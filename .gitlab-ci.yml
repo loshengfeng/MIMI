@@ -1,0 +1,12 @@
+image: "registry.silkrode.com.tw/team_mobile/mimi:1.0.1"
+
+stages:
+  - depoly
+
+depoly:
+  stage: depoly
+  script:
+    - fastlane init_env
+    - fastlane build_release
+  only:
+    - release
