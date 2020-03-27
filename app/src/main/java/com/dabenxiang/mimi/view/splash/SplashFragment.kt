@@ -10,7 +10,7 @@ class SplashFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        title.text = "Android"
+        title.text = "MiMi"
     }
 
     override fun getLayoutId(): Int {
