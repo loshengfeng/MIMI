@@ -1,0 +1,8 @@
+json_key_file("") # Path to the json secret file - Follow https://docs.fastlane.tools/actions/supply/#setup to get one
+package_name("com.dabenxiang.mimi") # e.g. com.krausefx.app
+
+ENV["ANDROID_SDK_DIR"]="sdk.dir=/android-sdk-linux"
+ENV["SLACK_HOOK_URL"]="https://hooks.slack.com/services/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"
+ENV["KEYSTORE_PATH"]="keystore/release.keystore"
+ENV["KEY_PASSWORD"]="android"
+ENV["KEY_ALIAS"]="androiddebugkey"
