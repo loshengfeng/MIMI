@@ -4,7 +4,7 @@ import com.dabenxiang.mimi.model.vo.ProfileData
 import com.dabenxiang.mimi.model.vo.TokenData
 import com.google.gson.Gson
 
-class Pref(private val gson: Gson, preferenceFileName: String) : AbstractPref(preferenceFileName) {
+class Pref(private val gson: Gson, preferenceFileName: String, isDebug: Boolean) : AbstractPref(preferenceFileName, isDebug) {
 
     private val tokenPref = StringPref("TOKEN")
     private val aesKeyPref = StringPref("AES_KEY")
@@ -14,11 +14,13 @@ class Pref(private val gson: Gson, preferenceFileName: String) : AbstractPref(pr
     var token: TokenData
         get() =
             try {
+                println("@@.....")
                 gson.fromJson(tokenPref.get(), TokenData::class.java)
             } catch (e: Exception) {
                 TokenData()
             }
         set(value) {
+            println("@@.....")
             tokenPref.set(gson.toJson(value))
         }
 
@@ -35,11 +37,11 @@ class Pref(private val gson: Gson, preferenceFileName: String) : AbstractPref(pr
 
     var aesKey: String
         get() = aesKeyPref.get().toString()
-        set(strAESKey) = aesKeyPref.set(strAESKey)
+        set(value) = aesKeyPref.set(value)
 
     var disableEllipsize: Boolean
         get() = ellipsizeKeyPref.get()
-        set(disable) = ellipsizeKeyPref.set(disable)
+        set(value) = ellipsizeKeyPref.set(value)
 
     fun clearToken() {
         tokenPref.remove()

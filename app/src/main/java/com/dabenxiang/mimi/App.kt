@@ -6,7 +6,6 @@ import com.dabenxiang.mimi.Constant.Companion.FLURRY_API_KEY
 import com.dabenxiang.mimi.di.apiModule
 import com.dabenxiang.mimi.di.appModule
 import com.dabenxiang.mimi.di.viewModelModule
-import com.dabenxiang.mimi.model.pref.Pref
 import com.facebook.stetho.Stetho
 import com.flurry.android.FlurryAgent
 import org.koin.android.ext.koin.androidContext
@@ -18,7 +17,6 @@ class App : Application() {
 
     companion object {
         lateinit var self: Application
-        var pref: Pref? = null
         fun applicationContext(): Application {
             return self
         }

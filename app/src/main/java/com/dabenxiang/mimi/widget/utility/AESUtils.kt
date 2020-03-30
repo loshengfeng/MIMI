@@ -1,14 +1,18 @@
 package com.dabenxiang.mimi.widget.utility
 
 import android.util.Base64
-import com.dabenxiang.mimi.App
+import com.dabenxiang.mimi.model.pref.Pref
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import timber.log.Timber
 import java.security.SecureRandom
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
-object AESUtils {
+object AESUtils : KoinComponent {
+
+    private val pref: Pref by inject()
 
     private val keyValue = byteArrayOf(
         'd'.toByte(),
@@ -83,7 +87,7 @@ object AESUtils {
 
     @Throws(Exception::class)
     private fun getRawKey(): ByteArray {
-        val key = SecretKeySpec(getAESkey(), "AES")
+        val key = SecretKeySpec(getAESKey(), "AES")
         return key.encoded
     }
 
@@ -97,7 +101,7 @@ object AESUtils {
 
     @Throws(Exception::class)
     private fun decrypt(encrypted: ByteArray): ByteArray {
-        val skeySpec = SecretKeySpec(getAESkey(), "AES")
+        val skeySpec = SecretKeySpec(getAESKey(), "AES")
         val cipher = Cipher.getInstance("AES")
         cipher.init(Cipher.DECRYPT_MODE, skeySpec)
         return cipher.doFinal(encrypted)
@@ -130,12 +134,12 @@ object AESUtils {
         sb.append(HEX[b.toInt() shr 4 and 0x0f]).append(HEX[b.toInt() and 0x0f])
     }
 
-    private fun getAESkey(): ByteArray {
+    private fun getAESKey(): ByteArray {
         return decodeAESKey(
-            if (App.pref?.aesKey!!.isBlank()) {
+            if (pref.aesKey.isBlank()) {
                 genAESKey()
             } else {
-                App.pref?.aesKey!!
+                pref.aesKey
             }
         )
     }
@@ -148,7 +152,7 @@ object AESUtils {
         val secureRandom = SecureRandom()
         secureRandom.nextBytes(aesByteArray)
         val str64 = Base64.encodeToString(aesByteArray, Base64.DEFAULT)
-        App.pref?.aesKey = str64
+        pref.aesKey = str64
         return str64
     }
 

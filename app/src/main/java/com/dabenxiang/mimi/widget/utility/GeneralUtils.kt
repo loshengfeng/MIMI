@@ -9,10 +9,14 @@ import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import com.blankj.utilcode.util.EncodeUtils
 import com.blankj.utilcode.util.ImageUtils
-import com.dabenxiang.mimi.App
+import com.dabenxiang.mimi.model.pref.Pref
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import timber.log.Timber
 
-object GeneralUtils {
+object GeneralUtils : KoinComponent {
+
+    private val pref: Pref by inject()
 
     fun showToast(context: Context, text: String) {
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
@@ -33,9 +37,9 @@ object GeneralUtils {
     }
 
     fun getEllipsizeString(text: String, startIndex: Int = 2, endIndex: Int = 2): String {
-        Timber.i("Disable ellipsize :${App.pref?.disableEllipsize}")
-        val disableEllipsize = App.pref?.disableEllipsize
-        if (disableEllipsize != null && disableEllipsize) return text
+        Timber.i("Disable ellipsize :${pref.disableEllipsize}")
+        val disableEllipsize = pref.disableEllipsize
+        if (disableEllipsize) return text
 
         var ellipsize = ""
 
