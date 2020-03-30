@@ -14,13 +14,11 @@ class Pref(private val gson: Gson, preferenceFileName: String, isDebug: Boolean)
     var token: TokenData
         get() =
             try {
-                println("@@.....")
                 gson.fromJson(tokenPref.get(), TokenData::class.java)
             } catch (e: Exception) {
                 TokenData()
             }
         set(value) {
-            println("@@.....")
             tokenPref.set(gson.toJson(value))
         }
 
