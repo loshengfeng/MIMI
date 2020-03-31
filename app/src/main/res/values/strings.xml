@@ -5,5 +5,13 @@
     <string name="server_error">无法连线．请检查您的网路环境</string>
     <string name="confirm">确定</string>
     <string name="close">关闭</string>
+    <string name="btn_close">取消</string>
+    <string name="register">注册</string>
+    <string name="login">登录</string>
+    <string name="login_name">请填写名称</string>
+    <string name="login_email">请填写Email</string>
+    <string name="login_desc">点选「注册」即表示您同意接受服务条款及隐私权保护政策</string>
+    <string name="login_keep_account">记住帐号</string>
+    <string name="login_forget">忘记密码</string>
 
 </resources>
