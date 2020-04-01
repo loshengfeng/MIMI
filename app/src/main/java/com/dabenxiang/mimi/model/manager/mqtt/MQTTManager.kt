@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.model.mqtt
+package com.dabenxiang.mimi.model.manager.mqtt
 
 import android.content.Context
 import org.eclipse.paho.android.service.MqttAndroidClient
@@ -10,27 +10,23 @@ class MQTTManager(val context: Context) {
     lateinit var client: MqttAndroidClient
     lateinit var options: MqttConnectOptions
 
-    fun init(serverUrl: String, clientId: String) {
+    fun init(serverUrl: String, clientId: String, extendedCallback: ExtendedCallback) {
         client = MqttAndroidClient(context, serverUrl, clientId)
         client.setCallback(object : MqttCallbackExtended {
-            override fun connectComplete(reconnect: Boolean, serverURI: String?) {
-                Timber.d("Connect: $serverURI")
-                if (reconnect) {
-                    // TODO:
-                }
+            override fun connectComplete(reconnect: Boolean, serverURI: String) {
+                extendedCallback.onConnectComplete(reconnect, serverURI)
             }
 
             override fun messageArrived(topic: String, message: MqttMessage) {
-                Timber.d("Incoming topic:: $topic")
-                Timber.d("Incoming message:: ${String(message.payload)}")
+                extendedCallback.onMessageArrived(topic, message)
             }
 
             override fun connectionLost(cause: Throwable) {
-                Timber.e("The Connection was lost: $cause")
+                extendedCallback.onConnectionLost(cause)
             }
 
             override fun deliveryComplete(token: IMqttDeliveryToken) {
-                Timber.d("deliveryComplete message:: ${String(token.message.payload)}")
+                extendedCallback.onDeliveryComplete(token)
             }
         })
 
@@ -39,10 +35,9 @@ class MQTTManager(val context: Context) {
         options.isCleanSession = false
     }
 
-    fun connect() {
+    fun connect(connectCallback: ConnectCallback) {
         client.connect(options, null, object : IMqttActionListener {
             override fun onSuccess(asyncActionToken: IMqttToken) {
-                Timber.d("Connection onSuccess")
                 val disconnectedBufferOptions = DisconnectedBufferOptions()
                 disconnectedBufferOptions.isBufferEnabled = true
                 disconnectedBufferOptions.bufferSize = 100
@@ -50,28 +45,28 @@ class MQTTManager(val context: Context) {
                 disconnectedBufferOptions.isDeleteOldestMessages = false
                 client.setBufferOpts(disconnectedBufferOptions)
 
-//                subscribeToTopic("topic")
+                connectCallback.onSuccess(asyncActionToken)
             }
 
             override fun onFailure(asyncActionToken: IMqttToken, exception: Throwable) {
-                Timber.e("Connection onFailure: $exception")
+                connectCallback.onFailure(asyncActionToken, exception)
             }
         })
     }
 
-    fun subscribeToTopic(subscriptionTopic: String) {
+    fun subscribeToTopic(subscriptionTopic: String, subscribeCallback: SubscribeCallback) {
         client.subscribe(subscriptionTopic, 0, null, object : IMqttActionListener {
-            override fun onSuccess(asyncActionToken: IMqttToken?) {
-                Timber.d("Subscribed")
+            override fun onSuccess(asyncActionToken: IMqttToken) {
+                subscribeCallback.onSuccess(asyncActionToken)
             }
 
-            override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                Timber.e("Failed to subscribe: $exception")
+            override fun onFailure(asyncActionToken: IMqttToken, exception: Throwable) {
+                subscribeCallback.onFailure(asyncActionToken, exception)
             }
         })
 
         client.subscribe(subscriptionTopic, 0) { topic, message ->
-            Timber.d("Message: $topic , ${String(message.payload)}")
+            subscribeCallback.onSubscribe(topic, message)
         }
     }
 

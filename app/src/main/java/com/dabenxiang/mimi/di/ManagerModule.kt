@@ -1,7 +1,7 @@
 package com.dabenxiang.mimi.di
 
 import android.content.Context
-import com.dabenxiang.mimi.model.mqtt.MQTTManager
+import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager
 import org.koin.dsl.module
 
 val managerModule = module {
