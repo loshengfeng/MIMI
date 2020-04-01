@@ -6,5 +6,6 @@ class ApiRepository(private val apiService: ApiService) {
         const val MEDIA_TYPE_JSON = "application/json"
     }
 
+    suspend fun fetchHomeCategories() = apiService.fetchHomeCategories()
 }
 
