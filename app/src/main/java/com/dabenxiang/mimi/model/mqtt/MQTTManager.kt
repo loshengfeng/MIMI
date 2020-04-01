@@ -66,12 +66,12 @@ class MQTTManager(val context: Context) {
             }
 
             override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                Timber.d("Failed to subscribe")
+                Timber.e("Failed to subscribe: $exception")
             }
         })
 
         client.subscribe(subscriptionTopic, 0) { topic, message ->
-            Timber.d("Message: $topic , : ${String(message.payload)}")
+            Timber.d("Message: $topic , ${String(message.payload)}")
         }
     }
 
