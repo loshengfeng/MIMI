@@ -7,12 +7,12 @@ import timber.log.Timber
 
 class MQTTManager(val context: Context) {
 
-    lateinit var client: MqttAndroidClient
-    lateinit var options: MqttConnectOptions
+    private var client: MqttAndroidClient? = null
+    private var options: MqttConnectOptions? = null
 
     fun init(serverUrl: String, clientId: String, extendedCallback: ExtendedCallback) {
         client = MqttAndroidClient(context, serverUrl, clientId)
-        client.setCallback(object : MqttCallbackExtended {
+        client?.setCallback(object : MqttCallbackExtended {
             override fun connectComplete(reconnect: Boolean, serverURI: String) {
                 extendedCallback.onConnectComplete(reconnect, serverURI)
             }
@@ -31,19 +31,19 @@ class MQTTManager(val context: Context) {
         })
 
         options = MqttConnectOptions()
-        options.isAutomaticReconnect = true
-        options.isCleanSession = false
+        options?.isAutomaticReconnect = true
+        options?.isCleanSession = false
     }
 
     fun connect(connectCallback: ConnectCallback) {
-        client.connect(options, null, object : IMqttActionListener {
+        client?.connect(options, null, object : IMqttActionListener {
             override fun onSuccess(asyncActionToken: IMqttToken) {
                 val disconnectedBufferOptions = DisconnectedBufferOptions()
                 disconnectedBufferOptions.isBufferEnabled = true
                 disconnectedBufferOptions.bufferSize = 100
                 disconnectedBufferOptions.isPersistBuffer = false
                 disconnectedBufferOptions.isDeleteOldestMessages = false
-                client.setBufferOpts(disconnectedBufferOptions)
+                client?.setBufferOpts(disconnectedBufferOptions)
 
                 connectCallback.onSuccess(asyncActionToken)
             }
@@ -54,8 +54,14 @@ class MQTTManager(val context: Context) {
         })
     }
 
+    fun disconnect() {
+        if (client != null) {
+            client?.disconnect()
+        }
+    }
+
     fun subscribeToTopic(subscriptionTopic: String, subscribeCallback: SubscribeCallback) {
-        client.subscribe(subscriptionTopic, 0, null, object : IMqttActionListener {
+        client?.subscribe(subscriptionTopic, 0, null, object : IMqttActionListener {
             override fun onSuccess(asyncActionToken: IMqttToken) {
                 subscribeCallback.onSuccess(asyncActionToken)
             }
@@ -65,7 +71,7 @@ class MQTTManager(val context: Context) {
             }
         })
 
-        client.subscribe(subscriptionTopic, 0) { topic, message ->
+        client?.subscribe(subscriptionTopic, 0) { topic, message ->
             subscribeCallback.onSubscribe(topic, message)
         }
     }
@@ -73,11 +79,11 @@ class MQTTManager(val context: Context) {
     fun publishMessage(publishTopic: String, publishMessage: String) {
         val message = MqttMessage()
         message.payload = publishMessage.toByteArray()
-        client.publish(publishTopic, message)
+        client?.publish(publishTopic, message)
         Timber.d("Message Published")
 
-        if (!client.isConnected) {
-            Timber.d("${client.bufferedMessageCount} messages in buffer.")
+        if (!client!!.isConnected) {
+            Timber.d("${client?.bufferedMessageCount} messages in buffer.")
         }
     }
 }
