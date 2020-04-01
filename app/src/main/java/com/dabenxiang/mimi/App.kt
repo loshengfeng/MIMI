@@ -31,7 +31,7 @@ class App : Application() {
         super.onCreate()
 
         if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
+            Timber.plant(DebugLogTree())
             Stetho.initializeWithDefaults(this)
         } else {
             FlurryAgent.Builder()
@@ -56,4 +56,20 @@ class App : Application() {
         }
     }
 
+}
+
+class DebugLogTree : Timber.DebugTree() {
+
+    companion object {
+        const val TAG_GLOBAL = "mimi"
+        const val FORMAT_MESSAGE = "%s: %s"
+    }
+
+    override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+        super.log(priority, TAG_GLOBAL, String.format(FORMAT_MESSAGE, tag, message), t)
+    }
+
+    override fun createStackElementTag(element: StackTraceElement): String? {
+        return "(${element.fileName}:${element.lineNumber})"
+    }
 }
