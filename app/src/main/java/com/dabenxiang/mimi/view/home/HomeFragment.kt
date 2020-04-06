@@ -44,14 +44,15 @@ class HomeFragment : BaseFragment() {
             }
         })
 
+        // todo for Test
+//        Handler().postDelayed({
+//            Navigation.findNavController(view!!).navigate(R.id.action_homeFragment_to_loginFragment)
+//        }, 1500)
+
     }
 
     override fun setupObservers() {
         Timber.d("${HomeFragment::class.java.simpleName}_setupObservers")
-
-        Handler().postDelayed({
-            Navigation.findNavController(view!!).navigate(R.id.action_homeFragment_to_loginFragment)
-        }, 3000)
     }
 
     override fun setupListeners() {

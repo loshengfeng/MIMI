@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.login
 
 import android.os.Bundle
 import android.view.View
+import androidx.navigation.Navigation
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -52,12 +53,14 @@ class LoginFragment : BaseFragment() {
 
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
+                R.id.btnClose -> Navigation.findNavController(view!!).navigateUp()
                 R.id.btnRegisterCancel, R.id.btnLoginCancel -> GeneralUtils.showToast(context!!, "Cancel")
                 R.id.btnRegister -> GeneralUtils.showToast(context!!, "Register")
                 R.id.btnForget -> GeneralUtils.showToast(context!!, "Forget")
                 R.id.btnLogin -> GeneralUtils.showToast(context!!, "btnLogin")
             }
         }.also {
+            btnClose.setOnClickListener(it)
             btnRegisterCancel.setOnClickListener(it)
             btnLoginCancel.setOnClickListener(it)
             btnRegister.setOnClickListener(it)
