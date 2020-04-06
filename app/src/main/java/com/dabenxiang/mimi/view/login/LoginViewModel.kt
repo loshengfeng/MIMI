@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.login
 
-import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.view.base.BaseViewModel
 
 class LoginViewModel : BaseViewModel() {

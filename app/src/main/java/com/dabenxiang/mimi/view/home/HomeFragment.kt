@@ -21,11 +21,14 @@ class HomeFragment : BaseFragment() {
             activity.window.statusBarColor = activity.getColor(R.color.color_bar)
         }
 
-        bottom_navigation.setOnNavigationItemSelectedListener { item ->
-            Timber.d("Selected: $item")
-            true
-        }
-
         //viewModel.loadHomeCategories()
+    }
+
+    override fun setupObservers() {
+        TODO("Not yet implemented")
+    }
+
+    override fun setupListeners() {
+        TODO("Not yet implemented")
     }
 }

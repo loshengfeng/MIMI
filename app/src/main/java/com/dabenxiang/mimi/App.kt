@@ -66,8 +66,22 @@ class DebugLogTree : Timber.DebugTree() {
     }
 
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-        super.log(priority, TAG_GLOBAL, String.format(FORMAT_MESSAGE, tag, message), t)
-    }
+        var priority = priority
+        var tag = tag
+        var message = message
+
+        val logFormatMsg = StringBuilder("[")
+            .append(Thread.currentThread().name)
+            .append(" Thread")
+            .append("] ")
+            .append(message)
+            .toString()
+
+        message = String.format(FORMAT_MESSAGE, tag, logFormatMsg)
+
+        tag = TAG_GLOBAL
+
+        super.log(priority, tag, message, t)    }
 
     override fun createStackElementTag(element: StackTraceElement): String? {
         return "(${element.fileName}:${element.lineNumber})"

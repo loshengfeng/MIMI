@@ -28,4 +28,12 @@ class MessengerFragment : BaseFragment() {
     override fun getLayoutId(): Int {
         return R.layout.fragment_messenger
     }
+
+    override fun setupObservers() {
+        TODO("Not yet implemented")
+    }
+
+    override fun setupListeners() {
+        TODO("Not yet implemented")
+    }
 }

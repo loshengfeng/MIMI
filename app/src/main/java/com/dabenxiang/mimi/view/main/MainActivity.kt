@@ -4,8 +4,10 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import android.os.Bundle
 import android.util.DisplayMetrics
+import androidx.navigation.Navigation
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseActivity
+import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : BaseActivity() {
@@ -27,6 +29,35 @@ class MainActivity : BaseActivity() {
             resources.configuration.densityDpi = metrics.densityDpi
             resources.configuration.fontScale = 1f
             baseContext.resources.updateConfiguration(resources.configuration, metrics)
+        }
+
+        bottom_navigation.setOnNavigationItemSelectedListener {
+            return@setOnNavigationItemSelectedListener when (it.itemId) {
+                R.id.btn_nav_home -> {
+                    Navigation.findNavController(this, R.id.nav_host_fragment)
+                        .navigate(R.id.action_bottom_nav_to_homeFragment)
+                    true
+                }
+
+                R.id.btn_nav_reload -> {
+                    Navigation.findNavController(this, R.id.nav_host_fragment)
+                        .navigate(R.id.action_bottom_nav_to_reloadFragment)
+                    true
+                }
+
+                R.id.btn_nav_favorite -> {
+                    Navigation.findNavController(this, R.id.nav_host_fragment)
+                        .navigate(R.id.action_bottom_nav_to_favoriteFragment)
+                    true
+                }
+
+                R.id.btn_nav_personal -> {
+                    Navigation.findNavController(this, R.id.nav_host_fragment)
+                        .navigate(R.id.action_bottom_nav_to_personalFragment)
+                    true
+                }
+                else -> false
+            }
         }
     }
 

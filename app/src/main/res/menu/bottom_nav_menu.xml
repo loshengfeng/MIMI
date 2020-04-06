@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/action_page_1"
+        android:id="@+id/btn_nav_home"
         android:enabled="true"
         android:icon="@drawable/btn_home"
-        android:title="Home1" />
+        android:title="@string/nav_home" />
     <item
-        android:id="@+id/action_page_2"
+        android:id="@+id/btn_nav_reload"
         android:enabled="true"
         android:icon="@drawable/btn_micoin"
-        android:title="Home2" />
+        android:title="@string/nav_reload" />
     <item
-        android:id="@+id/action_page_3"
+        android:id="@+id/btn_nav_favorite"
         android:enabled="true"
         android:icon="@drawable/btn_favorite"
-        android:title="Home3" />
+        android:title="@string/nav_favorite" />
     <item
-        android:id="@+id/action_page_4"
+        android:id="@+id/btn_nav_personal"
         android:enabled="true"
         android:icon="@drawable/btn_mine"
-        android:title="Home4" />
+        android:title="@string/nav_personal" />
 </menu>

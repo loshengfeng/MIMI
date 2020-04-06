@@ -6,8 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
+import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.main.MainViewModel
 import com.kaopiz.kprogresshud.KProgressHUD
+import kotlinx.android.synthetic.main.activity_main.*
 
 abstract class BaseFragment : Fragment() {
 
@@ -33,8 +35,17 @@ abstract class BaseFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         progressHUD = KProgressHUD.create(context)
             .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+
+        (activity as MainActivity?)?.also {
+            it.bottom_navigation?.visibility = bottomNavigationVisibility
+        }
     }
 
     abstract fun getLayoutId(): Int
 
+    abstract fun setupObservers()
+
+    abstract fun setupListeners()
+
+    open val bottomNavigationVisibility: Int = View.VISIBLE
 }

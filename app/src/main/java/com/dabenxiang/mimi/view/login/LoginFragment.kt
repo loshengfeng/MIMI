@@ -40,6 +40,14 @@ class LoginFragment: BaseFragment(), OnPermissionListener {
         return  R.layout.fragment_login
     }
 
+    override fun setupObservers() {
+        TODO("Not yet implemented")
+    }
+
+    override fun setupListeners() {
+        TODO("Not yet implemented")
+    }
+
     override fun onAllPermissionsGranted() {
         // todo
     }
