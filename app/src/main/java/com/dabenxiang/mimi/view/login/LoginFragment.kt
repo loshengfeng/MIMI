@@ -6,6 +6,7 @@ import android.view.View
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
 import org.koin.android.viewmodel.ext.android.viewModel
+import timber.log.Timber
 
 class LoginFragment: BaseFragment(), OnPermissionListener {
 
@@ -41,11 +42,11 @@ class LoginFragment: BaseFragment(), OnPermissionListener {
     }
 
     override fun setupObservers() {
-        TODO("Not yet implemented")
+        Timber.d("${LoginFragment::class.java.simpleName}_setupObservers")
     }
 
     override fun setupListeners() {
-        TODO("Not yet implemented")
+        Timber.d("${LoginFragment::class.java.simpleName}_setupListeners")
     }
 
     override fun onAllPermissionsGranted() {

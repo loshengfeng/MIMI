@@ -39,6 +39,9 @@ abstract class BaseFragment : Fragment() {
         (activity as MainActivity?)?.also {
             it.bottom_navigation?.visibility = bottomNavigationVisibility
         }
+
+        setupListeners()
+        setupObservers()
     }
 
     abstract fun getLayoutId(): Int

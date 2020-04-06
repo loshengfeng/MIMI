@@ -25,10 +25,10 @@ class HomeFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        TODO("Not yet implemented")
+        Timber.d("${HomeFragment::class.java.simpleName}_setupObservers")
     }
 
     override fun setupListeners() {
-        TODO("Not yet implemented")
+        Timber.d("${HomeFragment::class.java.simpleName}_setupListeners")
     }
 }

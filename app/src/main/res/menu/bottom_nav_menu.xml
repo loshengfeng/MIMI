@@ -6,10 +6,10 @@
         android:icon="@drawable/btn_home"
         android:title="@string/nav_home" />
     <item
-        android:id="@+id/btn_nav_reload"
+        android:id="@+id/btn_nav_topup"
         android:enabled="true"
         android:icon="@drawable/btn_micoin"
-        android:title="@string/nav_reload" />
+        android:title="@string/nav_topup" />
     <item
         android:id="@+id/btn_nav_favorite"
         android:enabled="true"

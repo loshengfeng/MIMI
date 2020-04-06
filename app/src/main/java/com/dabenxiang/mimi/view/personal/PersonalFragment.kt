@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.personal
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
 import org.koin.android.viewmodel.ext.android.viewModel
+import timber.log.Timber
 
 
 class PersonalFragment : BaseFragment() {
@@ -13,11 +14,11 @@ class PersonalFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        TODO("Not yet implemented")
+        Timber.d("${PersonalFragment::class.java.simpleName}_setupObservers")
     }
 
     override fun setupListeners() {
-        TODO("Not yet implemented")
+        Timber.d("${PersonalFragment::class.java.simpleName}_setupListeners")
     }
 
 }

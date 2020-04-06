@@ -3,7 +3,7 @@
 
     <!-- nav button-->
     <string name="nav_home">首页</string>
-    <string name="nav_reload">充值</string>
+    <string name="nav_topup">充值</string>
     <string name="nav_favorite">收藏</string>
     <string name="nav_personal">我的</string>
 

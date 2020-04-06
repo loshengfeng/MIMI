@@ -81,7 +81,8 @@ class DebugLogTree : Timber.DebugTree() {
 
         tag = TAG_GLOBAL
 
-        super.log(priority, tag, message, t)    }
+        super.log(priority, tag, message, t)
+    }
 
     override fun createStackElementTag(element: StackTraceElement): String? {
         return "(${element.fileName}:${element.lineNumber})"

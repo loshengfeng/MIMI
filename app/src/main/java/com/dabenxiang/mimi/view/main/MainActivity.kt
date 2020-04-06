@@ -39,9 +39,9 @@ class MainActivity : BaseActivity() {
                     true
                 }
 
-                R.id.btn_nav_reload -> {
+                R.id.btn_nav_topup -> {
                     Navigation.findNavController(this, R.id.nav_host_fragment)
-                        .navigate(R.id.action_bottom_nav_to_reloadFragment)
+                        .navigate(R.id.action_bottom_nav_to_topupFragment)
                     true
                 }
 

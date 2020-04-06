@@ -23,8 +23,8 @@
         tools:layout="@layout/fragment_home">
 
         <action
-            android:id="@+id/action_bottom_nav_to_reloadFragment"
-            app:destination="@id/reloadFragment"
+            android:id="@+id/action_bottom_nav_to_topupFragment"
+            app:destination="@id/topupFragment"
             app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="true" />
 
@@ -41,8 +41,8 @@
             app:popUpToInclusive="true" />
 
         <action
-            android:id="@+id/action_homeFragment_to_reloadFragment"
-            app:destination="@id/reloadFragment"
+            android:id="@+id/action_homeFragment_to_topupFragment"
+            app:destination="@id/topupFragment"
             app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="true" />
 
@@ -61,44 +61,44 @@
     </fragment>
 
     <fragment
-        android:id="@+id/reloadFragment"
-        android:name="com.dabenxiang.mimi.view.reload.ReloadFragment"
-        tools:layout="@layout/fragment_reload">
+        android:id="@+id/topupFragment"
+        android:name="com.dabenxiang.mimi.view.topup.TopupFragment"
+        tools:layout="@layout/fragment_topup">
 
         <action
             android:id="@+id/action_bottom_nav_to_homeFragment"
             app:destination="@id/homeFragment"
-            app:popUpTo="@id/reloadFragment"
+            app:popUpTo="@id/topupFragment"
             app:popUpToInclusive="true" />
 
         <action
             android:id="@+id/action_bottom_nav_to_favoriteFragment"
             app:destination="@id/favoriteFragment"
-            app:popUpTo="@id/reloadFragment"
+            app:popUpTo="@id/topupFragment"
             app:popUpToInclusive="true" />
 
         <action
             android:id="@+id/action_bottom_nav_to_personalFragment"
             app:destination="@id/personalFragment"
-            app:popUpTo="@id/reloadFragment"
+            app:popUpTo="@id/topupFragment"
             app:popUpToInclusive="true" />
 
         <action
-            android:id="@+id/action_reloadFragment_to_homeFragment"
+            android:id="@+id/action_topupFragment_to_homeFragment"
             app:destination="@id/homeFragment"
-            app:popUpTo="@id/reloadFragment"
+            app:popUpTo="@id/topupFragment"
             app:popUpToInclusive="true" />
 
         <action
-            android:id="@+id/action_reloadFragment_to_favoriteFragment"
+            android:id="@+id/action_topupFragment_to_favoriteFragment"
             app:destination="@id/favoriteFragment"
-            app:popUpTo="@id/reloadFragment"
+            app:popUpTo="@id/topupFragment"
             app:popUpToInclusive="true" />
 
         <action
-            android:id="@+id/action_reloadFragment_to_personalFragment"
+            android:id="@+id/action_topupFragment_to_personalFragment"
             app:destination="@id/personalFragment"
-            app:popUpTo="@id/reloadFragment"
+            app:popUpTo="@id/topupFragment"
             app:popUpToInclusive="true" />
     </fragment>
 
@@ -114,8 +114,8 @@
             app:popUpToInclusive="true" />
 
         <action
-            android:id="@+id/action_bottom_nav_to_reloadFragment"
-            app:destination="@id/reloadFragment"
+            android:id="@+id/action_bottom_nav_to_topupFragment"
+            app:destination="@id/topupFragment"
             app:popUpTo="@id/favoriteFragment"
             app:popUpToInclusive="true" />
 
@@ -132,8 +132,8 @@
             app:popUpToInclusive="true" />
 
         <action
-            android:id="@+id/action_favoriteFragment_to_reloadFragment"
-            app:destination="@id/reloadFragment"
+            android:id="@+id/action_favoriteFragment_to_topupFragment"
+            app:destination="@id/topupFragment"
             app:popUpTo="@id/favoriteFragment"
             app:popUpToInclusive="true" />
 
@@ -156,8 +156,8 @@
             app:popUpToInclusive="true" />
 
         <action
-            android:id="@+id/action_bottom_nav_to_reloadFragment"
-            app:destination="@id/reloadFragment"
+            android:id="@+id/action_bottom_nav_to_topupFragment"
+            app:destination="@id/topupFragment"
             app:popUpTo="@id/personalFragment"
             app:popUpToInclusive="true" />
 
@@ -174,8 +174,8 @@
             app:popUpToInclusive="true" />
 
         <action
-            android:id="@+id/action_personalFragment_to_reloadFragment"
-            app:destination="@id/reloadFragment"
+            android:id="@+id/action_personalFragment_to_topupFragment"
+            app:destination="@id/topupFragment"
             app:popUpTo="@id/personalFragment"
             app:popUpToInclusive="true" />
 
