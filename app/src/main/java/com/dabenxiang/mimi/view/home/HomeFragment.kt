@@ -2,7 +2,9 @@ package com.dabenxiang.mimi.view.home
 
 import android.os.Bundle
 import android.view.View
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.view.adapter.LeaderboardAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -42,6 +44,10 @@ class HomeFragment : BaseFragment() {
             }
         })
 
+        val layoutManager = LinearLayoutManager(activity!!)
+        layoutManager.orientation = LinearLayoutManager.HORIZONTAL
+        recyclerview_leaderboard.layoutManager = layoutManager
+        recyclerview_leaderboard.adapter = LeaderboardAdapter()
     }
 
     override fun setupObservers() {

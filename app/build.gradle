@@ -216,6 +216,8 @@ dependencies {
     // AndroidUtilCode
     implementation "com.blankj:utilcodex:$utilcodex_version"
 
+    implementation 'com.github.yulichswift:RoundedViews:1.1.0'
+
     // Test
     testImplementation "io.mockk:mockk:$mokk_version"
     testImplementation "junit:junit:$junit_version"

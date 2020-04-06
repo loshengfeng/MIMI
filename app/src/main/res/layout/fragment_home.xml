@@ -75,20 +75,86 @@
             app:layout_constraintStart_toEndOf="@id/iv_search"
             app:layout_constraintTop_toTopOf="@id/iv_bg_search" />
 
-        <Button
+
+        <com.yulichswift.roundedview.widget.RoundedTextView
             android:id="@+id/btn_all"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:background="@drawable/bg_black_1_05"
+            android:clickable="true"
             android:drawableStart="@drawable/ico_filter"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
+            android:paddingStart="6dp"
+            android:paddingEnd="12dp"
+            android:singleLine="true"
             android:text="全部"
             android:textColor="@color/color_black_1"
             android:textSize="14sp"
+            app:btn_corner_radius="6dp"
+            app:btn_pressed_color="@color/color_red_1"
+            app:btn_solid_color="@color/color_black_1_05"
             app:layout_constraintBottom_toBottomOf="@id/iv_bg_search"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/iv_bg_search" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layout_search_bar">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="60dp"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/iv_cate1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:src="@drawable/ico_data"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_cate1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:text="熱門"
+                    android:textColor="@color/color_black_1"
+                    app:layout_constraintBottom_toBottomOf="@id/iv_cate1"
+                    app:layout_constraintStart_toEndOf="@id/iv_cate1"
+                    app:layout_constraintTop_toTopOf="@id/iv_cate1" />
+
+                <TextView
+                    android:id="@+id/btn_cate1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:background="@null"
+                    android:drawableEnd="@drawable/btn_arrow_pink_n"
+                    android:text="更多"
+                    android:textColor="@color/color_red_1"
+                    app:layout_constraintBottom_toBottomOf="@id/iv_cate1"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/iv_cate1" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerview_leaderboard"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal"
+                    app:layout_constraintTop_toBottomOf="@id/iv_cate1" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
