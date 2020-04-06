@@ -42,6 +42,7 @@ abstract class BaseFragment : Fragment() {
 
         setupListeners()
         setupObservers()
+        initSettings()
     }
 
     abstract fun getLayoutId(): Int
@@ -49,6 +50,8 @@ abstract class BaseFragment : Fragment() {
     abstract fun setupObservers()
 
     abstract fun setupListeners()
+
+    abstract fun initSettings()
 
     open val bottomNavigationVisibility: Int = View.VISIBLE
 }

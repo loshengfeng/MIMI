@@ -1,7 +1,9 @@
 package com.dabenxiang.mimi.view.home
 
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
+import androidx.navigation.Navigation
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.google.android.material.tabs.TabLayout
@@ -46,9 +48,17 @@ class HomeFragment : BaseFragment() {
 
     override fun setupObservers() {
         Timber.d("${HomeFragment::class.java.simpleName}_setupObservers")
+
+        Handler().postDelayed({
+            Navigation.findNavController(view!!).navigate(R.id.action_homeFragment_to_loginFragment)
+        }, 3000)
     }
 
     override fun setupListeners() {
         Timber.d("${HomeFragment::class.java.simpleName}_setupListeners")
+    }
+
+    override fun initSettings() {
+        Timber.d("${HomeFragment::class.java.simpleName}_initSettings")
     }
 }

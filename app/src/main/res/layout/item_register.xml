@@ -1,204 +1,202 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="50dp"
+    android:paddingStart="30dp"
+    android:paddingEnd="30dp"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
+
+    <EditText
+        android:id="@+id/edtRegisterName"
+        style="@style/login_edit_text"
+        android:layout_marginTop="0dp"
         android:layout_height="wrap_content"
-        android:paddingStart="30dp"
-        android:paddingTop="50dp"
-        android:paddingEnd="30dp"
+        android:width="0dp"
+        android:hint="@string/login_name"
+        android:importantForAutofill="no"
+        android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <EditText
-            android:id="@+id/edtName"
-            style="@style/login_edit_text"
-            android:layout_height="wrap_content"
-            android:width="0dp"
-            android:hint="@string/login_name"
-            android:importantForAutofill="no"
-            android:inputType="text"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <CheckBox
+        android:id="@+id/cbName"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/ico_checked_selector"
+        android:button="@null"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/edtRegisterName"
+        app:layout_constraintEnd_toEndOf="@id/edtRegisterName"
+        app:layout_constraintTop_toTopOf="@id/edtRegisterName"
+        tools:checked="true"
+        tools:visibility="visible" />
 
-        <CheckBox
-            android:id="@+id/cbName"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginEnd="12dp"
-            android:background="@drawable/ico_checked_selector"
-            android:button="@null"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@id/edtName"
-            app:layout_constraintEnd_toEndOf="@id/edtName"
-            app:layout_constraintTop_toTopOf="@id/edtName"
-            tools:checked="true"
-            tools:visibility="visible" />
+    <TextView
+        android:id="@+id/tvNameError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color_red_2"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtRegisterName"
+        tools:text="错误讯息"
+        tools:visibility="visible" />
 
-        <TextView
-            android:id="@+id/tvNameError"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/color_red_2"
-            android:textSize="12sp"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edtName"
-            tools:text="错误讯息"
-            tools:visibility="visible" />
+    <EditText
+        android:id="@+id/edtEmail"
+        style="@style/login_edit_text"
+        android:layout_height="wrap_content"
+        android:width="0dp"
+        android:hint="@string/login_email"
+        android:importantForAutofill="no"
+        android:inputType="textEmailAddress"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtRegisterName" />
 
-        <EditText
-            android:id="@+id/edtEmail"
-            style="@style/login_edit_text"
-            android:layout_height="wrap_content"
-            android:width="0dp"
-            android:hint="@string/login_email"
-            android:importantForAutofill="no"
-            android:inputType="textEmailAddress"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edtName" />
+    <CheckBox
+        android:id="@+id/cbEmail"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/ico_checked_selector"
+        android:button="@null"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/edtEmail"
+        app:layout_constraintEnd_toEndOf="@id/edtEmail"
+        app:layout_constraintTop_toTopOf="@id/edtEmail"
+        tools:checked="false"
+        tools:visibility="visible" />
 
-        <CheckBox
-            android:id="@+id/cbEmail"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginEnd="12dp"
-            android:background="@drawable/ico_checked_selector"
-            android:button="@null"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@id/edtEmail"
-            app:layout_constraintEnd_toEndOf="@id/edtEmail"
-            app:layout_constraintTop_toTopOf="@id/edtEmail"
-            tools:checked="false"
-            tools:visibility="visible" />
+    <TextView
+        android:id="@+id/tvEmailError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color_red_2"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtEmail"
+        tools:text="错误讯息"
+        tools:visibility="visible" />
 
-        <TextView
-            android:id="@+id/tvEmailError"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/color_red_2"
-            android:textSize="12sp"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edtEmail"
-            tools:text="错误讯息"
-            tools:visibility="visible" />
+    <EditText
+        android:id="@+id/edtRegisterPw"
+        style="@style/login_edit_text"
+        android:layout_height="wrap_content"
+        android:width="0dp"
+        android:importantForAutofill="no"
+        android:inputType="textPassword"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtEmail"
+        tools:ignore="LabelFor" />
 
-        <EditText
-            android:id="@+id/edtPw"
-            style="@style/login_edit_text"
-            android:layout_height="wrap_content"
-            android:width="0dp"
-            android:importantForAutofill="no"
-            android:inputType="textPassword"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edtEmail"
-            tools:ignore="LabelFor" />
+    <CheckBox
+        android:id="@+id/cbShowPw"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/ico_eye_selector"
+        android:button="@null"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/edtRegisterPw"
+        app:layout_constraintEnd_toEndOf="@id/edtRegisterPw"
+        app:layout_constraintTop_toTopOf="@id/edtRegisterPw"
+        tools:checked="true"
+        tools:visibility="visible" />
 
-        <CheckBox
-            android:id="@+id/cbShowPw"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="12dp"
-            android:background="@drawable/ico_eye_selector"
-            android:button="@null"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@id/edtPw"
-            app:layout_constraintEnd_toEndOf="@id/edtPw"
-            app:layout_constraintTop_toTopOf="@id/edtPw"
-            tools:checked="true"
-            tools:visibility="visible" />
+    <TextView
+        android:id="@+id/tvPwError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color_red_2"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtRegisterPw"
+        tools:text="错误讯息"
+        tools:visibility="visible" />
 
-        <TextView
-            android:id="@+id/tvPwError"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/color_red_2"
-            android:textSize="12sp"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edtPw"
-            tools:text="错误讯息"
-            tools:visibility="visible" />
+    <EditText
+        android:id="@+id/edtPwConfirm"
+        style="@style/login_edit_text"
+        android:layout_height="wrap_content"
+        android:width="0dp"
+        android:importantForAutofill="no"
+        android:inputType="textPassword"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtRegisterPw"
+        tools:ignore="LabelFor" />
 
-        <EditText
-            android:id="@+id/edtPwConfirm"
-            style="@style/login_edit_text"
-            android:layout_height="wrap_content"
-            android:width="0dp"
-            android:importantForAutofill="no"
-            android:inputType="textPassword"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edtPw"
-            tools:ignore="LabelFor" />
+    <CheckBox
+        android:id="@+id/cbShowPwConfirm"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/ico_eye_selector"
+        android:button="@null"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/edtPwConfirm"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/edtPwConfirm"
+        tools:visibility="visible" />
 
-        <CheckBox
-            android:id="@+id/cbShowPwConfirm"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="12dp"
-            android:background="@drawable/ico_eye_selector"
-            android:button="@null"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/edtPwConfirm"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/edtPwConfirm"
-            tools:visibility="visible" />
+    <TextView
+        android:id="@+id/tvPwConfirmError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color_red_2"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtPwConfirm"
+        tools:text="错误讯息"
+        tools:visibility="visible" />
 
-        <TextView
-            android:id="@+id/tvPwConfirmError"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/color_red_2"
-            android:textSize="12sp"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edtPwConfirm"
-            tools:text="错误讯息"
-            tools:visibility="visible" />
+    <TextView
+        android:id="@+id/tvDesc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/login_desc"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/edtPwConfirm" />
 
-        <TextView
-            android:id="@+id/tvDesc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="@string/login_desc"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edtPwConfirm" />
+    <Button
+        android:id="@+id/btnRegisterCancel"
+        android:layout_width="76dp"
+        android:layout_height="33dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/bg_cancel"
+        android:text="@string/btn_close"
+        android:textColor="@color/color_black_1_50"
+        app:layout_constraintEnd_toStartOf="@id/btnRegister"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvDesc" />
 
-        <Button
-            android:id="@+id/btnCancel"
-            android:layout_width="76dp"
-            android:layout_height="33dp"
-            android:layout_marginTop="30dp"
-            android:background="@drawable/bg_cancel"
-            android:text="@string/btn_close"
-            android:textColor="@color/color_black_1_50"
-            app:layout_constraintEnd_toStartOf="@id/btnRegister"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvDesc" />
-
-        <Button
-            android:id="@+id/btnRegister"
-            android:layout_width="76dp"
-            android:layout_height="33dp"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="30dp"
-            android:background="@drawable/bg_register"
-            android:text="@string/register"
-            android:textColor="@color/color_white_1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/btnCancel"
-            app:layout_constraintTop_toBottomOf="@id/tvDesc" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</layout>
+    <Button
+        android:id="@+id/btnRegister"
+        android:layout_width="76dp"
+        android:layout_height="33dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/bg_register"
+        android:text="@string/register"
+        android:textColor="@color/color_white_1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/btnRegisterCancel"
+        app:layout_constraintTop_toBottomOf="@id/tvDesc" />
+</androidx.constraintlayout.widget.ConstraintLayout>
