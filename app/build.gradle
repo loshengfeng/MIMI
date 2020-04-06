@@ -73,15 +73,15 @@ android {
 
     productFlavors {
         dev {
-            buildConfigField "String", "API_HOST", '"http://10.1.1.121:12080/"'
+            buildConfigField "String", "API_HOST", '"http://10.1.1.121:50080/"'
         }
 
         sit {
-            buildConfigField "String", "API_HOST", '"http://10.1.1.121:12080/"'
+            buildConfigField "String", "API_HOST", '"http://10.1.1.121:50080/"'
         }
 
         prod {
-            buildConfigField "String", "API_HOST", '"http://10.1.1.121:12080/"'
+            buildConfigField "String", "API_HOST", '"http://10.1.1.121:50080/"'
         }
     }
 

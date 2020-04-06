@@ -2,7 +2,7 @@ package com.dabenxiang.mimi.model.api.vo
 
 import com.google.gson.annotations.SerializedName
 
-data class ApiBaseItem<T>(
+data class ApiBasePagingItem<T>(
     @SerializedName("code")
     val code: Int,
 
@@ -10,5 +10,8 @@ data class ApiBaseItem<T>(
     val message: String,
 
     @SerializedName("content")
-    val content: T?
+    val content: T?,
+
+    @SerializedName("paging")
+    val paging: PagingItem?
 )

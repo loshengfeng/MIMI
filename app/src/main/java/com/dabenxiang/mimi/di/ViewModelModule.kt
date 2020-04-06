@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.di
 
 import com.dabenxiang.mimi.view.login.LoginViewModel
+import com.dabenxiang.mimi.view.home.HomeViewModel
 import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.view.messenger.MessengerViewModel
 import com.dabenxiang.mimi.view.splash.SplashViewModel
@@ -12,4 +13,5 @@ val viewModelModule = module {
     viewModel { SplashViewModel() }
     viewModel { MessengerViewModel() }
     viewModel { LoginViewModel() }
+    viewModel { HomeViewModel() }
 }
