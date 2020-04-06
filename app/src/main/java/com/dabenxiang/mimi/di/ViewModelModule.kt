@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.di
 
 import com.dabenxiang.mimi.view.favorite.FavoriteViewModel
+import com.dabenxiang.mimi.view.forgetpassword.ForgetPasswordViewModel
 import com.dabenxiang.mimi.view.login.LoginViewModel
 import com.dabenxiang.mimi.view.home.HomeViewModel
 import com.dabenxiang.mimi.view.main.MainViewModel
@@ -20,4 +21,5 @@ val viewModelModule = module {
     viewModel { TopupViewModel() }
     viewModel { FavoriteViewModel() }
     viewModel { PersonalViewModel() }
+    viewModel { ForgetPasswordViewModel() }
 }
