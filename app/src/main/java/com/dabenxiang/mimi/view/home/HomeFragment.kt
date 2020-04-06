@@ -17,15 +17,15 @@ class HomeFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val fragment = TestFragment()
-
-        childFragmentManager.beginTransaction().add(R.id.container_home, fragment).commit()
+        activity?.also { activity ->
+            activity.window.statusBarColor = activity.getColor(R.color.color_bar)
+        }
 
         bottom_navigation.setOnNavigationItemSelectedListener { item ->
             Timber.d("Selected: $item")
             true
         }
 
-        viewModel.loadHomeCategories()
+        //viewModel.loadHomeCategories()
     }
 }
