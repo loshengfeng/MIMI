@@ -9,6 +9,11 @@
         android:id="@+id/splashFragment"
         android:name="com.dabenxiang.mimi.view.splash.SplashFragment"
         android:label="SplashFragment"
-        tools:layout="@layout/fragment_splash"></fragment>
+        tools:layout="@layout/fragment_splash" />
+
+    <fragment
+        android:id="@+id/messengerFragment"
+        android:name="com.dabenxiang.mimi.view.messenger.MessengerFragment"
+        tools:layout="@layout/fragment_messenger" />
 
 </navigation>

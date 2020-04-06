@@ -40,7 +40,7 @@ android {
 
     defaultConfig {
         applicationId "com.dabenxiang.mimi"
-        minSdkVersion 26
+        minSdkVersion 24
         targetSdkVersion 29
         versionCode version.versionCode.toInteger()
         versionName version.versionName
@@ -193,6 +193,11 @@ dependencies {
 
     // WebSocket
     implementation "org.java-websocket:Java-WebSocket:$websocket_version"
+
+    // MQTT
+    implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:$mqtt_version"
+    implementation "org.eclipse.paho:org.eclipse.paho.android.service:$paho_service_version"
+    implementation "androidx.localbroadcastmanager:localbroadcastmanager:$local_broadcast_manager_version"
 
     // Security-Crypto
     implementation "androidx.security:security-crypto:$security_crypto_version"
