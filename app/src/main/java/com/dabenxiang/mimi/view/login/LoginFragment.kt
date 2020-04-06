@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.login
 
 import android.os.Bundle
 import android.view.View
+import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -27,6 +28,50 @@ class LoginFragment : BaseFragment() {
 
     override fun setupObservers() {
         Timber.d("${LoginFragment::class.java.simpleName}_setupObservers")
+        viewModel.accountError.observe(viewLifecycleOwner, Observer {
+            if (it == null) {
+                tvLoginAccError.visibility = View.INVISIBLE
+            } else {
+                tvLoginAccError.text = getString(it)
+                tvLoginAccError.visibility = View.VISIBLE
+            }
+        })
+
+        viewModel.emailError.observe(viewLifecycleOwner, Observer {
+            if (it == null) {
+                tvEmailError.visibility = View.INVISIBLE
+            } else {
+                tvEmailError.text = getString(it)
+                tvEmailError.visibility = View.VISIBLE
+            }
+        })
+
+        viewModel.registerPasswordError.observe(viewLifecycleOwner, Observer {
+            if (it == null) {
+                tvRegisterAccError.visibility = View.INVISIBLE
+            } else {
+                tvRegisterAccError.text = getString(it)
+                tvRegisterAccError.visibility = View.VISIBLE
+            }
+        })
+
+        viewModel.confirmPasswordError.observe(viewLifecycleOwner, Observer {
+            if (it == null) {
+                tvPwConfirmError.visibility = View.INVISIBLE
+            } else {
+                tvPwConfirmError.text = getString(it)
+                tvPwConfirmError.visibility = View.VISIBLE
+            }
+        })
+
+        viewModel.loginPasswordError.observe(viewLifecycleOwner, Observer {
+            if (it == null) {
+                tvLoginPwError.visibility = View.INVISIBLE
+            } else {
+                tvLoginPwError.text = getString(it)
+                tvLoginPwError.visibility = View.VISIBLE
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -55,9 +100,23 @@ class LoginFragment : BaseFragment() {
             when (buttonView.id) {
                 R.id.btnClose -> Navigation.findNavController(view!!).navigateUp()
                 R.id.btnRegisterCancel, R.id.btnLoginCancel -> GeneralUtils.showToast(context!!, "Cancel")
-                R.id.btnRegister -> GeneralUtils.showToast(context!!, "Register")
+                R.id.btnRegister -> {
+                    GeneralUtils.showToast(context!!, "Register")
+                    viewModel.doRegisterValidateAndSubmit(
+                        edtRegisterAcc.text.toString(),
+                        edtEmail.text.toString(),
+                        edtRegisterPw.text.toString(),
+                        edtPwConfirm.text.toString()
+                    )
+                }
                 R.id.btnForget -> GeneralUtils.showToast(context!!, "Forget")
-                R.id.btnLogin -> GeneralUtils.showToast(context!!, "btnLogin")
+                R.id.btnLogin -> {
+                    GeneralUtils.showToast(context!!, "btnLogin")
+                    viewModel.doLoginValidateAndSubmit(
+                        edtLoginAcc.text.toString(),
+                        edtLoginPw.text.toString()
+                    )
+                }
             }
         }.also {
             btnClose.setOnClickListener(it)

@@ -12,7 +12,7 @@
     app:layout_constraintTop_toTopOf="parent">
 
     <EditText
-        android:id="@+id/edtLoginName"
+        android:id="@+id/edtLoginAcc"
         style="@style/login_edit_text"
         android:layout_marginTop="0dp"
         android:layout_height="wrap_content"
@@ -24,6 +24,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/tvLoginAccError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color_red_2"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtLoginAcc"
+        tools:text="错误讯息"
+        tools:visibility="visible" />
+
     <EditText
         android:id="@+id/edtLoginPw"
         style="@style/login_edit_text"
@@ -34,8 +46,20 @@
         android:labelFor="@id/edtLoginPw"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtLoginName"
+        app:layout_constraintTop_toBottomOf="@+id/edtLoginAcc"
         tools:ignore="LabelFor" />
+
+    <TextView
+        android:id="@+id/tvLoginPwError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color_red_2"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtLoginPw"
+        tools:text="错误讯息"
+        tools:visibility="visible" />
 
     <CheckBox
         android:id="@+id/cbShowPw"
