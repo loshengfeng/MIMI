@@ -99,7 +99,7 @@ class LoginFragment : BaseFragment() {
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.btnClose -> Navigation.findNavController(view!!).navigateUp()
-                R.id.btnRegisterCancel, R.id.btnLoginCancel -> GeneralUtils.showToast(context!!, "Cancel")
+                R.id.btnRegisterCancel, R.id.btnLoginCancel -> Navigation.findNavController(view!!).navigateUp()
                 R.id.btnRegister -> {
                     GeneralUtils.showToast(context!!, "Register")
                     viewModel.doRegisterValidateAndSubmit(
