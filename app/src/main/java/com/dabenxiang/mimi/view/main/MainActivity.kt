@@ -17,7 +17,6 @@ class MainActivity : BaseActivity() {
     override fun getLayoutId(): Int {
         return R.layout.activity_main
     }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         windowManager?.let {
@@ -30,6 +29,8 @@ class MainActivity : BaseActivity() {
             resources.configuration.fontScale = 1f
             baseContext.resources.updateConfiguration(resources.configuration, metrics)
         }
+
+        bottom_navigation.setOnNavigationItemReselectedListener {}
 
         bottom_navigation.setOnNavigationItemSelectedListener {
             return@setOnNavigationItemSelectedListener when (it.itemId) {

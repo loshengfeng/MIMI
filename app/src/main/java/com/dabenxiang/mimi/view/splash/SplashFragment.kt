@@ -22,11 +22,7 @@ class SplashFragment : BaseFragment() {
         return R.layout.fragment_splash
     }
 
-    override fun setupObservers() {
-//        Handler().postDelayed({
-//            viewModel.navigateView.postValue(R.id.action_splashFragment_to_loginFragment)
-//        }, 5000)
-    }
+    override fun setupObservers() {}
 
     override fun setupListeners() {
         TODO("Not yet implemented")
