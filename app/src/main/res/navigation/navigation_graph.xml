@@ -12,6 +12,18 @@
         tools:layout="@layout/fragment_splash" />
 
     <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.dabenxiang.mimi.view.login.LoginFragment"
+        android:label="LoginFragment"
+        tools:layout="@layout/fragment_login">
+        <!--<action
+            android:id="@+id/action_loginFragment_to_messengerFragment"
+            app:destination="@id/messengerFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />-->
+    </fragment>
+
+    <fragment
         android:id="@+id/messengerFragment"
         android:name="com.dabenxiang.mimi.view.messenger.MessengerFragment"
         tools:layout="@layout/fragment_messenger" />

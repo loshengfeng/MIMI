@@ -9,7 +9,8 @@
     <color name="color_green_4">#00b5a9</color>
     <color name="color_black_1">#000000</color>
     <color name="color_black_1_50">#80000000</color>
-    <color name="color_red">#ff4d4d</color>
+    <color name="color_red_1">#ff4d4d</color>
+    <color name="color_red_2">#e57c7c</color>
     <color name="color_gray">#e5e5e5</color>
 
 </resources>

@@ -14,7 +14,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tabGravity="fill"
-        app:tabIndicatorColor="@color/color_red"
+        app:tabIndicatorColor="@color/color_red_1"
         app:tabIndicatorFullWidth="true"
         app:tabIndicatorHeight="3dp"
         app:tabMode="fixed"

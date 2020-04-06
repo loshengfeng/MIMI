@@ -12,6 +12,6 @@
     <string name="login_email">请填写Email</string>
     <string name="login_desc">点选「注册」即表示您同意接受服务条款及隐私权保护政策</string>
     <string name="login_keep_account">记住帐号</string>
-    <string name="login_forget">忘记密码</string>
+    <string name="login_forget">忘记密码?</string>
 
 </resources>

@@ -6,8 +6,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="50dp"
         android:paddingStart="30dp"
+        android:paddingTop="50dp"
         android:paddingEnd="30dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,7 +23,33 @@
             android:inputType="text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/typeTabs" />
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <CheckBox
+            android:id="@+id/cbName"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/ico_checked_selector"
+            android:button="@null"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/edtName"
+            app:layout_constraintEnd_toEndOf="@id/edtName"
+            app:layout_constraintTop_toTopOf="@id/edtName"
+            tools:checked="true"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/tvNameError"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/color_red_2"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edtName"
+            tools:text="错误讯息"
+            tools:visibility="visible" />
 
         <EditText
             android:id="@+id/edtEmail"
@@ -41,12 +67,27 @@
             android:id="@+id/cbEmail"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:layout_marginStart="3dp"
-            android:background="@drawable/ico-checked"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/ico_checked_selector"
             android:button="@null"
-            app:layout_constraintBottom_toBottomOf="@+id/edtEmail"
-            app:layout_constraintStart_toEndOf="@+id/edtEmail"
-            app:layout_constraintTop_toTopOf="@+id/edtEmail" />
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/edtEmail"
+            app:layout_constraintEnd_toEndOf="@id/edtEmail"
+            app:layout_constraintTop_toTopOf="@id/edtEmail"
+            tools:checked="false"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/tvEmailError"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/color_red_2"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edtEmail"
+            tools:text="错误讯息"
+            tools:visibility="visible" />
 
         <EditText
             android:id="@+id/edtPw"
@@ -62,15 +103,29 @@
 
         <CheckBox
             android:id="@+id/cbShowPw"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/ico_eye_selector"
+            android:button="@null"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/edtPw"
+            app:layout_constraintEnd_toEndOf="@id/edtPw"
+            app:layout_constraintTop_toTopOf="@id/edtPw"
+            tools:checked="true"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/tvPwError"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
-            android:background="@drawable/password_eye_selector"
-            android:button="@null"
-            app:layout_constraintBottom_toBottomOf="@+id/edtPw"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/edtPw"
-            tools:checked="true" />
+            android:textColor="@color/color_red_2"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edtPw"
+            tools:text="错误讯息"
+            tools:visibility="visible" />
 
         <EditText
             android:id="@+id/edtPwConfirm"
@@ -86,14 +141,28 @@
 
         <CheckBox
             android:id="@+id/cbShowPwConfirm"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:layout_marginEnd="12dp"
-            android:background="@drawable/password_eye_selector"
+            android:background="@drawable/ico_eye_selector"
             android:button="@null"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@+id/edtPwConfirm"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/edtPwConfirm" />
+            app:layout_constraintTop_toTopOf="@+id/edtPwConfirm"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/tvPwConfirmError"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/color_red_2"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edtPwConfirm"
+            tools:text="错误讯息"
+            tools:visibility="visible" />
 
         <TextView
             android:id="@+id/tvDesc"
