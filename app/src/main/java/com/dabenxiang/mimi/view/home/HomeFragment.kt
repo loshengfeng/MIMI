@@ -21,8 +21,9 @@ class HomeFragment : BaseFragment() {
 
         childFragmentManager.beginTransaction().add(R.id.container_home, fragment).commit()
 
-        bottom_navigation.setOnNavigationItemReselectedListener { item ->
-            Timber.d("Jeff: $item")
+        bottom_navigation.setOnNavigationItemSelectedListener { item ->
+            Timber.d("Selected: $item")
+            true
         }
 
         viewModel.loadHomeCategories()
