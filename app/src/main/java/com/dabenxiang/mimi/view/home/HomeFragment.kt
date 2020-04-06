@@ -48,7 +48,6 @@ class HomeFragment : BaseFragment() {
 //        Handler().postDelayed({
 //            Navigation.findNavController(view!!).navigate(R.id.action_homeFragment_to_loginFragment)
 //        }, 1500)
-
     }
 
     override fun setupObservers() {

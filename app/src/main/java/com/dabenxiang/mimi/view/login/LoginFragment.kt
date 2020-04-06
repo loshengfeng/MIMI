@@ -1,11 +1,16 @@
 package com.dabenxiang.mimi.view.login
 
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.dialog.login.LoginDialogFragment
+import com.dabenxiang.mimi.view.dialog.login.LoginDialogFragment.Companion.TYPE_SUCCESS
+import com.dabenxiang.mimi.view.dialog.login.LoginDialogFragment.Companion.TYPE_VALIDATION
+import com.dabenxiang.mimi.view.dialog.login.OnLoginDialogListener
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_login.*
@@ -18,8 +23,20 @@ class LoginFragment : BaseFragment() {
 
     private val viewModel by viewModel<LoginViewModel>()
 
+    private var dialog: LoginDialogFragment? = null
+
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // todo: for test
+        Handler().postDelayed({
+            dialog = LoginDialogFragment.newInstance(onLoginDialogListener,
+                LoginDialogFragment.TYPE_SUCCESS
+            )
+            dialog?.show(activity!!.supportFragmentManager, LoginDialogFragment::class.java.simpleName)
+        },1500)
     }
 
     override fun getLayoutId(): Int {
@@ -135,5 +152,11 @@ class LoginFragment : BaseFragment() {
 
     override fun initSettings() {
         Timber.d("${LoginFragment::class.java.simpleName}_initSettings")
+    }
+
+    private val onLoginDialogListener = object : OnLoginDialogListener {
+        override fun onConfirm() {
+            dialog?.dismiss()
+        }
     }
 }
