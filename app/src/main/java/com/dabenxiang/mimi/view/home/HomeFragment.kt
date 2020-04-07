@@ -2,11 +2,10 @@ package com.dabenxiang.mimi.view.home
 
 import android.os.Bundle
 import android.view.View
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.view.adapter.HomeRecommendAdapter
-import com.dabenxiang.mimi.view.adapter.LeaderboardAdapter
+import com.dabenxiang.mimi.view.adapter.HomeAdapter
+
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -26,14 +25,11 @@ class HomeFragment : BaseFragment() {
             activity.window.statusBarColor = activity.getColor(R.color.color_bar)
 
             LinearLayoutManager(activity).also { layoutManager ->
-                layoutManager.orientation = LinearLayoutManager.HORIZONTAL
-                recyclerview_leaderboard.layoutManager = layoutManager
+                layoutManager.orientation = LinearLayoutManager.VERTICAL
+                recyclerview_content.layoutManager = layoutManager
             }
 
-
-            GridLayoutManager(activity, 2).also { layoutManager ->
-                recyclerview_cate1.layoutManager = layoutManager
-            }
+            recyclerview_content.adapter = HomeAdapter(activity)
         }
 
         //viewModel.loadHomeCategories()
@@ -55,10 +51,6 @@ class HomeFragment : BaseFragment() {
                 Timber.d("onTabSelected: ${tab?.position}")
             }
         })
-
-
-        recyclerview_leaderboard.adapter = LeaderboardAdapter()
-        recyclerview_cate1.adapter = HomeRecommendAdapter()
     }
 
     override fun setupObservers() {

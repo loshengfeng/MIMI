@@ -3,37 +3,49 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="280dp"
-    android:layout_gravity="center"
-    android:layout_marginStart="6dp"
-    android:layout_marginEnd="6dp">
+    android:layout_height="wrap_content"
+    android:paddingTop="40dp">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/layout_card"
-        android:layout_width="150dp"
-        android:layout_height="200dp"
-        app:cardCornerRadius="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
+    <ImageView
+        android:id="@+id/iv_cate1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:src="@drawable/ico_star"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/iv_poster"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@color/color_red_2" />
-
-    </androidx.cardview.widget.CardView>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/tv_title"
-        android:layout_width="0dp"
+        android:id="@+id/tv_cate1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:ellipsize="end"
-        android:lines="2"
-        app:layout_constraintStart_toStartOf="@id/layout_card"
-        app:layout_constraintEnd_toEndOf="@id/layout_card"
-        app:layout_constraintTop_toBottomOf="@+id/layout_card"
-        tools:text="TOP" />
+        android:layout_marginStart="10dp"
+        android:text="推薦"
+        android:textColor="@color/color_black_1"
+        app:layout_constraintBottom_toBottomOf="@id/iv_cate1"
+        app:layout_constraintStart_toEndOf="@id/iv_cate1"
+        app:layout_constraintTop_toTopOf="@id/iv_cate1" />
+
+    <TextView
+        android:id="@+id/btn_more_cate1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:background="@null"
+        android:drawableEnd="@drawable/btn_arrow_pink_n"
+        android:text="更多"
+        android:textColor="@color/color_red_1"
+        app:layout_constraintBottom_toBottomOf="@id/iv_cate1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/iv_cate1" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerview_recommend"
+        android:layout_width="match_parent"
+        android:layout_height="600dp"
+        android:layout_marginTop="16dp"
+        android:nestedScrollingEnabled="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/iv_cate1" />
 </androidx.constraintlayout.widget.ConstraintLayout>
