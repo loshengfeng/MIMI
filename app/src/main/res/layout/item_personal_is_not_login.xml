@@ -44,7 +44,7 @@
 
 
     <TextView
-        android:id="@+id/btnLogin"
+        android:id="@+id/btn_login"
         android:layout_width="0dp"
         android:layout_height="33dp"
         android:layout_marginStart="80dp"
@@ -74,5 +74,5 @@
         android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnLogin" />
+        app:layout_constraintTop_toBottomOf="@id/btn_login" />
 </androidx.constraintlayout.widget.ConstraintLayout>

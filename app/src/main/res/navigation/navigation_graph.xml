@@ -237,12 +237,29 @@
             android:id="@+id/action_settingFragment_to_resendMailFragment"
             app:destination="@id/resendMailFragment"/>
 
+        <action
+            android:id="@+id/action_settingFragment_to_changePasswordFragment"
+            app:destination="@id/changePasswordFragment"/>
+
     </fragment>
 
     <fragment
         android:id="@+id/resendMailFragment"
         android:name="com.dabenxiang.mimi.view.resendmail.ResendMailFragment"
         tools:layout="@layout/fragment_resend_mail">
+
+        <!--<action
+            android:id="@+id/action_settingFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/settingFragment"
+            app:popUpToInclusive="true" />-->
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/changePasswordFragment"
+        android:name="com.dabenxiang.mimi.view.changepassword.ChangePasswordFragment"
+        tools:layout="@layout/fragment_change_password">
 
         <!--<action
             android:id="@+id/action_settingFragment_to_loginFragment"

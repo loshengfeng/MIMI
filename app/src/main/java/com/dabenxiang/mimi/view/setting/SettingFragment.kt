@@ -43,7 +43,7 @@ class SettingFragment : BaseFragment() {
                 R.id.btnRaw1 -> GeneralUtils.showToast(context!!, "btnRaw1")
                 R.id.btnEmail -> Navigation.findNavController(view!!).navigate(R.id.action_settingFragment_to_resendMailFragment)
                 R.id.btnRaw2 -> GeneralUtils.showToast(context!!, "btnRaw2")
-                R.id.btnChangPw -> GeneralUtils.showToast(context!!, "btnChangPw")
+                R.id.btnChangPw -> Navigation.findNavController(view!!).navigate(R.id.action_settingFragment_to_changePasswordFragment)
             }
         }.also {
             tv_back.setOnClickListener(it)

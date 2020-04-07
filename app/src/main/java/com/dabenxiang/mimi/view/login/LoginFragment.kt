@@ -102,10 +102,10 @@ class LoginFragment : BaseFragment() {
 
         viewModel.loginPasswordError.observe(viewLifecycleOwner, Observer {
             if (it == null) {
-                tvLoginPwError.visibility = View.INVISIBLE
+                tv_login_pw_error.visibility = View.INVISIBLE
             } else {
-                tvLoginPwError.text = getString(it)
-                tvLoginPwError.visibility = View.VISIBLE
+                tv_login_pw_error.text = getString(it)
+                tv_login_pw_error.visibility = View.VISIBLE
             }
         })
 
@@ -200,7 +200,7 @@ class LoginFragment : BaseFragment() {
 
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
-                R.id.btnClose, R.id.btn_register_cancel, R.id.btnLoginCancel -> Navigation.findNavController(view!!).navigateUp()
+                R.id.btnClose, R.id.btn_register_cancel, R.id.btn_login_cancel -> Navigation.findNavController(view!!).navigateUp()
                 R.id.btn_register -> {
                     GeneralUtils.showToast(context!!, "Register")
                     viewModel.doRegisterValidateAndSubmit(
@@ -210,28 +210,28 @@ class LoginFragment : BaseFragment() {
                         edit_confirm_pw.text.toString()
                     )
                 }
-                R.id.btnForget -> {
+                R.id.btn_forget -> {
                     GeneralUtils.showToast(context!!, "Forget")
                     Navigation.findNavController(view!!).navigate(R.id.action_loginFragment_to_forgetPasswordFragment)
                 }
-                R.id.btnLogin -> {
+                R.id.btn_login -> {
                     GeneralUtils.showToast(context!!, "btnLogin")
                     viewModel.doLoginValidateAndSubmit(
-                        edtLoginAcc.text.toString(),
-                        edtLoginPw.text.toString()
+                        edit_login_account.text.toString(),
+                        edit_login_pw.text.toString()
                     )
                 }
             }
         }.also {
             btnClose.setOnClickListener(it)
             btn_register_cancel.setOnClickListener(it)
-            btnLoginCancel.setOnClickListener(it)
+            btn_login_cancel.setOnClickListener(it)
             btn_register.setOnClickListener(it)
-            btnForget.setOnClickListener(it)
-            btnLogin.setOnClickListener(it)
+            btn_forget.setOnClickListener(it)
+            btn_login.setOnClickListener(it)
         }
 
-        cbKeepAcc.setOnCheckedChangeListener { _, isChecked ->
+        cb_keep_account.setOnCheckedChangeListener { _, isChecked ->
             Timber.d("${LoginFragment::class.java.simpleName}_isChecked = $isChecked")
             GeneralUtils.showToast(context!!, "Remember")
         }

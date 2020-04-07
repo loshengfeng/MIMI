@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.di
 
+import com.dabenxiang.mimi.view.changepassword.ChangePasswordViewModel
 import com.dabenxiang.mimi.view.favorite.FavoriteViewModel
 import com.dabenxiang.mimi.view.forgetpassword.ForgetPasswordViewModel
 import com.dabenxiang.mimi.view.login.LoginViewModel
@@ -26,4 +27,5 @@ val viewModelModule = module {
     viewModel { ForgetPasswordViewModel() }
     viewModel { SettingViewModel() }
     viewModel { ResendMailViewModel() }
+    viewModel { ChangePasswordViewModel() }
 }
