@@ -5,19 +5,19 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import kotlinx.android.synthetic.main.item_leaderboard.view.*
+import kotlinx.android.synthetic.main.item_home_recommend.view.*
 
-class LeaderboardAdapter : RecyclerView.Adapter<BaseViewHolder>() {
+class HomeRecommendAdapter : RecyclerView.Adapter<BaseViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_leaderboard, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_home_recommend, parent, false)
         return BaseViewHolder(view)
     }
 
     override fun getItemCount(): Int {
-        return 10
+        return 4
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
-        holder.itemView.tv_leaderboard.text = "TOP${position + 1}"
+        holder.itemView.tv_title.text = "標題${position + 1}標題標題標題標題標題標題標題標題標題標題標題標題"
     }
 }

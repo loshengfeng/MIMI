@@ -2,8 +2,10 @@ package com.dabenxiang.mimi.view.home
 
 import android.os.Bundle
 import android.view.View
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.view.adapter.HomeRecommendAdapter
 import com.dabenxiang.mimi.view.adapter.LeaderboardAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.google.android.material.tabs.TabLayout
@@ -22,6 +24,16 @@ class HomeFragment : BaseFragment() {
 
         activity?.also { activity ->
             activity.window.statusBarColor = activity.getColor(R.color.color_bar)
+
+            LinearLayoutManager(activity).also { layoutManager ->
+                layoutManager.orientation = LinearLayoutManager.HORIZONTAL
+                recyclerview_leaderboard.layoutManager = layoutManager
+            }
+
+
+            GridLayoutManager(activity, 2).also { layoutManager ->
+                recyclerview_cate1.layoutManager = layoutManager
+            }
         }
 
         //viewModel.loadHomeCategories()
@@ -30,7 +42,7 @@ class HomeFragment : BaseFragment() {
             layout_top_tap.addTab(layout_top_tap.newTab().setText("第${i}層"))
         }
 
-        layout_top_tap.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
+        layout_top_tap.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabReselected(tab: TabLayout.Tab?) {
                 Timber.d("onTabReselected: ${tab?.position}")
             }
@@ -44,10 +56,10 @@ class HomeFragment : BaseFragment() {
             }
         })
 
-        val layoutManager = LinearLayoutManager(activity!!)
-        layoutManager.orientation = LinearLayoutManager.HORIZONTAL
-        recyclerview_leaderboard.layoutManager = layoutManager
+
         recyclerview_leaderboard.adapter = LeaderboardAdapter()
+        recyclerview_cate1.adapter = HomeRecommendAdapter()
+
     }
 
     override fun setupObservers() {

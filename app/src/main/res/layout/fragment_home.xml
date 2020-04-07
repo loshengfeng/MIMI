@@ -108,13 +108,14 @@
             android:layout_height="wrap_content">
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_leaderboard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="60dp"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
-                    android:id="@+id/iv_cate1"
+                    android:id="@+id/iv_leaderboard"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
@@ -123,18 +124,67 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/tv_cate1"
+                    android:id="@+id/tv_leaderboard"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:text="熱門"
+                    android:textColor="@color/color_black_1"
+                    app:layout_constraintBottom_toBottomOf="@id/iv_leaderboard"
+                    app:layout_constraintStart_toEndOf="@id/iv_leaderboard"
+                    app:layout_constraintTop_toTopOf="@id/iv_leaderboard" />
+
+                <TextView
+                    android:id="@+id/btn_more_leaderboard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:background="@null"
+                    android:drawableEnd="@drawable/btn_arrow_pink_n"
+                    android:text="更多"
+                    android:textColor="@color/color_red_1"
+                    app:layout_constraintBottom_toBottomOf="@id/iv_leaderboard"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/iv_leaderboard" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerview_leaderboard"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal"
+                    app:layout_constraintTop_toBottomOf="@id/iv_leaderboard" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_cate1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                app:layout_constraintTop_toBottomOf="@id/layout_leaderboard">
+
+                <ImageView
+                    android:id="@+id/iv_cate1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:src="@drawable/ico_star"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_cate1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:text="推薦"
                     android:textColor="@color/color_black_1"
                     app:layout_constraintBottom_toBottomOf="@id/iv_cate1"
                     app:layout_constraintStart_toEndOf="@id/iv_cate1"
                     app:layout_constraintTop_toTopOf="@id/iv_cate1" />
 
                 <TextView
-                    android:id="@+id/btn_cate1"
+                    android:id="@+id/btn_more_cate1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
@@ -147,11 +197,13 @@
                     app:layout_constraintTop_toTopOf="@id/iv_cate1" />
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerview_leaderboard"
+                    android:id="@+id/recyclerview_cate1"
                     android:layout_width="match_parent"
-                    android:layout_height="120dp"
+                    android:layout_height="600dp"
                     android:layout_marginTop="16dp"
-                    android:orientation="horizontal"
+                    android:nestedScrollingEnabled="false"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/iv_cate1" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
