@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/btnBack"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="16dp"
+        android:drawableStart="@drawable/ic_btn_back_black_n"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="17dp"
+        android:text="@string/title_setting"
+        android:textColor="@color/color_black_1"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="29dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle">
+
+        <TextView
+            android:id="@+id/btnPhoto"
+            style="@style/settingStyle_1"
+            android:drawableEnd="@drawable/ic_btn_arrow_black_n"
+            android:gravity="center_vertical"
+            android:text="@string/setting_photo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/ivPhoto"
+            android:background="@drawable/ico_default_photo"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="@id/btnPhoto"
+            app:layout_constraintEnd_toEndOf="@id/btnPhoto"
+            app:layout_constraintTop_toTopOf="@id/btnPhoto"
+            tools:text="ABCDEFG@abcde.com"
+            android:contentDescription="@null" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@color/color_gray_3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnPhoto" />
+
+        <TextView
+            android:id="@+id/btnRaw1"
+            style="@style/settingStyle_1"
+            android:drawableEnd="@drawable/ic_btn_arrow_black_n"
+            android:gravity="center_vertical"
+            android:text="@string/setting_raw_1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnPhoto" />
+
+        <TextView
+            android:id="@+id/tvRaw1"
+            style="@style/settingStyle_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="23dp"
+            android:drawablePadding="7dp"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="@id/btnRaw1"
+            app:layout_constraintEnd_toEndOf="@id/btnRaw1"
+            app:layout_constraintTop_toTopOf="@id/btnRaw1"
+            tools:text="內容內容內容內容" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@color/color_gray_3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnRaw1" />
+
+        <TextView
+            android:id="@+id/btnEmail"
+            style="@style/settingStyle_1"
+            android:drawableEnd="@drawable/ic_btn_arrow_black_n"
+            android:gravity="center_vertical"
+            android:text="@string/setting_email"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnRaw1" />
+
+        <TextView
+            android:id="@+id/tvEmail"
+            style="@style/settingStyle_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="23dp"
+            android:drawableEnd="@drawable/ico_checked"
+            android:drawablePadding="7dp"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="@id/btnEmail"
+            app:layout_constraintEnd_toEndOf="@id/btnEmail"
+            app:layout_constraintTop_toTopOf="@id/btnEmail"
+            tools:text="ABCDEFG@abcde.com" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@color/color_gray_3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnEmail" />
+
+        <TextView
+            android:id="@+id/btnRaw2"
+            style="@style/settingStyle_1"
+            android:drawableEnd="@drawable/ic_btn_arrow_black_n"
+            android:gravity="center_vertical"
+            android:text="@string/setting_raw_2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnEmail" />
+
+        <TextView
+            android:id="@+id/tvRaw2"
+            style="@style/settingStyle_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="23dp"
+            android:drawablePadding="7dp"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="@id/btnRaw2"
+            app:layout_constraintEnd_toEndOf="@id/btnRaw2"
+            app:layout_constraintTop_toTopOf="@id/btnRaw2"
+            tools:text="內容內容內容內容" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@color/color_gray_3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnRaw2" />
+
+        <TextView
+            android:id="@+id/btnChangPw"
+            style="@style/settingStyle_1"
+            android:drawableEnd="@drawable/ic_btn_arrow_black_n"
+            android:gravity="center_vertical"
+            android:text="@string/setting_change_pw"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnRaw2" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

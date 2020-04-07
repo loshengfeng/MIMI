@@ -1,7 +1,9 @@
 package com.dabenxiang.mimi.view.personal
 
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
+import androidx.navigation.Navigation
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -23,7 +25,6 @@ class PersonalFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initSettings()
-        // todo
         /*Handler().postDelayed({
             Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_loginFragment)
         },1000)*/
@@ -43,18 +44,18 @@ class PersonalFragment : BaseFragment() {
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.btnTopup -> GeneralUtils.showToast(context!!, "btnTopup")
-                R.id.btnFavorite -> GeneralUtils.showToast(context!!, "btnFavorite")
-                R.id.btnTopupHistory -> GeneralUtils.showToast(context!!, "btnTopupHistory")
-                R.id.btnChatHistory -> GeneralUtils.showToast(context!!, "btnChatHistory")
-                R.id.btnSetting -> GeneralUtils.showToast(context!!, "btnSetting")
+                R.id.btnPhoto -> GeneralUtils.showToast(context!!, "btnFavorite")
+                R.id.btnRaw1 -> GeneralUtils.showToast(context!!, "btnTopupHistory")
+                R.id.btnEmail -> GeneralUtils.showToast(context!!, "btnChatHistory")
+                R.id.btnRaw2 -> Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_settingFragment)
                 R.id.btnLogout -> GeneralUtils.showToast(context!!, "btnLogout")
             }
         }.also {
             btnTopup.setOnClickListener(it)
-            btnFavorite.setOnClickListener(it)
-            btnTopupHistory.setOnClickListener(it)
-            btnChatHistory.setOnClickListener(it)
-            btnSetting.setOnClickListener(it)
+            btnPhoto.setOnClickListener(it)
+            btnRaw1.setOnClickListener(it)
+            btnEmail.setOnClickListener(it)
+            btnRaw2.setOnClickListener(it)
             btnLogout.setOnClickListener(it)
         }
     }

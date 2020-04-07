@@ -86,7 +86,7 @@
             android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/btnFavorite"
+                android:id="@+id/btnPhoto"
                 style="@style/personalStyle"
                 android:drawableStart="@drawable/btn_favorite_n"
                 android:drawableEnd="@drawable/ic_btn_arrow_black_n"
@@ -100,34 +100,34 @@
                 android:layout_height="1dp"
                 android:background="@color/color_gray_3"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/btnFavorite" />
+                app:layout_constraintTop_toBottomOf="@id/btnPhoto" />
 
             <TextView
-                android:id="@+id/btnTopupHistory"
+                android:id="@+id/btnRaw1"
                 style="@style/personalStyle"
                 android:drawableStart="@drawable/ic_btn_note_n"
                 android:drawableEnd="@drawable/ic_btn_arrow_black_n"
                 android:gravity="center_vertical"
                 android:text="@string/personal_topoup_history"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/btnFavorite" />
+                app:layout_constraintTop_toBottomOf="@id/btnPhoto" />
 
             <View
                 android:layout_width="0dp"
                 android:layout_height="1dp"
                 android:background="@color/color_gray_3"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/btnTopupHistory" />
+                app:layout_constraintTop_toBottomOf="@id/btnRaw1" />
 
             <TextView
-                android:id="@+id/btnChatHistory"
+                android:id="@+id/btnEmail"
                 style="@style/personalStyle"
                 android:drawableStart="@drawable/ic_ico_messenger_gray"
                 android:drawableEnd="@drawable/ic_btn_arrow_black_n"
                 android:gravity="center_vertical"
                 android:text="@string/personal_chat_history"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/btnTopupHistory" />
+                app:layout_constraintTop_toBottomOf="@id/btnRaw1" />
 
             <TextView
                 android:id="@+id/tvNew"
@@ -138,9 +138,9 @@
                 android:gravity="center"
                 android:textColor="@color/color_white_1"
                 android:textSize="10sp"
-                app:layout_constraintBottom_toBottomOf="@id/btnChatHistory"
-                app:layout_constraintEnd_toEndOf="@id/btnChatHistory"
-                app:layout_constraintTop_toTopOf="@id/btnChatHistory"
+                app:layout_constraintBottom_toBottomOf="@id/btnEmail"
+                app:layout_constraintEnd_toEndOf="@id/btnEmail"
+                app:layout_constraintTop_toTopOf="@id/btnEmail"
                 tools:text="N" />
 
             <View
@@ -148,17 +148,17 @@
                 android:layout_height="1dp"
                 android:background="@color/color_gray_3"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/btnChatHistory" />
+                app:layout_constraintTop_toBottomOf="@id/btnEmail" />
 
             <TextView
-                android:id="@+id/btnSetting"
+                android:id="@+id/btnRaw2"
                 style="@style/personalStyle"
                 android:drawableStart="@drawable/ic_ico_setting"
                 android:drawableEnd="@drawable/ic_btn_arrow_black_n"
                 android:gravity="center_vertical"
                 android:text="@string/personal_setting"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/btnChatHistory" />
+                app:layout_constraintTop_toBottomOf="@id/btnEmail" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
