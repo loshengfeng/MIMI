@@ -21,4 +21,8 @@ class PersonalFragment : BaseFragment() {
         Timber.d("${PersonalFragment::class.java.simpleName}_setupListeners")
     }
 
+    override fun initSettings() {
+        Timber.d("${PersonalFragment::class.java.simpleName}_initSettings")
+    }
+
 }

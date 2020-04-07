@@ -59,7 +59,6 @@ class HomeFragment : BaseFragment() {
 
         recyclerview_leaderboard.adapter = LeaderboardAdapter()
         recyclerview_cate1.adapter = HomeRecommendAdapter()
-
     }
 
     override fun setupObservers() {
@@ -68,5 +67,9 @@ class HomeFragment : BaseFragment() {
 
     override fun setupListeners() {
         Timber.d("${HomeFragment::class.java.simpleName}_setupListeners")
+    }
+
+    override fun initSettings() {
+        Timber.d("${HomeFragment::class.java.simpleName}_initSettings")
     }
 }

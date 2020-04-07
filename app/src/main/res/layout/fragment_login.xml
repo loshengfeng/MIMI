@@ -4,11 +4,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <Button
+        android:id="@+id/btnClose"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/btn_close_n"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/typeTabs"
-        android:layout_width="140dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="110dp"
+        android:layout_marginTop="80dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -17,18 +27,17 @@
         app:tabIndicatorFullWidth="true"
         app:tabIndicatorHeight="3dp"
         app:tabMode="fixed"
-        app:tabSelectedTextColor="@color/color_black_1"
-        app:tabTextColor="@color/color_black_1">
+        app:tabTextAppearance="@style/tab_item_text">
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/ti_bank"
+            android:id="@+id/tiLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="false"
             android:text="@string/register" />
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/ti_alipay"
+            android:id="@+id/ti_Register"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="false"
@@ -40,19 +49,19 @@
         layout="@layout/item_register"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/typeTabs"
-        android:visibility="visible"/>
+        app:layout_constraintTop_toBottomOf="@+id/typeTabs" />
 
     <include
         android:id="@+id/item_login"
         layout="@layout/item_login"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/typeTabs"
-        android:visibility="gone"/>
+        app:layout_constraintTop_toBottomOf="@+id/typeTabs" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
