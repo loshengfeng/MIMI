@@ -73,23 +73,23 @@ class LoginDialogFragment : BaseDialogFragment() {
             TYPE_VALIDATION -> {
                 Timber.d("${LoginDialogFragment::class.java.simpleName}_TYPE_VALIDATION")
                 ivTitle.setBackgroundResource(R.drawable.img_verification_mail)
-                tvTitle.text = getString(R.string.receive_mail)
+                tv_title.text = getString(R.string.receive_mail)
                 ivIcon.setBackgroundResource(R.drawable.ico_email)
-                tvDesc.text = getString(R.string.desc_register)
+                tv_desc.text = getString(R.string.desc_register)
             }
             TYPE_RESET -> {
                 Timber.d("${LoginDialogFragment::class.java.simpleName}_TYPE_RESET")
                 ivTitle.setBackgroundResource(R.drawable.img_verification_mail)
-                tvTitle.text = getString(R.string.receive_mail)
+                tv_title.text = getString(R.string.receive_mail)
                 ivIcon.setBackgroundResource(R.drawable.ico_email)
-                tvDesc.text = getString(R.string.desc_mail, "xxx@silkrode.com.tw")
+                tv_desc.text = getString(R.string.desc_mail, "xxx@silkrode.com.tw")
             }
             TYPE_SUCCESS -> {
                 Timber.d("${LoginDialogFragment::class.java.simpleName}_TYPE_SUCCESS")
                 ivTitle.setBackgroundResource(R.drawable.img_login_success)
-                tvTitle.text = getString(R.string.desc_success)
+                tv_title.text = getString(R.string.desc_success)
                 ivIcon.setBackgroundResource(R.drawable.ico_default_photo)
-                tvDesc.text = "好大一棵洋梨"
+                tv_desc.text = "好大一棵洋梨"
             }
         }
     }

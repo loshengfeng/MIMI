@@ -22,7 +22,7 @@ class HomeFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         activity?.also { activity ->
-            activity.window.statusBarColor = activity.getColor(R.color.color_bar)
+            activity.window.statusBarColor = activity.getColor(R.color.color_gray_2)
 
             LinearLayoutManager(activity).also { layoutManager ->
                 layoutManager.orientation = LinearLayoutManager.VERTICAL

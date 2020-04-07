@@ -4,8 +4,6 @@
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
 
-    <color name="color_bar">#f7f7f7</color>
-
     <color name="color_white_1">#ffffff</color>
     <color name="color_khaki_2">#908b6d</color>
     <color name="color_green_4">#00b5a9</color>
@@ -23,4 +21,5 @@
     <color name="color_gray_1">#e5e5e5</color>
     <color name="color_gray_2">#f7f7f7</color>
     <color name="color_gray_3">#d8d8d8</color>
+    <color name="color_gray_4">#F0F0F0</color>
 </resources>

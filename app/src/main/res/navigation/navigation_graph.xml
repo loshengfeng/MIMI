@@ -233,6 +233,17 @@
         android:name="com.dabenxiang.mimi.view.setting.SettingFragment"
         tools:layout="@layout/fragment_setting">
 
+        <action
+            android:id="@+id/action_settingFragment_to_resendMailFragment"
+            app:destination="@id/resendMailFragment"/>
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/resendMailFragment"
+        android:name="com.dabenxiang.mimi.view.resendmail.ResendMailFragment"
+        tools:layout="@layout/fragment_resend_mail">
+
         <!--<action
             android:id="@+id/action_settingFragment_to_loginFragment"
             app:destination="@id/loginFragment"

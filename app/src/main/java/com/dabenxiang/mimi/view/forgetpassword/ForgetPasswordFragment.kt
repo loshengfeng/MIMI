@@ -7,7 +7,6 @@ import androidx.navigation.Navigation
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import kotlinx.android.synthetic.main.fragment_dialog_login.*
 import kotlinx.android.synthetic.main.fragment_forget_password.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
@@ -28,19 +27,19 @@ class ForgetPasswordFragment : BaseFragment() {
         Timber.d("${ForgetPasswordFragment::class.java.simpleName}_setupObservers")
         viewModel.accountError.observe(viewLifecycleOwner, Observer {
             if (it == null) {
-                tvAccountError.visibility = View.INVISIBLE
+                tv_account_error.visibility = View.INVISIBLE
             } else {
-                tvAccountError.text = getString(it)
-                tvAccountError.visibility = View.VISIBLE
+                tv_account_error.text = getString(it)
+                tv_account_error.visibility = View.VISIBLE
             }
         })
 
         viewModel.emailError.observe(viewLifecycleOwner, Observer {
             if (it == null) {
-                tvEmailError.visibility = View.INVISIBLE
+                tv_email_error.visibility = View.INVISIBLE
             } else {
-                tvEmailError.text = getString(it)
-                tvEmailError.visibility = View.VISIBLE
+                tv_email_error.text = getString(it)
+                tv_email_error.visibility = View.VISIBLE
             }
         })
 
@@ -82,19 +81,19 @@ class ForgetPasswordFragment : BaseFragment() {
         Timber.d("${ForgetPasswordFragment::class.java.simpleName}_setupListeners")
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
-                R.id.btnBack, R.id.btnCancel -> Navigation.findNavController(view!!).navigateUp()
-                R.id.btnSend -> {
+                R.id.tv_back, R.id.btn_cancel -> Navigation.findNavController(view!!).navigateUp()
+                R.id.btn_send -> {
                     GeneralUtils.showToast(context!!, "btnSend")
                     viewModel.doValidateAndSubmit(
-                        edtAccount.text.toString(),
-                        edtEmail.text.toString()
+                        edit_account.text.toString(),
+                        edit_email.text.toString()
                     )
                 }
             }
         }.also {
-            btnBack.setOnClickListener(it)
-            btnCancel.setOnClickListener(it)
-            btnSend.setOnClickListener(it)
+            tv_back.setOnClickListener(it)
+            btn_cancel.setOnClickListener(it)
+            btn_send.setOnClickListener(it)
         }
     }
 }

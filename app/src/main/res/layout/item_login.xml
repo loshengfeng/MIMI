@@ -62,7 +62,7 @@
         tools:visibility="visible" />
 
     <CheckBox
-        android:id="@+id/cbShowPw"
+        android:id="@+id/cb_show_pw"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginEnd="12dp"

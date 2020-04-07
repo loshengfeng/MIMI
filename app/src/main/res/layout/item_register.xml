@@ -13,7 +13,7 @@
     app:layout_constraintTop_toTopOf="parent">
 
     <EditText
-        android:id="@+id/edtRegisterAcc"
+        android:id="@+id/edit_register_account"
         style="@style/login_edit_text"
         android:layout_marginTop="0dp"
         android:layout_height="wrap_content"
@@ -26,33 +26,33 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <CheckBox
-        android:id="@+id/cbAcc"
+        android:id="@+id/cb_account"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginEnd="12dp"
         android:background="@drawable/ico_checked_selector"
         android:button="@null"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/edtRegisterAcc"
-        app:layout_constraintEnd_toEndOf="@id/edtRegisterAcc"
-        app:layout_constraintTop_toTopOf="@id/edtRegisterAcc"
+        app:layout_constraintBottom_toBottomOf="@id/edit_register_account"
+        app:layout_constraintEnd_toEndOf="@id/edit_register_account"
+        app:layout_constraintTop_toTopOf="@id/edit_register_account"
         tools:checked="true"
         tools:visibility="visible" />
 
     <TextView
-        android:id="@+id/tvRegisterAccError"
+        android:id="@+id/tv_register_account_error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/color_red_2"
         android:textSize="12sp"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtRegisterAcc"
+        app:layout_constraintTop_toBottomOf="@+id/edit_register_account"
         tools:text="错误讯息"
         tools:visibility="visible" />
 
     <EditText
-        android:id="@+id/edtEmail"
+        android:id="@+id/edit_email"
         style="@style/login_edit_text"
         android:layout_height="wrap_content"
         android:width="0dp"
@@ -61,36 +61,36 @@
         android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtRegisterAcc" />
+        app:layout_constraintTop_toBottomOf="@+id/edit_register_account" />
 
     <CheckBox
-        android:id="@+id/cbEmail"
+        android:id="@+id/cb_email"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginEnd="12dp"
         android:background="@drawable/ico_checked_selector"
         android:button="@null"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/edtEmail"
-        app:layout_constraintEnd_toEndOf="@id/edtEmail"
-        app:layout_constraintTop_toTopOf="@id/edtEmail"
+        app:layout_constraintBottom_toBottomOf="@id/edit_email"
+        app:layout_constraintEnd_toEndOf="@id/edit_email"
+        app:layout_constraintTop_toTopOf="@id/edit_email"
         tools:checked="false"
         tools:visibility="visible" />
 
     <TextView
-        android:id="@+id/tvEmailError"
+        android:id="@+id/tv_email_error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/color_red_2"
         android:textSize="12sp"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtEmail"
+        app:layout_constraintTop_toBottomOf="@+id/edit_email"
         tools:text="错误讯息"
         tools:visibility="visible" />
 
     <EditText
-        android:id="@+id/edtRegisterPw"
+        android:id="@+id/edit_register_pw"
         style="@style/login_edit_text"
         android:layout_height="wrap_content"
         android:width="0dp"
@@ -98,37 +98,37 @@
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtEmail"
+        app:layout_constraintTop_toBottomOf="@+id/edit_email"
         tools:ignore="LabelFor" />
 
     <CheckBox
-        android:id="@+id/cbShowPw"
+        android:id="@+id/cb_show_pw"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginEnd="12dp"
         android:background="@drawable/ico_eye_selector"
         android:button="@null"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/edtRegisterPw"
-        app:layout_constraintEnd_toEndOf="@id/edtRegisterPw"
-        app:layout_constraintTop_toTopOf="@id/edtRegisterPw"
+        app:layout_constraintBottom_toBottomOf="@id/edit_register_pw"
+        app:layout_constraintEnd_toEndOf="@id/edit_register_pw"
+        app:layout_constraintTop_toTopOf="@id/edit_register_pw"
         tools:checked="true"
         tools:visibility="visible" />
 
     <TextView
-        android:id="@+id/tvPwError"
+        android:id="@+id/tv_pw_error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/color_red_2"
         android:textSize="12sp"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtRegisterPw"
+        app:layout_constraintTop_toBottomOf="@+id/edit_register_pw"
         tools:text="错误讯息"
         tools:visibility="visible" />
 
     <EditText
-        android:id="@+id/edtPwConfirm"
+        android:id="@+id/edit_confirm_pw"
         style="@style/login_edit_text"
         android:layout_height="wrap_content"
         android:width="0dp"
@@ -136,59 +136,59 @@
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtRegisterPw"
+        app:layout_constraintTop_toBottomOf="@+id/edit_register_pw"
         tools:ignore="LabelFor" />
 
     <CheckBox
-        android:id="@+id/cbShowPwConfirm"
+        android:id="@+id/cb_show_confirm_pw"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginEnd="12dp"
         android:background="@drawable/ico_eye_selector"
         android:button="@null"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/edtPwConfirm"
+        app:layout_constraintBottom_toBottomOf="@+id/edit_confirm_pw"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/edtPwConfirm"
+        app:layout_constraintTop_toTopOf="@+id/edit_confirm_pw"
         tools:visibility="visible" />
 
     <TextView
-        android:id="@+id/tvPwConfirmError"
+        android:id="@+id/tv_confirm_pw_error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/color_red_2"
         android:textSize="12sp"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtPwConfirm"
+        app:layout_constraintTop_toBottomOf="@+id/edit_confirm_pw"
         tools:text="错误讯息"
         tools:visibility="visible" />
 
     <TextView
-        android:id="@+id/tvDesc"
+        android:id="@+id/tv_desc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:text="@string/login_desc"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/edtPwConfirm" />
+        app:layout_constraintTop_toBottomOf="@id/edit_confirm_pw" />
 
     <Button
-        android:id="@+id/btnRegisterCancel"
+        android:id="@+id/btn_register_cancel"
         android:layout_width="76dp"
         android:layout_height="33dp"
         android:layout_marginTop="30dp"
         android:background="@drawable/bg_white_stroke_1_radius_6"
         android:text="@string/btn_cancel"
         android:textColor="@color/color_black_1_50"
-        app:layout_constraintEnd_toStartOf="@id/btnRegister"
+        app:layout_constraintEnd_toStartOf="@id/btn_register"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvDesc" />
+        app:layout_constraintTop_toBottomOf="@id/tv_desc" />
 
     <Button
-        android:id="@+id/btnRegister"
+        android:id="@+id/btn_register"
         android:layout_width="76dp"
         android:layout_height="33dp"
         android:layout_marginStart="15dp"
@@ -197,6 +197,6 @@
         android:text="@string/btn_register"
         android:textColor="@color/color_white_1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/btnRegisterCancel"
-        app:layout_constraintTop_toBottomOf="@id/tvDesc" />
+        app:layout_constraintStart_toEndOf="@id/btn_register_cancel"
+        app:layout_constraintTop_toBottomOf="@id/tv_desc" />
 </androidx.constraintlayout.widget.ConstraintLayout>

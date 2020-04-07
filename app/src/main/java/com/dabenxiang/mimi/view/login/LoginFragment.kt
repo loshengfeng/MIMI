@@ -75,28 +75,28 @@ class LoginFragment : BaseFragment() {
 
         viewModel.emailError.observe(viewLifecycleOwner, Observer {
             if (it == null) {
-                tvEmailError.visibility = View.INVISIBLE
+                tv_email_error.visibility = View.INVISIBLE
             } else {
-                tvEmailError.text = getString(it)
-                tvEmailError.visibility = View.VISIBLE
+                tv_email_error.text = getString(it)
+                tv_email_error.visibility = View.VISIBLE
             }
         })
 
         viewModel.registerPasswordError.observe(viewLifecycleOwner, Observer {
             if (it == null) {
-                tvRegisterAccError.visibility = View.INVISIBLE
+                tv_register_account_error.visibility = View.INVISIBLE
             } else {
-                tvRegisterAccError.text = getString(it)
-                tvRegisterAccError.visibility = View.VISIBLE
+                tv_register_account_error.text = getString(it)
+                tv_register_account_error.visibility = View.VISIBLE
             }
         })
 
         viewModel.confirmPasswordError.observe(viewLifecycleOwner, Observer {
             if (it == null) {
-                tvPwConfirmError.visibility = View.INVISIBLE
+                tv_confirm_pw_error.visibility = View.INVISIBLE
             } else {
-                tvPwConfirmError.text = getString(it)
-                tvPwConfirmError.visibility = View.VISIBLE
+                tv_confirm_pw_error.text = getString(it)
+                tv_confirm_pw_error.visibility = View.VISIBLE
             }
         })
 
@@ -200,14 +200,14 @@ class LoginFragment : BaseFragment() {
 
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
-                R.id.btnClose, R.id.btnRegisterCancel, R.id.btnLoginCancel -> Navigation.findNavController(view!!).navigateUp()
-                R.id.btnRegister -> {
+                R.id.btnClose, R.id.btn_register_cancel, R.id.btnLoginCancel -> Navigation.findNavController(view!!).navigateUp()
+                R.id.btn_register -> {
                     GeneralUtils.showToast(context!!, "Register")
                     viewModel.doRegisterValidateAndSubmit(
-                        edtRegisterAcc.text.toString(),
-                        edtEmail.text.toString(),
-                        edtRegisterPw.text.toString(),
-                        edtPwConfirm.text.toString()
+                        edit_register_account.text.toString(),
+                        edit_email.text.toString(),
+                        edit_register_pw.text.toString(),
+                        edit_confirm_pw.text.toString()
                     )
                 }
                 R.id.btnForget -> {
@@ -224,9 +224,9 @@ class LoginFragment : BaseFragment() {
             }
         }.also {
             btnClose.setOnClickListener(it)
-            btnRegisterCancel.setOnClickListener(it)
+            btn_register_cancel.setOnClickListener(it)
             btnLoginCancel.setOnClickListener(it)
-            btnRegister.setOnClickListener(it)
+            btn_register.setOnClickListener(it)
             btnForget.setOnClickListener(it)
             btnLogin.setOnClickListener(it)
         }

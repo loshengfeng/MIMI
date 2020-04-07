@@ -7,6 +7,7 @@ import com.dabenxiang.mimi.view.home.HomeViewModel
 import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.view.messenger.MessengerViewModel
 import com.dabenxiang.mimi.view.personal.PersonalViewModel
+import com.dabenxiang.mimi.view.resendmail.ResendMailViewModel
 import com.dabenxiang.mimi.view.setting.SettingViewModel
 import com.dabenxiang.mimi.view.topup.TopupViewModel
 import com.dabenxiang.mimi.view.splash.SplashViewModel
@@ -24,4 +25,5 @@ val viewModelModule = module {
     viewModel { PersonalViewModel() }
     viewModel { ForgetPasswordViewModel() }
     viewModel { SettingViewModel() }
+    viewModel { ResendMailViewModel() }
 }
