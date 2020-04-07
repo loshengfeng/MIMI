@@ -52,17 +52,12 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun fetchHomeCategories() = apiService.fetchHomeCategories()
 
     suspend fun searchHomeVideos(
-        category: String,
-        q: String,
-        offset: Int,
-        limit: Int
+        category: String, q: String, offset: Int, limit: Int
     ) = apiService.searchHomeVideos(category, q, offset, limit)
 
     //TODO: statisticsType?
     suspend fun statisticsHomeVideos(
-        statisticsType: Int,
-        offset: Int,
-        limit: Int
+        statisticsType: Int, offset: Int, limit: Int
     ) = apiService.statisticsHomeVideos(statisticsType, offset, limit)
 
     /**********************************************************
@@ -129,6 +124,7 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun getVideoEpisode(videoId: Int, episodeId: Int) = apiService.getVideoEpisode(videoId, episodeId)
 
     //TODO: ??
-    suspend fun getVideoStreamOfEpisode(videoId: Int, episodeId: Int, streamId: Int) = apiService.getVideoStreamOfEpisode(videoId, episodeId, streamId)
+    suspend fun getVideoStreamOfEpisode(videoId: Int, episodeId: Int, streamId: Int) =
+        apiService.getVideoStreamOfEpisode(videoId, episodeId, streamId)
 }
 

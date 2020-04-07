@@ -7,8 +7,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.view.ViewPagerIndicator
+import kotlinx.android.synthetic.main.item_banner.view.*
 import kotlinx.android.synthetic.main.item_carousel.view.*
 import kotlinx.android.synthetic.main.item_header.view.*
+import kotlinx.android.synthetic.main.item_home_categories.view.*
 import kotlinx.android.synthetic.main.item_home_leaderboard.view.*
 import kotlinx.android.synthetic.main.item_home_recommend.view.*
 
@@ -31,4 +33,12 @@ class HomeRecommendViewHolder(itemView: View) : HomeViewHolder(itemView) {
 class HomeCarouselViewHolder(itemView: View) : HomeViewHolder(itemView) {
     val viewPager: ViewPager2 = itemView.viewpager
     val pagerIndicator: ViewPagerIndicator = itemView.pager_indicator
+}
+
+class HomeBannerViewHolder(itemView: View) : HomeViewHolder(itemView) {
+    val ivPoster: ImageView = itemView.iv_poster
+}
+
+class HomeCategoriesViewHolder(itemView: View) : HomeViewHolder(itemView) {
+    val recyclerView: RecyclerView = itemView.recyclerview_categories
 }

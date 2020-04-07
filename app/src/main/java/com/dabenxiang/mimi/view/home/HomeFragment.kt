@@ -29,7 +29,15 @@ class HomeFragment : BaseFragment() {
                 recyclerview_content.layoutManager = layoutManager
             }
 
-            recyclerview_content.adapter = HomeAdapter(activity)
+            val templateList = mutableListOf<HomeTemplate>()
+            templateList.add(HomeTemplate.Banner)
+            templateList.add(HomeTemplate.Carousel)
+            templateList.add(HomeTemplate.Header(null, "分類1"))
+            templateList.add(HomeTemplate.Categories)
+            templateList.add(HomeTemplate.Header(null, "分類2"))
+            templateList.add(HomeTemplate.Categories)
+
+            recyclerview_content.adapter = HomeAdapter(activity, templateList)
         }
 
         //viewModel.loadHomeCategories()

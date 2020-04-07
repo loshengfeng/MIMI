@@ -5,8 +5,7 @@
     android:paddingBottom="30dp">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerview_recommend"
+        android:id="@+id/recyclerview_categories"
         android:layout_width="match_parent"
-        android:layout_height="560dp"
-        android:nestedScrollingEnabled="false" />
+        android:layout_height="160dp" />
 </LinearLayout>

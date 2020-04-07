@@ -17,7 +17,6 @@ class CarouselAdapter : RecyclerView.Adapter<BaseViewHolder>() {
         return BaseViewHolder(layoutInflater.inflate(R.layout.item_item_carousel, parent, false))
     }
 
-
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
 
     }
