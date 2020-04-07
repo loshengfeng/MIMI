@@ -1,49 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:paddingTop="40dp"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:paddingTop="30dp">
 
     <ImageView
-        android:id="@+id/iv_leaderboard"
+        android:id="@+id/iv_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:src="@drawable/ico_data"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ico_data" />
 
     <TextView
-        android:id="@+id/tv_leaderboard"
+        android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:text="熱門"
         android:textColor="@color/color_black_1"
-        app:layout_constraintBottom_toBottomOf="@id/iv_leaderboard"
-        app:layout_constraintStart_toEndOf="@id/iv_leaderboard"
-        app:layout_constraintTop_toTopOf="@id/iv_leaderboard" />
+        app:layout_constraintBottom_toBottomOf="@id/iv_icon"
+        app:layout_constraintStart_toEndOf="@id/iv_icon"
+        app:layout_constraintTop_toTopOf="@id/iv_icon"
+        tools:text="測試" />
 
     <TextView
-        android:id="@+id/btn_more_leaderboard"
+        android:id="@+id/btn_more"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:background="@null"
         android:drawableEnd="@drawable/btn_arrow_pink_n"
-        android:text="更多"
+        android:text="@string/text_more"
         android:textColor="@color/color_red_1"
-        app:layout_constraintBottom_toBottomOf="@id/iv_leaderboard"
+        app:layout_constraintBottom_toBottomOf="@id/iv_icon"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/iv_leaderboard" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerview_leaderboard"
-        android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:layout_marginTop="16dp"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/iv_leaderboard" />
+        app:layout_constraintTop_toTopOf="@id/iv_icon" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

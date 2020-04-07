@@ -216,6 +216,9 @@ dependencies {
     // AndroidUtilCode
     implementation "com.blankj:utilcodex:$utilcodex_version"
 
+    // Viewpager2
+    implementation "androidx.viewpager2:viewpager2:$viewpager2_version"
+
     implementation 'com.github.yulichswift:RoundedViews:1.1.0'
 
     // Test

@@ -5,8 +5,8 @@
     android:layout_marginTop="16dp">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerview_recommend"
+        android:id="@+id/recyclerview_leaderboard"
         android:layout_width="match_parent"
-        android:layout_height="600dp"
+        android:layout_height="120dp"
         android:nestedScrollingEnabled="false" />
 </LinearLayout>

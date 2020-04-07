@@ -36,4 +36,6 @@
     <string name="login_forget">忘记密码?</string>
     <string name="username_or_password_incorrect">使用者名称或密码错误</string>
 
+    <string name="text_more">更多</string>
+
 </resources>
