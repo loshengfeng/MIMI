@@ -54,7 +54,7 @@ class SimpleConfirmDialogFragment : BaseDialogFragment() {
 
         btn_cancel.setOnClickListener {
             dismiss()
-            onSimpleDialogListener?.onCancle()
+            onSimpleDialogListener?.onCancel()
         }
     }
 

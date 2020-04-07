@@ -203,6 +203,12 @@
             app:popUpTo="@id/personalFragment"
             app:popUpToInclusive="true" />
 
+        <action
+            android:id="@+id/action_personalFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/personalFragment"
+            app:popUpToInclusive="true" />
+
     </fragment>
 
     <fragment

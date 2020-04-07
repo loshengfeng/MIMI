@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.view.splash
 
 import android.os.Bundle
-import android.os.Handler
 import android.view.View
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
