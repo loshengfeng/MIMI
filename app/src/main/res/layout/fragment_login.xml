@@ -34,14 +34,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="false"
-            android:text="@string/register" />
+            android:text="@string/btn_register" />
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/ti_Register"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="false"
-            android:text="@string/login" />
+            android:text="@string/btn_login" />
     </com.google.android.material.tabs.TabLayout>
 
     <include

@@ -37,9 +37,4 @@ class MessengerFragment : BaseFragment() {
     override fun setupListeners() {
         Timber.d("${MessengerFragment::class.java.simpleName}_setupListeners")
     }
-
-    override fun initSettings() {
-        Timber.d("${MessengerFragment::class.java.simpleName}_initSettings")
-    }
-
 }

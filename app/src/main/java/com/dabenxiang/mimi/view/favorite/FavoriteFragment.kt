@@ -16,8 +16,4 @@ class FavoriteFragment  : BaseFragment() {
     override fun setupListeners() {
         Timber.d("${FavoriteFragment::class.java.simpleName}_setupListeners")
     }
-
-    override fun initSettings() {
-        Timber.d("${FavoriteFragment::class.java.simpleName}_initSettings")
-    }
 }

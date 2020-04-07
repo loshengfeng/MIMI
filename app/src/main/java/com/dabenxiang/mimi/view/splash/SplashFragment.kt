@@ -30,8 +30,4 @@ class SplashFragment : BaseFragment() {
     override fun setupListeners() {
         Timber.d("${SplashFragment::class.java.simpleName}_setupListeners")
     }
-
-    override fun initSettings() {
-        Timber.d("${SplashFragment::class.java.simpleName}_initSettings")
-    }
 }

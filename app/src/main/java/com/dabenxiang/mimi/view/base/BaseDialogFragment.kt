@@ -31,6 +31,9 @@ abstract class BaseDialogFragment : DialogFragment() {
 
         progressHUD = KProgressHUD.create(context)
             .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+
+        setupListeners()
+        setupObservers()
     }
 
     override fun onStart() {
@@ -53,5 +56,9 @@ abstract class BaseDialogFragment : DialogFragment() {
     abstract fun isFullLayout(): Boolean
 
     abstract fun getLayoutId(): Int
+
+    abstract fun setupObservers()
+
+    abstract fun setupListeners()
 
 }

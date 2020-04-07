@@ -6,10 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
+import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.main.MainViewModel
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.kaopiz.kprogresshud.KProgressHUD
 import kotlinx.android.synthetic.main.activity_main.*
+import retrofit2.HttpException
 
 abstract class BaseFragment : Fragment() {
 
@@ -42,7 +48,28 @@ abstract class BaseFragment : Fragment() {
 
         setupListeners()
         setupObservers()
-        initSettings()
+    }
+
+    fun showHttpErrorDialog(type: HttpErrorMsgType = HttpErrorMsgType.API_FAILED) {
+        when (type) {
+            HttpErrorMsgType.API_FAILED -> showErrorDialog(getString(R.string.api_failed_msg))
+            HttpErrorMsgType.CHECK_NETWORK -> showErrorDialog(getString(R.string.server_error))
+        }
+    }
+
+    fun showErrorDialog(message: String) {
+        MaterialDialog(context!!).show {
+            cancelable(false)
+            message(text = message)
+            positiveButton(R.string.btn_confirm) { dialog ->
+                dialog.dismiss()
+            }
+            lifecycleOwner(this@BaseFragment)
+        }
+    }
+
+    fun showHttpErrorToast(e: HttpException) {
+        GeneralUtils.showToast(context!!, "$e")
     }
 
     abstract fun getLayoutId(): Int
@@ -50,8 +77,6 @@ abstract class BaseFragment : Fragment() {
     abstract fun setupObservers()
 
     abstract fun setupListeners()
-
-    abstract fun initSettings()
 
     open val bottomNavigationVisibility: Int = View.VISIBLE
 }

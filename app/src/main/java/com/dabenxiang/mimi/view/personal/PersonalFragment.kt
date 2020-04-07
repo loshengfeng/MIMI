@@ -20,9 +20,4 @@ class PersonalFragment : BaseFragment() {
     override fun setupListeners() {
         Timber.d("${PersonalFragment::class.java.simpleName}_setupListeners")
     }
-
-    override fun initSettings() {
-        Timber.d("${PersonalFragment::class.java.simpleName}_initSettings")
-    }
-
 }

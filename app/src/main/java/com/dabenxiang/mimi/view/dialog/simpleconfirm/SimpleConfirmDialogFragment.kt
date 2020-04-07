@@ -5,6 +5,7 @@ import android.view.View
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import kotlinx.android.synthetic.main.fragment_simple_confirm_dialog.*
+import timber.log.Timber
 
 
 class SimpleConfirmDialogFragment : BaseDialogFragment() {
@@ -59,5 +60,13 @@ class SimpleConfirmDialogFragment : BaseDialogFragment() {
 
     override fun isFullLayout(): Boolean {
         return true
+    }
+
+    override fun setupObservers() {
+        Timber.d("${SimpleConfirmDialogFragment::class.java.simpleName}_setupObservers")
+    }
+
+    override fun setupListeners() {
+        Timber.d("${SimpleConfirmDialogFragment::class.java.simpleName}_setupListeners")
     }
 }

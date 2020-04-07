@@ -5,7 +5,6 @@ import android.view.View
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import kotlinx.android.synthetic.main.fragment_dialog_login.*
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 class LoginDialogFragment : BaseDialogFragment() {
@@ -48,9 +47,24 @@ class LoginDialogFragment : BaseDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         val type = arguments?.getInt(KEY_TYPE)
         refreshUI(type)
-        Timber.d("${LoginDialogFragment::class.java.simpleName}_type: $type")
+    }
+
+    override fun setupObservers() {
+        Timber.d("${LoginDialogFragment::class.java.simpleName}_setupObservers")
+    }
+
+    override fun setupListeners() {
+        Timber.d("${LoginDialogFragment::class.java.simpleName}_setupListeners")
         btnConfirm?.setOnClickListener {
             onLoginDialogListener?.onConfirm()
+        }
+
+        View.OnClickListener { buttonView ->
+            when (buttonView.id) {
+                R.id.btnConfirm -> onLoginDialogListener?.onConfirm()
+            }
+        }.also {
+            btnConfirm.setOnClickListener(it)
         }
     }
 

@@ -83,7 +83,7 @@
             android:layout_marginStart="15dp"
             android:layout_marginTop="20dp"
             android:background="@drawable/bg_register"
-            android:text="@string/confirm"
+            android:text="@string/btn_confirm"
             android:textColor="@color/color_white_1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

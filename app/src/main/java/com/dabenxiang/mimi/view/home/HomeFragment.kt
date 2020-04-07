@@ -68,8 +68,4 @@ class HomeFragment : BaseFragment() {
     override fun setupListeners() {
         Timber.d("${HomeFragment::class.java.simpleName}_setupListeners")
     }
-
-    override fun initSettings() {
-        Timber.d("${HomeFragment::class.java.simpleName}_initSettings")
-    }
 }

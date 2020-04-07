@@ -16,9 +16,4 @@ class TopupFragment : BaseFragment() {
     override fun setupListeners() {
         Timber.d("${TopupFragment::class.java.simpleName}_setupListeners")
     }
-
-    override fun initSettings() {
-        Timber.d("${TopupFragment::class.java.simpleName}_initSettings")
-    }
-
 }
