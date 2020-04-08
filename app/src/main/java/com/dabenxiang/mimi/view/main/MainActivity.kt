@@ -8,17 +8,19 @@ import androidx.navigation.Navigation
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class MainActivity : BaseActivity() {
 
-//    private val viewModel by viewModel<MainViewModel>()
+    private val viewModel by viewModel<MainViewModel>()
 
     override fun getLayoutId(): Int {
         return R.layout.activity_main
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         windowManager?.let {
             val metrics = DisplayMetrics()
             it.defaultDisplay.getMetrics(metrics)
