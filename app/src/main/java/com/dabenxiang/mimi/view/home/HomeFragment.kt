@@ -5,16 +5,20 @@ import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
-
-import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.base.BaseFragment2
+import com.dabenxiang.mimi.view.base.NavigateItem
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-class HomeFragment : BaseFragment() {
+class HomeFragment : BaseFragment2<HomeViewModel>() {
 
     private val viewModel by viewModel<HomeViewModel>()
+
+    override fun fetchViewModel(): HomeViewModel? {
+        return viewModel
+    }
 
     override fun getLayoutId() = R.layout.fragment_home
 
@@ -29,6 +33,11 @@ class HomeFragment : BaseFragment() {
 
         Timber.d("onViewCreated Home")
 
+        loadSample()
+    }
+
+    //TODO: Testing
+    private fun loadSample() {
         activity?.also { activity ->
             LinearLayoutManager(activity).also { layoutManager ->
                 layoutManager.orientation = LinearLayoutManager.VERTICAL
@@ -51,7 +60,12 @@ class HomeFragment : BaseFragment() {
         for (i in 1..10) {
             layout_top_tap.addTab(layout_top_tap.newTab().setText("第${i}層"))
         }
+    }
 
+    override fun setupObservers() {
+    }
+
+    override fun setupListeners() {
         layout_top_tap.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabReselected(tab: TabLayout.Tab?) {
                 Timber.d("onTabReselected: ${tab?.position}")
@@ -64,17 +78,14 @@ class HomeFragment : BaseFragment() {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 Timber.d("onTabSelected: ${tab?.position}")
 
-                val nightMode = tab?.position == 1
-                mainViewModel?.enableNightMode?.value = nightMode
+                val position = tab!!.position
+
+                mainViewModel?.enableNightMode?.value = position == 1
+
+                if (position > 1) {
+                    viewModel.navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_categoriesFragment))
+                }
             }
         })
-    }
-
-    override fun setupObservers() {
-        Timber.d("${HomeFragment::class.java.simpleName}_setupObservers")
-    }
-
-    override fun setupListeners() {
-        Timber.d("${HomeFragment::class.java.simpleName}_setupListeners")
     }
 }

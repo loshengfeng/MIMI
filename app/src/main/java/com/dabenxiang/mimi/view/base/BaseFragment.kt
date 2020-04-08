@@ -10,7 +10,6 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
-import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.kaopiz.kprogresshud.KProgressHUD
@@ -42,9 +41,7 @@ abstract class BaseFragment : Fragment() {
         progressHUD = KProgressHUD.create(context)
             .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
 
-        (activity as MainActivity?)?.also {
-            it.bottom_navigation?.visibility = bottomNavigationVisibility
-        }
+        activity?.bottom_navigation?.visibility = bottomNavigationVisibility
 
         setupListeners()
         setupObservers()

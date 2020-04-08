@@ -76,10 +76,10 @@
             app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="true" />
 
-        <action android:id="@+id/action_homeFragment_to_categoriesFragment"
+        <action
+            android:id="@+id/action_homeFragment_to_categoriesFragment"
             app:destination="@+id/categoriesFragment"
-            app:popUpTo="@id/homeFragment"
-            app:popUpToInclusive="true" />
+            app:launchSingleTop="true" />
 
     </fragment>
 
@@ -245,11 +245,11 @@
 
         <action
             android:id="@+id/action_settingFragment_to_resendMailFragment"
-            app:destination="@id/resendMailFragment"/>
+            app:destination="@id/resendMailFragment" />
 
         <action
             android:id="@+id/action_settingFragment_to_changePasswordFragment"
-            app:destination="@id/changePasswordFragment"/>
+            app:destination="@id/changePasswordFragment" />
 
     </fragment>
 
