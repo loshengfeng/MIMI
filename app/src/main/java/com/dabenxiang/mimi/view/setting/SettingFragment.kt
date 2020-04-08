@@ -38,9 +38,9 @@ class SettingFragment : BaseFragment() {
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.tv_back -> Navigation.findNavController(view!!).navigateUp()
-                R.id.btnTopup -> GeneralUtils.showToast(context!!, "btnTopup")
+                R.id.tv_topup -> GeneralUtils.showToast(context!!, "btnTopup")
                 R.id.btnPhoto -> GeneralUtils.showToast(context!!, "btnPhoto")
-                R.id.btnRaw1 -> GeneralUtils.showToast(context!!, "btnRaw1")
+                R.id.tv_raw1 -> GeneralUtils.showToast(context!!, "btnRaw1")
                 R.id.btnEmail -> Navigation.findNavController(view!!).navigate(R.id.action_settingFragment_to_resendMailFragment)
                 R.id.btnRaw2 -> GeneralUtils.showToast(context!!, "btnRaw2")
                 R.id.btnChangPw -> Navigation.findNavController(view!!).navigate(R.id.action_settingFragment_to_changePasswordFragment)
@@ -48,7 +48,7 @@ class SettingFragment : BaseFragment() {
         }.also {
             tv_back.setOnClickListener(it)
             btnPhoto.setOnClickListener(it)
-            btnRaw1.setOnClickListener(it)
+            tv_raw1.setOnClickListener(it)
             btnEmail.setOnClickListener(it)
             btnRaw2.setOnClickListener(it)
             btnChangPw.setOnClickListener(it)

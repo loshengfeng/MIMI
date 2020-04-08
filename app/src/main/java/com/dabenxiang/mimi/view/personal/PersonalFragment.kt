@@ -42,20 +42,20 @@ class PersonalFragment : BaseFragment() {
 
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
-                R.id.btnTopup -> GeneralUtils.showToast(context!!, "btnTopup")
-                R.id.btnFavorite -> GeneralUtils.showToast(context!!, "btnFavorite")
-                R.id.btnRaw1 -> GeneralUtils.showToast(context!!, "btnTopupHistory")
-                R.id.btnChatHistory -> GeneralUtils.showToast(context!!, "btnChatHistory")
-                R.id.btnSetting -> Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_settingFragment)
-                R.id.btnLogout -> GeneralUtils.showToast(context!!, "btnLogout")
+                R.id.tv_topup -> GeneralUtils.showToast(context!!, "btnTopup")
+                R.id.tv_favorite -> GeneralUtils.showToast(context!!, "btnFavorite")
+                R.id.tv_raw1 -> GeneralUtils.showToast(context!!, "btnTopupHistory")
+                R.id.tv_chat_history -> GeneralUtils.showToast(context!!, "btnChatHistory")
+                R.id.tv_setting -> Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_settingFragment)
+                R.id.tv_logout -> GeneralUtils.showToast(context!!, "btnLogout")
             }
         }.also {
-            btnTopup.setOnClickListener(it)
-            btnFavorite.setOnClickListener(it)
-            btnRaw1.setOnClickListener(it)
-            btnChatHistory.setOnClickListener(it)
-            btnSetting.setOnClickListener(it)
-            btnLogout.setOnClickListener(it)
+            tv_topup.setOnClickListener(it)
+            tv_favorite.setOnClickListener(it)
+            tv_raw1.setOnClickListener(it)
+            tv_chat_history.setOnClickListener(it)
+            tv_setting.setOnClickListener(it)
+            tv_logout.setOnClickListener(it)
         }
     }
 
@@ -68,14 +68,16 @@ class PersonalFragment : BaseFragment() {
             false -> {
                 item_is_Login.visibility = View.GONE
                 item_is_not_Login.visibility = View.VISIBLE
+
             }
         }
 
         // todo: for testing
-        tvName.text = "好大一棵洋梨"
-        tvCoco.text = "200"
-        tvNew.text = "N"
-        tvVersion.text = "v1.0.0"
+        tv_name.text = "好大一棵洋梨"
+        tv_coco.text = "200"
+        tv_new.text = "N"
+        tv_version_is_login.text = "v1.0.0"
+        tv_version_is_not_login.text = "v1.0.0"
         tvContent1.text = "文字內容文字內容"
         tvContent2.text = "文字內容文字內容文字內容文字內容文字內容文字內容文字內容文字內容"
     }

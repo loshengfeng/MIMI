@@ -32,7 +32,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/ivPhoto"
+            android:id="@+id/iv_photo"
             android:background="@drawable/ico_default_photo"
             android:layout_width="50dp"
             android:layout_height="50dp"
@@ -52,7 +52,7 @@
             app:layout_constraintTop_toBottomOf="@id/btnPhoto" />
 
         <TextView
-            android:id="@+id/btnRaw1"
+            android:id="@+id/tv_raw1"
             style="@style/settingStyle_1"
             android:drawableEnd="@drawable/ic_btn_arrow_black_n"
             android:gravity="center_vertical"
@@ -68,9 +68,9 @@
             android:layout_marginEnd="23dp"
             android:drawablePadding="7dp"
             android:gravity="center"
-            app:layout_constraintBottom_toBottomOf="@id/btnRaw1"
-            app:layout_constraintEnd_toEndOf="@id/btnRaw1"
-            app:layout_constraintTop_toTopOf="@id/btnRaw1"
+            app:layout_constraintBottom_toBottomOf="@id/tv_raw1"
+            app:layout_constraintEnd_toEndOf="@id/tv_raw1"
+            app:layout_constraintTop_toTopOf="@id/tv_raw1"
             tools:text="內容內容內容內容" />
 
         <View
@@ -78,7 +78,7 @@
             android:layout_height="1dp"
             android:background="@color/color_gray_3"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btnRaw1" />
+            app:layout_constraintTop_toBottomOf="@id/tv_raw1" />
 
         <TextView
             android:id="@+id/btnEmail"
@@ -87,7 +87,7 @@
             android:gravity="center_vertical"
             android:text="@string/setting_email"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btnRaw1" />
+            app:layout_constraintTop_toBottomOf="@id/tv_raw1" />
 
         <TextView
             android:id="@+id/tvEmail"
