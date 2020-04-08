@@ -4,6 +4,8 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import android.os.Bundle
 import android.util.DisplayMetrics
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseActivity
@@ -18,6 +20,7 @@ class MainActivity : BaseActivity() {
     override fun getLayoutId(): Int {
         return R.layout.activity_main
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -31,6 +34,14 @@ class MainActivity : BaseActivity() {
             resources.configuration.fontScale = 1f
             baseContext.resources.updateConfiguration(resources.configuration, metrics)
         }
+
+        viewModel.enableNightMode.observe(this, Observer { isNight ->
+            //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            val mode = if (isNight) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+            if (delegate.localNightMode != mode) {
+                delegate.localNightMode = mode
+            }
+        })
 
         bottom_navigation.setOnNavigationItemReselectedListener {}
 
@@ -80,5 +91,4 @@ class MainActivity : BaseActivity() {
         }
         super.onConfigurationChanged(newConfig)
     }
-
 }

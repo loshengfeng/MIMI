@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#6200EE</color>
-    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorPrimary">@color/color_white_1_30</color>
+    <color name="colorPrimaryDark">#f7f7f7</color>
     <color name="colorAccent">#03DAC5</color>
 
-    <color name="color_bar">#f7f7f7</color>
+    <color name="day_night_color_background">@color/color_white_1</color>
+    <color name="day_night_color_status_bar">#f7f7f7</color>
+    <color name="day_night_color_text">@color/color_black_1</color>
+    <color name="day_night_color_search_bar">#f7f7f7</color>
+    <color name="day_night_color_search_text">@color/color_black_1_30</color>
+    <color name="day_night_color_bottom_bar_item">@color/color_black_1</color>
+    <color name="day_night_color_tab_unselected_text">#868686</color>
 
     <color name="color_white_1">#ffffff</color>
+    <color name="color_white_1_30">#4dffffff</color>
     <color name="color_khaki_2">#908b6d</color>
     <color name="color_green_4">#00b5a9</color>
     <color name="color_black_1">#000000</color>
     <color name="color_black_1_05">#0d000000</color>
+    <color name="color_black_1_20">#33000000</color>
     <color name="color_black_1_30">#4d000000</color>
     <color name="color_black_1_40">#66000000</color>
     <color name="color_black_1_50">#80000000</color>

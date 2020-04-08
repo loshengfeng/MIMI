@@ -18,12 +18,18 @@ class HomeFragment : BaseFragment() {
 
     override fun getLayoutId() = R.layout.fragment_home
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        Timber.d("onCreate Home")
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        activity?.also { activity ->
-            activity.window.statusBarColor = activity.getColor(R.color.color_gray_2)
+        Timber.d("onViewCreated Home")
 
+        activity?.also { activity ->
             LinearLayoutManager(activity).also { layoutManager ->
                 layoutManager.orientation = LinearLayoutManager.VERTICAL
                 recyclerview_content.layoutManager = layoutManager
@@ -57,6 +63,9 @@ class HomeFragment : BaseFragment() {
 
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 Timber.d("onTabSelected: ${tab?.position}")
+
+                val nightMode = tab?.position == 1
+                mainViewModel?.enableNightMode?.value = nightMode
             }
         })
     }

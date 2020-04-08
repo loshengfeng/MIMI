@@ -7,7 +7,8 @@
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewpager"
         android:layout_width="match_parent"
-        android:layout_height="186dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="330:186"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.dabenxiang.mimi.widget.view.ViewPagerIndicator
