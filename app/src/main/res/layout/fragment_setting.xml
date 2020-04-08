@@ -33,7 +33,7 @@
 
         <ImageView
             android:id="@+id/iv_photo"
-            android:background="@drawable/ico_default_photo"
+            android:src="@drawable/ico_default_photo"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginEnd="16dp"

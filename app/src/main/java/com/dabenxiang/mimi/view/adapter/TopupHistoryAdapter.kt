@@ -23,8 +23,8 @@ class TopupHistoryAdapter : RecyclerView.Adapter<TopupHistoryViewHolder>() {
         Timber.d("${TopupHistoryAdapter::class.java.simpleName}_onBindViewHolder")
         holder.tvAccount.text = "1234***890"
         holder.tvTime.text = "2020-05-05 14:00"
-        holder.tvMoney.text = "3000+300"
-        holder.tvMoney2.text = "¥ 50.00"
+        holder.tvToken.text = "3000+300"
+        holder.tvPrice.text = "¥ 50.00"
     }
 
 }

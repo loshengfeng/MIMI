@@ -15,7 +15,7 @@
         android:layout_height="24dp"
         android:layout_marginTop="15dp"
         android:layout_marginStart="15dp"
-        android:background="@drawable/ic_ico_alipay"
+        android:src="@drawable/ic_ico_alipay"
         android:contentDescription="@null"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -45,7 +45,7 @@
         tools:text="2020-05-05 14:00" />
 
     <TextView
-        android:id="@+id/tv_money"
+        android:id="@+id/tv_token"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
@@ -57,15 +57,15 @@
         tools:text="3000+300" />
 
     <ImageView
-        android:id="@+id/iv_money"
+        android:id="@+id/iv_token"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:background="@drawable/ic_ico_micoin_small"
+        android:src="@drawable/ic_ico_micoin_small"
         android:layout_marginEnd="5dp"
         android:contentDescription="@null"
-        app:layout_constraintEnd_toStartOf="@id/tv_money"
-        app:layout_constraintBottom_toBottomOf="@id/tv_money"
-        app:layout_constraintTop_toTopOf="@id/tv_money" />
+        app:layout_constraintEnd_toStartOf="@id/tv_token"
+        app:layout_constraintBottom_toBottomOf="@id/tv_token"
+        app:layout_constraintTop_toTopOf="@id/tv_token" />
 
     <View
         android:id="@+id/viewLine"
@@ -91,7 +91,7 @@
         app:layout_constraintBottom_toBottomOf="parent"/>
 
     <TextView
-        android:id="@+id/tv_money_2"
+        android:id="@+id/tv_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="15dp"

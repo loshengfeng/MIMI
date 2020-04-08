@@ -21,6 +21,11 @@
     <string name="desc_success">登录成功</string>
     <string name="forget_password">忘记密码</string>
 
+    <!-- Topup-->
+    <string name="topup_desc">蜜币购买</string>
+    <string name="topup_total">总计</string>
+    <string name="topup_confirm_pay">确认支付</string>
+
     <!-- Favorite -->
     <string name="favorite_title">我的收藏</string>
     <string name="favorite_clean">清除所有收藏</string>

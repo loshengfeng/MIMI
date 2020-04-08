@@ -8,6 +8,6 @@ class TopupHistoryViewHolder(view: View) : BaseViewHolder(view) {
     val ivType = itemView.iv_type!!
     val tvAccount = itemView.tv_account!!
     val tvTime = itemView.tv_time!!
-    val tvMoney = itemView.tv_money!!
-    val tvMoney2 = itemView.tv_money_2!!
+    val tvToken = itemView.tv_token!!
+    val tvPrice = itemView.tv_price!!
 }

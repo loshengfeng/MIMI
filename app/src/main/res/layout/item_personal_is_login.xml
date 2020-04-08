@@ -23,7 +23,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginStart="18dp"
-            android:background="@drawable/ico_default_photo"
+            android:src="@drawable/ico_default_photo"
             android:contentDescription="@null"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
