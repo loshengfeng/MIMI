@@ -5,10 +5,10 @@ import android.view.View
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_favorite.*
-import kotlinx.android.synthetic.main.item_favorite_data.*
 import kotlinx.android.synthetic.main.item_favorite_no_data.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
@@ -44,11 +44,11 @@ class FavoriteFragment  : BaseFragment() {
     private fun initSettings() {
         when(hasData) {
             true -> {
-                item_data.visibility = View.VISIBLE
+                rv_content.visibility = View.VISIBLE
                 item_no_data.visibility = View.GONE
             }
             false -> {
-                item_data.visibility = View.GONE
+                rv_content.visibility = View.GONE
                 item_no_data.visibility = View.VISIBLE
             }
         }

@@ -1,9 +1,10 @@
-package com.dabenxiang.mimi.view.favorite
+package com.dabenxiang.mimi.view.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.view.favorite.FavoriteViewHolder
 import timber.log.Timber
 
 class FavoriteAdapter : RecyclerView.Adapter<FavoriteViewHolder>() {

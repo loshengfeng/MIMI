@@ -50,9 +50,8 @@
         app:layout_constraintTop_toBottomOf="@+id/layout_title"
         tools:visability="visible" />
 
-    <include
-        android:id="@+id/item_data"
-        layout="@layout/item_favorite_data"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_content"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="10dp"

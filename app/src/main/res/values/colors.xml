@@ -22,6 +22,7 @@
     <color name="color_black_1_30">#4d000000</color>
     <color name="color_black_1_40">#66000000</color>
     <color name="color_black_1_50">#80000000</color>
+    <color name="color_black_2_50">#80222222</color>
     <color name="color_red_1">#ff4d4d</color>
     <color name="color_red_2">#e57c7c</color>
     <color name="color_red_3">#ed5063</color>
@@ -32,4 +33,6 @@
     <color name="color_gray_2">#f7f7f7</color>
     <color name="color_gray_3">#d8d8d8</color>
     <color name="color_gray_4">#F0F0F0</color>
+    <color name="color_gray_5">#02000000</color>
+    <color name="color_gray_6">#0c000000</color>
 </resources>
