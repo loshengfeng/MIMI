@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment2
-import com.dabenxiang.mimi.view.base.NavigateItem
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -22,6 +21,20 @@ class HomeFragment : BaseFragment2<HomeViewModel>() {
 
     override fun getLayoutId() = R.layout.fragment_home
 
+    private val adapter by lazy {
+        HomeAdapter(context!!, adapterListener)
+    }
+
+    private val adapterListener = object : HomeAdapter.EventListener {
+        override fun onHeaderItemClick(view: View, template: HomeTemplate.Header) {
+            Timber.d("$template")
+        }
+
+        override fun onVideoClick(view: View) {
+
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -33,33 +46,51 @@ class HomeFragment : BaseFragment2<HomeViewModel>() {
 
         Timber.d("onViewCreated Home")
 
-        loadSample()
-    }
-
-    //TODO: Testing
-    private fun loadSample() {
         activity?.also { activity ->
             LinearLayoutManager(activity).also { layoutManager ->
                 layoutManager.orientation = LinearLayoutManager.VERTICAL
                 recyclerview_content.layoutManager = layoutManager
             }
 
-            val templateList = mutableListOf<HomeTemplate>()
-            templateList.add(HomeTemplate.Banner)
-            templateList.add(HomeTemplate.Carousel)
-            templateList.add(HomeTemplate.Header(null, "分類1"))
-            templateList.add(HomeTemplate.Categories)
-            templateList.add(HomeTemplate.Header(null, "分類2"))
-            templateList.add(HomeTemplate.Categories)
-
-            recyclerview_content.adapter = HomeAdapter(activity, templateList)
+            recyclerview_content.adapter = adapter
         }
+
+        loadSample()
+    }
+
+    //TODO: Testing
+    private fun loadSample() {
+        loadHome()
 
         //viewModel.loadHomeCategories()
 
         for (i in 1..10) {
             layout_top_tap.addTab(layout_top_tap.newTab().setText("第${i}層"))
         }
+    }
+
+    private fun loadHome() {
+        btn_all.visibility = View.GONE
+
+        val templateList = mutableListOf<HomeTemplate>()
+        templateList.add(HomeTemplate.Banner)
+        templateList.add(HomeTemplate.Carousel)
+        templateList.add(HomeTemplate.Header(null, "分類1"))
+        templateList.add(HomeTemplate.Categories())
+        templateList.add(HomeTemplate.Header(null, "分類2"))
+        templateList.add(HomeTemplate.Categories())
+
+        adapter.setDataSrc(templateList)
+    }
+
+    private fun loadCategories() {
+        btn_all.visibility = View.VISIBLE
+
+        val templateList = mutableListOf<HomeTemplate>()
+        templateList.add(HomeTemplate.Banner)
+        templateList.add(HomeTemplate.VideoList)
+
+        adapter.setDataSrc(templateList)
     }
 
     override fun setupObservers() {
@@ -82,8 +113,18 @@ class HomeFragment : BaseFragment2<HomeViewModel>() {
 
                 mainViewModel?.enableNightMode?.value = position == 1
 
-                if (position > 1) {
-                    viewModel.navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_categoriesFragment))
+                when (position) {
+                    0 -> {
+                        loadHome()
+                    }
+
+                    1 -> {
+
+                    }
+                    else -> {
+                        //viewModel.navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_categoriesFragment))
+                        loadCategories()
+                    }
                 }
             }
         })

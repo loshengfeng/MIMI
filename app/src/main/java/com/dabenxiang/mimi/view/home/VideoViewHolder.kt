@@ -2,7 +2,7 @@ package com.dabenxiang.mimi.view.home
 
 import android.view.View
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import kotlinx.android.synthetic.main.item_item_home_categories.view.*
+import kotlinx.android.synthetic.main.nested_item_home_categories.view.*
 
 class VideoViewHolder(itemView: View) : BaseViewHolder(itemView) {
     val tvResolution = itemView.tv_resolution!!

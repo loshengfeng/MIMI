@@ -49,9 +49,10 @@
             android:layout_width="0dp"
             android:layout_height="36dp"
             app:btn_corner_radius="standard"
+            android:layout_marginEnd="10dp"
             app:btn_solid_color="@color/day_night_color_search_bar"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btn_all"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -60,7 +61,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:src="@drawable/day_night_btn_search_n"
+            android:src="@drawable/day_night_btn_search"
             app:layout_constraintBottom_toBottomOf="@id/iv_bg_search"
             app:layout_constraintStart_toStartOf="@id/layout_search_bar"
             app:layout_constraintTop_toTopOf="@id/iv_bg_search" />
@@ -74,6 +75,25 @@
             android:textColor="@color/day_night_color_search_text"
             app:layout_constraintBottom_toBottomOf="@id/iv_bg_search"
             app:layout_constraintStart_toEndOf="@id/iv_search"
+            app:layout_constraintTop_toTopOf="@id/iv_bg_search" />
+
+        <com.yulichswift.roundedview.widget.RoundedTextView
+            android:id="@+id/btn_all"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:clickable="true"
+            android:drawableStart="@drawable/ico_filter"
+            android:paddingStart="6dp"
+            android:paddingEnd="12dp"
+            android:singleLine="true"
+            android:text="全部"
+            android:textColor="@color/color_black_1"
+            android:textSize="14sp"
+            app:btn_corner_radius="6dp"
+            app:btn_pressed_color="@color/color_red_1"
+            app:btn_solid_color="@color/color_black_1_05"
+            app:layout_constraintBottom_toBottomOf="@id/iv_bg_search"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/iv_bg_search" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

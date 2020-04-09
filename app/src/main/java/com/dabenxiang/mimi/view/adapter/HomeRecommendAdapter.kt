@@ -5,11 +5,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import kotlinx.android.synthetic.main.item_item_home_recommend.view.*
+import kotlinx.android.synthetic.main.nested_item_home_recommend.view.*
 
 class HomeRecommendAdapter : RecyclerView.Adapter<BaseViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_item_home_recommend, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.nested_item_home_recommend, parent, false)
         return BaseViewHolder(view)
     }
 

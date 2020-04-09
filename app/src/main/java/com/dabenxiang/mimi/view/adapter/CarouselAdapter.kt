@@ -14,7 +14,7 @@ class CarouselAdapter : RecyclerView.Adapter<BaseViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        return BaseViewHolder(layoutInflater.inflate(R.layout.item_item_carousel, parent, false))
+        return BaseViewHolder(layoutInflater.inflate(R.layout.nested_item_carousel, parent, false))
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {

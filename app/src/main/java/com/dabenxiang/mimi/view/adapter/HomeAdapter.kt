@@ -4,115 +4,103 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.widget.ViewPager2
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.*
-import timber.log.Timber
 
-enum class HomeItemType {
-    HEADER, BANNER, CAROUSEL, LEADERBOARD, RECOMMEND, CATEGORIES
-}
+class HomeAdapter(val context: Context, private val listener: EventListener) : RecyclerView.Adapter<BaseViewHolder>() {
 
-class HomeAdapter(val context: Context, val templateList: List<HomeTemplate>) : RecyclerView.Adapter<HomeViewHolder>() {
+    interface EventListener {
+        fun onHeaderItemClick(view: View, template: HomeTemplate.Header)
+        fun onVideoClick(view: View)
+    }
+
+    private var templateList: List<HomeTemplate>? = null
+
+    fun setDataSrc(src: List<HomeTemplate>) {
+        templateList = src
+        notifyDataSetChanged()
+    }
 
     override fun getItemCount(): Int {
-        return templateList.count()
+        return templateList?.count() ?: 0
     }
 
     override fun getItemViewType(position: Int): Int {
-        val template = templateList[position]
-        return template.type.ordinal
+        templateList?.also {
+            val template = it[position]
+            return template.type.ordinal
+        }
+
+        return -1
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomeViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
 
         val layoutInflater = LayoutInflater.from(parent.context)
 
         val viewHolder = when (viewType) {
             HomeItemType.HEADER.ordinal -> {
-                HeaderViewHolder(layoutInflater.inflate(R.layout.item_header, parent, false))
+                HeaderViewHolder(layoutInflater.inflate(R.layout.item_header, parent, false), listener)
             }
             HomeItemType.BANNER.ordinal -> {
-                HomeBannerViewHolder(layoutInflater.inflate(R.layout.item_banner, parent, false))
+                HomeBannerViewHolder(layoutInflater.inflate(R.layout.item_banner, parent, false), listener)
             }
             HomeItemType.CAROUSEL.ordinal -> {
-                HomeCarouselViewHolder(layoutInflater.inflate(R.layout.item_carousel, parent, false))
+                HomeCarouselViewHolder(layoutInflater.inflate(R.layout.item_carousel, parent, false), listener)
             }
             HomeItemType.CATEGORIES.ordinal -> {
-                HomeCategoriesViewHolder(layoutInflater.inflate(R.layout.item_home_categories, parent, false))
+                HomeCategoriesViewHolder(layoutInflater.inflate(R.layout.item_home_categories, parent, false), listener)
             }
             HomeItemType.LEADERBOARD.ordinal -> {
-                HomeLeaderboardViewHolder(layoutInflater.inflate(R.layout.item_home_leaderboard, parent, false))
+                HomeLeaderboardViewHolder(layoutInflater.inflate(R.layout.item_home_leaderboard, parent, false), listener)
             }
             HomeItemType.RECOMMEND.ordinal -> {
-                HomeRecommendViewHolder(layoutInflater.inflate(R.layout.item_home_recommend, parent, false))
+                HomeRecommendViewHolder(layoutInflater.inflate(R.layout.item_home_recommend, parent, false), listener)
+            }
+            HomeItemType.VIDEOLIST.ordinal -> {
+                HomeVideoListViewHolder(layoutInflater.inflate(R.layout.item_video_list, parent, false), listener)
             }
             else -> {
-                HomeViewHolder(layoutInflater.inflate(R.layout.item_header, parent, false))
+                HeaderViewHolder(layoutInflater.inflate(R.layout.item_header, parent, false), listener)
             }
         }
 
         return viewHolder
     }
 
-    override fun onBindViewHolder(holder: HomeViewHolder, position: Int) {
-        when (holder.itemViewType) {
-            HomeItemType.HEADER.ordinal -> {
-                val vh = holder as HeaderViewHolder
-                val template = templateList[position] as HomeTemplate.Header
-                if (template.iconRes != null) {
-                    vh.ivIcon.setImageResource(template.iconRes)
-                    vh.ivIcon.visibility = View.VISIBLE
-                } else {
-                    vh.ivIcon.setImageDrawable(null)
-                    vh.ivIcon.visibility = View.GONE
+    override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
+        templateList?.also { templateList ->
+            when (holder.itemViewType) {
+                HomeItemType.HEADER.ordinal -> {
+                    val vh = holder as HeaderViewHolder
+                    vh.bind(templateList[position])
                 }
-
-                vh.tvTitle.text = template.title
-            }
-            HomeItemType.BANNER.ordinal -> {
-                val vh = holder as HomeBannerViewHolder
-            }
-            HomeItemType.CAROUSEL.ordinal -> {
-                val vh = holder as HomeCarouselViewHolder
-                vh.viewPager.adapter = CarouselAdapter()
-                vh.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-                    override fun onPageSelected(position: Int) {
-                        super.onPageSelected(position)
-                        Timber.d("onPageSelected: $position")
-                    }
-                })
-
-                vh.pagerIndicator.setViewPager2(vh.viewPager)
-            }
-            HomeItemType.CATEGORIES.ordinal -> {
-                val vh = holder as HomeCategoriesViewHolder
-                LinearLayoutManager(context).also { layoutManager ->
-                    layoutManager.orientation = LinearLayoutManager.HORIZONTAL
-                    vh.recyclerView.layoutManager = layoutManager
+                HomeItemType.BANNER.ordinal -> {
+                    val vh = holder as HomeBannerViewHolder
+                    vh.bind(templateList[position])
                 }
-
-                vh.recyclerView.adapter = HomeCategoriesAdapter()
-            }
-            HomeItemType.LEADERBOARD.ordinal -> {
-                val vh = holder as HomeLeaderboardViewHolder
-                LinearLayoutManager(context).also { layoutManager ->
-                    layoutManager.orientation = LinearLayoutManager.HORIZONTAL
-                    vh.recyclerView.layoutManager = layoutManager
+                HomeItemType.CAROUSEL.ordinal -> {
+                    val vh = holder as HomeCarouselViewHolder
+                    vh.bind(templateList[position])
                 }
-
-                vh.recyclerView.adapter = LeaderboardAdapter()
-            }
-            HomeItemType.RECOMMEND.ordinal -> {
-                val vh = holder as HomeRecommendViewHolder
-                GridLayoutManager(context, 2).also { layoutManager ->
-                    vh.recyclerView.layoutManager = layoutManager
+                HomeItemType.CATEGORIES.ordinal -> {
+                    val vh = holder as HomeCategoriesViewHolder
+                    vh.bind(templateList[position])
                 }
-
-                vh.recyclerView.adapter = HomeRecommendAdapter()
+                HomeItemType.LEADERBOARD.ordinal -> {
+                    val vh = holder as HomeLeaderboardViewHolder
+                    vh.bind(templateList[position])
+                }
+                HomeItemType.RECOMMEND.ordinal -> {
+                    val vh = holder as HomeRecommendViewHolder
+                    vh.bind(templateList[position])
+                }
+                HomeItemType.VIDEOLIST.ordinal -> {
+                    val vh = holder as HomeVideoListViewHolder
+                    vh.bind(templateList[position])
+                }
             }
         }
     }

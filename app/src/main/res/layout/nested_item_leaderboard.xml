@@ -21,17 +21,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <com.yulichswift.roundedview.widget.RoundedTextView
             android:id="@+id/tv_leaderboard"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:background="@drawable/bg_black_1_50_radius_4"
             android:gravity="center"
             android:paddingStart="6dp"
             android:paddingTop="3dp"
             android:paddingEnd="6dp"
             android:paddingBottom="3dp"
+            app:btn_corner_radius="4dp"
+            app:btn_solid_color="@color/color_black_1_50"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
