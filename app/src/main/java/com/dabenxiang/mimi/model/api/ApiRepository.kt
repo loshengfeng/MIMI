@@ -1,9 +1,6 @@
 package com.dabenxiang.mimi.model.api
 
-import com.dabenxiang.mimi.model.api.vo.MeProfileItem
-import com.dabenxiang.mimi.model.api.vo.MembersAccountItem
-import com.dabenxiang.mimi.model.api.vo.PasswordRequest
-import com.dabenxiang.mimi.model.api.vo.ResetTotpRequest
+import com.dabenxiang.mimi.model.api.vo.*
 import org.json.JSONObject
 
 class ApiRepository(private val apiService: ApiService) {
@@ -17,16 +14,20 @@ class ApiRepository(private val apiService: ApiService) {
      *                  Attachment
      *
      ***********************************************************/
-    suspend fun getAttachment(id: Int) = apiService.getAttachment(id)
+    suspend fun postAttachment(body: String) = apiService.postAttachment(body)
 
-    suspend fun postAttachment(id: Int, body: String) = apiService.postAttachment(id, body)
+    suspend fun getAttachment(id: String) = apiService.getAttachment(id)
+
+    suspend fun putAttachment(id: String, request: String) = apiService.putAttachment(id, request)
+
+    suspend fun deleteAttachment(id: String) = apiService.deleteAttachment(id)
 
     /**********************************************************
      *
      *                  Auth
      *
      ***********************************************************/
-    suspend fun resetPassword(request: PasswordRequest) = apiService.resetPassword(request)
+    suspend fun resetPassword(requestReset: ResetPasswordRequest) = apiService.resetPassword(requestReset)
 
     suspend fun resetTotp(request: ResetTotpRequest) = apiService.resetTotp(request)
 
@@ -35,7 +36,15 @@ class ApiRepository(private val apiService: ApiService) {
      *                  Chats
      *
      ***********************************************************/
-    suspend fun getChats(targetUserId: String) = apiService.getChats(targetUserId)
+    suspend fun postChats(request: ChatRequest) = apiService.postChat(request)
+
+    suspend fun getChats(offset: String, limit: String) = apiService.getChat(offset, limit)
+
+    suspend fun postMessage(request: MsgRequest) = apiService.postMessage(request)
+
+    suspend fun getMessage(
+        chatId: Int, lastReadTime: String, offset: String, limit: String
+    ) = apiService.getMessage(chatId, lastReadTime, offset, limit)
 
     /**********************************************************
      *
@@ -67,40 +76,41 @@ class ApiRepository(private val apiService: ApiService) {
      ***********************************************************/
     suspend fun getMe() = apiService.getMe()
 
-    suspend fun getMeChatItem() = apiService.getMeChat()
+    suspend fun getMeChatItem(
+        offset: Int, limit: Int
+    ) = apiService.getMeChat(offset, limit)
 
-    suspend fun getMeMessage(chatId: String) = apiService.getMeMessage(chatId)
+    suspend fun getMeMessage(
+        chatId: String, offset: Int, limit: Int
+    ) = apiService.getMeMessage(chatId, offset, limit)
 
-    suspend fun getMeOrder() = apiService.getMeOrder()
+    suspend fun getMeOrder(
+        offset: Int, limit: Int
+    ) = apiService.getMeOrder(offset, limit)
 
-    //TODO: body內容待確認
-    suspend fun deleteMePlaylist(body: JSONObject) = apiService.deleteMePlaylist(body)
+    suspend fun deleteMePlaylist(
+        ids : List<Int>
+    ) = apiService.deleteMePlaylist(ids)
 
-    //TODO: playlistType?
-    suspend fun getMePlaylist(playlistType: Int) = apiService.getMePlaylist(playlistType)
+    suspend fun getMePlaylist(
+        playlistType: Int, offset: Int, limit: Int
+    ) = apiService.getMePlaylist(playlistType, offset, limit)
 
-    //TODO: 沒有用戶參數!!
     suspend fun getMeProfile() = apiService.getMeProfile()
 
-    //TODO: 沒有用戶參數!!, Resp內容？
     suspend fun updatedMeProfile(body: MeProfileItem) = apiService.updatedMeProfile(body)
 
-    /**********************************************************
-     *
-     *                  Members
-     *
-     ***********************************************************/
-    suspend fun forgetPassword(body: PasswordRequest) = apiService.forgetPassword(body)
+    suspend fun forgetPassword(body: ForgetPasswordRequest) = apiService.forgetPassword(body)
 
     suspend fun signUp(body: MembersAccountItem) = apiService.signUp(body)
 
+    suspend fun emailValidation(key: String) = apiService.validationEmail(key)
+
     /**********************************************************
      *
-     *                  Notification/Email
+     *                  Merchants
      *
      ***********************************************************/
-    //TODO: 沒有用戶參數!!
-    suspend fun emailValidation() = apiService.emailValidation()
 
     /**********************************************************
      *
@@ -110,7 +120,22 @@ class ApiRepository(private val apiService: ApiService) {
 
     /**********************************************************
      *
-     *                  Ordering
+     *                  Operators/Video
+     *
+     ***********************************************************/
+//    suspend fun getOperatorsVideo(
+//        id: Int, key: String, status: Int, offset: Int, limit: Int
+//    ) = apiService.getOperatorsVideo(id, key, status, offset, limit)
+//
+//    suspend fun putOperatorsVideo(request: OperatorsVideoRequest) = apiService.putOperatorsVideo(request)
+//
+//    suspend fun postCrawler(
+//        videoEpisodeIds : List<Int>
+//    ) = apiService.postCrawler(videoEpisodeIds)
+
+    /**********************************************************
+     *
+     *                  Ordering 建訂單用
      *
      ***********************************************************/
 

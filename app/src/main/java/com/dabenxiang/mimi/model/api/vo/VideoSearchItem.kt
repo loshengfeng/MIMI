@@ -4,11 +4,11 @@ import com.google.gson.annotations.SerializedName
 
 data class VideoSearchItem(
     @SerializedName("cover")
-    val cover: String,
+    val cover: String?,
 
     @SerializedName("id")
-    val id: Int,
+    val id: Int?,
 
     @SerializedName("title")
-    val title: String
+    val title: String?
 )

@@ -3,7 +3,7 @@ package com.dabenxiang.mimi.model.manager
 import android.text.TextUtils
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.PasswordRequest
+import com.dabenxiang.mimi.model.api.vo.ResetPasswordRequest
 import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.model.vo.ProfileData
 import com.dabenxiang.mimi.model.vo.TokenData
@@ -97,7 +97,7 @@ class AccountManager(private val pref: Pref,
 
     fun resetPwd(userName: String, newPwd: String) =
         flow {
-            val request = PasswordRequest(userName, newPwd)
+            val request = ResetPasswordRequest(userName, newPwd)
             val result = apiRepository.resetPassword(request)
             if (!result.isSuccessful) throw HttpException(result)
             getProfile()?.copy(password = newPwd)?.let {

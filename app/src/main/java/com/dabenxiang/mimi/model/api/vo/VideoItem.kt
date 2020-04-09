@@ -3,50 +3,60 @@ package com.dabenxiang.mimi.model.api.vo
 import com.google.gson.annotations.SerializedName
 
 data class VideoItem(
-    @SerializedName("country")
-    val country: String?,
+    @SerializedName("id")
+    val id: Int?,
 
-    @SerializedName("cover")
-    val cover: String?,
+    @SerializedName("title")
+    val title: String?,
 
     @SerializedName("description")
     val description: String?,
 
-    @SerializedName("id")
-    val id: Int?,
+    @SerializedName("cover")
+    val cover: String?,
 
     @SerializedName("tags")
     val tags: List<String>?,
 
-    @SerializedName("title")
-    val title: String?,
+    @SerializedName("country")
+    val country: String?,
+
+    @SerializedName("years")
+    val years: Int?,
 
     @SerializedName("updateTime")
     val updateTime: String?,
 
     @SerializedName("videoSources")
-    val videoSources: List<VideoSource>?,
+    val videoEpisode: List<VideoEpisode>?
 
-    @SerializedName("years")
-    val years: Int?
 ) {
 
-    data class VideoSource(
+    data class VideoEpisode(
+        @SerializedName("id")
+        val id: Int?,
+
+        @SerializedName("source")
+        val source: String?,
+
+        @SerializedName("episode")
+        val episode: String?,
+
+        @SerializedName("videoStreams")
+        val videoStreams: VideoStreams?
+    )
+
+    data class VideoStreams(
+        @SerializedName("id")
+        val id: Int?,
+
         @SerializedName("name")
         val name: String?,
 
-        @SerializedName("videoEpisodes")
-        val videoEpisodes: List<VideoEpisode>?
-    )
-
-    data class VideoEpisode(
         @SerializedName("episode")
         val episode: String?,
 
         @SerializedName("episodePublishTime")
-        val episodePublishTime: String?,
-
-        @SerializedName("id")
-        val id: Int?
+        val episodePublishTime: String?
     )
 }

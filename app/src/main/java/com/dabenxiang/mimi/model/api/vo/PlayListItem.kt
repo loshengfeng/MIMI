@@ -3,27 +3,27 @@ package com.dabenxiang.mimi.model.api.vo
 import com.google.gson.annotations.SerializedName
 
 data class PlayListItem(
-    @SerializedName("cover")
-    val cover: String,
-
-    @SerializedName("episode")
-    val episode: String,
-
     @SerializedName("id")
-    val id: Int,
-
-    @SerializedName("playlistType")
-    val playlistType: Int,
-
-    @SerializedName("subTitle")
-    val subTitle: String,
+    val id: Int?,
 
     @SerializedName("title")
-    val title: String,
+    val title: String?,
 
-    @SerializedName("videoEpisodeId")
-    val videoEpisodeId: Int,
+    @SerializedName("subTitle")
+    val subTitle: String?,
+
+    @SerializedName("cover")
+    val cover: String?,
 
     @SerializedName("videoId")
-    val videoId: Int
+    val videoId: Int?,
+
+    @SerializedName("episode")
+    val episode: String?,
+
+    @SerializedName("videoEpisodeId")
+    val videoEpisodeId: Int?,
+
+    @SerializedName("playlistType")
+    val playlistType: Int?
 )

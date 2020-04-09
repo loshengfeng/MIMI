@@ -8,11 +8,10 @@ class ErrorCode {
          *                  Common
          *
          ***********************************************************/
-        const val TOKEN_NOT_FOUND = "401001"
-        const val WRONG_NAME = "404002"
-        const val WRONG_PW = "401002"
-        const val DUPLICATE_ACCOUNT = "409001"
-        const val DUPLICATE_QR_CODE = "409005"
-        const val INSUFFICIENT_BALANCE = "403011"
+        const val SUCCESS      = "201000" // Success Created
+        const val REDIRECT     = "302"    // Redirect
+        const val BAD_REQUEST  = "400000" // Bad Request (400) - One of the request inputs is not valid.
+        const val NOT_FOUND    = "404000" // The specified resource does not exist.
+        const val SERVER_ERROR = "500000" // Internal Server Error
     }
 }

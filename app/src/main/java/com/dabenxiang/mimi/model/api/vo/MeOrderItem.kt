@@ -4,20 +4,20 @@ import com.google.gson.annotations.SerializedName
 
 data class MeOrderItem(
     @SerializedName("merchantUserFriendlyName")
-    val merchantUserFriendlyName: String,
+    val merchantUserFriendlyName: String?,
 
     @SerializedName("packageName")
-    val packageName: String,
-
-    @SerializedName("paymentStatus")
-    val paymentStatus: Int,
+    val packageName: String?,
 
     @SerializedName("paymentType")
-    val paymentType: Int,
+    val paymentType: Int?,
+
+    @SerializedName("paymentStatus")
+    val paymentStatus: Int?,
 
     @SerializedName("sellingPrice")
-    val sellingPrice: Int,
+    val sellingPrice: Int?,
 
     @SerializedName("status")
-    val status: Int
+    val status: Int?
 )

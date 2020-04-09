@@ -1,27 +1,35 @@
 package com.dabenxiang.mimi.model.api
 
 import com.dabenxiang.mimi.model.api.vo.*
-import org.json.JSONObject
 import retrofit2.Response
 import retrofit2.http.*
-
 interface ApiService {
 
     /**********************************************************
      *
-     *                  Attachment
+     *                  Attachment 附檔相關的API Ex: 上傳附檔、取附檔
      *
      ***********************************************************/
-    @GET("/v1/Attachment/{id}")
-    suspend fun getAttachment(
-        @Path("id") id: Int
-    ): Response<String>
-
-    @POST("/v1/Attachment/{id}")
+    @POST("/v1/Attachment/")
     suspend fun postAttachment(
-        @Path("id") id: Int,
         @Body request: String
     ): Response<String>
+
+    @GET("/v1/Attachment/{id}")
+    suspend fun getAttachment(
+        @Path("id") id: String
+    ): Response<String>
+
+    @PUT("/v1/Attachment/{id}")
+    suspend fun putAttachment(
+        @Path("id") id: String,
+        @Body request: String
+    ): Response<Void>
+
+    @DELETE("/v1/Attachment/{id}")
+    suspend fun deleteAttachment(
+        @Path("id") id: String
+    ): Response<Void>
 
     /**********************************************************
      *
@@ -29,7 +37,7 @@ interface ApiService {
      *
      ***********************************************************/
     @PUT("/v1/Auth/ResetPassword")
-    suspend fun resetPassword(@Body request: PasswordRequest): Response<Void>
+    suspend fun resetPassword(@Body requestReset: ResetPasswordRequest): Response<Void>
 
     @PUT("/v1/Auth/ResetTotp")
     suspend fun resetTotp(@Body request: ResetTotpRequest): Response<Void>
@@ -39,16 +47,42 @@ interface ApiService {
      *                  Chats
      *
      ***********************************************************/
-    @POST("/v1/Chats")
-    suspend fun getChats(@Query("targetUserId") targetUserId: String): Response<ApiBaseItem<String>>
+    // todo: not ready...
+    @POST("/v1/Chats/Chat")
+    suspend fun postChat(
+        @Body request: ChatRequest
+    ): Response<Void>
+
+    // todo: not ready...
+    @GET("/v1/Chats/Chat")
+    suspend fun getChat(
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ): Response<ApiBasePagingItem<List<String>>>
+
+    // todo: not ready...
+    @POST("/v1/Chats/Message")
+    suspend fun postMessage(
+        @Body request: MsgRequest
+    ): Response<ApiBaseItem<List<String>>>
+
+    // todo: not ready...
+    @GET("/v1/Chats/Message")
+    suspend fun getMessage(
+        @Query("chatId") chatId: Int,
+        @Query("lastReadTime") lastReadTime: String,
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ): Response<ApiBasePagingItem<List<String>>>
 
     /**********************************************************
      *
      *                  Functions
      *
      ***********************************************************/
+    // todo: not ready...
     @GET("/v1/Functions")
-    suspend fun getFunctions(): Response<ApiBaseItem<List<String>>>
+    suspend fun getFunctions(): Response<ApiBasePagingItem<List<FunctionItem>>>
 
     /**********************************************************
      *
@@ -80,65 +114,99 @@ interface ApiService {
 
     /**********************************************************
      *
-     *                  Me
+     *                  Members/Me
      *
      ***********************************************************/
-    @GET("/v1/Me")
+    @GET("/v1/Members/Me")
     suspend fun getMe(): Response<ApiBaseItem<MeItem>>
 
-    @GET("/v1/MeChat")
-    suspend fun getMeChat(): Response<ApiBasePagingItem<List<MeChatItem>>>
+    @GET("/v1/Members/Me/Chat")
+    suspend fun getMeChat(
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
+    ): Response<ApiBasePagingItem<List<MeChatItem>>>
 
-    @GET("/v1/Me/Message/{chatId}")
-    suspend fun getMeMessage(@Path("chatId") chatId: String): Response<ApiBaseItem<List<MeMessageItem>>>
+    @PUT("/v1/Members/ForgetPassword")
+    suspend fun forgetPassword(@Body body: ForgetPasswordRequest): Response<Void>
 
-    @GET("/v1/Me/Order")
-    suspend fun getMeOrder(): Response<ApiBaseItem<List<MeOrderItem>>>
+    @GET("/v1/Members/Me/Message/{chatId}")
+    suspend fun getMeMessage(
+        @Path("chatId") chatId: String,
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
+    ): Response<ApiBaseItem<List<MeMessageItem>>>
 
-    @DELETE("/v1/Me/Playlist")
-    suspend fun deleteMePlaylist(@Body body: JSONObject): Response<Void>
+    @GET("/v1/Members/Me/Order")
+    suspend fun getMeOrder(
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
+    ): Response<ApiBaseItem<List<MeOrderItem>>>
 
-    @GET("/v1/Me/Playlist/{playlistType}")
-    suspend fun getMePlaylist(@Path("playlistType") playlistType: Int): Response<ApiBasePagingItem<PlayListItem>>
+    @DELETE("/v1/Members/Me/Playlist")
+    suspend fun deleteMePlaylist(
+        @Body ids: List<Int>
+    ): Response<Void>
 
-    @GET("/v1/Me/Profile")
+    @GET("/v1/Members/Me/Playlist/{playlistType}")
+    suspend fun getMePlaylist(
+        @Path("playlistType") playlistType: Int,
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
+    ): Response<ApiBasePagingItem<PlayListItem>>
+
+    @GET("/v1/Members/Me/Profile")
     suspend fun getMeProfile(): Response<ApiBaseItem<MeProfileItem>>
 
-    @PUT("/v1/Me/Profile")
+    @PUT("/v1/Members/Me/Profile")
     suspend fun updatedMeProfile(@Body body: MeProfileItem): Response<Void>
-
-    /**********************************************************
-     *
-     *                  Members
-     *
-     ***********************************************************/
-    @PUT("/v1/Members/ForgetPassword")
-    suspend fun forgetPassword(@Body body: PasswordRequest): Response<Void>
 
     @POST("/v1/Members/SignUp")
     suspend fun signUp(@Body body: MembersAccountItem): Response<Void>
 
-    /**********************************************************
-     *
-     *                  Notification/Email
-     *
-     ***********************************************************/
-    @GET("/v1/Notification/Email/Validation")
-    suspend fun emailValidation(): Response<Void>
+    @GET("/v1/Members/Me/ValidationEmail/{key}")
+    suspend fun validationEmail(
+        @Path("key") key: String
+    ): Response<Void>
 
     /**********************************************************
      *
-     *                  Operators
+     *                  Merchants 代理
      *
      ***********************************************************/
 
     /**********************************************************
      *
-     *                  Ordering
+     *                  Operators Operators
      *
      ***********************************************************/
-    @POST("/v1/Ordering")
-    suspend fun uppdatedOrdering()
+
+    /**********************************************************
+     *
+     *                  Operators/Video
+     *
+     ***********************************************************/
+//    @GET("/v1/Operators/Video")
+//    suspend fun getOperatorsVideo(
+//        @Query("id") id: Int,
+//        @Query("key") key: String,
+//        @Query("status") status: Int,
+//        @Query("offset") offset: Int,
+//        @Query("limit") limit: Int
+//    ): Response<Void>
+//
+//    @PUT("/v1/Operators/Video")
+//    suspend fun putOperatorsVideo(request: OperatorsVideoRequest): Response<Void>
+//
+//    @POST("/v1/Operators/Video/Crawler")
+//    suspend fun postCrawler(
+//        @Body videoEpisodeIds: List<Int>
+//    ) : Response<Void>
+
+    /**********************************************************
+     *
+     *                  Ordering 建訂單用
+     *
+     ***********************************************************/
 
     /**********************************************************
      *

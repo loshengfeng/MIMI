@@ -2,10 +2,10 @@ package com.dabenxiang.mimi.model.api.vo
 
 import com.google.gson.annotations.SerializedName
 
-data class ResetTotpRequest(
+data class ResetPasswordRequest(
     @SerializedName("username")
-    val userName: String?,
+    val username: String?,
 
-    @SerializedName("friendlyName")
-    val friendlyName: String?
+    @SerializedName("password")
+    val password: String?
 )

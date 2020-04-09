@@ -5,11 +5,11 @@ import com.google.gson.annotations.SerializedName
 data class ErrorItem(
 
     @SerializedName("code")
-    var code: String? = null,
+    var code: String?,
 
     @SerializedName("message")
-    var message: String? = null,
+    var message: String?,
 
     @SerializedName("details")
-    var details: String? = null
+    var details: String?
 )

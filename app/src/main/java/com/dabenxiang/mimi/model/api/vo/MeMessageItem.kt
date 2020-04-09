@@ -4,14 +4,14 @@ import com.google.gson.annotations.SerializedName
 
 data class MeMessageItem(
     @SerializedName("content")
-    val content: String,
-
-    @SerializedName("creationDate")
-    val creationDate: String,
-
-    @SerializedName("type")
-    val type: Int,
+    val content: String?,
 
     @SerializedName("userId")
-    val userId: Int
+    val userId: Int?,
+
+    @SerializedName("type")
+    val type: Int?,
+
+    @SerializedName("creationDate")
+    val creationDate: String?
 )
