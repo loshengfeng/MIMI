@@ -141,92 +141,132 @@
 
     </RadioGroup>
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tl_type"
-        android:layout_width="344dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="46dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/rg_Type"
-        app:tabGravity="fill"
-        app:tabIndicatorColor="@color/color_red_1"
-        app:tabIndicatorFullWidth="true"
-        app:tabIndicatorGravity="top"
-        app:tabIndicatorHeight="2dp"
-        app:tabMode="fixed"
-        app:tabSelectedTextColor="@color/day_night_color_text"
-        app:tabTextAppearance="@style/login_tab_item_text"
-        app:tabTextColor="@color/color_black_1_50">
-
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/ti_wechat_pay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/ti_alipay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/ti_china_pay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </com.google.android.material.tabs.TabLayout>
-
-    <ImageView
-        android:id="@+id/iv_wechat"
-        android:layout_width="114dp"
-        android:layout_height="24dp"
-        android:contentDescription="@null"
-        android:paddingStart="22dp"
-        android:paddingEnd="22dp"
-        android:src="@drawable/ico_wechat_pay"
-        app:layout_constraintBottom_toBottomOf="@id/tl_type"
-        app:layout_constraintStart_toStartOf="@id/tl_type"
-        app:layout_constraintTop_toTopOf="@id/tl_type" />
-
-    <ImageView
-        android:id="@+id/iv_alipay"
-        android:layout_width="114dp"
-        android:layout_height="24dp"
-        android:contentDescription="@null"
-        android:paddingStart="22dp"
-        android:paddingEnd="22dp"
-        android:src="@drawable/ic_ico_alipay"
-        app:layout_constraintBottom_toBottomOf="@id/tl_type"
-        app:layout_constraintStart_toEndOf="@id/iv_wechat"
-        app:layout_constraintTop_toTopOf="@id/tl_type" />
-
-    <ImageView
-        android:id="@+id/iv_china_pay"
-        android:layout_width="114dp"
-        android:layout_height="24dp"
-        android:contentDescription="@null"
-        android:paddingStart="22dp"
-        android:paddingEnd="22dp"
-        android:src="@drawable/ic_ico_china_pay"
-        app:layout_constraintBottom_toBottomOf="@id/tl_type"
-        app:layout_constraintStart_toEndOf="@id/iv_alipay"
-        app:layout_constraintTop_toTopOf="@id/tl_type" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_content"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/layout_account"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="46dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/layout_total"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tl_type" />
+        app:layout_constraintTop_toBottomOf="@id/rg_Type">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/test"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            android:paddingBottom="12dp"
+            android:background="@drawable/bg_gray_10_stroke_1_radius_4"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tl_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tabGravity="fill"
+                app:tabIndicatorColor="@color/color_red_1"
+                app:tabIndicatorFullWidth="true"
+                app:tabIndicatorGravity="top"
+                app:tabIndicatorHeight="2dp"
+                app:tabMode="fixed"
+                app:tabSelectedTextColor="@color/day_night_color_text"
+                app:tabTextAppearance="@style/login_tab_item_text"
+                app:tabTextColor="@color/color_black_1_50">
+
+                <com.google.android.material.tabs.TabItem
+                    android:id="@+id/ti_wechat_pay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <com.google.android.material.tabs.TabItem
+                    android:id="@+id/ti_alipay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <com.google.android.material.tabs.TabItem
+                    android:id="@+id/ti_china_pay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.tabs.TabLayout>
+
+            <ImageView
+                android:id="@+id/iv_wechat"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:contentDescription="@null"
+                android:paddingStart="22dp"
+                android:paddingEnd="22dp"
+                android:src="@drawable/ico_wechat_pay"
+                app:layout_constraintBottom_toBottomOf="@id/tl_type"
+                app:layout_constraintEnd_toStartOf="@id/iv_alipay"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toStartOf="@id/tl_type"
+                app:layout_constraintTop_toTopOf="@id/tl_type" />
+
+            <ImageView
+                android:id="@+id/iv_alipay"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:contentDescription="@null"
+                android:paddingStart="22dp"
+                android:paddingEnd="22dp"
+                android:src="@drawable/ic_ico_alipay"
+                app:layout_constraintBottom_toBottomOf="@id/tl_type"
+                app:layout_constraintEnd_toStartOf="@id/iv_china_pay"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toEndOf="@id/iv_wechat"
+                app:layout_constraintTop_toTopOf="@id/tl_type" />
+
+            <ImageView
+                android:id="@+id/iv_china_pay"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:contentDescription="@null"
+                android:paddingStart="22dp"
+                android:paddingEnd="22dp"
+                android:src="@drawable/ic_ico_china_pay"
+                app:layout_constraintBottom_toBottomOf="@id/tl_type"
+                app:layout_constraintEnd_toEndOf="@id/tl_type"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toEndOf="@id/iv_alipay"
+                app:layout_constraintTop_toTopOf="@id/tl_type" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_content"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="6dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tl_type" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/layout_account"
+        android:id="@+id/layout_total"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:background="@color/color_gray_2"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/rv_content">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <TextView
             android:id="@+id/tv_total_title"
@@ -258,6 +298,7 @@
             android:layout_width="92dp"
             android:layout_height="33dp"
             android:layout_marginStart="15dp"
+            android:layout_marginEnd="9dp"
             android:background="@drawable/bg_red_1_radius_6"
             android:text="@string/topup_confirm_pay"
             android:textColor="@color/color_white_1"
@@ -266,5 +307,6 @@
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
