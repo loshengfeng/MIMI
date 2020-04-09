@@ -62,7 +62,7 @@
     <string name="btn_login">登录</string>
     <string name="login_name">请填写名称</string>
     <string name="login_email">请填写Email</string>
-    <string name="login_desc">点选「注册」即表示您同意接受服务条款及隐私权保护政策</string>
+    <string name="login_desc">点选「注册」即表示您同意接受<font fgcolor="#ff4d4d">服务条款</font>及<font fgcolor="#ff4d4d">服隐私权保护政策</font></string>
     <string name="login_keep_account">记住帐号</string>
     <string name="login_forget">忘记密码?</string>
     <string name="username_or_password_incorrect">使用者名称或密码错误</string>

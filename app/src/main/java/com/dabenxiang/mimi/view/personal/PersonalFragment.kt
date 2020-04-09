@@ -26,7 +26,7 @@ class PersonalFragment : BaseFragment() {
         initSettings()
 //        Handler().postDelayed({
 //            Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_topupHistoryFragment)
-////            Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_loginFragment)
+//            Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_loginFragment)
 //        },1000)
     }
 
