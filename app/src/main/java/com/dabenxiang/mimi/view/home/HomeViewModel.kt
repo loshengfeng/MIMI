@@ -14,26 +14,4 @@ import timber.log.Timber
 class HomeViewModel : BaseViewModel2() {
 
     private val apiRepository: ApiRepository by inject()
-
-    fun loadHomeCategories() {
-        viewModelScope.launch {
-            flow {
-                val resp = apiRepository.fetchHomeCategories()
-                if (!resp.isSuccessful) throw HttpException(resp)
-                emit(ApiResult.success(resp.body()))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { result ->
-                    when (result) {
-                        is ApiResult.Success -> Timber.d(result.result.toString())
-                        is ApiResult.Error -> Timber.e(result.throwable)
-                        is ApiResult.Loading -> Timber.d("Loading")
-                        is ApiResult.Loaded -> Timber.d("Loaded")
-                    }
-                }
-        }
-    }
 }

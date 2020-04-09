@@ -25,11 +25,6 @@
             app:tabMode="scrollable"
             app:tabSelectedTextColor="@color/day_night_color_text"
             app:tabTextColor="@color/day_night_color_tab_unselected_text">
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="首頁" />
         </com.google.android.material.tabs.TabLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 

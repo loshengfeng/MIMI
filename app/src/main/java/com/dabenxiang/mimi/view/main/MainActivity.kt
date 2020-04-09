@@ -73,6 +73,12 @@ class MainActivity : BaseActivity() {
                 else -> false
             }
         }
+
+        initSettings()
+    }
+
+    private fun initSettings() {
+        viewModel.loadHomeCategories()
     }
 
     override fun getResources(): Resources {

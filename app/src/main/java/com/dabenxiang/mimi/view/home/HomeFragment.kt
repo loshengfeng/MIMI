@@ -2,8 +2,10 @@ package com.dabenxiang.mimi.view.home
 
 import android.os.Bundle
 import android.view.View
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.holder.CarouselHolderItem
 import com.dabenxiang.mimi.model.holder.VideoHolderItem
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
@@ -56,31 +58,42 @@ class HomeFragment : BaseFragment2<HomeViewModel>() {
 
             recyclerview_content.adapter = adapter
         }
-
-        loadSample()
     }
 
     //TODO: Testing
     private fun loadSample() {
-        loadHome()
+        //loadFirstTab()
 
-        //viewModel.loadHomeCategories()
-
+        /*
         repeat(10) { i ->
-            layout_top_tap.addTab(layout_top_tap.newTab().setText("第${i}層"))
+            layout_top_tap.addTab(layout_top_tap.newTab().setText("第一層${i + 1}"))
         }
+        */
     }
 
-    private fun loadHome() {
+    private fun loadFirstTab(list: List<CategoriesItem>?) {
         btn_all.visibility = View.GONE
 
         val templateList = mutableListOf<HomeTemplate>()
+
+        templateList.add(HomeTemplate.Banner(imgUrl = "https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
+        templateList.add(HomeTemplate.Carousel(getTempCarouselList()))
+
+        if (list != null) {
+            for (item in list) {
+                templateList.add(HomeTemplate.Header(item.id,null, item.name))
+                templateList.add(HomeTemplate.Categories(getTempVideoList()))
+            }
+        }
+
+        /*
         templateList.add(HomeTemplate.Banner(imgUrl = "https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
         templateList.add(HomeTemplate.Carousel(getTempCarouselList()))
         templateList.add(HomeTemplate.Header(null, "分類1"))
         templateList.add(HomeTemplate.Categories(getTempVideoList()))
         templateList.add(HomeTemplate.Header(null, "分類2"))
         templateList.add(HomeTemplate.Categories(getTempVideoList()))
+        */
 
         adapter.setDataSrc(templateList)
     }
@@ -125,6 +138,20 @@ class HomeFragment : BaseFragment2<HomeViewModel>() {
     }
 
     override fun setupObservers() {
+        mainViewModel?.also { mainViewModel ->
+            mainViewModel.categoriesData.observe(viewLifecycleOwner, Observer { item ->
+
+                layout_top_tap.removeAllTabs()
+
+                item.categories?.also { level1 ->
+                    for (item in level1) {
+                        layout_top_tap.addTab(layout_top_tap.newTab().setText(item.name))
+                    }
+
+                    loadFirstTab(level1[0].categories)
+                }
+            })
+        }
     }
 
     override fun setupListeners() {
@@ -142,14 +169,14 @@ class HomeFragment : BaseFragment2<HomeViewModel>() {
 
                 val position = tab!!.position
 
-                mainViewModel?.enableNightMode?.value = position == 1
+                mainViewModel?.enableNightMode?.value = ((position == layout_top_tap.tabCount - 1) && position > 0)
 
                 when (position) {
                     0 -> {
-                        loadHome()
+                        loadFirstTab(mainViewModel?.categoriesData?.value?.categories)
                     }
 
-                    1 -> {
+                    layout_top_tap.tabCount - 1 -> {
 
                     }
                     else -> {

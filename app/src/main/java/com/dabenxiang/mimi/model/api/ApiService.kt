@@ -52,11 +52,11 @@ interface ApiService {
 
     /**********************************************************
      *
-     *                  Home/Categories
+     *                  Members/Home/Categories
      *
      ***********************************************************/
-    @GET("/v1/Home/Categories")
-    suspend fun fetchHomeCategories(): Response<CategoriesItem>
+    @GET("/v1/Members/Home/Categories")
+    suspend fun fetchHomeCategories(): Response<ApiBaseItem<CategoriesItem>>
 
     /**********************************************************
      *
