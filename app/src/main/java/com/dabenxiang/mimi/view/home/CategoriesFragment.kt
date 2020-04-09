@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.home
 
+import android.os.Bundle
 import android.view.View
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment2
@@ -8,6 +9,11 @@ import kotlinx.android.synthetic.main.fragment_categories.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class CategoriesFragment: BaseFragment2<CategoriesViewModel>() {
+
+    companion object {
+        const val TITLE = "title"
+        const val ID = "id"
+    }
 
     private val viewModel by viewModel<CategoriesViewModel>()
 
@@ -29,6 +35,14 @@ class CategoriesFragment: BaseFragment2<CategoriesViewModel>() {
     override fun setupListeners() {
         iv_back.setOnClickListener {
             viewModel.navigateTo(NavigateItem.Up)
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        arguments?.also {
+            tv_title.text = it.getString(TITLE)
         }
     }
 }

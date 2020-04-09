@@ -38,7 +38,7 @@ class HeaderViewHolder(itemView: View, nestedListener: HomeAdapter.EventListener
     HomeViewHolder<HomeTemplate.Header>(itemView, nestedListener) {
     private val ivIcon: ImageView = itemView.iv_icon
     private val tvTitle: TextView = itemView.tv_title
-    private val btnMore: TextView = itemView.btn_more
+    private val btnMore: View = itemView.btn_more
 
     init {
         btnMore.setOnClickListener { btn ->

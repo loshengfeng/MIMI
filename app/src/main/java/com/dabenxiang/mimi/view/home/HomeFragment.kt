@@ -10,12 +10,17 @@ import com.dabenxiang.mimi.model.holder.CarouselHolderItem
 import com.dabenxiang.mimi.model.holder.VideoHolderItem
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment2
+import com.dabenxiang.mimi.view.base.NavigateItem
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 class HomeFragment : BaseFragment2<HomeViewModel>() {
+
+    companion object {
+        var lastPosition = 0
+    }
 
     private val viewModel by viewModel<HomeViewModel>()
 
@@ -32,6 +37,12 @@ class HomeFragment : BaseFragment2<HomeViewModel>() {
     private val adapterListener = object : HomeAdapter.EventListener {
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
             Timber.d("$item")
+
+            val bundle = Bundle()
+            bundle.putString(CategoriesFragment.ID, item.id)
+            bundle.putString(CategoriesFragment.TITLE, item.title)
+
+            viewModel.navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_categoriesFragment, bundle))
         }
 
         override fun onVideoClick(view: View, item: VideoHolderItem) {
@@ -72,8 +83,6 @@ class HomeFragment : BaseFragment2<HomeViewModel>() {
     }
 
     private fun loadFirstTab(list: List<CategoriesItem>?) {
-        btn_all.visibility = View.GONE
-
         val templateList = mutableListOf<HomeTemplate>()
 
         templateList.add(HomeTemplate.Banner(imgUrl = "https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
@@ -81,7 +90,7 @@ class HomeFragment : BaseFragment2<HomeViewModel>() {
 
         if (list != null) {
             for (item in list) {
-                templateList.add(HomeTemplate.Header(item.id,null, item.name))
+                templateList.add(HomeTemplate.Header(item.id, null, item.name))
                 templateList.add(HomeTemplate.Categories(getTempVideoList()))
             }
         }
@@ -128,8 +137,6 @@ class HomeFragment : BaseFragment2<HomeViewModel>() {
     }
 
     private fun loadCategories() {
-        btn_all.visibility = View.VISIBLE
-
         val templateList = mutableListOf<HomeTemplate>()
         templateList.add(HomeTemplate.Banner(imgUrl = "https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
         templateList.add(HomeTemplate.VideoList(getTempVideoList()))
@@ -144,14 +151,38 @@ class HomeFragment : BaseFragment2<HomeViewModel>() {
                 layout_top_tap.removeAllTabs()
 
                 item.categories?.also { level1 ->
-                    for (item in level1) {
-                        layout_top_tap.addTab(layout_top_tap.newTab().setText(item.name))
+                    for (i in 0 until level1.count()) {
+                        val detail = level1[i]
+                        layout_top_tap.addTab(layout_top_tap.newTab().setText(detail.name), i == lastPosition)
                     }
 
                     loadFirstTab(level1[0].categories)
                 }
             })
         }
+
+        viewModel.tabLayoutPosition.observe(viewLifecycleOwner, Observer { position ->
+            lastPosition = position
+
+            when (position) {
+                0 -> {
+                    btn_filter.visibility = View.GONE
+                    loadFirstTab(mainViewModel?.categoriesData?.value?.categories?.get(position)?.categories)
+                    //mainViewModel?.enableNightMode?.value = false
+                }
+
+                layout_top_tap.tabCount - 1 -> {
+                    btn_filter.visibility = View.VISIBLE
+                    loadFirstTab(mainViewModel?.categoriesData?.value?.categories?.get(position)?.categories)
+                    //mainViewModel?.enableNightMode?.value = true
+                }
+                else -> {
+                    btn_filter.visibility = View.VISIBLE
+                    loadCategories()
+                    //mainViewModel?.enableNightMode?.value = false
+                }
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -167,23 +198,7 @@ class HomeFragment : BaseFragment2<HomeViewModel>() {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 Timber.d("onTabSelected: ${tab?.position}")
 
-                val position = tab!!.position
-
-                mainViewModel?.enableNightMode?.value = ((position == layout_top_tap.tabCount - 1) && position > 0)
-
-                when (position) {
-                    0 -> {
-                        loadFirstTab(mainViewModel?.categoriesData?.value?.categories)
-                    }
-
-                    layout_top_tap.tabCount - 1 -> {
-
-                    }
-                    else -> {
-                        //viewModel.navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_categoriesFragment))
-                        loadCategories()
-                    }
-                }
+                viewModel.setTopTabPosition(tab!!.position)
             }
         })
     }
