@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.holder.CarouselHolderItem
+import com.dabenxiang.mimi.model.holder.VideoHolderItem
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment2
 import com.google.android.material.tabs.TabLayout
@@ -26,12 +28,12 @@ class HomeFragment : BaseFragment2<HomeViewModel>() {
     }
 
     private val adapterListener = object : HomeAdapter.EventListener {
-        override fun onHeaderItemClick(view: View, template: HomeTemplate.Header) {
-            Timber.d("$template")
+        override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
+            Timber.d("$item")
         }
 
-        override fun onVideoClick(view: View) {
-
+        override fun onVideoClick(view: View, item: VideoHolderItem) {
+            Timber.d("$item")
         }
     }
 
@@ -64,7 +66,7 @@ class HomeFragment : BaseFragment2<HomeViewModel>() {
 
         //viewModel.loadHomeCategories()
 
-        for (i in 1..10) {
+        repeat(10) { i ->
             layout_top_tap.addTab(layout_top_tap.newTab().setText("第${i}層"))
         }
     }
@@ -73,22 +75,51 @@ class HomeFragment : BaseFragment2<HomeViewModel>() {
         btn_all.visibility = View.GONE
 
         val templateList = mutableListOf<HomeTemplate>()
-        templateList.add(HomeTemplate.Banner)
-        templateList.add(HomeTemplate.Carousel)
+        templateList.add(HomeTemplate.Banner(imgUrl = "https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
+        templateList.add(HomeTemplate.Carousel(getTempCarouselList()))
         templateList.add(HomeTemplate.Header(null, "分類1"))
-        templateList.add(HomeTemplate.Categories())
+        templateList.add(HomeTemplate.Categories(getTempVideoList()))
         templateList.add(HomeTemplate.Header(null, "分類2"))
-        templateList.add(HomeTemplate.Categories())
+        templateList.add(HomeTemplate.Categories(getTempVideoList()))
 
         adapter.setDataSrc(templateList)
+    }
+
+    //TODO: Testing
+    private fun getTempVideoList(): List<VideoHolderItem> {
+        val list = mutableListOf<VideoHolderItem>()
+
+        repeat(12) {
+            list.add(
+                VideoHolderItem(
+                    title = "標題",
+                    resolution = "720P",
+                    info = "全30集",
+                    imgUrl = "https://i2.kknews.cc/SIG=1nkii03/470400035pnr3n5r3s7n.jpg"
+                )
+            )
+        }
+
+        return list
+    }
+
+    //TODO: Testing
+    private fun getTempCarouselList(): List<CarouselHolderItem> {
+        val list = mutableListOf<CarouselHolderItem>()
+
+        repeat(5) {
+            list.add(CarouselHolderItem("https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
+        }
+
+        return list
     }
 
     private fun loadCategories() {
         btn_all.visibility = View.VISIBLE
 
         val templateList = mutableListOf<HomeTemplate>()
-        templateList.add(HomeTemplate.Banner)
-        templateList.add(HomeTemplate.VideoList)
+        templateList.add(HomeTemplate.Banner(imgUrl = "https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
+        templateList.add(HomeTemplate.VideoList(getTempVideoList()))
 
         adapter.setDataSrc(templateList)
     }

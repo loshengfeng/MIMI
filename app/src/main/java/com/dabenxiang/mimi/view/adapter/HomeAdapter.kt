@@ -6,14 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.holder.VideoHolderItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.*
 
 class HomeAdapter(val context: Context, private val listener: EventListener) : RecyclerView.Adapter<BaseViewHolder>() {
 
     interface EventListener {
-        fun onHeaderItemClick(view: View, template: HomeTemplate.Header)
-        fun onVideoClick(view: View)
+        fun onHeaderItemClick(view: View, item: HomeTemplate.Header)
+        fun onVideoClick(view: View, item: VideoHolderItem)
     }
 
     private var templateList: List<HomeTemplate>? = null

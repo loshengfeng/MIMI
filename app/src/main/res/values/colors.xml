@@ -11,6 +11,7 @@
     <color name="day_night_color_search_text">@color/color_black_1_30</color>
     <color name="day_night_color_bottom_bar_item">@color/color_black_1</color>
     <color name="day_night_color_tab_unselected_text">#868686</color>
+    <color name="day_night_color_card_background">@color/color_black_1</color>
 
     <color name="color_white_1">#ffffff</color>
     <color name="color_white_1_30">#4dffffff</color>

@@ -4,23 +4,37 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.holder.VideoHolderItem
+import com.dabenxiang.mimi.view.home.HomeTemplate
 import com.dabenxiang.mimi.view.home.VideoViewHolder
 
-
 class HomeVideoListAdapter(private val nestedListener: HomeAdapter.EventListener) : RecyclerView.Adapter<VideoViewHolder>() {
+
+    private var data: List<VideoHolderItem>? = null
+
+    fun setDataSrc(src: HomeTemplate.VideoList) {
+        data = src.videoList
+
+        updated()
+    }
+
+    private fun updated() {
+
+        notifyDataSetChanged()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.nested_item_video, parent, false)
-        return VideoViewHolder(view)
+        return VideoViewHolder(view, nestedListener)
     }
 
     override fun getItemCount(): Int {
-        return 100
+        return data?.count() ?: 0
     }
 
     override fun onBindViewHolder(holder: VideoViewHolder, position: Int) {
-        holder.tvResolution.text = "720P"
-        holder.tvInfo.text = "全30集"
-        holder.tvTitle.text =
-            "標題${position}標題${position}標題${position}標題${position}標題${position}標題${position}標題${position}標題${position}標題${position}標題${position}標題${position}標題${position}"
+        data?.also { it ->
+            holder.bind(it[position])
+        }
     }
 }

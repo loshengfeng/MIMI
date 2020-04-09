@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.view.adapter.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.view.ViewPagerIndicator
@@ -48,34 +49,43 @@ class HeaderViewHolder(itemView: View, nestedListener: HomeAdapter.EventListener
     }
 
     override fun updated() {
-        data?.also { src ->
-            if (src.iconRes != null) {
-                ivIcon.setImageResource(src.iconRes)
+        data?.also { data ->
+            if (data.iconRes != null) {
+                ivIcon.setImageResource(data.iconRes)
                 ivIcon.visibility = View.VISIBLE
             } else {
                 ivIcon.setImageDrawable(null)
                 ivIcon.visibility = View.GONE
             }
 
-            tvTitle.text = src.title
+            tvTitle.text = data.title
         }
     }
 }
 
 class HomeBannerViewHolder(itemView: View, listener: HomeAdapter.EventListener) : HomeViewHolder<HomeTemplate.Banner>(itemView, listener) {
-    val ivPoster: ImageView = itemView.iv_poster
+    private val ivPoster: ImageView = itemView.iv_poster
 
     override fun updated() {
+        data?.also {
+            Glide.with(itemView.context)
+                .load(data?.imgUrl)
+                .into(ivPoster)
+        }
     }
 }
 
 class HomeCarouselViewHolder(itemView: View, listener: HomeAdapter.EventListener) :
     HomeViewHolder<HomeTemplate.Carousel>(itemView, listener) {
-    val viewPager: ViewPager2 = itemView.viewpager
-    val pagerIndicator: ViewPagerIndicator = itemView.pager_indicator
+
+    private val viewPager: ViewPager2 = itemView.viewpager
+    private val pagerIndicator: ViewPagerIndicator = itemView.pager_indicator
+    private val nestedAdapter by lazy {
+        CarouselAdapter(nestedListener)
+    }
 
     init {
-        viewPager.adapter = CarouselAdapter()
+        viewPager.adapter = nestedAdapter
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
@@ -85,7 +95,10 @@ class HomeCarouselViewHolder(itemView: View, listener: HomeAdapter.EventListener
     }
 
     override fun updated() {
-        pagerIndicator.setViewPager2(viewPager)
+        data?.also {
+            nestedAdapter.setDataSrc(it)
+            pagerIndicator.setViewPager2(viewPager)
+        }
     }
 }
 
@@ -106,6 +119,10 @@ class HomeVideoListViewHolder(itemView: View, listener: HomeAdapter.EventListene
     }
 
     override fun updated() {
+        data?.also {
+            nestedAdapter.setDataSrc(it)
+            nestedAdapter.notifyDataSetChanged()
+        }
     }
 }
 
@@ -127,6 +144,10 @@ class HomeCategoriesViewHolder(itemView: View, listener: HomeAdapter.EventListen
     }
 
     override fun updated() {
+        data?.also {
+            nestedAdapter.setDataSrc(it)
+            nestedAdapter.notifyDataSetChanged()
+        }
     }
 }
 
@@ -153,6 +174,7 @@ class HomeLeaderboardViewHolder(itemView: View, listener: HomeAdapter.EventListe
 
 class HomeRecommendViewHolder(itemView: View, listener: HomeAdapter.EventListener) :
     HomeViewHolder<HomeTemplate.Recommend>(itemView, listener) {
+
     private val recyclerView: RecyclerView = itemView.recyclerview_recommend
     private val nestedAdapter by lazy {
         HomeRecommendAdapter()
