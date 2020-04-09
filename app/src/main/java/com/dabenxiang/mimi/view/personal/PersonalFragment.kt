@@ -24,9 +24,10 @@ class PersonalFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initSettings()
-        /*Handler().postDelayed({
-            Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_loginFragment)
-        },1000)*/
+//        Handler().postDelayed({
+//            Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_topupHistoryFragment)
+////            Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_loginFragment)
+//        },1000)
     }
 
     override fun getLayoutId(): Int {
@@ -44,7 +45,7 @@ class PersonalFragment : BaseFragment() {
             when (buttonView.id) {
                 R.id.tv_topup -> GeneralUtils.showToast(context!!, "btnTopup")
                 R.id.tv_favorite -> GeneralUtils.showToast(context!!, "btnFavorite")
-                R.id.tv_raw1 -> GeneralUtils.showToast(context!!, "btnTopupHistory")
+                R.id.tv_topup_history -> Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_topupHistoryFragment)
                 R.id.tv_chat_history -> GeneralUtils.showToast(context!!, "btnChatHistory")
                 R.id.tv_setting -> Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_settingFragment)
                 R.id.tv_logout -> GeneralUtils.showToast(context!!, "btnLogout")
@@ -52,7 +53,7 @@ class PersonalFragment : BaseFragment() {
         }.also {
             tv_topup.setOnClickListener(it)
             tv_favorite.setOnClickListener(it)
-            tv_raw1.setOnClickListener(it)
+            tv_topup_history.setOnClickListener(it)
             tv_chat_history.setOnClickListener(it)
             tv_setting.setOnClickListener(it)
             tv_logout.setOnClickListener(it)

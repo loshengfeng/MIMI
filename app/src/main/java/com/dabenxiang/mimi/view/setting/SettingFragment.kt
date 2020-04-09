@@ -38,7 +38,6 @@ class SettingFragment : BaseFragment() {
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.tv_back -> Navigation.findNavController(view!!).navigateUp()
-                R.id.tv_topup -> GeneralUtils.showToast(context!!, "btnTopup")
                 R.id.btnPhoto -> GeneralUtils.showToast(context!!, "btnPhoto")
                 R.id.tv_raw1 -> GeneralUtils.showToast(context!!, "btnRaw1")
                 R.id.btnEmail -> Navigation.findNavController(view!!).navigate(R.id.action_settingFragment_to_resendMailFragment)

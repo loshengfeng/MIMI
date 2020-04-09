@@ -100,7 +100,7 @@
             app:layout_constraintTop_toBottomOf="@id/tv_favorite" />
 
         <TextView
-            android:id="@+id/tv_raw1"
+            android:id="@+id/tv_topup_history"
             style="@style/personalStyle"
             android:drawableStart="@drawable/ic_btn_note_n"
             android:drawableEnd="@drawable/ic_btn_arrow_black_n"
@@ -118,7 +118,7 @@
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_raw1" />
+            app:layout_constraintTop_toBottomOf="@id/tv_topup_history" />
 
         <TextView
             android:id="@+id/tv_chat_history"
@@ -130,7 +130,7 @@
             android:paddingEnd="20dp"
             android:text="@string/personal_chat_history"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_raw1" />
+            app:layout_constraintTop_toBottomOf="@id/tv_topup_history" />
 
         <TextView
             android:id="@+id/tv_new"

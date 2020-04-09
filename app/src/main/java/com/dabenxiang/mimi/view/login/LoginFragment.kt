@@ -179,7 +179,7 @@ class LoginFragment : BaseFragment() {
     override fun setupListeners() {
         Timber.d("${LoginFragment::class.java.simpleName}_setupListeners")
 
-        typeTabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+        tl_type.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 when (tab.position) {
                     0 -> {
