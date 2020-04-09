@@ -3,8 +3,10 @@ package com.dabenxiang.mimi.view.topup
 import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.view.adapter.TopupAdapter
+import com.dabenxiang.mimi.view.adapter.TopupOnlinePayAdapter
+import com.dabenxiang.mimi.view.adapter.TopupProxyPayAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
@@ -34,8 +36,14 @@ class TopupFragment : BaseFragment() {
 
         rg_Type.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
-                R.id.rb_online_pay-> GeneralUtils.showToast(context!!, "rb_online_pay")
-                R.id.rb_proxy_pay-> GeneralUtils.showToast(context!!, "rb_proxy_pay")
+                R.id.rb_online_pay-> {
+                    layout_online_pay.visibility = View.VISIBLE
+                    rv_proxy_pay.visibility = View.GONE
+                }
+                R.id.rb_proxy_pay-> {
+                    layout_online_pay.visibility = View.GONE
+                    rv_proxy_pay.visibility = View.VISIBLE
+                }
             }
         }
 
@@ -69,8 +77,16 @@ class TopupFragment : BaseFragment() {
         tv_total.text = "¥ 50.00"
 
         GridLayoutManager(context, 2).also { layoutManager ->
-            rv_content.layoutManager = layoutManager
+            rv_online_pay.layoutManager = layoutManager
         }
-        rv_content.adapter = TopupAdapter()
+        rv_online_pay.adapter = TopupOnlinePayAdapter()
+
+        activity?.also { activity ->
+            LinearLayoutManager(activity).also { layoutManager ->
+                layoutManager.orientation = LinearLayoutManager.VERTICAL
+                rv_proxy_pay.layoutManager = layoutManager
+            }
+        }
+        rv_proxy_pay.adapter = TopupProxyPayAdapter()
     }
 }

@@ -170,46 +170,6 @@ interface ApiService {
 
     /**********************************************************
      *
-     *                  Merchants 代理
-     *
-     ***********************************************************/
-
-    /**********************************************************
-     *
-     *                  Operators Operators
-     *
-     ***********************************************************/
-
-    /**********************************************************
-     *
-     *                  Operators/Video
-     *
-     ***********************************************************/
-//    @GET("/v1/Operators/Video")
-//    suspend fun getOperatorsVideo(
-//        @Query("id") id: Int,
-//        @Query("key") key: String,
-//        @Query("status") status: Int,
-//        @Query("offset") offset: Int,
-//        @Query("limit") limit: Int
-//    ): Response<Void>
-//
-//    @PUT("/v1/Operators/Video")
-//    suspend fun putOperatorsVideo(request: OperatorsVideoRequest): Response<Void>
-//
-//    @POST("/v1/Operators/Video/Crawler")
-//    suspend fun postCrawler(
-//        @Body videoEpisodeIds: List<Int>
-//    ) : Response<Void>
-
-    /**********************************************************
-     *
-     *                  Ordering 建訂單用
-     *
-     ***********************************************************/
-
-    /**********************************************************
-     *
      *                  Player
      *
      ***********************************************************/

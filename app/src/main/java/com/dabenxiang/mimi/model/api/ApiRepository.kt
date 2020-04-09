@@ -104,40 +104,7 @@ class ApiRepository(private val apiService: ApiService) {
 
     suspend fun signUp(body: MembersAccountItem) = apiService.signUp(body)
 
-    suspend fun emailValidation(key: String) = apiService.validationEmail(key)
-
-    /**********************************************************
-     *
-     *                  Merchants
-     *
-     ***********************************************************/
-
-    /**********************************************************
-     *
-     *                  Operators
-     *
-     ***********************************************************/
-
-    /**********************************************************
-     *
-     *                  Operators/Video
-     *
-     ***********************************************************/
-//    suspend fun getOperatorsVideo(
-//        id: Int, key: String, status: Int, offset: Int, limit: Int
-//    ) = apiService.getOperatorsVideo(id, key, status, offset, limit)
-//
-//    suspend fun putOperatorsVideo(request: OperatorsVideoRequest) = apiService.putOperatorsVideo(request)
-//
-//    suspend fun postCrawler(
-//        videoEpisodeIds : List<Int>
-//    ) = apiService.postCrawler(videoEpisodeIds)
-
-    /**********************************************************
-     *
-     *                  Ordering 建訂單用
-     *
-     ***********************************************************/
+    suspend fun validationEmail(key: String) = apiService.validationEmail(key)
 
     /**********************************************************
      *
@@ -148,7 +115,6 @@ class ApiRepository(private val apiService: ApiService) {
 
     suspend fun getVideoEpisode(videoId: Int, episodeId: Int) = apiService.getVideoEpisode(videoId, episodeId)
 
-    //TODO: ??
     suspend fun getVideoStreamOfEpisode(videoId: Int, episodeId: Int, streamId: Int) =
         apiService.getVideoStreamOfEpisode(videoId, episodeId, streamId)
 }

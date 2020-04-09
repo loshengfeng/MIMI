@@ -32,7 +32,7 @@
         app:tabIndicatorHeight="4dp"
         app:tabMode="fixed"
         app:tabTextAppearance="@style/favorite_tab_item_text"
-        app:tabSelectedTextColor="@color/day_night_color_text"
+        app:tabSelectedTextColor="@color/color_black_1"
         app:tabTextColor="@color/color_black_1_50">
 
         <com.google.android.material.tabs.TabItem
