@@ -1,12 +1,29 @@
 package com.dabenxiang.mimi.view.topup
 
 import android.view.View
-import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.holder.TopupProxyPayItem
+import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
+import com.dabenxiang.mimi.view.listener.AdapterEventListener
 import kotlinx.android.synthetic.main.item_topup_proxy_pay.view.*
+import timber.log.Timber
 
-class TopupProxyPayViewHolder(view: View) : BaseViewHolder(view) {
-    val ivPhoto = itemView.iv_photo!!
-    val tvTitle = itemView.tv_title!!
-    val tvSubtitle = itemView.tv_subtitle!!
-    val ivNext = itemView.iv_next!!
+class TopupProxyPayViewHolder(
+    view: View,
+    listener: AdapterEventListener<TopupProxyPayItem>
+) : BaseAnyViewHolder<TopupProxyPayItem>(view) {
+    private val ivPhoto = itemView.iv_photo!!
+    private val tvTitle = itemView.tv_title!!
+    private val tvSubtitle = itemView.tv_subtitle!!
+
+    init {
+        view.setOnClickListener { data?.let { it -> listener.onItemClick(view, it) } }
+    }
+
+    override fun updated() {
+        Timber.d("${TopupProxyPayViewHolder::class.java.simpleName}_updated")
+        ivPhoto.setImageResource(R.drawable.ico_default_photo)
+        tvTitle.text = data?.title
+        tvSubtitle.text = data?.subtitle
+    }
 }

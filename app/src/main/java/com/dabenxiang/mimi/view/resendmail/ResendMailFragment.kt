@@ -14,6 +14,9 @@ import timber.log.Timber
 class ResendMailFragment :BaseFragment() {
     private val viewModel by viewModel<ResendMailViewModel>()
 
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initSettings()

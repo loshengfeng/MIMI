@@ -5,8 +5,10 @@ import android.view.View
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.holder.FavoriteItem
 import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.listener.AdapterEventListener
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_favorite.*
 import kotlinx.android.synthetic.main.item_favorite_no_data.*
@@ -62,7 +64,24 @@ class FavoriteFragment  : BaseFragment() {
                 rv_content.layoutManager = layoutManager
             }
         }
-        rv_content.adapter = FavoriteAdapter()
+
+        val proxyPayList = mutableListOf<FavoriteItem>(
+            FavoriteItem("1", "Photo", "01:54:10", "冰题标题标题标题标题标题标题标题标…", "副标副标副标副标…"),
+            FavoriteItem("2", "Photo", "01:54:10", "冰题标题标题标题标题标题标题标题标…", "副标副标副标副标…"),
+            FavoriteItem("3", "Photo", "01:54:10", "冰题标题标题标题标题标题标题标题标…", "副标副标副标副标…"),
+            FavoriteItem("4", "Photo", "01:54:10", "冰题标题标题标题标题标题标题标题标…", "副标副标副标副标…"),
+            FavoriteItem("5", "Photo", "01:54:10", "冰题标题标题标题标题标题标题标题标…", "副标副标副标副标…"),
+            FavoriteItem("6", "Photo", "01:54:10", "冰题标题标题标题标题标题标题标题标…", "副标副标副标副标…"),
+            FavoriteItem("7", "Photo", "01:54:10", "冰题标题标题标题标题标题标题标题标…", "副标副标副标副标…"),
+            FavoriteItem("8", "Photo", "01:54:10", "冰题标题标题标题标题标题标题标题标…", "副标副标副标副标…"),
+            FavoriteItem("9", "Photo", "01:54:10", "冰题标题标题标题标题标题标题标题标…", "副标副标副标副标…"),
+            FavoriteItem("10", "Photo", "01:54:10", "冰题标题标题标题标题标题标题标题标…", "副标副标副标副标…")
+        )
+
+        rv_content.adapter = FavoriteAdapter(favoriteListener)
+        val proxyAdapter = rv_content.adapter as FavoriteAdapter
+        proxyAdapter.setDataSrc(proxyPayList)
+
     }
 
     private fun showMenu(btnMenu: View) {
@@ -80,5 +99,11 @@ class FavoriteFragment  : BaseFragment() {
             return@setOnMenuItemClickListener false
         }
         menu.show()
+    }
+
+    private val favoriteListener = object : AdapterEventListener<FavoriteItem> {
+        override fun onItemClick(view: View, item: FavoriteItem) {
+            Timber.d("${FavoriteFragment::class.java.simpleName}_onlinePayListener_onItemClick_item: $item")
+        }
     }
 }

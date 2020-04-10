@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="100dp"
-    android:layout_marginTop="12dp"
     android:layout_marginStart="5dp"
-    android:layout_marginEnd="5dp"
+    android:layout_marginTop="12dp"
+    android:layout_marginEnd="6dp"
     android:background="@drawable/bg_gray_7_stroke_1_radius_8">
 
     <ImageView
@@ -22,10 +22,11 @@
         android:id="@+id/iv_token"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_marginStart="47dp"
         android:contentDescription="@null"
         android:src="@drawable/ic_ico_micoin_small"
+        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/tv_token"
         app:layout_constraintTop_toBottomOf="@id/iv_check" />
 
     <TextView
@@ -35,6 +36,7 @@
         android:layout_marginStart="3dp"
         android:textColor="@color/color_black_1"
         android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/iv_token"
         app:layout_constraintTop_toTopOf="@id/iv_token"
         tools:text="300" />
@@ -47,7 +49,8 @@
         android:lineSpacingExtra="2sp"
         android:textColor="@color/color_red_1"
         android:textSize="22sp"
-        app:layout_constraintStart_toStartOf="@+id/iv_token"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/iv_token"
         tools:text="¥ 50.00" />
 
@@ -59,8 +62,8 @@
         android:lineSpacingExtra="2sp"
         android:textColor="@color/color_gray_9"
         android:textSize="14sp"
-        app:layout_constraintStart_toStartOf="@id/tv_price"
-        app:layout_constraintEnd_toEndOf="@+id/tv_price"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_price"
         tools:text="¥ 55.00" />
 
