@@ -9,6 +9,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
+import timber.log.Timber
 
 class ChatHistoryAdapter(private val chatHistory: ArrayList<FakeChatHistory>, private val onClickListener: View.OnClickListener?) : RecyclerView.Adapter<ChatHistoryAdapter.ChatHistoryViewHolder>() {
 
@@ -32,6 +33,8 @@ class ChatHistoryAdapter(private val chatHistory: ArrayList<FakeChatHistory>, pr
             holder.btnChatHistory.setBackgroundResource(R.drawable.btn_chat_history_new)
             holder.imgIsNew.visibility = View.VISIBLE
         }
+
+        Timber.d("${ChatHistoryAdapter::class.java.simpleName}_url: ${history.imgUrl}")
 
         Glide.with(holder.imgChatPhoto.context)
             .load(history.imgUrl)

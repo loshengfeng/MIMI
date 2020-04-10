@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.di
 
 import com.dabenxiang.mimi.view.changepassword.ChangePasswordViewModel
+import com.dabenxiang.mimi.view.chathistory.ChatHistoryViewModel
 import com.dabenxiang.mimi.view.favorite.FavoriteViewModel
 import com.dabenxiang.mimi.view.forgetpassword.ForgetPasswordViewModel
 import com.dabenxiang.mimi.view.home.CategoriesViewModel
@@ -32,4 +33,5 @@ val viewModelModule = module {
     viewModel { ChangePasswordViewModel() }
     viewModel { CategoriesViewModel() }
     viewModel { TopupHistoryViewModel() }
+    viewModel { ChatHistoryViewModel() }
 }

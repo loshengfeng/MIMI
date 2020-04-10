@@ -46,7 +46,7 @@ class PersonalFragment : BaseFragment() {
                 R.id.tv_topup -> GeneralUtils.showToast(context!!, "btnTopup")
                 R.id.tv_favorite -> GeneralUtils.showToast(context!!, "btnFavorite")
                 R.id.tv_topup_history -> Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_topupHistoryFragment)
-                R.id.tv_chat_history -> GeneralUtils.showToast(context!!, "btnChatHistory")
+                R.id.tv_chat_history -> Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_chatHistoryFragment)
                 R.id.tv_setting -> Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_settingFragment)
                 R.id.tv_logout -> GeneralUtils.showToast(context!!, "btnLogout")
             }

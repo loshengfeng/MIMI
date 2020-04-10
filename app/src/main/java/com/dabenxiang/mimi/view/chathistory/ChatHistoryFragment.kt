@@ -21,7 +21,7 @@ class ChatHistoryFragment : BaseFragment() {
     }
 
     override fun getLayoutId(): Int {
-        return R.layout.fragment_chat_content
+        return R.layout.fragment_chat_history
     }
 
     override fun setupObservers() {
