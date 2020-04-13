@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.model.holder.VideoHolderItem
+import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.HomeTemplate
@@ -48,7 +49,7 @@ class HomeCategoriesAdapter(private val nestedListener: HomeAdapter.EventListene
             override fun onClickItemIndex(view: View, index: Int) {
                 if (index > -1) {
                     data?.get(index)?.also {
-                        nestedListener.onVideoClick(view, it)
+                        nestedListener.onVideoClick(view, PlayerData.parser(it))
                     }
                 }
             }
@@ -82,7 +83,7 @@ class HomeCategoriesAdapter(private val nestedListener: HomeAdapter.EventListene
         repeat(12) {
             list.add(
                 StatisticsItem(
-                    title = "標題",
+                    title = "標題${it + 1}",
                     id = it,
                     type = it,
                     cover = "https://i2.kknews.cc/SIG=1nkii03/470400035pnr3n5r3s7n.jpg"

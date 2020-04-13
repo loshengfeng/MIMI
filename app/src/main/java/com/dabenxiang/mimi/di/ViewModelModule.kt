@@ -10,11 +10,12 @@ import com.dabenxiang.mimi.view.login.LoginViewModel
 import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.view.messenger.MessengerViewModel
 import com.dabenxiang.mimi.view.personal.PersonalViewModel
+import com.dabenxiang.mimi.view.player.PlayerViewModel
 import com.dabenxiang.mimi.view.resendmail.ResendMailViewModel
 import com.dabenxiang.mimi.view.setting.SettingViewModel
 import com.dabenxiang.mimi.view.splash.SplashViewModel
-import com.dabenxiang.mimi.view.topuphistory.TopupHistoryViewModel
 import com.dabenxiang.mimi.view.topup.TopupViewModel
+import com.dabenxiang.mimi.view.topuphistory.TopupHistoryViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -34,4 +35,5 @@ val viewModelModule = module {
     viewModel { CategoriesViewModel() }
     viewModel { TopupHistoryViewModel() }
     viewModel { ChatHistoryViewModel() }
+    viewModel { PlayerViewModel() }
 }

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.*
 
@@ -13,7 +14,7 @@ class HomeAdapter(val context: Context, private val listener: EventListener) : R
 
     interface EventListener {
         fun onHeaderItemClick(view: View, item: HomeTemplate.Header)
-        fun onVideoClick(view: View, item: Any)
+        fun onVideoClick(view: View, item: PlayerData)
         fun onLoadAdapter(adapter: HomeCategoriesAdapter, src: HomeTemplate.Categories)
     }
 

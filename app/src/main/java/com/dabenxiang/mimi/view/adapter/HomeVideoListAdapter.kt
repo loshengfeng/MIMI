@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.holder.VideoHolderItem
+import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.home.HomeTemplate
 import com.dabenxiang.mimi.view.home.VideoViewHolder
@@ -30,7 +31,7 @@ class HomeVideoListAdapter(private val nestedListener: HomeAdapter.EventListener
             override fun onClickItemIndex(view: View, index: Int) {
                 if (index > -1) {
                     data?.get(index)?.also {
-                        nestedListener.onVideoClick(view, it)
+                        nestedListener.onVideoClick(view, PlayerData.parser(it))
                     }
                 }
             }

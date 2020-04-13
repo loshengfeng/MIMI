@@ -1,18 +1,20 @@
 package com.dabenxiang.mimi.view.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
-import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.model.holder.CarouselHolderItem
 import com.dabenxiang.mimi.model.holder.VideoHolderItem
+import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeCategoriesAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -47,14 +49,12 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
             viewModel.navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_categoriesFragment, bundle))
         }
 
-        override fun onVideoClick(view: View, item: Any) {
+        override fun onVideoClick(view: View, item: PlayerData) {
             Timber.d("$item")
 
-            when (item) {
-                is StatisticsItem -> {
-                    
-                }
-            }
+            val intent = Intent(activity!!, PlayerActivity::class.java)
+            intent.putExtras(PlayerActivity.createBundle(item))
+            startActivity(intent)
         }
 
         override fun onLoadAdapter(adapter: HomeCategoriesAdapter, src: HomeTemplate.Categories) {

@@ -17,18 +17,18 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
 //    val toastData = MutableLiveData<String>()
 //    val dialogData = MutableLiveData<String>()
 
-    private val mShowProgress by lazy { MutableLiveData<Boolean>() }
-    val showProgress: LiveData<Boolean> get() = mShowProgress
+    protected val _showProgress by lazy { MutableLiveData<Boolean>() }
+    val showProgress: LiveData<Boolean> get() = _showProgress
 
-    private val mNavigateDestination by lazy { MutableLiveData<NavigateItem>() }
-    val navigateDestination: LiveData<NavigateItem> = mNavigateDestination
+    private val _navigateDestination by lazy { MutableLiveData<NavigateItem>() }
+    val navigateDestination: LiveData<NavigateItem> = _navigateDestination
 
     open fun navigateTo(item: NavigateItem) {
         viewModelScope.launch {
             navigationTaskJoinOrRun {
-                mNavigateDestination.value = item
+                _navigateDestination.value = item
                 delay(200L)
-                mNavigateDestination.value = NavigateItem.Clean
+                _navigateDestination.value = NavigateItem.Clean
                 delay(1000L)
             }
         }

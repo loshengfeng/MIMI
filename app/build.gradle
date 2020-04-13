@@ -221,6 +221,10 @@ dependencies {
 
     implementation 'com.github.yulichswift:RoundedViews:1.1.0'
 
+    // ExoPlayer
+    implementation "com.google.android.exoplayer:exoplayer:$exoplayer_version"
+    implementation "com.google.android.exoplayer:extension-rtmp:$exoplayer_version"
+
     // Test
     testImplementation "io.mockk:mockk:$mokk_version"
     testImplementation "junit:junit:$junit_version"

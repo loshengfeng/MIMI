@@ -15,6 +15,7 @@
 
     <color name="color_white_1">#ffffff</color>
     <color name="color_white_1_30">#4dffffff</color>
+    <color name="color_white_1_50">#80ffffff</color>
     <color name="color_white_1_65625">#a8ffffff</color>
     <color name="color_khaki_2">#908b6d</color>
     <color name="color_green_4">#00b5a9</color>
