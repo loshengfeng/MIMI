@@ -12,7 +12,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 
-class SettingFragment : BaseFragment() {
+class SettingFragment : BaseFragment<SettingViewModel>() {
     private val viewModel by viewModel<SettingViewModel>()
     private var isValidated = true
 
@@ -26,6 +26,10 @@ class SettingFragment : BaseFragment() {
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_setting
+    }
+
+    override fun fetchViewModel(): SettingViewModel? {
+        return viewModel
     }
 
     override fun setupObservers() {

@@ -11,8 +11,7 @@ import kotlinx.android.synthetic.main.fragment_forget_password.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-class ForgetPasswordFragment : BaseFragment() {
-
+class ForgetPasswordFragment : BaseFragment<ForgetPasswordViewModel>() {
     private val viewModel by viewModel<ForgetPasswordViewModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -21,6 +20,10 @@ class ForgetPasswordFragment : BaseFragment() {
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_forget_password
+    }
+
+    override fun fetchViewModel(): ForgetPasswordViewModel? {
+        return viewModel
     }
 
     override fun setupObservers() {

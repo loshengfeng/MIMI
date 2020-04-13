@@ -16,8 +16,7 @@ import kotlinx.android.synthetic.main.item_register.*
 import org.koin.android.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-class LoginFragment : BaseFragment() {
-
+class LoginFragment : BaseFragment<LoginViewModel>() {
     private val viewModel by viewModel<LoginViewModel>()
 
     private var dialog: LoginDialogFragment? = null
@@ -38,6 +37,10 @@ class LoginFragment : BaseFragment() {
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_login
+    }
+
+    override fun fetchViewModel(): LoginViewModel? {
+        return viewModel
     }
 
     override fun setupObservers() {

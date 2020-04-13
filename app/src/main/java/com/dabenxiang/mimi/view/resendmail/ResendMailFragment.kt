@@ -11,7 +11,7 @@ import kotlinx.android.synthetic.main.item_setting_bar.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-class ResendMailFragment :BaseFragment() {
+class ResendMailFragment :BaseFragment<ResendMailViewModel>() {
     private val viewModel by viewModel<ResendMailViewModel>()
 
     override val bottomNavigationVisibility: Int
@@ -24,6 +24,10 @@ class ResendMailFragment :BaseFragment() {
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_resend_mail
+    }
+
+    override fun fetchViewModel(): ResendMailViewModel? {
+        return viewModel
     }
 
     override fun setupObservers() {

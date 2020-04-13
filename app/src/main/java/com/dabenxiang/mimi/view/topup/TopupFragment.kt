@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.fragment_topup.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-class TopupFragment : BaseFragment() {
+class TopupFragment : BaseFragment<TopupViewModel>() {
 
     private val viewModel by viewModel<TopupViewModel>()
 
@@ -28,6 +28,10 @@ class TopupFragment : BaseFragment() {
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_topup
+    }
+
+    override fun fetchViewModel(): TopupViewModel? {
+        return viewModel
     }
 
     override fun setupObservers() {

@@ -16,7 +16,7 @@ import kotlinx.android.synthetic.main.item_topup_history_no_data.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-class TopupHistoryFragment : BaseFragment() {
+class TopupHistoryFragment : BaseFragment<TopupHistoryViewModel>() {
     private val viewModel by viewModel<TopupHistoryViewModel>()
     private var hasData = true
 
@@ -30,6 +30,10 @@ class TopupHistoryFragment : BaseFragment() {
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_topup_history
+    }
+
+    override fun fetchViewModel(): TopupHistoryViewModel? {
+        return viewModel
     }
 
     override fun setupObservers() {

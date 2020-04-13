@@ -13,7 +13,7 @@ import org.koin.android.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 
-class PersonalFragment : BaseFragment() {
+class PersonalFragment : BaseFragment<PersonalViewModel>() {
     private val viewModel by viewModel<PersonalViewModel>()
     private val isLogin = true
 
@@ -32,6 +32,10 @@ class PersonalFragment : BaseFragment() {
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_personal
+    }
+
+    override fun fetchViewModel(): PersonalViewModel? {
+        return viewModel
     }
 
     override fun setupObservers() {

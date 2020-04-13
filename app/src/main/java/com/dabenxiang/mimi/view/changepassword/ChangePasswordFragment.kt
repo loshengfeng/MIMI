@@ -7,11 +7,13 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_change_password.*
-import kotlinx.android.synthetic.main.fragment_resend_mail.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-class ChangePasswordFragment : BaseFragment() {
+class ChangePasswordFragment : BaseFragment<ChangePasswordViewModel>() {
+
+    private  val viewModel by viewModel<ChangePasswordViewModel>()
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -24,6 +26,10 @@ class ChangePasswordFragment : BaseFragment() {
     override fun getLayoutId(): Int {
         Timber.d("${ChangePasswordFragment::class.java.simpleName}_setupObservers")
         return R.layout.fragment_change_password
+    }
+
+    override fun fetchViewModel(): ChangePasswordViewModel? {
+        return viewModel
     }
 
     override fun setupObservers() {

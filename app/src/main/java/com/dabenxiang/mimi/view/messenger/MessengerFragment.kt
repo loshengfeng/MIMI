@@ -8,8 +8,7 @@ import kotlinx.android.synthetic.main.fragment_messenger.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-class MessengerFragment : BaseFragment() {
-
+class MessengerFragment : BaseFragment<MessengerViewModel>() {
     private val viewModel by viewModel<MessengerViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,6 +27,10 @@ class MessengerFragment : BaseFragment() {
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_messenger
+    }
+
+    override fun fetchViewModel(): MessengerViewModel? {
+        return  viewModel
     }
 
     override fun setupObservers() {

@@ -8,7 +8,7 @@ import kotlinx.android.synthetic.main.fragment_splash.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-class SplashFragment : BaseFragment() {
+class SplashFragment : BaseFragment<SplashViewModel>() {
 
     private val viewModel by viewModel<SplashViewModel>()
 
@@ -24,6 +24,10 @@ class SplashFragment : BaseFragment() {
 
     override fun setupObservers() {
         Timber.d("${SplashFragment::class.java.simpleName}_setupObservers")
+    }
+
+    override fun fetchViewModel(): SplashViewModel? {
+        return viewModel
     }
 
     override fun setupListeners() {

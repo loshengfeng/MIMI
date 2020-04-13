@@ -12,7 +12,7 @@ import kotlinx.android.synthetic.main.fragment_chat_history.*
 import org.koin.android.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-class ChatHistoryFragment : BaseFragment() {
+class ChatHistoryFragment : BaseFragment<ChatHistoryViewModel>() {
     private val viewModel by viewModel<ChatHistoryViewModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -22,6 +22,10 @@ class ChatHistoryFragment : BaseFragment() {
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_chat_history
+    }
+
+    override fun fetchViewModel(): ChatHistoryViewModel? {
+        return  viewModel
     }
 
     override fun setupObservers() {

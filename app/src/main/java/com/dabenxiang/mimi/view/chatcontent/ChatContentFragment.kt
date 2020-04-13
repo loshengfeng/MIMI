@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.fragment_chat_content.*
 import org.koin.android.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-class ChatContentFragment : BaseFragment() {
+class ChatContentFragment : BaseFragment<ChatContentViewModel>() {
     private val viewModel by viewModel<ChatContentViewModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -23,6 +23,10 @@ class ChatContentFragment : BaseFragment() {
 
     override fun setupObservers() {
         Timber.d("${ChatContentFragment::class.java.simpleName}_setupObservers")
+    }
+
+    override fun fetchViewModel(): ChatContentViewModel? {
+        return viewModel
     }
 
     override fun setupListeners() {
