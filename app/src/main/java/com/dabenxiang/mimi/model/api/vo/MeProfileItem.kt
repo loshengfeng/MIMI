@@ -16,6 +16,9 @@ data class MeProfileItem(
     @SerializedName("gender")
     var gender: Int?,
 
+    @SerializedName("avatarAttachmentId")
+    var avatarAttachmentId: Int?,
+
     @SerializedName("birthday")
     var birthday: String?,
 

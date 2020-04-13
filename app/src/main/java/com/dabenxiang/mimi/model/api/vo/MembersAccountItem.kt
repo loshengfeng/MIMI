@@ -16,8 +16,5 @@ data class MembersAccountItem(
     val friendlyName: String?,
 
     @SerializedName("promoCode")
-    val promoCode: String?,
-
-    @SerializedName("validationUrl")
-    val validationUrl: String?
+    val promoCode: String? // not necessary
 )

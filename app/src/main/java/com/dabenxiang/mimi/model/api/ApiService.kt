@@ -7,13 +7,13 @@ interface ApiService {
 
     /**********************************************************
      *
-     *                  Attachment
+     *                  Attachment x 4
      *
      ***********************************************************/
     // 上傳檔案
-    @POST("/v1/Attachment/")
+    @POST("/v1/Attachment")
     suspend fun postAttachment(
-        @Body request: String
+        @Body file: String
     ): Response<String>
 
     // 取得檔案
@@ -26,7 +26,7 @@ interface ApiService {
     @PUT("/v1/Attachment/{id}")
     suspend fun putAttachment(
         @Path("id") id: String,
-        @Body request: String
+        @Body file: String
     ): Response<Void>
 
     // 刪除檔案
@@ -37,30 +37,28 @@ interface ApiService {
 
     /**********************************************************
      *
-     *                  Auth
+     *                  Auth x 1
      *
      ***********************************************************/
-    // 修改密碼
+    // 修改密碼(未登入)
     @PUT("/v1/Auth/ResetPassword")
-    suspend fun resetPassword(@Body requestReset: ResetPasswordRequest): Response<Void>
-
-    // 修改OTP
-    @PUT("/v1/Auth/ResetTotp")
-    suspend fun resetTotp(@Body request: ResetTotpRequest): Response<Void>
+    suspend fun resetPassword(
+        @Body request: ResetPasswordRequest
+    ): Response<Void>
 
     /**********************************************************
      *
-     *                  Chats
+     *                  Chats x 4
      *
      ***********************************************************/
     // 建立聊天室
-    @POST("/v1/Chats/Chat")
+    @POST("/v1/Chats")
     suspend fun postChat(
         @Body request: ChatRequest
     ): Response<Void>
 
     // 取得聊天室列表
-    @GET("/v1/Chats/Chat")
+    @GET("/v1/Chats")
     suspend fun getChat(
         @Query("offset") offset: String,
         @Query("limit") limit: String
@@ -83,7 +81,7 @@ interface ApiService {
 
     /**********************************************************
      *
-     *                  Functions
+     *                  Functions x 1
      *
      ***********************************************************/
     // 取得角色功能列表
@@ -92,7 +90,7 @@ interface ApiService {
 
     /**********************************************************
      *
-     *                  Members/Home/Categories
+     *                  Members/Home/Categories x 1
      *
      ***********************************************************/
     // 取得影片類別清單
@@ -101,7 +99,7 @@ interface ApiService {
 
     /**********************************************************
      *
-     *                  Home/Videos
+     *                  Members/Home/Videos x 2
      *
      ***********************************************************/
     // 取得類別影片
@@ -123,12 +121,18 @@ interface ApiService {
 
     /**********************************************************
      *
-     *                  Members/Me
+     *                  Members/Me x 14
      *
      ***********************************************************/
     // 取得用者資訊
     @GET("/v1/Members/Me")
     suspend fun getMe(): Response<ApiBaseItem<MeItem>>
+
+    // 修改密碼(未登入)
+    @PUT("/v1/Members/Me/ChangePassword")
+    suspend fun changePassword(
+        @Body password: String
+    ): Response<Void>
 
     // 取得聊天室列表
     @GET("/v1/Members/Me/Chat")
@@ -156,10 +160,10 @@ interface ApiService {
         @Query("limit") limit: Int
     ): Response<ApiBaseItem<List<MeOrderItem>>>
 
-    // rutodo: 13/04/2020
+    // 加入收藏
     @POST("/v1/Members/Me/Playlist")
-    suspend fun postMePlaylist(
-        @Body ids: List<Int>
+    suspend fun addMePlaylist(
+        @Body request: PlayListRequest
     ): Response<Void>
 
     // 刪除使用者列表影片
@@ -168,6 +172,7 @@ interface ApiService {
         @Body ids: List<Int>
     ): Response<Void>
 
+    // 取得使用者影片列表 0:History, 1:Favorite
     @GET("/v1/Members/Me/Playlist/{playlistType}")
     suspend fun getMePlaylist(
         @Path("playlistType") playlistType: Int,
@@ -175,15 +180,29 @@ interface ApiService {
         @Query("limit") limit: Int
     ): Response<ApiBasePagingItem<PlayListItem>>
 
+    // 取得使用者資訊明細
     @GET("/v1/Members/Me/Profile")
     suspend fun getMeProfile(): Response<ApiBaseItem<MeProfileItem>>
 
+    // 修改使用者資訊
     @PUT("/v1/Members/Me/Profile")
-    suspend fun updatedMeProfile(@Body body: MeProfileItem): Response<Void>
+    suspend fun updatedMeProfile(
+        @Body body: MeProfileItem
+    ): Response<Void>
 
-    @POST("/v1/Members/SignUp")
-    suspend fun signUp(@Body body: MembersAccountItem): Response<Void>
+    // 建立新使用者
+    @POST("/v1/Members/me/SignUp")
+    suspend fun signUp(
+        @Body body: MembersAccountItem
+    ): Response<Void>
 
+    // 發驗證信
+    @POST("/v1/Members/Me/ValidationEmail")
+    suspend fun validationEmail(
+        @Body request: ValidateEmailRequest
+    ): Response<Void>
+
+    // 驗證信箱
     @GET("/v1/Members/Me/ValidationEmail/{key}")
     suspend fun validationEmail(
         @Path("key") key: String
@@ -191,18 +210,34 @@ interface ApiService {
 
     /**********************************************************
      *
-     *                  Player
+     *                  Ordering x 1
      *
      ***********************************************************/
-    @GET("/v1/Player/{videoId}")
-    suspend fun getVideoInfo(@Path("videoId") videoId: Int): Response<ApiBaseItem<VideoItem>>
+    @GET("/v1/Ordering/Agent")
+    suspend fun getAgent(
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
+    ): Response<ApiBasePagingItem<AgentItem>>
 
+    /**********************************************************
+     *
+     *                  Player x 3
+     *
+     ***********************************************************/
+    // 取得影片資訊
+    @GET("/v1/Player/{videoId}")
+    suspend fun getVideoInfo(
+        @Path("videoId") videoId: Int
+    ): Response<ApiBaseItem<VideoItem>>
+
+    // 取得影片集數資訊
     @GET("/v1/Player/{videoId}/{episodeId}")
     suspend fun getVideoEpisode(
         @Path("videoId") videoId: Int,
         @Path("episodeId") episodeId: Int
     ): Response<ApiBaseItem<VideoEpisodeItem>>
 
+    // 取得影片檔案
     @GET("/v1/Player/{videoId}/{episodeId}/{streamId}")
     suspend fun getVideoStreamOfEpisode(
         @Path("videoId") videoId: Int,

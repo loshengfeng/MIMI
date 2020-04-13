@@ -2,10 +2,10 @@ package com.dabenxiang.mimi.model.api.vo
 
 import com.google.gson.annotations.SerializedName
 
-data class ChatRequest(
+data class ValidateEmailRequest(
     @SerializedName("userId")
     val userId: Int?,
 
-    @SerializedName("name")
-    val name: String?
+    @SerializedName("validationUrl")
+    val validationUrl: String?
 )

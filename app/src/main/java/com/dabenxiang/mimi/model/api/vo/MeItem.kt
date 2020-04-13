@@ -10,5 +10,8 @@ data class MeItem(
     val availablePoint: Int?,
 
     @SerializedName("hasNewMessage")
-    val hasNewMessage: Boolean?
+    val hasNewMessage: Boolean?,
+
+    @SerializedName("avatarAttachmentId")
+    val avatarAttachmentId: Int?
 )

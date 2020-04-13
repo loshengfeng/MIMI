@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.model.api
 
 import com.dabenxiang.mimi.model.api.vo.*
-import org.json.JSONObject
 
 class ApiRepository(private val apiService: ApiService) {
 
@@ -11,82 +10,122 @@ class ApiRepository(private val apiService: ApiService) {
 
     /**********************************************************
      *
-     *                  Attachment
+     *                  Attachment x 4
      *
      ***********************************************************/
-    suspend fun postAttachment(body: String) = apiService.postAttachment(body)
+    suspend fun postAttachment(
+        body: String
+    ) = apiService.postAttachment(body)
 
-    suspend fun getAttachment(id: String) = apiService.getAttachment(id)
+    suspend fun getAttachment(
+        id: String
+    ) = apiService.getAttachment(id)
 
-    suspend fun putAttachment(id: String, request: String) = apiService.putAttachment(id, request)
+    suspend fun putAttachment(
+        id: String,
+        body: String
+    ) = apiService.putAttachment(id, body)
 
-    suspend fun deleteAttachment(id: String) = apiService.deleteAttachment(id)
+    suspend fun deleteAttachment(
+        id: String
+    ) = apiService.deleteAttachment(id)
 
     /**********************************************************
      *
-     *                  Auth
+     *                  Auth x 1
      *
      ***********************************************************/
-    suspend fun resetPassword(requestReset: ResetPasswordRequest) = apiService.resetPassword(requestReset)
-
-    suspend fun resetTotp(request: ResetTotpRequest) = apiService.resetTotp(request)
+    suspend fun resetPassword(
+        body: ResetPasswordRequest
+    ) = apiService.resetPassword(body)
 
     /**********************************************************
      *
-     *                  Chats
+     *                  Chats x 4
      *
      ***********************************************************/
-    suspend fun postChats(request: ChatRequest) = apiService.postChat(request)
+    suspend fun postChats(
+        body: ChatRequest
+    ) = apiService.postChat(body)
 
-    suspend fun getChats(offset: String, limit: String) = apiService.getChat(offset, limit)
+    suspend fun getChats(
+        offset: String,
+        limit: String
+    ) = apiService.getChat(offset, limit)
 
-    suspend fun postMessage(request: MsgRequest) = apiService.postMessage(request)
+    suspend fun postMessage(
+        body: MsgRequest
+    ) = apiService.postMessage(body)
 
     suspend fun getMessage(
-        chatId: Int, lastReadTime: String, offset: String, limit: String
+        chatId: Int,
+        lastReadTime: String,
+        offset: String,
+        limit: String
     ) = apiService.getMessage(chatId, lastReadTime, offset, limit)
 
     /**********************************************************
      *
-     *                  Functions
+     *                  Functions x 1
      *
      ***********************************************************/
     suspend fun getFunctions() = apiService.getFunctions()
 
     /**********************************************************
      *
-     *                  Home/Categories
+     *                   Members/Home/Categories x 1
      *
      ***********************************************************/
     suspend fun fetchHomeCategories() = apiService.fetchHomeCategories()
 
+    /**********************************************************
+     *
+     *                   Members/Home/Videos x 2
+     *
+     ***********************************************************/
     suspend fun searchHomeVideos(
-        category: String, q: String, offset: Int, limit: Int
+        category: String,
+        q: String,
+        offset: Int,
+        limit: Int
     ) = apiService.searchHomeVideos(category, q, offset, limit)
 
-    //TODO: statisticsType?
     suspend fun statisticsHomeVideos(
-        statisticsType: Int, offset: Int, limit: Int
+        statisticsType: Int,
+        offset: Int,
+        limit: Int
     ) = apiService.statisticsHomeVideos(statisticsType, offset, limit)
 
     /**********************************************************
      *
-     *                  Me
+     *                  Me x 14
      *
      ***********************************************************/
     suspend fun getMe() = apiService.getMe()
 
+    suspend fun changePassword(
+        password: String
+    ) = apiService.changePassword(password)
+
     suspend fun getMeChatItem(
-        offset: Int, limit: Int
+        offset: Int,
+        limit: Int
     ) = apiService.getMeChat(offset, limit)
 
     suspend fun getMeMessage(
-        chatId: String, offset: Int, limit: Int
+        chatId: String,
+        offset: Int,
+        limit: Int
     ) = apiService.getMeMessage(chatId, offset, limit)
 
     suspend fun getMeOrder(
-        offset: Int, limit: Int
+        offset: Int,
+        limit: Int
     ) = apiService.getMeOrder(offset, limit)
+
+    suspend fun postMePlaylist(
+        body: PlayListRequest
+    ) = apiService.addMePlaylist(body)
 
     suspend fun deleteMePlaylist(
         ids : List<Int>
@@ -98,24 +137,54 @@ class ApiRepository(private val apiService: ApiService) {
 
     suspend fun getMeProfile() = apiService.getMeProfile()
 
-    suspend fun updatedMeProfile(body: MeProfileItem) = apiService.updatedMeProfile(body)
+    suspend fun updatedMeProfile(
+        body: MeProfileItem
+    ) = apiService.updatedMeProfile(body)
 
-    suspend fun forgetPassword(body: ForgetPasswordRequest) = apiService.forgetPassword(body)
+    suspend fun forgetPassword(
+        body: ForgetPasswordRequest
+    ) = apiService.forgetPassword(body)
 
-    suspend fun signUp(body: MembersAccountItem) = apiService.signUp(body)
+    suspend fun signUp(
+        body: MembersAccountItem
+    ) = apiService.signUp(body)
 
-    suspend fun validationEmail(key: String) = apiService.validationEmail(key)
+    suspend fun validationEmail(
+        body: ValidateEmailRequest
+    ) = apiService.validationEmail(body)
+
+    suspend fun validationEmail(
+        key: String
+    ) = apiService.validationEmail(key)
 
     /**********************************************************
      *
-     *                  Player
+     *                  Ordering x 1
      *
      ***********************************************************/
-    suspend fun getVideoInfo(videoId: Int) = apiService.getVideoInfo(videoId)
+    suspend fun getAgent(
+        offset: Int,
+        limit: Int
+    ) =  apiService.getAgent(offset, limit)
 
-    suspend fun getVideoEpisode(videoId: Int, episodeId: Int) = apiService.getVideoEpisode(videoId, episodeId)
+    /**********************************************************
+     *
+     *                  Player x 3
+     *
+     ***********************************************************/
+    suspend fun getVideoInfo(
+        videoId: Int
+    ) = apiService.getVideoInfo(videoId)
 
-    suspend fun getVideoStreamOfEpisode(videoId: Int, episodeId: Int, streamId: Int) =
-        apiService.getVideoStreamOfEpisode(videoId, episodeId, streamId)
+    suspend fun getVideoEpisode(
+        videoId: Int,
+        episodeId: Int
+    ) = apiService.getVideoEpisode(videoId, episodeId)
+
+    suspend fun getVideoStreamOfEpisode(
+        videoId: Int,
+        episodeId: Int,
+        streamId: Int
+    ) = apiService.getVideoStreamOfEpisode(videoId, episodeId, streamId)
 }
 
