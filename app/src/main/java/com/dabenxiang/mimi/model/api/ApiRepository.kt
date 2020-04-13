@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.model.api
 
 import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.enums.StatisticsType
 
 class ApiRepository(private val apiService: ApiService) {
 
@@ -76,6 +77,9 @@ class ApiRepository(private val apiService: ApiService) {
      *                   Members/Home/Categories x 1
      *
      ***********************************************************/
+    /**
+     * 取得影片類別清單
+     */
     suspend fun fetchHomeCategories() = apiService.fetchHomeCategories()
 
     /**********************************************************
@@ -83,18 +87,20 @@ class ApiRepository(private val apiService: ApiService) {
      *                   Members/Home/Videos x 2
      *
      ***********************************************************/
+    /**
+     * 取得類別影片
+     */
     suspend fun searchHomeVideos(
-        category: String,
-        q: String,
-        offset: Int,
-        limit: Int
+        category: String, q: String, offset: Int, limit: Int
     ) = apiService.searchHomeVideos(category, q, offset, limit)
 
+
+    /**
+     * 取得熱門影片
+     */
     suspend fun statisticsHomeVideos(
-        statisticsType: Int,
-        offset: Int,
-        limit: Int
-    ) = apiService.statisticsHomeVideos(statisticsType, offset, limit)
+        statisticsType: StatisticsType, tag: String, offset: Int, limit: Int
+    ) = apiService.statisticsHomeVideos(statisticsType.ordinal, tag, offset, limit)
 
     /**********************************************************
      *

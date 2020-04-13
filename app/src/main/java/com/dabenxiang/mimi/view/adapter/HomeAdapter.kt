@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.holder.VideoHolderItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.*
 
@@ -14,7 +13,8 @@ class HomeAdapter(val context: Context, private val listener: EventListener) : R
 
     interface EventListener {
         fun onHeaderItemClick(view: View, item: HomeTemplate.Header)
-        fun onVideoClick(view: View, item: VideoHolderItem)
+        fun onVideoClick(view: View, item: Any)
+        fun onLoadAdapter(adapter: HomeCategoriesAdapter, src: HomeTemplate.Categories)
     }
 
     private var templateList: List<HomeTemplate>? = null
@@ -75,32 +75,32 @@ class HomeAdapter(val context: Context, private val listener: EventListener) : R
         templateList?.also { templateList ->
             when (holder.itemViewType) {
                 HomeItemType.HEADER.ordinal -> {
-                    val vh = holder as HeaderViewHolder
-                    vh.bind(templateList[position])
+                    holder as HeaderViewHolder
+                    holder.bind(templateList[position])
                 }
                 HomeItemType.BANNER.ordinal -> {
-                    val vh = holder as HomeBannerViewHolder
-                    vh.bind(templateList[position])
+                    holder as HomeBannerViewHolder
+                    holder.bind(templateList[position])
                 }
                 HomeItemType.CAROUSEL.ordinal -> {
-                    val vh = holder as HomeCarouselViewHolder
-                    vh.bind(templateList[position])
+                    holder as HomeCarouselViewHolder
+                    holder.bind(templateList[position])
                 }
                 HomeItemType.CATEGORIES.ordinal -> {
-                    val vh = holder as HomeCategoriesViewHolder
-                    vh.bind(templateList[position])
+                    holder as HomeCategoriesViewHolder
+                    holder.bind(templateList[position])
                 }
                 HomeItemType.LEADERBOARD.ordinal -> {
-                    val vh = holder as HomeLeaderboardViewHolder
-                    vh.bind(templateList[position])
+                    holder as HomeLeaderboardViewHolder
+                    holder.bind(templateList[position])
                 }
                 HomeItemType.RECOMMEND.ordinal -> {
-                    val vh = holder as HomeRecommendViewHolder
-                    vh.bind(templateList[position])
+                    holder as HomeRecommendViewHolder
+                    holder.bind(templateList[position])
                 }
                 HomeItemType.VIDEOLIST.ordinal -> {
-                    val vh = holder as HomeVideoListViewHolder
-                    vh.bind(templateList[position])
+                    holder as HomeVideoListViewHolder
+                    holder.bind(templateList[position])
                 }
             }
         }

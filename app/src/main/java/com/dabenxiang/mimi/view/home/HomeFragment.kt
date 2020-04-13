@@ -6,9 +6,11 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
+import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.model.holder.CarouselHolderItem
 import com.dabenxiang.mimi.model.holder.VideoHolderItem
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
+import com.dabenxiang.mimi.view.adapter.HomeCategoriesAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.google.android.material.tabs.TabLayout
@@ -45,8 +47,18 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
             viewModel.navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_categoriesFragment, bundle))
         }
 
-        override fun onVideoClick(view: View, item: VideoHolderItem) {
+        override fun onVideoClick(view: View, item: Any) {
             Timber.d("$item")
+
+            when (item) {
+                is StatisticsItem -> {
+                    
+                }
+            }
+        }
+
+        override fun onLoadAdapter(adapter: HomeCategoriesAdapter, src: HomeTemplate.Categories) {
+            viewModel.loadNestedCategoriesList(adapter, src)
         }
     }
 
@@ -91,18 +103,9 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
         if (list != null) {
             for (item in list) {
                 templateList.add(HomeTemplate.Header(item.id, null, item.name))
-                templateList.add(HomeTemplate.Categories(getTempVideoList()))
+                templateList.add(HomeTemplate.Categories(item.id, item.name))
             }
         }
-
-        /*
-        templateList.add(HomeTemplate.Banner(imgUrl = "https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
-        templateList.add(HomeTemplate.Carousel(getTempCarouselList()))
-        templateList.add(HomeTemplate.Header(null, "分類1"))
-        templateList.add(HomeTemplate.Categories(getTempVideoList()))
-        templateList.add(HomeTemplate.Header(null, "分類2"))
-        templateList.add(HomeTemplate.Categories(getTempVideoList()))
-        */
 
         adapter.setDataSrc(templateList)
     }

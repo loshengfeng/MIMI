@@ -103,7 +103,7 @@ interface ApiService {
      *
      ***********************************************************/
     // 取得類別影片
-    @GET("/v1/Home/Videos/Search")
+    @GET("/v1/Members/Home/Videos/Search")
     suspend fun searchHomeVideos(
         @Query("category") category: String,
         @Query("q") q: String,
@@ -112,12 +112,13 @@ interface ApiService {
     ): Response<ApiBasePagingItem<List<VideoSearchItem>>>
 
     // 取得熱門影片
-    @GET("/v1/Home/Videos/Statistics")
+    @GET("/v1/Members/Home/Videos/Statistics")
     suspend fun statisticsHomeVideos(
         @Query("statisticsType") statisticsType: Int,
+        @Query("tag") tag: String,
         @Query("offset") offset: Int,
         @Query("limit") limit: Int
-    ): Response<ApiBasePagingItem<List<VideoSearchItem>>>
+    ): Response<ApiBasePagingItem<List<StatisticsItem>>>
 
     /**********************************************************
      *

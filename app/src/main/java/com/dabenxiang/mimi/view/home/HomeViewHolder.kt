@@ -145,8 +145,7 @@ class HomeCategoriesViewHolder(itemView: View, listener: HomeAdapter.EventListen
 
     override fun updated() {
         data?.also {
-            nestedAdapter.setDataSrc(it)
-            nestedAdapter.notifyDataSetChanged()
+            nestedAdapter.loadData(it)
         }
     }
 }

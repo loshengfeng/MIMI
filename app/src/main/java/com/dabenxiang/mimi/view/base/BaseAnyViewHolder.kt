@@ -2,11 +2,11 @@ package com.dabenxiang.mimi.view.base
 
 import android.view.View
 
-abstract class BaseAnyViewHolder<VM: Any>(itemView: View): BaseViewHolder(itemView) {
+abstract class BaseAnyViewHolder<M : Any>(itemView: View) : BaseViewHolder(itemView) {
 
-    protected var data: VM? = null
+    protected var data: M? = null
 
-    fun bind(bind: VM?) {
+    fun bind(bind: M?) {
         data = bind
         updated()
     }

@@ -2,12 +2,13 @@ package com.dabenxiang.mimi.view.home
 
 import android.view.View
 import com.bumptech.glide.Glide
+import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.holder.VideoHolderItem
-import com.dabenxiang.mimi.view.adapter.HomeAdapter
-import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
+import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import kotlinx.android.synthetic.main.nested_item_home_categories.view.*
 
-class VideoViewHolder(itemView: View, listener: HomeAdapter.EventListener) : BaseAnyViewHolder<VideoHolderItem>(itemView) {
+class VideoViewHolder(itemView: View, onClickListener: IndexViewHolderListener) : BaseIndexViewHolder<VideoHolderItem>(itemView, onClickListener) {
+
     private val tvResolution = itemView.tv_resolution!!
     private val tvInfo = itemView.tv_info!!
     private val tvTitle = itemView.tv_title!!
@@ -15,19 +16,27 @@ class VideoViewHolder(itemView: View, listener: HomeAdapter.EventListener) : Bas
 
     init {
         ivPoster.setOnClickListener {
-            data?.also { data ->
-                listener.onVideoClick(it, data)
-            }
+            listener.onClickItemIndex(it, index)
         }
     }
 
-    override fun updated() {
-        tvResolution.text = data?.resolution
-        tvInfo.text = data?.info
-        tvTitle.text = data?.title
+    override fun updated(model: VideoHolderItem?) {
+        if (model == null) {
+            tvResolution.text = ""
+            tvInfo.text = ""
+            tvTitle.text = ""
 
-        Glide.with(itemView.context)
-            .load(data?.imgUrl)
-            .into(ivPoster)
+            Glide.with(itemView.context)
+                .load(R.drawable.bg_black_1)
+                .into(ivPoster)
+        } else {
+            tvResolution.text = model.resolution
+            tvInfo.text = model.info
+            tvTitle.text = model.title
+
+            Glide.with(itemView.context)
+                .load(model.imgUrl)
+                .into(ivPoster)
+        }
     }
 }

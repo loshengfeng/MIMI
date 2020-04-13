@@ -1,10 +1,12 @@
 package com.dabenxiang.mimi.view.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.holder.VideoHolderItem
+import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.home.HomeTemplate
 import com.dabenxiang.mimi.view.home.VideoViewHolder
 
@@ -23,9 +25,21 @@ class HomeVideoListAdapter(private val nestedListener: HomeAdapter.EventListener
         notifyDataSetChanged()
     }
 
+    private val videoViewHolderListener by lazy {
+        object : BaseIndexViewHolder.IndexViewHolderListener {
+            override fun onClickItemIndex(view: View, index: Int) {
+                if (index > -1) {
+                    data?.get(index)?.also {
+                        nestedListener.onVideoClick(view, it)
+                    }
+                }
+            }
+        }
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.nested_item_video, parent, false)
-        return VideoViewHolder(view, nestedListener)
+        return VideoViewHolder(view, videoViewHolderListener)
     }
 
     override fun getItemCount(): Int {
@@ -34,7 +48,7 @@ class HomeVideoListAdapter(private val nestedListener: HomeAdapter.EventListener
 
     override fun onBindViewHolder(holder: VideoViewHolder, position: Int) {
         data?.also { it ->
-            holder.bind(it[position])
+            holder.bind(it[position], position)
         }
     }
 }

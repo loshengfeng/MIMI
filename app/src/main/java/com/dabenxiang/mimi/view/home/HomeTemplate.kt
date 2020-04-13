@@ -9,6 +9,6 @@ sealed class HomeTemplate(val type: HomeItemType) {
     data class Carousel(val carouselList: List<CarouselHolderItem>) : HomeTemplate(HomeItemType.CAROUSEL)
     object Leaderboard : HomeTemplate(HomeItemType.LEADERBOARD)
     object Recommend : HomeTemplate(HomeItemType.RECOMMEND)
-    data class Categories(val videoList: List<VideoHolderItem>) : HomeTemplate(HomeItemType.CATEGORIES)
+    data class Categories(val id: String?, val title: String?) : HomeTemplate(HomeItemType.CATEGORIES)
     data class VideoList(val videoList: List<VideoHolderItem>) : HomeTemplate(HomeItemType.VIDEOLIST)
 }
