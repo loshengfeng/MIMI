@@ -14,7 +14,7 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
 
     val accountManager: AccountManager by inject()
     val gson: Gson by inject()
-//    val toastData = MutableLiveData<String>()
+    val toastData = MutableLiveData<String>()
 //    val dialogData = MutableLiveData<String>()
 
     protected val _showProgress by lazy { MutableLiveData<Boolean>() }

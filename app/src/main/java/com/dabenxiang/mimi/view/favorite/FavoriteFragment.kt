@@ -19,6 +19,12 @@ class FavoriteFragment  : BaseFragment<FavoriteViewModel>() {
     private val viewModel by viewModel<FavoriteViewModel>()
     private var hasData = true
 
+    private val favoriteListener = object : AdapterEventListener<FavoriteItem> {
+        override fun onItemClick(view: View, item: FavoriteItem) {
+            Timber.d("${FavoriteFragment::class.java.simpleName}_onlinePayListener_onItemClick_item: $item")
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initSettings()
@@ -103,11 +109,5 @@ class FavoriteFragment  : BaseFragment<FavoriteViewModel>() {
             return@setOnMenuItemClickListener false
         }
         menu.show()
-    }
-
-    private val favoriteListener = object : AdapterEventListener<FavoriteItem> {
-        override fun onItemClick(view: View, item: FavoriteItem) {
-            Timber.d("${FavoriteFragment::class.java.simpleName}_onlinePayListener_onItemClick_item: $item")
-        }
     }
 }

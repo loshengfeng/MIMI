@@ -24,6 +24,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <CheckBox
+        android:id="@+id/cb_login_account"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/ico_checked_selector"
+        android:button="@null"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/edit_login_account"
+        app:layout_constraintEnd_toEndOf="@id/edit_login_account"
+        app:layout_constraintTop_toTopOf="@id/edit_login_account"
+        tools:checked="true"
+        tools:visibility="visible" />
+
     <TextView
         android:id="@+id/tv_login_account_error"
         android:layout_width="wrap_content"
@@ -62,18 +76,17 @@
         tools:visibility="visible" />
 
     <CheckBox
-        android:id="@+id/cb_show_pw"
+        android:id="@+id/cb_show_login_pw"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginEnd="12dp"
         android:background="@drawable/ico_eye_selector"
         android:button="@null"
-        android:visibility="gone"
+        android:checked="false"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="@id/edit_login_pw"
         app:layout_constraintEnd_toEndOf="@id/edit_login_pw"
-        app:layout_constraintTop_toTopOf="@id/edit_login_pw"
-        tools:checked="true"
-        tools:visibility="visible" />
+        app:layout_constraintTop_toTopOf="@id/edit_login_pw" />
 
     <CheckBox
         android:id="@+id/cb_keep_account"

@@ -7,17 +7,17 @@
     android:background="@color/color_white_1">
 
     <ImageView
-        android:id="@+id/ivLogo"
+        android:id="@+id/iv_Logo"
         android:layout_width="250dp"
         android:layout_height="150dp"
-        android:src="@drawable/ic_img_notlogin"
         android:contentDescription="@null"
+        android:src="@drawable/ic_img_notlogin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/tvContent1"
+        android:id="@+id/tv_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -26,11 +26,11 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ivLogo"
+        app:layout_constraintTop_toBottomOf="@id/iv_Logo"
         tools:text="文字內容文字內容" />
 
     <TextView
-        android:id="@+id/tvContent2"
+        android:id="@+id/tv_sub_content"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
@@ -40,12 +40,12 @@
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvContent1"
+        app:layout_constraintTop_toBottomOf="@id/tv_content"
         tools:text="文字內容文字內容文字內容文字內容" />
 
 
     <TextView
-        android:id="@+id/btn_login"
+        android:id="@+id/tv_login"
         android:layout_width="0dp"
         android:layout_height="33dp"
         android:layout_marginStart="80dp"
@@ -59,10 +59,10 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvContent2" />
+        app:layout_constraintTop_toBottomOf="@id/tv_sub_content" />
 
     <TextView
-        android:id="@+id/btn_register"
+        android:id="@+id/tv_register"
         android:layout_width="0dp"
         android:layout_height="33dp"
         android:layout_marginStart="80dp"
@@ -75,18 +75,18 @@
         android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_login" />
+        app:layout_constraintTop_toBottomOf="@id/tv_login" />
 
     <TextView
         android:id="@+id/tv_version_is_not_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
         android:layout_marginTop="15dp"
+        android:gravity="center"
         android:textColor="@color/color_black_1_30"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_register"
+        app:layout_constraintTop_toBottomOf="@id/tv_register"
         tools:text="v1.0.0" />
 </androidx.constraintlayout.widget.ConstraintLayout>

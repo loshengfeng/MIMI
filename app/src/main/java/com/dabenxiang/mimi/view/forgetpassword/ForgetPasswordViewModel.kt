@@ -5,16 +5,12 @@ import androidx.lifecycle.MutableLiveData
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.widget.utility.AppUtils.isAccountValid
+import com.dabenxiang.mimi.widget.utility.AppUtils.isEmailValid
 import timber.log.Timber
 import java.util.regex.Pattern
 
 class ForgetPasswordViewModel : BaseViewModel() {
-
-    companion object {
-        const val REGEXP_USER_NAME = "^[a-zA-Z0-9]{5,20}$"
-        const val REGEXP_EMAIL = "^[A-Za-z0-9_\\-\\.\\u4e00-\\u9fa5]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*$"
-    }
-
     private val _accountError = MutableLiveData<Int>()
     val accountError: LiveData<Int> = _accountError
 
@@ -32,10 +28,10 @@ class ForgetPasswordViewModel : BaseViewModel() {
         }
     }
 
-    private fun isValidateAccount(userName: String): Boolean {
+    private fun isValidateAccount(account: String): Boolean {
         _accountError.value = when {
-            userName.isNullOrBlank() -> R.string.account_empty
-            !Pattern.matches(REGEXP_USER_NAME, userName) -> R.string.account_format_error
+            account.isNullOrBlank() -> R.string.account_empty
+            !isAccountValid(account) -> R.string.account_format_error
             else -> null
         }
 
@@ -48,7 +44,7 @@ class ForgetPasswordViewModel : BaseViewModel() {
     private fun isValidateEmail(email: String): Boolean {
         _emailError.value = when {
             email.isNullOrBlank() -> R.string.email_format_error_1
-            !Pattern.matches(REGEXP_EMAIL, email) -> R.string.email_format_error_2
+            !isEmailValid(email) -> R.string.email_format_error_2
             else -> null
         }
 
@@ -59,6 +55,7 @@ class ForgetPasswordViewModel : BaseViewModel() {
     }
 
     private fun doReset(account: String, password: String) {
+        toastData.value = "doReset"
 //        viewModelScope.launch {
 //            accountManager.reset(account, password)
 //                .collect { _result.value = it }

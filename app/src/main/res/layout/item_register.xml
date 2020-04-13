@@ -26,7 +26,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <CheckBox
-        android:id="@+id/cb_account"
+        android:id="@+id/cb_register_account"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginEnd="12dp"
@@ -102,21 +102,20 @@
         tools:ignore="LabelFor" />
 
     <CheckBox
-        android:id="@+id/cb_show_pw"
+        android:id="@+id/cb_show_register_pw"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginEnd="12dp"
         android:background="@drawable/ico_eye_selector"
         android:button="@null"
-        android:visibility="gone"
+        android:visibility="visible"
+        android:checked="false"
         app:layout_constraintBottom_toBottomOf="@id/edit_register_pw"
         app:layout_constraintEnd_toEndOf="@id/edit_register_pw"
-        app:layout_constraintTop_toTopOf="@id/edit_register_pw"
-        tools:checked="true"
-        tools:visibility="visible" />
+        app:layout_constraintTop_toTopOf="@id/edit_register_pw"/>
 
     <TextView
-        android:id="@+id/tv_pw_error"
+        android:id="@+id/tv_register_pw_error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/color_red_2"
@@ -128,7 +127,7 @@
         tools:visibility="visible" />
 
     <EditText
-        android:id="@+id/edit_confirm_pw"
+        android:id="@+id/edit_register_confirm_pw"
         style="@style/login_edit_text"
         android:layout_height="wrap_content"
         android:width="0dp"
@@ -140,27 +139,26 @@
         tools:ignore="LabelFor" />
 
     <CheckBox
-        android:id="@+id/cb_show_confirm_pw"
+        android:id="@+id/cb_show_register_confirm_pw"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginEnd="12dp"
         android:background="@drawable/ico_eye_selector"
         android:button="@null"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/edit_confirm_pw"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/edit_register_confirm_pw"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/edit_confirm_pw"
-        tools:visibility="visible" />
+        app:layout_constraintTop_toTopOf="@+id/edit_register_confirm_pw"/>
 
     <TextView
-        android:id="@+id/tv_confirm_pw_error"
+        android:id="@+id/tv_register_confirm_pw_error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/color_red_2"
         android:textSize="12sp"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_confirm_pw"
+        app:layout_constraintTop_toBottomOf="@+id/edit_register_confirm_pw"
         tools:text="错误讯息"
         tools:visibility="visible" />
 
@@ -172,7 +170,7 @@
         android:text="@string/login_desc"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/edit_confirm_pw" />
+        app:layout_constraintTop_toBottomOf="@id/edit_register_confirm_pw" />
 
     <Button
         android:id="@+id/btn_register_cancel"

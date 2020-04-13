@@ -18,8 +18,19 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 class TopupFragment : BaseFragment<TopupViewModel>() {
-
     private val viewModel by viewModel<TopupViewModel>()
+
+    private val onlinePayListener = object : AdapterEventListener<TopupOnlinePayItem> {
+        override fun onItemClick(view: View, item: TopupOnlinePayItem) {
+            Timber.d("${TopupFragment::class.java.simpleName}_onlinePayListener_onItemClick_item: $item")
+        }
+    }
+
+    private val proxyPayListener = object : AdapterEventListener<TopupProxyPayItem> {
+        override fun onItemClick(view: View, item: TopupProxyPayItem) {
+            Timber.d("${TopupFragment::class.java.simpleName}_proxyPayListener_onItemClick_item: $item")
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -116,17 +127,5 @@ class TopupFragment : BaseFragment<TopupViewModel>() {
         val proxyAdapter = rv_proxy_pay.adapter as TopupProxyPayAdapter
         proxyAdapter.setDataSrc(proxyPayList)
 
-    }
-
-    private val onlinePayListener = object : AdapterEventListener<TopupOnlinePayItem> {
-        override fun onItemClick(view: View, item: TopupOnlinePayItem) {
-            Timber.d("${TopupFragment::class.java.simpleName}_onlinePayListener_onItemClick_item: $item")
-        }
-    }
-
-    private val proxyPayListener = object : AdapterEventListener<TopupProxyPayItem> {
-        override fun onItemClick(view: View, item: TopupProxyPayItem) {
-            Timber.d("${TopupFragment::class.java.simpleName}_proxyPayListener_onItemClick_item: $item")
-        }
     }
 }

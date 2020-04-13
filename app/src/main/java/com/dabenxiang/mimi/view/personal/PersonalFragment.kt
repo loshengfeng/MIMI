@@ -5,6 +5,9 @@ import android.view.View
 import androidx.navigation.Navigation
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.login.LoginFragment
+import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_LOGIN
+import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_personal.*
 import kotlinx.android.synthetic.main.item_personal_is_login.*
@@ -12,14 +15,9 @@ import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import org.koin.android.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-
 class PersonalFragment : BaseFragment<PersonalViewModel>() {
     private val viewModel by viewModel<PersonalViewModel>()
-    private val isLogin = true
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    private val isLogin = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -38,21 +36,26 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
         return viewModel
     }
 
-    override fun setupObservers() {
-        Timber.d("${PersonalFragment::class.java.simpleName}_setupObservers")
-    }
+    override fun setupObservers() {}
 
     override fun setupListeners() {
-        Timber.d("${PersonalFragment::class.java.simpleName}_setupListeners")
-
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.tv_topup -> GeneralUtils.showToast(context!!, "btnTopup")
                 R.id.tv_favorite -> GeneralUtils.showToast(context!!, "btnFavorite")
-                R.id.tv_topup_history -> Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_topupHistoryFragment)
-                R.id.tv_chat_history -> Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_chatHistoryFragment)
-                R.id.tv_setting -> Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_settingFragment)
+                R.id.tv_topup_history -> Navigation.findNavController(view!!)
+                    .navigate(R.id.action_personalFragment_to_topupHistoryFragment)
+                R.id.tv_chat_history -> Navigation.findNavController(view!!)
+                    .navigate(R.id.action_personalFragment_to_chatHistoryFragment)
+                R.id.tv_setting -> Navigation.findNavController(view!!)
+                    .navigate(R.id.action_personalFragment_to_settingFragment)
                 R.id.tv_logout -> GeneralUtils.showToast(context!!, "btnLogout")
+                R.id.tv_login -> Navigation.findNavController(view!!)
+                    .navigate(R.id.action_personalFragment_to_loginFragment,
+                        LoginFragment.createBundle(TYPE_LOGIN))
+                R.id.tv_register -> Navigation.findNavController(view!!)
+                    .navigate(R.id.action_personalFragment_to_loginFragment,
+                        LoginFragment.createBundle(TYPE_REGISTER))
             }
         }.also {
             tv_topup.setOnClickListener(it)
@@ -61,11 +64,13 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
             tv_chat_history.setOnClickListener(it)
             tv_setting.setOnClickListener(it)
             tv_logout.setOnClickListener(it)
+            tv_login.setOnClickListener(it)
+            tv_register.setOnClickListener(it)
         }
     }
 
     private fun initSettings() {
-        when(isLogin) {
+        when (isLogin) {
             true -> {
                 item_is_Login.visibility = View.VISIBLE
                 item_is_not_Login.visibility = View.GONE
@@ -83,7 +88,7 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
         tv_new.text = "N"
         tv_version_is_login.text = "v1.0.0"
         tv_version_is_not_login.text = "v1.0.0"
-        tvContent1.text = "文字內容文字內容"
-        tvContent2.text = "文字內容文字內容文字內容文字內容文字內容文字內容文字內容文字內容"
+        tv_content.text = "文字內容文字內容"
+        tv_sub_content.text = "文字內容文字內容文字內容文字內容文字內容文字內容文字內容文字內容"
     }
 }

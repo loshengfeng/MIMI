@@ -19,6 +19,7 @@ import java.io.PrintWriter
 import java.io.StringWriter
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.regex.Pattern
 
 object AppUtils {
 
@@ -121,5 +122,17 @@ object AppUtils {
         t.printStackTrace(pw)
         pw.flush()
         return sw.toString()
+    }
+
+    fun isAccountValid(account: String): Boolean {
+        return Pattern.matches("^[a-zA-Z0-9]{5,20}$", account)
+    }
+
+    fun isEmailValid(email: String): Boolean {
+        return Pattern.matches("^[A-Za-z0-9_\\-\\.\\u4e00-\\u9fa5]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*$", email)
+    }
+
+    fun isPasswordValid(password: String): Boolean {
+        return Pattern.matches("^\\S{8,20}$", password)
     }
 }

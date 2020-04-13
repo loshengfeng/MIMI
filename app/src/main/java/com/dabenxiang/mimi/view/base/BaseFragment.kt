@@ -71,6 +71,10 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
                     progressHUD?.dismiss()
                 }
             })
+
+            viewModel.toastData.observe(viewLifecycleOwner, Observer {
+                GeneralUtils.showToast(context!!, it)
+            })
         }
 
         setupListeners()

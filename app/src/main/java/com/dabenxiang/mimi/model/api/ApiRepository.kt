@@ -14,19 +14,31 @@ class ApiRepository(private val apiService: ApiService) {
      *                  Attachment x 4
      *
      ***********************************************************/
+    /**
+     * 上傳檔案
+     */
     suspend fun postAttachment(
         body: String
     ) = apiService.postAttachment(body)
 
+    /**
+     * 取得檔案
+     */
     suspend fun getAttachment(
         id: String
     ) = apiService.getAttachment(id)
 
+    /**
+     * 修改檔案
+     */
     suspend fun putAttachment(
         id: String,
         body: String
     ) = apiService.putAttachment(id, body)
 
+    /**
+     * 刪除檔案
+     */
     suspend fun deleteAttachment(
         id: String
     ) = apiService.deleteAttachment(id)
@@ -36,6 +48,9 @@ class ApiRepository(private val apiService: ApiService) {
      *                  Auth x 1
      *
      ***********************************************************/
+    /**
+     * 修改密碼(未登入)
+     */
     suspend fun resetPassword(
         body: ResetPasswordRequest
     ) = apiService.resetPassword(body)
@@ -45,19 +60,31 @@ class ApiRepository(private val apiService: ApiService) {
      *                  Chats x 4
      *
      ***********************************************************/
+    /**
+     * 建立聊天室
+     */
     suspend fun postChats(
         body: ChatRequest
     ) = apiService.postChat(body)
 
+    /**
+     * 取得聊天室列表
+     */
     suspend fun getChats(
         offset: String,
         limit: String
     ) = apiService.getChat(offset, limit)
 
+    /**
+     * 發送訊息
+     */
     suspend fun postMessage(
         body: MsgRequest
     ) = apiService.postMessage(body)
 
+    /**
+     * 取得訊息
+     */
     suspend fun getMessage(
         chatId: Int,
         lastReadTime: String,
@@ -70,6 +97,9 @@ class ApiRepository(private val apiService: ApiService) {
      *                  Functions x 1
      *
      ***********************************************************/
+    /**
+     * 取得角色功能列表
+     */
     suspend fun getFunctions() = apiService.getFunctions()
 
     /**********************************************************
@@ -94,7 +124,6 @@ class ApiRepository(private val apiService: ApiService) {
         category: String, q: String, offset: Int, limit: Int
     ) = apiService.searchHomeVideos(category, q, offset, limit)
 
-
     /**
      * 取得熱門影片
      */
@@ -107,58 +136,100 @@ class ApiRepository(private val apiService: ApiService) {
      *                  Me x 14
      *
      ***********************************************************/
+    /**
+     * 取得用者資訊
+     */
     suspend fun getMe() = apiService.getMe()
 
+    /**
+     * 修改密碼(已登入)
+     */
     suspend fun changePassword(
         password: String
     ) = apiService.changePassword(password)
 
+    /**
+     * 取得聊天室列表
+     */
     suspend fun getMeChatItem(
         offset: Int,
         limit: Int
     ) = apiService.getMeChat(offset, limit)
 
+    /**
+     * 取得聊天室內容
+     */
     suspend fun getMeMessage(
         chatId: String,
         offset: Int,
         limit: Int
     ) = apiService.getMeMessage(chatId, offset, limit)
 
+    /**
+     * 忘記密碼
+     */
+    suspend fun forgetPassword(
+        body: ForgetPasswordRequest
+    ) = apiService.forgetPassword(body)
+
+    /**
+     * 取得使用者充值記錄
+     */
     suspend fun getMeOrder(
         offset: Int,
         limit: Int
     ) = apiService.getMeOrder(offset, limit)
 
+    /**
+     * 加入收藏
+     */
     suspend fun postMePlaylist(
         body: PlayListRequest
     ) = apiService.addMePlaylist(body)
 
+    /**
+     * 刪除使用者列表影片
+     */
     suspend fun deleteMePlaylist(
         ids : List<Int>
     ) = apiService.deleteMePlaylist(ids)
 
+    /**
+     * 取得使用者影片列表 0:History, 1:Favorite
+     */
     suspend fun getMePlaylist(
         playlistType: Int, offset: Int, limit: Int
     ) = apiService.getMePlaylist(playlistType, offset, limit)
 
+    /**
+     * 取得使用者資訊明細
+     */
     suspend fun getMeProfile() = apiService.getMeProfile()
 
+    /**
+     * 修改使用者資訊
+     */
     suspend fun updatedMeProfile(
         body: MeProfileItem
     ) = apiService.updatedMeProfile(body)
 
-    suspend fun forgetPassword(
-        body: ForgetPasswordRequest
-    ) = apiService.forgetPassword(body)
-
+    /**
+     * 建立新使用者
+     */
     suspend fun signUp(
         body: MembersAccountItem
     ) = apiService.signUp(body)
 
+    /**
+     * 發驗證信
+     */
     suspend fun validationEmail(
         body: ValidateEmailRequest
     ) = apiService.validationEmail(body)
 
+    /**
+     * 驗證信箱
+     */
     suspend fun validationEmail(
         key: String
     ) = apiService.validationEmail(key)
@@ -168,6 +239,9 @@ class ApiRepository(private val apiService: ApiService) {
      *                  Ordering x 1
      *
      ***********************************************************/
+    /**
+     * 取得在線客服列表
+     */
     suspend fun getAgent(
         offset: Int,
         limit: Int
@@ -178,15 +252,24 @@ class ApiRepository(private val apiService: ApiService) {
      *                  Player x 3
      *
      ***********************************************************/
+    /**
+     * 取得影片資訊
+     */
     suspend fun getVideoInfo(
         videoId: Int
     ) = apiService.getVideoInfo(videoId)
 
+    /**
+     * 取得影片集數資訊
+     */
     suspend fun getVideoEpisode(
         videoId: Int,
         episodeId: Int
     ) = apiService.getVideoEpisode(videoId, episodeId)
 
+    /**
+     * 取得影片檔案
+     */
     suspend fun getVideoStreamOfEpisode(
         videoId: Int,
         episodeId: Int,

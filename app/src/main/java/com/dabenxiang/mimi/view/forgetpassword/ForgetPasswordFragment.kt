@@ -6,7 +6,6 @@ import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_forget_password.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
@@ -16,6 +15,8 @@ class ForgetPasswordFragment : BaseFragment<ForgetPasswordViewModel>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        edit_account.setText("jeff7788")
+        edit_email.setText("jeff@silkrode.com.tw")
     }
 
     override fun getLayoutId(): Int {
@@ -35,12 +36,22 @@ class ForgetPasswordFragment : BaseFragment<ForgetPasswordViewModel>() {
                 tv_account_error.text = getString(it)
                 tv_account_error.visibility = View.VISIBLE
             }
+            if (it == null) {
+                edit_account.setBackgroundResource(R.drawable.edit_text_rectangle)
+                tv_account_error.visibility = View.INVISIBLE
+            } else {
+                edit_account.setBackgroundResource(R.drawable.edit_text_error_rectangle)
+                tv_account_error.text = getString(it)
+                tv_account_error.visibility = View.VISIBLE
+            }
         })
 
         viewModel.emailError.observe(viewLifecycleOwner, Observer {
             if (it == null) {
+                edit_email.setBackgroundResource(R.drawable.edit_text_rectangle)
                 tv_email_error.visibility = View.INVISIBLE
             } else {
+                edit_email.setBackgroundResource(R.drawable.edit_text_error_rectangle)
                 tv_email_error.text = getString(it)
                 tv_email_error.visibility = View.VISIBLE
             }
@@ -86,7 +97,6 @@ class ForgetPasswordFragment : BaseFragment<ForgetPasswordViewModel>() {
             when (buttonView.id) {
                 R.id.tv_back, R.id.btn_cancel -> Navigation.findNavController(view!!).navigateUp()
                 R.id.btn_send -> {
-                    GeneralUtils.showToast(context!!, "btnSend")
                     viewModel.doValidateAndSubmit(
                         edit_account.text.toString(),
                         edit_email.text.toString()
@@ -98,5 +108,12 @@ class ForgetPasswordFragment : BaseFragment<ForgetPasswordViewModel>() {
             btn_cancel.setOnClickListener(it)
             btn_send.setOnClickListener(it)
         }
+
+        /*cb_show_pw.setOnCheckedChangeListener { _, isChecked ->
+            edit_pw.transformationMethod = when {
+                isChecked -> HideReturnsTransformationMethod.getInstance()
+                else -> PasswordTransformationMethod.getInstance()
+            }
+        }*/
     }
 }
