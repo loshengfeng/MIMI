@@ -3,12 +3,12 @@ package com.dabenxiang.mimi.view.home
 import android.os.Bundle
 import android.view.View
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.view.base.BaseFragment2
+import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import kotlinx.android.synthetic.main.fragment_categories.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class CategoriesFragment: BaseFragment2<CategoriesViewModel>() {
+class CategoriesFragment: BaseFragment<CategoriesViewModel>() {
 
     companion object {
         const val TITLE = "title"

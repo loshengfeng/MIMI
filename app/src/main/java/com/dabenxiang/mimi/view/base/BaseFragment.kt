@@ -5,7 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.dabenxiang.mimi.R
@@ -16,16 +18,34 @@ import com.kaopiz.kprogresshud.KProgressHUD
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.HttpException
 
-abstract class BaseFragment : Fragment() {
+abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
 
     open var mainViewModel: MainViewModel? = null
     var progressHUD: KProgressHUD? = null
+
+    abstract fun fetchViewModel(): VM?
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activity?.let {
             mainViewModel = ViewModelProviders.of(it).get(MainViewModel::class.java)
         }
+
+        fetchViewModel()?.navigateDestination?.observe(this, Observer { item ->
+            findNavController().also { navController ->
+                when (item) {
+                    NavigateItem.Up -> navController.navigateUp() //.popBackStack()
+                    is NavigateItem.PopBackStack -> navController.popBackStack(item.fragmentId, item.inclusive)
+                    is NavigateItem.Destination -> {
+                        if (item.bundle == null) {
+                            navController.navigate(item.action)
+                        } else {
+                            navController.navigate(item.action, item.bundle)
+                        }
+                    }
+                }
+            }
+        })
     }
 
     override fun onCreateView(
@@ -42,6 +62,16 @@ abstract class BaseFragment : Fragment() {
             .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
 
         activity?.bottom_navigation?.visibility = bottomNavigationVisibility
+
+        fetchViewModel()?.also { viewModel ->
+            viewModel.showProgress.observe(viewLifecycleOwner, Observer {
+                if (it) {
+                    progressHUD?.show()
+                } else {
+                    progressHUD?.dismiss()
+                }
+            })
+        }
 
         setupListeners()
         setupObservers()
