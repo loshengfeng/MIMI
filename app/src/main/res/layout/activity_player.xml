@@ -15,18 +15,29 @@
         app:rewind_increment="30000"
         app:show_timeout="10000" />
 
+    <ImageView
+        android:id="@+id/iv_player"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/ico_default_photo"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/player_view"
+        app:layout_constraintEnd_toEndOf="@id/player_view"
+        app:layout_constraintStart_toStartOf="@id/player_view"
+        app:layout_constraintTop_toTopOf="@id/player_view" />
+
     <com.yulichswift.roundedview.widget.RoundedTextView
-        android:id="@+id/tv_fast_forward"
+        android:id="@+id/tv_forward_backward"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:visibility="gone"
         android:paddingStart="10dp"
         android:paddingTop="6dp"
         android:paddingEnd="10dp"
         android:paddingBottom="6dp"
         android:textColor="@color/color_white_1"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:visibility="gone"
         app:btn_corner_radius="10dp"
         app:btn_solid_color="@color/color_black_1_30"
         app:layout_constraintBottom_toBottomOf="@id/player_view"
@@ -38,14 +49,14 @@
         android:id="@+id/tv_sound_tune"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:visibility="gone"
         android:paddingStart="10dp"
         android:paddingTop="6dp"
         android:paddingEnd="10dp"
         android:paddingBottom="6dp"
         android:textColor="@color/color_white_1"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:visibility="gone"
         app:btn_corner_radius="10dp"
         app:btn_solid_color="@color/color_black_1_30"
         app:layout_constraintBottom_toBottomOf="@id/player_view"
@@ -63,7 +74,6 @@
         app:layout_constraintEnd_toEndOf="@id/player_view"
         app:layout_constraintStart_toStartOf="@id/player_view"
         app:layout_constraintTop_toTopOf="@id/player_view" />
-
 
     <LinearLayout
         android:layout_width="match_parent"

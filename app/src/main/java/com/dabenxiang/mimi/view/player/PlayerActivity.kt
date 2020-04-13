@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.player
 
+import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.hardware.SensorManager
 import android.os.Bundle
@@ -47,12 +48,12 @@ class PlayerActivity : BaseActivity() {
         return R.layout.activity_player
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         viewModel.fastForwardTime.observe(this, Observer {
-            //Timber.d("swipe time ${it / 1000}")
-            tv_fast_forward.text = "${if (it >= 0) "+" else ""}${it / 1000}秒"
+            tv_forward_backward.text = "${if (it > 0) "+" else ""}${it / 1000}秒"
         })
 
         viewModel.soundLevel.observe(this, Observer {
@@ -72,6 +73,13 @@ class PlayerActivity : BaseActivity() {
         viewModel.currentVideoUrl.observe(this, Observer {
             it?.also { url ->
                 setupPlayUrl(url)
+            }
+        })
+
+        viewModel.isPlaying.observe(this, Observer {
+            iv_player.visibility = when (it) {
+                true -> View.GONE
+                false -> View.VISIBLE
             }
         })
 
@@ -161,7 +169,7 @@ class PlayerActivity : BaseActivity() {
 
             player?.also { player ->
                 player.repeatMode = Player.REPEAT_MODE_OFF
-                player.playWhenReady = viewModel.playWhenReady
+                player.playWhenReady = viewModel.isPlaying.value ?: true
                 player.seekTo(viewModel.currentWindow, viewModel.playbackPosition)
                 player.volume = PlayerViewModel.volume
                 player.addListener(playbackStateListener)
@@ -219,14 +227,16 @@ class PlayerActivity : BaseActivity() {
                         player_view.showController()
                     isMove = if (abs(dx) >= SWIPE_DISTANCE_UNIT || abs(dy) >= SWIPE_DISTANCE_UNIT) {
                         if (abs(dx) > abs(dy)) {
-                            tv_fast_forward.visibility = View.VISIBLE
-                            tv_sound_tune.visibility = View.GONE
-                            if (dx > 0)
-                                viewModel.setFastForwardTime((dx.toInt() / SWIPE_DISTANCE_UNIT) * JUMP_TIME)
-                            else
-                                viewModel.setRewindTime(abs((dx.toInt() / SWIPE_DISTANCE_UNIT) * JUMP_TIME))
+                            if (viewModel.isPlaying.value == true) {
+                                tv_forward_backward.visibility = View.VISIBLE
+                                tv_sound_tune.visibility = View.GONE
+                                if (dx > 0)
+                                    viewModel.setFastForwardTime((dx.toInt() / SWIPE_DISTANCE_UNIT) * JUMP_TIME)
+                                else
+                                    viewModel.setRewindTime(abs((dx.toInt() / SWIPE_DISTANCE_UNIT) * JUMP_TIME))
+                            }
                         } else {
-                            tv_fast_forward.visibility = View.GONE
+                            tv_forward_backward.visibility = View.GONE
                             tv_sound_tune.visibility = View.VISIBLE
                             if (abs(dy) > SWIPE_SOUND_LEAST) {
                                 if (dy > 0)
@@ -244,13 +254,15 @@ class PlayerActivity : BaseActivity() {
                     val dy = event.y - originY
                     isMove = if (abs(dx) >= SWIPE_DISTANCE_UNIT || abs(dy) >= SWIPE_DISTANCE_UNIT) {
                         if (abs(dx) > abs(dy)) {
-                            if (dx > 0) {
-                                val fastForwardMs = (dx.toInt() / SWIPE_DISTANCE_UNIT) * JUMP_TIME
-                                fastForward(fastForwardMs)
+                            if (viewModel.isPlaying.value == true) {
+                                if (dx > 0) {
+                                    val fastForwardMs = (dx.toInt() / SWIPE_DISTANCE_UNIT) * JUMP_TIME
+                                    fastForward(fastForwardMs)
 
-                            } else {
-                                val rewindMs = abs((dx.toInt() / SWIPE_DISTANCE_UNIT) * JUMP_TIME)
-                                rewind(rewindMs)
+                                } else {
+                                    val rewindMs = abs((dx.toInt() / SWIPE_DISTANCE_UNIT) * JUMP_TIME)
+                                    rewind(rewindMs)
+                                }
                             }
                         } else {
                             if (abs(dy) > SWIPE_SOUND_LEAST) {
@@ -261,12 +273,21 @@ class PlayerActivity : BaseActivity() {
                             }
                         }
                         true
-                    } else false
-                    tv_fast_forward.visibility = View.GONE
+                    } else {
+                        player?.also {
+                            it.playWhenReady.also { playing ->
+                                it.playWhenReady = !playing
+                                viewModel.setPlaying(!playing)
+                            }
+                        }
+                        false
+                    }
+
+                    tv_forward_backward.visibility = View.GONE
                     tv_sound_tune.visibility = View.GONE
                 }
                 else -> {
-                    //Timber.d("ACTION_ELSE")
+
                 }
             }
             isMove
@@ -277,7 +298,7 @@ class PlayerActivity : BaseActivity() {
         player?.also { player ->
             viewModel.playbackPosition = player.currentPosition
             viewModel.currentWindow = player.currentWindowIndex
-            viewModel.playWhenReady = player.playWhenReady
+            viewModel.setPlaying(player.playWhenReady)
             player.removeListener(playbackStateListener)
             player.release()
         }

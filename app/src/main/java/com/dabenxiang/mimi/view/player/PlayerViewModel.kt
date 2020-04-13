@@ -30,7 +30,6 @@ class PlayerViewModel : BaseViewModel() {
         var volume: Float = 1f
     }
 
-    var playWhenReady: Boolean = true
     var currentWindow: Int = 0
     var playbackPosition: Long = 0
     var canFullScreen = false
@@ -43,6 +42,9 @@ class PlayerViewModel : BaseViewModel() {
 
     private val _isLoadingActive = MutableLiveData<Boolean>()
     val isLoadingActive: LiveData<Boolean> = _isLoadingActive
+
+    private val _isPlaying = MutableLiveData<Boolean>()
+    val isPlaying: LiveData<Boolean> = _isPlaying
 
     private val _videoItem = MutableLiveData<VideoItem>()
     val videoItem: LiveData<VideoItem> = _videoItem
@@ -61,6 +63,10 @@ class PlayerViewModel : BaseViewModel() {
 
     fun setSoundLevel(level: Float) {
         _soundLevel.value = if (level > 1) 1f else if (level < 0) 0f else level
+    }
+
+    fun setPlaying(playing: Boolean) {
+        _isPlaying.value = playing
     }
 
     fun activateLoading(isLoading: Boolean) {
