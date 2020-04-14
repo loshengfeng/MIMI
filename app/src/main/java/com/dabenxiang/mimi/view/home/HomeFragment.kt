@@ -42,9 +42,7 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
             Timber.d("$item")
 
-            val bundle = Bundle()
-            bundle.putString(CategoriesFragment.ID, item.id)
-            bundle.putString(CategoriesFragment.TITLE, item.title)
+            val bundle = CategoriesFragment.createBundle(item.id ?: "", item.title ?: "")
 
             viewModel.navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_categoriesFragment, bundle))
         }
@@ -204,5 +202,9 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
                 viewModel.setTopTabPosition(tab!!.position)
             }
         })
+
+        iv_bg_search.setOnClickListener {
+            viewModel.navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_searchVideoFragment))
+        }
     }
 }

@@ -1,10 +1,10 @@
 package com.dabenxiang.mimi.view.player
 
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
@@ -32,7 +32,8 @@ class PlayerViewModel : BaseViewModel() {
 
     var currentWindow: Int = 0
     var playbackPosition: Long = 0
-    var canFullScreen = false
+    var lockFullScreen = false
+    var currentOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
     private val _fastForwardTime = MutableLiveData<Int>()
     val fastForwardTime: LiveData<Int> = _fastForwardTime

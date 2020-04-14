@@ -3,16 +3,26 @@ package com.dabenxiang.mimi.view.home
 import android.os.Bundle
 import android.view.View
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.serializable.CategoriesData
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import kotlinx.android.synthetic.main.fragment_categories.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class CategoriesFragment: BaseFragment<CategoriesViewModel>() {
+class CategoriesFragment : BaseFragment<CategoriesViewModel>() {
 
     companion object {
-        const val TITLE = "title"
-        const val ID = "id"
+        const val KEY_DATA = "data"
+
+        fun createBundle(id: String, title: String): Bundle {
+            val data = CategoriesData()
+            data.id = id
+            data.title = title
+
+            return Bundle().also {
+                it.putSerializable(KEY_DATA, data)
+            }
+        }
     }
 
     private val viewModel by viewModel<CategoriesViewModel>()
@@ -36,13 +46,17 @@ class CategoriesFragment: BaseFragment<CategoriesViewModel>() {
         iv_back.setOnClickListener {
             viewModel.navigateTo(NavigateItem.Up)
         }
+
+        iv_search.setOnClickListener {
+            viewModel.navigateTo(NavigateItem.Destination(R.id.action_categoriesFragment_to_searchVideoFragment))
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        arguments?.also {
-            tv_title.text = it.getString(TITLE)
+        (arguments?.getSerializable(KEY_DATA) as CategoriesData?)?.also {
+            tv_title.text = it.title
         }
     }
 }

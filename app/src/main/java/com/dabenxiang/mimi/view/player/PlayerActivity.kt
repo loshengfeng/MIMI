@@ -84,11 +84,14 @@ class PlayerActivity : BaseActivity() {
         })
 
         btn_full_screen.setOnClickListener {
-            viewModel.canFullScreen = !viewModel.canFullScreen
+            viewModel.lockFullScreen = !viewModel.lockFullScreen
 
             requestedOrientation =
-                if (viewModel.canFullScreen) {
-                    ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                if (viewModel.lockFullScreen) {
+                    when (viewModel.currentOrientation) {
+                        ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE, ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE -> viewModel.currentOrientation
+                        else -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    }
                 } else {
                     ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                 }
@@ -96,15 +99,17 @@ class PlayerActivity : BaseActivity() {
 
         orientationDetector = OrientationDetector(this, SensorManager.SENSOR_DELAY_NORMAL).also { detector ->
             detector.setChangeListener(object : OrientationDetector.OnChangeListener {
-                override fun onChanged(requestedOrientation: Int) {
-                    if (viewModel.canFullScreen) {
-                        when (requestedOrientation) {
+                override fun onChanged(orientation: Int) {
+                    viewModel.currentOrientation = orientation
+
+                    if (viewModel.lockFullScreen) {
+                        when (orientation) {
                             ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE, ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE -> {
-                                setRequestedOrientation(
-                                    requestedOrientation
-                                )
+                                requestedOrientation = orientation
                             }
                         }
+                    } else {
+                        requestedOrientation = orientation
                     }
                 }
             })

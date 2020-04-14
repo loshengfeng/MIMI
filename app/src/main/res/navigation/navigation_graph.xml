@@ -78,14 +78,29 @@
 
         <action
             android:id="@+id/action_homeFragment_to_categoriesFragment"
-            app:destination="@+id/categoriesFragment" />
+            app:destination="@id/categoriesFragment" />
+
+        <action
+            android:id="@+id/action_homeFragment_to_searchVideoFragment"
+            app:destination="@id/searchVideoFragment" />
 
     </fragment>
 
     <fragment
         android:id="@+id/categoriesFragment"
         android:name="com.dabenxiang.mimi.view.home.CategoriesFragment"
-        tools:layout="@layout/fragment_categories"></fragment>
+        tools:layout="@layout/fragment_categories">
+
+        <action
+            android:id="@+id/action_categoriesFragment_to_searchVideoFragment"
+            app:destination="@id/searchVideoFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/searchVideoFragment"
+        android:name="com.dabenxiang.mimi.view.search.SearchVideoFragment"
+        tools:layout="@layout/fragment_search_video" />
 
     <fragment
         android:id="@+id/topupFragment"
@@ -214,7 +229,7 @@
 
         <action
             android:id="@+id/action_personalFragment_to_loginFragment"
-            app:destination="@id/loginFragment"/>
+            app:destination="@id/loginFragment" />
 
         <action
             android:id="@+id/action_personalFragment_to_chatHistoryFragment"
@@ -227,7 +242,7 @@
 
         <action
             android:id="@+id/action_personalFragment_to_topupHistoryFragment"
-            app:destination="@id/topupHistoryFragmentFragment"/>
+            app:destination="@id/topupHistoryFragmentFragment" />
 
     </fragment>
 
