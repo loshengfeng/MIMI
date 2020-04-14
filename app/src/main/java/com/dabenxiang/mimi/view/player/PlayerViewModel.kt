@@ -46,9 +46,6 @@ class PlayerViewModel : BaseViewModel() {
     private val _isPlaying = MutableLiveData<Boolean>()
     val isPlaying: LiveData<Boolean> = _isPlaying
 
-    private val _videoItem = MutableLiveData<VideoItem>()
-    val videoItem: LiveData<VideoItem> = _videoItem
-
     //TODO: 測試
     val _currentVideoUrl = MutableLiveData<String?>()
     val currentVideoUrl: LiveData<String?> = _currentVideoUrl

@@ -38,8 +38,17 @@ class HomeVideoListAdapter(private val nestedListener: HomeAdapter.EventListener
         }
     }
 
+    override fun getItemViewType(position: Int): Int {
+        return position % 2
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.nested_item_video, parent, false)
+        val layout = when (viewType) {
+            0 -> R.layout.nested_item_left_video
+            else -> R.layout.nested_item_right_video
+        }
+
+        val view = LayoutInflater.from(parent.context).inflate(layout, parent, false)
         return VideoViewHolder(view, videoViewHolderListener)
     }
 
