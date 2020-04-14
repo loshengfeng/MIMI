@@ -5,17 +5,18 @@ import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
 import androidx.lifecycle.Observer
-import androidx.navigation.Navigation
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.login.LoginDialogFragment
 import com.dabenxiang.mimi.view.dialog.login.OnLoginDialogListener
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.item_login.*
 import kotlinx.android.synthetic.main.item_register.*
+import kotlinx.android.synthetic.main.item_register.edit_email
+import kotlinx.android.synthetic.main.item_register.tv_email_error
 import org.koin.android.viewmodel.ext.android.viewModel
-import timber.log.Timber
 
 class LoginFragment : BaseFragment<LoginViewModel>() {
     private val viewModel by viewModel<LoginViewModel>()
@@ -46,23 +47,7 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        tl_type.selectTab(this.arguments?.getInt(KEY_TYPE, TYPE_REGISTER)?.let { tl_type.getTabAt(it) })
-
-        edit_register_account.setText("jeff7788")
-        edit_login_account.setText("jeff7788")
-        edit_email.setText("jeff@silkrode.com.tw")
-        edit_register_pw.setText("12345678")
-        edit_register_confirm_pw.setText("12345678")
-        edit_login_pw.setText("12345678")
-
-        // todo: for API response testing
-        /*Handler().postDelayed({
-            dialog = LoginDialogFragment.newInstance(onLoginDialogListener,
-                LoginDialogFragment.TYPE_SUCCESS
-            )
-            dialog?.show(activity!!.supportFragmentManager, LoginDialogFragment::class.java.simpleName)
-        },1500)*/
+        initSettings()
     }
 
     override fun getLayoutId(): Int {
@@ -107,6 +92,17 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
             }
         })
 
+        viewModel.friendlyNameError.observe(viewLifecycleOwner, Observer {
+            if (it == null) {
+                edit_friendly_name.setBackgroundResource(R.drawable.edit_text_rectangle)
+                tv_friendly_name_error.visibility = View.INVISIBLE
+            } else {
+                edit_friendly_name.setBackgroundResource(R.drawable.edit_text_error_rectangle)
+                tv_friendly_name_error.text = getString(it)
+                tv_friendly_name_error.visibility = View.VISIBLE
+            }
+        })
+
         viewModel.registerPasswordError.observe(viewLifecycleOwner, Observer {
             if (it == null) {
                 edit_register_pw.setBackgroundResource(R.drawable.edit_text_rectangle)
@@ -140,70 +136,11 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
             }
         })
 
-        viewModel.registerResult.observe(viewLifecycleOwner, Observer {
-            // todo
-            /*when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Loaded -> progressHUD?.dismiss()
-                is ApiResult.Empty -> onLoginDialogListener?.onConfirm()
-                is Error -> {
-                    Timber.e("Error: $it")
-                    when (val errorHandler =
-                        it.throwable.handleException { ex -> viewModel.processException(ex) }) {
-                        is ExceptionResult.HttpError -> {
-                            when (errorHandler.httpExceptionData.errorItem.code) {
-                                ErrorCode.WRONG_NAME, ErrorCode.WRONG_PW -> {
-                                    showErrorDialog(getString(R.string.username_or_password_incorrect))
-                                }
-                                else -> {
-                                    showHttpErrorDialog(HttpErrorMsgType.CHECK_NETWORK)
-                                    showHttpErrorToast(errorHandler.httpExceptionData.httpExceptionClone)
-                                }
-                            }
-                        }
-                        is ExceptionResult.Crash -> {
-                            if (errorHandler.throwable is UnknownHostException) {
-                                showHttpErrorDialog(HttpErrorMsgType.CHECK_NETWORK)
-                            } else {
-                                GeneralUtils.showToast(context!!, "${errorHandler.throwable}")
-                            }
-                        }
-                    }
-                }
-            }*/
-        })
-
         viewModel.loginResult.observe(viewLifecycleOwner, Observer {
-            // todo
-            /*when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Loaded -> progressHUD?.dismiss()
-                is ApiResult.Empty -> onLoginDialogListener?.onConfirm()
-                is Error -> {
-                    Timber.e("Error: $it")
-                    when (val errorHandler =
-                        it.throwable.handleException { ex -> viewModel.processException(ex) }) {
-                        is ExceptionResult.HttpError -> {
-                            when (errorHandler.httpExceptionData.errorItem.code) {
-                                ErrorCode.WRONG_NAME, ErrorCode.WRONG_PW -> {
-                                    showErrorDialog(getString(R.string.username_or_password_incorrect))
-                                }
-                                else -> {
-                                    showHttpErrorDialog(HttpErrorMsgType.CHECK_NETWORK)
-                                    showHttpErrorToast(errorHandler.httpExceptionData.httpExceptionClone)
-                                }
-                            }
-                        }
-                        is ExceptionResult.Crash -> {
-                            if (errorHandler.throwable is UnknownHostException) {
-                                showHttpErrorDialog(HttpErrorMsgType.CHECK_NETWORK)
-                            } else {
-                                GeneralUtils.showToast(context!!, "${errorHandler.throwable}")
-                            }
-                        }
-                    }
-                }
-            }*/
+            dialog = LoginDialogFragment.newInstance(onLoginDialogListener,
+                LoginDialogFragment.TYPE_SUCCESS
+            )
+            dialog?.show(activity!!.supportFragmentManager, LoginDialogFragment::class.java.simpleName)
         })
     }
 
@@ -230,25 +167,10 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
 
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
-                R.id.btnClose, R.id.btn_register_cancel, R.id.btn_login_cancel -> Navigation.findNavController(view!!).navigateUp()
-                R.id.btn_register -> {
-                    viewModel.doRegisterValidateAndSubmit(
-                        edit_register_account.text.toString(),
-                        edit_email.text.toString(),
-                        edit_register_pw.text.toString(),
-                        edit_register_confirm_pw.text.toString()
-                    )
-                }
-                R.id.btn_forget -> {
-                    viewModel.toastData.value = "Forget"
-                    Navigation.findNavController(view!!).navigate(R.id.action_loginFragment_to_forgetPasswordFragment)
-                }
-                R.id.btn_login -> {
-                    viewModel.doLoginValidateAndSubmit(
-                        edit_login_account.text.toString(),
-                        edit_login_pw.text.toString()
-                    )
-                }
+                R.id.btnClose, R.id.btn_register_cancel, R.id.btn_login_cancel -> viewModel.navigateTo(NavigateItem.Up)
+                R.id.btn_register -> viewModel.doRegisterValidateAndSubmit()
+                R.id.btn_forget -> viewModel.navigateTo(NavigateItem.Destination(R.id.action_loginFragment_to_forgetPasswordFragment))
+                R.id.btn_login -> viewModel.doLoginValidateAndSubmit()
             }
         }.also {
             btnClose.setOnClickListener(it)
@@ -287,5 +209,25 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
             viewModel.toastData.value = "Remember: $isChecked"
             // todo: save Account to SharePreference...
         }
+    }
+
+    private fun initSettings() {
+        viewModel.registerAccount.bindingEditText = edit_register_account
+        viewModel.email.bindingEditText = edit_email
+        viewModel.friendlyName.bindingEditText = edit_friendly_name
+        viewModel.registerPw.bindingEditText = edit_register_pw
+        viewModel.confirmPw.bindingEditText = edit_register_confirm_pw
+        viewModel.loginAccount.bindingEditText = edit_login_account
+        viewModel.loginPw.bindingEditText = edit_login_pw
+
+        tl_type.selectTab(this.arguments?.getInt(KEY_TYPE, TYPE_REGISTER)?.let { tl_type.getTabAt(it) })
+
+        edit_register_account.setText("jeff7788")
+        edit_login_account.setText("jeff7788")
+        edit_email.setText("jeff@silkrode.com.tw")
+        edit_friendly_name.setText("我是Jeff")
+        edit_register_pw.setText("12345678")
+        edit_register_confirm_pw.setText("12345678")
+        edit_login_pw.setText("12345678")
     }
 }

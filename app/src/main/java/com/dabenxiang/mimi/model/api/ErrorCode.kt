@@ -13,5 +13,14 @@ class ErrorCode {
         const val BAD_REQUEST  = "400000" // Bad Request (400) - One of the request inputs is not valid.
         const val NOT_FOUND    = "404000" // The specified resource does not exist.
         const val SERVER_ERROR = "500000" // Internal Server Error
+
+        /**********************************************************
+         *
+         *                  Me
+         *
+         ***********************************************************/
+        const val SIGN_UP  = "400000" // Username' is not a valid username., Email' is not a valid email.
+
+
     }
 }

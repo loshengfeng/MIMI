@@ -132,6 +132,10 @@ object AppUtils {
         return Pattern.matches("^[A-Za-z0-9_\\-\\.\\u4e00-\\u9fa5]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*$", email)
     }
 
+    fun isFriendlyNameValid(name: String): Boolean {
+        return Pattern.matches("^[a-zA-Z0-9-\\u4e00-\\u9fa5]{1,10}$", name)
+    }
+
     fun isPasswordValid(password: String): Boolean {
         return Pattern.matches("^\\S{8,20}$", password)
     }

@@ -90,6 +90,28 @@
         tools:visibility="visible" />
 
     <EditText
+        android:id="@+id/edit_friendly_name"
+        style="@style/login_edit_text"
+        android:layout_height="wrap_content"
+        android:width="0dp"
+        android:inputType="text"
+        app:layout_constraintTop_toBottomOf="@id/edit_email"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/tv_friendly_name_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color_red_2"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_friendly_name"
+        tools:text="错误讯息"
+        tools:visibility="visible" />
+
+    <EditText
         android:id="@+id/edit_register_pw"
         style="@style/login_edit_text"
         android:layout_height="wrap_content"
@@ -98,7 +120,7 @@
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_email"
+        app:layout_constraintTop_toBottomOf="@+id/edit_friendly_name"
         tools:ignore="LabelFor" />
 
     <CheckBox

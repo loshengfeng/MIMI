@@ -80,6 +80,34 @@ interface ApiService {
 
     /**********************************************************
      *
+     *                  Members x 5
+     *
+     ***********************************************************/
+    @PUT("/v1/Members/ChangePassword")
+    suspend fun changePassword(
+        @Body password: String
+    ): Response<Void>
+
+    @PUT("/v1/Members/ForgetPassword")
+    suspend fun forgetPassword(@Body body: ForgetPasswordRequest): Response<Void>
+
+    @POST("/v1/Members/SignUp")
+    suspend fun signUp(
+        @Body body: MembersAccountItem
+    ): Response<Void>
+
+    @POST("/v1/Members/Me/ValidationEmail")
+    suspend fun validationEmail(
+        @Body request: ValidateEmailRequest
+    ): Response<Void>
+
+    @GET("/v1/Members/Me/ValidationEmail/{key}")
+    suspend fun validationEmail(
+        @Path("key") key: String
+    ): Response<Void>
+
+    /**********************************************************
+     *
      *                  Members/Home/Categories x 1
      *
      ***********************************************************/
@@ -109,16 +137,11 @@ interface ApiService {
 
     /**********************************************************
      *
-     *                  Members/Me x 14
+     *                  Members/Me x 9
      *
      ***********************************************************/
     @GET("/v1/Members/Me")
     suspend fun getMe(): Response<ApiBaseItem<MeItem>>
-
-    @PUT("/v1/Members/Me/ChangePassword")
-    suspend fun changePassword(
-        @Body password: String
-    ): Response<Void>
 
     @GET("/v1/Members/Me/Chat")
     suspend fun getMeChat(
@@ -132,9 +155,6 @@ interface ApiService {
         @Query("offset") offset: Int,
         @Query("limit") limit: Int
     ): Response<ApiBaseItem<List<MeMessageItem>>>
-
-    @PUT("/v1/Members/ForgetPassword")
-    suspend fun forgetPassword(@Body body: ForgetPasswordRequest): Response<Void>
 
     @GET("/v1/Members/Me/Order")
     suspend fun getMeOrder(
@@ -165,21 +185,6 @@ interface ApiService {
     @PUT("/v1/Members/Me/Profile")
     suspend fun updatedMeProfile(
         @Body body: MeProfileItem
-    ): Response<Void>
-
-    @POST("/v1/Members/me/SignUp")
-    suspend fun signUp(
-        @Body body: MembersAccountItem
-    ): Response<Void>
-
-    @POST("/v1/Members/Me/ValidationEmail")
-    suspend fun validationEmail(
-        @Body request: ValidateEmailRequest
-    ): Response<Void>
-
-    @GET("/v1/Members/Me/ValidationEmail/{key}")
-    suspend fun validationEmail(
-        @Path("key") key: String
     ): Response<Void>
 
     /**********************************************************

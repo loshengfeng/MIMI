@@ -12,6 +12,8 @@
     <string name="account_format_error">账号限定为5~20字英数，请确认</string>
     <string name="email_format_error_1">请填写email</string>
     <string name="email_format_error_2">email错误，请确认</string>
+    <string name="friendly_name_format_error_1">请填写昵称</string>
+    <string name="friendly_name_format_error_2">昵称限定为1~10字英数，请确认</string>
     <string name="password_empty">请填写密码</string>
     <string name="password_format_error_1">密码限定为8~20英数或特殊符号，区分大小写</string>
     <string name="password_format_error_2">密码不相符</string>

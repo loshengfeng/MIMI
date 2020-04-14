@@ -104,6 +104,46 @@ class ApiRepository(private val apiService: ApiService) {
 
     /**********************************************************
      *
+     *                  Members x 5
+     *
+     ***********************************************************/
+    /**
+     * 修改密碼(已登入)
+     */
+    suspend fun changePassword(
+        password: String
+    ) = apiService.changePassword(password)
+
+    /**
+     * 忘記密碼
+     */
+    suspend fun forgetPassword(
+        body: ForgetPasswordRequest
+    ) = apiService.forgetPassword(body)
+
+    /**
+     * 建立新使用者
+     */
+    suspend fun signUp(
+        body: MembersAccountItem
+    ) = apiService.signUp(body)
+
+    /**
+     * 發驗證信
+     */
+    suspend fun validationEmail(
+        body: ValidateEmailRequest
+    ) = apiService.validationEmail(body)
+
+    /**
+     * 驗證信箱
+     */
+    suspend fun validationEmail(
+        key: String
+    ) = apiService.validationEmail(key)
+
+    /**********************************************************
+     *
      *                   Members/Home/Categories x 1
      *
      ***********************************************************/
@@ -133,20 +173,13 @@ class ApiRepository(private val apiService: ApiService) {
 
     /**********************************************************
      *
-     *                  Me x 14
+     *                  Me x 9
      *
      ***********************************************************/
     /**
      * 取得用者資訊
      */
     suspend fun getMe() = apiService.getMe()
-
-    /**
-     * 修改密碼(已登入)
-     */
-    suspend fun changePassword(
-        password: String
-    ) = apiService.changePassword(password)
 
     /**
      * 取得聊天室列表
@@ -164,13 +197,6 @@ class ApiRepository(private val apiService: ApiService) {
         offset: Int,
         limit: Int
     ) = apiService.getMeMessage(chatId, offset, limit)
-
-    /**
-     * 忘記密碼
-     */
-    suspend fun forgetPassword(
-        body: ForgetPasswordRequest
-    ) = apiService.forgetPassword(body)
 
     /**
      * 取得使用者充值記錄
@@ -212,27 +238,6 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun updatedMeProfile(
         body: MeProfileItem
     ) = apiService.updatedMeProfile(body)
-
-    /**
-     * 建立新使用者
-     */
-    suspend fun signUp(
-        body: MembersAccountItem
-    ) = apiService.signUp(body)
-
-    /**
-     * 發驗證信
-     */
-    suspend fun validationEmail(
-        body: ValidateEmailRequest
-    ) = apiService.validationEmail(body)
-
-    /**
-     * 驗證信箱
-     */
-    suspend fun validationEmail(
-        key: String
-    ) = apiService.validationEmail(key)
 
     /**********************************************************
      *

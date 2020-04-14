@@ -38,7 +38,8 @@ class HomeViewModel : BaseViewModel() {
                     if (!resp.isSuccessful) throw HttpException(resp)
 
                     emit(ApiResult.success(resp.body()))
-                }.flowOn(Dispatchers.IO)
+                }
+                    .flowOn(Dispatchers.IO)
                     .onStart { emit(ApiResult.loading()) }
                     .onCompletion { emit(ApiResult.loaded()) }
                     .catch { e -> emit(ApiResult.error(e)) }
@@ -49,12 +50,8 @@ class HomeViewModel : BaseViewModel() {
                                 adapter.notifyUpdated(resp.result.content)
                             }
                             is ApiResult.Error -> Timber.e(resp.throwable)
-                            is ApiResult.Loading -> {
-
-                            }
-                            is ApiResult.Loaded -> {
-
-                            }
+                            is ApiResult.Loading -> setShowProgress(true)
+                            is ApiResult.Loaded -> setShowProgress(false)
                         }
                     }
             }

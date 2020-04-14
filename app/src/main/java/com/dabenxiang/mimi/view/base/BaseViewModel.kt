@@ -17,7 +17,7 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     val toastData = MutableLiveData<String>()
 //    val dialogData = MutableLiveData<String>()
 
-    protected val _showProgress by lazy { MutableLiveData<Boolean>() }
+    private val _showProgress by lazy { MutableLiveData<Boolean>() }
     val showProgress: LiveData<Boolean> get() = _showProgress
 
     private val _navigateDestination by lazy { MutableLiveData<NavigateItem>() }
@@ -53,5 +53,9 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
             navigationTask = newTask
             newTask.await()
         }
+    }
+
+    fun setShowProgress(show: Boolean) {
+        _showProgress.value = show
     }
 }
