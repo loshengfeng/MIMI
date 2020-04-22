@@ -44,7 +44,7 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
 
             val bundle = CategoriesFragment.createBundle(item.id ?: "", item.title ?: "")
 
-            viewModel.navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_categoriesFragment, bundle))
+            navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_categoriesFragment, bundle))
         }
 
         override fun onVideoClick(view: View, item: PlayerData) {
@@ -204,7 +204,7 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
         })
 
         iv_bg_search.setOnClickListener {
-            viewModel.navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_searchVideoFragment))
+            navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_searchVideoFragment))
         }
     }
 }

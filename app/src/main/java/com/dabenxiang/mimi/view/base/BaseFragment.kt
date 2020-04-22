@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
@@ -16,6 +17,7 @@ import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.kaopiz.kprogresshud.KProgressHUD
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.*
 import retrofit2.HttpException
 
 abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
@@ -30,22 +32,6 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
         activity?.let {
             mainViewModel = ViewModelProviders.of(it).get(MainViewModel::class.java)
         }
-
-        fetchViewModel()?.navigateDestination?.observe(this, Observer { item ->
-            findNavController().also { navController ->
-                when (item) {
-                    NavigateItem.Up -> navController.navigateUp() //.popBackStack()
-                    is NavigateItem.PopBackStack -> navController.popBackStack(item.fragmentId, item.inclusive)
-                    is NavigateItem.Destination -> {
-                        if (item.bundle == null) {
-                            navController.navigate(item.action)
-                        } else {
-                            navController.navigate(item.action, item.bundle)
-                        }
-                    }
-                }
-            }
-        })
     }
 
     override fun onCreateView(
@@ -110,4 +96,46 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
     abstract fun setupListeners()
 
     open val bottomNavigationVisibility: Int = View.VISIBLE
+
+    open fun navigateTo(item: NavigateItem) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            navigationTaskJoinOrRun {
+                findNavController().also { navController ->
+                    when (item) {
+                        NavigateItem.Up -> navController.navigateUp() //.popBackStack()
+                        is NavigateItem.PopBackStack -> navController.popBackStack(item.fragmentId, item.inclusive)
+                        is NavigateItem.Destination -> {
+                            if (item.bundle == null) {
+                                navController.navigate(item.action)
+                            } else {
+                                navController.navigate(item.action, item.bundle)
+                            }
+                        }
+                    }
+                }
+                delay(1000L)
+            }
+        }
+    }
+
+    private var navigationTask: Deferred<Any>? = null
+
+    private suspend fun navigationTaskJoinOrRun(block: suspend () -> Any): Any {
+        navigationTask?.let {
+            return it.await()
+        }
+
+        return coroutineScope {
+            val newTask = async {
+                block()
+            }
+
+            newTask.invokeOnCompletion {
+                navigationTask = null
+            }
+
+            navigationTask = newTask
+            newTask.await()
+        }
+    }
 }

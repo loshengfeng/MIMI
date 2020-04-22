@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
             android:background="@null"
-            android:lines="1"
+            android:singleLine="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/iv_clean"
             app:layout_constraintStart_toEndOf="@id/iv_search"

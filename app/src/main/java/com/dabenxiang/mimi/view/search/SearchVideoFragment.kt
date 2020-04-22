@@ -29,7 +29,7 @@ class SearchVideoFragment : BaseFragment<SearchVideoViewModel>() {
 
     override fun setupListeners() {
         iv_back.setOnClickListener {
-            viewModel.navigateTo(NavigateItem.Up)
+            navigateTo(NavigateItem.Up)
         }
 
         iv_clean.setOnClickListener {

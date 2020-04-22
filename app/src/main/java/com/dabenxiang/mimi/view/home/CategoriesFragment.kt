@@ -44,11 +44,11 @@ class CategoriesFragment : BaseFragment<CategoriesViewModel>() {
 
     override fun setupListeners() {
         iv_back.setOnClickListener {
-            viewModel.navigateTo(NavigateItem.Up)
+            navigateTo(NavigateItem.Up)
         }
 
         iv_search.setOnClickListener {
-            viewModel.navigateTo(NavigateItem.Destination(R.id.action_categoriesFragment_to_searchVideoFragment))
+            navigateTo(NavigateItem.Destination(R.id.action_categoriesFragment_to_searchVideoFragment))
         }
     }
 
