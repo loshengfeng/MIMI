@@ -229,13 +229,5 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
         viewModel.loginPw.bindingEditText = edit_login_pw
 
         tl_type.selectTab(this.arguments?.getInt(KEY_TYPE, TYPE_REGISTER)?.let { tl_type.getTabAt(it) })
-
-        edit_register_account.setText("jeff7788")
-        edit_login_account.setText("jeff7788")
-        edit_email.setText("jeff@silkrode.com.tw")
-        edit_friendly_name.setText("我是Jeff")
-        edit_register_pw.setText("12345678")
-        edit_register_confirm_pw.setText("12345678")
-        edit_login_pw.setText("12345678")
     }
 }

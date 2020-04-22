@@ -7,7 +7,13 @@ class ApiRepository(private val apiService: ApiService) {
 
     companion object {
         const val MEDIA_TYPE_JSON = "application/json"
+        const val AUTHORIZATION = "Authorization"
     }
+
+    /**
+     * 拿脫啃
+     */
+    suspend fun getToken() = apiService.getToken("client_credentials", "3770511208570945536", "1d760dedf35a4a508ecd71b5013a1611")
 
     /**********************************************************
      *

@@ -1,9 +1,19 @@
 package com.dabenxiang.mimi.model.api
 
 import com.dabenxiang.mimi.model.api.vo.*
+import org.json.JSONObject
 import retrofit2.Response
 import retrofit2.http.*
 interface ApiService {
+
+    @FormUrlEncoded
+    @Headers("Authorization: basic ZmFkYWNhaV9mcm9udGVuZDo0NGVkMWJiZDI3NDUwOTZkYTI1MmM5NWM0YTQ0NGVkMWJiZA==")
+    @POST("/v1/oauth2/token")
+    suspend fun getToken(
+        @Field("grant_type") grantType: String,
+        @Field("client_id") clientId: String,
+        @Field("client_secret") clientSecret: String
+    ): Response<String>
 
     /**********************************************************
      *
