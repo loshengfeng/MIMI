@@ -62,6 +62,9 @@ class LoginViewModel : BaseViewModel() {
     private val _loginResult = MutableLiveData<Boolean>()
     val loginResult: LiveData<Boolean> = _loginResult
 
+    private val _apiSignUpResult = MutableLiveData<ApiResult<Nothing>>()
+    val apiSignUpResult: LiveData<ApiResult<Nothing>> = _apiSignUpResult
+
     fun doRegisterValidateAndSubmit() {
         val account = registerAccount.value ?: ""
         val email = email.value ?: ""
@@ -88,7 +91,7 @@ class LoginViewModel : BaseViewModel() {
 
                         if (!resp.isSuccessful) throw HttpException(resp)
 
-                        emit(ApiResult.success(resp.body()))
+                        emit(ApiResult.success(null))
                     }
                         .flowOn(Dispatchers.IO)
                         .onStart { emit(ApiResult.loading()) }
@@ -98,7 +101,7 @@ class LoginViewModel : BaseViewModel() {
                             when (resp) {
                                 is ApiResult.Success -> {
                                     Timber.d("${LoginViewModel::class.java.simpleName}_ApiResult.success")
-                                    navigateTo(NavigateItem.Up)
+                                    _apiSignUpResult.value = resp
                                 }
                                 is ApiResult.Error -> {
                                     Timber.d("${LoginViewModel::class.java.simpleName}_ApiResult.error")

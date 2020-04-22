@@ -6,6 +6,7 @@ import android.text.method.PasswordTransformationMethod
 import android.view.View
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.login.LoginDialogFragment
@@ -59,6 +60,12 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
     }
 
     override fun setupObservers() {
+        viewModel.apiSignUpResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Empty -> navigateTo(NavigateItem.Up)
+            }
+        })
+
         viewModel.registerAccountError.observe(viewLifecycleOwner, Observer {
             if (it == null) {
                 edit_register_account.setBackgroundResource(R.drawable.edit_text_rectangle)
@@ -137,7 +144,8 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
         })
 
         viewModel.loginResult.observe(viewLifecycleOwner, Observer {
-            dialog = LoginDialogFragment.newInstance(onLoginDialogListener,
+            dialog = LoginDialogFragment.newInstance(
+                onLoginDialogListener,
                 LoginDialogFragment.TYPE_SUCCESS
             )
             dialog?.show(activity!!.supportFragmentManager, LoginDialogFragment::class.java.simpleName)
@@ -167,9 +175,9 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
 
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
-                R.id.btnClose, R.id.btn_register_cancel, R.id.btn_login_cancel -> viewModel.navigateTo(NavigateItem.Up)
+                R.id.btnClose, R.id.btn_register_cancel, R.id.btn_login_cancel -> navigateTo(NavigateItem.Up)
                 R.id.btn_register -> viewModel.doRegisterValidateAndSubmit()
-                R.id.btn_forget -> viewModel.navigateTo(NavigateItem.Destination(R.id.action_loginFragment_to_forgetPasswordFragment))
+                R.id.btn_forget -> navigateTo(NavigateItem.Destination(R.id.action_loginFragment_to_forgetPasswordFragment))
                 R.id.btn_login -> viewModel.doLoginValidateAndSubmit()
             }
         }.also {
