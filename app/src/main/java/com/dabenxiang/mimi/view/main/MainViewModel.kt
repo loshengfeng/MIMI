@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
+import com.dabenxiang.mimi.model.api.vo.TokenItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -22,6 +23,28 @@ class MainViewModel : BaseViewModel() {
 
     private val mCategoriesData = MutableLiveData<CategoriesItem>()
     val categoriesData: LiveData<CategoriesItem> = mCategoriesData
+
+    private val _apiGetToken = MutableLiveData<ApiResult<TokenItem>>()
+    val apiGetToken: LiveData<ApiResult<TokenItem>> = _apiGetToken
+
+    fun getToken() {
+        viewModelScope.launch {
+            viewModelScope.launch {
+                flow {
+                    val resp = apiRepository.getToken()
+                    if (!resp.isSuccessful) throw HttpException(resp)
+                    emit(ApiResult.success(resp.body()))
+                }
+                    .flowOn(Dispatchers.IO)
+                    .onStart { emit(ApiResult.loading()) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .collect { resp ->
+                        _apiGetToken.value = resp
+                    }
+            }
+        }
+    }
 
     fun loadHomeCategories() {
         viewModelScope.launch {

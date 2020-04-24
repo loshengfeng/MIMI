@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.view.base.BaseActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -34,6 +35,23 @@ class MainActivity : BaseActivity() {
             resources.configuration.fontScale = 1f
             baseContext.resources.updateConfiguration(resources.configuration, metrics)
         }
+
+        viewModel.apiGetToken.observe(this, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                }
+                is ApiResult.Error -> {
+                }
+                is ApiResult.Empty -> {
+                }
+                is ApiResult.Loading -> {
+                }
+                is ApiResult.Loaded -> {
+                }
+            }
+        })
+
+        viewModel.getToken()
 
         viewModel.enableNightMode.observe(this, Observer { isNight ->
             //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
@@ -73,12 +91,6 @@ class MainActivity : BaseActivity() {
                 else -> false
             }
         }
-
-        initSettings()
-    }
-
-    private fun initSettings() {
-        viewModel.loadHomeCategories()
     }
 
     override fun getResources(): Resources {

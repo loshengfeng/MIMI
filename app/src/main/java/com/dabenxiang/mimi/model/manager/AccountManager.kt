@@ -10,6 +10,7 @@ import com.dabenxiang.mimi.model.vo.TokenData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import retrofit2.HttpException
+import timber.log.Timber
 
 class AccountManager(private val pref: Pref,
                      private val apiRepository: ApiRepository
@@ -43,6 +44,24 @@ class AccountManager(private val pref: Pref,
     private fun clearToken() {
         pref.clearToken()
     }
+
+    fun getToken() =
+        flow {
+            val result = apiRepository.getToken()
+            if (!result.isSuccessful) throw HttpException(result)
+            val tokenItem = result.body()
+            Timber.d("Token: ${tokenItem?.accessToken}")
+            if (tokenItem != null) {
+
+                setupToken(TokenData(accessToken = tokenItem.accessToken))
+            }
+            emit(ApiResult.success(null))
+        }
+            .flowOn(Dispatchers.IO)
+            .catch { e ->
+                emit(ApiResult.error(e))
+            }
+
 
 //    fun login(userName: String, password: String) =
 //        flow {
@@ -80,7 +99,6 @@ class AccountManager(private val pref: Pref,
 //            }.onCompletion {
 //                emit(ApiResult.loaded())
 //            }
-
 //    fun refreshToken() =
 //        flow {
 //            val result = apiRepository.refreshToken(pref.token.refreshToken)
