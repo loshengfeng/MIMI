@@ -4,14 +4,14 @@ import com.google.gson.annotations.SerializedName
 
 data class PagingItem(
     @SerializedName("limit")
-    val limit: Int?,
+    val limit: Long?,
 
     @SerializedName("offset")
-    val offset: Int?,
+    val offset: Long?,
 
     @SerializedName("pages")
-    val pages: Int?,
+    val pages: Long?,
 
     @SerializedName("count")
-    val count: Int?
+    val count: Long?
 )

@@ -76,21 +76,23 @@ class HomeCategoriesAdapter(private val nestedListener: HomeAdapter.EventListene
     private var data: List<StatisticsItem>? = null
 
     fun notifyUpdated(updated: List<StatisticsItem>?) {
-        //data = updated
+        data = updated
 
-        //TODO: Testing
+        /*
+        //Fake date:
         val list = mutableListOf<StatisticsItem>()
         repeat(12) {
             list.add(
                 StatisticsItem(
                     title = "標題${it + 1}",
-                    id = it,
-                    type = it,
+                    id = it.toLong(),
+                    count = it.toLong(),
                     cover = "https://i2.kknews.cc/SIG=1nkii03/470400035pnr3n5r3s7n.jpg"
                 )
             )
         }
         data = list
+        */
 
         notifyDataSetChanged()
     }

@@ -9,12 +9,12 @@ class PlayerData : Serializable {
         fun parser(item: Any): PlayerData {
             return when (item) {
                 is StatisticsItem -> PlayerData().also {
-                    it.videoId = item.id ?: -1
+                    it.videoId = item.id ?: 0L
                 }
                 else -> PlayerData()
             }
         }
     }
 
-    var videoId: Int = -1
+    var videoId = 0L
 }

@@ -3,15 +3,15 @@ import com.google.gson.annotations.SerializedName
 
 
 data class StatisticsItem(
-    @SerializedName("cover")
-    val cover: String?,
-
     @SerializedName("id")
-    val id: Int?,
+    val id: Long?,
 
     @SerializedName("title")
     val title: String?,
 
-    @SerializedName("type")
-    val type: Int?
+    @SerializedName("cover")
+    val cover: String?,
+
+    @SerializedName("count")
+    val count: Long?
 )
