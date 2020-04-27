@@ -10,15 +10,21 @@ class Pref(private val gson: Gson, preferenceFileName: String, isDebug: Boolean)
     private val aesKeyPref = StringPref("AES_KEY")
     private val ellipsizeKeyPref = BooleanPref("ELLIPSIZE_KEY")
     private val profilePref = StringPref("PROFILE")
+    private var cachedToken: TokenData? = null
 
     var token: TokenData
         get() =
             try {
-                gson.fromJson(tokenPref.get(), TokenData::class.java)
+                if (cachedToken == null) {
+                    cachedToken = gson.fromJson(tokenPref.get(), TokenData::class.java)
+                }
+
+                cachedToken ?: TokenData()
             } catch (e: Exception) {
                 TokenData()
             }
         set(value) {
+            cachedToken = value
             tokenPref.set(gson.toJson(value))
         }
 

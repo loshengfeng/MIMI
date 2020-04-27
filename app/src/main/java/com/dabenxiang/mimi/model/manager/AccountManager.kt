@@ -10,10 +10,11 @@ import com.dabenxiang.mimi.model.vo.TokenData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import retrofit2.HttpException
-import timber.log.Timber
+import java.util.*
 
-class AccountManager(private val pref: Pref,
-                     private val apiRepository: ApiRepository
+class AccountManager(
+    private val pref: Pref,
+    private val apiRepository: ApiRepository
 ) {
 
     fun getProfile(): ProfileData? {
@@ -33,11 +34,13 @@ class AccountManager(private val pref: Pref,
                 && !TextUtils.isEmpty(pref.token.refreshToken))
     }
 
-    fun setupToken(tokenData: TokenData) {
-        if (TextUtils.isEmpty(tokenData.refreshToken)) {
-            pref.token = TokenData(tokenData.accessToken, pref.token.refreshToken)
-        } else {
-            pref.token = tokenData
+    fun isTokenValid(): Boolean {
+        val tokenData = pref.token
+        return when {
+            tokenData.expiresTimestamp == 0L -> false
+            Date().time > tokenData.expiresTimestamp -> false
+            tokenData.accessToken.isBlank() -> false
+            else -> true
         }
     }
 
@@ -49,11 +52,11 @@ class AccountManager(private val pref: Pref,
         flow {
             val result = apiRepository.getToken()
             if (!result.isSuccessful) throw HttpException(result)
-            val tokenItem = result.body()
-            Timber.d("Token: ${tokenItem?.accessToken}")
-            if (tokenItem != null) {
-
-                setupToken(TokenData(accessToken = tokenItem.accessToken))
+            result.body()?.also { tokenItem ->
+                pref.token =
+                    TokenData(accessToken = tokenItem.accessToken,
+                        // 提前2分鐘過期
+                        expiresTimestamp = Date().time + (tokenItem.expiresIn - 120) * 1000)
             }
             emit(ApiResult.success(null))
         }
@@ -61,7 +64,6 @@ class AccountManager(private val pref: Pref,
             .catch { e ->
                 emit(ApiResult.error(e))
             }
-
 
 //    fun login(userName: String, password: String) =
 //        flow {
