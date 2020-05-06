@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_topup"
+    app:startDestination="@id/topupFragment">
+
+    <fragment
+        android:id="@+id/topupFragment"
+        android:name="com.dabenxiang.mimi.view.topup.TopupFragment"
+        tools:layout="@layout/fragment_topup">
+    </fragment>
+
+</navigation>

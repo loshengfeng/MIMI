@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/btn_nav_home"
+        android:id="@+id/navigation_home"
         android:enabled="true"
         android:icon="@drawable/btn_home"
         android:title="@string/nav_home" />
     <item
-        android:id="@+id/btn_nav_topup"
+        android:id="@+id/navigation_topup"
         android:enabled="true"
         android:icon="@drawable/btn_micoin"
         android:title="@string/nav_topup" />
     <item
-        android:id="@+id/btn_nav_favorite"
+        android:id="@+id/navigation_favorite"
         android:enabled="true"
         android:icon="@drawable/btn_favorite"
         android:title="@string/nav_favorite" />
     <item
-        android:id="@+id/btn_nav_personal"
+        android:id="@+id/navigation_personal"
         android:enabled="true"
         android:icon="@drawable/btn_mine"
         android:title="@string/nav_personal" />

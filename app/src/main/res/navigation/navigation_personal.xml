@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_personal"
+    app:startDestination="@id/personalFragment">
+
+    <fragment
+        android:id="@+id/personalFragment"
+        android:name="com.dabenxiang.mimi.view.personal.PersonalFragment"
+        tools:layout="@layout/fragment_personal">
+
+        <action
+            android:id="@+id/action_personalFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+
+        <action
+            android:id="@+id/action_personalFragment_to_chatHistoryFragment"
+            app:destination="@id/chatHistoryFragment" />
+
+
+        <action
+            android:id="@+id/action_personalFragment_to_settingFragment"
+            app:destination="@id/settingFragment" />
+
+        <action
+            android:id="@+id/action_personalFragment_to_topupHistoryFragment"
+            app:destination="@id/topupHistoryFragmentFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.dabenxiang.mimi.view.login.LoginFragment"
+        android:label="LoginFragment"
+        tools:layout="@layout/fragment_login">
+
+        <action
+            android:id="@+id/action_loginFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/topupFragment"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_loginFragment_to_forgetPasswordFragment"
+            app:destination="@id/forgetPasswordFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/forgetPasswordFragment"
+        android:name="com.dabenxiang.mimi.view.forgetpassword.ForgetPasswordFragment"
+        tools:layout="@layout/fragment_forget_password">
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/settingFragment"
+        android:name="com.dabenxiang.mimi.view.setting.SettingFragment"
+        tools:layout="@layout/fragment_setting">
+
+        <action
+            android:id="@+id/action_settingFragment_to_resendMailFragment"
+            app:destination="@id/resendMailFragment" />
+
+        <action
+            android:id="@+id/action_settingFragment_to_changePasswordFragment"
+            app:destination="@id/changePasswordFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/resendMailFragment"
+        android:name="com.dabenxiang.mimi.view.resendmail.ResendMailFragment"
+        tools:layout="@layout/fragment_resend_mail">
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/changePasswordFragment"
+        android:name="com.dabenxiang.mimi.view.changepassword.ChangePasswordFragment"
+        tools:layout="@layout/fragment_change_password">
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/topupHistoryFragmentFragment"
+        android:name="com.dabenxiang.mimi.view.topuphistory.TopupHistoryFragment"
+        tools:layout="@layout/fragment_topup_history">
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/chatHistoryFragment"
+        android:name="com.dabenxiang.mimi.view.chathistory.ChatHistoryFragment"
+        tools:layout="@layout/fragment_chat_history" />
+
+    <fragment
+        android:id="@+id/messengerFragment"
+        android:name="com.dabenxiang.mimi.view.messenger.MessengerFragment"
+        tools:layout="@layout/fragment_messenger" />
+</navigation>
