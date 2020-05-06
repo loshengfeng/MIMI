@@ -48,6 +48,10 @@ class AccountManager(
         pref.clearToken()
     }
 
+    //TODO: 取代GetToken, refreshToken
+    fun updatedToken() {
+    }
+
     fun getToken() =
         flow {
             val result = apiRepository.getToken()
@@ -55,6 +59,25 @@ class AccountManager(
             result.body()?.also { tokenItem ->
                 pref.token =
                     TokenData(accessToken = tokenItem.accessToken,
+                        // 提前2分鐘過期
+                        expiresTimestamp = Date().time + (tokenItem.expiresIn - 120) * 1000)
+            }
+            emit(ApiResult.success(null))
+        }
+            .flowOn(Dispatchers.IO)
+            .catch { e ->
+                emit(ApiResult.error(e))
+            }
+
+
+    fun refreshToken() =
+        flow {
+            val result = apiRepository.refreshToken(pref.token.accessToken)
+            if (!result.isSuccessful) throw HttpException(result)
+            result.body()?.also { tokenItem ->
+                pref.token =
+                    TokenData(accessToken = tokenItem.accessToken,
+                        refreshToken = tokenItem.refreshToken,
                         // 提前2分鐘過期
                         expiresTimestamp = Date().time + (tokenItem.expiresIn - 120) * 1000)
             }

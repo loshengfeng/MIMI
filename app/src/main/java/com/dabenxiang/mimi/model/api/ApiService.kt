@@ -15,6 +15,16 @@ interface ApiService {
         @Field("client_secret") clientSecret: String
     ): Response<TokenItem>
 
+    @FormUrlEncoded
+    @Headers("Authorization: basic ZmFkYWNhaV9mcm9udGVuZDo0NGVkMWJiZDI3NDUwOTZkYTI1MmM5NWM0YTQ0NGVkMWJiZA==")
+    @POST("/v1/oauth2/token")
+    suspend fun refreshToken(
+        @Field("grant_type") grantType: String,
+        @Field("refresh_token") refreshToken: String,
+        @Field("client_id") clientId: String,
+        @Field("client_secret") clientSecret: String
+    ): Response<TokenItem>
+
     /**********************************************************
      *
      *                  Attachment x 4

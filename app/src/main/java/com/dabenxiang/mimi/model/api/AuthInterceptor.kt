@@ -26,10 +26,8 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
             !accountManager.isTokenValid() -> {
                 runBlocking {
                     withContext(Dispatchers.IO) {
-                        accountManager.getToken().collect {
-                        }
+                        accountManager.getToken().collect()
                     }
-
                     chain.proceed(chain.addAuthorization())
                 }
             }
@@ -40,7 +38,7 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
                     HttpURLConnection.HTTP_UNAUTHORIZED -> {
                         runBlocking {
                             withContext(Dispatchers.IO) {
-                                // TODO: Refresh token
+                                accountManager.refreshToken().collect()
                             }
                             chain.proceed(chain.addAuthorization())
                         }
