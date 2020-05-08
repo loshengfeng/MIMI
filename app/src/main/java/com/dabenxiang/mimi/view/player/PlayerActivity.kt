@@ -195,7 +195,7 @@ class PlayerActivity : BaseActivity() {
                 Timber.d("$it, id: ${it.videoId}")
             }
             // 透過Observer 設定 video src
-            viewModel._currentVideoUrl.value = "https://storage.googleapis.com/exoplayer-test-media-0/BigBuckBunny_320x180.mp4"
+            viewModel._currentVideoUrl.value = "https://cdn-file.pinsewu.com/group1/M00/06/8C/wKgBm11BjXOAWRXKAAA_XDt-0eI56.m3u8_web"
         } else {
             // OnStart or OnResume 設定 video src
             setupPlayUrl(viewModel.currentVideoUrl.value!!)

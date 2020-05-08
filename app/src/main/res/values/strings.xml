@@ -2,7 +2,8 @@
     <string name="app_name">MiMi</string>
 
     <!-- nav button-->
-    <string name="nav_home">首页</string>
+    <string name="nav_home">一般影视</string>
+    <string name="nav_adult">成人影视</string>
     <string name="nav_topup">充值</string>
     <string name="nav_favorite">收藏</string>
     <string name="nav_personal">我的</string>

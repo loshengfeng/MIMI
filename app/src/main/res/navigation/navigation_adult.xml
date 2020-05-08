@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_adult"
+    app:startDestination="@id/adultHomeFragment">
+
+    <fragment
+        android:id="@+id/adultHomeFragment"
+        android:name="com.dabenxiang.mimi.view.home.AdultHomeFragment"
+        tools:layout="@layout/fragment_home">
+
+        <action
+            android:id="@+id/action_homeFragment_to_categoriesFragment"
+            app:destination="@id/categoriesFragment" />
+
+        <action
+            android:id="@+id/action_homeFragment_to_searchVideoFragment"
+            app:destination="@id/searchVideoFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/categoriesFragment"
+        android:name="com.dabenxiang.mimi.view.home.CategoriesFragment"
+        tools:layout="@layout/fragment_categories">
+
+        <action
+            android:id="@+id/action_categoriesFragment_to_searchVideoFragment"
+            app:destination="@id/searchVideoFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/searchVideoFragment"
+        android:name="com.dabenxiang.mimi.view.search.SearchVideoFragment"
+        tools:layout="@layout/fragment_search_video" />
+
+</navigation>

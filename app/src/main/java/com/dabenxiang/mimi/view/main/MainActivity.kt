@@ -38,7 +38,9 @@ class MainActivity : BaseActivity() {
      * Called on first creation and when restoring state.
      */
     private fun setupBottomNavigationBar() {
-        val navGraphIds = listOf(R.navigation.navigation_home, R.navigation.navigation_topup, R.navigation.navigation_favorite, R.navigation.navigation_personal)
+        bottom_navigation.itemIconTintList = null
+
+        val navGraphIds = listOf(R.navigation.navigation_home, R.navigation.navigation_adult, R.navigation.navigation_topup, R.navigation.navigation_favorite, R.navigation.navigation_personal)
 
         // Setup the bottom navigation view with a list of navigation graphs
         bottom_navigation.setupWithNavController(

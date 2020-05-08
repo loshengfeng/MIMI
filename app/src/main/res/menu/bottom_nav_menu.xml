@@ -3,8 +3,13 @@
     <item
         android:id="@+id/navigation_home"
         android:enabled="true"
-        android:icon="@drawable/btn_home"
+        android:icon="@drawable/btn_normal_movies"
         android:title="@string/nav_home" />
+    <item
+        android:id="@+id/navigation_adult"
+        android:enabled="true"
+        android:icon="@drawable/btn_adult_movies"
+        android:title="@string/nav_adult" />
     <item
         android:id="@+id/navigation_topup"
         android:enabled="true"

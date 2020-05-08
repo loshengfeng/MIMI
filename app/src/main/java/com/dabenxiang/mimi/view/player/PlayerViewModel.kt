@@ -102,6 +102,8 @@ class PlayerViewModel : BaseViewModel() {
                     uriString.startsWith("rtmp://") ->
                         ProgressiveMediaSource.Factory(RtmpDataSourceFactory())
                             .createMediaSource(uri)
+                    uriString.contains("m3u8") -> HlsMediaSource.Factory(sourceFactory)
+                        .createMediaSource(uri)
                     else ->
                         ProgressiveMediaSource.Factory(sourceFactory)
                             .createMediaSource(uri)
