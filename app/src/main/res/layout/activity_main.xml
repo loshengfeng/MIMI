@@ -20,8 +20,6 @@
         android:layout_height="50dp"
         android:layout_gravity="bottom"
         app:labelVisibilityMode="labeled"
-        app:itemBackground="@color/day_night_color_status_bar"
-        app:itemTextColor="@color/day_night_color_bottom_bar_item"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

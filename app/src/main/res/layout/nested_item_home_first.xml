@@ -21,7 +21,7 @@
         android:layout_marginTop="10dp"
         android:ellipsize="end"
         android:lines="2"
-        android:textColor="@color/day_night_color_text"
+        android:textColor="@color/normal_color_text"
         app:layout_constraintEnd_toEndOf="@id/layout_card"
         app:layout_constraintStart_toStartOf="@id/layout_card"
         app:layout_constraintTop_toBottomOf="@+id/layout_card"

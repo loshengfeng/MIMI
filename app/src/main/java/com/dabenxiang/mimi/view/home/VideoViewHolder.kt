@@ -9,6 +9,7 @@ import kotlinx.android.synthetic.main.nested_item_home_categories.view.*
 
 class VideoViewHolder(itemView: View, onClickListener: IndexViewHolderListener) : BaseIndexViewHolder<VideoHolderItem>(itemView, onClickListener) {
 
+    private val card = itemView.layout_card!!
     private val tvResolution = itemView.tv_resolution!!
     private val tvInfo = itemView.tv_info!!
     private val tvTitle = itemView.tv_title!!
@@ -33,6 +34,14 @@ class VideoViewHolder(itemView: View, onClickListener: IndexViewHolderListener) 
             tvResolution.text = model.resolution
             tvInfo.text = model.info
             tvTitle.text = model.title
+
+            if (model.isAdult) {
+                card.setCardBackgroundColor(itemView.resources.getColor(R.color.adult_color_card_background, null))
+                tvTitle.setTextColor(itemView.resources.getColor(R.color.adult_color_text, null))
+            } else {
+                card.setCardBackgroundColor(itemView.resources.getColor(R.color.normal_color_card_background, null))
+                tvTitle.setTextColor(itemView.resources.getColor(R.color.normal_color_text, null))
+            }
 
             Glide.with(itemView.context)
                 .load(model.imgUrl)

@@ -3,12 +3,4 @@
     <color name="colorPrimary">@color/color_black_1_30</color>
     <color name="colorPrimaryDark">#1e233a</color>
     <color name="colorAccent">#03DAC5</color>
-
-    <color name="day_night_color_background">#141932</color>
-    <color name="day_night_color_status_bar">#1e233a</color>
-    <color name="day_night_color_text">@color/color_white_1</color>
-    <color name="day_night_color_search_bar">@color/color_black_1_20</color>
-    <color name="day_night_color_search_text">@color/color_white_1_30</color>
-    <color name="day_night_color_bottom_bar_item">@color/color_red_1</color>
-    <color name="day_night_color_card_background">@color/color_black_1_20</color>
 </resources>

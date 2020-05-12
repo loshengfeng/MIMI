@@ -17,4 +17,6 @@ class PlayerData : Serializable {
     }
 
     var videoId = 0L
+
+    var isAdult = false
 }

@@ -15,6 +15,7 @@ import com.dabenxiang.mimi.view.adapter.HomeCategoriesAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.player.PlayerActivity
+import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -35,14 +36,14 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
     override fun getLayoutId() = R.layout.fragment_home
 
     private val adapter by lazy {
-        HomeAdapter(context!!, adapterListener)
+        HomeAdapter(context!!, adapterListener, false)
     }
 
     private val adapterListener = object : HomeAdapter.EventListener {
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
             Timber.d("$item")
 
-            val bundle = CategoriesFragment.createBundle(item.id ?: "", item.title ?: "")
+            val bundle = CategoriesFragment.createBundle(item.id ?: "", item.title ?: "", false)
 
             navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_categoriesFragment, bundle))
         }
@@ -118,7 +119,8 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
                     title = "標題",
                     resolution = "720P",
                     info = "全30集",
-                    imgUrl = "https://i2.kknews.cc/SIG=1nkii03/470400035pnr3n5r3s7n.jpg"
+                    imgUrl = "https://i2.kknews.cc/SIG=1nkii03/470400035pnr3n5r3s7n.jpg",
+                    isAdult = false
                 )
             )
         }
@@ -204,7 +206,8 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
         })
 
         iv_bg_search.setOnClickListener {
-            navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_searchVideoFragment))
+            val bundle = SearchVideoFragment.createBundle("", "", false)
+            navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_searchVideoFragment, bundle))
         }
     }
 }

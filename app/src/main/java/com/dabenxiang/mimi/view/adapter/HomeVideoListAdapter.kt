@@ -11,7 +11,7 @@ import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.home.HomeTemplate
 import com.dabenxiang.mimi.view.home.VideoViewHolder
 
-class HomeVideoListAdapter(private val nestedListener: HomeAdapter.EventListener) : RecyclerView.Adapter<VideoViewHolder>() {
+class HomeVideoListAdapter(private val nestedListener: HomeAdapter.EventListener, private val isAdult: Boolean) : RecyclerView.Adapter<VideoViewHolder>() {
 
     private var data: List<VideoHolderItem>? = null
 
@@ -31,7 +31,9 @@ class HomeVideoListAdapter(private val nestedListener: HomeAdapter.EventListener
             override fun onClickItemIndex(view: View, index: Int) {
                 if (index > -1) {
                     data?.get(index)?.also {
-                        nestedListener.onVideoClick(view, PlayerData.parser(it))
+                        nestedListener.onVideoClick(view, PlayerData.parser(it).also { playerData ->
+                            playerData.isAdult = isAdult
+                        })
                     }
                 }
             }

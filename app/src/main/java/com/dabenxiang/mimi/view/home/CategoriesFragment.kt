@@ -2,10 +2,12 @@ package com.dabenxiang.mimi.view.home
 
 import android.os.Bundle
 import android.view.View
+import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.serializable.CategoriesData
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import kotlinx.android.synthetic.main.fragment_categories.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -14,10 +16,11 @@ class CategoriesFragment : BaseFragment<CategoriesViewModel>() {
     companion object {
         const val KEY_DATA = "data"
 
-        fun createBundle(id: String, title: String): Bundle {
+        fun createBundle(id: String, title: String, isAdult: Boolean): Bundle {
             val data = CategoriesData()
             data.id = id
             data.title = title
+            data.isAdult = isAdult
 
             return Bundle().also {
                 it.putSerializable(KEY_DATA, data)
@@ -38,25 +41,70 @@ class CategoriesFragment : BaseFragment<CategoriesViewModel>() {
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
-    override fun setupObservers() {
-
-    }
-
-    override fun setupListeners() {
-        iv_back.setOnClickListener {
-            navigateTo(NavigateItem.Up)
-        }
-
-        iv_search.setOnClickListener {
-            navigateTo(NavigateItem.Destination(R.id.action_categoriesFragment_to_searchVideoFragment))
-        }
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        (arguments?.getSerializable(KEY_DATA) as CategoriesData?)?.also {
-            tv_title.text = it.title
+        (arguments?.getSerializable(KEY_DATA) as CategoriesData?)?.also { data ->
+            tv_title.text = data.title
+
+            recyclerview_content.background =
+                if (data.isAdult) {
+                    R.color.adult_color_background
+                } else {
+                    R.color.normal_color_background
+                }.let { res ->
+                    requireActivity().getDrawable(res)
+                }
+
+            layout_top.background =
+                if (data.isAdult) {
+                    R.color.adult_color_status_bar
+                } else {
+                    R.color.normal_color_status_bar
+                }.let { res ->
+                    requireActivity().getDrawable(res)
+                }
+
+            iv_back.setImageResource(
+                if (data.isAdult) {
+                    R.drawable.ic_adult_btn_back
+                } else {
+                    R.drawable.ic_normal_btn_back
+                }
+            )
+
+            iv_search.setImageResource(
+                if (data.isAdult) {
+                    R.drawable.ic_adult_btn_search
+                } else {
+                    R.drawable.ic_normal_btn_search
+                }
+            )
+
+            tv_title.setTextColor(
+                if (data.isAdult) {
+                    R.color.adult_color_text
+                } else {
+                    R.color.normal_color_text
+                }.let { res ->
+                    requireActivity().getColor(res)
+                }
+            )
+
+            iv_back.setOnClickListener {
+                navigateTo(NavigateItem.Up)
+            }
+
+            iv_search.setOnClickListener {
+                val bundle = SearchVideoFragment.createBundle("", "", data.isAdult)
+                navigateTo(NavigateItem.Destination(R.id.action_categoriesFragment_to_searchVideoFragment, bundle))
+            }
         }
+    }
+
+    override fun setupObservers() {
+    }
+
+    override fun setupListeners() {
     }
 }

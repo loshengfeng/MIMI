@@ -52,6 +52,16 @@ class PlayerActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerData)?.also { data ->
+            layout_others.setBackgroundColor(
+                if (data.isAdult) {
+                    getColor(R.color.adult_color_background)
+                } else {
+                    getColor(R.color.normal_color_background)
+                }
+            )
+        }
+
         viewModel.fastForwardTime.observe(this, Observer {
             tv_forward_backward.text = "${if (it > 0) "+" else ""}${it / 1000}秒"
         })

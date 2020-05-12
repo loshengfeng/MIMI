@@ -27,9 +27,22 @@ class MainActivity : BaseActivity() {
 
         viewModel.enableNightMode.observe(this, Observer { isNight ->
             //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            val mode = if (isNight) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+            val mode =
+                if (isNight) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
             if (delegate.localNightMode != mode) {
                 delegate.localNightMode = mode
+            }
+        })
+
+        viewModel.adultMode.observe(this, Observer { openAdult ->
+            if (openAdult) {
+                window?.statusBarColor = getColor(R.color.adult_color_status_bar)
+                bottom_navigation.setBackgroundColor(getColor(R.color.adult_color_status_bar))
+                bottom_navigation.itemTextColor = resources.getColorStateList(R.color.adult_color_bottom_bar_item, null)
+            } else {
+                window?.statusBarColor = getColor(R.color.normal_color_status_bar)
+                bottom_navigation.setBackgroundColor(getColor(R.color.normal_color_status_bar))
+                bottom_navigation.itemTextColor = resources.getColorStateList(R.color.normal_color_bottom_bar_item, null)
             }
         })
     }
@@ -40,7 +53,13 @@ class MainActivity : BaseActivity() {
     private fun setupBottomNavigationBar() {
         bottom_navigation.itemIconTintList = null
 
-        val navGraphIds = listOf(R.navigation.navigation_home, R.navigation.navigation_adult, R.navigation.navigation_topup, R.navigation.navigation_favorite, R.navigation.navigation_personal)
+        val navGraphIds = listOf(
+            R.navigation.navigation_home,
+            R.navigation.navigation_adult,
+            R.navigation.navigation_topup,
+            R.navigation.navigation_favorite,
+            R.navigation.navigation_personal
+        )
 
         // Setup the bottom navigation view with a list of navigation graphs
         bottom_navigation.setupWithNavController(

@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
+import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.adapter.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.view.ViewPagerIndicator
@@ -20,7 +21,9 @@ import kotlinx.android.synthetic.main.item_home_recommend.view.*
 import kotlinx.android.synthetic.main.item_video_list.view.*
 import timber.log.Timber
 
-abstract class HomeViewHolder<VM : HomeTemplate>(itemView: View, protected val nestedListener: HomeAdapter.EventListener) :
+abstract class HomeViewHolder<VM : HomeTemplate>(
+    itemView: View, protected val nestedListener: HomeAdapter.EventListener, protected val isAdult: Boolean
+) :
     BaseViewHolder(itemView) {
 
     protected var data: VM? = null
@@ -34,8 +37,8 @@ abstract class HomeViewHolder<VM : HomeTemplate>(itemView: View, protected val n
     abstract fun updated()
 }
 
-class HeaderViewHolder(itemView: View, nestedListener: HomeAdapter.EventListener) :
-    HomeViewHolder<HomeTemplate.Header>(itemView, nestedListener) {
+class HeaderViewHolder(itemView: View, nestedListener: HomeAdapter.EventListener, isAdult: Boolean) :
+    HomeViewHolder<HomeTemplate.Header>(itemView, nestedListener, isAdult) {
     private val ivIcon: ImageView = itemView.iv_icon
     private val tvTitle: TextView = itemView.tv_title
     private val btnMore: View = itemView.btn_more
@@ -59,11 +62,21 @@ class HeaderViewHolder(itemView: View, nestedListener: HomeAdapter.EventListener
             }
 
             tvTitle.text = data.title
+            tvTitle.setTextColor(
+                if (isAdult) {
+                    R.color.adult_color_text
+                } else {
+                    R.color.normal_color_text
+                }.let {
+                    itemView.resources.getColor(it, null)
+                }
+            )
         }
     }
 }
 
-class HomeBannerViewHolder(itemView: View, listener: HomeAdapter.EventListener) : HomeViewHolder<HomeTemplate.Banner>(itemView, listener) {
+class HomeBannerViewHolder(itemView: View, listener: HomeAdapter.EventListener, isAdult: Boolean) :
+    HomeViewHolder<HomeTemplate.Banner>(itemView, listener, isAdult) {
     private val ivPoster: ImageView = itemView.iv_poster
 
     override fun updated() {
@@ -75,8 +88,8 @@ class HomeBannerViewHolder(itemView: View, listener: HomeAdapter.EventListener) 
     }
 }
 
-class HomeCarouselViewHolder(itemView: View, listener: HomeAdapter.EventListener) :
-    HomeViewHolder<HomeTemplate.Carousel>(itemView, listener) {
+class HomeCarouselViewHolder(itemView: View, listener: HomeAdapter.EventListener, isAdult: Boolean) :
+    HomeViewHolder<HomeTemplate.Carousel>(itemView, listener, isAdult) {
 
     private val viewPager: ViewPager2 = itemView.viewpager
     private val pagerIndicator: ViewPagerIndicator = itemView.pager_indicator
@@ -102,12 +115,12 @@ class HomeCarouselViewHolder(itemView: View, listener: HomeAdapter.EventListener
     }
 }
 
-class HomeVideoListViewHolder(itemView: View, listener: HomeAdapter.EventListener) :
-    HomeViewHolder<HomeTemplate.VideoList>(itemView, listener) {
+class HomeVideoListViewHolder(itemView: View, listener: HomeAdapter.EventListener, isAdult: Boolean) :
+    HomeViewHolder<HomeTemplate.VideoList>(itemView, listener, isAdult) {
 
     private val recyclerView: RecyclerView = itemView.recyclerview_video
     private val nestedAdapter by lazy {
-        HomeVideoListAdapter(nestedListener)
+        HomeVideoListAdapter(nestedListener, isAdult)
     }
 
     init {
@@ -126,12 +139,12 @@ class HomeVideoListViewHolder(itemView: View, listener: HomeAdapter.EventListene
     }
 }
 
-class HomeCategoriesViewHolder(itemView: View, listener: HomeAdapter.EventListener) :
-    HomeViewHolder<HomeTemplate.Categories>(itemView, listener) {
+class HomeCategoriesViewHolder(itemView: View, listener: HomeAdapter.EventListener, isAdult: Boolean) :
+    HomeViewHolder<HomeTemplate.Categories>(itemView, listener, isAdult) {
 
     private val recyclerView: RecyclerView = itemView.recyclerview_categories
     private val nestedAdapter by lazy {
-        HomeCategoriesAdapter(nestedListener)
+        HomeCategoriesAdapter(nestedListener, isAdult)
     }
 
     init {
@@ -150,8 +163,8 @@ class HomeCategoriesViewHolder(itemView: View, listener: HomeAdapter.EventListen
     }
 }
 
-class HomeLeaderboardViewHolder(itemView: View, listener: HomeAdapter.EventListener) :
-    HomeViewHolder<HomeTemplate.Leaderboard>(itemView, listener) {
+class HomeLeaderboardViewHolder(itemView: View, listener: HomeAdapter.EventListener, isAdult: Boolean) :
+    HomeViewHolder<HomeTemplate.Leaderboard>(itemView, listener, isAdult) {
 
     private val recyclerView: RecyclerView = itemView.recyclerview_leaderboard
     private val nestedAdapter by lazy {
@@ -171,8 +184,8 @@ class HomeLeaderboardViewHolder(itemView: View, listener: HomeAdapter.EventListe
     }
 }
 
-class HomeRecommendViewHolder(itemView: View, listener: HomeAdapter.EventListener) :
-    HomeViewHolder<HomeTemplate.Recommend>(itemView, listener) {
+class HomeRecommendViewHolder(itemView: View, listener: HomeAdapter.EventListener, isAdult: Boolean) :
+    HomeViewHolder<HomeTemplate.Recommend>(itemView, listener, isAdult) {
 
     private val recyclerView: RecyclerView = itemView.recyclerview_recommend
     private val nestedAdapter by lazy {

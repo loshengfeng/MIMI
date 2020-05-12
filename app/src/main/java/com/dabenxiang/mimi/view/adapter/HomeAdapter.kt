@@ -10,7 +10,7 @@ import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.*
 
-class HomeAdapter(val context: Context, private val listener: EventListener) : RecyclerView.Adapter<BaseViewHolder>() {
+class HomeAdapter(val context: Context, private val listener: EventListener, private val isAdult: Boolean) : RecyclerView.Adapter<BaseViewHolder>() {
 
     interface EventListener {
         fun onHeaderItemClick(view: View, item: HomeTemplate.Header)
@@ -44,28 +44,28 @@ class HomeAdapter(val context: Context, private val listener: EventListener) : R
 
         val viewHolder = when (viewType) {
             HomeItemType.HEADER.ordinal -> {
-                HeaderViewHolder(layoutInflater.inflate(R.layout.item_header, parent, false), listener)
+                HeaderViewHolder(layoutInflater.inflate(R.layout.item_header, parent, false), listener, isAdult)
             }
             HomeItemType.BANNER.ordinal -> {
-                HomeBannerViewHolder(layoutInflater.inflate(R.layout.item_banner, parent, false), listener)
+                HomeBannerViewHolder(layoutInflater.inflate(R.layout.item_banner, parent, false), listener, isAdult)
             }
             HomeItemType.CAROUSEL.ordinal -> {
-                HomeCarouselViewHolder(layoutInflater.inflate(R.layout.item_carousel, parent, false), listener)
+                HomeCarouselViewHolder(layoutInflater.inflate(R.layout.item_carousel, parent, false), listener, isAdult)
             }
             HomeItemType.CATEGORIES.ordinal -> {
-                HomeCategoriesViewHolder(layoutInflater.inflate(R.layout.item_home_categories, parent, false), listener)
+                HomeCategoriesViewHolder(layoutInflater.inflate(R.layout.item_home_categories, parent, false), listener, isAdult)
             }
             HomeItemType.LEADERBOARD.ordinal -> {
-                HomeLeaderboardViewHolder(layoutInflater.inflate(R.layout.item_home_leaderboard, parent, false), listener)
+                HomeLeaderboardViewHolder(layoutInflater.inflate(R.layout.item_home_leaderboard, parent, false), listener, isAdult)
             }
             HomeItemType.RECOMMEND.ordinal -> {
-                HomeRecommendViewHolder(layoutInflater.inflate(R.layout.item_home_recommend, parent, false), listener)
+                HomeRecommendViewHolder(layoutInflater.inflate(R.layout.item_home_recommend, parent, false), listener, isAdult)
             }
             HomeItemType.VIDEOLIST.ordinal -> {
-                HomeVideoListViewHolder(layoutInflater.inflate(R.layout.item_video_list, parent, false), listener)
+                HomeVideoListViewHolder(layoutInflater.inflate(R.layout.item_video_list, parent, false), listener, isAdult)
             }
             else -> {
-                HeaderViewHolder(layoutInflater.inflate(R.layout.item_header, parent, false), listener)
+                HeaderViewHolder(layoutInflater.inflate(R.layout.item_header, parent, false), listener, isAdult)
             }
         }
 

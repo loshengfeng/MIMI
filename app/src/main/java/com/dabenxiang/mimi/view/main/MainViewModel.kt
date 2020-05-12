@@ -19,6 +19,7 @@ class MainViewModel : BaseViewModel() {
     private val apiRepository: ApiRepository by inject()
 
     val enableNightMode = MutableLiveData<Boolean>()
+    val adultMode = MutableLiveData<Boolean>(false)
 
     private val mCategoriesData = MutableLiveData<CategoriesItem>()
     val categoriesData: LiveData<CategoriesItem> = mCategoriesData

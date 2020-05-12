@@ -15,6 +15,8 @@ import com.dabenxiang.mimi.view.adapter.HomeCategoriesAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.player.PlayerActivity
+import com.dabenxiang.mimi.view.search.SearchVideoFragment
+import com.dabenxiang.mimi.widget.view.setBtnSolidDolor
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -35,14 +37,14 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
     override fun getLayoutId() = R.layout.fragment_home
 
     private val adapter by lazy {
-        HomeAdapter(context!!, adapterListener)
+        HomeAdapter(context!!, adapterListener, true)
     }
 
     private val adapterListener = object : HomeAdapter.EventListener {
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
             Timber.d("$item")
 
-            val bundle = CategoriesFragment.createBundle(item.id ?: "", item.title ?: "")
+            val bundle = CategoriesFragment.createBundle(item.id ?: "", item.title ?: "", true)
 
             navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_categoriesFragment, bundle))
         }
@@ -71,6 +73,8 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
 
         Timber.d("onViewCreated Home")
 
+        setupAdultUI()
+
         activity?.also { activity ->
             LinearLayoutManager(activity).also { layoutManager ->
                 layoutManager.orientation = LinearLayoutManager.VERTICAL
@@ -79,6 +83,37 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
 
             recyclerview_content.adapter = adapter
         }
+    }
+
+    private fun setupAdultUI() {
+        mainViewModel?.adultMode?.value = true
+
+        layout_top.background = requireActivity().getDrawable(R.color.adult_color_status_bar)
+        layout_top_tap.setTabTextColors(
+            requireActivity().getColor(R.color.adult_color_text),
+            requireActivity().getColor(R.color.color_tab_unselected_text)
+        )
+
+        layout_search_bar.background = requireActivity().getDrawable(R.color.adult_color_background)
+        iv_bg_search.setBtnSolidDolor(requireActivity().getColor(R.color.adult_color_search_bar))
+
+        iv_search.setImageResource(R.drawable.ic_adult_btn_search)
+        tv_search.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
+
+        recyclerview_content.background = requireActivity().getDrawable(R.color.adult_color_background)
+
+        btn_filter.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
+        btn_filter.setBtnSolidDolor(
+            requireActivity().getColor(R.color.color_white_1_30),
+            requireActivity().getColor(R.color.color_red_1),
+            resources.getDimension(R.dimen.dp_6)
+        )
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        mainViewModel?.adultMode?.value = false
     }
 
     //TODO: Testing
@@ -118,7 +153,8 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
                     title = "標題",
                     resolution = "720P",
                     info = "全30集",
-                    imgUrl = "https://i2.kknews.cc/SIG=1nkii03/470400035pnr3n5r3s7n.jpg"
+                    imgUrl = "https://i2.kknews.cc/SIG=1nkii03/470400035pnr3n5r3s7n.jpg",
+                    isAdult = true
                 )
             )
         }
@@ -204,7 +240,8 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
         })
 
         iv_bg_search.setOnClickListener {
-            navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_searchVideoFragment))
+            val bundle = SearchVideoFragment.createBundle("", "", true)
+            navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_searchVideoFragment, bundle))
         }
     }
 }

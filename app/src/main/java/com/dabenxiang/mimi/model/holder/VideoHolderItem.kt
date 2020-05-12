@@ -4,5 +4,6 @@ data class VideoHolderItem(
     val title: String?,
     val resolution: String?,
     val info: String?,
-    val imgUrl: String?
+    val imgUrl: String?,
+    val isAdult: Boolean
 )

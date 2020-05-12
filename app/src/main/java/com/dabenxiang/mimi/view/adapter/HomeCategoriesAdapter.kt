@@ -17,7 +17,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 
-class HomeCategoriesAdapter(private val nestedListener: HomeAdapter.EventListener) : RecyclerView.Adapter<BaseViewHolder>() {
+class HomeCategoriesAdapter(private val nestedListener: HomeAdapter.EventListener, private val isAdult: Boolean) :
+    RecyclerView.Adapter<BaseViewHolder>() {
 
     fun loadData(src: HomeTemplate.Categories) {
         reset()
@@ -49,7 +50,9 @@ class HomeCategoriesAdapter(private val nestedListener: HomeAdapter.EventListene
             override fun onClickItemIndex(view: View, index: Int) {
                 if (index > -1) {
                     data?.get(index)?.also {
-                        nestedListener.onVideoClick(view, PlayerData.parser(it))
+                        nestedListener.onVideoClick(view, PlayerData.parser(it).also { playerData ->
+                            playerData.isAdult = isAdult
+                        })
                     }
                 }
             }
@@ -131,7 +134,7 @@ class HomeCategoriesAdapter(private val nestedListener: HomeAdapter.EventListene
 
             data?.also { data ->
                 val item = data[realPosition]
-                VideoHolderItem(title = item.title, imgUrl = item.cover, resolution = "", info = "").also {
+                VideoHolderItem(title = item.title, imgUrl = item.cover, resolution = "", info = "", isAdult = isAdult).also {
                     resetSuccess = true
                     holder.bind(it, realPosition)
                 }

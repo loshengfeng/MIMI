@@ -8,16 +8,17 @@
         android:id="@+id/layout_top"
         android:layout_width="match_parent"
         android:layout_height="@dimen/app_bar_height"
-        android:background="@color/day_night_color_status_bar"
+        android:background="@color/normal_color_status_bar"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
+        <ImageButton
             android:id="@+id/iv_back"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginStart="12dp"
             android:scaleType="center"
-            android:src="@drawable/day_night_btn_back"
+            android:background="@null"
+            android:src="@drawable/ic_normal_btn_back"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -27,19 +28,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="分類"
-            android:textColor="@color/day_night_color_text"
+            android:textColor="@color/normal_color_text"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
+        <ImageButton
             android:id="@+id/iv_search"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
-            android:src="@drawable/day_night_btn_search"
+            android:background="@null"
+            android:src="@drawable/ic_normal_btn_search"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -50,7 +52,7 @@
         android:id="@+id/recyclerview_content"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@color/day_night_color_background"
+        android:background="@color/normal_color_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layout_top" />
 </androidx.constraintlayout.widget.ConstraintLayout>
