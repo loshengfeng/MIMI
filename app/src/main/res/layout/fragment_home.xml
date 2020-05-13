@@ -10,22 +10,11 @@
         android:layout_height="@dimen/app_bar_height"
         android:background="@color/normal_color_status_bar"
         app:layout_constraintTop_toTopOf="parent">
-
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/layout_top_tap"
+        
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerview_tab"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:drawablePadding="2dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tabIndicatorColor="@color/color_red_1"
-            app:tabIndicatorFullWidth="true"
-            app:tabIndicatorHeight="3dp"
-            app:tabMode="scrollable"
-            app:tabSelectedTextColor="@color/normal_color_text"
-            app:tabTextColor="@color/color_tab_unselected_text">
-        </com.google.android.material.tabs.TabLayout>
+            android:layout_height="match_parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -43,8 +32,8 @@
             android:id="@+id/iv_bg_search"
             android:layout_width="0dp"
             android:layout_height="36dp"
-            app:btn_corner_radius="standard"
             android:layout_marginEnd="10dp"
+            app:btn_corner_radius="standard"
             app:btn_solid_color="@color/normal_color_search_bar"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/btn_filter"

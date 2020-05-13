@@ -12,11 +12,12 @@ import com.dabenxiang.mimi.model.holder.VideoHolderItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeCategoriesAdapter
+import com.dabenxiang.mimi.view.adapter.HomeTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
-import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
@@ -34,6 +35,14 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
     }
 
     override fun getLayoutId() = R.layout.fragment_home
+
+    private val tabAdapter by lazy {
+        HomeTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
+            override fun onClickItemIndex(view: View, index: Int) {
+                viewModel.setTopTabPosition(index)
+            }
+        }, false)
+    }
 
     private val adapter by lazy {
         HomeAdapter(context!!, adapterListener, false)
@@ -73,6 +82,13 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
         Timber.d("onViewCreated Home")
 
         activity?.also { activity ->
+            LinearLayoutManager(activity).also { layoutManager ->
+                layoutManager.orientation = LinearLayoutManager.HORIZONTAL
+                recyclerview_tab.layoutManager = layoutManager
+            }
+
+            recyclerview_tab.adapter = tabAdapter
+
             LinearLayoutManager(activity).also { layoutManager ->
                 layoutManager.orientation = LinearLayoutManager.VERTICAL
                 recyclerview_content.layoutManager = layoutManager
@@ -151,13 +167,14 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
         mainViewModel?.also { mainViewModel ->
             mainViewModel.categoriesData.observe(viewLifecycleOwner, Observer { item ->
 
-                layout_top_tap.removeAllTabs()
-
+                val list = mutableListOf<String>()
                 item.categories?.also { level1 ->
                     for (i in 0 until level1.count()) {
                         val detail = level1[i]
-                        layout_top_tap.addTab(layout_top_tap.newTab().setText(detail.name), i == lastPosition)
+                        list.add(detail.name ?: "")
                     }
+
+                    tabAdapter.setTabList(list, lastPosition)
 
                     loadFirstTab(level1[0].categories)
                 }
@@ -167,17 +184,13 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
         viewModel.tabLayoutPosition.observe(viewLifecycleOwner, Observer { position ->
             lastPosition = position
 
+            tabAdapter.setLastSelectedIndex(lastPosition)
+
             when (position) {
                 0 -> {
                     btn_filter.visibility = View.GONE
                     loadFirstTab(mainViewModel?.categoriesData?.value?.categories?.get(position)?.categories)
                     //mainViewModel?.enableNightMode?.value = false
-                }
-
-                layout_top_tap.tabCount - 1 -> {
-                    btn_filter.visibility = View.VISIBLE
-                    loadFirstTab(mainViewModel?.categoriesData?.value?.categories?.get(position)?.categories)
-                    //mainViewModel?.enableNightMode?.value = true
                 }
                 else -> {
                     btn_filter.visibility = View.VISIBLE
@@ -189,22 +202,6 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
     }
 
     override fun setupListeners() {
-        layout_top_tap.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabReselected(tab: TabLayout.Tab?) {
-                Timber.d("onTabReselected: ${tab?.position}")
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-                Timber.d("onTabUnselected: ${tab?.position}")
-            }
-
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                Timber.d("onTabSelected: ${tab?.position}")
-
-                viewModel.setTopTabPosition(tab!!.position)
-            }
-        })
-
         iv_bg_search.setOnClickListener {
             val bundle = SearchVideoFragment.createBundle("", "", false)
             navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_searchVideoFragment, bundle))

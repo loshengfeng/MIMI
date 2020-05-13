@@ -23,18 +23,20 @@ class HomeViewModel : BaseViewModel() {
 
     private val apiRepository: ApiRepository by inject()
 
-    private val mTabLayoutPosition = MutableLiveData<Int>()
-    val tabLayoutPosition: LiveData<Int> = mTabLayoutPosition
+    private val _tabLayoutPosition = MutableLiveData<Int>()
+    val tabLayoutPosition: LiveData<Int> = _tabLayoutPosition
 
     fun setTopTabPosition(position: Int) {
-        mTabLayoutPosition.value = position
+        if (position != tabLayoutPosition.value) {
+            _tabLayoutPosition.value = position
+        }
     }
 
     fun loadNestedCategoriesList(adapter: HomeCategoriesAdapter, src: HomeTemplate.Categories) {
         viewModelScope.launch {
             adapter.activeTask {
                 flow {
-                    val resp = apiRepository.statisticsHomeVideos(StatisticsType.Newest, src.title ?: "", 0 , 30)
+                    val resp = apiRepository.statisticsHomeVideos(StatisticsType.Newest, src.title ?: "", 0, 30)
                     if (!resp.isSuccessful) throw HttpException(resp)
 
                     emit(ApiResult.success(resp.body()))
@@ -50,8 +52,8 @@ class HomeViewModel : BaseViewModel() {
                                 adapter.notifyUpdated(resp.result.content)
                             }
                             is ApiResult.Error -> Timber.e(resp.throwable)
-                            is ApiResult.Loading -> setShowProgress(true)
-                            is ApiResult.Loaded -> setShowProgress(false)
+                            //is ApiResult.Loading -> setShowProgress(true)
+                            //is ApiResult.Loaded -> setShowProgress(false)
                         }
                     }
             }
