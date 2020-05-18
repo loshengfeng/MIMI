@@ -13,5 +13,5 @@ data class ApiBasePagingItem<T>(
     val content: T?,
 
     @SerializedName("paging")
-    val paging: PagingItem?
+    val paging: PagingItem
 )

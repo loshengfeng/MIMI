@@ -40,6 +40,8 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
                             withContext(Dispatchers.IO) {
                                 accountManager.refreshToken().collect()
                             }
+                            // Prod crash when not call close
+                            response.close()
                             chain.proceed(chain.addAuthorization())
                         }
                     }

@@ -8,8 +8,6 @@ import com.dabenxiang.mimi.model.serializable.CategoriesData
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import kotlinx.android.synthetic.main.fragment_search_video.*
-import kotlinx.android.synthetic.main.fragment_search_video.iv_back
-import kotlinx.android.synthetic.main.fragment_search_video.recyclerview_content
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchVideoFragment : BaseFragment<SearchVideoViewModel>() {
@@ -17,11 +15,9 @@ class SearchVideoFragment : BaseFragment<SearchVideoViewModel>() {
     companion object {
         const val KEY_DATA = "data"
 
-        fun createBundle(id: String, title: String, isAdult: Boolean): Bundle {
+        fun createBundle(title: String): Bundle {
             val data = CategoriesData()
-            data.id = id
             data.title = title
-            data.isAdult = isAdult
 
             return Bundle().also {
                 it.putSerializable(KEY_DATA, data)
@@ -45,10 +41,12 @@ class SearchVideoFragment : BaseFragment<SearchVideoViewModel>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val isAdult = mainViewModel?.adultMode?.value ?: false
+
         (arguments?.getSerializable(KEY_DATA) as CategoriesData?)?.also { data ->
 
             recyclerview_content.background =
-                if (data.isAdult) {
+                if (isAdult) {
                     R.color.adult_color_background
                 } else {
                     R.color.normal_color_background
@@ -57,7 +55,7 @@ class SearchVideoFragment : BaseFragment<SearchVideoViewModel>() {
                 }
 
             layout_top.background =
-                if (data.isAdult) {
+                if (isAdult) {
                     R.color.adult_color_status_bar
                 } else {
                     R.color.normal_color_status_bar
@@ -66,7 +64,7 @@ class SearchVideoFragment : BaseFragment<SearchVideoViewModel>() {
                 }
 
             iv_back.setImageResource(
-                if (data.isAdult) {
+                if (isAdult) {
                     R.drawable.ic_adult_btn_back
                 } else {
                     R.drawable.ic_normal_btn_back
@@ -74,7 +72,7 @@ class SearchVideoFragment : BaseFragment<SearchVideoViewModel>() {
             )
 
             iv_search_bar.setImageResource(
-                if (data.isAdult) {
+                if (isAdult) {
                     R.drawable.bg_black_1_30_radius_18
                 } else {
                     R.drawable.bg_white_1_65625_border_gray_11_radius_18
@@ -82,7 +80,7 @@ class SearchVideoFragment : BaseFragment<SearchVideoViewModel>() {
             )
 
             iv_search.setImageResource(
-                if (data.isAdult) {
+                if (isAdult) {
                     R.drawable.ic_adult_btn_search
                 } else {
                     R.drawable.ic_normal_btn_search
@@ -90,7 +88,7 @@ class SearchVideoFragment : BaseFragment<SearchVideoViewModel>() {
             )
 
             edit_search.setTextColor(
-                if (data.isAdult) {
+                if (isAdult) {
                     R.color.adult_color_text
                 } else {
                     R.color.normal_color_text
@@ -100,7 +98,7 @@ class SearchVideoFragment : BaseFragment<SearchVideoViewModel>() {
             )
 
             iv_clean.setImageResource(
-                if (data.isAdult) {
+                if (isAdult) {
                     R.drawable.btn_close_white
                 } else {
                     R.drawable.btn_close_gray

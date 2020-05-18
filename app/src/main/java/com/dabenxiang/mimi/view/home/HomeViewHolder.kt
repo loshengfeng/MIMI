@@ -18,7 +18,6 @@ import kotlinx.android.synthetic.main.item_header.view.*
 import kotlinx.android.synthetic.main.item_home_categories.view.*
 import kotlinx.android.synthetic.main.item_home_leaderboard.view.*
 import kotlinx.android.synthetic.main.item_home_recommend.view.*
-import kotlinx.android.synthetic.main.item_video_list.view.*
 import timber.log.Timber
 
 abstract class HomeViewHolder<VM : HomeTemplate>(
@@ -111,30 +110,6 @@ class HomeCarouselViewHolder(itemView: View, listener: HomeAdapter.EventListener
         data?.also {
             nestedAdapter.setDataSrc(it)
             pagerIndicator.setViewPager2(viewPager)
-        }
-    }
-}
-
-class HomeVideoListViewHolder(itemView: View, listener: HomeAdapter.EventListener, isAdult: Boolean) :
-    HomeViewHolder<HomeTemplate.VideoList>(itemView, listener, isAdult) {
-
-    private val recyclerView: RecyclerView = itemView.recyclerview_video
-    private val nestedAdapter by lazy {
-        HomeVideoListAdapter(nestedListener, isAdult)
-    }
-
-    init {
-        GridLayoutManager(itemView.context, 2).also { layoutManager ->
-            recyclerView.layoutManager = layoutManager
-        }
-
-        recyclerView.adapter = nestedAdapter
-    }
-
-    override fun updated() {
-        data?.also {
-            nestedAdapter.setDataSrc(it)
-            nestedAdapter.notifyDataSetChanged()
         }
     }
 }

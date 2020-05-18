@@ -141,11 +141,14 @@ interface ApiService {
      ***********************************************************/
     @GET("/v1/Members/Home/Videos/Search")
     suspend fun searchHomeVideos(
-        @Query("category") category: String,
-        @Query("q") q: String,
-        @Query("offset") offset: Int,
-        @Query("limit") limit: Int
-    ): Response<ApiBasePagingItem<List<VideoSearchItem>>>
+        @Query("category") category: String?,
+        @Query("q") q: String?,
+        @Query("country") country: String?,
+        @Query("years") years: Int?,
+        @Query("isAdult") isAdult: Boolean?,
+        @Query("offset") offset: String?,
+        @Query("limit") limit: String?
+    ): Response<ApiBasePagingItem<VideoSearchItem>>
 
     @GET("/v1/Members/Home/Videos/Statistics")
     suspend fun statisticsHomeVideos(

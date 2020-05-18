@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.view.main
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseActivity
@@ -25,6 +24,7 @@ class MainActivity : BaseActivity() {
 
         viewModel.loadHomeCategories()
 
+        /* 備案
         viewModel.enableNightMode.observe(this, Observer { isNight ->
             //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             val mode =
@@ -33,18 +33,7 @@ class MainActivity : BaseActivity() {
                 delegate.localNightMode = mode
             }
         })
-
-        viewModel.adultMode.observe(this, Observer { openAdult ->
-            if (openAdult) {
-                window?.statusBarColor = getColor(R.color.adult_color_status_bar)
-                bottom_navigation.setBackgroundColor(getColor(R.color.adult_color_status_bar))
-                bottom_navigation.itemTextColor = resources.getColorStateList(R.color.adult_color_bottom_bar_item, null)
-            } else {
-                window?.statusBarColor = getColor(R.color.normal_color_status_bar)
-                bottom_navigation.setBackgroundColor(getColor(R.color.normal_color_status_bar))
-                bottom_navigation.itemTextColor = resources.getColorStateList(R.color.normal_color_bottom_bar_item, null)
-            }
-        })
+        */
     }
 
     /**
@@ -62,11 +51,34 @@ class MainActivity : BaseActivity() {
         )
 
         // Setup the bottom navigation view with a list of navigation graphs
-        bottom_navigation.setupWithNavController(
+        val controller = bottom_navigation.setupWithNavController(
             navGraphIds = navGraphIds,
             fragmentManager = supportFragmentManager,
             containerId = R.id.nav_host_fragment,
             intent = intent
         )
+
+        controller.observe(this, Observer {
+            val isAdult =
+                when (it.graph.id) {
+                    R.id.navigation_adult -> true
+                    else -> false
+                }
+
+            viewModel.setAdultMode(isAdult)
+            setUiMode(isAdult)
+        })
+    }
+
+    private fun setUiMode(isAdult: Boolean) {
+        if (isAdult) {
+            window?.statusBarColor = getColor(R.color.adult_color_status_bar)
+            bottom_navigation.setBackgroundColor(getColor(R.color.adult_color_status_bar))
+            bottom_navigation.itemTextColor = resources.getColorStateList(R.color.adult_color_bottom_bar_item, null)
+        } else {
+            window?.statusBarColor = getColor(R.color.normal_color_status_bar)
+            bottom_navigation.setBackgroundColor(getColor(R.color.normal_color_status_bar))
+            bottom_navigation.itemTextColor = resources.getColorStateList(R.color.normal_color_bottom_bar_item, null)
+        }
     }
 }

@@ -18,11 +18,17 @@ class MainViewModel : BaseViewModel() {
 
     private val apiRepository: ApiRepository by inject()
 
-    val enableNightMode = MutableLiveData<Boolean>()
-    val adultMode = MutableLiveData<Boolean>(false)
+    private val _adultMode = MutableLiveData<Boolean>(false)
+    val adultMode: LiveData<Boolean> = _adultMode
 
     private val mCategoriesData = MutableLiveData<CategoriesItem>()
     val categoriesData: LiveData<CategoriesItem> = mCategoriesData
+
+    fun setAdultMode(isAdult: Boolean) {
+        if (_adultMode.value != isAdult) {
+            _adultMode.value = isAdult
+        }
+    }
 
     fun loadHomeCategories() {
         viewModelScope.launch {

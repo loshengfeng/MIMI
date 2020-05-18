@@ -2,10 +2,14 @@ package com.dabenxiang.mimi.view.home
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import androidx.paging.LivePagedListBuilder
+import androidx.paging.PagedList
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.enums.StatisticsType
+import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.view.adapter.HomeCategoriesAdapter
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
@@ -58,5 +62,34 @@ class HomeViewModel : BaseViewModel() {
                     }
             }
         }
+    }
+
+    private val _videoList = MutableLiveData<PagedList<BaseVideoItem>>()
+    val videoList: LiveData<PagedList<BaseVideoItem>> = _videoList
+
+    fun setupVideoList(isAdult: Boolean, category: String?) {
+        viewModelScope.launch {
+            val dataSrc = VideoListDataSource(isAdult, category ?: "", viewModelScope, apiRepository, pagingCallback)
+            val factory = VideoListFactory(dataSrc)
+            val config = PagedList.Config.Builder()
+                .setPageSize(VideoListDataSource.PER_LIMIT.toInt())
+                .build()
+
+            LivePagedListBuilder(factory, config).build().asFlow().collect {
+                _videoList.postValue(it)
+            }
+        }
+    }
+
+    val pagingCallback = object : PagingCallback {
+        override fun onLoading() {
+        }
+
+        override fun onLoaded() {
+        }
+
+        override fun onThrowable(throwable: Throwable) {
+        }
+
     }
 }

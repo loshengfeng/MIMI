@@ -7,7 +7,6 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.holder.TopupOnlinePayItem
 import com.dabenxiang.mimi.view.listener.AdapterEventListener
 import com.dabenxiang.mimi.view.topup.TopupOnlinePayViewHolder
-import timber.log.Timber
 
 class TopupOnlinePayAdapter(
     private val listener: AdapterEventListener<TopupOnlinePayItem>
@@ -31,12 +30,10 @@ class TopupOnlinePayAdapter(
     }
 
     override fun getItemCount(): Int {
-        Timber.d("${TopupOnlinePayAdapter::class.java.simpleName}_getItemCount")
         return data?.count() ?: 0
     }
 
     override fun onBindViewHolder(holderOnlinePay: TopupOnlinePayViewHolder, position: Int) {
-        Timber.d("${TopupOnlinePayAdapter::class.java.simpleName}_onBindViewHolder_itemList: $data")
         val item = data?.get(position)
         holderOnlinePay.bind(item)
     }

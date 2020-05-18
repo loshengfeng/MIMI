@@ -3,64 +3,108 @@ package com.dabenxiang.mimi.view.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.paging.PagedListAdapter
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.holder.VideoHolderItem
+import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
-import com.dabenxiang.mimi.view.home.HomeTemplate
+import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.view.home.GridBannerHolder
 import com.dabenxiang.mimi.view.home.VideoViewHolder
 
-class HomeVideoListAdapter(private val nestedListener: HomeAdapter.EventListener, private val isAdult: Boolean) : RecyclerView.Adapter<VideoViewHolder>() {
+class HomeVideoListAdapter(private val nestedListener: HomeAdapter.EventListener, private val isAdult: Boolean) :
+    PagedListAdapter<BaseVideoItem, BaseViewHolder>(diffCallback) {
 
-    private var data: List<VideoHolderItem>? = null
+    companion object {
+        val diffCallback = object : DiffUtil.ItemCallback<BaseVideoItem>() {
+            override fun areItemsTheSame(oldItem: BaseVideoItem, newItem: BaseVideoItem): Boolean {
+                return oldItem == newItem
+            }
 
-    fun setDataSrc(src: HomeTemplate.VideoList) {
-        data = src.videoList
+            override fun areContentsTheSame(oldItem: BaseVideoItem, newItem: BaseVideoItem): Boolean {
+                return oldItem == newItem
+            }
+        }
 
-        updated()
-    }
-
-    private fun updated() {
-
-        notifyDataSetChanged()
+        private const val BANNER = 0
+        private const val LEFT_VIDEO = 1
+        private const val RIGHT_VIDEO = 2
     }
 
     private val videoViewHolderListener by lazy {
         object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
                 if (index > -1) {
-                    data?.get(index)?.also {
-                        nestedListener.onVideoClick(view, PlayerData.parser(it).also { playerData ->
-                            playerData.isAdult = isAdult
-                        })
+                    getItem(index)?.also {
+                        val playerData = PlayerData.parser(it)
+                        playerData.isAdult = isAdult
+                        nestedListener.onVideoClick(view, playerData)
                     }
                 }
             }
         }
     }
 
+    var showLeft = false
+
     override fun getItemViewType(position: Int): Int {
-        return position % 2
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoViewHolder {
-        val layout = when (viewType) {
-            0 -> R.layout.nested_item_left_video
-            else -> R.layout.nested_item_right_video
+        return when (getItem(position)) {
+            is BaseVideoItem.Video -> {
+                showLeft = !showLeft
+                return if (showLeft) {
+                    LEFT_VIDEO
+                } else {
+                    RIGHT_VIDEO
+                }
+            }
+            else -> BANNER
         }
-
-        val view = LayoutInflater.from(parent.context).inflate(layout, parent, false)
-        return VideoViewHolder(view, videoViewHolderListener)
     }
 
-    override fun getItemCount(): Int {
-        return data?.count() ?: 0
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
+        return return when (viewType) {
+            LEFT_VIDEO -> {
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.nested_item_left_video, parent, false)
+                VideoViewHolder(view, videoViewHolderListener)
+            }
+            RIGHT_VIDEO -> {
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.nested_item_right_video, parent, false)
+                VideoViewHolder(view, videoViewHolderListener)
+            }
+            else -> {
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_banner, parent, false)
+                GridBannerHolder(view, videoViewHolderListener)
+            }
+        }
     }
 
-    override fun onBindViewHolder(holder: VideoViewHolder, position: Int) {
-        data?.also { it ->
-            holder.bind(it[position], position)
+
+    override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
+        getItem(position)?.also {
+            when (it) {
+                is BaseVideoItem.Video -> {
+                    (holder as VideoViewHolder).bind(it, position)
+                }
+                is BaseVideoItem.Banner -> {
+                    (holder as GridBannerHolder).bind(it, position)
+                }
+            }
+        }
+    }
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+
+        (recyclerView.layoutManager as GridLayoutManager).spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return when (position) {
+                    0 -> 2
+                    else -> 1
+                }
+            }
         }
     }
 }

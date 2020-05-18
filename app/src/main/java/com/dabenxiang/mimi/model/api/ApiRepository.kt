@@ -18,7 +18,8 @@ class ApiRepository(private val apiService: ApiService) {
     /**
      * 更新Token
      */
-    suspend fun refreshToken(token: String) = apiService.refreshToken("refresh_token", token, "3770511208570945536", "1d760dedf35a4a508ecd71b5013a1611")
+    suspend fun refreshToken(token: String) =
+        apiService.refreshToken("refresh_token", token, "3770511208570945536", "1d760dedf35a4a508ecd71b5013a1611")
 
     /**********************************************************
      *
@@ -172,8 +173,14 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得類別影片
      */
     suspend fun searchHomeVideos(
-        category: String, q: String, offset: Int, limit: Int
-    ) = apiService.searchHomeVideos(category, q, offset, limit)
+        category: String,
+        q: String? = null,
+        country: String? = null,
+        years: Int? = null,
+        isAdult: Boolean,
+        offset: String,
+        limit: String
+    ) = apiService.searchHomeVideos(category, q, country, years, isAdult, offset, limit)
 
     /**
      * 取得熱門影片

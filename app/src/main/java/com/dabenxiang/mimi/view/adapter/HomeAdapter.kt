@@ -61,9 +61,6 @@ class HomeAdapter(val context: Context, private val listener: EventListener, pri
             HomeItemType.RECOMMEND.ordinal -> {
                 HomeRecommendViewHolder(layoutInflater.inflate(R.layout.item_home_recommend, parent, false), listener, isAdult)
             }
-            HomeItemType.VIDEOLIST.ordinal -> {
-                HomeVideoListViewHolder(layoutInflater.inflate(R.layout.item_video_list, parent, false), listener, isAdult)
-            }
             else -> {
                 HeaderViewHolder(layoutInflater.inflate(R.layout.item_header, parent, false), listener, isAdult)
             }
@@ -97,10 +94,6 @@ class HomeAdapter(val context: Context, private val listener: EventListener, pri
                 }
                 HomeItemType.RECOMMEND.ordinal -> {
                     holder as HomeRecommendViewHolder
-                    holder.bind(templateList[position])
-                }
-                HomeItemType.VIDEOLIST.ordinal -> {
-                    holder as HomeVideoListViewHolder
                     holder.bind(templateList[position])
                 }
             }

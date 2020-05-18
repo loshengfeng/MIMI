@@ -4,15 +4,16 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.CategoriesItem
+import com.dabenxiang.mimi.model.api.vo.SecondCategoriesItem
 import com.dabenxiang.mimi.model.holder.CarouselHolderItem
-import com.dabenxiang.mimi.model.holder.VideoHolderItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeCategoriesAdapter
 import com.dabenxiang.mimi.view.adapter.HomeTabAdapter
+import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
@@ -46,14 +47,18 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
     }
 
     private val adapter by lazy {
-        HomeAdapter(context!!, adapterListener, true)
+        HomeAdapter(requireContext(), adapterListener, true)
+    }
+
+    private val videoListAdapter by lazy {
+        HomeVideoListAdapter(adapterListener, true)
     }
 
     private val adapterListener = object : HomeAdapter.EventListener {
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
             Timber.d("$item")
 
-            val bundle = CategoriesFragment.createBundle(item.id ?: "", item.title ?: "", true)
+            val bundle = CategoriesFragment.createBundle(item.title ?: "")
 
             navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_categoriesFragment, bundle))
         }
@@ -84,27 +89,32 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
 
         setupAdultUI()
 
-        activity?.also { activity ->
-            LinearLayoutManager(activity).also { layoutManager ->
-                layoutManager.orientation = LinearLayoutManager.HORIZONTAL
-                recyclerview_tab.layoutManager = layoutManager
-            }
-
-            recyclerview_tab.adapter = tabAdapter
-
-
-            LinearLayoutManager(activity).also { layoutManager ->
-                layoutManager.orientation = LinearLayoutManager.VERTICAL
-                recyclerview_content.layoutManager = layoutManager
-            }
-
-            recyclerview_content.adapter = adapter
+        LinearLayoutManager(activity).also { layoutManager ->
+            layoutManager.orientation = LinearLayoutManager.HORIZONTAL
+            recyclerview_tab.layoutManager = layoutManager
         }
+
+        recyclerview_tab.adapter = tabAdapter
+
+        LinearLayoutManager(activity).also { layoutManager ->
+            layoutManager.orientation = LinearLayoutManager.VERTICAL
+            recyclerview_content.layoutManager = layoutManager
+        }
+
+        recyclerview_content.adapter = adapter
+
+        GridLayoutManager(activity, 2).also { layoutManager ->
+            recyclerview_videos.layoutManager = layoutManager
+        }
+
+        recyclerview_videos.adapter = videoListAdapter
+
+        viewModel.videoList.observe(viewLifecycleOwner, Observer {
+            videoListAdapter.submitList(it)
+        })
     }
 
     private fun setupAdultUI() {
-        mainViewModel?.adultMode?.value = true
-
         layout_top.background = requireActivity().getDrawable(R.color.adult_color_status_bar)
 
         layout_search_bar.background = requireActivity().getDrawable(R.color.adult_color_background)
@@ -114,6 +124,7 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
         tv_search.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
 
         recyclerview_content.background = requireActivity().getDrawable(R.color.adult_color_background)
+        recyclerview_videos.background = requireActivity().getDrawable(R.color.adult_color_background)
 
         btn_filter.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
         btn_filter.setBtnSolidDolor(
@@ -123,24 +134,10 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
         )
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
+    private fun loadFirstTab(list: List<SecondCategoriesItem>?) {
+        recyclerview_videos.visibility = View.GONE
+        recyclerview_content.visibility = View.VISIBLE
 
-        mainViewModel?.adultMode?.value = false
-    }
-
-    //TODO: Testing
-    private fun loadSample() {
-        //loadFirstTab()
-
-        /*
-        repeat(10) { i ->
-            layout_top_tap.addTab(layout_top_tap.newTab().setText("第一層${i + 1}"))
-        }
-        */
-    }
-
-    private fun loadFirstTab(list: List<CategoriesItem>?) {
         val templateList = mutableListOf<HomeTemplate>()
 
         templateList.add(HomeTemplate.Banner(imgUrl = "https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
@@ -148,31 +145,12 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
 
         if (list != null) {
             for (item in list) {
-                templateList.add(HomeTemplate.Header(item.id, null, item.name))
-                templateList.add(HomeTemplate.Categories(item.id, item.name))
+                templateList.add(HomeTemplate.Header(null, item.name))
+                templateList.add(HomeTemplate.Categories(item.name))
             }
         }
 
         adapter.setDataSrc(templateList)
-    }
-
-    //TODO: Testing
-    private fun getTempVideoList(): List<VideoHolderItem> {
-        val list = mutableListOf<VideoHolderItem>()
-
-        repeat(12) {
-            list.add(
-                VideoHolderItem(
-                    title = "標題",
-                    resolution = "720P",
-                    info = "全30集",
-                    imgUrl = "https://i2.kknews.cc/SIG=1nkii03/470400035pnr3n5r3s7n.jpg",
-                    isAdult = true
-                )
-            )
-        }
-
-        return list
     }
 
     //TODO: Testing
@@ -186,12 +164,11 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
         return list
     }
 
-    private fun loadCategories() {
-        val templateList = mutableListOf<HomeTemplate>()
-        templateList.add(HomeTemplate.Banner(imgUrl = "https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
-        templateList.add(HomeTemplate.VideoList(getTempVideoList()))
+    private fun loadCategories(keyword: String?) {
+        recyclerview_videos.visibility = View.VISIBLE
+        recyclerview_content.visibility = View.GONE
 
-        adapter.setDataSrc(templateList)
+        viewModel.setupVideoList(true, keyword)
     }
 
     override fun setupObservers() {
@@ -221,12 +198,10 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
                 0 -> {
                     btn_filter.visibility = View.GONE
                     loadFirstTab(mainViewModel?.categoriesData?.value?.categories?.get(position)?.categories)
-                    //mainViewModel?.enableNightMode?.value = false
                 }
                 else -> {
                     btn_filter.visibility = View.VISIBLE
-                    loadCategories()
-                    //mainViewModel?.enableNightMode?.value = false
+                    loadCategories(mainViewModel?.categoriesData?.value?.categories?.get(position)?.name)
                 }
             }
         })
@@ -234,7 +209,7 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
 
     override fun setupListeners() {
         iv_bg_search.setOnClickListener {
-            val bundle = SearchVideoFragment.createBundle("", "", true)
+            val bundle = SearchVideoFragment.createBundle("")
             navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_searchVideoFragment, bundle))
         }
     }

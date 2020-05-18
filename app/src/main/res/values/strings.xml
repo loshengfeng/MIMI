@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">MiMi</string>
 
-    <!-- nav button-->
+    <!-- nav button -->
     <string name="nav_home">一般影视</string>
     <string name="nav_adult">成人影视</string>
     <string name="nav_topup">充值</string>
@@ -24,7 +24,7 @@
     <string name="desc_success">登录成功</string>
     <string name="forget_password">忘记密码</string>
 
-    <!-- Topup-->
+    <!-- Topup -->
     <string name="topup_desc">蜜币购买</string>
     <string name="topup_total">总计</string>
     <string name="topup_confirm_pay">确认支付</string>

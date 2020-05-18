@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.StatisticsItem
-import com.dabenxiang.mimi.model.holder.VideoHolderItem
+import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
@@ -134,7 +134,7 @@ class HomeCategoriesAdapter(private val nestedListener: HomeAdapter.EventListene
 
             data?.also { data ->
                 val item = data[realPosition]
-                VideoHolderItem(title = item.title, imgUrl = item.cover, resolution = "", info = "", isAdult = isAdult).also {
+                BaseVideoItem.Video(title = item.title, imgUrl = item.cover, resolution = "", info = "", isAdult = isAdult).also {
                     resetSuccess = true
                     holder.bind(it, realPosition)
                 }

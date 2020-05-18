@@ -3,11 +3,12 @@ package com.dabenxiang.mimi.view.home
 import android.view.View
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.holder.VideoHolderItem
+import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import kotlinx.android.synthetic.main.nested_item_home_categories.view.*
 
-class VideoViewHolder(itemView: View, onClickListener: IndexViewHolderListener) : BaseIndexViewHolder<VideoHolderItem>(itemView, onClickListener) {
+class VideoViewHolder(itemView: View, onClickListener: IndexViewHolderListener) :
+    BaseIndexViewHolder<BaseVideoItem.Video>(itemView, onClickListener) {
 
     private val card = itemView.layout_card!!
     private val tvResolution = itemView.tv_resolution!!
@@ -21,19 +22,39 @@ class VideoViewHolder(itemView: View, onClickListener: IndexViewHolderListener) 
         }
     }
 
-    override fun updated(model: VideoHolderItem?) {
+    override fun updated(model: BaseVideoItem.Video?) {
         if (model == null) {
-            tvResolution.text = ""
-            tvInfo.text = ""
-            tvTitle.text = ""
+            tvResolution.visibility = View.INVISIBLE
+            tvInfo.visibility = View.INVISIBLE
+            tvTitle.visibility = View.INVISIBLE
 
             Glide.with(itemView.context)
                 .load(R.drawable.bg_black_1)
                 .into(ivPoster)
         } else {
-            tvResolution.text = model.resolution
-            tvInfo.text = model.info
-            tvTitle.text = model.title
+            tvResolution.visibility =
+                if (model.resolution.isNullOrEmpty()) {
+                    View.INVISIBLE
+                } else {
+                    tvResolution.text = model.resolution
+                    View.VISIBLE
+                }
+
+            tvInfo.visibility =
+                if (model.info.isNullOrEmpty()) {
+                    View.INVISIBLE
+                } else {
+                    tvInfo.text = model.info
+                    View.VISIBLE
+                }
+
+            tvTitle.visibility =
+                if (model.title.isNullOrEmpty()) {
+                    View.INVISIBLE
+                } else {
+                    tvTitle.text = model.title
+                    View.VISIBLE
+                }
 
             if (model.isAdult) {
                 card.setCardBackgroundColor(itemView.resources.getColor(R.color.adult_color_card_background, null))
