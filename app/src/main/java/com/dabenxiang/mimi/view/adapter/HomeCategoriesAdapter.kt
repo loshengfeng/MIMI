@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.StatisticsItem
+import com.dabenxiang.mimi.model.api.vo.VideoSearchDetail
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
@@ -76,9 +76,9 @@ class HomeCategoriesAdapter(private val nestedListener: HomeAdapter.EventListene
         notifyDataSetChanged()
     }
 
-    private var data: List<StatisticsItem>? = null
+    private var data: List<VideoSearchDetail>? = null
 
-    fun notifyUpdated(updated: List<StatisticsItem>?) {
+    fun notifyUpdated(updated: List<VideoSearchDetail>?) {
         data = updated
 
         /*

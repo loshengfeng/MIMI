@@ -55,9 +55,7 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
 
     private val adapterListener = object : HomeAdapter.EventListener {
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
-            Timber.d("$item")
-
-            val bundle = CategoriesFragment.createBundle(item.title ?: "")
+            val bundle = CategoriesFragment.createBundle(item.title ?: "", item.categories)
 
             navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_categoriesFragment, bundle))
         }
@@ -75,16 +73,8 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        Timber.d("onCreate Home")
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        Timber.d("onViewCreated Home")
 
         LinearLayoutManager(activity).also { layoutManager ->
             layoutManager.orientation = LinearLayoutManager.HORIZONTAL
@@ -111,7 +101,7 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
         })
     }
 
-    private fun loadFirstTab(list: List<SecondCategoriesItem>?) {
+    private fun loadFirstTab(root: SecondCategoriesItem?) {
         recyclerview_videos.visibility = View.GONE
         recyclerview_content.visibility = View.VISIBLE
 
@@ -120,10 +110,11 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
         templateList.add(HomeTemplate.Banner(imgUrl = "https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
         templateList.add(HomeTemplate.Carousel(getTempCarouselList()))
 
-        if (list != null) {
-            for (item in list) {
-                templateList.add(HomeTemplate.Header(null, item.name))
-                templateList.add(HomeTemplate.Categories(item.name))
+        if (root?.categories != null) {
+            for (item in root.categories) {
+                val combineCategories = "${root.name},${item.name}"
+                templateList.add(HomeTemplate.Header(null, item.name, combineCategories))
+                templateList.add(HomeTemplate.Categories(item.name, combineCategories, false))
             }
         }
 
@@ -145,7 +136,7 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
         recyclerview_videos.visibility = View.VISIBLE
         recyclerview_content.visibility = View.GONE
 
-        viewModel.setupVideoList(false, keyword)
+        viewModel.setupVideoList(keyword, false)
     }
 
     override fun setupObservers() {
@@ -160,8 +151,7 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
                     }
 
                     tabAdapter.setTabList(list, lastPosition)
-
-                    loadFirstTab(level1[0].categories)
+                    loadFirstTab(level1[0])
                 }
             })
         }
@@ -174,7 +164,7 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
             when (position) {
                 0 -> {
                     btn_filter.visibility = View.GONE
-                    loadFirstTab(mainViewModel?.categoriesData?.value?.categories?.get(position)?.categories)
+                    loadFirstTab(mainViewModel?.categoriesData?.value?.categories?.get(position))
                 }
                 else -> {
                     btn_filter.visibility = View.VISIBLE

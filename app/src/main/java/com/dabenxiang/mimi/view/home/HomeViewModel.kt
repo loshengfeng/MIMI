@@ -30,6 +30,9 @@ class HomeViewModel : BaseViewModel() {
     private val _tabLayoutPosition = MutableLiveData<Int>()
     val tabLayoutPosition: LiveData<Int> = _tabLayoutPosition
 
+    private var _selectedCategoryTitle = ""
+    val selectedCategoryTitle = _selectedCategoryTitle
+
     fun setTopTabPosition(position: Int) {
         if (position != tabLayoutPosition.value) {
             _tabLayoutPosition.value = position
@@ -40,7 +43,7 @@ class HomeViewModel : BaseViewModel() {
         viewModelScope.launch {
             adapter.activeTask {
                 flow {
-                    val resp = apiRepository.statisticsHomeVideos(StatisticsType.Newest, src.title ?: "", 0, 30)
+                    val resp = apiRepository.searchHomeVideos(src.categories, null, null, null, src.isAdult, "0", "30")
                     if (!resp.isSuccessful) throw HttpException(resp)
 
                     emit(ApiResult.success(resp.body()))
@@ -53,7 +56,7 @@ class HomeViewModel : BaseViewModel() {
                         when (resp) {
                             is ApiResult.Success -> {
                                 //Timber.d(resp.result.toString())
-                                adapter.notifyUpdated(resp.result.content)
+                                adapter.notifyUpdated(resp.result.content?.videos)
                             }
                             is ApiResult.Error -> Timber.e(resp.throwable)
                             //is ApiResult.Loading -> setShowProgress(true)
@@ -67,7 +70,7 @@ class HomeViewModel : BaseViewModel() {
     private val _videoList = MutableLiveData<PagedList<BaseVideoItem>>()
     val videoList: LiveData<PagedList<BaseVideoItem>> = _videoList
 
-    fun setupVideoList(isAdult: Boolean, category: String?) {
+    fun setupVideoList(category: String?, isAdult: Boolean) {
         viewModelScope.launch {
             val dataSrc = VideoListDataSource(isAdult, category ?: "", viewModelScope, apiRepository, pagingCallback)
             val factory = VideoListFactory(dataSrc)
@@ -83,13 +86,14 @@ class HomeViewModel : BaseViewModel() {
 
     val pagingCallback = object : PagingCallback {
         override fun onLoading() {
+            setShowProgress(true)
         }
 
         override fun onLoaded() {
+            setShowProgress(false)
         }
 
         override fun onThrowable(throwable: Throwable) {
         }
-
     }
 }
