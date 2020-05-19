@@ -103,7 +103,7 @@ class VideoListDataSource(
     private fun List<VideoSearchDetail>.parser(): List<BaseVideoItem> {
         val result = mutableListOf<BaseVideoItem>()
         forEach { item ->
-            val holderItem = BaseVideoItem.Video(title = item.title, imgUrl = item.cover, isAdult = isAdult, resolution = "", info = "")
+            val holderItem = BaseVideoItem.Video(id = item.id, title = item.title, imgUrl = item.cover, isAdult = isAdult, resolution = "", info = "")
             result.add(holderItem)
         }
 

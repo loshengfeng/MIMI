@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.VideoSearchDetail
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
@@ -59,26 +58,15 @@ class HomeCategoriesAdapter(private val nestedListener: HomeAdapter.EventListene
         }
     }
 
-    // TODO: 不確定
-    /*
-    private var data: List<VideoSearchItem>? = null
-
-    fun notifyUpdated(updated: List<VideoSearchItem>?) {
-        data = updated
-
-        notifyDataSetChanged()
-    }
-    */
-
     private fun reset() {
         data = null
 
         notifyDataSetChanged()
     }
 
-    private var data: List<VideoSearchDetail>? = null
+    private var data: List<BaseVideoItem.Video>? = null
 
-    fun notifyUpdated(updated: List<VideoSearchDetail>?) {
+    fun notifyUpdated(updated: List<BaseVideoItem.Video>?) {
         data = updated
 
         /*
@@ -134,10 +122,8 @@ class HomeCategoriesAdapter(private val nestedListener: HomeAdapter.EventListene
 
             data?.also { data ->
                 val item = data[realPosition]
-                BaseVideoItem.Video(title = item.title, imgUrl = item.cover, resolution = "", info = "", isAdult = isAdult).also {
-                    resetSuccess = true
-                    holder.bind(it, realPosition)
-                }
+                holder.bind(item, realPosition)
+                resetSuccess = true
             }
 
             if (!resetSuccess) {

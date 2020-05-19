@@ -33,6 +33,7 @@ class PlayerActivity : BaseActivity() {
         private const val SWIPE_SOUND_LEAST = 100
 
         fun createBundle(data: PlayerData): Bundle {
+            Timber.d("IsAdult: ${data.isAdult}, VideoId: ${data.videoId}")
             return Bundle().also {
                 it.putSerializable(KEY_PLAYER_SRC, data)
             }
@@ -52,7 +53,7 @@ class PlayerActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerData)?.also { data ->
+        (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerData?)?.also { data ->
             layout_others.setBackgroundColor(
                 if (data.isAdult) {
                     getColor(R.color.adult_color_background)

@@ -1,6 +1,6 @@
 package com.dabenxiang.mimi.model.serializable
 
-import com.dabenxiang.mimi.model.api.vo.StatisticsItem
+import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import java.io.Serializable
 
 class PlayerData : Serializable {
@@ -8,7 +8,7 @@ class PlayerData : Serializable {
     companion object {
         fun parser(item: Any): PlayerData {
             return when (item) {
-                is StatisticsItem -> PlayerData().also {
+                is BaseVideoItem.Video -> PlayerData().also {
                     it.videoId = item.id ?: 0L
                 }
                 else -> PlayerData()

@@ -40,7 +40,8 @@ class CategoriesFragment : BaseFragment<CategoriesViewModel>() {
     private val viewModel by viewModel<CategoriesViewModel>()
 
     private val videoListAdapter by lazy {
-        HomeVideoListAdapter(adapterListener, true)
+        val isAdult = mainViewModel?.adultMode?.value ?: false
+        HomeVideoListAdapter(adapterListener, isAdult)
     }
 
     private val adapterListener = object : HomeAdapter.EventListener {
@@ -48,8 +49,6 @@ class CategoriesFragment : BaseFragment<CategoriesViewModel>() {
         }
 
         override fun onVideoClick(view: View, item: PlayerData) {
-            Timber.d("$item")
-
             val intent = Intent(activity!!, PlayerActivity::class.java)
             intent.putExtras(PlayerActivity.createBundle(item))
             startActivity(intent)
@@ -57,22 +56,6 @@ class CategoriesFragment : BaseFragment<CategoriesViewModel>() {
 
         override fun onLoadAdapter(adapter: HomeCategoriesAdapter, src: HomeTemplate.Categories) {
 
-        }
-    }
-
-    private val adapterFilter = object : FilterTabAdapter.FilterTabAdapterListener {
-        override fun onSelectedFilterTab(recyclerView: RecyclerView, position: Int) {
-            when (recyclerView) {
-                filter_0 -> {
-                    viewModel.updatedFilterPosition(0, position)
-                }
-                filter_1 -> {
-                    viewModel.updatedFilterPosition(1, position)
-                }
-                filter_2 -> {
-                    viewModel.updatedFilterPosition(2, position)
-                }
-            }
         }
     }
 
@@ -198,7 +181,11 @@ class CategoriesFragment : BaseFragment<CategoriesViewModel>() {
                     years.add("${2020 - y}")
                 }
 
-                val adapter = FilterTabAdapter(adapterFilter, isAdult)
+                val adapter = FilterTabAdapter(object : FilterTabAdapter.FilterTabAdapterListener {
+                    override fun onSelectedFilterTab(recyclerView: RecyclerView, position: Int) {
+                        viewModel.updatedFilterPosition(i, position)
+                    }
+                }, isAdult)
                 adapter.setTabList(years, 0)
 
                 filterViewList[i].adapter = adapter

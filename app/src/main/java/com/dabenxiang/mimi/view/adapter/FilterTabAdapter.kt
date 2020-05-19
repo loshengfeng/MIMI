@@ -12,7 +12,7 @@ class FilterTabAdapter(private val listener: FilterTabAdapterListener, private v
     RecyclerView.Adapter<FilterTabHolder>() {
 
     interface FilterTabAdapterListener {
-        fun onSelectedFilterTab(recyclerView: RecyclerView, index: Int)
+        fun onSelectedFilterTab(recyclerView: RecyclerView, position: Int)
     }
 
     private var tabList: List<String>? = null

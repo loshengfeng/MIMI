@@ -19,7 +19,6 @@ import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import timber.log.Timber
 
 class HomeFragment : BaseFragment<HomeViewModel>() {
 
@@ -59,8 +58,6 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
         }
 
         override fun onVideoClick(view: View, item: PlayerData) {
-            Timber.d("$item")
-
             val intent = Intent(activity!!, PlayerActivity::class.java)
             intent.putExtras(PlayerActivity.createBundle(item))
             startActivity(intent)

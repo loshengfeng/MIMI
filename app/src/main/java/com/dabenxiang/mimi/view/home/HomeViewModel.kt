@@ -8,8 +8,8 @@ import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.enums.StatisticsType
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
+import com.dabenxiang.mimi.model.holder.parser
 import com.dabenxiang.mimi.view.adapter.HomeCategoriesAdapter
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +22,7 @@ import timber.log.Timber
 class HomeViewModel : BaseViewModel() {
 
     companion object {
-        const val CATEGORIES_LIMIT = 30
+        const val CATEGORIES_LIMIT = "30"
     }
 
     private val apiRepository: ApiRepository by inject()
@@ -43,7 +43,7 @@ class HomeViewModel : BaseViewModel() {
         viewModelScope.launch {
             adapter.activeTask {
                 flow {
-                    val resp = apiRepository.searchHomeVideos(src.categories, null, null, null, src.isAdult, "0", "30")
+                    val resp = apiRepository.searchHomeVideos(src.categories, null, null, null, src.isAdult, "0", CATEGORIES_LIMIT)
                     if (!resp.isSuccessful) throw HttpException(resp)
 
                     emit(ApiResult.success(resp.body()))
@@ -56,7 +56,7 @@ class HomeViewModel : BaseViewModel() {
                         when (resp) {
                             is ApiResult.Success -> {
                                 //Timber.d(resp.result.toString())
-                                adapter.notifyUpdated(resp.result.content?.videos)
+                                adapter.notifyUpdated(resp.result.content?.videos?.parser(src.isAdult))
                             }
                             is ApiResult.Error -> Timber.e(resp.throwable)
                             //is ApiResult.Loading -> setShowProgress(true)

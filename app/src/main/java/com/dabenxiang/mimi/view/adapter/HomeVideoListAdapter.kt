@@ -48,7 +48,7 @@ class HomeVideoListAdapter(private val nestedListener: HomeAdapter.EventListener
         }
     }
 
-    var showLeft = false
+    private var showLeft = false
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
@@ -81,7 +81,6 @@ class HomeVideoListAdapter(private val nestedListener: HomeAdapter.EventListener
         }
     }
 
-
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         getItem(position)?.also {
             when (it) {
@@ -100,8 +99,8 @@ class HomeVideoListAdapter(private val nestedListener: HomeAdapter.EventListener
 
         (recyclerView.layoutManager as GridLayoutManager).spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return when (position) {
-                    0 -> 2
+                return when (getItemViewType(position)) {
+                    BANNER -> 2
                     else -> 1
                 }
             }
