@@ -20,6 +20,20 @@ class CategoriesViewModel : BaseViewModel() {
     private val _videoList = MutableLiveData<PagedList<BaseVideoItem>>()
     val videoList: LiveData<PagedList<BaseVideoItem>> = _videoList
 
+    private val filterPositionDataList by lazy {
+        val map = mutableMapOf<Int, MutableLiveData<Int>>()
+        repeat(3) {
+            map[it] = MutableLiveData(0)
+        }
+        return@lazy map
+    }
+
+    fun filterPositionData(index: Int): LiveData<Int>? = filterPositionDataList[index]
+
+    fun updatedFilterPosition(index: Int, position: Int) {
+        filterPositionDataList[index]?.value = position
+    }
+
     fun setupVideoList(category: String?, isAdult: Boolean) {
         viewModelScope.launch {
             val dataSrc = VideoListDataSource(isAdult, category ?: "", viewModelScope, apiRepository, pagingCallback)

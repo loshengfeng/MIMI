@@ -1,0 +1,37 @@
+package com.dabenxiang.mimi.view.home
+
+import android.view.View
+import android.widget.TextView
+import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
+import kotlinx.android.synthetic.main.item_filter.view.*
+
+class FilterTabHolder(itemView: View, listener: IndexViewHolderListener, var isAdult: Boolean) : BaseIndexViewHolder<String>(itemView, listener) {
+
+    private val tvTitle: TextView = itemView.tv_title
+
+    init {
+        itemView.setOnClickListener {
+            listener.onClickItemIndex(it, index)
+        }
+    }
+
+    override fun updated(model: String?) {
+        tvTitle.text = model
+    }
+
+    fun setSelected(isSelected: Boolean) {
+        when {
+            isSelected -> R.color.color_white_1
+            isAdult -> R.color.adult_color_text
+            else -> R.color.normal_color_text
+        }.also {
+            tvTitle.setTextColor(itemView.resources.getColor(it, null))
+        }
+
+        when {
+            isSelected -> tvTitle.setBackgroundResource(R.drawable.bg_red_1_radius_6)
+            else -> tvTitle.background = null
+        }
+    }
+}

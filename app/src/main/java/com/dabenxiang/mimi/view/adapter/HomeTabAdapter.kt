@@ -39,7 +39,6 @@ class HomeTabAdapter(private val listener: BaseIndexViewHolder.IndexViewHolderLi
         return HomeTabHolder(view, listener, isAdult)
     }
 
-
     override fun onBindViewHolder(holder: HomeTabHolder, position: Int) {
         holder.bind(tabList?.get(position) ?: "", position)
         holder.setSelected(lastSelected == position)

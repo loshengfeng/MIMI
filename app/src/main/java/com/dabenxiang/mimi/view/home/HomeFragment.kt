@@ -4,8 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.SecondCategoriesItem
 import com.dabenxiang.mimi.model.holder.CarouselHolderItem
@@ -76,23 +74,9 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        LinearLayoutManager(activity).also { layoutManager ->
-            layoutManager.orientation = LinearLayoutManager.HORIZONTAL
-            recyclerview_tab.layoutManager = layoutManager
-        }
-
         recyclerview_tab.adapter = tabAdapter
 
-        LinearLayoutManager(activity).also { layoutManager ->
-            layoutManager.orientation = LinearLayoutManager.VERTICAL
-            recyclerview_content.layoutManager = layoutManager
-        }
-
         recyclerview_content.adapter = adapter
-
-        GridLayoutManager(activity, 2).also { layoutManager ->
-            recyclerview_videos.layoutManager = layoutManager
-        }
 
         recyclerview_videos.adapter = videoListAdapter
 
