@@ -72,6 +72,12 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        view.isFocusableInTouchMode = true
+        view.setOnKeyListener { _, _, _ ->
+            backToDesktop()
+            return@setOnKeyListener true
+        }
+
         setupAdultUI()
 
         recyclerview_tab.adapter = tabAdapter

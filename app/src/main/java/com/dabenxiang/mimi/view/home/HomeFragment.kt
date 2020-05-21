@@ -71,6 +71,12 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        view.isFocusableInTouchMode = true
+        view.setOnKeyListener { _, _, _ ->
+            backToDesktop()
+            return@setOnKeyListener true
+        }
+
         recyclerview_tab.adapter = tabAdapter
 
         recyclerview_content.adapter = adapter

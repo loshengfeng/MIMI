@@ -138,4 +138,16 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
             newTask.await()
         }
     }
+
+    fun backToDesktop() {
+        activity?.moveTaskToBack(true)
+
+        /*
+        startActivity(
+            Intent(Intent.ACTION_MAIN).also {
+                it.addCategory(Intent.CATEGORY_DEFAULT)
+                it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            })
+        */
+    }
 }
