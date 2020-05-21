@@ -23,6 +23,8 @@
     <string name="desc_mail">已传送新密码至您的邮箱%s请至邮箱确认</string>
     <string name="desc_success">登录成功</string>
     <string name="forget_password">忘记密码</string>
+    <string name="login_yet">尚未登录</string>
+    <string name="login_message">请立即登录享受线上强档</string>
 
     <!-- Topup -->
     <string name="topup_desc">蜜币购买</string>

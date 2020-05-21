@@ -72,14 +72,14 @@ class LoginDialogFragment : BaseDialogFragment() {
         when(type) {
             TYPE_VALIDATION -> {
                 Timber.d("${LoginDialogFragment::class.java.simpleName}_TYPE_VALIDATION")
-                ivTitle.setBackgroundResource(R.drawable.img_verification_mail)
+                ivTitle.setBackgroundResource(R.drawable.ic_verification_mail)
                 tv_title.text = getString(R.string.receive_mail)
                 ivIcon.setBackgroundResource(R.drawable.ico_email)
                 tv_desc.text = getString(R.string.desc_register)
             }
             TYPE_RESET -> {
                 Timber.d("${LoginDialogFragment::class.java.simpleName}_TYPE_RESET")
-                ivTitle.setBackgroundResource(R.drawable.img_verification_mail)
+                ivTitle.setBackgroundResource(R.drawable.ic_verification_mail)
                 tv_title.text = getString(R.string.receive_mail)
                 ivIcon.setBackgroundResource(R.drawable.ico_email)
                 tv_desc.text = getString(R.string.desc_mail, "xxx@silkrode.com.tw")

@@ -45,7 +45,7 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
     private fun setDefaultStyleable(context: Context, attrs: AttributeSet) {
         mSelected_color = Color.BLACK
         mDefault_color = Color.parseColor("#ffcdcdcd")
-        mRadius = 20f
+        mRadius = 12f
         mRadiusSelected = mRadius
         mLength = 2 * mRadius
         mDistance = 3 * mRadius

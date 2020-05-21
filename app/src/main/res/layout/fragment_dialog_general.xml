@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/color_white_1"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingStart="20dp"
-    android:paddingEnd="20dp">
+    android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
@@ -20,74 +20,91 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/ivTitle"
+            android:id="@+id/iv_title"
             android:layout_width="26dp"
             android:layout_height="26dp"
-            android:src="@drawable/ic_verification_mail"
-            app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintEnd_toStartOf="@id/tv_title"
+            app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/ic_verification_mail" />
 
         <TextView
             android:id="@+id/tv_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/receive_mail"
-            android:textColor="@color/color_black_1"
             android:layout_marginStart="12dp"
+            android:textColor="@color/color_black_1"
             android:textSize="20sp"
-            app:layout_constraintStart_toEndOf="@id/ivTitle"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toEndOf="@id/iv_title"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@string/receive_mail" />
 
         <ImageView
-            android:id="@+id/ivIcon"
+            android:id="@+id/iv_message"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_marginTop="25dp"
-            android:src="@drawable/ico_email"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_title" />
+            app:layout_constraintTop_toBottomOf="@id/tv_title"
+            tools:src="@drawable/ico_email" />
 
         <TextView
-            android:id="@+id/tv_desc"
+            android:id="@+id/tv_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingStart="44dp"
             android:layout_marginTop="16dp"
+            android:paddingStart="44dp"
             android:paddingEnd="44dp"
-            android:text="@string/desc_register"
             android:textColor="@color/color_black_1"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ivIcon" />
+            app:layout_constraintTop_toBottomOf="@id/iv_message"
+            tools:text="@string/desc_register" />
 
         <View
-            android:id="@+id/viewLine"
+            android:id="@+id/line"
             android:layout_width="0dp"
             android:layout_height="1dp"
             android:layout_marginTop="62dp"
             android:background="@color/color_black_1_05"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_desc" />
+            app:layout_constraintTop_toBottomOf="@id/tv_message" />
 
         <Button
-            android:id="@+id/btnConfirm"
-            android:layout_width="76dp"
+            android:id="@+id/btn_first"
+            android:layout_width="wrap_content"
+            android:layout_height="33dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bg_white_stroke_1_radius_6"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+            android:textColor="@color/color_black_1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btn_second"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/line"
+            tools:text="@string/btn_cancel" />
+
+        <Button
+            android:id="@+id/btn_second"
+            android:layout_width="wrap_content"
             android:layout_height="33dp"
             android:layout_marginStart="15dp"
-            android:layout_marginTop="20dp"
             android:background="@drawable/bg_red_1_radius_6"
-            android:text="@string/btn_confirm"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
             android:textColor="@color/color_white_1"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/viewLine" />
+            app:layout_constraintStart_toEndOf="@id/btn_first"
+            app:layout_constraintTop_toTopOf="@id/btn_first"
+            tools:text="@string/btn_confirm" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

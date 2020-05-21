@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseActivity
-import com.dabenxiang.mimi.widget.utility.setupWithNavController
+import com.dabenxiang.mimi.extension.setupWithNavController
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

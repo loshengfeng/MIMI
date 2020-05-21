@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.home
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.activity.addCallback
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.SecondCategoriesItem
@@ -17,7 +18,7 @@ import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
-import com.dabenxiang.mimi.widget.view.setBtnSolidDolor
+import com.dabenxiang.mimi.extension.setBtnSolidDolor
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -72,10 +73,8 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.isFocusableInTouchMode = true
-        view.setOnKeyListener { _, _, _ ->
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             backToDesktop()
-            return@setOnKeyListener true
         }
 
         setupAdultUI()

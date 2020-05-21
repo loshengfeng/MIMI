@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.widget.view
+package com.dabenxiang.mimi.extension
 
 import com.yulichswift.roundedview.tool.RoundedDrawable
 import com.yulichswift.roundedview.widget.RoundedTextView

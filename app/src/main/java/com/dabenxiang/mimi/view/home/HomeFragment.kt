@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.home
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.activity.addCallback
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.SecondCategoriesItem
@@ -71,10 +72,8 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.isFocusableInTouchMode = true
-        view.setOnKeyListener { _, _, _ ->
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             backToDesktop()
-            return@setOnKeyListener true
         }
 
         recyclerview_tab.adapter = tabAdapter
@@ -165,6 +164,24 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
         iv_bg_search.setOnClickListener {
             val bundle = SearchVideoFragment.createBundle("")
             navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_searchVideoFragment, bundle))
+
+            /*
+            val data = GeneralDialogData(
+                titleRes = R.string.login_yet,
+                messageIcon = R.drawable.ico_default_photo,
+                message = getString(R.string.login_message),
+                firstBtn = getString(R.string.btn_register),
+                secondBtn = getString(R.string.btn_register),
+                firstBlock = {
+                    val bundle = SearchVideoFragment.createBundle("")
+                    navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_searchVideoFragment, bundle))
+                },
+                secondBlock = {
+                    val bundle = SearchVideoFragment.createBundle("")
+                    navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_searchVideoFragment, bundle))
+                })
+            GeneralDialog.newInstance(data).show(parentFragmentManager, "dialog")
+            */
         }
     }
 }
