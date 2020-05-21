@@ -27,6 +27,8 @@ class ForgetPasswordFragment : BaseFragment<ForgetPasswordViewModel>() {
         return viewModel
     }
 
+    override val bottomNavigationVisibility = View.GONE
+
     override fun setupObservers() {
         Timber.d("${ForgetPasswordFragment::class.java.simpleName}_setupObservers")
         viewModel.accountError.observe(viewLifecycleOwner, Observer {

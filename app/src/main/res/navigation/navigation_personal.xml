@@ -5,6 +5,8 @@
     android:id="@+id/navigation_personal"
     app:startDestination="@id/personalFragment">
 
+    <include app:graph="@navigation/navigation_login" />
+
     <fragment
         android:id="@+id/personalFragment"
         android:name="com.dabenxiang.mimi.view.personal.PersonalFragment"
@@ -12,7 +14,7 @@
 
         <action
             android:id="@+id/action_personalFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
+            app:destination="@id/navigation_login" />
 
         <action
             android:id="@+id/action_personalFragment_to_chatHistoryFragment"
@@ -26,31 +28,6 @@
         <action
             android:id="@+id/action_personalFragment_to_topupHistoryFragment"
             app:destination="@id/topupHistoryFragmentFragment" />
-
-    </fragment>
-
-    <fragment
-        android:id="@+id/loginFragment"
-        android:name="com.dabenxiang.mimi.view.login.LoginFragment"
-        android:label="LoginFragment"
-        tools:layout="@layout/fragment_login">
-
-        <action
-            android:id="@+id/action_loginFragment_to_homeFragment"
-            app:destination="@id/homeFragment"
-            app:popUpTo="@id/topupFragment"
-            app:popUpToInclusive="true" />
-
-        <action
-            android:id="@+id/action_loginFragment_to_forgetPasswordFragment"
-            app:destination="@id/forgetPasswordFragment" />
-
-    </fragment>
-
-    <fragment
-        android:id="@+id/forgetPasswordFragment"
-        android:name="com.dabenxiang.mimi.view.forgetpassword.ForgetPasswordFragment"
-        tools:layout="@layout/fragment_forget_password">
 
     </fragment>
 

@@ -5,6 +5,8 @@
     android:id="@+id/navigation_home"
     app:startDestination="@id/homeFragment">
 
+    <include app:graph="@navigation/navigation_login" />
+
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.dabenxiang.mimi.view.home.HomeFragment"
@@ -17,6 +19,10 @@
         <action
             android:id="@+id/action_homeFragment_to_searchVideoFragment"
             app:destination="@id/searchVideoFragment" />
+
+        <action
+            android:id="@+id/action_homeFragment_to_loginFragment"
+            app:destination="@id/navigation_login"/>
 
     </fragment>
 

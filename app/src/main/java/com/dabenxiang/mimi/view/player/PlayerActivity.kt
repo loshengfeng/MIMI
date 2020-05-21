@@ -27,6 +27,7 @@ import kotlin.math.round
 class PlayerActivity : BaseActivity() {
 
     companion object {
+        const val REQUEST_CODE = 111
         private const val KEY_PLAYER_SRC = "KEY_PLAYER_SRC"
         private const val JUMP_TIME = 1000
         private const val SWIPE_DISTANCE_UNIT = 25

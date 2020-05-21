@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.fragment.app.FragmentManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import kotlinx.android.synthetic.main.fragment_dialog_general.*
@@ -17,8 +18,13 @@ class GeneralDialogData(
     var firstBtn: String,
     var firstBlock: (() -> Unit)? = null,
     var secondBtn: String,
-    var secondBlock: (() -> Unit)? = null
+    var secondBlock: (() -> Unit)? = null,
+    var dismissBlock: (() -> Unit)? = null
 ) : Serializable
+
+fun GeneralDialog.show(manager: FragmentManager) {
+    this.show(manager, "Dialog")
+}
 
 class GeneralDialog : BaseDialogFragment() {
 
@@ -60,6 +66,14 @@ class GeneralDialog : BaseDialogFragment() {
                     btn_second.setOnClickListener(btnOnClickListener)
                     View.VISIBLE
                 }
+
+            btn_close.visibility =
+                if (data.dismissBlock == null) {
+                    View.GONE
+                } else {
+                    btn_close.setOnClickListener(btnOnClickListener)
+                    View.VISIBLE
+                }
         }
     }
 
@@ -71,15 +85,20 @@ class GeneralDialog : BaseDialogFragment() {
                 if (data?.firstBlock != null) {
                     data.firstBlock!!()
                 }
-                dismiss()
             }
             btn_second -> {
                 if (data?.secondBlock != null) {
                     data.secondBlock!!()
                 }
-                dismiss()
+            }
+            btn_close -> {
+                if (data?.dismissBlock != null) {
+                    data.dismissBlock!!()
+                }
             }
         }
+
+        dismiss()
     }
 
     override fun isFullLayout(): Boolean {

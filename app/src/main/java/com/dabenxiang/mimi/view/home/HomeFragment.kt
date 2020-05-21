@@ -16,8 +16,11 @@ import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.dialog.GeneralDialog
+import com.dabenxiang.mimi.view.dialog.GeneralDialogData
+import com.dabenxiang.mimi.view.dialog.show
+import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
-import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -61,7 +64,7 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
         override fun onVideoClick(view: View, item: PlayerData) {
             val intent = Intent(activity!!, PlayerActivity::class.java)
             intent.putExtras(PlayerActivity.createBundle(item))
-            startActivity(intent)
+            startActivityForResult(intent, PlayerActivity.REQUEST_CODE)
         }
 
         override fun onLoadAdapter(adapter: HomeCategoriesAdapter, src: HomeTemplate.Categories) {
@@ -162,26 +165,34 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
 
     override fun setupListeners() {
         iv_bg_search.setOnClickListener {
-            val bundle = SearchVideoFragment.createBundle("")
-            navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_searchVideoFragment, bundle))
+            //val bundle = SearchVideoFragment.createBundle("")
+            //navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_searchVideoFragment, bundle))
 
-            /*
+            // TODO: Testing
+            val registerBlock = {
+                val bundle = LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_loginFragment, bundle))
+            }
+
+            val loginBlock = {
+                val bundle = LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_loginFragment, bundle))
+            }
+
             val data = GeneralDialogData(
                 titleRes = R.string.login_yet,
                 messageIcon = R.drawable.ico_default_photo,
                 message = getString(R.string.login_message),
                 firstBtn = getString(R.string.btn_register),
-                secondBtn = getString(R.string.btn_register),
-                firstBlock = {
-                    val bundle = SearchVideoFragment.createBundle("")
-                    navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_searchVideoFragment, bundle))
-                },
-                secondBlock = {
-                    val bundle = SearchVideoFragment.createBundle("")
-                    navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_searchVideoFragment, bundle))
-                })
-            GeneralDialog.newInstance(data).show(parentFragmentManager, "dialog")
-            */
+                firstBlock = registerBlock,
+                secondBtn = getString(R.string.btn_login),
+                secondBlock = loginBlock,
+                dismissBlock = {
+                    navigateTo(NavigateItem.Up)
+                }
+            )
+
+            GeneralDialog.newInstance(data).show(parentFragmentManager)
         }
     }
 }
