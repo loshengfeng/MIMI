@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.player
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.hardware.SensorManager
 import android.os.Bundle
@@ -11,6 +12,11 @@ import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.base.BaseActivity
+import com.dabenxiang.mimi.view.dialog.GeneralDialog
+import com.dabenxiang.mimi.view.dialog.GeneralDialogData
+import com.dabenxiang.mimi.view.dialog.show
+import com.dabenxiang.mimi.view.login.LoginActivity
+import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.widget.utility.OrientationDetector
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.analytics.AnalyticsListener
@@ -53,6 +59,8 @@ class PlayerActivity : BaseActivity() {
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        //setResult(999, Intent("12345678"))
 
         (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerData?)?.also { data ->
             layout_others.setBackgroundColor(
@@ -140,6 +148,8 @@ class PlayerActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        openLoginDialog()
 
         hideSystemUi()
 
@@ -437,5 +447,36 @@ class PlayerActivity : BaseActivity() {
         ) {
             Timber.d("AnalyticsListener onAudioUnderrun")
         }
+    }
+
+    private fun openLoginDialog() {
+        val registerBlock = {
+            val intent = Intent(this, LoginActivity::class.java)
+            intent.putExtras(LoginFragment.createBundle(LoginFragment.TYPE_REGISTER))
+            startActivity(intent)
+        }
+
+        val loginBlock = {
+            val intent = Intent(this, LoginActivity::class.java)
+            intent.putExtras(LoginFragment.createBundle(LoginFragment.TYPE_LOGIN))
+            startActivity(intent)
+        }
+
+        val data = GeneralDialogData(
+            titleRes = R.string.login_yet,
+            messageIcon = R.drawable.ico_default_photo,
+            message = getString(R.string.login_message),
+            firstBtn = getString(R.string.btn_register),
+            firstBlock = registerBlock,
+            secondBtn = getString(R.string.btn_login),
+            secondBlock = loginBlock,
+            dismissBlock = { finish() }
+        )
+
+        GeneralDialog.newInstance(data).apply {
+            isCancelable = false
+            show(supportFragmentManager)
+        }
+
     }
 }

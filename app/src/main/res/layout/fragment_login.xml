@@ -4,15 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Button
+    <ImageView
         android:id="@+id/btnClose"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/btn_close_n"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/btn_close_n"
+        android:padding="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tl_type"
@@ -27,8 +28,8 @@
         app:tabIndicatorFullWidth="true"
         app:tabIndicatorHeight="4dp"
         app:tabMode="fixed"
-        app:tabTextAppearance="@style/login_tab_item_text"
         app:tabSelectedTextColor="@color/color_black_1"
+        app:tabTextAppearance="@style/login_tab_item_text"
         app:tabTextColor="@color/color_black_1_50">
 
         <com.google.android.material.tabs.TabItem

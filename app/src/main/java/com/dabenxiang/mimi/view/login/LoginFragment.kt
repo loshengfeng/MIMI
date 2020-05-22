@@ -5,6 +5,7 @@ import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -15,8 +16,6 @@ import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.item_login.*
 import kotlinx.android.synthetic.main.item_register.*
-import kotlinx.android.synthetic.main.item_register.edit_email
-import kotlinx.android.synthetic.main.item_register.tv_email_error
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class LoginFragment : BaseFragment<LoginViewModel>() {
@@ -229,5 +228,27 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
         viewModel.loginPw.bindingEditText = edit_login_pw
 
         tl_type.selectTab(this.arguments?.getInt(KEY_TYPE, TYPE_REGISTER)?.let { tl_type.getTabAt(it) })
+    }
+
+    override fun navigateTo(item: NavigateItem) {
+        findNavController().also { navController ->
+            when (item) {
+                NavigateItem.Up -> {
+                    when (navController.navigateUp()) {
+                        false -> when (val activity = requireActivity()) {
+                            is LoginActivity -> activity.finish()
+                        }
+                    }
+                }
+                is NavigateItem.PopBackStack -> navController.popBackStack(item.fragmentId, item.inclusive)
+                is NavigateItem.Destination -> {
+                    if (item.bundle == null) {
+                        navController.navigate(item.action)
+                    } else {
+                        navController.navigate(item.action, item.bundle)
+                    }
+                }
+            }
+        }
     }
 }

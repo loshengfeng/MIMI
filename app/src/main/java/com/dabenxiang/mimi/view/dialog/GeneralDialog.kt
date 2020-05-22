@@ -9,6 +9,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import kotlinx.android.synthetic.main.fragment_dialog_general.*
 import java.io.Serializable
+import java.util.*
 
 class GeneralDialogData(
     @DrawableRes var titleIcon: Int = R.drawable.ic_verification_mail,
@@ -23,7 +24,7 @@ class GeneralDialogData(
 ) : Serializable
 
 fun GeneralDialog.show(manager: FragmentManager) {
-    this.show(manager, "Dialog")
+    this.show(manager, "${Calendar.getInstance().timeInMillis}")
 }
 
 class GeneralDialog : BaseDialogFragment() {

@@ -49,7 +49,7 @@ class CategoriesFragment : BaseFragment<CategoriesViewModel>() {
         }
 
         override fun onVideoClick(view: View, item: PlayerData) {
-            val intent = Intent(activity!!, PlayerActivity::class.java)
+            val intent = Intent(requireContext(), PlayerActivity::class.java)
             intent.putExtras(PlayerActivity.createBundle(item))
             startActivity(intent)
         }
@@ -57,7 +57,7 @@ class CategoriesFragment : BaseFragment<CategoriesViewModel>() {
         override fun onLoadAdapter(adapter: HomeCategoriesAdapter, src: HomeTemplate.Categories) {
 
         }
-    }
+     }
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_categories

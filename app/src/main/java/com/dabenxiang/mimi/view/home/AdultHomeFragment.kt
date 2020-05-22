@@ -6,6 +6,7 @@ import android.view.View
 import androidx.activity.addCallback
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.extension.setBtnSolidDolor
 import com.dabenxiang.mimi.model.api.vo.SecondCategoriesItem
 import com.dabenxiang.mimi.model.holder.CarouselHolderItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
@@ -18,7 +19,6 @@ import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
-import com.dabenxiang.mimi.extension.setBtnSolidDolor
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -60,7 +60,7 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
         }
 
         override fun onVideoClick(view: View, item: PlayerData) {
-            val intent = Intent(activity!!, PlayerActivity::class.java)
+            val intent = Intent(requireContext(), PlayerActivity::class.java)
             intent.putExtras(PlayerActivity.createBundle(item))
             startActivity(intent)
         }
