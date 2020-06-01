@@ -18,9 +18,9 @@ class GeneralDialogData(
     var message: String,
     var firstBtn: String,
     var firstBlock: (() -> Unit)? = null,
-    var secondBtn: String,
+    var secondBtn: String = "",
     var secondBlock: (() -> Unit)? = null,
-    var dismissBlock: (() -> Unit)? = null
+    var closeBlock: (() -> Unit)? = null
 ) : Serializable
 
 fun GeneralDialog.show(manager: FragmentManager) {
@@ -69,7 +69,7 @@ class GeneralDialog : BaseDialogFragment() {
                 }
 
             btn_close.visibility =
-                if (data.dismissBlock == null) {
+                if (data.closeBlock == null) {
                     View.GONE
                 } else {
                     btn_close.setOnClickListener(btnOnClickListener)
@@ -93,8 +93,8 @@ class GeneralDialog : BaseDialogFragment() {
                 }
             }
             btn_close -> {
-                if (data?.dismissBlock != null) {
-                    data.dismissBlock!!()
+                if (data?.closeBlock != null) {
+                    data.closeBlock!!()
                 }
             }
         }

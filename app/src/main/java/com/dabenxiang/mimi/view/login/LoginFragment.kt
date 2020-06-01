@@ -10,13 +10,18 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.dialog.GeneralDialog
+import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.login.LoginDialogFragment
 import com.dabenxiang.mimi.view.dialog.login.OnLoginDialogListener
+import com.dabenxiang.mimi.view.dialog.show
+import com.dabenxiang.mimi.widget.utility.AppUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.item_login.*
 import kotlinx.android.synthetic.main.item_register.*
 import org.koin.android.viewmodel.ext.android.viewModel
+import retrofit2.HttpException
 
 class LoginFragment : BaseFragment<LoginViewModel>() {
     private val viewModel by viewModel<LoginViewModel>()
@@ -34,7 +39,7 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
 
         fun createBundle(type: Int): Bundle {
             return Bundle().also {
-                it.putSerializable(KEY_TYPE, type)
+                it.putInt(KEY_TYPE, type)
             }
         }
 
@@ -59,9 +64,31 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
     }
 
     override fun setupObservers() {
-        viewModel.apiSignUpResult.observe(viewLifecycleOwner, Observer {
+        viewModel.apiResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Empty -> navigateTo(NavigateItem.Up)
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Empty -> {
+                    progressHUD?.dismiss()
+                    navigateTo(NavigateItem.Up)
+                }
+                is ApiResult.Error -> {
+                    progressHUD?.dismiss()
+                    when (it.throwable) {
+                        is HttpException -> {
+                            val data = AppUtils.getHttpExceptionData(it.throwable)
+                            data.errorItem.message?.also { message ->
+                                GeneralDialog.newInstance(
+                                    GeneralDialogData(
+                                        titleRes = R.string.login_yet,
+                                        message = message,
+                                        messageIcon = R.drawable.ico_default_photo,
+                                        firstBtn = getString(R.string.btn_confirm)
+                                    )
+                                ).show(parentFragmentManager)
+                            }
+                        }
+                    }
+                }
             }
         })
 
@@ -143,10 +170,7 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
         })
 
         viewModel.loginResult.observe(viewLifecycleOwner, Observer {
-            dialog = LoginDialogFragment.newInstance(
-                onLoginDialogListener,
-                LoginDialogFragment.TYPE_SUCCESS
-            )
+            dialog = LoginDialogFragment.newInstance(onLoginDialogListener, LoginDialogFragment.TYPE_SUCCESS)
             dialog?.show(activity!!.supportFragmentManager, LoginDialogFragment::class.java.simpleName)
         })
     }

@@ -25,6 +25,9 @@ interface ApiService {
         @Field("client_secret") clientSecret: String
     ): Response<TokenItem>
 
+    @POST("/v1/auth/signin")
+    suspend fun signIn(@Body loginRequest: LoginRequest): Response<ApiBaseItem<LoginItem>>
+
     /**********************************************************
      *
      *                  Attachment x 4

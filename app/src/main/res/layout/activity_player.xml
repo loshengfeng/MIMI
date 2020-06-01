@@ -19,7 +19,7 @@
         android:id="@+id/iv_player"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:src="@drawable/ico_default_photo"
+        android:src="@drawable/exo_icon_play"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/player_view"
         app:layout_constraintEnd_toEndOf="@id/player_view"

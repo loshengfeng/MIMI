@@ -185,11 +185,13 @@ private fun BottomNavigationView.setupItemReselected(
     fragmentManager: FragmentManager
 ) {
     setOnNavigationItemReselectedListener { item ->
+        /*
         val newlySelectedItemTag = graphIdToTagMap[item.itemId]
         val selectedFragment = fragmentManager.findFragmentByTag(newlySelectedItemTag) as NavHostFragment
         val navController = selectedFragment.navController
         // Pop the back stack to the start destination of the current navController graph
         navController.popBackStack(navController.graph.startDestination, false)
+        */
     }
 }
 

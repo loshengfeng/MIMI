@@ -1,6 +1,6 @@
 package com.dabenxiang.mimi.model.api
 
-import com.dabenxiang.mimi.model.manager.AccountManager
+import com.dabenxiang.mimi.manager.AccountManager
 import com.dabenxiang.mimi.model.pref.Pref
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
@@ -22,16 +22,16 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
             chain.request().url.toString().endsWith("/token") -> {
                 return chain.proceed(chain.request())
             }
+            //TODO: 是否已登入
 
             !accountManager.isTokenValid() -> {
                 runBlocking {
                     withContext(Dispatchers.IO) {
-                        accountManager.getToken().collect()
+                        accountManager.getPublicToken().collect()
                     }
                     chain.proceed(chain.addAuthorization())
                 }
             }
-
             else -> {
                 val response = chain.proceed(chain.addAuthorization())
                 return when (response.code) {
@@ -53,7 +53,7 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
 
     private fun Interceptor.Chain.addAuthorization(): Request {
         val requestBuilder = request().newBuilder()
-        requestBuilder.addHeader("Authorization", "Bearer ${pref.token.accessToken}")
+        requestBuilder.addHeader("Authorization", "Bearer ${pref.publicToken.accessToken}")
         return requestBuilder.build()
     }
 }

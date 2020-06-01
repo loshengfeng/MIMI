@@ -5,13 +5,13 @@ import com.yulichswift.roundedview.widget.RoundedTextView
 
 fun RoundedTextView.setBtnSolidDolor(color: Int) {
     val drawable = RoundedDrawable(true)
-    drawable.setSolidColorsAndPressedGrayer(color)
+    drawable.setSolidColorsAndPressedColor(normal = color, pressed = 0, selected = 0, disable = 0)
     background = drawable
 }
 
 fun RoundedTextView.setBtnSolidDolor(color1: Int, color2: Int, radius: Float) {
     val drawable = RoundedDrawable(false)
     drawable.cornerRadius = radius
-    drawable.setSolidColorsAndPressedColor(color1, color2)
+    drawable.setSolidColorsAndPressedColor(normal = color1, pressed = color2, selected = 0, disable = 0)
     background = drawable
 }

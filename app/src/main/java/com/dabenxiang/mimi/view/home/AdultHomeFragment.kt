@@ -127,7 +127,7 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
             }
         }
 
-        adapter.setDataSrc(templateList)
+        adapter.submitList(templateList)
     }
 
     //TODO: Testing

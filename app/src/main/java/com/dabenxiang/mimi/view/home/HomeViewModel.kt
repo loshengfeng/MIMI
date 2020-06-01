@@ -73,6 +73,7 @@ class HomeViewModel : BaseViewModel() {
     fun setupVideoList(category: String?, isAdult: Boolean) {
         viewModelScope.launch {
             val dataSrc = VideoListDataSource(isAdult, category ?: "", viewModelScope, apiRepository, pagingCallback)
+            dataSrc.isInvalid
             val factory = VideoListFactory(dataSrc)
             val config = PagedList.Config.Builder()
                 .setPageSize(VideoListDataSource.PER_LIMIT.toInt())

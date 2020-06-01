@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.personal
 import android.os.Bundle
 import android.view.View
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
@@ -17,15 +18,11 @@ import timber.log.Timber
 
 class PersonalFragment : BaseFragment<PersonalViewModel>() {
     private val viewModel by viewModel<PersonalViewModel>()
-    private val isLogin = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         initSettings()
-//        Handler().postDelayed({
-//            Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_topupHistoryFragment)
-//            Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_loginFragment)
-//        },1000)
     }
 
     override fun getLayoutId(): Int {
@@ -49,13 +46,15 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
                     .navigate(R.id.action_personalFragment_to_chatHistoryFragment)
                 R.id.tv_setting -> Navigation.findNavController(view!!)
                     .navigate(R.id.action_personalFragment_to_settingFragment)
-                R.id.tv_logout -> GeneralUtils.showToast(context!!, "btnLogout")
-                R.id.tv_login -> Navigation.findNavController(view!!)
-                    .navigate(R.id.action_personalFragment_to_loginFragment,
-                        LoginFragment.createBundle(TYPE_LOGIN))
-                R.id.tv_register -> Navigation.findNavController(view!!)
-                    .navigate(R.id.action_personalFragment_to_loginFragment,
-                        LoginFragment.createBundle(TYPE_REGISTER))
+                R.id.tv_logout -> {
+                    initSettings()
+                }
+                R.id.tv_login -> {
+                    findNavController().navigate(R.id.action_personalFragment_to_loginFragment, LoginFragment.createBundle(TYPE_LOGIN))
+                }
+                R.id.tv_register -> {
+                    findNavController().navigate(R.id.action_personalFragment_to_loginFragment, LoginFragment.createBundle(TYPE_REGISTER))
+                }
             }
         }.also {
             tv_topup.setOnClickListener(it)
@@ -70,7 +69,7 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
     }
 
     private fun initSettings() {
-        when (isLogin) {
+        when (viewModel.accountManager.isLogin.value) {
             true -> {
                 item_is_Login.visibility = View.VISIBLE
                 item_is_not_Login.visibility = View.GONE
@@ -78,7 +77,6 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
             false -> {
                 item_is_Login.visibility = View.GONE
                 item_is_not_Login.visibility = View.VISIBLE
-
             }
         }
 

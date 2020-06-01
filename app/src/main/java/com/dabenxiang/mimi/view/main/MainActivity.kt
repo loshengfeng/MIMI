@@ -7,6 +7,7 @@ import com.dabenxiang.mimi.view.base.BaseActivity
 import com.dabenxiang.mimi.extension.setupWithNavController
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import timber.log.Timber
 
 
 class MainActivity : BaseActivity() {

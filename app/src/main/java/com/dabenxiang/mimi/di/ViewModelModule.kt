@@ -11,6 +11,7 @@ import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.view.messenger.MessengerViewModel
 import com.dabenxiang.mimi.view.personal.PersonalViewModel
 import com.dabenxiang.mimi.view.player.PlayerViewModel
+import com.dabenxiang.mimi.view.player.ShortPlayerViewModel
 import com.dabenxiang.mimi.view.resendmail.ResendMailViewModel
 import com.dabenxiang.mimi.view.search.SearchVideoViewModel
 import com.dabenxiang.mimi.view.setting.SettingViewModel
@@ -38,4 +39,5 @@ val viewModelModule = module {
     viewModel { ChatHistoryViewModel() }
     viewModel { PlayerViewModel() }
     viewModel { SearchVideoViewModel() }
+    viewModel { ShortPlayerViewModel() }
 }

@@ -4,13 +4,29 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.*
 
-class HomeAdapter(val context: Context, private val listener: EventListener, private val isAdult: Boolean) : RecyclerView.Adapter<BaseViewHolder>() {
+class HomeAdapter(val context: Context, private val listener: EventListener, private val isAdult: Boolean) :
+    ListAdapter<HomeTemplate, BaseViewHolder>(DIFF_CALLBACK) {
+
+    companion object {
+        private val DIFF_CALLBACK =
+            object : DiffUtil.ItemCallback<HomeTemplate>() {
+                override fun areItemsTheSame(oldItem: HomeTemplate, newItem: HomeTemplate): Boolean {
+                    return oldItem.type == newItem.type
+                }
+
+                override fun areContentsTheSame(oldItem: HomeTemplate, newItem: HomeTemplate): Boolean {
+                    return oldItem == newItem
+                }
+            }
+    }
 
     interface EventListener {
         fun onHeaderItemClick(view: View, item: HomeTemplate.Header)
@@ -18,24 +34,9 @@ class HomeAdapter(val context: Context, private val listener: EventListener, pri
         fun onLoadAdapter(adapter: HomeCategoriesAdapter, src: HomeTemplate.Categories)
     }
 
-    private var templateList: List<HomeTemplate>? = null
-
-    fun setDataSrc(src: List<HomeTemplate>) {
-        templateList = src
-        notifyDataSetChanged()
-    }
-
-    override fun getItemCount(): Int {
-        return templateList?.count() ?: 0
-    }
-
     override fun getItemViewType(position: Int): Int {
-        templateList?.also {
-            val template = it[position]
-            return template.type.ordinal
-        }
-
-        return -1
+        val template = getItem(position)
+        return template.type.ordinal
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
@@ -70,32 +71,31 @@ class HomeAdapter(val context: Context, private val listener: EventListener, pri
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
-        templateList?.also { templateList ->
-            when (holder.itemViewType) {
-                HomeItemType.HEADER.ordinal -> {
-                    holder as HeaderViewHolder
-                    holder.bind(templateList[position])
-                }
-                HomeItemType.BANNER.ordinal -> {
-                    holder as HomeBannerViewHolder
-                    holder.bind(templateList[position])
-                }
-                HomeItemType.CAROUSEL.ordinal -> {
-                    holder as HomeCarouselViewHolder
-                    holder.bind(templateList[position])
-                }
-                HomeItemType.CATEGORIES.ordinal -> {
-                    holder as HomeCategoriesViewHolder
-                    holder.bind(templateList[position])
-                }
-                HomeItemType.LEADERBOARD.ordinal -> {
-                    holder as HomeLeaderboardViewHolder
-                    holder.bind(templateList[position])
-                }
-                HomeItemType.RECOMMEND.ordinal -> {
-                    holder as HomeRecommendViewHolder
-                    holder.bind(templateList[position])
-                }
+        val template = getItem(position)
+        when (holder.itemViewType) {
+            HomeItemType.HEADER.ordinal -> {
+                holder as HeaderViewHolder
+                holder.bind(template)
+            }
+            HomeItemType.BANNER.ordinal -> {
+                holder as HomeBannerViewHolder
+                holder.bind(template)
+            }
+            HomeItemType.CAROUSEL.ordinal -> {
+                holder as HomeCarouselViewHolder
+                holder.bind(template)
+            }
+            HomeItemType.CATEGORIES.ordinal -> {
+                holder as HomeCategoriesViewHolder
+                holder.bind(template)
+            }
+            HomeItemType.LEADERBOARD.ordinal -> {
+                holder as HomeLeaderboardViewHolder
+                holder.bind(template)
+            }
+            HomeItemType.RECOMMEND.ordinal -> {
+                holder as HomeRecommendViewHolder
+                holder.bind(template)
             }
         }
     }

@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.topup
 
 import android.os.Bundle
 import android.view.View
+import androidx.activity.addCallback
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
@@ -35,6 +36,10 @@ class TopupFragment : BaseFragment<TopupViewModel>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initSettings()
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            backToDesktop()
+        }
     }
 
     override fun getLayoutId(): Int {

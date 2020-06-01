@@ -51,6 +51,7 @@ class PlayerActivity : BaseActivity() {
 
     private var player: SimpleExoPlayer? = null
     private var orientationDetector: OrientationDetector? = null
+    private var dialog: GeneralDialog? = null
 
     override fun getLayoutId(): Int {
         return R.layout.activity_player
@@ -149,7 +150,9 @@ class PlayerActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
 
-        openLoginDialog()
+        if (dialog == null || dialog?.isVisible == false) {
+            openLoginDialog()
+        }
 
         hideSystemUi()
 
@@ -167,6 +170,8 @@ class PlayerActivity : BaseActivity() {
 
     override fun onPause() {
         super.onPause()
+
+        dialog?.dismiss()
 
         orientationDetector?.also {
             it.disable()
@@ -470,13 +475,12 @@ class PlayerActivity : BaseActivity() {
             firstBlock = registerBlock,
             secondBtn = getString(R.string.btn_login),
             secondBlock = loginBlock,
-            dismissBlock = { finish() }
+            closeBlock = { finish() }
         )
 
-        GeneralDialog.newInstance(data).apply {
+        dialog = GeneralDialog.newInstance(data).apply {
             isCancelable = false
             show(supportFragmentManager)
         }
-
     }
 }

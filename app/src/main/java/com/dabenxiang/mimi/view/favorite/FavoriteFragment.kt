@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.favorite
 import android.os.Bundle
 import android.view.View
 import android.widget.PopupMenu
+import androidx.activity.addCallback
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.holder.FavoriteItem
@@ -28,6 +29,10 @@ class FavoriteFragment  : BaseFragment<FavoriteViewModel>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initSettings()
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            backToDesktop()
+        }
     }
 
     override fun getLayoutId(): Int {

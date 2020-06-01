@@ -9,7 +9,11 @@ class ApiRepository(private val apiService: ApiService) {
         const val MEDIA_TYPE_JSON = "application/json"
         const val AUTHORIZATION = "Authorization"
     }
-
+    /**********************************************************
+     *
+     *                  Auth
+     *
+     ***********************************************************/
     /**
      * 拿脫啃
      */
@@ -20,6 +24,11 @@ class ApiRepository(private val apiService: ApiService) {
      */
     suspend fun refreshToken(token: String) =
         apiService.refreshToken("refresh_token", token, "3770511208570945536", "1d760dedf35a4a508ecd71b5013a1611")
+
+    /**
+     * 登入
+     */
+    suspend fun signIn(loginRequest: LoginRequest) = apiService.signIn(loginRequest)
 
     /**********************************************************
      *

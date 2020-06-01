@@ -1,8 +1,11 @@
-package com.dabenxiang.mimi.model.manager
+package com.dabenxiang.mimi.manager
 
 import android.text.TextUtils
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.LoginRequest
 import com.dabenxiang.mimi.model.api.vo.ResetPasswordRequest
 import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.model.vo.ProfileData
@@ -12,10 +15,9 @@ import kotlinx.coroutines.flow.*
 import retrofit2.HttpException
 import java.util.*
 
-class AccountManager(
-    private val pref: Pref,
-    private val apiRepository: ApiRepository
-) {
+class AccountManager(private val pref: Pref, private val apiRepository: ApiRepository) {
+    private val _isLogin = MutableLiveData(false)
+    val isLogin: LiveData<Boolean> = _isLogin
 
     fun getProfile(): ProfileData? {
         return pref.profileData
@@ -29,13 +31,8 @@ class AccountManager(
         pref.clearProfile()
     }
 
-    fun isAutoLogin(): Boolean {
-        return (!TextUtils.isEmpty(pref.token.accessToken)
-                && !TextUtils.isEmpty(pref.token.refreshToken))
-    }
-
     fun isTokenValid(): Boolean {
-        val tokenData = pref.token
+        val tokenData = pref.publicToken
         return when {
             tokenData.expiresTimestamp == 0L -> false
             Date().time > tokenData.expiresTimestamp -> false
@@ -48,19 +45,17 @@ class AccountManager(
         pref.clearToken()
     }
 
-    //TODO: 取代GetToken, refreshToken
-    fun updatedToken() {
-    }
-
-    fun getToken() =
+    fun getPublicToken() =
         flow {
             val result = apiRepository.getToken()
             if (!result.isSuccessful) throw HttpException(result)
             result.body()?.also { tokenItem ->
-                pref.token =
-                    TokenData(accessToken = tokenItem.accessToken,
+                pref.publicToken =
+                    TokenData(
+                        accessToken = tokenItem.accessToken,
                         // 提前2分鐘過期
-                        expiresTimestamp = Date().time + (tokenItem.expiresIn - 120) * 1000)
+                        expiresTimestamp = Date().time + (tokenItem.expiresIn - 120) * 1000
+                    )
             }
             emit(ApiResult.success(null))
         }
@@ -72,14 +67,15 @@ class AccountManager(
 
     fun refreshToken() =
         flow {
-            val result = apiRepository.refreshToken(pref.token.accessToken)
+            val result = apiRepository.refreshToken(pref.publicToken.accessToken)
             if (!result.isSuccessful) throw HttpException(result)
             result.body()?.also { tokenItem ->
-                pref.token =
-                    TokenData(accessToken = tokenItem.accessToken,
-                        refreshToken = tokenItem.refreshToken,
-                        // 提前2分鐘過期
-                        expiresTimestamp = Date().time + (tokenItem.expiresIn - 120) * 1000)
+                pref.publicToken = TokenData(
+                    accessToken = tokenItem.accessToken,
+                    refreshToken = tokenItem.refreshToken,
+                    // 提前2分鐘過期
+                    expiresTimestamp = Date().time + (tokenItem.expiresIn - 120) * 1000
+                )
             }
             emit(ApiResult.success(null))
         }
@@ -88,25 +84,29 @@ class AccountManager(
                 emit(ApiResult.error(e))
             }
 
-//    fun login(userName: String, password: String) =
-//        flow {
-//            val request = LoginRequest(AppUtils.getAndroidID(), userName, password)
-//            val result = apiRepository.login(request)
-//            Timber.d("login result: $result")
-//            if (!result.isSuccessful) throw HttpException(result)
-//            val loginItem = result.body()?.data
-//            setupToken(TokenData(loginItem!!.accessToken, loginItem.refreshToken))
-//            setupProfile(ProfileData(AppUtils.getAndroidID(), userName, password))
-//            emit(ApiResult.success(null))
-//        }
-//            .flowOn(Dispatchers.IO)
-//            .onStart { emit(ApiResult.loading()) }
-//            .catch { e ->
-//                e.printStackTrace()
-//                emit(ApiResult.error(e))
-//            }.onCompletion {
-//                emit(ApiResult.loaded())
-//            }
+
+    fun signIn(userName: String, password: String) =
+        flow {
+            val request = LoginRequest(userName, password)
+            val result = apiRepository.signIn(request)
+            if (!result.isSuccessful) throw HttpException(result)
+
+            val loginItem = result.body()?.content
+
+            _isLogin.postValue(true)
+
+            //setupToken(TokenData(loginItem!!.accessToken, loginItem.refreshToken))
+            //setupProfile(ProfileData(AppUtils.getAndroidID(), userName, password))
+            emit(ApiResult.success(null))
+        }
+            .flowOn(Dispatchers.IO)
+            .onStart { emit(ApiResult.loading()) }
+            .catch { e ->
+                emit(ApiResult.error(e))
+            }.onCompletion {
+                emit(ApiResult.loaded())
+            }
+
 
 //    fun logout() =
 //        flow {

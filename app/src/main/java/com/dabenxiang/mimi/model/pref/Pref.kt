@@ -7,25 +7,43 @@ import com.google.gson.Gson
 class Pref(private val gson: Gson, preferenceFileName: String, isDebug: Boolean) : AbstractPref(preferenceFileName, isDebug) {
 
     private val tokenPref = StringPref("TOKEN")
+    private val memberTokenPref = StringPref("MEMBER_TOKEN")
     private val aesKeyPref = StringPref("AES_KEY")
     private val ellipsizeKeyPref = BooleanPref("ELLIPSIZE_KEY")
     private val profilePref = StringPref("PROFILE")
-    private var cachedToken: TokenData? = null
+    private var cachedPublicToken: TokenData? = null
+    private var cachedMemberToken: TokenData? = null
 
-    var token: TokenData
+    var publicToken: TokenData
         get() =
             try {
-                if (cachedToken == null) {
-                    cachedToken = gson.fromJson(tokenPref.get(), TokenData::class.java)
+                if (cachedPublicToken == null) {
+                    cachedPublicToken = gson.fromJson(tokenPref.get(), TokenData::class.java)
                 }
 
-                cachedToken ?: TokenData()
+                cachedPublicToken ?: TokenData()
             } catch (e: Exception) {
                 TokenData()
             }
         set(value) {
-            cachedToken = value
+            cachedPublicToken = value
             tokenPref.set(gson.toJson(value))
+        }
+
+    var memberToken: TokenData
+        get() =
+            try {
+                if (cachedMemberToken == null) {
+                    cachedMemberToken = gson.fromJson(memberTokenPref.get(), TokenData::class.java)
+                }
+
+                cachedMemberToken ?: TokenData()
+            } catch (e: Exception) {
+                TokenData()
+            }
+        set(value) {
+            cachedMemberToken = value
+            memberTokenPref.set(gson.toJson(value))
         }
 
     var profileData: ProfileData

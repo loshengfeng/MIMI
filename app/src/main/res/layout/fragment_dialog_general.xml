@@ -61,9 +61,10 @@
 
         <TextView
             android:id="@+id/tv_message"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:gravity="center"
             android:paddingStart="44dp"
             android:paddingEnd="44dp"
             android:textColor="@color/color_black_1"
@@ -84,34 +85,41 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_message" />
 
-        <Button
+        <com.yulichswift.roundedview.widget.RoundedTextView
             android:id="@+id/btn_first"
             android:layout_width="wrap_content"
-            android:layout_height="33dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:background="@drawable/bg_white_stroke_1_radius_6"
-            android:paddingStart="18dp"
-            android:paddingEnd="18dp"
+            android:gravity="center"
             android:textColor="@color/color_black_1"
+            app:btn_corner_radius="@dimen/dp_6"
+            app:btn_pressed_color="darker"
+            app:btn_solid_color="@color/color_white_1"
+            app:btn_stroke_color="@color/color_black_1"
+            app:btn_stroke_width="1dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintEnd_toStartOf="@id/btn_second"
+            app:layout_constraintHeight_min="33dp"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/line"
+            app:layout_constraintWidth_min="76dp"
             tools:text="@string/btn_cancel" />
 
-        <Button
+        <com.yulichswift.roundedview.widget.RoundedTextView
             android:id="@+id/btn_second"
             android:layout_width="wrap_content"
-            android:layout_height="33dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
-            android:background="@drawable/bg_red_1_radius_6"
-            android:paddingStart="18dp"
-            android:paddingEnd="18dp"
             android:textColor="@color/color_white_1"
+            app:btn_corner_radius="@dimen/dp_6"
+            app:btn_pressed_color="darker"
+            app:btn_solid_color="@color/color_red_1"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_min="33dp"
             app:layout_constraintStart_toEndOf="@id/btn_first"
             app:layout_constraintTop_toTopOf="@id/btn_first"
+            app:layout_constraintWidth_min="76dp"
             tools:text="@string/btn_confirm" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

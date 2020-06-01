@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">MiMi</string>
 
+    <string name="splash_text">欢  迎  来  到  蜜  蜜</string>
+
     <!-- nav button -->
     <string name="nav_home">一般影视</string>
     <string name="nav_adult">成人影视</string>
