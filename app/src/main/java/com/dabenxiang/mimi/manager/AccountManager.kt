@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.manager
 
-import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.dabenxiang.mimi.model.api.ApiRepository
@@ -31,7 +30,19 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
         pref.clearProfile()
     }
 
-    fun isTokenValid(): Boolean {
+    fun isMemberTokenValid(): Boolean {
+        val tokenData = pref.memberToken
+        return when {
+            tokenData.expiresTimestamp == 0L -> false
+            Date().time > tokenData.expiresTimestamp -> false
+            tokenData.accessToken.isBlank() -> false
+            else -> {
+                true
+            }
+        }
+    }
+
+    fun isPublicTokenValid(): Boolean {
         val tokenData = pref.publicToken
         return when {
             tokenData.expiresTimestamp == 0L -> false
@@ -41,8 +52,8 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
         }
     }
 
-    private fun clearToken() {
-        pref.clearToken()
+    private fun clearMemberToken() {
+        pref.clearMemberToken()
     }
 
     fun getPublicToken() =
@@ -69,12 +80,12 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
         flow {
             val result = apiRepository.refreshToken(pref.publicToken.accessToken)
             if (!result.isSuccessful) throw HttpException(result)
-            result.body()?.also { tokenItem ->
+            result.body()?.also { item ->
                 pref.publicToken = TokenData(
-                    accessToken = tokenItem.accessToken,
-                    refreshToken = tokenItem.refreshToken,
+                    accessToken = item.accessToken,
+                    refreshToken = item.refreshToken,
                     // 提前2分鐘過期
-                    expiresTimestamp = Date().time + (tokenItem.expiresIn - 120) * 1000
+                    expiresTimestamp = Date().time + (item.expiresIn - 120) * 1000
                 )
             }
             emit(ApiResult.success(null))
@@ -91,7 +102,14 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
             val result = apiRepository.signIn(request)
             if (!result.isSuccessful) throw HttpException(result)
 
-            val loginItem = result.body()?.content
+            result.body()?.content?.also { item ->
+                pref.memberToken = TokenData(
+                    accessToken = item.accessToken,
+                    refreshToken = item.refreshToken,
+                    // 提前2分鐘過期
+                    expiresTimestamp = Date().time + (item.expiresIn - 120) * 1000
+                )
+            }
 
             _isLogin.postValue(true)
 
@@ -102,6 +120,7 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
             .flowOn(Dispatchers.IO)
             .onStart { emit(ApiResult.loading()) }
             .catch { e ->
+                _isLogin.postValue(false)
                 emit(ApiResult.error(e))
             }.onCompletion {
                 emit(ApiResult.loaded())
@@ -158,9 +177,8 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
 
 
     fun logoutLocal() {
-//        socketManager.finish()
         clearProfile()
-        clearToken()
+        clearMemberToken()
     }
 
 }

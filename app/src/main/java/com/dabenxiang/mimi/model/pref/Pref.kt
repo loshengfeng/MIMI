@@ -65,8 +65,8 @@ class Pref(private val gson: Gson, preferenceFileName: String, isDebug: Boolean)
         get() = ellipsizeKeyPref.get()
         set(value) = ellipsizeKeyPref.set(value)
 
-    fun clearToken() {
-        tokenPref.remove()
+    fun clearMemberToken() {
+        memberTokenPref.remove()
     }
 
     fun clearProfile() {

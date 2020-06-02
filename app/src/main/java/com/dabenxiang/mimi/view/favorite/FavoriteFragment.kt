@@ -29,10 +29,6 @@ class FavoriteFragment  : BaseFragment<FavoriteViewModel>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initSettings()
-
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            backToDesktop()
-        }
     }
 
     override fun getLayoutId(): Int {

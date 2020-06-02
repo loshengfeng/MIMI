@@ -133,6 +133,7 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
             mainViewModel.categoriesData.observe(viewLifecycleOwner, Observer { item ->
 
                 val list = mutableListOf<String>()
+                list.add("首頁")
                 item.categories?.also { level1 ->
                     for (i in 0 until level1.count()) {
                         val detail = level1[i]

@@ -18,36 +18,36 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         //Timber.d(chain.request().url.toString())
-        return when {
-            chain.request().url.toString().endsWith("/token") -> {
-                return chain.proceed(chain.request())
-            }
-            //TODO: 是否已登入
+        if (chain.request().url.toString().endsWith("/token")) {
+            return chain.proceed(chain.request())
+        }
 
-            !accountManager.isTokenValid() -> {
+        // TODO:
+        if (!accountManager.isMemberTokenValid()) {
+            
+        }
+
+        if (!accountManager.isPublicTokenValid()) {
+            runBlocking {
+                withContext(Dispatchers.IO) {
+                    accountManager.getPublicToken().collect()
+                }
+            }
+        }
+
+        val response = chain.proceed(chain.addAuthorization())
+        return when (response.code) {
+            HttpURLConnection.HTTP_UNAUTHORIZED -> {
                 runBlocking {
                     withContext(Dispatchers.IO) {
-                        accountManager.getPublicToken().collect()
+                        accountManager.refreshToken().collect()
                     }
+                    // Prod crash when not call close
+                    response.close()
                     chain.proceed(chain.addAuthorization())
                 }
             }
-            else -> {
-                val response = chain.proceed(chain.addAuthorization())
-                return when (response.code) {
-                    HttpURLConnection.HTTP_UNAUTHORIZED -> {
-                        runBlocking {
-                            withContext(Dispatchers.IO) {
-                                accountManager.refreshToken().collect()
-                            }
-                            // Prod crash when not call close
-                            response.close()
-                            chain.proceed(chain.addAuthorization())
-                        }
-                    }
-                    else -> response
-                }
-            }
+            else -> response
         }
     }
 

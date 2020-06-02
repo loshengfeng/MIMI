@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.login
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -79,7 +80,17 @@ class LoginViewModel : BaseViewModel() {
         ) {
             viewModelScope.launch {
                 flow {
-                    val resp = apiRepository.signUp(MembersAccountItem(account, email, friendlyName, registerPw, confirmPw))
+                    val resp = apiRepository.signUp(
+                        MembersAccountItem(
+                            username = account,
+                            email = email,
+                            friendlyName = friendlyName,
+                            password = registerPw,
+                            promoCode = "TestCode",
+                            // TODO: 從DomainManager取得Url
+                            validationUrl = BuildConfig.API_HOST + "v1/Members/ValidateEmail"
+                        )
+                    )
                     if (!resp.isSuccessful) throw HttpException(resp)
                     emit(ApiResult.success(null))
                 }
