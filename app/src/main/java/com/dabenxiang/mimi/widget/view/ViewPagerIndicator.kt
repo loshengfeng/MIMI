@@ -698,8 +698,8 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
      * @param viewPager 適配的viewpager
      * @return
      */
-    fun setViewPager(viewPager: ViewPager): ViewPagerIndicator {
-        setViewPager(viewPager, viewPager.adapter!!.count, false)
+    fun setViewPager2(viewPager: ViewPager2): ViewPagerIndicator {
+        setViewPager(viewPager, viewPager.adapter!!.itemCount, false)
         return this
     }
 
@@ -708,7 +708,7 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
      * @param CycleNumber 偽無限循環 真實個數
      * @return
      */
-    fun setViewPager(viewpager: ViewPager, CycleNumber: Int): ViewPagerIndicator {
+    fun setViewPager2(viewpager: ViewPager2, CycleNumber: Int): ViewPagerIndicator {
         setViewPager(viewpager, CycleNumber, false)
         return this
     }
@@ -718,76 +718,12 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
      * @param isInfiniteCircle 真無限循環 配合BannerView 通常是true;false為一般 不循環 固定等價於[.setViewPager]
      * @return
      */
-    fun setViewPager(viewPager: ViewPager, isInfiniteCircle: Boolean): ViewPagerIndicator {
+    fun setViewPager2(viewPager: ViewPager2, isInfiniteCircle: Boolean): ViewPagerIndicator {
         if (isInfiniteCircle) {
-            setViewPager(viewPager, viewPager.adapter!!.count - 2, isInfiniteCircle)
+            setViewPager(viewPager, viewPager.adapter!!.itemCount - 2, isInfiniteCircle)
         } else {
-            setViewPager(viewPager, viewPager.adapter!!.count, isInfiniteCircle)
+            setViewPager(viewPager, viewPager.adapter!!.itemCount, isInfiniteCircle)
         }
-        return this
-    }
-
-    fun setViewPager2(viewPager2: ViewPager2): ViewPagerIndicator {
-        mNum = viewPager2.adapter!!.itemCount
-        mIsInfiniteCircle = false
-        viewPager2.registerOnPageChangeCallback(object : OnPageChangeCallback() {
-            //記錄上一次滑動的positionOffsetPixels值
-            private var lastValue = -1
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-                var position = position
-                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-                if (!mAnimation) {
-                    //不需要動畫
-                    return
-                }
-                var isLeft = mIsLeft
-                if (lastValue / 10 > positionOffsetPixels / 10) {
-                    //右滑
-                    isLeft = false
-                } else if (lastValue / 10 < positionOffsetPixels / 10) {
-                    //左滑
-                    isLeft = true
-                }
-                if (mNum > 0 && !mIsInfiniteCircle) {
-                    move(positionOffset, position % mNum, isLeft)
-                } else if (mNum > 0 && mIsInfiniteCircle) {
-                    if (position == 0) {
-                        position = mNum - 1
-                    } else if (position == mNum + 1) {
-                        position = 0
-                    } else {
-                        position--
-                    }
-                    move(positionOffset, position, isLeft)
-                }
-                lastValue = positionOffsetPixels
-            }
-
-            override fun onPageSelected(position: Int) {
-                var position = position
-                super.onPageSelected(position)
-                if (mAnimation) {
-                    //需要動畫
-                    return
-                }
-                if (mNum > 0 && !mIsInfiniteCircle) {
-                    move(0f, position % mNum, false)
-                } else if (mNum > 0 && mIsInfiniteCircle) {
-                    if (position == 0) {
-                        position = mNum - 1
-                    } else if (position == mNum + 1) {
-                        position = 0
-                    } else {
-                        position--
-                    }
-                    move(0f, position, false)
-                }
-            }
-
-            override fun onPageScrollStateChanged(state: Int) {
-                super.onPageScrollStateChanged(state)
-            }
-        })
         return this
     }
 
@@ -797,10 +733,10 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
      * @param isInfiniteCircle 真無限循環 配合Banner
      * @return
      */
-    fun setViewPager(viewpager: ViewPager, CycleNumber: Int, isInfiniteCircle: Boolean): ViewPagerIndicator {
+    private fun setViewPager(viewpager: ViewPager2, CycleNumber: Int, isInfiniteCircle: Boolean): ViewPagerIndicator {
         mNum = CycleNumber
         mIsInfiniteCircle = isInfiniteCircle
-        viewpager.addOnPageChangeListener(object : OnPageChangeListener {
+        viewpager.registerOnPageChangeCallback(object : OnPageChangeCallback() {
             //記錄上一次滑動的positionOffsetPixels值
             private var lastValue = -1
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {

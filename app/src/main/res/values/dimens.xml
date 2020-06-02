@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="dp_6">6dp</dimen>
+    <dimen name="dp_8">8dp</dimen>
     <dimen name="margin_bottom_8">8dp</dimen>
     <dimen name="margin_top_75">75dp</dimen>
     <dimen name="app_bar_height">56dp</dimen>

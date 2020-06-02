@@ -6,19 +6,18 @@ import android.widget.TextView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.adapter.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.view.ViewPagerIndicator
+import com.to.aboomy.pager2banner.Banner
 import kotlinx.android.synthetic.main.item_banner.view.*
 import kotlinx.android.synthetic.main.item_carousel.view.*
 import kotlinx.android.synthetic.main.item_header.view.*
 import kotlinx.android.synthetic.main.item_home_categories.view.*
 import kotlinx.android.synthetic.main.item_home_leaderboard.view.*
 import kotlinx.android.synthetic.main.item_home_recommend.view.*
-import timber.log.Timber
 
 abstract class HomeViewHolder<VM : HomeTemplate>(
     itemView: View, protected val nestedListener: HomeAdapter.EventListener, protected val isAdult: Boolean
@@ -90,26 +89,24 @@ class HomeBannerViewHolder(itemView: View, listener: HomeAdapter.EventListener, 
 class HomeCarouselViewHolder(itemView: View, listener: HomeAdapter.EventListener, isAdult: Boolean) :
     HomeViewHolder<HomeTemplate.Carousel>(itemView, listener, isAdult) {
 
-    private val viewPager: ViewPager2 = itemView.viewpager
+    private val banner: Banner = itemView.banner
     private val pagerIndicator: ViewPagerIndicator = itemView.pager_indicator
     private val nestedAdapter by lazy {
         CarouselAdapter(nestedListener)
     }
 
+    private val dp8 by lazy { itemView.resources.getDimensionPixelSize(R.dimen.dp_8) }
+
     init {
-        viewPager.adapter = nestedAdapter
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                Timber.d("onPageSelected: $position")
-            }
-        })
+        banner.adapter = nestedAdapter
     }
 
     override fun updated() {
         data?.also {
-            nestedAdapter.setDataSrc(it)
-            pagerIndicator.setViewPager2(viewPager)
+            nestedAdapter.submitList(it.carouselList)
+            banner.setPageMargin(dp8, dp8)
+            pagerIndicator.setViewPager2(banner.viewPager2, true)
+            //banner.setPageTransformer(ScaleInTransformer())
         }
     }
 }

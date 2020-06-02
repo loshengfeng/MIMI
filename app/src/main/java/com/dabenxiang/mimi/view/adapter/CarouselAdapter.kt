@@ -2,25 +2,25 @@ package com.dabenxiang.mimi.view.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.holder.CarouselHolderItem
 import com.dabenxiang.mimi.view.home.CarouselViewHolder
-import com.dabenxiang.mimi.view.home.HomeTemplate
 
-class CarouselAdapter(private val nestedListener: HomeAdapter.EventListener) : RecyclerView.Adapter<CarouselViewHolder>() {
+class CarouselAdapter(private val nestedListener: HomeAdapter.EventListener) : ListAdapter<CarouselHolderItem, CarouselViewHolder>(DIFF_CALLBACK) {
 
-    private var data: List<CarouselHolderItem>? = null
+    companion object {
+        private val DIFF_CALLBACK =
+            object : DiffUtil.ItemCallback<CarouselHolderItem>() {
+                override fun areItemsTheSame(oldItem: CarouselHolderItem, newItem: CarouselHolderItem): Boolean {
+                    return oldItem.imgUrl == newItem.imgUrl
+                }
 
-    fun setDataSrc(src: HomeTemplate.Carousel) {
-        data = src.carouselList
-
-        updated()
-    }
-
-    private fun updated() {
-
-        notifyDataSetChanged()
+                override fun areContentsTheSame(oldItem: CarouselHolderItem, newItem: CarouselHolderItem): Boolean {
+                    return oldItem == newItem
+                }
+            }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CarouselViewHolder {
@@ -28,13 +28,7 @@ class CarouselAdapter(private val nestedListener: HomeAdapter.EventListener) : R
         return CarouselViewHolder(layoutInflater.inflate(R.layout.nested_item_carousel, parent, false), nestedListener)
     }
 
-    override fun getItemCount(): Int {
-        return data?.count() ?: 0
-    }
-
     override fun onBindViewHolder(holder: CarouselViewHolder, position: Int) {
-        data?.also { it ->
-            holder.bind(it[position])
-        }
+        holder.bind(getItem(position))
     }
 }

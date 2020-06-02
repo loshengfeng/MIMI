@@ -20,7 +20,6 @@ import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import timber.log.Timber
 
 class HomeFragment : BaseFragment<HomeViewModel>() {
 
@@ -54,11 +53,8 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
 
     private val adapterListener = object : HomeAdapter.EventListener {
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
-            val intent = Intent(requireContext(), PlayerActivity::class.java)
-            startActivityForResult(intent, PlayerActivity.REQUEST_CODE)
-
-//            val bundle = CategoriesFragment.createBundle(item.title ?: "", item.categories)
-//            navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_categoriesFragment, bundle))
+            val bundle = CategoriesFragment.createBundle(item.title ?: "", item.categories)
+            navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_categoriesFragment, bundle))
         }
 
         override fun onVideoClick(view: View, item: PlayerData) {
@@ -114,7 +110,7 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
     private fun getTempCarouselList(): List<CarouselHolderItem> {
         val list = mutableListOf<CarouselHolderItem>()
 
-        repeat(5) {
+        repeat(2) {
             list.add(CarouselHolderItem("https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
         }
 
@@ -134,14 +130,14 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
 
                 val list = mutableListOf<String>()
                 list.add("首頁")
-                item.categories?.also { level1 ->
-                    for (i in 0 until level1.count()) {
-                        val detail = level1[i]
+                item.categories?.get(0)?.categories?.also { level2 ->
+                    for (i in 0 until level2.count()) {
+                        val detail = level2[i]
                         list.add(detail.name ?: "")
                     }
 
                     tabAdapter.setTabList(list, lastPosition)
-                    loadFirstTab(level1[0])
+                    loadFirstTab(level2[0])
                 }
             })
         }
@@ -169,11 +165,5 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
             val bundle = SearchVideoFragment.createBundle("")
             navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_searchVideoFragment, bundle))
         }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        Timber.d("ReqCode: $requestCode, ResultCode: $resultCode, Data: $data")
     }
 }

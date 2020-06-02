@@ -222,6 +222,7 @@ dependencies {
 
     // Viewpager2
     implementation "androidx.viewpager2:viewpager2:$viewpager2_version"
+    implementation 'com.to.aboomy:pager2banner:0.0.5'
 
     implementation 'com.github.yulichswift:RoundedViews:1.3.0'
 

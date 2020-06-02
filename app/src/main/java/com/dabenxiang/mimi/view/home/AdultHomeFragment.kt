@@ -134,9 +134,10 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
     private fun getTempCarouselList(): List<CarouselHolderItem> {
         val list = mutableListOf<CarouselHolderItem>()
 
-        repeat(5) {
-            list.add(CarouselHolderItem("https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
-        }
+        list.add(CarouselHolderItem("https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
+        list.add(CarouselHolderItem("https://cdn2.ettoday.net/images/4838/4838493.jpg"))
+        list.add(CarouselHolderItem("https://img.technews.tw/wp-content/uploads/2020/04/20102348/iphone-se-gallery6.jpg"))
+        list.add(CarouselHolderItem("https://www.apple.com/105/media/us/iphone-se/2020/90024c0f-285a-4bf5-af04-2c38de97b06e/anim/hero-flow/large_2x/flow/flow_key_099.jpg"))
 
         return list
     }

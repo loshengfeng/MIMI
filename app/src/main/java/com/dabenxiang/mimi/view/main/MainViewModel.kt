@@ -21,8 +21,8 @@ class MainViewModel : BaseViewModel() {
     private val _adultMode = MutableLiveData<Boolean>(false)
     val adultMode: LiveData<Boolean> = _adultMode
 
-    private val mCategoriesData = MutableLiveData<CategoriesItem>()
-    val categoriesData: LiveData<CategoriesItem> = mCategoriesData
+    private val _CategoriesData = MutableLiveData<CategoriesItem>()
+    val categoriesData: LiveData<CategoriesItem> = _CategoriesData
 
     fun setAdultMode(isAdult: Boolean) {
         if (_adultMode.value != isAdult) {
@@ -45,7 +45,7 @@ class MainViewModel : BaseViewModel() {
                     when (resp) {
                         is ApiResult.Success -> {
                             //Timber.d(resp.result.toString())
-                            mCategoriesData.value = resp.result.content
+                            _CategoriesData.value = resp.result.content
                         }
                         is ApiResult.Error -> Timber.e(resp.throwable)
                         is ApiResult.Loading -> Timber.d("Loading")
