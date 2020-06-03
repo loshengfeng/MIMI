@@ -98,7 +98,7 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
     open val bottomNavigationVisibility: Int = View.VISIBLE
 
     open fun navigateTo(item: NavigateItem) {
-        viewLifecycleOwner.lifecycleScope.launch {
+        lifecycleScope.launch {
             navigationTaskJoinOrRun {
                 findNavController().also { navController ->
                     when (item) {

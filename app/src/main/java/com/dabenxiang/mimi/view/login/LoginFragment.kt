@@ -82,7 +82,7 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
                                         titleRes = R.string.login_yet,
                                         message = message,
                                         messageIcon = R.drawable.ico_default_photo,
-                                        firstBtn = getString(R.string.btn_confirm)
+                                        secondBtn = getString(R.string.btn_confirm)
                                     )
                                 ).show(parentFragmentManager)
                             }

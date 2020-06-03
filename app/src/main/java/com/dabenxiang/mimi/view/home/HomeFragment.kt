@@ -6,7 +6,7 @@ import android.view.View
 import androidx.activity.addCallback
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.SecondCategoriesItem
+import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.holder.CarouselHolderItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
@@ -53,7 +53,7 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
 
     private val adapterListener = object : HomeAdapter.EventListener {
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
-            val bundle = CategoriesFragment.createBundle(item.title ?: "", item.categories)
+            val bundle = CategoriesFragment.createBundle(item.title, item.categories)
             navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_categoriesFragment, bundle))
         }
 
@@ -86,7 +86,7 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
         })
     }
 
-    private fun loadFirstTab(root: SecondCategoriesItem?) {
+    private fun loadFirstTab(root: CategoriesItem?) {
         recyclerview_videos.visibility = View.GONE
         recyclerview_content.visibility = View.VISIBLE
 
@@ -97,9 +97,8 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
 
         if (root?.categories != null) {
             for (item in root.categories) {
-                val combineCategories = "${root.name},${item.name}"
-                templateList.add(HomeTemplate.Header(null, item.name, combineCategories))
-                templateList.add(HomeTemplate.Categories(item.name, combineCategories, false))
+                templateList.add(HomeTemplate.Header(null, item.name, item.name))
+                templateList.add(HomeTemplate.Categories(item.name, item.name, false))
             }
         }
 
@@ -130,14 +129,16 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
 
                 val list = mutableListOf<String>()
                 list.add("首頁")
-                item.categories?.get(0)?.categories?.also { level2 ->
+
+                val normal = item.getNormal()
+                normal?.categories?.also { level2 ->
                     for (i in 0 until level2.count()) {
                         val detail = level2[i]
-                        list.add(detail.name ?: "")
+                        list.add(detail.name)
                     }
 
                     tabAdapter.setTabList(list, lastPosition)
-                    loadFirstTab(level2[0])
+                    loadFirstTab(normal)
                 }
             })
         }
@@ -150,11 +151,11 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
             when (position) {
                 0 -> {
                     btn_filter.visibility = View.GONE
-                    loadFirstTab(mainViewModel?.categoriesData?.value?.categories?.get(position))
+                    loadFirstTab(mainViewModel?.categoriesData?.value?.getNormal())
                 }
                 else -> {
                     btn_filter.visibility = View.VISIBLE
-                    loadCategories(mainViewModel?.categoriesData?.value?.categories?.get(position)?.name)
+                    loadCategories(mainViewModel?.categoriesData?.value?.getNormal()?.categories?.get(position - 1)?.name)
                 }
             }
         })

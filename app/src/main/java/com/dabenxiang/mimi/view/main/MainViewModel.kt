@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.CategoriesItem
+import com.dabenxiang.mimi.model.api.vo.RootCategoriesItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -21,8 +21,8 @@ class MainViewModel : BaseViewModel() {
     private val _adultMode = MutableLiveData<Boolean>(false)
     val adultMode: LiveData<Boolean> = _adultMode
 
-    private val _CategoriesData = MutableLiveData<CategoriesItem>()
-    val categoriesData: LiveData<CategoriesItem> = _CategoriesData
+    private val _categoriesData = MutableLiveData<RootCategoriesItem>()
+    val categoriesData: LiveData<RootCategoriesItem> = _categoriesData
 
     fun setAdultMode(isAdult: Boolean) {
         if (_adultMode.value != isAdult) {
@@ -45,7 +45,7 @@ class MainViewModel : BaseViewModel() {
                     when (resp) {
                         is ApiResult.Success -> {
                             //Timber.d(resp.result.toString())
-                            _CategoriesData.value = resp.result.content
+                            _categoriesData.value = resp.result.content
                         }
                         is ApiResult.Error -> Timber.e(resp.throwable)
                         is ApiResult.Loading -> Timber.d("Loading")

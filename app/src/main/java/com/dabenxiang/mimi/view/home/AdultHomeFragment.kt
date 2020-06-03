@@ -7,7 +7,7 @@ import androidx.activity.addCallback
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setBtnSolidDolor
-import com.dabenxiang.mimi.model.api.vo.SecondCategoriesItem
+import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.holder.CarouselHolderItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
@@ -110,7 +110,7 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
         )
     }
 
-    private fun loadFirstTab(root: SecondCategoriesItem?) {
+    private fun loadFirstTab(root: CategoriesItem?) {
         recyclerview_videos.visibility = View.GONE
         recyclerview_content.visibility = View.VISIBLE
 
@@ -121,9 +121,8 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
 
         if (root?.categories != null) {
             for (item in root.categories) {
-                val combineCategories = "${root.name},${item.name}"
-                templateList.add(HomeTemplate.Header(null, item.name, combineCategories))
-                templateList.add(HomeTemplate.Categories(item.name, "${root.name},${item.name}", true))
+                templateList.add(HomeTemplate.Header(null, item.name, item.name))
+                templateList.add(HomeTemplate.Categories(item.name, item.name, true))
             }
         }
 
@@ -154,15 +153,17 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
             mainViewModel.categoriesData.observe(viewLifecycleOwner, Observer { item ->
 
                 val list = mutableListOf<String>()
-                item.categories?.also { level1 ->
-                    for (i in 0 until level1.count()) {
-                        val detail = level1[i]
-                        list.add(detail.name ?: "")
+
+                val adult = item.getAdult()
+                adult?.categories?.also { level2 ->
+                    for (i in 0 until level2.count()) {
+                        val detail = level2[i]
+                        list.add(detail.name)
                     }
 
                     tabAdapter.setTabList(list, lastPosition)
 
-                    loadFirstTab(level1[0])
+                    loadFirstTab(adult)
                 }
             })
         }
@@ -175,11 +176,11 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
             when (position) {
                 0 -> {
                     btn_filter.visibility = View.GONE
-                    loadFirstTab(mainViewModel?.categoriesData?.value?.categories?.get(position))
+                    loadFirstTab(mainViewModel?.categoriesData?.value?.getAdult())
                 }
                 else -> {
                     btn_filter.visibility = View.VISIBLE
-                    loadCategories(mainViewModel?.categoriesData?.value?.categories?.get(position)?.name)
+                    loadCategories(mainViewModel?.categoriesData?.value?.getAdult()?.categories?.get(position)?.name)
                 }
             }
         })

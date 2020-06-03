@@ -6,9 +6,11 @@ import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LoginRequest
 import com.dabenxiang.mimi.model.api.vo.ResetPasswordRequest
+import com.dabenxiang.mimi.model.enums.TokenResult
 import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.model.vo.ProfileData
 import com.dabenxiang.mimi.model.vo.TokenData
+import com.dabenxiang.mimi.widget.utility.AppUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import retrofit2.HttpException
@@ -26,29 +28,29 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
         pref.profileData = profileData
     }
 
-    private fun clearProfile() {
-        pref.clearProfile()
+    fun isAutoLogin(): Boolean {
+        val tokenItem = pref.memberToken
+        return tokenItem.accessToken.isNotEmpty() && tokenItem.refreshToken.isNotEmpty()
     }
 
-    fun isMemberTokenValid(): Boolean {
+    fun getMemberTokenResult(): TokenResult {
         val tokenData = pref.memberToken
         return when {
-            tokenData.expiresTimestamp == 0L -> false
-            Date().time > tokenData.expiresTimestamp -> false
-            tokenData.accessToken.isBlank() -> false
-            else -> {
-                true
-            }
+            tokenData.expiresTimestamp == 0L -> TokenResult.Empty
+            tokenData.accessToken.isEmpty() -> TokenResult.Empty
+            tokenData.refreshToken.isEmpty() -> TokenResult.Empty
+            Date().time > tokenData.expiresTimestamp -> TokenResult.Expired
+            else -> TokenResult.Pass
         }
     }
 
-    fun isPublicTokenValid(): Boolean {
+    fun getPublicTokenResult(): TokenResult {
         val tokenData = pref.publicToken
         return when {
-            tokenData.expiresTimestamp == 0L -> false
-            Date().time > tokenData.expiresTimestamp -> false
-            tokenData.accessToken.isBlank() -> false
-            else -> true
+            tokenData.expiresTimestamp == 0L -> TokenResult.Empty
+            tokenData.accessToken.isEmpty() -> TokenResult.Empty
+            Date().time > tokenData.expiresTimestamp -> TokenResult.Expired
+            else -> TokenResult.Pass
         }
     }
 
@@ -78,10 +80,10 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
 
     fun refreshToken() =
         flow {
-            val result = apiRepository.refreshToken(pref.publicToken.accessToken)
+            val result = apiRepository.refreshToken(pref.memberToken.accessToken)
             if (!result.isSuccessful) throw HttpException(result)
             result.body()?.also { item ->
-                pref.publicToken = TokenData(
+                pref.memberToken = TokenData(
                     accessToken = item.accessToken,
                     refreshToken = item.refreshToken,
                     // 提前2分鐘過期
@@ -111,51 +113,39 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
                 )
             }
 
+            setupProfile(ProfileData(AppUtils.getAndroidID(), userName, password))
+
             _isLogin.postValue(true)
 
-            //setupToken(TokenData(loginItem!!.accessToken, loginItem.refreshToken))
-            //setupProfile(ProfileData(AppUtils.getAndroidID(), userName, password))
             emit(ApiResult.success(null))
         }
             .flowOn(Dispatchers.IO)
             .onStart { emit(ApiResult.loading()) }
             .catch { e ->
-                _isLogin.postValue(false)
                 emit(ApiResult.error(e))
             }.onCompletion {
                 emit(ApiResult.loaded())
             }
 
 
-//    fun logout() =
-//        flow {
-//            val result = apiRepository.logout()
-//            if (!result.isSuccessful) throw HttpException(result)
-//            socketManager.finish()
-//            clearProfile()
-//            clearToken()
-//            emit(ApiResult.success(null))
-//        }
-//            .flowOn(Dispatchers.IO)
-//            .onStart { emit(ApiResult.loading()) }
-//            .catch { e ->
-//                emit(ApiResult.error(e))
-//            }.onCompletion {
-//                emit(ApiResult.loaded())
-//            }
-//    fun refreshToken() =
-//        flow {
-//            val result = apiRepository.refreshToken(pref.token.refreshToken)
-//            if (!result.isSuccessful) throw HttpException(result)
-//            val refreshTokenItem = result.body()?.data
-//            setupToken(TokenData(refreshTokenItem!!.accessToken, refreshTokenItem.refreshToken))
-//            socketManager.startWebSocket()
-//            emit(ApiResult.success(null))
-//        }
-//            .flowOn(Dispatchers.IO)
-//            .catch { e ->
-//                emit(ApiResult.error(e))
-//            }
+    fun signOut() =
+        flow {
+            val result = apiRepository.signOut()
+            if (!result.isSuccessful) throw HttpException(result)
+
+            clearMemberToken()
+
+            _isLogin.postValue(false)
+
+            emit(ApiResult.success(null))
+        }
+            .flowOn(Dispatchers.IO)
+            .onStart { emit(ApiResult.loading()) }
+            .catch { e ->
+                emit(ApiResult.error(e))
+            }.onCompletion {
+                emit(ApiResult.loaded())
+            }
 
     fun resetPwd(userName: String, newPwd: String) =
         flow {
@@ -174,11 +164,4 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
             }.onCompletion {
                 emit(ApiResult.loaded())
             }
-
-
-    fun logoutLocal() {
-        clearProfile()
-        clearMemberToken()
-    }
-
 }

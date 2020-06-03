@@ -30,6 +30,11 @@ class ApiRepository(private val apiService: ApiService) {
      */
     suspend fun signIn(loginRequest: LoginRequest) = apiService.signIn(loginRequest)
 
+    /**
+     * 登出
+     */
+    suspend fun signOut() = apiService.signOut()
+
     /**********************************************************
      *
      *                  Attachment x 4

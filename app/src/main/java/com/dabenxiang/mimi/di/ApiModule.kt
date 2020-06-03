@@ -44,7 +44,7 @@ fun provideOkHttpClient(authInterceptor: AuthInterceptor, httpLoggingInterceptor
         .addInterceptor(authInterceptor)
         .addInterceptor(httpLoggingInterceptor)
 
-    if(BuildConfig.DEBUG) {
+    if (BuildConfig.DEBUG) {
         builder.addNetworkInterceptor(StethoInterceptor())
     }
 

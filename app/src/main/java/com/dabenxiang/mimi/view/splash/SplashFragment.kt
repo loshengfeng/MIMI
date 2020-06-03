@@ -2,10 +2,12 @@ package com.dabenxiang.mimi.view.splash
 
 import android.os.Bundle
 import android.view.View
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.base.NavigateItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -27,12 +29,20 @@ class SplashFragment : BaseFragment<SplashViewModel>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            delay(1000)
-            withContext(Dispatchers.Main) {
-                findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
+        viewModel.autoLogin()
+
+        viewModel.isAutoLogin.observe(viewLifecycleOwner, Observer {
+            lifecycleScope.launch(Dispatchers.IO) {
+
+                mainViewModel?.loadHomeCategories()
+
+                delay(1000)
+
+                withContext(Dispatchers.Main) {
+                    navigateTo(NavigateItem.Destination(R.id.action_splashFragment_to_homeFragment))
+                }
             }
-        }
+        })
     }
 
     override val bottomNavigationVisibility: Int

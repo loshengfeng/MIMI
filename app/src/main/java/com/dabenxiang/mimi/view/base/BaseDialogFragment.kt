@@ -47,12 +47,12 @@ abstract class BaseDialogFragment : DialogFragment() {
         if (isFullLayout()) {
             dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         } else {
-            val window = dialog?.window
-            if (window != null) {
-                val widthPixels = (resources.displayMetrics.widthPixels * 0.8).toInt()
-                window.setLayout(widthPixels, ViewGroup.LayoutParams.WRAP_CONTENT)
-                window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            }
+//            val window = dialog?.window
+//            if (window != null) {
+//                val widthPixels = (resources.displayMetrics.widthPixels * 0.8).toInt()
+//                window.setLayout(widthPixels, ViewGroup.LayoutParams.WRAP_CONTENT)
+//                window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+//            }
         }
     }
 

@@ -28,6 +28,9 @@ interface ApiService {
     @POST("/v1/auth/signin")
     suspend fun signIn(@Body loginRequest: LoginRequest): Response<ApiBaseItem<LoginItem>>
 
+    @GET("/v1/auth/signout")
+    suspend fun signOut(): Response<Void>
+
     /**********************************************************
      *
      *                  Attachment x 4
@@ -135,7 +138,7 @@ interface ApiService {
      *
      ***********************************************************/
     @GET("/v1/Members/Home/Categories")
-    suspend fun fetchHomeCategories(): Response<ApiBaseItem<CategoriesItem>>
+    suspend fun fetchHomeCategories(): Response<ApiBaseItem<RootCategoriesItem>>
 
     /**********************************************************
      *

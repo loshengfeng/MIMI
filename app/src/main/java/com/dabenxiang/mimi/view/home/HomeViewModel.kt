@@ -22,7 +22,7 @@ import timber.log.Timber
 class HomeViewModel : BaseViewModel() {
 
     companion object {
-        const val CATEGORIES_LIMIT = "30"
+        const val CATEGORIES_LIMIT = "20"
     }
 
     private val apiRepository: ApiRepository by inject()

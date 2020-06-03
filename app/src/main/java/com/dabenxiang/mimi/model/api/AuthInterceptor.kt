@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.model.api
 
 import com.dabenxiang.mimi.manager.AccountManager
+import com.dabenxiang.mimi.model.enums.TokenResult
 import com.dabenxiang.mimi.model.pref.Pref
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
@@ -14,6 +15,7 @@ import org.koin.core.inject
 import java.net.HttpURLConnection
 
 class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
+
     private val accountManager: AccountManager by inject()
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -22,20 +24,30 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
             return chain.proceed(chain.request())
         }
 
-        // TODO:
-        if (!accountManager.isMemberTokenValid()) {
-            
-        }
-
-        if (!accountManager.isPublicTokenValid()) {
-            runBlocking {
-                withContext(Dispatchers.IO) {
-                    accountManager.getPublicToken().collect()
+        val isAutoLogin = accountManager.isAutoLogin()
+        if (isAutoLogin) {
+            when (accountManager.getMemberTokenResult()) {
+                TokenResult.Expired -> {
+                    runBlocking {
+                        withContext(Dispatchers.IO) {
+                            accountManager.refreshToken().collect()
+                        }
+                    }
+                }
+            }
+        } else {
+            when (val r = accountManager.getPublicTokenResult()) {
+                TokenResult.Empty, TokenResult.Expired -> {
+                    runBlocking {
+                        withContext(Dispatchers.IO) {
+                            accountManager.getPublicToken().collect()
+                        }
+                    }
                 }
             }
         }
 
-        val response = chain.proceed(chain.addAuthorization())
+        val response = chain.proceed(chain.addAuthorization(isAutoLogin))
         return when (response.code) {
             HttpURLConnection.HTTP_UNAUTHORIZED -> {
                 runBlocking {
@@ -44,16 +56,21 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
                     }
                     // Prod crash when not call close
                     response.close()
-                    chain.proceed(chain.addAuthorization())
+                    chain.proceed(chain.addAuthorization(isAutoLogin))
                 }
             }
             else -> response
         }
     }
 
-    private fun Interceptor.Chain.addAuthorization(): Request {
+    private fun Interceptor.Chain.addAuthorization(isLogin: Boolean): Request {
         val requestBuilder = request().newBuilder()
-        requestBuilder.addHeader("Authorization", "Bearer ${pref.publicToken.accessToken}")
+        if (isLogin) {
+            requestBuilder.addHeader("Authorization", "Bearer ${pref.memberToken.accessToken}")
+        } else {
+            requestBuilder.addHeader("Authorization", "Bearer ${pref.publicToken.accessToken}")
+        }
+
         return requestBuilder.build()
     }
 }

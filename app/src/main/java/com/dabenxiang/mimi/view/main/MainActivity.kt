@@ -23,8 +23,6 @@ class MainActivity : BaseActivity() {
 
         setupBottomNavigationBar()
 
-        viewModel.loadHomeCategories()
-
         /* 備案
         viewModel.enableNightMode.observe(this, Observer { isNight ->
             //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
