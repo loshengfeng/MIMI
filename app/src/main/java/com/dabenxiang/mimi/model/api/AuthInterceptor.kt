@@ -36,7 +36,7 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
                 }
             }
         } else {
-            when (val r = accountManager.getPublicTokenResult()) {
+            when (accountManager.getPublicTokenResult()) {
                 TokenResult.Empty, TokenResult.Expired -> {
                     runBlocking {
                         withContext(Dispatchers.IO) {
@@ -52,7 +52,11 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
             HttpURLConnection.HTTP_UNAUTHORIZED -> {
                 runBlocking {
                     withContext(Dispatchers.IO) {
-                        accountManager.refreshToken().collect()
+                        if (isAutoLogin) {
+                            accountManager.refreshToken().collect()
+                        } else {
+                            accountManager.getPublicToken().collect()
+                        }
                     }
                     // Prod crash when not call close
                     response.close()

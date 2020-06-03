@@ -54,10 +54,6 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
         }
     }
 
-    private fun clearMemberToken() {
-        pref.clearMemberToken()
-    }
-
     fun getPublicToken() =
         flow {
             val result = apiRepository.getToken()
@@ -80,7 +76,7 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
 
     fun refreshToken() =
         flow {
-            val result = apiRepository.refreshToken(pref.memberToken.accessToken)
+            val result = apiRepository.refreshToken(pref.memberToken.refreshToken)
             if (!result.isSuccessful) throw HttpException(result)
             result.body()?.also { item ->
                 pref.memberToken = TokenData(
@@ -133,7 +129,7 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
             val result = apiRepository.signOut()
             if (!result.isSuccessful) throw HttpException(result)
 
-            clearMemberToken()
+            pref.clearMemberToken()
 
             _isLogin.postValue(false)
 
