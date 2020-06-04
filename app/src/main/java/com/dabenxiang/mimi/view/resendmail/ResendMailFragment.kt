@@ -47,7 +47,7 @@ class ResendMailFragment :BaseFragment<ResendMailViewModel>() {
         }
     }
 
-    private fun initSettings() {
+    override fun initSettings() {
         tv_title.text = getString(R.string.setting_resend_mail)
         tv_text.text = getString(R.string.setting_resend_mail)
     }

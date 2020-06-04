@@ -8,20 +8,19 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ErrorCode
+import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.dialog.GeneralDialog
-import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.login.LoginDialogFragment
 import com.dabenxiang.mimi.view.dialog.login.OnLoginDialogListener
-import com.dabenxiang.mimi.view.dialog.show
-import com.dabenxiang.mimi.widget.utility.AppUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.item_login.*
 import kotlinx.android.synthetic.main.item_register.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.android.viewmodel.ext.android.viewModel
-import retrofit2.HttpException
+import timber.log.Timber
 
 class LoginFragment : BaseFragment<LoginViewModel>() {
     private val viewModel by viewModel<LoginViewModel>()
@@ -42,7 +41,6 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
                 it.putInt(KEY_TYPE, type)
             }
         }
-
     }
 
     private var dialog: LoginDialogFragment? = null
@@ -55,16 +53,13 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
         initSettings()
     }
 
-    override fun getLayoutId(): Int {
-        return R.layout.fragment_login
-    }
+    override fun getLayoutId(): Int { return R.layout.fragment_login }
 
-    override fun fetchViewModel(): LoginViewModel? {
-        return viewModel
-    }
+    override fun fetchViewModel(): LoginViewModel? { return viewModel }
 
     override fun setupObservers() {
         viewModel.apiResult.observe(viewLifecycleOwner, Observer {
+            Timber.d("James_it: $it")
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Empty -> {
@@ -73,108 +68,112 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
                 }
                 is ApiResult.Error -> {
                     progressHUD?.dismiss()
-                    when (it.throwable) {
-                        is HttpException -> {
-                            val data = AppUtils.getHttpExceptionData(it.throwable)
-                            data.errorItem.message?.also { message ->
-                                GeneralDialog.newInstance(
-                                    GeneralDialogData(
-                                        titleRes = R.string.login_yet,
-                                        message = message,
-                                        messageIcon = R.drawable.ico_default_photo,
-                                        secondBtn = getString(R.string.btn_confirm)
-                                    )
-                                ).show(parentFragmentManager)
-                            }
-                        }
-                    }
+                    onApiError(it.throwable)
+                    // todo: 05/06/2020
+//                    when (it.throwable) {
+//                        is HttpException -> {
+//                            val data = AppUtils.getHttpExceptionData(it.throwable)
+//                            data.errorItem.message?.also { message ->
+//                                GeneralDialog.newInstance(
+//                                    GeneralDialogData(
+//                                        titleRes = R.string.login_yet,
+//                                        message = message,
+//                                        messageIcon = R.drawable.ico_default_photo,
+//                                        secondBtn = getString(R.string.btn_confirm)
+//                                    )
+//                                ).show(parentFragmentManager)
+//                            }
+//                        }
+//                    }
                 }
             }
         })
 
-        viewModel.registerAccountError.observe(viewLifecycleOwner, Observer {
-            if (it == null) {
-                edit_register_account.setBackgroundResource(R.drawable.edit_text_rectangle)
-                tv_register_account_error.visibility = View.INVISIBLE
-            } else {
-                edit_register_account.setBackgroundResource(R.drawable.edit_text_error_rectangle)
-                tv_register_account_error.text = getString(it)
-                tv_register_account_error.visibility = View.VISIBLE
-            }
-        })
-
-        viewModel.loginAccountError.observe(viewLifecycleOwner, Observer {
-            if (it == null) {
-                edit_login_account.setBackgroundResource(R.drawable.edit_text_rectangle)
-                tv_login_account_error.visibility = View.INVISIBLE
-            } else {
-                edit_login_account.setBackgroundResource(R.drawable.edit_text_error_rectangle)
-                tv_login_account_error.text = getString(it)
-                tv_login_account_error.visibility = View.VISIBLE
-            }
-        })
-
-        viewModel.emailError.observe(viewLifecycleOwner, Observer {
-            if (it == null) {
-                edit_email.setBackgroundResource(R.drawable.edit_text_rectangle)
-                tv_email_error.visibility = View.INVISIBLE
-            } else {
-                edit_email.setBackgroundResource(R.drawable.edit_text_error_rectangle)
-                tv_email_error.text = getString(it)
-                tv_email_error.visibility = View.VISIBLE
-            }
-        })
-
         viewModel.friendlyNameError.observe(viewLifecycleOwner, Observer {
-            if (it == null) {
+            if (it == "") {
                 edit_friendly_name.setBackgroundResource(R.drawable.edit_text_rectangle)
                 tv_friendly_name_error.visibility = View.INVISIBLE
             } else {
                 edit_friendly_name.setBackgroundResource(R.drawable.edit_text_error_rectangle)
-                tv_friendly_name_error.text = getString(it)
+                tv_friendly_name_error.text = it
                 tv_friendly_name_error.visibility = View.VISIBLE
             }
         })
 
+        viewModel.emailError.observe(viewLifecycleOwner, Observer {
+            if (it == "") {
+                edit_email.setBackgroundResource(R.drawable.edit_text_rectangle)
+                tv_email_error.visibility = View.INVISIBLE
+            } else {
+                edit_email.setBackgroundResource(R.drawable.edit_text_error_rectangle)
+                tv_email_error.text = it
+                tv_email_error.visibility = View.VISIBLE
+            }
+        })
+
+        viewModel.registerAccountError.observe(viewLifecycleOwner, Observer {
+            if (it == "") {
+                edit_register_account.setBackgroundResource(R.drawable.edit_text_rectangle)
+                tv_register_account_error.visibility = View.INVISIBLE
+            } else {
+                edit_register_account.setBackgroundResource(R.drawable.edit_text_error_rectangle)
+                tv_register_account_error.text = it
+                tv_register_account_error.visibility = View.VISIBLE
+            }
+        })
+
         viewModel.registerPasswordError.observe(viewLifecycleOwner, Observer {
-            if (it == null) {
+            if (it == "") {
                 edit_register_pw.setBackgroundResource(R.drawable.edit_text_rectangle)
                 tv_register_pw_error.visibility = View.INVISIBLE
             } else {
                 edit_register_pw.setBackgroundResource(R.drawable.edit_text_error_rectangle)
-                tv_register_pw_error.text = getString(it)
+                tv_register_pw_error.text = it
                 tv_register_pw_error.visibility = View.VISIBLE
             }
         })
 
         viewModel.confirmPasswordError.observe(viewLifecycleOwner, Observer {
-            if (it == null) {
+            if (it == "") {
                 edit_register_confirm_pw.setBackgroundResource(R.drawable.edit_text_rectangle)
                 tv_register_confirm_pw_error.visibility = View.INVISIBLE
             } else {
                 edit_register_confirm_pw.setBackgroundResource(R.drawable.edit_text_error_rectangle)
-                tv_register_confirm_pw_error.text = getString(it)
+                tv_register_confirm_pw_error.text = it
                 tv_register_confirm_pw_error.visibility = View.VISIBLE
             }
         })
 
+        viewModel.loginAccountError.observe(viewLifecycleOwner, Observer {
+            if (it == "") {
+                edit_login_account.setBackgroundResource(R.drawable.edit_text_rectangle)
+                tv_login_account_error.visibility = View.INVISIBLE
+            } else {
+                edit_login_account.setBackgroundResource(R.drawable.edit_text_error_rectangle)
+                tv_login_account_error.text = it
+                tv_login_account_error.visibility = View.VISIBLE
+            }
+        })
+
         viewModel.loginPasswordError.observe(viewLifecycleOwner, Observer {
-            if (it == null) {
+            if (it == "") {
                 edit_login_pw.setBackgroundResource(R.drawable.edit_text_rectangle)
                 tv_login_pw_error.visibility = View.INVISIBLE
             } else {
                 edit_login_pw.setBackgroundResource(R.drawable.edit_text_error_rectangle)
-                tv_login_pw_error.text = getString(it)
+                tv_login_pw_error.text = it
                 tv_login_pw_error.visibility = View.VISIBLE
             }
         })
 
         viewModel.loginResult.observe(viewLifecycleOwner, Observer {
+            Timber.d("James_it: $it")
             dialog = LoginDialogFragment.newInstance(onLoginDialogListener, LoginDialogFragment.TYPE_SUCCESS)
             dialog?.show(activity!!.supportFragmentManager, LoginDialogFragment::class.java.simpleName)
         })
     }
 
+    @ExperimentalCoroutinesApi
     override fun setupListeners() {
         tl_type.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
@@ -242,7 +241,7 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
         }
     }
 
-    private fun initSettings() {
+    override fun initSettings() {
         viewModel.registerAccount.bindingEditText = edit_register_account
         viewModel.email.bindingEditText = edit_email
         viewModel.friendlyName.bindingEditText = edit_friendly_name
@@ -252,6 +251,15 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
         viewModel.loginPw.bindingEditText = edit_login_pw
 
         tl_type.selectTab(this.arguments?.getInt(KEY_TYPE, TYPE_REGISTER)?.let { tl_type.getTabAt(it) })
+
+        // todo: for testing...
+        viewModel.friendlyName.value = "Wayne"
+        viewModel.email.value = "wayne.liu@silkrode.com.tw"
+        viewModel.registerAccount.value = "Wayne"
+        viewModel.registerPw.value = "12345678"
+        viewModel.confirmPw.value = "12345678"
+        viewModel.loginAccount.value = "Wayne"
+        viewModel.loginPw.value = "12345678"
     }
 
     override fun navigateTo(item: NavigateItem) {
@@ -273,6 +281,12 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
                     }
                 }
             }
+        }
+    }
+
+    override fun handleHttpError(errorHandler: ExceptionResult.HttpError) {
+        when (errorHandler.httpExceptionItem.errorItem.code) {
+            ErrorCode.LOGIN_403001 -> showErrorMessageDialog(getString(R.string.error_username_or_password_incorrect))
         }
     }
 }

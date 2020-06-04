@@ -5,7 +5,7 @@ import android.provider.Settings
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.vo.ErrorItem
-import com.dabenxiang.mimi.model.api.vo.HttpExceptionData
+import com.dabenxiang.mimi.model.api.vo.HttpExceptionItem
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -26,6 +26,7 @@ object AppUtils {
     private const val TIME_ZONE_OFFSET: Long = 1000 * 60 * 60 * 8  //UTC - 8 hours
     private const val MIN_CLICK_DELAY_TIME = 1000
     private var lastClickTime = 0L
+
 
     @SuppressLint("HardwareIds")
     fun getAndroidID(): String {
@@ -82,7 +83,7 @@ object AppUtils {
         }
     }
 
-    fun getHttpExceptionData(httpException: HttpException): HttpExceptionData {
+    fun getHttpExceptionData(httpException: HttpException): HttpExceptionItem {
         val oriResponse = httpException.response()
 
         val url = oriResponse?.raw()?.request?.url.toString()
@@ -113,7 +114,7 @@ object AppUtils {
         val response = Response.error<ErrorItem>(responseBody, rawResponse)
 
         val httpExceptionClone = HttpException(response)
-        return HttpExceptionData(errorItem, httpExceptionClone, url)
+        return HttpExceptionItem(errorItem, httpExceptionClone, url)
     }
 
     private fun getStackTrace(t: Throwable): String {
@@ -124,19 +125,19 @@ object AppUtils {
         return sw.toString()
     }
 
-    fun isAccountValid(account: String): Boolean {
-        return Pattern.matches("^[a-zA-Z0-9]{5,20}$", account)
+    fun isFriendlyNameValid(name: String): Boolean {
+        return Pattern.matches("^[a-zA-Z0-9-\\u4e00-\\u9fa5-`\\[\\]~!@#\$%^&*()_+\\-=;',./?<>{}|:\"\\\\]{1,20}+$", name)
     }
 
     fun isEmailValid(email: String): Boolean {
         return Pattern.matches("^[A-Za-z0-9_\\-\\.\\u4e00-\\u9fa5]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*$", email)
     }
 
-    fun isFriendlyNameValid(name: String): Boolean {
-        return Pattern.matches("^[a-zA-Z0-9-\\u4e00-\\u9fa5]{1,10}$", name)
+    fun isAccountValid(account: String): Boolean {
+        return Pattern.matches("^[a-zA-Z0-9]{5,20}$", account)
     }
 
-    fun isPasswordValid(password: String): Boolean {
-        return Pattern.matches("^\\S{8,20}$", password)
+    fun isPasswordValid(pwd: String): Boolean {
+        return Pattern.matches("^[a-zA-Z0-9-`\\[\\]~!@#\$%^&*()_+\\-=;',./?<>{}|:\"\\\\]{8,20}+$", pwd)
     }
 }

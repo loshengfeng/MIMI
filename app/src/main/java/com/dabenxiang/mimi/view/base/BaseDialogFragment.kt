@@ -11,7 +11,7 @@ import com.kaopiz.kprogresshud.KProgressHUD
 
 abstract class BaseDialogFragment : DialogFragment() {
 
-    var progressHUD: KProgressHUD? = null
+    private var progressHUD: KProgressHUD? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,12 +61,8 @@ abstract class BaseDialogFragment : DialogFragment() {
     @LayoutRes
     abstract fun getLayoutId(): Int
 
-    open fun setupObservers() {
+    open fun setupObservers() {}
 
-    }
-
-    open fun setupListeners() {
-
-    }
+    open fun setupListeners() {}
 
 }

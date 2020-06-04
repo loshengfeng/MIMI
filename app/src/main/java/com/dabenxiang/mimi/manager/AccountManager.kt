@@ -94,6 +94,36 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
             }
 
 
+    // todo: 04/06/2020
+    fun register(userName: String, password: String) =
+        flow {
+            val request = LoginRequest(userName, password)
+            val result = apiRepository.signIn(request)
+            if (!result.isSuccessful) throw HttpException(result)
+
+            result.body()?.content?.also { item ->
+                pref.memberToken = TokenData(
+                    accessToken = item.accessToken,
+                    refreshToken = item.refreshToken,
+                    // 提前2分鐘過期
+                    expiresTimestamp = Date().time + (item.expiresIn - 120) * 1000
+                )
+            }
+
+            setupProfile(ProfileData(AppUtils.getAndroidID(), userName, password))
+
+            _isLogin.postValue(true)
+
+            emit(ApiResult.success(null))
+        }
+            .flowOn(Dispatchers.IO)
+            .onStart { emit(ApiResult.loading()) }
+            .catch { e ->
+                emit(ApiResult.error(e))
+            }.onCompletion {
+                emit(ApiResult.loaded())
+            }
+
     fun signIn(userName: String, password: String) =
         flow {
             val request = LoginRequest(userName, password)
@@ -160,4 +190,8 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
             }.onCompletion {
                 emit(ApiResult.loaded())
             }
+
+    fun logoutLocal() {
+        pref.clearMemberToken()
+    }
 }

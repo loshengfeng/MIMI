@@ -78,7 +78,7 @@ class TopupHistoryFragment : BaseFragment<TopupHistoryViewModel>() {
         }
     }
 
-    private fun initSettings() {
+    override fun initSettings() {
         tv_title.text = getString(R.string.personal_topoup_history)
         when(hasData) {
             true -> {

@@ -15,8 +15,7 @@ class ForgetPasswordFragment : BaseFragment<ForgetPasswordViewModel>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        edit_account.setText("jeff7788")
-        edit_email.setText("jeff@silkrode.com.tw")
+        initSettings()
     }
 
     override fun getLayoutId(): Int {
@@ -97,7 +96,7 @@ class ForgetPasswordFragment : BaseFragment<ForgetPasswordViewModel>() {
         Timber.d("${ForgetPasswordFragment::class.java.simpleName}_setupListeners")
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
-                R.id.tv_back, R.id.btn_cancel -> Navigation.findNavController(view!!).navigateUp()
+//                R.id.tv_back, R.id.btn_cancel -> Navigation.findNavController(view!!).navigateUp()
                 R.id.btn_send -> {
                     viewModel.doValidateAndSubmit(
                         edit_account.text.toString(),
@@ -106,7 +105,6 @@ class ForgetPasswordFragment : BaseFragment<ForgetPasswordViewModel>() {
                 }
             }
         }.also {
-            tv_back.setOnClickListener(it)
             btn_cancel.setOnClickListener(it)
             btn_send.setOnClickListener(it)
         }
@@ -117,5 +115,12 @@ class ForgetPasswordFragment : BaseFragment<ForgetPasswordViewModel>() {
                 else -> PasswordTransformationMethod.getInstance()
             }
         }*/
+    }
+
+    override fun initSettings() {
+        super.initSettings()
+        // todo: for testing...
+        edit_account.setText("Wayne")
+        edit_email.setText("wayne.liu@silkrode.com.tw")
     }
 }

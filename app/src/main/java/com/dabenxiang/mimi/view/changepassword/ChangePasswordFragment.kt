@@ -64,7 +64,7 @@ class ChangePasswordFragment : BaseFragment<ChangePasswordViewModel>() {
         }
     }
 
-    private fun initSettings() {
+    override fun initSettings() {
         tv_title.text = getString(R.string.setting_change_password)
     }
 }

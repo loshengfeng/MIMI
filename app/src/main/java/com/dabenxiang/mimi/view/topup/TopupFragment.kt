@@ -89,7 +89,7 @@ class TopupFragment : BaseFragment<TopupViewModel>() {
         }
     }
 
-    private fun initSettings() {
+    override fun initSettings() {
         tv_name.text = "好大一棵洋梨"
         tv_coco.text = "200"
         tv_subtitle.text = "副标内容副标内容"

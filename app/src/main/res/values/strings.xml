@@ -3,6 +3,12 @@
 
     <string name="splash_text">欢  迎  来  到  蜜  蜜</string>
 
+    <string name="error_device_binding_title">@string/oops</string>
+    <string name="error_device_binding_positive">@string/i_know</string>
+
+    <string name="oops">Oops!</string>
+    <string name="i_know">知道了</string>
+
     <!-- nav button -->
     <string name="nav_home">一般影视</string>
     <string name="nav_adult">成人影视</string>
@@ -11,15 +17,19 @@
     <string name="nav_personal">我的</string>
 
     <!-- Login -->
-    <string name="account_empty">请填写账号</string>
-    <string name="account_format_error">账号限定为5~20字英数，请确认</string>
+    <string name="friendly_name_format_error_1">请填写中文、英文或数字或特殊符号</string>
+    <string name="friendly_name_format_error_2">已超过字数上限20字</string>
     <string name="email_format_error_1">请填写email</string>
-    <string name="email_format_error_2">email错误，请确认</string>
-    <string name="friendly_name_format_error_1">请填写昵称</string>
-    <string name="friendly_name_format_error_2">昵称限定为1~10字英数，请确认</string>
-    <string name="password_empty">请填写密码</string>
-    <string name="password_format_error_1">密码限定为8~20英数或特殊符号，区分大小写</string>
-    <string name="password_format_error_2">密码不相符</string>
+    <string name="email_format_error_2">请填写正确的Email格式</string>
+    <string name="email_format_error_3">已超过字数上限100字，请确认</string>
+    <string name="email_format_error_4">此Email已存在，请重新填写</string>
+    <string name="account_format_error_1">请填写账号</string>
+    <string name="account_format_error_2">請填寫5~20字的英文或數字</string>
+    <string name="account_format_error_3">此账号已存在，请重新填写</string>
+    <string name="password_format_error_1">请填写密码</string>
+    <string name="password_format_error_2">请填写8~20字的英文、数字或特殊符号，区分大小写</string>
+    <string name="password_format_error_3">请填写确认密码</string>
+    <string name="password_format_error_4">密码不相符</string>
     <string name="receive_mail">请收验证信</string>
     <string name="desc_register">请至信箱查看验证信以完成账号注册</string>
     <string name="desc_mail">已传送新密码至您的邮箱%s请至邮箱确认</string>
@@ -27,6 +37,7 @@
     <string name="forget_password">忘记密码</string>
     <string name="login_yet">尚未登录</string>
     <string name="login_message">请立即登录享受线上强档</string>
+    <string name="error_username_or_password_incorrect">使用者名称或密码错误</string>
 
     <!-- Topup -->
     <string name="topup_desc">蜜币购买</string>
@@ -71,6 +82,9 @@
     <string name="btn_login">登录</string>
     <string name="login_name">请填写名称</string>
     <string name="login_email">请填写Email</string>
+    <string name="login_account">请填写帐号</string>
+    <string name="login_pw">请填写密码</string>
+    <string name="login_confirm_pw">请填写确认密码</string>
     <string name="login_desc">点选「注册」即表示您同意接受<font fgcolor="#ff4d4d">服务条款</font>及<font fgcolor="#ff4d4d">服隐私权保护政策</font></string>
     <string name="login_keep_account">记住帐号</string>
     <string name="login_forget">忘记密码?</string>

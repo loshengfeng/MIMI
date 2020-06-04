@@ -12,13 +12,18 @@ import androidx.navigation.fragment.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.ExceptionResult
+import com.dabenxiang.mimi.model.api.vo.handleException
 import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
+import com.dabenxiang.mimi.view.dialog.message.MessageDialogFragment
+import com.dabenxiang.mimi.view.dialog.message.OnMessageDialogListener
 import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.kaopiz.kprogresshud.KProgressHUD
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import retrofit2.HttpException
+import java.net.UnknownHostException
 
 abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
 
@@ -74,7 +79,7 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
         }
     }
 
-    fun showErrorDialog(message: String) {
+    private fun showErrorDialog(message: String) {
         MaterialDialog(context!!).show {
             cancelable(false)
             message(text = message)
@@ -83,6 +88,15 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
             }
             lifecycleOwner(this@BaseFragment)
         }
+    }
+
+    fun showErrorMessageDialog(message: String, listener: OnMessageDialogListener? = null) {
+        val content = MessageDialogFragment.Content(
+            title = getString(R.string.error_device_binding_title),
+            message = message,
+            positiveBtnText = getString(R.string.error_device_binding_positive),
+            listener = listener)
+        MessageDialogFragment.newInstance(content).show(requireActivity().supportFragmentManager, MessageDialogFragment::class.java.simpleName)
     }
 
     fun showHttpErrorToast(e: HttpException) {
@@ -94,6 +108,8 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
     abstract fun setupObservers()
 
     abstract fun setupListeners()
+
+    open fun initSettings() {}
 
     open val bottomNavigationVisibility: Int = View.VISIBLE
 
@@ -149,5 +165,34 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
                 it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             })
         */
+    }
+
+    open fun onApiError(throwable: Throwable) {
+        when (val errorHandler = throwable.handleException { ex -> mainViewModel?.processException(ex) }) {
+            is ExceptionResult.RefreshTokenExpired -> logoutLocal()
+            is ExceptionResult.HttpError -> {
+                handleHttpError(errorHandler)
+                GeneralUtils.showToast(requireContext(), errorHandler.httpExceptionItem.errorItem.toString())
+            }
+            is ExceptionResult.Crash -> {
+                if (errorHandler.throwable is UnknownHostException) {
+                    GeneralUtils.showHttpErrorDialog(requireContext(), HttpErrorMsgType.CHECK_NETWORK)
+                } else {
+                    GeneralUtils.showToast(requireContext(), "${errorHandler.throwable}")
+                }
+            }
+        }
+    }
+
+    open fun handleHttpError(errorHandler: ExceptionResult.HttpError) {
+        GeneralUtils.showToast(requireContext(), "${errorHandler.httpExceptionItem.errorItem}")
+    }
+
+    private fun logoutLocal() {
+        view?.let {
+            mainViewModel?.clearToken()
+            // todo: 05/06/2020
+//            findNavController().navigate(R.id.action_to_loginFragment)
+        }
     }
 }

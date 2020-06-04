@@ -58,7 +58,7 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
         }
     }
 
-    private fun initSettings() {
+    override fun initSettings() {
         tvRaw1.text = "內容內容內容內容"
         tvEmail.text = "ABCDEFG@abcde.com"
         var img = when(isValidated) {

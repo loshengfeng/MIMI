@@ -30,8 +30,8 @@ class ForgetPasswordViewModel : BaseViewModel() {
 
     private fun isValidateAccount(account: String): Boolean {
         _accountError.value = when {
-            account.isNullOrBlank() -> R.string.account_empty
-            !isAccountValid(account) -> R.string.account_format_error
+            account.isNullOrBlank() -> R.string.account_format_error_1
+            !isAccountValid(account) -> R.string.account_format_error_2
             else -> null
         }
 

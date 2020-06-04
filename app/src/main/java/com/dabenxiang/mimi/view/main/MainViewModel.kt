@@ -54,4 +54,8 @@ class MainViewModel : BaseViewModel() {
                 }
         }
     }
+
+    fun clearToken() {
+        accountManager.logoutLocal()
+    }
 }

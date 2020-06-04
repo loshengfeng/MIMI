@@ -9,7 +9,10 @@ import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import com.blankj.utilcode.util.EncodeUtils
 import com.blankj.utilcode.util.ImageUtils
+import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.model.pref.Pref
+import com.dabenxiang.mimi.view.dialog.SingleBtnWithIconDialog
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import timber.log.Timber
@@ -65,5 +68,27 @@ object GeneralUtils : KoinComponent {
     fun Int.toDp(resources: Resources): Int {
         return (resources.displayMetrics.density * this).toInt()
     }
+
+    fun showHttpErrorDialog(
+        context: Context,
+        type: HttpErrorMsgType = HttpErrorMsgType.API_FAILED
+    ) {
+        SingleBtnWithIconDialog(
+            context = context,
+            icon = R.drawable.ico_fail_big,
+            message = when (type) {
+                HttpErrorMsgType.API_FAILED -> R.string.api_failed_msg
+                HttpErrorMsgType.CHECK_NETWORK -> R.string.server_error
+            },
+            btnText = R.string.btn_close
+        ).show()
+    }
+
+//    @ExperimentalCoroutinesApi
+//    fun sendApiLog(data: LogApiItem) {
+//        MainScope().launch {
+//            deviceManager.sendApiLog(data)
+//        }
+//    }
 
 }

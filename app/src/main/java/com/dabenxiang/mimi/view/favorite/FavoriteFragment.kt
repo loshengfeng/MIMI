@@ -54,7 +54,7 @@ class FavoriteFragment  : BaseFragment<FavoriteViewModel>() {
         }
     }
 
-    private fun initSettings() {
+    override fun initSettings() {
         when(hasData) {
             true -> {
                 rv_content.visibility = View.VISIBLE
