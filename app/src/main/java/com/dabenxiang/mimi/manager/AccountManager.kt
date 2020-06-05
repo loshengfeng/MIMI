@@ -24,6 +24,12 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
         return pref.profileData
     }
 
+    var keepAccount: Boolean
+        get() = pref.keepAccount
+        set(value) {
+            pref.keepAccount = value
+        }
+
     private fun setupProfile(profileData: ProfileData) {
         pref.profileData = profileData
     }
@@ -193,5 +199,6 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
 
     fun logoutLocal() {
         pref.clearMemberToken()
+        _isLogin.value = false
     }
 }

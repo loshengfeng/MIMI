@@ -15,7 +15,6 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     val gson: Gson by inject()
     val toastData = MutableLiveData<String>()
 
-
     private val _showProgress by lazy { MutableLiveData<Boolean>() }
     val showProgress: LiveData<Boolean> get() = _showProgress
 

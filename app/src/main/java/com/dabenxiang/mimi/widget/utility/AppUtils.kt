@@ -126,7 +126,7 @@ object AppUtils {
     }
 
     fun isFriendlyNameValid(name: String): Boolean {
-        return Pattern.matches("^[a-zA-Z0-9-\\u4e00-\\u9fa5-`\\[\\]~!@#\$%^&*()_+\\-=;',./?<>{}|:\"\\\\]{1,20}+$", name)
+        return Pattern.matches("^[a-zA-Z0-9-\\u4e00-\\u9fa5-`\\[\\]~!@#\$%^&*()_+{}|:”<>?`\\[\\];’,./\\\\]{1,20}+$", name)
     }
 
     fun isEmailValid(email: String): Boolean {

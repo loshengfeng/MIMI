@@ -8,9 +8,8 @@ class Pref(private val gson: Gson, preferenceFileName: String, isDebug: Boolean)
 
     private val tokenPref = StringPref("TOKEN")
     private val memberTokenPref = StringPref("MEMBER_TOKEN")
-    private val aesKeyPref = StringPref("AES_KEY")
-    private val ellipsizeKeyPref = BooleanPref("ELLIPSIZE_KEY")
     private val profilePref = StringPref("PROFILE")
+    private val keepAccountPref = BooleanPref("KEEP_ACCOUNT")
     private var cachedPublicToken: TokenData? = null
     private var cachedMemberToken: TokenData? = null
 
@@ -57,13 +56,9 @@ class Pref(private val gson: Gson, preferenceFileName: String, isDebug: Boolean)
             profilePref.set(gson.toJson(value))
         }
 
-    var aesKey: String
-        get() = aesKeyPref.get().toString()
-        set(value) = aesKeyPref.set(value)
-
-    var disableEllipsize: Boolean
-        get() = ellipsizeKeyPref.get()
-        set(value) = ellipsizeKeyPref.set(value)
+    var keepAccount: Boolean
+        get() = keepAccountPref.get()
+        set(value) = keepAccountPref.set(value)
 
     fun clearMemberToken() {
         cachedMemberToken = null

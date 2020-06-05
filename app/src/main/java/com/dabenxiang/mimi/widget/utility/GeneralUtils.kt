@@ -15,7 +15,6 @@ import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.view.dialog.SingleBtnWithIconDialog
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import timber.log.Timber
 
 object GeneralUtils : KoinComponent {
 
@@ -37,27 +36,6 @@ object GeneralUtils : KoinComponent {
     fun showKeyboard(context: Context, editText: View) {
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(editText, InputMethodManager.SHOW_FORCED)
-    }
-
-    fun getEllipsizeString(text: String, startIndex: Int = 2, endIndex: Int = 2): String {
-        Timber.i("Disable ellipsize :${pref.disableEllipsize}")
-        val disableEllipsize = pref.disableEllipsize
-        if (disableEllipsize) return text
-
-        var ellipsize = ""
-
-        if (text.length == 2) {
-            ellipsize = "${text[0]}*"
-        } else {
-            text.forEachIndexed { index, char ->
-                ellipsize += if (index < startIndex || index >= text.length - endIndex) {
-                    char.toString()
-                } else {
-                    "*"
-                }
-            }
-        }
-        return ellipsize
     }
 
     fun bitmapToBase64(bitmap: Bitmap): String {

@@ -236,8 +236,7 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
         }
 
         cb_keep_account.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.toastData.value = "Remember: $isChecked"
-            // todo: save Account to SharePreference...
+            viewModel.accountManager.keepAccount = isChecked
         }
     }
 
@@ -258,8 +257,18 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
         viewModel.registerAccount.value = "Wayne"
         viewModel.registerPw.value = "12345678"
         viewModel.confirmPw.value = "12345678"
-        viewModel.loginAccount.value = "Wayne"
-        viewModel.loginPw.value = "12345678"
+
+        val keepAccount = viewModel.accountManager.keepAccount
+
+        cb_keep_account.isChecked = keepAccount
+
+        viewModel.loginAccount.value = when(keepAccount) {
+            true -> {
+                val profile = viewModel.accountManager.getProfile()
+                profile?.account
+            }
+            false -> ""
+        }
     }
 
     override fun navigateTo(item: NavigateItem) {
