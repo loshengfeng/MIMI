@@ -20,7 +20,7 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
     private val _isLogin = MutableLiveData(false)
     val isLogin: LiveData<Boolean> = _isLogin
 
-    fun getProfile(): ProfileData? {
+    fun getProfile(): ProfileData {
         return pref.profileData
     }
 
@@ -28,7 +28,7 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
         pref.profileData = profileData
     }
 
-    fun isAutoLogin(): Boolean {
+    fun hasMemberToken(): Boolean {
         val tokenItem = pref.memberToken
         return tokenItem.accessToken.isNotEmpty() && tokenItem.refreshToken.isNotEmpty()
     }
@@ -153,15 +153,12 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
                 emit(ApiResult.loaded())
             }
 
-
     fun signOut() =
         flow {
             val result = apiRepository.signOut()
             if (!result.isSuccessful) throw HttpException(result)
 
-            pref.clearMemberToken()
-
-            _isLogin.postValue(false)
+            logoutLocal()
 
             emit(ApiResult.success(null))
         }
@@ -193,5 +190,6 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
 
     fun logoutLocal() {
         pref.clearMemberToken()
+        _isLogin.postValue(false)
     }
 }

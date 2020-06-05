@@ -258,8 +258,6 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
         viewModel.registerAccount.value = "Wayne"
         viewModel.registerPw.value = "12345678"
         viewModel.confirmPw.value = "12345678"
-        viewModel.loginAccount.value = "Wayne"
-        viewModel.loginPw.value = "12345678"
     }
 
     override fun navigateTo(item: NavigateItem) {

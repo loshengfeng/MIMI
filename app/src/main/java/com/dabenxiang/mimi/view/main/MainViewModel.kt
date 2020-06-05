@@ -55,7 +55,7 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
-    fun clearToken() {
+    fun logoutLocal() {
         accountManager.logoutLocal()
     }
 }

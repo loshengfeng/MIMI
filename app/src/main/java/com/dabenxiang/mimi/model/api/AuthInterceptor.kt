@@ -6,13 +6,16 @@ import com.dabenxiang.mimi.model.pref.Pref
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import timber.log.Timber
 import java.net.HttpURLConnection
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
+import javax.net.ssl.SSLHandshakeException
 
 class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
 
@@ -20,61 +23,94 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         //Timber.d(chain.request().url.toString())
-        if (chain.request().url.toString().endsWith("/token")) {
+        val urlString = chain.request().url.toString()
+        if (urlString.endsWith("/token")) {
             return chain.proceed(chain.request())
         }
 
-        val isAutoLogin = accountManager.isAutoLogin()
-        if (isAutoLogin) {
+        var userMemberToken = accountManager.hasMemberToken()
+        if (userMemberToken) {
+            userMemberToken = when {
+                urlString.endsWith("/signin") -> false
+                else -> true
+            }
+        }
+
+        if (userMemberToken) {
             when (accountManager.getMemberTokenResult()) {
-                TokenResult.Expired -> {
-                    runBlocking {
-                        withContext(Dispatchers.IO) {
-                            accountManager.refreshToken().collect()
-                        }
-                    }
-                }
+                TokenResult.Expired -> doRefreshToken()
             }
         } else {
             when (accountManager.getPublicTokenResult()) {
-                TokenResult.Empty, TokenResult.Expired -> {
-                    runBlocking {
-                        withContext(Dispatchers.IO) {
-                            accountManager.getPublicToken().collect()
-                        }
-                    }
-                }
+                TokenResult.Empty, TokenResult.Expired -> getPublicToken()
             }
         }
 
-        val response = chain.proceed(chain.addAuthorization(isAutoLogin))
-        return when (response.code) {
-            HttpURLConnection.HTTP_UNAUTHORIZED -> {
-                runBlocking {
-                    withContext(Dispatchers.IO) {
-                        if (isAutoLogin) {
-                            accountManager.refreshToken().collect()
-                        } else {
-                            accountManager.getPublicToken().collect()
-                        }
-                    }
-                    // Prod crash when not call close
+        var response: Response? = null
+
+        try {
+            response = chain.proceed(chain.addAuthorization(userMemberToken))
+
+            return when (response.code) {
+                HttpURLConnection.HTTP_UNAUTHORIZED -> {
                     response.close()
-                    chain.proceed(chain.addAuthorization(isAutoLogin))
+                    if (userMemberToken) {
+                        doRefreshToken()
+                    } else {
+                        getPublicToken()
+                    }
+
+                    chain.proceed(chain.addAuthorization(userMemberToken))
                 }
+                else -> response
             }
-            else -> response
+
+        } catch (e: Exception) {
+            response?.close()
+            return when (e) {
+                is UnknownHostException,
+                is SocketTimeoutException,
+                is SSLHandshakeException -> {
+                    //domainManager.changeApiDomainIndex()
+                    chain.proceed(chain.addAuthorization(userMemberToken))
+                }
+                else -> chain.proceed(chain.addAuthorization(userMemberToken))
+            }
         }
     }
 
-    private fun Interceptor.Chain.addAuthorization(isLogin: Boolean): Request {
+    private fun Interceptor.Chain.addAuthorization(userMember: Boolean): Request {
         val requestBuilder = request().newBuilder()
-        if (isLogin) {
+        if (userMember) {
             requestBuilder.addHeader("Authorization", "Bearer ${pref.memberToken.accessToken}")
         } else {
             requestBuilder.addHeader("Authorization", "Bearer ${pref.publicToken.accessToken}")
         }
 
         return requestBuilder.build()
+    }
+
+    private fun doRefreshToken() {
+        runBlocking(Dispatchers.IO) {
+            accountManager.refreshToken()
+                .collect {
+                    when (it) {
+                        is ApiResult.Empty -> Timber.d("Refresh token successful!")
+                        is ApiResult.Error -> Timber.e("Refresh token error: $it")
+                    }
+                }
+        }
+    }
+
+    private fun getPublicToken() {
+        runBlocking(Dispatchers.IO) {
+            accountManager.getPublicToken()
+                .collect {
+                    when (it) {
+                        is ApiResult.Empty -> Timber.d("Get token successful!")
+                        is ApiResult.Error -> Timber.e("Get token error: $it")
+                    }
+                }
+        }
     }
 }

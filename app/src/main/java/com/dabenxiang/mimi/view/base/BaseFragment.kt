@@ -189,10 +189,6 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
     }
 
     private fun logoutLocal() {
-        view?.let {
-            mainViewModel?.clearToken()
-            // todo: 05/06/2020
-//            findNavController().navigate(R.id.action_to_loginFragment)
-        }
+        mainViewModel?.logoutLocal()
     }
 }
