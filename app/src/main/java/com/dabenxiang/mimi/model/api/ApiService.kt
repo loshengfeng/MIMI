@@ -26,7 +26,7 @@ interface ApiService {
     ): Response<TokenItem>
 
     @POST("/v1/auth/signin")
-    suspend fun signIn(@Body loginRequest: LoginRequest): Response<ApiBaseItem<LoginItem>>
+    suspend fun signIn(@Body request: SignInRequest): Response<ApiBaseItem<SignInItem>>
 
     @GET("/v1/auth/signout")
     suspend fun signOut(): Response<Void>
@@ -119,7 +119,7 @@ interface ApiService {
 
     @POST("/v1/Members/SignUp")
     suspend fun signUp(
-        @Body body: MembersAccountItem
+        @Body body: SingUpRequest
     ): Response<Void>
 
     @POST("/v1/Members/Me/ValidationEmail")

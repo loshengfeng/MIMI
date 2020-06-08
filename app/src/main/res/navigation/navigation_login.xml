@@ -15,11 +15,20 @@
             android:id="@+id/action_loginFragment_to_forgetPasswordFragment"
             app:destination="@id/forgetPasswordFragment" />
 
+        <action
+            android:id="@+id/action_loginFragment_to_changePasswordFragment"
+            app:destination="@id/changePasswordFragment" />
+
     </fragment>
 
     <fragment
         android:id="@+id/forgetPasswordFragment"
         android:name="com.dabenxiang.mimi.view.forgetpassword.ForgetPasswordFragment"
         tools:layout="@layout/fragment_forget_password" />
+
+    <fragment
+        android:id="@+id/changePasswordFragment"
+        android:name="com.dabenxiang.mimi.view.changepassword.ChangePasswordFragment"
+        tools:layout="@layout/fragment_change_password" />
 
 </navigation>

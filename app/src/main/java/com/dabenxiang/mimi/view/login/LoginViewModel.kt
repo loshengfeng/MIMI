@@ -7,28 +7,22 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.MembersAccountItem
+import com.dabenxiang.mimi.model.api.vo.SingUpRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
-import com.dabenxiang.mimi.widget.utility.AppUtils
 import com.dabenxiang.mimi.widget.utility.AppUtils.isAccountValid
 import com.dabenxiang.mimi.widget.utility.AppUtils.isEmailValid
 import com.dabenxiang.mimi.widget.utility.AppUtils.isFriendlyNameValid
 import com.dabenxiang.mimi.widget.utility.AppUtils.isPasswordValid
 import com.dabenxiang.mimi.widget.utility.EditTextMutableLiveData
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.inject
-import retrofit2.HttpException
-import timber.log.Timber
 
 class LoginViewModel : BaseViewModel() {
     private val app: Application by inject()
-    private val apiRepository: ApiRepository by inject()
 
     var type = TYPE_REGISTER
 
@@ -57,6 +51,9 @@ class LoginViewModel : BaseViewModel() {
     private val _confirmPasswordError = MutableLiveData<String>()
     val confirmPasswordError: LiveData<String> = _confirmPasswordError
 
+    private val _registerResult = MutableLiveData<ApiResult<Nothing>>()
+    val registerResult: LiveData<ApiResult<Nothing>> = _registerResult
+
     // Login
     private val _loginAccountError = MutableLiveData<String>()
     val loginAccountError: LiveData<String> = _loginAccountError
@@ -64,11 +61,8 @@ class LoginViewModel : BaseViewModel() {
     private val _loginPasswordError = MutableLiveData<String>()
     val loginPasswordError: LiveData<String> = _loginPasswordError
 
-    private val _loginResult = MutableLiveData<Boolean>()
-    val loginResult: LiveData<Boolean> = _loginResult
-
-    private val _apiResult = MutableLiveData<ApiResult<Nothing>>()
-    val apiResult: LiveData<ApiResult<Nothing>> = _apiResult
+    private val _loginResult = MutableLiveData<ApiResult<Nothing>>()
+    val loginResult: LiveData<ApiResult<Nothing>> = _loginResult
 
     @ExperimentalCoroutinesApi
     fun doRegisterValidateAndSubmit() {
@@ -84,53 +78,21 @@ class LoginViewModel : BaseViewModel() {
             "" == _registerPasswordError.value &&
             "" == _confirmPasswordError.value
         ) {
-            Timber.d("James_success")
-//            viewModelScope.launch {
-//                flow {
-//                    val resp = apiRepository.signUp(
-//                        MembersAccountItem(
-//                            username = registerAccount.value,
-//                            email = email.value,
-//                            friendlyName = friendlyName.value,
-//                            password = registerPw.value,
-//                            promoCode = "TestCode",
-//                            // TODO: 從DomainManager取得Url
-//                            validationUrl = BuildConfig.API_HOST + "v1/Members/ValidateEmail"
-//                        )
-//                    )
-//                    if (!resp.isSuccessful) throw HttpException(resp)
-//                    emit(ApiResult.success(null))
-//                }
-//                    .flowOn(Dispatchers.IO)
-//                    .onStart { emit(ApiResult.loading()) }
-//                    .onCompletion { emit(ApiResult.loaded()) }
-//                    .catch { e -> emit(ApiResult.error(e)) }
-//                    .collect { resp ->
-//                        when (resp) {
-//                            is ApiResult.Success -> {
-//                                Timber.d("${LoginViewModel::class.java.simpleName}_ApiResult.success")
-//                                _apiResult.value = resp
-//                            }
-//                            is ApiResult.Error -> {
-//                                Timber.d("${LoginViewModel::class.java.simpleName}_ApiResult.error")
-//                                when (resp.throwable) {
-//                                    is HttpException -> {
-//                                        val data = AppUtils.getHttpExceptionData(resp.throwable)
-//                                        val errorItem = data.errorItem
-//                                        Timber.d("${LoginViewModel::class.java.simpleName}_isHttpException")
-//                                        Timber.d("${LoginViewModel::class.java.simpleName}_code: ${errorItem.code}")
-//                                        Timber.d("${LoginViewModel::class.java.simpleName}_message: ${errorItem.message}")
-//                                    }
-//                                    else -> {
-//                                        toastData.value = resp.throwable.toString()
-//                                    }
-//                                }
-//                            }
-//                            is ApiResult.Loading -> setShowProgress(true)
-//                            is ApiResult.Loaded -> setShowProgress(false)
-//                        }
-//                    }
-//            }
+            viewModelScope.launch {
+                accountManager.singUp(
+                    SingUpRequest(
+                            username = registerAccount.value,
+                            email = email.value,
+                            friendlyName = friendlyName.value,
+                            password = registerPw.value,
+                            promoCode = "TestCode",
+                            // TODO: 從DomainManager取得Url
+                            validationUrl = BuildConfig.API_HOST + "v1/Members/ValidateEmail"
+                        )
+                ).collect {
+                    _registerResult.value = it
+                }
+            }
         }
     }
 
@@ -145,10 +107,10 @@ class LoginViewModel : BaseViewModel() {
         }
     }
 
-    private fun doLogin(userName: String, password: String) {
+    fun doLogin(userName: String, password: String) {
         viewModelScope.launch {
             accountManager.signIn(userName, password).collect {
-                _apiResult.value = it
+                _loginResult.value = it
             }
         }
     }

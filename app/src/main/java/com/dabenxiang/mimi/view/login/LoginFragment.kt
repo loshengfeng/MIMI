@@ -12,38 +12,27 @@ import com.dabenxiang.mimi.model.api.ErrorCode
 import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.dialog.login.LoginDialogFragment
-import com.dabenxiang.mimi.view.dialog.login.OnLoginDialogListener
+import com.dabenxiang.mimi.view.dialog.GeneralDialog
+import com.dabenxiang.mimi.view.dialog.GeneralDialogData
+import com.dabenxiang.mimi.view.dialog.show
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.item_login.*
 import kotlinx.android.synthetic.main.item_register.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.android.viewmodel.ext.android.viewModel
-import timber.log.Timber
 
 class LoginFragment : BaseFragment<LoginViewModel>() {
     private val viewModel by viewModel<LoginViewModel>()
-
-    private val onLoginDialogListener = object : OnLoginDialogListener {
-        override fun onConfirm() {
-            dialog?.dismiss()
-        }
-    }
 
     companion object {
         private const val KEY_TYPE = "TYPE"
         const val TYPE_REGISTER = 0
         const val TYPE_LOGIN = 1
 
-        fun createBundle(type: Int): Bundle {
-            return Bundle().also {
-                it.putInt(KEY_TYPE, type)
-            }
-        }
+        fun createBundle(type: Int): Bundle { return Bundle().also { it.putInt(KEY_TYPE, type) } }
     }
 
-    private var dialog: LoginDialogFragment? = null
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -53,41 +42,16 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
         initSettings()
     }
 
+    override fun onResume() {
+        super.onResume()
+        if(viewModel.accountManager.isLogin.value == true) { navigateTo(NavigateItem.Up) }
+    }
+
     override fun getLayoutId(): Int { return R.layout.fragment_login }
 
     override fun fetchViewModel(): LoginViewModel? { return viewModel }
 
     override fun setupObservers() {
-        viewModel.apiResult.observe(viewLifecycleOwner, Observer {
-            Timber.d("James_it: $it")
-            when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Empty -> {
-                    progressHUD?.dismiss()
-                    navigateTo(NavigateItem.Up)
-                }
-                is ApiResult.Error -> {
-                    progressHUD?.dismiss()
-                    onApiError(it.throwable)
-                    // todo: 05/06/2020
-//                    when (it.throwable) {
-//                        is HttpException -> {
-//                            val data = AppUtils.getHttpExceptionData(it.throwable)
-//                            data.errorItem.message?.also { message ->
-//                                GeneralDialog.newInstance(
-//                                    GeneralDialogData(
-//                                        titleRes = R.string.login_yet,
-//                                        message = message,
-//                                        messageIcon = R.drawable.ico_default_photo,
-//                                        secondBtn = getString(R.string.btn_confirm)
-//                                    )
-//                                ).show(parentFragmentManager)
-//                            }
-//                        }
-//                    }
-                }
-            }
-        })
 
         viewModel.friendlyNameError.observe(viewLifecycleOwner, Observer {
             if (it == "") {
@@ -101,24 +65,30 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
         })
 
         viewModel.emailError.observe(viewLifecycleOwner, Observer {
+            cb_email.visibility = View.VISIBLE
             if (it == "") {
                 edit_email.setBackgroundResource(R.drawable.edit_text_rectangle)
                 tv_email_error.visibility = View.INVISIBLE
+                cb_email.isChecked = true
             } else {
                 edit_email.setBackgroundResource(R.drawable.edit_text_error_rectangle)
                 tv_email_error.text = it
                 tv_email_error.visibility = View.VISIBLE
+                cb_email.isChecked = false
             }
         })
 
         viewModel.registerAccountError.observe(viewLifecycleOwner, Observer {
+            cb_register_account.visibility = View.VISIBLE
             if (it == "") {
                 edit_register_account.setBackgroundResource(R.drawable.edit_text_rectangle)
                 tv_register_account_error.visibility = View.INVISIBLE
+                cb_register_account.isChecked = true
             } else {
                 edit_register_account.setBackgroundResource(R.drawable.edit_text_error_rectangle)
                 tv_register_account_error.text = it
                 tv_register_account_error.visibility = View.VISIBLE
+                cb_register_account.isChecked = false
             }
         })
 
@@ -166,10 +136,35 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
             }
         })
 
+        viewModel.registerResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Empty -> {
+                    viewModel.registerAccount.value?.let { it1 -> viewModel.registerPw.value?.let { it2 ->
+                        viewModel.doLogin(it1,
+                            it2
+                        )
+                    } }
+                }
+                is ApiResult.Error -> {
+                    progressHUD?.dismiss()
+                    onApiError(it.throwable)
+                }
+            }
+        })
+
         viewModel.loginResult.observe(viewLifecycleOwner, Observer {
-            Timber.d("James_it: $it")
-            dialog = LoginDialogFragment.newInstance(onLoginDialogListener, LoginDialogFragment.TYPE_SUCCESS)
-            dialog?.show(activity!!.supportFragmentManager, LoginDialogFragment::class.java.simpleName)
+            when (it) {
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Empty -> {
+                    progressHUD?.dismiss()
+                    navigateTo(NavigateItem.Up)
+                }
+                is ApiResult.Error -> {
+                    progressHUD?.dismiss()
+                    onApiError(it.throwable)
+                }
+            }
         })
     }
 
@@ -251,10 +246,13 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
 
         tl_type.selectTab(this.arguments?.getInt(KEY_TYPE, TYPE_REGISTER)?.let { tl_type.getTabAt(it) })
 
+        viewModel.loginAccount.value = "Kevinlove"
+        viewModel.loginPw.value = "1234567"
+
         // todo: for testing...
-        viewModel.friendlyName.value = "Wayne"
+        viewModel.friendlyName.value = "Kevinlove"
         viewModel.email.value = "wayne.liu@silkrode.com.tw"
-        viewModel.registerAccount.value = "Wayne"
+        viewModel.registerAccount.value = "Kevinlove"
         viewModel.registerPw.value = "12345678"
         viewModel.confirmPw.value = "12345678"
 
@@ -262,10 +260,10 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
 
         cb_keep_account.isChecked = keepAccount
 
-        viewModel.loginAccount.value = when(keepAccount) {
+        viewModel.loginAccount.value = when (keepAccount) {
             true -> {
                 val profile = viewModel.accountManager.getProfile()
-                profile?.account
+                profile.account
             }
             false -> ""
         }
@@ -281,7 +279,10 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
                         }
                     }
                 }
-                is NavigateItem.PopBackStack -> navController.popBackStack(item.fragmentId, item.inclusive)
+                is NavigateItem.PopBackStack -> navController.popBackStack(
+                    item.fragmentId,
+                    item.inclusive
+                )
                 is NavigateItem.Destination -> {
                     if (item.bundle == null) {
                         navController.navigate(item.action)
@@ -295,7 +296,29 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
 
     override fun handleHttpError(errorHandler: ExceptionResult.HttpError) {
         when (errorHandler.httpExceptionItem.errorItem.code) {
+            // todo: LOGIN_400000, LOGIN_409000 not sure...
+            ErrorCode.LOGIN_400000 -> {
+                cb_email.isChecked = false
+                showErrorMessageDialog(getString(R.string.error_email_duplicate))
+            }
             ErrorCode.LOGIN_403001 -> showErrorMessageDialog(getString(R.string.error_username_or_password_incorrect))
+            ErrorCode.LOGIN_403002 -> showErrorMessageDialog(getString(R.string.error_account_disable))
+            ErrorCode.LOGIN_403004 -> showErrorMessageDialog(getString(R.string.error_validation))
+            ErrorCode.LOGIN_403006 -> {
+                GeneralDialog.newInstance(
+                    GeneralDialogData(
+                        titleRes = R.string.desc_success,
+                        message = getString(R.string.error_first_login),
+                        messageIcon = R.drawable.ico_default_photo,
+                        secondBtn = getString(R.string.btn_confirm),
+                        secondBlock = {navigateTo(NavigateItem.Destination(R.id.action_loginFragment_to_changePasswordFragment))}
+                    )
+                ).show(requireActivity().supportFragmentManager)
+            }
+            ErrorCode.LOGIN_409000 -> {
+                cb_register_account.isChecked = false
+                showErrorMessageDialog(getString(R.string.error_account_duplicate))
+            }
         }
     }
 }

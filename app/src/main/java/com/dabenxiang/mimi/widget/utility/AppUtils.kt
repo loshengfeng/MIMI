@@ -3,6 +3,8 @@ package com.dabenxiang.mimi.widget.utility
 import android.annotation.SuppressLint
 import android.provider.Settings
 import com.dabenxiang.mimi.App
+import com.dabenxiang.mimi.BuildConfig
+import com.dabenxiang.mimi.manager.DomainManager
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.vo.ErrorItem
 import com.dabenxiang.mimi.model.api.vo.HttpExceptionItem
@@ -123,6 +125,14 @@ object AppUtils {
         t.printStackTrace(pw)
         pw.flush()
         return sw.toString()
+    }
+
+    fun getLibEnv(): String {
+        return when (BuildConfig.FLAVOR) {
+            DomainManager.FLAVOR_DEV -> "d"
+            DomainManager.FLAVOR_SIT -> "s"
+            else -> "p"
+        }
     }
 
     fun isFriendlyNameValid(name: String): Boolean {

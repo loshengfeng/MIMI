@@ -23,7 +23,7 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     }
 
     fun processException(exceptionResult: ExceptionResult) {
-        // todo
+        // todo: send log...
 //        when (exceptionResult) {
 //            is ExceptionResult.Crash -> deviceManager.sendCrashReport(AppUtils.getExceptionDetail(exceptionResult.throwable))
 //            is ExceptionResult.HttpError -> deviceManager.sendCrashReport(AppUtils.getExceptionDetail(exceptionResult.httpExceptionItem.httpExceptionClone))

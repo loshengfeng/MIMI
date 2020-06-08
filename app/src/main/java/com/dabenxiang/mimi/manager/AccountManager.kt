@@ -2,10 +2,8 @@ package com.dabenxiang.mimi.manager
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.LoginRequest
-import com.dabenxiang.mimi.model.api.vo.ResetPasswordRequest
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.TokenResult
 import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.model.vo.ProfileData
@@ -16,7 +14,7 @@ import kotlinx.coroutines.flow.*
 import retrofit2.HttpException
 import java.util.*
 
-class AccountManager(private val pref: Pref, private val apiRepository: ApiRepository) {
+class AccountManager(private val pref: Pref, private val domainManager: DomainManager) {
     private val _isLogin = MutableLiveData(false)
     val isLogin: LiveData<Boolean> = _isLogin
 
@@ -67,7 +65,7 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
 
     fun getPublicToken() =
         flow {
-            val result = apiRepository.getToken()
+            val result = domainManager.getApiRepository().getToken()
             if (!result.isSuccessful) throw HttpException(result)
             result.body()?.also { tokenItem ->
                 pref.publicToken =
@@ -87,7 +85,7 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
 
     fun refreshToken() =
         flow {
-            val result = apiRepository.refreshToken(pref.memberToken.refreshToken)
+            val result = domainManager.getApiRepository().refreshToken(pref.memberToken.refreshToken)
             if (!result.isSuccessful) throw HttpException(result)
             result.body()?.also { item ->
                 pref.memberToken = TokenData(
@@ -104,27 +102,10 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
                 emit(ApiResult.error(e))
             }
 
-
-    // todo: 04/06/2020
-    fun register(userName: String, password: String) =
+    fun singUp(request: SingUpRequest) =
         flow {
-            val request = LoginRequest(userName, password)
-            val result = apiRepository.signIn(request)
+            val result = domainManager.getApiRepository().signUp(request)
             if (!result.isSuccessful) throw HttpException(result)
-
-            result.body()?.content?.also { item ->
-                pref.memberToken = TokenData(
-                    accessToken = item.accessToken,
-                    refreshToken = item.refreshToken,
-                    // 提前2分鐘過期
-                    expiresTimestamp = Date().time + (item.expiresIn - 120) * 1000
-                )
-            }
-
-            setupProfile(ProfileData(AppUtils.getAndroidID(), userName, password))
-
-            _isLogin.postValue(true)
-
             emit(ApiResult.success(null))
         }
             .flowOn(Dispatchers.IO)
@@ -137,8 +118,8 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
 
     fun signIn(userName: String, password: String) =
         flow {
-            val request = LoginRequest(userName, password)
-            val result = apiRepository.signIn(request)
+            val request = SignInRequest(userName, password)
+            val result = domainManager.getApiRepository().signIn(request)
             if (!result.isSuccessful) throw HttpException(result)
 
             result.body()?.content?.also { item ->
@@ -166,7 +147,7 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
 
     fun signOut() =
         flow {
-            val result = apiRepository.signOut()
+            val result = domainManager.getApiRepository().signOut()
             if (!result.isSuccessful) throw HttpException(result)
 
             logoutLocal()
@@ -184,7 +165,7 @@ class AccountManager(private val pref: Pref, private val apiRepository: ApiRepos
     fun resetPwd(userName: String, newPwd: String) =
         flow {
             val request = ResetPasswordRequest(userName, newPwd)
-            val result = apiRepository.resetPassword(request)
+            val result = domainManager.getApiRepository().resetPassword(request)
             if (!result.isSuccessful) throw HttpException(result)
             getProfile()?.copy(password = newPwd)?.let {
                 setupProfile(it)

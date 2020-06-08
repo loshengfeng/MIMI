@@ -22,7 +22,12 @@ class ErrorCode {
          *                  Login
          *
          ***********************************************************/
+        const val LOGIN_400000 = "400000" // Bad Request (400) - One of the request inputs is not valid.
         const val LOGIN_403001 = "403001" // Username or Password is incorrect.
+        const val LOGIN_403002 = "403002" // The specified account is disabled.
+        const val LOGIN_403004 = "403004" // Two-factor authentication failed..
+        const val LOGIN_403006 = "403006"
+        const val LOGIN_409000 = "409000" // Conflict (409) - The specified resource already exists..
 
         /**********************************************************
          *

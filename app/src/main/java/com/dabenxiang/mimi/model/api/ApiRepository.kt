@@ -28,7 +28,7 @@ class ApiRepository(private val apiService: ApiService) {
     /**
      * 登入
      */
-    suspend fun signIn(loginRequest: LoginRequest) = apiService.signIn(loginRequest)
+    suspend fun signIn(request: SignInRequest) = apiService.signIn(request)
 
     /**
      * 登出
@@ -151,7 +151,7 @@ class ApiRepository(private val apiService: ApiService) {
      * 建立新使用者
      */
     suspend fun signUp(
-        body: MembersAccountItem
+        body: SingUpRequest
     ) = apiService.signUp(body)
 
     /**
