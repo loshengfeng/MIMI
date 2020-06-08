@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
@@ -31,7 +30,7 @@ class SplashFragment : BaseFragment<SplashViewModel>() {
 
         viewModel.autoLogin()
 
-        viewModel.isAutoLogin.observe(viewLifecycleOwner, Observer {
+        viewModel.autoLoginResult.observe(viewLifecycleOwner, Observer {
             lifecycleScope.launch(Dispatchers.IO) {
 
                 mainViewModel?.loadHomeCategories()

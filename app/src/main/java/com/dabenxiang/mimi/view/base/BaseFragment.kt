@@ -201,7 +201,7 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
 
     private fun logoutLocal() {
         view?.let {
-            mainViewModel?.clearToken()
+            mainViewModel?.logoutLocal()
         }
     }
 }

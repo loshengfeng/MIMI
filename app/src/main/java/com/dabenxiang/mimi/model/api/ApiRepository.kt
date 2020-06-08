@@ -293,24 +293,24 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得影片資訊
      */
     suspend fun getVideoInfo(
-        videoId: Int
+        videoId: Long
     ) = apiService.getVideoInfo(videoId)
 
     /**
      * 取得影片集數資訊
      */
     suspend fun getVideoEpisode(
-        videoId: Int,
-        episodeId: Int
+        videoId: Long,
+        episodeId: Long
     ) = apiService.getVideoEpisode(videoId, episodeId)
 
     /**
      * 取得影片檔案
      */
     suspend fun getVideoStreamOfEpisode(
-        videoId: Int,
-        episodeId: Int,
-        streamId: Int
+        videoId: Long,
+        episodeId: Long,
+        streamId: Long
     ) = apiService.getVideoStreamOfEpisode(videoId, episodeId, streamId)
 }
 

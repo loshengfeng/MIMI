@@ -85,7 +85,7 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-    val pagingCallback = object : PagingCallback {
+    private val pagingCallback = object : PagingCallback {
         override fun onLoading() {
             setShowProgress(true)
         }

@@ -88,47 +88,28 @@ class HomeCategoriesAdapter(private val nestedListener: HomeAdapter.EventListene
         notifyDataSetChanged()
     }
 
-    override fun getItemViewType(position: Int): Int {
-        return when (position) {
-            0 -> 0
-            else -> 1
-        }
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        return when (viewType) {
-            0 -> {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.nested_item_home_first, parent, false)
-                BaseViewHolder(view)
-            }
-            else -> {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.nested_item_home_categories, parent, false)
-                VideoViewHolder(view, videoViewHolderListener)
-            }
-        }
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.nested_item_home_categories, parent, false)
+        return VideoViewHolder(view, videoViewHolderListener)
     }
 
     override fun getItemCount(): Int {
-        return (data?.count() ?: 0) + 1
+        return data?.count() ?: 0
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
-        if (position > 0) {
-            val realPosition = position - 1
+        holder as VideoViewHolder
 
-            holder as VideoViewHolder
+        var resetSuccess = false
 
-            var resetSuccess = false
+        data?.also { data ->
+            val item = data[position]
+            holder.bind(item, position)
+            resetSuccess = true
+        }
 
-            data?.also { data ->
-                val item = data[realPosition]
-                holder.bind(item, realPosition)
-                resetSuccess = true
-            }
-
-            if (!resetSuccess) {
-                holder.bind(null, -1)
-            }
+        if (!resetSuccess) {
+            holder.bind(null, -1)
         }
     }
 }

@@ -10,26 +10,26 @@ import kotlinx.coroutines.launch
 
 class SplashViewModel : BaseViewModel() {
 
-    private val _isAutoLogin = MutableLiveData<Boolean>()
-    val isAutoLogin: LiveData<Boolean> = _isAutoLogin
+    private val _autoLoginResult = MutableLiveData<Boolean>()
+    val autoLoginResult: LiveData<Boolean> = _autoLoginResult
 
     fun autoLogin() {
-        if (accountManager.isAutoLogin()) {
+        if (accountManager.hasMemberToken()) {
             viewModelScope.launch {
                 val profile = accountManager.getProfile()
-                if (profile == null) {
-                    _isAutoLogin.value = false
+                if (profile.account.isEmpty() || profile.password.isEmpty()) {
+                    _autoLoginResult.value = false
                 } else
                     accountManager.signIn(profile.account, profile.password)
                         .collect {
                             when (it) {
-                                is ApiResult.Empty -> _isAutoLogin.value = true
-                                else -> _isAutoLogin.value = false
+                                is ApiResult.Empty -> _autoLoginResult.value = true
+                                else -> _autoLoginResult.value = false
                             }
                         }
             }
         } else {
-            _isAutoLogin.value = false
+            _autoLoginResult.value = false
         }
     }
 }

@@ -234,19 +234,19 @@ interface ApiService {
      ***********************************************************/
     @GET("/v1/Player/{videoId}")
     suspend fun getVideoInfo(
-        @Path("videoId") videoId: Int
+        @Path("videoId") videoId: Long
     ): Response<ApiBaseItem<VideoItem>>
 
     @GET("/v1/Player/{videoId}/{episodeId}")
     suspend fun getVideoEpisode(
-        @Path("videoId") videoId: Int,
-        @Path("episodeId") episodeId: Int
+        @Path("videoId") videoId: Long,
+        @Path("episodeId") episodeId: Long
     ): Response<ApiBaseItem<VideoEpisodeItem>>
 
     @GET("/v1/Player/{videoId}/{episodeId}/{streamId}")
     suspend fun getVideoStreamOfEpisode(
-        @Path("videoId") videoId: Int,
-        @Path("episodeId") episodeId: Int,
-        @Path("streamId") streamId: Int
+        @Path("videoId") videoId: Long,
+        @Path("episodeId") episodeId: Long,
+        @Path("streamId") streamId: Long
     ): Response<Void>
 }
