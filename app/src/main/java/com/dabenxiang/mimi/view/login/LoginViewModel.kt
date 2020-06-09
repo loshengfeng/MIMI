@@ -7,6 +7,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.manager.DomainManager.Companion.PROMO_CODE
+import com.dabenxiang.mimi.manager.DomainManager.Companion.VALIDATION_URL
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.SingUpRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
@@ -85,9 +87,8 @@ class LoginViewModel : BaseViewModel() {
                             email = email.value,
                             friendlyName = friendlyName.value,
                             password = registerPw.value,
-                            promoCode = "TestCode",
-                            // TODO: 從DomainManager取得Url
-                            validationUrl = BuildConfig.API_HOST + "v1/Members/ValidateEmail"
+                            promoCode = PROMO_CODE,
+                            validationUrl = BuildConfig.API_HOST + VALIDATION_URL
                         )
                 ).collect {
                     _registerResult.value = it
@@ -129,7 +130,6 @@ class LoginViewModel : BaseViewModel() {
             TextUtils.isEmpty(email) -> app.getString(R.string.email_format_error_1)
             !isEmailValid(email) -> app.getString(R.string.email_format_error_2)
             email.length > 100 -> app.getString(R.string.email_format_error_3)
-            // todo: email_format_error_4
             else -> ""
         }
     }
@@ -138,7 +138,6 @@ class LoginViewModel : BaseViewModel() {
         return when {
             TextUtils.isEmpty(account) -> app.getString(R.string.account_format_error_1)
             !isAccountValid(account) -> app.getString(R.string.account_format_error_2)
-            // todo: account_format_error_3
             else -> ""
         }
     }

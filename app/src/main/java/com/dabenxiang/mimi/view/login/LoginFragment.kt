@@ -246,16 +246,6 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
 
         tl_type.selectTab(this.arguments?.getInt(KEY_TYPE, TYPE_REGISTER)?.let { tl_type.getTabAt(it) })
 
-        viewModel.loginAccount.value = "Kevinlove"
-        viewModel.loginPw.value = "1234567"
-
-        // todo: for testing...
-        viewModel.friendlyName.value = "Kevinlove"
-        viewModel.email.value = "wayne.liu@silkrode.com.tw"
-        viewModel.registerAccount.value = "Kevinlove"
-        viewModel.registerPw.value = "12345678"
-        viewModel.confirmPw.value = "12345678"
-
         val keepAccount = viewModel.accountManager.keepAccount
 
         cb_keep_account.isChecked = keepAccount

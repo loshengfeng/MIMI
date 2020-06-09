@@ -18,7 +18,8 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
 
     companion object {
         const val MIMI_PROJECT_ID = "815e22a6"
-
+        const val PROMO_CODE = "xxx"
+        const val VALIDATION_URL = "v1/Members/ValidateEmail"
         const val FLAVOR_DEV = "dev"
         const val FLAVOR_SIT = "sit"
     }
