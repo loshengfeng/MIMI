@@ -94,7 +94,21 @@ class HomeCategoriesAdapter(private val nestedListener: HomeAdapter.EventListene
     }
 
     override fun getItemCount(): Int {
-        return data?.count() ?: 0
+        val count = data?.count()
+        return when {
+            count == null -> 0
+            count < 2 -> count
+            else -> Int.MAX_VALUE
+        }
+    }
+
+    private fun getRealPosition(position: Int): Int {
+        val count = data?.count()!!
+        return when {
+            count == 0 -> 0
+            position > count - 1 -> position % count
+            else -> position
+        }
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
@@ -102,9 +116,11 @@ class HomeCategoriesAdapter(private val nestedListener: HomeAdapter.EventListene
 
         var resetSuccess = false
 
+        val realPosition = getRealPosition(position)
+
         data?.also { data ->
-            val item = data[position]
-            holder.bind(item, position)
+            val item = data[realPosition]
+            holder.bind(item, realPosition)
             resetSuccess = true
         }
 

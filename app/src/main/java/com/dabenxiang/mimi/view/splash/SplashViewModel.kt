@@ -24,7 +24,7 @@ class SplashViewModel : BaseViewModel() {
                         .collect {
                             when (it) {
                                 is ApiResult.Empty -> _autoLoginResult.value = true
-                                else -> _autoLoginResult.value = false
+                                is ApiResult.Error -> _autoLoginResult.value = false
                             }
                         }
             }

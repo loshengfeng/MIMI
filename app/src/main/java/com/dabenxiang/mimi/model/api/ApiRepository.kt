@@ -8,6 +8,7 @@ class ApiRepository(private val apiService: ApiService) {
     companion object {
         const val MEDIA_TYPE_JSON = "application/json"
         const val AUTHORIZATION = "Authorization"
+        const val BEARER = "Bearer "
         fun isRefreshTokenFailed(code: String?): Boolean {
             return code == ErrorCode.TOKEN_NOT_FOUND
         }

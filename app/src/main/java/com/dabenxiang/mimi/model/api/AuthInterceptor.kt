@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.model.api
 
 import com.dabenxiang.mimi.manager.AccountManager
+import com.dabenxiang.mimi.manager.DomainManager
 import com.dabenxiang.mimi.model.enums.TokenResult
 import com.dabenxiang.mimi.model.pref.Pref
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +20,7 @@ import javax.net.ssl.SSLHandshakeException
 
 class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
 
+    private val domainManager: DomainManager by inject()
     private val accountManager: AccountManager by inject()
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -71,7 +73,7 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
                 is UnknownHostException,
                 is SocketTimeoutException,
                 is SSLHandshakeException -> {
-                    //domainManager.changeApiDomainIndex()
+                    domainManager.changeApiDomainIndex()
                     chain.proceed(chain.addAuthorization(userMemberToken))
                 }
                 else -> chain.proceed(chain.addAuthorization(userMemberToken))
@@ -81,11 +83,15 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
 
     private fun Interceptor.Chain.addAuthorization(userMember: Boolean): Request {
         val requestBuilder = request().newBuilder()
-        if (userMember) {
-            requestBuilder.addHeader("Authorization", "Bearer ${pref.memberToken.accessToken}")
-        } else {
-            requestBuilder.addHeader("Authorization", "Bearer ${pref.publicToken.accessToken}")
-        }
+
+        val auth = ApiRepository.BEARER +
+                if (userMember) {
+                    pref.memberToken.accessToken
+                } else {
+                    pref.publicToken.accessToken
+                }
+
+        requestBuilder.addHeader(ApiRepository.AUTHORIZATION, auth)
 
         return requestBuilder.build()
     }
