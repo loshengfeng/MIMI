@@ -1,65 +1,13 @@
 package com.dabenxiang.mimi.widget.utility
 
 import android.content.Context
-import android.content.res.Resources
-import android.graphics.Bitmap
-import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import androidx.fragment.app.FragmentActivity
-import com.blankj.utilcode.util.EncodeUtils
-import com.blankj.utilcode.util.ImageUtils
-import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
-import com.dabenxiang.mimi.model.pref.Pref
-import com.dabenxiang.mimi.view.dialog.SingleBtnWithIconDialog
 import org.koin.core.KoinComponent
-import org.koin.core.inject
 
 object GeneralUtils : KoinComponent {
 
-    private val pref: Pref by inject()
-
     fun showToast(context: Context, text: String) {
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
-    }
-
-    fun hideKeyboard(activity: FragmentActivity) {
-        val view = activity.currentFocus
-        if (view != null) {
-            val inputManager =
-                activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            inputManager.hideSoftInputFromWindow(view.windowToken, 0)
-        }
-    }
-
-    fun showKeyboard(context: Context, editText: View) {
-        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(editText, InputMethodManager.SHOW_FORCED)
-    }
-
-    fun bitmapToBase64(bitmap: Bitmap): String {
-        val bytes = ImageUtils.bitmap2Bytes(bitmap, Bitmap.CompressFormat.PNG)
-        return EncodeUtils.base64Encode2String(bytes)
-    }
-
-    fun Int.toDp(resources: Resources): Int {
-        return (resources.displayMetrics.density * this).toInt()
-    }
-
-    fun showHttpErrorDialog(
-        context: Context,
-        type: HttpErrorMsgType = HttpErrorMsgType.API_FAILED
-    ) {
-        SingleBtnWithIconDialog(
-            context = context,
-            icon = R.drawable.ico_fail_big,
-            message = when (type) {
-                HttpErrorMsgType.API_FAILED -> R.string.api_failed_msg
-                HttpErrorMsgType.CHECK_NETWORK -> R.string.server_error
-            },
-            btnText = R.string.btn_close
-        ).show()
     }
 
 //    @ExperimentalCoroutinesApi

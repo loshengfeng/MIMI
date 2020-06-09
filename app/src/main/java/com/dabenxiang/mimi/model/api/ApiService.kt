@@ -209,11 +209,11 @@ interface ApiService {
     ): Response<ApiBasePagingItem<PlayListItem>>
 
     @GET("/v1/Members/Me/Profile")
-    suspend fun getMeProfile(): Response<ApiBaseItem<MeProfileItem>>
+    suspend fun getMeProfile(): Response<ApiBaseItem<ProfileItem>>
 
     @PUT("/v1/Members/Me/Profile")
     suspend fun updatedMeProfile(
-        @Body body: MeProfileItem
+        @Body body: ProfileItem
     ): Response<Void>
 
     /**********************************************************

@@ -9,22 +9,18 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.api.vo.handleException
 import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
-import com.dabenxiang.mimi.view.dialog.message.OnMessageDialogListener
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.kaopiz.kprogresshud.KProgressHUD
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
-import retrofit2.HttpException
 import java.net.UnknownHostException
 
 abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
@@ -72,47 +68,6 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
 
         setupListeners()
         setupObservers()
-    }
-
-    fun showHttpErrorDialog(type: HttpErrorMsgType = HttpErrorMsgType.API_FAILED) {
-        when (type) {
-            HttpErrorMsgType.API_FAILED -> showErrorDialog(getString(R.string.api_failed_msg))
-            HttpErrorMsgType.CHECK_NETWORK -> showErrorDialog(getString(R.string.server_error))
-        }
-    }
-
-    private fun showErrorDialog(message: String) {
-        MaterialDialog(context!!).show {
-            cancelable(false)
-            message(text = message)
-            positiveButton(R.string.btn_confirm) { dialog ->
-                dialog.dismiss()
-            }
-            lifecycleOwner(this@BaseFragment)
-        }
-    }
-
-    fun showErrorMessageDialog(message: String, listener: OnMessageDialogListener? = null) {
-//        val content = MessageDialogFragment.Content(
-//            title = getString(R.string.error_device_binding_title),
-//            message = message,
-//            positiveBtnText = getString(R.string.error_device_binding_positive),
-//            listener = listener)
-//        MessageDialogFragment.newInstance(content).show(requireActivity().supportFragmentManager, MessageDialogFragment::class.java.simpleName)
-//        val data = AppUtils.getHttpExceptionData(it.throwable)
-//        data.errorItem.message?.also { message ->
-        GeneralDialog.newInstance(
-            GeneralDialogData(
-                titleRes = R.string.login_yet,
-                message = message,
-                messageIcon = R.drawable.ico_default_photo,
-                secondBtn = getString(R.string.btn_confirm)
-            )
-        ).show(requireActivity().supportFragmentManager)
-    }
-
-    fun showHttpErrorToast(e: HttpException) {
-        GeneralUtils.showToast(context!!, "$e")
     }
 
     abstract fun getLayoutId(): Int
@@ -181,22 +136,41 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
     open fun onApiError(throwable: Throwable) {
         when (val errorHandler = throwable.handleException { ex -> mainViewModel?.processException(ex) }) {
             is ExceptionResult.RefreshTokenExpired -> logoutLocal()
-            is ExceptionResult.HttpError -> {
-                handleHttpError(errorHandler)
-                GeneralUtils.showToast(requireContext(), errorHandler.httpExceptionItem.errorItem.toString())
-            }
+            is ExceptionResult.HttpError -> handleHttpError(errorHandler)
             is ExceptionResult.Crash -> {
                 if (errorHandler.throwable is UnknownHostException) {
-                    GeneralUtils.showHttpErrorDialog(requireContext(), HttpErrorMsgType.CHECK_NETWORK)
+                    showCrashDialog(HttpErrorMsgType.CHECK_NETWORK)
                 } else {
-                    GeneralUtils.showToast(requireContext(), "${errorHandler.throwable}")
+                    GeneralUtils.showToast(context!!, errorHandler.throwable.toString())
                 }
             }
         }
     }
 
     open fun handleHttpError(errorHandler: ExceptionResult.HttpError) {
-        GeneralUtils.showToast(requireContext(), "${errorHandler.httpExceptionItem.errorItem}")
+        GeneralDialog.newInstance(
+            GeneralDialogData(
+                titleRes = R.string.error_device_binding_title,
+                message = errorHandler.httpExceptionItem.errorItem.toString(),
+                messageIcon = R.drawable.ico_default_photo,
+                secondBtn = getString(R.string.btn_confirm)
+            )
+        ).show(requireActivity().supportFragmentManager)
+    }
+
+    private fun showCrashDialog(type: HttpErrorMsgType = HttpErrorMsgType.API_FAILED) {
+        GeneralDialog.newInstance(
+            GeneralDialogData(
+                titleRes = R.string.error_device_binding_title,
+                message = when(type) {
+                    HttpErrorMsgType.API_FAILED -> getString(R.string.api_failed_msg)
+                    HttpErrorMsgType.CHECK_NETWORK -> getString(R.string.server_error)
+                },
+                messageIcon = R.drawable.ico_default_photo,
+                secondBtn = getString(R.string.btn_close)
+            )
+        ).show(requireActivity().supportFragmentManager)
+
     }
 
     private fun logoutLocal() {

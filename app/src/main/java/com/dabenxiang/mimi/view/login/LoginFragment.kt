@@ -10,6 +10,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ErrorCode
 import com.dabenxiang.mimi.model.api.ExceptionResult
+import com.dabenxiang.mimi.model.api.vo.handleException
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
@@ -19,6 +20,8 @@ import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.item_login.*
 import kotlinx.android.synthetic.main.item_register.*
+import kotlinx.android.synthetic.main.item_register.edit_email
+import kotlinx.android.synthetic.main.item_register.tv_email_error
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.android.viewmodel.ext.android.viewModel
 
@@ -52,7 +55,6 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
     override fun fetchViewModel(): LoginViewModel? { return viewModel }
 
     override fun setupObservers() {
-
         viewModel.friendlyNameError.observe(viewLifecycleOwner, Observer {
             if (it == "") {
                 edit_friendly_name.setBackgroundResource(R.drawable.edit_text_rectangle)
@@ -140,16 +142,22 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Empty -> {
-                    viewModel.registerAccount.value?.let { it1 -> viewModel.registerPw.value?.let { it2 ->
-                        viewModel.doLogin(it1,
-                            it2
-                        )
-                    } }
-                }
-                is ApiResult.Error -> {
                     progressHUD?.dismiss()
-                    onApiError(it.throwable)
+                    GeneralDialog.newInstance(
+                        GeneralDialogData(
+                            titleRes = R.string.receive_mail,
+                            message = getString(R.string.desc_register),
+                            messageIcon = R.drawable.ico_default_photo,
+                            secondBtn = getString(R.string.btn_confirm),
+                            secondBlock = {
+                                viewModel.registerAccount.value?.let { it1 -> viewModel.registerPw.value?.let { it2 ->
+                                    viewModel.doLogin(it1, it2)
+                                } }
+                            }
+                        )
+                    ).show(requireActivity().supportFragmentManager)
                 }
+                is ApiResult.Error -> onApiError(it.throwable)
             }
         })
 
@@ -158,11 +166,32 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Empty -> {
                     progressHUD?.dismiss()
-                    navigateTo(NavigateItem.Up)
+                    viewModel.getProfile()
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.profileItem.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Success -> {
+                    progressHUD?.dismiss()
+                    GeneralDialog.newInstance(
+                        GeneralDialogData(
+                            titleRes = R.string.desc_success,
+                            message = it.result.friendlyName.toString(),
+                            messageIcon = R.drawable.ico_default_photo,
+                            secondBtn = getString(R.string.btn_confirm),
+                            secondBlock = { navigateTo(NavigateItem.Up) }
+                        )
+                    ).show(requireActivity().supportFragmentManager)
                 }
                 is ApiResult.Error -> {
-                    progressHUD?.dismiss()
-                    onApiError(it.throwable)
+                    when (val errorHandler = it.throwable.handleException { ex -> mainViewModel?.processException(ex) }) {
+                        is ExceptionResult.HttpError -> showErrorMessageDialog(errorHandler.httpExceptionItem.errorItem.message.toString())
+                        else -> onApiError(it.throwable)
+                    }
                 }
             }
         })
@@ -285,8 +314,9 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
     }
 
     override fun handleHttpError(errorHandler: ExceptionResult.HttpError) {
+        progressHUD?.dismiss()
+
         when (errorHandler.httpExceptionItem.errorItem.code) {
-            // todo: LOGIN_400000, LOGIN_409000 not sure...
             ErrorCode.LOGIN_400000 -> {
                 cb_email.isChecked = false
                 showErrorMessageDialog(getString(R.string.error_email_duplicate))
@@ -310,5 +340,16 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
                 showErrorMessageDialog(getString(R.string.error_account_duplicate))
             }
         }
+    }
+
+    private fun showErrorMessageDialog(message: String) {
+        GeneralDialog.newInstance(
+            GeneralDialogData(
+                titleRes = R.string.login_yet,
+                message = message,
+                messageIcon = R.drawable.ico_default_photo,
+                secondBtn = getString(R.string.btn_confirm)
+            )
+        ).show(requireActivity().supportFragmentManager)
     }
 }

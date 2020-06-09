@@ -32,7 +32,8 @@
     <string name="password_format_error_4">密码不相符</string>
     <string name="receive_mail">请收验证信</string>
     <string name="desc_register">请至信箱查看验证信以完成账号注册</string>
-    <string name="desc_mail">已传送新密码至您的邮箱%s请至邮箱确认</string>
+    <string name="desc_email">已传送新密码至您的邮箱\n%s\n请至邮箱确认</string>
+    <string name="desc_email_account_not_match">Email与账号不符，请确认</string>
     <string name="desc_success">登录成功</string>
     <string name="forget_password">忘记密码</string>
     <string name="login_yet">尚未登录</string>
@@ -44,6 +45,7 @@
     <string name="error_email_duplicate">此Email已存在，請重新填寫</string>
     <string name="error_account_duplicate">此賬號已存在，請重新填寫</string>
     <string name="error_first_login">第一次登入需重设密码</string>
+    <string name="reset_pw_success">重设密码成功</string>
 
     <!-- Topup -->
     <string name="topup_desc">蜜币购买</string>

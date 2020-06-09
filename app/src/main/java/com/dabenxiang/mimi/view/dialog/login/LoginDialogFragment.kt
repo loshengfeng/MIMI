@@ -82,7 +82,7 @@ class LoginDialogFragment : BaseDialogFragment() {
                 ivTitle.setBackgroundResource(R.drawable.ic_verification_mail)
                 tv_title.text = getString(R.string.receive_mail)
                 ivIcon.setBackgroundResource(R.drawable.ico_email)
-                tv_desc.text = getString(R.string.desc_mail, "xxx@silkrode.com.tw")
+                tv_desc.text = getString(R.string.desc_email, "xxx@silkrode.com.tw")
             }
             TYPE_SUCCESS -> {
                 Timber.d("${LoginDialogFragment::class.java.simpleName}_TYPE_SUCCESS")

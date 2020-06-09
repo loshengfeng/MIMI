@@ -56,6 +56,7 @@
         style="@style/login_edit_text"
         android:layout_height="wrap_content"
         android:width="0dp"
+        android:hint="@string/login_pw"
         android:importantForAutofill="no"
         android:inputType="textPassword"
         android:labelFor="@id/edit_login_pw"

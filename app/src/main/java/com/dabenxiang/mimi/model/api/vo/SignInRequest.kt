@@ -1,3 +1,11 @@
 package com.dabenxiang.mimi.model.api.vo
 
-class SignInRequest(val username: String, val password: String)
+import com.google.gson.annotations.SerializedName
+
+class SignInRequest(
+    @SerializedName("username")
+    val userName: String?,
+
+    @SerializedName("password")
+    val password: String?
+)

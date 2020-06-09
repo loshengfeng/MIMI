@@ -162,23 +162,24 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
                 emit(ApiResult.loaded())
             }
 
-    fun resetPwd(userName: String, newPwd: String) =
-        flow {
-            val request = ResetPasswordRequest(userName, newPwd)
-            val result = domainManager.getApiRepository().resetPassword(request)
-            if (!result.isSuccessful) throw HttpException(result)
-            getProfile()?.copy(password = newPwd)?.let {
-                setupProfile(it)
-            }
-            emit(ApiResult.success(null))
-        }
-            .flowOn(Dispatchers.IO)
-            .onStart { emit(ApiResult.loading()) }
-            .catch { e ->
-                emit(ApiResult.error(e))
-            }.onCompletion {
-                emit(ApiResult.loaded())
-            }
+    // todo: 10/06/2020
+//    fun resetPwd(userName: String, newPwd: String) =
+//        flow {
+//            val request = ResetPasswordRequest(userName, newPwd)
+//            val result = domainManager.getApiRepository().resetPassword(request)
+//            if (!result.isSuccessful) throw HttpException(result)
+//            getProfile()?.copy(password = newPwd)?.let {
+//                setupProfile(it)
+//            }
+//            emit(ApiResult.success(null))
+//        }
+//            .flowOn(Dispatchers.IO)
+//            .onStart { emit(ApiResult.loading()) }
+//            .catch { e ->
+//                emit(ApiResult.error(e))
+//            }.onCompletion {
+//                emit(ApiResult.loaded())
+//            }
 
     fun logoutLocal() {
         pref.clearMemberToken()

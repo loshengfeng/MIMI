@@ -269,7 +269,7 @@ class ApiRepository(private val apiService: ApiService) {
      * 修改使用者資訊
      */
     suspend fun updatedMeProfile(
-        body: MeProfileItem
+        body: ProfileItem
     ) = apiService.updatedMeProfile(body)
 
     /**********************************************************

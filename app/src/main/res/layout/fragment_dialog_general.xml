@@ -24,7 +24,8 @@
             android:background="@drawable/btn_close_1_n"
             android:src="@null"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:contentDescription="@null" />
 
         <ImageView
             android:id="@+id/iv_title"
@@ -35,7 +36,8 @@
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:src="@drawable/ic_verification_mail" />
+            tools:src="@drawable/ic_verification_mail"
+            android:contentDescription="@null" />
 
         <TextView
             android:id="@+id/tv_title"
@@ -57,7 +59,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_title"
-            tools:src="@drawable/ico_email" />
+            tools:src="@drawable/ico_email"
+            android:contentDescription="@null" />
 
         <TextView
             android:id="@+id/tv_message"

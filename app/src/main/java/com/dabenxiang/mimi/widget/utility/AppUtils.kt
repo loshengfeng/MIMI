@@ -89,7 +89,6 @@ object AppUtils {
         val oriResponse = httpException.response()
 
         val url = oriResponse?.raw()?.request?.url.toString()
-        Timber.d("url: $url")
 
         val errorBody = oriResponse?.errorBody()
         val jsonStr = errorBody?.string()
@@ -101,7 +100,6 @@ object AppUtils {
             e.printStackTrace()
             ErrorItem(null, null, null)
         }
-        Timber.d("errorItem: $errorItem")
 
         val responseBody = Gson().toJson(ErrorItem(errorItem.code, errorItem.message, null))
             .toResponseBody(ApiRepository.MEDIA_TYPE_JSON.toMediaTypeOrNull())
