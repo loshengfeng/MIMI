@@ -20,6 +20,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_personal.*
 import kotlinx.android.synthetic.main.item_personal_is_login.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.android.viewmodel.ext.android.viewModel
 import retrofit2.HttpException
 
@@ -35,6 +36,7 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
 
     override fun fetchViewModel(): PersonalViewModel? { return viewModel }
 
+    @ExperimentalCoroutinesApi
     override fun setupObservers() {
         viewModel.meItem.observe(viewLifecycleOwner, Observer {
             when(it) {
@@ -49,28 +51,15 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
                         true -> View.VISIBLE
                         else -> View.GONE
                     }
-                    /*GeneralDialog.newInstance(
-                        GeneralDialogData(
-                            titleRes = R.string.desc_success,
-                            message = it.result.friendlyName.toString(),
-                            messageIcon = R.drawable.ico_default_photo,
-                            secondBtn = getString(R.string.btn_confirm),
-                            secondBlock = { navigateTo(NavigateItem.Up) }
-                        )
-                    ).show(requireActivity().supportFragmentManager)*/
                 }
-                is ApiResult.Error -> onApiError(it.throwable) /*{
-                    when (val errorHandler = it.throwable.handleException { ex -> mainViewModel?.processException(ex) }) {
-                        is ExceptionResult.HttpError -> showErrorMessageDialog(errorHandler.httpExceptionItem.errorItem.message.toString())
-                        else -> onApiError(it.throwable)
-                    }
-                }*/
+                is ApiResult.Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.accountManager.isLogin.observe(viewLifecycleOwner, Observer {
             when (it) {
                 true -> {
+                    viewModel.getMe()
                     item_is_Login.visibility = View.VISIBLE
                     item_is_not_Login.visibility = View.GONE
                 }
@@ -137,7 +126,6 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
 
     override fun initSettings() {
         super.initSettings()
-        viewModel.getMe()
         tv_version_is_login.text = BuildConfig.VERSION_NAME
         tv_version_is_not_login.text = BuildConfig.VERSION_NAME
     }
