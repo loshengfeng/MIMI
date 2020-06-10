@@ -3,10 +3,14 @@ package com.dabenxiang.mimi.view.setting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.dabenxiang.mimi.BuildConfig
+import com.dabenxiang.mimi.manager.DomainManager
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.EmailRequest
 import com.dabenxiang.mimi.model.api.vo.ProfileItem
+import com.dabenxiang.mimi.model.api.vo.ProfileRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -55,16 +59,24 @@ class SettingViewModel : BaseViewModel() {
     }
 
     fun updateProfile() {
-//        viewModelScope.launch {
-//            flow {
-//                val result = profileData?.let { domainManager.getApiRepository().updateProfile(it) }
-//                if (!result.isSuccessful) throw HttpException(result)
-//                emit(ApiResult.success(null))
-//            }
-//                .onStart { emit(ApiResult.loading()) }
-//                .catch { e -> emit(ApiResult.error(e)) }
-//                .onCompletion { emit(ApiResult.loaded()) }
-//                .collect { _updateResult.value = it }
-//        }
+        viewModelScope.launch {
+            flow {
+                val request = ProfileRequest(
+                    profileData?.friendlyName,
+                    profileData?.gender,
+                    profileData?.birthday,
+                    profileData?.email,
+                    BuildConfig.API_HOST + DomainManager.VALIDATION_URL
+                )
+                val result = domainManager.getApiRepository().updateProfile(request)
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _updateResult.value = it }
+        }
     }
 }

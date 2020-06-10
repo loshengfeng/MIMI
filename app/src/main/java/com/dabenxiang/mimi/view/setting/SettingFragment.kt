@@ -113,7 +113,6 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
                 R.id.btn_resend -> viewModel.resendEmail()
                 R.id.btn_chang_pw -> navigateTo(NavigateItem.Destination(R.id.action_settingFragment_to_changePasswordFragment))
                 R.id.btn_gender -> {
-                    Timber.d("btn_gender: ${viewModel.profileData.toString()}")
                     showFilterDialog(
                         R.string.setting_choose,
                         R.array.filter_gender,
