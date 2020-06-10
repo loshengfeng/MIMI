@@ -68,7 +68,11 @@ class ChangePasswordFragment : BaseFragment<ChangePasswordViewModel>() {
         viewModel.changeResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Empty -> navigateTo(NavigateItem.Up)
+                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is ApiResult.Empty -> {
+                    progressHUD?.dismiss()
+                    navigateTo(NavigateItem.Up)
+                }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })

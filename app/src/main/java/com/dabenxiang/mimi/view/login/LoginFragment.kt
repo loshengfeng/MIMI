@@ -164,6 +164,7 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
         viewModel.loginResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Loaded -> progressHUD?.dismiss()
                 is ApiResult.Empty -> {
                     progressHUD?.dismiss()
                     viewModel.getProfile()
@@ -314,8 +315,6 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
     }
 
     override fun handleHttpError(errorHandler: ExceptionResult.HttpError) {
-        progressHUD?.dismiss()
-
         when (errorHandler.httpExceptionItem.errorItem.code) {
             ErrorCode.LOGIN_400000 -> {
                 cb_email.isChecked = false

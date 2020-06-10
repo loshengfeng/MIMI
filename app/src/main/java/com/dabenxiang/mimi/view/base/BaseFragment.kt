@@ -81,7 +81,6 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
     open val bottomNavigationVisibility: Int = View.VISIBLE
 
     open fun navigateTo(item: NavigateItem) {
-        progressHUD?.dismiss()
         lifecycleScope.launch {
             navigationTaskJoinOrRun {
                 findNavController().also { navController ->
@@ -135,7 +134,6 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
     }
 
     open fun onApiError(throwable: Throwable) {
-        progressHUD?.dismiss()
         when (val errorHandler = throwable.handleException { ex -> mainViewModel?.processException(ex) }) {
             is ExceptionResult.RefreshTokenExpired -> logoutLocal()
             is ExceptionResult.HttpError -> handleHttpError(errorHandler)
