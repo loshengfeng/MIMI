@@ -104,6 +104,5 @@ class UpdateProfileFragment :BaseFragment<UpdateProfileViewModel>() {
         }
 
         viewModel.content.bindingEditText = edit_content
-        edit_content.setText("Test")
     }
 }
