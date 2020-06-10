@@ -41,6 +41,11 @@ class GeneralDialog : BaseDialogFragment() {
         }
     }
 
+    fun setCancel(isCancel: Boolean): GeneralDialog {
+        isCancelable = isCancel
+        return this
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

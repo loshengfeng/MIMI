@@ -12,7 +12,7 @@ import com.dabenxiang.mimi.view.messenger.MessengerViewModel
 import com.dabenxiang.mimi.view.personal.PersonalViewModel
 import com.dabenxiang.mimi.view.player.PlayerViewModel
 import com.dabenxiang.mimi.view.player.ShortPlayerViewModel
-import com.dabenxiang.mimi.view.resendmail.ResendMailViewModel
+import com.dabenxiang.mimi.view.updateprofile.UpdateProfileViewModel
 import com.dabenxiang.mimi.view.search.SearchVideoViewModel
 import com.dabenxiang.mimi.view.setting.SettingViewModel
 import com.dabenxiang.mimi.view.splash.SplashViewModel
@@ -32,7 +32,7 @@ val viewModelModule = module {
     viewModel { PersonalViewModel() }
     viewModel { ForgetPasswordViewModel() }
     viewModel { SettingViewModel() }
-    viewModel { ResendMailViewModel() }
+    viewModel { UpdateProfileViewModel() }
     viewModel { ChangePasswordViewModel() }
     viewModel { CategoriesViewModel() }
     viewModel { TopupHistoryViewModel() }

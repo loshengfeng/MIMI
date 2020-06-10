@@ -25,6 +25,7 @@ import kotlinx.android.synthetic.main.item_register.tv_email_error
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.android.viewmodel.ext.android.viewModel
 
+@ExperimentalCoroutinesApi
 class LoginFragment : BaseFragment<LoginViewModel>() {
     private val viewModel by viewModel<LoginViewModel>()
 
@@ -35,7 +36,6 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
 
         fun createBundle(type: Int): Bundle { return Bundle().also { it.putInt(KEY_TYPE, type) } }
     }
-
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -155,7 +155,8 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
                                 } }
                             }
                         )
-                    ).show(requireActivity().supportFragmentManager)
+                    ).setCancel(false)
+                        .show(requireActivity().supportFragmentManager)
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
@@ -164,18 +165,24 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
         viewModel.loginResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is ApiResult.Error -> onApiError(it.throwable)
                 is ApiResult.Empty -> {
                     progressHUD?.dismiss()
                     viewModel.getProfile()
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is ApiResult.Loaded -> progressHUD?.dismiss()
             }
         })
 
         viewModel.profileItem.observe(viewLifecycleOwner, Observer {
             when(it) {
                 is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Error -> {
+                    when (val errorHandler = it.throwable.handleException { ex -> mainViewModel?.processException(ex) }) {
+                        is ExceptionResult.HttpError -> showErrorMessageDialog(errorHandler.httpExceptionItem.errorItem.message.toString())
+                        else -> onApiError(it.throwable)
+                    }
+                }
                 is ApiResult.Success -> {
                     progressHUD?.dismiss()
                     GeneralDialog.newInstance(
@@ -186,19 +193,14 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
                             secondBtn = getString(R.string.btn_confirm),
                             secondBlock = { navigateTo(NavigateItem.Up) }
                         )
-                    ).show(requireActivity().supportFragmentManager)
+                    ).setCancel(false)
+                        .show(requireActivity().supportFragmentManager)
                 }
-                is ApiResult.Error -> {
-                    when (val errorHandler = it.throwable.handleException { ex -> mainViewModel?.processException(ex) }) {
-                        is ExceptionResult.HttpError -> showErrorMessageDialog(errorHandler.httpExceptionItem.errorItem.message.toString())
-                        else -> onApiError(it.throwable)
-                    }
-                }
+                is ApiResult.Loaded -> progressHUD?.dismiss()
             }
         })
     }
 
-    @ExperimentalCoroutinesApi
     override fun setupListeners() {
         tl_type.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
@@ -332,7 +334,8 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
                         secondBtn = getString(R.string.btn_confirm),
                         secondBlock = {navigateTo(NavigateItem.Destination(R.id.action_loginFragment_to_changePasswordFragment))}
                     )
-                ).show(requireActivity().supportFragmentManager)
+                ).setCancel(false)
+                    .show(requireActivity().supportFragmentManager)
             }
             ErrorCode.LOGIN_409000 -> {
                 cb_register_account.isChecked = false

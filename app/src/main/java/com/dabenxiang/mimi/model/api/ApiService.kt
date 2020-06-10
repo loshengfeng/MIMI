@@ -122,15 +122,16 @@ interface ApiService {
         @Body body: SingUpRequest
     ): Response<Void>
 
-    @POST("/v1/Members/Me/ValidationEmail")
-    suspend fun validationEmail(
-        @Body request: ValidateEmailRequest
+    @POST("/v1/Members/Me/Email")
+    suspend fun resendEmail(
+        @Body body: EmailRequest
     ): Response<Void>
 
-    @GET("/v1/Members/Me/ValidationEmail/{key}")
-    suspend fun validationEmail(
-        @Path("key") key: String
-    ): Response<Void>
+    // todo
+//    @GET("/v1/Members/Me/ValidationEmail/{key}")
+//    suspend fun validationEmail(
+//        @Path("key") key: String
+//    ): Response<Void>
 
     /**********************************************************
      *
@@ -212,7 +213,7 @@ interface ApiService {
     suspend fun getProfile(): Response<ApiBaseItem<ProfileItem>>
 
     @PUT("/v1/Members/Me/Profile")
-    suspend fun updatedMeProfile(
+    suspend fun updateProfile(
         @Body body: ProfileItem
     ): Response<Void>
 

@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.model.api.vo
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 
 data class ProfileItem(
@@ -13,15 +14,16 @@ data class ProfileItem(
     @SerializedName("email")
     var email: String?,
 
+    // 0:Female|1:Male
     @SerializedName("gender")
     var gender: Int?,
+
+    @SerializedName("birthday")
+    var birthday: String,
 
     @SerializedName("avatarAttachmentId")
     var avatarAttachmentId: Int?,
 
-    @SerializedName("birthday")
-    var birthday: String?,
-
-    @SerializedName("password")
-    var password: String?
-)
+    @SerializedName("emailConfirmed")
+    var emailConfirmed: Boolean?
+) : Serializable

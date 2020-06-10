@@ -37,8 +37,8 @@
         tools:layout="@layout/fragment_setting">
 
         <action
-            android:id="@+id/action_settingFragment_to_resendMailFragment"
-            app:destination="@id/resendMailFragment" />
+            android:id="@+id/action_settingFragment_to_updateProfileFragment"
+            app:destination="@id/updateProfileFragment" />
 
         <action
             android:id="@+id/action_settingFragment_to_changePasswordFragment"
@@ -47,9 +47,9 @@
     </fragment>
 
     <fragment
-        android:id="@+id/resendMailFragment"
-        android:name="com.dabenxiang.mimi.view.resendmail.ResendMailFragment"
-        tools:layout="@layout/fragment_resend_mail">
+        android:id="@+id/updateProfileFragment"
+        android:name="com.dabenxiang.mimi.view.updateprofile.UpdateProfileFragment"
+        tools:layout="@layout/fragment_update_profile">
 
     </fragment>
 

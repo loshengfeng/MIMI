@@ -66,11 +66,18 @@
     <string name="btn_logout">登出</string>
     <string name="title_setting">个人设置</string>
     <string name="setting_photo">头像</string>
-    <string name="setting_raw_1">标题内容</string>
+    <string name="setting_name">名称</string>
     <string name="setting_email">email</string>
-    <string name="setting_raw_2">标题内容</string>
-    <string name="setting_raw_3">标题内容</string>
+    <string name="setting_account">帐号</string>
+    <string name="setting_gender">性别</string>
+    <string name="setting_choose">请选择(预设)</string>
+    <string name="setting_birthday">生日</string>
+    <string name="setting_birthday_title">修改生日</string>
+    <string name="setting_type_birthday">请填写生日</string>
+    <string name="setting_birthday_hint">YYYY-MM-DD</string>
+    <string name="setting_change_name">修改名称</string>
     <string name="setting_change_pw">修改密码</string>
+    <string name="setting_mail_title">信箱设置</string>
     <string name="setting_resend_mail">重发认证信</string>
     <string name="setting_change_password">修改密码</string>
     <string name="setting_current_password">目前密码</string>
@@ -109,4 +116,14 @@
     <!-- Home -->
     <string name="text_more">更多</string>
     <string name="text_search">搜寻</string>
+
+    <string-array name="filter_gender">
+        <item>女</item>
+        <item>男</item>
+    </string-array>
+
+    <integer-array name="filter_gender_value">
+        <item>0</item>
+        <item>1</item>
+    </integer-array>
 </resources>

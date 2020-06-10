@@ -57,7 +57,7 @@ class ForgetPasswordFragment : BaseFragment<ForgetPasswordViewModel>() {
         viewModel.result.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is ApiResult.Error -> onApiError(it.throwable)
                 is ApiResult.Empty -> {
                     progressHUD?.dismiss()
                     GeneralDialog.newInstance(
@@ -68,9 +68,10 @@ class ForgetPasswordFragment : BaseFragment<ForgetPasswordViewModel>() {
                             secondBtn = getString(R.string.btn_confirm),
                             secondBlock = { navigateTo(NavigateItem.Up) }
                         )
-                    ).show(requireActivity().supportFragmentManager)
+                    ).setCancel(false)
+                        .show(requireActivity().supportFragmentManager)
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is ApiResult.Loaded -> progressHUD?.dismiss()
 
             }
         })

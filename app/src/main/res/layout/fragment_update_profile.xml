@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_gray_4">
+
+    <include
+        android:id="@+id/layout_title"
+        layout="@layout/item_setting_bar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="30dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layout_title"
+        tools:text="标题内容" />
+
+    <EditText
+        android:id="@+id/edit_content"
+        style="@style/login_edit_text"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="20dp"
+        android:width="0dp"
+        android:importantForAutofill="no"
+        android:inputType="textEmailAddress"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_text"
+        tools:ignore="LabelFor" />
+
+    <CheckBox
+        android:id="@+id/cb_email"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/ico_checked_selector"
+        android:button="@null"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/edit_content"
+        app:layout_constraintEnd_toEndOf="@id/edit_content"
+        app:layout_constraintTop_toTopOf="@id/edit_content"
+        tools:checked="true"
+        tools:visibility="visible" />
+
+    <Button
+        android:id="@+id/btn_confirm"
+        android:layout_width="110dp"
+        android:layout_height="33dp"
+        android:layout_marginTop="30dp"
+        android:text="@string/btn_confirm"
+        android:textSize="15sp"
+        android:textColor="@color/color_white_1"
+        android:background="@drawable/bg_red_1_radius_6"
+        app:layout_constraintTop_toBottomOf="@id/edit_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

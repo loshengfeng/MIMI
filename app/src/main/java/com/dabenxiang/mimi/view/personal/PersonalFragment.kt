@@ -41,6 +41,7 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
         viewModel.meItem.observe(viewLifecycleOwner, Observer {
             when(it) {
                 is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Error -> onApiError(it.throwable)
                 is ApiResult.Success -> {
                     val meItem = it.result
                     progressHUD?.dismiss()
@@ -52,7 +53,7 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
                         else -> View.GONE
                     }
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is ApiResult.Loaded -> progressHUD?.dismiss()
             }
         })
 
@@ -69,7 +70,7 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
                 }
             }
 
-            // todo: for testing
+            // todo: confirm by Jeff...
             tv_new.text = "N"
             tv_content.text = "文字內容文字內容"
             tv_sub_content.text = "文字內容文字內容文字內容文字內容文字內容文字內容文字內容文字內容"
@@ -78,7 +79,6 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
         viewModel.apiSignOut.observe(viewLifecycleOwner, Observer {
             when(it) {
                 is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Loaded -> progressHUD?.dismiss()
                 is ApiResult.Error -> {
                     when (it.throwable) {
                         is HttpException -> {
@@ -96,6 +96,8 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
                         }
                     }
                 }
+                is ApiResult.Empty -> {}
+                is ApiResult.Loaded -> progressHUD?.dismiss()
             }
         })
     }

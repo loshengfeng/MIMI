@@ -156,18 +156,18 @@ class ApiRepository(private val apiService: ApiService) {
     ) = apiService.signUp(body)
 
     /**
-     * 發驗證信
+     * 重發驗證信(需登入)
      */
-    suspend fun validationEmail(
-        body: ValidateEmailRequest
-    ) = apiService.validationEmail(body)
+    suspend fun resendEmail(
+        body: EmailRequest
+    ) = apiService.resendEmail(body)
 
     /**
      * 驗證信箱
      */
-    suspend fun validationEmail(
-        key: String
-    ) = apiService.validationEmail(key)
+//    suspend fun validationEmail(
+//        key: String
+//    ) = apiService.validationEmail(key)
 
     /**********************************************************
      *
@@ -268,9 +268,9 @@ class ApiRepository(private val apiService: ApiService) {
     /**
      * 修改使用者資訊
      */
-    suspend fun updatedMeProfile(
+    suspend fun updateProfile(
         body: ProfileItem
-    ) = apiService.updatedMeProfile(body)
+    ) = apiService.updateProfile(body)
 
     /**********************************************************
      *
