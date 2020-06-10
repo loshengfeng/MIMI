@@ -30,6 +30,6 @@ class FavoriteViewHolder(
         tvInfo.text = data?.info
         tvTitle.text = data?.title
         tvSubtitle.text = data?.subtitle
-        ivFavorite.setImageResource(R.drawable.ic_btn_favorite_white_s)
+        ivFavorite.setImageResource(R.drawable.btn_favorite_white_s)
     }
 }

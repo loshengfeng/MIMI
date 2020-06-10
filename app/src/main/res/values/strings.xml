@@ -126,4 +126,9 @@
         <item>0</item>
         <item>1</item>
     </integer-array>
+
+    <!-- Player -->
+    <string name="introduction">简介</string>
+    <string name="player_info_format">更新: %-20s地區: %s</string>
+    <string name="write_comment">留下评论</string>
 </resources>

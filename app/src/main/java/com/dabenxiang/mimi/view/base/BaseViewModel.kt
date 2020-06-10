@@ -33,4 +33,8 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
 //            is ExceptionResult.HttpError -> deviceManager.sendCrashReport(AppUtils.getExceptionDetail(exceptionResult.httpExceptionItem.httpExceptionClone))
 //        }
     }
+
+    fun logoutLocal() {
+        accountManager.logoutLocal()
+    }
 }

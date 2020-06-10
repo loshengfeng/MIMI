@@ -56,7 +56,7 @@ class HomeViewModel : BaseViewModel() {
                         when (resp) {
                             is ApiResult.Success -> {
                                 //Timber.d(resp.result.toString())
-                                adapter.notifyUpdated(resp.result.content?.videos?.parser(src.isAdult))
+                                adapter.submitList(resp.result.content?.videos?.parser(src.isAdult))
                             }
                             is ApiResult.Error -> Timber.e(resp.throwable)
                             //is ApiResult.Loading -> setShowProgress(true)

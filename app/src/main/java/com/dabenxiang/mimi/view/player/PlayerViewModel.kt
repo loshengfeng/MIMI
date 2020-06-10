@@ -5,8 +5,12 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.dabenxiang.mimi.model.api.ApiRepository
+import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.Timeline
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
@@ -17,18 +21,22 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.koin.core.inject
+import retrofit2.HttpException
+import timber.log.Timber
 
 
 class PlayerViewModel : BaseViewModel() {
 
+    private val apiRepository: ApiRepository by inject()
+
     companion object {
         var volume: Float = 1f
     }
+
+    var videoId: Long = 0L
 
     var currentWindow: Int = 0
     var playbackPosition: Long = 0
@@ -47,9 +55,23 @@ class PlayerViewModel : BaseViewModel() {
     private val _isPlaying = MutableLiveData<Boolean>()
     val isPlaying: LiveData<Boolean> = _isPlaying
 
-    //TODO: 測試
-    val _currentVideoUrl = MutableLiveData<String?>()
+    private val _currentVideoUrl = MutableLiveData<String?>()
     val currentVideoUrl: LiveData<String?> = _currentVideoUrl
+
+    private val _apiVideoInfo = MutableLiveData<ApiResult<VideoItem>>()
+    val apiVideoInfo: LiveData<ApiResult<VideoItem>> = _apiVideoInfo
+
+    val showIntroduction = MutableLiveData(false)
+
+    val likeVideo = MutableLiveData<Boolean>()
+    val favoriteVideo = MutableLiveData<Boolean>()
+    val likeVideoCount = MutableLiveData<Long>()
+    val favoriteVideoCount = MutableLiveData<Long>()
+    val commentCount = MutableLiveData<Long>()
+
+    var isDeducted = false
+    var costPoint = 0L
+    var availablePoint = 0L
 
     fun setFastForwardTime(time: Int) {
         _fastForwardTime.value = time
@@ -113,4 +135,24 @@ class PlayerViewModel : BaseViewModel() {
         }
     }
 
+    fun getVideoInfo() {
+        viewModelScope.launch {
+            flow {
+                val resp = apiRepository.getVideoInfo(videoId)
+                if (!resp.isSuccessful) throw HttpException(resp)
+
+                emit(ApiResult.success(resp.body()?.content))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e ->
+                    Timber.e(e)
+                    emit(ApiResult.error(e))
+                }
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect {
+                    _apiVideoInfo.value = it
+                }
+        }
+    }
 }

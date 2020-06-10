@@ -20,9 +20,9 @@ class HomeCategoriesAdapter(private val nestedListener: HomeAdapter.EventListene
     RecyclerView.Adapter<BaseViewHolder>() {
 
     fun loadData(src: HomeTemplate.Categories) {
-        reset()
-
-        nestedListener.onLoadAdapter(this, src)
+        if (list == null) {
+            nestedListener.onLoadAdapter(this, src)
+        }
     }
 
     private var activeTask: Deferred<Any>? = null
@@ -48,7 +48,7 @@ class HomeCategoriesAdapter(private val nestedListener: HomeAdapter.EventListene
         object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
                 if (index > -1) {
-                    data?.get(index)?.also {
+                    list?.get(index)?.also {
                         nestedListener.onVideoClick(view, PlayerData.parser(it).also { playerData ->
                             playerData.isAdult = isAdult
                         })
@@ -58,16 +58,10 @@ class HomeCategoriesAdapter(private val nestedListener: HomeAdapter.EventListene
         }
     }
 
-    private fun reset() {
-        data = null
+    private var list: List<BaseVideoItem.Video>? = null
 
-        notifyDataSetChanged()
-    }
-
-    private var data: List<BaseVideoItem.Video>? = null
-
-    fun notifyUpdated(updated: List<BaseVideoItem.Video>?) {
-        data = updated
+    fun submitList(updated: List<BaseVideoItem.Video>?) {
+        list = updated
 
         /*
         //Fake date:
@@ -94,7 +88,7 @@ class HomeCategoriesAdapter(private val nestedListener: HomeAdapter.EventListene
     }
 
     override fun getItemCount(): Int {
-        val count = data?.count()
+        val count = list?.count()
         return when {
             count == null -> 0
             count < 2 -> count
@@ -103,7 +97,7 @@ class HomeCategoriesAdapter(private val nestedListener: HomeAdapter.EventListene
     }
 
     private fun getRealPosition(position: Int): Int {
-        val count = data?.count()!!
+        val count = list?.count()!!
         return when {
             count == 0 -> 0
             position > count - 1 -> position % count
@@ -118,7 +112,7 @@ class HomeCategoriesAdapter(private val nestedListener: HomeAdapter.EventListene
 
         val realPosition = getRealPosition(position)
 
-        data?.also { data ->
+        list?.also { data ->
             val item = data[realPosition]
             holder.bind(item, realPosition)
             resetSuccess = true

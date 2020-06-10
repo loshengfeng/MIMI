@@ -54,8 +54,4 @@ class MainViewModel : BaseViewModel() {
                 }
         }
     }
-
-    fun logoutLocal() {
-        accountManager.logoutLocal()
-    }
 }

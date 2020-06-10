@@ -170,7 +170,6 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
                 secondBtn = getString(R.string.btn_close)
             )
         ).show(requireActivity().supportFragmentManager)
-
     }
 
     private fun logoutLocal() {

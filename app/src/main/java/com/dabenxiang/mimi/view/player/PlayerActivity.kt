@@ -3,13 +3,21 @@ package com.dabenxiang.mimi.view.player
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.content.res.ColorStateList
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.Surface
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.extension.setBtnSolidDolor
+import com.dabenxiang.mimi.extension.setNot
+import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ExceptionResult
+import com.dabenxiang.mimi.model.api.vo.handleException
+import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.base.BaseActivity
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
@@ -17,15 +25,21 @@ import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.login.LoginActivity
 import com.dabenxiang.mimi.view.login.LoginFragment
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.OrientationDetector
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.analytics.AnalyticsListener
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
+import com.google.android.material.chip.Chip
+import com.kaopiz.kprogresshud.KProgressHUD
 import kotlinx.android.synthetic.main.activity_player.*
 import kotlinx.android.synthetic.main.custom_playback_control.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
+import java.net.UnknownHostException
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.math.abs
 import kotlin.math.round
 
@@ -40,7 +54,6 @@ class PlayerActivity : BaseActivity() {
         private const val SWIPE_SOUND_LEAST = 100
 
         fun createBundle(data: PlayerData): Bundle {
-            Timber.d("IsAdult: ${data.isAdult}, VideoId: ${data.videoId}")
             return Bundle().also {
                 it.putSerializable(KEY_PLAYER_SRC, data)
             }
@@ -53,24 +66,91 @@ class PlayerActivity : BaseActivity() {
     private var orientationDetector: OrientationDetector? = null
     private var dialog: GeneralDialog? = null
 
+    private val progressHUD by lazy {
+        KProgressHUD.create(this).setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+    }
+
     override fun getLayoutId(): Int {
         return R.layout.activity_player
     }
+
+    fun getIsAdult() = (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerData?)?.isAdult ?: false
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //setResult(999, Intent("12345678"))
+        val isAdult = getIsAdult()
+        val backgroundColor = if (isAdult) {
+            getColor(R.color.adult_color_background)
+        } else {
+            getColor(R.color.normal_color_background)
+        }
+        scrollView.setBackgroundColor(backgroundColor)
 
-        (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerData?)?.also { data ->
-            layout_others.setBackgroundColor(
-                if (data.isAdult) {
-                    getColor(R.color.adult_color_background)
+        val titleColor =
+            if (isAdult) {
+                R.color.adult_color_text
+            } else {
+                R.color.normal_color_text
+            }.let {
+                getColor(it)
+            }
+        tv_title.setTextColor(titleColor)
+
+        val subTitleColor =
+            if (isAdult) {
+                R.color.color_white_1_50
+            } else {
+                R.color.color_black_1_50
+            }.let {
+                getColor(it)
+            }
+        btn_show_introduction.setTextColor(subTitleColor)
+        tv_introduction.setTextColor(subTitleColor)
+        tv_info.setTextColor(subTitleColor)
+        tv_introduction.setBackgroundResource(
+            if (isAdult) {
+                R.drawable.bg_white_stroke_1_radius_2
+            } else {
+                R.drawable.bg_black_stroke_1_radius_2
+            }
+        )
+
+        btn_show_introduction.setOnClickListener {
+            viewModel.showIntroduction.setNot()
+        }
+
+        viewModel.showIntroduction.observe(this, Observer { isShow ->
+            val drawableRes =
+                if (isAdult) {
+                    if (isShow) {
+                        R.drawable.btn_arrowup_white_n
+                    } else {
+                        R.drawable.btn_arrowdown_white_n
+                    }
                 } else {
-                    getColor(R.color.normal_color_background)
+                    if (isShow) {
+                        R.drawable.btn_arrowup_gray_n
+                    } else {
+                        R.drawable.btn_arrowdown_gray_n
+                    }
                 }
-            )
+            tv_introduction.visibility = if (isShow) View.VISIBLE else View.GONE
+            btn_show_introduction.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawableRes, 0)
+        })
+
+        bottom_func_bar.setBackgroundResource(
+            if (isAdult) {
+                R.drawable.bg_adult_top_line
+            } else {
+                R.drawable.bg_gray_2_top_line
+            }
+        )
+
+        if (isAdult) {
+            btn_write_comment.setTextColor(getColor(R.color.color_white_1_30))
+            btn_write_comment.setBtnSolidDolor(getColor(R.color.color_black_1_20))
         }
 
         viewModel.fastForwardTime.observe(this, Observer {
@@ -104,6 +184,96 @@ class PlayerActivity : BaseActivity() {
             }
         })
 
+        var isFirstInit = true
+        viewModel.apiVideoInfo.observe(this, Observer {
+            when (it) {
+                is ApiResult.Loading -> progressHUD.show()
+                is ApiResult.Error -> {
+                    progressHUD.dismiss()
+                    onApiError(it.throwable)
+                }
+                is ApiResult.Success -> {
+                    progressHUD.dismiss()
+
+                    val result = it.result
+                    Timber.d("Result: $result")
+
+                    if (isFirstInit) {
+                        isFirstInit = false
+                        tv_title.text = result.title
+                        tv_introduction.text = result.description
+
+                        val dateString = result.updateTime?.let { date ->
+                            SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(date)
+                        }
+
+                        tv_info.text = String.format(getString(R.string.player_info_format), dateString ?: "", result.country)
+
+                        setupChipGroup(result.tags)
+                    }
+
+                    viewModel.likeVideo.value = result.like
+                    viewModel.likeVideoCount.value = result.likeCount
+                    viewModel.favoriteVideo.value = result.favorite
+                    viewModel.favoriteVideoCount.value = result.favoriteCount
+                    viewModel.commentCount.value = result.commentCount
+
+                    viewModel.isDeducted = result.deducted ?: false
+                    viewModel.costPoint = result.point ?: 0L
+                    viewModel.availablePoint = result.availablePoint ?: 0L
+                }
+            }
+        })
+
+        tv_comment.setCompoundDrawablesRelativeWithIntrinsicBounds(
+            if (isAdult) R.drawable.ico_messege_adult else R.drawable.ico_messege_adult_gray, 0, 0, 0
+        )
+
+        tv_like.setTextColor(titleColor)
+        tv_favorite.setTextColor(titleColor)
+        tv_comment.setTextColor(titleColor)
+
+        iv_share.setImageResource(if (isAdult) R.drawable.btn_share_white_n else R.drawable.btn_share_gray_n)
+        iv_more.setImageResource(if (isAdult) R.drawable.btn_more_white_n else R.drawable.btn_more_gray_n)
+
+        viewModel.likeVideo.observe(this, Observer {
+            val res = when (it) {
+                true -> R.drawable.ico_nice_s
+                else ->
+                    when (isAdult) {
+                        true -> R.drawable.ico_nice
+                        else -> R.drawable.ico_nice_gray
+                    }
+            }
+
+            tv_like.setCompoundDrawablesRelativeWithIntrinsicBounds(res, 0, 0, 0)
+        })
+
+        viewModel.likeVideoCount.observe(this, Observer {
+            tv_like.text = it.toString()
+        })
+
+        viewModel.favoriteVideo.observe(this, Observer {
+            val res = when (it) {
+                true -> R.drawable.btn_favorite_white_s
+                else ->
+                    when (isAdult) {
+                        true -> R.drawable.btn_favorite_white_n
+                        else -> R.drawable.btn_favorite_n
+                    }
+            }
+
+            tv_favorite.setCompoundDrawablesRelativeWithIntrinsicBounds(res, 0, 0, 0)
+        })
+
+        viewModel.favoriteVideoCount.observe(this, Observer {
+            tv_favorite.text = it.toString()
+        })
+
+        viewModel.commentCount.observe(this, Observer {
+            tv_comment.text = it.toString()
+        })
+
         btn_full_screen.setOnClickListener {
             viewModel.lockFullScreen = !viewModel.lockFullScreen
 
@@ -135,6 +305,12 @@ class PlayerActivity : BaseActivity() {
                 }
             })
         }
+
+        player_view.isEnabled = false
+
+//        btn.setOnClickListener {
+//            setupPlayUrl("https://cdn-file.pinsewu.com/group1/M00/06/8C/wKgBm11BjXOAWRXKAAA_XDt-0eI56.m3u8_web")
+//        }
     }
 
     override fun onStart() {
@@ -150,13 +326,13 @@ class PlayerActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
 
-        if (viewModel.accountManager.isLogin.value == false &&
-            (dialog == null || dialog?.isVisible == false)
-        ) {
+        if (viewModel.accountManager.isLogin.value == false && (dialog == null || dialog?.isVisible == false)) {
             openLoginDialog()
+        } else {
+            loadVideo()
         }
 
-        hideSystemUi()
+        //hideSystemUi()
 
         if ((Util.SDK_INT <= 23 || player == null)) {
             setupPlayer()
@@ -211,20 +387,15 @@ class PlayerActivity : BaseActivity() {
 
                 initTouchListener()
             }
-
-            loadVideo()
         }
     }
 
     private fun loadVideo() {
-        // TODO Not yet!
         if (viewModel.currentVideoUrl.value == null) {
-            //TODO: Get Video
             (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerData?)?.also {
-                Timber.d("$it, id: ${it.videoId}")
+                viewModel.videoId = it.videoId
+                viewModel.getVideoInfo()
             }
-            // 透過Observer 設定 video src
-            viewModel._currentVideoUrl.value = "https://cdn-file.pinsewu.com/group1/M00/06/8C/wKgBm11BjXOAWRXKAAA_XDt-0eI56.m3u8_web"
         } else {
             // OnStart or OnResume 設定 video src
             setupPlayUrl(viewModel.currentVideoUrl.value!!)
@@ -235,10 +406,9 @@ class PlayerActivity : BaseActivity() {
         val agent = Util.getUserAgent(this, getString(R.string.app_name))
         val sourceFactory = DefaultDataSourceFactory(this, agent)
 
-        viewModel.getMediaSource(url, sourceFactory)
-            ?.also {
-                player?.prepare(it, false, false)
-            }
+        viewModel.getMediaSource(url, sourceFactory)?.also {
+            player?.prepare(it, false, false)
+        }
     }
 
     private fun initTouchListener() {
@@ -399,7 +569,7 @@ class PlayerActivity : BaseActivity() {
         }
 
         override fun onPositionDiscontinuity(reason: Int) {
-            Timber.d("onPositionDiscontinuity")
+            Timber.d("onPositionDiscontinuity: $reason")
         }
 
         override fun onTimelineChanged(timeline: Timeline, reason: Int) {
@@ -484,5 +654,83 @@ class PlayerActivity : BaseActivity() {
             isCancelable = false
             show(supportFragmentManager)
         }
+    }
+
+    private fun setupChipGroup(list: List<String>?) {
+        reflow_group.removeAllViews()
+
+        if (list == null) {
+            return
+        }
+
+        list.indices.mapNotNull {
+            list[it]
+        }.forEach {
+            val chip = layoutInflater.inflate(R.layout.chip_item, reflow_group, false) as Chip
+            chip.text = it
+
+            val isAdult = getIsAdult()
+
+            chip.setTextColor(
+                if (isAdult) {
+                    R.color.color_white_1_50
+                } else {
+                    R.color.color_black_1_50
+                }.let { colorRes ->
+                    getColor(colorRes)
+                }
+            )
+
+            chip.chipBackgroundColor = ColorStateList.valueOf(
+                ContextCompat.getColor(
+                    this, if (isAdult) {
+                        R.color.adult_color_status_bar
+                    } else {
+                        R.color.color_black_1_10
+                    }
+                )
+            )
+
+            reflow_group.addView(chip)
+        }
+    }
+
+    private fun onApiError(throwable: Throwable) {
+        when (val errorHandler = throwable.handleException { e -> viewModel.processException(e) }) {
+            is ExceptionResult.RefreshTokenExpired -> viewModel.logoutLocal()
+            is ExceptionResult.HttpError -> handleHttpError(errorHandler)
+            is ExceptionResult.Crash -> {
+                if (errorHandler.throwable is UnknownHostException) {
+                    showCrashDialog(HttpErrorMsgType.CHECK_NETWORK)
+                } else {
+                    GeneralUtils.showToast(this, errorHandler.throwable.toString())
+                }
+            }
+        }
+    }
+
+    private fun handleHttpError(errorHandler: ExceptionResult.HttpError) {
+        GeneralDialog.newInstance(
+            GeneralDialogData(
+                titleRes = R.string.error_device_binding_title,
+                message = errorHandler.httpExceptionItem.errorItem.toString(),
+                messageIcon = R.drawable.ico_default_photo,
+                secondBtn = getString(R.string.btn_confirm)
+            )
+        ).show(supportFragmentManager)
+    }
+
+    private fun showCrashDialog(type: HttpErrorMsgType = HttpErrorMsgType.API_FAILED) {
+        GeneralDialog.newInstance(
+            GeneralDialogData(
+                titleRes = R.string.error_device_binding_title,
+                message = when(type) {
+                    HttpErrorMsgType.API_FAILED -> getString(R.string.api_failed_msg)
+                    HttpErrorMsgType.CHECK_NETWORK -> getString(R.string.server_error)
+                },
+                messageIcon = R.drawable.ico_default_photo,
+                secondBtn = getString(R.string.btn_close)
+            )
+        ).show(supportFragmentManager)
     }
 }

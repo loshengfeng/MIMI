@@ -36,6 +36,7 @@
             android:layout_height="36dp"
             android:layout_marginEnd="10dp"
             app:btn_corner_radius="standard"
+            app:btn_pressed_color="darker"
             app:btn_solid_color="@color/normal_color_search_bar"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/btn_filter"
@@ -104,6 +105,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layout_search_bar"
         app:spanCount="2" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

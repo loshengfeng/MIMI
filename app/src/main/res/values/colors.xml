@@ -21,6 +21,7 @@
     <color name="adult_color_card_background">@color/color_black_1_20</color>
 
     <color name="color_white_1">#ffffff</color>
+    <color name="color_white_1_10">#1Affffff</color>
     <color name="color_white_1_30">#4dffffff</color>
     <color name="color_white_1_50">#80ffffff</color>
     <color name="color_white_1_65625">#a8ffffff</color>

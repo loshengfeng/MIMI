@@ -3,9 +3,7 @@ package com.dabenxiang.mimi.view.home
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.adapter.*
@@ -126,6 +124,8 @@ class HomeCategoriesViewHolder(itemView: View, listener: HomeAdapter.EventListen
         }
 
         recyclerView.adapter = nestedAdapter
+
+        PagerSnapHelper().attachToRecyclerView(recyclerView)
     }
 
     override fun updated() {

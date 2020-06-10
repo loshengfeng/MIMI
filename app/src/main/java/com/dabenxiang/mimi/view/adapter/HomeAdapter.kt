@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.base.BaseViewHolder
@@ -35,65 +34,60 @@ class HomeAdapter(val context: Context, private val listener: EventListener, pri
     }
 
     override fun getItemViewType(position: Int): Int {
-        val template = getItem(position)
-        return template.type.ordinal
+        return position
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-
         val layoutInflater = LayoutInflater.from(parent.context)
-
-        val viewHolder = when (viewType) {
-            HomeItemType.HEADER.ordinal -> {
+        return when (getItem(viewType).type) {
+            HomeItemType.HEADER -> {
                 HeaderViewHolder(layoutInflater.inflate(R.layout.item_header, parent, false), listener, isAdult)
             }
-            HomeItemType.BANNER.ordinal -> {
+            HomeItemType.BANNER -> {
                 HomeBannerViewHolder(layoutInflater.inflate(R.layout.item_banner, parent, false), listener, isAdult)
             }
-            HomeItemType.CAROUSEL.ordinal -> {
+            HomeItemType.CAROUSEL -> {
                 HomeCarouselViewHolder(layoutInflater.inflate(R.layout.item_carousel, parent, false), listener, isAdult)
             }
-            HomeItemType.CATEGORIES.ordinal -> {
+            HomeItemType.CATEGORIES -> {
                 HomeCategoriesViewHolder(layoutInflater.inflate(R.layout.item_home_categories, parent, false), listener, isAdult)
             }
-            HomeItemType.LEADERBOARD.ordinal -> {
+            HomeItemType.LEADERBOARD -> {
                 HomeLeaderboardViewHolder(layoutInflater.inflate(R.layout.item_home_leaderboard, parent, false), listener, isAdult)
             }
-            HomeItemType.RECOMMEND.ordinal -> {
+            HomeItemType.RECOMMEND -> {
                 HomeRecommendViewHolder(layoutInflater.inflate(R.layout.item_home_recommend, parent, false), listener, isAdult)
             }
             else -> {
                 HeaderViewHolder(layoutInflater.inflate(R.layout.item_header, parent, false), listener, isAdult)
             }
         }
-
-        return viewHolder
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         val template = getItem(position)
-        when (holder.itemViewType) {
-            HomeItemType.HEADER.ordinal -> {
+        when (template.type) {
+            HomeItemType.HEADER -> {
                 holder as HeaderViewHolder
                 holder.bind(template)
             }
-            HomeItemType.BANNER.ordinal -> {
+            HomeItemType.BANNER -> {
                 holder as HomeBannerViewHolder
                 holder.bind(template)
             }
-            HomeItemType.CAROUSEL.ordinal -> {
+            HomeItemType.CAROUSEL -> {
                 holder as HomeCarouselViewHolder
                 holder.bind(template)
             }
-            HomeItemType.CATEGORIES.ordinal -> {
+            HomeItemType.CATEGORIES -> {
                 holder as HomeCategoriesViewHolder
                 holder.bind(template)
             }
-            HomeItemType.LEADERBOARD.ordinal -> {
+            HomeItemType.LEADERBOARD -> {
                 holder as HomeLeaderboardViewHolder
                 holder.bind(template)
             }
-            HomeItemType.RECOMMEND.ordinal -> {
+            HomeItemType.RECOMMEND -> {
                 holder as HomeRecommendViewHolder
                 holder.bind(template)
             }
