@@ -78,10 +78,7 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
             emit(ApiResult.success(null))
         }
             .flowOn(Dispatchers.IO)
-            .catch { e ->
-                emit(ApiResult.error(e))
-            }
-
+            .catch { e -> emit(ApiResult.error(e)) }
 
     fun refreshToken() =
         flow {
@@ -98,9 +95,7 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
             emit(ApiResult.success(null))
         }
             .flowOn(Dispatchers.IO)
-            .catch { e ->
-                emit(ApiResult.error(e))
-            }
+            .catch { e -> emit(ApiResult.error(e)) }
 
     fun singUp(request: SingUpRequest) =
         flow {
@@ -110,11 +105,8 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
         }
             .flowOn(Dispatchers.IO)
             .onStart { emit(ApiResult.loading()) }
-            .catch { e ->
-                emit(ApiResult.error(e))
-            }.onCompletion {
-                emit(ApiResult.loaded())
-            }
+            .catch { e -> emit(ApiResult.error(e)) }
+            .onCompletion { emit(ApiResult.loaded()) }
 
     fun signIn(userName: String, password: String) =
         flow {
@@ -139,11 +131,8 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
         }
             .flowOn(Dispatchers.IO)
             .onStart { emit(ApiResult.loading()) }
-            .catch { e ->
-                emit(ApiResult.error(e))
-            }.onCompletion {
-                emit(ApiResult.loaded())
-            }
+            .catch { e -> emit(ApiResult.error(e)) }
+            .onCompletion { emit(ApiResult.loaded()) }
 
     fun signOut() =
         flow {
@@ -156,30 +145,23 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
         }
             .flowOn(Dispatchers.IO)
             .onStart { emit(ApiResult.loading()) }
-            .catch { e ->
-                emit(ApiResult.error(e))
-            }.onCompletion {
-                emit(ApiResult.loaded())
-            }
+            .catch { e -> emit(ApiResult.error(e)) }
+            .onCompletion { emit(ApiResult.loaded()) }
 
-    // todo: 10/06/2020
-//    fun resetPwd(userName: String, newPwd: String) =
-//        flow {
-//            val request = ResetPasswordRequest(userName, newPwd)
-//            val result = domainManager.getApiRepository().resetPassword(request)
-//            if (!result.isSuccessful) throw HttpException(result)
-//            getProfile()?.copy(password = newPwd)?.let {
-//                setupProfile(it)
-//            }
-//            emit(ApiResult.success(null))
-//        }
-//            .flowOn(Dispatchers.IO)
-//            .onStart { emit(ApiResult.loading()) }
-//            .catch { e ->
-//                emit(ApiResult.error(e))
-//            }.onCompletion {
-//                emit(ApiResult.loaded())
-//            }
+    fun changePwd(oldPassword: String, newPassword: String) =
+        flow {
+            val request = ChangePasswordRequest(oldPassword, newPassword)
+            val result = domainManager.getApiRepository().changePassword(request)
+            if (!result.isSuccessful) throw HttpException(result)
+            getProfile()?.copy(password = newPassword)?.let {
+                setupProfile(it)
+            }
+            emit(ApiResult.success(null))
+        }
+            .flowOn(Dispatchers.IO)
+            .onStart { emit(ApiResult.loading()) }
+            .catch { e -> emit(ApiResult.error(e)) }
+            .onCompletion { emit(ApiResult.loaded()) }
 
     fun logoutLocal() {
         pref.clearMemberToken()

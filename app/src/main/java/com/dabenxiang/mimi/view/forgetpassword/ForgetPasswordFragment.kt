@@ -59,7 +59,6 @@ class ForgetPasswordFragment : BaseFragment<ForgetPasswordViewModel>() {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Loaded -> progressHUD?.dismiss()
                 is ApiResult.Empty -> {
-                    progressHUD?.dismiss()
                     GeneralDialog.newInstance(
                         GeneralDialogData(
                             titleRes = R.string.reset_pw_success,

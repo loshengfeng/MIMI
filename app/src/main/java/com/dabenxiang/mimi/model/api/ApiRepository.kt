@@ -138,8 +138,8 @@ class ApiRepository(private val apiService: ApiService) {
      * 修改密碼(已登入)
      */
     suspend fun changePassword(
-        password: String
-    ) = apiService.changePassword(password)
+        body: ChangePasswordRequest
+    ) = apiService.changePassword(body)
 
     /**
      * 忘記密碼
@@ -263,7 +263,7 @@ class ApiRepository(private val apiService: ApiService) {
     /**
      * 取得使用者資訊明細
      */
-    suspend fun getMeProfile() = apiService.getMeProfile()
+    suspend fun getProfile() = apiService.getProfile()
 
     /**
      * 修改使用者資訊

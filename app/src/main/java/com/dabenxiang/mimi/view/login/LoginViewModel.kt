@@ -163,7 +163,7 @@ class LoginViewModel : BaseViewModel() {
     fun getProfile() {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().getMeProfile()
+                val result = domainManager.getApiRepository().getProfile()
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(result.body()?.content))
             }

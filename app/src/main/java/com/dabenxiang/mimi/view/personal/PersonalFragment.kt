@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
+import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -21,24 +22,52 @@ import kotlinx.android.synthetic.main.item_personal_is_login.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import org.koin.android.viewmodel.ext.android.viewModel
 import retrofit2.HttpException
-import timber.log.Timber
 
 class PersonalFragment : BaseFragment<PersonalViewModel>() {
     private val viewModel by viewModel<PersonalViewModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initSettings()
     }
 
-    override fun getLayoutId(): Int {
-        return R.layout.fragment_personal
-    }
+    override fun getLayoutId(): Int { return R.layout.fragment_personal }
 
-    override fun fetchViewModel(): PersonalViewModel? {
-        return viewModel
-    }
+    override fun fetchViewModel(): PersonalViewModel? { return viewModel }
 
     override fun setupObservers() {
+        viewModel.meItem.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Success -> {
+                    val meItem = it.result
+                    progressHUD?.dismiss()
+                    tv_name.text = meItem.friendlyName.toString()
+                    tv_Point.text = meItem.availablePoint.toString()
+                    // todo: confirm by Jeff...
+                    tv_new.visibility = when(meItem.hasNewMessage) {
+                        true -> View.VISIBLE
+                        else -> View.GONE
+                    }
+                    /*GeneralDialog.newInstance(
+                        GeneralDialogData(
+                            titleRes = R.string.desc_success,
+                            message = it.result.friendlyName.toString(),
+                            messageIcon = R.drawable.ico_default_photo,
+                            secondBtn = getString(R.string.btn_confirm),
+                            secondBlock = { navigateTo(NavigateItem.Up) }
+                        )
+                    ).show(requireActivity().supportFragmentManager)*/
+                }
+                is ApiResult.Error -> onApiError(it.throwable) /*{
+                    when (val errorHandler = it.throwable.handleException { ex -> mainViewModel?.processException(ex) }) {
+                        is ExceptionResult.HttpError -> showErrorMessageDialog(errorHandler.httpExceptionItem.errorItem.message.toString())
+                        else -> onApiError(it.throwable)
+                    }
+                }*/
+            }
+        })
+
         viewModel.accountManager.isLogin.observe(viewLifecycleOwner, Observer {
             when (it) {
                 true -> {
@@ -52,11 +81,7 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
             }
 
             // todo: for testing
-            tv_name.text = "好大一棵洋梨"
-            tv_coco.text = "200"
             tv_new.text = "N"
-            tv_version_is_login.text = "v1.0.0"
-            tv_version_is_not_login.text = "v1.0.0"
             tv_content.text = "文字內容文字內容"
             tv_sub_content.text = "文字內容文字內容文字內容文字內容文字內容文字內容文字內容文字內容"
         })
@@ -90,26 +115,17 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.tv_topup -> GeneralUtils.showToast(context!!, "btnTopup")
-                R.id.tv_favorite -> GeneralUtils.showToast(context!!, "btnFavorite")
-                R.id.tv_topup_history -> Navigation.findNavController(view!!)
-                    .navigate(R.id.action_personalFragment_to_topupHistoryFragment)
-                R.id.tv_chat_history -> Navigation.findNavController(view!!)
-                    .navigate(R.id.action_personalFragment_to_chatHistoryFragment)
-                R.id.tv_setting -> Navigation.findNavController(view!!)
-                    .navigate(R.id.action_personalFragment_to_settingFragment)
-                R.id.tv_logout -> {
-                    viewModel.signOut()
-                }
-                R.id.tv_login -> {
-                    navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_loginFragment, LoginFragment.createBundle(TYPE_LOGIN)))
-                }
-                R.id.tv_register -> {
-                    navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_loginFragment, LoginFragment.createBundle(TYPE_REGISTER)))
-                }
+                R.id.tv_follow -> GeneralUtils.showToast(context!!, "btnFollow")
+                R.id.tv_topup_history -> Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_topupHistoryFragment)
+                R.id.tv_chat_history -> Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_chatHistoryFragment)
+                R.id.tv_setting -> Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_settingFragment)
+                R.id.tv_logout -> viewModel.signOut()
+                R.id.tv_login -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_loginFragment, LoginFragment.createBundle(TYPE_LOGIN)))
+                R.id.tv_register -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_loginFragment, LoginFragment.createBundle(TYPE_REGISTER)))
             }
         }.also {
             tv_topup.setOnClickListener(it)
-            tv_favorite.setOnClickListener(it)
+            tv_follow.setOnClickListener(it)
             tv_topup_history.setOnClickListener(it)
             tv_chat_history.setOnClickListener(it)
             tv_setting.setOnClickListener(it)
@@ -117,5 +133,12 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
             tv_login.setOnClickListener(it)
             tv_register.setOnClickListener(it)
         }
+    }
+
+    override fun initSettings() {
+        super.initSettings()
+        viewModel.getMe()
+        tv_version_is_login.text = BuildConfig.VERSION_NAME
+        tv_version_is_not_login.text = BuildConfig.VERSION_NAME
     }
 }

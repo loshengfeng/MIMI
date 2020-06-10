@@ -111,7 +111,7 @@ interface ApiService {
      ***********************************************************/
     @PUT("/v1/Members/ChangePassword")
     suspend fun changePassword(
-        @Body password: String
+        @Body body: ChangePasswordRequest
     ): Response<Void>
 
     @PUT("/v1/Members/ForgetPassword")
@@ -209,7 +209,7 @@ interface ApiService {
     ): Response<ApiBasePagingItem<PlayListItem>>
 
     @GET("/v1/Members/Me/Profile")
-    suspend fun getMeProfile(): Response<ApiBaseItem<ProfileItem>>
+    suspend fun getProfile(): Response<ApiBaseItem<ProfileItem>>
 
     @PUT("/v1/Members/Me/Profile")
     suspend fun updatedMeProfile(

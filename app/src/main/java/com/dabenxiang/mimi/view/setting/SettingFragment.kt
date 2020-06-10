@@ -11,7 +11,6 @@ import kotlinx.android.synthetic.main.item_setting_bar.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-
 class SettingFragment : BaseFragment<SettingViewModel>() {
     private val viewModel by viewModel<SettingViewModel>()
     private var isValidated = true
@@ -37,8 +36,6 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
     }
 
     override fun setupListeners() {
-        Timber.d("${SettingFragment::class.java.simpleName}_setupListeners")
-
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.tv_back -> Navigation.findNavController(view!!).navigateUp()

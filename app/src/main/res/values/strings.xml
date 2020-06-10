@@ -59,6 +59,7 @@
     <!-- Personal -->
     <string name="personal_title">我的</string>
     <string name="personal_topup">充值去 ></string>
+    <string name="personal_follow">我的关注</string>
     <string name="personal_topoup_history">充值记录</string>
     <string name="personal_chat_history">对话记录</string>
     <string name="personal_setting">设置</string>
@@ -73,6 +74,13 @@
     <string name="setting_resend_mail">重发认证信</string>
     <string name="setting_change_password">修改密码</string>
     <string name="setting_current_password">目前密码</string>
+    <string name="setting_current_password_error_1">请填写目前密码</string>
+    <string name="setting_current_password_error_2">密码错误</string>
+    <string name="setting_new_password">新密码</string>
+    <string name="setting_new_password_error_1">请填写新密码</string>
+    <string name="setting_confirm_password">确认新密码</string>
+    <string name="setting_confirm_password_error_1">请填写确认新密码</string>
+    <string name="setting_confirm_password_error_2">与新密码不相符</string>
     <string name="topup_all">全部</string>
     <string name="topup_online_pay">在线支付</string>
     <string name="topup_proxy_pay">代理支付</string>
