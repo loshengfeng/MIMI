@@ -3,7 +3,6 @@ package com.dabenxiang.mimi.model.api.vo
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
-
 data class ProfileItem(
     @SerializedName("username")
     var username: String?,

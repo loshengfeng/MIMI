@@ -214,7 +214,7 @@ interface ApiService {
 
     @PUT("/v1/Members/Me/Profile")
     suspend fun updateProfile(
-        @Body body: ProfileItem
+        @Body body: ProfileRequest
     ): Response<Void>
 
     /**********************************************************

@@ -40,6 +40,18 @@
         app:layout_constraintTop_toBottomOf="@id/tv_text"
         tools:ignore="LabelFor" />
 
+    <TextView
+        android:id="@+id/tv_content_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color_red_2"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@id/edit_content"
+        app:layout_constraintTop_toBottomOf="@+id/edit_content"
+        tools:text="错误讯息"
+        tools:visibility="visible" />
+
     <CheckBox
         android:id="@+id/cb_email"
         android:layout_width="20dp"

@@ -8,12 +8,12 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ProfileItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_update_profile.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import timber.log.Timber
 
+@ExperimentalCoroutinesApi
 class UpdateProfileFragment :BaseFragment<UpdateProfileViewModel>() {
     private val viewModel by viewModel<UpdateProfileViewModel>()
 
@@ -44,6 +44,17 @@ class UpdateProfileFragment :BaseFragment<UpdateProfileViewModel>() {
     override fun fetchViewModel(): UpdateProfileViewModel? { return viewModel }
 
     override fun setupObservers() {
+        viewModel.error.observe(viewLifecycleOwner, Observer {
+            if (it == "") {
+                edit_content.setBackgroundResource(R.drawable.edit_text_rectangle)
+                tv_content_error.visibility = View.INVISIBLE
+            } else {
+                edit_content.setBackgroundResource(R.drawable.edit_text_error_rectangle)
+                tv_content_error.text = it
+                tv_content_error.visibility = View.VISIBLE
+            }
+        })
+
         viewModel.updateResult.observe(viewLifecycleOwner, Observer {
             when(it) {
                 is ApiResult.Loading -> progressHUD?.show()
@@ -61,7 +72,7 @@ class UpdateProfileFragment :BaseFragment<UpdateProfileViewModel>() {
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.tv_back -> navigateTo(NavigateItem.Up)
-                R.id.btn_confirm -> viewModel.updateProfile()
+                R.id.btn_confirm -> viewModel.doRegisterValidateAndSubmit()
             }
         }.also {
             tv_back.setOnClickListener(it)
@@ -72,7 +83,8 @@ class UpdateProfileFragment :BaseFragment<UpdateProfileViewModel>() {
     override fun initSettings() {
         arguments?.also { it ->
             viewModel.profileItem = it.getSerializable(KEY_PROFILE) as ProfileItem
-            when(it.getInt(KEY_TYPE, TYPE_NAME)) {
+            viewModel.type = it.getInt(KEY_TYPE, TYPE_NAME)
+            when(viewModel.type) {
                 TYPE_NAME -> {
                     tv_title.text = getString(R.string.setting_change_name)
                     tv_text.text = getString(R.string.setting_name)
@@ -90,5 +102,8 @@ class UpdateProfileFragment :BaseFragment<UpdateProfileViewModel>() {
                 }
             }
         }
+
+        viewModel.content.bindingEditText = edit_content
+        edit_content.setText("Test")
     }
 }
