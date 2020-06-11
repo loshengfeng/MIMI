@@ -98,11 +98,13 @@ class UpdateProfileFragment :BaseFragment<UpdateProfileViewModel>() {
                 TYPE_BIRTHDAY -> {
                     tv_title.text = getString(R.string.setting_birthday_title)
                     tv_text.text = getString(R.string.setting_birthday)
-                    edit_content.hint = getString(R.string.setting_birthday_hint)
+                    edit_content.visibility = View.INVISIBLE
+                    edit_birthday.visibility = View.VISIBLE
+                    edit_birthday.listen()
                 }
             }
         }
-
         viewModel.content.bindingEditText = edit_content
+        viewModel.birthday.bindingEditText = edit_birthday
     }
 }

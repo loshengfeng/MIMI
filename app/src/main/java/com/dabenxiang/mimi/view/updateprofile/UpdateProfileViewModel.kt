@@ -23,6 +23,7 @@ import retrofit2.HttpException
 class UpdateProfileViewModel : BaseViewModel() {
     var type = UpdateProfileFragment.TYPE_NAME
     val content = EditTextMutableLiveData()
+    val birthday = EditTextMutableLiveData()
 
     lateinit var profileItem: ProfileItem
 
@@ -68,9 +69,10 @@ class UpdateProfileViewModel : BaseViewModel() {
     }
 
     private fun isValidateBirthday(): String {
-        val birthday = content.value ?: ""
+        val birthday = birthday.value?: ""
         return when {
             TextUtils.isEmpty(birthday) -> app.getString(R.string.setting_type_birthday)
+            birthday.length != 10 -> app.getString(R.string.setting_birthday_error)
             else -> {
                 profileItem.birthday = birthday
                 ""

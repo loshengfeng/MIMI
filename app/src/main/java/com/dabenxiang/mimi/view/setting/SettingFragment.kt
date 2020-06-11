@@ -16,7 +16,6 @@ import kotlinx.android.synthetic.main.fragment_setting.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import timber.log.Timber
 
 @ExperimentalCoroutinesApi
 class SettingFragment : BaseFragment<SettingViewModel>() {
@@ -36,7 +35,7 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
 
     override fun setupObservers() {
         viewModel.profileItem.observe(viewLifecycleOwner, Observer {
-            when(it) {
+            when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Loaded -> progressHUD?.dismiss()
                 is ApiResult.Success -> {
@@ -44,7 +43,7 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
                     tv_email.text = viewModel.profileData?.email
                     tv_account.text = viewModel.profileData?.username
                     var img: Drawable? = null
-                    when(viewModel.profileData?.emailConfirmed ?: false) {
+                    when (viewModel.profileData?.emailConfirmed ?: false) {
                         true -> {
                             img = context!!.resources.getDrawable(R.drawable.ico_checked)
                             btn_resend.visibility = View.GONE
@@ -52,7 +51,7 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
                         else -> btn_resend.visibility = View.VISIBLE
                     }
 
-                    tv_email.setCompoundDrawablesWithIntrinsicBounds(null, null, img,null)
+                    tv_email.setCompoundDrawablesWithIntrinsicBounds(null, null, img, null)
 
 //                    GeneralDialog.newInstance(
 //                        GeneralDialogData(
@@ -75,19 +74,19 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
         })
 
         viewModel.resendResult.observe(viewLifecycleOwner, Observer {
-            when(it) {
+            when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Empty -> { }
+                is ApiResult.Empty -> {}
                 is ApiResult.Loaded -> progressHUD?.dismiss()
             }
         })
 
         viewModel.updateResult.observe(viewLifecycleOwner, Observer {
-            when(it) {
+            when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Empty -> { }
+                is ApiResult.Empty -> {}
                 is ApiResult.Loaded -> progressHUD?.dismiss()
             }
         })
@@ -98,18 +97,24 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
             when (buttonView.id) {
                 R.id.tv_back -> navigateTo(NavigateItem.Up)
                 R.id.btn_photo -> GeneralUtils.showToast(context!!, "btnPhoto")
-                R.id.btn_name -> navigateTo(NavigateItem.Destination(R.id.updateProfileFragment,
-                    viewModel.profileData?.let {
-                        UpdateProfileFragment.createBundle(UpdateProfileFragment.TYPE_NAME,
-                            it
-                        )
-                    }))
-                R.id.btn_email -> navigateTo(NavigateItem.Destination(R.id.updateProfileFragment,
-                    viewModel.profileData?.let {
-                        UpdateProfileFragment.createBundle(UpdateProfileFragment.TYPE_EMAIL,
-                            it
-                        )
-                    }))
+                R.id.btn_name -> navigateTo(
+                    NavigateItem.Destination(R.id.updateProfileFragment,
+                        viewModel.profileData?.let {
+                            UpdateProfileFragment.createBundle(
+                                UpdateProfileFragment.TYPE_NAME,
+                                it
+                            )
+                        })
+                )
+                R.id.btn_email -> navigateTo(
+                    NavigateItem.Destination(R.id.updateProfileFragment,
+                        viewModel.profileData?.let {
+                            UpdateProfileFragment.createBundle(
+                                UpdateProfileFragment.TYPE_EMAIL,
+                                it
+                            )
+                        })
+                )
                 R.id.btn_resend -> viewModel.resendEmail()
                 R.id.btn_chang_pw -> navigateTo(NavigateItem.Destination(R.id.action_settingFragment_to_changePasswordFragment))
                 R.id.btn_gender -> {
@@ -121,12 +126,15 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
                         onDialogListener
                     )
                 }
-                R.id.btn_birthday -> navigateTo(NavigateItem.Destination(R.id.updateProfileFragment,
-                    viewModel.profileData?.let {
-                        UpdateProfileFragment.createBundle(UpdateProfileFragment.TYPE_BIRTHDAY,
-                            it
-                        )
-                    }))
+                R.id.btn_birthday -> navigateTo(
+                    NavigateItem.Destination(R.id.updateProfileFragment,
+                        viewModel.profileData?.let {
+                            UpdateProfileFragment.createBundle(
+                                UpdateProfileFragment.TYPE_BIRTHDAY,
+                                it
+                            )
+                        })
+                )
             }
         }.also {
             tv_back.setOnClickListener(it)
@@ -142,14 +150,26 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
 
     override fun initSettings() { viewModel.getProfile() }
 
-    private fun showFilterDialog(titleId: Int,
-                                 textArrayId: Int,
-                                 valueArrayId: Int,
-                                 selectedValue: Int,
-                                 dialogListener: OnDialogListener
+    private fun showFilterDialog(
+        titleId: Int,
+        textArrayId: Int,
+        valueArrayId: Int,
+        selectedValue: Int,
+        dialogListener: OnDialogListener
     ) {
-        val dialog = FilterDialogFragment.newInstance(FilterDialogFragment.Content(titleId, textArrayId, valueArrayId, dialogListener, selectedValue))
-        dialog.show(requireActivity().supportFragmentManager, FilterDialogFragment::class.java.simpleName)
+        val dialog = FilterDialogFragment.newInstance(
+            FilterDialogFragment.Content(
+                titleId,
+                textArrayId,
+                valueArrayId,
+                dialogListener,
+                selectedValue
+            )
+        )
+        dialog.show(
+            requireActivity().supportFragmentManager,
+            FilterDialogFragment::class.java.simpleName
+        )
     }
 
     private val onDialogListener = object : OnDialogListener {

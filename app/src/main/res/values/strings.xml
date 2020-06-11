@@ -75,6 +75,7 @@
     <string name="setting_birthday_title">修改生日</string>
     <string name="setting_type_birthday">请填写生日</string>
     <string name="setting_birthday_hint">YYYY-MM-DD</string>
+    <string name="setting_birthday_error">格式错误(YYYY-MM-DD)</string>
     <string name="setting_change_name">修改名称</string>
     <string name="setting_change_pw">修改密码</string>
     <string name="setting_mail_title">信箱设置</string>
