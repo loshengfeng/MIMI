@@ -266,6 +266,9 @@ interface ApiService {
     suspend fun getVideoStreamOfEpisode(
         @Path("videoId") videoId: Long,
         @Path("episodeId") episodeId: Long,
-        @Path("streamId") streamId: Long
+        @Path("streamId") streamId: Long,
+        @Query("userId") userId: Long?,
+        @Query("utcTime") utcTime: Long?,
+        @Query("sign") sign: String?
     ): Response<Void>
 }

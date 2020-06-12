@@ -6,16 +6,12 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import org.koin.core.inject
 
 class CategoriesViewModel : BaseViewModel() {
-
-    private val apiRepository: ApiRepository by inject()
 
     private val _videoList = MutableLiveData<PagedList<BaseVideoItem>>()
     val videoList: LiveData<PagedList<BaseVideoItem>> = _videoList
@@ -36,7 +32,7 @@ class CategoriesViewModel : BaseViewModel() {
 
     fun setupVideoList(category: String?, isAdult: Boolean) {
         viewModelScope.launch {
-            val dataSrc = VideoListDataSource(isAdult, category ?: "", viewModelScope, apiRepository, pagingCallback)
+            val dataSrc = VideoListDataSource(isAdult, category ?: "", viewModelScope, domainManager.getApiRepository(), pagingCallback)
             val factory = VideoListFactory(dataSrc)
             val config = PagedList.Config.Builder()
                 .setPageSize(VideoListDataSource.PER_LIMIT.toInt())

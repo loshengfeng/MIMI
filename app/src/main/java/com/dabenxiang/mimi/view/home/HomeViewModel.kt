@@ -6,7 +6,6 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.holder.parser
@@ -15,7 +14,6 @@ import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import org.koin.core.inject
 import retrofit2.HttpException
 import timber.log.Timber
 
@@ -24,8 +22,6 @@ class HomeViewModel : BaseViewModel() {
     companion object {
         const val CATEGORIES_LIMIT = "20"
     }
-
-    private val apiRepository: ApiRepository by inject()
 
     private val _tabLayoutPosition = MutableLiveData<Int>()
     val tabLayoutPosition: LiveData<Int> = _tabLayoutPosition
@@ -43,7 +39,7 @@ class HomeViewModel : BaseViewModel() {
         viewModelScope.launch {
             adapter.activeTask {
                 flow {
-                    val resp = apiRepository.searchHomeVideos(src.categories, null, null, null, src.isAdult, "0", CATEGORIES_LIMIT)
+                    val resp = domainManager.getApiRepository().searchHomeVideos(src.categories, null, null, null, src.isAdult, "0", CATEGORIES_LIMIT)
                     if (!resp.isSuccessful) throw HttpException(resp)
 
                     emit(ApiResult.success(resp.body()))
@@ -72,7 +68,7 @@ class HomeViewModel : BaseViewModel() {
 
     fun setupVideoList(category: String?, isAdult: Boolean) {
         viewModelScope.launch {
-            val dataSrc = VideoListDataSource(isAdult, category ?: "", viewModelScope, apiRepository, pagingCallback)
+            val dataSrc = VideoListDataSource(isAdult, category ?: "", viewModelScope, domainManager.getApiRepository(), pagingCallback)
             dataSrc.isInvalid
             val factory = VideoListFactory(dataSrc)
             val config = PagedList.Config.Builder()

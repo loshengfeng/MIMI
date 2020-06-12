@@ -6,7 +6,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import kotlinx.android.synthetic.main.item_filter.view.*
 
-class SelectStreamHolder(itemView: View, listener: IndexViewHolderListener, var isAdult: Boolean) : BaseIndexViewHolder<String>(itemView, listener) {
+class SelectEpisodeHolder(itemView: View, listener: IndexViewHolderListener, var isAdult: Boolean) : BaseIndexViewHolder<String>(itemView, listener) {
 
     private val tvTitle: TextView = itemView.tv_title
 

@@ -3,22 +3,18 @@ package com.dabenxiang.mimi.view.main
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.RootCategoriesItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import org.koin.core.inject
 import retrofit2.HttpException
 import timber.log.Timber
 
 class MainViewModel : BaseViewModel() {
 
-    private val apiRepository: ApiRepository by inject()
-
-    private val _adultMode = MutableLiveData<Boolean>(false)
+    private val _adultMode = MutableLiveData(false)
     val adultMode: LiveData<Boolean> = _adultMode
 
     private val _categoriesData = MutableLiveData<RootCategoriesItem>()
@@ -33,7 +29,7 @@ class MainViewModel : BaseViewModel() {
     fun loadHomeCategories() {
         viewModelScope.launch {
             flow {
-                val resp = apiRepository.fetchHomeCategories()
+                val resp = domainManager.getApiRepository().fetchHomeCategories()
                 if (!resp.isSuccessful) throw HttpException(resp)
                 emit(ApiResult.success(resp.body()))
             }

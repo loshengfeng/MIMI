@@ -5,7 +5,6 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.Source
 import com.dabenxiang.mimi.model.api.vo.VideoItem
@@ -24,16 +23,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import org.koin.core.inject
 import retrofit2.HttpException
 import timber.log.Timber
 
 class PlayerViewModel : BaseViewModel() {
 
-    private val apiRepository: ApiRepository by inject()
-
     companion object {
         var volume: Float = 1f
+        const val StreamUrlFormat = "%s/v1/Player/%d/%d/%d?userId=%d&utcTime=%d&sign=%s"
     }
 
     var videoId: Long = 0L
@@ -55,11 +52,11 @@ class PlayerViewModel : BaseViewModel() {
     private val _isPlaying = MutableLiveData<Boolean>()
     val isPlaying: LiveData<Boolean> = _isPlaying
 
-    private val _currentVideoUrl = MutableLiveData<String?>()
-    val currentVideoUrl: LiveData<String?> = _currentVideoUrl
-
     private val _apiVideoInfo = MutableLiveData<ApiResult<VideoItem>>()
     val apiVideoInfo: LiveData<ApiResult<VideoItem>> = _apiVideoInfo
+
+    private val _apiStreamResult = MutableLiveData<ApiResult<Nothing>>()
+    val apiStreamResult: LiveData<ApiResult<Nothing>> = _apiStreamResult
 
     private val _consumeResult = MutableLiveData<VideoConsumeResult>()
     val consumeResult: LiveData<VideoConsumeResult> = _consumeResult
@@ -67,11 +64,13 @@ class PlayerViewModel : BaseViewModel() {
     private val _sourceListPosition = MutableLiveData<Int>()
     val sourceListPosition: LiveData<Int> = _sourceListPosition
 
-    private val _streamPosition = MutableLiveData<Int>()
-    val streamPosition: LiveData<Int> = _streamPosition
+    private val _episodePosition = MutableLiveData<Int>()
+    val episodePosition: LiveData<Int> = _episodePosition
 
     val showIntroduction = MutableLiveData(false)
 
+    var nextVideoUrl: String? = null
+    var currentVideoUrl: String? = null
     var sourceList: List<Source>? = null
     val likeVideo = MutableLiveData<Boolean>()
     val favoriteVideo = MutableLiveData<Boolean>()
@@ -148,7 +147,7 @@ class PlayerViewModel : BaseViewModel() {
     fun getVideoInfo() {
         viewModelScope.launch {
             flow {
-                val resp = apiRepository.getVideoInfo(videoId)
+                val resp = domainManager.getApiRepository().getVideoInfo(videoId)
                 if (!resp.isSuccessful) throw HttpException(resp)
 
                 emit(ApiResult.success(resp.body()?.content))
@@ -162,6 +161,55 @@ class PlayerViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect {
                     _apiVideoInfo.value = it
+                }
+        }
+    }
+
+    fun getStreamUrl() {
+        viewModelScope.launch {
+            flow {
+                val source = sourceList?.get(sourceListPosition.value!!)!!
+                val episode = source.videoEpisodes?.get(episodePosition.value!!)!!
+                val episodeId = episode.id!!
+
+                val apiRepository = domainManager.getApiRepository()
+
+                val episodeResp = apiRepository.getVideoEpisode(videoId, episodeId)
+                if (!episodeResp.isSuccessful) throw HttpException(episodeResp)
+
+                if (!isDeducted) {
+                    val videoInfoResp = domainManager.getApiRepository().getVideoInfo(videoId)
+                    if (!videoInfoResp.isSuccessful) throw HttpException(videoInfoResp)
+                    isDeducted = videoInfoResp.body()?.content?.deducted ?: false
+                }
+
+                if (!isDeducted) throw Exception("點數不足")
+
+                val episodeInfo = episodeResp.body()?.content
+                val stream = episodeInfo?.videoStreams?.get(0)!!
+                val streamResp = apiRepository.getVideoStreamOfEpisode(
+                    videoId,
+                    episodeId,
+                    stream.id!!,
+                    accountManager.getProfile().userId,
+                    stream.utcTime,
+                    stream.sign
+                )
+                if (!streamResp.isSuccessful) throw HttpException(streamResp)
+                // 取得轉址Url
+                nextVideoUrl = streamResp.raw().request.url.toString()
+
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e ->
+                    Timber.e(e)
+                    emit(ApiResult.error(e))
+                }
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect {
+                    _apiStreamResult.value = it
                 }
         }
     }
@@ -186,8 +234,8 @@ class PlayerViewModel : BaseViewModel() {
     }
 
     fun setStreamPosition(position: Int) {
-        if (position != _streamPosition.value) {
-            _streamPosition.value = position
+        if (position != _episodePosition.value) {
+            _episodePosition.value = position
         }
     }
 }

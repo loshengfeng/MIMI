@@ -349,7 +349,10 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun getVideoStreamOfEpisode(
         videoId: Long,
         episodeId: Long,
-        streamId: Long
-    ) = apiService.getVideoStreamOfEpisode(videoId, episodeId, streamId)
+        streamId: Long,
+        userId: Long? = null,
+        utcTime: Long? = null,
+        sign: String? = null
+    ) = apiService.getVideoStreamOfEpisode(videoId, episodeId, streamId, userId, utcTime, sign)
 }
 

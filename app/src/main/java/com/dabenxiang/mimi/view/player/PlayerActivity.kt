@@ -23,7 +23,7 @@ import com.dabenxiang.mimi.model.api.vo.handleException
 import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.serializable.PlayerData
-import com.dabenxiang.mimi.view.adapter.SelectStreamAdapter
+import com.dabenxiang.mimi.view.adapter.SelectEpisodeAdapter
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseActivity
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
@@ -81,8 +81,8 @@ class PlayerActivity : BaseActivity() {
         }, getIsAdult())
     }
 
-    private val streamAdapter by lazy {
-        SelectStreamAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
+    private val episodeAdapter by lazy {
+        SelectEpisodeAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
                 viewModel.setStreamPosition(index)
             }
@@ -198,12 +198,6 @@ class PlayerActivity : BaseActivity() {
             }
         })
 
-        viewModel.currentVideoUrl.observe(this, Observer {
-            it?.also { url ->
-                setupPlayUrl(url)
-            }
-        })
-
         viewModel.isPlaying.observe(this, Observer {
             iv_player.visibility = when (it) {
                 true -> View.GONE
@@ -218,11 +212,24 @@ class PlayerActivity : BaseActivity() {
             }
         })
 
-        viewModel.streamPosition.observe(this, Observer {
+        viewModel.episodePosition.observe(this, Observer {
             if (it >= 0) {
-                streamAdapter.setLastSelectedIndex(it)
+                episodeAdapter.setLastSelectedIndex(it)
                 // TODO: 播放影片?
                 viewModel.checkConsumeResult()
+            }
+        })
+
+        viewModel.apiStreamResult.observe(this, Observer {
+            when (it) {
+                is ApiResult.Loading -> progressHUD.show()
+                is ApiResult.Loaded -> progressHUD.dismiss()
+                is ApiResult.Empty -> {
+                    loadVideo()
+                }
+                is ApiResult.Error -> {
+                    onApiError(it.throwable)
+                }
             }
         })
 
@@ -230,13 +237,11 @@ class PlayerActivity : BaseActivity() {
         viewModel.apiVideoInfo.observe(this, Observer {
             when (it) {
                 is ApiResult.Loading -> progressHUD.show()
+                is ApiResult.Loaded -> progressHUD.dismiss()
                 is ApiResult.Error -> {
-                    progressHUD.dismiss()
                     onApiError(it.throwable)
                 }
                 is ApiResult.Success -> {
-                    progressHUD.dismiss()
-
                     val result = it.result
                     //Timber.d("Result: $result")
 
@@ -321,9 +326,9 @@ class PlayerActivity : BaseActivity() {
 
         viewModel.consumeResult.observe(this, Observer {
             consumeDialog?.dismiss()
-
             when (it) {
                 VideoConsumeResult.Paid -> {
+                    viewModel.getStreamUrl()
                 }
                 VideoConsumeResult.PaidYet -> {
                     consumeDialog = showCostPointDialog()
@@ -335,7 +340,7 @@ class PlayerActivity : BaseActivity() {
         })
 
         recyclerview_source_list.adapter = sourceListAdapter
-        recyclerview_stream.adapter = streamAdapter
+        recyclerview_episode.adapter = episodeAdapter
 
         btn_full_screen.setOnClickListener {
             viewModel.lockFullScreen = !viewModel.lockFullScreen
@@ -454,7 +459,7 @@ class PlayerActivity : BaseActivity() {
     }
 
     private fun loadVideo() {
-        if (viewModel.currentVideoUrl.value == null) {
+        if (viewModel.nextVideoUrl == null) {
             if (viewModel.apiVideoInfo.value == null) {
                 (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerData?)?.also {
                     viewModel.videoId = it.videoId
@@ -463,16 +468,22 @@ class PlayerActivity : BaseActivity() {
             }
         } else {
             // OnStart or OnResume 設定 video src
-            setupPlayUrl(viewModel.currentVideoUrl.value!!)
+            var isReset = false
+            if (viewModel.nextVideoUrl != viewModel.currentVideoUrl) {
+                isReset = true
+                viewModel.currentVideoUrl = viewModel.nextVideoUrl!!
+            }
+
+            setupPlayUrl(viewModel.currentVideoUrl!!, isReset)
         }
     }
 
-    private fun setupPlayUrl(url: String) {
+    private fun setupPlayUrl(url: String, isReset: Boolean) {
         val agent = Util.getUserAgent(this, getString(R.string.app_name))
         val sourceFactory = DefaultDataSourceFactory(this, agent)
 
         viewModel.getMediaSource(url, sourceFactory)?.also {
-            player?.prepare(it, false, false)
+            player?.prepare(it, isReset, isReset)
         }
     }
 
@@ -750,7 +761,7 @@ class PlayerActivity : BaseActivity() {
             }
         }
 
-        streamAdapter.submitList(result, -1)
+        episodeAdapter.submitList(result, -1)
         viewModel.setStreamPosition(-1)
     }
 
@@ -850,6 +861,7 @@ class PlayerActivity : BaseActivity() {
     private fun showCostPointDialog(): GeneralDialog {
         val message = String.format(getString(R.string.cost_point_message), viewModel.availablePoint, viewModel.costPoint)
 
+
         return GeneralDialog.newInstance(
             GeneralDialogData(
                 titleString = tv_title.text.toString(),
@@ -858,10 +870,7 @@ class PlayerActivity : BaseActivity() {
                 message = message,
                 firstBtn = getString(R.string.btn_cancel),
                 secondBtn = getString(R.string.btn_confirm),
-                secondBlock = {
-                    // TODO:
-                    Timber.d("%d, %d", viewModel.sourceListPosition.value, viewModel.streamPosition.value)
-                }
+                secondBlock = { viewModel.getStreamUrl() }
             )
         )
             .setCancel(false)
