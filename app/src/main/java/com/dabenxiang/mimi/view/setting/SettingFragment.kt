@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
 import androidx.lifecycle.Observer
+import com.blankj.utilcode.util.ImageUtils
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.MultiTransformation
@@ -24,20 +25,24 @@ import com.dabenxiang.mimi.view.dialog.choosepicker.OnChoosePickerDialogListener
 import com.dabenxiang.mimi.view.listener.OnDialogListener
 import com.dabenxiang.mimi.view.updateprofile.UpdateProfileFragment
 import kotlinx.android.synthetic.main.fragment_setting.*
+import kotlinx.android.synthetic.main.fragment_setting.iv_photo
+import kotlinx.android.synthetic.main.fragment_setting.tv_name
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import timber.log.Timber
 
 @ExperimentalCoroutinesApi
 class SettingFragment : BaseFragment<SettingViewModel>() {
     private val viewModel by viewModel<SettingViewModel>()
 
-    private var bitmap: Bitmap? = null
-
     companion object {
         private const val REQUEST_CODE_CAMERA = 100
         private const val REQUEST_CODE_ALBUM = 200
+        private const val KEY_PHOTO = "PHOTO"
+
+        fun createBundle(byteArray : ByteArray) = Bundle().also {
+            it.putSerializable(KEY_PHOTO, byteArray)
+        }
     }
 
     override val bottomNavigationVisibility: Int
@@ -98,21 +103,16 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> {
-                    Timber.d("Post Success_:${it.result}")
-                    viewModel.putAvatar(it.result)
-                }
+                is ApiResult.Success -> viewModel.putAvatar(it.result)
                 is ApiResult.Loaded -> progressHUD?.dismiss()
             }
         })
 
-        viewModel.putResult.observe(viewLifecycleOwner, Observer {
+        viewModel.putResult.observe(viewLifecycleOwner, Observer { it ->
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> {
-                    Timber.d("put Success")
-                }
+                is ApiResult.Empty -> { viewModel.bitmap?.also { it1 -> setupPhoto(it1) } }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
             }
         })
@@ -178,7 +178,16 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
         }
     }
 
-    override fun initSettings() { viewModel.getProfile() }
+    override fun initSettings() {
+        viewModel.getProfile()
+        arguments?.also { it ->
+            val byteArray = it.getSerializable(KEY_PHOTO) as ByteArray
+            byteArray?.also {
+                val bitmap = ImageUtils.bytes2Bitmap(it)
+                setupPhoto(bitmap)
+            }
+        }
+    }
 
     private fun showFilterDialog(
         titleId: Int,
@@ -215,7 +224,6 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
     }
 
     private fun openCamera() {
-        Timber.d("James_openCamera")
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         if (intent.resolveActivity(context!!.packageManager) != null) {
             startActivityForResult(intent, REQUEST_CODE_CAMERA)
@@ -233,8 +241,7 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && (requestCode == REQUEST_CODE_CAMERA || requestCode == REQUEST_CODE_ALBUM)) {
-            Timber.d("requestCode: $requestCode, resultCode: $resultCode, data: ${data.toString()}")
-            val tmpBitmap = when (requestCode) {
+            viewModel.bitmap = when (requestCode) {
                 REQUEST_CODE_CAMERA -> data?.extras?.get("data") as Bitmap
                 REQUEST_CODE_ALBUM -> {
                     val type = data?.data?.let { activity!!.contentResolver.getType(it) }
@@ -247,26 +254,19 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
                 }
                 else -> null
             }
-
-            if (tmpBitmap != null) {
-                viewModel.postAttachment(tmpBitmap)
-            }
-
-//            if (tmpBitmap != null) {
-//                bitmap = tmpBitmap
-//
-//                val options: RequestOptions = RequestOptions()
-//                    .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-//                    .placeholder(R.mipmap.ic_launcher)
-//                    .error(R.mipmap.ic_launcher)
-//                    .priority(Priority.NORMAL)
-//
-//                Glide.with(this).load(bitmap)
-//                    .apply(options)
-//                    .into(iv_photo)
-//            } else {
-//                viewModel.toastData.value = getString(R.string.file_type_not_supported)
-//            }
+            viewModel.bitmap?.also { viewModel.postAttachment() }
         }
+    }
+
+    private fun setupPhoto(bitmap: Bitmap) {
+        val options: RequestOptions = RequestOptions()
+            .transform(MultiTransformation(CenterCrop(), CircleCrop()))
+            .placeholder(R.mipmap.ic_launcher)
+            .error(R.mipmap.ic_launcher)
+            .priority(Priority.NORMAL)
+
+        Glide.with(this).load(bitmap)
+            .apply(options)
+            .into(iv_photo)
     }
 }

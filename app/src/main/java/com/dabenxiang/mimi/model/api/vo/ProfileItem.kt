@@ -25,4 +25,5 @@ data class ProfileItem(
 
     @SerializedName("emailConfirmed")
     var emailConfirmed: Boolean?
+
 ) : Serializable

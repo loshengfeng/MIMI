@@ -23,6 +23,7 @@ import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_LOGIN
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
+import com.dabenxiang.mimi.view.setting.SettingFragment
 import com.dabenxiang.mimi.widget.utility.AppUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_personal.*
@@ -57,7 +58,9 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
                     val meItem = it.result
 
                     val profile = viewModel.accountManager.getProfile()
+                    profile.userId = meItem.id ?: 0
                     profile.avatarAttachmentId = meItem.avatarAttachmentId ?: 0
+                    profile.friendlyName = meItem.friendlyName ?: ""
                     viewModel.accountManager.setupProfile(profile)
 
                     viewModel.getAttachment()
@@ -145,7 +148,7 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
                 R.id.tv_follow -> GeneralUtils.showToast(context!!, "btnFollow")
                 R.id.tv_topup_history -> Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_topupHistoryFragment)
                 R.id.tv_chat_history -> Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_chatHistoryFragment)
-                R.id.tv_setting -> Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_settingFragment)
+                R.id.tv_setting -> Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_settingFragment, viewModel.byteArray?.let { SettingFragment.createBundle(it) })
                 R.id.tv_logout -> viewModel.signOut()
                 R.id.tv_login -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_loginFragment, LoginFragment.createBundle(TYPE_LOGIN)))
                 R.id.tv_register -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_loginFragment, LoginFragment.createBundle(TYPE_REGISTER)))

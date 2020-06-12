@@ -9,7 +9,6 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.manager.DomainManager.Companion.PROMO_CODE
 import com.dabenxiang.mimi.manager.DomainManager.Companion.VALIDATION_URL
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.ProfileItem
 import com.dabenxiang.mimi.model.api.vo.SingUpRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
@@ -21,8 +20,8 @@ import com.dabenxiang.mimi.widget.utility.EditTextMutableLiveData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 
+@ExperimentalCoroutinesApi
 class LoginViewModel : BaseViewModel() {
     var type = TYPE_REGISTER
 
@@ -63,9 +62,6 @@ class LoginViewModel : BaseViewModel() {
 
     private val _loginResult = MutableLiveData<ApiResult<Nothing>>()
     val loginResult: LiveData<ApiResult<Nothing>> = _loginResult
-
-    private val _profileItem = MutableLiveData<ApiResult<ProfileItem>>()
-    val profileItem : LiveData<ApiResult<ProfileItem>> = _profileItem
 
     @ExperimentalCoroutinesApi
     fun doRegisterValidateAndSubmit() {
@@ -156,23 +152,6 @@ class LoginViewModel : BaseViewModel() {
             TextUtils.isEmpty(confirmPw) -> app.getString(R.string.password_format_error_3)
             pwd != confirmPw -> app.getString(R.string.password_format_error_4)
             else -> ""
-        }
-    }
-
-    @ExperimentalCoroutinesApi
-    fun getProfile() {
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository().getProfile()
-                if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(result.body()?.content))
-            }
-                .onStart { emit(ApiResult.loading()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .collect{
-                    _profileItem.value = it
-                }
         }
     }
 }

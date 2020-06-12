@@ -10,7 +10,6 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ErrorCode
 import com.dabenxiang.mimi.model.api.ExceptionResult
-import com.dabenxiang.mimi.model.api.vo.handleException
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
@@ -168,33 +167,17 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
                 is ApiResult.Error -> onApiError(it.throwable)
                 is ApiResult.Empty -> {
                     progressHUD?.dismiss()
-                    viewModel.getProfile()
-                }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
-            }
-        })
-
-        viewModel.profileItem.observe(viewLifecycleOwner, Observer {
-            when(it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> {
-                    when (val errorHandler = it.throwable.handleException { ex -> mainViewModel?.processException(ex) }) {
-                        is ExceptionResult.HttpError -> showErrorMessageDialog(errorHandler.httpExceptionItem.errorItem.message.toString())
-                        else -> onApiError(it.throwable)
-                    }
-                }
-                is ApiResult.Success -> {
-                    progressHUD?.dismiss()
                     GeneralDialog.newInstance(
                         GeneralDialogData(
                             titleRes = R.string.desc_success,
-                            message = it.result.friendlyName.toString(),
+                            message = viewModel.accountManager.getProfile().friendlyName,
                             messageIcon = R.drawable.ico_default_photo,
                             secondBtn = getString(R.string.btn_confirm),
                             secondBlock = { navigateTo(NavigateItem.Up) }
                         )
                     ).setCancel(false)
                         .show(requireActivity().supportFragmentManager)
+//                    viewModel.getProfile()
                 }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
             }

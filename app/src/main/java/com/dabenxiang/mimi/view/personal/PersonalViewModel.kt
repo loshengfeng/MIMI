@@ -16,6 +16,8 @@ import retrofit2.HttpException
 @ExperimentalCoroutinesApi
 class PersonalViewModel : BaseViewModel() {
 
+    var byteArray : ByteArray ? = null
+
     private val _meItem = MutableLiveData<ApiResult<MeItem>>()
     val meItem : LiveData<ApiResult<MeItem>> = _meItem
 
@@ -47,8 +49,8 @@ class PersonalViewModel : BaseViewModel() {
                 val result = domainManager.getApiRepository()
                     .getAttachment(accountManager.getProfile().avatarAttachmentId)
                 if (!result.isSuccessful) throw HttpException(result)
-                val bImg = result.body()?.bytes()
-                val bitmap = ImageUtils.bytes2Bitmap(bImg)
+                byteArray = result.body()?.bytes()
+                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
                 emit(ApiResult.success(bitmap))
             }
                 .onStart { emit(ApiResult.loading()) }

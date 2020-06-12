@@ -12,6 +12,7 @@ import com.dabenxiang.mimi.widget.utility.AppUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import retrofit2.HttpException
+import retrofit2.Response
 import java.util.*
 
 class AccountManager(private val pref: Pref, private val domainManager: DomainManager) {
@@ -121,7 +122,14 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
                 )
             }
 
-            setupProfile(ProfileData(AppUtils.getAndroidID(), userName, password))
+            var meResult : Response<ApiBaseItem<MeItem>>? = null
+
+            if(getProfile().userId == 0L) { meResult = domainManager.getApiRepository().getMe() }
+
+            if (!result.isSuccessful) throw HttpException(meResult)
+
+            val meItem = meResult?.body()?.content
+            setupProfile(ProfileData(userId = meItem?.id ?: 0, deviceId = AppUtils.getAndroidID(), account = userName, password = password, friendlyName = meItem?.friendlyName ?: ""))
 
             _isLogin.postValue(true)
 
@@ -163,6 +171,7 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
 
     fun logoutLocal() {
         pref.clearMemberToken()
+        pref.clearProfile()
         _isLogin.postValue(false)
     }
 }

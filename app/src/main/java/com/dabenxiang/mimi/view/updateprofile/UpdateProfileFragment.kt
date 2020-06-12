@@ -28,7 +28,6 @@ class UpdateProfileFragment :BaseFragment<UpdateProfileViewModel>() {
             it.putInt(KEY_TYPE, type)
             it.putSerializable(KEY_PROFILE, profileItem)
         }
-
     }
 
     override val bottomNavigationVisibility: Int
