@@ -15,7 +15,9 @@
             android:id="@+id/recyclerview_tab"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:clipToPadding="false"
             android:orientation="horizontal"
+            android:paddingStart="20dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -85,21 +87,29 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerview_content"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/refresh_home"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@color/normal_color_background"
-        android:orientation="vertical"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layout_search_bar" />
+        app:layout_constraintTop_toBottomOf="@id/layout_search_bar">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerview_home"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/normal_color_background"
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview_videos"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@color/normal_color_background"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
         android:visibility="gone"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"

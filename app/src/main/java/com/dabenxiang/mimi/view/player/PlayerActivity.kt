@@ -6,6 +6,7 @@ import android.content.pm.ActivityInfo
 import android.content.res.ColorStateList
 import android.hardware.SensorManager
 import android.os.Bundle
+import android.text.Html
 import android.view.MotionEvent
 import android.view.Surface
 import android.view.View
@@ -16,10 +17,16 @@ import com.dabenxiang.mimi.extension.setBtnSolidDolor
 import com.dabenxiang.mimi.extension.setNot
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ExceptionResult
+import com.dabenxiang.mimi.model.api.vo.Source
+import com.dabenxiang.mimi.model.api.vo.VideoEpisode
 import com.dabenxiang.mimi.model.api.vo.handleException
 import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
+import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.serializable.PlayerData
+import com.dabenxiang.mimi.view.adapter.SelectStreamAdapter
+import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseActivity
+import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
@@ -43,7 +50,6 @@ import java.util.*
 import kotlin.math.abs
 import kotlin.math.round
 
-
 class PlayerActivity : BaseActivity() {
 
     companion object {
@@ -65,6 +71,23 @@ class PlayerActivity : BaseActivity() {
     private var player: SimpleExoPlayer? = null
     private var orientationDetector: OrientationDetector? = null
     private var dialog: GeneralDialog? = null
+    private var consumeDialog: GeneralDialog? = null
+
+    private val sourceListAdapter by lazy {
+        TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
+            override fun onClickItemIndex(view: View, index: Int) {
+                viewModel.setSourceListPosition(index)
+            }
+        }, getIsAdult())
+    }
+
+    private val streamAdapter by lazy {
+        SelectStreamAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
+            override fun onClickItemIndex(view: View, index: Int) {
+                viewModel.setStreamPosition(index)
+            }
+        }, getIsAdult())
+    }
 
     private val progressHUD by lazy {
         KProgressHUD.create(this).setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
@@ -97,6 +120,7 @@ class PlayerActivity : BaseActivity() {
                 getColor(it)
             }
         tv_title.setTextColor(titleColor)
+        tv_source.setTextColor(titleColor)
 
         val subTitleColor =
             if (isAdult) {
@@ -116,6 +140,9 @@ class PlayerActivity : BaseActivity() {
                 R.drawable.bg_black_stroke_1_radius_2
             }
         )
+
+        val lineColor = if (isAdult) getColor(R.color.color_white_1_10) else getColor(R.color.color_black_1_05)
+        line_source.setBackgroundColor(lineColor)
 
         btn_show_introduction.setOnClickListener {
             viewModel.showIntroduction.setNot()
@@ -184,6 +211,21 @@ class PlayerActivity : BaseActivity() {
             }
         })
 
+        viewModel.sourceListPosition.observe(this, Observer {
+            sourceListAdapter.setLastSelectedIndex(it)
+            viewModel.sourceList?.get(it)?.videoEpisodes?.also { videoEpisodes ->
+                setupStream(videoEpisodes)
+            }
+        })
+
+        viewModel.streamPosition.observe(this, Observer {
+            if (it >= 0) {
+                streamAdapter.setLastSelectedIndex(it)
+                // TODO: 播放影片?
+                viewModel.checkConsumeResult()
+            }
+        })
+
         var isFirstInit = true
         viewModel.apiVideoInfo.observe(this, Observer {
             when (it) {
@@ -196,12 +238,12 @@ class PlayerActivity : BaseActivity() {
                     progressHUD.dismiss()
 
                     val result = it.result
-                    Timber.d("Result: $result")
+                    //Timber.d("Result: $result")
 
                     if (isFirstInit) {
                         isFirstInit = false
                         tv_title.text = result.title
-                        tv_introduction.text = result.description
+                        tv_introduction.text = Html.fromHtml(result.description, Html.FROM_HTML_MODE_COMPACT)
 
                         val dateString = result.updateTime?.let { date ->
                             SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(date)
@@ -209,7 +251,10 @@ class PlayerActivity : BaseActivity() {
 
                         tv_info.text = String.format(getString(R.string.player_info_format), dateString ?: "", result.country)
 
+                        viewModel.sourceList = result.sources
+
                         setupChipGroup(result.tags)
+                        setupSourceList(viewModel.sourceList)
                     }
 
                     viewModel.likeVideo.value = result.like
@@ -273,6 +318,24 @@ class PlayerActivity : BaseActivity() {
         viewModel.commentCount.observe(this, Observer {
             tv_comment.text = it.toString()
         })
+
+        viewModel.consumeResult.observe(this, Observer {
+            consumeDialog?.dismiss()
+
+            when (it) {
+                VideoConsumeResult.Paid -> {
+                }
+                VideoConsumeResult.PaidYet -> {
+                    consumeDialog = showCostPointDialog()
+                }
+                VideoConsumeResult.PointNotEnough -> {
+                    consumeDialog = showPointNotEnoughDialog()
+                }
+            }
+        })
+
+        recyclerview_source_list.adapter = sourceListAdapter
+        recyclerview_stream.adapter = streamAdapter
 
         btn_full_screen.setOnClickListener {
             viewModel.lockFullScreen = !viewModel.lockFullScreen
@@ -392,9 +455,11 @@ class PlayerActivity : BaseActivity() {
 
     private fun loadVideo() {
         if (viewModel.currentVideoUrl.value == null) {
-            (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerData?)?.also {
-                viewModel.videoId = it.videoId
-                viewModel.getVideoInfo()
+            if (viewModel.apiVideoInfo.value == null) {
+                (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerData?)?.also {
+                    viewModel.videoId = it.videoId
+                    viewModel.getVideoInfo()
+                }
             }
         } else {
             // OnStart or OnResume 設定 video src
@@ -656,6 +721,39 @@ class PlayerActivity : BaseActivity() {
         }
     }
 
+    private fun setupSourceList(list: List<Source>?) {
+        if (list == null) {
+            recyclerview_source_list.visibility = View.GONE
+        } else {
+            val size = list.size
+            if (size <= 1) {
+                recyclerview_source_list.visibility = View.GONE
+            } else {
+                val result = mutableListOf<String>()
+                for (item in list) {
+                    item.name?.also {
+                        result.add(it)
+                    }
+                }
+
+                sourceListAdapter.submitList(result, 0)
+                viewModel.setSourceListPosition(0)
+            }
+        }
+    }
+
+    private fun setupStream(list: List<VideoEpisode>) {
+        val result = mutableListOf<String>()
+        for (item in list) {
+            item.episode?.also {
+                result.add(it)
+            }
+        }
+
+        streamAdapter.submitList(result, -1)
+        viewModel.setStreamPosition(-1)
+    }
+
     private fun setupChipGroup(list: List<String>?) {
         reflow_group.removeAllViews()
 
@@ -724,7 +822,7 @@ class PlayerActivity : BaseActivity() {
         GeneralDialog.newInstance(
             GeneralDialogData(
                 titleRes = R.string.error_device_binding_title,
-                message = when(type) {
+                message = when (type) {
                     HttpErrorMsgType.API_FAILED -> getString(R.string.api_failed_msg)
                     HttpErrorMsgType.CHECK_NETWORK -> getString(R.string.server_error)
                 },
@@ -732,5 +830,41 @@ class PlayerActivity : BaseActivity() {
                 secondBtn = getString(R.string.btn_close)
             )
         ).show(supportFragmentManager)
+    }
+
+    private fun showPointNotEnoughDialog(): GeneralDialog {
+        return GeneralDialog.newInstance(
+            GeneralDialogData(
+                titleRes = R.string.point_not_enough,
+                messageIcon = R.drawable.ico_topup,
+                isHtml = true,
+                message = getString(R.string.point_not_enough_message),
+                firstBtn = getString(R.string.btn_cancel),
+                secondBtn = getString(R.string.recharge)
+            )
+        )
+            .setCancel(false)
+            .show(supportFragmentManager)
+    }
+
+    private fun showCostPointDialog(): GeneralDialog {
+        val message = String.format(getString(R.string.cost_point_message), viewModel.availablePoint, viewModel.costPoint)
+
+        return GeneralDialog.newInstance(
+            GeneralDialogData(
+                titleString = tv_title.text.toString(),
+                messageIcon = R.drawable.ico_topup,
+                isHtml = true,
+                message = message,
+                firstBtn = getString(R.string.btn_cancel),
+                secondBtn = getString(R.string.btn_confirm),
+                secondBlock = {
+                    // TODO:
+                    Timber.d("%d, %d", viewModel.sourceListPosition.value, viewModel.streamPosition.value)
+                }
+            )
+        )
+            .setCancel(false)
+            .show(supportFragmentManager)
     }
 }

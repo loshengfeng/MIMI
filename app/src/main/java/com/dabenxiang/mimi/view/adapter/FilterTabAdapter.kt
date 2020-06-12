@@ -9,32 +9,14 @@ import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.home.FilterTabHolder
 
 class FilterTabAdapter(private val listener: FilterTabAdapterListener, private val isAdult: Boolean) :
-    RecyclerView.Adapter<FilterTabHolder>() {
+    BaseTabAdapter<FilterTabHolder>() {
 
     interface FilterTabAdapterListener {
         fun onSelectedFilterTab(recyclerView: RecyclerView, position: Int)
     }
 
-    private var tabList: List<String>? = null
-    private var lastPosition = 0
     private var attachedRecyclerView: RecyclerView? = null
 
-    fun setTabList(src: List<String>, initSelectedPosition: Int) {
-        lastPosition = initSelectedPosition
-        tabList = src
-
-        notifyDataSetChanged()
-    }
-
-    val size = tabList?.size ?: 0
-
-    fun setLastSelectedPosition(position: Int) {
-        val oldPosition = lastPosition
-        lastPosition = position
-
-        notifyItemChanged(oldPosition)
-        notifyItemChanged(lastPosition)
-    }
 
     private val holderListener = object : BaseIndexViewHolder.IndexViewHolderListener {
         override fun onClickItemIndex(view: View, position: Int) {
@@ -44,10 +26,6 @@ class FilterTabAdapter(private val listener: FilterTabAdapterListener, private v
         }
     }
 
-    override fun getItemCount(): Int {
-        return tabList?.size ?: 0
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilterTabHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_filter, parent, false)
         return FilterTabHolder(view, holderListener, isAdult)
@@ -55,7 +33,7 @@ class FilterTabAdapter(private val listener: FilterTabAdapterListener, private v
 
     override fun onBindViewHolder(holder: FilterTabHolder, position: Int) {
         holder.bind(tabList?.get(position) ?: "", position)
-        holder.setSelected(lastPosition == position)
+        holder.setSelected(lastSelected == position)
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {

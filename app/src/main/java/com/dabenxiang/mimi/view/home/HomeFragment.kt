@@ -11,7 +11,7 @@ import com.dabenxiang.mimi.model.holder.CarouselHolderItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeCategoriesAdapter
-import com.dabenxiang.mimi.view.adapter.HomeTabAdapter
+import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
@@ -36,7 +36,7 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
     override fun getLayoutId() = R.layout.fragment_home
 
     private val tabAdapter by lazy {
-        HomeTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
+        TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
                 viewModel.setTopTabPosition(index)
             }
@@ -77,9 +77,16 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
 
         recyclerview_tab.adapter = tabAdapter
 
-        recyclerview_content.adapter = adapter
+        recyclerview_home.adapter = adapter
 
         recyclerview_videos.adapter = videoListAdapter
+
+        refresh_home.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
+        refresh_home.setOnRefreshListener {
+            refresh_home.isRefreshing = false
+
+            mainViewModel?.loadHomeCategories()
+        }
 
         viewModel.videoList.observe(viewLifecycleOwner, Observer {
             videoListAdapter.submitList(it)
@@ -88,7 +95,7 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
 
     private fun loadFirstTab(root: CategoriesItem?) {
         recyclerview_videos.visibility = View.GONE
-        recyclerview_content.visibility = View.VISIBLE
+        refresh_home.visibility = View.VISIBLE
 
         val templateList = mutableListOf<HomeTemplate>()
 
@@ -118,7 +125,7 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
 
     private fun loadCategories(keyword: String?) {
         recyclerview_videos.visibility = View.VISIBLE
-        recyclerview_content.visibility = View.GONE
+        refresh_home.visibility = View.GONE
 
         viewModel.setupVideoList(keyword, false)
     }
@@ -137,7 +144,7 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
                         list.add(detail.name)
                     }
 
-                    tabAdapter.setTabList(list, lastPosition)
+                    tabAdapter.submitList(list, lastPosition)
                     loadFirstTab(normal)
                 }
             })

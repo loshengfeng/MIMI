@@ -7,10 +7,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.Source
 import com.dabenxiang.mimi.model.api.vo.VideoItem
+import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.Timeline
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
@@ -26,7 +27,6 @@ import kotlinx.coroutines.launch
 import org.koin.core.inject
 import retrofit2.HttpException
 import timber.log.Timber
-
 
 class PlayerViewModel : BaseViewModel() {
 
@@ -61,8 +61,18 @@ class PlayerViewModel : BaseViewModel() {
     private val _apiVideoInfo = MutableLiveData<ApiResult<VideoItem>>()
     val apiVideoInfo: LiveData<ApiResult<VideoItem>> = _apiVideoInfo
 
+    private val _consumeResult = MutableLiveData<VideoConsumeResult>()
+    val consumeResult: LiveData<VideoConsumeResult> = _consumeResult
+
+    private val _sourceListPosition = MutableLiveData<Int>()
+    val sourceListPosition: LiveData<Int> = _sourceListPosition
+
+    private val _streamPosition = MutableLiveData<Int>()
+    val streamPosition: LiveData<Int> = _streamPosition
+
     val showIntroduction = MutableLiveData(false)
 
+    var sourceList: List<Source>? = null
     val likeVideo = MutableLiveData<Boolean>()
     val favoriteVideo = MutableLiveData<Boolean>()
     val likeVideoCount = MutableLiveData<Long>()
@@ -153,6 +163,31 @@ class PlayerViewModel : BaseViewModel() {
                 .collect {
                     _apiVideoInfo.value = it
                 }
+        }
+    }
+
+    fun checkConsumeResult() {
+        val result =
+            when {
+                costPoint == 0L || isDeducted -> VideoConsumeResult.Paid
+                else -> when {
+                    availablePoint > costPoint -> VideoConsumeResult.PaidYet
+                    else -> VideoConsumeResult.PointNotEnough
+                }
+            }
+
+        _consumeResult.value = result
+    }
+
+    fun setSourceListPosition(position: Int) {
+        if (position != _sourceListPosition.value) {
+            _sourceListPosition.value = position
+        }
+    }
+
+    fun setStreamPosition(position: Int) {
+        if (position != _streamPosition.value) {
+            _streamPosition.value = position
         }
     }
 }
