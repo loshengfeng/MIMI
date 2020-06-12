@@ -123,7 +123,7 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
             when (buttonView.id) {
                 R.id.tv_back -> navigateTo(NavigateItem.Up)
                 R.id.btn_photo -> {
-                    val dialog = ChoosePickerDialogFragment.newInstance(onChoosePickerDialogListener).also {
+                    ChoosePickerDialogFragment.newInstance(onChoosePickerDialogListener).also {
                         it.show(activity!!.supportFragmentManager, ChoosePickerDialogFragment::class.java.simpleName)
                     }
                 }
@@ -182,7 +182,7 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
         viewModel.getProfile()
         arguments?.also { it ->
             val byteArray = it.getSerializable(KEY_PHOTO) as ByteArray
-            byteArray?.also {
+            byteArray.also {
                 val bitmap = ImageUtils.bytes2Bitmap(it)
                 setupPhoto(bitmap)
             }
@@ -248,7 +248,7 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
                     if (type != null && type.startsWith("image")) {
                         MediaStore.Images.Media.getBitmap(
                             activity!!.contentResolver,
-                            data?.data
+                            data.data
                         )
                     } else null
                 }
