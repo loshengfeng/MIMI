@@ -30,8 +30,7 @@ class HomeVideoListAdapter(private val nestedListener: HomeAdapter.EventListener
         }
 
         private const val BANNER = 0
-        private const val LEFT_VIDEO = 1
-        private const val RIGHT_VIDEO = 2
+        private const val VIDEO = 1
     }
 
     private val videoViewHolderListener by lazy {
@@ -48,30 +47,17 @@ class HomeVideoListAdapter(private val nestedListener: HomeAdapter.EventListener
         }
     }
 
-    private var showLeft = false
-
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
-            is BaseVideoItem.Video -> {
-                showLeft = !showLeft
-                return if (showLeft) {
-                    LEFT_VIDEO
-                } else {
-                    RIGHT_VIDEO
-                }
-            }
+            is BaseVideoItem.Video -> VIDEO
             else -> BANNER
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return return when (viewType) {
-            LEFT_VIDEO -> {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.nested_item_left_video, parent, false)
-                VideoViewHolder(view, videoViewHolderListener)
-            }
-            RIGHT_VIDEO -> {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.nested_item_right_video, parent, false)
+            VIDEO -> {
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.nested_item_video, parent, false)
                 VideoViewHolder(view, videoViewHolderListener)
             }
             else -> {

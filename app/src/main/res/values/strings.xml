@@ -131,4 +131,9 @@
     <string name="introduction">简介</string>
     <string name="player_info_format">更新: %-20s地區: %s</string>
     <string name="write_comment">留下评论</string>
+    <string name="point_not_enough">点数不足</string>
+    <string name="point_not_enough_message">&lt;font color=\"#000000\"&gt;请先至充值页面，&lt;/font&gt;&lt;font color=\"#ff4d4d\"&gt;充值&lt;/font&gt;&lt;font color=\"#000000\"&gt;去吧&lt;/font&gt;</string>
+    <string name="cost_point_message">&lt;font color=\"#000000\"&gt;目前蜜币余额%d，是否支付&lt;/font&gt;&lt;font color=\"#ff4d4d\"&gt;%d&lt;/font&gt;&lt;font color=\"#000000\"&gt;蜜币播放视频？&lt;/font&gt;</string>
+    <string name="recharge">前往充值</string>
+    <string name="player_source">播放列表</string>
 </resources>

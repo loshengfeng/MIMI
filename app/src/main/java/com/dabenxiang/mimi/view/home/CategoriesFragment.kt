@@ -186,14 +186,14 @@ class CategoriesFragment : BaseFragment<CategoriesViewModel>() {
                         viewModel.updatedFilterPosition(i, position)
                     }
                 }, isAdult)
-                adapter.setTabList(years, 0)
+                adapter.submitList(years, 0)
 
                 filterViewList[i].adapter = adapter
                 filterAdapterList[i] = adapter
 
                 // TODO: Observer last position
                 viewModel.filterPositionData(i)?.observe(viewLifecycleOwner, Observer { position ->
-                    adapter.setLastSelectedPosition(position)
+                    adapter.setLastSelectedIndex(position)
 
                     val sb = StringBuilder()
                     var isFirst = true

@@ -22,28 +22,31 @@
             android:layout_marginTop="15dp"
             android:layout_marginEnd="15dp"
             android:background="@drawable/btn_close_1_n"
+            android:contentDescription="@null"
             android:src="@null"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:contentDescription="@null" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/iv_title"
             android:layout_width="26dp"
             android:layout_height="26dp"
             android:layout_marginTop="45dp"
+            android:contentDescription="@null"
             app:layout_constraintEnd_toStartOf="@id/tv_title"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:src="@drawable/ic_verification_mail"
-            android:contentDescription="@null" />
+            tools:src="@drawable/ic_verification_mail" />
 
         <TextView
             android:id="@+id/tv_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:maxEms="7"
+
+            android:maxLines="2"
             android:textColor="@color/color_black_1"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -56,11 +59,11 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_marginTop="20dp"
+            android:contentDescription="@null"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_title"
-            tools:src="@drawable/ico_email"
-            android:contentDescription="@null" />
+            tools:src="@drawable/ico_email" />
 
         <TextView
             android:id="@+id/tv_message"
@@ -94,11 +97,13 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:gravity="center"
-            android:textColor="@color/color_black_1"
+            android:paddingStart="@dimen/dp_18"
+            android:paddingEnd="@dimen/dp_18"
+            android:textColor="@color/color_black_1_50"
             app:btn_corner_radius="@dimen/dp_6"
             app:btn_pressed_color="darker"
             app:btn_solid_color="@color/color_white_1"
-            app:btn_stroke_color="@color/color_black_1"
+            app:btn_stroke_color="@color/color_black_1_50"
             app:btn_stroke_width="1dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintEnd_toStartOf="@id/btn_second"
@@ -115,6 +120,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="20dp"
+            android:paddingStart="@dimen/dp_18"
+            android:paddingEnd="@dimen/dp_18"
             android:textColor="@color/color_white_1"
             app:btn_corner_radius="@dimen/dp_6"
             app:btn_pressed_color="darker"

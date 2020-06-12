@@ -12,7 +12,7 @@ import com.dabenxiang.mimi.model.holder.CarouselHolderItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeCategoriesAdapter
-import com.dabenxiang.mimi.view.adapter.HomeTabAdapter
+import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
@@ -37,7 +37,7 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
     override fun getLayoutId() = R.layout.fragment_home
 
     private val tabAdapter by lazy {
-        HomeTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
+        TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
                 viewModel.setTopTabPosition(index)
             }
@@ -81,7 +81,7 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
 
         recyclerview_tab.adapter = tabAdapter
 
-        recyclerview_content.adapter = adapter
+        recyclerview_home.adapter = adapter
 
         recyclerview_videos.adapter = videoListAdapter
 
@@ -99,7 +99,7 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
         iv_search.setImageResource(R.drawable.ic_adult_btn_search)
         tv_search.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
 
-        recyclerview_content.background = requireActivity().getDrawable(R.color.adult_color_background)
+        recyclerview_home.background = requireActivity().getDrawable(R.color.adult_color_background)
         recyclerview_videos.background = requireActivity().getDrawable(R.color.adult_color_background)
 
         btn_filter.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
@@ -112,7 +112,7 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
 
     private fun loadFirstTab(root: CategoriesItem?) {
         recyclerview_videos.visibility = View.GONE
-        recyclerview_content.visibility = View.VISIBLE
+        refresh_home.visibility = View.VISIBLE
 
         val templateList = mutableListOf<HomeTemplate>()
 
@@ -143,7 +143,7 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
 
     private fun loadCategories(keyword: String?) {
         recyclerview_videos.visibility = View.VISIBLE
-        recyclerview_content.visibility = View.GONE
+        refresh_home.visibility = View.GONE
 
         viewModel.setupVideoList(keyword, true)
     }
@@ -161,7 +161,7 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
                         list.add(detail.name)
                     }
 
-                    tabAdapter.setTabList(list, lastPosition)
+                    tabAdapter.submitList(list, lastPosition)
 
                     loadFirstTab(adult)
                 }

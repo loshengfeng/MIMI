@@ -1,6 +1,8 @@
 package com.dabenxiang.mimi.view.dialog
 
 import android.os.Bundle
+import android.text.Html
+import android.text.SpannableString
 import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -12,19 +14,22 @@ import java.io.Serializable
 import java.util.*
 
 class GeneralDialogData(
-    @DrawableRes var titleIcon: Int = R.drawable.ic_verification_mail,
-    @StringRes var titleRes: Int,
-    @DrawableRes var messageIcon: Int,
-    var message: String = "",
-    var firstBtn: String = "",
-    var firstBlock: (() -> Unit)? = null,
-    var secondBtn: String = "",
-    var secondBlock: (() -> Unit)? = null,
-    var closeBlock: (() -> Unit)? = null
+    @DrawableRes val titleIcon: Int = R.drawable.ic_verification_mail,
+    @StringRes val titleRes: Int? = null,
+    val titleString: String = "",
+    @DrawableRes val messageIcon: Int,
+    val message: String = "",
+    val isHtml: Boolean = false,
+    val firstBtn: String = "",
+    val firstBlock: (() -> Unit)? = null,
+    val secondBtn: String = "",
+    val secondBlock: (() -> Unit)? = null,
+    val closeBlock: (() -> Unit)? = null
 ) : Serializable
 
-fun GeneralDialog.show(manager: FragmentManager) {
+fun GeneralDialog.show(manager: FragmentManager): GeneralDialog {
     this.show(manager, "${Calendar.getInstance().timeInMillis}")
+    return this
 }
 
 class GeneralDialog : BaseDialogFragment() {
@@ -51,9 +56,18 @@ class GeneralDialog : BaseDialogFragment() {
 
         (requireArguments().getSerializable(KEY_DATA) as? GeneralDialogData)?.also { data ->
             iv_title.setImageResource(data.titleIcon)
-            tv_title.setText(data.titleRes)
+            if (data.titleRes != null) {
+                tv_title.setText(data.titleRes)
+            } else {
+                tv_title.text = data.titleString
+            }
+
             iv_message.setImageResource(data.messageIcon)
-            tv_message.text = data.message
+
+            if (data.isHtml)
+                tv_message.text = Html.fromHtml(data.message, Html.FROM_HTML_MODE_COMPACT)
+            else
+                tv_message.text = data.message
 
             btn_first.visibility =
                 if (data.firstBtn.isBlank()) {
