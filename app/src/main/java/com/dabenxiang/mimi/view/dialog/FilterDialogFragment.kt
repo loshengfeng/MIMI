@@ -11,6 +11,8 @@ import com.dabenxiang.mimi.view.adapter.FilterGenderAdapter
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import com.dabenxiang.mimi.view.listener.OnDialogListener
 import kotlinx.android.synthetic.main.fragment_dialog_filter.*
+import kotlinx.android.synthetic.main.fragment_dialog_filter.btn_close
+import kotlinx.android.synthetic.main.fragment_dialog_filter.tv_title
 import java.io.Serializable
 
 class FilterDialogFragment : BaseDialogFragment() {
@@ -34,9 +36,17 @@ class FilterDialogFragment : BaseDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initSettings()
+    }
+
+    override fun getLayoutId(): Int { return R.layout.fragment_dialog_filter }
+
+    override fun isFullLayout(): Boolean { return true }
+
+    private fun initSettings() {
         val content = arguments?.getSerializable(KEY_CONTENT) as Content
 
-        textTitle.text = getString(content.title)
+        tv_title.text = getString(content.title)
 
         recyclerFilter.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
 
@@ -49,13 +59,15 @@ class FilterDialogFragment : BaseDialogFragment() {
                 dismiss()
             }
         })
-
-        dialogLayout.setOnClickListener {
-            dismiss()
-        }
     }
 
-    override fun getLayoutId(): Int { return R.layout.fragment_dialog_filter }
-
-    override fun isFullLayout(): Boolean { return true }
+    override fun setupListeners() {
+        super.setupListeners()
+        View.OnClickListener {
+            dismiss()
+        }.also {
+            layout_root.setOnClickListener(it)
+            btn_close.setOnClickListener(it)
+        }
+    }
 }

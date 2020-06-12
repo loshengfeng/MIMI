@@ -2,6 +2,13 @@ package com.dabenxiang.mimi.model.api
 
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.StatisticsType
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import retrofit2.Response
+import java.io.File
 
 class ApiRepository(private val apiService: ApiService) {
 
@@ -9,6 +16,8 @@ class ApiRepository(private val apiService: ApiService) {
         const val MEDIA_TYPE_JSON = "application/json"
         const val AUTHORIZATION = "Authorization"
         const val BEARER = "Bearer "
+        const val FILE = "file"
+        const val MEDIA_TYPE_IMAGE = "image/*"
         fun isRefreshTokenFailed(code: String?): Boolean {
             return code == ErrorCode.TOKEN_NOT_FOUND
         }
@@ -44,24 +53,46 @@ class ApiRepository(private val apiService: ApiService) {
     /**
      * 上傳檔案
      */
-    suspend fun postAttachment(
-        body: String
-    ) = apiService.postAttachment(body)
+//    suspend fun postAttachment(body: String) {
+//        val requestFile = MultipartBody.Part.createFormData(
+//            FILE, targetName, RequestBody.create(MediaType.parse(MEDIA_TYPE_IMAGE), file)
+//        )
+//        return apiService.postAttachment(requestFile)
+//    }
 
     /**
-     * 取得檔案
+     * 上傳檔案
      */
-    suspend fun getAttachment(
-        id: String
-    ) = apiService.getAttachment(id)
+    suspend fun postAttachment(
+        file: File,
+        fileName: String
+    ): Response<ApiBaseItem<Long>> {
+        val requestFile = MultipartBody.Part.createFormData(
+            FILE, fileName, file.asRequestBody(MEDIA_TYPE_IMAGE.toMediaTypeOrNull())
+        )
+        return apiService.postAttachment(requestFile)
+    }
 
     /**
      * 修改檔案
      */
     suspend fun putAttachment(
-        id: String,
-        body: String
-    ) = apiService.putAttachment(id, body)
+        id: Long,
+        file: File,
+        fileName: String
+    ) : Response<Void> {
+        val requestFile = MultipartBody.Part.createFormData(
+            FILE, fileName, file.asRequestBody(MEDIA_TYPE_IMAGE.toMediaTypeOrNull())
+        )
+        return apiService.putAttachment(id, requestFile)
+    }
+
+    /**
+     * 取得檔案
+     */
+    suspend fun getAttachment(
+        id: Long
+    ) = apiService.getAttachment(id)
 
     /**
      * 刪除檔案
@@ -213,6 +244,13 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得用者資訊
      */
     suspend fun getMe() = apiService.getMe()
+
+    /**
+     * 變更使用者頭像(需登入帳號)
+     */
+    suspend fun putAvatar(
+        body: AvatarRequest
+    ) = apiService.putAvatar(body)
 
     /**
      * 取得聊天室列表

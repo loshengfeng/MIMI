@@ -1,9 +1,13 @@
 package com.dabenxiang.mimi.widget.utility
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Environment
 import android.os.StatFs
+import timber.log.Timber
+import java.io.BufferedOutputStream
 import java.io.File
+import java.io.FileOutputStream
 
 object FileUtil {
 
@@ -51,6 +55,21 @@ object FileUtil {
                 Environment.getExternalStorageDirectory().toString()
             }
             else -> context.filesDir.toString()
+        }
+    }
+
+    fun saveBitmapToJpegFile(bitmap: Bitmap, destWidth: Int = 480, destHeight: Int = 640, destPath: String) {
+        var scale: Bitmap? = Bitmap.createScaledBitmap(bitmap, destWidth, destHeight, true)
+        try {
+            val bos = BufferedOutputStream(FileOutputStream(destPath))
+            if (scale!!.compress(Bitmap.CompressFormat.JPEG, 100, bos)) {
+                bos.flush()
+            }
+            bos.close()
+        } catch (e: Exception) {
+            Timber.e(e)
+        } finally {
+            scale?.recycle()
         }
     }
 

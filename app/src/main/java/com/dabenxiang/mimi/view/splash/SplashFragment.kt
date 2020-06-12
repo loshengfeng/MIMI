@@ -1,7 +1,10 @@
 package com.dabenxiang.mimi.view.splash
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.dabenxiang.mimi.R
@@ -15,24 +18,80 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SplashFragment : BaseFragment<SplashViewModel>() {
 
+    companion object { const val PERMISSION_REQUEST_CODE = 100 }
+
+    private val permissions = arrayOf(
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.READ_PHONE_STATE
+    )
+
     private val viewModel by viewModel<SplashViewModel>()
 
-    override fun fetchViewModel(): SplashViewModel? {
-        return viewModel
-    }
+    override fun fetchViewModel(): SplashViewModel? { return viewModel }
 
-    override fun getLayoutId(): Int {
-        return R.layout.fragment_splash
-    }
+    override fun getLayoutId(): Int { return R.layout.fragment_splash }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requestPermissions()
+    }
 
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
+
+    override fun setupObservers() {}
+
+    override fun setupListeners() {}
+
+    private fun requestPermissions() {
+        val requestList = arrayListOf<String>()
+        for (i in permissions.indices) {
+            if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    permissions[i]
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestList.add(permissions[i])
+            }
+        }
+
+        if (requestList.size > 0) {
+            requestPermissions(requestList.toTypedArray(), PERMISSION_REQUEST_CODE)
+        } else {
+            initSettings()
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            var isPermissionAllGranted = true
+            for (i in permissions.indices) {
+                if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
+                    isPermissionAllGranted = false
+                    break
+                }
+            }
+
+            if (isPermissionAllGranted) {
+                initSettings()
+            } else {
+                requestPermissions()
+            }
+        }
+    }
+
+    override fun initSettings() {
+        super.initSettings()
         viewModel.autoLogin()
-
         viewModel.autoLoginResult.observe(viewLifecycleOwner, Observer {
             lifecycleScope.launch(Dispatchers.IO) {
-
                 mainViewModel?.loadHomeCategories()
 
                 delay(1000)
@@ -42,15 +101,5 @@ class SplashFragment : BaseFragment<SplashViewModel>() {
                 }
             }
         })
-    }
-
-    override val bottomNavigationVisibility: Int
-        get() = View.GONE
-
-    override fun setupObservers() {
-
-    }
-
-    override fun setupListeners() {
     }
 }

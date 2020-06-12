@@ -18,9 +18,7 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
     private val _isLogin = MutableLiveData(false)
     val isLogin: LiveData<Boolean> = _isLogin
 
-    fun getProfile(): ProfileData {
-        return pref.profileData
-    }
+    fun getProfile(): ProfileData { return pref.profileData }
 
     var keepAccount: Boolean
         get() = pref.keepAccount
@@ -28,7 +26,7 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
             pref.keepAccount = value
         }
 
-    private fun setupProfile(profileData: ProfileData) {
+    fun setupProfile(profileData: ProfileData) {
         pref.profileData = profileData
     }
 

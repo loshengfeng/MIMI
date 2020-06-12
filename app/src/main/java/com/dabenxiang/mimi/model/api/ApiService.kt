@@ -1,6 +1,8 @@
 package com.dabenxiang.mimi.model.api
 
 import com.dabenxiang.mimi.model.api.vo.*
+import okhttp3.MultipartBody
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -36,23 +38,32 @@ interface ApiService {
      *                  Attachment x 4
      *
      ***********************************************************/
-    @POST("/v1/Attachment")
-    suspend fun postAttachment(
-        @Body file: String
-    ): Response<String>
-
-    @GET("/v1/Attachment/{id}")
+    @Streaming
+    @GET("/v1/Attachments/{id}")
     suspend fun getAttachment(
-        @Path("id") id: String
-    ): Response<String>
+        @Path("id") id: Long
+    ): Response<ResponseBody>
 
-    @PUT("/v1/Attachment/{id}")
+    @Multipart
+    @PUT("/v1/Attachments/{id}")
     suspend fun putAttachment(
-        @Path("id") id: String,
-        @Body file: String
+        @Path("id") id: Long,
+        @Part file: MultipartBody.Part
     ): Response<Void>
 
-    @DELETE("/v1/Attachment/{id}")
+//    @Multipart
+//    @POST("/v1/Attachments")
+//    suspend fun postAttachment(
+//        @Part file: MultipartBody.Part
+//    ): Response<ApiBaseItem<Long>>
+
+    @Multipart
+    @POST("/v1/Attachments")
+    suspend fun postAttachment(
+        @Part file: MultipartBody.Part
+    ): Response<ApiBaseItem<Long>>
+
+    @DELETE("/v1/Attachments/{id}")
     suspend fun deleteAttachment(
         @Path("id") id: String
     ): Response<Void>
@@ -115,7 +126,9 @@ interface ApiService {
     ): Response<Void>
 
     @PUT("/v1/Members/ForgetPassword")
-    suspend fun forgetPassword(@Body body: ForgetPasswordRequest): Response<Void>
+    suspend fun forgetPassword(
+        @Body body: ForgetPasswordRequest
+    ): Response<Void>
 
     @POST("/v1/Members/SignUp")
     suspend fun signUp(
@@ -172,6 +185,11 @@ interface ApiService {
      ***********************************************************/
     @GET("/v1/Members/Me")
     suspend fun getMe(): Response<ApiBaseItem<MeItem>>
+
+    @PUT("/v1/Members/Me/Avatar")
+    suspend fun putAvatar(
+        @Body request: AvatarRequest
+    ): Response<Void>
 
     @GET("/v1/Members/Me/Chat")
     suspend fun getMeChat(

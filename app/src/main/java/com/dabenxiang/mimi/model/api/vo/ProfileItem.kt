@@ -18,10 +18,10 @@ data class ProfileItem(
     var gender: Int?,
 
     @SerializedName("birthday")
-    var birthday: String,
+    var birthday: String?,
 
-    @SerializedName("avatarAttachmentId")
-    var avatarAttachmentId: Int?,
+    @SerializedName("id")
+    var id: Long?,
 
     @SerializedName("emailConfirmed")
     var emailConfirmed: Boolean?

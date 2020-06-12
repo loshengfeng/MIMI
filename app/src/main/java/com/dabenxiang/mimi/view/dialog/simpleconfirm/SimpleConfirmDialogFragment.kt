@@ -33,9 +33,7 @@ class SimpleConfirmDialogFragment : BaseDialogFragment() {
 
     var onSimpleDialogListener: OnSimpleDialogListener? = null
 
-    override fun getLayoutId(): Int {
-        return R.layout.fragment_simple_confirm_dialog
-    }
+    override fun getLayoutId(): Int { return R.layout.fragment_simple_confirm_dialog }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -58,15 +56,9 @@ class SimpleConfirmDialogFragment : BaseDialogFragment() {
         }
     }
 
-    override fun isFullLayout(): Boolean {
-        return true
-    }
+    override fun isFullLayout(): Boolean { return true }
 
-    override fun setupObservers() {
-        Timber.d("${SimpleConfirmDialogFragment::class.java.simpleName}_setupObservers")
-    }
+    override fun setupObservers() { Timber.d("${SimpleConfirmDialogFragment::class.java.simpleName}_setupObservers") }
 
-    override fun setupListeners() {
-        Timber.d("${SimpleConfirmDialogFragment::class.java.simpleName}_setupListeners")
-    }
+    override fun setupListeners() { Timber.d("${SimpleConfirmDialogFragment::class.java.simpleName}_setupListeners") }
 }

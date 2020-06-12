@@ -43,9 +43,8 @@ abstract class BaseDialogFragment : DialogFragment() {
 
     override fun onStart() {
         super.onStart()
-
         if (isFullLayout()) {
-            dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog?.window?.setBackgroundDrawable(ColorDrawable(requireContext().getColor(R.color.color_black_1_50)))
         } else {
             val window = dialog?.window
             if (window != null) {

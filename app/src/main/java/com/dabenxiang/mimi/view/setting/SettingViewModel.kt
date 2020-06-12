@@ -1,20 +1,27 @@
 package com.dabenxiang.mimi.view.setting
 
+import android.graphics.Bitmap
+import android.os.Environment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.manager.DomainManager
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.AvatarRequest
 import com.dabenxiang.mimi.model.api.vo.EmailRequest
 import com.dabenxiang.mimi.model.api.vo.ProfileItem
 import com.dabenxiang.mimi.model.api.vo.ProfileRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.widget.utility.FileUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
+import java.io.File
+import java.net.URLEncoder
 
 @ExperimentalCoroutinesApi
 class SettingViewModel : BaseViewModel() {
@@ -26,6 +33,12 @@ class SettingViewModel : BaseViewModel() {
 
     private val _updateResult = MutableLiveData<ApiResult<Nothing>>()
     val updateResult: LiveData<ApiResult<Nothing>> = _updateResult
+
+    private val _postResult = MutableLiveData<ApiResult<Long>>()
+    val postResult: LiveData<ApiResult<Long>> = _postResult
+
+    private val _putResult = MutableLiveData<ApiResult<Nothing>>()
+    val putResult: LiveData<ApiResult<Nothing>> = _putResult
 
     var profileData: ProfileItem? = null
 
@@ -77,6 +90,44 @@ class SettingViewModel : BaseViewModel() {
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _updateResult.value = it }
+        }
+    }
+
+    fun postAttachment(bitmap : Bitmap) {
+        val tempImagePath = Environment.getExternalStorageDirectory().path.plus("/temp.jpeg")
+
+        FileUtil.saveBitmapToJpegFile(bitmap, destPath = tempImagePath)
+
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().postAttachment(
+                    File(tempImagePath),
+                    fileName = URLEncoder.encode("Test.jpg", "UTF-8")
+                )
+
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(result.body()?.content))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _postResult.value = it }
+        }
+    }
+
+    fun putAvatar(id: Long) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().putAvatar(AvatarRequest(id))
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _putResult.value = it }
         }
     }
 }

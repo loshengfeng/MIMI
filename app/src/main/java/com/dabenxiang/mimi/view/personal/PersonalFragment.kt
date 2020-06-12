@@ -4,9 +4,17 @@ import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
+import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.load.MultiTransformation
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ErrorCode
+import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
@@ -24,6 +32,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.android.viewmodel.ext.android.viewModel
 import retrofit2.HttpException
 
+@ExperimentalCoroutinesApi
 class PersonalFragment : BaseFragment<PersonalViewModel>() {
     private val viewModel by viewModel<PersonalViewModel>()
 
@@ -43,15 +52,42 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Error -> onApiError(it.throwable)
                 is ApiResult.Success -> {
-                    val meItem = it.result
                     progressHUD?.dismiss()
+
+                    val meItem = it.result
+
+                    val profile = viewModel.accountManager.getProfile()
+                    profile.avatarAttachmentId = meItem.avatarAttachmentId ?: 0
+                    viewModel.accountManager.setupProfile(profile)
+
+                    viewModel.getAttachment()
                     tv_name.text = meItem.friendlyName.toString()
                     tv_Point.text = meItem.availablePoint.toString()
+
                     // todo: confirm by Jeff...
                     tv_new.visibility = when(meItem.hasNewMessage) {
                         true -> View.VISIBLE
                         else -> View.GONE
                     }
+                }
+                is ApiResult.Loaded -> progressHUD?.dismiss()
+            }
+        })
+
+        viewModel.imageBitmap.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Error -> onApiError(it.throwable)
+                is ApiResult.Success -> {
+                    val options: RequestOptions = RequestOptions()
+                        .transform(MultiTransformation(CenterCrop(), CircleCrop()))
+                        .placeholder(R.mipmap.ic_launcher)
+                        .error(R.mipmap.ic_launcher)
+                        .priority(Priority.NORMAL)
+
+                    Glide.with(this).load(it.result)
+                        .apply(options)
+                        .into(iv_photo)
                 }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
             }
@@ -130,5 +166,11 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
         super.initSettings()
         tv_version_is_login.text = BuildConfig.VERSION_NAME
         tv_version_is_not_login.text = BuildConfig.VERSION_NAME
+    }
+
+    override fun handleHttpError(errorHandler: ExceptionResult.HttpError) {
+        when (errorHandler.httpExceptionItem.errorItem.code) {
+            ErrorCode.NOT_FOUND -> { viewModel.toastData.value = "no photo"}
+        }
     }
 }

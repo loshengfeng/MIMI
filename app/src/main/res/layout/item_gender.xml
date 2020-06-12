@@ -7,13 +7,12 @@
 
     <RadioButton
         android:id="@+id/radioFilter"
-        android:layout_width="0dp"
+        android:layout_width="100dp"
         android:layout_height="0dp"
         android:background="@color/color_white_1"
         android:button="@null"
         android:drawableEnd="@drawable/chk_filter_check"
-        android:paddingStart="75dp"
-        android:paddingEnd="75dp"
+        android:gravity="center"
         android:textColor="@color/color_black_1"
         android:textSize="16sp"
         android:textStyle="bold"

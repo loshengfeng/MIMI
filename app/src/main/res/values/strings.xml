@@ -89,6 +89,11 @@
     <string name="setting_confirm_password">确认新密码</string>
     <string name="setting_confirm_password_error_1">请填写确认新密码</string>
     <string name="setting_confirm_password_error_2">与新密码不相符</string>
+    <string name="pls_choose_photo">选择图片</string>
+    <string name="upload_tool">上传图片工具</string>
+    <string name="choose_camera">使用相机</string>
+    <string name="choose_album">使用相薄</string>
+    <string name="file_type_not_supported">不支援的档案格式，请重新上传</string>
     <string name="topup_all">全部</string>
     <string name="topup_online_pay">在线支付</string>
     <string name="topup_proxy_pay">代理支付</string>
