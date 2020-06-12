@@ -10,10 +10,12 @@ import com.dabenxiang.mimi.model.vo.ProfileData
 import com.dabenxiang.mimi.model.vo.TokenData
 import com.dabenxiang.mimi.widget.utility.AppUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import retrofit2.HttpException
 import java.util.*
 
+@ExperimentalCoroutinesApi
 class AccountManager(private val pref: Pref, private val domainManager: DomainManager) {
     private val _isLogin = MutableLiveData(false)
     val isLogin: LiveData<Boolean> = _isLogin
@@ -35,10 +37,10 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
         return tokenItem.accessToken.isNotEmpty() && tokenItem.refreshToken.isNotEmpty()
     }
 
-    fun isAutoLogin(): Boolean {
-        val tokenItem = pref.memberToken
-        return tokenItem.accessToken.isNotEmpty() && tokenItem.refreshToken.isNotEmpty()
-    }
+//    fun isAutoLogin(): Boolean {
+//        val tokenItem = pref.memberToken
+//        return tokenItem.accessToken.isNotEmpty() && tokenItem.refreshToken.isNotEmpty()
+//    }
 
     fun getMemberTokenResult(): TokenResult {
         val tokenData = pref.memberToken
@@ -157,9 +159,7 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
             val request = ChangePasswordRequest(oldPassword, newPassword)
             val result = domainManager.getApiRepository().changePassword(request)
             if (!result.isSuccessful) throw HttpException(result)
-            getProfile()?.copy(password = newPassword)?.let {
-                setupProfile(it)
-            }
+            setupProfile(getProfile().copy(password = newPassword))
             emit(ApiResult.success(null))
         }
             .flowOn(Dispatchers.IO)
