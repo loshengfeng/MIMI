@@ -9,6 +9,7 @@ import com.dabenxiang.mimi.view.home.HomeViewModel
 import com.dabenxiang.mimi.view.login.LoginViewModel
 import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.view.messenger.MessengerViewModel
+import com.dabenxiang.mimi.view.myfollow.MyFollowViewModel
 import com.dabenxiang.mimi.view.personal.PersonalViewModel
 import com.dabenxiang.mimi.view.player.PlayerViewModel
 import com.dabenxiang.mimi.view.player.ShortPlayerViewModel
@@ -30,6 +31,7 @@ val viewModelModule = module {
     viewModel { TopupViewModel() }
     viewModel { FavoriteViewModel() }
     viewModel { PersonalViewModel() }
+    viewModel { MyFollowViewModel() }
     viewModel { ForgetPasswordViewModel() }
     viewModel { SettingViewModel() }
     viewModel { UpdateProfileViewModel() }

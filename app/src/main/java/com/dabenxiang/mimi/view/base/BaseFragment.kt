@@ -133,10 +133,14 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
         */
     }
 
-    open fun onApiError(throwable: Throwable) {
-        when (val errorHandler = throwable.handleException { ex -> mainViewModel?.processException(ex) }) {
+    open fun onApiError(throwable: Throwable, onHttpErrorBlock: ((ExceptionResult.HttpError) -> Unit)? = null) {
+        when (val errorHandler =
+            throwable.handleException { ex -> mainViewModel?.processException(ex) }) {
             is ExceptionResult.RefreshTokenExpired -> logoutLocal()
-            is ExceptionResult.HttpError -> handleHttpError(errorHandler)
+            is ExceptionResult.HttpError -> {
+                if (onHttpErrorBlock == null) handleHttpError(errorHandler)
+                else onHttpErrorBlock(errorHandler)
+            }
             is ExceptionResult.Crash -> {
                 if (errorHandler.throwable is UnknownHostException) {
                     showCrashDialog(HttpErrorMsgType.CHECK_NETWORK)

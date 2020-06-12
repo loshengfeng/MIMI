@@ -16,7 +16,7 @@ import kotlinx.android.synthetic.main.item_favorite_no_data.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-class FavoriteFragment  : BaseFragment<FavoriteViewModel>() {
+class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
     private val viewModel by viewModel<FavoriteViewModel>()
     private var hasData = true
 
@@ -31,17 +31,11 @@ class FavoriteFragment  : BaseFragment<FavoriteViewModel>() {
         initSettings()
     }
 
-    override fun getLayoutId(): Int {
-        return R.layout.fragment_favorite
-    }
+    override fun getLayoutId(): Int { return R.layout.fragment_favorite }
 
-    override fun fetchViewModel(): FavoriteViewModel? {
-        return  viewModel
-    }
+    override fun fetchViewModel(): FavoriteViewModel? { return  viewModel }
 
-    override fun setupObservers() {
-        Timber.d("${FavoriteFragment::class.java.simpleName}_setupObservers")
-    }
+    override fun setupObservers() { Timber.d("${FavoriteFragment::class.java.simpleName}_setupObservers") }
 
     override fun setupListeners() {
         Timber.d("${FavoriteFragment::class.java.simpleName}_setupListeners")

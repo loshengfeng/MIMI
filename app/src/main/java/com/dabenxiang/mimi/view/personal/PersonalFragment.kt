@@ -80,7 +80,12 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
         viewModel.imageBitmap.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
+                is ApiResult.Error -> onApiError(it.throwable, onHttpErrorBlock = { httpError ->
+                    when (httpError.httpExceptionItem.errorItem.code) {
+                        // todo: confirm by jeff...
+//                        ErrorCode.NOT_FOUND -> { viewModel.toastData.value = "no photo"}
+                    }
+                })
                 is ApiResult.Success -> {
                     val options: RequestOptions = RequestOptions()
                         .transform(MultiTransformation(CenterCrop(), CircleCrop()))
@@ -145,10 +150,10 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.tv_topup -> GeneralUtils.showToast(context!!, "btnTopup")
-                R.id.tv_follow -> GeneralUtils.showToast(context!!, "btnFollow")
-                R.id.tv_topup_history -> Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_topupHistoryFragment)
-                R.id.tv_chat_history -> Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_chatHistoryFragment)
-                R.id.tv_setting -> Navigation.findNavController(view!!).navigate(R.id.action_personalFragment_to_settingFragment, viewModel.byteArray?.let { SettingFragment.createBundle(it) })
+                R.id.tv_follow -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
+                R.id.tv_topup_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_topupHistoryFragment))
+                R.id.tv_chat_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_chatHistoryFragment))
+                R.id.tv_setting -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_settingFragment, viewModel.byteArray?.let { SettingFragment.createBundle(it) }))
                 R.id.tv_logout -> viewModel.signOut()
                 R.id.tv_login -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_loginFragment, LoginFragment.createBundle(TYPE_LOGIN)))
                 R.id.tv_register -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_loginFragment, LoginFragment.createBundle(TYPE_REGISTER)))
@@ -169,11 +174,5 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
         super.initSettings()
         tv_version_is_login.text = BuildConfig.VERSION_NAME
         tv_version_is_not_login.text = BuildConfig.VERSION_NAME
-    }
-
-    override fun handleHttpError(errorHandler: ExceptionResult.HttpError) {
-        when (errorHandler.httpExceptionItem.errorItem.code) {
-            ErrorCode.NOT_FOUND -> { viewModel.toastData.value = "no photo"}
-        }
     }
 }

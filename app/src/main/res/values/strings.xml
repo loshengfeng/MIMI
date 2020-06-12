@@ -120,6 +120,13 @@
     <string name="username_or_password_incorrect">使用者名称或密码错误</string>
 
     <!-- Home -->
+    <string name="follow_title">我的关注</string>
+    <string name="follow_people">关注的人</string>
+    <string name="follow_circle">关注的圈子</string>
+    <string name="follow_all">全部关注%s人</string>
+    <string name="follow_clean">清除</string>
+
+    <!-- Home -->
     <string name="text_more">更多</string>
     <string name="text_search">搜寻</string>
 
