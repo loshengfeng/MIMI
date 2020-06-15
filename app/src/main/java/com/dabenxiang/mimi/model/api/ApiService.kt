@@ -192,6 +192,28 @@ interface ApiService {
         @Body request: AvatarRequest
     ): Response<Void>
 
+    @GET("/v1/Members/Me/ClubFollow")
+    suspend fun getClubFollow(
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ) : Response<ApiBasePagingItem<List<ClubFollowItem>>>
+
+    @DELETE("/v1/Members/Me/ClubFollow/{clubId}")
+    suspend fun deleteClubFollow(
+        @Path("clubId") id: Int
+    ) : Response<Void>
+
+    @GET("/v1/Members/Me/MemberFollow")
+    suspend fun getMemberFollow(
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ) : Response<ApiBasePagingItem<List<MemberFollowItem>>>
+
+    @DELETE("/v1/Members/Me/MemberFollow/{userId}")
+    suspend fun deleteMemberFollow(
+        @Path("userId") id: Int
+    ) : Response<Void>
+
     @GET("/v1/Members/Me/Chat")
     suspend fun getMeChat(
         @Query("offset") offset: Int,

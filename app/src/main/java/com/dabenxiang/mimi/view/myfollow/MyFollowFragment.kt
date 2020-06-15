@@ -2,16 +2,31 @@ package com.dabenxiang.mimi.view.myfollow
 
 import android.os.Bundle
 import android.view.View
+import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.view.adapter.ClubFollowAdapter
+import com.dabenxiang.mimi.view.adapter.MemberFollowAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_my_follow.*
+import kotlinx.android.synthetic.main.fragment_my_follow.tl_type
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import kotlinx.android.synthetic.main.item_setting_bar.tv_title
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import timber.log.Timber
 
 class MyFollowFragment : BaseFragment<MyFollowViewModel>() {
     private val viewModel by viewModel<MyFollowViewModel>()
+
+    companion object {
+        const val TYPE_MEMBER = 0
+        const val TYPE_CLUB = 1
+    }
+
+    private val clubFollowAdapter by lazy { ClubFollowAdapter() }
+
+    private val memberFollowAdapter by lazy { MemberFollowAdapter() }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -23,16 +38,44 @@ class MyFollowFragment : BaseFragment<MyFollowViewModel>() {
     override fun fetchViewModel(): MyFollowViewModel? { return viewModel }
 
     override fun setupObservers() {
-        Timber.d("setupObservers")
+        viewModel.clubList.observe(viewLifecycleOwner, Observer {
+            refreshUi(it.size)
+            clubFollowAdapter.submitList(it)
+        })
+
+        viewModel.memberList.observe(viewLifecycleOwner, Observer {
+            refreshUi(it.size)
+            memberFollowAdapter.submitList(it)
+        })
     }
 
     override fun setupListeners() {
         View.OnClickListener { btnView ->
             when(btnView.id) {
                 R.id.tv_back -> navigateTo(NavigateItem.Up)
+                R.id.tv_clean -> GeneralUtils.showToast(requireContext(), "Clean")
             }
         }.also {
             tv_back.setOnClickListener(it)
+            tv_clean.setOnClickListener(it)
+        }
+
+        tl_type.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                when (tab.position) {
+                    TYPE_MEMBER -> viewModel.initData(tab.position)
+                    TYPE_CLUB -> viewModel.initData(tab.position)
+                }
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+        })
+
+        layout_refresh.setOnRefreshListener {
+            layout_refresh.isRefreshing = false
+            viewModel.initData(tl_type.selectedTabPosition)
         }
     }
 
@@ -40,6 +83,19 @@ class MyFollowFragment : BaseFragment<MyFollowViewModel>() {
         super.initSettings()
         tv_clean.visibility = View.VISIBLE
         tv_title.setText(R.string.follow_title)
-        tv_all.text = getString(R.string.follow_all, "32")
+        tv_all.text = getString(R.string.follow_all, "0")
+
+        val adapter = ClubFollowAdapter()
+        rv_content.adapter = adapter
+
+        viewModel.initData(tl_type.selectedTabPosition)
+    }
+
+    private fun refreshUi(size: Int) {
+        when(size) {
+            0 -> item_no_data.visibility = View.VISIBLE
+            else -> item_no_data.visibility = View.GONE
+        }
+        tv_all.text = getString(R.string.follow_all, size.toString())
     }
 }
