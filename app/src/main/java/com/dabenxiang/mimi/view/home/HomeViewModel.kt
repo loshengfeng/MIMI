@@ -8,8 +8,8 @@ import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
-import com.dabenxiang.mimi.model.holder.parser
-import com.dabenxiang.mimi.view.adapter.HomeCategoriesAdapter
+import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
+import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -21,13 +21,11 @@ class HomeViewModel : BaseViewModel() {
 
     companion object {
         const val CATEGORIES_LIMIT = "20"
+        const val STATISTICS_LIMIT = 20
     }
 
     private val _tabLayoutPosition = MutableLiveData<Int>()
     val tabLayoutPosition: LiveData<Int> = _tabLayoutPosition
-
-    private var _selectedCategoryTitle = ""
-    val selectedCategoryTitle = _selectedCategoryTitle
 
     fun setTopTabPosition(position: Int) {
         if (position != tabLayoutPosition.value) {
@@ -35,11 +33,38 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-    fun loadNestedCategoriesList(adapter: HomeCategoriesAdapter, src: HomeTemplate.Categories) {
+    fun loadNestedStatisticsListForCarousel(vh: HomeCarouselViewHolder, src: HomeTemplate.Carousel) {
         viewModelScope.launch {
-            adapter.activeTask {
+            flow {
+                val resp =
+                    domainManager.getApiRepository().statisticsHomeVideos(isAdult = src.isAdult, offset = 0, limit = 5)
+                if (!resp.isSuccessful) throw HttpException(resp)
+
+                emit(ApiResult.success(resp.body()))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { resp ->
+                    when (resp) {
+                        is ApiResult.Success -> {
+                            //Timber.d(resp.result.toString())
+                            vh.submitList(resp.result.content?.statisticsItemToCarouselHolderItem(src.isAdult))
+                        }
+                        is ApiResult.Error -> Timber.e(resp.throwable)
+                    }
+                }
+        }
+    }
+
+    fun loadNestedStatisticsList(vh: HomeStatisticsViewHolder, src: HomeTemplate.Statistics) {
+        viewModelScope.launch {
+            vh.activeTask {
                 flow {
-                    val resp = domainManager.getApiRepository().searchHomeVideos(src.categories, null, null, null, src.isAdult, "0", CATEGORIES_LIMIT)
+                    //val resp = domainManager.getApiRepository().searchHomeVideos(src.categories, null, null, null, src.isAdult, "0", CATEGORIES_LIMIT)
+                    val resp = domainManager.getApiRepository()
+                        .statisticsHomeVideos(category = src.categories, isAdult = src.isAdult, offset = 0, limit = STATISTICS_LIMIT)
                     if (!resp.isSuccessful) throw HttpException(resp)
 
                     emit(ApiResult.success(resp.body()))
@@ -52,11 +77,9 @@ class HomeViewModel : BaseViewModel() {
                         when (resp) {
                             is ApiResult.Success -> {
                                 //Timber.d(resp.result.toString())
-                                adapter.submitList(resp.result.content?.videos?.parser(src.isAdult))
+                                vh.submitList(resp.result.content?.statisticsItemToVideoItem(src.isAdult))
                             }
                             is ApiResult.Error -> Timber.e(resp.throwable)
-                            //is ApiResult.Loading -> setShowProgress(true)
-                            //is ApiResult.Loaded -> setShowProgress(false)
                         }
                     }
             }

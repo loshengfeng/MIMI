@@ -2,8 +2,8 @@ package com.dabenxiang.mimi.view.home
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.model.api.ApiRepository
-import com.dabenxiang.mimi.model.api.vo.VideoSearchDetail
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
+import com.dabenxiang.mimi.model.holder.searchItemToVideoItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -40,7 +40,7 @@ class VideoListDataSource(
                 val item = result.body()
                 val videos = item?.content?.videos
                 if (videos != null) {
-                    returnList.addAll(videos.parser())
+                    returnList.addAll(videos.searchItemToVideoItem(isAdult))
                 }
 
                 val nextPageKey = when {
@@ -81,7 +81,7 @@ class VideoListDataSource(
                                 else -> null
                             }
 
-                            callback.onResult(list.parser(), nextPageKey)
+                            callback.onResult(list.searchItemToVideoItem(isAdult), nextPageKey)
                         }
                     }
                 }
@@ -98,15 +98,5 @@ class VideoListDataSource(
             offset >= total -> false
             else -> true
         }
-    }
-
-    private fun List<VideoSearchDetail>.parser(): List<BaseVideoItem> {
-        val result = mutableListOf<BaseVideoItem>()
-        forEach { item ->
-            val holderItem = BaseVideoItem.Video(id = item.id, title = item.title, imgUrl = item.cover, isAdult = isAdult, resolution = "", info = "")
-            result.add(holderItem)
-        }
-
-        return result
     }
 }

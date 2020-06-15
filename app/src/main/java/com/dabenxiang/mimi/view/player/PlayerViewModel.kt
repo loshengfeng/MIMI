@@ -165,7 +165,71 @@ class PlayerViewModel : BaseViewModel() {
         }
     }
 
-    fun getStreamUrl() {
+    fun getStreamUrl(isAdult: Boolean) {
+        if (isAdult) {
+            getAdultStreamUrl()
+        } else {
+            getStreamUrl()
+        }
+    }
+
+    private fun getAdultStreamUrl() {
+        viewModelScope.launch {
+            flow {
+                val source = sourceList?.get(sourceListPosition.value!!)!!
+                val episode = source.videoEpisodes?.get(0)!!
+                val episodeId = episode.id!!
+
+                val apiRepository = domainManager.getApiRepository()
+
+                val episodeResp = apiRepository.getVideoEpisode(videoId, episodeId)
+                if (!episodeResp.isSuccessful) throw HttpException(episodeResp)
+
+                if (!isDeducted) {
+                    val videoInfoResp = domainManager.getApiRepository().getVideoInfo(videoId)
+                    if (!videoInfoResp.isSuccessful) throw HttpException(videoInfoResp)
+                    isDeducted = videoInfoResp.body()?.content?.deducted ?: false
+                }
+
+                if (!isDeducted) throw Exception("點數不足")
+
+                val episodeInfo = episodeResp.body()?.content
+                val videoStreamsSize = episodeInfo?.videoStreams?.size ?: 0
+                val selectedEpisodeIndex = episodePosition.value ?: 0
+
+                val stream = episodeInfo?.videoStreams?.get(
+                    if (videoStreamsSize > selectedEpisodeIndex)
+                        selectedEpisodeIndex
+                    else
+                        0
+                )!!
+
+                val streamResp = apiRepository.getVideoVideoStreamM3u8(
+                    stream.id!!,
+                    accountManager.getProfile().userId,
+                    stream.utcTime,
+                    stream.sign
+                )
+                if (!streamResp.isSuccessful) throw HttpException(streamResp)
+                // 取得轉址Url
+                nextVideoUrl = streamResp.raw().request.url.toString()
+
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e ->
+                    Timber.e(e)
+                    emit(ApiResult.error(e))
+                }
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect {
+                    _apiStreamResult.value = it
+                }
+        }
+    }
+
+    private fun getStreamUrl() {
         viewModelScope.launch {
             flow {
                 val source = sourceList?.get(sourceListPosition.value!!)!!

@@ -3,12 +3,12 @@ package com.dabenxiang.mimi.view.adapter
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 
-abstract class BaseTabAdapter<VH : BaseIndexViewHolder<String>> : RecyclerView.Adapter<VH>() {
+abstract class BaseTabAdapter<M: Any, VH : RecyclerView.ViewHolder> : RecyclerView.Adapter<VH>() {
 
-    protected var tabList: List<String>? = null
+    protected var tabList: List<M>? = null
     protected var lastSelected = 0
 
-    fun submitList(src: List<String>, initSelectedIndex: Int) {
+    fun submitList(src: List<M>, initSelectedIndex: Int) {
         lastSelected = initSelectedIndex
         tabList = src
 

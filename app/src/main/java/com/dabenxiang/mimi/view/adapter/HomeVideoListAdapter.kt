@@ -38,8 +38,7 @@ class HomeVideoListAdapter(private val nestedListener: HomeAdapter.EventListener
             override fun onClickItemIndex(view: View, index: Int) {
                 if (index > -1) {
                     getItem(index)?.also {
-                        val playerData = PlayerData.parser(it)
-                        playerData.isAdult = isAdult
+                        val playerData = PlayerData.parser(it, isAdult)
                         nestedListener.onVideoClick(view, playerData)
                     }
                 }

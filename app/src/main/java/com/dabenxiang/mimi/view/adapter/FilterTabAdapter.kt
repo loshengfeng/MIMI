@@ -9,7 +9,7 @@ import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.home.FilterTabHolder
 
 class FilterTabAdapter(private val listener: FilterTabAdapterListener, private val isAdult: Boolean) :
-    BaseTabAdapter<FilterTabHolder>() {
+    BaseTabAdapter<String, FilterTabHolder>() {
 
     interface FilterTabAdapterListener {
         fun onSelectedFilterTab(recyclerView: RecyclerView, position: Int)

@@ -12,7 +12,6 @@ import com.dabenxiang.mimi.model.serializable.CategoriesData
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.FilterTabAdapter
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
-import com.dabenxiang.mimi.view.adapter.HomeCategoriesAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
@@ -54,10 +53,14 @@ class CategoriesFragment : BaseFragment<CategoriesViewModel>() {
             startActivity(intent)
         }
 
-        override fun onLoadAdapter(adapter: HomeCategoriesAdapter, src: HomeTemplate.Categories) {
+        override fun onLoadStatisticsViewHolder(vh: HomeStatisticsViewHolder, src: HomeTemplate.Statistics) {
 
         }
-     }
+
+        override fun onLoadCarouselViewHolder(vh: HomeCarouselViewHolder, src: HomeTemplate.Carousel) {
+
+        }
+    }
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_categories

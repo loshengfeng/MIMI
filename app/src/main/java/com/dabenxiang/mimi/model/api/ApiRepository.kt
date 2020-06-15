@@ -2,10 +2,8 @@ package com.dabenxiang.mimi.model.api
 
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.StatisticsType
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
 import java.io.File
@@ -22,6 +20,7 @@ class ApiRepository(private val apiService: ApiService) {
             return code == ErrorCode.TOKEN_NOT_FOUND
         }
     }
+
     /**********************************************************
      *
      *                  Auth
@@ -80,7 +79,7 @@ class ApiRepository(private val apiService: ApiService) {
         id: Long,
         file: File,
         fileName: String
-    ) : Response<Void> {
+    ): Response<Void> {
         val requestFile = MultipartBody.Part.createFormData(
             FILE, fileName, file.asRequestBody(MEDIA_TYPE_IMAGE.toMediaTypeOrNull())
         )
@@ -232,8 +231,14 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得熱門影片
      */
     suspend fun statisticsHomeVideos(
-        statisticsType: StatisticsType, tag: String, offset: Int, limit: Int
-    ) = apiService.statisticsHomeVideos(statisticsType.ordinal, tag, offset, limit)
+        statisticsType: StatisticsType = StatisticsType.Newest, category: String? = null, isAdult: Boolean, offset: Int, limit: Int
+    ) = apiService.statisticsHomeVideos(
+        statisticsType = statisticsType.ordinal,
+        category = category,
+        isAdult = isAdult,
+        offset = offset,
+        limit = limit
+    )
 
     /**********************************************************
      *
@@ -354,5 +359,12 @@ class ApiRepository(private val apiService: ApiService) {
         utcTime: Long? = null,
         sign: String? = null
     ) = apiService.getVideoStreamOfEpisode(videoId, episodeId, streamId, userId, utcTime, sign)
+
+    suspend fun getVideoVideoStreamM3u8(
+        streamId: Long,
+        userId: Long? = null,
+        utcTime: Long? = null,
+        sign: String? = null
+    ) = apiService.getVideoStreamM3u8(streamId, userId, utcTime, sign)
 }
 

@@ -172,8 +172,9 @@ interface ApiService {
 
     @GET("/v1/Members/Home/Videos/Statistics")
     suspend fun statisticsHomeVideos(
-        @Query("statisticsType") statisticsType: Int,
-        @Query("tag") tag: String,
+        @Query("statisticsType") statisticsType: Int?,
+        @Query("category") category: String?,
+        @Query("isAdult") isAdult: Boolean,
         @Query("offset") offset: Int,
         @Query("limit") limit: Int
     ): Response<ApiBasePagingItem<List<StatisticsItem>>>
@@ -248,7 +249,7 @@ interface ApiService {
 
     /**********************************************************
      *
-     *                  Player x 3
+     *                  Player x 4
      *
      ***********************************************************/
     @GET("/v1/Player/{videoId}")
@@ -270,5 +271,13 @@ interface ApiService {
         @Query("userId") userId: Long?,
         @Query("utcTime") utcTime: Long?,
         @Query("sign") sign: String?
+    ): Response<Void>
+
+    @GET("/v1/Player/VideoStreamM3u8/{streamId}/{userId}/{utcTime}/{sign}/index.m3u8")
+    suspend fun getVideoStreamM3u8(
+        @Path("streamId") streamId: Long,
+        @Path("userId") userId: Long?,
+        @Path("utcTime") utcTime: Long?,
+        @Path("sign") sign: String?
     ): Response<Void>
 }

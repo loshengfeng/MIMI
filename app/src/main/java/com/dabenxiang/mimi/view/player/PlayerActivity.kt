@@ -97,7 +97,7 @@ class PlayerActivity : BaseActivity() {
         return R.layout.activity_player
     }
 
-    fun getIsAdult() = (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerData?)?.isAdult ?: false
+    private fun getIsAdult() = (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerData?)?.isAdult ?: false
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -248,7 +248,9 @@ class PlayerActivity : BaseActivity() {
                     if (isFirstInit) {
                         isFirstInit = false
                         tv_title.text = result.title
-                        tv_introduction.text = Html.fromHtml(result.description, Html.FROM_HTML_MODE_COMPACT)
+
+                        if (!result.description.isNullOrBlank())
+                            tv_introduction.text = Html.fromHtml(result.description, Html.FROM_HTML_MODE_COMPACT)
 
                         val dateString = result.updateTime?.let { date ->
                             SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(date)
@@ -328,7 +330,7 @@ class PlayerActivity : BaseActivity() {
             consumeDialog?.dismiss()
             when (it) {
                 VideoConsumeResult.Paid -> {
-                    viewModel.getStreamUrl()
+                    viewModel.getStreamUrl(getIsAdult())
                 }
                 VideoConsumeResult.PaidYet -> {
                     consumeDialog = showCostPointDialog()
@@ -737,9 +739,13 @@ class PlayerActivity : BaseActivity() {
             recyclerview_source_list.visibility = View.GONE
         } else {
             val size = list.size
-            if (size <= 1) {
+            if (size == 0) {
                 recyclerview_source_list.visibility = View.GONE
             } else {
+                if (size == 1) {
+                    recyclerview_source_list.visibility = View.GONE
+                }
+
                 val result = mutableListOf<String>()
                 for (item in list) {
                     item.name?.also {
@@ -755,9 +761,23 @@ class PlayerActivity : BaseActivity() {
 
     private fun setupStream(list: List<VideoEpisode>) {
         val result = mutableListOf<String>()
-        for (item in list) {
-            item.episode?.also {
-                result.add(it)
+        // 成人取得Streaming邏輯不同
+        if (getIsAdult()) {
+            if (list.size == 1) {
+                val videoStreams = list[0].videoStreams
+                if (videoStreams != null && videoStreams.isNotEmpty()) {
+                    for (item in videoStreams) {
+                        if (item.id != null) {
+                            result.add(item.streamName ?: "")
+                        }
+                    }
+                }
+            }
+        } else {
+            for (item in list) {
+                if (item.id != null) {
+                    result.add(item.episode ?: "")
+                }
             }
         }
 
@@ -870,7 +890,7 @@ class PlayerActivity : BaseActivity() {
                 message = message,
                 firstBtn = getString(R.string.btn_cancel),
                 secondBtn = getString(R.string.btn_confirm),
-                secondBlock = { viewModel.getStreamUrl() }
+                secondBlock = { viewModel.getStreamUrl(getIsAdult()) }
             )
         )
             .setCancel(false)
