@@ -30,7 +30,8 @@ class HomeAdapter(val context: Context, private val listener: EventListener, pri
     interface EventListener {
         fun onHeaderItemClick(view: View, item: HomeTemplate.Header)
         fun onVideoClick(view: View, item: PlayerData)
-        fun onLoadAdapter(adapter: HomeCategoriesAdapter, src: HomeTemplate.Categories)
+        fun onLoadStatisticsViewHolder(vh: HomeStatisticsViewHolder, src: HomeTemplate.Statistics)
+        fun onLoadCarouselViewHolder(vh: HomeCarouselViewHolder, src: HomeTemplate.Carousel)
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -49,8 +50,8 @@ class HomeAdapter(val context: Context, private val listener: EventListener, pri
             HomeItemType.CAROUSEL -> {
                 HomeCarouselViewHolder(layoutInflater.inflate(R.layout.item_carousel, parent, false), listener, isAdult)
             }
-            HomeItemType.CATEGORIES -> {
-                HomeCategoriesViewHolder(layoutInflater.inflate(R.layout.item_home_categories, parent, false), listener, isAdult)
+            HomeItemType.STATISTICS -> {
+                HomeStatisticsViewHolder(layoutInflater.inflate(R.layout.item_home_statistics, parent, false), listener, isAdult)
             }
             HomeItemType.LEADERBOARD -> {
                 HomeLeaderboardViewHolder(layoutInflater.inflate(R.layout.item_home_leaderboard, parent, false), listener, isAdult)
@@ -79,8 +80,8 @@ class HomeAdapter(val context: Context, private val listener: EventListener, pri
                 holder as HomeCarouselViewHolder
                 holder.bind(template)
             }
-            HomeItemType.CATEGORIES -> {
-                holder as HomeCategoriesViewHolder
+            HomeItemType.STATISTICS -> {
+                holder as HomeStatisticsViewHolder
                 holder.bind(template)
             }
             HomeItemType.LEADERBOARD -> {

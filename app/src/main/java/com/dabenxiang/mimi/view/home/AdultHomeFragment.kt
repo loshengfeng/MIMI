@@ -8,12 +8,10 @@ import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setBtnSolidDolor
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
-import com.dabenxiang.mimi.model.holder.CarouselHolderItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
-import com.dabenxiang.mimi.view.adapter.HomeCategoriesAdapter
-import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
+import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
@@ -65,8 +63,12 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
             startActivity(intent)
         }
 
-        override fun onLoadAdapter(adapter: HomeCategoriesAdapter, src: HomeTemplate.Categories) {
-            viewModel.loadNestedCategoriesList(adapter, src)
+        override fun onLoadStatisticsViewHolder(vh: HomeStatisticsViewHolder, src: HomeTemplate.Statistics) {
+            viewModel.loadNestedStatisticsList(vh, src)
+        }
+
+        override fun onLoadCarouselViewHolder(vh: HomeCarouselViewHolder, src: HomeTemplate.Carousel) {
+            viewModel.loadNestedStatisticsListForCarousel(vh, src)
         }
     }
 
@@ -117,28 +119,23 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
         val templateList = mutableListOf<HomeTemplate>()
 
         templateList.add(HomeTemplate.Banner(imgUrl = "https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
-        templateList.add(HomeTemplate.Carousel(getTempCarouselList()))
+        templateList.add(HomeTemplate.Carousel(true))
 
         if (root?.categories != null) {
             for (item in root.categories) {
                 templateList.add(HomeTemplate.Header(null, item.name, item.name))
-                templateList.add(HomeTemplate.Categories(item.name, item.name, true))
+                when (item.name) {
+                    "蜜蜜影视" -> templateList.add(HomeTemplate.Statistics(item.name, null, true))
+                    "关注" -> { }
+                    "短视频" -> { }
+                    "图片" -> { }
+                    "短文" -> { }
+                    "圈子" -> { }
+                }
             }
         }
 
         adapter.submitList(templateList)
-    }
-
-    //TODO: Testing
-    private fun getTempCarouselList(): List<CarouselHolderItem> {
-        val list = mutableListOf<CarouselHolderItem>()
-
-        list.add(CarouselHolderItem("https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
-        list.add(CarouselHolderItem("https://cdn2.ettoday.net/images/4838/4838493.jpg"))
-        list.add(CarouselHolderItem("https://img.technews.tw/wp-content/uploads/2020/04/20102348/iphone-se-gallery6.jpg"))
-        list.add(CarouselHolderItem("https://www.apple.com/105/media/us/iphone-se/2020/90024c0f-285a-4bf5-af04-2c38de97b06e/anim/hero-flow/large_2x/flow/flow_key_099.jpg"))
-
-        return list
     }
 
     private fun loadCategories(keyword: String?) {
@@ -153,6 +150,7 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
             mainViewModel.categoriesData.observe(viewLifecycleOwner, Observer { item ->
 
                 val list = mutableListOf<String>()
+                list.add("首页")
 
                 val adult = item.getAdult()
                 adult?.categories?.also { level2 ->

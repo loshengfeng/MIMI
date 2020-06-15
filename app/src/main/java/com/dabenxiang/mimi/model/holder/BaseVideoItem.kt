@@ -1,7 +1,7 @@
 package com.dabenxiang.mimi.model.holder
 
-import com.dabenxiang.mimi.model.api.vo.VideoSearchDetail
-
+import com.dabenxiang.mimi.model.api.vo.StatisticsItem
+import com.dabenxiang.mimi.model.api.vo.VideoSearchItem
 
 sealed class BaseVideoItem {
     data class Banner(val imgUrl: String?) : BaseVideoItem()
@@ -15,7 +15,16 @@ sealed class BaseVideoItem {
     ) : BaseVideoItem()
 }
 
-fun List<VideoSearchDetail>.parser(isAdult: Boolean): List<BaseVideoItem.Video> {
+fun List<VideoSearchItem.VideoSearchDetail>.searchItemToVideoItem(isAdult: Boolean): List<BaseVideoItem.Video> {
+    val result = mutableListOf<BaseVideoItem.Video>()
+    forEach { item ->
+        val holderItem = BaseVideoItem.Video(id = item.id, title = item.title, imgUrl = item.cover, isAdult = isAdult, resolution = "", info = "")
+        result.add(holderItem)
+    }
+    return result
+}
+
+fun List<StatisticsItem>.statisticsItemToVideoItem(isAdult: Boolean): List<BaseVideoItem.Video> {
     val result = mutableListOf<BaseVideoItem.Video>()
     forEach { item ->
         val holderItem = BaseVideoItem.Video(id = item.id, title = item.title, imgUrl = item.cover, isAdult = isAdult, resolution = "", info = "")

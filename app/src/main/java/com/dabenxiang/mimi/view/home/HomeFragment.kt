@@ -7,12 +7,10 @@ import androidx.activity.addCallback
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
-import com.dabenxiang.mimi.model.holder.CarouselHolderItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
-import com.dabenxiang.mimi.view.adapter.HomeCategoriesAdapter
-import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
+import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
@@ -63,8 +61,12 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
             startActivityForResult(intent, PlayerActivity.REQUEST_CODE)
         }
 
-        override fun onLoadAdapter(adapter: HomeCategoriesAdapter, src: HomeTemplate.Categories) {
-            viewModel.loadNestedCategoriesList(adapter, src)
+        override fun onLoadStatisticsViewHolder(vh: HomeStatisticsViewHolder, src: HomeTemplate.Statistics) {
+            viewModel.loadNestedStatisticsList(vh, src)
+        }
+
+        override fun onLoadCarouselViewHolder(vh: HomeCarouselViewHolder, src: HomeTemplate.Carousel) {
+            viewModel.loadNestedStatisticsListForCarousel(vh, src)
         }
     }
 
@@ -100,27 +102,16 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
         val templateList = mutableListOf<HomeTemplate>()
 
         templateList.add(HomeTemplate.Banner(imgUrl = "https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
-        templateList.add(HomeTemplate.Carousel(getTempCarouselList()))
+        templateList.add(HomeTemplate.Carousel(false))
 
         if (root?.categories != null) {
             for (item in root.categories) {
                 templateList.add(HomeTemplate.Header(null, item.name, item.name))
-                templateList.add(HomeTemplate.Categories(item.name, item.name, false))
+                templateList.add(HomeTemplate.Statistics(item.name, item.name, false))
             }
         }
 
         adapter.submitList(templateList)
-    }
-
-    //TODO: Testing
-    private fun getTempCarouselList(): List<CarouselHolderItem> {
-        val list = mutableListOf<CarouselHolderItem>()
-
-        repeat(2) {
-            list.add(CarouselHolderItem("https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
-        }
-
-        return list
     }
 
     private fun loadCategories(keyword: String?) {
@@ -135,7 +126,7 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
             mainViewModel.categoriesData.observe(viewLifecycleOwner, Observer { item ->
 
                 val list = mutableListOf<String>()
-                list.add("首頁")
+                list.add("首页")
 
                 val normal = item.getNormal()
                 normal?.categories?.also { level2 ->

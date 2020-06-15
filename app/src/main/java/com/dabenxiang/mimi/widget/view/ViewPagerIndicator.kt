@@ -4,8 +4,6 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
-import androidx.viewpager.widget.ViewPager
-import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 
@@ -710,20 +708,6 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
      */
     fun setViewPager2(viewpager: ViewPager2, CycleNumber: Int): ViewPagerIndicator {
         setViewPager(viewpager, CycleNumber, false)
-        return this
-    }
-
-    /**
-     * @param viewPager        適配的viewpager
-     * @param isInfiniteCircle 真無限循環 配合BannerView 通常是true;false為一般 不循環 固定等價於[.setViewPager]
-     * @return
-     */
-    fun setViewPager2(viewPager: ViewPager2, isInfiniteCircle: Boolean): ViewPagerIndicator {
-        if (isInfiniteCircle) {
-            setViewPager(viewPager, viewPager.adapter!!.itemCount - 2, isInfiniteCircle)
-        } else {
-            setViewPager(viewPager, viewPager.adapter!!.itemCount, isInfiniteCircle)
-        }
         return this
     }
 

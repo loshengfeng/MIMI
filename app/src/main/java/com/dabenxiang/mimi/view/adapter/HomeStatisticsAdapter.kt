@@ -9,49 +9,17 @@ import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.view.home.HomeTemplate
 import com.dabenxiang.mimi.view.home.VideoViewHolder
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
-import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.coroutineScope
 
-class HomeCategoriesAdapter(private val nestedListener: HomeAdapter.EventListener, private val isAdult: Boolean) :
+class HomeStatisticsAdapter(private val nestedListener: HomeAdapter.EventListener, private val isAdult: Boolean) :
     RecyclerView.Adapter<BaseViewHolder>() {
-
-    fun loadData(src: HomeTemplate.Categories) {
-        if (list == null) {
-            nestedListener.onLoadAdapter(this, src)
-        }
-    }
-
-    private var activeTask: Deferred<Any>? = null
-
-    suspend fun activeTask(block: suspend () -> Any): Any {
-        activeTask?.cancelAndJoin()
-
-        return coroutineScope {
-            val newTask = async {
-                block()
-            }
-
-            newTask.invokeOnCompletion {
-                activeTask = null
-            }
-
-            activeTask = newTask
-            newTask.await()
-        }
-    }
 
     private val videoViewHolderListener by lazy {
         object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
                 if (index > -1) {
                     list?.get(index)?.also {
-                        nestedListener.onVideoClick(view, PlayerData.parser(it).also { playerData ->
-                            playerData.isAdult = isAdult
-                        })
+                        nestedListener.onVideoClick(view, PlayerData.parser(it, isAdult))
                     }
                 }
             }
@@ -60,8 +28,8 @@ class HomeCategoriesAdapter(private val nestedListener: HomeAdapter.EventListene
 
     private var list: List<BaseVideoItem.Video>? = null
 
-    fun submitList(updated: List<BaseVideoItem.Video>?) {
-        list = updated
+    fun submitList(submit: List<BaseVideoItem.Video>?) {
+        list = submit
 
         /*
         //Fake date:

@@ -8,7 +8,7 @@ import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.home.HomeTabHolder
 
 class TopTabAdapter(private val listener: BaseIndexViewHolder.IndexViewHolderListener, private val isAdult: Boolean) :
-    BaseTabAdapter<HomeTabHolder>() {
+    BaseTabAdapter<String, HomeTabHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomeTabHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_tab, parent, false)
