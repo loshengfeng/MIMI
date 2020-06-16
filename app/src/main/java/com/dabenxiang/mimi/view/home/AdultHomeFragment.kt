@@ -87,6 +87,13 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
 
         recyclerview_videos.adapter = videoListAdapter
 
+        refresh_home.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
+        refresh_home.setOnRefreshListener {
+            refresh_home.isRefreshing = false
+
+            mainViewModel?.loadHomeCategories()
+        }
+
         viewModel.videoList.observe(viewLifecycleOwner, Observer {
             videoListAdapter.submitList(it)
         })
@@ -175,6 +182,10 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
                 0 -> {
                     btn_filter.visibility = View.GONE
                     loadFirstTab(mainViewModel?.categoriesData?.value?.getAdult())
+                }
+                1 -> {
+                    btn_filter.visibility = View.VISIBLE
+                    loadCategories(null)
                 }
                 else -> {
                     btn_filter.visibility = View.VISIBLE

@@ -12,6 +12,7 @@ import android.view.Surface
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearSnapHelper
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setBtnSolidDolor
 import com.dabenxiang.mimi.extension.setNot
@@ -23,6 +24,7 @@ import com.dabenxiang.mimi.model.api.vo.handleException
 import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.serializable.PlayerData
+import com.dabenxiang.mimi.view.adapter.GuessLikeAdapter
 import com.dabenxiang.mimi.view.adapter.SelectEpisodeAdapter
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseActivity
@@ -89,6 +91,14 @@ class PlayerActivity : BaseActivity() {
         }, getIsAdult())
     }
 
+    private val guessLikeAdapter by lazy {
+        GuessLikeAdapter(object : GuessLikeAdapter.GuessLikeAdapterListener{
+            override fun onVideoClick(view: View, item: PlayerData) {
+
+            }
+        }, getIsAdult())
+    }
+
     private val progressHUD by lazy {
         KProgressHUD.create(this).setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
     }
@@ -121,6 +131,7 @@ class PlayerActivity : BaseActivity() {
             }
         tv_title.setTextColor(titleColor)
         tv_source.setTextColor(titleColor)
+        tv_guess_like.setTextColor(titleColor)
 
         val subTitleColor =
             if (isAdult) {
@@ -215,7 +226,6 @@ class PlayerActivity : BaseActivity() {
         viewModel.episodePosition.observe(this, Observer {
             if (it >= 0) {
                 episodeAdapter.setLastSelectedIndex(it)
-                // TODO: 播放影片?
                 viewModel.checkConsumeResult()
             }
         })
@@ -262,6 +272,9 @@ class PlayerActivity : BaseActivity() {
 
                         setupChipGroup(result.tags)
                         setupSourceList(viewModel.sourceList)
+
+                        val categoriesString = result.categories?.last()
+                        viewModel.setupGuessLikeList(categoriesString, isAdult)
                     }
 
                     viewModel.likeVideo.value = result.like
@@ -343,6 +356,13 @@ class PlayerActivity : BaseActivity() {
 
         recyclerview_source_list.adapter = sourceListAdapter
         recyclerview_episode.adapter = episodeAdapter
+
+        recyclerview_guess_like.adapter = guessLikeAdapter
+        LinearSnapHelper().attachToRecyclerView(recyclerview_guess_like)
+
+        viewModel.videoList.observe(this, Observer {
+            guessLikeAdapter.submitList(it)
+        })
 
         btn_full_screen.setOnClickListener {
             viewModel.lockFullScreen = !viewModel.lockFullScreen

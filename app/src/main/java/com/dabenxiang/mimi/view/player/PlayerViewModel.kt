@@ -4,12 +4,19 @@ import android.content.pm.ActivityInfo
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import androidx.paging.LivePagedListBuilder
+import androidx.paging.PagedList
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.Source
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
+import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.home.GuessLikeDataSource
+import com.dabenxiang.mimi.view.home.GuessLikeFactory
+import com.dabenxiang.mimi.view.home.PagingCallback
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
 import com.google.android.exoplayer2.source.MediaSource
@@ -66,6 +73,9 @@ class PlayerViewModel : BaseViewModel() {
 
     private val _episodePosition = MutableLiveData<Int>()
     val episodePosition: LiveData<Int> = _episodePosition
+
+    private val _videoList = MutableLiveData<PagedList<BaseVideoItem>>()
+    val videoList: LiveData<PagedList<BaseVideoItem>> = _videoList
 
     val showIntroduction = MutableLiveData(false)
 
@@ -300,6 +310,33 @@ class PlayerViewModel : BaseViewModel() {
     fun setStreamPosition(position: Int) {
         if (position != _episodePosition.value) {
             _episodePosition.value = position
+        }
+    }
+
+    fun setupGuessLikeList(category: String?, isAdult: Boolean) {
+        viewModelScope.launch {
+            val dataSrc = GuessLikeDataSource(isAdult, category ?: "", viewModelScope, domainManager.getApiRepository(), pagingCallback)
+            val factory = GuessLikeFactory(dataSrc)
+            val config = PagedList.Config.Builder()
+                .setPageSize(GuessLikeDataSource.PER_LIMIT.toInt())
+                .build()
+
+            LivePagedListBuilder(factory, config).build().asFlow().collect {
+                _videoList.postValue(it)
+            }
+        }
+    }
+
+    private val pagingCallback = object : PagingCallback {
+        override fun onLoading() {
+            setShowProgress(true)
+        }
+
+        override fun onLoaded() {
+            setShowProgress(false)
+        }
+
+        override fun onThrowable(throwable: Throwable) {
         }
     }
 }

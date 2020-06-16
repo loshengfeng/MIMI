@@ -10,6 +10,7 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
+import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -92,7 +93,7 @@ class HomeViewModel : BaseViewModel() {
     fun setupVideoList(category: String?, isAdult: Boolean) {
         viewModelScope.launch {
             val dataSrc = VideoListDataSource(isAdult, category ?: "", viewModelScope, domainManager.getApiRepository(), pagingCallback)
-            dataSrc.isInvalid
+HomeAdapter
             val factory = VideoListFactory(dataSrc)
             val config = PagedList.Config.Builder()
                 .setPageSize(VideoListDataSource.PER_LIMIT.toInt())

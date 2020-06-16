@@ -170,6 +170,14 @@ interface ApiService {
         @Query("limit") limit: String?
     ): Response<ApiBasePagingItem<VideoSearchItem>>
 
+    @GET("/v1/Members/Home/Videos/SearchWithCategory")
+    suspend fun searchWithCategory(
+        @Query("category") category: String?,
+        @Query("isAdult") isAdult: Boolean?,
+        @Query("offset") offset: String?,
+        @Query("limit") limit: String?
+    ): Response<ApiBasePagingItem<List<SimpleVideoItem>>>
+
     @GET("/v1/Members/Home/Videos/Statistics")
     suspend fun statisticsHomeVideos(
         @Query("statisticsType") statisticsType: Int?,

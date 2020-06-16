@@ -215,7 +215,7 @@ class ApiRepository(private val apiService: ApiService) {
      *
      ***********************************************************/
     /**
-     * 取得類別影片
+     * 取得影片
      */
     suspend fun searchHomeVideos(
         category: String,
@@ -226,6 +226,16 @@ class ApiRepository(private val apiService: ApiService) {
         offset: String,
         limit: String
     ) = apiService.searchHomeVideos(category, q, country, years, isAdult, offset, limit)
+
+    /**
+     * 取得類別影片
+     */
+    suspend fun searchWithCategory(
+        category: String,
+        isAdult: Boolean,
+        offset: String,
+        limit: String
+    ) = apiService.searchWithCategory(category, isAdult, offset, limit)
 
     /**
      * 取得熱門影片

@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
-class VideoListDataSource(
+class GuessLikeDataSource(
     private val isAdult: Boolean,
     private val category: String,
     private val viewModelScope: CoroutineScope,
@@ -19,7 +19,7 @@ class VideoListDataSource(
 ) : PageKeyedDataSource<Long, BaseVideoItem>() {
 
     companion object {
-        const val PER_LIMIT = "20"
+        const val PER_LIMIT = "10"
         val PER_LIMIT_LONG = PER_LIMIT.toLong()
     }
 
@@ -29,10 +29,6 @@ class VideoListDataSource(
         viewModelScope.launch {
             flow {
                 val returnList = mutableListOf<BaseVideoItem>()
-
-                // TODO: 取得廣告
-                val adBanner = "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSd667siFJDLVZKf6mIzT86lWuspAhd40nq-2ACy5UpAQYJEWSM&usqp=CAU"
-                returnList.add(BaseVideoItem.Banner(adBanner))
 
                 val result = apiRepository.searchWithCategory(category, isAdult, "0", PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
