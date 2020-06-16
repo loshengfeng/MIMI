@@ -1,18 +1,11 @@
 package com.dabenxiang.mimi.view.adapter.viewHolder
 
-import android.graphics.Bitmap
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.Priority
-import com.bumptech.glide.load.MultiTransformation
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.CircleCrop
-import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
 import timber.log.Timber
@@ -27,13 +20,10 @@ class ClubFollowViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
     init {
         view.setOnClickListener {
-            // todo : 16/06/2020
             Timber.d("onClick")
-//            post?.url?.let { url ->
-//                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-//                view.context.startActivity(intent)
-//            }
         }
+        // todo: [頭像]，[圈子名稱]，[圈子介紹]按鈕點擊後，進入該會員的VAI4.1.4_圈子頁
+        // todo: [已關注]按鈕點擊後，取消關注
     }
 
     companion object {
@@ -50,18 +40,18 @@ class ClubFollowViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 //        tvSubTitle.text = clubFollowItem?.description
 //        tvFollow.text = clubFollowItem?.tag
     }
-
-    private fun setupPhoto(bitmap: Bitmap) {
-        val options: RequestOptions = RequestOptions()
-            .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-            .placeholder(R.mipmap.ic_launcher)
-            .error(R.mipmap.ic_launcher)
-            .priority(Priority.NORMAL)
-
-        Glide.with(ivPhoto.context).load(bitmap)
-            .apply(options)
-            .into(ivPhoto)
-    }
+    // todo : not sure...
+//    private fun setupPhoto(bitmap: Bitmap) {
+//        val options: RequestOptions = RequestOptions()
+//            .transform(MultiTransformation(CenterCrop(), CircleCrop()))
+//            .placeholder(R.mipmap.ic_launcher)
+//            .error(R.mipmap.ic_launcher)
+//            .priority(Priority.NORMAL)
+//
+//        Glide.with(ivPhoto.context).load(bitmap)
+//            .apply(options)
+//            .into(ivPhoto)
+//    }
 
 //    private fun getAttachment() {
 //        viewModelScope.launch {

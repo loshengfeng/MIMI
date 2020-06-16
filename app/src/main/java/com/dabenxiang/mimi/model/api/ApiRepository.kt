@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.model.api
 
+import android.text.SpannableString
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.StatisticsType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -302,6 +303,21 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun getMePlaylist(
         playlistType: Int, offset: Int, limit: Int
     ) = apiService.getMePlaylist(playlistType, offset, limit)
+
+    /**
+     * 取得我的帖子收藏
+     */
+    suspend fun getPostFavorite(
+        offset: Int,
+        limit: Int
+    ) = apiService.getPostFavorite(offset, limit)
+
+    /**
+     * 移除我的帖子收藏
+     */
+    suspend fun deletePostFavorite(
+        postFavoriteId: Long
+    ) = apiService.deletePostFavorite(postFavoriteId)
 
     /**
      * 取得使用者資訊明細

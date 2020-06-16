@@ -18,7 +18,7 @@ import com.dabenxiang.mimi.view.search.SearchVideoViewModel
 import com.dabenxiang.mimi.view.setting.SettingViewModel
 import com.dabenxiang.mimi.view.splash.SplashViewModel
 import com.dabenxiang.mimi.view.topup.TopupViewModel
-import com.dabenxiang.mimi.view.topuphistory.TopupHistoryViewModel
+import com.dabenxiang.mimi.view.order.OrderViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -37,7 +37,7 @@ val viewModelModule = module {
     viewModel { UpdateProfileViewModel() }
     viewModel { ChangePasswordViewModel() }
     viewModel { CategoriesViewModel() }
-    viewModel { TopupHistoryViewModel() }
+    viewModel { OrderViewModel() }
     viewModel { ChatHistoryViewModel() }
     viewModel { PlayerViewModel() }
     viewModel { SearchVideoViewModel() }

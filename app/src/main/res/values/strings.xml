@@ -60,7 +60,9 @@
     <string name="personal_title">我的</string>
     <string name="personal_topup">充值去 ></string>
     <string name="personal_follow">我的关注</string>
-    <string name="personal_topoup_history">充值记录</string>
+    <string name="personal_order">充值记录</string>
+    <string name="personal_topup_now">现在充值去</string>
+    <string name="personal_my_post">我的帖子</string>
     <string name="personal_chat_history">对话记录</string>
     <string name="personal_setting">设置</string>
     <string name="btn_logout">登出</string>

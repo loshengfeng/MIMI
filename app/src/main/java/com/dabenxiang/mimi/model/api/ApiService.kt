@@ -214,6 +214,12 @@ interface ApiService {
         @Path("userId") id: Int
     ) : Response<Void>
 
+    @GET("/v1/Members/Me/Order")
+    suspend fun getOrder(
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ) : Response<ApiBasePagingItem<List<OrderItem>>>
+
     @GET("/v1/Members/Me/Chat")
     suspend fun getMeChat(
         @Query("offset") offset: Int,
@@ -249,6 +255,17 @@ interface ApiService {
         @Query("offset") offset: Int,
         @Query("limit") limit: Int
     ): Response<ApiBasePagingItem<PlayListItem>>
+
+    @GET("/v1/Members/Me/PostFavorite")
+    suspend fun getPostFavorite(
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
+    ): Response<ApiBasePagingItem<PostFavoriteItem>>
+
+    @DELETE("/v1/Members/Me/PostFavorite/{postFavoriteId}")
+    suspend fun deletePostFavorite(
+        @Path("postFavoriteId") postFavoriteId: Long
+    ): Response<Void>
 
     @GET("/v1/Members/Me/Profile")
     suspend fun getProfile(): Response<ApiBaseItem<ProfileItem>>

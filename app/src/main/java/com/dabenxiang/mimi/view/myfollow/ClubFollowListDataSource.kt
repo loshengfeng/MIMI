@@ -4,13 +4,11 @@ import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
 import com.dabenxiang.mimi.view.home.PagingCallback
-import com.dabenxiang.mimi.view.home.VideoListDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import timber.log.Timber
 
 class ClubFollowListDataSource constructor(
     private val viewModelScope: CoroutineScope,
@@ -29,7 +27,6 @@ class ClubFollowListDataSource constructor(
         params: LoadInitialParams<Long>,
         callback: LoadInitialCallback<Long, ClubFollowItem>
     ) {
-        Timber.d("loadInitial")
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getClubFollow("0", PER_LIMIT)
@@ -42,7 +39,7 @@ class ClubFollowListDataSource constructor(
                         item?.paging?.count ?: 0,
                         item?.paging?.offset ?: 0,
                         clubs?.size ?: 0
-                    ) -> VideoListDataSource.PER_LIMIT_LONG
+                    ) -> PER_LIMIT_LONG
                     else -> null
                 }
                 emit(InitResult(clubs ?: arrayListOf(), nextPageKey))
@@ -57,10 +54,9 @@ class ClubFollowListDataSource constructor(
         }
     }
 
-    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Long, ClubFollowItem>) { Timber.d("loadBefore") }
+    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Long, ClubFollowItem>) {}
 
     override fun loadAfter(params: LoadParams<Long>, callback: LoadCallback<Long, ClubFollowItem>) {
-        Timber.d("loadAfter")
         val next = params.key
         viewModelScope.launch {
             flow {
@@ -98,5 +94,4 @@ class ClubFollowListDataSource constructor(
             else -> true
         }
     }
-
 }

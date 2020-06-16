@@ -1,36 +1,36 @@
-package com.dabenxiang.mimi.view.myfollow
+package com.dabenxiang.mimi.view.order
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.manager.DomainManager
-import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
+import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.view.home.PagingCallback
-import com.dabenxiang.mimi.view.home.VideoListDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
-class MemberFollowListDataSource constructor(
+class OrderListDataSource constructor(
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
     private val pagingCallback: PagingCallback
-) : PageKeyedDataSource<Long, MemberFollowItem>() {
+) : PageKeyedDataSource<Long, OrderItem>() {
 
     companion object {
-        const val PER_LIMIT = "20"
+        const val PER_LIMIT = "10"
         val PER_LIMIT_LONG = PER_LIMIT.toLong()
     }
 
-    private data class InitResult(val list: List<MemberFollowItem>, val nextKey: Long?)
+    private data class InitResult(val list: List<OrderItem>, val nextKey: Long?)
 
     override fun loadInitial(
         params: LoadInitialParams<Long>,
-        callback: LoadInitialCallback<Long, MemberFollowItem>
+        callback: LoadInitialCallback<Long, OrderItem>
     ) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().getMemberFollow("0", PER_LIMIT)
+                val result = domainManager.getApiRepository().getOrder("0", PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()
                 val clubs = item?.content
@@ -40,10 +40,11 @@ class MemberFollowListDataSource constructor(
                         item?.paging?.count ?: 0,
                         item?.paging?.offset ?: 0,
                         clubs?.size ?: 0
-                    ) -> VideoListDataSource.PER_LIMIT_LONG
+                    ) -> PER_LIMIT_LONG
                     else -> null
                 }
-                emit(MemberFollowListDataSource.InitResult(clubs ?: arrayListOf(), nextPageKey))
+                emit(InitResult(clubs ?: arrayListOf(), nextPageKey))
+
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> pagingCallback.onThrowable(e) }
@@ -54,17 +55,15 @@ class MemberFollowListDataSource constructor(
         }
     }
 
-    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Long, MemberFollowItem>) {}
+    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Long, OrderItem>) { Timber.d("loadBefore") }
 
-    override fun loadAfter(
-        params: LoadParams<Long>,
-        callback: LoadCallback<Long, MemberFollowItem>
-    ) {
+    override fun loadAfter(params: LoadParams<Long>, callback: LoadCallback<Long, OrderItem>) {
+        Timber.d("loadAfter")
         val next = params.key
         viewModelScope.launch {
             flow {
                 val result =
-                    domainManager.getApiRepository().getMemberFollow(next.toString(), PER_LIMIT)
+                    domainManager.getApiRepository().getOrder(next.toString(), PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(result)
             }
@@ -97,5 +96,4 @@ class MemberFollowListDataSource constructor(
             else -> true
         }
     }
-
 }

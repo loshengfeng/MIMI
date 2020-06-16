@@ -110,7 +110,7 @@
             android:gravity="center_vertical"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
-            android:text="@string/personal_topoup_history"
+            android:text="@string/personal_order"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_follow" />
 
@@ -160,6 +160,27 @@
             app:layout_constraintTop_toBottomOf="@id/tv_chat_history" />
 
         <TextView
+            android:id="@+id/tv_my_post"
+            style="@style/personalStyle"
+            android:drawableStart="@drawable/ic_ico_myposts"
+            android:drawableEnd="@drawable/ic_btn_arrow_black_n"
+            android:gravity="center_vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:text="@string/personal_my_post"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_chat_history" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@color/color_gray_3"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_my_post" />
+
+        <TextView
             android:id="@+id/tv_setting"
             style="@style/personalStyle"
             android:drawableStart="@drawable/ic_ico_setting"
@@ -169,7 +190,7 @@
             android:paddingEnd="20dp"
             android:text="@string/personal_setting"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_chat_history" />
+            app:layout_constraintTop_toBottomOf="@id/tv_my_post" />
 
         <TextView
             android:id="@+id/tv_logout"

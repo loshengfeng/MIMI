@@ -40,7 +40,6 @@ class MainViewModel : BaseViewModel() {
                 .collect { resp ->
                     when (resp) {
                         is ApiResult.Success -> {
-                            //Timber.d(resp.result.toString())
                             _categoriesData.value = resp.result.content
                         }
                         is ApiResult.Error -> Timber.e(resp.throwable)

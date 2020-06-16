@@ -3,7 +3,6 @@ package com.dabenxiang.mimi.view.personal
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.Observer
-import androidx.navigation.Navigation
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.MultiTransformation
@@ -13,8 +12,6 @@ import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.ErrorCode
-import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
@@ -151,8 +148,9 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
             when (buttonView.id) {
                 R.id.tv_topup -> GeneralUtils.showToast(context!!, "btnTopup")
                 R.id.tv_follow -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
-                R.id.tv_topup_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_topupHistoryFragment))
+                R.id.tv_topup_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_orderFragment))
                 R.id.tv_chat_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_chatHistoryFragment))
+                R.id.tv_my_post -> GeneralUtils.showToast(context!!, "My post")
                 R.id.tv_setting -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_settingFragment, viewModel.byteArray?.let { SettingFragment.createBundle(it) }))
                 R.id.tv_logout -> viewModel.signOut()
                 R.id.tv_login -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_loginFragment, LoginFragment.createBundle(TYPE_LOGIN)))
@@ -163,6 +161,7 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
             tv_follow.setOnClickListener(it)
             tv_topup_history.setOnClickListener(it)
             tv_chat_history.setOnClickListener(it)
+            tv_my_post.setOnClickListener(it)
             tv_setting.setOnClickListener(it)
             tv_logout.setOnClickListener(it)
             tv_login.setOnClickListener(it)

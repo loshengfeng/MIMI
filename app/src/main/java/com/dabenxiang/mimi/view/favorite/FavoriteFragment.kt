@@ -35,10 +35,9 @@ class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
 
     override fun fetchViewModel(): FavoriteViewModel? { return  viewModel }
 
-    override fun setupObservers() { Timber.d("${FavoriteFragment::class.java.simpleName}_setupObservers") }
+    override fun setupObservers() {}
 
     override fun setupListeners() {
-        Timber.d("${FavoriteFragment::class.java.simpleName}_setupListeners")
         View.OnClickListener { buttonView ->
             when(buttonView.id) {
                 R.id.tv_more -> showMenu(buttonView)
