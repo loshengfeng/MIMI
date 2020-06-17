@@ -113,8 +113,6 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
 
             // todo: confirm by Jeff...
             tv_new.text = "N"
-            tv_content.text = "文字內容文字內容"
-            tv_sub_content.text = "文字內容文字內容文字內容文字內容文字內容文字內容文字內容文字內容"
         })
 
         viewModel.apiSignOut.observe(viewLifecycleOwner, Observer {
