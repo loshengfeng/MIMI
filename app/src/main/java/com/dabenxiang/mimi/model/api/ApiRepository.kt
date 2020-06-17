@@ -258,6 +258,44 @@ class ApiRepository(private val apiService: ApiService) {
     ) = apiService.putAvatar(body)
 
     /**
+     * 取得我關注的圈子
+     */
+    suspend fun getClubFollow(
+        offset: String,
+        limit: String
+    ) = apiService.getClubFollow(offset, limit)
+
+    /**
+     * 移除我關注的圈子
+     */
+    suspend fun deleteClubFollow(
+        clubId: Int
+    ) = apiService.deleteClubFollow(clubId)
+
+    /**
+     * 取得我關注的人
+     */
+    suspend fun getMemberFollow(
+        offset: String,
+        limit: String
+    ) = apiService.getMemberFollow(offset, limit)
+
+    /**
+     * 移除我關注的人
+     */
+    suspend fun deleteMemberFollow(
+        userId: Int
+    ) = apiService.deleteMemberFollow(userId)
+
+    /**
+     * 取得使用者充值紀錄(需登入帳號)
+     */
+    suspend fun getOrder(
+        offset: String,
+        limit: String
+    ) = apiService.getOrder(offset, limit)
+
+    /**
      * 取得聊天室列表
      */
     suspend fun getMeChatItem(

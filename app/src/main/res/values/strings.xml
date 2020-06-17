@@ -154,4 +154,7 @@
     <string name="cost_point_message">&lt;font color=\"#000000\"&gt;目前蜜币余额%d，是否支付&lt;/font&gt;&lt;font color=\"#ff4d4d\"&gt;%d&lt;/font&gt;&lt;font color=\"#000000\"&gt;蜜币播放视频？&lt;/font&gt;</string>
     <string name="recharge">前往充值</string>
     <string name="player_source">播放列表</string>
+
+    <!-- follow -->
+    <string name="my_follow_follow">已关注</string>
 </resources>
