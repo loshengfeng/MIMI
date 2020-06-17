@@ -23,7 +23,7 @@
         android:layout_marginStart="55dp"
         android:layout_marginTop="40dp"
         android:layout_marginEnd="55dp"
-        android:src="@drawable/ic_img_history_empty_2"
+        android:src="@drawable/img_history_empty_2"
         android:contentDescription="@null"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"

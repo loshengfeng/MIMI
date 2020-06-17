@@ -42,7 +42,7 @@
                 <TextView
                     android:id="@+id/btn_photo"
                     style="@style/settingStyle_1"
-                    android:drawableEnd="@drawable/ic_btn_arrow_black_n"
+                    android:drawableEnd="@drawable/btn_arrow_black_n"
                     android:gravity="center_vertical"
                     android:text="@string/setting_photo"
                     app:layout_constraintStart_toStartOf="parent"
@@ -72,7 +72,7 @@
                 <TextView
                     android:id="@+id/btn_name"
                     style="@style/settingStyle_1"
-                    android:drawableEnd="@drawable/ic_btn_arrow_black_n"
+                    android:drawableEnd="@drawable/btn_arrow_black_n"
                     android:gravity="center_vertical"
                     android:text="@string/setting_name"
                     app:layout_constraintStart_toStartOf="parent"
@@ -103,7 +103,7 @@
                 <TextView
                     android:id="@+id/btn_email"
                     style="@style/settingStyle_1"
-                    android:drawableEnd="@drawable/ic_btn_arrow_black_n"
+                    android:drawableEnd="@drawable/btn_arrow_black_n"
                     android:gravity="center_vertical"
                     android:text="@string/setting_email"
                     app:layout_constraintStart_toStartOf="parent"
@@ -179,7 +179,7 @@
                 android:id="@+id/btn_chang_pw"
                 style="@style/settingStyle_1"
                 android:layout_marginTop="15dp"
-                android:drawableEnd="@drawable/ic_btn_arrow_black_n"
+                android:drawableEnd="@drawable/btn_arrow_black_n"
                 android:gravity="center_vertical"
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp"
@@ -201,7 +201,7 @@
                 <TextView
                     android:id="@+id/btn_gender"
                     style="@style/settingStyle_1"
-                    android:drawableEnd="@drawable/ic_btn_arrow_black_n"
+                    android:drawableEnd="@drawable/btn_arrow_black_n"
                     android:gravity="center_vertical"
                     android:text="@string/setting_gender"
                     app:layout_constraintStart_toStartOf="parent"
@@ -219,7 +219,7 @@
                 <TextView
                     android:id="@+id/btn_birthday"
                     style="@style/settingStyle_1"
-                    android:drawableEnd="@drawable/ic_btn_arrow_black_n"
+                    android:drawableEnd="@drawable/btn_arrow_black_n"
                     android:gravity="center_vertical"
                     android:text="@string/setting_birthday"
                     app:layout_constraintStart_toStartOf="parent"

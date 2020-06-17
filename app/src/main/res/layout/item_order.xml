@@ -15,7 +15,7 @@
         android:layout_height="24dp"
         android:layout_marginTop="15dp"
         android:layout_marginStart="15dp"
-        android:src="@drawable/ic_ico_alipay"
+        android:src="@drawable/ico_alipay"
         android:contentDescription="@null"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -60,7 +60,7 @@
         android:id="@+id/iv_token"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:src="@drawable/ic_ico_micoin_small"
+        android:src="@drawable/ico_micoin_small"
         android:layout_marginEnd="5dp"
         android:contentDescription="@null"
         app:layout_constraintEnd_toStartOf="@id/tv_token"

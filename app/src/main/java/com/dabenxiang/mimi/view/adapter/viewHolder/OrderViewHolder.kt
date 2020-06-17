@@ -40,11 +40,11 @@ class OrderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     fun bind(orderItem: OrderItem?) {
         this.orderItem = orderItem
         ivType.setBackgroundResource(when(orderItem?.paymentType) {
-            NONE -> R.drawable.ic_ico_alipay
-            ALIPAY -> R.drawable.ic_ico_alipay
+            NONE -> R.drawable.ico_alipay
+            ALIPAY -> R.drawable.ico_alipay
             WECHAT -> R.drawable.ico_wechat_pay
-            UNIONPAY -> R.drawable.ic_ico_china_pay
-            else -> R.drawable.ic_ico_alipay
+            UNIONPAY -> R.drawable.ico_china_pay
+            else -> R.drawable.ico_alipay
         })
 
         tvAccount.text = orderItem?.accountName

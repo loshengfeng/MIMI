@@ -98,7 +98,7 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
         layout_search_bar.background = requireActivity().getDrawable(R.color.adult_color_background)
         iv_bg_search.setBtnSolidDolor(requireActivity().getColor(R.color.adult_color_search_bar))
 
-        iv_search.setImageResource(R.drawable.ic_adult_btn_search)
+        iv_search.setImageResource(R.drawable.adult_btn_search)
         tv_search.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
 
         recyclerview_home.background = requireActivity().getDrawable(R.color.adult_color_background)

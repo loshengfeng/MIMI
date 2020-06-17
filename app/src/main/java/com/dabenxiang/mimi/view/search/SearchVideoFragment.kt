@@ -65,9 +65,9 @@ class SearchVideoFragment : BaseFragment<SearchVideoViewModel>() {
 
             iv_back.setImageResource(
                 if (isAdult) {
-                    R.drawable.ic_adult_btn_back
+                    R.drawable.adult_btn_back
                 } else {
-                    R.drawable.ic_normal_btn_back
+                    R.drawable.normal_btn_back
                 }
             )
 
@@ -81,9 +81,9 @@ class SearchVideoFragment : BaseFragment<SearchVideoViewModel>() {
 
             iv_search.setImageResource(
                 if (isAdult) {
-                    R.drawable.ic_adult_btn_search
+                    R.drawable.adult_btn_search
                 } else {
-                    R.drawable.ic_normal_btn_search
+                    R.drawable.normal_btn_search
                 }
             )
 

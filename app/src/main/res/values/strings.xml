@@ -55,6 +55,10 @@
     <!-- Favorite -->
     <string name="favorite_title">我的收藏</string>
     <string name="favorite_clean">清除所有收藏</string>
+    <string name="favorite_normal">一般视频</string>
+    <string name="favorite_adult">成人视频</string>
+    <string name="favorite_tab_mimi">蜜蜜影视</string>
+    <string name="favorite_tab_short">短视频</string>
 
     <!-- Personal -->
     <string name="personal_title">我的</string>

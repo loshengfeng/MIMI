@@ -14,7 +14,7 @@
         android:id="@+id/imgChatPhoto"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:background="@drawable/ic_default_profile_picture"
+        android:background="@drawable/default_profile_picture"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
@@ -23,7 +23,7 @@
         android:id="@+id/imgIsNew"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_ico_new_chat"
+        android:src="@drawable/ico_new_chat"
         android:layout_marginBottom="29dp"
         android:layout_marginStart="29dp"
         app:layout_constraintStart_toStartOf="@id/imgChatPhoto"
@@ -76,7 +76,7 @@
         android:id="@+id/imgGo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_btn_arrow_black_n"
+        android:src="@drawable/btn_arrow_black_n"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
