@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
@@ -32,9 +32,7 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        activity?.let {
-            mainViewModel = ViewModelProviders.of(it).get(MainViewModel::class.java)
-        }
+        activity?.let { mainViewModel = ViewModelProvider(it).get(MainViewModel::class.java) }
     }
 
     override fun onCreateView(
