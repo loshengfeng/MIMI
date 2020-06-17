@@ -1,12 +1,12 @@
 package com.dabenxiang.mimi.view.player
 
+import androidx.fragment.app.viewModels
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ShortPlayerFragment : BaseFragment<ShortPlayerViewModel>() {
 
-    private val viewModel by viewModel<ShortPlayerViewModel>()
+    private val viewModel: ShortPlayerViewModel by viewModels()
 
     override fun fetchViewModel(): ShortPlayerViewModel? {
         return viewModel

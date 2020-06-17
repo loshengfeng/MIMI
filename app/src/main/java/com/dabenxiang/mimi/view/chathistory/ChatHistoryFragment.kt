@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.chathistory
 
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.adapter.ChatHistoryAdapter
@@ -9,10 +10,9 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import kotlinx.android.synthetic.main.fragment_chat_history.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import org.koin.android.viewmodel.ext.android.viewModel
 
 class ChatHistoryFragment : BaseFragment<ChatHistoryViewModel>() {
-    private val viewModel by viewModel<ChatHistoryViewModel>()
+    private val viewModel: ChatHistoryViewModel by viewModels()
 
 //    private var chatHistoryAdapter by lazy { ChatHistoryAdapter() }
 

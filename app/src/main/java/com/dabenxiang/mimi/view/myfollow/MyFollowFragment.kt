@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.myfollow
 
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.adapter.ClubFollowAdapter
@@ -15,13 +16,11 @@ import kotlinx.android.synthetic.main.fragment_my_follow.item_no_data
 import kotlinx.android.synthetic.main.fragment_my_follow.layout_refresh
 import kotlinx.android.synthetic.main.fragment_my_follow.rv_content
 import kotlinx.android.synthetic.main.fragment_my_follow.tl_type
-import kotlinx.android.synthetic.main.fragment_order.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import kotlinx.android.synthetic.main.item_setting_bar.tv_title
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MyFollowFragment : BaseFragment<MyFollowViewModel>() {
-    private val viewModel by viewModel<MyFollowViewModel>()
+    private val viewModel: MyFollowViewModel by viewModels()
 
     companion object {
         const val NO_DATA = 0
@@ -45,11 +44,13 @@ class MyFollowFragment : BaseFragment<MyFollowViewModel>() {
     override fun setupObservers() {
         viewModel.clubList.observe(viewLifecycleOwner, Observer {
             refreshUi(it.size)
+            rv_content.adapter = clubFollowAdapter
             clubFollowAdapter.submitList(it)
         })
 
         viewModel.memberList.observe(viewLifecycleOwner, Observer {
             refreshUi(it.size)
+            rv_content.adapter = memberFollowAdapter
             memberFollowAdapter.submitList(it)
         })
     }
@@ -91,7 +92,7 @@ class MyFollowFragment : BaseFragment<MyFollowViewModel>() {
         tv_title.setText(R.string.follow_title)
         tv_all.text = getString(R.string.follow_all, "0")
 
-        rv_content.adapter = clubFollowAdapter
+        rv_content.adapter = memberFollowAdapter
 
         viewModel.initData(tl_type.selectedTabPosition)
     }

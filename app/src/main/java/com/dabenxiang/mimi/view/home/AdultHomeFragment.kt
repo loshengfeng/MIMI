@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setBtnSolidDolor
@@ -18,7 +19,6 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import kotlinx.android.synthetic.main.fragment_home.*
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AdultHomeFragment : BaseFragment<HomeViewModel>() {
 
@@ -26,7 +26,7 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
         var lastPosition = 0
     }
 
-    private val viewModel by viewModel<HomeViewModel>()
+    private val viewModel: HomeViewModel by viewModels()
 
     override fun fetchViewModel(): HomeViewModel? {
         return viewModel

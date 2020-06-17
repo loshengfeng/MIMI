@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.order
 
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.adapter.OrderAdapter
@@ -15,10 +16,9 @@ import kotlinx.android.synthetic.main.fragment_order.rv_content
 import kotlinx.android.synthetic.main.fragment_order.tl_type
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import kotlinx.android.synthetic.main.item_order_no_data.*
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class OrderFragment : BaseFragment<OrderViewModel>() {
-    private val viewModel by viewModel<OrderViewModel>()
+    private val viewModel: OrderViewModel by viewModels()
 
     companion object {
         const val NO_DATA = 0

@@ -5,6 +5,7 @@ import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
@@ -17,7 +18,6 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import kotlinx.android.synthetic.main.fragment_categories.*
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 class CategoriesFragment : BaseFragment<CategoriesViewModel>() {
@@ -36,7 +36,7 @@ class CategoriesFragment : BaseFragment<CategoriesViewModel>() {
         }
     }
 
-    private val viewModel by viewModel<CategoriesViewModel>()
+    private val viewModel: CategoriesViewModel by viewModels()
 
     private val videoListAdapter by lazy {
         val isAdult = mainViewModel?.adultMode?.value ?: false

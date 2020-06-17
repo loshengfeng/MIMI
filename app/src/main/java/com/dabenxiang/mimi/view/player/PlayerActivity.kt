@@ -10,6 +10,7 @@ import android.text.Html
 import android.view.MotionEvent
 import android.view.Surface
 import android.view.View
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
@@ -42,7 +43,6 @@ import com.google.android.material.chip.Chip
 import com.kaopiz.kprogresshud.KProgressHUD
 import kotlinx.android.synthetic.main.activity_player.*
 import kotlinx.android.synthetic.main.custom_playback_control.*
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 import java.net.UnknownHostException
 import java.text.SimpleDateFormat
@@ -66,7 +66,7 @@ class PlayerActivity : BaseActivity() {
         }
     }
 
-    private val viewModel by viewModel<PlayerViewModel>()
+    private val viewModel: PlayerViewModel by viewModels()
 
     private var player: SimpleExoPlayer? = null
     private var orientationDetector: OrientationDetector? = null

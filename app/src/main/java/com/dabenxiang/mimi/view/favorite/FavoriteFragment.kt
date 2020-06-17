@@ -3,7 +3,7 @@ package com.dabenxiang.mimi.view.favorite
 import android.os.Bundle
 import android.view.View
 import android.widget.PopupMenu
-import androidx.activity.addCallback
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.holder.FavoriteItem
@@ -13,17 +13,13 @@ import com.dabenxiang.mimi.view.listener.AdapterEventListener
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_favorite.*
 import kotlinx.android.synthetic.main.item_favorite_no_data.*
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import timber.log.Timber
 
 class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
-    private val viewModel by viewModel<FavoriteViewModel>()
+    private val viewModel: FavoriteViewModel by viewModels()
     private var hasData = true
 
     private val favoriteListener = object : AdapterEventListener<FavoriteItem> {
-        override fun onItemClick(view: View, item: FavoriteItem) {
-            Timber.d("${FavoriteFragment::class.java.simpleName}_onlinePayListener_onItemClick_item: $item")
-        }
+        override fun onItemClick(view: View, item: FavoriteItem) {}
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.personal
 
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
@@ -27,12 +28,11 @@ import kotlinx.android.synthetic.main.fragment_personal.*
 import kotlinx.android.synthetic.main.item_personal_is_login.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.koin.android.viewmodel.ext.android.viewModel
 import retrofit2.HttpException
 
 @ExperimentalCoroutinesApi
 class PersonalFragment : BaseFragment<PersonalViewModel>() {
-    private val viewModel by viewModel<PersonalViewModel>()
+    private val viewModel: PersonalViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

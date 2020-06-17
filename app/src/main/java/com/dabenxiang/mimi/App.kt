@@ -6,7 +6,6 @@ import com.dabenxiang.mimi.Constant.Companion.FLURRY_API_KEY
 import com.dabenxiang.mimi.di.apiModule
 import com.dabenxiang.mimi.di.appModule
 import com.dabenxiang.mimi.di.managerModule
-import com.dabenxiang.mimi.di.viewModelModule
 import com.facebook.stetho.Stetho
 import com.flurry.android.FlurryAgent
 import org.koin.android.ext.koin.androidContext
@@ -45,8 +44,7 @@ class App : Application() {
         val module = listOf(
             appModule,
             apiModule,
-            managerModule,
-            viewModelModule
+            managerModule
         )
 
         startKoin {
