@@ -59,6 +59,7 @@
     <string name="favorite_adult">成人视频</string>
     <string name="favorite_tab_mimi">蜜蜜影视</string>
     <string name="favorite_tab_short">短视频</string>
+    <string name="favorite_follow">+关注</string>
 
     <!-- Personal -->
     <string name="personal_title">我的</string>

@@ -253,22 +253,23 @@ interface ApiService {
     ): Response<Void>
 
     @DELETE("/v1/Members/Me/Playlist")
-    suspend fun deleteMePlaylist(
+    suspend fun deletePlaylist(
         @Body ids: List<Int>
     ): Response<Void>
 
     @GET("/v1/Members/Me/Playlist/{playlistType}")
-    suspend fun getMePlaylist(
+    suspend fun getPlaylist(
         @Path("playlistType") playlistType: Int,
-        @Query("offset") offset: Int,
-        @Query("limit") limit: Int
-    ): Response<ApiBasePagingItem<PlayListItem>>
+        @Query("isAdult") isAdult: Boolean,
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ): Response<ApiBasePagingItem<List<PlayListItem>>>
 
     @GET("/v1/Members/Me/PostFavorite")
     suspend fun getPostFavorite(
-        @Query("offset") offset: Int,
-        @Query("limit") limit: Int
-    ): Response<ApiBasePagingItem<PostFavoriteItem>>
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ): Response<ApiBasePagingItem<List<PlayListItem>>>
 
     @DELETE("/v1/Members/Me/PostFavorite/{postFavoriteId}")
     suspend fun deletePostFavorite(

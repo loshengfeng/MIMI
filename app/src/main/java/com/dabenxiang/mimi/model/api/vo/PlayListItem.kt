@@ -4,10 +4,13 @@ import com.google.gson.annotations.SerializedName
 
 data class PlayListItem(
     @SerializedName("id")
-    val id: Int?,
+    val id: Long?,
 
     @SerializedName("title")
     val title: String?,
+
+    @SerializedName("description")
+    val description: String?,
 
     @SerializedName("subTitle")
     val subTitle: String?,
@@ -15,15 +18,36 @@ data class PlayListItem(
     @SerializedName("cover")
     val cover: String?,
 
+    @SerializedName("source")
+    val source: String?,
+
     @SerializedName("videoId")
-    val videoId: Int?,
+    val videoId: Long?,
 
     @SerializedName("episode")
     val episode: String?,
 
     @SerializedName("videoEpisodeId")
-    val videoEpisodeId: Int?,
+    val videoEpisodeId: Long?,
 
     @SerializedName("playlistType")
-    val playlistType: Int?
+    val playlistType: Long?,
+
+    @SerializedName("isAdult")
+    val isAdult: Boolean?,
+
+    @SerializedName("like")
+    val like: Boolean?,
+
+    @SerializedName("likeCount")
+    val likeCount: Int?,
+
+    @SerializedName("favorite")
+    val favorite: Boolean?,
+
+    @SerializedName("favoriteCount")
+    val favoriteCount: Int?,
+
+    @SerializedName("commentCount")
+    val commentCount: Int?
 )

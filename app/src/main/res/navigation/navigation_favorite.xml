@@ -3,11 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation_favorite"
-    app:startDestination="@id/favoriteFragment">
+    app:startDestination="@id/postFavoriteFragment">
 
     <fragment
-        android:id="@+id/favoriteFragment"
-        android:name="com.dabenxiang.mimi.view.favorite.FavoriteFragment"
-        tools:layout="@layout/fragment_favorite">
+        android:id="@+id/postFavoriteFragment"
+        android:name="com.dabenxiang.mimi.view.postfavorite.PostFavoriteFragment"
+        tools:layout="@layout/fragment_post_favorite">
     </fragment>
 </navigation>

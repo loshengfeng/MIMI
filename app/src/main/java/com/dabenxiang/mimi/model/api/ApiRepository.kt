@@ -342,21 +342,24 @@ class ApiRepository(private val apiService: ApiService) {
      */
     suspend fun deleteMePlaylist(
         ids: List<Int>
-    ) = apiService.deleteMePlaylist(ids)
+    ) = apiService.deletePlaylist(ids)
 
     /**
      * 取得使用者影片列表 0:History, 1:Favorite
      */
-    suspend fun getMePlaylist(
-        playlistType: Int, offset: Int, limit: Int
-    ) = apiService.getMePlaylist(playlistType, offset, limit)
+    suspend fun getPlaylist(
+        playlistType: Int,
+        isAdult: Boolean,
+        offset: String,
+        limit: String
+    ) = apiService.getPlaylist(playlistType, isAdult, offset, limit)
 
     /**
      * 取得我的帖子收藏
      */
     suspend fun getPostFavorite(
-        offset: Int,
-        limit: Int
+        offset: String,
+        limit: String
     ) = apiService.getPostFavorite(offset, limit)
 
     /**

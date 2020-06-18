@@ -7,32 +7,81 @@
     android:paddingStart="20dp"
     android:paddingEnd="20dp">
 
+    <ImageView
+        android:id="@+id/iv_head"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/default_profile_picture"
+        android:contentDescription="@null"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:textColor="@color/color_black_1"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@id/tv_follow"
+        app:layout_constraintStart_toEndOf="@id/iv_head"
+        app:layout_constraintTop_toTopOf="@id/iv_head"
+        tools:text="名称名称" />
+
+    <TextView
+        android:id="@+id/tv_period"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="10dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:textColor="@color/color_black_1_50"
+        android:textSize="10sp"
+        app:layout_constraintEnd_toStartOf="@id/tv_follow"
+        app:layout_constraintStart_toEndOf="@id/iv_head"
+        app:layout_constraintTop_toBottomOf="@id/tv_name"
+        tools:text="1小时前" />
+
+    <TextView
+        android:id="@+id/tv_follow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/bg_red_1_stroke_radius_16"
+        android:gravity="center"
+        android:paddingStart="9dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="9dp"
+        android:paddingBottom="3dp"
+        android:src="@drawable/btn_arrow_black_n"
+        android:text="@string/favorite_follow"
+        android:textColor="@color/color_red_1"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@id/iv_head"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/iv_head" />
+
     <TextView
         android:id="@+id/tv_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:ellipsize="end"
+        android:maxLength="60"
         android:maxLines="1"
         android:textColor="@color/color_black_1"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/iv_head"
         tools:text="名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称" />
-
-    <TextView
-        android:id="@+id/tv_sub_title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:textColor="@color/color_black_1_50"
-        android:textSize="12sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_title"
-        tools:text="副标副标副标副标副标副标副标副标副标副标标副标副标副标副标副标副标" />
 
     <ImageView
         android:id="@+id/iv_photo"
@@ -44,7 +93,20 @@
         android:src="@drawable/img_nopic_03"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_sub_title" />
+        app:layout_constraintTop_toBottomOf="@id/tv_title" />
+
+    <ImageView
+        android:id="@+id/iv_play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_gray_12_radius_6"
+        android:contentDescription="@null"
+        android:src="@drawable/btn_play_n"
+        app:layout_constraintBottom_toBottomOf="@id/iv_photo"
+        app:layout_constraintEnd_toEndOf="@id/iv_photo"
+        app:layout_constraintStart_toStartOf="@id/iv_photo"
+        app:layout_constraintTop_toTopOf="@id/iv_photo" />
 
     <TextView
         android:id="@+id/tv_info"

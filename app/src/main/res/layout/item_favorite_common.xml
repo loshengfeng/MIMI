@@ -5,95 +5,58 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/iv_nice"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="@null"
-        android:src="@drawable/ico_nice_gray"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <TextView
-        android:id="@+id/tv_nice"
+        android:id="@+id/tv_like"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="3dp"
-        android:textColor="@color/color_black_1"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/iv_nice"
+        android:drawableStart="@drawable/ico_nice_gray"
+        android:drawablePadding="3dp"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="99" />
-
-    <ImageView
-        android:id="@+id/iv_star"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:contentDescription="@null"
-        android:src="@drawable/btn_favorite_forvideo_s"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/tv_nice"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tv_favorite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="3dp"
-        android:textColor="@color/color_black_1"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/iv_star"
+        android:layout_marginStart="30dp"
+        android:drawableStart="@drawable/btn_favorite_forvideo_s"
+        android:drawablePadding="3dp"
+        android:gravity="center"
+        app:layout_constraintStart_toEndOf="@id/tv_like"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="99" />
-
-    <ImageView
-        android:id="@+id/iv_msg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:contentDescription="@null"
-        android:src="@drawable/ico_messege_adult_gray"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/tv_favorite"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tv_msg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="3dp"
-        android:textColor="@color/color_black_1"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/iv_msg"
+        android:layout_marginStart="30dp"
+        android:drawableStart="@drawable/ico_messege_adult_gray"
+        android:drawablePadding="3dp"
+        android:gravity="center"
+        app:layout_constraintStart_toEndOf="@id/tv_favorite"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="99" />
 
-    <ImageView
-        android:id="@+id/iv_share"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:contentDescription="@null"
-        android:src="@drawable/btn_share_gray_n"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/tv_msg"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
+    <TextView
         android:id="@+id/tv_share"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="@null"
-        android:src="@drawable/btn_more_gray_n"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginStart="30dp"
+        android:drawableStart="@drawable/btn_share_gray_n"
+        app:layout_constraintStart_toEndOf="@id/tv_msg"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_more"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:drawableStart="@drawable/btn_more_gray_n"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="99" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <View
         android:layout_width="match_parent"
@@ -103,5 +66,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/iv_nice" />
+        app:layout_constraintTop_toBottomOf="@id/tv_favorite" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

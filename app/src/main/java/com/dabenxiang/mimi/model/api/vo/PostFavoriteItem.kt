@@ -4,19 +4,19 @@ import com.google.gson.annotations.SerializedName
 
 data class PostFavoriteItem(
     @SerializedName("id")
-    val id: Int?,
+    val id: Long?,
 
     @SerializedName("postId")
-    val postId: Int?,
+    val postId: Long?,
 
     @SerializedName("posterId")
-    val posterId: Int?,
+    val posterId: Long?,
 
     @SerializedName("posterName")
     val posterName: String?,
 
     @SerializedName("posterAvatarAttachmentId")
-    val posterAvatarAttachmentId: Int?,
+    val posterAvatarAttachmentId: Long?,
 
     @SerializedName("postDate")
     val postDate: String?,
