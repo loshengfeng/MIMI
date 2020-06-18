@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.home
+package com.dabenxiang.mimi.callback
 
 interface PagingCallback {
     fun onLoading()

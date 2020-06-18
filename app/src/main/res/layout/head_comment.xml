@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <View
+        android:id="@+id/line_comment"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:background="@color/color_black_1_05" />
+
+    <TextView
+        android:id="@+id/title_comment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:paddingBottom="15dp"
+        android:text="@string/comment"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="@id/line_comment"
+        app:layout_constraintTop_toBottomOf="@id/line_comment" />
+
+    <TextView
+        android:id="@+id/tv_newest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:text="@string/newest"
+        app:layout_constraintEnd_toStartOf="@id/line_separate"
+        app:layout_constraintTop_toTopOf="@id/title_comment" />
+
+    <View
+        android:id="@+id/line_separate"
+        android:layout_width="1dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintEnd_toStartOf="@id/tv_hottest"
+        app:layout_constraintTop_toTopOf="@id/title_comment"
+        tools:background="@color/color_black_1_05" />
+
+    <TextView
+        android:id="@+id/tv_hottest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:text="@string/hottest"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/title_comment" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -15,7 +15,7 @@ class GuessLikeDataSource(
     private val category: String,
     private val viewModelScope: CoroutineScope,
     private val apiRepository: ApiRepository,
-    private val pagingCallback: PagingCallback
+    private val pagingCallback: GuessLikePagingCallBack
 ) : PageKeyedDataSource<Long, BaseVideoItem>() {
 
     companion object {
@@ -23,7 +23,7 @@ class GuessLikeDataSource(
         val PER_LIMIT_LONG = PER_LIMIT.toLong()
     }
 
-    private data class InitResult(val list: List<BaseVideoItem>, val nextKey: Long?)
+    private data class EmitResult(val list: List<BaseVideoItem>, val nextKey: Long?)
 
     override fun loadInitial(params: LoadInitialParams<Long>, callback: LoadInitialCallback<Long, BaseVideoItem>) {
         viewModelScope.launch {
@@ -44,13 +44,14 @@ class GuessLikeDataSource(
                     else -> null
                 }
 
-                emit(InitResult(returnList, nextPageKey))
+                emit(EmitResult(returnList, nextPageKey))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion {
                     pagingCallback.onLoaded()
                 }.collect { response ->
+                    pagingCallback.onLoadInit(response.list.size)
                     callback.onResult(response.list, null, response.nextKey)
                 }
         }
@@ -62,7 +63,17 @@ class GuessLikeDataSource(
             flow {
                 val result = apiRepository.searchWithCategory(category, isAdult, next.toString(), PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
-                emit(result)
+
+                result.body()?.also { item ->
+                    item.content?.also { list ->
+                        val nextPageKey = when {
+                            hasNextPage(item.paging.count, item.paging.offset, list.size) -> next + PER_LIMIT_LONG
+                            else -> null
+                        }
+
+                        emit(EmitResult(list.simpleVideoItemToVideoItem(isAdult), nextPageKey))
+                    }
+                }
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e ->
@@ -70,16 +81,7 @@ class GuessLikeDataSource(
                 }.onCompletion {
                     pagingCallback.onLoaded()
                 }.collect { response ->
-                    response.body()?.also { item ->
-                        item.content?.also { list ->
-                            val nextPageKey = when {
-                                hasNextPage(item.paging.count, item.paging.offset, list.size) -> next + PER_LIMIT_LONG
-                                else -> null
-                            }
-
-                            callback.onResult(list.simpleVideoItemToVideoItem(isAdult), nextPageKey)
-                        }
-                    }
+                    callback.onResult(response.list, response.nextKey)
                 }
         }
     }

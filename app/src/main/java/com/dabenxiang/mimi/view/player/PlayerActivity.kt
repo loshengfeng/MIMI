@@ -10,8 +10,10 @@ import android.text.Html
 import android.view.MotionEvent
 import android.view.Surface
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearSnapHelper
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setBtnSolidDolor
@@ -25,6 +27,7 @@ import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.GuessLikeAdapter
+import com.dabenxiang.mimi.view.adapter.PlayerInfoAdapter
 import com.dabenxiang.mimi.view.adapter.SelectEpisodeAdapter
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseActivity
@@ -44,6 +47,10 @@ import com.google.android.material.chip.Chip
 import com.kaopiz.kprogresshud.KProgressHUD
 import kotlinx.android.synthetic.main.activity_player.*
 import kotlinx.android.synthetic.main.custom_playback_control.*
+import kotlinx.android.synthetic.main.head_comment.view.*
+import kotlinx.android.synthetic.main.head_guess_like.view.*
+import kotlinx.android.synthetic.main.head_source.view.*
+import kotlinx.android.synthetic.main.head_video_info.view.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 import java.net.UnknownHostException
@@ -80,7 +87,7 @@ class PlayerActivity : BaseActivity() {
             override fun onClickItemIndex(view: View, index: Int) {
                 viewModel.setSourceListPosition(index)
             }
-        }, getIsAdult())
+        }, obtainIsAdult())
     }
 
     private val episodeAdapter by lazy {
@@ -88,38 +95,77 @@ class PlayerActivity : BaseActivity() {
             override fun onClickItemIndex(view: View, index: Int) {
                 viewModel.setStreamPosition(index)
             }
-        }, getIsAdult())
+        }, obtainIsAdult())
     }
 
     private val guessLikeAdapter by lazy {
-        GuessLikeAdapter(object : GuessLikeAdapter.GuessLikeAdapterListener{
+        GuessLikeAdapter(object : GuessLikeAdapter.GuessLikeAdapterListener {
             override fun onVideoClick(view: View, item: PlayerData) {
+                val intent = Intent(this@PlayerActivity, PlayerActivity::class.java)
+                intent.putExtras(createBundle(item))
+                startActivity(intent)
 
+                finish()
             }
-        }, getIsAdult())
+        }, obtainIsAdult())
     }
 
     private val progressHUD by lazy {
         KProgressHUD.create(this).setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
     }
 
+    private val headVideoInfo by lazy {
+        layoutInflater.inflate(R.layout.head_video_info, recycler_info.parent as ViewGroup, false)
+    }
+
+    private val headSource by lazy {
+        layoutInflater.inflate(R.layout.head_source, recycler_info.parent as ViewGroup, false)
+    }
+
+    private val headGuessLike by lazy {
+        layoutInflater.inflate(R.layout.head_guess_like, recycler_info.parent as ViewGroup, false)
+    }
+
+    private val headComment by lazy {
+        layoutInflater.inflate(R.layout.head_comment, recycler_info.parent as ViewGroup, false)
+    }
+
+    private val playerInfoAdapter by lazy {
+        PlayerInfoAdapter().apply {
+            loadMoreModule.apply {
+                isEnableLoadMore = true
+                isAutoLoadMore = true
+                isEnableLoadMoreIfNotFullPage = true
+            }
+        }
+    }
+
     override fun getLayoutId(): Int {
         return R.layout.activity_player
     }
 
-    private fun getIsAdult() = (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerData?)?.isAdult ?: false
+    private fun obtainIsAdult() = (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerData?)?.isAdult ?: false
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val isAdult = getIsAdult()
+        val isAdult = obtainIsAdult()
+
+        playerInfoAdapter.addHeaderView(headVideoInfo)
+        playerInfoAdapter.addHeaderView(headSource)
+        playerInfoAdapter.addHeaderView(headGuessLike)
+        playerInfoAdapter.addHeaderView(headComment)
+        playerInfoAdapter.loadMoreModule.loadMoreView = CommentLoadMoreView(isAdult)
+
+        recycler_info.adapter = playerInfoAdapter
+
         val backgroundColor = if (isAdult) {
             getColor(R.color.adult_color_background)
         } else {
             getColor(R.color.normal_color_background)
         }
-        scrollView.setBackgroundColor(backgroundColor)
+        recycler_info.setBackgroundColor(backgroundColor)
 
         val titleColor =
             if (isAdult) {
@@ -129,9 +175,10 @@ class PlayerActivity : BaseActivity() {
             }.let {
                 getColor(it)
             }
-        tv_title.setTextColor(titleColor)
-        tv_source.setTextColor(titleColor)
-        tv_guess_like.setTextColor(titleColor)
+        headVideoInfo.tv_title.setTextColor(titleColor)
+        headSource.title_source.setTextColor(titleColor)
+        headGuessLike.title_guess_like.setTextColor(titleColor)
+        headComment.title_comment.setTextColor(titleColor)
 
         val subTitleColor =
             if (isAdult) {
@@ -141,10 +188,10 @@ class PlayerActivity : BaseActivity() {
             }.let {
                 getColor(it)
             }
-        btn_show_introduction.setTextColor(subTitleColor)
-        tv_introduction.setTextColor(subTitleColor)
-        tv_info.setTextColor(subTitleColor)
-        tv_introduction.setBackgroundResource(
+        headVideoInfo.btn_show_introduction.setTextColor(subTitleColor)
+        headVideoInfo.tv_introduction.setTextColor(subTitleColor)
+        headVideoInfo.tv_info.setTextColor(subTitleColor)
+        headVideoInfo.tv_introduction.setBackgroundResource(
             if (isAdult) {
                 R.drawable.bg_white_stroke_1_radius_2
             } else {
@@ -153,9 +200,11 @@ class PlayerActivity : BaseActivity() {
         )
 
         val lineColor = if (isAdult) getColor(R.color.color_white_1_10) else getColor(R.color.color_black_1_05)
-        line_source.setBackgroundColor(lineColor)
+        headSource.line_source.setBackgroundColor(lineColor)
+        headComment.line_comment.setBackgroundColor(lineColor)
+        headComment.line_separate.setBackgroundColor(lineColor)
 
-        btn_show_introduction.setOnClickListener {
+        headVideoInfo.btn_show_introduction.setOnClickListener {
             viewModel.showIntroduction.setNot()
         }
 
@@ -174,8 +223,8 @@ class PlayerActivity : BaseActivity() {
                         R.drawable.btn_arrowdown_gray_n
                     }
                 }
-            tv_introduction.visibility = if (isShow) View.VISIBLE else View.GONE
-            btn_show_introduction.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawableRes, 0)
+            headVideoInfo.tv_introduction.visibility = if (isShow) View.VISIBLE else View.GONE
+            headVideoInfo.btn_show_introduction.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawableRes, 0)
         })
 
         bottom_func_bar.setBackgroundResource(
@@ -257,16 +306,16 @@ class PlayerActivity : BaseActivity() {
 
                     if (isFirstInit) {
                         isFirstInit = false
-                        tv_title.text = result.title
+                        headVideoInfo.tv_title.text = result.title
 
                         if (!result.description.isNullOrBlank())
-                            tv_introduction.text = Html.fromHtml(result.description, Html.FROM_HTML_MODE_COMPACT)
+                            headVideoInfo.tv_introduction.text = Html.fromHtml(result.description, Html.FROM_HTML_MODE_COMPACT)
 
                         val dateString = result.updateTime?.let { date ->
                             SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(date)
                         }
 
-                        tv_info.text = String.format(getString(R.string.player_info_format), dateString ?: "", result.country)
+                        headVideoInfo.tv_info.text = String.format(getString(R.string.player_info_format), dateString ?: "", result.country)
 
                         viewModel.sourceList = result.sources
 
@@ -286,6 +335,10 @@ class PlayerActivity : BaseActivity() {
                     viewModel.isDeducted = result.deducted ?: false
                     viewModel.costPoint = result.point ?: 0L
                     viewModel.availablePoint = result.availablePoint ?: 0L
+
+                    lifecycleScope.launchWhenResumed {
+                        viewModel.setupCommentDataSource(playerInfoAdapter)
+                    }
                 }
             }
         })
@@ -343,7 +396,7 @@ class PlayerActivity : BaseActivity() {
             consumeDialog?.dismiss()
             when (it) {
                 VideoConsumeResult.Paid -> {
-                    viewModel.getStreamUrl(getIsAdult())
+                    viewModel.getStreamUrl(obtainIsAdult())
                 }
                 VideoConsumeResult.PaidYet -> {
                     consumeDialog = showCostPointDialog()
@@ -354,14 +407,19 @@ class PlayerActivity : BaseActivity() {
             }
         })
 
-        recyclerview_source_list.adapter = sourceListAdapter
-        recyclerview_episode.adapter = episodeAdapter
+        headSource.recyclerview_source_list.adapter = sourceListAdapter
+        headSource.recyclerview_episode.adapter = episodeAdapter
 
-        recyclerview_guess_like.adapter = guessLikeAdapter
-        LinearSnapHelper().attachToRecyclerView(recyclerview_guess_like)
+        headGuessLike.recyclerview_guess_like.adapter = guessLikeAdapter
+        LinearSnapHelper().attachToRecyclerView(headGuessLike.recyclerview_guess_like)
 
         viewModel.videoList.observe(this, Observer {
             guessLikeAdapter.submitList(it)
+        })
+
+        viewModel.recyclerViewGuessLikeVisible.observe(this, Observer {
+            headGuessLike.title_guess_like.visibility = it
+            headGuessLike.recyclerview_guess_like.visibility = it
         })
 
         btn_full_screen.setOnClickListener {
@@ -397,10 +455,6 @@ class PlayerActivity : BaseActivity() {
         }
 
         player_view.isEnabled = false
-
-//        btn.setOnClickListener {
-//            setupPlayUrl("https://cdn-file.pinsewu.com/group1/M00/06/8C/wKgBm11BjXOAWRXKAAA_XDt-0eI56.m3u8_web")
-//        }
     }
 
     override fun onStart() {
@@ -756,14 +810,14 @@ class PlayerActivity : BaseActivity() {
 
     private fun setupSourceList(list: List<Source>?) {
         if (list == null) {
-            recyclerview_source_list.visibility = View.GONE
+            headSource.recyclerview_source_list.visibility = View.GONE
         } else {
             val size = list.size
             if (size == 0) {
-                recyclerview_source_list.visibility = View.GONE
+                headSource.recyclerview_source_list.visibility = View.GONE
             } else {
                 if (size == 1) {
-                    recyclerview_source_list.visibility = View.GONE
+                    headSource.recyclerview_source_list.visibility = View.GONE
                 }
 
                 val result = mutableListOf<String>()
@@ -782,7 +836,7 @@ class PlayerActivity : BaseActivity() {
     private fun setupStream(list: List<VideoEpisode>) {
         val result = mutableListOf<String>()
         // 成人取得Streaming邏輯不同
-        if (getIsAdult()) {
+        if (obtainIsAdult()) {
             if (list.size == 1) {
                 val videoStreams = list[0].videoStreams
                 if (videoStreams != null && videoStreams.isNotEmpty()) {
@@ -806,7 +860,7 @@ class PlayerActivity : BaseActivity() {
     }
 
     private fun setupChipGroup(list: List<String>?) {
-        reflow_group.removeAllViews()
+        headVideoInfo.reflow_group.removeAllViews()
 
         if (list == null) {
             return
@@ -815,10 +869,10 @@ class PlayerActivity : BaseActivity() {
         list.indices.mapNotNull {
             list[it]
         }.forEach {
-            val chip = layoutInflater.inflate(R.layout.chip_item, reflow_group, false) as Chip
+            val chip = layoutInflater.inflate(R.layout.chip_item, headVideoInfo.reflow_group, false) as Chip
             chip.text = it
 
-            val isAdult = getIsAdult()
+            val isAdult = obtainIsAdult()
 
             chip.setTextColor(
                 if (isAdult) {
@@ -840,7 +894,7 @@ class PlayerActivity : BaseActivity() {
                 )
             )
 
-            reflow_group.addView(chip)
+            headVideoInfo.reflow_group.addView(chip)
         }
     }
 
@@ -904,13 +958,13 @@ class PlayerActivity : BaseActivity() {
 
         return GeneralDialog.newInstance(
             GeneralDialogData(
-                titleString = tv_title.text.toString(),
+                titleString = headVideoInfo.tv_title.text.toString(),
                 messageIcon = R.drawable.ico_topup,
                 isHtml = true,
                 message = message,
                 firstBtn = getString(R.string.btn_cancel),
                 secondBtn = getString(R.string.btn_confirm),
-                secondBlock = { viewModel.getStreamUrl(getIsAdult()) }
+                secondBlock = { viewModel.getStreamUrl(obtainIsAdult()) }
             )
         )
             .setCancel(false)

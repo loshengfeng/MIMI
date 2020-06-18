@@ -29,7 +29,7 @@
         android:pathData="M153.792,177.479c4.523,23.267 -10.674,45.794 -33.939,50.316C96.586,232.318 74.058,217.124 69.535,193.856 65.012,170.589 80.209,148.061 103.476,143.538c23.265,-4.522 45.794,10.672 50.316,33.94"
         android:fillType="evenOdd">
       <aapt:attr name="android:fillColor">
-        <gradient 
+        <gradient
             android:startY="139.01599"
             android:startX="123.64268"
             android:endY="227.30394"

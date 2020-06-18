@@ -218,7 +218,7 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得影片
      */
     suspend fun searchHomeVideos(
-        category: String,
+        category: String? = null,
         q: String? = null,
         country: String? = null,
         years: Int? = null,

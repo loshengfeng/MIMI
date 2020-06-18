@@ -6,11 +6,11 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
+import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
-import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -21,7 +21,7 @@ import timber.log.Timber
 class HomeViewModel : BaseViewModel() {
 
     companion object {
-        const val CATEGORIES_LIMIT = "20"
+        const val CAROUSEL_LIMIT = 5
         const val STATISTICS_LIMIT = 20
     }
 
@@ -38,7 +38,7 @@ class HomeViewModel : BaseViewModel() {
         viewModelScope.launch {
             flow {
                 val resp =
-                    domainManager.getApiRepository().statisticsHomeVideos(isAdult = src.isAdult, offset = 0, limit = 5)
+                    domainManager.getApiRepository().statisticsHomeVideos(isAdult = src.isAdult, offset = 0, limit = CAROUSEL_LIMIT)
                 if (!resp.isSuccessful) throw HttpException(resp)
 
                 emit(ApiResult.success(resp.body()))
@@ -92,8 +92,7 @@ class HomeViewModel : BaseViewModel() {
 
     fun setupVideoList(category: String?, isAdult: Boolean) {
         viewModelScope.launch {
-            val dataSrc = VideoListDataSource(isAdult, category ?: "", viewModelScope, domainManager.getApiRepository(), pagingCallback)
-HomeAdapter
+            val dataSrc = VideoListDataSource(isAdult, category, viewModelScope, domainManager.getApiRepository(), pagingCallback)
             val factory = VideoListFactory(dataSrc)
             val config = PagedList.Config.Builder()
                 .setPageSize(VideoListDataSource.PER_LIMIT.toInt())

@@ -50,10 +50,10 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
 
     fun getApiDomain(): String {
         return when (BuildConfig.FLAVOR) {
-            FLAVOR_DEV -> StringBuilder("https://").append(getDomain()).toString()
+            FLAVOR_DEV -> BuildConfig.API_HOST
             else -> {
                 val domains = getDomain()
-                if(domains.isEmpty()) {
+                if (domains.isEmpty()) {
                     BuildConfig.API_HOST
                 } else {
                     StringBuilder("https://api.").append(getDomain()).toString()
@@ -67,7 +67,7 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
             currentDomainIndex < domainList.size -> domainList[currentDomainIndex]
             else -> {
                 val domains = getDomains()
-                if(domains.isNullOrEmpty()) {
+                if (domains.isNullOrEmpty()) {
                     ""
                 } else {
                     domains[currentDomainIndex]

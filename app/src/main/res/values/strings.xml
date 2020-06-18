@@ -143,4 +143,11 @@
     <string name="recharge">前往充值</string>
     <string name="player_source">播放列表</string>
     <string name="guess_u_like">猜你喜欢</string>
+    <string name="comment">评论</string>
+    <string name="newest">最新</string>
+    <string name="hottest">最热</string>
+    <string name="no_comment">暂无评论</string>
+    <string name="load_more_comment">查看更多</string>
+    <string name="all_comment_display">已显示全部内容</string>
+    <string name="load_more_comment_fail">加载失败</string>
 </resources>

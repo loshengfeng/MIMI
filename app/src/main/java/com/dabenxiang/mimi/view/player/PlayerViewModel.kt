@@ -2,21 +2,24 @@ package com.dabenxiang.mimi.view.player
 
 import android.content.pm.ActivityInfo
 import android.net.Uri
+import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
+import com.chad.library.adapter.base.module.BaseLoadMoreModule
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.Source
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
+import com.dabenxiang.mimi.view.adapter.PlayerInfoAdapter
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.home.GuessLikeDataSource
 import com.dabenxiang.mimi.view.home.GuessLikeFactory
-import com.dabenxiang.mimi.view.home.PagingCallback
+import com.dabenxiang.mimi.view.home.GuessLikePagingCallBack
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
 import com.google.android.exoplayer2.source.MediaSource
@@ -30,6 +33,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import timber.log.Timber
 
@@ -76,6 +80,9 @@ class PlayerViewModel : BaseViewModel() {
 
     private val _videoList = MutableLiveData<PagedList<BaseVideoItem>>()
     val videoList: LiveData<PagedList<BaseVideoItem>> = _videoList
+
+    private val _recyclerViewGuessLikeVisible = MutableLiveData<Int>()
+    val recyclerViewGuessLikeVisible: LiveData<Int> = _recyclerViewGuessLikeVisible
 
     val showIntroduction = MutableLiveData(false)
 
@@ -327,13 +334,40 @@ class PlayerViewModel : BaseViewModel() {
         }
     }
 
-    private val pagingCallback = object : PagingCallback {
+    suspend fun setupCommentDataSource(adapter: PlayerInfoAdapter) {
+        val dataSrc = CommentDataSource(adapter.loadMoreModule)
+
+        viewModelScope.launch {
+            val load = dataSrc.loadMore()
+            load.content?.also { content ->
+                adapter.addData(content)
+            }
+        }
+
+        adapter.loadMoreModule.setOnLoadMoreListener {
+            viewModelScope.launch {
+                val load = dataSrc.loadMore()
+                load.content?.also { content ->
+                    adapter.addData(content)
+                }
+            }
+        }
+    }
+
+    private val pagingCallback = object : GuessLikePagingCallBack {
+        override fun onLoadInit(initCount: Int) {
+            _recyclerViewGuessLikeVisible.value =
+                if (initCount == 0) {
+                    View.GONE
+                } else {
+                    View.VISIBLE
+                }
+        }
+
         override fun onLoading() {
-            setShowProgress(true)
         }
 
         override fun onLoaded() {
-            setShowProgress(false)
         }
 
         override fun onThrowable(throwable: Throwable) {

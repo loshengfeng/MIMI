@@ -1,8 +1,10 @@
 package com.dabenxiang.mimi.view.home
 
 import androidx.paging.PageKeyedDataSource
+import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
+import com.dabenxiang.mimi.model.holder.searchItemToVideoItem
 import com.dabenxiang.mimi.model.holder.simpleVideoItemToVideoItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -12,7 +14,7 @@ import retrofit2.HttpException
 
 class VideoListDataSource(
     private val isAdult: Boolean,
-    private val category: String,
+    private val category: String?,
     private val viewModelScope: CoroutineScope,
     private val apiRepository: ApiRepository,
     private val pagingCallback: PagingCallback
@@ -23,7 +25,7 @@ class VideoListDataSource(
         val PER_LIMIT_LONG = PER_LIMIT.toLong()
     }
 
-    private data class InitResult(val list: List<BaseVideoItem>, val nextKey: Long?)
+    private data class LoadResult(val list: List<BaseVideoItem>, val nextKey: Long?)
 
     override fun loadInitial(params: LoadInitialParams<Long>, callback: LoadInitialCallback<Long, BaseVideoItem>) {
         viewModelScope.launch {
@@ -34,21 +36,37 @@ class VideoListDataSource(
                 val adBanner = "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSd667siFJDLVZKf6mIzT86lWuspAhd40nq-2ACy5UpAQYJEWSM&usqp=CAU"
                 returnList.add(BaseVideoItem.Banner(adBanner))
 
-                val result = apiRepository.searchWithCategory(category, isAdult, "0", PER_LIMIT)
-                if (!result.isSuccessful) throw HttpException(result)
+                if (category != null) {
+                    val result = apiRepository.searchWithCategory(category, isAdult, "0", PER_LIMIT)
+                    if (!result.isSuccessful) throw HttpException(result)
 
-                val item = result.body()
-                val videos = item?.content
-                if (videos != null) {
-                    returnList.addAll(videos.simpleVideoItemToVideoItem(isAdult))
+                    val item = result.body()
+                    val videos = item?.content
+                    if (videos != null) {
+                        returnList.addAll(videos.simpleVideoItemToVideoItem(isAdult))
+                    }
+
+                    val nextPageKey = when {
+                        hasNextPage(item?.paging?.count ?: 0, item?.paging?.offset ?: 0, videos?.size ?: 0) -> PER_LIMIT_LONG
+                        else -> null
+                    }
+                    emit(LoadResult(returnList, nextPageKey))
+                } else {
+                    val result = apiRepository.searchHomeVideos(isAdult = isAdult, offset = "0", limit = PER_LIMIT)
+                    if (!result.isSuccessful) throw HttpException(result)
+
+                    val item = result.body()
+                    val videos = item?.content?.videos
+                    if (videos != null) {
+                        returnList.addAll(videos.searchItemToVideoItem(isAdult))
+                    }
+
+                    val nextPageKey = when {
+                        hasNextPage(item?.paging?.count ?: 0, item?.paging?.offset ?: 0, videos?.size ?: 0) -> PER_LIMIT_LONG
+                        else -> null
+                    }
+                    emit(LoadResult(returnList, nextPageKey))
                 }
-
-                val nextPageKey = when {
-                    hasNextPage(item?.paging?.count ?: 0, item?.paging?.offset ?: 0, videos?.size ?: 0) -> PER_LIMIT_LONG
-                    else -> null
-                }
-
-                emit(InitResult(returnList, nextPageKey))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> pagingCallback.onThrowable(e) }
@@ -64,9 +82,39 @@ class VideoListDataSource(
         val next = params.key
         viewModelScope.launch {
             flow {
-                val result = apiRepository.searchWithCategory(category, isAdult, next.toString(), PER_LIMIT)
-                if (!result.isSuccessful) throw HttpException(result)
-                emit(result)
+                val returnList = mutableListOf<BaseVideoItem>()
+
+                if (category != null) {
+                    val result = apiRepository.searchWithCategory(category, isAdult, next.toString(), PER_LIMIT)
+                    if (!result.isSuccessful) throw HttpException(result)
+
+                    val item = result.body()
+                    val videos = item?.content
+                    if (videos != null) {
+                        returnList.addAll(videos.simpleVideoItemToVideoItem(isAdult))
+                    }
+
+                    val nextPageKey = when {
+                        hasNextPage(item?.paging?.count ?: 0, item?.paging?.offset ?: 0, videos?.size ?: 0) -> next + PER_LIMIT_LONG
+                        else -> null
+                    }
+                    emit(LoadResult(returnList, nextPageKey))
+                } else {
+                    val result = apiRepository.searchHomeVideos(isAdult = isAdult, offset = next.toString(), limit = PER_LIMIT)
+                    if (!result.isSuccessful) throw HttpException(result)
+
+                    val item = result.body()
+                    val videos = item?.content?.videos
+                    if (videos != null) {
+                        returnList.addAll(videos.searchItemToVideoItem(isAdult))
+                    }
+
+                    val nextPageKey = when {
+                        hasNextPage(item?.paging?.count ?: 0, item?.paging?.offset ?: 0, videos?.size ?: 0) -> next + PER_LIMIT_LONG
+                        else -> null
+                    }
+                    emit(LoadResult(returnList, nextPageKey))
+                }
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e ->
@@ -74,16 +122,7 @@ class VideoListDataSource(
                 }.onCompletion {
                     pagingCallback.onLoaded()
                 }.collect { response ->
-                    response.body()?.also { item ->
-                        item.content?.also { list ->
-                            val nextPageKey = when {
-                                hasNextPage(item.paging.count, item.paging.offset, list.size) -> next + PER_LIMIT_LONG
-                                else -> null
-                            }
-
-                            callback.onResult(list.simpleVideoItemToVideoItem(isAdult), nextPageKey)
-                        }
-                    }
+                    callback.onResult(response.list, response.nextKey)
                 }
         }
     }
