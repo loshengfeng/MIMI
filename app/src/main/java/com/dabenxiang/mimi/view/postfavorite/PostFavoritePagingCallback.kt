@@ -1,6 +1,6 @@
 package com.dabenxiang.mimi.view.postfavorite
 
-import com.dabenxiang.mimi.view.home.PagingCallback
+import com.dabenxiang.mimi.callback.PagingCallback
 
 interface PostFavoritePagingCallback : PagingCallback {
     fun onTotalCount(count: Int)
