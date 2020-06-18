@@ -48,7 +48,7 @@
             android:layout_marginTop="2dp"
             android:background="@drawable/bg_coin"
             android:gravity="center"
-            android:drawableStart="@drawable/ic_ico_micoin_small"
+            android:drawableStart="@drawable/ico_micoin_small"
             android:drawablePadding="2dp"
             android:paddingStart="4dp"
             android:paddingEnd="6dp"
@@ -84,8 +84,8 @@
         <TextView
             android:id="@+id/tv_follow"
             style="@style/personalStyle"
-            android:drawableStart="@drawable/ic_ico_love"
-            android:drawableEnd="@drawable/ic_btn_arrow_black_n"
+            android:drawableStart="@drawable/ico_love"
+            android:drawableEnd="@drawable/btn_arrow_black_n"
             android:gravity="center_vertical"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
@@ -105,12 +105,12 @@
         <TextView
             android:id="@+id/tv_topup_history"
             style="@style/personalStyle"
-            android:drawableStart="@drawable/ic_btn_note_n"
-            android:drawableEnd="@drawable/ic_btn_arrow_black_n"
+            android:drawableStart="@drawable/btn_note_n"
+            android:drawableEnd="@drawable/btn_arrow_black_n"
             android:gravity="center_vertical"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
-            android:text="@string/personal_topoup_history"
+            android:text="@string/personal_order"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_follow" />
 
@@ -126,8 +126,8 @@
         <TextView
             android:id="@+id/tv_chat_history"
             style="@style/personalStyle"
-            android:drawableStart="@drawable/ic_ico_messenger_gray"
-            android:drawableEnd="@drawable/ic_btn_arrow_black_n"
+            android:drawableStart="@drawable/ico_messenger_gray"
+            android:drawableEnd="@drawable/btn_arrow_black_n"
             android:gravity="center_vertical"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
@@ -140,7 +140,7 @@
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:layout_marginEnd="46dp"
-            android:background="@drawable/ic_ico_new"
+            android:background="@drawable/ico_new"
             android:gravity="center"
             android:visibility="gone"
             android:text="N"
@@ -160,16 +160,37 @@
             app:layout_constraintTop_toBottomOf="@id/tv_chat_history" />
 
         <TextView
+            android:id="@+id/tv_my_post"
+            style="@style/personalStyle"
+            android:drawableStart="@drawable/ico_myposts"
+            android:drawableEnd="@drawable/btn_arrow_black_n"
+            android:gravity="center_vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:text="@string/personal_my_post"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_chat_history" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@color/color_gray_3"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_my_post" />
+
+        <TextView
             android:id="@+id/tv_setting"
             style="@style/personalStyle"
-            android:drawableStart="@drawable/ic_ico_setting"
-            android:drawableEnd="@drawable/ic_btn_arrow_black_n"
+            android:drawableStart="@drawable/ico_setting"
+            android:drawableEnd="@drawable/btn_arrow_black_n"
             android:gravity="center_vertical"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:text="@string/personal_setting"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_chat_history" />
+            app:layout_constraintTop_toBottomOf="@id/tv_my_post" />
 
         <TextView
             android:id="@+id/tv_logout"

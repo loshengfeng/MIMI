@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -12,12 +13,11 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import kotlinx.android.synthetic.main.fragment_change_password.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @ExperimentalCoroutinesApi
 class ChangePasswordFragment : BaseFragment<ChangePasswordViewModel>() {
 
-    private  val viewModel by viewModel<ChangePasswordViewModel>()
+    private  val viewModel:ChangePasswordViewModel by viewModels()
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE

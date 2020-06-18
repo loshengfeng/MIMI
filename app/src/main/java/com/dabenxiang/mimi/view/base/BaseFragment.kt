@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
@@ -32,9 +32,7 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        activity?.let {
-            mainViewModel = ViewModelProviders.of(it).get(MainViewModel::class.java)
-        }
+        activity?.let { mainViewModel = ViewModelProvider(it).get(MainViewModel::class.java) }
     }
 
     override fun onCreateView(
@@ -133,10 +131,14 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
         */
     }
 
-    open fun onApiError(throwable: Throwable) {
-        when (val errorHandler = throwable.handleException { ex -> mainViewModel?.processException(ex) }) {
+    open fun onApiError(throwable: Throwable, onHttpErrorBlock: ((ExceptionResult.HttpError) -> Unit)? = null) {
+        when (val errorHandler =
+            throwable.handleException { ex -> mainViewModel?.processException(ex) }) {
             is ExceptionResult.RefreshTokenExpired -> logoutLocal()
-            is ExceptionResult.HttpError -> handleHttpError(errorHandler)
+            is ExceptionResult.HttpError -> {
+                if (onHttpErrorBlock == null) handleHttpError(errorHandler)
+                else onHttpErrorBlock(errorHandler)
+            }
             is ExceptionResult.Crash -> {
                 if (errorHandler.throwable is UnknownHostException) {
                     showCrashDialog(HttpErrorMsgType.CHECK_NETWORK)

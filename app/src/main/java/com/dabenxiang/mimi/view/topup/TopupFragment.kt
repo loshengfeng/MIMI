@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.topup
 
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
@@ -14,11 +15,10 @@ import com.dabenxiang.mimi.view.listener.AdapterEventListener
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_topup.*
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 class TopupFragment : BaseFragment<TopupViewModel>() {
-    private val viewModel by viewModel<TopupViewModel>()
+    private val viewModel: TopupViewModel by viewModels()
 
     private val onlinePayListener = object : AdapterEventListener<TopupOnlinePayItem> {
         override fun onItemClick(view: View, item: TopupOnlinePayItem) {

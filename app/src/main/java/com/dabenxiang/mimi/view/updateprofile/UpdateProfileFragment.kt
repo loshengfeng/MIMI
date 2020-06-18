@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.updateprofile
 
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -11,11 +12,10 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import kotlinx.android.synthetic.main.fragment_update_profile.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @ExperimentalCoroutinesApi
 class UpdateProfileFragment :BaseFragment<UpdateProfileViewModel>() {
-    private val viewModel by viewModel<UpdateProfileViewModel>()
+    private val viewModel: UpdateProfileViewModel by viewModels()
 
     companion object {
         private const val KEY_TYPE = "TYPE"

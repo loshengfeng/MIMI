@@ -2,13 +2,13 @@ package com.dabenxiang.mimi.view.search
 
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.serializable.CategoriesData
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import kotlinx.android.synthetic.main.fragment_search_video.*
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchVideoFragment : BaseFragment<SearchVideoViewModel>() {
 
@@ -25,7 +25,7 @@ class SearchVideoFragment : BaseFragment<SearchVideoViewModel>() {
         }
     }
 
-    private val viewModel by viewModel<SearchVideoViewModel>()
+    private val viewModel: SearchVideoViewModel by viewModels()
 
     override fun fetchViewModel(): SearchVideoViewModel? {
         return viewModel
@@ -65,9 +65,9 @@ class SearchVideoFragment : BaseFragment<SearchVideoViewModel>() {
 
             iv_back.setImageResource(
                 if (isAdult) {
-                    R.drawable.ic_adult_btn_back
+                    R.drawable.adult_btn_back
                 } else {
-                    R.drawable.ic_normal_btn_back
+                    R.drawable.normal_btn_back
                 }
             )
 
@@ -81,9 +81,9 @@ class SearchVideoFragment : BaseFragment<SearchVideoViewModel>() {
 
             iv_search.setImageResource(
                 if (isAdult) {
-                    R.drawable.ic_adult_btn_search
+                    R.drawable.adult_btn_search
                 } else {
-                    R.drawable.ic_normal_btn_search
+                    R.drawable.normal_btn_search
                 }
             )
 

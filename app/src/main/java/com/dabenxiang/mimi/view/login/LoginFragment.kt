@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
@@ -22,11 +23,10 @@ import kotlinx.android.synthetic.main.item_register.*
 import kotlinx.android.synthetic.main.item_register.edit_email
 import kotlinx.android.synthetic.main.item_register.tv_email_error
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.koin.android.viewmodel.ext.android.viewModel
 
 @ExperimentalCoroutinesApi
 class LoginFragment : BaseFragment<LoginViewModel>() {
-    private val viewModel by viewModel<LoginViewModel>()
+    private val viewModel: LoginViewModel by viewModels()
 
     companion object {
         private const val KEY_TYPE = "TYPE"

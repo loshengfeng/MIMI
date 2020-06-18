@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.forgetpassword
 
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -15,10 +16,9 @@ import com.dabenxiang.mimi.view.dialog.show
 import kotlinx.android.synthetic.main.fragment_forget_password.*
 import kotlinx.android.synthetic.main.fragment_forget_password.edit_email
 import kotlinx.android.synthetic.main.fragment_forget_password.tv_email_error
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ForgetPasswordFragment : BaseFragment<ForgetPasswordViewModel>() {
-    private val viewModel by viewModel<ForgetPasswordViewModel>()
+    private val viewModel: ForgetPasswordViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

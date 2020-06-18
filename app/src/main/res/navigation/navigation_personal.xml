@@ -17,17 +17,20 @@
             app:destination="@id/navigation_login" />
 
         <action
+            android:id="@+id/action_personalFragment_to_myFollowFragment"
+            app:destination="@id/myFollowFragment" />
+
+        <action
+            android:id="@+id/action_personalFragment_to_orderFragment"
+            app:destination="@id/orderFragment" />
+
+        <action
             android:id="@+id/action_personalFragment_to_chatHistoryFragment"
             app:destination="@id/chatHistoryFragment" />
-
 
         <action
             android:id="@+id/action_personalFragment_to_settingFragment"
             app:destination="@id/settingFragment" />
-
-        <action
-            android:id="@+id/action_personalFragment_to_topupHistoryFragment"
-            app:destination="@id/topupHistoryFragmentFragment" />
 
     </fragment>
 
@@ -54,17 +57,15 @@
     </fragment>
 
     <fragment
-        android:id="@+id/changePasswordFragment"
-        android:name="com.dabenxiang.mimi.view.changepassword.ChangePasswordFragment"
-        tools:layout="@layout/fragment_change_password">
-
+        android:id="@+id/myFollowFragment"
+        android:name="com.dabenxiang.mimi.view.myfollow.MyFollowFragment"
+        tools:layout="@layout/fragment_my_follow">
     </fragment>
 
     <fragment
-        android:id="@+id/topupHistoryFragmentFragment"
-        android:name="com.dabenxiang.mimi.view.topuphistory.TopupHistoryFragment"
-        tools:layout="@layout/fragment_topup_history">
-
+        android:id="@+id/orderFragment"
+        android:name="com.dabenxiang.mimi.view.order.OrderFragment"
+        tools:layout="@layout/fragment_order">
     </fragment>
 
     <fragment
@@ -76,4 +77,11 @@
         android:id="@+id/messengerFragment"
         android:name="com.dabenxiang.mimi.view.messenger.MessengerFragment"
         tools:layout="@layout/fragment_messenger" />
+
+    <fragment
+        android:id="@+id/changePasswordFragment"
+        android:name="com.dabenxiang.mimi.view.changepassword.ChangePasswordFragment"
+        tools:layout="@layout/fragment_change_password">
+
+    </fragment>
 </navigation>

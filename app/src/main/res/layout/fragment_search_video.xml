@@ -18,7 +18,7 @@
             android:layout_height="40dp"
             android:layout_marginStart="12dp"
             android:background="@null"
-            android:src="@drawable/ic_normal_btn_back"
+            android:src="@drawable/normal_btn_back"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -54,7 +54,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:src="@drawable/ic_normal_btn_search"
+            android:src="@drawable/normal_btn_search"
             app:layout_constraintBottom_toBottomOf="@id/iv_search_bar"
             app:layout_constraintStart_toStartOf="@id/iv_search_bar"
             app:layout_constraintTop_toTopOf="@id/iv_search_bar" />

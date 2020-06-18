@@ -55,12 +55,21 @@
     <!-- Favorite -->
     <string name="favorite_title">我的收藏</string>
     <string name="favorite_clean">清除所有收藏</string>
+    <string name="favorite_normal">一般视频</string>
+    <string name="favorite_adult">成人视频</string>
+    <string name="favorite_tab_mimi">蜜蜜影视</string>
+    <string name="favorite_tab_short">短视频</string>
 
     <!-- Personal -->
     <string name="personal_title">我的</string>
+    <string name="personal_not_login_tips_1">还没登录吗?</string>
+    <string name="personal_not_login_tips_2">赶紧登录观看更多内容</string>
+    <string name="personal_not_login_tips_3">若尚未成为会员，赶紧注册体验更多内容</string>
     <string name="personal_topup">充值去 ></string>
     <string name="personal_follow">我的关注</string>
-    <string name="personal_topoup_history">充值记录</string>
+    <string name="personal_order">充值记录</string>
+    <string name="personal_topup_now">现在充值去</string>
+    <string name="personal_my_post">我的帖子</string>
     <string name="personal_chat_history">对话记录</string>
     <string name="personal_setting">设置</string>
     <string name="btn_logout">登出</string>
@@ -120,6 +129,13 @@
     <string name="username_or_password_incorrect">使用者名称或密码错误</string>
 
     <!-- Home -->
+    <string name="follow_title">我的关注</string>
+    <string name="follow_people">关注的人</string>
+    <string name="follow_circle">关注的圈子</string>
+    <string name="follow_all">全部关注%s人</string>
+    <string name="follow_clean">清除</string>
+
+    <!-- Home -->
     <string name="text_more">更多</string>
     <string name="text_search">搜寻</string>
 
@@ -150,4 +166,7 @@
     <string name="load_more_comment">查看更多</string>
     <string name="all_comment_display">已显示全部内容</string>
     <string name="load_more_comment_fail">加载失败</string>
+
+    <!-- follow -->
+    <string name="my_follow_follow">已关注</string>
 </resources>

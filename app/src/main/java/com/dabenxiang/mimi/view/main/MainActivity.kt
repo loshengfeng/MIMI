@@ -1,18 +1,16 @@
 package com.dabenxiang.mimi.view.main
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseActivity
 import com.dabenxiang.mimi.extension.setupWithNavController
 import kotlinx.android.synthetic.main.activity_main.*
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import timber.log.Timber
-
 
 class MainActivity : BaseActivity() {
 
-    private val viewModel by viewModel<MainViewModel>()
+    private val viewModel: MainViewModel by viewModels()
 
     override fun getLayoutId(): Int {
         return R.layout.activity_main

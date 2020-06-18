@@ -11,7 +11,10 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import timber.log.Timber
 
-class ChatHistoryAdapter(private val chatHistory: ArrayList<FakeChatHistory>, private val onClickListener: View.OnClickListener?) : RecyclerView.Adapter<ChatHistoryAdapter.ChatHistoryViewHolder>() {
+class ChatHistoryAdapter(
+    private val chatHistory: ArrayList<FakeChatHistory>,
+    private val onClickListener: View.OnClickListener?
+) : RecyclerView.Adapter<ChatHistoryAdapter.ChatHistoryViewHolder>() {
 
     data class FakeChatHistory(val id: String, val name: String, val message: String, val imgUrl: String, val lastDate: String, val isRead: Boolean)
 

@@ -35,7 +35,7 @@ interface ApiService {
 
     /**********************************************************
      *
-     *                  Attachment x 4
+     *                  Attachment
      *
      ***********************************************************/
     @Streaming
@@ -70,7 +70,7 @@ interface ApiService {
 
     /**********************************************************
      *
-     *                  Auth x 1
+     *                  Auth
      *
      ***********************************************************/
     @PUT("/v1/Auth/ResetPassword")
@@ -80,7 +80,7 @@ interface ApiService {
 
     /**********************************************************
      *
-     *                  Chats x 4
+     *                  Chats
      *
      ***********************************************************/
     @POST("/v1/Chats")
@@ -109,7 +109,7 @@ interface ApiService {
 
     /**********************************************************
      *
-     *                  Functions x 1
+     *                  Functions
      *
      ***********************************************************/
     @GET("/v1/Functions")
@@ -117,7 +117,7 @@ interface ApiService {
 
     /**********************************************************
      *
-     *                  Members x 5
+     *                  Members
      *
      ***********************************************************/
     @PUT("/v1/Members/ChangePassword")
@@ -148,7 +148,7 @@ interface ApiService {
 
     /**********************************************************
      *
-     *                  Members/Home/Categories x 1
+     *                  Members/Home/Categories
      *
      ***********************************************************/
     @GET("/v1/Members/Home/Categories")
@@ -156,7 +156,7 @@ interface ApiService {
 
     /**********************************************************
      *
-     *                  Members/Home/Videos x 2
+     *                  Members/Home/Videos
      *
      ***********************************************************/
     @GET("/v1/Members/Home/Videos/Search")
@@ -189,7 +189,7 @@ interface ApiService {
 
     /**********************************************************
      *
-     *                  Members/Me x 9
+     *                  Members/Me
      *
      ***********************************************************/
     @GET("/v1/Members/Me")
@@ -199,6 +199,34 @@ interface ApiService {
     suspend fun putAvatar(
         @Body request: AvatarRequest
     ): Response<Void>
+
+    @GET("/v1/Members/Me/ClubFollow")
+    suspend fun getClubFollow(
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ) : Response<ApiBasePagingItem<List<ClubFollowItem>>>
+
+    @DELETE("/v1/Members/Me/ClubFollow/{clubId}")
+    suspend fun deleteClubFollow(
+        @Path("clubId") id: Int
+    ) : Response<Void>
+
+    @GET("/v1/Members/Me/MemberFollow")
+    suspend fun getMemberFollow(
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ) : Response<ApiBasePagingItem<List<MemberFollowItem>>>
+
+    @DELETE("/v1/Members/Me/MemberFollow/{userId}")
+    suspend fun deleteMemberFollow(
+        @Path("userId") id: Int
+    ) : Response<Void>
+
+    @GET("/v1/Members/Me/Order")
+    suspend fun getOrder(
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ) : Response<ApiBasePagingItem<List<OrderItem>>>
 
     @GET("/v1/Members/Me/Chat")
     suspend fun getMeChat(
@@ -236,6 +264,17 @@ interface ApiService {
         @Query("limit") limit: Int
     ): Response<ApiBasePagingItem<PlayListItem>>
 
+    @GET("/v1/Members/Me/PostFavorite")
+    suspend fun getPostFavorite(
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
+    ): Response<ApiBasePagingItem<PostFavoriteItem>>
+
+    @DELETE("/v1/Members/Me/PostFavorite/{postFavoriteId}")
+    suspend fun deletePostFavorite(
+        @Path("postFavoriteId") postFavoriteId: Long
+    ): Response<Void>
+
     @GET("/v1/Members/Me/Profile")
     suspend fun getProfile(): Response<ApiBaseItem<ProfileItem>>
 
@@ -246,7 +285,7 @@ interface ApiService {
 
     /**********************************************************
      *
-     *                  Ordering x 1
+     *                  Ordering
      *
      ***********************************************************/
     @GET("/v1/Ordering/Agent")
@@ -257,7 +296,7 @@ interface ApiService {
 
     /**********************************************************
      *
-     *                  Player x 4
+     *                  Player
      *
      ***********************************************************/
     @GET("/v1/Player/{videoId}")

@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.blankj.utilcode.util.ImageUtils
 import com.bumptech.glide.Glide
@@ -29,11 +30,10 @@ import kotlinx.android.synthetic.main.fragment_setting.iv_photo
 import kotlinx.android.synthetic.main.fragment_setting.tv_name
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @ExperimentalCoroutinesApi
 class SettingFragment : BaseFragment<SettingViewModel>() {
-    private val viewModel by viewModel<SettingViewModel>()
+    private val viewModel: SettingViewModel by viewModels()
 
     companion object {
         private const val REQUEST_CODE_CAMERA = 100

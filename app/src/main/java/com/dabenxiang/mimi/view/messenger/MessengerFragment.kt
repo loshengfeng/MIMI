@@ -2,14 +2,14 @@ package com.dabenxiang.mimi.view.messenger
 
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.viewModels
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
 import kotlinx.android.synthetic.main.fragment_messenger.*
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 class MessengerFragment : BaseFragment<MessengerViewModel>() {
-    private val viewModel by viewModel<MessengerViewModel>()
+    private val viewModel: MessengerViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

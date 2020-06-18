@@ -46,7 +46,7 @@ class ApiRepository(private val apiService: ApiService) {
 
     /**********************************************************
      *
-     *                  Attachment x 4
+     *                  Attachment
      *
      ***********************************************************/
     /**
@@ -102,7 +102,7 @@ class ApiRepository(private val apiService: ApiService) {
 
     /**********************************************************
      *
-     *                  Auth x 1
+     *                  Auth
      *
      ***********************************************************/
     /**
@@ -114,7 +114,7 @@ class ApiRepository(private val apiService: ApiService) {
 
     /**********************************************************
      *
-     *                  Chats x 4
+     *                  Chats
      *
      ***********************************************************/
     /**
@@ -151,7 +151,7 @@ class ApiRepository(private val apiService: ApiService) {
 
     /**********************************************************
      *
-     *                  Functions x 1
+     *                  Functions
      *
      ***********************************************************/
     /**
@@ -161,7 +161,7 @@ class ApiRepository(private val apiService: ApiService) {
 
     /**********************************************************
      *
-     *                  Members x 5
+     *                  Members
      *
      ***********************************************************/
     /**
@@ -201,7 +201,7 @@ class ApiRepository(private val apiService: ApiService) {
 
     /**********************************************************
      *
-     *                   Members/Home/Categories x 1
+     *                   Members/Home/Categories
      *
      ***********************************************************/
     /**
@@ -211,7 +211,7 @@ class ApiRepository(private val apiService: ApiService) {
 
     /**********************************************************
      *
-     *                   Members/Home/Videos x 2
+     *                   Members/Home/Videos
      *
      ***********************************************************/
     /**
@@ -252,7 +252,7 @@ class ApiRepository(private val apiService: ApiService) {
 
     /**********************************************************
      *
-     *                  Me x 9
+     *                  Me
      *
      ***********************************************************/
     /**
@@ -266,6 +266,44 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun putAvatar(
         body: AvatarRequest
     ) = apiService.putAvatar(body)
+
+    /**
+     * 取得我關注的圈子
+     */
+    suspend fun getClubFollow(
+        offset: String,
+        limit: String
+    ) = apiService.getClubFollow(offset, limit)
+
+    /**
+     * 移除我關注的圈子
+     */
+    suspend fun deleteClubFollow(
+        clubId: Int
+    ) = apiService.deleteClubFollow(clubId)
+
+    /**
+     * 取得我關注的人
+     */
+    suspend fun getMemberFollow(
+        offset: String,
+        limit: String
+    ) = apiService.getMemberFollow(offset, limit)
+
+    /**
+     * 移除我關注的人
+     */
+    suspend fun deleteMemberFollow(
+        userId: Int
+    ) = apiService.deleteMemberFollow(userId)
+
+    /**
+     * 取得使用者充值紀錄(需登入帳號)
+     */
+    suspend fun getOrder(
+        offset: String,
+        limit: String
+    ) = apiService.getOrder(offset, limit)
 
     /**
      * 取得聊天室列表
@@ -314,6 +352,21 @@ class ApiRepository(private val apiService: ApiService) {
     ) = apiService.getMePlaylist(playlistType, offset, limit)
 
     /**
+     * 取得我的帖子收藏
+     */
+    suspend fun getPostFavorite(
+        offset: Int,
+        limit: Int
+    ) = apiService.getPostFavorite(offset, limit)
+
+    /**
+     * 移除我的帖子收藏
+     */
+    suspend fun deletePostFavorite(
+        postFavoriteId: Long
+    ) = apiService.deletePostFavorite(postFavoriteId)
+
+    /**
      * 取得使用者資訊明細
      */
     suspend fun getProfile() = apiService.getProfile()
@@ -327,7 +380,7 @@ class ApiRepository(private val apiService: ApiService) {
 
     /**********************************************************
      *
-     *                  Ordering x 1
+     *                  Ordering
      *
      ***********************************************************/
     /**
@@ -340,7 +393,7 @@ class ApiRepository(private val apiService: ApiService) {
 
     /**********************************************************
      *
-     *                  Player x 3
+     *                  Player
      *
      ***********************************************************/
     /**

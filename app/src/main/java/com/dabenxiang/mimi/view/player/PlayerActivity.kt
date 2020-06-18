@@ -10,6 +10,7 @@ import android.text.Html
 import android.view.MotionEvent
 import android.view.Surface
 import android.view.View
+import androidx.activity.viewModels
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -75,7 +76,7 @@ class PlayerActivity : BaseActivity() {
         }
     }
 
-    private val viewModel by viewModel<PlayerViewModel>()
+    private val viewModel: PlayerViewModel by viewModels()
 
     private var player: SimpleExoPlayer? = null
     private var orientationDetector: OrientationDetector? = null

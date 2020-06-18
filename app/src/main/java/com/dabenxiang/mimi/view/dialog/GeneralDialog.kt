@@ -2,7 +2,6 @@ package com.dabenxiang.mimi.view.dialog
 
 import android.os.Bundle
 import android.text.Html
-import android.text.SpannableString
 import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -14,7 +13,7 @@ import java.io.Serializable
 import java.util.*
 
 class GeneralDialogData(
-    @DrawableRes val titleIcon: Int = R.drawable.ic_verification_mail,
+    @DrawableRes val titleIcon: Int = R.drawable.verification_mail,
     @StringRes val titleRes: Int? = null,
     val titleString: String = "",
     @DrawableRes val messageIcon: Int,

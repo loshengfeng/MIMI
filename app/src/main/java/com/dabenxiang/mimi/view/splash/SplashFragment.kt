@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import androidx.core.app.ActivityCompat
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.dabenxiang.mimi.R
@@ -14,7 +15,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SplashFragment : BaseFragment<SplashViewModel>() {
 
@@ -28,7 +28,7 @@ class SplashFragment : BaseFragment<SplashViewModel>() {
         Manifest.permission.CAMERA
     )
 
-    private val viewModel by viewModel<SplashViewModel>()
+    private val viewModel: SplashViewModel by viewModels()
 
     override fun fetchViewModel(): SplashViewModel? { return viewModel }
 
