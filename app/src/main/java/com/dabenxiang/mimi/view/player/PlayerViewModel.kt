@@ -9,7 +9,6 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.chad.library.adapter.base.module.BaseLoadMoreModule
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.Source
 import com.dabenxiang.mimi.model.api.vo.VideoItem
@@ -17,9 +16,7 @@ import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.view.adapter.PlayerInfoAdapter
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.home.GuessLikeDataSource
-import com.dabenxiang.mimi.view.home.GuessLikeFactory
-import com.dabenxiang.mimi.view.home.GuessLikePagingCallBack
+import com.dabenxiang.mimi.callback.GuessLikePagingCallBack
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
 import com.google.android.exoplayer2.source.MediaSource
@@ -33,7 +30,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import timber.log.Timber
 
@@ -322,7 +318,13 @@ class PlayerViewModel : BaseViewModel() {
 
     fun setupGuessLikeList(category: String?, isAdult: Boolean) {
         viewModelScope.launch {
-            val dataSrc = GuessLikeDataSource(isAdult, category ?: "", viewModelScope, domainManager.getApiRepository(), pagingCallback)
+            val dataSrc = GuessLikeDataSource(
+                isAdult,
+                category ?: "",
+                viewModelScope,
+                domainManager.getApiRepository(),
+                pagingCallback
+            )
             val factory = GuessLikeFactory(dataSrc)
             val config = PagedList.Config.Builder()
                 .setPageSize(GuessLikeDataSource.PER_LIMIT.toInt())

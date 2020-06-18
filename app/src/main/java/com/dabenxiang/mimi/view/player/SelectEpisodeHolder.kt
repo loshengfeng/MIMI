@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.home
+package com.dabenxiang.mimi.view.player
 
 import android.view.View
 import android.widget.TextView

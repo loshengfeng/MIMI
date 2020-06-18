@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.player
+package com.dabenxiang.mimi.view.base
 
 import com.chad.library.adapter.base.module.BaseLoadMoreModule
 import java.lang.ref.WeakReference
@@ -9,7 +9,8 @@ private interface ILoadPage<Key> {
 
 data class JFLoadAfterResult<Value>(val isEnd: Boolean, val content: Value?)
 
-abstract class JFPageDataSource<Key : Any, Value : Any>(loadMoreModule: BaseLoadMoreModule) : ILoadPage<Key> {
+abstract class JFPageDataSource<Key : Any, Value : Any>(loadMoreModule: BaseLoadMoreModule) :
+    ILoadPage<Key> {
 
     private var loadInit = true
     private var nextKey: Key? = null
@@ -59,11 +60,5 @@ abstract class JFPageDataSource<Key : Any, Value : Any>(loadMoreModule: BaseLoad
         }
 
         return result
-    }
-}
-
-class CommentDataSource(loadMoreModule: BaseLoadMoreModule) : JFPageDataSource<Long, List<String>>(loadMoreModule) {
-    override suspend fun load(params: Long?): JFLoadResult {
-        return JFLoadResult.Page(null, listOf("AAA", "BB"))
     }
 }

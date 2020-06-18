@@ -1,6 +1,7 @@
-package com.dabenxiang.mimi.view.home
+package com.dabenxiang.mimi.view.player
 
 import androidx.paging.PageKeyedDataSource
+import com.dabenxiang.mimi.callback.GuessLikePagingCallBack
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.holder.simpleVideoItemToVideoItem
@@ -30,7 +31,9 @@ class GuessLikeDataSource(
             flow {
                 val returnList = mutableListOf<BaseVideoItem>()
 
-                val result = apiRepository.searchWithCategory(category, isAdult, "0", PER_LIMIT)
+                val result = apiRepository.searchWithCategory(category, isAdult, "0",
+                    PER_LIMIT
+                )
                 if (!result.isSuccessful) throw HttpException(result)
 
                 val item = result.body()
@@ -61,7 +64,9 @@ class GuessLikeDataSource(
         val next = params.key
         viewModelScope.launch {
             flow {
-                val result = apiRepository.searchWithCategory(category, isAdult, next.toString(), PER_LIMIT)
+                val result = apiRepository.searchWithCategory(category, isAdult, next.toString(),
+                    PER_LIMIT
+                )
                 if (!result.isSuccessful) throw HttpException(result)
 
                 result.body()?.also { item ->
@@ -71,7 +76,12 @@ class GuessLikeDataSource(
                             else -> null
                         }
 
-                        emit(EmitResult(list.simpleVideoItemToVideoItem(isAdult), nextPageKey))
+                        emit(
+                            EmitResult(
+                                list.simpleVideoItemToVideoItem(isAdult),
+                                nextPageKey
+                            )
+                        )
                     }
                 }
             }
