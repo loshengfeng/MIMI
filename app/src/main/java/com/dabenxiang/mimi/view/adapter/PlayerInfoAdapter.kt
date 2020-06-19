@@ -62,11 +62,11 @@ class MembersPostCommentItemBinder(private val isAdult: Boolean) : QuickItemBind
         holder.setText(R.id.tv_message, data.content)
         holder.setTextColorRes(R.id.tv_message, getMessageTextColor())
         holder.setText(R.id.tv_like, (data.likeCount ?: 0L).toString())
-        holder.getView<TextView>(R.id.tv_like).setCompoundDrawablesRelativeWithIntrinsicBounds(getLikeRes(true), 0, 0, 0)
+        holder.getView<TextView>(R.id.tv_like).setCompoundDrawablesRelativeWithIntrinsicBounds(getLikeRes(data.likeType == 0), 0, 0, 0)
         holder.setTextColorRes(R.id.tv_like, getMessageTextColor())
         holder.setText(R.id.tv_unlike, (data.dislikeCount ?: 0L).toString())
         holder.setTextColorRes(R.id.tv_unlike, getMessageTextColor())
-        holder.getView<TextView>(R.id.tv_unlike).setCompoundDrawablesRelativeWithIntrinsicBounds(getUnlikeRes(true), 0, 0, 0)
+        holder.getView<TextView>(R.id.tv_unlike).setCompoundDrawablesRelativeWithIntrinsicBounds(getDislikeRes(data.likeType == 1), 0, 0, 0)
 
         //holder.getView<ImageView>(R.id.btn_more)
         holder.setTextColorRes(R.id.btn_reply, getTextColor())
@@ -122,8 +122,8 @@ class MembersPostCommentItemBinder(private val isAdult: Boolean) : QuickItemBind
         }
     }
 
-    private fun getUnlikeRes(isLike: Boolean): Int {
-        return if (!isLike) {
+    private fun getDislikeRes(isDislike: Boolean): Int {
+        return if (isDislike) {
             R.drawable.ico_bad_s
         } else {
             if (isAdult) {

@@ -19,7 +19,7 @@ data class MembersPostCommentItem(
     @SerializedName("likeCount")
     val likeCount: Long?,
     @SerializedName("likeType")
-    val likeType: Long?,
+    val likeType: Int?,
     @SerializedName("postAvatarAttachmentId")
     val postAvatarAttachmentId: Long?,
     @SerializedName("postName")
