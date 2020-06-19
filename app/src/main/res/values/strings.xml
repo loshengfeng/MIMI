@@ -167,6 +167,8 @@
     <string name="load_more_comment">查看更多</string>
     <string name="all_comment_display">已显示全部内容</string>
     <string name="load_more_comment_fail">加载失败</string>
+    <string name="reply">回复</string>
+    <string name="n_reply">%d个回复</string>
 
     <!-- follow -->
     <string name="my_follow_follow">已关注</string>

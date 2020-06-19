@@ -10,8 +10,8 @@ import android.text.Html
 import android.view.MotionEvent
 import android.view.Surface
 import android.view.View
-import androidx.activity.viewModels
 import android.view.ViewGroup
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -52,7 +52,9 @@ import kotlinx.android.synthetic.main.head_comment.view.*
 import kotlinx.android.synthetic.main.head_guess_like.view.*
 import kotlinx.android.synthetic.main.head_source.view.*
 import kotlinx.android.synthetic.main.head_video_info.view.*
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.net.UnknownHostException
 import java.text.SimpleDateFormat
@@ -132,12 +134,42 @@ class PlayerActivity : BaseActivity() {
     }
 
     private val playerInfoAdapter by lazy {
-        PlayerInfoAdapter().apply {
+        PlayerInfoAdapter(obtainIsAdult()).apply {
             loadMoreModule.apply {
                 isEnableLoadMore = true
-                isAutoLoadMore = true
-                isEnableLoadMoreIfNotFullPage = true
+                isAutoLoadMore = false
+                isEnableLoadMoreIfNotFullPage = false
             }
+        }
+    }
+
+    private suspend fun setupCommentDataSource(adapter: PlayerInfoAdapter) {
+        val dataSrc = CommentDataSource(viewModel.videoId, viewModel.domainManager)
+
+        dataSrc.loadMore().also { load ->
+            withContext(Dispatchers.Main) {
+                load.content?.also { adapter.setList(it) }
+                setupLoadMoreResult(adapter, load.isEnd)
+            }
+        }
+
+        adapter.loadMoreModule.setOnLoadMoreListener {
+            lifecycleScope.launch(Dispatchers.IO) {
+                dataSrc.loadMore().also { load ->
+                    withContext(Dispatchers.Main) {
+                        load.content?.also { adapter.addData(it) }
+                        setupLoadMoreResult(adapter, load.isEnd)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setupLoadMoreResult(adapter: PlayerInfoAdapter, isEnd: Boolean) {
+        if (isEnd) {
+            adapter.loadMoreModule.loadMoreEnd()
+        } else {
+            adapter.loadMoreModule.loadMoreComplete()
         }
     }
 
@@ -338,7 +370,7 @@ class PlayerActivity : BaseActivity() {
                     viewModel.availablePoint = result.availablePoint ?: 0L
 
                     lifecycleScope.launchWhenResumed {
-                        viewModel.setupCommentDataSource(playerInfoAdapter)
+                        setupCommentDataSource(playerInfoAdapter)
                     }
                 }
             }
@@ -722,7 +754,7 @@ class PlayerActivity : BaseActivity() {
         }
 
         override fun onPositionDiscontinuity(reason: Int) {
-            Timber.d("onPositionDiscontinuity: $reason")
+            //Timber.d("onPositionDiscontinuity: $reason")
         }
 
         override fun onTimelineChanged(timeline: Timeline, reason: Int) {

@@ -148,6 +148,20 @@ interface ApiService {
 
     /**********************************************************
      *
+     *                  Members/Post
+     *
+     ***********************************************************/
+    @GET("/v1/Members/Post/{postId}/Comment")
+    suspend fun getMembersPostComment(
+        @Path("postId") postId: Long,
+        @Query("parentId") parentId: Long?,
+        @Query("sorting") sorting: Int,
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ): Response<ApiBasePagingItem<List<MembersPostCommentItem>>>
+
+    /**********************************************************
+     *
      *                  Members/Home/Categories
      *
      ***********************************************************/

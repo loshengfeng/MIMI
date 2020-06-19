@@ -198,6 +198,18 @@ class ApiRepository(private val apiService: ApiService) {
 //    suspend fun validationEmail(
 //        key: String
 //    ) = apiService.validationEmail(key)
+    /**********************************************************
+     *
+     *                  Members/Post
+     *
+     ***********************************************************/
+    suspend fun getMembersPostComment(
+        postId: Long,
+        parentId: Long? = null,
+        sorting: Int = 1,
+        offset: String,
+        limit: String
+    ) = apiService.getMembersPostComment(postId, parentId, sorting, offset, limit)
 
     /**********************************************************
      *

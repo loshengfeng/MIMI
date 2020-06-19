@@ -9,14 +9,13 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
+import com.dabenxiang.mimi.callback.GuessLikePagingCallBack
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.Source
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
-import com.dabenxiang.mimi.view.adapter.PlayerInfoAdapter
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.callback.GuessLikePagingCallBack
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
 import com.google.android.exoplayer2.source.MediaSource
@@ -332,26 +331,6 @@ class PlayerViewModel : BaseViewModel() {
 
             LivePagedListBuilder(factory, config).build().asFlow().collect {
                 _videoList.postValue(it)
-            }
-        }
-    }
-
-    suspend fun setupCommentDataSource(adapter: PlayerInfoAdapter) {
-        val dataSrc = CommentDataSource(adapter.loadMoreModule)
-
-        viewModelScope.launch {
-            val load = dataSrc.loadMore()
-            load.content?.also { content ->
-                adapter.addData(content)
-            }
-        }
-
-        adapter.loadMoreModule.setOnLoadMoreListener {
-            viewModelScope.launch {
-                val load = dataSrc.loadMore()
-                load.content?.also { content ->
-                    adapter.addData(content)
-                }
             }
         }
     }

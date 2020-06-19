@@ -17,11 +17,12 @@ class CommentLoadMoreView(private val isAdult: Boolean) : BaseLoadMoreView() {
     }
 
     override fun getLoadingView(holder: BaseViewHolder): View {
+        holder.setBackgroundResource(R.id.view_load_more_loading, getBackground())
         return holder.getView(R.id.view_load_more_loading)
     }
 
     override fun getLoadComplete(holder: BaseViewHolder): View {
-        setTextColor(holder.getView(R.id.tv_load_more_complete))
+        holder.setTextColorRes(R.id.tv_load_more_complete, getTextColorRes())
 
         val bgView = holder.getView<RoundedTextView>(R.id.bg_load_more_complete)
         val res = bgView.resources
@@ -36,26 +37,25 @@ class CommentLoadMoreView(private val isAdult: Boolean) : BaseLoadMoreView() {
             0
         )
 
+        holder.setBackgroundResource(R.id.view_load_more_complete, getBackground())
+
         return holder.getView(R.id.view_load_more_complete)
     }
 
     override fun getLoadEndView(holder: BaseViewHolder): View {
-        return setTextColor(holder.getView(R.id.view_load_more_end))
+        holder.setTextColorRes(R.id.tv_load_more_end, getTextColorRes())
+        holder.setBackgroundResource(R.id.bg_load_more_end, getBackground())
+        return holder.getView(R.id.view_load_more_end)
     }
 
     override fun getLoadFailView(holder: BaseViewHolder): View {
-        return setTextColor(holder.getView(R.id.view_load_more_fail))
+        holder.setTextColorRes(R.id.tv_load_more_fail, getTextColorRes())
+        holder.setBackgroundResource(R.id.bg_load_more_fail, getBackground())
+        return holder.getView(R.id.view_load_more_fail)
     }
 
-    private fun setTextColor(textView: TextView): TextView {
-        val textColor = if (isAdult) {
-            R.color.color_white_1_30
-        } else {
-            R.color.color_black_1_50
-        }.let {
-            textView.resources.getColor(it, null)
-        }
-        textView.setTextColor(textColor)
-        return textView
-    }
+
+    private fun getTextColorRes() = if (isAdult) R.color.color_white_1_50 else R.color.color_black_1_50
+
+    private fun getBackground() = if (isAdult) R.drawable.bg_adult_comment_bottom_radius_10 else R.drawable.bg_comment_bottom_radius_10
 }

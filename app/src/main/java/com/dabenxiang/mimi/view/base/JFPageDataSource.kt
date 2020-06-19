@@ -1,20 +1,16 @@
 package com.dabenxiang.mimi.view.base
 
-import com.chad.library.adapter.base.module.BaseLoadMoreModule
-import java.lang.ref.WeakReference
-
 private interface ILoadPage<Key> {
     suspend fun load(params: Key?): JFPageDataSource.JFLoadResult
 }
 
 data class JFLoadAfterResult<Value>(val isEnd: Boolean, val content: Value?)
 
-abstract class JFPageDataSource<Key : Any, Value : Any>(loadMoreModule: BaseLoadMoreModule) :
+abstract class JFPageDataSource<Key : Any, Value : Any> :
     ILoadPage<Key> {
 
     private var loadInit = true
     private var nextKey: Key? = null
-    private val loadMoreModule = WeakReference(loadMoreModule)
 
     // 重置數據
     fun resetPage() {
@@ -31,34 +27,20 @@ abstract class JFPageDataSource<Key : Any, Value : Any>(loadMoreModule: BaseLoad
         val isLoadInit = loadInit
         loadInit = false
         if (nextKey != null || isLoadInit) {
-            val data = load(nextKey)
-            nextKey = when (data) {
+            when (val data = load(nextKey)) {
                 is JFLoadResult.Page<*, *> -> {
-                    if (data.nextKey == null) {
-                        data.nextKey
-                    } else {
-                        data.nextKey as? Key
+                    if (data.nextKey != null) {
+                        nextKey = data.nextKey as? Key
                     }
-                    val result = JFLoadAfterResult(nextKey == null, data.content as? Value)
-                    return setupLoadMore(result)
-                }
-                is JFLoadResult.PageError -> {
-                    null
+
+                    if (data.content != null) {
+                        return JFLoadAfterResult(nextKey == null, data.content as? Value)
+                    }
                 }
             }
         }
-        return setupLoadMore(JFLoadAfterResult(true, null))
-    }
 
-    private fun setupLoadMore(result: JFLoadAfterResult<Value>): JFLoadAfterResult<Value> {
-        loadMoreModule.get()?.apply {
-            if (result.isEnd) {
-                loadMoreEnd()
-            } else {
-                loadMoreComplete()
-            }
-        }
-
-        return result
+        nextKey = null
+        return JFLoadAfterResult(true, null)
     }
 }
