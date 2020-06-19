@@ -60,7 +60,7 @@ object AppUtils {
     }
 
     fun utcToDate(utcTime: String): Date {
-        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.getDefault())
         return Date(sdf.parse(utcTime).time + TIME_ZONE_OFFSET)
     }
 

@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.model.api.vo
 
 import com.google.gson.annotations.SerializedName
+import java.util.*
 
 data class PostFavoriteItem(
     @SerializedName("id")
@@ -19,7 +20,7 @@ data class PostFavoriteItem(
     val posterAvatarAttachmentId: Long?,
 
     @SerializedName("postDate")
-    val postDate: String?,
+    val postDate: Date?,
 
     @SerializedName("type")
     val type: Int?,
@@ -43,5 +44,14 @@ data class PostFavoriteItem(
     val dislikeCount: Int?,
 
     @SerializedName("favoriteCount")
-    val favoriteCount: Int?
+    val favoriteCount: Int?,
+
+    @SerializedName("isFollow")
+    val isFollow: Boolean?,
+
+    @SerializedName("likeType")
+    val likeType: Int?,
+
+    @SerializedName("commentCount")
+    val commentCount: Int?
 )

@@ -283,7 +283,7 @@ interface ApiService {
     suspend fun getPostFavorite(
         @Query("offset") offset: String,
         @Query("limit") limit: String
-    ): Response<ApiBasePagingItem<List<PlayListItem>>>
+    ): Response<ApiBasePagingItem<List<PostFavoriteItem>>>
 
     @DELETE("/v1/Members/Me/PostFavorite/{postFavoriteId}")
     suspend fun deletePostFavorite(
@@ -297,6 +297,37 @@ interface ApiService {
     suspend fun updateProfile(
         @Body body: ProfileRequest
     ): Response<Void>
+
+    /**********************************************************
+     *
+     *                  Members/Post
+     *
+     ***********************************************************/
+    @POST("/v1/Members/Post/{postId}/Favorite")
+    suspend fun addFavorite(
+        @Path("postId") postId: Long
+    ) : Response<Void>
+
+    @DELETE("/v1/Members/Post/{postId}/Favorite")
+    suspend fun deleteFavorite(
+        @Path("postId") postId: Long
+    ) : Response<Void>
+
+    @POST("/v1/Members/Post/{postId}/Like")
+    suspend fun addLike(
+        @Path("postId") postId: Long
+    ) : Response<Void>
+
+    @DELETE("/v1/Members/Post/{postId}/Like")
+    suspend fun deleteLike(
+        @Path("postId") postId: Long
+    ) : Response<Void>
+
+
+    @POST("/v1/Members/Post/{postId}/PostReport")
+    suspend fun postReport(
+        @Path("postId") postId: Long
+    ) : Response<Void>
 
     /**********************************************************
      *

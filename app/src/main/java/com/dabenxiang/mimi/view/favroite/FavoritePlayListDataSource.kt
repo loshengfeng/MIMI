@@ -1,60 +1,54 @@
-package com.dabenxiang.mimi.view.postfavorite
+package com.dabenxiang.mimi.view.favroite
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.manager.DomainManager
-import com.dabenxiang.mimi.model.api.vo.PlayListItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import timber.log.Timber
 
 @ExperimentalCoroutinesApi
-class PostFavoriteListDataSource constructor(
+class FavoritePlayListDataSource constructor(
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
-    private val pagingCallback: PostFavoritePagingCallback,
+    private val pagingCallback: FavoritePagingCallback,
     private val playlistType: Int = 1,
     private val isAdult: Boolean = false
-) : PageKeyedDataSource<Long, PlayListItem>() {
+) : PageKeyedDataSource<Long, Any>() {
 
     companion object {
         const val PER_LIMIT = "10"
         val PER_LIMIT_LONG = PER_LIMIT.toLong()
     }
 
-    private data class InitResult(val list: List<PlayListItem>, val nextKey: Long?)
+    private data class InitResult(val list: List<Any>, val nextKey: Long?)
 
     override fun loadInitial(
         params: LoadInitialParams<Long>,
-        callback: LoadInitialCallback<Long, PlayListItem>
+        callback: LoadInitialCallback<Long, Any>
     ) {
         viewModelScope.launch {
             flow {
-//                val result = domainManager.getApiRepository().getPostFavorite("0", PER_LIMIT)
                 val result = domainManager.getApiRepository().getPlaylist(playlistType, isAdult, "0", PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()
-                val playListItems = item?.content
+                val Anys = item?.content
 
                 val nextPageKey = when {
                     hasNextPage(
                         item?.paging?.count ?: 0,
                         item?.paging?.offset ?: 0,
-                        playListItems?.size ?: 0
+                        Anys?.size ?: 0
                     ) -> PER_LIMIT_LONG
                     else -> null
                 }
-
-                Timber.d("loadInitial_nextPageKey: ${nextPageKey.toString()}")
-
-                emit(InitResult(playListItems ?: arrayListOf(), nextPageKey))
+                emit(InitResult(Anys ?: arrayListOf(), nextPageKey))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { pagingCallback.onLoading() }
-                .catch { e -> Timber.e(e) }
+                .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect { response ->
                     pagingCallback.onTotalCount(response.list.size)
@@ -63,18 +57,12 @@ class PostFavoriteListDataSource constructor(
         }
     }
 
-    override fun loadBefore(
-        params: LoadParams<Long>,
-        callback: LoadCallback<Long, PlayListItem>
-    ) {
-        Timber.d("loadBefore")
-    }
+    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Long, Any>) {}
 
     override fun loadAfter(
         params: LoadParams<Long>,
-        callback: LoadCallback<Long, PlayListItem>
+        callback: LoadCallback<Long, Any>
     ) {
-        Timber.d("loadAfter")
         val next = params.key
         viewModelScope.launch {
             flow {

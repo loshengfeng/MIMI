@@ -395,6 +395,46 @@ class ApiRepository(private val apiService: ApiService) {
 
     /**********************************************************
      *
+     *                  Members/Post
+     *
+     ***********************************************************/
+    /**
+     * 帖子加入收藏
+     */
+    suspend fun addFavorite(
+        postId: Long
+    ) = apiService.addFavorite(postId)
+
+    /**
+     * 帖子移除收藏
+     */
+    suspend fun deleteFavorite(
+        postId: Long
+    ) = apiService.deleteFavorite(postId)
+
+    /**
+     * 帖子喜歡/不喜歡
+     */
+    suspend fun addLike(
+        postId: Long
+    ) = apiService.addLike(postId)
+
+    /**
+     * 移除帖子的喜歡/不喜歡
+     */
+    suspend fun deleteLike(
+        postId: Long
+    ) = apiService.deleteLike(postId)
+
+    /**
+     * 帖子問題回報
+     */
+    suspend fun postReport(
+        postId: Long
+    ) = apiService.postReport(postId)
+
+    /**********************************************************
+     *
      *                  Ordering
      *
      ***********************************************************/
