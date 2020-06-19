@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/postFavoriteFragment"
-        android:name="com.dabenxiang.mimi.view.postfavorite.PostFavoriteFragment"
+        android:name="com.dabenxiang.mimi.view.favroite.FavoriteFragment"
         tools:layout="@layout/fragment_post_favorite">
     </fragment>
 </navigation>

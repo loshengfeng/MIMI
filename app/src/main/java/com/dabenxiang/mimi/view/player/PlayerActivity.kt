@@ -52,7 +52,6 @@ import kotlinx.android.synthetic.main.head_comment.view.*
 import kotlinx.android.synthetic.main.head_guess_like.view.*
 import kotlinx.android.synthetic.main.head_source.view.*
 import kotlinx.android.synthetic.main.head_video_info.view.*
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 import java.net.UnknownHostException
 import java.text.SimpleDateFormat
