@@ -36,7 +36,10 @@ class FavoriteAdapter(
 
     enum class FunctionType { Video, Like, Favorite, Msg, Share, More }
 
-    interface EventListener { fun onItemClick(type: FunctionType, iew: View, item: Any) }
+    interface EventListener {
+        fun onVideoClick(item: Any)
+        fun onFunctionClick(type: FunctionType, view: View, item: Any)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)

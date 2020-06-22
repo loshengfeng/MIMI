@@ -120,11 +120,7 @@ class GeneralDialog : BaseDialogFragment() {
         dismiss()
     }
 
-    override fun isFullLayout(): Boolean {
-        return false
-    }
+    override fun isFullLayout(): Boolean { return false }
 
-    override fun getLayoutId(): Int {
-        return R.layout.fragment_dialog_general
-    }
+    override fun getLayoutId(): Int { return R.layout.fragment_dialog_general }
 }

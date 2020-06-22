@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.favroite
 
 import androidx.paging.PageKeyedDataSource
+import com.dabenxiang.mimi.callback.FavoritePagingCallback
 import com.dabenxiang.mimi.manager.DomainManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,17 +35,17 @@ class FavoritePlayListDataSource constructor(
                 val result = domainManager.getApiRepository().getPlaylist(playlistType, isAdult, "0", PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()
-                val Anys = item?.content
+                val items = item?.content
 
                 val nextPageKey = when {
                     hasNextPage(
                         item?.paging?.count ?: 0,
                         item?.paging?.offset ?: 0,
-                        Anys?.size ?: 0
+                        items?.size ?: 0
                     ) -> PER_LIMIT_LONG
                     else -> null
                 }
-                emit(InitResult(Anys ?: arrayListOf(), nextPageKey))
+                emit(InitResult(items ?: arrayListOf(), nextPageKey))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { pagingCallback.onLoading() }

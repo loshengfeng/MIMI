@@ -26,12 +26,12 @@ class FavoritePlayViewHolder(
     private val tvMore = itemView.findViewById(R.id.tv_more) as TextView
 
     init {
-        ivPhoto.setOnClickListener { listener.onItemClick(FavoriteAdapter.FunctionType.Video, it, data!!) }
-        tvLike.setOnClickListener { listener.onItemClick(FavoriteAdapter.FunctionType.Like, it, data!!) }
-        tvFavorite.setOnClickListener { listener.onItemClick(FavoriteAdapter.FunctionType.Favorite, it, data!!) }
-        tvMsg.setOnClickListener { listener.onItemClick(FavoriteAdapter.FunctionType.Msg, it, data!!) }
-        tvShare.setOnClickListener { listener.onItemClick(FavoriteAdapter.FunctionType.Share, it, data!!) }
-        tvMore.setOnClickListener { listener.onItemClick(FavoriteAdapter.FunctionType.More, it, data!!) }
+        ivPhoto.setOnClickListener { listener.onVideoClick(data!!) }
+        tvLike.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.Like, it, data!!) }
+        tvFavorite.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.Favorite, it, data!!) }
+        tvMsg.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.Msg, it, data!!) }
+        tvShare.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.Share, it, data!!) }
+        tvMore.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.More, it, data!!) }
     }
 
     override fun updated() {

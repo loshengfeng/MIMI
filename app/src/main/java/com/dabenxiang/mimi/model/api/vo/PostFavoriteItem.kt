@@ -54,4 +54,5 @@ data class PostFavoriteItem(
 
     @SerializedName("commentCount")
     val commentCount: Int?
-)
+
+) : BaseItem()

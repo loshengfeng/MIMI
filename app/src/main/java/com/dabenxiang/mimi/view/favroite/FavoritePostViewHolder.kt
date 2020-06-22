@@ -9,7 +9,6 @@ import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
-import com.dabenxiang.mimi.widget.utility.AppUtils
 import com.google.android.material.chip.ChipGroup
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -36,12 +35,12 @@ class FavoritePostViewHolder(
     private val tvMore = itemView.findViewById(R.id.tv_more) as TextView
 
     init {
-        ivPhoto.setOnClickListener { listener.onItemClick(FavoriteAdapter.FunctionType.Video, it, data!!) }
-        tvLike.setOnClickListener { listener.onItemClick(FavoriteAdapter.FunctionType.Like, it, data!!) }
-        tvFavorite.setOnClickListener { listener.onItemClick(FavoriteAdapter.FunctionType.Favorite, it, data!!) }
-        tvMsg.setOnClickListener { listener.onItemClick(FavoriteAdapter.FunctionType.Msg, it, data!!) }
-        tvShare.setOnClickListener { listener.onItemClick(FavoriteAdapter.FunctionType.Share, it, data!!) }
-        tvMore.setOnClickListener { listener.onItemClick(FavoriteAdapter.FunctionType.More, it, data!!) }
+        ivPhoto.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.Video, it, data!!) }
+        tvLike.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.Like, it, data!!) }
+        tvFavorite.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.Favorite, it, data!!) }
+        tvMsg.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.Msg, it, data!!) }
+        tvShare.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.Share, it, data!!) }
+        tvMore.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.More, it, data!!) }
     }
 
     override fun updated() {

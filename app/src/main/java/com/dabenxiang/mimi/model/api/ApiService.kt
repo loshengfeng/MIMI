@@ -315,13 +315,15 @@ interface ApiService {
 
     @POST("/v1/Members/Post/{postId}/Like")
     suspend fun addLike(
-        @Path("postId") postId: Long
+        @Path("postId") postId: Long,
+        @Body body: LikeRequest
     ) : Response<Void>
 
-    @DELETE("/v1/Members/Post/{postId}/Like")
-    suspend fun deleteLike(
-        @Path("postId") postId: Long
-    ) : Response<Void>
+    // todo: not sure...
+//    @DELETE("/v1/Members/Post/{postId}/Like")
+//    suspend fun deleteLike(
+//        @Path("postId") postId: Long
+//    ) : Response<Void>
 
 
     @POST("/v1/Members/Post/{postId}/PostReport")

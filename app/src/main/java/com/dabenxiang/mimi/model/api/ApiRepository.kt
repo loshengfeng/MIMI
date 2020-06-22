@@ -6,6 +6,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
+import retrofit2.http.Body
 import java.io.File
 
 class ApiRepository(private val apiService: ApiService) {
@@ -416,15 +417,17 @@ class ApiRepository(private val apiService: ApiService) {
      * 帖子喜歡/不喜歡
      */
     suspend fun addLike(
-        postId: Long
-    ) = apiService.addLike(postId)
+        postId: Long,
+        body: LikeRequest
+    ) = apiService.addLike(postId, body)
 
+    // todo: not sure...
     /**
      * 移除帖子的喜歡/不喜歡
      */
-    suspend fun deleteLike(
-        postId: Long
-    ) = apiService.deleteLike(postId)
+//    suspend fun deleteLike(
+//        postId: Long
+//    ) = apiService.deleteLike(postId)
 
     /**
      * 帖子問題回報

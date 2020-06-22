@@ -50,4 +50,5 @@ data class PlayListItem (
 
     @SerializedName("commentCount")
     val commentCount: Int?
-)
+
+) : BaseItem()
