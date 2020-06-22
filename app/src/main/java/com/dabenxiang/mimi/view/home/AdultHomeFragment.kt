@@ -7,7 +7,7 @@ import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.extension.setBtnSolidDolor
+import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
@@ -103,7 +103,7 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
         layout_top.background = requireActivity().getDrawable(R.color.adult_color_status_bar)
 
         layout_search_bar.background = requireActivity().getDrawable(R.color.adult_color_background)
-        iv_bg_search.setBtnSolidDolor(requireActivity().getColor(R.color.adult_color_search_bar))
+        iv_bg_search.setBtnSolidColor(requireActivity().getColor(R.color.adult_color_search_bar))
 
         iv_search.setImageResource(R.drawable.adult_btn_search)
         tv_search.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
@@ -112,7 +112,7 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
         recyclerview_videos.background = requireActivity().getDrawable(R.color.adult_color_background)
 
         btn_filter.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
-        btn_filter.setBtnSolidDolor(
+        btn_filter.setBtnSolidColor(
             requireActivity().getColor(R.color.color_white_1_30),
             requireActivity().getColor(R.color.color_red_1),
             resources.getDimension(R.dimen.dp_6)

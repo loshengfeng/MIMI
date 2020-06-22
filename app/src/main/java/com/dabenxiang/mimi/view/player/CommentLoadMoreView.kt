@@ -7,7 +7,7 @@ import android.widget.TextView
 import com.chad.library.adapter.base.loadmore.BaseLoadMoreView
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.extension.setBtnSolidDolor
+import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.yulichswift.roundedview.widget.RoundedTextView
 
 class CommentLoadMoreView(private val isAdult: Boolean) : BaseLoadMoreView() {
@@ -27,7 +27,7 @@ class CommentLoadMoreView(private val isAdult: Boolean) : BaseLoadMoreView() {
         val bgView = holder.getView<RoundedTextView>(R.id.bg_load_more_complete)
         val res = bgView.resources
         val bgColor = res.getColor(if (isAdult) R.color.color_white_1_10 else R.color.color_black_1_05, null)
-        bgView.setBtnSolidDolor(bgColor, -1, res.getDimension(R.dimen.dp_4))
+        bgView.setBtnSolidColor(bgColor, -1, res.getDimension(R.dimen.dp_4))
 
         val textView = holder.getView<TextView>(R.id.tv_load_more_complete)
         textView.setCompoundDrawablesRelativeWithIntrinsicBounds(

@@ -8,7 +8,7 @@ import com.chad.library.adapter.base.binder.QuickItemBinder
 import com.chad.library.adapter.base.module.LoadMoreModule
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.extension.setBtnSolidDolor
+import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.yulichswift.roundedview.widget.RoundedTextView
 import java.text.SimpleDateFormat
@@ -91,7 +91,7 @@ class MembersPostCommentItemBinder(private val isAdult: Boolean) : QuickItemBind
                         it.resources.getColor(colorRes, null)
                     }
 
-                it.setBtnSolidDolor(solidColor, pressedColor, it.resources.getDimension(R.dimen.dp_10))
+                it.setBtnSolidColor(solidColor, pressedColor, it.resources.getDimension(R.dimen.dp_10))
                 it.text = String.format(it.resources.getString(R.string.n_reply), data.commentCount)
 
                 it.visibility = View.VISIBLE

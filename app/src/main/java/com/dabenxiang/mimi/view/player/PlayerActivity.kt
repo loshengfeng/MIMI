@@ -17,7 +17,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearSnapHelper
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.extension.setBtnSolidDolor
+import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.extension.setNot
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ExceptionResult
@@ -50,6 +50,7 @@ import kotlinx.android.synthetic.main.activity_player.*
 import kotlinx.android.synthetic.main.custom_playback_control.*
 import kotlinx.android.synthetic.main.head_comment.view.*
 import kotlinx.android.synthetic.main.head_guess_like.view.*
+import kotlinx.android.synthetic.main.head_no_comment.view.*
 import kotlinx.android.synthetic.main.head_source.view.*
 import kotlinx.android.synthetic.main.head_video_info.view.*
 import kotlinx.coroutines.Dispatchers
@@ -133,11 +134,15 @@ class PlayerActivity : BaseActivity() {
         layoutInflater.inflate(R.layout.head_comment, recycler_info.parent as ViewGroup, false)
     }
 
+    private val headNoComment by lazy {
+        layoutInflater.inflate(R.layout.head_no_comment, recycler_info.parent as ViewGroup, false)
+    }
+
     private val playerInfoAdapter by lazy {
         PlayerInfoAdapter(obtainIsAdult()).apply {
             loadMoreModule.apply {
                 isEnableLoadMore = true
-                isAutoLoadMore = false
+                isAutoLoadMore = true
                 isEnableLoadMoreIfNotFullPage = false
             }
         }
@@ -189,6 +194,7 @@ class PlayerActivity : BaseActivity() {
         playerInfoAdapter.addHeaderView(headSource)
         playerInfoAdapter.addHeaderView(headGuessLike)
         playerInfoAdapter.addHeaderView(headComment)
+        playerInfoAdapter.addHeaderView(headNoComment)
         playerInfoAdapter.loadMoreModule.loadMoreView = CommentLoadMoreView(isAdult)
 
         recycler_info.adapter = playerInfoAdapter
@@ -212,6 +218,7 @@ class PlayerActivity : BaseActivity() {
         headSource.title_source.setTextColor(titleColor)
         headGuessLike.title_guess_like.setTextColor(titleColor)
         headComment.title_comment.setTextColor(titleColor)
+        headNoComment.title_no_comment.setTextColor(titleColor)
 
         val subTitleColor =
             if (isAdult) {
@@ -270,7 +277,7 @@ class PlayerActivity : BaseActivity() {
 
         if (isAdult) {
             btn_write_comment.setTextColor(getColor(R.color.color_white_1_30))
-            btn_write_comment.setBtnSolidDolor(getColor(R.color.color_black_1_20))
+            btn_write_comment.setBtnSolidColor(getColor(R.color.color_black_1_20))
         }
 
         viewModel.fastForwardTime.observe(this, Observer {
@@ -369,8 +376,24 @@ class PlayerActivity : BaseActivity() {
                     viewModel.costPoint = result.point ?: 0L
                     viewModel.availablePoint = result.availablePoint ?: 0L
 
-                    lifecycleScope.launchWhenResumed {
-                        setupCommentDataSource(playerInfoAdapter)
+                    if (result.commentCount == 0L) {
+                        headNoComment.title_no_comment.visibility = View.VISIBLE
+                        headNoComment.title_no_comment.setTextColor(titleColor)
+                        val bgColor =
+                            if (isAdult) {
+                                R.color.color_white_1_10
+                            } else {
+                                R.color.color_black_1_10
+                            }.let { colorRes ->
+                                getColor(colorRes)
+                            }
+                        headNoComment.title_no_comment.setBtnSolidColor(bgColor, bgColor, resources.getDimension(R.dimen.dp_10))
+                    } else {
+                        headNoComment.title_no_comment.visibility = View.GONE
+
+                        lifecycleScope.launchWhenResumed {
+                            setupCommentDataSource(playerInfoAdapter)
+                        }
                     }
                 }
             }
