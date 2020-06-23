@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.adapter
+package com.dabenxiang.mimi.view.player
 
 import android.view.LayoutInflater
 import android.view.View

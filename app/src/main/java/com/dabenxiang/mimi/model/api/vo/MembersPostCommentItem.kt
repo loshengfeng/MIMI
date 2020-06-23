@@ -9,21 +9,21 @@ data class MembersPostCommentItem(
     @SerializedName("content")
     val content: String?,
     @SerializedName("creationDate")
-    val creationDate: Date?,
+    var creationDate: Date?,
     @SerializedName("creatorId")
     val creatorId: Long?,
     @SerializedName("dislikeCount")
-    val dislikeCount: Long?,
+    var dislikeCount: Long?,
     @SerializedName("id")
     val id: Long?,
     @SerializedName("likeCount")
-    val likeCount: Long?,
+    var likeCount: Long?,
     @SerializedName("likeType")
-    val likeType: Int?,
+    var likeType: Int?,
     @SerializedName("postAvatarAttachmentId")
     val postAvatarAttachmentId: Long?,
     @SerializedName("postName")
     val postName: String?,
     @SerializedName("reported")
-    val reported: Boolean?
+    var reported: Boolean?
 )

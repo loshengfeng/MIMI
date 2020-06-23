@@ -1,10 +1,10 @@
-package com.dabenxiang.mimi.view.adapter
+package com.dabenxiang.mimi.view.player
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.view.adapter.BaseTabAdapter
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
-import com.dabenxiang.mimi.view.player.SelectEpisodeHolder
 
 class SelectEpisodeAdapter(private val listener: BaseIndexViewHolder.IndexViewHolderListener, private val isAdult: Boolean) :
     BaseTabAdapter<String, SelectEpisodeHolder>() {

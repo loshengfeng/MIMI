@@ -27,9 +27,6 @@ import com.dabenxiang.mimi.model.api.vo.handleException
 import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.serializable.PlayerData
-import com.dabenxiang.mimi.view.adapter.GuessLikeAdapter
-import com.dabenxiang.mimi.view.adapter.PlayerInfoAdapter
-import com.dabenxiang.mimi.view.adapter.SelectEpisodeAdapter
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseActivity
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
@@ -86,6 +83,8 @@ class PlayerActivity : BaseActivity() {
     private var dialog: GeneralDialog? = null
     private var consumeDialog: GeneralDialog? = null
 
+    private var loadReplayCommentBlock: (() -> Unit)? = null
+
     private val sourceListAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
@@ -103,7 +102,8 @@ class PlayerActivity : BaseActivity() {
     }
 
     private val guessLikeAdapter by lazy {
-        GuessLikeAdapter(object : GuessLikeAdapter.GuessLikeAdapterListener {
+        GuessLikeAdapter(object :
+            GuessLikeAdapter.GuessLikeAdapterListener {
             override fun onVideoClick(view: View, item: PlayerData) {
                 val intent = Intent(this@PlayerActivity, PlayerActivity::class.java)
                 intent.putExtras(createBundle(item))
@@ -139,42 +139,17 @@ class PlayerActivity : BaseActivity() {
     }
 
     private val playerInfoAdapter by lazy {
-        PlayerInfoAdapter(obtainIsAdult()).apply {
+        PlayerInfoAdapter(obtainIsAdult(), object : PlayerInfoAdapter.PlayerInfoListener {
+            override fun expandComment(adapter: PlayerInfoAdapter, parentNode: RootCommentNode, succeededBlock: () -> Unit) {
+                loadReplayCommentBlock = succeededBlock
+                viewModel.loadReplyComment(parentNode, parentNode.data.id)
+            }
+        }).apply {
             loadMoreModule.apply {
                 isEnableLoadMore = true
                 isAutoLoadMore = true
                 isEnableLoadMoreIfNotFullPage = false
             }
-        }
-    }
-
-    private suspend fun setupCommentDataSource(adapter: PlayerInfoAdapter) {
-        val dataSrc = CommentDataSource(viewModel.videoId, viewModel.domainManager)
-
-        dataSrc.loadMore().also { load ->
-            withContext(Dispatchers.Main) {
-                load.content?.also { adapter.setList(it) }
-                setupLoadMoreResult(adapter, load.isEnd)
-            }
-        }
-
-        adapter.loadMoreModule.setOnLoadMoreListener {
-            lifecycleScope.launch(Dispatchers.IO) {
-                dataSrc.loadMore().also { load ->
-                    withContext(Dispatchers.Main) {
-                        load.content?.also { adapter.addData(it) }
-                        setupLoadMoreResult(adapter, load.isEnd)
-                    }
-                }
-            }
-        }
-    }
-
-    private fun setupLoadMoreResult(adapter: PlayerInfoAdapter, isEnd: Boolean) {
-        if (isEnd) {
-            adapter.loadMoreModule.loadMoreEnd()
-        } else {
-            adapter.loadMoreModule.loadMoreComplete()
         }
     }
 
@@ -392,10 +367,20 @@ class PlayerActivity : BaseActivity() {
                         headNoComment.title_no_comment.visibility = View.GONE
 
                         lifecycleScope.launchWhenResumed {
-                            setupCommentDataSource(playerInfoAdapter)
+                            viewModel.setupCommentDataSource(playerInfoAdapter)
                         }
                     }
                 }
+            }
+        })
+
+        viewModel.isSelectedNewestComment.observe(this, Observer {
+            if (it) {
+                headComment.tv_newest.setTextColor(getColor(R.color.color_red_1))
+                headComment.tv_hottest.setTextColor(subTitleColor)
+            } else {
+                headComment.tv_newest.setTextColor(subTitleColor)
+                headComment.tv_hottest.setTextColor(getColor(R.color.color_red_1))
             }
         })
 
@@ -409,6 +394,20 @@ class PlayerActivity : BaseActivity() {
 
         iv_share.setImageResource(if (isAdult) R.drawable.btn_share_white_n else R.drawable.btn_share_gray_n)
         iv_more.setImageResource(if (isAdult) R.drawable.btn_more_white_n else R.drawable.btn_more_gray_n)
+
+        headComment.tv_newest.setOnClickListener {
+            viewModel.updatedSelectedNewestComment(true)
+            lifecycleScope.launch {
+                viewModel.setupCommentDataSource(playerInfoAdapter)
+            }
+        }
+
+        headComment.tv_hottest.setOnClickListener {
+            viewModel.updatedSelectedNewestComment(false)
+            lifecycleScope.launch {
+                viewModel.setupCommentDataSource(playerInfoAdapter)
+            }
+        }
 
         viewModel.likeVideo.observe(this, Observer {
             val res = when (it) {
@@ -459,6 +458,18 @@ class PlayerActivity : BaseActivity() {
                 }
                 VideoConsumeResult.PointNotEnough -> {
                     consumeDialog = showPointNotEnoughDialog()
+                }
+            }
+        })
+
+        viewModel.apiLoadReplyCommentResult.observe(this, Observer { event ->
+            event.getContentIfNotHandled()?.also { apiResult ->
+                when (apiResult) {
+                    is ApiResult.Loading -> progressHUD.show()
+                    is ApiResult.Loaded -> progressHUD.dismiss()
+                    is ApiResult.Empty -> loadReplayCommentBlock?.let {
+                        it()
+                    }
                 }
             }
         })

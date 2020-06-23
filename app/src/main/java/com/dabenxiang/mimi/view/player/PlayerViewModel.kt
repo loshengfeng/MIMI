@@ -3,10 +3,7 @@ package com.dabenxiang.mimi.view.player
 import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.view.View
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asFlow
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.dabenxiang.mimi.callback.GuessLikePagingCallBack
@@ -16,6 +13,7 @@ import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.widget.utility.SingleEvent
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
 import com.google.android.exoplayer2.source.MediaSource
@@ -29,6 +27,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import timber.log.Timber
 
@@ -64,6 +63,9 @@ class PlayerViewModel : BaseViewModel() {
     private val _apiStreamResult = MutableLiveData<ApiResult<Nothing>>()
     val apiStreamResult: LiveData<ApiResult<Nothing>> = _apiStreamResult
 
+    private val _apiLoadReplyCommentResult = MutableLiveData<SingleEvent<ApiResult<Nothing>>>()
+    val apiLoadReplyCommentResult: LiveData<SingleEvent<ApiResult<Nothing>>> = _apiLoadReplyCommentResult
+
     private val _consumeResult = MutableLiveData<VideoConsumeResult>()
     val consumeResult: LiveData<VideoConsumeResult> = _consumeResult
 
@@ -78,6 +80,12 @@ class PlayerViewModel : BaseViewModel() {
 
     private val _recyclerViewGuessLikeVisible = MutableLiveData<Int>()
     val recyclerViewGuessLikeVisible: LiveData<Int> = _recyclerViewGuessLikeVisible
+
+    private val _isSelectedNewestComment = MutableLiveData(true)
+    val isSelectedNewestComment: LiveData<Boolean> = _isSelectedNewestComment
+    fun updatedSelectedNewestComment(isNewest: Boolean) {
+        _isSelectedNewestComment.value = isNewest
+    }
 
     val showIntroduction = MutableLiveData(false)
 
@@ -183,6 +191,10 @@ class PlayerViewModel : BaseViewModel() {
         } else {
             getStreamUrl()
         }
+    }
+
+    private fun updated() {
+
     }
 
     private fun getAdultStreamUrl() {
@@ -352,6 +364,104 @@ class PlayerViewModel : BaseViewModel() {
         }
 
         override fun onThrowable(throwable: Throwable) {
+        }
+    }
+
+    fun setupCommentDataSource(adapter: PlayerInfoAdapter) {
+        viewModelScope.launch {
+            val sorting = if (isSelectedNewestComment.value == true) 1 else 2
+            val dataSrc = CommentDataSource(videoId, sorting, domainManager)
+
+            dataSrc.loadMore().also { load ->
+                withContext(Dispatchers.Main) {
+                    load.content?.let { list ->
+                        val finalList = list.map { item ->
+                            RootCommentNode(item)
+                        }
+                        adapter.setList(finalList)
+                    }
+                }
+                setupLoadMoreResult(adapter, load.isEnd)
+            }
+
+            adapter.loadMoreModule.setOnLoadMoreListener {
+                viewModelScope.launch(Dispatchers.IO) {
+                    dataSrc.loadMore().also { load ->
+                        withContext(Dispatchers.Main) {
+                            load.content?.also { list ->
+                                val finalList = list.map { item ->
+                                    RootCommentNode(item)
+                                }
+                                adapter.addData(finalList)
+                            }
+                            setupLoadMoreResult(adapter, load.isEnd)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setupLoadMoreResult(adapter: PlayerInfoAdapter, isEnd: Boolean) {
+        if (isEnd) {
+            adapter.loadMoreModule.loadMoreEnd()
+        } else {
+            adapter.loadMoreModule.loadMoreComplete()
+        }
+    }
+
+    fun loadReplyComment(parentNode: RootCommentNode, commentId: Long?) {
+        viewModelScope.launch {
+            flow {
+                var isFirst = true
+                var total = 0L
+                var offset = 0L
+                var currentSize = 0
+                while (isFirst || hasNextPage(total, offset, currentSize)) {
+                    isFirst = false
+
+                    currentSize = 0
+
+                    val resp = domainManager.getApiRepository()
+                        .getMembersPostComment(postId = videoId, parentId = commentId, sorting = 1, offset = "0", limit = "50")
+                    if (!resp.isSuccessful) throw HttpException(resp)
+
+                    parentNode.nestedCommentList.clear()
+                    resp.body()?.content?.map {
+                        NestedCommentNode(it)
+                    }?.also {
+                        parentNode.nestedCommentList.addAll(it)
+
+                        val pagingItem = resp.body()?.paging
+                        total = pagingItem?.count ?: 0L
+                        offset = pagingItem?.offset ?: 0L
+                        currentSize = it.size
+                    }
+
+                    if (currentSize == 0)
+                        break
+                }
+
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e ->
+                    Timber.e(e)
+                    emit(ApiResult.error(e))
+                }
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect {
+                    _apiLoadReplyCommentResult.value = SingleEvent(it)
+                }
+        }
+    }
+
+    private fun hasNextPage(total: Long, offset: Long, currentSize: Int): Boolean {
+        return when {
+            currentSize < 50 -> false
+            offset >= total -> false
+            else -> true
         }
     }
 }

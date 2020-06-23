@@ -1,12 +1,13 @@
 package com.dabenxiang.mimi.view.player
 
 import com.dabenxiang.mimi.manager.DomainManager
+import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.view.base.JFPageDataSource
 import retrofit2.HttpException
 import timber.log.Timber
 
-class CommentDataSource(private val videoId: Long, private val domainManager: DomainManager) :
-    JFPageDataSource<Long, List<String>>() {
+class CommentDataSource(private val videoId: Long, private val sorting: Int, private val domainManager: DomainManager) :
+    JFPageDataSource<Long, List<MembersPostCommentItem>>() {
 
     companion object {
         const val PER_LIMIT = "20"
@@ -18,7 +19,7 @@ class CommentDataSource(private val videoId: Long, private val domainManager: Do
             val nowOffset = params ?: 0L
 
             val resp = domainManager.getApiRepository()
-                .getMembersPostComment(postId = videoId, sorting = 1, offset = nowOffset.toString(), limit = PER_LIMIT)
+                .getMembersPostComment(postId = videoId, sorting = sorting, offset = nowOffset.toString(), limit = PER_LIMIT)
             if (!resp.isSuccessful) throw HttpException(resp)
 
             val body = resp.body()!!

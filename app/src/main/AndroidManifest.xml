@@ -50,6 +50,7 @@
 
         <activity
             android:name=".view.player.PlayerActivity"
+            android:theme="@style/PlayerTheme"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
             android:exported="true"
             android:screenOrientation="portrait"
