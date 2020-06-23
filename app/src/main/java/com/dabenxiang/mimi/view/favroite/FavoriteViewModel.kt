@@ -25,6 +25,7 @@ import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_NORMAL
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_SHORT_VIDEO
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_ADULT
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -37,6 +38,9 @@ class FavoriteViewModel : BaseViewModel() {
     val dataCount = MutableLiveData<Int>()
 
     var viewStatus: MutableMap<Int, Int> = mutableMapOf()
+
+    private val _cleanResult = MutableLiveData<ApiResult<Nothing>>()
+    val cleanResult: LiveData<ApiResult<Nothing>> = _cleanResult
 
     private val _playList = MutableLiveData<PagedList<Any>>()
     val playList: LiveData<PagedList<Any>> = _playList
@@ -156,6 +160,7 @@ class FavoriteViewModel : BaseViewModel() {
                 }
                 emit(ApiResult.success(view))
             }
+                .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
@@ -185,6 +190,7 @@ class FavoriteViewModel : BaseViewModel() {
                 }
                 emit(ApiResult.success(view))
             }
+                .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
@@ -199,9 +205,26 @@ class FavoriteViewModel : BaseViewModel() {
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }
+                .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
+        }
+    }
+
+    fun deleteFavorite(postFavoriteId: Long, ostFavoriteIds: List<Long>) {
+        viewModelScope.launch {
+            flow {
+                // todo: 清除此頁顯示的視頻...
+                val result = domainManager.getApiRepository().deletePostFavorite(123, listOf(123))
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _cleanResult.value = it }
         }
     }
 
@@ -211,4 +234,5 @@ class FavoriteViewModel : BaseViewModel() {
         override fun onThrowable(throwable: Throwable) {}
         override fun onTotalCount(count: Int) { viewModelScope.launch { dataCount.value = count } }
     }
+
 }

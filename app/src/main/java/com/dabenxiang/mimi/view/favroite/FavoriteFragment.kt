@@ -91,27 +91,17 @@ class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
         viewModel.postList.observe(viewLifecycleOwner, Observer { favoriteAdapter.submitList(it) })
         viewModel.dataCount.observe(viewLifecycleOwner, Observer { refreshUi(it) })
 
-//        viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
-//            when (it) {
-//                is ApiResult.Error -> onApiError(it.throwable)
-//                is ApiResult.Success -> {
-//                    Timber.d("James_2: $id")
-//                    val bitmap = viewModel.lruCacheManager.getLruCache(it.result.second)
-//
-//                    val options: RequestOptions = RequestOptions()
-//                        .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-//                        .placeholder(R.mipmap.ic_launcher)
-//                        .error(R.mipmap.ic_launcher)
-//                        .priority(Priority.NORMAL)
-//
-//                    Glide.with(App.self).load(bitmap)
-//                        .apply(options)
-//                        .into(it.result.first)
-//                    true
-//                }
-//                is ApiResult.Loaded -> progressHUD?.dismiss()
-//            }
-//        })
+
+        viewModel.cleanResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Error -> onApiError(it.throwable)
+                is ApiResult.Empty -> {
+                    // todo: reload data...
+                }
+                is ApiResult.Loaded -> progressHUD?.dismiss()
+            }
+        })
 
         viewModel.likeResult.observe(viewLifecycleOwner, Observer {
             when (it) {
@@ -326,6 +316,7 @@ class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
     private val onCleanDialogListener = object : OnCleanDialogListener {
         override fun onClean() {
             // todo: 清除此頁顯示的視頻...
+            viewModel.deleteFavorite(123, listOf())
         }
     }
 

@@ -379,8 +379,9 @@ class ApiRepository(private val apiService: ApiService) {
      * 移除我的帖子收藏
      */
     suspend fun deletePostFavorite(
-        postFavoriteId: Long
-    ) = apiService.deletePostFavorite(postFavoriteId)
+        postFavoriteId: Long,
+        postFavoriteIds: List<Long>
+    ) = apiService.deletePostFavorite(postFavoriteId, postFavoriteIds)
 
     /**
      * 取得使用者資訊明細
