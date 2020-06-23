@@ -4,11 +4,12 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.PlayListItem
+import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_NORMAL
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_SHORT_VIDEO
@@ -39,6 +40,7 @@ class FavoriteAdapter(
     interface EventListener {
         fun onVideoClick(item: Any)
         fun onFunctionClick(type: FunctionType, view: View, item: Any)
+        fun onAvatarDownload(view: ImageView, id: Long)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -53,14 +55,14 @@ class FavoriteAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
         when (holder) {
-            is FavoritePlayViewHolder -> holder.bind(item as PlayListItem)
+            is FavoritePlayViewHolder -> holder.bind(item as PlayItem)
             is FavoritePostViewHolder -> holder.bind(item as PostFavoriteItem)
         }
     }
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
-            is PlayListItem -> TYPE_NORMAL
+            is PlayItem -> TYPE_NORMAL
             else -> TYPE_SHORT_VIDEO
         }
     }

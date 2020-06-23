@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.dabenxiang.mimi.manager.AccountManager
 import com.dabenxiang.mimi.manager.DomainManager
+import com.dabenxiang.mimi.manager.LruCacheManager
 import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.google.gson.Gson
 import org.koin.core.KoinComponent
@@ -18,6 +19,7 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     val gson: Gson by inject()
     val toastData = MutableLiveData<String>()
     val domainManager: DomainManager by inject()
+    val lruCacheManager: LruCacheManager by inject()
 
     private val _showProgress by lazy { MutableLiveData<Boolean>() }
     val showProgress: LiveData<Boolean> get() = _showProgress

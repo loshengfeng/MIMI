@@ -2,7 +2,7 @@ package com.dabenxiang.mimi.model.api.vo
 
 import com.google.gson.annotations.SerializedName
 
-data class PlayListItem (
+data class PlayItem (
     @SerializedName("id")
     val id: Long?,
 
@@ -49,6 +49,9 @@ data class PlayListItem (
     val favoriteCount: Int?,
 
     @SerializedName("commentCount")
-    val commentCount: Int?
+    val commentCount: Int?,
+
+    @SerializedName("tags")
+    val tags: List<String>?
 
 ) : BaseItem()

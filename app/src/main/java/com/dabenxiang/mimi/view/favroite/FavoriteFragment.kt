@@ -5,13 +5,21 @@ import android.content.ClipboardManager
 import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.load.MultiTransformation
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import com.bumptech.glide.request.RequestOptions
+import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.BaseItem
-import com.dabenxiang.mimi.model.api.vo.PlayListItem
+import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.serializable.PlayerData
@@ -19,6 +27,8 @@ import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.adapter.FavoriteTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
+import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
+import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.dialog.more.OnMoreDialogListener
 import com.dabenxiang.mimi.view.dialog.more.MoreDialogFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
@@ -29,6 +39,7 @@ import kotlinx.android.synthetic.main.fragment_post_favorite.layout_refresh
 import kotlinx.android.synthetic.main.fragment_post_favorite.rv_content
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import timber.log.Timber
 
 @ExperimentalCoroutinesApi
 class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
@@ -42,7 +53,7 @@ class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
         const val TAB_SECONDARY = 1
         const val TYPE_NORMAL = 0
         const val TYPE_ADULT = 1
-        const val TYPE_MIMI = 0
+        private const val TYPE_MIMI = 0
         const val TYPE_SHORT_VIDEO = 1
         var lastPrimaryIndex = TYPE_NORMAL
         var lastSecondaryIndex = TYPE_MIMI
@@ -80,6 +91,28 @@ class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
         viewModel.postList.observe(viewLifecycleOwner, Observer { favoriteAdapter.submitList(it) })
         viewModel.dataCount.observe(viewLifecycleOwner, Observer { refreshUi(it) })
 
+//        viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
+//            when (it) {
+//                is ApiResult.Error -> onApiError(it.throwable)
+//                is ApiResult.Success -> {
+//                    Timber.d("James_2: $id")
+//                    val bitmap = viewModel.lruCacheManager.getLruCache(it.result.second)
+//
+//                    val options: RequestOptions = RequestOptions()
+//                        .transform(MultiTransformation(CenterCrop(), CircleCrop()))
+//                        .placeholder(R.mipmap.ic_launcher)
+//                        .error(R.mipmap.ic_launcher)
+//                        .priority(Priority.NORMAL)
+//
+//                    Glide.with(App.self).load(bitmap)
+//                        .apply(options)
+//                        .into(it.result.first)
+//                    true
+//                }
+//                is ApiResult.Loaded -> progressHUD?.dismiss()
+//            }
+//        })
+
         viewModel.likeResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
@@ -111,8 +144,11 @@ class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
     override fun setupListeners() {
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
-                // todo: clean single tab or all tabs?
-                R.id.tv_clean -> GeneralUtils.showToast(requireContext(), "clean")
+                R.id.tv_clean -> {
+                    CleanDialogFragment.newInstance(onCleanDialogListener).also {
+                        it.show(activity!!.supportFragmentManager, CleanDialogFragment::class.java.simpleName)
+                    }
+                }
             }
         }.also {
             tv_clean.setOnClickListener(it)
@@ -127,7 +163,7 @@ class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
     override fun initSettings() {
         tv_back.visibility = View.GONE
         tv_title.text = getString(R.string.favorite_title)
-        tv_clean.visibility = View.GONE
+        tv_clean.visibility = View.VISIBLE
 
         rv_primary.adapter = primaryAdapter
 
@@ -183,15 +219,20 @@ class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
     }
 
     private val listener = object : FavoriteAdapter.EventListener {
+        override fun onAvatarDownload(view: ImageView, id: Long) {
+            viewModel.getAttachment(view, id)
+        }
+
         override fun onVideoClick(item: Any) {
             when (item) {
-                is PlayListItem -> {
+                is PlayItem -> {
                     val playerData = PlayerData(item.videoId ?: 0, item.isAdult ?: false)
                     val intent = Intent(requireContext(), PlayerActivity::class.java)
                     intent.putExtras(PlayerActivity.createBundle(playerData))
                     startActivity(intent)
                 }
-                is PostFavoriteItem -> { /*todo:...*/
+                is PostFavoriteItem -> {
+                    // todo: 進入VAI4.1.2.1_短視頻詳細頁，wainting for 短視頻詳細頁...
                 }
             }
         }
@@ -200,9 +241,8 @@ class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
             val textView = view as TextView
             when (type) {
                 FavoriteAdapter.FunctionType.Like -> {
-                    // 點擊後按讚次數+1，再次點擊則-1
                     when (item) {
-                        is PlayListItem -> {
+                        is PlayItem -> {
                             item.id?.let {
                                 viewModel.viewStatus[textView.id] =
                                     viewModel.viewStatus[textView.id] ?: LikeType.DISLIKE.value
@@ -220,9 +260,9 @@ class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
                 }
 
                 FavoriteAdapter.FunctionType.Favorite -> {
-                    // 點擊後加入收藏
+                    // 點擊後加入收藏,
                     when (item) {
-                        is PlayListItem -> {
+                        is PlayItem -> {
                             item.id?.let {
                                 viewModel.viewStatus[textView.id] = viewModel.viewStatus[textView.id] ?: LikeType.DISLIKE.value
                                 viewModel.modifyFavorite(textView, it)
@@ -240,7 +280,7 @@ class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
                 FavoriteAdapter.FunctionType.Share -> {
                     /* 點擊後複製網址 */
                     val url = when (item) {
-                        is PlayListItem -> {
+                        is PlayItem -> {
                             // todo: API hsn no url...
 //                            item.url
                             "url"
@@ -257,7 +297,6 @@ class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
                 }
 
                 FavoriteAdapter.FunctionType.More -> {
-                    // 點擊後popup視窗，popup(2)問題回報視窗
                     // 若已經檢舉過則Disable -> todo: can't determine?
                     MoreDialogFragment.newInstance(item as BaseItem, onReportDialogListener).also {
                         it.show(activity!!.supportFragmentManager, MoreDialogFragment::class.java.simpleName)
@@ -266,6 +305,7 @@ class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
                 else -> {}
             }
         }
+
     }
 
     private fun refreshUI(view: TextView) {
@@ -283,15 +323,20 @@ class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
         view.text = count.toString()
     }
 
+    private val onCleanDialogListener = object : OnCleanDialogListener {
+        override fun onClean() {
+            // todo: 清除此頁顯示的視頻...
+        }
+    }
+
     private val onReportDialogListener = object : OnMoreDialogListener {
         override fun onReport(item: BaseItem) {
             val postId = when(item) {
-                is PlayListItem -> item.id?: 0
+                is PlayItem -> item.id?: 0
                 is PostFavoriteItem -> item.postId?: 0
                 else -> 0
             }
             viewModel.report(postId)
         }
     }
-
 }

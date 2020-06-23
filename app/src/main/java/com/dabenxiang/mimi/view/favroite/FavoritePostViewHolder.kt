@@ -1,5 +1,7 @@
 package com.dabenxiang.mimi.view.favroite
 
+import android.content.res.ColorStateList
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -9,7 +11,9 @@ import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
+import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import kotlinx.android.synthetic.main.head_video_info.view.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.text.SimpleDateFormat
@@ -17,7 +21,7 @@ import java.util.*
 
 class FavoritePostViewHolder(
     itemView: View,
-    listener: FavoriteAdapter.EventListener
+    private val listener: FavoriteAdapter.EventListener
 ) : BaseAnyViewHolder<PostFavoriteItem>(itemView), KoinComponent {
     private val gson: Gson by inject()
     private val ivHead = itemView.findViewById(R.id.iv_head) as ImageView
@@ -35,7 +39,7 @@ class FavoritePostViewHolder(
     private val tvMore = itemView.findViewById(R.id.tv_more) as TextView
 
     init {
-        ivPhoto.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.Video, it, data!!) }
+        ivPhoto.setOnClickListener { listener.onVideoClick(data!!) }
         tvLike.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.Like, it, data!!) }
         tvFavorite.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.Favorite, it, data!!) }
         tvMsg.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.Msg, it, data!!) }
@@ -44,19 +48,47 @@ class FavoritePostViewHolder(
     }
 
     override fun updated() {
+        data?.posterAvatarAttachmentId?.let {
+            listener.onAvatarDownload(ivHead, it)
+        }
+
         tvName.text = data?.posterName
         tvTitle.text = data?.title
         tvTime.text = data?.postDate.let { date -> SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(date) }
         val contentItem = gson.fromJson(data?.content.toString(), ContentItem::class.java)
         tvLength.text = contentItem?.shortVideoItem?.length
 
-        // todo:...
-//        Glide.with(ivPhoto.context)
-//            .load(contentItem.images?.get(0))
-//            .into(ivPhoto)
+        when(data?.isFollow) {
+            true -> {
+                tvFollow.setTextColor(tvFollow.context.getColor(R.color.color_red_1))
+                tvFollow.setBackgroundResource(R.drawable.bg_red_1_stroke_radius_16)
+            }
+            else -> {
+                tvFollow.setTextColor(tvFollow.context.getColor(R.color.color_black_1_60))
+                tvFollow.setBackgroundResource(R.drawable.bg_gray_6_radius_16)
+            }
+        }
+
+        if(!data?.tag.isNullOrEmpty()) { setupChipGroup(data?.tag?.split(",")) }
 
         tvLike.text = data?.likeCount.toString()
         tvFavorite.text = data?.favoriteCount.toString()
         tvMsg.text = data?.commentCount.toString()
+    }
+
+    private fun setupChipGroup(list: List<String>?) {
+        reflowGroup.reflow_group.removeAllViews()
+
+        if (list == null) { return }
+
+        list.indices.mapNotNull {
+            list[it]
+        }.forEach {
+            val chip = LayoutInflater.from(reflowGroup.context).inflate(R.layout.chip_item, reflowGroup, false) as Chip
+            chip.text = it
+            chip.setTextColor(chip.context.getColor(R.color.color_black_1_50))
+            chip.chipBackgroundColor = ColorStateList.valueOf(chip.context.getColor(R.color.color_black_1_10))
+            reflowGroup.addView(chip)
+        }
     }
 }

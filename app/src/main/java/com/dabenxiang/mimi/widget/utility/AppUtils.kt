@@ -16,19 +16,9 @@ import okhttp3.Request
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.HttpException
 import retrofit2.Response
-import timber.log.Timber
-import java.io.PrintWriter
-import java.io.StringWriter
-import java.text.SimpleDateFormat
-import java.util.*
 import java.util.regex.Pattern
 
 object AppUtils {
-
-    private const val TIME_ZONE_OFFSET: Long = 1000 * 60 * 60 * 8  //UTC - 8 hours
-    private const val MIN_CLICK_DELAY_TIME = 1000
-    private var lastClickTime = 0L
-
 
     @SuppressLint("HardwareIds")
     fun getAndroidID(): String {
@@ -36,53 +26,6 @@ object AppUtils {
             App.applicationContext().contentResolver,
             Settings.Secure.ANDROID_ID
         )
-    }
-
-    fun getSystemProperty(key: String, defaultValue: String): String {
-        var value = defaultValue
-        try {
-            value = Class.forName("android.os.SystemProperties")
-                .getMethod("get", String::class.java)
-                .invoke(null, key) as String
-            if (value == "") {
-                value = defaultValue
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return value
-    }
-
-    fun convertUtcByDateFormat(utcTime: String, pattern: String): String {
-        val sdf = SimpleDateFormat(pattern, Locale.getDefault())
-        val date = utcToDate(utcTime)
-        return sdf.format(date)
-    }
-
-    fun utcToDate(utcTime: String): Date {
-        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.getDefault())
-        return Date(sdf.parse(utcTime).time + TIME_ZONE_OFFSET)
-    }
-
-    fun isFastClick(clickDelay: Int = MIN_CLICK_DELAY_TIME): Boolean {
-        val curClickTime = System.currentTimeMillis()
-        var flag = false
-        if ((curClickTime - lastClickTime) <= clickDelay) {
-            flag = true
-        } else {
-            lastClickTime = curClickTime
-        }
-        return flag
-    }
-
-    fun getExceptionDetail(t: Throwable): String {
-        return when (t) {
-            is HttpException -> {
-                val data = getHttpExceptionData(t)
-                "$data, ${t.localizedMessage}"
-            }
-            else -> getStackTrace(t)
-        }
     }
 
     fun getHttpExceptionData(httpException: HttpException): HttpExceptionItem {
@@ -115,14 +58,6 @@ object AppUtils {
 
         val httpExceptionClone = HttpException(response)
         return HttpExceptionItem(errorItem, httpExceptionClone, url)
-    }
-
-    private fun getStackTrace(t: Throwable): String {
-        val sw = StringWriter(256)
-        val pw = PrintWriter(sw, false)
-        t.printStackTrace(pw)
-        pw.flush()
-        return sw.toString()
     }
 
     fun getLibEnv(): String {

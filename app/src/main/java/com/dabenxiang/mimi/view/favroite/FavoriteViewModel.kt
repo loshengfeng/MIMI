@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.favroite
 
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -7,6 +8,15 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
+import com.blankj.utilcode.util.ImageUtils
+import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.load.MultiTransformation
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import com.bumptech.glide.request.RequestOptions
+import com.dabenxiang.mimi.App
+import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.FavoritePagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.LikeRequest
@@ -83,6 +93,54 @@ class FavoriteViewModel : BaseViewModel() {
         }
     }
 
+    fun getAttachment(view: ImageView, id: Long) {
+        if (!setImage(view, id)) {
+            viewModelScope.launch {
+                flow {
+                    val result = domainManager.getApiRepository().getAttachment(id)
+                    if (!result.isSuccessful) throw HttpException(result)
+
+                    var byteArray = result.body()?.bytes()
+                    val bitmap = ImageUtils.bytes2Bitmap(byteArray)
+                    if (bitmap != null) {
+                        lruCacheManager.putLruCache(id, bitmap)
+                        setImage(view, id)
+                    }
+                    emit(ApiResult.success(Pair(view, id)))
+                }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .collect { resp ->
+                        when (resp) {
+                            is ApiResult.Error -> Timber.e(resp.throwable)
+                            is ApiResult.Success -> {
+                            }
+                        }
+                    }
+            }
+        }
+    }
+
+    private fun setImage(view: ImageView, id: Long) : Boolean {
+        val bitmap = lruCacheManager.getLruCache(id)
+
+        return when (lruCacheManager.getLruCache(id)) {
+            null -> false
+            else -> {
+                val options: RequestOptions = RequestOptions()
+                    .transform(MultiTransformation(CenterCrop(), CircleCrop()))
+                    .placeholder(R.mipmap.ic_launcher)
+                    .error(R.mipmap.ic_launcher)
+                    .priority(Priority.NORMAL)
+
+                Glide.with(App.self).load(bitmap)
+                    .apply(options)
+                    .into(view)
+                true
+            }
+        }
+    }
+
+    // todo: {"code":404000,"message":"can not find post : xxxxxxxx"}
     fun modifyLike(view: TextView, postId: Long) {
         viewModelScope.launch {
             flow {
@@ -105,6 +163,7 @@ class FavoriteViewModel : BaseViewModel() {
         }
     }
 
+    // todo: {"code":404000,"message":"The specified resource does not exist."}
     fun modifyFavorite(view: TextView, postId: Long) {
         Timber.d("addFavorite: $postId")
         viewModelScope.launch {

@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.di
 import android.content.Context
 import com.dabenxiang.mimi.manager.AccountManager
 import com.dabenxiang.mimi.manager.DomainManager
+import com.dabenxiang.mimi.manager.LruCacheManager
 import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager
 import com.dabenxiang.mimi.widget.utility.EnumTypeAdapterFactory
 import com.google.gson.GsonBuilder
@@ -13,6 +14,7 @@ val managerModule = module {
     single { provideDomainManager(get()) }
     single { provideMQTTManager(get()) }
     single { AccountManager(get(), get()) }
+    single { provideLruCacheManager() }
 }
 
 fun provideDomainManager(okHttpClient: OkHttpClient): DomainManager {
@@ -22,4 +24,8 @@ fun provideDomainManager(okHttpClient: OkHttpClient): DomainManager {
 
 fun provideMQTTManager(context: Context): MQTTManager {
     return MQTTManager(context)
+}
+
+fun provideLruCacheManager(): LruCacheManager {
+    return LruCacheManager()
 }

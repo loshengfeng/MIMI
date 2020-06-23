@@ -277,7 +277,7 @@ interface ApiService {
         @Query("isAdult") isAdult: Boolean,
         @Query("offset") offset: String,
         @Query("limit") limit: String
-    ): Response<ApiBasePagingItem<List<PlayListItem>>>
+    ): Response<ApiBasePagingItem<List<PlayItem>>>
 
     @GET("/v1/Members/Me/PostFavorite")
     suspend fun getPostFavorite(
