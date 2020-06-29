@@ -47,6 +47,8 @@ buildscript {
     ext.local_broadcast_manager_version = '1.0.0'
     ext.viewpager2_version = '1.0.0'
     ext.exoplayer_version = '2.11.4'
+    ext.rounded_views_version = '1.3.0'
+    ext.base_recycler_view_adapter_helper_version = '3.0.4'
 
     repositories {
         google()

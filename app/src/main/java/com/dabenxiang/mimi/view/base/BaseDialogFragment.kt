@@ -6,26 +6,8 @@ import android.os.Bundle
 import android.view.*
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.DialogFragment
-import com.dabenxiang.mimi.R
-import com.kaopiz.kprogresshud.KProgressHUD
 
 abstract class BaseDialogFragment : DialogFragment() {
-
-    private var progressHUD: KProgressHUD? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        if (isFullLayout()) {
-            val dialog = super.onCreateDialog(savedInstanceState)
-            val window = dialog.window
-            if (window != null) {
-                //window.requestFeature(Window.FEATURE_NO_TITLE)
-                window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
-                setStyle(STYLE_NORMAL, R.style.AppTheme)
-            }
-        }
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(getLayoutId(), container, false)
@@ -34,9 +16,6 @@ abstract class BaseDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        progressHUD = KProgressHUD.create(context)
-            .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
-
         setupListeners()
         setupObservers()
     }
@@ -44,7 +23,11 @@ abstract class BaseDialogFragment : DialogFragment() {
     override fun onStart() {
         super.onStart()
         if (isFullLayout()) {
-            dialog?.window?.setBackgroundDrawable(ColorDrawable(requireContext().getColor(R.color.color_black_1_50)))
+            val window = dialog?.window
+            if (window != null) {
+                window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+                window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            }
         } else {
             val window = dialog?.window
             if (window != null) {

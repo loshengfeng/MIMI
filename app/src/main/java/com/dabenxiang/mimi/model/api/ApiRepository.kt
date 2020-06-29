@@ -212,6 +212,22 @@ class ApiRepository(private val apiService: ApiService) {
         limit: String
     ) = apiService.getMembersPostComment(postId, parentId, sorting, offset, limit)
 
+    suspend fun postMembersPostComment(
+        postId: Long,
+        body: PostCommentRequest
+    ) = apiService.postMembersPostComment(postId, body)
+
+    suspend fun postMembersPostCommentLike(
+        postId: Long,
+        commentId: Long,
+        body: PostLikeRequest
+    ) = apiService.postMembersPostCommentLike(postId, commentId, body)
+
+    suspend fun deleteMembersPostCommentLike(
+        postId: Long,
+        commentId: Long
+    ) = apiService.deleteMembersPostCommentLike(postId, commentId)
+
     /**********************************************************
      *
      *                   Members/Home/Categories

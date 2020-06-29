@@ -21,9 +21,7 @@ import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.extension.setNot
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ExceptionResult
-import com.dabenxiang.mimi.model.api.vo.Source
-import com.dabenxiang.mimi.model.api.vo.VideoEpisode
-import com.dabenxiang.mimi.model.api.vo.handleException
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.serializable.PlayerData
@@ -32,6 +30,7 @@ import com.dabenxiang.mimi.view.base.BaseActivity
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
+import com.dabenxiang.mimi.view.dialog.SendCommentDialog
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.login.LoginActivity
 import com.dabenxiang.mimi.view.login.LoginFragment
@@ -50,9 +49,7 @@ import kotlinx.android.synthetic.main.head_guess_like.view.*
 import kotlinx.android.synthetic.main.head_no_comment.view.*
 import kotlinx.android.synthetic.main.head_source.view.*
 import kotlinx.android.synthetic.main.head_video_info.view.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.net.UnknownHostException
 import java.text.SimpleDateFormat
@@ -82,8 +79,20 @@ class PlayerActivity : BaseActivity() {
     private var orientationDetector: OrientationDetector? = null
     private var dialog: GeneralDialog? = null
     private var consumeDialog: GeneralDialog? = null
+    private var sendCommentDialog: SendCommentDialog? = null
 
-    private var loadReplayCommentBlock: (() -> Unit)? = null
+    private var loadReplyCommentBlock: (() -> Unit)? = null
+    private var loadCommentLikeBlock: (() -> Unit)? = null
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        dialog = null
+        consumeDialog = null
+        sendCommentDialog = null
+        loadReplyCommentBlock = null
+        loadCommentLikeBlock = null
+    }
 
     private val sourceListAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
@@ -140,9 +149,40 @@ class PlayerActivity : BaseActivity() {
 
     private val playerInfoAdapter by lazy {
         PlayerInfoAdapter(obtainIsAdult(), object : PlayerInfoAdapter.PlayerInfoListener {
-            override fun expandComment(adapter: PlayerInfoAdapter, parentNode: RootCommentNode, succeededBlock: () -> Unit) {
-                loadReplayCommentBlock = succeededBlock
-                viewModel.loadReplyComment(parentNode, parentNode.data.id)
+            override fun sendComment(replyId: Long?, replyName: String?) {
+                if (replyId != null) {
+                    sendCommentDialog = SendCommentDialog.newInstance(obtainIsAdult(), replyId, replyName, sendCommentDialogListener)
+                    sendCommentDialog?.show(supportFragmentManager, null)
+                }
+            }
+
+            override fun expandReply(parentNode: RootCommentNode, succeededBlock: () -> Unit) {
+                loadReplyCommentBlock = succeededBlock
+                parentNode.data.id?.also {
+                    viewModel.loadReplyComment(parentNode, it)
+                }
+            }
+
+            override fun replyComment(replyId: Long?, replyName: String?) {
+                if (replyId != null) {
+                    sendCommentDialog = SendCommentDialog.newInstance(obtainIsAdult(), replyId, replyName, sendCommentDialogListener)
+                    sendCommentDialog?.show(supportFragmentManager, null)
+                }
+            }
+
+            override fun setCommentLikeType(replyId: Long?, isLike: Boolean, succeededBlock: () -> Unit) {
+                loadCommentLikeBlock = succeededBlock
+                replyId?.also {
+                    val type = if (isLike) 0 else 1
+                    viewModel.postCommentLike(replyId, PostLikeRequest(type))
+                }
+            }
+
+            override fun removeCommentLikeType(replyId: Long?, succeededBlock: () -> Unit) {
+                loadCommentLikeBlock = succeededBlock
+                replyId?.also {
+                    viewModel.deleteCommentLike(replyId)
+                }
             }
         }).apply {
             loadMoreModule.apply {
@@ -307,6 +347,54 @@ class PlayerActivity : BaseActivity() {
             }
         })
 
+        viewModel.apiPostCommentResult.observe(this, Observer { event ->
+            event.getContentIfNotHandled()?.also {
+                when (it) {
+                    is ApiResult.Loading -> progressHUD.show()
+                    is ApiResult.Loaded -> progressHUD.dismiss()
+                    is ApiResult.Empty -> {
+                        sendCommentDialog?.dismiss()
+                        sendCommentDialog = null
+
+                        viewModel.setupCommentDataSource(playerInfoAdapter)
+                    }
+                    is ApiResult.Error -> onApiError(it.throwable)
+                }
+            }
+        })
+
+        viewModel.apiCommentLikeResult.observe(this, Observer { event ->
+            event.getContentIfNotHandled()?.also {
+                when (it) {
+                    is ApiResult.Loading -> progressHUD.show()
+                    is ApiResult.Loaded -> progressHUD.dismiss()
+                    is ApiResult.Empty -> {
+                        loadCommentLikeBlock = loadCommentLikeBlock?.let {
+                            it()
+                            null
+                        }
+                    }
+                    is ApiResult.Error -> onApiError(it.throwable)
+                }
+            }
+        })
+
+        viewModel.apiDeleteCommentLikeResult.observe(this, Observer { event ->
+            event.getContentIfNotHandled()?.also {
+                when (it) {
+                    is ApiResult.Loading -> progressHUD.show()
+                    is ApiResult.Loaded -> progressHUD.dismiss()
+                    is ApiResult.Empty -> {
+                        loadCommentLikeBlock = loadCommentLikeBlock?.let {
+                            it()
+                            null
+                        }
+                    }
+                    is ApiResult.Error -> onApiError(it.throwable)
+                }
+            }
+        })
+
         var isFirstInit = true
         viewModel.apiVideoInfo.observe(this, Observer {
             when (it) {
@@ -466,9 +554,14 @@ class PlayerActivity : BaseActivity() {
             event.getContentIfNotHandled()?.also { apiResult ->
                 when (apiResult) {
                     is ApiResult.Loading -> progressHUD.show()
-                    is ApiResult.Loaded -> progressHUD.dismiss()
-                    is ApiResult.Empty -> loadReplayCommentBlock?.let {
-                        it()
+                    is ApiResult.Empty -> {
+                        loadReplyCommentBlock?.also {
+                            it()
+                        }
+                    }
+                    is ApiResult.Loaded -> {
+                        loadReplyCommentBlock = null
+                        progressHUD.dismiss()
                     }
                 }
             }
@@ -521,7 +614,18 @@ class PlayerActivity : BaseActivity() {
             })
         }
 
+        btn_write_comment.setOnClickListener {
+            sendCommentDialog = SendCommentDialog.newInstance(isAdult, null, null, sendCommentDialogListener)
+            sendCommentDialog?.show(supportFragmentManager, null)
+        }
+
         player_view.isEnabled = false
+    }
+
+    private val sendCommentDialogListener = object : SendCommentDialog.SendCommentDialogListener {
+        override fun onSuccess(replyId: Long?, content: String) {
+            viewModel.postComment(PostCommentRequest(replyId, content))
+        }
     }
 
     override fun onStart() {
@@ -1021,7 +1125,6 @@ class PlayerActivity : BaseActivity() {
 
     private fun showCostPointDialog(): GeneralDialog {
         val message = String.format(getString(R.string.cost_point_message), viewModel.availablePoint, viewModel.costPoint)
-
 
         return GeneralDialog.newInstance(
             GeneralDialogData(

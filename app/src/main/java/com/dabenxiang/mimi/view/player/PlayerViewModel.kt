@@ -8,6 +8,8 @@ import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.dabenxiang.mimi.callback.GuessLikePagingCallBack
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.PostCommentRequest
+import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
 import com.dabenxiang.mimi.model.api.vo.Source
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
@@ -65,6 +67,15 @@ class PlayerViewModel : BaseViewModel() {
 
     private val _apiLoadReplyCommentResult = MutableLiveData<SingleEvent<ApiResult<Nothing>>>()
     val apiLoadReplyCommentResult: LiveData<SingleEvent<ApiResult<Nothing>>> = _apiLoadReplyCommentResult
+
+    private val _apiPostCommentResult = MutableLiveData<SingleEvent<ApiResult<Nothing>>>()
+    val apiPostCommentResult: LiveData<SingleEvent<ApiResult<Nothing>>> = _apiPostCommentResult
+
+    private val _apiCommentLikeResult = MutableLiveData<SingleEvent<ApiResult<Nothing>>>()
+    val apiCommentLikeResult: LiveData<SingleEvent<ApiResult<Nothing>>> = _apiCommentLikeResult
+
+    private val _apiDeleteCommentLikeResult = MutableLiveData<SingleEvent<ApiResult<Nothing>>>()
+    val apiDeleteCommentLikeResult: LiveData<SingleEvent<ApiResult<Nothing>>> = _apiDeleteCommentLikeResult
 
     private val _consumeResult = MutableLiveData<VideoConsumeResult>()
     val consumeResult: LiveData<VideoConsumeResult> = _consumeResult
@@ -410,14 +421,14 @@ class PlayerViewModel : BaseViewModel() {
         }
     }
 
-    fun loadReplyComment(parentNode: RootCommentNode, commentId: Long?) {
+    fun loadReplyComment(parentNode: RootCommentNode, commentId: Long) {
         viewModelScope.launch {
             flow {
                 var isFirst = true
                 var total = 0L
                 var offset = 0L
                 var currentSize = 0
-                while (isFirst || hasNextPage(total, offset, currentSize)) {
+                while (isFirst || replyCommentHasNextPage(total, offset, currentSize)) {
                     isFirst = false
 
                     currentSize = 0
@@ -428,7 +439,7 @@ class PlayerViewModel : BaseViewModel() {
 
                     parentNode.nestedCommentList.clear()
                     resp.body()?.content?.map {
-                        NestedCommentNode(it)
+                        NestedCommentNode(parentNode, it)
                     }?.also {
                         parentNode.nestedCommentList.addAll(it)
 
@@ -457,11 +468,71 @@ class PlayerViewModel : BaseViewModel() {
         }
     }
 
-    private fun hasNextPage(total: Long, offset: Long, currentSize: Int): Boolean {
+    private fun replyCommentHasNextPage(total: Long, offset: Long, currentSize: Int): Boolean {
         return when {
             currentSize < 50 -> false
             offset >= total -> false
             else -> true
+        }
+    }
+
+    fun postComment(body: PostCommentRequest) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository().postMembersPostComment(videoId, body)
+                if (!resp.isSuccessful) throw HttpException(resp)
+
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e ->
+                    emit(ApiResult.error(e))
+                }
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect {
+                    _apiPostCommentResult.value = SingleEvent(it)
+                }
+        }
+    }
+
+    fun postCommentLike(commentId: Long, body: PostLikeRequest) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository().postMembersPostCommentLike(videoId, commentId, body)
+                if (!resp.isSuccessful) throw HttpException(resp)
+
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e ->
+                    emit(ApiResult.error(e))
+                }
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect {
+                    _apiCommentLikeResult.value = SingleEvent(it)
+                }
+        }
+    }
+
+    fun deleteCommentLike(commentId: Long) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository().deleteMembersPostCommentLike(videoId, commentId)
+                if (!resp.isSuccessful) throw HttpException(resp)
+
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e ->
+                    emit(ApiResult.error(e))
+                }
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect {
+                    _apiDeleteCommentLikeResult.value = SingleEvent(it)
+                }
         }
     }
 }

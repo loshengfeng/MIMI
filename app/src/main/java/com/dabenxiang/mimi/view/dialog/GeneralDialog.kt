@@ -102,17 +102,17 @@ class GeneralDialog : BaseDialogFragment() {
         when (it) {
             btn_first -> {
                 if (data?.firstBlock != null) {
-                    data.firstBlock!!()
+                    (data.firstBlock)()
                 }
             }
             btn_second -> {
                 if (data?.secondBlock != null) {
-                    data.secondBlock!!()
+                    (data.secondBlock)()
                 }
             }
             btn_close -> {
                 if (data?.closeBlock != null) {
-                    data.closeBlock!!()
+                    (data.closeBlock)()
                 }
             }
         }

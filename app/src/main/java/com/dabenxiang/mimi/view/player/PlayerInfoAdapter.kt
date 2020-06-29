@@ -22,7 +22,11 @@ class PlayerInfoAdapter(isAdult: Boolean, listener: PlayerInfoListener) : BaseNo
     }
 
     interface PlayerInfoListener {
-        fun expandComment(adapter: PlayerInfoAdapter, parentNode: RootCommentNode, succeededBlock: () -> Unit)
+        fun sendComment(replyId: Long?, replyName: String?)
+        fun expandReply(parentNode: RootCommentNode, succeededBlock: () -> Unit)
+        fun replyComment(replyId: Long?, replyName: String?)
+        fun setCommentLikeType(replyId: Long?, isLike: Boolean, succeededBlock: () -> Unit)
+        fun removeCommentLikeType(replyId: Long?, succeededBlock: () -> Unit)
     }
 
     init {
@@ -93,33 +97,66 @@ class RootCommentProvider(private val isAdult: Boolean, private val listener: Pl
     }
 
     override fun onChildClick(holder: BaseViewHolder, view: View, data: BaseNode, position: Int) {
-        val realData = data as RootCommentNode
-        if (view.id == R.id.btn_show_comment_reply) {
-            if (realData.isExpanded) {
-                getAdapter()?.expandOrCollapse(
-                    position = position,
-                    animate = false,
-                    notify = true,
-                    parentPayload = PlayerInfoAdapter.EXPAND_COLLAPSE_PAYLOAD
-                )
-            } else {
-                val adapter = getAdapter() as? PlayerInfoAdapter
-                if (adapter != null) {
-                    listener.expandComment(adapter, realData) {
-                        adapter.expandOrCollapse(
-                            position = position,
-                            animate = false,
-                            notify = true,
-                            parentPayload = PlayerInfoAdapter.EXPAND_COLLAPSE_PAYLOAD
-                        )
+        val actualData = data as RootCommentNode
+        when (view.id) {
+            R.id.btn_show_comment_reply -> {
+                if (actualData.isExpanded) {
+                    getAdapter()?.expandOrCollapse(
+                        position = position,
+                        animate = false,
+                        notify = true,
+                        parentPayload = PlayerInfoAdapter.EXPAND_COLLAPSE_PAYLOAD
+                    )
+                } else {
+                    val adapter = getAdapter() as? PlayerInfoAdapter
+                    if (adapter != null) {
+                        listener.expandReply(actualData) {
+                            adapter.expand(
+                                position = position,
+                                animate = false,
+                                notify = true,
+                                parentPayload = PlayerInfoAdapter.EXPAND_COLLAPSE_PAYLOAD
+                            )
+                        }
                     }
                 }
+            }
+            R.id.tv_like -> {
+                val isLike = true
+                if (isRemoveLikeData(actualData.data, isLike)) {
+                    listener.removeCommentLikeType(actualData.data.id) {
+                        removeLikeData(actualData.data, isLike)
+                        updateLikeCountAndDislikeCount(holder, actualData.data)
+                    }
+                } else {
+                    listener.setCommentLikeType(actualData.data.id, isLike) {
+                        setLikeData(actualData.data, isLike)
+                        updateLikeCountAndDislikeCount(holder, actualData.data)
+                    }
+                }
+            }
+            R.id.tv_unlike -> {
+                val isLike = false
+                if (isRemoveLikeData(actualData.data, isLike)) {
+                    listener.removeCommentLikeType(actualData.data.id) {
+                        removeLikeData(actualData.data, isLike)
+                        updateLikeCountAndDislikeCount(holder, actualData.data)
+                    }
+                } else {
+                    listener.setCommentLikeType(actualData.data.id, isLike) {
+                        setLikeData(actualData.data, isLike)
+                        updateLikeCountAndDislikeCount(holder, actualData.data)
+                    }
+                }
+            }
+            R.id.btn_reply -> {
+                listener.sendComment(actualData.data.id, actualData.data.postName)
             }
         }
     }
 }
 
-class NestedCommentProvider(isAdult: Boolean, listener: PlayerInfoAdapter.PlayerInfoListener) : BaseCommentProvider(isAdult) {
+class NestedCommentProvider(isAdult: Boolean, val listener: PlayerInfoAdapter.PlayerInfoListener) : BaseCommentProvider(isAdult) {
     override val itemViewType: Int
         get() = 2
 
@@ -130,12 +167,53 @@ class NestedCommentProvider(isAdult: Boolean, listener: PlayerInfoAdapter.Player
         addChildClickViewIds(R.id.tv_like, R.id.tv_unlike, R.id.btn_reply)
     }
 
-    override fun convert(helper: BaseViewHolder, item: BaseNode) {
-        dataConvert(helper, (item as NestedCommentNode).data)
+    override fun convert(holder: BaseViewHolder, item: BaseNode) {
+        dataConvert(holder, (item as NestedCommentNode).data)
     }
 
-    override fun onChildClick(helper: BaseViewHolder, view: View, data: BaseNode, position: Int) {
-
+    override fun onChildClick(holder: BaseViewHolder, view: View, data: BaseNode, position: Int) {
+        val actualData = data as NestedCommentNode
+        when (view.id) {
+            R.id.tv_like -> {
+                val isLike = true
+                if (isRemoveLikeData(actualData.data, isLike)) {
+                    listener.removeCommentLikeType(actualData.data.id) {
+                        removeLikeData(actualData.data, isLike)
+                        updateLikeCountAndDislikeCount(holder, actualData.data)
+                    }
+                } else {
+                    listener.setCommentLikeType(actualData.data.id, isLike) {
+                        setLikeData(actualData.data, isLike)
+                        updateLikeCountAndDislikeCount(holder, actualData.data)
+                    }
+                }
+                updateLikeCountAndDislikeCount(holder, actualData.data)
+            }
+            R.id.tv_unlike -> {
+                val isLike = false
+                if (isRemoveLikeData(actualData.data, isLike)) {
+                    listener.removeCommentLikeType(actualData.data.id) {
+                        removeLikeData(actualData.data, isLike)
+                        updateLikeCountAndDislikeCount(holder, actualData.data)
+                    }
+                } else {
+                    listener.setCommentLikeType(actualData.data.id, isLike) {
+                        setLikeData(actualData.data, isLike)
+                        updateLikeCountAndDislikeCount(holder, actualData.data)
+                    }
+                }
+            }
+            R.id.btn_reply -> {
+                val adapter = getAdapter() as? PlayerInfoAdapter
+                if (adapter != null) {
+                    val parentNode = actualData.parentNodeRef.get()!!
+                    val parentPosition = adapter.findParentNode(data)
+                    if (parentPosition > -1) {
+                        listener.replyComment(parentNode.data.id, actualData.data.postName)
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -178,12 +256,8 @@ abstract class BaseCommentProvider(private val isAdult: Boolean) : BaseNodeProvi
         holder.setTextColorRes(R.id.tv_date, getTextColor())
         holder.setText(R.id.tv_message, data.content)
         holder.setTextColorRes(R.id.tv_message, getMessageTextColor())
-        holder.setText(R.id.tv_like, (data.likeCount ?: 0L).toString())
-        holder.getView<TextView>(R.id.tv_like).setCompoundDrawablesRelativeWithIntrinsicBounds(getLikeRes(data.likeType == 0), 0, 0, 0)
         holder.setTextColorRes(R.id.tv_like, getMessageTextColor())
-        holder.setText(R.id.tv_unlike, (data.dislikeCount ?: 0L).toString())
         holder.setTextColorRes(R.id.tv_unlike, getMessageTextColor())
-        holder.getView<TextView>(R.id.tv_unlike).setCompoundDrawablesRelativeWithIntrinsicBounds(getDislikeRes(data.likeType == 1), 0, 0, 0)
 
         //holder.getView<ImageView>(R.id.btn_more)
         holder.setTextColorRes(R.id.btn_reply, getTextColor())
@@ -195,6 +269,15 @@ abstract class BaseCommentProvider(private val isAdult: Boolean) : BaseNodeProvi
         }.also {
             holder.setText(R.id.tv_date, it)
         }
+
+        updateLikeCountAndDislikeCount(holder, data)
+    }
+
+    fun updateLikeCountAndDislikeCount(holder: BaseViewHolder, data: MembersPostCommentItem) {
+        holder.setText(R.id.tv_like, (data.likeCount ?: 0L).toString())
+        holder.getView<TextView>(R.id.tv_like).setCompoundDrawablesRelativeWithIntrinsicBounds(getLikeRes(data.likeType == 0), 0, 0, 0)
+        holder.setText(R.id.tv_unlike, (data.dislikeCount ?: 0L).toString())
+        holder.getView<TextView>(R.id.tv_unlike).setCompoundDrawablesRelativeWithIntrinsicBounds(getDislikeRes(data.likeType == 1), 0, 0, 0)
     }
 
     private fun getTextColor() = if (isAdult) R.color.color_white_1_50 else R.color.color_black_1_50
@@ -222,6 +305,54 @@ abstract class BaseCommentProvider(private val isAdult: Boolean) : BaseNodeProvi
             } else {
                 R.drawable.ico_bad_gray
             }
+        }
+    }
+
+    protected fun isRemoveLikeData(data: MembersPostCommentItem, isLike: Boolean): Boolean {
+        return when (data.likeType) {
+            0 -> isLike
+            1 -> !isLike
+            else -> false
+        }
+    }
+
+    protected fun removeLikeData(data: MembersPostCommentItem, isLike: Boolean) {
+        data.likeType = null
+        if (isLike) {
+            data.likeCount = decreaseLikeCount(data.likeCount)
+        } else {
+            data.dislikeCount = decreaseLikeCount(data.dislikeCount)
+        }
+    }
+
+    private fun increaseLikeCount(count: Long?): Long {
+        return if (count == null) 1L else count + 1
+    }
+
+    private fun decreaseLikeCount(count: Long?): Long {
+        return if (count == null) 0L else count - 1
+    }
+
+    protected fun setLikeData(data: MembersPostCommentItem, isLike: Boolean) {
+        when (data.likeType) {
+            0 -> {
+                if (!isLike) {
+                    data.likeCount = decreaseLikeCount(data.likeCount)
+                }
+            }
+            1 -> {
+                if (isLike) {
+                    data.dislikeCount = decreaseLikeCount(data.dislikeCount)
+                }
+            }
+        }
+
+        if (isLike) {
+            data.likeType = 0
+            data.likeCount = increaseLikeCount(data.likeCount)
+        } else {
+            data.likeType = 1
+            data.dislikeCount = increaseLikeCount(data.dislikeCount)
         }
     }
 }

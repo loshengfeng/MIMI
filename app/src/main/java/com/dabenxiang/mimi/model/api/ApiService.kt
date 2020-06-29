@@ -160,6 +160,25 @@ interface ApiService {
         @Query("limit") limit: String
     ): Response<ApiBasePagingItem<List<MembersPostCommentItem>>>
 
+    @POST("/v1/Members/Post/{postId}/Comment")
+    suspend fun postMembersPostComment(
+        @Path("postId") postId: Long,
+        @Body request: PostCommentRequest
+    ): Response<Void>
+
+    @POST("/v1/Members/Post/{postId}/Comment/{commentId}/Like")
+    suspend fun postMembersPostCommentLike(
+        @Path("postId") postId: Long,
+        @Path("commentId") commentId: Long,
+        @Body request: PostLikeRequest
+    ): Response<Void>
+
+    @DELETE("/v1/Members/Post/{postId}/Comment/{commentId}/Like")
+    suspend fun deleteMembersPostCommentLike(
+        @Path("postId") postId: Long,
+        @Path("commentId") commentId: Long
+    ): Response<Void>
+
     /**********************************************************
      *
      *                  Members/Home/Categories
