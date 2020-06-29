@@ -306,7 +306,8 @@ interface ApiService {
 
     @DELETE("/v1/Members/Me/PostFavorite/{postFavoriteId}")
     suspend fun deletePostFavorite(
-        @Path("postFavoriteId") postFavoriteId: Long
+        @Path("postFavoriteId") postFavoriteId: Long,
+        @Query("postFavoriteId") postFavoriteIds: List<Long>
     ): Response<Void>
 
     @GET("/v1/Members/Me/Profile")
