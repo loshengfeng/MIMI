@@ -180,9 +180,9 @@ class HomeStatisticsViewHolder(
 
     override fun updated() {
         data?.also {
-            if (nestedAdapter.itemCount == 0) {
+//            if (nestedAdapter.itemCount == 0) {
                 nestedListener.onLoadStatisticsViewHolder(this, it)
-            }
+//            }
         }
     }
 
