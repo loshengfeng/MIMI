@@ -35,28 +35,28 @@ class HomeAdapter(val context: Context, private val listener: EventListener, pri
     }
 
     override fun getItemViewType(position: Int): Int {
-        return position
+        return getItem(position).type.ordinal
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        return when (getItem(viewType).type) {
-            HomeItemType.HEADER -> {
+        return when (viewType) {
+            HomeItemType.HEADER.ordinal -> {
                 HeaderViewHolder(layoutInflater.inflate(R.layout.item_header, parent, false), listener, isAdult)
             }
-            HomeItemType.BANNER -> {
+            HomeItemType.BANNER.ordinal -> {
                 HomeBannerViewHolder(layoutInflater.inflate(R.layout.item_banner, parent, false), listener, isAdult)
             }
-            HomeItemType.CAROUSEL -> {
+            HomeItemType.CAROUSEL.ordinal -> {
                 HomeCarouselViewHolder(layoutInflater.inflate(R.layout.item_carousel, parent, false), listener, isAdult)
             }
-            HomeItemType.STATISTICS -> {
+            HomeItemType.STATISTICS.ordinal -> {
                 HomeStatisticsViewHolder(layoutInflater.inflate(R.layout.item_home_statistics, parent, false), listener, isAdult)
             }
-            HomeItemType.LEADERBOARD -> {
+            HomeItemType.LEADERBOARD.ordinal -> {
                 HomeLeaderboardViewHolder(layoutInflater.inflate(R.layout.item_home_leaderboard, parent, false), listener, isAdult)
             }
-            HomeItemType.RECOMMEND -> {
+            HomeItemType.RECOMMEND.ordinal -> {
                 HomeRecommendViewHolder(layoutInflater.inflate(R.layout.item_home_recommend, parent, false), listener, isAdult)
             }
             else -> {
