@@ -8,6 +8,7 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.PlayItem
+import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
 import com.google.android.material.chip.Chip
@@ -18,6 +19,7 @@ class FavoritePlayViewHolder(
     itemView: View,
     listener: FavoriteAdapter.EventListener
 ) : BaseAnyViewHolder<PlayItem>(itemView) {
+
     private val tvTitle = itemView.findViewById(R.id.tv_title) as TextView
     private val tvDesc = itemView.findViewById(R.id.tv_desc) as TextView
     private val ivPhoto = itemView.findViewById(R.id.iv_photo) as ImageView
@@ -33,35 +35,35 @@ class FavoritePlayViewHolder(
         ivPhoto.setOnClickListener { listener.onVideoClick(data!!) }
         tvLike.setOnClickListener {
             listener.onFunctionClick(
-                FavoriteAdapter.FunctionType.Like,
+                FunctionType.LIKE,
                 it,
                 data!!
             )
         }
         tvFavorite.setOnClickListener {
             listener.onFunctionClick(
-                FavoriteAdapter.FunctionType.Favorite,
+                FunctionType.FAVORITE,
                 it,
                 data!!
             )
         }
         tvMsg.setOnClickListener {
             listener.onFunctionClick(
-                FavoriteAdapter.FunctionType.Msg,
+                FunctionType.MSG,
                 it,
                 data!!
             )
         }
         tvShare.setOnClickListener {
             listener.onFunctionClick(
-                FavoriteAdapter.FunctionType.Share,
+                FunctionType.SHARE,
                 it,
                 data!!
             )
         }
         tvMore.setOnClickListener {
             listener.onFunctionClick(
-                FavoriteAdapter.FunctionType.More,
+                FunctionType.MORE,
                 it,
                 data!!
             )

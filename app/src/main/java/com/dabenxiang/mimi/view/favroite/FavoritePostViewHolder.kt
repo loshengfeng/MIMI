@@ -8,6 +8,7 @@ import android.widget.TextView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
+import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
 import com.google.android.material.chip.Chip
@@ -42,35 +43,35 @@ class FavoritePostViewHolder(
         ivPhoto.setOnClickListener { listener.onVideoClick(data!!) }
         tvLike.setOnClickListener {
             listener.onFunctionClick(
-                FavoriteAdapter.FunctionType.Like,
+                FunctionType.LIKE,
                 it,
                 data!!
             )
         }
         tvFavorite.setOnClickListener {
             listener.onFunctionClick(
-                FavoriteAdapter.FunctionType.Favorite,
+                FunctionType.FAVORITE,
                 it,
                 data!!
             )
         }
         tvMsg.setOnClickListener {
             listener.onFunctionClick(
-                FavoriteAdapter.FunctionType.Msg,
+                FunctionType.MSG,
                 it,
                 data!!
             )
         }
         tvShare.setOnClickListener {
             listener.onFunctionClick(
-                FavoriteAdapter.FunctionType.Share,
+                FunctionType.SHARE,
                 it,
                 data!!
             )
         }
         tvMore.setOnClickListener {
             listener.onFunctionClick(
-                FavoriteAdapter.FunctionType.More,
+                FunctionType.MORE,
                 it,
                 data!!
             )

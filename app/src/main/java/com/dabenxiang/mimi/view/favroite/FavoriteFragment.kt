@@ -14,6 +14,7 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.BaseItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
+import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
@@ -219,10 +220,11 @@ class FavoriteFragment : BaseFragment() {
             }
         }
 
-        override fun onFunctionClick(type: FavoriteAdapter.FunctionType, view: View, item: Any) {
+
+        override fun onFunctionClick(type: FunctionType, view: View, item: Any) {
             val textView = view as TextView
             when (type) {
-                FavoriteAdapter.FunctionType.Like -> {
+                FunctionType.LIKE -> {
                     when (item) {
                         is PlayItem -> {
                             item.id?.let {
@@ -241,7 +243,7 @@ class FavoriteFragment : BaseFragment() {
                     }
                 }
 
-                FavoriteAdapter.FunctionType.Favorite -> {
+                FunctionType.FAVORITE -> {
                     // 點擊後加入收藏,
                     when (item) {
                         is PlayItem -> {
@@ -261,7 +263,7 @@ class FavoriteFragment : BaseFragment() {
                     }
                 }
 
-                FavoriteAdapter.FunctionType.Share -> {
+                FunctionType.SHARE -> {
                     /* 點擊後複製網址 */
                     val url = when (item) {
                         is PlayItem -> {
@@ -280,7 +282,7 @@ class FavoriteFragment : BaseFragment() {
                     GeneralUtils.showToast(requireContext(), "already copy url")
                 }
 
-                FavoriteAdapter.FunctionType.More -> {
+                FunctionType.MORE -> {
                     // 若已經檢舉過則Disable -> todo: can't determine?
                     MoreDialogFragment.newInstance(item as BaseItem, onReportDialogListener).also {
                         it.show(

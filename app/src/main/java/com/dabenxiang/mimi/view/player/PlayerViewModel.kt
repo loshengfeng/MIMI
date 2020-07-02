@@ -321,10 +321,10 @@ class PlayerViewModel : BaseViewModel() {
     fun checkConsumeResult() {
         val result =
             when {
-                costPoint == 0L || isDeducted -> VideoConsumeResult.Paid
+                costPoint == 0L || isDeducted -> VideoConsumeResult.PAID
                 else -> when {
-                    availablePoint > costPoint -> VideoConsumeResult.PaidYet
-                    else -> VideoConsumeResult.PointNotEnough
+                    availablePoint > costPoint -> VideoConsumeResult.PAID_YET
+                    else -> VideoConsumeResult.POINT_NOT_ENOUGH
                 }
             }
 

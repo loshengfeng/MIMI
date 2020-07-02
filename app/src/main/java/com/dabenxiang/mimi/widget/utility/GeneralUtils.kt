@@ -8,8 +8,8 @@ import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.manager.DomainManager
 import com.dabenxiang.mimi.model.api.ApiRepository
-import com.dabenxiang.mimi.model.api.vo.ErrorItem
-import com.dabenxiang.mimi.model.api.vo.HttpExceptionItem
+import com.dabenxiang.mimi.model.api.vo.error.ErrorItem
+import com.dabenxiang.mimi.model.api.vo.error.HttpExceptionItem
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -50,7 +50,13 @@ object GeneralUtils {
             ErrorItem(null, null, null)
         }
 
-        val responseBody = Gson().toJson(ErrorItem(errorItem.code, errorItem.message, null))
+        val responseBody = Gson().toJson(
+            ErrorItem(
+                errorItem.code,
+                errorItem.message,
+                null
+            )
+        )
             .toResponseBody(ApiRepository.MEDIA_TYPE_JSON.toMediaTypeOrNull())
 
         val rawResponse = okhttp3.Response.Builder()
@@ -63,7 +69,11 @@ object GeneralUtils {
         val response = Response.error<ErrorItem>(responseBody, rawResponse)
 
         val httpExceptionClone = HttpException(response)
-        return HttpExceptionItem(errorItem, httpExceptionClone, url)
+        return HttpExceptionItem(
+            errorItem,
+            httpExceptionClone,
+            url
+        )
     }
 
     fun getLibEnv(): String {

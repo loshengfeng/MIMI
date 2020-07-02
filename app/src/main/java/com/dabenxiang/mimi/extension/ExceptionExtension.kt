@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.model.api.vo
+package com.dabenxiang.mimi.extension
 
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ExceptionResult

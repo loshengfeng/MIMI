@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
+import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_NORMAL
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_SHORT_VIDEO
 import com.dabenxiang.mimi.view.favroite.FavoritePlayViewHolder
@@ -34,8 +35,6 @@ class FavoriteAdapter(
             ): Boolean = oldItem == newItem
         }
     }
-
-    enum class FunctionType { Video, Like, Favorite, Msg, Share, More }
 
     interface EventListener {
         fun onVideoClick(item: Any)

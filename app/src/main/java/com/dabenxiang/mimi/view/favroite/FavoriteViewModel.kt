@@ -19,7 +19,7 @@ import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.FavoritePagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.LikeRequest
+import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_ADULT
@@ -147,7 +147,9 @@ class FavoriteViewModel : BaseViewModel() {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository()
-                    .addLike(postId, LikeRequest(viewStatus[view.id]))
+                    .addLike(postId,
+                        LikeRequest(viewStatus[view.id])
+                    )
                 if (!result.isSuccessful) {
                     viewStatus[view.id] =
                         when (viewStatus[view.id]) {

@@ -39,29 +39,24 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
         return tokenItem.accessToken.isNotEmpty() && tokenItem.refreshToken.isNotEmpty()
     }
 
-//    fun isAutoLogin(): Boolean {
-//        val tokenItem = pref.memberToken
-//        return tokenItem.accessToken.isNotEmpty() && tokenItem.refreshToken.isNotEmpty()
-//    }
-
     fun getMemberTokenResult(): TokenResult {
         val tokenData = pref.memberToken
         return when {
-            tokenData.expiresTimestamp == 0L -> TokenResult.Empty
-            tokenData.accessToken.isEmpty() -> TokenResult.Empty
-            tokenData.refreshToken.isEmpty() -> TokenResult.Empty
-            Date().time > tokenData.expiresTimestamp -> TokenResult.Expired
-            else -> TokenResult.Pass
+            tokenData.expiresTimestamp == 0L -> TokenResult.EMPTY
+            tokenData.accessToken.isEmpty() -> TokenResult.EMPTY
+            tokenData.refreshToken.isEmpty() -> TokenResult.EMPTY
+            Date().time > tokenData.expiresTimestamp -> TokenResult.EXPIRED
+            else -> TokenResult.PASS
         }
     }
 
     fun getPublicTokenResult(): TokenResult {
         val tokenData = pref.publicToken
         return when {
-            tokenData.expiresTimestamp == 0L -> TokenResult.Empty
-            tokenData.accessToken.isEmpty() -> TokenResult.Empty
-            Date().time > tokenData.expiresTimestamp -> TokenResult.Expired
-            else -> TokenResult.Pass
+            tokenData.expiresTimestamp == 0L -> TokenResult.EMPTY
+            tokenData.accessToken.isEmpty() -> TokenResult.EMPTY
+            Date().time > tokenData.expiresTimestamp -> TokenResult.EMPTY
+            else -> TokenResult.PASS
         }
     }
 
@@ -73,8 +68,7 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
                 pref.publicToken =
                     TokenItem(
                         accessToken = tokenItem.accessToken,
-                        // 提前2分鐘過期
-                        expiresTimestamp = Date().time + (tokenItem.expiresIn - 120) * 1000
+                        expiresTimestamp = Date().time + (tokenItem.expiresIn - 120) * 1000 // 提前2分鐘過期
                     )
             }
             emit(ApiResult.success(null))
@@ -91,8 +85,7 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
                 pref.memberToken = TokenItem(
                     accessToken = item.accessToken,
                     refreshToken = item.refreshToken,
-                    // 提前2分鐘過期
-                    expiresTimestamp = Date().time + (item.expiresIn - 120) * 1000
+                    expiresTimestamp = Date().time + (item.expiresIn - 120) * 1000  // 提前2分鐘過期
                 )
             }
             emit(ApiResult.success(null))

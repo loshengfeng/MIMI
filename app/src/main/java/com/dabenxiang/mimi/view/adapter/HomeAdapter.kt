@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.enums.HomeItemType
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.*
@@ -83,7 +84,7 @@ class HomeAdapter(
                     ), listener, isAdult
                 )
             }
-            HomeItemType.LEADERBOARD -> {
+            HomeItemType.LEADER_BOARD -> {
                 HomeLeaderboardViewHolder(
                     layoutInflater.inflate(
                         R.layout.item_home_leaderboard,
@@ -130,7 +131,7 @@ class HomeAdapter(
                 holder as HomeStatisticsViewHolder
                 holder.bind(template)
             }
-            HomeItemType.LEADERBOARD -> {
+            HomeItemType.LEADER_BOARD -> {
                 holder as HomeLeaderboardViewHolder
                 holder.bind(template)
             }

@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.model.api
+package com.dabenxiang.mimi.model.api.vo.error
 
 /**********************************************************
  *

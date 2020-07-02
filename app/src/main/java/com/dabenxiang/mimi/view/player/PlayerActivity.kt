@@ -17,6 +17,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearSnapHelper
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.extension.handleException
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.extension.setNot
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -571,13 +572,13 @@ class PlayerActivity : BaseActivity() {
         viewModel.consumeResult.observe(this, Observer {
             consumeDialog?.dismiss()
             when (it) {
-                VideoConsumeResult.Paid -> {
+                VideoConsumeResult.PAID -> {
                     viewModel.getStreamUrl(obtainIsAdult())
                 }
-                VideoConsumeResult.PaidYet -> {
+                VideoConsumeResult.PAID_YET -> {
                     consumeDialog = showCostPointDialog()
                 }
-                VideoConsumeResult.PointNotEnough -> {
+                VideoConsumeResult.POINT_NOT_ENOUGH -> {
                     consumeDialog = showPointNotEnoughDialog()
                 }
             }

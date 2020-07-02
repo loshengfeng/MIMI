@@ -1,5 +1,7 @@
 package com.dabenxiang.mimi.model.enums
 
 enum class VideoConsumeResult {
-    Paid, PaidYet, PointNotEnough
+    PAID,
+    PAID_YET,
+    POINT_NOT_ENOUGH
 }

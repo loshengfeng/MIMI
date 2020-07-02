@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.model.api
 
 import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.api.vo.error.TOKEN_NOT_FOUND
 import com.dabenxiang.mimi.model.enums.StatisticsType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -278,7 +279,7 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得熱門影片
      */
     suspend fun statisticsHomeVideos(
-        statisticsType: StatisticsType = StatisticsType.Newest,
+        statisticsType: StatisticsType = StatisticsType.NEWEST,
         category: String? = null,
         isAdult: Boolean,
         offset: Int,
