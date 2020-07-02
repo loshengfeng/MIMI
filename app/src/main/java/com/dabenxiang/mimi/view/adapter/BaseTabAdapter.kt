@@ -1,9 +1,8 @@
 package com.dabenxiang.mimi.view.adapter
 
 import androidx.recyclerview.widget.RecyclerView
-import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 
-abstract class BaseTabAdapter<M: Any, VH : RecyclerView.ViewHolder> : RecyclerView.Adapter<VH>() {
+abstract class BaseTabAdapter<M : Any, VH : RecyclerView.ViewHolder> : RecyclerView.Adapter<VH>() {
 
     protected var tabList: List<M>? = null
     protected var lastSelected = 0

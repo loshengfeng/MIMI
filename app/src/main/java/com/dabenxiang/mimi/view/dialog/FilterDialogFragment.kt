@@ -11,8 +11,6 @@ import com.dabenxiang.mimi.view.adapter.FilterGenderAdapter
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import com.dabenxiang.mimi.view.listener.OnDialogListener
 import kotlinx.android.synthetic.main.fragment_dialog_filter.*
-import kotlinx.android.synthetic.main.fragment_dialog_filter.btn_close
-import kotlinx.android.synthetic.main.fragment_dialog_filter.tv_title
 import java.io.Serializable
 
 class FilterDialogFragment : BaseDialogFragment() {
@@ -28,20 +26,26 @@ class FilterDialogFragment : BaseDialogFragment() {
         }
     }
 
-    data class Content(@StringRes val title: Int,
-                       @ArrayRes val textArray: Int,
-                       @ArrayRes val valueArray: Int,
-                       val dialogListener: OnDialogListener? = null,
-                       val selectedValue: Int = 0) : Serializable
+    data class Content(
+        @StringRes val title: Int,
+        @ArrayRes val textArray: Int,
+        @ArrayRes val valueArray: Int,
+        val dialogListener: OnDialogListener? = null,
+        val selectedValue: Int = 0
+    ) : Serializable
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initSettings()
     }
 
-    override fun getLayoutId(): Int { return R.layout.fragment_dialog_filter }
+    override fun getLayoutId(): Int {
+        return R.layout.fragment_dialog_filter
+    }
 
-    override fun isFullLayout(): Boolean { return true }
+    override fun isFullLayout(): Boolean {
+        return true
+    }
 
     private fun initSettings() {
         val content = arguments?.getSerializable(KEY_CONTENT) as Content
@@ -53,12 +57,16 @@ class FilterDialogFragment : BaseDialogFragment() {
         val textArray = resources.getStringArray(content.textArray)
         val valueArray = resources.getIntArray(content.valueArray)
 
-        recyclerFilter.adapter = FilterGenderAdapter(textArray, valueArray, content.selectedValue, object : OnDialogListener {
-            override fun onItemSelected(value: Int, text: String) {
-                content.dialogListener?.onItemSelected(value, text)
-                dismiss()
-            }
-        })
+        recyclerFilter.adapter = FilterGenderAdapter(
+            textArray,
+            valueArray,
+            content.selectedValue,
+            object : OnDialogListener {
+                override fun onItemSelected(value: Int, text: String) {
+                    content.dialogListener?.onItemSelected(value, text)
+                    dismiss()
+                }
+            })
     }
 
     override fun setupListeners() {

@@ -26,13 +26,10 @@ import com.dabenxiang.mimi.view.dialog.choosepicker.OnChoosePickerDialogListener
 import com.dabenxiang.mimi.view.listener.OnDialogListener
 import com.dabenxiang.mimi.view.updateprofile.UpdateProfileFragment
 import kotlinx.android.synthetic.main.fragment_setting.*
-import kotlinx.android.synthetic.main.fragment_setting.iv_photo
-import kotlinx.android.synthetic.main.fragment_setting.tv_name
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@ExperimentalCoroutinesApi
-class SettingFragment : BaseFragment<SettingViewModel>() {
+class SettingFragment : BaseFragment() {
+
     private val viewModel: SettingViewModel by viewModels()
 
     companion object {
@@ -40,7 +37,7 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
         private const val REQUEST_CODE_ALBUM = 200
         private const val KEY_PHOTO = "PHOTO"
 
-        fun createBundle(byteArray : ByteArray) = Bundle().also {
+        fun createBundle(byteArray: ByteArray) = Bundle().also {
             it.putSerializable(KEY_PHOTO, byteArray)
         }
     }
@@ -53,9 +50,9 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
         initSettings()
     }
 
-    override fun getLayoutId(): Int { return R.layout.fragment_setting }
-
-    override fun fetchViewModel(): SettingViewModel? { return viewModel }
+    override fun getLayoutId(): Int {
+        return R.layout.fragment_setting
+    }
 
     override fun setupObservers() {
         viewModel.profileItem.observe(viewLifecycleOwner, Observer {
@@ -85,7 +82,8 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Empty -> {}
+                is ApiResult.Empty -> {
+                }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
             }
         })
@@ -94,7 +92,8 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Empty -> {}
+                is ApiResult.Empty -> {
+                }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
             }
         })
@@ -112,7 +111,9 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Empty -> { viewModel.bitmap?.also { it1 -> setupPhoto(it1) } }
+                is ApiResult.Empty -> {
+                    viewModel.bitmap?.also { it1 -> setupPhoto(it1) }
+                }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
             }
         })
@@ -124,7 +125,10 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
                 R.id.tv_back -> navigateTo(NavigateItem.Up)
                 R.id.btn_photo -> {
                     ChoosePickerDialogFragment.newInstance(onChoosePickerDialogListener).also {
-                        it.show(activity!!.supportFragmentManager, ChoosePickerDialogFragment::class.java.simpleName)
+                        it.show(
+                            activity!!.supportFragmentManager,
+                            ChoosePickerDialogFragment::class.java.simpleName
+                        )
                     }
                 }
                 R.id.btn_name -> navigateTo(
@@ -219,8 +223,13 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
     }
 
     private val onChoosePickerDialogListener = object : OnChoosePickerDialogListener {
-        override fun onPickFromCamera() { openCamera() }
-        override fun onPickFromAlbum() { openAlbum() }
+        override fun onPickFromCamera() {
+            openCamera()
+        }
+
+        override fun onPickFromAlbum() {
+            openAlbum()
+        }
     }
 
     private fun openCamera() {
@@ -234,7 +243,12 @@ class SettingFragment : BaseFragment<SettingViewModel>() {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.type = "image/*"
         if (intent.resolveActivity(context!!.packageManager) != null) {
-            startActivityForResult(Intent.createChooser(intent, getString(R.string.pls_choose_photo)), REQUEST_CODE_ALBUM)
+            startActivityForResult(
+                Intent.createChooser(
+                    intent,
+                    getString(R.string.pls_choose_photo)
+                ), REQUEST_CODE_ALBUM
+            )
         }
     }
 

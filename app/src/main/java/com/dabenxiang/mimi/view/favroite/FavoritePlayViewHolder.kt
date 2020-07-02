@@ -31,11 +31,41 @@ class FavoritePlayViewHolder(
 
     init {
         ivPhoto.setOnClickListener { listener.onVideoClick(data!!) }
-        tvLike.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.Like, it, data!!) }
-        tvFavorite.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.Favorite, it, data!!) }
-        tvMsg.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.Msg, it, data!!) }
-        tvShare.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.Share, it, data!!) }
-        tvMore.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.More, it, data!!) }
+        tvLike.setOnClickListener {
+            listener.onFunctionClick(
+                FavoriteAdapter.FunctionType.Like,
+                it,
+                data!!
+            )
+        }
+        tvFavorite.setOnClickListener {
+            listener.onFunctionClick(
+                FavoriteAdapter.FunctionType.Favorite,
+                it,
+                data!!
+            )
+        }
+        tvMsg.setOnClickListener {
+            listener.onFunctionClick(
+                FavoriteAdapter.FunctionType.Msg,
+                it,
+                data!!
+            )
+        }
+        tvShare.setOnClickListener {
+            listener.onFunctionClick(
+                FavoriteAdapter.FunctionType.Share,
+                it,
+                data!!
+            )
+        }
+        tvMore.setOnClickListener {
+            listener.onFunctionClick(
+                FavoriteAdapter.FunctionType.More,
+                it,
+                data!!
+            )
+        }
     }
 
     override fun updated() {
@@ -49,7 +79,9 @@ class FavoritePlayViewHolder(
         // todo: no length data...
         tvLength.text = "09:00:00"
 
-        if(!data?.tags.isNullOrEmpty()) { setupChipGroup(data?.tags) }
+        if (!data?.tags.isNullOrEmpty()) {
+            setupChipGroup(data?.tags)
+        }
 
         tvFavorite.text = data?.favoriteCount.toString()
         tvLike.text = data?.likeCount.toString()
@@ -60,15 +92,19 @@ class FavoritePlayViewHolder(
     private fun setupChipGroup(list: List<String>?) {
         reflowGroup.reflow_group.removeAllViews()
 
-        if (list == null) { return }
+        if (list == null) {
+            return
+        }
 
         list.indices.mapNotNull {
             list[it]
         }.forEach {
-            val chip = LayoutInflater.from(reflowGroup.context).inflate(R.layout.chip_item, reflowGroup, false) as Chip
+            val chip = LayoutInflater.from(reflowGroup.context)
+                .inflate(R.layout.chip_item, reflowGroup, false) as Chip
             chip.text = it
             chip.setTextColor(chip.context.getColor(R.color.color_black_1_50))
-            chip.chipBackgroundColor = ColorStateList.valueOf(chip.context.getColor(R.color.color_black_1_10))
+            chip.chipBackgroundColor =
+                ColorStateList.valueOf(chip.context.getColor(R.color.color_black_1_10))
             reflowGroup.addView(chip)
         }
     }

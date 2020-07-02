@@ -34,11 +34,18 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-    fun loadNestedStatisticsListForCarousel(vh: HomeCarouselViewHolder, src: HomeTemplate.Carousel) {
+    fun loadNestedStatisticsListForCarousel(
+        vh: HomeCarouselViewHolder,
+        src: HomeTemplate.Carousel
+    ) {
         viewModelScope.launch {
             flow {
                 val resp =
-                    domainManager.getApiRepository().statisticsHomeVideos(isAdult = src.isAdult, offset = 0, limit = CAROUSEL_LIMIT)
+                    domainManager.getApiRepository().statisticsHomeVideos(
+                        isAdult = src.isAdult,
+                        offset = 0,
+                        limit = CAROUSEL_LIMIT
+                    )
                 if (!resp.isSuccessful) throw HttpException(resp)
 
                 emit(ApiResult.success(resp.body()))
@@ -51,7 +58,11 @@ class HomeViewModel : BaseViewModel() {
                     when (resp) {
                         is ApiResult.Success -> {
                             //Timber.d(resp.result.toString())
-                            vh.submitList(resp.result.content?.statisticsItemToCarouselHolderItem(src.isAdult))
+                            vh.submitList(
+                                resp.result.content?.statisticsItemToCarouselHolderItem(
+                                    src.isAdult
+                                )
+                            )
                         }
                         is ApiResult.Error -> Timber.e(resp.throwable)
                     }
@@ -65,7 +76,12 @@ class HomeViewModel : BaseViewModel() {
                 flow {
                     //val resp = domainManager.getApiRepository().searchHomeVideos(src.categories, null, null, null, src.isAdult, "0", CATEGORIES_LIMIT)
                     val resp = domainManager.getApiRepository()
-                        .statisticsHomeVideos(category = src.categories, isAdult = src.isAdult, offset = 0, limit = STATISTICS_LIMIT)
+                        .statisticsHomeVideos(
+                            category = src.categories,
+                            isAdult = src.isAdult,
+                            offset = 0,
+                            limit = STATISTICS_LIMIT
+                        )
                     if (!resp.isSuccessful) throw HttpException(resp)
 
                     emit(ApiResult.success(resp.body()))
@@ -92,7 +108,13 @@ class HomeViewModel : BaseViewModel() {
 
     fun setupVideoList(category: String?, isAdult: Boolean) {
         viewModelScope.launch {
-            val dataSrc = VideoListDataSource(isAdult, category, viewModelScope, domainManager.getApiRepository(), pagingCallback)
+            val dataSrc = VideoListDataSource(
+                isAdult,
+                category,
+                viewModelScope,
+                domainManager.getApiRepository(),
+                pagingCallback
+            )
             val factory = VideoListFactory(dataSrc)
             val config = PagedList.Config.Builder()
                 .setPageSize(VideoListDataSource.PER_LIMIT.toInt())

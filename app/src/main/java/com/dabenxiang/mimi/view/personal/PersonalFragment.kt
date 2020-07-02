@@ -22,16 +22,14 @@ import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_LOGIN
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
 import com.dabenxiang.mimi.view.setting.SettingFragment
-import com.dabenxiang.mimi.widget.utility.AppUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_personal.*
 import kotlinx.android.synthetic.main.item_personal_is_login.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import retrofit2.HttpException
 
-@ExperimentalCoroutinesApi
-class PersonalFragment : BaseFragment<PersonalViewModel>() {
+class PersonalFragment : BaseFragment() {
+
     private val viewModel: PersonalViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -39,14 +37,13 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
         initSettings()
     }
 
-    override fun getLayoutId(): Int { return R.layout.fragment_personal }
+    override fun getLayoutId(): Int {
+        return R.layout.fragment_personal
+    }
 
-    override fun fetchViewModel(): PersonalViewModel? { return viewModel }
-
-    @ExperimentalCoroutinesApi
     override fun setupObservers() {
         viewModel.meItem.observe(viewLifecycleOwner, Observer {
-            when(it) {
+            when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Error -> onApiError(it.throwable)
                 is ApiResult.Success -> {
@@ -65,7 +62,7 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
                     tv_Point.text = meItem.availablePoint.toString()
 
                     // todo: confirm by Jeff...
-                    tv_new.visibility = when(meItem.hasNewMessage) {
+                    tv_new.visibility = when (meItem.hasNewMessage) {
                         true -> View.VISIBLE
                         else -> View.GONE
                     }
@@ -116,12 +113,12 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
         })
 
         viewModel.apiSignOut.observe(viewLifecycleOwner, Observer {
-            when(it) {
+            when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Error -> {
                     when (it.throwable) {
                         is HttpException -> {
-                            val data = AppUtils.getHttpExceptionData(it.throwable)
+                            val data = GeneralUtils.getHttpExceptionData(it.throwable)
                             data.errorItem.message?.also { message ->
                                 GeneralDialog.newInstance(
                                     GeneralDialogData(
@@ -135,7 +132,8 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
                         }
                     }
                 }
-                is ApiResult.Empty -> {}
+                is ApiResult.Empty -> {
+                }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
             }
         })
@@ -144,15 +142,29 @@ class PersonalFragment : BaseFragment<PersonalViewModel>() {
     override fun setupListeners() {
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
-                R.id.tv_topup -> GeneralUtils.showToast(context!!, "btnTopup")
+                R.id.tv_topup -> GeneralUtils.showToast(requireContext(), "btnTopup")
                 R.id.tv_follow -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
                 R.id.tv_topup_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_orderFragment))
                 R.id.tv_chat_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_chatHistoryFragment))
-                R.id.tv_my_post -> GeneralUtils.showToast(context!!, "My post")
-                R.id.tv_setting -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_settingFragment, viewModel.byteArray?.let { SettingFragment.createBundle(it) }))
+                R.id.tv_my_post -> GeneralUtils.showToast(requireContext(), "My post")
+                R.id.tv_setting -> navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_personalFragment_to_settingFragment,
+                        viewModel.byteArray?.let { SettingFragment.createBundle(it) })
+                )
                 R.id.tv_logout -> viewModel.signOut()
-                R.id.tv_login -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_loginFragment, LoginFragment.createBundle(TYPE_LOGIN)))
-                R.id.tv_register -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_loginFragment, LoginFragment.createBundle(TYPE_REGISTER)))
+                R.id.tv_login -> navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_personalFragment_to_loginFragment,
+                        LoginFragment.createBundle(TYPE_LOGIN)
+                    )
+                )
+                R.id.tv_register -> navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_personalFragment_to_loginFragment,
+                        LoginFragment.createBundle(TYPE_REGISTER)
+                    )
+                )
             }
         }.also {
             tv_topup.setOnClickListener(it)

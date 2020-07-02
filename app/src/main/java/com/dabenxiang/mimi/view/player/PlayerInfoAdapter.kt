@@ -15,7 +15,8 @@ import com.yulichswift.roundedview.widget.RoundedTextView
 import java.text.SimpleDateFormat
 import java.util.*
 
-class PlayerInfoAdapter(isAdult: Boolean, listener: PlayerInfoListener) : BaseNodeAdapter(), LoadMoreModule {
+class PlayerInfoAdapter(isAdult: Boolean, listener: PlayerInfoListener) : BaseNodeAdapter(),
+    LoadMoreModule {
 
     companion object {
         const val EXPAND_COLLAPSE_PAYLOAD = 99
@@ -43,7 +44,10 @@ class PlayerInfoAdapter(isAdult: Boolean, listener: PlayerInfoListener) : BaseNo
     }
 }
 
-class RootCommentProvider(private val isAdult: Boolean, private val listener: PlayerInfoAdapter.PlayerInfoListener) : BaseCommentProvider(isAdult) {
+class RootCommentProvider(
+    private val isAdult: Boolean,
+    private val listener: PlayerInfoAdapter.PlayerInfoListener
+) : BaseCommentProvider(isAdult) {
 
     override val itemViewType: Int
         get() = 1
@@ -52,7 +56,12 @@ class RootCommentProvider(private val isAdult: Boolean, private val listener: Pl
         get() = R.layout.item_comment_root
 
     init {
-        addChildClickViewIds(R.id.tv_like, R.id.tv_unlike, R.id.btn_reply, R.id.btn_show_comment_reply)
+        addChildClickViewIds(
+            R.id.tv_like,
+            R.id.tv_unlike,
+            R.id.btn_reply,
+            R.id.btn_show_comment_reply
+        )
     }
 
     override fun convert(holder: BaseViewHolder, item: BaseNode) {
@@ -79,8 +88,13 @@ class RootCommentProvider(private val isAdult: Boolean, private val listener: Pl
                         it.resources.getColor(colorRes, null)
                     }
 
-                it.setBtnSolidColor(solidColor, solidColor, it.resources.getDimension(R.dimen.dp_10))
-                it.text = String.format(it.resources.getString(R.string.n_reply), node.data.commentCount)
+                it.setBtnSolidColor(
+                    solidColor,
+                    solidColor,
+                    it.resources.getDimension(R.dimen.dp_10)
+                )
+                it.text =
+                    String.format(it.resources.getString(R.string.n_reply), node.data.commentCount)
 
                 it.visibility = View.VISIBLE
             } else {
@@ -156,7 +170,8 @@ class RootCommentProvider(private val isAdult: Boolean, private val listener: Pl
     }
 }
 
-class NestedCommentProvider(isAdult: Boolean, val listener: PlayerInfoAdapter.PlayerInfoListener) : BaseCommentProvider(isAdult) {
+class NestedCommentProvider(isAdult: Boolean, val listener: PlayerInfoAdapter.PlayerInfoListener) :
+    BaseCommentProvider(isAdult) {
     override val itemViewType: Int
         get() = 2
 
@@ -275,14 +290,25 @@ abstract class BaseCommentProvider(private val isAdult: Boolean) : BaseNodeProvi
 
     fun updateLikeCountAndDislikeCount(holder: BaseViewHolder, data: MembersPostCommentItem) {
         holder.setText(R.id.tv_like, (data.likeCount ?: 0L).toString())
-        holder.getView<TextView>(R.id.tv_like).setCompoundDrawablesRelativeWithIntrinsicBounds(getLikeRes(data.likeType == 0), 0, 0, 0)
+        holder.getView<TextView>(R.id.tv_like).setCompoundDrawablesRelativeWithIntrinsicBounds(
+            getLikeRes(data.likeType == 0),
+            0,
+            0,
+            0
+        )
         holder.setText(R.id.tv_unlike, (data.dislikeCount ?: 0L).toString())
-        holder.getView<TextView>(R.id.tv_unlike).setCompoundDrawablesRelativeWithIntrinsicBounds(getDislikeRes(data.likeType == 1), 0, 0, 0)
+        holder.getView<TextView>(R.id.tv_unlike).setCompoundDrawablesRelativeWithIntrinsicBounds(
+            getDislikeRes(data.likeType == 1),
+            0,
+            0,
+            0
+        )
     }
 
     private fun getTextColor() = if (isAdult) R.color.color_white_1_50 else R.color.color_black_1_50
 
-    private fun getMessageTextColor() = if (isAdult) R.color.color_white_1 else R.color.color_black_1
+    private fun getMessageTextColor() =
+        if (isAdult) R.color.color_white_1 else R.color.color_black_1
 
     private fun getLikeRes(isLike: Boolean): Int {
         return if (isLike) {

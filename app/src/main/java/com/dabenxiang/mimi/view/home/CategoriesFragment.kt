@@ -20,7 +20,7 @@ import com.dabenxiang.mimi.view.player.PlayerActivity
 import kotlinx.android.synthetic.main.fragment_categories.*
 import timber.log.Timber
 
-class CategoriesFragment : BaseFragment<CategoriesViewModel>() {
+class CategoriesFragment : BaseFragment() {
 
     companion object {
         const val KEY_DATA = "data"
@@ -53,21 +53,23 @@ class CategoriesFragment : BaseFragment<CategoriesViewModel>() {
             startActivity(intent)
         }
 
-        override fun onLoadStatisticsViewHolder(vh: HomeStatisticsViewHolder, src: HomeTemplate.Statistics) {
+        override fun onLoadStatisticsViewHolder(
+            vh: HomeStatisticsViewHolder,
+            src: HomeTemplate.Statistics
+        ) {
 
         }
 
-        override fun onLoadCarouselViewHolder(vh: HomeCarouselViewHolder, src: HomeTemplate.Carousel) {
+        override fun onLoadCarouselViewHolder(
+            vh: HomeCarouselViewHolder,
+            src: HomeTemplate.Carousel
+        ) {
 
         }
     }
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_categories
-    }
-
-    override fun fetchViewModel(): CategoriesViewModel? {
-        return viewModel
     }
 
     override val bottomNavigationVisibility: Int
@@ -252,7 +254,8 @@ class CategoriesFragment : BaseFragment<CategoriesViewModel>() {
             val filterTranslationY = bar_filter.translationY
             when {
                 filterTranslationY > 0 -> bar_filter.translationY = 0f
-                filterTranslationY <= -bar_filter.height.toFloat() && dy > 0 -> bar_filter.translationY = -bar_filter.height.toFloat()
+                filterTranslationY <= -bar_filter.height.toFloat() && dy > 0 -> bar_filter.translationY =
+                    -bar_filter.height.toFloat()
                 filterTranslationY <= 0 -> {
                     bar_filter.translationY = if (bar_filter.translationY - dy > 0f) {
                         0f
@@ -263,7 +266,9 @@ class CategoriesFragment : BaseFragment<CategoriesViewModel>() {
             }
 
             when {
-                filterTranslationY <= -bar_filter.height.toFloat() && dy > 0 -> setCollapsingFilterBar(View.VISIBLE)
+                filterTranslationY <= -bar_filter.height.toFloat() && dy > 0 -> setCollapsingFilterBar(
+                    View.VISIBLE
+                )
                 else -> setCollapsingFilterBar(View.GONE)
             }
         }

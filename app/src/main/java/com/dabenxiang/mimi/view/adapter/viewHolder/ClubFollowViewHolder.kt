@@ -1,11 +1,11 @@
 package com.dabenxiang.mimi.view.adapter.viewHolder
 
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
 import timber.log.Timber
@@ -16,7 +16,7 @@ class ClubFollowViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 //    private val tvSubTitle = itemView.findViewById(R.id.tv_sub_title) as TextView
 //    private val tvFollow = itemView.findViewById(R.id.tv_follow) as TextView
 
-    private var clubFollowItem : ClubFollowItem? = null
+    private var clubFollowItem: ClubFollowItem? = null
 
     init {
         view.setOnClickListener {
@@ -28,7 +28,8 @@ class ClubFollowViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
     companion object {
         fun create(parent: ViewGroup): ClubFollowViewHolder {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_follow, parent, false)
+            val view =
+                LayoutInflater.from(parent.context).inflate(R.layout.item_follow, parent, false)
             return ClubFollowViewHolder(view)
         }
     }

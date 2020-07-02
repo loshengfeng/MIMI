@@ -7,7 +7,8 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import kotlinx.android.synthetic.main.item_tab.view.*
 
-class HomeTabHolder(itemView: View, listener: IndexViewHolderListener, var isAdult: Boolean) : BaseIndexViewHolder<String>(itemView, listener) {
+class HomeTabHolder(itemView: View, listener: IndexViewHolderListener, var isAdult: Boolean) :
+    BaseIndexViewHolder<String>(itemView, listener) {
 
     private val tvTitle: TextView = itemView.tv_title
     private val ivSelected: ImageView = itemView.iv_selected

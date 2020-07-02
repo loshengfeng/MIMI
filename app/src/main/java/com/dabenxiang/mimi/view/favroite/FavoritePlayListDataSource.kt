@@ -5,12 +5,10 @@ import com.dabenxiang.mimi.callback.FavoritePagingCallback
 import com.dabenxiang.mimi.manager.DomainManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
-@ExperimentalCoroutinesApi
 class FavoritePlayListDataSource constructor(
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
@@ -32,7 +30,8 @@ class FavoritePlayListDataSource constructor(
     ) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().getPlaylist(playlistType, isAdult, "0", PER_LIMIT)
+                val result = domainManager.getApiRepository()
+                    .getPlaylist(playlistType, isAdult, "0", PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()
                 val items = item?.content

@@ -12,13 +12,13 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.SingUpRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
-import com.dabenxiang.mimi.widget.utility.AppUtils.isAccountValid
-import com.dabenxiang.mimi.widget.utility.AppUtils.isEmailValid
-import com.dabenxiang.mimi.widget.utility.AppUtils.isFriendlyNameValid
-import com.dabenxiang.mimi.widget.utility.AppUtils.isPasswordValid
 import com.dabenxiang.mimi.widget.utility.EditTextMutableLiveData
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.isAccountValid
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.isEmailValid
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.isFriendlyNameValid
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.isPasswordValid
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
@@ -69,7 +69,8 @@ class LoginViewModel : BaseViewModel() {
         _emailError.value = isValidateEmail(email.value ?: "")
         _registerAccountError.value = isValidateAccount(registerAccount.value ?: "")
         _registerPasswordError.value = isValidatePassword(registerPw.value ?: "")
-        _confirmPasswordError.value  = isValidateConfirmPassword(registerPw.value ?: "", confirmPw.value?: "")
+        _confirmPasswordError.value =
+            isValidateConfirmPassword(registerPw.value ?: "", confirmPw.value ?: "")
 
         if ("" == _friendlyNameError.value &&
             "" == _emailError.value &&
@@ -80,13 +81,13 @@ class LoginViewModel : BaseViewModel() {
             viewModelScope.launch {
                 accountManager.singUp(
                     SingUpRequest(
-                            username = registerAccount.value,
-                            email = email.value,
-                            friendlyName = friendlyName.value,
-                            password = registerPw.value,
-                            promoCode = PROMO_CODE,
-                            validationUrl = BuildConfig.API_HOST + VALIDATION_URL
-                        )
+                        username = registerAccount.value,
+                        email = email.value,
+                        friendlyName = friendlyName.value,
+                        password = registerPw.value,
+                        promoCode = PROMO_CODE,
+                        validationUrl = BuildConfig.API_HOST + VALIDATION_URL
+                    )
                 ).collect {
                     _registerResult.value = it
                 }

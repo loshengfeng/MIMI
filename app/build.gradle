@@ -20,8 +20,8 @@ android {
         }
     }
 
-    compileSdkVersion 28
-    buildToolsVersion "28.0.3"
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
 
     def getLocalIPv4 = { ->
         def ip4s = []
@@ -41,15 +41,17 @@ android {
     defaultConfig {
         applicationId "com.dabenxiang.mimi"
         minSdkVersion 24
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode version.versionCode.toInteger()
         versionName version.versionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
         buildConfigField "String", "LOCAL_SOCKET_HOST", "\"${getLocalIPv4()}\""
         buildConfigField "int", "LOCAL_SOCKET_PORT", "8080"
-        buildConfigField "String", "WEB_SOCKET_HOST", '"ws://dev-wt-api.silkrode.com.tw/topics/atw-wx?token="'
         archivesBaseName = "$applicationName-v$versionName"
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a" // todo: select one
+        }
     }
 
     buildTypes {
@@ -77,11 +79,11 @@ android {
         }
 
         sit {
-            buildConfigField "String", "API_HOST", '"https://api.ymmsp.com/"'
+            buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
         }
 
         prod {
-            buildConfigField "String", "API_HOST", '"http://10.1.1.121:50080/"'
+            buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
         }
     }
 
@@ -103,12 +105,34 @@ android {
         }
     }
 
+    kapt {
+        correctErrorTypes = true
+        arguments {
+            arg("room.schemaLocation", "$projectDir/schemas".toString())
+        }
+    }
+
     androidExtensions {
         experimental = true
     }
 
     testOptions {
         unitTests.returnDefaultValues = true
+    }
+
+    lintOptions {
+        disable 'MissingDefaultResource'
+    }
+
+}
+
+project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions {
+        freeCompilerArgs = [
+                "-Xjsr305=strict",
+                "-progressive"
+        ]
+        jvmTarget = "1.8"
     }
 }
 

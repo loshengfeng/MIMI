@@ -8,21 +8,22 @@ import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.manager.DomainManager
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.api.vo.AvatarRequest
+import com.dabenxiang.mimi.model.api.vo.EmailRequest
+import com.dabenxiang.mimi.model.api.vo.ProfileItem
+import com.dabenxiang.mimi.model.api.vo.ProfileRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.File
 import java.net.URLEncoder
 
-@ExperimentalCoroutinesApi
 class SettingViewModel : BaseViewModel() {
 
-    var bitmap : Bitmap? = null
+    var bitmap: Bitmap? = null
 
     private val _profileItem = MutableLiveData<ApiResult<ProfileItem>>()
     val profileItem: LiveData<ApiResult<ProfileItem>> = _profileItem
@@ -59,7 +60,8 @@ class SettingViewModel : BaseViewModel() {
     fun resendEmail() {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().resendEmail(EmailRequest(profileData?.email))
+                val result =
+                    domainManager.getApiRepository().resendEmail(EmailRequest(profileData?.email))
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }
@@ -93,8 +95,10 @@ class SettingViewModel : BaseViewModel() {
     }
 
     fun postAttachment() {
-        val fileName = StringBuffer(accountManager.getProfile().friendlyName).append(".jpeg").toString()
-        val tempImagePath = Environment.getExternalStorageDirectory().path.plus(StringBuffer("/").append(fileName))
+        val fileName =
+            StringBuffer(accountManager.getProfile().friendlyName).append(".jpeg").toString()
+        val tempImagePath =
+            Environment.getExternalStorageDirectory().path.plus(StringBuffer("/").append(fileName))
 
         FileUtil.saveBitmapToJpegFile(bitmap!!, destPath = tempImagePath)
 

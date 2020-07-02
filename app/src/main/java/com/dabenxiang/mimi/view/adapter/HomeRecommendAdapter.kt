@@ -9,7 +9,8 @@ import kotlinx.android.synthetic.main.nested_item_home_recommend.view.*
 
 class HomeRecommendAdapter : RecyclerView.Adapter<BaseViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.nested_item_home_recommend, parent, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.nested_item_home_recommend, parent, false)
         return BaseViewHolder(view)
     }
 

@@ -26,7 +26,8 @@ class TopupProxyPayAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TopupProxyPayViewHolder {
         val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.item_topup_proxy_pay, parent, false)
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_topup_proxy_pay, parent, false)
         return TopupProxyPayViewHolder(view, listener)
     }
 

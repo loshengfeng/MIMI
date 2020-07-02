@@ -16,9 +16,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class SplashFragment : BaseFragment<SplashViewModel>() {
+class SplashFragment : BaseFragment() {
 
-    companion object { const val PERMISSION_REQUEST_CODE = 100 }
+    companion object {
+        const val PERMISSION_REQUEST_CODE = 100
+    }
 
     private val permissions = arrayOf(
         Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -30,9 +32,9 @@ class SplashFragment : BaseFragment<SplashViewModel>() {
 
     private val viewModel: SplashViewModel by viewModels()
 
-    override fun fetchViewModel(): SplashViewModel? { return viewModel }
-
-    override fun getLayoutId(): Int { return R.layout.fragment_splash }
+    override fun getLayoutId(): Int {
+        return R.layout.fragment_splash
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

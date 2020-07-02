@@ -53,7 +53,11 @@ class MemberFollowListDataSource constructor(
         }
     }
 
-    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Long, MemberFollowItem>) {}
+    override fun loadBefore(
+        params: LoadParams<Long>,
+        callback: LoadCallback<Long, MemberFollowItem>
+    ) {
+    }
 
     override fun loadAfter(
         params: LoadParams<Long>,

@@ -8,18 +8,16 @@ import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MeItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
-@ExperimentalCoroutinesApi
 class PersonalViewModel : BaseViewModel() {
 
-    var byteArray : ByteArray ? = null
+    var byteArray: ByteArray? = null
 
     private val _meItem = MutableLiveData<ApiResult<MeItem>>()
-    val meItem : LiveData<ApiResult<MeItem>> = _meItem
+    val meItem: LiveData<ApiResult<MeItem>> = _meItem
 
     private val _apiSignOut = MutableLiveData<ApiResult<Nothing>>()
     val apiSignOut: LiveData<ApiResult<Nothing>> = _apiSignOut
@@ -37,7 +35,7 @@ class PersonalViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
-                .collect{
+                .collect {
                     _meItem.value = it
                 }
         }

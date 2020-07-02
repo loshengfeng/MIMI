@@ -54,7 +54,11 @@ class ClubFollowListDataSource constructor(
         }
     }
 
-    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Long, ClubFollowItem>) {}
+    override fun loadBefore(
+        params: LoadParams<Long>,
+        callback: LoadCallback<Long, ClubFollowItem>
+    ) {
+    }
 
     override fun loadAfter(params: LoadParams<Long>, callback: LoadCallback<Long, ClubFollowItem>) {
         val next = params.key

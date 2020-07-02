@@ -57,10 +57,20 @@ class VideoViewHolder(itemView: View, onClickListener: IndexViewHolderListener) 
                 }
 
             if (model.isAdult) {
-                card.setCardBackgroundColor(itemView.resources.getColor(R.color.adult_color_card_background, null))
+                card.setCardBackgroundColor(
+                    itemView.resources.getColor(
+                        R.color.adult_color_card_background,
+                        null
+                    )
+                )
                 tvTitle.setTextColor(itemView.resources.getColor(R.color.adult_color_text, null))
             } else {
-                card.setCardBackgroundColor(itemView.resources.getColor(R.color.normal_color_card_background, null))
+                card.setCardBackgroundColor(
+                    itemView.resources.getColor(
+                        R.color.normal_color_card_background,
+                        null
+                    )
+                )
                 tvTitle.setTextColor(itemView.resources.getColor(R.color.normal_color_text, null))
             }
 

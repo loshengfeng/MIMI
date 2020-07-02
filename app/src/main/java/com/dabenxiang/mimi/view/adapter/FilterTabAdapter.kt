@@ -8,7 +8,10 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.home.FilterTabHolder
 
-class FilterTabAdapter(private val listener: FilterTabAdapterListener, private val isAdult: Boolean) :
+class FilterTabAdapter(
+    private val listener: FilterTabAdapterListener,
+    private val isAdult: Boolean
+) :
     BaseTabAdapter<String, FilterTabHolder>() {
 
     interface FilterTabAdapterListener {

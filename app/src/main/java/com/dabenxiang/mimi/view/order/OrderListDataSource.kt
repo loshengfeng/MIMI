@@ -55,7 +55,9 @@ class OrderListDataSource constructor(
         }
     }
 
-    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Long, OrderItem>) { Timber.d("loadBefore") }
+    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Long, OrderItem>) {
+        Timber.d("loadBefore")
+    }
 
     override fun loadAfter(params: LoadParams<Long>, callback: LoadCallback<Long, OrderItem>) {
         Timber.d("loadAfter")

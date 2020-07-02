@@ -53,15 +53,25 @@ class BirthdayEditText : TextInputEditText {
     private var edited = false
     private var valueWithError: String? = null
 
-    constructor(context: Context?) : super(context!!) { initDateEditText() }
-    constructor(context: Context?, attrs: AttributeSet?) : super(context!!, attrs) { initDateEditText(attrs = attrs) }
+    constructor(context: Context?) : super(context!!) {
+        initDateEditText()
+    }
+
+    constructor(context: Context?, attrs: AttributeSet?) : super(context!!, attrs) {
+        initDateEditText(attrs = attrs)
+    }
+
     constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(
         context!!,
         attrs,
         defStyle
-    ) { initDateEditText(attrs = attrs) }
+    ) {
+        initDateEditText(attrs = attrs)
+    }
 
-    fun listen() { addTextChangedListener(dateTextWatcher) }
+    fun listen() {
+        addTextChangedListener(dateTextWatcher)
+    }
 
     @SuppressLint("RtlHardcoded", "CustomViewStyleable")
     private fun initDateEditText(attrs: AttributeSet? = null) {
@@ -70,7 +80,9 @@ class BirthdayEditText : TextInputEditText {
         setOnClickListener { setSelection(text?.length ?: 0) }
         inputType = InputType.TYPE_CLASS_NUMBER
 
-        if (attrs == null) { return }
+        if (attrs == null) {
+            return
+        }
 
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.DateEditText, 0, 0)
 
@@ -92,14 +104,20 @@ class BirthdayEditText : TextInputEditText {
     private fun getDateFormat(typedArray: TypedArray) {
         val dateFormat = typedArray.getInt(R.styleable.DateEditText_dateFormat, 0)
 
-        if (dateFormat == 0) { this.dateFormat = DateFormat.YYYYMMDD }
+        if (dateFormat == 0) {
+            this.dateFormat = DateFormat.YYYYMMDD
+        }
 
-        if (hint.isNullOrEmpty()) { hint = getDateFormatFromDivider() }
+        if (hint.isNullOrEmpty()) {
+            hint = getDateFormatFromDivider()
+        }
     }
 
     private fun getDividerCharacter(typedArray: TypedArray) {
         val dividerCharacter = typedArray.getInt(R.styleable.DateEditText_dividerCharacter, 0)
-        if (dividerCharacter == 0) { this.dividerCharacter = DividerCharacter.Minus }
+        if (dividerCharacter == 0) {
+            this.dividerCharacter = DividerCharacter.Minus
+        }
     }
 
     private fun getMaxDate(typedArray: TypedArray) {
@@ -126,7 +144,9 @@ class BirthdayEditText : TextInputEditText {
 
     private fun validateMinMaxDate(date: String) {
         if (dateFormat == DateFormat.YYYYMMDD) {
-            if (date.length != 10) { throw IllegalArgumentException("Invalid date") }
+            if (date.length != 10) {
+                throw IllegalArgumentException("Invalid date")
+            }
 
             val day = date.substring(0, 4).toInt()
             val month = date.substring(5, 7).toInt()
@@ -134,7 +154,9 @@ class BirthdayEditText : TextInputEditText {
 
             val isLeapYear = (year % 100 != 0 || year % 400 != 0)
 
-            if (month > 12 || month <= 0) { throw IllegalArgumentException("Invalid date") }
+            if (month > 12 || month <= 0) {
+                throw IllegalArgumentException("Invalid date")
+            }
 
             if (day > 31 || day == 0) {
                 throw IllegalArgumentException("Invalid date")
@@ -151,7 +173,9 @@ class BirthdayEditText : TextInputEditText {
     private fun validateMinMaxDate(minDate: Date?, maxDate: Date?) {
         val mMinDate = minDate ?: return
         val mMaxDate = maxDate ?: return
-        if (mMinDate >= mMaxDate) { throw IllegalArgumentException("min date must be smaller than max date") }
+        if (mMinDate >= mMaxDate) {
+            throw IllegalArgumentException("min date must be smaller than max date")
+        }
     }
 
     private val dateTextWatcher = object : TextWatcher {
@@ -190,7 +214,9 @@ class BirthdayEditText : TextInputEditText {
     }
 
     private fun validate(value: String): String {
-        if (dateFormat == DateFormat.YYYYMMDD) { return validatedDateFormat(value) }
+        if (dateFormat == DateFormat.YYYYMMDD) {
+            return validatedDateFormat(value)
+        }
         return value
     }
 
@@ -217,12 +243,14 @@ class BirthdayEditText : TextInputEditText {
                     }
                 } else if (day > 31 || day == 0) {
                     if (autoCorrect) {
-                        mValue = mValue.replace(day.toString(),
-                            when(month % 2 == 0) {
+                        mValue = mValue.replace(
+                            day.toString(),
+                            when (month % 2 == 0) {
                                 true -> "30"
                                 else -> "31"
                             },
-                            false)
+                            false
+                        )
                     }
                 }
             }

@@ -6,18 +6,17 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.ErrorCode
 import com.dabenxiang.mimi.model.api.ExceptionResult
+import com.dabenxiang.mimi.model.api.NOT_FOUND
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
 import kotlinx.android.synthetic.main.fragment_forget_password.*
-import kotlinx.android.synthetic.main.fragment_forget_password.edit_email
-import kotlinx.android.synthetic.main.fragment_forget_password.tv_email_error
 
-class ForgetPasswordFragment : BaseFragment<ForgetPasswordViewModel>() {
+class ForgetPasswordFragment : BaseFragment() {
+
     private val viewModel: ForgetPasswordViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -25,9 +24,9 @@ class ForgetPasswordFragment : BaseFragment<ForgetPasswordViewModel>() {
         initSettings()
     }
 
-    override fun getLayoutId(): Int { return R.layout.fragment_forget_password }
-
-    override fun fetchViewModel(): ForgetPasswordViewModel? { return viewModel }
+    override fun getLayoutId(): Int {
+        return R.layout.fragment_forget_password
+    }
 
     override val bottomNavigationVisibility = View.GONE
 
@@ -99,7 +98,7 @@ class ForgetPasswordFragment : BaseFragment<ForgetPasswordViewModel>() {
         progressHUD?.dismiss()
 
         when (errorHandler.httpExceptionItem.errorItem.code) {
-            ErrorCode.NOT_FOUND -> {
+            NOT_FOUND -> {
                 GeneralDialog.newInstance(
                     GeneralDialogData(
                         titleRes = R.string.login_yet,

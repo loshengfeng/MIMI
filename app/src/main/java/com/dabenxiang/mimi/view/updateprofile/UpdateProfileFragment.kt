@@ -11,10 +11,9 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import kotlinx.android.synthetic.main.fragment_update_profile.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@ExperimentalCoroutinesApi
-class UpdateProfileFragment :BaseFragment<UpdateProfileViewModel>() {
+class UpdateProfileFragment : BaseFragment() {
+
     private val viewModel: UpdateProfileViewModel by viewModels()
 
     companion object {
@@ -38,9 +37,9 @@ class UpdateProfileFragment :BaseFragment<UpdateProfileViewModel>() {
         initSettings()
     }
 
-    override fun getLayoutId(): Int { return R.layout.fragment_update_profile }
-
-    override fun fetchViewModel(): UpdateProfileViewModel? { return viewModel }
+    override fun getLayoutId(): Int {
+        return R.layout.fragment_update_profile
+    }
 
     override fun setupObservers() {
         viewModel.error.observe(viewLifecycleOwner, Observer {
@@ -55,7 +54,7 @@ class UpdateProfileFragment :BaseFragment<UpdateProfileViewModel>() {
         })
 
         viewModel.updateResult.observe(viewLifecycleOwner, Observer {
-            when(it) {
+            when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Error -> onApiError(it.throwable)
                 is ApiResult.Empty -> {
@@ -83,7 +82,7 @@ class UpdateProfileFragment :BaseFragment<UpdateProfileViewModel>() {
         arguments?.also { it ->
             viewModel.profileItem = it.getSerializable(KEY_PROFILE) as ProfileItem
             viewModel.type = it.getInt(KEY_TYPE, TYPE_NAME)
-            when(viewModel.type) {
+            when (viewModel.type) {
                 TYPE_NAME -> {
                     tv_title.text = getString(R.string.setting_change_name)
                     tv_text.text = getString(R.string.setting_name)

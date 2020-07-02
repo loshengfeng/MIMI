@@ -33,7 +33,13 @@ class CategoriesViewModel : BaseViewModel() {
 
     fun setupVideoList(category: String?, isAdult: Boolean) {
         viewModelScope.launch {
-            val dataSrc = VideoListDataSource(isAdult, category ?: "", viewModelScope, domainManager.getApiRepository(), pagingCallback)
+            val dataSrc = VideoListDataSource(
+                isAdult,
+                category ?: "",
+                viewModelScope,
+                domainManager.getApiRepository(),
+                pagingCallback
+            )
             val factory = VideoListFactory(dataSrc)
             val config = PagedList.Config.Builder()
                 .setPageSize(VideoListDataSource.PER_LIMIT.toInt())

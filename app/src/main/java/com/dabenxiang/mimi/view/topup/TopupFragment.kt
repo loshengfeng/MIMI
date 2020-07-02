@@ -17,7 +17,8 @@ import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_topup.*
 import timber.log.Timber
 
-class TopupFragment : BaseFragment<TopupViewModel>() {
+class TopupFragment : BaseFragment() {
+
     private val viewModel: TopupViewModel by viewModels()
 
     private val onlinePayListener = object : AdapterEventListener<TopupOnlinePayItem> {
@@ -41,10 +42,6 @@ class TopupFragment : BaseFragment<TopupViewModel>() {
         return R.layout.fragment_topup
     }
 
-    override fun fetchViewModel(): TopupViewModel? {
-        return viewModel
-    }
-
     override fun setupObservers() {
         Timber.d("${TopupFragment::class.java.simpleName}_setupObservers")
     }
@@ -54,11 +51,11 @@ class TopupFragment : BaseFragment<TopupViewModel>() {
 
         rg_Type.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
-                R.id.rb_online_pay-> {
+                R.id.rb_online_pay -> {
                     layout_online_pay.visibility = View.VISIBLE
                     rv_proxy_pay.visibility = View.GONE
                 }
-                R.id.rb_proxy_pay-> {
+                R.id.rb_proxy_pay -> {
                     layout_online_pay.visibility = View.GONE
                     rv_proxy_pay.visibility = View.VISIBLE
                 }

@@ -19,7 +19,9 @@ abstract class JFPageDataSource<Key : Any, Value : Any> :
     }
 
     sealed class JFLoadResult {
-        data class Page<Key : Any, Value : Any>(val nextKey: Key?, val content: List<Value>?) : JFLoadResult()
+        data class Page<Key : Any, Value : Any>(val nextKey: Key?, val content: List<Value>?) :
+            JFLoadResult()
+
         data class PageError(val e: Exception) : JFLoadResult()
     }
 

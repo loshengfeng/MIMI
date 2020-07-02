@@ -10,7 +10,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import kotlinx.android.synthetic.main.fragment_search_video.*
 
-class SearchVideoFragment : BaseFragment<SearchVideoViewModel>() {
+class SearchVideoFragment : BaseFragment() {
 
     companion object {
         const val KEY_DATA = "data"
@@ -26,10 +26,6 @@ class SearchVideoFragment : BaseFragment<SearchVideoViewModel>() {
     }
 
     private val viewModel: SearchVideoViewModel by viewModels()
-
-    override fun fetchViewModel(): SearchVideoViewModel? {
-        return viewModel
-    }
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_search_video

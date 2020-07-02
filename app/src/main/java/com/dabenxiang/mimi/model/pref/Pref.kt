@@ -1,56 +1,57 @@
 package com.dabenxiang.mimi.model.pref
 
-import com.dabenxiang.mimi.model.vo.ProfileData
-import com.dabenxiang.mimi.model.vo.TokenData
+import com.dabenxiang.mimi.model.vo.ProfileItem
+import com.dabenxiang.mimi.model.vo.TokenItem
 import com.google.gson.Gson
 
-class Pref(private val gson: Gson, preferenceFileName: String, isDebug: Boolean) : AbstractPref(preferenceFileName, isDebug) {
+class Pref(private val gson: Gson, preferenceFileName: String, isDebug: Boolean) :
+    AbstractPref(preferenceFileName, isDebug) {
 
     private val tokenPref = StringPref("TOKEN")
     private val memberTokenPref = StringPref("MEMBER_TOKEN")
     private val profilePref = StringPref("PROFILE")
     private val keepAccountPref = BooleanPref("KEEP_ACCOUNT")
-    private var cachedPublicToken: TokenData? = null
-    private var cachedMemberToken: TokenData? = null
+    private var cachedPublicToken: TokenItem? = null
+    private var cachedMemberToken: TokenItem? = null
 
-    var publicToken: TokenData
+    var publicToken: TokenItem
         get() =
             try {
                 if (cachedPublicToken == null) {
-                    cachedPublicToken = gson.fromJson(tokenPref.get(), TokenData::class.java)
+                    cachedPublicToken = gson.fromJson(tokenPref.get(), TokenItem::class.java)
                 }
 
-                cachedPublicToken ?: TokenData()
+                cachedPublicToken ?: TokenItem()
             } catch (e: Exception) {
-                TokenData()
+                TokenItem()
             }
         set(value) {
             cachedPublicToken = value
             tokenPref.set(gson.toJson(value))
         }
 
-    var memberToken: TokenData
+    var memberToken: TokenItem
         get() =
             try {
                 if (cachedMemberToken == null) {
-                    cachedMemberToken = gson.fromJson(memberTokenPref.get(), TokenData::class.java)
+                    cachedMemberToken = gson.fromJson(memberTokenPref.get(), TokenItem::class.java)
                 }
 
-                cachedMemberToken ?: TokenData()
+                cachedMemberToken ?: TokenItem()
             } catch (e: Exception) {
-                TokenData()
+                TokenItem()
             }
         set(value) {
             cachedMemberToken = value
             memberTokenPref.set(gson.toJson(value))
         }
 
-    var profileData: ProfileData
+    var profileItem: ProfileItem
         get() =
             try {
-                gson.fromJson(profilePref.get(), ProfileData::class.java)
+                gson.fromJson(profilePref.get(), ProfileItem::class.java)
             } catch (e: Exception) {
-                ProfileData()
+                ProfileItem()
             }
         set(value) {
             profilePref.set(gson.toJson(value))

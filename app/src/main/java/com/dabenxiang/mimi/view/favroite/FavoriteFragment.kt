@@ -9,13 +9,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import com.bumptech.glide.Glide
-import com.bumptech.glide.Priority
-import com.bumptech.glide.load.MultiTransformation
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.CircleCrop
-import com.bumptech.glide.request.RequestOptions
-import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.BaseItem
@@ -29,20 +22,15 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
-import com.dabenxiang.mimi.view.dialog.more.OnMoreDialogListener
 import com.dabenxiang.mimi.view.dialog.more.MoreDialogFragment
+import com.dabenxiang.mimi.view.dialog.more.OnMoreDialogListener
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_post_favorite.*
-import kotlinx.android.synthetic.main.fragment_post_favorite.item_no_data
-import kotlinx.android.synthetic.main.fragment_post_favorite.layout_refresh
-import kotlinx.android.synthetic.main.fragment_post_favorite.rv_content
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import timber.log.Timber
 
-@ExperimentalCoroutinesApi
-class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
+class FavoriteFragment : BaseFragment() {
+
     private val viewModel: FavoriteViewModel by viewModels()
 
     private val favoriteAdapter by lazy { FavoriteAdapter(listener) }
@@ -82,9 +70,9 @@ class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
         initSettings()
     }
 
-    override fun getLayoutId(): Int { return R.layout.fragment_post_favorite }
-
-    override fun fetchViewModel(): FavoriteViewModel? { return viewModel }
+    override fun getLayoutId(): Int {
+        return R.layout.fragment_post_favorite
+    }
 
     override fun setupObservers() {
         viewModel.playList.observe(viewLifecycleOwner, Observer { favoriteAdapter.submitList(it) })
@@ -125,7 +113,8 @@ class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> {}
+                is ApiResult.Success -> {
+                }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
             }
         })
@@ -136,7 +125,10 @@ class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
             when (buttonView.id) {
                 R.id.tv_clean -> {
                     CleanDialogFragment.newInstance(onCleanDialogListener).also {
-                        it.show(activity!!.supportFragmentManager, CleanDialogFragment::class.java.simpleName)
+                        it.show(
+                            requireActivity().supportFragmentManager,
+                            CleanDialogFragment::class.java.simpleName
+                        )
                     }
                 }
             }
@@ -254,13 +246,15 @@ class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
                     when (item) {
                         is PlayItem -> {
                             item.id?.let {
-                                viewModel.viewStatus[textView.id] = viewModel.viewStatus[textView.id] ?: LikeType.DISLIKE.value
+                                viewModel.viewStatus[textView.id] =
+                                    viewModel.viewStatus[textView.id] ?: LikeType.DISLIKE.value
                                 viewModel.modifyFavorite(textView, it)
                             }
                         }
                         is PostFavoriteItem -> {
                             item.id?.let {
-                                viewModel.viewStatus[textView.id] = viewModel.viewStatus[textView.id] ?: LikeType.DISLIKE.value
+                                viewModel.viewStatus[textView.id] =
+                                    viewModel.viewStatus[textView.id] ?: LikeType.DISLIKE.value
                                 viewModel.modifyFavorite(textView, it)
                             }
                         }
@@ -282,17 +276,21 @@ class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
                     val clipboard =
                         requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
                     val clip = ClipData.newPlainText(url, url)
-                    clipboard.primaryClip = clip
+                    clipboard.setPrimaryClip(clip)
                     GeneralUtils.showToast(requireContext(), "already copy url")
                 }
 
                 FavoriteAdapter.FunctionType.More -> {
                     // 若已經檢舉過則Disable -> todo: can't determine?
                     MoreDialogFragment.newInstance(item as BaseItem, onReportDialogListener).also {
-                        it.show(activity!!.supportFragmentManager, MoreDialogFragment::class.java.simpleName)
+                        it.show(
+                            activity!!.supportFragmentManager,
+                            MoreDialogFragment::class.java.simpleName
+                        )
                     }
                 }
-                else -> {}
+                else -> {
+                }
             }
         }
 
@@ -300,7 +298,7 @@ class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
 
     private fun refreshUI(view: TextView) {
         var count = view.text.toString().toInt()
-        when(viewModel.viewStatus[view.id]) {
+        when (viewModel.viewStatus[view.id]) {
             LikeType.LIKE.value -> {
                 count--
                 viewModel.viewStatus[view.id] = LikeType.DISLIKE.value
@@ -322,9 +320,9 @@ class FavoriteFragment : BaseFragment<FavoriteViewModel>() {
 
     private val onReportDialogListener = object : OnMoreDialogListener {
         override fun onReport(item: BaseItem) {
-            val postId = when(item) {
-                is PlayItem -> item.id?: 0
-                is PostFavoriteItem -> item.postId?: 0
+            val postId = when (item) {
+                is PlayItem -> item.id ?: 0
+                is PostFavoriteItem -> item.postId ?: 0
                 else -> 0
             }
             viewModel.report(postId)

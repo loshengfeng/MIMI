@@ -6,7 +6,11 @@ import com.dabenxiang.mimi.view.base.JFPageDataSource
 import retrofit2.HttpException
 import timber.log.Timber
 
-class CommentDataSource(private val videoId: Long, private val sorting: Int, private val domainManager: DomainManager) :
+class CommentDataSource(
+    private val videoId: Long,
+    private val sorting: Int,
+    private val domainManager: DomainManager
+) :
     JFPageDataSource<Long, List<MembersPostCommentItem>>() {
 
     companion object {
@@ -19,13 +23,22 @@ class CommentDataSource(private val videoId: Long, private val sorting: Int, pri
             val nowOffset = params ?: 0L
 
             val resp = domainManager.getApiRepository()
-                .getMembersPostComment(postId = videoId, sorting = sorting, offset = nowOffset.toString(), limit = PER_LIMIT)
+                .getMembersPostComment(
+                    postId = videoId,
+                    sorting = sorting,
+                    offset = nowOffset.toString(),
+                    limit = PER_LIMIT
+                )
             if (!resp.isSuccessful) throw HttpException(resp)
 
             val body = resp.body()!!
             val paging = body.paging
             val nextPageKey = when {
-                hasNextPage(paging.count, paging.offset, body.content?.size ?: 0) -> nowOffset + PER_LIMIT_LONG
+                hasNextPage(
+                    paging.count,
+                    paging.offset,
+                    body.content?.size ?: 0
+                ) -> nowOffset + PER_LIMIT_LONG
                 else -> null
             }
 

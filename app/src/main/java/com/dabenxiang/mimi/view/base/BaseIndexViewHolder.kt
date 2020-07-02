@@ -2,7 +2,10 @@ package com.dabenxiang.mimi.view.base
 
 import android.view.View
 
-abstract class BaseIndexViewHolder<M : Any>(itemView: View, protected val listener: IndexViewHolderListener) : BaseViewHolder(itemView) {
+abstract class BaseIndexViewHolder<M : Any>(
+    itemView: View,
+    protected val listener: IndexViewHolderListener
+) : BaseViewHolder(itemView) {
 
     interface IndexViewHolderListener {
         fun onClickItemIndex(view: View, index: Int)

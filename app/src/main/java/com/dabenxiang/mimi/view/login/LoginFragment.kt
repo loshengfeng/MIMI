@@ -8,9 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.ErrorCode
-import com.dabenxiang.mimi.model.api.ExceptionResult
+import com.dabenxiang.mimi.model.api.*
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
@@ -20,12 +18,9 @@ import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.item_login.*
 import kotlinx.android.synthetic.main.item_register.*
-import kotlinx.android.synthetic.main.item_register.edit_email
-import kotlinx.android.synthetic.main.item_register.tv_email_error
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@ExperimentalCoroutinesApi
-class LoginFragment : BaseFragment<LoginViewModel>() {
+class LoginFragment : BaseFragment() {
+
     private val viewModel: LoginViewModel by viewModels()
 
     companion object {
@@ -33,7 +28,9 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
         const val TYPE_REGISTER = 0
         const val TYPE_LOGIN = 1
 
-        fun createBundle(type: Int): Bundle { return Bundle().also { it.putInt(KEY_TYPE, type) } }
+        fun createBundle(type: Int): Bundle {
+            return Bundle().also { it.putInt(KEY_TYPE, type) }
+        }
     }
 
     override val bottomNavigationVisibility: Int
@@ -46,12 +43,14 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
 
     override fun onResume() {
         super.onResume()
-        if(viewModel.accountManager.isLogin.value == true) { navigateTo(NavigateItem.Up) }
+        if (viewModel.accountManager.isLogin.value == true) {
+            navigateTo(NavigateItem.Up)
+        }
     }
 
-    override fun getLayoutId(): Int { return R.layout.fragment_login }
-
-    override fun fetchViewModel(): LoginViewModel? { return viewModel }
+    override fun getLayoutId(): Int {
+        return R.layout.fragment_login
+    }
 
     override fun setupObservers() {
         viewModel.friendlyNameError.observe(viewLifecycleOwner, Observer {
@@ -149,9 +148,11 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
                             messageIcon = R.drawable.ico_default_photo,
                             secondBtn = getString(R.string.btn_confirm),
                             secondBlock = {
-                                viewModel.registerAccount.value?.let { it1 -> viewModel.registerPw.value?.let { it2 ->
-                                    viewModel.doLogin(it1, it2)
-                                } }
+                                viewModel.registerAccount.value?.let { it1 ->
+                                    viewModel.registerPw.value?.let { it2 ->
+                                        viewModel.doLogin(it1, it2)
+                                    }
+                                }
                             }
                         )
                     ).setCancel(false)
@@ -207,7 +208,9 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
 
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
-                R.id.btnClose, R.id.btn_register_cancel, R.id.btn_login_cancel -> navigateTo(NavigateItem.Up)
+                R.id.btnClose, R.id.btn_register_cancel, R.id.btn_login_cancel -> navigateTo(
+                    NavigateItem.Up
+                )
                 R.id.btn_register -> viewModel.doRegisterValidateAndSubmit()
                 R.id.btn_forget -> navigateTo(NavigateItem.Destination(R.id.action_loginFragment_to_forgetPasswordFragment))
                 R.id.btn_login -> viewModel.doLoginValidateAndSubmit()
@@ -259,7 +262,8 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
         viewModel.loginAccount.bindingEditText = edit_login_account
         viewModel.loginPw.bindingEditText = edit_login_pw
 
-        tl_type.selectTab(this.arguments?.getInt(KEY_TYPE, TYPE_REGISTER)?.let { tl_type.getTabAt(it) })
+        tl_type.selectTab(
+            this.arguments?.getInt(KEY_TYPE, TYPE_REGISTER)?.let { tl_type.getTabAt(it) })
 
         val keepAccount = viewModel.accountManager.keepAccount
 
@@ -301,26 +305,26 @@ class LoginFragment : BaseFragment<LoginViewModel>() {
 
     override fun handleHttpError(errorHandler: ExceptionResult.HttpError) {
         when (errorHandler.httpExceptionItem.errorItem.code) {
-            ErrorCode.LOGIN_400000 -> {
+            LOGIN_400000 -> {
                 cb_email.isChecked = false
                 showErrorMessageDialog(getString(R.string.error_email_duplicate))
             }
-            ErrorCode.LOGIN_403001 -> showErrorMessageDialog(getString(R.string.error_username_or_password_incorrect))
-            ErrorCode.LOGIN_403002 -> showErrorMessageDialog(getString(R.string.error_account_disable))
-            ErrorCode.LOGIN_403004 -> showErrorMessageDialog(getString(R.string.error_validation))
-            ErrorCode.LOGIN_403006 -> {
+            LOGIN_403001 -> showErrorMessageDialog(getString(R.string.error_username_or_password_incorrect))
+            LOGIN_403002 -> showErrorMessageDialog(getString(R.string.error_account_disable))
+            LOGIN_403004 -> showErrorMessageDialog(getString(R.string.error_validation))
+            LOGIN_403006 -> {
                 GeneralDialog.newInstance(
                     GeneralDialogData(
                         titleRes = R.string.desc_success,
                         message = getString(R.string.error_first_login),
                         messageIcon = R.drawable.ico_default_photo,
                         secondBtn = getString(R.string.btn_confirm),
-                        secondBlock = {navigateTo(NavigateItem.Destination(R.id.action_loginFragment_to_changePasswordFragment))}
+                        secondBlock = { navigateTo(NavigateItem.Destination(R.id.action_loginFragment_to_changePasswordFragment)) }
                     )
                 ).setCancel(false)
                     .show(requireActivity().supportFragmentManager)
             }
-            ErrorCode.LOGIN_409000 -> {
+            LOGIN_409000 -> {
                 cb_register_account.isChecked = false
                 showErrorMessageDialog(getString(R.string.error_account_duplicate))
             }

@@ -58,7 +58,12 @@ object FileUtil {
         }
     }
 
-    fun saveBitmapToJpegFile(bitmap: Bitmap, destWidth: Int = 480, destHeight: Int = 640, destPath: String) {
+    fun saveBitmapToJpegFile(
+        bitmap: Bitmap,
+        destWidth: Int = 480,
+        destHeight: Int = 640,
+        destPath: String
+    ) {
         var scale: Bitmap? = Bitmap.createScaledBitmap(bitmap, destWidth, destHeight, true)
         try {
             val bos = BufferedOutputStream(FileOutputStream(destPath))
@@ -72,5 +77,4 @@ object FileUtil {
             scale?.recycle()
         }
     }
-
 }

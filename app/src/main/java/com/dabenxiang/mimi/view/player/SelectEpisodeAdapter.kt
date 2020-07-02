@@ -6,7 +6,10 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.adapter.BaseTabAdapter
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 
-class SelectEpisodeAdapter(private val listener: BaseIndexViewHolder.IndexViewHolderListener, private val isAdult: Boolean) :
+class SelectEpisodeAdapter(
+    private val listener: BaseIndexViewHolder.IndexViewHolderListener,
+    private val isAdult: Boolean
+) :
     BaseTabAdapter<String, SelectEpisodeHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SelectEpisodeHolder {

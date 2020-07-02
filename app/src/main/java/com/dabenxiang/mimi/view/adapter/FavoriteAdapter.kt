@@ -46,9 +46,27 @@ class FavoriteAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            TYPE_NORMAL -> FavoritePlayViewHolder(layoutInflater.inflate(R.layout.item_favorite_normal, parent, false), listener)
-            TYPE_SHORT_VIDEO -> FavoritePostViewHolder(layoutInflater.inflate(R.layout.item_favorite_short_video, parent, false), listener)
-            else -> FavoritePlayViewHolder(layoutInflater.inflate(R.layout.item_favorite_normal, parent, false), listener)
+            TYPE_NORMAL -> FavoritePlayViewHolder(
+                layoutInflater.inflate(
+                    R.layout.item_favorite_normal,
+                    parent,
+                    false
+                ), listener
+            )
+            TYPE_SHORT_VIDEO -> FavoritePostViewHolder(
+                layoutInflater.inflate(
+                    R.layout.item_favorite_short_video,
+                    parent,
+                    false
+                ), listener
+            )
+            else -> FavoritePlayViewHolder(
+                layoutInflater.inflate(
+                    R.layout.item_favorite_normal,
+                    parent,
+                    false
+                ), listener
+            )
         }
     }
 
