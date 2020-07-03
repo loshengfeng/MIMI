@@ -5,14 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import com.google.gson.Gson
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
+import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.head_video_info.view.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -40,11 +41,41 @@ class FavoritePostViewHolder(
 
     init {
         ivPhoto.setOnClickListener { listener.onVideoClick(data!!) }
-        tvLike.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.Like, it, data!!) }
-        tvFavorite.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.Favorite, it, data!!) }
-        tvMsg.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.Msg, it, data!!) }
-        tvShare.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.Share, it, data!!) }
-        tvMore.setOnClickListener { listener.onFunctionClick(FavoriteAdapter.FunctionType.More, it, data!!) }
+        tvLike.setOnClickListener {
+            listener.onFunctionClick(
+                FunctionType.LIKE,
+                it,
+                data!!
+            )
+        }
+        tvFavorite.setOnClickListener {
+            listener.onFunctionClick(
+                FunctionType.FAVORITE,
+                it,
+                data!!
+            )
+        }
+        tvMsg.setOnClickListener {
+            listener.onFunctionClick(
+                FunctionType.MSG,
+                it,
+                data!!
+            )
+        }
+        tvShare.setOnClickListener {
+            listener.onFunctionClick(
+                FunctionType.SHARE,
+                it,
+                data!!
+            )
+        }
+        tvMore.setOnClickListener {
+            listener.onFunctionClick(
+                FunctionType.MORE,
+                it,
+                data!!
+            )
+        }
     }
 
     override fun updated() {
@@ -54,11 +85,16 @@ class FavoritePostViewHolder(
 
         tvName.text = data?.posterName
         tvTitle.text = data?.title
-        tvTime.text = data?.postDate.let { date -> SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(date) }
+        tvTime.text = data?.postDate.let { date ->
+            SimpleDateFormat(
+                "yyyy-MM-dd HH:mm",
+                Locale.getDefault()
+            ).format(date)
+        }
         val contentItem = gson.fromJson(data?.content.toString(), ContentItem::class.java)
         tvLength.text = contentItem?.shortVideoItem?.length
 
-        when(data?.isFollow) {
+        when (data?.isFollow) {
             true -> {
                 tvFollow.setTextColor(tvFollow.context.getColor(R.color.color_red_1))
                 tvFollow.setBackgroundResource(R.drawable.bg_red_1_stroke_radius_16)
@@ -69,7 +105,9 @@ class FavoritePostViewHolder(
             }
         }
 
-        if(!data?.tag.isNullOrEmpty()) { setupChipGroup(data?.tag?.split(",")) }
+        if (!data?.tag.isNullOrEmpty()) {
+            setupChipGroup(data?.tag?.split(","))
+        }
 
         tvLike.text = data?.likeCount.toString()
         tvFavorite.text = data?.favoriteCount.toString()
@@ -79,15 +117,19 @@ class FavoritePostViewHolder(
     private fun setupChipGroup(list: List<String>?) {
         reflowGroup.reflow_group.removeAllViews()
 
-        if (list == null) { return }
+        if (list == null) {
+            return
+        }
 
         list.indices.mapNotNull {
             list[it]
         }.forEach {
-            val chip = LayoutInflater.from(reflowGroup.context).inflate(R.layout.chip_item, reflowGroup, false) as Chip
+            val chip = LayoutInflater.from(reflowGroup.context)
+                .inflate(R.layout.chip_item, reflowGroup, false) as Chip
             chip.text = it
             chip.setTextColor(chip.context.getColor(R.color.color_black_1_50))
-            chip.chipBackgroundColor = ColorStateList.valueOf(chip.context.getColor(R.color.color_black_1_10))
+            chip.chipBackgroundColor =
+                ColorStateList.valueOf(chip.context.getColor(R.color.color_black_1_10))
             reflowGroup.addView(chip)
         }
     }

@@ -10,9 +10,9 @@ import com.dabenxiang.mimi.model.api.ApiResult.Companion.loaded
 import com.dabenxiang.mimi.model.api.ApiResult.Companion.loading
 import com.dabenxiang.mimi.model.api.vo.ForgetPasswordRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.widget.utility.AppUtils.isAccountValid
-import com.dabenxiang.mimi.widget.utility.AppUtils.isEmailValid
 import com.dabenxiang.mimi.widget.utility.EditTextMutableLiveData
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.isAccountValid
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.isEmailValid
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -36,7 +36,7 @@ class ForgetPasswordViewModel : BaseViewModel() {
         _emailError.value = isValidateEmail(email.value ?: "")
 
         if ("" == _accountError.value && "" == _emailError.value) {
-            account.value?.let { it1 -> email.value?.let { it2 -> doReset(it1, it2) }}
+            account.value?.let { it1 -> email.value?.let { it2 -> doReset(it1, it2) } }
         }
     }
 
@@ -60,7 +60,8 @@ class ForgetPasswordViewModel : BaseViewModel() {
     private fun doReset(account: String, email: String) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().forgetPassword(ForgetPasswordRequest(account, email))
+                val result = domainManager.getApiRepository()
+                    .forgetPassword(ForgetPasswordRequest(account, email))
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }

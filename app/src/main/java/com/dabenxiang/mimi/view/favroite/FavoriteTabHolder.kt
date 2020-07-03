@@ -20,7 +20,9 @@ class FavoriteTabHolder(
         itemView.setOnClickListener { listener.onClickItemIndex(it, index) }
     }
 
-    override fun updated(model: String?) { tvTitle.text = model }
+    override fun updated(model: String?) {
+        tvTitle.text = model
+    }
 
     fun setSelected(isSelected: Boolean) {
         ivSelected.visibility =

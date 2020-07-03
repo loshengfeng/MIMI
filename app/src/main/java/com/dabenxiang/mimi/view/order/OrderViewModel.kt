@@ -9,7 +9,7 @@ import androidx.paging.PagedList
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class OrderViewModel : BaseViewModel() {
@@ -33,8 +33,14 @@ class OrderViewModel : BaseViewModel() {
     }
 
     private val pagingCallback = object : PagingCallback {
-        override fun onLoading() { setShowProgress(true) }
-        override fun onLoaded() { setShowProgress(false) }
+        override fun onLoading() {
+            setShowProgress(true)
+        }
+
+        override fun onLoaded() {
+            setShowProgress(false)
+        }
+
         override fun onThrowable(throwable: Throwable) {}
     }
 }

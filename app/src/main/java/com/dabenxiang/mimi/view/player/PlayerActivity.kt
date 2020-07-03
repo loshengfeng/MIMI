@@ -17,6 +17,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearSnapHelper
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.extension.handleException
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.extension.setNot
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -151,7 +152,12 @@ class PlayerActivity : BaseActivity() {
         PlayerInfoAdapter(obtainIsAdult(), object : PlayerInfoAdapter.PlayerInfoListener {
             override fun sendComment(replyId: Long?, replyName: String?) {
                 if (replyId != null) {
-                    sendCommentDialog = SendCommentDialog.newInstance(obtainIsAdult(), replyId, replyName, sendCommentDialogListener)
+                    sendCommentDialog = SendCommentDialog.newInstance(
+                        obtainIsAdult(),
+                        replyId,
+                        replyName,
+                        sendCommentDialogListener
+                    )
                     sendCommentDialog?.show(supportFragmentManager, null)
                 }
             }
@@ -165,12 +171,21 @@ class PlayerActivity : BaseActivity() {
 
             override fun replyComment(replyId: Long?, replyName: String?) {
                 if (replyId != null) {
-                    sendCommentDialog = SendCommentDialog.newInstance(obtainIsAdult(), replyId, replyName, sendCommentDialogListener)
+                    sendCommentDialog = SendCommentDialog.newInstance(
+                        obtainIsAdult(),
+                        replyId,
+                        replyName,
+                        sendCommentDialogListener
+                    )
                     sendCommentDialog?.show(supportFragmentManager, null)
                 }
             }
 
-            override fun setCommentLikeType(replyId: Long?, isLike: Boolean, succeededBlock: () -> Unit) {
+            override fun setCommentLikeType(
+                replyId: Long?,
+                isLike: Boolean,
+                succeededBlock: () -> Unit
+            ) {
                 loadCommentLikeBlock = succeededBlock
                 replyId?.also {
                     val type = if (isLike) 0 else 1
@@ -197,7 +212,8 @@ class PlayerActivity : BaseActivity() {
         return R.layout.activity_player
     }
 
-    private fun obtainIsAdult() = (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerData?)?.isAdult ?: false
+    private fun obtainIsAdult() =
+        (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerData?)?.isAdult ?: false
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -254,7 +270,8 @@ class PlayerActivity : BaseActivity() {
             }
         )
 
-        val lineColor = if (isAdult) getColor(R.color.color_white_1_10) else getColor(R.color.color_black_1_05)
+        val lineColor =
+            if (isAdult) getColor(R.color.color_white_1_10) else getColor(R.color.color_black_1_05)
         headSource.line_source.setBackgroundColor(lineColor)
         headComment.line_comment.setBackgroundColor(lineColor)
         headComment.line_separate.setBackgroundColor(lineColor)
@@ -279,7 +296,12 @@ class PlayerActivity : BaseActivity() {
                     }
                 }
             headVideoInfo.tv_introduction.visibility = if (isShow) View.VISIBLE else View.GONE
-            headVideoInfo.btn_show_introduction.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawableRes, 0)
+            headVideoInfo.btn_show_introduction.setCompoundDrawablesWithIntrinsicBounds(
+                0,
+                0,
+                drawableRes,
+                0
+            )
         })
 
         bottom_func_bar.setBackgroundResource(
@@ -412,13 +434,18 @@ class PlayerActivity : BaseActivity() {
                         headVideoInfo.tv_title.text = result.title
 
                         if (!result.description.isNullOrBlank())
-                            headVideoInfo.tv_introduction.text = Html.fromHtml(result.description, Html.FROM_HTML_MODE_COMPACT)
+                            headVideoInfo.tv_introduction.text =
+                                Html.fromHtml(result.description, Html.FROM_HTML_MODE_COMPACT)
 
                         val dateString = result.updateTime?.let { date ->
                             SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(date)
                         }
 
-                        headVideoInfo.tv_info.text = String.format(getString(R.string.player_info_format), dateString ?: "", result.country)
+                        headVideoInfo.tv_info.text = String.format(
+                            getString(R.string.player_info_format),
+                            dateString ?: "",
+                            result.country
+                        )
 
                         viewModel.sourceList = result.sources
 
@@ -450,7 +477,11 @@ class PlayerActivity : BaseActivity() {
                             }.let { colorRes ->
                                 getColor(colorRes)
                             }
-                        headNoComment.title_no_comment.setBtnSolidColor(bgColor, bgColor, resources.getDimension(R.dimen.dp_10))
+                        headNoComment.title_no_comment.setBtnSolidColor(
+                            bgColor,
+                            bgColor,
+                            resources.getDimension(R.dimen.dp_10)
+                        )
                     } else {
                         headNoComment.title_no_comment.visibility = View.GONE
 
@@ -473,7 +504,10 @@ class PlayerActivity : BaseActivity() {
         })
 
         tv_comment.setCompoundDrawablesRelativeWithIntrinsicBounds(
-            if (isAdult) R.drawable.ico_messege_adult else R.drawable.ico_messege_adult_gray, 0, 0, 0
+            if (isAdult) R.drawable.ico_messege_adult else R.drawable.ico_messege_adult_gray,
+            0,
+            0,
+            0
         )
 
         tv_like.setTextColor(titleColor)
@@ -538,13 +572,13 @@ class PlayerActivity : BaseActivity() {
         viewModel.consumeResult.observe(this, Observer {
             consumeDialog?.dismiss()
             when (it) {
-                VideoConsumeResult.Paid -> {
+                VideoConsumeResult.PAID -> {
                     viewModel.getStreamUrl(obtainIsAdult())
                 }
-                VideoConsumeResult.PaidYet -> {
+                VideoConsumeResult.PAID_YET -> {
                     consumeDialog = showCostPointDialog()
                 }
-                VideoConsumeResult.PointNotEnough -> {
+                VideoConsumeResult.POINT_NOT_ENOUGH -> {
                     consumeDialog = showPointNotEnoughDialog()
                 }
             }
@@ -596,30 +630,30 @@ class PlayerActivity : BaseActivity() {
                 }
         }
 
-        orientationDetector = OrientationDetector(this, SensorManager.SENSOR_DELAY_NORMAL).also { detector ->
-            detector.setChangeListener(object : OrientationDetector.OnChangeListener {
-                override fun onChanged(orientation: Int) {
-                    viewModel.currentOrientation = orientation
+        orientationDetector =
+            OrientationDetector(this, SensorManager.SENSOR_DELAY_NORMAL).also { detector ->
+                detector.setChangeListener(object : OrientationDetector.OnChangeListener {
+                    override fun onChanged(orientation: Int) {
+                        viewModel.currentOrientation = orientation
 
-                    if (viewModel.lockFullScreen) {
-                        when (orientation) {
-                            ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE, ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE -> {
-                                requestedOrientation = orientation
+                        if (viewModel.lockFullScreen) {
+                            when (orientation) {
+                                ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE, ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE -> {
+                                    requestedOrientation = orientation
+                                }
                             }
+                        } else {
+                            requestedOrientation = orientation
                         }
-                    } else {
-                        requestedOrientation = orientation
                     }
-                }
-            })
-        }
+                })
+            }
 
         btn_write_comment.setOnClickListener {
-            sendCommentDialog = SendCommentDialog.newInstance(isAdult, null, null, sendCommentDialogListener)
+            sendCommentDialog =
+                SendCommentDialog.newInstance(isAdult, null, null, sendCommentDialogListener)
             sendCommentDialog?.show(supportFragmentManager, null)
         }
-
-        player_view.isEnabled = false
     }
 
     private val sendCommentDialogListener = object : SendCommentDialog.SendCommentDialogListener {
@@ -783,11 +817,13 @@ class PlayerActivity : BaseActivity() {
                         if (abs(dx) > abs(dy)) {
                             if (viewModel.isPlaying.value == true) {
                                 if (dx > 0) {
-                                    val fastForwardMs = (dx.toInt() / SWIPE_DISTANCE_UNIT) * JUMP_TIME
+                                    val fastForwardMs =
+                                        (dx.toInt() / SWIPE_DISTANCE_UNIT) * JUMP_TIME
                                     fastForward(fastForwardMs)
 
                                 } else {
-                                    val rewindMs = abs((dx.toInt() / SWIPE_DISTANCE_UNIT) * JUMP_TIME)
+                                    val rewindMs =
+                                        abs((dx.toInt() / SWIPE_DISTANCE_UNIT) * JUMP_TIME)
                                     rewind(rewindMs)
                                 }
                             }
@@ -845,7 +881,8 @@ class PlayerActivity : BaseActivity() {
     private fun rewind(rewindMs: Int) {
         if (player != null && player!!.isCurrentWindowSeekable && rewindMs > 0) {
             viewModel.setRewindTime(rewindMs)
-            val newPos = if (player!!.currentPosition - rewindMs > 0) player!!.currentPosition - rewindMs else 0
+            val newPos =
+                if (player!!.currentPosition - rewindMs > 0) player!!.currentPosition - rewindMs else 0
             player!!.seekTo(player!!.currentWindowIndex, newPos)
         }
     }
@@ -931,11 +968,18 @@ class PlayerActivity : BaseActivity() {
     }
 
     private val playerAnalyticsListener = object : AnalyticsListener {
-        override fun onRenderedFirstFrame(eventTime: AnalyticsListener.EventTime, surface: Surface?) {
+        override fun onRenderedFirstFrame(
+            eventTime: AnalyticsListener.EventTime,
+            surface: Surface?
+        ) {
             Timber.d("AnalyticsListener onRenderedFirstFrame")
         }
 
-        override fun onDroppedVideoFrames(eventTime: AnalyticsListener.EventTime, droppedFrames: Int, elapsedMs: Long) {
+        override fun onDroppedVideoFrames(
+            eventTime: AnalyticsListener.EventTime,
+            droppedFrames: Int,
+            elapsedMs: Long
+        ) {
             Timber.d("AnalyticsListener onDroppedVideoFrames")
         }
 
@@ -1040,7 +1084,11 @@ class PlayerActivity : BaseActivity() {
         list.indices.mapNotNull {
             list[it]
         }.forEach {
-            val chip = layoutInflater.inflate(R.layout.chip_item, headVideoInfo.reflow_group, false) as Chip
+            val chip = layoutInflater.inflate(
+                R.layout.chip_item,
+                headVideoInfo.reflow_group,
+                false
+            ) as Chip
             chip.text = it
 
             val isAdult = obtainIsAdult()
@@ -1124,7 +1172,11 @@ class PlayerActivity : BaseActivity() {
     }
 
     private fun showCostPointDialog(): GeneralDialog {
-        val message = String.format(getString(R.string.cost_point_message), viewModel.availablePoint, viewModel.costPoint)
+        val message = String.format(
+            getString(R.string.cost_point_message),
+            viewModel.availablePoint,
+            viewModel.costPoint
+        )
 
         return GeneralDialog.newInstance(
             GeneralDialogData(

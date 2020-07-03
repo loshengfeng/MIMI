@@ -10,7 +10,8 @@ import kotlinx.android.synthetic.main.fragment_chat_content.*
 import org.koin.android.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-class ChatContentFragment : BaseFragment<ChatContentViewModel>() {
+class ChatContentFragment : BaseFragment() {
+
     private val viewModel by viewModel<ChatContentViewModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -25,17 +26,14 @@ class ChatContentFragment : BaseFragment<ChatContentViewModel>() {
         Timber.d("${ChatContentFragment::class.java.simpleName}_setupObservers")
     }
 
-    override fun fetchViewModel(): ChatContentViewModel? {
-        return viewModel
-    }
-
     override fun setupListeners() {
         Timber.d("${ChatContentFragment::class.java.simpleName}_setupListeners")
 
         btnClose.setOnClickListener {
-            Navigation.findNavController(view!!).navigateUp()
+            Navigation.findNavController(requireView()).navigateUp()
         }
 
-        recyclerContent.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        recyclerContent.layoutManager =
+            LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
     }
 }

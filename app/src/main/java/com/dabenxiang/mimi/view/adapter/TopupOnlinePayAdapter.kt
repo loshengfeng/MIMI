@@ -25,7 +25,8 @@ class TopupOnlinePayAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TopupOnlinePayViewHolder {
         val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.item_topup_online_pay, parent, false)
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_topup_online_pay, parent, false)
         return TopupOnlinePayViewHolder(view, listener)
     }
 

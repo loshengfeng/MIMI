@@ -15,7 +15,10 @@ import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.GridBannerHolder
 import com.dabenxiang.mimi.view.home.VideoViewHolder
 
-class HomeVideoListAdapter(private val nestedListener: HomeAdapter.EventListener, private val isAdult: Boolean) :
+class HomeVideoListAdapter(
+    private val nestedListener: HomeAdapter.EventListener,
+    private val isAdult: Boolean
+) :
     PagedListAdapter<BaseVideoItem, BaseViewHolder>(diffCallback) {
 
     companion object {
@@ -24,7 +27,10 @@ class HomeVideoListAdapter(private val nestedListener: HomeAdapter.EventListener
                 return oldItem == newItem
             }
 
-            override fun areContentsTheSame(oldItem: BaseVideoItem, newItem: BaseVideoItem): Boolean {
+            override fun areContentsTheSame(
+                oldItem: BaseVideoItem,
+                newItem: BaseVideoItem
+            ): Boolean {
                 return oldItem == newItem
             }
         }
@@ -56,11 +62,13 @@ class HomeVideoListAdapter(private val nestedListener: HomeAdapter.EventListener
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return return when (viewType) {
             VIDEO -> {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.nested_item_video, parent, false)
+                val view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.nested_item_video, parent, false)
                 VideoViewHolder(view, videoViewHolderListener)
             }
             else -> {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_banner, parent, false)
+                val view =
+                    LayoutInflater.from(parent.context).inflate(R.layout.item_banner, parent, false)
                 GridBannerHolder(view, videoViewHolderListener)
             }
         }
@@ -82,13 +90,14 @@ class HomeVideoListAdapter(private val nestedListener: HomeAdapter.EventListener
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
 
-        (recyclerView.layoutManager as GridLayoutManager).spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int {
-                return when (getItemViewType(position)) {
-                    BANNER -> 2
-                    else -> 1
+        (recyclerView.layoutManager as GridLayoutManager).spanSizeLookup =
+            object : GridLayoutManager.SpanSizeLookup() {
+                override fun getSpanSize(position: Int): Int {
+                    return when (getItemViewType(position)) {
+                        BANNER -> 2
+                        else -> 1
+                    }
                 }
             }
-        }
     }
 }

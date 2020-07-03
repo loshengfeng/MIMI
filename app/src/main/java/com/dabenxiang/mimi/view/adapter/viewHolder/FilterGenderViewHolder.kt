@@ -5,6 +5,6 @@ import android.widget.RadioButton
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 
-class FilterGenderViewHolder (itemView: View): RecyclerView.ViewHolder(itemView) {
+class FilterGenderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val radioFilter = itemView.findViewById(R.id.radioFilter) as RadioButton
 }

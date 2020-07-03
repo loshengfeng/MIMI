@@ -1,8 +1,8 @@
 package com.dabenxiang.mimi.view.dialog.clean
 
 import android.view.View
-import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import kotlinx.android.synthetic.main.fragment_dialog_clean.*
 
 class CleanDialogFragment : BaseDialogFragment() {
@@ -20,15 +20,19 @@ class CleanDialogFragment : BaseDialogFragment() {
         }
     }
 
-    override fun isFullLayout(): Boolean { return true }
+    override fun isFullLayout(): Boolean {
+        return true
+    }
 
-    override fun getLayoutId(): Int { return R.layout.fragment_dialog_clean }
+    override fun getLayoutId(): Int {
+        return R.layout.fragment_dialog_clean
+    }
 
     override fun setupListeners() {
         super.setupListeners()
         View.OnClickListener { btnView ->
             dismiss()
-            when(btnView.id) {
+            when (btnView.id) {
                 R.id.btn_confirm -> onCleanDialogListener?.onClean()
             }
         }.also {

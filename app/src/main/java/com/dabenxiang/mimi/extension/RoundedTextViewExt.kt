@@ -12,6 +12,11 @@ fun RoundedTextView.setBtnSolidColor(color: Int) {
 fun RoundedTextView.setBtnSolidColor(color1: Int, color2: Int, radius: Float) {
     val drawable = RoundedDrawable(false)
     drawable.cornerRadius = radius
-    drawable.setSolidColorsAndPressedColor(normal = color1, pressed = color2, selected = 0, disable = 0)
+    drawable.setSolidColorsAndPressedColor(
+        normal = color1,
+        pressed = color2,
+        selected = 0,
+        disable = 0
+    )
     background = drawable
 }

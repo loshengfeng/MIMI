@@ -9,16 +9,21 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.ApiResult.Empty
+import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
-class SplashFragment : BaseFragment<SplashViewModel>() {
+class SplashFragment : BaseFragment() {
 
-    companion object { const val PERMISSION_REQUEST_CODE = 100 }
+    companion object {
+        const val PERMISSION_REQUEST_CODE = 637
+    }
 
     private val permissions = arrayOf(
         Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -30,9 +35,9 @@ class SplashFragment : BaseFragment<SplashViewModel>() {
 
     private val viewModel: SplashViewModel by viewModels()
 
-    override fun fetchViewModel(): SplashViewModel? { return viewModel }
-
-    override fun getLayoutId(): Int { return R.layout.fragment_splash }
+    override fun getLayoutId(): Int {
+        return R.layout.fragment_splash
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -89,17 +94,22 @@ class SplashFragment : BaseFragment<SplashViewModel>() {
 
     override fun initSettings() {
         super.initSettings()
-        viewModel.autoLogin()
+
         viewModel.autoLoginResult.observe(viewLifecycleOwner, Observer {
-            lifecycleScope.launch(Dispatchers.IO) {
-                mainViewModel?.loadHomeCategories()
-
-                delay(1000)
-
-                withContext(Dispatchers.Main) {
-                    navigateTo(NavigateItem.Destination(R.id.action_splashFragment_to_homeFragment))
+            when (it) {
+                is Empty -> {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        mainViewModel?.loadHomeCategories()
+                        delay(1000)
+                        withContext(Dispatchers.Main) {
+                            navigateTo(NavigateItem.Destination(R.id.action_splashFragment_to_homeFragment))
+                        }
+                    }
                 }
+                is Error -> Timber.e(it.throwable)
             }
         })
+
+        viewModel.autoLogin()
     }
 }

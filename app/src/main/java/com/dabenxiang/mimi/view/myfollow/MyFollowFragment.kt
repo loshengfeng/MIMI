@@ -12,14 +12,10 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_my_follow.*
-import kotlinx.android.synthetic.main.fragment_my_follow.item_no_data
-import kotlinx.android.synthetic.main.fragment_my_follow.layout_refresh
-import kotlinx.android.synthetic.main.fragment_my_follow.rv_content
-import kotlinx.android.synthetic.main.fragment_my_follow.tl_type
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import kotlinx.android.synthetic.main.item_setting_bar.tv_title
 
-class MyFollowFragment : BaseFragment<MyFollowViewModel>() {
+class MyFollowFragment : BaseFragment() {
+
     private val viewModel: MyFollowViewModel by viewModels()
 
     companion object {
@@ -37,9 +33,9 @@ class MyFollowFragment : BaseFragment<MyFollowViewModel>() {
         initSettings()
     }
 
-    override fun getLayoutId(): Int { return R.layout.fragment_my_follow }
-
-    override fun fetchViewModel(): MyFollowViewModel? { return viewModel }
+    override fun getLayoutId(): Int {
+        return R.layout.fragment_my_follow
+    }
 
     override fun setupObservers() {
         viewModel.clubList.observe(viewLifecycleOwner, Observer {
@@ -57,7 +53,7 @@ class MyFollowFragment : BaseFragment<MyFollowViewModel>() {
 
     override fun setupListeners() {
         View.OnClickListener { btnView ->
-            when(btnView.id) {
+            when (btnView.id) {
                 R.id.tv_back -> navigateTo(NavigateItem.Up)
                 // todo: clean all or ?...
                 R.id.tv_clean -> GeneralUtils.showToast(requireContext(), "Clean")
@@ -98,12 +94,12 @@ class MyFollowFragment : BaseFragment<MyFollowViewModel>() {
     }
 
     private fun refreshUi(size: Int) {
-        rv_content.visibility = when(size) {
+        rv_content.visibility = when (size) {
             NO_DATA -> View.GONE
             else -> View.VISIBLE
         }
 
-        item_no_data.visibility = when(size) {
+        item_no_data.visibility = when (size) {
             NO_DATA -> View.VISIBLE
             else -> View.GONE
         }

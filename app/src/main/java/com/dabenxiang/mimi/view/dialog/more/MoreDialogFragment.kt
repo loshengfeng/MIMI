@@ -2,17 +2,15 @@ package com.dabenxiang.mimi.view.dialog.more
 
 import android.os.Bundle
 import android.view.View
-import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.BaseItem
+import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import kotlinx.android.synthetic.main.fragment_dialog_more.*
-import kotlinx.android.synthetic.main.fragment_dialog_more.btn_close
-import kotlinx.android.synthetic.main.fragment_dialog_more.layout_root
 
 class MoreDialogFragment : BaseDialogFragment() {
 
     private var onMoreDialogListener: OnMoreDialogListener? = null
-    private var data: BaseItem?= null
+    private var data: BaseItem? = null
 
     companion object {
         private const val KEY_DATA = "KEY_DATA"
@@ -30,9 +28,13 @@ class MoreDialogFragment : BaseDialogFragment() {
         }
     }
 
-    override fun isFullLayout(): Boolean { return true }
+    override fun isFullLayout(): Boolean {
+        return true
+    }
 
-    override fun getLayoutId(): Int { return R.layout.fragment_dialog_more }
+    override fun getLayoutId(): Int {
+        return R.layout.fragment_dialog_more
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -43,7 +45,7 @@ class MoreDialogFragment : BaseDialogFragment() {
         super.setupListeners()
         View.OnClickListener { btnView ->
             dismiss()
-            when(btnView.id) {
+            when (btnView.id) {
                 R.id.btn_report -> data?.let { onMoreDialogListener?.onReport(data!!) }
             }
         }.also {

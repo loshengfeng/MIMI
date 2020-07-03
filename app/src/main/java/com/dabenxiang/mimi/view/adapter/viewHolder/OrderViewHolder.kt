@@ -17,7 +17,7 @@ class OrderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     private val tvToken = itemView.findViewById(R.id.tv_token) as TextView
     private val tvPrice = itemView.findViewById(R.id.tv_price) as TextView
 
-    private var orderItem: OrderItem?= null
+    private var orderItem: OrderItem? = null
 
     init {
         view.setOnClickListener {
@@ -28,9 +28,11 @@ class OrderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
     companion object {
         fun create(parent: ViewGroup): ClubFollowViewHolder {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_order, parent, false)
+            val view =
+                LayoutInflater.from(parent.context).inflate(R.layout.item_order, parent, false)
             return ClubFollowViewHolder(view)
         }
+
         const val NONE = 0
         const val ALIPAY = 1
         const val WECHAT = 2
@@ -39,13 +41,15 @@ class OrderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
     fun bind(orderItem: OrderItem?) {
         this.orderItem = orderItem
-        ivType.setBackgroundResource(when(orderItem?.paymentType) {
-            NONE -> R.drawable.ico_alipay
-            ALIPAY -> R.drawable.ico_alipay
-            WECHAT -> R.drawable.ico_wechat_pay
-            UNIONPAY -> R.drawable.ico_china_pay
-            else -> R.drawable.ico_alipay
-        })
+        ivType.setBackgroundResource(
+            when (orderItem?.paymentType) {
+                NONE -> R.drawable.ico_alipay
+                ALIPAY -> R.drawable.ico_alipay
+                WECHAT -> R.drawable.ico_wechat_pay
+                UNIONPAY -> R.drawable.ico_china_pay
+                else -> R.drawable.ico_alipay
+            }
+        )
 
         tvAccount.text = orderItem?.accountName
 

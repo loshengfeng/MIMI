@@ -2,7 +2,7 @@ package com.dabenxiang.mimi.model.api.vo
 
 import com.google.gson.annotations.SerializedName
 
-data class PlayItem (
+data class PlayItem(
     @SerializedName("id")
     val id: Long?,
 

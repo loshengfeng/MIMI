@@ -7,7 +7,7 @@ import com.dabenxiang.mimi.model.api.ApiService
 import com.dabenxiang.mimi.model.vo.domain.DomainInputItem
 import com.dabenxiang.mimi.model.vo.domain.DomainOutputItem
 import com.dabenxiang.mimi.model.vo.domain.DomainOutputListItem
-import com.dabenxiang.mimi.widget.utility.AppUtils
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -88,7 +88,7 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
             DomainInputItem(
                 MIMI_PROJECT_ID,
                 App.applicationContext().filesDir.path,
-                AppUtils.getLibEnv()
+                GeneralUtils.getLibEnv()
             )
 
         val input = gson.toJson(domainInputItem)

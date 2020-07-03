@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.model.api.vo
+package com.dabenxiang.mimi.model.api.vo.error
 
 import com.google.gson.annotations.SerializedName
 

@@ -129,11 +129,21 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
                 var i = 0
                 while (i < mNum) {
                     //默認點 -(mNum - 1) * 0.5f * mDistance 第一個點
-                    canvas.drawCircle(-(mNum - 1) * 0.5f * mDistance + i * mDistance, 0f, mRadius, paintStroke!!)
+                    canvas.drawCircle(
+                        -(mNum - 1) * 0.5f * mDistance + i * mDistance,
+                        0f,
+                        mRadius,
+                        paintStroke!!
+                    )
                     i++
                 }
                 //選中
-                canvas.drawCircle(-(mNum - 1) * 0.5f * mDistance + mOffset, 0f, mRadiusSelected, paintFill!!)
+                canvas.drawCircle(
+                    -(mNum - 1) * 0.5f * mDistance + mOffset,
+                    0f,
+                    mRadiusSelected,
+                    paintFill!!
+                )
             }
             IndicatorType.LINE -> {
                 paintStroke!!.strokeWidth = mRadius
@@ -142,7 +152,13 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
                 //默認
                 var i = 0
                 while (i < mNum) {
-                    canvas.drawLine(startX + i * mDistance, 0f, stopX + i * mDistance, 0f, paintStroke!!)
+                    canvas.drawLine(
+                        startX + i * mDistance,
+                        0f,
+                        stopX + i * mDistance,
+                        0f,
+                        paintStroke!!
+                    )
                     i++
                 }
                 //選中
@@ -169,7 +185,12 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
                 //圓
                 var i = 1
                 while (i < mNum) {
-                    canvas.drawCircle(rightClose - mRadius + i * mDistance, 0f, mRadius, paintStroke!!)
+                    canvas.drawCircle(
+                        rightClose - mRadius + i * mDistance,
+                        0f,
+                        mRadius,
+                        paintStroke!!
+                    )
                     i++
                 }
             } else {
@@ -193,13 +214,23 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
                 run {
                     var i = mPosition + 3
                     while (i <= mNum) {
-                        canvas.drawCircle(-mNum * 0.5f * mDistance + i * mDistance, 0f, mRadius, paintStroke!!)
+                        canvas.drawCircle(
+                            -mNum * 0.5f * mDistance + i * mDistance,
+                            0f,
+                            mRadius,
+                            paintStroke!!
+                        )
                         i++
                     }
                 }
                 var i = mPosition - 1
                 while (i >= 0) {
-                    canvas.drawCircle(-mNum * 0.5f * mDistance + i * mDistance, 0f, mRadius, paintStroke!!)
+                    canvas.drawCircle(
+                        -mNum * 0.5f * mDistance + i * mDistance,
+                        0f,
+                        mRadius,
+                        paintStroke!!
+                    )
                     i--
                 }
             }
@@ -207,7 +238,12 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
                 var i = 0
                 while (i < mNum) {
                     //默認點 -(mNum - 1) * 0.5f * mDistance 第一個點
-                    canvas.drawCircle(-(mNum - 1) * 0.5f * mDistance + i * mDistance, 0f, mRadius, paintStroke!!)
+                    canvas.drawCircle(
+                        -(mNum - 1) * 0.5f * mDistance + i * mDistance,
+                        0f,
+                        mRadius,
+                        paintStroke!!
+                    )
                     i++
                 }
                 //選中
@@ -217,7 +253,12 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
                 var i = 0
                 while (i < mNum) {
                     //默認點 -(mNum - 1) * 0.5f * mDistance 第一個點
-                    canvas.drawCircle(-(mNum - 1) * 0.5f * mDistance + i * mDistance, 0f, mRadius, paintStroke!!)
+                    canvas.drawCircle(
+                        -(mNum - 1) * 0.5f * mDistance + i * mDistance,
+                        0f,
+                        mRadius,
+                        paintStroke!!
+                    )
                     i++
                 }
                 drawSpringBezier(canvas)
@@ -226,7 +267,12 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
                 var i = 0
                 while (i < mNum) {
                     //默認點 -(mNum - 1) * 0.5f * mDistance 第一個點
-                    canvas.drawCircle(-(mNum - 1) * 0.5f * mDistance + i * mDistance, 0f, mRadius, paintStroke!!)
+                    canvas.drawCircle(
+                        -(mNum - 1) * 0.5f * mDistance + i * mDistance,
+                        0f,
+                        mRadius,
+                        paintStroke!!
+                    )
                     i++
                 }
                 //選中
@@ -265,10 +311,13 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
         if (mPosition == mNum - 1 && !mIsLeft) { //第一個 右滑  0---4
             if (mPercent <= 0.5) {
                 right_circle_x = -(mNum - 1) * 0.5f * mDistance + (mNum - 1) * mDistance
-                left_circle_x = -(mNum - 1) * 0.5f * mDistance + (0.5f - mPercent) / 0.5f * (mNum - 1) * mDistance
-                right_circle_radius = min_radius + (max_radius - min_radius) * (0.5f - mPercent) / 0.5f
+                left_circle_x =
+                    -(mNum - 1) * 0.5f * mDistance + (0.5f - mPercent) / 0.5f * (mNum - 1) * mDistance
+                right_circle_radius =
+                    min_radius + (max_radius - min_radius) * (0.5f - mPercent) / 0.5f
             } else {
-                right_circle_x = -(mNum - 1) * 0.5f * mDistance + (1f - mPercent) / 0.5f * (mNum - 1) * mDistance
+                right_circle_x =
+                    -(mNum - 1) * 0.5f * mDistance + (1f - mPercent) / 0.5f * (mNum - 1) * mDistance
                 left_circle_x = -(mNum - 1) * 0.5f * mDistance
                 right_circle_radius = min_radius
             }
@@ -276,23 +325,29 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
         } else if (mPosition == mNum - 1 && mIsLeft) { //最後一個 左滑 4--0
             //0-1
             if (mPercent >= 0.5) { //左亭
-                left_circle_radius = min_radius + (max_radius - min_radius) * (-0.5f + mPercent) / 0.5f
+                left_circle_radius =
+                    min_radius + (max_radius - min_radius) * (-0.5f + mPercent) / 0.5f
                 left_circle_x = -(mNum - 1) * 0.5f * mDistance
-                right_circle_x = -(mNum - 1) * 0.5f * mDistance + (1 - mPercent) / 0.5f * (mNum - 1) * mDistance
+                right_circle_x =
+                    -(mNum - 1) * 0.5f * mDistance + (1 - mPercent) / 0.5f * (mNum - 1) * mDistance
             } else { //左動
                 left_circle_radius = min_radius
-                left_circle_x = -(mNum - 1) * 0.5f * mDistance + (0.5f - mPercent) / 0.5f * (mNum - 1) * mDistance
+                left_circle_x =
+                    -(mNum - 1) * 0.5f * mDistance + (0.5f - mPercent) / 0.5f * (mNum - 1) * mDistance
                 right_circle_x = -(mNum - 1) * 0.5f * mDistance + (mNum - 1) * mDistance
             }
             right_circle_radius = mRadius * (1 - mPercent)
         } else if (mIsLeft) { //中間的 左滑
             mOffset = (mPercent + mPosition) * mDistance
             if (mPercent >= 0.5) {
-                left_circle_x = -(mNum - 1) * 0.5f * mDistance + ((mPercent - 0.5f) / 0.5f + mPosition) * mDistance
+                left_circle_x =
+                    -(mNum - 1) * 0.5f * mDistance + ((mPercent - 0.5f) / 0.5f + mPosition) * mDistance
                 right_circle_x = -(mNum - 1) * 0.5f * mDistance + (1 + mPosition) * mDistance
-                right_circle_radius = min_radius + (max_radius - min_radius) * (mPercent - 0.5f) / 0.5f
+                right_circle_radius =
+                    min_radius + (max_radius - min_radius) * (mPercent - 0.5f) / 0.5f
             } else {
-                right_circle_x = -(mNum - 1) * 0.5f * mDistance + (mPercent / 0.5f + mPosition) * mDistance
+                right_circle_x =
+                    -(mNum - 1) * 0.5f * mDistance + (mPercent / 0.5f + mPosition) * mDistance
                 left_circle_x = -(mNum - 1) * 0.5f * mDistance + mPosition * mDistance
                 right_circle_radius = min_radius
             }
@@ -301,10 +356,13 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
             mOffset = (mPercent + mPosition) * mDistance
             if (mPercent <= 0.5) {
                 left_circle_x = -(mNum - 1) * 0.5f * mDistance + mPosition * mDistance
-                right_circle_x = -(mNum - 1) * 0.5f * mDistance + (mPercent / 0.5f + mPosition) * mDistance
-                left_circle_radius = min_radius + (max_radius - min_radius) * (0.5f - mPercent) / 0.5f
+                right_circle_x =
+                    -(mNum - 1) * 0.5f * mDistance + (mPercent / 0.5f + mPosition) * mDistance
+                left_circle_radius =
+                    min_radius + (max_radius - min_radius) * (0.5f - mPercent) / 0.5f
             } else {
-                left_circle_x = -(mNum - 1) * 0.5f * mDistance + ((mPercent - 0.5f) / 0.5f + mPosition) * mDistance
+                left_circle_x =
+                    -(mNum - 1) * 0.5f * mDistance + ((mPercent - 0.5f) / 0.5f + mPosition) * mDistance
                 right_circle_x = -(mNum - 1) * 0.5f * mDistance + (mPosition + 1) * mDistance
                 left_circle_radius = min_radius
             }
@@ -332,9 +390,19 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
         mSpringPoint[3]!!.y = right_circle_radius
         mPath!!.reset()
         mPath!!.moveTo(mSpringPoint[0]!!.x, mSpringPoint[0]!!.y)
-        mPath!!.quadTo(mSpringPoint[1]!!.x, mSpringPoint[1]!!.y, mSpringPoint[2]!!.x, mSpringPoint[2]!!.y)
+        mPath!!.quadTo(
+            mSpringPoint[1]!!.x,
+            mSpringPoint[1]!!.y,
+            mSpringPoint[2]!!.x,
+            mSpringPoint[2]!!.y
+        )
         mPath!!.lineTo(mSpringPoint[3]!!.x, mSpringPoint[3]!!.y)
-        mPath!!.quadTo(mSpringPoint[4]!!.x, mSpringPoint[4]!!.y, mSpringPoint[5]!!.x, mSpringPoint[5]!!.y)
+        mPath!!.quadTo(
+            mSpringPoint[4]!!.x,
+            mSpringPoint[4]!!.y,
+            mSpringPoint[5]!!.x,
+            mSpringPoint[5]!!.y
+        )
         canvas.drawPath(mPath!!, paintFill!!)
     }
 
@@ -406,7 +474,8 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
             if (mPercent <= 0.2) { //回彈 圓心到達
                 mCenterPoint.x = -(mNum - 1) * 0.5f * mDistance + (mNum - 1) * mDistance //最後一個
             } else if (mPercent <= 0.8) { //加速 左凸起 扁平化M 最右端固定不變  圓心移動
-                mCenterPoint.x = -(mNum - 1) * 0.5f * mDistance + (1 - (mPercent - 0.2f) / 0.6f) * (mNum - 1) * mDistance
+                mCenterPoint.x =
+                    -(mNum - 1) * 0.5f * mDistance + (1 - (mPercent - 0.2f) / 0.6f) * (mNum - 1) * mDistance
             } else if (mPercent > 0.8 && mPercent < 1) { //
                 mCenterPoint.x = -(mNum - 1) * 0.5f * mDistance //第一個
             } else if (mPercent == 1f) { //圓
@@ -414,23 +483,28 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
             }
             //控製點位置
             if (mPercent > 0.8 && mPercent <= 1) { //右凸起 圓心不變
-                mControlPoint[5]!!.x = mCenterPoint.x + mRadius * (2 - (mPercent - 0.8f) / 0.2f) //右半圓
+                mControlPoint[5]!!.x =
+                    mCenterPoint.x + mRadius * (2 - (mPercent - 0.8f) / 0.2f) //右半圓
                 mControlPoint[0]!!.x = mCenterPoint.x - mRadius //左半圓
             } else if (mPercent > 0.5 && mPercent <= 0.8) { //加速 左凸起 扁平化M 最右端固定不變  圓心移動
                 mControlPoint[5]!!.x = mCenterPoint.x + 2 * mRadius //右半圓
-                mControlPoint[0]!!.x = mCenterPoint.x - mRadius * (1 + (0.8f - mPercent) / 0.3f) //左半圓
+                mControlPoint[0]!!.x =
+                    mCenterPoint.x - mRadius * (1 + (0.8f - mPercent) / 0.3f) //左半圓
                 mControlPoint[2]!!.y = mRadius * (1 + (mPercent - 0.8f) / 0.3f * 0.1f) //底部
                 mControlPoint[8]!!.y = -mRadius * (1 + (mPercent - 0.8f) / 0.3f * 0.1f) //頂部
                 mc = mc * (1 + (-mPercent + 0.8f) / 0.3f * 0.3f)
             } else if (mPercent > 0.2 && mPercent <= 0.5) { //左右恢復 變圓M逐漸重置為原來大小  圓心移動
-                mControlPoint[5]!!.x = mCenterPoint.x + mRadius * (1 + (mPercent - 0.2f) / 0.3f) //右半圓
-                mControlPoint[0]!!.x = mCenterPoint.x - mRadius * (1 + (mPercent - 0.2f) / 0.3f) //左半圓
+                mControlPoint[5]!!.x =
+                    mCenterPoint.x + mRadius * (1 + (mPercent - 0.2f) / 0.3f) //右半圓
+                mControlPoint[0]!!.x =
+                    mCenterPoint.x - mRadius * (1 + (mPercent - 0.2f) / 0.3f) //左半圓
                 mControlPoint[2]!!.y = mRadius * (1 - (mPercent - 0.2f) / 0.3f * 0.1f) //底部
                 mControlPoint[8]!!.y = -mRadius * (1 - (mPercent - 0.2f) / 0.3f * 0.1f) //頂部
                 mc = mc * (1 + (mPercent - 0.2f) / 0.3f * 0.3f)
             } else if (mPercent > 0.1 && mPercent <= 0.2) { //左凹 圓心到達.0
                 mControlPoint[5]!!.x = mCenterPoint.x + mRadius //右半圓
-                mControlPoint[0]!!.x = mCenterPoint.x - mRadius * (1 - (0.2f - mPercent) / 0.1f * 0.5f) //左半圓
+                mControlPoint[0]!!.x =
+                    mCenterPoint.x - mRadius * (1 - (0.2f - mPercent) / 0.1f * 0.5f) //左半圓
             } else if (mPercent >= 0 && mPercent <= 0.1) { //回彈 圓心到達
                 mControlPoint[5]!!.x = mCenterPoint.x + mRadius //右半圓
                 mControlPoint[0]!!.x = mCenterPoint.x - mRadius * (1 - mPercent / 0.1f * 0.5f) //左半圓
@@ -439,7 +513,8 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
             if (mPercent <= 0.2) { //圓
                 mCenterPoint.x = -(mNum - 1) * 0.5f * mDistance + (mNum - 1) * mDistance
             } else if (mPercent <= 0.8) { //加速 左凸起 扁平化M 最右端固定不變  圓心移動
-                mCenterPoint.x = -(mNum - 1) * 0.5f * mDistance + (1 - (mPercent - 0.2f) / 0.6f) * (mNum - 1) * mDistance
+                mCenterPoint.x =
+                    -(mNum - 1) * 0.5f * mDistance + (1 - (mPercent - 0.2f) / 0.6f) * (mNum - 1) * mDistance
             } else if (mPercent > 0.8 && mPercent < 1) { //回彈 圓心到達
                 mCenterPoint.x = -(mNum - 1) * 0.5f * mDistance //第一個
             } else if (mPercent == 1f) { //圓
@@ -450,22 +525,27 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
                 mControlPoint[5]!!.x = mCenterPoint.x + mRadius //右半圓
                 mControlPoint[0]!!.x = mCenterPoint.x - mRadius * (1 + mPercent / 0.2f) //左半圓
             } else if (mPercent > 0.2 && mPercent <= 0.5) { //加速 右凸起 扁平化M 最左端固定不變  圓心移動
-                mControlPoint[5]!!.x = mCenterPoint.x + mRadius * (1 + (mPercent - 0.2f) / 0.3f) //右半圓
+                mControlPoint[5]!!.x =
+                    mCenterPoint.x + mRadius * (1 + (mPercent - 0.2f) / 0.3f) //右半圓
                 mControlPoint[0]!!.x = mCenterPoint.x - 2 * mRadius //左半圓
                 mControlPoint[2]!!.y = mRadius * (1 - (mPercent - 0.2f) / 0.3f * 0.1f) //底部
                 mControlPoint[8]!!.y = -mRadius * (1 - (mPercent - 0.2f) / 0.3f * 0.1f) //頂部
                 mc = mc * (1 + (mPercent - 0.2f) / 0.3f * 0.3f)
             } else if (mPercent > 0.5 && mPercent <= 0.8) { //左右恢復 變圓M逐漸重置為原來大小  圓心移動
-                mControlPoint[5]!!.x = mCenterPoint.x + mRadius * (1 + (0.8f - mPercent) / 0.3f) //右半圓
-                mControlPoint[0]!!.x = mCenterPoint.x - mRadius * (1 + (0.8f - mPercent) / 0.3f) //左半圓
+                mControlPoint[5]!!.x =
+                    mCenterPoint.x + mRadius * (1 + (0.8f - mPercent) / 0.3f) //右半圓
+                mControlPoint[0]!!.x =
+                    mCenterPoint.x - mRadius * (1 + (0.8f - mPercent) / 0.3f) //左半圓
                 mControlPoint[2]!!.y = mRadius * (1 + (mPercent - 0.8f) / 0.3f * 0.1f) //底部
                 mControlPoint[8]!!.y = -mRadius * (1 + (mPercent - 0.8f) / 0.3f * 0.1f) //頂部
                 mc = mc * (1 + (0.8f - mPercent) / 0.3f * 0.3f)
             } else if (mPercent > 0.8 && mPercent <= 0.9) { //右凹 圓心到達
-                mControlPoint[5]!!.x = mCenterPoint.x + mRadius * (1 - (mPercent - 0.8f) / 0.1f * 0.5f) //右半圓
+                mControlPoint[5]!!.x =
+                    mCenterPoint.x + mRadius * (1 - (mPercent - 0.8f) / 0.1f * 0.5f) //右半圓
                 mControlPoint[0]!!.x = mCenterPoint.x - mRadius //左半圓
             } else if (mPercent > 0.9 && mPercent <= 1) { //回彈 圓心到達
-                mControlPoint[5]!!.x = mCenterPoint.x + mRadius * (1 - (mPercent - 0.9f) / 0.1f * 0.5f) //右半圓
+                mControlPoint[5]!!.x =
+                    mCenterPoint.x + mRadius * (1 - (mPercent - 0.9f) / 0.1f * 0.5f) //右半圓
                 mControlPoint[0]!!.x = mCenterPoint.x - mRadius //左半圓
             }
         } else {
@@ -473,7 +553,8 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
                 mCenterPoint.x = -(mNum - 1) * 0.5f * mDistance + mPosition * mDistance
             } else if (mPercent <= 0.8) { //加速 左凸起 扁平化M 最右端固定不變  圓心移動
                 mCenterPoint.x = -(mNum - 1) * 0.5f * mDistance + (mPosition + mPercent) * mDistance
-                mCenterPoint.x = -(mNum - 1) * 0.5f * mDistance + (mPosition + (mPercent - 0.2f) / 0.6f) * mDistance
+                mCenterPoint.x =
+                    -(mNum - 1) * 0.5f * mDistance + (mPosition + (mPercent - 0.2f) / 0.6f) * mDistance
             } else if (mPercent > 0.8 && mPercent < 1) { //回彈 圓心到達
                 mCenterPoint.x = -(mNum - 1) * 0.5f * mDistance + (mPosition + 1) * mDistance
             } else if (mPercent == 1f) { //圓
@@ -483,49 +564,61 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
             if (mIsLeft) //左滑
             {
                 if (mPercent >= 0 && mPercent <= 0.2) { //右凸起 圓心不變
-                    mControlPoint[5]!!.x = mCenterPoint.x + mRadius * (2 - (0.2f - mPercent) / 0.2f) //右半圓
+                    mControlPoint[5]!!.x =
+                        mCenterPoint.x + mRadius * (2 - (0.2f - mPercent) / 0.2f) //右半圓
                     mControlPoint[0]!!.x = mCenterPoint.x - mRadius //左半圓
                 } else if (mPercent > 0.2 && mPercent <= 0.5) { //加速 左凸起 扁平化M 最右端固定不變  圓心移動
                     mControlPoint[5]!!.x = mCenterPoint.x + 2 * mRadius //右半圓
-                    mControlPoint[0]!!.x = mCenterPoint.x - mRadius * (1 + (mPercent - 0.2f) / 0.3f) //左半圓
+                    mControlPoint[0]!!.x =
+                        mCenterPoint.x - mRadius * (1 + (mPercent - 0.2f) / 0.3f) //左半圓
                     mControlPoint[2]!!.y = mRadius * (1 - (mPercent - 0.2f) / 0.3f * 0.1f) //底部
                     mControlPoint[8]!!.y = -mRadius * (1 - (mPercent - 0.2f) / 0.3f * 0.1f) //頂部
                     mc = mc * (1 + (mPercent - 0.2f) / 0.3f * 0.3f)
                 } else if (mPercent > 0.5 && mPercent <= 0.8) { //左右恢復 變圓M逐漸重置為原來大小  圓心移動
-                    mControlPoint[5]!!.x = mCenterPoint.x + mRadius * (1 + (0.8f - mPercent) / 0.3f) //右半圓
-                    mControlPoint[0]!!.x = mCenterPoint.x - mRadius * (1 + (0.8f - mPercent) / 0.3f) //左半圓
+                    mControlPoint[5]!!.x =
+                        mCenterPoint.x + mRadius * (1 + (0.8f - mPercent) / 0.3f) //右半圓
+                    mControlPoint[0]!!.x =
+                        mCenterPoint.x - mRadius * (1 + (0.8f - mPercent) / 0.3f) //左半圓
                     mControlPoint[2]!!.y = mRadius * (1 + (mPercent - 0.8f) / 0.3f * 0.1f) //底部
                     mControlPoint[8]!!.y = -mRadius * (1 + (mPercent - 0.8f) / 0.3f * 0.1f) //頂部
                     mc = mc * (1 + (-mPercent + 0.8f) / 0.3f * 0.3f)
                 } else if (mPercent > 0.8 && mPercent <= 0.9) { //左凹 圓心到達
                     mControlPoint[5]!!.x = mCenterPoint.x + mRadius //右半圓
-                    mControlPoint[0]!!.x = mCenterPoint.x - mRadius * (1 - (mPercent - 0.8f) / 0.1f * 0.5f) //左半圓
+                    mControlPoint[0]!!.x =
+                        mCenterPoint.x - mRadius * (1 - (mPercent - 0.8f) / 0.1f * 0.5f) //左半圓
                 } else if (mPercent > 0.9 && mPercent <= 1) { //回彈 圓心到達
                     mControlPoint[5]!!.x = mCenterPoint.x + mRadius //右半圓
-                    mControlPoint[0]!!.x = mCenterPoint.x - mRadius * (1 - (1.0f - mPercent) / 0.1f * 0.5f) //左半圓
+                    mControlPoint[0]!!.x =
+                        mCenterPoint.x - mRadius * (1 - (1.0f - mPercent) / 0.1f * 0.5f) //左半圓
                 }
             } else  //右滑
             {
                 if (mPercent <= 1 && mPercent >= 0.8) { //左凸起 圓心不變
                     mControlPoint[5]!!.x = mCenterPoint.x + mRadius //右半圓
-                    mControlPoint[0]!!.x = mCenterPoint.x - mRadius * (2 - (mPercent - 0.8f) / 0.2f) //左半圓
+                    mControlPoint[0]!!.x =
+                        mCenterPoint.x - mRadius * (2 - (mPercent - 0.8f) / 0.2f) //左半圓
                 } else if (mPercent > 0.5 && mPercent <= 0.8) { //加速 右凸起 扁平化M 最左端固定不變  圓心移動
-                    mControlPoint[5]!!.x = mCenterPoint.x + mRadius * (2 - (mPercent - 0.5f) / 0.3f) //右半圓
+                    mControlPoint[5]!!.x =
+                        mCenterPoint.x + mRadius * (2 - (mPercent - 0.5f) / 0.3f) //右半圓
                     mControlPoint[0]!!.x = mCenterPoint.x - 2 * mRadius //左半圓
                     mControlPoint[2]!!.y = mRadius * (1 - (0.8f - mPercent) / 0.3f * 0.1f) //底部
                     mControlPoint[8]!!.y = -mRadius * (1 - (0.8f - mPercent) / 0.3f * 0.1f) //頂部
                     mc = mc * (1 + (0.8f - mPercent) / 0.3f * 0.3f)
                 } else if (mPercent > 0.2 && mPercent <= 0.5) { //左右恢復 變圓M逐漸重置為原來大小  圓心移動
-                    mControlPoint[5]!!.x = mCenterPoint.x + mRadius * (1 + (mPercent - 0.2f) / 0.3f) //右半圓
-                    mControlPoint[0]!!.x = mCenterPoint.x - mRadius * (1 + (mPercent - 0.2f) / 0.3f) //左半圓
+                    mControlPoint[5]!!.x =
+                        mCenterPoint.x + mRadius * (1 + (mPercent - 0.2f) / 0.3f) //右半圓
+                    mControlPoint[0]!!.x =
+                        mCenterPoint.x - mRadius * (1 + (mPercent - 0.2f) / 0.3f) //左半圓
                     mControlPoint[2]!!.y = mRadius * (1 - (mPercent - 0.2f) / 0.3f * 0.1f) //底部
                     mControlPoint[8]!!.y = -mRadius * (1 - (mPercent - 0.2f) / 0.3f * 0.1f) //頂部
                     mc = mc * (1 + (mPercent - 0.2f) / 0.3f * 0.3f)
                 } else if (mPercent > 0.1 && mPercent <= 0.2) { //右凹 圓心到達
-                    mControlPoint[5]!!.x = mCenterPoint.x + mRadius * (1 - (0.2f - mPercent) / 0.1f * 0.5f) //右半圓
+                    mControlPoint[5]!!.x =
+                        mCenterPoint.x + mRadius * (1 - (0.2f - mPercent) / 0.1f * 0.5f) //右半圓
                     mControlPoint[0]!!.x = mCenterPoint.x - mRadius //左半圓
                 } else if (mPercent >= 0 && mPercent <= 0.1) { //回彈 圓心到達
-                    mControlPoint[5]!!.x = mCenterPoint.x + mRadius * (1 - mPercent / 0.1f * 0.5f) //右半圓
+                    mControlPoint[5]!!.x =
+                        mCenterPoint.x + mRadius * (1 - mPercent / 0.1f * 0.5f) //右半圓
                     mControlPoint[0]!!.x = mCenterPoint.x - mRadius //左半圓
                 }
             }
@@ -594,13 +687,14 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
                     percent * mDistance
                 }
             }
-            IndicatorType.CIRCLE, IndicatorType.LINE, IndicatorType.PROGRESS -> mOffset = if (mPosition == mNum - 1 && !isLeft) { //第一個 右滑
-                (1 - percent) * (mNum - 1) * mDistance
-            } else if (mPosition == mNum - 1 && isLeft) { //最後一個 左滑
-                (1 - percent) * (mNum - 1) * mDistance
-            } else { //中間的
-                (percent + mPosition) * mDistance
-            }
+            IndicatorType.CIRCLE, IndicatorType.LINE, IndicatorType.PROGRESS -> mOffset =
+                if (mPosition == mNum - 1 && !isLeft) { //第一個 右滑
+                    (1 - percent) * (mNum - 1) * mDistance
+                } else if (mPosition == mNum - 1 && isLeft) { //最後一個 左滑
+                    (1 - percent) * (mNum - 1) * mDistance
+                } else { //中間的
+                    (percent + mPosition) * mDistance
+                }
             IndicatorType.BEZIER -> {
             }
             IndicatorType.SPRING -> {
@@ -717,13 +811,21 @@ class ViewPagerIndicator(context: Context, attrs: AttributeSet) : View(context, 
      * @param isInfiniteCircle 真無限循環 配合Banner
      * @return
      */
-    private fun setViewPager(viewpager: ViewPager2, CycleNumber: Int, isInfiniteCircle: Boolean): ViewPagerIndicator {
+    private fun setViewPager(
+        viewpager: ViewPager2,
+        CycleNumber: Int,
+        isInfiniteCircle: Boolean
+    ): ViewPagerIndicator {
         mNum = CycleNumber
         mIsInfiniteCircle = isInfiniteCircle
         viewpager.registerOnPageChangeCallback(object : OnPageChangeCallback() {
             //記錄上一次滑動的positionOffsetPixels值
             private var lastValue = -1
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
                 var position = position
                 if (!mAnimation) {
                     //不需要動畫

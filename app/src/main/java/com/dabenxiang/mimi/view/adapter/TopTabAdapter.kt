@@ -6,7 +6,10 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.home.HomeTabHolder
 
-class TopTabAdapter(private val listener: BaseIndexViewHolder.IndexViewHolderListener, private val isAdult: Boolean) :
+class TopTabAdapter(
+    private val listener: BaseIndexViewHolder.IndexViewHolderListener,
+    private val isAdult: Boolean
+) :
     BaseTabAdapter<String, HomeTabHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomeTabHolder {

@@ -27,7 +27,7 @@
         android:text="@string/personal_not_login_tips_1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/iv_Logo"/>
+        app:layout_constraintTop_toBottomOf="@id/iv_Logo" />
 
     <TextView
         android:id="@+id/tv_tips_2"
@@ -41,7 +41,7 @@
         android:text="@string/personal_not_login_tips_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_tips_1"/>
+        app:layout_constraintTop_toBottomOf="@id/tv_tips_1" />
 
     <TextView
         android:id="@+id/tv_tips_3"
@@ -54,7 +54,7 @@
         android:text="@string/personal_not_login_tips_3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_tips_2"/>
+        app:layout_constraintTop_toBottomOf="@id/tv_tips_2" />
 
     <TextView
         android:id="@+id/tv_login"

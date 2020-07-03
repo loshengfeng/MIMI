@@ -20,17 +20,13 @@ import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import kotlinx.android.synthetic.main.fragment_home.*
 
-class AdultHomeFragment : BaseFragment<HomeViewModel>() {
+class AdultHomeFragment : BaseFragment() {
 
     companion object {
         var lastPosition = 0
     }
 
     private val viewModel: HomeViewModel by viewModels()
-
-    override fun fetchViewModel(): HomeViewModel? {
-        return viewModel
-    }
 
     override fun getLayoutId() = R.layout.fragment_home
 
@@ -54,7 +50,12 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
             val bundle = CategoriesFragment.createBundle(item.title ?: "", item.categories)
 
-            navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_categoriesFragment, bundle))
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_homeFragment_to_categoriesFragment,
+                    bundle
+                )
+            )
         }
 
         override fun onVideoClick(view: View, item: PlayerData) {
@@ -63,11 +64,17 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
             startActivity(intent)
         }
 
-        override fun onLoadStatisticsViewHolder(vh: HomeStatisticsViewHolder, src: HomeTemplate.Statistics) {
+        override fun onLoadStatisticsViewHolder(
+            vh: HomeStatisticsViewHolder,
+            src: HomeTemplate.Statistics
+        ) {
             viewModel.loadNestedStatisticsList(vh, src)
         }
 
-        override fun onLoadCarouselViewHolder(vh: HomeCarouselViewHolder, src: HomeTemplate.Carousel) {
+        override fun onLoadCarouselViewHolder(
+            vh: HomeCarouselViewHolder,
+            src: HomeTemplate.Carousel
+        ) {
             viewModel.loadNestedStatisticsListForCarousel(vh, src)
         }
     }
@@ -75,7 +82,7 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+        requireActivity().onBackPressedDispatcher.addCallback {
             backToDesktop()
         }
 
@@ -109,7 +116,8 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
         tv_search.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
 
         recyclerview_home.background = requireActivity().getDrawable(R.color.adult_color_background)
-        recyclerview_videos.background = requireActivity().getDrawable(R.color.adult_color_background)
+        recyclerview_videos.background =
+            requireActivity().getDrawable(R.color.adult_color_background)
 
         btn_filter.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
         btn_filter.setBtnSolidColor(
@@ -133,11 +141,16 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
                 templateList.add(HomeTemplate.Header(null, item.name, item.name))
                 when (item.name) {
                     "蜜蜜影视" -> templateList.add(HomeTemplate.Statistics(item.name, null, true))
-                    "关注" -> { }
-                    "短视频" -> { }
-                    "图片" -> { }
-                    "短文" -> { }
-                    "圈子" -> { }
+                    "关注" -> {
+                    }
+                    "短视频" -> {
+                    }
+                    "图片" -> {
+                    }
+                    "短文" -> {
+                    }
+                    "圈子" -> {
+                    }
                 }
             }
         }
@@ -189,7 +202,11 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
                 }
                 else -> {
                     btn_filter.visibility = View.VISIBLE
-                    loadCategories(mainViewModel?.categoriesData?.value?.getAdult()?.categories?.get(position)?.name)
+                    loadCategories(
+                        mainViewModel?.categoriesData?.value?.getAdult()?.categories?.get(
+                            position
+                        )?.name
+                    )
                 }
             }
         })
@@ -198,7 +215,12 @@ class AdultHomeFragment : BaseFragment<HomeViewModel>() {
     override fun setupListeners() {
         iv_bg_search.setOnClickListener {
             val bundle = SearchVideoFragment.createBundle("")
-            navigateTo(NavigateItem.Destination(R.id.action_homeFragment_to_searchVideoFragment, bundle))
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_homeFragment_to_searchVideoFragment,
+                    bundle
+                )
+            )
         }
     }
 }

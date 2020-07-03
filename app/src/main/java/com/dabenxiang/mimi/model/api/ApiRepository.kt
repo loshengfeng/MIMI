@@ -1,12 +1,12 @@
 package com.dabenxiang.mimi.model.api
 
 import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.api.vo.error.TOKEN_NOT_FOUND
 import com.dabenxiang.mimi.model.enums.StatisticsType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
-import retrofit2.http.Body
 import java.io.File
 
 class ApiRepository(private val apiService: ApiService) {
@@ -18,7 +18,7 @@ class ApiRepository(private val apiService: ApiService) {
         const val FILE = "file"
         const val MEDIA_TYPE_IMAGE = "image/*"
         fun isRefreshTokenFailed(code: String?): Boolean {
-            return code == ErrorCode.TOKEN_NOT_FOUND
+            return code == TOKEN_NOT_FOUND
         }
     }
 
@@ -27,13 +27,22 @@ class ApiRepository(private val apiService: ApiService) {
      *                  Auth
      *
      ***********************************************************/
-    suspend fun getToken() = apiService.getToken("client_credentials", "3770511208570945536", "1d760dedf35a4a508ecd71b5013a1611")
+    suspend fun getToken() = apiService.getToken(
+        "client_credentials",
+        "3770511208570945536",
+        "1d760dedf35a4a508ecd71b5013a1611"
+    )
 
     /**
      * 更新Token
      */
     suspend fun refreshToken(token: String) =
-        apiService.refreshToken("refresh_token", token, "3770511208570945536", "1d760dedf35a4a508ecd71b5013a1611")
+        apiService.refreshToken(
+            "refresh_token",
+            token,
+            "3770511208570945536",
+            "1d760dedf35a4a508ecd71b5013a1611"
+        )
 
     /**
      * 登入
@@ -270,7 +279,11 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得熱門影片
      */
     suspend fun statisticsHomeVideos(
-        statisticsType: StatisticsType = StatisticsType.Newest, category: String? = null, isAdult: Boolean, offset: Int, limit: Int
+        statisticsType: StatisticsType = StatisticsType.NEWEST,
+        category: String? = null,
+        isAdult: Boolean,
+        offset: Int,
+        limit: Int
     ) = apiService.statisticsHomeVideos(
         statisticsType = statisticsType.ordinal,
         category = category,

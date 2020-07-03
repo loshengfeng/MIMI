@@ -27,13 +27,17 @@ class VideoListDataSource(
 
     private data class LoadResult(val list: List<BaseVideoItem>, val nextKey: Long?)
 
-    override fun loadInitial(params: LoadInitialParams<Long>, callback: LoadInitialCallback<Long, BaseVideoItem>) {
+    override fun loadInitial(
+        params: LoadInitialParams<Long>,
+        callback: LoadInitialCallback<Long, BaseVideoItem>
+    ) {
         viewModelScope.launch {
             flow {
                 val returnList = mutableListOf<BaseVideoItem>()
 
                 // TODO: 取得廣告
-                val adBanner = "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSd667siFJDLVZKf6mIzT86lWuspAhd40nq-2ACy5UpAQYJEWSM&usqp=CAU"
+                val adBanner =
+                    "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSd667siFJDLVZKf6mIzT86lWuspAhd40nq-2ACy5UpAQYJEWSM&usqp=CAU"
                 returnList.add(BaseVideoItem.Banner(adBanner))
 
                 if (category != null) {
@@ -47,12 +51,20 @@ class VideoListDataSource(
                     }
 
                     val nextPageKey = when {
-                        hasNextPage(item?.paging?.count ?: 0, item?.paging?.offset ?: 0, videos?.size ?: 0) -> PER_LIMIT_LONG
+                        hasNextPage(
+                            item?.paging?.count ?: 0,
+                            item?.paging?.offset ?: 0,
+                            videos?.size ?: 0
+                        ) -> PER_LIMIT_LONG
                         else -> null
                     }
                     emit(LoadResult(returnList, nextPageKey))
                 } else {
-                    val result = apiRepository.searchHomeVideos(isAdult = isAdult, offset = "0", limit = PER_LIMIT)
+                    val result = apiRepository.searchHomeVideos(
+                        isAdult = isAdult,
+                        offset = "0",
+                        limit = PER_LIMIT
+                    )
                     if (!result.isSuccessful) throw HttpException(result)
 
                     val item = result.body()
@@ -62,7 +74,11 @@ class VideoListDataSource(
                     }
 
                     val nextPageKey = when {
-                        hasNextPage(item?.paging?.count ?: 0, item?.paging?.offset ?: 0, videos?.size ?: 0) -> PER_LIMIT_LONG
+                        hasNextPage(
+                            item?.paging?.count ?: 0,
+                            item?.paging?.offset ?: 0,
+                            videos?.size ?: 0
+                        ) -> PER_LIMIT_LONG
                         else -> null
                     }
                     emit(LoadResult(returnList, nextPageKey))
@@ -85,7 +101,12 @@ class VideoListDataSource(
                 val returnList = mutableListOf<BaseVideoItem>()
 
                 if (category != null) {
-                    val result = apiRepository.searchWithCategory(category, isAdult, next.toString(), PER_LIMIT)
+                    val result = apiRepository.searchWithCategory(
+                        category,
+                        isAdult,
+                        next.toString(),
+                        PER_LIMIT
+                    )
                     if (!result.isSuccessful) throw HttpException(result)
 
                     val item = result.body()
@@ -95,12 +116,20 @@ class VideoListDataSource(
                     }
 
                     val nextPageKey = when {
-                        hasNextPage(item?.paging?.count ?: 0, item?.paging?.offset ?: 0, videos?.size ?: 0) -> next + PER_LIMIT_LONG
+                        hasNextPage(
+                            item?.paging?.count ?: 0,
+                            item?.paging?.offset ?: 0,
+                            videos?.size ?: 0
+                        ) -> next + PER_LIMIT_LONG
                         else -> null
                     }
                     emit(LoadResult(returnList, nextPageKey))
                 } else {
-                    val result = apiRepository.searchHomeVideos(isAdult = isAdult, offset = next.toString(), limit = PER_LIMIT)
+                    val result = apiRepository.searchHomeVideos(
+                        isAdult = isAdult,
+                        offset = next.toString(),
+                        limit = PER_LIMIT
+                    )
                     if (!result.isSuccessful) throw HttpException(result)
 
                     val item = result.body()
@@ -110,7 +139,11 @@ class VideoListDataSource(
                     }
 
                     val nextPageKey = when {
-                        hasNextPage(item?.paging?.count ?: 0, item?.paging?.offset ?: 0, videos?.size ?: 0) -> next + PER_LIMIT_LONG
+                        hasNextPage(
+                            item?.paging?.count ?: 0,
+                            item?.paging?.offset ?: 0,
+                            videos?.size ?: 0
+                        ) -> next + PER_LIMIT_LONG
                         else -> null
                     }
                     emit(LoadResult(returnList, nextPageKey))

@@ -8,7 +8,6 @@
     <fragment
         android:id="@+id/topupFragment"
         android:name="com.dabenxiang.mimi.view.topup.TopupFragment"
-        tools:layout="@layout/fragment_topup">
-    </fragment>
+        tools:layout="@layout/fragment_topup"></fragment>
 
 </navigation>

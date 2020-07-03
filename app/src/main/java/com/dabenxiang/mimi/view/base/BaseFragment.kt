@@ -5,13 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ExceptionResult
-import com.dabenxiang.mimi.model.api.vo.handleException
+import com.dabenxiang.mimi.extension.handleException
 import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
@@ -23,12 +22,10 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import java.net.UnknownHostException
 
-abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
+abstract class BaseFragment : Fragment() {
 
     open var mainViewModel: MainViewModel? = null
     var progressHUD: KProgressHUD? = null
-
-    abstract fun fetchViewModel(): VM?
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,20 +47,6 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
 
         activity?.bottom_navigation?.visibility = bottomNavigationVisibility
 
-        fetchViewModel()?.also { viewModel ->
-            viewModel.showProgress.observe(viewLifecycleOwner, Observer {
-                if (it) {
-                    progressHUD?.show()
-                } else {
-                    progressHUD?.dismiss()
-                }
-            })
-
-            viewModel.toastData.observe(viewLifecycleOwner, Observer {
-                GeneralUtils.showToast(context!!, it)
-            })
-        }
-
         setupListeners()
         setupObservers()
     }
@@ -84,7 +67,10 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
                 findNavController().also { navController ->
                     when (item) {
                         NavigateItem.Up -> navController.navigateUp() //.popBackStack()
-                        is NavigateItem.PopBackStack -> navController.popBackStack(item.fragmentId, item.inclusive)
+                        is NavigateItem.PopBackStack -> navController.popBackStack(
+                            item.fragmentId,
+                            item.inclusive
+                        )
                         is NavigateItem.Destination -> {
                             if (item.bundle == null) {
                                 navController.navigate(item.action)
@@ -131,7 +117,10 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
         */
     }
 
-    open fun onApiError(throwable: Throwable, onHttpErrorBlock: ((ExceptionResult.HttpError) -> Unit)? = null) {
+    open fun onApiError(
+        throwable: Throwable,
+        onHttpErrorBlock: ((ExceptionResult.HttpError) -> Unit)? = null
+    ) {
         when (val errorHandler =
             throwable.handleException { ex -> mainViewModel?.processException(ex) }) {
             is ExceptionResult.RefreshTokenExpired -> logoutLocal()
@@ -143,7 +132,7 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
                 if (errorHandler.throwable is UnknownHostException) {
                     showCrashDialog(HttpErrorMsgType.CHECK_NETWORK)
                 } else {
-                    GeneralUtils.showToast(context!!, errorHandler.throwable.toString())
+                    GeneralUtils.showToast(requireContext(), errorHandler.throwable.toString())
                 }
             }
         }
@@ -164,7 +153,7 @@ abstract class BaseFragment<out VM : BaseViewModel> : Fragment() {
         GeneralDialog.newInstance(
             GeneralDialogData(
                 titleRes = R.string.error_device_binding_title,
-                message = when(type) {
+                message = when (type) {
                     HttpErrorMsgType.API_FAILED -> getString(R.string.api_failed_msg)
                     HttpErrorMsgType.CHECK_NETWORK -> getString(R.string.server_error)
                 },

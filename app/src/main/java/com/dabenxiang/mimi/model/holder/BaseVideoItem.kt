@@ -19,7 +19,14 @@ sealed class BaseVideoItem {
 fun List<VideoSearchItem.VideoSearchDetail>.searchItemToVideoItem(isAdult: Boolean): List<BaseVideoItem.Video> {
     val result = mutableListOf<BaseVideoItem.Video>()
     forEach { item ->
-        val holderItem = BaseVideoItem.Video(id = item.id, title = item.title, imgUrl = item.cover, isAdult = isAdult, resolution = "", info = "")
+        val holderItem = BaseVideoItem.Video(
+            id = item.id,
+            title = item.title,
+            imgUrl = item.cover,
+            isAdult = isAdult,
+            resolution = "",
+            info = ""
+        )
         result.add(holderItem)
     }
     return result
@@ -28,7 +35,14 @@ fun List<VideoSearchItem.VideoSearchDetail>.searchItemToVideoItem(isAdult: Boole
 fun List<StatisticsItem>.statisticsItemToVideoItem(isAdult: Boolean): List<BaseVideoItem.Video> {
     val result = mutableListOf<BaseVideoItem.Video>()
     forEach { item ->
-        val holderItem = BaseVideoItem.Video(id = item.id, title = item.title, imgUrl = item.cover, isAdult = isAdult, resolution = "", info = "")
+        val holderItem = BaseVideoItem.Video(
+            id = item.id,
+            title = item.title,
+            imgUrl = item.cover,
+            isAdult = isAdult,
+            resolution = "",
+            info = ""
+        )
         result.add(holderItem)
     }
     return result
@@ -37,7 +51,14 @@ fun List<StatisticsItem>.statisticsItemToVideoItem(isAdult: Boolean): List<BaseV
 fun List<SimpleVideoItem>.simpleVideoItemToVideoItem(isAdult: Boolean): List<BaseVideoItem.Video> {
     val result = mutableListOf<BaseVideoItem.Video>()
     forEach { item ->
-        val holderItem = BaseVideoItem.Video(id = item.id, title = item.title, imgUrl = item.cover, isAdult = isAdult, resolution = "", info = "")
+        val holderItem = BaseVideoItem.Video(
+            id = item.id,
+            title = item.title,
+            imgUrl = item.cover,
+            isAdult = isAdult,
+            resolution = "",
+            info = ""
+        )
         result.add(holderItem)
     }
     return result

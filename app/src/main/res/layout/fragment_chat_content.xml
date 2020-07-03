@@ -17,7 +17,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="密密"/>
+        tools:text="密密" />
+
     <ImageButton
         android:id="@+id/btnClose"
         android:layout_width="32dp"
@@ -27,7 +28,8 @@
         android:src="@drawable/btn_close_n"
         android:background="@null"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerContent"
         android:layout_width="0dp"
@@ -35,14 +37,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textTitle"
-        app:layout_constraintBottom_toTopOf="@id/layoutChat"/>
+        app:layout_constraintBottom_toTopOf="@id/layoutChat" />
+
     <View
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:background="@color/color_black_1_10"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/layoutChat"/>
+        app:layout_constraintBottom_toTopOf="@id/layoutChat" />
+
     <LinearLayout
         android:id="@+id/layoutChat"
         android:layout_width="0dp"
@@ -55,6 +59,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
+
         <EditText
             android:id="@+id/editChat"
             android:layout_width="0dp"
@@ -68,20 +73,22 @@
             android:textSize="14sp"
             android:hint="@string/edit_hint_chat"
             android:background="@drawable/bg_white_1_65625_radius_18" />
+
         <ImageButton
             android:id="@+id/btnAdd"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_marginStart="11dp"
             android:src="@drawable/btn_add"
-            android:background="@null"/>
+            android:background="@null" />
+
         <ImageButton
             android:id="@+id/btnSend"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_marginStart="7dp"
             android:src="@drawable/btn_send"
-            android:background="@null"/>
+            android:background="@null" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

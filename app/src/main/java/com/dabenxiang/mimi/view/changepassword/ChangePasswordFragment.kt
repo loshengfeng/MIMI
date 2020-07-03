@@ -12,12 +12,10 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import kotlinx.android.synthetic.main.fragment_change_password.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@ExperimentalCoroutinesApi
-class ChangePasswordFragment : BaseFragment<ChangePasswordViewModel>() {
+class ChangePasswordFragment : BaseFragment() {
 
-    private  val viewModel:ChangePasswordViewModel by viewModels()
+    private val viewModel: ChangePasswordViewModel by viewModels()
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -27,9 +25,9 @@ class ChangePasswordFragment : BaseFragment<ChangePasswordViewModel>() {
         initSettings()
     }
 
-    override fun getLayoutId(): Int { return R.layout.fragment_change_password }
-
-    override fun fetchViewModel(): ChangePasswordViewModel? { return viewModel }
+    override fun getLayoutId(): Int {
+        return R.layout.fragment_change_password
+    }
 
     override fun setupObservers() {
         viewModel.currentError.observe(viewLifecycleOwner, Observer {

@@ -33,7 +33,7 @@ class MQTTManager(val context: Context, private val pref: Pref) {
 
         options = MqttConnectOptions()
         options?.password = pref.memberToken.accessToken.toCharArray()
-        options?.userName = pref.profileData.userId.toString()
+        options?.userName = pref.profileItem.userId.toString()
         options?.isAutomaticReconnect = true
         options?.isCleanSession = false
     }

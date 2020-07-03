@@ -3,10 +3,14 @@ package com.dabenxiang.mimi.view.player
 import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.view.View
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.dabenxiang.mimi.callback.GuessLikePagingCallBack
+import com.dabenxiang.mimi.event.SingleLiveEvent
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.PostCommentRequest
 import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
@@ -15,7 +19,6 @@ import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.widget.utility.SingleEvent
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
 import com.google.android.exoplayer2.source.MediaSource
@@ -65,17 +68,19 @@ class PlayerViewModel : BaseViewModel() {
     private val _apiStreamResult = MutableLiveData<ApiResult<Nothing>>()
     val apiStreamResult: LiveData<ApiResult<Nothing>> = _apiStreamResult
 
-    private val _apiLoadReplyCommentResult = MutableLiveData<SingleEvent<ApiResult<Nothing>>>()
-    val apiLoadReplyCommentResult: LiveData<SingleEvent<ApiResult<Nothing>>> = _apiLoadReplyCommentResult
+    private val _apiLoadReplyCommentResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
+    val apiLoadReplyCommentResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> =
+        _apiLoadReplyCommentResult
 
-    private val _apiPostCommentResult = MutableLiveData<SingleEvent<ApiResult<Nothing>>>()
-    val apiPostCommentResult: LiveData<SingleEvent<ApiResult<Nothing>>> = _apiPostCommentResult
+    private val _apiPostCommentResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
+    val apiPostCommentResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _apiPostCommentResult
 
-    private val _apiCommentLikeResult = MutableLiveData<SingleEvent<ApiResult<Nothing>>>()
-    val apiCommentLikeResult: LiveData<SingleEvent<ApiResult<Nothing>>> = _apiCommentLikeResult
+    private val _apiCommentLikeResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
+    val apiCommentLikeResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _apiCommentLikeResult
 
-    private val _apiDeleteCommentLikeResult = MutableLiveData<SingleEvent<ApiResult<Nothing>>>()
-    val apiDeleteCommentLikeResult: LiveData<SingleEvent<ApiResult<Nothing>>> = _apiDeleteCommentLikeResult
+    private val _apiDeleteCommentLikeResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
+    val apiDeleteCommentLikeResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> =
+        _apiDeleteCommentLikeResult
 
     private val _consumeResult = MutableLiveData<VideoConsumeResult>()
     val consumeResult: LiveData<VideoConsumeResult> = _consumeResult
@@ -316,10 +321,10 @@ class PlayerViewModel : BaseViewModel() {
     fun checkConsumeResult() {
         val result =
             when {
-                costPoint == 0L || isDeducted -> VideoConsumeResult.Paid
+                costPoint == 0L || isDeducted -> VideoConsumeResult.PAID
                 else -> when {
-                    availablePoint > costPoint -> VideoConsumeResult.PaidYet
-                    else -> VideoConsumeResult.PointNotEnough
+                    availablePoint > costPoint -> VideoConsumeResult.PAID_YET
+                    else -> VideoConsumeResult.POINT_NOT_ENOUGH
                 }
             }
 
@@ -434,7 +439,13 @@ class PlayerViewModel : BaseViewModel() {
                     currentSize = 0
 
                     val resp = domainManager.getApiRepository()
-                        .getMembersPostComment(postId = videoId, parentId = commentId, sorting = 1, offset = "0", limit = "50")
+                        .getMembersPostComment(
+                            postId = videoId,
+                            parentId = commentId,
+                            sorting = 1,
+                            offset = "0",
+                            limit = "50"
+                        )
                     if (!resp.isSuccessful) throw HttpException(resp)
 
                     parentNode.nestedCommentList.clear()
@@ -463,7 +474,7 @@ class PlayerViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect {
-                    _apiLoadReplyCommentResult.value = SingleEvent(it)
+                    _apiLoadReplyCommentResult.value = SingleLiveEvent(it)
                 }
         }
     }
@@ -491,7 +502,7 @@ class PlayerViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect {
-                    _apiPostCommentResult.value = SingleEvent(it)
+                    _apiPostCommentResult.value = SingleLiveEvent(it)
                 }
         }
     }
@@ -499,7 +510,8 @@ class PlayerViewModel : BaseViewModel() {
     fun postCommentLike(commentId: Long, body: PostLikeRequest) {
         viewModelScope.launch {
             flow {
-                val resp = domainManager.getApiRepository().postMembersPostCommentLike(videoId, commentId, body)
+                val resp = domainManager.getApiRepository()
+                    .postMembersPostCommentLike(videoId, commentId, body)
                 if (!resp.isSuccessful) throw HttpException(resp)
 
                 emit(ApiResult.success(null))
@@ -511,7 +523,7 @@ class PlayerViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect {
-                    _apiCommentLikeResult.value = SingleEvent(it)
+                    _apiCommentLikeResult.value = SingleLiveEvent(it)
                 }
         }
     }
@@ -519,7 +531,8 @@ class PlayerViewModel : BaseViewModel() {
     fun deleteCommentLike(commentId: Long) {
         viewModelScope.launch {
             flow {
-                val resp = domainManager.getApiRepository().deleteMembersPostCommentLike(videoId, commentId)
+                val resp = domainManager.getApiRepository()
+                    .deleteMembersPostCommentLike(videoId, commentId)
                 if (!resp.isSuccessful) throw HttpException(resp)
 
                 emit(ApiResult.success(null))
@@ -531,7 +544,7 @@ class PlayerViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect {
-                    _apiDeleteCommentLikeResult.value = SingleEvent(it)
+                    _apiDeleteCommentLikeResult.value = SingleLiveEvent(it)
                 }
         }
     }

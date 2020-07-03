@@ -45,7 +45,7 @@
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@id/space_start"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Jeff"/>
+            tools:text="Jeff" />
 
         <EditText
             android:id="@+id/edit_message"

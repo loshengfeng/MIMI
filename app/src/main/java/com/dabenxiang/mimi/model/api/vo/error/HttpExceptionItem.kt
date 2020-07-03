@@ -1,5 +1,6 @@
-package com.dabenxiang.mimi.model.api.vo
+package com.dabenxiang.mimi.model.api.vo.error
 
+import com.dabenxiang.mimi.model.api.vo.error.ErrorItem
 import retrofit2.HttpException
 
 data class HttpExceptionItem(

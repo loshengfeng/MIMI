@@ -19,20 +19,18 @@ import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.FavoritePagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.LikeRequest
+import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.enums.LikeType
-import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_NORMAL
-import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_SHORT_VIDEO
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_ADULT
+import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_NORMAL
+import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_SHORT_VIDEO
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
 
-@ExperimentalCoroutinesApi
 class FavoriteViewModel : BaseViewModel() {
 
     val dataCount = MutableLiveData<Int>()
@@ -124,7 +122,7 @@ class FavoriteViewModel : BaseViewModel() {
         }
     }
 
-    private fun setImage(view: ImageView, id: Long) : Boolean {
+    private fun setImage(view: ImageView, id: Long): Boolean {
         val bitmap = lruCacheManager.getLruCache(id)
 
         return when (lruCacheManager.getLruCache(id)) {
@@ -148,7 +146,10 @@ class FavoriteViewModel : BaseViewModel() {
     fun modifyLike(view: TextView, postId: Long) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().addLike(postId, LikeRequest(viewStatus[view.id]))
+                val result = domainManager.getApiRepository()
+                    .addLike(postId,
+                        LikeRequest(viewStatus[view.id])
+                    )
                 if (!result.isSuccessful) {
                     viewStatus[view.id] =
                         when (viewStatus[view.id]) {
@@ -229,10 +230,18 @@ class FavoriteViewModel : BaseViewModel() {
     }
 
     private val favoritePagingCallback = object : FavoritePagingCallback {
-        override fun onLoading() { setShowProgress(true) }
-        override fun onLoaded() { setShowProgress(false) }
+        override fun onLoading() {
+            setShowProgress(true)
+        }
+
+        override fun onLoaded() {
+            setShowProgress(false)
+        }
+
         override fun onThrowable(throwable: Throwable) {}
-        override fun onTotalCount(count: Int) { viewModelScope.launch { dataCount.value = count } }
+        override fun onTotalCount(count: Int) {
+            viewModelScope.launch { dataCount.value = count }
+        }
     }
 
 }

@@ -7,13 +7,11 @@ import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.widget.utility.AppUtils
 import com.dabenxiang.mimi.widget.utility.EditTextMutableLiveData
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-@ExperimentalCoroutinesApi
 class ChangePasswordViewModel : BaseViewModel() {
     val current = EditTextMutableLiveData()
     val new = EditTextMutableLiveData()
@@ -55,7 +53,7 @@ class ChangePasswordViewModel : BaseViewModel() {
     private fun isValidateNew(pwd: String): String {
         return when {
             TextUtils.isEmpty(pwd) -> app.getString(R.string.setting_new_password_error_1)
-            !AppUtils.isPasswordValid(pwd) -> app.getString(R.string.password_format_error_2)
+            !GeneralUtils.isPasswordValid(pwd) -> app.getString(R.string.password_format_error_2)
             else -> ""
         }
     }

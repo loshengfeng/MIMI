@@ -9,7 +9,8 @@ import kotlinx.android.synthetic.main.nested_item_leaderboard.view.*
 
 class LeaderboardAdapter : RecyclerView.Adapter<BaseViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.nested_item_leaderboard, parent, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.nested_item_leaderboard, parent, false)
         return BaseViewHolder(view)
     }
 

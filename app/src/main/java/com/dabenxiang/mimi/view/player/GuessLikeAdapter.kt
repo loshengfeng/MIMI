@@ -12,7 +12,10 @@ import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.VideoViewHolder
 
-class GuessLikeAdapter(private val listener: GuessLikeAdapterListener, private val isAdult: Boolean) :
+class GuessLikeAdapter(
+    private val listener: GuessLikeAdapterListener,
+    private val isAdult: Boolean
+) :
     PagedListAdapter<BaseVideoItem, BaseViewHolder>(diffCallback) {
 
     interface GuessLikeAdapterListener {
@@ -25,7 +28,10 @@ class GuessLikeAdapter(private val listener: GuessLikeAdapterListener, private v
                 return oldItem == newItem
             }
 
-            override fun areContentsTheSame(oldItem: BaseVideoItem, newItem: BaseVideoItem): Boolean {
+            override fun areContentsTheSame(
+                oldItem: BaseVideoItem,
+                newItem: BaseVideoItem
+            ): Boolean {
                 return oldItem == newItem
             }
         }
@@ -45,7 +51,8 @@ class GuessLikeAdapter(private val listener: GuessLikeAdapterListener, private v
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.nested_item_home_categories, parent, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.nested_item_home_categories, parent, false)
         return VideoViewHolder(view, videoViewHolderListener)
     }
 

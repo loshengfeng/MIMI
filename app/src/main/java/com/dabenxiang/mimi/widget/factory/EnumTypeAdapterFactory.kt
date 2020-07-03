@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.widget.utility
+package com.dabenxiang.mimi.widget.factory
 
 import com.google.gson.Gson
 import com.google.gson.TypeAdapter
@@ -25,17 +25,26 @@ class EnumTypeAdapterFactory : TypeAdapterFactory {
                 tt.javaClass.getField(it.toString()).getAnnotation(SerializedName::class.java)
 
             if (serializedName != null) {
-                maps[tt] = ValueType(serializedName.value, BasicType.STRING)
+                maps[tt] =
+                    ValueType(
+                        serializedName.value,
+                        BasicType.STRING
+                    )
                 return@forEach
             }
 
             val field = tt.javaClass.declaredFields.firstOrNull { it2 ->
-                BasicType.isBasicType(it2.type.name)
+                BasicType.isBasicType(
+                    it2.type.name
+                )
             }
 
             if (field != null) {
                 field.isAccessible = true
-                val basicType = BasicType.get(field.type.name)
+                val basicType =
+                    BasicType.get(
+                        field.type.name
+                    )
                 val value: Any = when (basicType) {
                     BasicType.INT -> field.getInt(tt)
                     BasicType.STRING -> field.get(tt) as String
@@ -43,9 +52,17 @@ class EnumTypeAdapterFactory : TypeAdapterFactory {
                     BasicType.DOUBLE -> field.getDouble(tt)
                     BasicType.BOOLEAN -> field.getBoolean(tt)
                 }
-                maps[tt] = ValueType(value, basicType)
+                maps[tt] =
+                    ValueType(
+                        value,
+                        basicType
+                    )
             } else {
-                maps[tt] = ValueType(tt.toString(), BasicType.STRING)
+                maps[tt] =
+                    ValueType(
+                        tt.toString(),
+                        BasicType.STRING
+                    )
             }
         }
 

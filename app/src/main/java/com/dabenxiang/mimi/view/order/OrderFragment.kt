@@ -10,14 +10,12 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
-import kotlinx.android.synthetic.main.fragment_order.item_no_data
-import kotlinx.android.synthetic.main.fragment_order.layout_refresh
-import kotlinx.android.synthetic.main.fragment_order.rv_content
-import kotlinx.android.synthetic.main.fragment_order.tl_type
-import kotlinx.android.synthetic.main.item_setting_bar.*
+import kotlinx.android.synthetic.main.fragment_order.*
 import kotlinx.android.synthetic.main.item_order_no_data.*
+import kotlinx.android.synthetic.main.item_setting_bar.*
 
-class OrderFragment : BaseFragment<OrderViewModel>() {
+class OrderFragment : BaseFragment() {
+
     private val viewModel: OrderViewModel by viewModels()
 
     companion object {
@@ -37,9 +35,9 @@ class OrderFragment : BaseFragment<OrderViewModel>() {
         initSettings()
     }
 
-    override fun getLayoutId(): Int { return R.layout.fragment_order }
-
-    override fun fetchViewModel(): OrderViewModel? { return viewModel }
+    override fun getLayoutId(): Int {
+        return R.layout.fragment_order
+    }
 
     override fun setupObservers() {
         viewModel.orderList.observe(viewLifecycleOwner, Observer {
@@ -53,6 +51,7 @@ class OrderFragment : BaseFragment<OrderViewModel>() {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 viewModel.getOrder(tab.position)
             }
+
             override fun onTabUnselected(tab: TabLayout.Tab) {}
             override fun onTabReselected(tab: TabLayout.Tab) {}
         })
@@ -60,7 +59,7 @@ class OrderFragment : BaseFragment<OrderViewModel>() {
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.tv_back -> navigateTo(NavigateItem.Up)
-                R.id.tv_topup -> GeneralUtils.showToast(requireContext(),"btn_topup")
+                R.id.tv_topup -> GeneralUtils.showToast(requireContext(), "btn_topup")
             }
         }.also {
             tv_back.setOnClickListener(it)
@@ -81,22 +80,23 @@ class OrderFragment : BaseFragment<OrderViewModel>() {
     }
 
     private fun refreshUi(size: Int) {
-        layout_refresh.visibility = when(size) {
+        layout_refresh.visibility = when (size) {
             NO_DATA -> View.GONE
             else -> View.VISIBLE
         }
 
-        item_no_data.visibility = when(size) {
+        item_no_data.visibility = when (size) {
             NO_DATA -> View.VISIBLE
             else -> View.GONE
         }
 
-        val title = when(tl_type.selectedTabPosition) {
+        val title = when (tl_type.selectedTabPosition) {
             TYPE_ALL -> getString(R.string.topup_all)
             TYPE_ONLINE_PAY -> getString(R.string.topup_online_pay)
             else -> getString(R.string.topup_proxy_pay)
         }
 
-        tl_type.getTabAt(tl_type.selectedTabPosition)?.text = StringBuilder(title).append("(").append(size).append(")").toString()
+        tl_type.getTabAt(tl_type.selectedTabPosition)?.text =
+            StringBuilder(title).append("(").append(size).append(")").toString()
     }
 }

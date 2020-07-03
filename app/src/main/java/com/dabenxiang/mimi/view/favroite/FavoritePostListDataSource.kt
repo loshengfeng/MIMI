@@ -5,13 +5,11 @@ import com.dabenxiang.mimi.callback.FavoritePagingCallback
 import com.dabenxiang.mimi.manager.DomainManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
 
-@ExperimentalCoroutinesApi
 class FavoritePostListDataSource constructor(
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,

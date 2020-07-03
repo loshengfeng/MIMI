@@ -3,24 +3,26 @@ package com.dabenxiang.mimi.manager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.api.vo.ChangePasswordRequest
+import com.dabenxiang.mimi.model.api.vo.SignInRequest
+import com.dabenxiang.mimi.model.api.vo.SingUpRequest
 import com.dabenxiang.mimi.model.enums.TokenResult
 import com.dabenxiang.mimi.model.pref.Pref
-import com.dabenxiang.mimi.model.vo.ProfileData
-import com.dabenxiang.mimi.model.vo.TokenData
-import com.dabenxiang.mimi.widget.utility.AppUtils
+import com.dabenxiang.mimi.model.vo.ProfileItem
+import com.dabenxiang.mimi.model.vo.TokenItem
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import retrofit2.HttpException
 import java.util.*
 
-@ExperimentalCoroutinesApi
 class AccountManager(private val pref: Pref, private val domainManager: DomainManager) {
     private val _isLogin = MutableLiveData(false)
     val isLogin: LiveData<Boolean> = _isLogin
 
-    fun getProfile(): ProfileData { return pref.profileData }
+    fun getProfile(): ProfileItem {
+        return pref.profileItem
+    }
 
     var keepAccount: Boolean
         get() = pref.keepAccount
@@ -28,8 +30,8 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
             pref.keepAccount = value
         }
 
-    fun setupProfile(profileData: ProfileData) {
-        pref.profileData = profileData
+    fun setupProfile(profileItem: ProfileItem) {
+        pref.profileItem = profileItem
     }
 
     fun hasMemberToken(): Boolean {
@@ -37,29 +39,24 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
         return tokenItem.accessToken.isNotEmpty() && tokenItem.refreshToken.isNotEmpty()
     }
 
-//    fun isAutoLogin(): Boolean {
-//        val tokenItem = pref.memberToken
-//        return tokenItem.accessToken.isNotEmpty() && tokenItem.refreshToken.isNotEmpty()
-//    }
-
     fun getMemberTokenResult(): TokenResult {
         val tokenData = pref.memberToken
         return when {
-            tokenData.expiresTimestamp == 0L -> TokenResult.Empty
-            tokenData.accessToken.isEmpty() -> TokenResult.Empty
-            tokenData.refreshToken.isEmpty() -> TokenResult.Empty
-            Date().time > tokenData.expiresTimestamp -> TokenResult.Expired
-            else -> TokenResult.Pass
+            tokenData.expiresTimestamp == 0L -> TokenResult.EMPTY
+            tokenData.accessToken.isEmpty() -> TokenResult.EMPTY
+            tokenData.refreshToken.isEmpty() -> TokenResult.EMPTY
+            Date().time > tokenData.expiresTimestamp -> TokenResult.EXPIRED
+            else -> TokenResult.PASS
         }
     }
 
     fun getPublicTokenResult(): TokenResult {
         val tokenData = pref.publicToken
         return when {
-            tokenData.expiresTimestamp == 0L -> TokenResult.Empty
-            tokenData.accessToken.isEmpty() -> TokenResult.Empty
-            Date().time > tokenData.expiresTimestamp -> TokenResult.Expired
-            else -> TokenResult.Pass
+            tokenData.expiresTimestamp == 0L -> TokenResult.EMPTY
+            tokenData.accessToken.isEmpty() -> TokenResult.EMPTY
+            Date().time > tokenData.expiresTimestamp -> TokenResult.EMPTY
+            else -> TokenResult.PASS
         }
     }
 
@@ -69,10 +66,9 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
             if (!result.isSuccessful) throw HttpException(result)
             result.body()?.also { tokenItem ->
                 pref.publicToken =
-                    TokenData(
+                    TokenItem(
                         accessToken = tokenItem.accessToken,
-                        // 提前2分鐘過期
-                        expiresTimestamp = Date().time + (tokenItem.expiresIn - 120) * 1000
+                        expiresTimestamp = Date().time + (tokenItem.expiresIn - 120) * 1000 // 提前2分鐘過期
                     )
             }
             emit(ApiResult.success(null))
@@ -82,14 +78,14 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
 
     fun refreshToken() =
         flow {
-            val result = domainManager.getApiRepository().refreshToken(pref.memberToken.refreshToken)
+            val result =
+                domainManager.getApiRepository().refreshToken(pref.memberToken.refreshToken)
             if (!result.isSuccessful) throw HttpException(result)
             result.body()?.also { item ->
-                pref.memberToken = TokenData(
+                pref.memberToken = TokenItem(
                     accessToken = item.accessToken,
                     refreshToken = item.refreshToken,
-                    // 提前2分鐘過期
-                    expiresTimestamp = Date().time + (item.expiresIn - 120) * 1000
+                    expiresTimestamp = Date().time + (item.expiresIn - 120) * 1000  // 提前2分鐘過期
                 )
             }
             emit(ApiResult.success(null))
@@ -115,7 +111,7 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
             if (!result.isSuccessful) throw HttpException(result)
 
             result.body()?.content?.also { item ->
-                pref.memberToken = TokenData(
+                pref.memberToken = TokenItem(
                     accessToken = item.accessToken,
                     refreshToken = item.refreshToken,
                     // 提前2分鐘過期
@@ -128,7 +124,15 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
                 if (!meResult.isSuccessful) throw HttpException(meResult)
 
                 val meItem = meResult.body()?.content
-                setupProfile(ProfileData(userId = meItem?.id ?: 0, deviceId = AppUtils.getAndroidID(), account = userName, password = password, friendlyName = meItem?.friendlyName ?: ""))
+                setupProfile(
+                    ProfileItem(
+                        userId = meItem?.id ?: 0,
+                        deviceId = GeneralUtils.getAndroidID(),
+                        account = userName,
+                        password = password,
+                        friendlyName = meItem?.friendlyName ?: ""
+                    )
+                )
             }
 
             _isLogin.postValue(true)

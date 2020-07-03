@@ -11,16 +11,15 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ProfileItem
 import com.dabenxiang.mimi.model.api.vo.ProfileRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.widget.utility.AppUtils
 import com.dabenxiang.mimi.widget.utility.EditTextMutableLiveData
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
-@ExperimentalCoroutinesApi
 class UpdateProfileViewModel : BaseViewModel() {
+
     var type = UpdateProfileFragment.TYPE_NAME
     val content = EditTextMutableLiveData()
     val birthday = EditTextMutableLiveData()
@@ -39,14 +38,16 @@ class UpdateProfileViewModel : BaseViewModel() {
             UpdateProfileFragment.TYPE_EMAIL -> _error.value = isValidateEmail()
             UpdateProfileFragment.TYPE_BIRTHDAY -> _error.value = isValidateBirthday()
         }
-        if ("" == _error.value) { updateProfile() }
+        if ("" == _error.value) {
+            updateProfile()
+        }
     }
 
     private fun isValidateFriendlyName(): String {
         val name = content.value ?: ""
         return when {
             TextUtils.isEmpty(name) -> app.getString(R.string.login_name)
-            !AppUtils.isFriendlyNameValid(name) -> app.getString(R.string.friendly_name_format_error_1)
+            !GeneralUtils.isFriendlyNameValid(name) -> app.getString(R.string.friendly_name_format_error_1)
             name.length > 20 -> app.getString(R.string.friendly_name_format_error_2)
             else -> {
                 profileItem.friendlyName = name
@@ -59,7 +60,7 @@ class UpdateProfileViewModel : BaseViewModel() {
         val email = content.value ?: ""
         return when {
             TextUtils.isEmpty(email) -> app.getString(R.string.email_format_error_1)
-            !AppUtils.isEmailValid(email) -> app.getString(R.string.email_format_error_2)
+            !GeneralUtils.isEmailValid(email) -> app.getString(R.string.email_format_error_2)
             email.length > 100 -> app.getString(R.string.email_format_error_3)
             else -> {
                 profileItem.email = email
@@ -69,7 +70,7 @@ class UpdateProfileViewModel : BaseViewModel() {
     }
 
     private fun isValidateBirthday(): String {
-        val birthday = birthday.value?: ""
+        val birthday = birthday.value ?: ""
         return when {
             TextUtils.isEmpty(birthday) -> app.getString(R.string.setting_type_birthday)
             birthday.length != 10 -> app.getString(R.string.setting_birthday_error)

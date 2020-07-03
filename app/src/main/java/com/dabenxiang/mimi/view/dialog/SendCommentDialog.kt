@@ -18,7 +18,12 @@ class SendCommentDialog(private val listener: SendCommentDialogListener) : BaseD
     companion object {
         private const val KEY_DATA = "data"
 
-        fun newInstance(isAdult: Boolean, replyId: Long? = null, replyName: String? = null, listener: SendCommentDialogListener): SendCommentDialog {
+        fun newInstance(
+            isAdult: Boolean,
+            replyId: Long? = null,
+            replyName: String? = null,
+            listener: SendCommentDialogListener
+        ): SendCommentDialog {
             val fragment = SendCommentDialog(listener)
             val args = Bundle()
             args.putSerializable(KEY_DATA, SendCommentData(isAdult, replyId, replyName))
@@ -27,7 +32,11 @@ class SendCommentDialog(private val listener: SendCommentDialogListener) : BaseD
         }
     }
 
-    private class SendCommentData(val isAdult: Boolean, val replyId: Long?, val replyName: String?) : Serializable
+    private class SendCommentData(
+        val isAdult: Boolean,
+        val replyId: Long?,
+        val replyName: String?
+    ) : Serializable
 
     override fun isFullLayout(): Boolean {
         return true
@@ -90,12 +99,14 @@ class SendCommentDialog(private val listener: SendCommentDialogListener) : BaseD
     }
 
     private fun showKeyboard() {
-        val inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val inputMethodManager =
+            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
     }
 
     private fun closeKeyboard() {
-        val inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val inputMethodManager =
+            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
     }
 }

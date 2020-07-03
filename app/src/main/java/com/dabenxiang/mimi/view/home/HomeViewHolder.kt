@@ -27,7 +27,9 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 
 abstract class HomeViewHolder<VM : HomeTemplate>(
-    itemView: View, protected val nestedListener: HomeAdapter.EventListener, protected val isAdult: Boolean
+    itemView: View,
+    protected val nestedListener: HomeAdapter.EventListener,
+    protected val isAdult: Boolean
 ) :
     BaseViewHolder(itemView) {
 
@@ -42,7 +44,11 @@ abstract class HomeViewHolder<VM : HomeTemplate>(
     abstract fun updated()
 }
 
-class HeaderViewHolder(itemView: View, nestedListener: HomeAdapter.EventListener, isAdult: Boolean) :
+class HeaderViewHolder(
+    itemView: View,
+    nestedListener: HomeAdapter.EventListener,
+    isAdult: Boolean
+) :
     HomeViewHolder<HomeTemplate.Header>(itemView, nestedListener, isAdult) {
     private val ivIcon: ImageView = itemView.iv_icon
     private val tvTitle: TextView = itemView.tv_title
@@ -185,7 +191,11 @@ class HomeStatisticsViewHolder(
     }
 }
 
-class HomeLeaderboardViewHolder(itemView: View, listener: HomeAdapter.EventListener, isAdult: Boolean) :
+class HomeLeaderboardViewHolder(
+    itemView: View,
+    listener: HomeAdapter.EventListener,
+    isAdult: Boolean
+) :
     HomeViewHolder<HomeTemplate.Leaderboard>(itemView, listener, isAdult) {
 
     private val recyclerView: RecyclerView = itemView.recyclerview_leaderboard
@@ -206,7 +216,11 @@ class HomeLeaderboardViewHolder(itemView: View, listener: HomeAdapter.EventListe
     }
 }
 
-class HomeRecommendViewHolder(itemView: View, listener: HomeAdapter.EventListener, isAdult: Boolean) :
+class HomeRecommendViewHolder(
+    itemView: View,
+    listener: HomeAdapter.EventListener,
+    isAdult: Boolean
+) :
     HomeViewHolder<HomeTemplate.Recommend>(itemView, listener, isAdult) {
 
     private val recyclerView: RecyclerView = itemView.recyclerview_recommend

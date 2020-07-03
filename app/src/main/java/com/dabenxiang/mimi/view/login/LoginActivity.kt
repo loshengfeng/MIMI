@@ -14,6 +14,9 @@ class LoginActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        findNavController(R.id.nav_host_fragment).setGraph(R.navigation.navigation_login, intent.extras)
+        findNavController(R.id.nav_host_fragment).setGraph(
+            R.navigation.navigation_login,
+            intent.extras
+        )
     }
 }

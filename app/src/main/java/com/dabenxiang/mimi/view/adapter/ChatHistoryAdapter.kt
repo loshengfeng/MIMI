@@ -16,10 +16,19 @@ class ChatHistoryAdapter(
     private val onClickListener: View.OnClickListener?
 ) : RecyclerView.Adapter<ChatHistoryAdapter.ChatHistoryViewHolder>() {
 
-    data class FakeChatHistory(val id: String, val name: String, val message: String, val imgUrl: String, val lastDate: String, val isRead: Boolean)
+    data class FakeChatHistory(
+        val id: String,
+        val name: String,
+        val message: String,
+        val imgUrl: String,
+        val lastDate: String,
+        val isRead: Boolean
+    )
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatHistoryViewHolder {
-        return ChatHistoryViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_chat_history, parent, false))
+        return ChatHistoryViewHolder(
+            LayoutInflater.from(parent.context).inflate(R.layout.item_chat_history, parent, false)
+        )
     }
 
     override fun getItemCount(): Int {
@@ -51,10 +60,11 @@ class ChatHistoryAdapter(
 
     class ChatHistoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imgChatPhoto: ImageView = itemView.findViewById(R.id.imgChatPhoto) as ImageView
-        val imgIsNew: ImageView  = itemView.findViewById(R.id.imgIsNew) as ImageView
-        val textName: TextView  = itemView.findViewById(R.id.textName) as TextView
-        val textContent: TextView  = itemView.findViewById(R.id.textContent) as TextView
-        val textDate: TextView  = itemView.findViewById(R.id.textDate) as TextView
-        val btnChatHistory: ConstraintLayout = itemView.findViewById(R.id.btnChatHistory) as ConstraintLayout
+        val imgIsNew: ImageView = itemView.findViewById(R.id.imgIsNew) as ImageView
+        val textName: TextView = itemView.findViewById(R.id.textName) as TextView
+        val textContent: TextView = itemView.findViewById(R.id.textContent) as TextView
+        val textDate: TextView = itemView.findViewById(R.id.textDate) as TextView
+        val btnChatHistory: ConstraintLayout =
+            itemView.findViewById(R.id.btnChatHistory) as ConstraintLayout
     }
 }

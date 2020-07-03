@@ -25,10 +25,14 @@ class ClubFollowAdapter : PagedListAdapter<ClubFollowItem, RecyclerView.ViewHold
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return ClubFollowViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_follow, parent, false))
+        return ClubFollowViewHolder(
+            LayoutInflater.from(parent.context).inflate(R.layout.item_follow, parent, false)
+        )
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (holder) { is ClubFollowViewHolder -> holder.bind(getItem(position)!!) }
+        when (holder) {
+            is ClubFollowViewHolder -> holder.bind(getItem(position)!!)
+        }
     }
 }

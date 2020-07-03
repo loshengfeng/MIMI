@@ -13,7 +13,8 @@ import com.yulichswift.roundedview.widget.RoundedTextView
 class CommentLoadMoreView(private val isAdult: Boolean) : BaseLoadMoreView() {
 
     override fun getRootView(parent: ViewGroup): View {
-        return LayoutInflater.from(parent.context).inflate(R.layout.layout_comment_load_more, parent, false)
+        return LayoutInflater.from(parent.context)
+            .inflate(R.layout.layout_comment_load_more, parent, false)
     }
 
     override fun getLoadingView(holder: BaseViewHolder): View {
@@ -26,7 +27,8 @@ class CommentLoadMoreView(private val isAdult: Boolean) : BaseLoadMoreView() {
 
         val bgView = holder.getView<RoundedTextView>(R.id.bg_load_more_complete)
         val res = bgView.resources
-        val bgColor = res.getColor(if (isAdult) R.color.color_white_1_10 else R.color.color_black_1_05, null)
+        val bgColor =
+            res.getColor(if (isAdult) R.color.color_white_1_10 else R.color.color_black_1_05, null)
         bgView.setBtnSolidColor(bgColor, -1, res.getDimension(R.dimen.dp_4))
 
         val textView = holder.getView<TextView>(R.id.tv_load_more_complete)
@@ -55,7 +57,9 @@ class CommentLoadMoreView(private val isAdult: Boolean) : BaseLoadMoreView() {
     }
 
 
-    private fun getTextColorRes() = if (isAdult) R.color.color_white_1_50 else R.color.color_black_1_50
+    private fun getTextColorRes() =
+        if (isAdult) R.color.color_white_1_50 else R.color.color_black_1_50
 
-    private fun getBackground() = if (isAdult) R.drawable.bg_adult_comment_bottom_radius_10 else R.drawable.bg_comment_bottom_radius_10
+    private fun getBackground() =
+        if (isAdult) R.drawable.bg_adult_comment_bottom_radius_10 else R.drawable.bg_comment_bottom_radius_10
 }

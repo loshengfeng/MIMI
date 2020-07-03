@@ -11,7 +11,10 @@ import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.VideoViewHolder
 
-class HomeStatisticsAdapter(private val nestedListener: HomeAdapter.EventListener, private val isAdult: Boolean) :
+class HomeStatisticsAdapter(
+    private val nestedListener: HomeAdapter.EventListener,
+    private val isAdult: Boolean
+) :
     RecyclerView.Adapter<BaseViewHolder>() {
 
     private val videoViewHolderListener by lazy {
@@ -51,7 +54,8 @@ class HomeStatisticsAdapter(private val nestedListener: HomeAdapter.EventListene
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.nested_item_home_categories, parent, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.nested_item_home_categories, parent, false)
         return VideoViewHolder(view, videoViewHolderListener)
     }
 

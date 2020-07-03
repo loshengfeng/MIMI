@@ -237,29 +237,29 @@ interface ApiService {
     suspend fun getClubFollow(
         @Query("offset") offset: String,
         @Query("limit") limit: String
-    ) : Response<ApiBasePagingItem<List<ClubFollowItem>>>
+    ): Response<ApiBasePagingItem<List<ClubFollowItem>>>
 
     @DELETE("/v1/Members/Me/ClubFollow/{clubId}")
     suspend fun deleteClubFollow(
         @Path("clubId") id: Int
-    ) : Response<Void>
+    ): Response<Void>
 
     @GET("/v1/Members/Me/MemberFollow")
     suspend fun getMemberFollow(
         @Query("offset") offset: String,
         @Query("limit") limit: String
-    ) : Response<ApiBasePagingItem<List<MemberFollowItem>>>
+    ): Response<ApiBasePagingItem<List<MemberFollowItem>>>
 
     @DELETE("/v1/Members/Me/MemberFollow/{userId}")
     suspend fun deleteMemberFollow(
         @Path("userId") id: Int
-    ) : Response<Void>
+    ): Response<Void>
 
     @GET("/v1/Members/Me/Order")
     suspend fun getOrder(
         @Query("offset") offset: String,
         @Query("limit") limit: String
-    ) : Response<ApiBasePagingItem<List<OrderItem>>>
+    ): Response<ApiBasePagingItem<List<OrderItem>>>
 
     @GET("/v1/Members/Me/Chat")
     suspend fun getMeChat(
@@ -326,18 +326,18 @@ interface ApiService {
     @POST("/v1/Members/Post/{postId}/Favorite")
     suspend fun addFavorite(
         @Path("postId") postId: Long
-    ) : Response<Void>
+    ): Response<Void>
 
     @DELETE("/v1/Members/Post/{postId}/Favorite")
     suspend fun deleteFavorite(
         @Path("postId") postId: Long
-    ) : Response<Void>
+    ): Response<Void>
 
     @POST("/v1/Members/Post/{postId}/Like")
     suspend fun addLike(
         @Path("postId") postId: Long,
         @Body body: LikeRequest
-    ) : Response<Void>
+    ): Response<Void>
 
     // todo: not sure...
 //    @DELETE("/v1/Members/Post/{postId}/Like")
@@ -349,7 +349,7 @@ interface ApiService {
     @POST("/v1/Members/Post/{postId}/PostReport")
     suspend fun postReport(
         @Path("postId") postId: Long
-    ) : Response<Void>
+    ): Response<Void>
 
     /**********************************************************
      *

@@ -4,8 +4,8 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.view.base.BaseActivity
 import com.dabenxiang.mimi.extension.setupWithNavController
+import com.dabenxiang.mimi.view.base.BaseActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BaseActivity() {
@@ -71,11 +71,13 @@ class MainActivity : BaseActivity() {
         if (isAdult) {
             window?.statusBarColor = getColor(R.color.adult_color_status_bar)
             bottom_navigation.setBackgroundColor(getColor(R.color.adult_color_status_bar))
-            bottom_navigation.itemTextColor = resources.getColorStateList(R.color.adult_color_bottom_bar_item, null)
+            bottom_navigation.itemTextColor =
+                resources.getColorStateList(R.color.adult_color_bottom_bar_item, null)
         } else {
             window?.statusBarColor = getColor(R.color.normal_color_status_bar)
             bottom_navigation.setBackgroundColor(getColor(R.color.normal_color_status_bar))
-            bottom_navigation.itemTextColor = resources.getColorStateList(R.color.normal_color_bottom_bar_item, null)
+            bottom_navigation.itemTextColor =
+                resources.getColorStateList(R.color.normal_color_bottom_bar_item, null)
         }
     }
 }

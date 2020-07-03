@@ -11,21 +11,22 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import kotlinx.android.synthetic.main.fragment_chat_history.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 
-class ChatHistoryFragment : BaseFragment<ChatHistoryViewModel>() {
+class ChatHistoryFragment : BaseFragment() {
+
     private val viewModel: ChatHistoryViewModel by viewModels()
 
-//    private var chatHistoryAdapter by lazy { ChatHistoryAdapter() }
-
-    companion object { const val NO_DATA = 0 }
+    companion object {
+        const val NO_DATA = 0
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initSettings()
     }
 
-    override fun getLayoutId(): Int { return R.layout.fragment_chat_history }
-
-    override fun fetchViewModel(): ChatHistoryViewModel? { return  viewModel }
+    override fun getLayoutId(): Int {
+        return R.layout.fragment_chat_history
+    }
 
     override fun setupObservers() {
         viewModel.fakeChatHistory.observe(viewLifecycleOwner, Observer {
@@ -36,7 +37,7 @@ class ChatHistoryFragment : BaseFragment<ChatHistoryViewModel>() {
 
     override fun setupListeners() {
         View.OnClickListener { buttonView ->
-            when(buttonView.id) {
+            when (buttonView.id) {
                 R.id.tv_back -> navigateTo(NavigateItem.Up)
             }
         }.also {
@@ -51,12 +52,12 @@ class ChatHistoryFragment : BaseFragment<ChatHistoryViewModel>() {
     }
 
     private fun refreshUi(size: Int) {
-        rv_content.visibility = when(size) {
+        rv_content.visibility = when (size) {
             NO_DATA -> View.GONE
             else -> View.VISIBLE
         }
 
-        item_no_data.visibility = when(size) {
+        item_no_data.visibility = when (size) {
             NO_DATA -> View.VISIBLE
             else -> View.GONE
         }

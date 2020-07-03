@@ -24,45 +24,49 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
     private val accountManager: AccountManager by inject()
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        //Timber.d(chain.request().url.toString())
+
         val urlString = chain.request().url.toString()
         if (urlString.endsWith("/token")) {
             return chain.proceed(chain.request())
         }
 
-        var userMemberToken = accountManager.hasMemberToken()
-        if (userMemberToken) {
-            userMemberToken = when {
+        var hasMemberToken = accountManager.hasMemberToken()
+        if (hasMemberToken) {
+            hasMemberToken = when {
                 urlString.endsWith("/signin") -> false
                 else -> true
             }
         }
 
-        if (userMemberToken) {
+        if (hasMemberToken) {
             when (accountManager.getMemberTokenResult()) {
-                TokenResult.Expired -> doRefreshToken()
+                TokenResult.EXPIRED -> doRefreshToken()
+                else -> {
+                }
             }
         } else {
             when (accountManager.getPublicTokenResult()) {
-                TokenResult.Empty, TokenResult.Expired -> getPublicToken()
+                TokenResult.EMPTY, TokenResult.EXPIRED -> getPublicToken()
+                else -> {
+                }
             }
         }
 
         var response: Response? = null
 
         try {
-            response = chain.proceed(chain.addAuthorization(userMemberToken))
+            response = chain.proceed(chain.addAuthorization(hasMemberToken))
 
             return when (response.code) {
                 HttpURLConnection.HTTP_UNAUTHORIZED -> {
                     response.close()
-                    if (userMemberToken) {
+                    if (hasMemberToken) {
                         doRefreshToken()
                     } else {
                         getPublicToken()
                     }
 
-                    chain.proceed(chain.addAuthorization(userMemberToken))
+                    chain.proceed(chain.addAuthorization(hasMemberToken))
                 }
                 else -> response
             }
@@ -74,25 +78,21 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
                 is SocketTimeoutException,
                 is SSLHandshakeException -> {
                     domainManager.changeApiDomainIndex()
-                    chain.proceed(chain.addAuthorization(userMemberToken))
+                    chain.proceed(chain.addAuthorization(hasMemberToken))
                 }
-                else -> chain.proceed(chain.addAuthorization(userMemberToken))
+                else -> chain.proceed(chain.addAuthorization(hasMemberToken))
             }
         }
     }
 
-    private fun Interceptor.Chain.addAuthorization(userMember: Boolean): Request {
+    private fun Interceptor.Chain.addAuthorization(hasMemberToken: Boolean): Request {
         val requestBuilder = request().newBuilder()
-
-        val auth = ApiRepository.BEARER +
-                if (userMember) {
-                    pref.memberToken.accessToken
-                } else {
-                    pref.publicToken.accessToken
-                }
-
+        val accessToken = when {
+            hasMemberToken -> pref.memberToken.accessToken
+            else -> pref.publicToken.accessToken
+        }
+        val auth = StringBuilder(ApiRepository.BEARER).append(accessToken).toString()
         requestBuilder.addHeader(ApiRepository.AUTHORIZATION, auth)
-
         return requestBuilder.build()
     }
 
