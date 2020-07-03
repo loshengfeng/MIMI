@@ -7,5 +7,11 @@ data class AgentItem(
     val merchantOwnerId: Int?,
 
     @SerializedName("merchantName")
-    val merchantName: String?
+    val merchantName: String?,
+
+    @SerializedName("agentId")
+    val agentId: String?,
+
+    @SerializedName("avatarAttachmentId")
+    val avatarAttachmentId: String?
 )

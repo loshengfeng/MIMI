@@ -83,23 +83,23 @@ interface ApiService {
      *                  Chats
      *
      ***********************************************************/
-    @POST("/v1/Chats")
+    @POST("/v1/Members/Me/Chats")
     suspend fun postChat(
         @Body request: ChatRequest
     ): Response<Void>
 
-    @GET("/v1/Chats")
+    @GET("/v1/Members/Me/Chats")
     suspend fun getChat(
         @Query("offset") offset: String,
         @Query("limit") limit: String
     ): Response<ApiBasePagingItem<List<String>>>
 
-    @POST("/v1/Chats/Message")
+    @POST("/v1/Members/Me/Chats/Message")
     suspend fun postMessage(
         @Body request: MsgRequest
     ): Response<ApiBaseItem<List<String>>>
 
-    @GET("/v1/Chats/Message")
+    @GET("/v1/Members/Me/Chats/Message")
     suspend fun getMessage(
         @Query("chatId") chatId: Int,
         @Query("lastReadTime") lastReadTime: String,

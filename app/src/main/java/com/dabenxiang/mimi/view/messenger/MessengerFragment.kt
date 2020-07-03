@@ -14,6 +14,7 @@ class MessengerFragment : BaseFragment<MessengerViewModel>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        viewModel.init()
         viewModel.connect()
     }
 
@@ -21,7 +22,8 @@ class MessengerFragment : BaseFragment<MessengerViewModel>() {
         super.onViewCreated(view, savedInstanceState)
 
         title.setOnClickListener {
-            viewModel.publishMsg()
+            //TODO: test code
+            viewModel.publishMsg(MessengerViewModel.PREFIX_CHAT + "3777788128132071424", "{\"ext\":\"\",\"content\":\"Hello, ni hao ma?\",\"sendTime\":\"2020-07-02T08:35:18Z\",\"type\":0}")
         }
     }
 
