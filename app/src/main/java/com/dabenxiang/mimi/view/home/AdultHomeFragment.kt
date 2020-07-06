@@ -8,7 +8,10 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setBtnSolidColor
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
+import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
+import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
@@ -19,16 +22,126 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import kotlinx.android.synthetic.main.fragment_home.*
+import timber.log.Timber
 
 class AdultHomeFragment : BaseFragment() {
 
-    companion object {
-        var lastPosition = 0
-    }
+    private var lastPosition = 0
 
     private val viewModel: HomeViewModel by viewModels()
 
+    private val homeCarouselViewHolderMap = hashMapOf<Int, HomeCarouselViewHolder>()
+    private val carouselMap = hashMapOf<Int, HomeTemplate.Carousel>()
+
+    private val homeStatisticsViewHolderMap = hashMapOf<Int, HomeStatisticsViewHolder>()
+    private val statisticsMap = hashMapOf<Int, HomeTemplate.Statistics>()
+
     override fun getLayoutId() = R.layout.fragment_home
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        requireActivity().onBackPressedDispatcher.addCallback { backToDesktop() }
+        setupAdultUI()
+        recyclerview_tab.adapter = tabAdapter
+        recyclerview_home.adapter = adapter
+        recyclerview_videos.adapter = videoListAdapter
+        refresh_home.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
+
+        mainViewModel?.loadHomeCategories()
+    }
+
+    override fun setupObservers() {
+        mainViewModel?.categoriesData?.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Loading -> refresh_home.isRefreshing = true
+                is Loaded -> refresh_home.isRefreshing = false
+                is Success -> {
+                    val list = mutableListOf<String>()
+                    list.add(getString(R.string.home))
+                    mainViewModel?.setupAdultCategoriesItem(it.result.content?.getAdult())
+                    mainViewModel?.adult?.categories?.also { level2 ->
+                        for (i in 0 until level2.count()) {
+                            val detail = level2[i]
+                            list.add(detail.name)
+                        }
+                        tabAdapter.submitList(list, lastPosition)
+                        loadFirstTab(mainViewModel?.adult)
+                    }
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
+
+        viewModel.tabLayoutPosition.observe(viewLifecycleOwner, Observer { position ->
+            lastPosition = position
+            tabAdapter.setLastSelectedIndex(lastPosition)
+            when (position) {
+                0 -> {
+                    btn_filter.visibility = View.GONE
+                    loadFirstTab(mainViewModel?.adult)
+                }
+                1 -> {
+                    btn_filter.visibility = View.VISIBLE
+                    loadCategories(null)
+                }
+                else -> {
+                    btn_filter.visibility = View.VISIBLE
+                    val keyword = mainViewModel?.adult?.categories?.get(position)?.name
+                    loadCategories(keyword)
+                }
+            }
+        })
+
+        viewModel.videoList.observe(viewLifecycleOwner, Observer {
+            videoListAdapter.submitList(it)
+        })
+
+        viewModel.carouselResult.observe(viewLifecycleOwner, Observer {
+            val position = it.first
+            when (val response = it.second) {
+                is Success -> {
+                    val viewHolder = homeCarouselViewHolderMap[position]
+                    val carousel = carouselMap[position]
+                    val carouselHolderItems =
+                        response.result.content?.statisticsItemToCarouselHolderItem(carousel!!.isAdult)
+                    viewHolder?.submitList(carouselHolderItems)
+                }
+                is Error -> Timber.e(response.throwable)
+            }
+        })
+
+        viewModel.videosResult.observe(viewLifecycleOwner, Observer {
+            val position = it.first
+            when (val response = it.second) {
+                is Success -> {
+                    val viewHolder = homeStatisticsViewHolderMap[position]
+                    val statistics = statisticsMap[position]
+                    val videoHolderItems =
+                        response.result.content?.statisticsItemToVideoItem(statistics!!.isAdult)
+                    viewHolder?.submitList(videoHolderItems)
+                }
+                is Error -> Timber.e(response.throwable)
+            }
+        })
+    }
+
+    override fun setupListeners() {
+        refresh_home.setOnRefreshListener {
+            refresh_home.isRefreshing = false
+            mainViewModel?.loadHomeCategories()
+        }
+
+        iv_bg_search.setOnClickListener {
+            val bundle = SearchVideoFragment.createBundle("")
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_homeFragment_to_searchVideoFragment,
+                    bundle
+                )
+            )
+        }
+    }
 
     private val tabAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
@@ -49,7 +162,6 @@ class AdultHomeFragment : BaseFragment() {
     private val adapterListener = object : HomeAdapter.EventListener {
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
             val bundle = CategoriesFragment.createBundle(item.title ?: "", item.categories)
-
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_homeFragment_to_categoriesFragment,
@@ -68,42 +180,19 @@ class AdultHomeFragment : BaseFragment() {
             vh: HomeStatisticsViewHolder,
             src: HomeTemplate.Statistics
         ) {
-            viewModel.loadNestedStatisticsList(vh, src)
+            homeStatisticsViewHolderMap[vh.adapterPosition] = vh
+            statisticsMap[vh.adapterPosition] = src
+            viewModel.loadNestedStatisticsList(vh.adapterPosition, src)
         }
 
         override fun onLoadCarouselViewHolder(
             vh: HomeCarouselViewHolder,
             src: HomeTemplate.Carousel
         ) {
-            viewModel.loadNestedStatisticsListForCarousel(vh, src)
+            homeCarouselViewHolderMap[vh.adapterPosition] = vh
+            carouselMap[vh.adapterPosition] = src
+            viewModel.loadNestedStatisticsListForCarousel(vh.adapterPosition, src)
         }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        requireActivity().onBackPressedDispatcher.addCallback {
-            backToDesktop()
-        }
-
-        setupAdultUI()
-
-        recyclerview_tab.adapter = tabAdapter
-
-        recyclerview_home.adapter = adapter
-
-        recyclerview_videos.adapter = videoListAdapter
-
-        refresh_home.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
-        refresh_home.setOnRefreshListener {
-            refresh_home.isRefreshing = false
-
-            mainViewModel?.loadHomeCategories()
-        }
-
-        viewModel.videoList.observe(viewLifecycleOwner, Observer {
-            videoListAdapter.submitList(it)
-        })
     }
 
     private fun setupAdultUI() {
@@ -154,73 +243,12 @@ class AdultHomeFragment : BaseFragment() {
                 }
             }
         }
-
         adapter.submitList(templateList)
     }
 
     private fun loadCategories(keyword: String?) {
         recyclerview_videos.visibility = View.VISIBLE
         refresh_home.visibility = View.GONE
-
         viewModel.setupVideoList(keyword, true)
-    }
-
-    override fun setupObservers() {
-        mainViewModel?.also { mainViewModel ->
-            mainViewModel.categoriesData.observe(viewLifecycleOwner, Observer { item ->
-
-                val list = mutableListOf<String>()
-                list.add("首页")
-
-                val adult = item.getAdult()
-                adult?.categories?.also { level2 ->
-                    for (i in 0 until level2.count()) {
-                        val detail = level2[i]
-                        list.add(detail.name)
-                    }
-
-                    tabAdapter.submitList(list, lastPosition)
-
-                    loadFirstTab(adult)
-                }
-            })
-        }
-
-        viewModel.tabLayoutPosition.observe(viewLifecycleOwner, Observer { position ->
-            lastPosition = position
-
-            tabAdapter.setLastSelectedIndex(lastPosition)
-
-            when (position) {
-                0 -> {
-                    btn_filter.visibility = View.GONE
-                    loadFirstTab(mainViewModel?.categoriesData?.value?.getAdult())
-                }
-                1 -> {
-                    btn_filter.visibility = View.VISIBLE
-                    loadCategories(null)
-                }
-                else -> {
-                    btn_filter.visibility = View.VISIBLE
-                    loadCategories(
-                        mainViewModel?.categoriesData?.value?.getAdult()?.categories?.get(
-                            position
-                        )?.name
-                    )
-                }
-            }
-        })
-    }
-
-    override fun setupListeners() {
-        iv_bg_search.setOnClickListener {
-            val bundle = SearchVideoFragment.createBundle("")
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_homeFragment_to_searchVideoFragment,
-                    bundle
-                )
-            )
-        }
     }
 }

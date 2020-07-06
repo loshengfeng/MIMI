@@ -16,6 +16,9 @@
     <string name="nav_favorite">收藏</string>
     <string name="nav_personal">我的</string>
 
+    <!-- Categories -->
+    <string name="home">首页</string>
+
     <!-- Login -->
     <string name="friendly_name_format_error_1">请填写中文、英文或数字或特殊符号</string>
     <string name="friendly_name_format_error_2">已超过字数上限20字</string>

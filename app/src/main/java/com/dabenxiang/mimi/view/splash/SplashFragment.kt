@@ -94,12 +94,10 @@ class SplashFragment : BaseFragment() {
 
     override fun initSettings() {
         super.initSettings()
-
         viewModel.autoLoginResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Empty -> {
                     lifecycleScope.launch(Dispatchers.IO) {
-                        mainViewModel?.loadHomeCategories()
                         delay(1000)
                         withContext(Dispatchers.Main) {
                             navigateTo(NavigateItem.Destination(R.id.action_splashFragment_to_homeFragment))
@@ -109,7 +107,6 @@ class SplashFragment : BaseFragment() {
                 is Error -> Timber.e(it.throwable)
             }
         })
-
         viewModel.autoLogin()
     }
 }

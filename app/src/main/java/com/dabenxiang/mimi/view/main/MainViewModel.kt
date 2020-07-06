@@ -4,21 +4,38 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.ApiBaseItem
+import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.RootCategoriesItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import timber.log.Timber
 
 class MainViewModel : BaseViewModel() {
 
     private val _adultMode = MutableLiveData(false)
     val adultMode: LiveData<Boolean> = _adultMode
 
-    private val _categoriesData = MutableLiveData<RootCategoriesItem>()
-    val categoriesData: LiveData<RootCategoriesItem> = _categoriesData
+    private val _categoriesData = MutableLiveData<ApiResult<ApiBaseItem<RootCategoriesItem>>>()
+    val categoriesData: LiveData<ApiResult<ApiBaseItem<RootCategoriesItem>>> = _categoriesData
+
+    private var _normal: CategoriesItem? = null
+    val normal
+        get() = _normal
+
+    private var _adult: CategoriesItem? = null
+    val adult
+        get() = _adult
+
+    fun setupNormalCategoriesItem(item: CategoriesItem?) {
+        _normal = item
+    }
+
+    fun setupAdultCategoriesItem(item: CategoriesItem?) {
+        _adult = item
+    }
 
     fun setAdultMode(isAdult: Boolean) {
         if (_adultMode.value != isAdult) {
@@ -37,16 +54,7 @@ class MainViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { resp ->
-                    when (resp) {
-                        is ApiResult.Success -> {
-                            _categoriesData.value = resp.result.content
-                        }
-                        is ApiResult.Error -> Timber.e(resp.throwable)
-                        is ApiResult.Loading -> Timber.d("Loading")
-                        is ApiResult.Loaded -> Timber.d("Loaded")
-                    }
-                }
+                .collect { _categoriesData.value = it }
         }
     }
 }

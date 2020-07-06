@@ -8,15 +8,14 @@ import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.ApiBasePagingItem
+import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
-import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
-import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import timber.log.Timber
 
 class HomeViewModel : BaseViewModel() {
 
@@ -25,8 +24,21 @@ class HomeViewModel : BaseViewModel() {
         const val STATISTICS_LIMIT = 20
     }
 
-    private val _tabLayoutPosition = MutableLiveData<Int>()
+    private var _videoList = MutableLiveData<PagedList<BaseVideoItem>>()
+    val videoList: LiveData<PagedList<BaseVideoItem>> = _videoList
+
+    private var _tabLayoutPosition = MutableLiveData<Int>()
     val tabLayoutPosition: LiveData<Int> = _tabLayoutPosition
+
+    private var _carouselResult =
+        MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<StatisticsItem>>>>>()
+    val carouselResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<StatisticsItem>>>>> =
+        _carouselResult
+
+    private var _videosResult =
+        MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<StatisticsItem>>>>>()
+    val videosResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<StatisticsItem>>>>> =
+        _videosResult
 
     fun setTopTabPosition(position: Int) {
         if (position != tabLayoutPosition.value) {
@@ -34,77 +46,44 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-    fun loadNestedStatisticsListForCarousel(
-        vh: HomeCarouselViewHolder,
-        src: HomeTemplate.Carousel
-    ) {
+    fun loadNestedStatisticsListForCarousel(position: Int, src: HomeTemplate.Carousel) {
         viewModelScope.launch {
             flow {
-                val resp =
-                    domainManager.getApiRepository().statisticsHomeVideos(
-                        isAdult = src.isAdult,
-                        offset = 0,
-                        limit = CAROUSEL_LIMIT
-                    )
+                val resp = domainManager.getApiRepository().statisticsHomeVideos(
+                    isAdult = src.isAdult,
+                    offset = 0,
+                    limit = CAROUSEL_LIMIT
+                )
                 if (!resp.isSuccessful) throw HttpException(resp)
-
                 emit(ApiResult.success(resp.body()))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { resp ->
-                    when (resp) {
-                        is ApiResult.Success -> {
-                            //Timber.d(resp.result.toString())
-                            vh.submitList(
-                                resp.result.content?.statisticsItemToCarouselHolderItem(
-                                    src.isAdult
-                                )
-                            )
-                        }
-                        is ApiResult.Error -> Timber.e(resp.throwable)
-                    }
-                }
+                .collect { _carouselResult.value = Pair(position, it) }
         }
     }
 
-    fun loadNestedStatisticsList(vh: HomeStatisticsViewHolder, src: HomeTemplate.Statistics) {
+    fun loadNestedStatisticsList(position: Int, src: HomeTemplate.Statistics) {
         viewModelScope.launch {
-            vh.activeTask {
-                flow {
-                    //val resp = domainManager.getApiRepository().searchHomeVideos(src.categories, null, null, null, src.isAdult, "0", CATEGORIES_LIMIT)
-                    val resp = domainManager.getApiRepository()
-                        .statisticsHomeVideos(
-                            category = src.categories,
-                            isAdult = src.isAdult,
-                            offset = 0,
-                            limit = STATISTICS_LIMIT
-                        )
-                    if (!resp.isSuccessful) throw HttpException(resp)
-
-                    emit(ApiResult.success(resp.body()))
-                }
-                    .flowOn(Dispatchers.IO)
-                    .onStart { emit(ApiResult.loading()) }
-                    .onCompletion { emit(ApiResult.loaded()) }
-                    .catch { e -> emit(ApiResult.error(e)) }
-                    .collect { resp ->
-                        when (resp) {
-                            is ApiResult.Success -> {
-                                //Timber.d(resp.result.toString())
-                                vh.submitList(resp.result.content?.statisticsItemToVideoItem(src.isAdult))
-                            }
-                            is ApiResult.Error -> Timber.e(resp.throwable)
-                        }
-                    }
+            flow {
+                val resp = domainManager.getApiRepository().statisticsHomeVideos(
+                    category = src.categories,
+                    isAdult = src.isAdult,
+                    offset = 0,
+                    limit = STATISTICS_LIMIT
+                )
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(resp.body()))
             }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _videosResult.value = Pair(position, it) }
         }
     }
-
-    private val _videoList = MutableLiveData<PagedList<BaseVideoItem>>()
-    val videoList: LiveData<PagedList<BaseVideoItem>> = _videoList
 
     fun setupVideoList(category: String?, isAdult: Boolean) {
         viewModelScope.launch {
