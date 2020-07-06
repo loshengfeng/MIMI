@@ -71,11 +71,7 @@ class FilterDialogFragment : BaseDialogFragment() {
 
     override fun setupListeners() {
         super.setupListeners()
-        View.OnClickListener {
-            dismiss()
-        }.also {
-            layout_root.setOnClickListener(it)
-            btn_close.setOnClickListener(it)
-        }
+        View.OnClickListener { dismiss() }
+            .also { layout_root.setOnClickListener(it) }
     }
 }

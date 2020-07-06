@@ -45,7 +45,7 @@
             android:background="@drawable/btn_red_1_radius_40"
             android:stateListAnimator="@null"
             android:text="@string/issue_report"
-            android:textColor="@color/color_white_1"
+            android:textColor="@color/color_black_1"
             android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

@@ -138,8 +138,7 @@
                     android:textColor="@color/color_white_1"
                     android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="@id/tv_email"
-                    app:layout_constraintTop_toBottomOf="@id/tv_email"
-                    tools:visibility="gone" />
+                    app:layout_constraintTop_toBottomOf="@id/tv_email" />
 
                 <View
                     android:id="@+id/line_email"
