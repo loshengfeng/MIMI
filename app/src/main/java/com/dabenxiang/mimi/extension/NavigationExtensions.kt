@@ -142,7 +142,7 @@ fun BottomNavigationView.setupWithNavController(
     }
 
     // Optional: on item reselected, pop back stack to the destination of the graph
-    setupItemReselected(graphIdToTagMap, fragmentManager)
+//    setupItemReselected(graphIdToTagMap, fragmentManager)
 
     // Handle deep link
     setupDeepLinks(navGraphIds, fragmentManager, containerId, intent)
