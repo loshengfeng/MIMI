@@ -98,11 +98,10 @@ class AdultHomeFragment : BaseFragment() {
         })
 
         viewModel.carouselResult.observe(viewLifecycleOwner, Observer {
-            val position = it.first
             when (val response = it.second) {
                 is Success -> {
-                    val viewHolder = homeCarouselViewHolderMap[position]
-                    val carousel = carouselMap[position]
+                    val viewHolder = homeCarouselViewHolderMap[it.first]
+                    val carousel = carouselMap[it.first]
                     val carouselHolderItems =
                         response.result.content?.statisticsItemToCarouselHolderItem(carousel!!.isAdult)
                     viewHolder?.submitList(carouselHolderItems)
@@ -112,11 +111,10 @@ class AdultHomeFragment : BaseFragment() {
         })
 
         viewModel.videosResult.observe(viewLifecycleOwner, Observer {
-            val position = it.first
             when (val response = it.second) {
                 is Success -> {
-                    val viewHolder = homeStatisticsViewHolderMap[position]
-                    val statistics = statisticsMap[position]
+                    val viewHolder = homeStatisticsViewHolderMap[it.first]
+                    val statistics = statisticsMap[it.first]
                     val videoHolderItems =
                         response.result.content?.statisticsItemToVideoItem(statistics!!.isAdult)
                     viewHolder?.submitList(videoHolderItems)
