@@ -65,12 +65,12 @@ class SettingFragment : BaseFragment() {
                     tv_email.text = viewModel.profileData?.email
                     tv_account.text = viewModel.profileData?.username
                     var img: Drawable? = null
-                    when (viewModel.profileData?.emailConfirmed ?: false) {
-                        true -> {
-                            img = requireContext().resources.getDrawable(R.drawable.ico_checked)
-                            btn_resend.visibility = View.GONE
-                        }
-                        else -> btn_resend.visibility = View.VISIBLE
+
+                    if(viewModel.isEmailConfirmed()) {
+                        img = requireContext().resources.getDrawable(R.drawable.ico_checked)
+                        btn_resend.visibility = View.GONE
+                    } else {
+                        btn_resend.visibility = View.VISIBLE
                     }
 
                     tv_email.setCompoundDrawablesWithIntrinsicBounds(null, null, img, null)
