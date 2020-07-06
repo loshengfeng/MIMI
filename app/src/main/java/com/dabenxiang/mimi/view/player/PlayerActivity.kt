@@ -620,17 +620,7 @@ class PlayerActivity : BaseActivity() {
         btn_full_screen.setOnClickListener {
             viewModel.lockFullScreen = !viewModel.lockFullScreen
 
-            requestedOrientation =
-                if (viewModel.lockFullScreen) {
-                    when (viewModel.currentOrientation) {
-                        ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE, ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE -> viewModel.currentOrientation
-                        else -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                    }
-                } else {
-                    ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                }
-
-            adjustPlayerSize()
+            switchScreenOrientation()
         }
 
         orientationDetector =
@@ -723,6 +713,15 @@ class PlayerActivity : BaseActivity() {
             player_view.onPause()
 
             releasePlayer()
+        }
+    }
+
+    override fun onBackPressed() {
+        if (requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+            super.onBackPressed()
+        } else {
+            viewModel.lockFullScreen = !viewModel.lockFullScreen
+            switchScreenOrientation()
         }
     }
 
@@ -1215,5 +1214,22 @@ class PlayerActivity : BaseActivity() {
             params.height = min(screenSize.first, screenSize.second) - GeneralUtils.getStatusBarHeight(baseContext)
             player_view.layoutParams = params
         }
+    }
+
+    /**
+     * 切換螢幕方向
+     */
+    private fun switchScreenOrientation(){
+        requestedOrientation =
+                if (viewModel.lockFullScreen) {
+                    when (viewModel.currentOrientation) {
+                        ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE, ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE -> viewModel.currentOrientation
+                        else -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    }
+                } else {
+                    ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                }
+
+        adjustPlayerSize()
     }
 }
