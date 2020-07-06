@@ -87,6 +87,11 @@ class AdultHomeFragment : BaseFragment() {
                     btn_filter.visibility = View.VISIBLE
                     loadCategories(null)
                 }
+                6 -> {
+                    btn_filter.visibility = View.VISIBLE
+                    recyclerview_videos.visibility = View.VISIBLE
+                    refresh_home.visibility = View.GONE
+                }
                 else -> {
                     btn_filter.visibility = View.VISIBLE
                     val keyword = mainViewModel?.adult?.categories?.get(position)?.name
