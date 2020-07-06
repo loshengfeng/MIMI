@@ -12,8 +12,8 @@ import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.view.home.GridBannerHolder
-import com.dabenxiang.mimi.view.home.VideoViewHolder
+import com.dabenxiang.mimi.view.home.viewholder.GridBannerHolder
+import com.dabenxiang.mimi.view.home.viewholder.VideoViewHolder
 
 class HomeVideoListAdapter(
     private val nestedListener: HomeAdapter.EventListener,
@@ -60,16 +60,22 @@ class HomeVideoListAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        return return when (viewType) {
+        return when (viewType) {
             VIDEO -> {
                 val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.nested_item_video, parent, false)
-                VideoViewHolder(view, videoViewHolderListener)
+                VideoViewHolder(
+                    view,
+                    videoViewHolderListener
+                )
             }
             else -> {
                 val view =
                     LayoutInflater.from(parent.context).inflate(R.layout.item_banner, parent, false)
-                GridBannerHolder(view, videoViewHolderListener)
+                GridBannerHolder(
+                    view,
+                    videoViewHolderListener
+                )
             }
         }
     }
@@ -89,7 +95,6 @@ class HomeVideoListAdapter(
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
-
         (recyclerView.layoutManager as GridLayoutManager).spanSizeLookup =
             object : GridLayoutManager.SpanSizeLookup() {
                 override fun getSpanSize(position: Int): Int {

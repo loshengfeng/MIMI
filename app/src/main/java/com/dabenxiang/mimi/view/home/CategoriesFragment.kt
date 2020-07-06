@@ -16,6 +16,8 @@ import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.home.viewholder.HomeCarouselViewHolder
+import com.dabenxiang.mimi.view.home.viewholder.HomeStatisticsViewHolder
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import kotlinx.android.synthetic.main.fragment_categories.*
 import timber.log.Timber

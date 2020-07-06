@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.home
+package com.dabenxiang.mimi.view.home.viewholder
 
 import android.view.View
 import com.bumptech.glide.Glide

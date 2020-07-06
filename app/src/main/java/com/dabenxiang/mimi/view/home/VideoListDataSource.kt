@@ -66,13 +66,11 @@ class VideoListDataSource(
                         limit = PER_LIMIT
                     )
                     if (!result.isSuccessful) throw HttpException(result)
-
                     val item = result.body()
                     val videos = item?.content?.videos
                     if (videos != null) {
                         returnList.addAll(videos.searchItemToVideoItem(isAdult))
                     }
-
                     val nextPageKey = when {
                         hasNextPage(
                             item?.paging?.count ?: 0,
@@ -86,11 +84,8 @@ class VideoListDataSource(
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> pagingCallback.onThrowable(e) }
-                .onCompletion {
-                    pagingCallback.onLoaded()
-                }.collect { response ->
-                    callback.onResult(response.list, null, response.nextKey)
-                }
+                .onCompletion { pagingCallback.onLoaded() }
+                .collect { callback.onResult(it.list, null, it.nextKey) }
         }
     }
 
@@ -99,7 +94,6 @@ class VideoListDataSource(
         viewModelScope.launch {
             flow {
                 val returnList = mutableListOf<BaseVideoItem>()
-
                 if (category != null) {
                     val result = apiRepository.searchWithCategory(
                         category,
@@ -108,13 +102,11 @@ class VideoListDataSource(
                         PER_LIMIT
                     )
                     if (!result.isSuccessful) throw HttpException(result)
-
                     val item = result.body()
                     val videos = item?.content
                     if (videos != null) {
                         returnList.addAll(videos.simpleVideoItemToVideoItem(isAdult))
                     }
-
                     val nextPageKey = when {
                         hasNextPage(
                             item?.paging?.count ?: 0,
@@ -131,13 +123,11 @@ class VideoListDataSource(
                         limit = PER_LIMIT
                     )
                     if (!result.isSuccessful) throw HttpException(result)
-
                     val item = result.body()
                     val videos = item?.content?.videos
                     if (videos != null) {
                         returnList.addAll(videos.searchItemToVideoItem(isAdult))
                     }
-
                     val nextPageKey = when {
                         hasNextPage(
                             item?.paging?.count ?: 0,
@@ -150,13 +140,9 @@ class VideoListDataSource(
                 }
             }
                 .flowOn(Dispatchers.IO)
-                .catch { e ->
-                    pagingCallback.onThrowable(e)
-                }.onCompletion {
-                    pagingCallback.onLoaded()
-                }.collect { response ->
-                    callback.onResult(response.list, response.nextKey)
-                }
+                .catch { e -> pagingCallback.onThrowable(e) }
+                .onCompletion { pagingCallback.onLoaded() }
+                .collect { callback.onResult(it.list, it.nextKey) }
         }
     }
 

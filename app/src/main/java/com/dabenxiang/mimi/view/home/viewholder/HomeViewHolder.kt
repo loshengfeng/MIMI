@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.home
+package com.dabenxiang.mimi.view.home.viewholder
 
 import android.view.View
 import android.widget.ImageView
@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.holder.CarouselHolderItem
 import com.dabenxiang.mimi.view.adapter.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.view.home.HomeTemplate
 import com.dabenxiang.mimi.widget.view.ViewPagerIndicator
 import com.to.aboomy.pager2banner.Banner
 import kotlinx.android.synthetic.main.item_banner.view.*
@@ -91,11 +92,9 @@ class HomeBannerViewHolder(itemView: View, listener: HomeAdapter.EventListener, 
     private val ivPoster: ImageView = itemView.iv_poster
 
     override fun updated() {
-        data?.also {
-            Glide.with(itemView.context)
-                .load(data?.imgUrl)
-                .into(ivPoster)
-        }
+        Glide.with(itemView.context)
+            .load(data?.imgUrl)
+            .into(ivPoster)
     }
 }
 
@@ -117,9 +116,6 @@ class HomeCarouselViewHolder(
     init {
         banner.adapter = nestedAdapter
         banner.setPageMargin(dp8, dp8)
-
-        //banner.setPageTransformer(ScaleInTransformer())
-        //nestedAdapter.submitList(it.carouselList)
     }
 
     override fun updated() {
@@ -180,9 +176,7 @@ class HomeStatisticsViewHolder(
 
     override fun updated() {
         data?.also {
-//            if (nestedAdapter.itemCount == 0) {
-                nestedListener.onLoadStatisticsViewHolder(this, it)
-//            }
+            nestedListener.onLoadStatisticsViewHolder(this, it)
         }
     }
 
@@ -191,12 +185,12 @@ class HomeStatisticsViewHolder(
     }
 }
 
-class HomeLeaderboardViewHolder(
+class HomeLeaderBoardViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
     isAdult: Boolean
 ) :
-    HomeViewHolder<HomeTemplate.Leaderboard>(itemView, listener, isAdult) {
+    HomeViewHolder<HomeTemplate.LeaderBoard>(itemView, listener, isAdult) {
 
     private val recyclerView: RecyclerView = itemView.recyclerview_leaderboard
     private val nestedAdapter by lazy {

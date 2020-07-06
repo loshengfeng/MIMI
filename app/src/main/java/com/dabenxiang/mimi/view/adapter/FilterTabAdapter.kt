@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
-import com.dabenxiang.mimi.view.home.FilterTabHolder
+import com.dabenxiang.mimi.view.home.viewholder.FilterTabHolder
 
 class FilterTabAdapter(
     private val listener: FilterTabAdapterListener,
@@ -20,7 +20,6 @@ class FilterTabAdapter(
 
     private var attachedRecyclerView: RecyclerView? = null
 
-
     private val holderListener = object : BaseIndexViewHolder.IndexViewHolderListener {
         override fun onClickItemIndex(view: View, position: Int) {
             attachedRecyclerView?.also {
@@ -31,7 +30,11 @@ class FilterTabAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilterTabHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_filter, parent, false)
-        return FilterTabHolder(view, holderListener, isAdult)
+        return FilterTabHolder(
+            view,
+            holderListener,
+            isAdult
+        )
     }
 
     override fun onBindViewHolder(holder: FilterTabHolder, position: Int) {
@@ -41,13 +44,11 @@ class FilterTabAdapter(
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
-
         attachedRecyclerView = recyclerView
     }
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         super.onDetachedFromRecyclerView(recyclerView)
-
         attachedRecyclerView = null
     }
 }

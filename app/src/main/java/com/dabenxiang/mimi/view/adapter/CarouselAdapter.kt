@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.holder.CarouselHolderItem
-import com.dabenxiang.mimi.view.home.CarouselViewHolder
+import com.dabenxiang.mimi.view.home.viewholder.CarouselViewHolder
 
 class CarouselAdapter(
     private val nestedListener: HomeAdapter.EventListener,

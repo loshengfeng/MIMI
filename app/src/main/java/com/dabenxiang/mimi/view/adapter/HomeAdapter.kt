@@ -11,6 +11,7 @@ import com.dabenxiang.mimi.model.enums.HomeItemType
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.*
+import com.dabenxiang.mimi.view.home.viewholder.*
 
 class HomeAdapter(
     val context: Context,
@@ -85,7 +86,7 @@ class HomeAdapter(
                 )
             }
             HomeItemType.LEADER_BOARD -> {
-                HomeLeaderboardViewHolder(
+                HomeLeaderBoardViewHolder(
                     layoutInflater.inflate(
                         R.layout.item_home_leaderboard,
                         parent,
@@ -132,7 +133,7 @@ class HomeAdapter(
                 holder.bind(template)
             }
             HomeItemType.LEADER_BOARD -> {
-                holder as HomeLeaderboardViewHolder
+                holder as HomeLeaderBoardViewHolder
                 holder.bind(template)
             }
             HomeItemType.RECOMMEND -> {

@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.home
+package com.dabenxiang.mimi.view.home.viewholder
 
 import android.view.View
 import com.bumptech.glide.Glide
@@ -32,29 +32,26 @@ class VideoViewHolder(itemView: View, onClickListener: IndexViewHolderListener) 
                 .load(R.drawable.bg_black_1)
                 .into(ivPoster)
         } else {
-            tvResolution.visibility =
-                if (model.resolution.isNullOrEmpty()) {
-                    View.INVISIBLE
-                } else {
-                    tvResolution.text = model.resolution
-                    View.VISIBLE
-                }
+            tvResolution.visibility = if (model.resolution.isNullOrEmpty()) {
+                View.INVISIBLE
+            } else {
+                tvResolution.text = model.resolution
+                View.VISIBLE
+            }
 
-            tvInfo.visibility =
-                if (model.info.isNullOrEmpty()) {
-                    View.INVISIBLE
-                } else {
-                    tvInfo.text = model.info
-                    View.VISIBLE
-                }
+            tvInfo.visibility = if (model.info.isNullOrEmpty()) {
+                View.INVISIBLE
+            } else {
+                tvInfo.text = model.info
+                View.VISIBLE
+            }
 
-            tvTitle.visibility =
-                if (model.title.isNullOrEmpty()) {
-                    View.INVISIBLE
-                } else {
-                    tvTitle.text = model.title
-                    View.VISIBLE
-                }
+            tvTitle.visibility = if (model.title.isNullOrEmpty()) {
+                View.INVISIBLE
+            } else {
+                tvTitle.text = model.title
+                View.VISIBLE
+            }
 
             if (model.isAdult) {
                 card.setCardBackgroundColor(

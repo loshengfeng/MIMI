@@ -9,7 +9,7 @@ import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.view.home.VideoViewHolder
+import com.dabenxiang.mimi.view.home.viewholder.VideoViewHolder
 
 class HomeStatisticsAdapter(
     private val nestedListener: HomeAdapter.EventListener,
@@ -56,7 +56,10 @@ class HomeStatisticsAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.nested_item_home_categories, parent, false)
-        return VideoViewHolder(view, videoViewHolderListener)
+        return VideoViewHolder(
+            view,
+            videoViewHolderListener
+        )
     }
 
     override fun getItemCount(): Int {

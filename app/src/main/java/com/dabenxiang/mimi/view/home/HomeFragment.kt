@@ -18,6 +18,8 @@ import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.home.viewholder.HomeCarouselViewHolder
+import com.dabenxiang.mimi.view.home.viewholder.HomeStatisticsViewHolder
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import kotlinx.android.synthetic.main.fragment_home.*
