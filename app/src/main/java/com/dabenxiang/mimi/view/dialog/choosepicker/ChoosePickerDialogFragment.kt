@@ -35,7 +35,6 @@ class ChoosePickerDialogFragment : BaseDialogFragment() {
             }
         }.also {
             layout_root.setOnClickListener(it)
-            btn_close.setOnClickListener(it)
             btn_camera.setOnClickListener(it)
             btn_album.setOnClickListener(it)
         }

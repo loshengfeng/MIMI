@@ -17,7 +17,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.FilterDialogFragment
@@ -25,6 +25,7 @@ import com.dabenxiang.mimi.view.dialog.choosepicker.ChoosePickerDialogFragment
 import com.dabenxiang.mimi.view.dialog.choosepicker.OnChoosePickerDialogListener
 import com.dabenxiang.mimi.view.listener.OnDialogListener
 import com.dabenxiang.mimi.view.updateprofile.UpdateProfileFragment
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_setting.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 
@@ -57,64 +58,70 @@ class SettingFragment : BaseFragment() {
     override fun setupObservers() {
         viewModel.profileItem.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Loaded -> progressHUD?.dismiss()
-                is ApiResult.Success -> {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> {
                     tv_name.text = viewModel.profileData?.friendlyName
                     tv_email.text = viewModel.profileData?.email
                     tv_account.text = viewModel.profileData?.username
                     var img: Drawable? = null
-                    when (viewModel.profileData?.emailConfirmed ?: false) {
-                        true -> {
-                            img = context!!.resources.getDrawable(R.drawable.ico_checked)
-                            btn_resend.visibility = View.GONE
-                        }
-                        else -> btn_resend.visibility = View.VISIBLE
+
+                    if(viewModel.isEmailConfirmed()) {
+                        img = requireContext().resources.getDrawable(R.drawable.ico_checked)
+                        btn_resend.visibility = View.GONE
+                    } else {
+                        btn_resend.visibility = View.VISIBLE
                     }
 
                     tv_email.setCompoundDrawablesWithIntrinsicBounds(null, null, img, null)
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.resendResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Empty -> {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Empty -> {
+                    GeneralUtils.showToast(
+                        requireContext(),
+                        getString(R.string.resend_mail_success)
+                    )
                 }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.updateResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Empty -> {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Empty -> {
+                    GeneralUtils.showToast(
+                        requireContext(),
+                        getString(R.string.gender_success)
+                    )
                 }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.postResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> viewModel.putAvatar(it.result)
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> viewModel.putAvatar(it.result)
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.putResult.observe(viewLifecycleOwner, Observer { it ->
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Empty -> {
-                    viewModel.bitmap?.also { it1 -> setupPhoto(it1) }
-                }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Empty -> viewModel.bitmap?.also { it1 -> setupPhoto(it1) }
+                is Error -> onApiError(it.throwable)
             }
         })
     }
@@ -126,29 +133,33 @@ class SettingFragment : BaseFragment() {
                 R.id.btn_photo -> {
                     ChoosePickerDialogFragment.newInstance(onChoosePickerDialogListener).also {
                         it.show(
-                            activity!!.supportFragmentManager,
+                            requireActivity().supportFragmentManager,
                             ChoosePickerDialogFragment::class.java.simpleName
                         )
                     }
                 }
-                R.id.btn_name -> navigateTo(
-                    NavigateItem.Destination(R.id.updateProfileFragment,
-                        viewModel.profileData?.let {
-                            UpdateProfileFragment.createBundle(
-                                UpdateProfileFragment.TYPE_NAME,
-                                it
-                            )
-                        })
-                )
-                R.id.btn_email -> navigateTo(
-                    NavigateItem.Destination(R.id.updateProfileFragment,
-                        viewModel.profileData?.let {
-                            UpdateProfileFragment.createBundle(
-                                UpdateProfileFragment.TYPE_EMAIL,
-                                it
-                            )
-                        })
-                )
+                R.id.btn_name -> {
+                    navigateTo(
+                        NavigateItem.Destination(R.id.updateProfileFragment,
+                            viewModel.profileData?.let {
+                                UpdateProfileFragment.createBundle(
+                                    UpdateProfileFragment.TYPE_NAME,
+                                    it
+                                )
+                            })
+                    )
+                }
+                R.id.btn_email -> {
+                    navigateTo(
+                        NavigateItem.Destination(R.id.updateProfileFragment,
+                            viewModel.profileData?.let {
+                                UpdateProfileFragment.createBundle(
+                                    UpdateProfileFragment.TYPE_EMAIL,
+                                    it
+                                )
+                            })
+                    )
+                }
                 R.id.btn_resend -> viewModel.resendEmail()
                 R.id.btn_chang_pw -> navigateTo(NavigateItem.Destination(R.id.action_settingFragment_to_changePasswordFragment))
                 R.id.btn_gender -> {
@@ -160,15 +171,17 @@ class SettingFragment : BaseFragment() {
                         onDialogListener
                     )
                 }
-                R.id.btn_birthday -> navigateTo(
-                    NavigateItem.Destination(R.id.updateProfileFragment,
-                        viewModel.profileData?.let {
-                            UpdateProfileFragment.createBundle(
-                                UpdateProfileFragment.TYPE_BIRTHDAY,
-                                it
-                            )
-                        })
-                )
+                R.id.btn_birthday -> {
+                    navigateTo(
+                        NavigateItem.Destination(R.id.updateProfileFragment,
+                            viewModel.profileData?.let {
+                                UpdateProfileFragment.createBundle(
+                                    UpdateProfileFragment.TYPE_BIRTHDAY,
+                                    it
+                                )
+                            })
+                    )
+                }
             }
         }.also {
             tv_back.setOnClickListener(it)
@@ -190,6 +203,26 @@ class SettingFragment : BaseFragment() {
                 val bitmap = ImageUtils.bytes2Bitmap(it)
                 setupPhoto(bitmap)
             }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && (requestCode == REQUEST_CODE_CAMERA || requestCode == REQUEST_CODE_ALBUM)) {
+            viewModel.bitmap = when (requestCode) {
+                REQUEST_CODE_CAMERA -> data?.extras?.get("data") as Bitmap
+                REQUEST_CODE_ALBUM -> {
+                    val type = data?.data?.let { requireActivity().contentResolver.getType(it) }
+                    if (type != null && type.startsWith("image")) {
+                        MediaStore.Images.Media.getBitmap(
+                            requireActivity().contentResolver,
+                            data.data
+                        )
+                    } else null
+                }
+                else -> null
+            }
+            viewModel.bitmap?.also { viewModel.postAttachment() }
         }
     }
 
@@ -234,7 +267,7 @@ class SettingFragment : BaseFragment() {
 
     private fun openCamera() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        if (intent.resolveActivity(context!!.packageManager) != null) {
+        if (intent.resolveActivity(requireContext().packageManager) != null) {
             startActivityForResult(intent, REQUEST_CODE_CAMERA)
         }
     }
@@ -242,33 +275,13 @@ class SettingFragment : BaseFragment() {
     private fun openAlbum() {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.type = "image/*"
-        if (intent.resolveActivity(context!!.packageManager) != null) {
+        if (intent.resolveActivity(requireContext().packageManager) != null) {
             startActivityForResult(
                 Intent.createChooser(
                     intent,
                     getString(R.string.pls_choose_photo)
                 ), REQUEST_CODE_ALBUM
             )
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK && (requestCode == REQUEST_CODE_CAMERA || requestCode == REQUEST_CODE_ALBUM)) {
-            viewModel.bitmap = when (requestCode) {
-                REQUEST_CODE_CAMERA -> data?.extras?.get("data") as Bitmap
-                REQUEST_CODE_ALBUM -> {
-                    val type = data?.data?.let { activity!!.contentResolver.getType(it) }
-                    if (type != null && type.startsWith("image")) {
-                        MediaStore.Images.Media.getBitmap(
-                            activity!!.contentResolver,
-                            data.data
-                        )
-                    } else null
-                }
-                else -> null
-            }
-            viewModel.bitmap?.also { viewModel.postAttachment() }
         }
     }
 

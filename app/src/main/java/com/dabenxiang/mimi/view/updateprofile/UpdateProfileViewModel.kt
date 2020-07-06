@@ -20,11 +20,11 @@ import retrofit2.HttpException
 
 class UpdateProfileViewModel : BaseViewModel() {
 
+    lateinit var profileItem: ProfileItem
+
     var type = UpdateProfileFragment.TYPE_NAME
     val content = EditTextMutableLiveData()
     val birthday = EditTextMutableLiveData()
-
-    lateinit var profileItem: ProfileItem
 
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> = _error
@@ -38,7 +38,7 @@ class UpdateProfileViewModel : BaseViewModel() {
             UpdateProfileFragment.TYPE_EMAIL -> _error.value = isValidateEmail()
             UpdateProfileFragment.TYPE_BIRTHDAY -> _error.value = isValidateBirthday()
         }
-        if ("" == _error.value) {
+        if (_error.value == "") {
             updateProfile()
         }
     }
@@ -80,7 +80,6 @@ class UpdateProfileViewModel : BaseViewModel() {
             }
         }
     }
-
 
     private fun updateProfile() {
         viewModelScope.launch {

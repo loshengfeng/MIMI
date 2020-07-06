@@ -24,19 +24,10 @@
             android:gravity="center"
             android:text="@string/setting_choose"
             android:textColor="@color/color_white_1"
-            android:textSize="22sp"
+            android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/btn_close"
-            android:layout_width="66dp"
-            android:layout_height="66dp"
-            android:background="@drawable/btn_close_popup"
-            android:stateListAnimator="@null"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
