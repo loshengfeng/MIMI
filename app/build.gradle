@@ -81,10 +81,12 @@ android {
 
         sit {
             buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
+            buildConfigField "String", "MQTT_HOST", '"ws://10.1.1.121:8083"'
         }
 
         prod {
             buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
+            buildConfigField "String", "MQTT_HOST", '"ws://10.1.1.121:8083"'
         }
     }
 
