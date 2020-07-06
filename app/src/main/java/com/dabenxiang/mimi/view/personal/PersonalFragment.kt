@@ -50,13 +50,7 @@ class PersonalFragment : BaseFragment() {
                     progressHUD?.dismiss()
 
                     val meItem = it.result
-
-                    val profile = viewModel.accountManager.getProfile()
-                    profile.userId = meItem.id ?: 0
-                    profile.avatarAttachmentId = meItem.avatarAttachmentId ?: 0
-                    profile.friendlyName = meItem.friendlyName ?: ""
-
-                    viewModel.accountManager.setupProfile(profile)
+                    viewModel.accountManager.setupProfile(meItem)
 
                     viewModel.getAttachment()
                     tv_name.text = meItem.friendlyName.toString()
@@ -101,7 +95,8 @@ class PersonalFragment : BaseFragment() {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
                 is Empty -> {
-
+                    item_is_Login.visibility = View.GONE
+                    item_is_not_Login.visibility = View.VISIBLE
                 }
                 is Error -> {
                     when (it.throwable) {

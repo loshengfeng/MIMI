@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.manager
 
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ChangePasswordRequest
+import com.dabenxiang.mimi.model.api.vo.MeItem
 import com.dabenxiang.mimi.model.api.vo.SignInRequest
 import com.dabenxiang.mimi.model.api.vo.SingUpRequest
 import com.dabenxiang.mimi.model.enums.TokenResult
@@ -25,8 +26,14 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
             pref.keepAccount = value
         }
 
-    fun setupProfile(profileItem: ProfileItem) {
+    private fun setupProfile(profileItem: ProfileItem) {
         pref.profileItem = profileItem
+    }
+
+    fun setupProfile(meItem: MeItem) {
+        pref.profileItem.userId = meItem.id ?: 0
+        pref.profileItem.avatarAttachmentId = meItem.avatarAttachmentId ?: 0
+        pref.profileItem.friendlyName = meItem.friendlyName ?: ""
     }
 
     fun hasMemberToken(): Boolean {
