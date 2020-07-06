@@ -95,23 +95,6 @@ class PersonalFragment : BaseFragment() {
             }
         })
 
-        viewModel.accountManager.isLogin.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                true -> {
-                    viewModel.getMe()
-                    item_is_Login.visibility = View.VISIBLE
-                    item_is_not_Login.visibility = View.GONE
-                }
-                false -> {
-                    item_is_Login.visibility = View.GONE
-                    item_is_not_Login.visibility = View.VISIBLE
-                }
-            }
-
-            // todo: confirm by Jeff...
-            tv_new.text = "N"
-        })
-
         viewModel.apiSignOut.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
@@ -133,6 +116,8 @@ class PersonalFragment : BaseFragment() {
                     }
                 }
                 is ApiResult.Empty -> {
+                    item_is_Login.visibility = View.GONE
+                    item_is_not_Login.visibility = View.VISIBLE
                 }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
             }
@@ -183,5 +168,17 @@ class PersonalFragment : BaseFragment() {
         super.initSettings()
         tv_version_is_login.text = BuildConfig.VERSION_NAME
         tv_version_is_not_login.text = BuildConfig.VERSION_NAME
-    }
+
+        when(viewModel.accountManager.isLogin()) {
+            true -> {
+                item_is_Login.visibility = View.VISIBLE
+                item_is_not_Login.visibility = View.GONE
+                viewModel.getMe()
+            }
+            false -> {
+                item_is_Login.visibility = View.GONE
+                item_is_not_Login.visibility = View.VISIBLE
+            }
+        }
+     }
 }
