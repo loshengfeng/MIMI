@@ -134,4 +134,8 @@ class SettingViewModel : BaseViewModel() {
                 .collect { _putResult.value = it }
         }
     }
+
+    fun isEmailConfirmed(): Boolean {
+        return profileData?.emailConfirmed ?: false
+    }
 }

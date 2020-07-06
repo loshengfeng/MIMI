@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class ChangePasswordViewModel : BaseViewModel() {
+
     val current = EditTextMutableLiveData()
     val new = EditTextMutableLiveData()
     val confirm = EditTextMutableLiveData()
@@ -34,9 +35,9 @@ class ChangePasswordViewModel : BaseViewModel() {
         _newError.value = isValidateNew(new.value ?: "")
         _confirmError.value = isValidateConfirm(new.value ?: "", confirm.value ?: "")
 
-        if ("" == _currentError.value &&
-            "" == _newError.value &&
-            "" == _confirmError.value
+        if (_currentError.value == "" &&
+            _newError.value == "" &&
+            _confirmError.value == ""
         ) {
             current.value?.let { new.value?.let { it1 -> doChangePwd(it, it1) } }
         }
@@ -68,9 +69,8 @@ class ChangePasswordViewModel : BaseViewModel() {
 
     private fun doChangePwd(oldPassword: String, newPassword: String) {
         viewModelScope.launch {
-            accountManager.changePwd(oldPassword, newPassword).collect {
-                _changeResult.value = it
-            }
+            accountManager.changePwd(oldPassword, newPassword)
+                .collect { _changeResult.value = it }
         }
     }
 }
