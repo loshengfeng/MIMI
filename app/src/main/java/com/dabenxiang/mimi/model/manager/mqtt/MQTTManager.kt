@@ -1,11 +1,12 @@
 package com.dabenxiang.mimi.model.manager.mqtt
 
 import android.content.Context
+import com.dabenxiang.mimi.model.pref.Pref
 import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.*
 import timber.log.Timber
 
-class MQTTManager(val context: Context) {
+class MQTTManager(val context: Context, private val pref: Pref) {
 
     private var client: MqttAndroidClient? = null
     private var options: MqttConnectOptions? = null
@@ -31,6 +32,8 @@ class MQTTManager(val context: Context) {
         })
 
         options = MqttConnectOptions()
+        options?.password = pref.memberToken.accessToken.toCharArray()
+        options?.userName = pref.profileItem.userId.toString()
         options?.isAutomaticReconnect = true
         options?.isCleanSession = false
     }
@@ -61,7 +64,7 @@ class MQTTManager(val context: Context) {
     }
 
     fun subscribeToTopic(subscriptionTopic: String, subscribeCallback: SubscribeCallback) {
-        client?.subscribe(subscriptionTopic, 0, null, object : IMqttActionListener {
+        client?.subscribe(subscriptionTopic, 1, null, object : IMqttActionListener {
             override fun onSuccess(asyncActionToken: IMqttToken) {
                 subscribeCallback.onSuccess(asyncActionToken)
             }
@@ -71,9 +74,9 @@ class MQTTManager(val context: Context) {
             }
         })
 
-        client?.subscribe(subscriptionTopic, 0) { topic, message ->
-            subscribeCallback.onSubscribe(topic, message)
-        }
+//        client?.subscribe(subscriptionTopic, 1) { topic, message ->
+//            subscribeCallback.onSubscribe(topic, message)
+//        }
     }
 
     fun publishMessage(publishTopic: String, publishMessage: String) {

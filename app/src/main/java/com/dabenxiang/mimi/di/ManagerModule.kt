@@ -13,7 +13,7 @@ import org.koin.dsl.module
 
 val managerModule = module {
     single { provideDomainManager(get()) }
-    single { provideMQTTManager(get()) }
+    single { provideMQTTManager(get(), get()) }
     single { provideAccountManager(get(), get()) }
     single { provideLruCacheManager() }
 }
@@ -23,8 +23,8 @@ fun provideDomainManager(okHttpClient: OkHttpClient): DomainManager {
     return DomainManager(gson, okHttpClient)
 }
 
-fun provideMQTTManager(context: Context): MQTTManager {
-    return MQTTManager(context)
+fun provideMQTTManager(context: Context, pref: Pref): MQTTManager {
+    return MQTTManager(context, pref)
 }
 
 fun provideAccountManager(pref: Pref, domainManager: DomainManager): AccountManager {
