@@ -56,6 +56,7 @@ import java.net.UnknownHostException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs
+import kotlin.math.min
 import kotlin.math.round
 
 class PlayerActivity : BaseActivity() {
@@ -628,6 +629,8 @@ class PlayerActivity : BaseActivity() {
                 } else {
                     ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                 }
+
+            adjustPlayerSize()
         }
 
         orientationDetector =
@@ -645,6 +648,8 @@ class PlayerActivity : BaseActivity() {
                         } else {
                             requestedOrientation = orientation
                         }
+
+                        adjustPlayerSize()
                     }
                 })
             }
@@ -1191,5 +1196,24 @@ class PlayerActivity : BaseActivity() {
         )
             .setCancel(false)
             .show(supportFragmentManager)
+    }
+
+    /**
+     * 調整 player 的寬與高
+     */
+    private fun adjustPlayerSize(){
+        val screenSize = GeneralUtils.getScreenSize(this)
+        if (requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+            val params = player_view.layoutParams
+            params.width = ViewGroup.LayoutParams.MATCH_PARENT
+            params.height = 0
+            player_view.layoutParams = params
+
+        } else {
+            val params = player_view.layoutParams
+            params.width = ViewGroup.LayoutParams.MATCH_PARENT
+            params.height = min(screenSize.first, screenSize.second) - GeneralUtils.getStatusBarHeight(baseContext)
+            player_view.layoutParams = params
+        }
     }
 }

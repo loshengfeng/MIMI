@@ -1,8 +1,10 @@
 package com.dabenxiang.mimi.widget.utility
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.provider.Settings
+import android.util.DisplayMetrics
 import android.widget.Toast
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.BuildConfig
@@ -107,5 +109,22 @@ object GeneralUtils {
             "^[a-zA-Z0-9-`\\[\\]~!@#\$%^&*()_+\\-=;',./?<>{}|:\"\\\\]{8,20}+$",
             pwd
         )
+    }
+
+    fun getScreenSize(activity: Activity): Pair<Int, Int> {
+        val displayMetrics = DisplayMetrics()
+        activity.windowManager.defaultDisplay.getMetrics(displayMetrics)
+        val height = displayMetrics.heightPixels
+        val width = displayMetrics.widthPixels
+        return Pair(width, height)
+    }
+
+    fun getStatusBarHeight(context: Context): Int {
+        var statusBarHeight = 0
+        val resourceId: Int = context.resources.getIdentifier("status_bar_height", "dimen", "android")
+        if (resourceId > 0) {
+            statusBarHeight = context.resources.getDimensionPixelSize(resourceId)
+        }
+        return statusBarHeight
     }
 }
