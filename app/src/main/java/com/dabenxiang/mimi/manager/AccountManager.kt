@@ -1,7 +1,5 @@
 package com.dabenxiang.mimi.manager
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ChangePasswordRequest
 import com.dabenxiang.mimi.model.api.vo.SignInRequest
@@ -17,9 +15,6 @@ import retrofit2.HttpException
 import java.util.*
 
 class AccountManager(private val pref: Pref, private val domainManager: DomainManager) {
-    private val _isLogin = MutableLiveData(false)
-    val isLogin: LiveData<Boolean> = _isLogin
-
     fun getProfile(): ProfileItem {
         return pref.profileItem
     }
@@ -37,6 +32,10 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
     fun hasMemberToken(): Boolean {
         val tokenItem = pref.memberToken
         return tokenItem.accessToken.isNotEmpty() && tokenItem.refreshToken.isNotEmpty()
+    }
+
+    fun isLogin(): Boolean {
+        return getMemberTokenResult() == TokenResult.PASS
     }
 
     fun getMemberTokenResult(): TokenResult {
@@ -135,8 +134,6 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
                 )
             }
 
-            _isLogin.postValue(true)
-
             emit(ApiResult.success(null))
         }
             .flowOn(Dispatchers.IO)
@@ -174,6 +171,5 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
     fun logoutLocal() {
         pref.clearMemberToken()
         pref.clearProfile()
-        _isLogin.postValue(false)
     }
 }
