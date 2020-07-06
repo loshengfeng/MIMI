@@ -35,9 +35,7 @@ class PersonalViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
-                .collect {
-                    _meItem.value = it
-                }
+                .collect { _meItem.value = it }
         }
     }
 

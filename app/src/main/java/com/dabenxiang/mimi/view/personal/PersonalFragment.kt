@@ -12,7 +12,7 @@ import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
@@ -44,9 +44,9 @@ class PersonalFragment : BaseFragment() {
     override fun setupObservers() {
         viewModel.meItem.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> {
                     progressHUD?.dismiss()
 
                     val meItem = it.result
@@ -55,6 +55,7 @@ class PersonalFragment : BaseFragment() {
                     profile.userId = meItem.id ?: 0
                     profile.avatarAttachmentId = meItem.avatarAttachmentId ?: 0
                     profile.friendlyName = meItem.friendlyName ?: ""
+
                     viewModel.accountManager.setupProfile(profile)
 
                     viewModel.getAttachment()
@@ -67,20 +68,15 @@ class PersonalFragment : BaseFragment() {
                         else -> View.GONE
                     }
                 }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.imageBitmap.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable, onHttpErrorBlock = { httpError ->
-                    when (httpError.httpExceptionItem.errorItem.code) {
-                        // todo: confirm by jeff...
-//                        ErrorCode.NOT_FOUND -> { viewModel.toastData.value = "no photo"}
-                    }
-                })
-                is ApiResult.Success -> {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> {
                     val options: RequestOptions = RequestOptions()
                         .transform(MultiTransformation(CenterCrop(), CircleCrop()))
                         .placeholder(R.mipmap.ic_launcher)
@@ -91,7 +87,12 @@ class PersonalFragment : BaseFragment() {
                         .apply(options)
                         .into(iv_photo)
                 }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is Error -> onApiError(it.throwable, onHttpErrorBlock = { httpError ->
+                    when (httpError.httpExceptionItem.errorItem.code) {
+                        // todo: confirm by jeff...
+//                        ErrorCode.NOT_FOUND -> { viewModel.toastData.value = "no photo"}
+                    }
+                })
             }
         })
 
@@ -114,8 +115,12 @@ class PersonalFragment : BaseFragment() {
 
         viewModel.apiSignOut.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Empty -> {
+
+                }
+                is Error -> {
                     when (it.throwable) {
                         is HttpException -> {
                             val data = GeneralUtils.getHttpExceptionData(it.throwable)
@@ -132,9 +137,6 @@ class PersonalFragment : BaseFragment() {
                         }
                     }
                 }
-                is ApiResult.Empty -> {
-                }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
             }
         })
     }
