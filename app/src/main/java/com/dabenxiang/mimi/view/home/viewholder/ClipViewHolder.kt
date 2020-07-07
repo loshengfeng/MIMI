@@ -81,6 +81,7 @@ class ClipViewHolder(
             val bitmap = attachmentMap[model?.avatarAttachmentId]
             Glide.with(itemView.context)
                 .load(bitmap)
+                .circleCrop()
                 .into(profileImg)
         }
     }
