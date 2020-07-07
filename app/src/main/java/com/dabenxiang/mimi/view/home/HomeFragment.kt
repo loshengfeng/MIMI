@@ -48,7 +48,8 @@ class HomeFragment : BaseFragment() {
         recyclerview_videos.adapter = videoListAdapter
         refresh_home.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
 
-        mainViewModel?.loadHomeCategories()
+        if (mainViewModel?.normal == null)
+            mainViewModel?.loadHomeCategories()
     }
 
     override fun setupObservers() {
