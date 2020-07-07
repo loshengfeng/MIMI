@@ -26,8 +26,7 @@ class HomeViewModel : BaseViewModel() {
 
     companion object {
         const val CAROUSEL_LIMIT = 5
-        const val STATISTICS_LIMIT = 20
-        const val CLIP_LIMIT = 20
+        const val PAGING_LIMIT = 20
     }
 
     private var _videoList = MutableLiveData<PagedList<BaseVideoItem>>()
@@ -50,6 +49,12 @@ class HomeViewModel : BaseViewModel() {
         MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberPostItem>>>>>()
     val clipsResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberPostItem>>>>> =
         _clipsResult
+
+    private var _pictureResult =
+        MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberPostItem>>>>>()
+    val pictureResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberPostItem>>>>> =
+        _pictureResult
+
 
     private var _attachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
     val attachmentResult: LiveData<ApiResult<AttachmentItem>> = _attachmentResult
@@ -86,7 +91,7 @@ class HomeViewModel : BaseViewModel() {
                     category = src.categories,
                     isAdult = src.isAdult,
                     offset = 0,
-                    limit = STATISTICS_LIMIT
+                    limit = PAGING_LIMIT
                 )
                 if (!resp.isSuccessful) throw HttpException(resp)
                 emit(ApiResult.success(resp.body()))
@@ -105,7 +110,7 @@ class HomeViewModel : BaseViewModel() {
                 val resp = domainManager.getApiRepository().getMembersPost(
                     type = PostType.VIDEO,
                     offset = 0,
-                    limit = CLIP_LIMIT
+                    limit = PAGING_LIMIT
                 )
                 if (!resp.isSuccessful) throw HttpException(resp)
                 emit(ApiResult.success(resp.body()))
@@ -115,6 +120,25 @@ class HomeViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _clipsResult.value = Pair(position, it) }
+        }
+    }
+
+    fun loadNestedPictureList(position: Int, src: HomeTemplate.Picture) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository().getMembersPost(
+                    type = PostType.IMAGE,
+                    offset = 0,
+                    limit = PAGING_LIMIT
+                )
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(resp.body()))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _pictureResult.value = Pair(position, it) }
         }
     }
 

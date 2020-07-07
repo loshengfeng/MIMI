@@ -12,10 +12,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.holder.CarouselHolderItem
-import com.dabenxiang.mimi.view.adapter.CarouselAdapter
-import com.dabenxiang.mimi.view.adapter.HomeAdapter
-import com.dabenxiang.mimi.view.adapter.HomeClipAdapter
-import com.dabenxiang.mimi.view.adapter.HomeStatisticsAdapter
+import com.dabenxiang.mimi.view.adapter.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.HomeTemplate
 import com.dabenxiang.mimi.widget.view.ViewPagerIndicator
@@ -24,6 +21,7 @@ import kotlinx.android.synthetic.main.item_banner.view.*
 import kotlinx.android.synthetic.main.item_carousel.view.*
 import kotlinx.android.synthetic.main.item_header.view.*
 import kotlinx.android.synthetic.main.item_home_clip.view.*
+import kotlinx.android.synthetic.main.item_home_picture.view.*
 import kotlinx.android.synthetic.main.item_home_statistics.view.*
 
 abstract class HomeViewHolder<VM : HomeTemplate>(
@@ -169,12 +167,18 @@ class HomeClipViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
     isAdult: Boolean,
-    clipListener: HomeClipAdapter.ClipListener,
+    attachmentListener: HomeAdapter.AttachmentListener,
     attachmentMap: HashMap<Long, Bitmap>
 ) : HomeViewHolder<HomeTemplate.Clip>(itemView, listener, isAdult) {
 
     private val recyclerView: RecyclerView = itemView.recyclerview_clip
-    private val nestedAdapter by lazy { HomeClipAdapter(listener, clipListener, attachmentMap) }
+    private val nestedAdapter by lazy {
+        HomeClipAdapter(
+            listener,
+            attachmentListener,
+            attachmentMap
+        )
+    }
 
     init {
         LinearLayoutManager(itemView.context).also { layoutManager ->
@@ -204,10 +208,42 @@ class HomeClipViewHolder(
 class HomePictureViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
-    isAdult: Boolean
+    isAdult: Boolean,
+    attachmentListener: HomeAdapter.AttachmentListener,
+    attachmentMap: HashMap<Long, Bitmap>
 ) : HomeViewHolder<HomeTemplate.Picture>(itemView, listener, isAdult) {
+
+    private val recyclerView: RecyclerView = itemView.recyclerview_picture
+    private val nestedAdapter by lazy {
+        HomePictureAdapter(
+            listener,
+            attachmentListener,
+            attachmentMap
+        )
+    }
+
+    init {
+        LinearLayoutManager(itemView.context).also { layoutManager ->
+            layoutManager.orientation = LinearLayoutManager.HORIZONTAL
+            recyclerView.layoutManager = layoutManager
+        }
+
+        recyclerView.adapter = nestedAdapter
+        LinearSnapHelper().attachToRecyclerView(recyclerView)
+    }
+
     override fun updated() {
-        TODO("Not yet implemented")
+        data?.also {
+            nestedListener.onLoadPictureViewHolder(this, it)
+        }
+    }
+
+    fun submitList(list: List<MemberPostItem>) {
+        nestedAdapter.submitList(list)
+    }
+
+    fun updateItem(position: Int) {
+        nestedAdapter.notifyItemChanged(position)
     }
 }
 

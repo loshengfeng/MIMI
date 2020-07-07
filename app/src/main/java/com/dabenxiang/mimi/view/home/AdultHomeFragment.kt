@@ -17,7 +17,6 @@ import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
-import com.dabenxiang.mimi.view.adapter.HomeClipAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -25,6 +24,7 @@ import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.home.viewholder.HomeCarouselViewHolder
 import com.dabenxiang.mimi.view.home.viewholder.HomeClipViewHolder
+import com.dabenxiang.mimi.view.home.viewholder.HomePictureViewHolder
 import com.dabenxiang.mimi.view.home.viewholder.HomeStatisticsViewHolder
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
@@ -44,6 +44,7 @@ class AdultHomeFragment : BaseFragment() {
     private val statisticsMap = hashMapOf<Int, HomeTemplate.Statistics>()
 
     private val homeClipViewHolderMap = hashMapOf<Int, HomeClipViewHolder>()
+    private val homePictureViewHolderMap = hashMapOf<Int, HomePictureViewHolder>()
     private val attachmentMap: HashMap<Long, Bitmap> = hashMapOf()
 
     override fun getLayoutId() = R.layout.fragment_home
@@ -151,6 +152,17 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
+        viewModel.pictureResult.observe(viewLifecycleOwner, Observer {
+            when (val response = it.second) {
+                is Success -> {
+                    val viewHolder = homePictureViewHolderMap[it.first]
+                    val memberPostItems = response.result.content ?: arrayListOf()
+                    viewHolder?.submitList(memberPostItems)
+                }
+                is Error -> Timber.e(response.throwable)
+            }
+        })
+
         viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
@@ -158,6 +170,9 @@ class AdultHomeFragment : BaseFragment() {
                     attachmentMap[attachmentItem.id] = attachmentItem.bitmap
                     when (val holder = adapter.homeViewHolderMap[attachmentItem.type]) {
                         is HomeClipViewHolder -> {
+                            holder.updateItem(attachmentItem.position)
+                        }
+                        is HomePictureViewHolder -> {
                             holder.updateItem(attachmentItem.position)
                         }
                     }
@@ -193,19 +208,15 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val adapter by lazy {
-        HomeAdapter(requireContext(), adapterListener, true, clipListener, attachmentMap)
+        HomeAdapter(requireContext(), adapterListener, true, attachmentListener, attachmentMap)
     }
 
     private val videoListAdapter by lazy {
         HomeVideoListAdapter(adapterListener, true)
     }
 
-    private val clipListener = object : HomeClipAdapter.ClipListener {
-        override fun onGetVideoImg(id: Long, position: Int, type: HomeItemType) {
-            viewModel.getAttachment(id, position, type)
-        }
-
-        override fun onGetAvatar(id: Long, position: Int, type: HomeItemType) {
+    private val attachmentListener = object : HomeAdapter.AttachmentListener {
+        override fun onGetAttachment(id: Long, position: Int, type: HomeItemType) {
             viewModel.getAttachment(id, position, type)
         }
     }
@@ -231,6 +242,10 @@ class AdultHomeFragment : BaseFragment() {
             TODO("Not yet implemented")
         }
 
+        override fun onPictureClick(view: View, item: MemberPostItem) {
+            TODO("Not yet implemented")
+        }
+
         override fun onLoadStatisticsViewHolder(
             vh: HomeStatisticsViewHolder,
             src: HomeTemplate.Statistics
@@ -252,6 +267,11 @@ class AdultHomeFragment : BaseFragment() {
         override fun onLoadClipViewHolder(vh: HomeClipViewHolder, src: HomeTemplate.Clip) {
             homeClipViewHolderMap[vh.adapterPosition] = vh
             viewModel.loadNestedClipList(vh.adapterPosition, src)
+        }
+
+        override fun onLoadPictureViewHolder(vh: HomePictureViewHolder, src: HomeTemplate.Picture) {
+            homePictureViewHolderMap[vh.adapterPosition] = vh
+            viewModel.loadNestedPictureList(vh.adapterPosition, src)
         }
     }
 
@@ -291,15 +311,9 @@ class AdultHomeFragment : BaseFragment() {
                 templateList.add(HomeTemplate.Header(null, item.name, item.name))
                 when (item.name) {
                     "蜜蜜影视" -> templateList.add(HomeTemplate.Statistics(item.name, null, true))
-                    "短视频" -> {
-                        templateList.add(HomeTemplate.Clip())
-                    }
-                    "图片" -> {
-                        templateList.add(HomeTemplate.Picture())
-                    }
-                    "圈子" -> {
-                        templateList.add(HomeTemplate.Club())
-                    }
+                    "短视频" -> templateList.add(HomeTemplate.Clip())
+                    "图片" -> templateList.add(HomeTemplate.Picture())
+                    "圈子" -> templateList.add(HomeTemplate.Club())
                 }
             }
         }

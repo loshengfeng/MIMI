@@ -24,6 +24,7 @@ import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.home.viewholder.HomeCarouselViewHolder
 import com.dabenxiang.mimi.view.home.viewholder.HomeClipViewHolder
+import com.dabenxiang.mimi.view.home.viewholder.HomePictureViewHolder
 import com.dabenxiang.mimi.view.home.viewholder.HomeStatisticsViewHolder
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
@@ -154,20 +155,16 @@ class HomeFragment : BaseFragment() {
     }
 
     private val adapter by lazy {
-        HomeAdapter(requireContext(), adapterListener, false, clipListener, attachmentMap)
+        HomeAdapter(requireContext(), adapterListener, false, attachmentListener, attachmentMap)
     }
 
     private val videoListAdapter by lazy {
         HomeVideoListAdapter(adapterListener, false)
     }
 
-    private val clipListener = object : HomeClipAdapter.ClipListener {
-        override fun onGetVideoImg(id: Long, position: Int, type: HomeItemType) {
-            TODO("Not yet implemented")
-        }
+    private val attachmentListener = object : HomeAdapter.AttachmentListener {
+        override fun onGetAttachment(id: Long, position: Int, type: HomeItemType) {
 
-        override fun onGetAvatar(id: Long, position: Int, type: HomeItemType) {
-            TODO("Not yet implemented")
         }
     }
 
@@ -192,6 +189,10 @@ class HomeFragment : BaseFragment() {
             TODO("Not yet implemented")
         }
 
+        override fun onPictureClick(view: View, item: MemberPostItem) {
+            TODO("Not yet implemented")
+        }
+
         override fun onLoadStatisticsViewHolder(
             vh: HomeStatisticsViewHolder,
             src: HomeTemplate.Statistics
@@ -212,6 +213,10 @@ class HomeFragment : BaseFragment() {
 
         override fun onLoadClipViewHolder(vh: HomeClipViewHolder, src: HomeTemplate.Clip) {
 
+        }
+
+        override fun onLoadPictureViewHolder(vh: HomePictureViewHolder, src: HomeTemplate.Picture) {
+            TODO("Not yet implemented")
         }
     }
 

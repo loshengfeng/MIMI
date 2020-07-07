@@ -19,6 +19,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.home.viewholder.HomeCarouselViewHolder
 import com.dabenxiang.mimi.view.home.viewholder.HomeClipViewHolder
+import com.dabenxiang.mimi.view.home.viewholder.HomePictureViewHolder
 import com.dabenxiang.mimi.view.home.viewholder.HomeStatisticsViewHolder
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import kotlinx.android.synthetic.main.fragment_categories.*
@@ -61,6 +62,10 @@ class CategoriesFragment : BaseFragment() {
             TODO("Not yet implemented")
         }
 
+        override fun onPictureClick(view: View, item: MemberPostItem) {
+            TODO("Not yet implemented")
+        }
+
         override fun onLoadStatisticsViewHolder(
             vh: HomeStatisticsViewHolder,
             src: HomeTemplate.Statistics
@@ -76,6 +81,10 @@ class CategoriesFragment : BaseFragment() {
         }
 
         override fun onLoadClipViewHolder(vh: HomeClipViewHolder, src: HomeTemplate.Clip) {
+
+        }
+
+        override fun onLoadPictureViewHolder(vh: HomePictureViewHolder, src: HomeTemplate.Picture) {
 
         }
     }

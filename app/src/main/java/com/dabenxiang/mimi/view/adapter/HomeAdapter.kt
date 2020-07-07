@@ -19,7 +19,7 @@ class HomeAdapter(
     val context: Context,
     private val listener: EventListener,
     private val isAdult: Boolean,
-    private val clipListener: HomeClipAdapter.ClipListener,
+    private val attachmentListener: AttachmentListener,
     private val attachmentMap: HashMap<Long, Bitmap>
 ) :
     ListAdapter<HomeTemplate, BaseViewHolder>(DIFF_CALLBACK) {
@@ -49,9 +49,11 @@ class HomeAdapter(
         fun onHeaderItemClick(view: View, item: HomeTemplate.Header)
         fun onVideoClick(view: View, item: PlayerData)
         fun onClipClick(view: View, item: MemberPostItem)
+        fun onPictureClick(view: View, item: MemberPostItem)
         fun onLoadStatisticsViewHolder(vh: HomeStatisticsViewHolder, src: HomeTemplate.Statistics)
         fun onLoadCarouselViewHolder(vh: HomeCarouselViewHolder, src: HomeTemplate.Carousel)
         fun onLoadClipViewHolder(vh: HomeClipViewHolder, src: HomeTemplate.Clip)
+        fun onLoadPictureViewHolder(vh: HomePictureViewHolder, src: HomeTemplate.Picture)
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -99,7 +101,7 @@ class HomeAdapter(
                         R.layout.item_home_clip,
                         parent,
                         false
-                    ), listener, isAdult, clipListener, attachmentMap
+                    ), listener, isAdult, attachmentListener, attachmentMap
                 )
             }
             HomeItemType.PICTURE -> {
@@ -108,7 +110,7 @@ class HomeAdapter(
                         R.layout.item_home_picture,
                         parent,
                         false
-                    ), listener, isAdult
+                    ), listener, isAdult, attachmentListener, attachmentMap
                 )
             }
             HomeItemType.CLUB -> {
@@ -149,8 +151,8 @@ class HomeAdapter(
                 holder.bind(template)
             }
             HomeItemType.PICTURE -> {
-//                holder as HomePictureViewHolder
-//                holder.bind(template)
+                holder as HomePictureViewHolder
+                holder.bind(template)
             }
             HomeItemType.CLUB -> {
 //                holder as HomeClubViewHolder
@@ -158,4 +160,9 @@ class HomeAdapter(
             }
         }
     }
+
+    interface AttachmentListener {
+        fun onGetAttachment(id: Long, position: Int, type: HomeItemType)
+    }
+
 }
