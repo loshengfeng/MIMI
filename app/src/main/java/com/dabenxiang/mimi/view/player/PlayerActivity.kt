@@ -379,6 +379,9 @@ class PlayerActivity : BaseActivity() {
                         sendCommentDialog?.dismiss()
                         sendCommentDialog = null
 
+                        headNoComment.title_no_comment.visibility = View.GONE
+                        viewModel.commentCount.value = viewModel.commentCount.value?.plus(1)
+
                         viewModel.setupCommentDataSource(playerInfoAdapter)
                     }
                     is ApiResult.Error -> onApiError(it.throwable)
