@@ -6,30 +6,30 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.holder.TopupOnlinePayItem
-import com.dabenxiang.mimi.model.holder.TopupProxyPayItem
-import com.dabenxiang.mimi.view.adapter.TopupOnlinePayAdapter
-import com.dabenxiang.mimi.view.adapter.TopupProxyPayAdapter
+import com.dabenxiang.mimi.model.holder.TopUpOnlinePayItem
+import com.dabenxiang.mimi.model.holder.TopUpProxyPayItem
+import com.dabenxiang.mimi.view.adapter.TopUpOnlinePayAdapter
+import com.dabenxiang.mimi.view.adapter.TopUpProxyPayAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.listener.AdapterEventListener
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
-import kotlinx.android.synthetic.main.fragment_topup.*
+import kotlinx.android.synthetic.main.fragment_top_up.*
 import timber.log.Timber
 
-class TopupFragment : BaseFragment() {
+class TopUpFragment : BaseFragment() {
 
-    private val viewModel: TopupViewModel by viewModels()
+    private val viewModel: TopUpViewModel by viewModels()
 
-    private val onlinePayListener = object : AdapterEventListener<TopupOnlinePayItem> {
-        override fun onItemClick(view: View, item: TopupOnlinePayItem) {
-            Timber.d("${TopupFragment::class.java.simpleName}_onlinePayListener_onItemClick_item: $item")
+    private val onlinePayListener = object : AdapterEventListener<TopUpOnlinePayItem> {
+        override fun onItemClick(view: View, item: TopUpOnlinePayItem) {
+            Timber.d("${TopUpFragment::class.java.simpleName}_onlinePayListener_onItemClick_item: $item")
         }
     }
 
-    private val proxyPayListener = object : AdapterEventListener<TopupProxyPayItem> {
-        override fun onItemClick(view: View, item: TopupProxyPayItem) {
-            Timber.d("${TopupFragment::class.java.simpleName}_proxyPayListener_onItemClick_item: $item")
+    private val proxyPayListener = object : AdapterEventListener<TopUpProxyPayItem> {
+        override fun onItemClick(view: View, item: TopUpProxyPayItem) {
+            Timber.d("${TopUpFragment::class.java.simpleName}_proxyPayListener_onItemClick_item: $item")
         }
     }
 
@@ -39,15 +39,15 @@ class TopupFragment : BaseFragment() {
     }
 
     override fun getLayoutId(): Int {
-        return R.layout.fragment_topup
+        return R.layout.fragment_top_up
     }
 
     override fun setupObservers() {
-        Timber.d("${TopupFragment::class.java.simpleName}_setupObservers")
+        Timber.d("${TopUpFragment::class.java.simpleName}_setupObservers")
     }
 
     override fun setupListeners() {
-        Timber.d("${TopupFragment::class.java.simpleName}_setupListeners")
+        Timber.d("${TopUpFragment::class.java.simpleName}_setupListeners")
 
         rg_Type.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
@@ -95,15 +95,15 @@ class TopupFragment : BaseFragment() {
             rv_online_pay.layoutManager = layoutManager
         }
 
-        val onlinePayList = mutableListOf<TopupOnlinePayItem>(
-            TopupOnlinePayItem(1, "300", "¥ 50.00", "¥ 55.00"),
-            TopupOnlinePayItem(0, "900+90", "¥ 150.00", "¥ 165.00"),
-            TopupOnlinePayItem(0, "1500+150", "¥ 250.00", "¥ 275.00"),
-            TopupOnlinePayItem(0, "3000+300", "¥ 500.00", "¥ 500.00")
+        val onlinePayList = mutableListOf<TopUpOnlinePayItem>(
+            TopUpOnlinePayItem(1, "300", "¥ 50.00", "¥ 55.00"),
+            TopUpOnlinePayItem(0, "900+90", "¥ 150.00", "¥ 165.00"),
+            TopUpOnlinePayItem(0, "1500+150", "¥ 250.00", "¥ 275.00"),
+            TopUpOnlinePayItem(0, "3000+300", "¥ 500.00", "¥ 500.00")
         )
 
-        rv_online_pay.adapter = TopupOnlinePayAdapter(onlinePayListener)
-        val onlinePayAdapter = rv_online_pay.adapter as TopupOnlinePayAdapter
+        rv_online_pay.adapter = TopUpOnlinePayAdapter(onlinePayListener)
+        val onlinePayAdapter = rv_online_pay.adapter as TopUpOnlinePayAdapter
         onlinePayAdapter.setDataSrc(onlinePayList)
 
         activity?.also { activity ->
@@ -113,15 +113,15 @@ class TopupFragment : BaseFragment() {
             }
         }
 
-        val proxyPayList = mutableListOf<TopupProxyPayItem>(
-            TopupProxyPayItem("photo", "火热代理1", "密密1"),
-            TopupProxyPayItem("photo", "火热代理2", "密密2"),
-            TopupProxyPayItem("photo", "火热代理3", "密密3"),
-            TopupProxyPayItem("photo", "火热代理4", "密密4")
+        val proxyPayList = mutableListOf<TopUpProxyPayItem>(
+            TopUpProxyPayItem("photo", "火热代理1", "密密1"),
+            TopUpProxyPayItem("photo", "火热代理2", "密密2"),
+            TopUpProxyPayItem("photo", "火热代理3", "密密3"),
+            TopUpProxyPayItem("photo", "火热代理4", "密密4")
         )
 
-        rv_proxy_pay.adapter = TopupProxyPayAdapter(proxyPayListener)
-        val proxyAdapter = rv_proxy_pay.adapter as TopupProxyPayAdapter
+        rv_proxy_pay.adapter = TopUpProxyPayAdapter(proxyPayListener)
+        val proxyAdapter = rv_proxy_pay.adapter as TopUpProxyPayAdapter
         proxyAdapter.setDataSrc(proxyPayList)
 
     }

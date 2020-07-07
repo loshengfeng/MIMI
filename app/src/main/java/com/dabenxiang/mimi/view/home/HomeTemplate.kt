@@ -19,6 +19,7 @@ sealed class HomeTemplate(val type: HomeItemType) {
     data class Banner(val imgUrl: String?) : HomeTemplate(HomeItemType.BANNER)
     data class Carousel(val isAdult: Boolean) : HomeTemplate(HomeItemType.CAROUSEL)
 
-    object LeaderBoard : HomeTemplate(HomeItemType.LEADER_BOARD)
-    object Recommend : HomeTemplate(HomeItemType.RECOMMEND)
+    class Clip : HomeTemplate(HomeItemType.CLIP)
+    class Picture : HomeTemplate(HomeItemType.PICTURE)
+    class Club : HomeTemplate(HomeItemType.CLUB)
 }

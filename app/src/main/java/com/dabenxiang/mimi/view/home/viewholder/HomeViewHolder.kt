@@ -3,7 +3,6 @@ package com.dabenxiang.mimi.view.home.viewholder
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -11,7 +10,10 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.holder.CarouselHolderItem
-import com.dabenxiang.mimi.view.adapter.*
+import com.dabenxiang.mimi.view.adapter.CarouselAdapter
+import com.dabenxiang.mimi.view.adapter.HomeAdapter
+import com.dabenxiang.mimi.view.adapter.HomeClipAdapter
+import com.dabenxiang.mimi.view.adapter.HomeStatisticsAdapter
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.HomeTemplate
 import com.dabenxiang.mimi.widget.view.ViewPagerIndicator
@@ -19,13 +21,8 @@ import com.to.aboomy.pager2banner.Banner
 import kotlinx.android.synthetic.main.item_banner.view.*
 import kotlinx.android.synthetic.main.item_carousel.view.*
 import kotlinx.android.synthetic.main.item_header.view.*
-import kotlinx.android.synthetic.main.item_home_leaderboard.view.*
-import kotlinx.android.synthetic.main.item_home_recommend.view.*
+import kotlinx.android.synthetic.main.item_home_clip.view.*
 import kotlinx.android.synthetic.main.item_home_statistics.view.*
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
-import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.coroutineScope
 
 abstract class HomeViewHolder<VM : HomeTemplate>(
     itemView: View,
@@ -139,7 +136,7 @@ class HomeStatisticsViewHolder(
 ) :
     HomeViewHolder<HomeTemplate.Statistics>(itemView, listener, isAdult) {
 
-    private val recyclerView: RecyclerView = itemView.recyclerview_categories
+    private val recyclerView: RecyclerView = itemView.recyclerview_statistics
     private val nestedAdapter by lazy {
         HomeStatisticsAdapter(nestedListener, isAdult)
     }
@@ -155,25 +152,6 @@ class HomeStatisticsViewHolder(
         LinearSnapHelper().attachToRecyclerView(recyclerView)
     }
 
-    private var activeTask: Deferred<Any>? = null
-
-    suspend fun activeTask(block: suspend () -> Any): Any {
-        activeTask?.cancelAndJoin()
-
-        return coroutineScope {
-            val newTask = async {
-                block()
-            }
-
-            newTask.invokeOnCompletion {
-                activeTask = null
-            }
-
-            activeTask = newTask
-            newTask.await()
-        }
-    }
-
     override fun updated() {
         data?.also {
             nestedListener.onLoadStatisticsViewHolder(this, it)
@@ -185,51 +163,38 @@ class HomeStatisticsViewHolder(
     }
 }
 
-class HomeLeaderBoardViewHolder(
+class HomeClipViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
     isAdult: Boolean
-) :
-    HomeViewHolder<HomeTemplate.LeaderBoard>(itemView, listener, isAdult) {
+) : HomeViewHolder<HomeTemplate.Clip>(itemView, listener, isAdult) {
 
-    private val recyclerView: RecyclerView = itemView.recyclerview_leaderboard
+    private val recyclerView: RecyclerView = itemView.recyclerview_clip
     private val nestedAdapter by lazy {
-        LeaderboardAdapter()
-    }
-
-    init {
-        LinearLayoutManager(itemView.context).also { layoutManager ->
-            layoutManager.orientation = LinearLayoutManager.HORIZONTAL
-            recyclerView.layoutManager = layoutManager
-        }
-
-        recyclerView.adapter = nestedAdapter
+        HomeClipAdapter(nestedListener, isAdult)
     }
 
     override fun updated() {
+        TODO("Not yet implemented")
     }
 }
 
-class HomeRecommendViewHolder(
+class HomePictureViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
     isAdult: Boolean
-) :
-    HomeViewHolder<HomeTemplate.Recommend>(itemView, listener, isAdult) {
-
-    private val recyclerView: RecyclerView = itemView.recyclerview_recommend
-    private val nestedAdapter by lazy {
-        HomeRecommendAdapter()
-    }
-
-    init {
-        GridLayoutManager(itemView.context, 2).also { layoutManager ->
-            recyclerView.layoutManager = layoutManager
-        }
-
-        recyclerView.adapter = nestedAdapter
-    }
-
+) : HomeViewHolder<HomeTemplate.Picture>(itemView, listener, isAdult) {
     override fun updated() {
+        TODO("Not yet implemented")
+    }
+}
+
+class HomeClubViewHolder(
+    itemView: View,
+    listener: HomeAdapter.EventListener,
+    isAdult: Boolean
+) : HomeViewHolder<HomeTemplate.Club>(itemView, listener, isAdult) {
+    override fun updated() {
+        TODO("Not yet implemented")
     }
 }

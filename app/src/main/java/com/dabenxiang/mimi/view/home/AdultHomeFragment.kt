@@ -227,18 +227,18 @@ class AdultHomeFragment : BaseFragment() {
 
         if (root?.categories != null) {
             for (item in root.categories) {
+                if (item.name == "关注" || item.name == "短文") continue
                 templateList.add(HomeTemplate.Header(null, item.name, item.name))
                 when (item.name) {
                     "蜜蜜影视" -> templateList.add(HomeTemplate.Statistics(item.name, null, true))
-                    "关注" -> {
-                    }
                     "短视频" -> {
+                        templateList.add(HomeTemplate.Clip())
                     }
                     "图片" -> {
-                    }
-                    "短文" -> {
+                        templateList.add(HomeTemplate.Picture())
                     }
                     "圈子" -> {
+                        templateList.add(HomeTemplate.Club())
                     }
                 }
             }

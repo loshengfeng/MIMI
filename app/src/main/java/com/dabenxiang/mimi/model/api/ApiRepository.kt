@@ -213,6 +213,10 @@ class ApiRepository(private val apiService: ApiService) {
      *                  Members/Post
      *
      ***********************************************************/
+    suspend fun getMembersPost(): Response<ApiBaseItem<List<MemberPostItem>>> {
+        return apiService.getMembersPost()
+    }
+
     suspend fun getMembersPostComment(
         postId: Long,
         parentId: Long? = null,

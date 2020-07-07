@@ -10,7 +10,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.enums.HomeItemType
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.view.home.*
+import com.dabenxiang.mimi.view.home.HomeTemplate
 import com.dabenxiang.mimi.view.home.viewholder.*
 
 class HomeAdapter(
@@ -85,29 +85,31 @@ class HomeAdapter(
                     ), listener, isAdult
                 )
             }
-            HomeItemType.LEADER_BOARD -> {
-                HomeLeaderBoardViewHolder(
+            HomeItemType.CLIP -> {
+                HomeClipViewHolder(
                     layoutInflater.inflate(
-                        R.layout.item_home_leaderboard,
+                        R.layout.item_home_clip,
                         parent,
                         false
                     ), listener, isAdult
                 )
             }
-            HomeItemType.RECOMMEND -> {
-                HomeRecommendViewHolder(
+            HomeItemType.PICTURE -> {
+                HomePictureViewHolder(
                     layoutInflater.inflate(
-                        R.layout.item_home_recommend,
+                        R.layout.item_home_picture,
                         parent,
                         false
                     ), listener, isAdult
                 )
             }
-            else -> {
-                HeaderViewHolder(
-                    layoutInflater.inflate(R.layout.item_header, parent, false),
-                    listener,
-                    isAdult
+            HomeItemType.CLUB -> {
+                HomeClubViewHolder(
+                    layoutInflater.inflate(
+                        R.layout.item_home_club,
+                        parent,
+                        false
+                    ), listener, isAdult
                 )
             }
         }
@@ -132,12 +134,16 @@ class HomeAdapter(
                 holder as HomeStatisticsViewHolder
                 holder.bind(template)
             }
-            HomeItemType.LEADER_BOARD -> {
-                holder as HomeLeaderBoardViewHolder
+            HomeItemType.CLIP -> {
+                holder as HomeClipViewHolder
                 holder.bind(template)
             }
-            HomeItemType.RECOMMEND -> {
-                holder as HomeRecommendViewHolder
+            HomeItemType.PICTURE -> {
+                holder as HomePictureViewHolder
+                holder.bind(template)
+            }
+            HomeItemType.CLUB -> {
+                holder as HomeClubViewHolder
                 holder.bind(template)
             }
         }

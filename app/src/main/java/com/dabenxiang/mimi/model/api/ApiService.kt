@@ -151,6 +151,9 @@ interface ApiService {
      *                  Members/Post
      *
      ***********************************************************/
+    @GET("/v1/Members/Post")
+    suspend fun getMembersPost(): Response<ApiBaseItem<List<MemberPostItem>>>
+
     @GET("/v1/Members/Post/{postId}/Comment")
     suspend fun getMembersPostComment(
         @Path("postId") postId: Long,

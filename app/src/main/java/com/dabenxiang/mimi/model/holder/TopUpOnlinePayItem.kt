@@ -1,6 +1,6 @@
 package com.dabenxiang.mimi.model.holder
 
-data class TopupOnlinePayItem(
+data class TopUpOnlinePayItem(
     val check: Int = 0,
     val token: String?,
     val price: String?,

@@ -17,6 +17,8 @@ class HomeStatisticsAdapter(
 ) :
     RecyclerView.Adapter<BaseViewHolder>() {
 
+    private var list: List<BaseVideoItem.Video>? = null
+
     private val videoViewHolderListener by lazy {
         object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
@@ -29,33 +31,14 @@ class HomeStatisticsAdapter(
         }
     }
 
-    private var list: List<BaseVideoItem.Video>? = null
-
     fun submitList(submit: List<BaseVideoItem.Video>?) {
         list = submit
-
-        /*
-        //Fake date:
-        val list = mutableListOf<StatisticsItem>()
-        repeat(12) {
-            list.add(
-                StatisticsItem(
-                    title = "標題${it + 1}",
-                    id = it.toLong(),
-                    count = it.toLong(),
-                    cover = "https://i2.kknews.cc/SIG=1nkii03/470400035pnr3n5r3s7n.jpg"
-                )
-            )
-        }
-        data = list
-        */
-
         notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.nested_item_home_categories, parent, false)
+            .inflate(R.layout.nested_item_home_statistics, parent, false)
         return VideoViewHolder(
             view,
             videoViewHolderListener
