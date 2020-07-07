@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.holder.CarouselHolderItem
@@ -21,6 +22,7 @@ import kotlinx.android.synthetic.main.item_banner.view.*
 import kotlinx.android.synthetic.main.item_carousel.view.*
 import kotlinx.android.synthetic.main.item_header.view.*
 import kotlinx.android.synthetic.main.item_home_clip.view.*
+import kotlinx.android.synthetic.main.item_home_club.view.*
 import kotlinx.android.synthetic.main.item_home_picture.view.*
 import kotlinx.android.synthetic.main.item_home_statistics.view.*
 
@@ -185,15 +187,12 @@ class HomeClipViewHolder(
             layoutManager.orientation = LinearLayoutManager.HORIZONTAL
             recyclerView.layoutManager = layoutManager
         }
-
         recyclerView.adapter = nestedAdapter
         LinearSnapHelper().attachToRecyclerView(recyclerView)
     }
 
     override fun updated() {
-        data?.also {
-            nestedListener.onLoadClipViewHolder(this, it)
-        }
+        nestedListener.onLoadClipViewHolder(this)
     }
 
     fun submitList(list: List<MemberPostItem>) {
@@ -227,15 +226,12 @@ class HomePictureViewHolder(
             layoutManager.orientation = LinearLayoutManager.HORIZONTAL
             recyclerView.layoutManager = layoutManager
         }
-
         recyclerView.adapter = nestedAdapter
         LinearSnapHelper().attachToRecyclerView(recyclerView)
     }
 
     override fun updated() {
-        data?.also {
-            nestedListener.onLoadPictureViewHolder(this, it)
-        }
+        nestedListener.onLoadPictureViewHolder(this)
     }
 
     fun submitList(list: List<MemberPostItem>) {
@@ -250,9 +246,39 @@ class HomePictureViewHolder(
 class HomeClubViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
-    isAdult: Boolean
+    isAdult: Boolean,
+    attachmentListener: HomeAdapter.AttachmentListener,
+    attachmentMap: HashMap<Long, Bitmap>
 ) : HomeViewHolder<HomeTemplate.Club>(itemView, listener, isAdult) {
-    override fun updated() {
-        TODO("Not yet implemented")
+
+    private val recyclerView: RecyclerView = itemView.recyclerview_club
+    private val nestedAdapter by lazy {
+        HomeClubAdapter(
+            listener,
+            attachmentListener,
+            attachmentMap
+        )
     }
+
+    init {
+        LinearLayoutManager(itemView.context).also { layoutManager ->
+            layoutManager.orientation = LinearLayoutManager.HORIZONTAL
+            recyclerView.layoutManager = layoutManager
+        }
+        recyclerView.adapter = nestedAdapter
+        LinearSnapHelper().attachToRecyclerView(recyclerView)
+    }
+
+    override fun updated() {
+        nestedListener.onLoadClubViewHolder(this)
+    }
+
+    fun submitList(list: List<MemberClubItem>) {
+        nestedAdapter.submitList(list)
+    }
+
+    fun updateItem(position: Int) {
+        nestedAdapter.notifyItemChanged(position)
+    }
+
 }

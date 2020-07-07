@@ -11,6 +11,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.HomeItemType
 import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
@@ -22,10 +23,7 @@ import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.home.viewholder.HomeCarouselViewHolder
-import com.dabenxiang.mimi.view.home.viewholder.HomeClipViewHolder
-import com.dabenxiang.mimi.view.home.viewholder.HomePictureViewHolder
-import com.dabenxiang.mimi.view.home.viewholder.HomeStatisticsViewHolder
+import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -45,6 +43,7 @@ class AdultHomeFragment : BaseFragment() {
 
     private val homeClipViewHolderMap = hashMapOf<Int, HomeClipViewHolder>()
     private val homePictureViewHolderMap = hashMapOf<Int, HomePictureViewHolder>()
+    private val homeClubViewHolderMap = hashMapOf<Int, HomeClubViewHolder>()
     private val attachmentMap: HashMap<Long, Bitmap> = hashMapOf()
 
     override fun getLayoutId() = R.layout.fragment_home
@@ -163,6 +162,17 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
+        viewModel.clubResult.observe(viewLifecycleOwner, Observer {
+            when (val response = it.second) {
+                is Success -> {
+                    val viewHolder = homeClubViewHolderMap[it.first]
+                    val memberClubItems = response.result.content ?: arrayListOf()
+                    viewHolder?.submitList(memberClubItems)
+                }
+                is Error -> Timber.e(response.throwable)
+            }
+        })
+
         viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
@@ -173,6 +183,9 @@ class AdultHomeFragment : BaseFragment() {
                             holder.updateItem(attachmentItem.position)
                         }
                         is HomePictureViewHolder -> {
+                            holder.updateItem(attachmentItem.position)
+                        }
+                        is HomeClubViewHolder -> {
                             holder.updateItem(attachmentItem.position)
                         }
                     }
@@ -246,6 +259,10 @@ class AdultHomeFragment : BaseFragment() {
             TODO("Not yet implemented")
         }
 
+        override fun onClubClick(view: View, item: MemberClubItem) {
+            TODO("Not yet implemented")
+        }
+
         override fun onLoadStatisticsViewHolder(
             vh: HomeStatisticsViewHolder,
             src: HomeTemplate.Statistics
@@ -264,14 +281,19 @@ class AdultHomeFragment : BaseFragment() {
             viewModel.loadNestedStatisticsListForCarousel(vh.adapterPosition, src)
         }
 
-        override fun onLoadClipViewHolder(vh: HomeClipViewHolder, src: HomeTemplate.Clip) {
+        override fun onLoadClipViewHolder(vh: HomeClipViewHolder) {
             homeClipViewHolderMap[vh.adapterPosition] = vh
-            viewModel.loadNestedClipList(vh.adapterPosition, src)
+            viewModel.loadNestedClipList(vh.adapterPosition)
         }
 
-        override fun onLoadPictureViewHolder(vh: HomePictureViewHolder, src: HomeTemplate.Picture) {
+        override fun onLoadPictureViewHolder(vh: HomePictureViewHolder) {
             homePictureViewHolderMap[vh.adapterPosition] = vh
-            viewModel.loadNestedPictureList(vh.adapterPosition, src)
+            viewModel.loadNestedPictureList(vh.adapterPosition)
+        }
+
+        override fun onLoadClubViewHolder(vh: HomeClubViewHolder) {
+            homeClubViewHolderMap[vh.adapterPosition] = vh
+            viewModel.loadNestedClubList(vh.adapterPosition)
         }
     }
 

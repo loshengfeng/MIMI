@@ -10,6 +10,7 @@ import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ApiBasePagingItem
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.model.enums.HomeItemType
@@ -55,6 +56,10 @@ class HomeViewModel : BaseViewModel() {
     val pictureResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberPostItem>>>>> =
         _pictureResult
 
+    private var _clubResult =
+        MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberClubItem>>>>>()
+    val clubResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberClubItem>>>>> =
+        _clubResult
 
     private var _attachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
     val attachmentResult: LiveData<ApiResult<AttachmentItem>> = _attachmentResult
@@ -104,7 +109,7 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-    fun loadNestedClipList(position: Int, src: HomeTemplate.Clip) {
+    fun loadNestedClipList(position: Int) {
         viewModelScope.launch {
             flow {
                 val resp = domainManager.getApiRepository().getMembersPost(
@@ -123,7 +128,7 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-    fun loadNestedPictureList(position: Int, src: HomeTemplate.Picture) {
+    fun loadNestedPictureList(position: Int) {
         viewModelScope.launch {
             flow {
                 val resp = domainManager.getApiRepository().getMembersPost(
@@ -139,6 +144,24 @@ class HomeViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _pictureResult.value = Pair(position, it) }
+        }
+    }
+
+    fun loadNestedClubList(position: Int) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository().getMembersClub(
+                    offset = 0,
+                    limit = PAGING_LIMIT
+                )
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(resp.body()))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _clubResult.value = Pair(position, it) }
         }
     }
 

@@ -10,22 +10,19 @@ import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.HomeItemType
 import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
-import com.dabenxiang.mimi.view.adapter.HomeClipAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.home.viewholder.HomeCarouselViewHolder
-import com.dabenxiang.mimi.view.home.viewholder.HomeClipViewHolder
-import com.dabenxiang.mimi.view.home.viewholder.HomePictureViewHolder
-import com.dabenxiang.mimi.view.home.viewholder.HomeStatisticsViewHolder
+import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -193,6 +190,10 @@ class HomeFragment : BaseFragment() {
             TODO("Not yet implemented")
         }
 
+        override fun onClubClick(view: View, item: MemberClubItem) {
+            TODO("Not yet implemented")
+        }
+
         override fun onLoadStatisticsViewHolder(
             vh: HomeStatisticsViewHolder,
             src: HomeTemplate.Statistics
@@ -211,11 +212,15 @@ class HomeFragment : BaseFragment() {
             viewModel.loadNestedStatisticsListForCarousel(vh.adapterPosition, src)
         }
 
-        override fun onLoadClipViewHolder(vh: HomeClipViewHolder, src: HomeTemplate.Clip) {
+        override fun onLoadClipViewHolder(vh: HomeClipViewHolder) {
 
         }
 
-        override fun onLoadPictureViewHolder(vh: HomePictureViewHolder, src: HomeTemplate.Picture) {
+        override fun onLoadPictureViewHolder(vh: HomePictureViewHolder) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onLoadClubViewHolder(vh: HomeClubViewHolder) {
             TODO("Not yet implemented")
         }
     }
