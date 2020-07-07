@@ -54,7 +54,8 @@ class AdultHomeFragment : BaseFragment() {
         recyclerview_videos.adapter = videoListAdapter
         refresh_home.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
 
-        mainViewModel?.loadHomeCategories()
+        if (mainViewModel?.adult == null)
+            mainViewModel?.loadHomeCategories()
     }
 
     override fun setupObservers() {
@@ -90,6 +91,11 @@ class AdultHomeFragment : BaseFragment() {
                 1 -> {
                     btn_filter.visibility = View.VISIBLE
                     loadCategories(null)
+                }
+                6 -> {
+                    btn_filter.visibility = View.VISIBLE
+                    recyclerview_videos.visibility = View.VISIBLE
+                    refresh_home.visibility = View.GONE
                 }
                 else -> {
                     btn_filter.visibility = View.VISIBLE

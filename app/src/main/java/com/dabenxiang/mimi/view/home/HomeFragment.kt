@@ -9,6 +9,7 @@ import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
@@ -49,7 +50,8 @@ class HomeFragment : BaseFragment() {
         recyclerview_videos.adapter = videoListAdapter
         refresh_home.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
 
-        mainViewModel?.loadHomeCategories()
+        if (mainViewModel?.normal == null)
+            mainViewModel?.loadHomeCategories()
     }
 
     override fun setupObservers() {
@@ -169,6 +171,10 @@ class HomeFragment : BaseFragment() {
             val intent = Intent(requireContext(), PlayerActivity::class.java)
             intent.putExtras(PlayerActivity.createBundle(item))
             startActivityForResult(intent, PlayerActivity.REQUEST_CODE)
+        }
+
+        override fun onClipClick(view: View, item: MemberPostItem) {
+            TODO("Not yet implemented")
         }
 
         override fun onLoadStatisticsViewHolder(
