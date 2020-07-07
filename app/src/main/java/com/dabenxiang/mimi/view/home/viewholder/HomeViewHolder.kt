@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.holder.CarouselHolderItem
 import com.dabenxiang.mimi.view.adapter.CarouselAdapter
@@ -170,12 +171,26 @@ class HomeClipViewHolder(
 ) : HomeViewHolder<HomeTemplate.Clip>(itemView, listener, isAdult) {
 
     private val recyclerView: RecyclerView = itemView.recyclerview_clip
-    private val nestedAdapter by lazy {
-        HomeClipAdapter(nestedListener, isAdult)
+    private val nestedAdapter by lazy { HomeClipAdapter(listener) }
+
+    init {
+        LinearLayoutManager(itemView.context).also { layoutManager ->
+            layoutManager.orientation = LinearLayoutManager.HORIZONTAL
+            recyclerView.layoutManager = layoutManager
+        }
+
+        recyclerView.adapter = nestedAdapter
+        LinearSnapHelper().attachToRecyclerView(recyclerView)
     }
 
     override fun updated() {
-        TODO("Not yet implemented")
+        data?.also {
+            nestedListener.onLoadClipViewHolder(this, it)
+        }
+    }
+
+    fun submitList(list: List<MemberPostItem>) {
+        nestedAdapter.submitList(list)
     }
 }
 

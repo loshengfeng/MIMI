@@ -9,7 +9,9 @@ import androidx.paging.PagedList
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ApiBasePagingItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.StatisticsItem
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +24,7 @@ class HomeViewModel : BaseViewModel() {
     companion object {
         const val CAROUSEL_LIMIT = 5
         const val STATISTICS_LIMIT = 20
+        const val CLIP_LIMIT = 20
     }
 
     private var _videoList = MutableLiveData<PagedList<BaseVideoItem>>()
@@ -39,6 +42,11 @@ class HomeViewModel : BaseViewModel() {
         MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<StatisticsItem>>>>>()
     val videosResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<StatisticsItem>>>>> =
         _videosResult
+
+    private var _clipsResult =
+        MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberPostItem>>>>>()
+    val clipsResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberPostItem>>>>> =
+        _clipsResult
 
     fun setTopTabPosition(position: Int) {
         if (position != tabLayoutPosition.value) {
@@ -82,6 +90,25 @@ class HomeViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _videosResult.value = Pair(position, it) }
+        }
+    }
+
+    fun loadNestedClipList(position: Int, src: HomeTemplate.Clip) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository().getMembersPost(
+                    type = PostType.VIDEO,
+                    offset = 0,
+                    limit = CLIP_LIMIT
+                )
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(resp.body()))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _clipsResult.value = Pair(position, it) }
         }
     }
 

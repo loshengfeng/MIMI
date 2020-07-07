@@ -19,6 +19,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.home.viewholder.HomeCarouselViewHolder
+import com.dabenxiang.mimi.view.home.viewholder.HomeClipViewHolder
 import com.dabenxiang.mimi.view.home.viewholder.HomeStatisticsViewHolder
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
@@ -186,6 +187,10 @@ class HomeFragment : BaseFragment() {
             homeCarouselViewHolderMap[vh.adapterPosition] = vh
             carouselMap[vh.adapterPosition] = src
             viewModel.loadNestedStatisticsListForCarousel(vh.adapterPosition, src)
+        }
+
+        override fun onLoadClipViewHolder(vh: HomeClipViewHolder, src: HomeTemplate.Clip) {
+
         }
     }
 

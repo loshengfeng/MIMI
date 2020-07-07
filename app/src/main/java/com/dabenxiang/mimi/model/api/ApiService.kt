@@ -152,7 +152,12 @@ interface ApiService {
      *
      ***********************************************************/
     @GET("/v1/Members/Post")
-    suspend fun getMembersPost(): Response<ApiBaseItem<List<MemberPostItem>>>
+    suspend fun getMembersPost(
+        @Query("type") type: Int,
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int,
+        @Query("isAdult") isAdult: Boolean = true
+    ): Response<ApiBasePagingItem<List<MemberPostItem>>>
 
     @GET("/v1/Members/Post/{postId}/Comment")
     suspend fun getMembersPostComment(

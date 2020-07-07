@@ -19,30 +19,10 @@ class HomeStatisticsAdapter(
 
     private var list: List<BaseVideoItem.Video>? = null
 
-    private val videoViewHolderListener by lazy {
-        object : BaseIndexViewHolder.IndexViewHolderListener {
-            override fun onClickItemIndex(view: View, index: Int) {
-                if (index > -1) {
-                    list?.get(index)?.also {
-                        nestedListener.onVideoClick(view, PlayerData.parser(it, isAdult))
-                    }
-                }
-            }
-        }
-    }
-
-    fun submitList(submit: List<BaseVideoItem.Video>?) {
-        list = submit
-        notifyDataSetChanged()
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.nested_item_home_statistics, parent, false)
-        return VideoViewHolder(
-            view,
-            videoViewHolderListener
-        )
+        return VideoViewHolder(view, videoViewHolderListener)
     }
 
     override fun getItemCount(): Int {
@@ -51,15 +31,6 @@ class HomeStatisticsAdapter(
             count == null -> 0
             count < 2 -> count
             else -> Int.MAX_VALUE
-        }
-    }
-
-    private fun getRealPosition(position: Int): Int {
-        val count = list?.count()!!
-        return when {
-            count == 0 -> 0
-            position > count - 1 -> position % count
-            else -> position
         }
     }
 
@@ -80,4 +51,31 @@ class HomeStatisticsAdapter(
             holder.bind(null, -1)
         }
     }
+
+    fun submitList(submit: List<BaseVideoItem.Video>?) {
+        list = submit
+        notifyDataSetChanged()
+    }
+
+    private fun getRealPosition(position: Int): Int {
+        val count = list?.count()!!
+        return when {
+            count == 0 -> 0
+            position > count - 1 -> position % count
+            else -> position
+        }
+    }
+
+    private val videoViewHolderListener by lazy {
+        object : BaseIndexViewHolder.IndexViewHolderListener {
+            override fun onClickItemIndex(view: View, index: Int) {
+                if (index > -1) {
+                    list?.get(index)?.also {
+                        nestedListener.onVideoClick(view, PlayerData.parser(it, isAdult))
+                    }
+                }
+            }
+        }
+    }
+
 }

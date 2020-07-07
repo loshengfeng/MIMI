@@ -10,6 +10,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
@@ -20,6 +21,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.home.viewholder.HomeCarouselViewHolder
+import com.dabenxiang.mimi.view.home.viewholder.HomeClipViewHolder
 import com.dabenxiang.mimi.view.home.viewholder.HomeStatisticsViewHolder
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
@@ -37,6 +39,8 @@ class AdultHomeFragment : BaseFragment() {
 
     private val homeStatisticsViewHolderMap = hashMapOf<Int, HomeStatisticsViewHolder>()
     private val statisticsMap = hashMapOf<Int, HomeTemplate.Statistics>()
+
+    private val homeClipViewHolderMap = hashMapOf<Int, HomeClipViewHolder>()
 
     override fun getLayoutId() = R.layout.fragment_home
 
@@ -124,6 +128,17 @@ class AdultHomeFragment : BaseFragment() {
                 is Error -> Timber.e(response.throwable)
             }
         })
+
+        viewModel.clipsResult.observe(viewLifecycleOwner, Observer {
+            when (val response = it.second) {
+                is Success -> {
+                    val viewHolder = homeClipViewHolderMap[it.first]
+                    val memberPostItems = response.result.content ?: arrayListOf()
+                    viewHolder?.submitList(memberPostItems)
+                }
+                is Error -> Timber.e(response.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -176,6 +191,10 @@ class AdultHomeFragment : BaseFragment() {
             startActivity(intent)
         }
 
+        override fun onClipClick(view: View, item: MemberPostItem) {
+            TODO("Not yet implemented")
+        }
+
         override fun onLoadStatisticsViewHolder(
             vh: HomeStatisticsViewHolder,
             src: HomeTemplate.Statistics
@@ -192,6 +211,11 @@ class AdultHomeFragment : BaseFragment() {
             homeCarouselViewHolderMap[vh.adapterPosition] = vh
             carouselMap[vh.adapterPosition] = src
             viewModel.loadNestedStatisticsListForCarousel(vh.adapterPosition, src)
+        }
+
+        override fun onLoadClipViewHolder(vh: HomeClipViewHolder, src: HomeTemplate.Clip) {
+            homeClipViewHolderMap[vh.adapterPosition] = vh
+            viewModel.loadNestedClipList(vh.adapterPosition, src)
         }
     }
 

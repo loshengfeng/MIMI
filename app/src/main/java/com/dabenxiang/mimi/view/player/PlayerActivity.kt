@@ -22,7 +22,10 @@ import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.extension.setNot
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ExceptionResult
-import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.api.vo.PostCommentRequest
+import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
+import com.dabenxiang.mimi.model.api.vo.Source
+import com.dabenxiang.mimi.model.api.vo.VideoEpisode
 import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.serializable.PlayerData
@@ -84,16 +87,6 @@ class PlayerActivity : BaseActivity() {
 
     private var loadReplyCommentBlock: (() -> Unit)? = null
     private var loadCommentLikeBlock: (() -> Unit)? = null
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        dialog = null
-        consumeDialog = null
-        sendCommentDialog = null
-        loadReplyCommentBlock = null
-        loadCommentLikeBlock = null
-    }
 
     private val sourceListAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
@@ -211,9 +204,6 @@ class PlayerActivity : BaseActivity() {
     override fun getLayoutId(): Int {
         return R.layout.activity_player
     }
-
-    private fun obtainIsAdult() =
-        (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerData?)?.isAdult ?: false
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -656,18 +646,11 @@ class PlayerActivity : BaseActivity() {
         }
     }
 
-    private val sendCommentDialogListener = object : SendCommentDialog.SendCommentDialogListener {
-        override fun onSuccess(replyId: Long?, content: String) {
-            viewModel.postComment(PostCommentRequest(replyId, content))
-        }
-    }
-
     override fun onStart() {
         super.onStart()
 
         if (Util.SDK_INT > 23) {
             setupPlayer()
-
             player_view.onResume()
         }
     }
@@ -685,7 +668,6 @@ class PlayerActivity : BaseActivity() {
 
         if ((Util.SDK_INT <= 23 || player == null)) {
             setupPlayer()
-
             player_view.onResume()
         }
 
@@ -706,19 +688,25 @@ class PlayerActivity : BaseActivity() {
 
         if ((Util.SDK_INT <= 23)) {
             player_view.onPause()
-
             releasePlayer()
         }
     }
 
     override fun onStop() {
         super.onStop()
-
         if (Util.SDK_INT > 23) {
             player_view.onPause()
-
             releasePlayer()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        dialog = null
+        consumeDialog = null
+        sendCommentDialog = null
+        loadReplyCommentBlock = null
+        loadCommentLikeBlock = null
     }
 
     private fun setupPlayer() {
@@ -754,7 +742,6 @@ class PlayerActivity : BaseActivity() {
                 isReset = true
                 viewModel.currentVideoUrl = viewModel.nextVideoUrl!!
             }
-
             setupPlayUrl(viewModel.currentVideoUrl!!, isReset)
         }
     }
@@ -967,6 +954,12 @@ class PlayerActivity : BaseActivity() {
         }
     }
 
+    private val sendCommentDialogListener = object : SendCommentDialog.SendCommentDialogListener {
+        override fun onSuccess(replyId: Long?, content: String) {
+            viewModel.postComment(PostCommentRequest(replyId, content))
+        }
+    }
+
     private val playerAnalyticsListener = object : AnalyticsListener {
         override fun onRenderedFirstFrame(
             eventTime: AnalyticsListener.EventTime,
@@ -991,6 +984,10 @@ class PlayerActivity : BaseActivity() {
         ) {
             Timber.d("AnalyticsListener onAudioUnderrun")
         }
+    }
+
+    private fun obtainIsAdult(): Boolean {
+        return (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerData?)?.isAdult ?: false
     }
 
     private fun openLoginDialog() {
