@@ -42,6 +42,9 @@ data class MemberPostItem(
     @SerializedName("clickThroughCount")
     val clickThroughCount: Int = 0,
 
+    @SerializedName("avatarAttachmentId")
+    val avatarAttachmentId: Long = 0,
+
     @SerializedName("creatorId")
     val creatorId: Long = 0,
 

@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.home.viewholder
 
+import android.graphics.Bitmap
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -167,11 +168,13 @@ class HomeStatisticsViewHolder(
 class HomeClipViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
-    isAdult: Boolean
+    isAdult: Boolean,
+    clipListener: HomeClipAdapter.ClipListener,
+    attachmentMap: HashMap<Long, Bitmap>
 ) : HomeViewHolder<HomeTemplate.Clip>(itemView, listener, isAdult) {
 
     private val recyclerView: RecyclerView = itemView.recyclerview_clip
-    private val nestedAdapter by lazy { HomeClipAdapter(listener) }
+    private val nestedAdapter by lazy { HomeClipAdapter(listener, clipListener, attachmentMap) }
 
     init {
         LinearLayoutManager(itemView.context).also { layoutManager ->
@@ -191,6 +194,10 @@ class HomeClipViewHolder(
 
     fun submitList(list: List<MemberPostItem>) {
         nestedAdapter.submitList(list)
+    }
+
+    fun updateItem(position: Int) {
+        nestedAdapter.notifyItemChanged(position)
     }
 }
 

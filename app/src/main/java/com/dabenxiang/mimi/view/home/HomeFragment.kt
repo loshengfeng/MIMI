@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.home
 
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
@@ -10,10 +11,12 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.HomeItemType
 import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
+import com.dabenxiang.mimi.view.adapter.HomeClipAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -38,6 +41,8 @@ class HomeFragment : BaseFragment() {
 
     private val homeStatisticsViewHolderMap = hashMapOf<Int, HomeStatisticsViewHolder>()
     private val statisticsMap = hashMapOf<Int, HomeTemplate.Statistics>()
+
+    private val attachmentMap: HashMap<Long, Bitmap> = hashMapOf()
 
     override fun getLayoutId() = R.layout.fragment_home
 
@@ -149,11 +154,21 @@ class HomeFragment : BaseFragment() {
     }
 
     private val adapter by lazy {
-        HomeAdapter(requireContext(), adapterListener, false)
+        HomeAdapter(requireContext(), adapterListener, false, clipListener, attachmentMap)
     }
 
     private val videoListAdapter by lazy {
         HomeVideoListAdapter(adapterListener, false)
+    }
+
+    private val clipListener = object : HomeClipAdapter.ClipListener {
+        override fun onGetVideoImg(id: Long, position: Int, type: HomeItemType) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onGetAvatar(id: Long, position: Int, type: HomeItemType) {
+            TODO("Not yet implemented")
+        }
     }
 
     private val adapterListener = object : HomeAdapter.EventListener {

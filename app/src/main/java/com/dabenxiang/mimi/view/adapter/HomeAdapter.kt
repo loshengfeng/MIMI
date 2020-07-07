@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.adapter
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,14 +14,17 @@ import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.HomeTemplate
 import com.dabenxiang.mimi.view.home.viewholder.*
-import timber.log.Timber
 
 class HomeAdapter(
     val context: Context,
     private val listener: EventListener,
-    private val isAdult: Boolean
+    private val isAdult: Boolean,
+    private val clipListener: HomeClipAdapter.ClipListener,
+    private val attachmentMap: HashMap<Long, Bitmap>
 ) :
     ListAdapter<HomeTemplate, BaseViewHolder>(DIFF_CALLBACK) {
+
+    val homeViewHolderMap: HashMap<HomeItemType, BaseViewHolder> = hashMapOf()
 
     companion object {
         private val DIFF_CALLBACK =
@@ -95,7 +99,7 @@ class HomeAdapter(
                         R.layout.item_home_clip,
                         parent,
                         false
-                    ), listener, isAdult
+                    ), listener, isAdult, clipListener, attachmentMap
                 )
             }
             HomeItemType.PICTURE -> {
@@ -121,6 +125,8 @@ class HomeAdapter(
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         val template = getItem(position)
+        homeViewHolderMap[template.type] = holder
+
         when (template.type) {
             HomeItemType.HEADER -> {
                 holder as HeaderViewHolder

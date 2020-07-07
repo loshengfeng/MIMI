@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.home
 
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
@@ -11,10 +12,12 @@ import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.HomeItemType
 import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
+import com.dabenxiang.mimi.view.adapter.HomeClipAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -41,6 +44,7 @@ class AdultHomeFragment : BaseFragment() {
     private val statisticsMap = hashMapOf<Int, HomeTemplate.Statistics>()
 
     private val homeClipViewHolderMap = hashMapOf<Int, HomeClipViewHolder>()
+    private val attachmentMap: HashMap<Long, Bitmap> = hashMapOf()
 
     override fun getLayoutId() = R.layout.fragment_home
 
@@ -54,8 +58,9 @@ class AdultHomeFragment : BaseFragment() {
         recyclerview_videos.adapter = videoListAdapter
         refresh_home.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
 
-        if (mainViewModel?.adult == null)
+        if (mainViewModel?.adult == null) {
             mainViewModel?.loadHomeCategories()
+        }
     }
 
     override fun setupObservers() {
@@ -145,6 +150,21 @@ class AdultHomeFragment : BaseFragment() {
                 is Error -> Timber.e(response.throwable)
             }
         })
+
+        viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    val attachmentItem = it.result
+                    attachmentMap[attachmentItem.id] = attachmentItem.bitmap
+                    when (val holder = adapter.homeViewHolderMap[attachmentItem.type]) {
+                        is HomeClipViewHolder -> {
+                            holder.updateItem(attachmentItem.position)
+                        }
+                    }
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -173,11 +193,21 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val adapter by lazy {
-        HomeAdapter(requireContext(), adapterListener, true)
+        HomeAdapter(requireContext(), adapterListener, true, clipListener, attachmentMap)
     }
 
     private val videoListAdapter by lazy {
         HomeVideoListAdapter(adapterListener, true)
+    }
+
+    private val clipListener = object : HomeClipAdapter.ClipListener {
+        override fun onGetVideoImg(id: Long, position: Int, type: HomeItemType) {
+            viewModel.getAttachment(id, position, type)
+        }
+
+        override fun onGetAvatar(id: Long, position: Int, type: HomeItemType) {
+            viewModel.getAttachment(id, position, type)
+        }
     }
 
     private val adapterListener = object : HomeAdapter.EventListener {

@@ -8,18 +8,29 @@ data class PostContentItem(
     val images: ArrayList<PostImageItem> = arrayListOf(),
 
     @SerializedName("shortVideos")
-    val shortVideo: PostVideoItem,
-
-    @SerializedName("length")
-    val length: String = ""
+    val shortVideo: PostVideoItem
 )
 
 data class PostImageItem(
+
+    @SerializedName("id")
+    val id: String = "",
+
     @SerializedName("url")
-    val url: String = ""
+    val url: String = "",
+
+    @SerializedName("ext")
+    val ext: String = ""
 )
 
 data class PostVideoItem(
+
+    @SerializedName("id")
+    val id: String = "",
+
     @SerializedName("url")
-    val url: String = ""
+    val url: String = "",
+
+    @SerializedName("length")
+    val length: String = ""
 )

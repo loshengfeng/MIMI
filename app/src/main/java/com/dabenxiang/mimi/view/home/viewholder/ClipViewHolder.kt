@@ -1,15 +1,24 @@
 package com.dabenxiang.mimi.view.home.viewholder
 
+import android.graphics.Bitmap
+import android.text.TextUtils
 import android.view.View
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.error.PostContentItem
+import com.dabenxiang.mimi.model.enums.HomeItemType
+import com.dabenxiang.mimi.view.adapter.HomeClipAdapter
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.nested_item_home_clip.view.*
 
-class ClipViewHolder(itemView: View, onClickListener: BaseIndexViewHolder.IndexViewHolderListener) :
+class ClipViewHolder(
+    itemView: View,
+    onClickListener: IndexViewHolderListener,
+    private val onClipListener: HomeClipAdapter.ClipListener,
+    private val attachmentMap: HashMap<Long, Bitmap>
+) :
     BaseIndexViewHolder<MemberPostItem>(itemView, onClickListener) {
 
     private val card = itemView.layout_card!!
@@ -27,23 +36,52 @@ class ClipViewHolder(itemView: View, onClickListener: BaseIndexViewHolder.IndexV
     }
 
     override fun updated(model: MemberPostItem?) {
-
         val postContentItem = Gson().fromJson(model?.content, PostContentItem::class.java)
 
-        Glide.with(itemView.context)
-            .load(postContentItem.images[0])
-            .into(videoImage)
+        val postImageItem = postContentItem.images[0]
 
-        videoTime.text = postContentItem.length
+        if (!TextUtils.isEmpty(postImageItem.url)) {
+            Glide.with(itemView.context)
+                .load(postImageItem.url)
+                .into(videoImage)
+        } else {
+            if (!TextUtils.isEmpty(postImageItem.id)) {
+                if (attachmentMap[postImageItem.id.toLong()] == null) {
+                    onClipListener.onGetVideoImg(
+                        postImageItem.id.toLong(),
+                        index,
+                        HomeItemType.CLIP
+                    )
 
-        profileName.text = ""
+                } else {
+                    val bitmap = attachmentMap[postImageItem.id.toLong()]
+                    Glide.with(itemView.context)
+                        .load(bitmap)
+                        .into(videoImage)
+                }
+            }
+        }
+
+        videoTime.text = postContentItem.shortVideo.length
+
+        profileName.text = model?.creatorId.toString()
         profileTime.text = model?.creationDate
         title.text = model?.title
 
-        card.setCardBackgroundColor(itemView.resources.getColor(R.color.adult_color_card_background, null))
+        card.setCardBackgroundColor(
+            itemView.resources.getColor(
+                R.color.adult_color_card_background,
+                null
+            )
+        )
 
-//        val creatorId = model?.creatorId
-
+        if (attachmentMap[model?.avatarAttachmentId] == null) {
+            onClipListener.onGetAvatar(model?.avatarAttachmentId!!, index, HomeItemType.CLIP)
+        } else {
+            val bitmap = attachmentMap[model?.avatarAttachmentId]
+            Glide.with(itemView.context)
+                .load(bitmap)
+                .into(profileImg)
+        }
     }
-
 }

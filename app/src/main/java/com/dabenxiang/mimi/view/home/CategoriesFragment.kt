@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.serializable.CategoriesData
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.FilterTabAdapter
@@ -54,6 +55,10 @@ class CategoriesFragment : BaseFragment() {
             val intent = Intent(requireContext(), PlayerActivity::class.java)
             intent.putExtras(PlayerActivity.createBundle(item))
             startActivity(intent)
+        }
+
+        override fun onClipClick(view: View, item: MemberPostItem) {
+            TODO("Not yet implemented")
         }
 
         override fun onLoadStatisticsViewHolder(
