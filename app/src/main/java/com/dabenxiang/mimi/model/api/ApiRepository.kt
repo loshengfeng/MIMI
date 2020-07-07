@@ -246,6 +246,19 @@ class ApiRepository(private val apiService: ApiService) {
         commentId: Long
     ) = apiService.deleteMembersPostCommentLike(postId, commentId)
 
+
+    /**********************************************************
+     *
+     *                  Members/Club
+     *
+     ***********************************************************/
+    suspend fun getMembersClub(
+        offset: Int,
+        limit: Int
+    ): Response<ApiBasePagingItem<List<MemberClubItem>>> {
+        return apiService.getMembersClub(offset, limit)
+    }
+
     /**********************************************************
      *
      *                   Members/Home/Categories
