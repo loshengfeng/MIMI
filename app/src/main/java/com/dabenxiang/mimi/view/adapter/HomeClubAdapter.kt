@@ -22,7 +22,13 @@ class HomeClubAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.nested_item_home_club, parent, false)
-        return ClubViewHolder(view, clubClickListener, attachmentListener, attachmentMap)
+        return ClubViewHolder(
+            view,
+            clubClickListener,
+            parent.context,
+            attachmentListener,
+            attachmentMap
+        )
     }
 
     override fun getItemCount(): Int {

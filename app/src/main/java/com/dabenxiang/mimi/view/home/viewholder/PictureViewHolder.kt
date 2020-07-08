@@ -5,14 +5,13 @@ import android.text.TextUtils
 import android.view.View
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.error.PostContentItem
 import com.dabenxiang.mimi.model.enums.HomeItemType
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.nested_item_home_picture.view.*
-import timber.log.Timber
 
 class PictureViewHolder(
     itemView: View,
@@ -24,7 +23,7 @@ class PictureViewHolder(
 
     private val card = itemView.layout_card!!
     private val pictureImage = itemView.iv_poster!!
-    private val profileImg = itemView.img_profile!!
+    private val avatarImg = itemView.img_avatar!!
     private val profileName = itemView.tv_name!!
     private val profileTime = itemView.tv_time!!
     private val title = itemView.tv_title!!
@@ -36,9 +35,9 @@ class PictureViewHolder(
     }
 
     override fun updated(model: MemberPostItem?) {
-        val postContentItem = Gson().fromJson(model?.content, PostContentItem::class.java)
+        val contentItem = Gson().fromJson(model?.content, ContentItem::class.java)
 
-        val postImageItem = postContentItem.images[0]
+        val postImageItem = contentItem.images[0]
 
         if (!TextUtils.isEmpty(postImageItem.url)) {
             Glide.with(itemView.context)
@@ -83,7 +82,7 @@ class PictureViewHolder(
             Glide.with(itemView.context)
                 .load(bitmap)
                 .circleCrop()
-                .into(profileImg)
+                .into(avatarImg)
         }
     }
 }

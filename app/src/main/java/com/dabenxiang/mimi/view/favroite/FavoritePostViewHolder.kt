@@ -92,7 +92,7 @@ class FavoritePostViewHolder(
             ).format(date)
         }
         val contentItem = gson.fromJson(data?.content.toString(), ContentItem::class.java)
-        tvLength.text = contentItem?.shortVideoItem?.length
+        tvLength.text = contentItem?.shortVideo?.length
 
         when (data?.isFollow) {
             true -> {
