@@ -23,6 +23,7 @@ import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.home.viewholder.HomeCarouselViewHolder
 import com.dabenxiang.mimi.view.home.viewholder.HomeClipViewHolder
 import com.dabenxiang.mimi.view.home.viewholder.HomeStatisticsViewHolder
@@ -227,8 +228,14 @@ class AdultHomeFragment : BaseFragment() {
             startActivity(intent)
         }
 
-        override fun onClipClick(view: View, item: MemberPostItem) {
-            TODO("Not yet implemented")
+        override fun onClipClick(view: View, item: List<MemberPostItem>) {
+            val bundle = ClipFragment.createBundle(ArrayList(item))
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_adultHomeFragment_to_clipFragment,
+                    bundle
+                )
+            )
         }
 
         override fun onLoadStatisticsViewHolder(

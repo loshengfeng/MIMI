@@ -48,7 +48,7 @@ class HomeAdapter(
     interface EventListener {
         fun onHeaderItemClick(view: View, item: HomeTemplate.Header)
         fun onVideoClick(view: View, item: PlayerData)
-        fun onClipClick(view: View, item: MemberPostItem)
+        fun onClipClick(view: View, item: List<MemberPostItem>)
         fun onLoadStatisticsViewHolder(vh: HomeStatisticsViewHolder, src: HomeTemplate.Statistics)
         fun onLoadCarouselViewHolder(vh: HomeCarouselViewHolder, src: HomeTemplate.Carousel)
         fun onLoadClipViewHolder(vh: HomeClipViewHolder, src: HomeTemplate.Clip)

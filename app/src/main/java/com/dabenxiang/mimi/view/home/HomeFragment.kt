@@ -188,8 +188,7 @@ class HomeFragment : BaseFragment() {
             startActivityForResult(intent, PlayerActivity.REQUEST_CODE)
         }
 
-        override fun onClipClick(view: View, item: MemberPostItem) {
-            TODO("Not yet implemented")
+        override fun onClipClick(view: View, item: List<MemberPostItem>) {
         }
 
         override fun onLoadStatisticsViewHolder(

@@ -57,8 +57,7 @@ class CategoriesFragment : BaseFragment() {
             startActivity(intent)
         }
 
-        override fun onClipClick(view: View, item: MemberPostItem) {
-            TODO("Not yet implemented")
+        override fun onClipClick(view: View, item: List<MemberPostItem>) {
         }
 
         override fun onLoadStatisticsViewHolder(
