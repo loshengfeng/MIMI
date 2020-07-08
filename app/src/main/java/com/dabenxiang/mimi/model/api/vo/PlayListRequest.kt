@@ -4,10 +4,10 @@ import com.google.gson.annotations.SerializedName
 
 data class PlayListRequest(
     @SerializedName("videoId")
-    val videoId: Int?,
+    val videoId: Long?,
 
-    @SerializedName("videoEpisodeId")
-    val videoEpisodeId: Int?,
+//    @SerializedName("videoEpisodeId")
+//    val videoEpisodeId: Int?,
 
     @SerializedName("playlistType")
     val playlistType: Int?

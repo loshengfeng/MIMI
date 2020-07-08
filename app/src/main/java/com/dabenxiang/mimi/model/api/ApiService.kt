@@ -304,9 +304,9 @@ interface ApiService {
         @Body request: PlayListRequest
     ): Response<Void>
 
-    @DELETE("/v1/Members/Me/Playlist")
+    @DELETE("/v1/Members/Me/Playlist/{videoId}")
     suspend fun deletePlaylist(
-        @Body ids: List<Int>
+        @Path("videoId") videoId: Long
     ): Response<Void>
 
     @GET("/v1/Members/Me/Playlist/{playlistType}")

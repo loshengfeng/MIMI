@@ -369,6 +369,9 @@ class PlayerActivity : BaseActivity() {
                         sendCommentDialog?.dismiss()
                         sendCommentDialog = null
 
+                        headNoComment.title_no_comment.visibility = View.GONE
+                        viewModel.commentCount.value = viewModel.commentCount.value?.plus(1)
+
                         viewModel.setupCommentDataSource(playerInfoAdapter)
                     }
                     is ApiResult.Error -> onApiError(it.throwable)
@@ -639,6 +642,46 @@ class PlayerActivity : BaseActivity() {
                 SendCommentDialog.newInstance(isAdult, null, null, sendCommentDialogListener)
             sendCommentDialog?.show(supportFragmentManager, null)
         }
+
+        tv_favorite.setOnClickListener {
+            viewModel.modifyFavorite()
+        }
+
+        viewModel.apiAddFavoriteResult.observe(this, Observer {event ->
+            event?.getContentIfNotHandled()?.also { apiResult ->
+                when (apiResult) {
+                    is ApiResult.Loading -> progressHUD.show()
+                    is ApiResult.Loaded -> {
+                        progressHUD.dismiss()
+                        viewModel.favoriteVideo.value = !(viewModel.favoriteVideo.value ?: false)
+                        viewModel.favoriteVideoCount.value = if (viewModel.favoriteVideo.value == true) viewModel.favoriteVideoCount.value?.plus(1) else viewModel.favoriteVideoCount.value?.minus(1)
+                    }
+                    is ApiResult.Error -> {
+                        onApiError(apiResult.throwable)
+                    }
+                }
+            }
+        })
+
+        tv_like.setOnClickListener {
+            viewModel.modifyLike()
+        }
+
+        viewModel.apiAddLikeResult.observe(this, Observer { event ->
+            event?.getContentIfNotHandled()?.also { apiResult ->
+                when (apiResult) {
+                    is ApiResult.Loading -> progressHUD.show()
+                    is ApiResult.Loaded -> {
+                        progressHUD.dismiss()
+                        viewModel.likeVideo.value = !(viewModel.likeVideo.value ?: false)
+                        viewModel.likeVideoCount.value = if (viewModel.likeVideo.value == true) viewModel.likeVideoCount.value?.plus(1) else viewModel.likeVideoCount.value?.minus(1)
+                    }
+                    is ApiResult.Error -> {
+                        onApiError(apiResult.throwable)
+                    }
+                }
+            }
+        })
     }
 
     override fun onStart() {
