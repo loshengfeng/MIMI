@@ -179,9 +179,7 @@ class AdultHomeFragment : BaseFragment() {
                 is Success -> {
                     when (val holder = adapter.homeViewHolderMap[HomeItemType.CLUB]) {
                         is HomeClubViewHolder -> {
-                            val item = holder.nestedAdapter.memberClubItems[it.result]
-                            item.isFollow = true
-                            holder.updateItem(it.result)
+                            holder.updateItemByFollow(it.result, true)
                         }
                     }
                 }
@@ -194,9 +192,7 @@ class AdultHomeFragment : BaseFragment() {
                 is Success -> {
                     when (val holder = adapter.homeViewHolderMap[HomeItemType.CLUB]) {
                         is HomeClubViewHolder -> {
-                            val item = holder.nestedAdapter.memberClubItems[it.result]
-                            item.isFollow = false
-                            holder.updateItem(it.result)
+                            holder.updateItemByFollow(it.result, false)
                         }
                     }
                 }

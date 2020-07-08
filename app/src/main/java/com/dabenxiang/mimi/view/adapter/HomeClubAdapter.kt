@@ -18,7 +18,7 @@ class HomeClubAdapter(
     private val attachmentMap: HashMap<Long, Bitmap>
 ) : RecyclerView.Adapter<BaseViewHolder>() {
 
-    var memberClubItems: List<MemberClubItem> = arrayListOf()
+    private var memberClubItems: List<MemberClubItem> = arrayListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -46,6 +46,10 @@ class HomeClubAdapter(
     fun submitList(list: List<MemberClubItem>) {
         memberClubItems = list
         notifyDataSetChanged()
+    }
+
+    fun getMemberClubItems(): List<MemberClubItem> {
+        return memberClubItems
     }
 
     private val clubClickListener by lazy {

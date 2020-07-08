@@ -279,8 +279,18 @@ class HomeClubViewHolder(
         nestedAdapter.submitList(list)
     }
 
+    fun getItem(position: Int): MemberClubItem {
+        return nestedAdapter.getMemberClubItems()[position]
+    }
+
     fun updateItem(position: Int) {
         nestedAdapter.notifyItemChanged(position)
+    }
+
+    fun updateItemByFollow(position: Int, result: Boolean) {
+        val item = getItem(position)
+        item.isFollow = result
+        updateItem(position)
     }
 
 }
