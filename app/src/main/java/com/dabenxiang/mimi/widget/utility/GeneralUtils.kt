@@ -2,6 +2,8 @@ package com.dabenxiang.mimi.widget.utility
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.provider.Settings
 import android.util.DisplayMetrics
@@ -126,5 +128,14 @@ object GeneralUtils {
             statusBarHeight = context.resources.getDimensionPixelSize(resourceId)
         }
         return statusBarHeight
+    }
+
+    /**
+     * 複製到剪貼板
+     */
+    fun copyToClipboard(context: Context, content: String) {
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText("share", content)
+        clipboard.setPrimaryClip(clip)
     }
 }
