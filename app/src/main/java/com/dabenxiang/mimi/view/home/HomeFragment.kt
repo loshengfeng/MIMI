@@ -10,21 +10,20 @@ import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.HomeItemType
 import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
-import com.dabenxiang.mimi.view.adapter.HomeClipAdapter
+import com.dabenxiang.mimi.view.adapter.HomeClubAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.home.viewholder.HomeCarouselViewHolder
-import com.dabenxiang.mimi.view.home.viewholder.HomeClipViewHolder
-import com.dabenxiang.mimi.view.home.viewholder.HomeStatisticsViewHolder
+import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -153,21 +152,32 @@ class HomeFragment : BaseFragment() {
         }, false)
     }
 
+    private val clubListener = object : HomeClubAdapter.ClubListener {
+        override fun followClub(id: Int, position: Int) {
+        }
+
+        override fun cancelFollowClub(id: Int, position: Int) {
+        }
+    }
+
     private val adapter by lazy {
-        HomeAdapter(requireContext(), adapterListener, false, clipListener, attachmentMap)
+        HomeAdapter(
+            requireContext(),
+            adapterListener,
+            false,
+            clubListener,
+            attachmentListener,
+            attachmentMap
+        )
     }
 
     private val videoListAdapter by lazy {
         HomeVideoListAdapter(adapterListener, false)
     }
 
-    private val clipListener = object : HomeClipAdapter.ClipListener {
-        override fun onGetVideoImg(id: Long, position: Int, type: HomeItemType) {
-            TODO("Not yet implemented")
-        }
+    private val attachmentListener = object : HomeAdapter.AttachmentListener {
+        override fun onGetAttachment(id: Long, position: Int, type: HomeItemType) {
 
-        override fun onGetAvatar(id: Long, position: Int, type: HomeItemType) {
-            TODO("Not yet implemented")
         }
     }
 
@@ -191,6 +201,13 @@ class HomeFragment : BaseFragment() {
         override fun onClipClick(view: View, item: List<MemberPostItem>) {
         }
 
+        override fun onPictureClick(view: View, item: MemberPostItem) {
+
+        }
+
+        override fun onClubClick(view: View, item: MemberClubItem) {
+        }
+
         override fun onLoadStatisticsViewHolder(
             vh: HomeStatisticsViewHolder,
             src: HomeTemplate.Statistics
@@ -209,8 +226,16 @@ class HomeFragment : BaseFragment() {
             viewModel.loadNestedStatisticsListForCarousel(vh.adapterPosition, src)
         }
 
-        override fun onLoadClipViewHolder(vh: HomeClipViewHolder, src: HomeTemplate.Clip) {
+        override fun onLoadClipViewHolder(vh: HomeClipViewHolder) {
 
+        }
+
+        override fun onLoadPictureViewHolder(vh: HomePictureViewHolder) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onLoadClubViewHolder(vh: HomeClubViewHolder) {
+            TODO("Not yet implemented")
         }
     }
 

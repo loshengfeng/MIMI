@@ -1,8 +1,5 @@
 package com.dabenxiang.mimi.view.favroite
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
 import android.view.View
 import android.widget.ImageView
@@ -265,21 +262,16 @@ class FavoriteFragment : BaseFragment() {
 
                 FunctionType.SHARE -> {
                     /* 點擊後複製網址 */
-                    val url = when (item) {
-                        is PlayItem -> {
-                            // todo: API hsn no url...
-//                            item.url
-                            "url"
-                        }
-                        else -> {
-                            "url"
+                    when(item){
+                        is PlayItem->{
+                            if (item.tags == null || item.tags.first().isEmpty() || item.videoId == null) {
+                                GeneralUtils.showToast(requireContext(), "copy url error")
+                            } else {
+                                GeneralUtils.copyToClipboard(requireContext(), viewModel.getShareUrl(item.tags[0], item.videoId, item.episode))
+                                GeneralUtils.showToast(requireContext(), "already copy url")
+                            }
                         }
                     }
-                    val clipboard =
-                        requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-                    val clip = ClipData.newPlainText(url, url)
-                    clipboard.setPrimaryClip(clip)
-                    GeneralUtils.showToast(requireContext(), "already copy url")
                 }
 
                 FunctionType.MORE -> {

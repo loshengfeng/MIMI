@@ -22,10 +22,7 @@ import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.extension.setNot
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ExceptionResult
-import com.dabenxiang.mimi.model.api.vo.PostCommentRequest
-import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
-import com.dabenxiang.mimi.model.api.vo.Source
-import com.dabenxiang.mimi.model.api.vo.VideoEpisode
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.serializable.PlayerData
@@ -369,6 +366,9 @@ class PlayerActivity : BaseActivity() {
                         sendCommentDialog?.dismiss()
                         sendCommentDialog = null
 
+                        headNoComment.title_no_comment.visibility = View.GONE
+                        viewModel.commentCount.value = viewModel.commentCount.value?.plus(1)
+
                         viewModel.setupCommentDataSource(playerInfoAdapter)
                     }
                     is ApiResult.Error -> onApiError(it.throwable)
@@ -418,6 +418,7 @@ class PlayerActivity : BaseActivity() {
                 }
                 is ApiResult.Success -> {
                     val result = it.result
+                    viewModel.category = result.categories?.get(0) ?: ""
                     //Timber.d("Result: $result")
 
                     if (isFirstInit) {
@@ -638,6 +639,51 @@ class PlayerActivity : BaseActivity() {
             sendCommentDialog =
                 SendCommentDialog.newInstance(isAdult, null, null, sendCommentDialogListener)
             sendCommentDialog?.show(supportFragmentManager, null)
+        }
+
+        tv_favorite.setOnClickListener {
+            viewModel.modifyFavorite()
+        }
+
+        viewModel.apiAddFavoriteResult.observe(this, Observer {event ->
+            event?.getContentIfNotHandled()?.also { apiResult ->
+                when (apiResult) {
+                    is ApiResult.Loading -> progressHUD.show()
+                    is ApiResult.Loaded -> {
+                        progressHUD.dismiss()
+                        viewModel.favoriteVideo.value = !(viewModel.favoriteVideo.value ?: false)
+                        viewModel.favoriteVideoCount.value = if (viewModel.favoriteVideo.value == true) viewModel.favoriteVideoCount.value?.plus(1) else viewModel.favoriteVideoCount.value?.minus(1)
+                    }
+                    is ApiResult.Error -> {
+                        onApiError(apiResult.throwable)
+                    }
+                }
+            }
+        })
+
+        tv_like.setOnClickListener {
+            viewModel.modifyLike()
+        }
+
+        viewModel.apiAddLikeResult.observe(this, Observer { event ->
+            event?.getContentIfNotHandled()?.also { apiResult ->
+                when (apiResult) {
+                    is ApiResult.Loading -> progressHUD.show()
+                    is ApiResult.Loaded -> {
+                        progressHUD.dismiss()
+                        viewModel.likeVideo.value = !(viewModel.likeVideo.value ?: false)
+                        viewModel.likeVideoCount.value = if (viewModel.likeVideo.value == true) viewModel.likeVideoCount.value?.plus(1) else viewModel.likeVideoCount.value?.minus(1)
+                    }
+                    is ApiResult.Error -> {
+                        onApiError(apiResult.throwable)
+                    }
+                }
+            }
+        })
+
+        iv_share.setOnClickListener {
+            GeneralUtils.copyToClipboard(baseContext, viewModel.getShareUrl(viewModel.category, viewModel.videoId, viewModel.episodeId.toString()))
+            GeneralUtils.showToast(baseContext, "already copy url")
         }
     }
 

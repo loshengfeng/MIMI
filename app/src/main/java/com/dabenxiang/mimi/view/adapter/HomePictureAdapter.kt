@@ -9,9 +9,9 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.view.home.viewholder.ClipViewHolder
+import com.dabenxiang.mimi.view.home.viewholder.PictureViewHolder
 
-class HomeClipAdapter(
+class HomePictureAdapter(
     nestedListener: HomeAdapter.EventListener,
     private val attachmentListener: HomeAdapter.AttachmentListener,
     private val attachmentMap: HashMap<Long, Bitmap>
@@ -21,8 +21,8 @@ class HomeClipAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.nested_item_home_clip, parent, false)
-        return ClipViewHolder(view, clipClickListener, attachmentListener, attachmentMap)
+            .inflate(R.layout.nested_item_home_picture, parent, false)
+        return PictureViewHolder(view, pictureClickListener, attachmentListener, attachmentMap)
     }
 
     override fun getItemCount(): Int {
@@ -30,7 +30,7 @@ class HomeClipAdapter(
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
-        holder as ClipViewHolder
+        holder as PictureViewHolder
         val memberPostItem = memberPostItems[position]
         holder.bind(memberPostItem, position)
     }
@@ -40,11 +40,12 @@ class HomeClipAdapter(
         notifyDataSetChanged()
     }
 
-    private val clipClickListener by lazy {
+    private val pictureClickListener by lazy {
         object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
-                nestedListener.onClipClick(view, memberPostItems)
+                nestedListener.onPictureClick(view, memberPostItems[index])
             }
         }
     }
+
 }

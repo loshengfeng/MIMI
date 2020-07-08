@@ -144,6 +144,8 @@
     <string name="follow_clean">清除</string>
     <string name="text_more">更多</string>
     <string name="text_search">搜寻</string>
+    <string name="text_follow">关注</string>
+    <string name="text_post">帖子</string>
 
     <string-array name="filter_gender">
         <item>女</item>
@@ -177,5 +179,10 @@
 
     <!-- Follow -->
     <string name="my_follow_follow">已关注</string>
+
+
+    <!-- Club -->
+    <string name="club_follow">+关注</string>
+    <string name="club_followed">已关注</string>
 
 </resources>

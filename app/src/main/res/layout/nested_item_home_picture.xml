@@ -24,23 +24,6 @@
                 android:id="@+id/iv_poster"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
-
-            <com.yulichswift.roundedview.widget.RoundedTextView
-                android:id="@+id/tv_video_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginBottom="6dp"
-                android:paddingStart="6dp"
-                android:paddingTop="2dp"
-                android:paddingEnd="6dp"
-                android:paddingBottom="2dp"
-                android:textColor="@color/color_white_1"
-                app:btn_corner_radius="4dp"
-                app:btn_solid_color="@color/color_black_1_50"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:text="01:54:10" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>

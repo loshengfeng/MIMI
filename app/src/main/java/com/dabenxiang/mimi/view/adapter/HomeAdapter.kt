@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.HomeItemType
 import com.dabenxiang.mimi.model.serializable.PlayerData
@@ -19,7 +20,8 @@ class HomeAdapter(
     val context: Context,
     private val listener: EventListener,
     private val isAdult: Boolean,
-    private val clipListener: HomeClipAdapter.ClipListener,
+    private val clubListener: HomeClubAdapter.ClubListener,
+    private val attachmentListener: AttachmentListener,
     private val attachmentMap: HashMap<Long, Bitmap>
 ) :
     ListAdapter<HomeTemplate, BaseViewHolder>(DIFF_CALLBACK) {
@@ -49,9 +51,13 @@ class HomeAdapter(
         fun onHeaderItemClick(view: View, item: HomeTemplate.Header)
         fun onVideoClick(view: View, item: PlayerData)
         fun onClipClick(view: View, item: List<MemberPostItem>)
+        fun onPictureClick(view: View, item: MemberPostItem)
+        fun onClubClick(view: View, item: MemberClubItem)
         fun onLoadStatisticsViewHolder(vh: HomeStatisticsViewHolder, src: HomeTemplate.Statistics)
         fun onLoadCarouselViewHolder(vh: HomeCarouselViewHolder, src: HomeTemplate.Carousel)
-        fun onLoadClipViewHolder(vh: HomeClipViewHolder, src: HomeTemplate.Clip)
+        fun onLoadClipViewHolder(vh: HomeClipViewHolder)
+        fun onLoadPictureViewHolder(vh: HomePictureViewHolder)
+        fun onLoadClubViewHolder(vh: HomeClubViewHolder)
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -99,7 +105,7 @@ class HomeAdapter(
                         R.layout.item_home_clip,
                         parent,
                         false
-                    ), listener, isAdult, clipListener, attachmentMap
+                    ), listener, isAdult, attachmentListener, attachmentMap
                 )
             }
             HomeItemType.PICTURE -> {
@@ -108,7 +114,7 @@ class HomeAdapter(
                         R.layout.item_home_picture,
                         parent,
                         false
-                    ), listener, isAdult
+                    ), listener, isAdult, attachmentListener, attachmentMap
                 )
             }
             HomeItemType.CLUB -> {
@@ -117,7 +123,7 @@ class HomeAdapter(
                         R.layout.item_home_club,
                         parent,
                         false
-                    ), listener, isAdult
+                    ), listener, isAdult, clubListener, attachmentListener, attachmentMap
                 )
             }
         }
@@ -149,13 +155,18 @@ class HomeAdapter(
                 holder.bind(template)
             }
             HomeItemType.PICTURE -> {
-//                holder as HomePictureViewHolder
-//                holder.bind(template)
+                holder as HomePictureViewHolder
+                holder.bind(template)
             }
             HomeItemType.CLUB -> {
-//                holder as HomeClubViewHolder
-//                holder.bind(template)
+                holder as HomeClubViewHolder
+                holder.bind(template)
             }
         }
     }
+
+    interface AttachmentListener {
+        fun onGetAttachment(id: Long, position: Int, type: HomeItemType)
+    }
+
 }

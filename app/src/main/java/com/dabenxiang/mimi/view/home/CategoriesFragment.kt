@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.serializable.CategoriesData
 import com.dabenxiang.mimi.model.serializable.PlayerData
@@ -17,9 +18,7 @@ import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.home.viewholder.HomeCarouselViewHolder
-import com.dabenxiang.mimi.view.home.viewholder.HomeClipViewHolder
-import com.dabenxiang.mimi.view.home.viewholder.HomeStatisticsViewHolder
+import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import kotlinx.android.synthetic.main.fragment_categories.*
 import timber.log.Timber
@@ -60,6 +59,14 @@ class CategoriesFragment : BaseFragment() {
         override fun onClipClick(view: View, item: List<MemberPostItem>) {
         }
 
+        override fun onPictureClick(view: View, item: MemberPostItem) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onClubClick(view: View, item: MemberClubItem) {
+            TODO("Not yet implemented")
+        }
+
         override fun onLoadStatisticsViewHolder(
             vh: HomeStatisticsViewHolder,
             src: HomeTemplate.Statistics
@@ -74,8 +81,16 @@ class CategoriesFragment : BaseFragment() {
 
         }
 
-        override fun onLoadClipViewHolder(vh: HomeClipViewHolder, src: HomeTemplate.Clip) {
+        override fun onLoadClipViewHolder(vh: HomeClipViewHolder) {
+            TODO("Not yet implemented")
+        }
 
+        override fun onLoadPictureViewHolder(vh: HomePictureViewHolder) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onLoadClubViewHolder(vh: HomeClubViewHolder) {
+            TODO("Not yet implemented")
         }
     }
 

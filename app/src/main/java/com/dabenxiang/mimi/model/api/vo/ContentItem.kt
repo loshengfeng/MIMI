@@ -3,9 +3,10 @@ package com.dabenxiang.mimi.model.api.vo
 import com.google.gson.annotations.SerializedName
 
 data class ContentItem(
+
     @SerializedName("images")
-    val images: List<ImageItem>?,
+    val images: ArrayList<ImageItem> = arrayListOf(),
 
     @SerializedName("shortVideos")
-    val shortVideoItem: ShortVideoItem?
+    val shortVideo: ShortVideoItem
 )

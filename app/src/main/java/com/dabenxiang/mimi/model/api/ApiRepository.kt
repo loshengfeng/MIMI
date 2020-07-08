@@ -246,6 +246,27 @@ class ApiRepository(private val apiService: ApiService) {
         commentId: Long
     ) = apiService.deleteMembersPostCommentLike(postId, commentId)
 
+
+    /**********************************************************
+     *
+     *                  Members/Club
+     *
+     ***********************************************************/
+    suspend fun getMembersClub(
+        offset: Int,
+        limit: Int
+    ): Response<ApiBasePagingItem<List<MemberClubItem>>> {
+        return apiService.getMembersClub(offset, limit)
+    }
+
+    suspend fun followClub(clubId: Int): Response<Void> {
+        return apiService.followClub(clubId)
+    }
+
+    suspend fun cancelFollowClub(clubId: Int): Response<Void> {
+        return apiService.cancelFollowClub(clubId)
+    }
+
     /**********************************************************
      *
      *                   Members/Home/Categories
@@ -288,13 +309,13 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得熱門影片
      */
     suspend fun statisticsHomeVideos(
-        statisticsType: StatisticsType = StatisticsType.NEWEST,
+        statisticsType: StatisticsType = StatisticsType.MONTH,
         category: String? = null,
         isAdult: Boolean,
         offset: Int,
         limit: Int
     ) = apiService.statisticsHomeVideos(
-        statisticsType = statisticsType.ordinal,
+        statisticsType = statisticsType.value,
         category = category,
         isAdult = isAdult,
         offset = offset,
@@ -392,8 +413,8 @@ class ApiRepository(private val apiService: ApiService) {
      * 刪除使用者列表影片
      */
     suspend fun deleteMePlaylist(
-        ids: List<Int>
-    ) = apiService.deletePlaylist(ids)
+        videoId: Long
+    ) = apiService.deletePlaylist(videoId)
 
     /**
      * 取得使用者影片列表 0:History, 1:Favorite

@@ -10,6 +10,7 @@ import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ApiBasePagingItem
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.model.enums.HomeItemType
@@ -26,8 +27,7 @@ class HomeViewModel : BaseViewModel() {
 
     companion object {
         const val CAROUSEL_LIMIT = 5
-        const val STATISTICS_LIMIT = 20
-        const val CLIP_LIMIT = 20
+        const val PAGING_LIMIT = 20
     }
 
     private var _videoList = MutableLiveData<PagedList<BaseVideoItem>>()
@@ -51,8 +51,24 @@ class HomeViewModel : BaseViewModel() {
     val clipsResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberPostItem>>>>> =
         _clipsResult
 
+    private var _pictureResult =
+        MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberPostItem>>>>>()
+    val pictureResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberPostItem>>>>> =
+        _pictureResult
+
+    private var _clubResult =
+        MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberClubItem>>>>>()
+    val clubResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberClubItem>>>>> =
+        _clubResult
+
     private var _attachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
     val attachmentResult: LiveData<ApiResult<AttachmentItem>> = _attachmentResult
+
+    private var _followClubResult = MutableLiveData<ApiResult<Int>>()
+    val followClubResult: LiveData<ApiResult<Int>> = _followClubResult
+
+    private var _cancelFollowClubResult = MutableLiveData<ApiResult<Int>>()
+    val cancelFollowClubResult: LiveData<ApiResult<Int>> = _cancelFollowClubResult
 
     fun setTopTabPosition(position: Int) {
         if (position != tabLayoutPosition.value) {
@@ -86,7 +102,7 @@ class HomeViewModel : BaseViewModel() {
                     category = src.categories,
                     isAdult = src.isAdult,
                     offset = 0,
-                    limit = STATISTICS_LIMIT
+                    limit = PAGING_LIMIT
                 )
                 if (!resp.isSuccessful) throw HttpException(resp)
                 emit(ApiResult.success(resp.body()))
@@ -99,13 +115,13 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-    fun loadNestedClipList(position: Int, src: HomeTemplate.Clip) {
+    fun loadNestedClipList(position: Int) {
         viewModelScope.launch {
             flow {
                 val resp = domainManager.getApiRepository().getMembersPost(
                     type = PostType.VIDEO,
                     offset = 0,
-                    limit = CLIP_LIMIT
+                    limit = PAGING_LIMIT
                 )
                 if (!resp.isSuccessful) throw HttpException(resp)
                 emit(ApiResult.success(resp.body()))
@@ -115,6 +131,43 @@ class HomeViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _clipsResult.value = Pair(position, it) }
+        }
+    }
+
+    fun loadNestedPictureList(position: Int) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository().getMembersPost(
+                    type = PostType.IMAGE,
+                    offset = 0,
+                    limit = PAGING_LIMIT
+                )
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(resp.body()))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _pictureResult.value = Pair(position, it) }
+        }
+    }
+
+    fun loadNestedClubList(position: Int) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository().getMembersClub(
+                    offset = 0,
+                    limit = PAGING_LIMIT
+                )
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(resp.body()))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _clubResult.value = Pair(position, it) }
         }
     }
 
@@ -152,6 +205,36 @@ class HomeViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _attachmentResult.value = it }
+        }
+    }
+
+    fun followClub(id: Int, position: Int) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().followClub(id.toInt())
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(position))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _followClubResult.value = it }
+        }
+    }
+
+    fun cancelFollowClub(id: Int, position: Int) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().cancelFollowClub(id.toInt())
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(position))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _cancelFollowClubResult.value = it }
         }
     }
 

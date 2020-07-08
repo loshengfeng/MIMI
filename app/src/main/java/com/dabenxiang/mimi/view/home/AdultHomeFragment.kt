@@ -11,13 +11,14 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.HomeItemType
 import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
-import com.dabenxiang.mimi.view.adapter.HomeClipAdapter
+import com.dabenxiang.mimi.view.adapter.HomeClubAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -27,6 +28,7 @@ import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.home.viewholder.HomeCarouselViewHolder
 import com.dabenxiang.mimi.view.home.viewholder.HomeClipViewHolder
 import com.dabenxiang.mimi.view.home.viewholder.HomeStatisticsViewHolder
+import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -45,6 +47,8 @@ class AdultHomeFragment : BaseFragment() {
     private val statisticsMap = hashMapOf<Int, HomeTemplate.Statistics>()
 
     private val homeClipViewHolderMap = hashMapOf<Int, HomeClipViewHolder>()
+    private val homePictureViewHolderMap = hashMapOf<Int, HomePictureViewHolder>()
+    private val homeClubViewHolderMap = hashMapOf<Int, HomeClubViewHolder>()
     private val attachmentMap: HashMap<Long, Bitmap> = hashMapOf()
 
     override fun getLayoutId() = R.layout.fragment_home
@@ -152,6 +156,54 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
+        viewModel.pictureResult.observe(viewLifecycleOwner, Observer {
+            when (val response = it.second) {
+                is Success -> {
+                    val viewHolder = homePictureViewHolderMap[it.first]
+                    val memberPostItems = response.result.content ?: arrayListOf()
+                    viewHolder?.submitList(memberPostItems)
+                }
+                is Error -> Timber.e(response.throwable)
+            }
+        })
+
+        viewModel.clubResult.observe(viewLifecycleOwner, Observer {
+            when (val response = it.second) {
+                is Success -> {
+                    val viewHolder = homeClubViewHolderMap[it.first]
+                    val memberClubItems = response.result.content ?: arrayListOf()
+                    viewHolder?.submitList(memberClubItems)
+                }
+                is Error -> Timber.e(response.throwable)
+            }
+        })
+
+        viewModel.followClubResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    when (val holder = adapter.homeViewHolderMap[HomeItemType.CLUB]) {
+                        is HomeClubViewHolder -> {
+                            holder.updateItemByFollow(it.result, true)
+                        }
+                    }
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
+
+        viewModel.cancelFollowClubResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    when (val holder = adapter.homeViewHolderMap[HomeItemType.CLUB]) {
+                        is HomeClubViewHolder -> {
+                            holder.updateItemByFollow(it.result, false)
+                        }
+                    }
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
+
         viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
@@ -159,6 +211,12 @@ class AdultHomeFragment : BaseFragment() {
                     attachmentMap[attachmentItem.id] = attachmentItem.bitmap
                     when (val holder = adapter.homeViewHolderMap[attachmentItem.type]) {
                         is HomeClipViewHolder -> {
+                            holder.updateItem(attachmentItem.position)
+                        }
+                        is HomePictureViewHolder -> {
+                            holder.updateItem(attachmentItem.position)
+                        }
+                        is HomeClubViewHolder -> {
                             holder.updateItem(attachmentItem.position)
                         }
                     }
@@ -194,20 +252,33 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val adapter by lazy {
-        HomeAdapter(requireContext(), adapterListener, true, clipListener, attachmentMap)
+        HomeAdapter(
+            requireContext(),
+            adapterListener,
+            true,
+            clubListener,
+            attachmentListener,
+            attachmentMap
+        )
     }
 
     private val videoListAdapter by lazy {
         HomeVideoListAdapter(adapterListener, true)
     }
 
-    private val clipListener = object : HomeClipAdapter.ClipListener {
-        override fun onGetVideoImg(id: Long, position: Int, type: HomeItemType) {
+    private val attachmentListener = object : HomeAdapter.AttachmentListener {
+        override fun onGetAttachment(id: Long, position: Int, type: HomeItemType) {
             viewModel.getAttachment(id, position, type)
         }
+    }
 
-        override fun onGetAvatar(id: Long, position: Int, type: HomeItemType) {
-            viewModel.getAttachment(id, position, type)
+    private val clubListener = object : HomeClubAdapter.ClubListener {
+        override fun followClub(id: Int, position: Int) {
+            viewModel.followClub(id, position)
+        }
+
+        override fun cancelFollowClub(id: Int, position: Int) {
+            viewModel.cancelFollowClub(id, position)
         }
     }
 
@@ -238,6 +309,14 @@ class AdultHomeFragment : BaseFragment() {
             )
         }
 
+        override fun onPictureClick(view: View, item: MemberPostItem) {
+
+        }
+
+        override fun onClubClick(view: View, item: MemberClubItem) {
+
+        }
+
         override fun onLoadStatisticsViewHolder(
             vh: HomeStatisticsViewHolder,
             src: HomeTemplate.Statistics
@@ -256,9 +335,19 @@ class AdultHomeFragment : BaseFragment() {
             viewModel.loadNestedStatisticsListForCarousel(vh.adapterPosition, src)
         }
 
-        override fun onLoadClipViewHolder(vh: HomeClipViewHolder, src: HomeTemplate.Clip) {
+        override fun onLoadClipViewHolder(vh: HomeClipViewHolder) {
             homeClipViewHolderMap[vh.adapterPosition] = vh
-            viewModel.loadNestedClipList(vh.adapterPosition, src)
+            viewModel.loadNestedClipList(vh.adapterPosition)
+        }
+
+        override fun onLoadPictureViewHolder(vh: HomePictureViewHolder) {
+            homePictureViewHolderMap[vh.adapterPosition] = vh
+            viewModel.loadNestedPictureList(vh.adapterPosition)
+        }
+
+        override fun onLoadClubViewHolder(vh: HomeClubViewHolder) {
+            homeClubViewHolderMap[vh.adapterPosition] = vh
+            viewModel.loadNestedClubList(vh.adapterPosition)
         }
     }
 
@@ -298,15 +387,9 @@ class AdultHomeFragment : BaseFragment() {
                 templateList.add(HomeTemplate.Header(null, item.name, item.name))
                 when (item.name) {
                     "蜜蜜影视" -> templateList.add(HomeTemplate.Statistics(item.name, null, true))
-                    "短视频" -> {
-                        templateList.add(HomeTemplate.Clip())
-                    }
-                    "图片" -> {
-                        templateList.add(HomeTemplate.Picture())
-                    }
-                    "圈子" -> {
-                        templateList.add(HomeTemplate.Club())
-                    }
+                    "短视频" -> templateList.add(HomeTemplate.Clip())
+                    "图片" -> templateList.add(HomeTemplate.Picture())
+                    "圈子" -> templateList.add(HomeTemplate.Club())
                 }
             }
         }

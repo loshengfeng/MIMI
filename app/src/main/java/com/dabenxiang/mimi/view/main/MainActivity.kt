@@ -20,17 +20,6 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         setupBottomNavigationBar()
-
-        /* 備案
-        viewModel.enableNightMode.observe(this, Observer { isNight ->
-            //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            val mode =
-                if (isNight) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
-            if (delegate.localNightMode != mode) {
-                delegate.localNightMode = mode
-            }
-        })
-        */
     }
 
     /**
@@ -72,7 +61,7 @@ class MainActivity : BaseActivity() {
             window?.statusBarColor = getColor(R.color.adult_color_status_bar)
             bottom_navigation.setBackgroundColor(getColor(R.color.adult_color_status_bar))
             bottom_navigation.itemTextColor =
-                resources.getColorStateList(R.color.adult_color_bottom_bar_item, null)
+                resources.getColorStateList(R.color.color_white_1_30, null)
         } else {
             window?.statusBarColor = getColor(R.color.normal_color_status_bar)
             bottom_navigation.setBackgroundColor(getColor(R.color.normal_color_status_bar))

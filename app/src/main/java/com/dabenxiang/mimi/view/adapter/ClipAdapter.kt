@@ -9,12 +9,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.error.PostContentItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.ClipViewHolder
 import com.dabenxiang.mimi.view.player.PlayerViewModel
 import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
@@ -27,7 +26,6 @@ import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.activity_player.*
 import timber.log.Timber
 
 class ClipAdapter(
@@ -80,8 +78,8 @@ class ClipAdapter(
 
     override fun onBindViewHolder(holder: ClipViewHolder, position: Int) {
         val item = memberPostItems[position]
-        val postContentItem = Gson().fromJson(item.content, PostContentItem::class.java)
-        Timber.d("@@onBindViewHolder position:$position, content: $postContentItem")
+        val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
+        Timber.d("@@onBindViewHolder position:$position, content: $contentItem")
         if (currentPosition == position) {
             processClip(holder.playerView, position)
         } else {
@@ -92,11 +90,11 @@ class ClipAdapter(
     private fun processClip(playerView: PlayerView, position: Int) {
         Timber.d("@@@processClip position:$position")
         val item = memberPostItems[position]
-        val postContentItem = Gson().fromJson(item.content, PostContentItem::class.java)
-        if (TextUtils.isEmpty(postContentItem.shortVideo.url)) {
+        val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
+        if (TextUtils.isEmpty(contentItem.shortVideo.url)) {
             playerView.player?.also { (it as SimpleExoPlayer).stop() }
         } else {
-            setupPlayer(playerView, postContentItem.shortVideo.url)
+            setupPlayer(playerView, contentItem.shortVideo.url)
         }
     }
 

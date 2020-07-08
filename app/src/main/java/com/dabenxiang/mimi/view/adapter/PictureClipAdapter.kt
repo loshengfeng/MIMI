@@ -11,7 +11,7 @@ import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.viewholder.ClipViewHolder
 
-class HomeClipAdapter(
+class PictureClipAdapter(
     nestedListener: HomeAdapter.EventListener,
     private val attachmentListener: HomeAdapter.AttachmentListener,
     private val attachmentMap: HashMap<Long, Bitmap>

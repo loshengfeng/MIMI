@@ -156,7 +156,8 @@ interface ApiService {
         @Query("type") type: Int,
         @Query("offset") offset: Int,
         @Query("limit") limit: Int,
-        @Query("isAdult") isAdult: Boolean = true
+        @Query("isAdult") isAdult: Boolean = true,
+        @Query("orderBy") orderBy: Int = 1
     ): Response<ApiBasePagingItem<List<MemberPostItem>>>
 
     @GET("/v1/Members/Post/{postId}/Comment")
@@ -186,6 +187,23 @@ interface ApiService {
         @Path("postId") postId: Long,
         @Path("commentId") commentId: Long
     ): Response<Void>
+
+    /**********************************************************
+     *
+     *                  Members/Club
+     *
+     ***********************************************************/
+    @GET("/v1/Members/Club")
+    suspend fun getMembersClub(
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
+    ): Response<ApiBasePagingItem<List<MemberClubItem>>>
+
+    @POST("/v1/Members/Club/{clubId}/Follow")
+    suspend fun followClub(@Path("clubId") clubId: Int): Response<Void>
+
+    @DELETE("/v1/Members/Club/{clubId}/Follow")
+    suspend fun cancelFollowClub(@Path("clubId") clubId: Int): Response<Void>
 
     /**********************************************************
      *
@@ -293,9 +311,9 @@ interface ApiService {
         @Body request: PlayListRequest
     ): Response<Void>
 
-    @DELETE("/v1/Members/Me/Playlist")
+    @DELETE("/v1/Members/Me/Playlist/{videoId}")
     suspend fun deletePlaylist(
-        @Body ids: List<Int>
+        @Path("videoId") videoId: Long
     ): Response<Void>
 
     @GET("/v1/Members/Me/Playlist/{playlistType}")

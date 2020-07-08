@@ -12,10 +12,7 @@ import androidx.paging.PagedList
 import com.dabenxiang.mimi.callback.GuessLikePagingCallBack
 import com.dabenxiang.mimi.event.SingleLiveEvent
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.PostCommentRequest
-import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
-import com.dabenxiang.mimi.model.api.vo.Source
-import com.dabenxiang.mimi.model.api.vo.VideoItem
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
@@ -44,6 +41,8 @@ class PlayerViewModel : BaseViewModel() {
     }
 
     var videoId: Long = 0L
+    var category: String = ""
+    var episodeId: Long = -1L
 
     var currentWindow: Int = 0
     var playbackPosition: Long = 0
@@ -99,6 +98,15 @@ class PlayerViewModel : BaseViewModel() {
 
     private val _isSelectedNewestComment = MutableLiveData(true)
     val isSelectedNewestComment: LiveData<Boolean> = _isSelectedNewestComment
+
+    private val _apiAddFavoriteResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
+    val apiAddFavoriteResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> =
+            _apiAddFavoriteResult
+
+    private val _apiAddLikeResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
+    val apiAddLikeResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> =
+            _apiAddLikeResult
+
     fun updatedSelectedNewestComment(isNewest: Boolean) {
         _isSelectedNewestComment.value = isNewest
     }
@@ -274,7 +282,7 @@ class PlayerViewModel : BaseViewModel() {
             flow {
                 val source = sourceList?.get(sourceListPosition.value!!)!!
                 val episode = source.videoEpisodes?.get(episodePosition.value!!)!!
-                val episodeId = episode.id!!
+                episodeId = episode.id ?: 0L
 
                 val apiRepository = domainManager.getApiRepository()
 
@@ -546,6 +554,59 @@ class PlayerViewModel : BaseViewModel() {
                 .collect {
                     _apiDeleteCommentLikeResult.value = SingleLiveEvent(it)
                 }
+        }
+    }
+
+    /**
+     * 加入收藏與解除收藏
+     */
+    fun modifyFavorite(){
+        viewModelScope.launch {
+            flow {
+                val resp = if (favoriteVideo.value == true)
+                    domainManager.getApiRepository()
+                            .deleteMePlaylist(videoId)
+                else
+                    domainManager.getApiRepository()
+                            .postMePlaylist(PlayListRequest(videoId, 1))
+
+                if (!resp.isSuccessful) throw HttpException(resp)
+
+                emit(ApiResult.success(null))
+            }
+                    .flowOn(Dispatchers.IO)
+                    .catch { e ->
+                        emit(ApiResult.error(e))
+                    }
+                    .onStart { emit(ApiResult.loading()) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .collect {
+                        _apiAddFavoriteResult.value = SingleLiveEvent(it)
+                    }
+        }
+    }
+
+    /**
+     * 按讚、取消讚
+     */
+    fun modifyLike(){
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository()
+                        .addLike(videoId, LikeRequest(if (likeVideo.value == true) 1 else 0))
+                if (!resp.isSuccessful) throw HttpException(resp)
+
+                emit(ApiResult.success(null))
+            }
+                    .flowOn(Dispatchers.IO)
+                    .catch { e ->
+                        emit(ApiResult.error(e))
+                    }
+                    .onStart { emit(ApiResult.loading()) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .collect {
+                        _apiAddLikeResult.value = SingleLiveEvent(it)
+                    }
         }
     }
 }

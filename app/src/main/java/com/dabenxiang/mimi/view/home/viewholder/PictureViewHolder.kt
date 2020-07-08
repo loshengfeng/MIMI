@@ -12,10 +12,10 @@ import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.nested_item_home_clip.view.*
+import kotlinx.android.synthetic.main.nested_item_home_picture.view.*
 import java.util.*
 
-class ClipViewHolder(
+class PictureViewHolder(
     itemView: View,
     onClickListener: IndexViewHolderListener,
     private val attachmentListener: HomeAdapter.AttachmentListener,
@@ -24,15 +24,14 @@ class ClipViewHolder(
     BaseIndexViewHolder<MemberPostItem>(itemView, onClickListener) {
 
     private val card = itemView.layout_card!!
-    private val videoImage = itemView.iv_poster!!
-    private val videoTime = itemView.tv_video_time!!
+    private val pictureImage = itemView.iv_poster!!
     private val avatarImg = itemView.img_avatar!!
     private val profileName = itemView.tv_name!!
     private val profileTime = itemView.tv_time!!
     private val title = itemView.tv_title!!
 
     init {
-        videoImage.setOnClickListener {
+        pictureImage.setOnClickListener {
             listener.onClickItemIndex(it, index)
         }
     }
@@ -41,7 +40,6 @@ class ClipViewHolder(
         val contentItem = Gson().fromJson(model?.content, ContentItem::class.java)
         val postImageItem = contentItem.images[0]
 
-        videoTime.text = contentItem.shortVideo.length
         profileName.text = model?.postFriendlyName
         profileTime.text = GeneralUtils.getTimeDiff(model?.creationDate ?: Date(), Date())
         title.text = model?.title
@@ -56,20 +54,20 @@ class ClipViewHolder(
         if (!TextUtils.isEmpty(postImageItem.url)) {
             Glide.with(itemView.context)
                 .load(postImageItem.url)
-                .into(videoImage)
+                .into(pictureImage)
         } else {
             if (!TextUtils.isEmpty(postImageItem.id)) {
                 if (attachmentMap[postImageItem.id.toLong()] == null) {
                     attachmentListener.onGetAttachment(
                         postImageItem.id.toLong(),
                         index,
-                        HomeItemType.CLIP
+                        HomeItemType.PICTURE
                     )
                 } else {
                     val bitmap = attachmentMap[postImageItem.id.toLong()]
                     Glide.with(itemView.context)
                         .load(bitmap)
-                        .into(videoImage)
+                        .into(pictureImage)
                 }
             }
         }
