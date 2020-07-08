@@ -16,5 +16,4 @@ class PlayerData(val videoId: Long, val isAdult: Boolean) : Serializable {
         }
     }
 
-
 }

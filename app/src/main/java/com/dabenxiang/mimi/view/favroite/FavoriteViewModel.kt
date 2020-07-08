@@ -102,7 +102,7 @@ class FavoriteViewModel : BaseViewModel() {
                     val result = domainManager.getApiRepository().getAttachment(id)
                     if (!result.isSuccessful) throw HttpException(result)
 
-                    var byteArray = result.body()?.bytes()
+                    val byteArray = result.body()?.bytes()
                     val bitmap = ImageUtils.bytes2Bitmap(byteArray)
                     if (bitmap != null) {
                         lruCacheManager.putLruCache(id, bitmap)

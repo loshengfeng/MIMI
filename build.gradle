@@ -16,7 +16,7 @@ buildscript {
     ext.room_version = '2.2.5'
     ext.paging_version = '2.1.2'
     ext.live_event_bus_version = '1.5.2'
-    ext.nav_version = '2.2.2'
+    ext.nav_version = '2.3.0'
     ext.okhttp_version = '4.7.2'
     ext.okhttp_interceptor_version = '4.7.2'
     ext.retrofit_version = '2.9.0'
@@ -37,7 +37,7 @@ buildscript {
     ext.android_test_ext_version = '1.1.1'
     ext.websocket_version = '1.5.1'
     ext.switch_button_version = '2.0.0'
-    ext.swipe_refresh_layout_version = '1.1.0-rc01'
+    ext.swipe_refresh_layout_version = '1.1.0'
     ext.stetho_version = "1.5.1"
     ext.flurry_version = '12.3.0@aar'
     ext.mock_webserver_version = '4.7.2'

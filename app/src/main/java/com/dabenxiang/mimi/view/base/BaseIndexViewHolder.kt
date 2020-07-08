@@ -16,7 +16,6 @@ abstract class BaseIndexViewHolder<M : Any>(
 
     fun bind(bind: M?, dataIndex: Int) {
         index = dataIndex
-
         updated(bind)
     }
 

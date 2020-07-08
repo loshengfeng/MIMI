@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.model.api
 
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.api.vo.error.TOKEN_NOT_FOUND
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.StatisticsType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -213,6 +214,14 @@ class ApiRepository(private val apiService: ApiService) {
      *                  Members/Post
      *
      ***********************************************************/
+    suspend fun getMembersPost(
+        type: PostType,
+        offset: Int,
+        limit: Int
+    ): Response<ApiBasePagingItem<List<MemberPostItem>>> {
+        return apiService.getMembersPost(type.value, offset, limit)
+    }
+
     suspend fun getMembersPostComment(
         postId: Long,
         parentId: Long? = null,
@@ -236,6 +245,19 @@ class ApiRepository(private val apiService: ApiService) {
         postId: Long,
         commentId: Long
     ) = apiService.deleteMembersPostCommentLike(postId, commentId)
+
+
+    /**********************************************************
+     *
+     *                  Members/Club
+     *
+     ***********************************************************/
+    suspend fun getMembersClub(
+        offset: Int,
+        limit: Int
+    ): Response<ApiBasePagingItem<List<MemberClubItem>>> {
+        return apiService.getMembersClub(offset, limit)
+    }
 
     /**********************************************************
      *

@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.home
 
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
@@ -10,6 +11,9 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.HomeItemType
 import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
@@ -19,8 +23,7 @@ import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.home.viewholder.HomeCarouselViewHolder
-import com.dabenxiang.mimi.view.home.viewholder.HomeStatisticsViewHolder
+import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -38,6 +41,11 @@ class AdultHomeFragment : BaseFragment() {
     private val homeStatisticsViewHolderMap = hashMapOf<Int, HomeStatisticsViewHolder>()
     private val statisticsMap = hashMapOf<Int, HomeTemplate.Statistics>()
 
+    private val homeClipViewHolderMap = hashMapOf<Int, HomeClipViewHolder>()
+    private val homePictureViewHolderMap = hashMapOf<Int, HomePictureViewHolder>()
+    private val homeClubViewHolderMap = hashMapOf<Int, HomeClubViewHolder>()
+    private val attachmentMap: HashMap<Long, Bitmap> = hashMapOf()
+
     override fun getLayoutId() = R.layout.fragment_home
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -50,8 +58,9 @@ class AdultHomeFragment : BaseFragment() {
         recyclerview_videos.adapter = videoListAdapter
         refresh_home.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
 
-        if (mainViewModel?.adult == null)
+        if (mainViewModel?.adult == null) {
             mainViewModel?.loadHomeCategories()
+        }
     }
 
     override fun setupObservers() {
@@ -130,6 +139,60 @@ class AdultHomeFragment : BaseFragment() {
                 is Error -> Timber.e(response.throwable)
             }
         })
+
+        viewModel.clipsResult.observe(viewLifecycleOwner, Observer {
+            when (val response = it.second) {
+                is Success -> {
+                    val viewHolder = homeClipViewHolderMap[it.first]
+                    val memberPostItems = response.result.content ?: arrayListOf()
+                    viewHolder?.submitList(memberPostItems)
+                }
+                is Error -> Timber.e(response.throwable)
+            }
+        })
+
+        viewModel.pictureResult.observe(viewLifecycleOwner, Observer {
+            when (val response = it.second) {
+                is Success -> {
+                    val viewHolder = homePictureViewHolderMap[it.first]
+                    val memberPostItems = response.result.content ?: arrayListOf()
+                    viewHolder?.submitList(memberPostItems)
+                }
+                is Error -> Timber.e(response.throwable)
+            }
+        })
+
+        viewModel.clubResult.observe(viewLifecycleOwner, Observer {
+            when (val response = it.second) {
+                is Success -> {
+                    val viewHolder = homeClubViewHolderMap[it.first]
+                    val memberClubItems = response.result.content ?: arrayListOf()
+                    viewHolder?.submitList(memberClubItems)
+                }
+                is Error -> Timber.e(response.throwable)
+            }
+        })
+
+        viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    val attachmentItem = it.result
+                    attachmentMap[attachmentItem.id] = attachmentItem.bitmap
+                    when (val holder = adapter.homeViewHolderMap[attachmentItem.type]) {
+                        is HomeClipViewHolder -> {
+                            holder.updateItem(attachmentItem.position)
+                        }
+                        is HomePictureViewHolder -> {
+                            holder.updateItem(attachmentItem.position)
+                        }
+                        is HomeClubViewHolder -> {
+                            holder.updateItem(attachmentItem.position)
+                        }
+                    }
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -158,11 +221,17 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val adapter by lazy {
-        HomeAdapter(requireContext(), adapterListener, true)
+        HomeAdapter(requireContext(), adapterListener, true, attachmentListener, attachmentMap)
     }
 
     private val videoListAdapter by lazy {
         HomeVideoListAdapter(adapterListener, true)
+    }
+
+    private val attachmentListener = object : HomeAdapter.AttachmentListener {
+        override fun onGetAttachment(id: Long, position: Int, type: HomeItemType) {
+            viewModel.getAttachment(id, position, type)
+        }
     }
 
     private val adapterListener = object : HomeAdapter.EventListener {
@@ -182,6 +251,18 @@ class AdultHomeFragment : BaseFragment() {
             startActivity(intent)
         }
 
+        override fun onClipClick(view: View, item: MemberPostItem) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onPictureClick(view: View, item: MemberPostItem) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onClubClick(view: View, item: MemberClubItem) {
+            TODO("Not yet implemented")
+        }
+
         override fun onLoadStatisticsViewHolder(
             vh: HomeStatisticsViewHolder,
             src: HomeTemplate.Statistics
@@ -198,6 +279,21 @@ class AdultHomeFragment : BaseFragment() {
             homeCarouselViewHolderMap[vh.adapterPosition] = vh
             carouselMap[vh.adapterPosition] = src
             viewModel.loadNestedStatisticsListForCarousel(vh.adapterPosition, src)
+        }
+
+        override fun onLoadClipViewHolder(vh: HomeClipViewHolder) {
+            homeClipViewHolderMap[vh.adapterPosition] = vh
+            viewModel.loadNestedClipList(vh.adapterPosition)
+        }
+
+        override fun onLoadPictureViewHolder(vh: HomePictureViewHolder) {
+            homePictureViewHolderMap[vh.adapterPosition] = vh
+            viewModel.loadNestedPictureList(vh.adapterPosition)
+        }
+
+        override fun onLoadClubViewHolder(vh: HomeClubViewHolder) {
+            homeClubViewHolderMap[vh.adapterPosition] = vh
+            viewModel.loadNestedClubList(vh.adapterPosition)
         }
     }
 
@@ -233,19 +329,13 @@ class AdultHomeFragment : BaseFragment() {
 
         if (root?.categories != null) {
             for (item in root.categories) {
+                if (item.name == "关注" || item.name == "短文") continue
                 templateList.add(HomeTemplate.Header(null, item.name, item.name))
                 when (item.name) {
                     "蜜蜜影视" -> templateList.add(HomeTemplate.Statistics(item.name, null, true))
-                    "关注" -> {
-                    }
-                    "短视频" -> {
-                    }
-                    "图片" -> {
-                    }
-                    "短文" -> {
-                    }
-                    "圈子" -> {
-                    }
+                    "短视频" -> templateList.add(HomeTemplate.Clip())
+                    "图片" -> templateList.add(HomeTemplate.Picture())
+                    "圈子" -> templateList.add(HomeTemplate.Club())
                 }
             }
         }

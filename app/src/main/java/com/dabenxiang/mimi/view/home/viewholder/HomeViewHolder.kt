@@ -1,14 +1,16 @@
 package com.dabenxiang.mimi.view.home.viewholder
 
+import android.graphics.Bitmap
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.holder.CarouselHolderItem
 import com.dabenxiang.mimi.view.adapter.*
@@ -19,13 +21,10 @@ import com.to.aboomy.pager2banner.Banner
 import kotlinx.android.synthetic.main.item_banner.view.*
 import kotlinx.android.synthetic.main.item_carousel.view.*
 import kotlinx.android.synthetic.main.item_header.view.*
-import kotlinx.android.synthetic.main.item_home_leaderboard.view.*
-import kotlinx.android.synthetic.main.item_home_recommend.view.*
+import kotlinx.android.synthetic.main.item_home_clip.view.*
+import kotlinx.android.synthetic.main.item_home_club.view.*
+import kotlinx.android.synthetic.main.item_home_picture.view.*
 import kotlinx.android.synthetic.main.item_home_statistics.view.*
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
-import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.coroutineScope
 
 abstract class HomeViewHolder<VM : HomeTemplate>(
     itemView: View,
@@ -139,7 +138,7 @@ class HomeStatisticsViewHolder(
 ) :
     HomeViewHolder<HomeTemplate.Statistics>(itemView, listener, isAdult) {
 
-    private val recyclerView: RecyclerView = itemView.recyclerview_categories
+    private val recyclerView: RecyclerView = itemView.recyclerview_statistics
     private val nestedAdapter by lazy {
         HomeStatisticsAdapter(nestedListener, isAdult)
     }
@@ -155,25 +154,6 @@ class HomeStatisticsViewHolder(
         LinearSnapHelper().attachToRecyclerView(recyclerView)
     }
 
-    private var activeTask: Deferred<Any>? = null
-
-    suspend fun activeTask(block: suspend () -> Any): Any {
-        activeTask?.cancelAndJoin()
-
-        return coroutineScope {
-            val newTask = async {
-                block()
-            }
-
-            newTask.invokeOnCompletion {
-                activeTask = null
-            }
-
-            activeTask = newTask
-            newTask.await()
-        }
-    }
-
     override fun updated() {
         data?.also {
             nestedListener.onLoadStatisticsViewHolder(this, it)
@@ -185,16 +165,21 @@ class HomeStatisticsViewHolder(
     }
 }
 
-class HomeLeaderBoardViewHolder(
+class HomeClipViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
-    isAdult: Boolean
-) :
-    HomeViewHolder<HomeTemplate.LeaderBoard>(itemView, listener, isAdult) {
+    isAdult: Boolean,
+    attachmentListener: HomeAdapter.AttachmentListener,
+    attachmentMap: HashMap<Long, Bitmap>
+) : HomeViewHolder<HomeTemplate.Clip>(itemView, listener, isAdult) {
 
-    private val recyclerView: RecyclerView = itemView.recyclerview_leaderboard
+    private val recyclerView: RecyclerView = itemView.recyclerview_clip
     private val nestedAdapter by lazy {
-        LeaderboardAdapter()
+        HomeClipAdapter(
+            listener,
+            attachmentListener,
+            attachmentMap
+        )
     }
 
     init {
@@ -202,34 +187,98 @@ class HomeLeaderBoardViewHolder(
             layoutManager.orientation = LinearLayoutManager.HORIZONTAL
             recyclerView.layoutManager = layoutManager
         }
-
         recyclerView.adapter = nestedAdapter
+        LinearSnapHelper().attachToRecyclerView(recyclerView)
     }
 
     override fun updated() {
+        nestedListener.onLoadClipViewHolder(this)
+    }
+
+    fun submitList(list: List<MemberPostItem>) {
+        nestedAdapter.submitList(list)
+    }
+
+    fun updateItem(position: Int) {
+        nestedAdapter.notifyItemChanged(position)
     }
 }
 
-class HomeRecommendViewHolder(
+class HomePictureViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
-    isAdult: Boolean
-) :
-    HomeViewHolder<HomeTemplate.Recommend>(itemView, listener, isAdult) {
+    isAdult: Boolean,
+    attachmentListener: HomeAdapter.AttachmentListener,
+    attachmentMap: HashMap<Long, Bitmap>
+) : HomeViewHolder<HomeTemplate.Picture>(itemView, listener, isAdult) {
 
-    private val recyclerView: RecyclerView = itemView.recyclerview_recommend
+    private val recyclerView: RecyclerView = itemView.recyclerview_picture
     private val nestedAdapter by lazy {
-        HomeRecommendAdapter()
+        HomePictureAdapter(
+            listener,
+            attachmentListener,
+            attachmentMap
+        )
     }
 
     init {
-        GridLayoutManager(itemView.context, 2).also { layoutManager ->
+        LinearLayoutManager(itemView.context).also { layoutManager ->
+            layoutManager.orientation = LinearLayoutManager.HORIZONTAL
             recyclerView.layoutManager = layoutManager
         }
-
         recyclerView.adapter = nestedAdapter
+        LinearSnapHelper().attachToRecyclerView(recyclerView)
     }
 
     override fun updated() {
+        nestedListener.onLoadPictureViewHolder(this)
     }
+
+    fun submitList(list: List<MemberPostItem>) {
+        nestedAdapter.submitList(list)
+    }
+
+    fun updateItem(position: Int) {
+        nestedAdapter.notifyItemChanged(position)
+    }
+}
+
+class HomeClubViewHolder(
+    itemView: View,
+    listener: HomeAdapter.EventListener,
+    isAdult: Boolean,
+    attachmentListener: HomeAdapter.AttachmentListener,
+    attachmentMap: HashMap<Long, Bitmap>
+) : HomeViewHolder<HomeTemplate.Club>(itemView, listener, isAdult) {
+
+    private val recyclerView: RecyclerView = itemView.recyclerview_club
+    private val nestedAdapter by lazy {
+        HomeClubAdapter(
+            listener,
+            attachmentListener,
+            attachmentMap
+        )
+    }
+
+    init {
+        LinearLayoutManager(itemView.context).also { layoutManager ->
+            layoutManager.orientation = LinearLayoutManager.HORIZONTAL
+            recyclerView.layoutManager = layoutManager
+        }
+        recyclerView.adapter = nestedAdapter
+        LinearSnapHelper().attachToRecyclerView(recyclerView)
+    }
+
+    override fun updated() {
+        nestedListener.onLoadClubViewHolder(this)
+    }
+
+    fun submitList(list: List<MemberClubItem>) {
+        nestedAdapter.submitList(list)
+    }
+
+    fun updateItem(position: Int) {
+        nestedAdapter.notifyItemChanged(position)
+    }
+
 }

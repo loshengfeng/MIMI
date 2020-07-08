@@ -151,6 +151,14 @@ interface ApiService {
      *                  Members/Post
      *
      ***********************************************************/
+    @GET("/v1/Members/Post")
+    suspend fun getMembersPost(
+        @Query("type") type: Int,
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int,
+        @Query("isAdult") isAdult: Boolean = true
+    ): Response<ApiBasePagingItem<List<MemberPostItem>>>
+
     @GET("/v1/Members/Post/{postId}/Comment")
     suspend fun getMembersPostComment(
         @Path("postId") postId: Long,
@@ -178,6 +186,17 @@ interface ApiService {
         @Path("postId") postId: Long,
         @Path("commentId") commentId: Long
     ): Response<Void>
+
+    /**********************************************************
+     *
+     *                  Members/Club
+     *
+     ***********************************************************/
+    @GET("/v1/Members/Club")
+    suspend fun getMembersClub(
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
+    ): Response<ApiBasePagingItem<List<MemberClubItem>>>
 
     /**********************************************************
      *

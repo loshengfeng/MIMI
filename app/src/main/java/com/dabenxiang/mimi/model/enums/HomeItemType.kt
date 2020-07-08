@@ -4,8 +4,8 @@ enum class HomeItemType {
     HEADER,
     BANNER,
     CAROUSEL,
-    LEADER_BOARD,
-    RECOMMEND,
     STATISTICS,
-    VIDEO_LIST
+    CLIP,
+    PICTURE,
+    CLUB
 }

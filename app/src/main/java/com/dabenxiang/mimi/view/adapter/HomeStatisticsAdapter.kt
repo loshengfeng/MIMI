@@ -17,49 +17,12 @@ class HomeStatisticsAdapter(
 ) :
     RecyclerView.Adapter<BaseViewHolder>() {
 
-    private val videoViewHolderListener by lazy {
-        object : BaseIndexViewHolder.IndexViewHolderListener {
-            override fun onClickItemIndex(view: View, index: Int) {
-                if (index > -1) {
-                    list?.get(index)?.also {
-                        nestedListener.onVideoClick(view, PlayerData.parser(it, isAdult))
-                    }
-                }
-            }
-        }
-    }
-
     private var list: List<BaseVideoItem.Video>? = null
-
-    fun submitList(submit: List<BaseVideoItem.Video>?) {
-        list = submit
-
-        /*
-        //Fake date:
-        val list = mutableListOf<StatisticsItem>()
-        repeat(12) {
-            list.add(
-                StatisticsItem(
-                    title = "標題${it + 1}",
-                    id = it.toLong(),
-                    count = it.toLong(),
-                    cover = "https://i2.kknews.cc/SIG=1nkii03/470400035pnr3n5r3s7n.jpg"
-                )
-            )
-        }
-        data = list
-        */
-
-        notifyDataSetChanged()
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.nested_item_home_categories, parent, false)
-        return VideoViewHolder(
-            view,
-            videoViewHolderListener
-        )
+            .inflate(R.layout.nested_item_home_statistics, parent, false)
+        return VideoViewHolder(view, videoViewHolderListener)
     }
 
     override fun getItemCount(): Int {
@@ -68,15 +31,6 @@ class HomeStatisticsAdapter(
             count == null -> 0
             count < 2 -> count
             else -> Int.MAX_VALUE
-        }
-    }
-
-    private fun getRealPosition(position: Int): Int {
-        val count = list?.count()!!
-        return when {
-            count == 0 -> 0
-            position > count - 1 -> position % count
-            else -> position
         }
     }
 
@@ -97,4 +51,31 @@ class HomeStatisticsAdapter(
             holder.bind(null, -1)
         }
     }
+
+    fun submitList(submit: List<BaseVideoItem.Video>?) {
+        list = submit
+        notifyDataSetChanged()
+    }
+
+    private fun getRealPosition(position: Int): Int {
+        val count = list?.count()!!
+        return when {
+            count == 0 -> 0
+            position > count - 1 -> position % count
+            else -> position
+        }
+    }
+
+    private val videoViewHolderListener by lazy {
+        object : BaseIndexViewHolder.IndexViewHolderListener {
+            override fun onClickItemIndex(view: View, index: Int) {
+                if (index > -1) {
+                    list?.get(index)?.also {
+                        nestedListener.onVideoClick(view, PlayerData.parser(it, isAdult))
+                    }
+                }
+            }
+        }
+    }
+
 }

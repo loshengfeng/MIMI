@@ -52,7 +52,7 @@ class GuessLikeAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.nested_item_home_categories, parent, false)
+            .inflate(R.layout.nested_item_home_statistics, parent, false)
         return VideoViewHolder(
             view,
             videoViewHolderListener

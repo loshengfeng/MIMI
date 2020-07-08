@@ -1,24 +1,31 @@
 package com.dabenxiang.mimi.view.adapter
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.HomeItemType
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.view.home.*
+import com.dabenxiang.mimi.view.home.HomeTemplate
 import com.dabenxiang.mimi.view.home.viewholder.*
 
 class HomeAdapter(
     val context: Context,
     private val listener: EventListener,
-    private val isAdult: Boolean
+    private val isAdult: Boolean,
+    private val attachmentListener: AttachmentListener,
+    private val attachmentMap: HashMap<Long, Bitmap>
 ) :
     ListAdapter<HomeTemplate, BaseViewHolder>(DIFF_CALLBACK) {
+
+    val homeViewHolderMap: HashMap<HomeItemType, BaseViewHolder> = hashMapOf()
 
     companion object {
         private val DIFF_CALLBACK =
@@ -42,8 +49,14 @@ class HomeAdapter(
     interface EventListener {
         fun onHeaderItemClick(view: View, item: HomeTemplate.Header)
         fun onVideoClick(view: View, item: PlayerData)
+        fun onClipClick(view: View, item: MemberPostItem)
+        fun onPictureClick(view: View, item: MemberPostItem)
+        fun onClubClick(view: View, item: MemberClubItem)
         fun onLoadStatisticsViewHolder(vh: HomeStatisticsViewHolder, src: HomeTemplate.Statistics)
         fun onLoadCarouselViewHolder(vh: HomeCarouselViewHolder, src: HomeTemplate.Carousel)
+        fun onLoadClipViewHolder(vh: HomeClipViewHolder)
+        fun onLoadPictureViewHolder(vh: HomePictureViewHolder)
+        fun onLoadClubViewHolder(vh: HomeClubViewHolder)
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -85,29 +98,31 @@ class HomeAdapter(
                     ), listener, isAdult
                 )
             }
-            HomeItemType.LEADER_BOARD -> {
-                HomeLeaderBoardViewHolder(
+            HomeItemType.CLIP -> {
+                HomeClipViewHolder(
                     layoutInflater.inflate(
-                        R.layout.item_home_leaderboard,
+                        R.layout.item_home_clip,
                         parent,
                         false
-                    ), listener, isAdult
+                    ), listener, isAdult, attachmentListener, attachmentMap
                 )
             }
-            HomeItemType.RECOMMEND -> {
-                HomeRecommendViewHolder(
+            HomeItemType.PICTURE -> {
+                HomePictureViewHolder(
                     layoutInflater.inflate(
-                        R.layout.item_home_recommend,
+                        R.layout.item_home_picture,
                         parent,
                         false
-                    ), listener, isAdult
+                    ), listener, isAdult, attachmentListener, attachmentMap
                 )
             }
-            else -> {
-                HeaderViewHolder(
-                    layoutInflater.inflate(R.layout.item_header, parent, false),
-                    listener,
-                    isAdult
+            HomeItemType.CLUB -> {
+                HomeClubViewHolder(
+                    layoutInflater.inflate(
+                        R.layout.item_home_club,
+                        parent,
+                        false
+                    ), listener, isAdult, attachmentListener, attachmentMap
                 )
             }
         }
@@ -115,6 +130,8 @@ class HomeAdapter(
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         val template = getItem(position)
+        homeViewHolderMap[template.type] = holder
+
         when (template.type) {
             HomeItemType.HEADER -> {
                 holder as HeaderViewHolder
@@ -132,14 +149,23 @@ class HomeAdapter(
                 holder as HomeStatisticsViewHolder
                 holder.bind(template)
             }
-            HomeItemType.LEADER_BOARD -> {
-                holder as HomeLeaderBoardViewHolder
+            HomeItemType.CLIP -> {
+                holder as HomeClipViewHolder
                 holder.bind(template)
             }
-            HomeItemType.RECOMMEND -> {
-                holder as HomeRecommendViewHolder
+            HomeItemType.PICTURE -> {
+                holder as HomePictureViewHolder
+                holder.bind(template)
+            }
+            HomeItemType.CLUB -> {
+                holder as HomeClubViewHolder
                 holder.bind(template)
             }
         }
     }
+
+    interface AttachmentListener {
+        fun onGetAttachment(id: Long, position: Int, type: HomeItemType)
+    }
+
 }
