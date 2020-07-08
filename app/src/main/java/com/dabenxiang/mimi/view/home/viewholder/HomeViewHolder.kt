@@ -247,14 +247,16 @@ class HomeClubViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
     isAdult: Boolean,
+    clubListener: HomeClubAdapter.ClubListener,
     attachmentListener: HomeAdapter.AttachmentListener,
     attachmentMap: HashMap<Long, Bitmap>
 ) : HomeViewHolder<HomeTemplate.Club>(itemView, listener, isAdult) {
 
     private val recyclerView: RecyclerView = itemView.recyclerview_club
-    private val nestedAdapter by lazy {
+    val nestedAdapter by lazy {
         HomeClubAdapter(
             listener,
+            clubListener,
             attachmentListener,
             attachmentMap
         )
@@ -277,8 +279,18 @@ class HomeClubViewHolder(
         nestedAdapter.submitList(list)
     }
 
+    fun getItem(position: Int): MemberClubItem {
+        return nestedAdapter.getMemberClubItems()[position]
+    }
+
     fun updateItem(position: Int) {
         nestedAdapter.notifyItemChanged(position)
+    }
+
+    fun updateItemByFollow(position: Int, result: Boolean) {
+        val item = getItem(position)
+        item.isFollow = result
+        updateItem(position)
     }
 
 }

@@ -259,6 +259,14 @@ class ApiRepository(private val apiService: ApiService) {
         return apiService.getMembersClub(offset, limit)
     }
 
+    suspend fun followClub(clubId: Int): Response<Void> {
+        return apiService.followClub(clubId)
+    }
+
+    suspend fun cancelFollowClub(clubId: Int): Response<Void> {
+        return apiService.cancelFollowClub(clubId)
+    }
+
     /**********************************************************
      *
      *                   Members/Home/Categories
@@ -301,13 +309,13 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得熱門影片
      */
     suspend fun statisticsHomeVideos(
-        statisticsType: StatisticsType = StatisticsType.NEWEST,
+        statisticsType: StatisticsType = StatisticsType.MONTH,
         category: String? = null,
         isAdult: Boolean,
         offset: Int,
         limit: Int
     ) = apiService.statisticsHomeVideos(
-        statisticsType = statisticsType.ordinal,
+        statisticsType = statisticsType.value,
         category = category,
         isAdult = isAdult,
         offset = offset,

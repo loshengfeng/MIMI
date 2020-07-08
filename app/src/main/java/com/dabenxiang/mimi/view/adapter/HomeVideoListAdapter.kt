@@ -39,26 +39,6 @@ class HomeVideoListAdapter(
         private const val VIDEO = 1
     }
 
-    private val videoViewHolderListener by lazy {
-        object : BaseIndexViewHolder.IndexViewHolderListener {
-            override fun onClickItemIndex(view: View, index: Int) {
-                if (index > -1) {
-                    getItem(index)?.also {
-                        val playerData = PlayerData.parser(it, isAdult)
-                        nestedListener.onVideoClick(view, playerData)
-                    }
-                }
-            }
-        }
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        return when (getItem(position)) {
-            is BaseVideoItem.Video -> VIDEO
-            else -> BANNER
-        }
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (viewType) {
             VIDEO -> {
@@ -93,6 +73,13 @@ class HomeVideoListAdapter(
         }
     }
 
+    override fun getItemViewType(position: Int): Int {
+        return when (getItem(position)) {
+            is BaseVideoItem.Video -> VIDEO
+            else -> BANNER
+        }
+    }
+
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         (recyclerView.layoutManager as GridLayoutManager).spanSizeLookup =
@@ -104,5 +91,18 @@ class HomeVideoListAdapter(
                     }
                 }
             }
+    }
+
+    private val videoViewHolderListener by lazy {
+        object : BaseIndexViewHolder.IndexViewHolderListener {
+            override fun onClickItemIndex(view: View, index: Int) {
+                if (index > -1) {
+                    getItem(index)?.also {
+                        val playerData = PlayerData.parser(it, isAdult)
+                        nestedListener.onVideoClick(view, playerData)
+                    }
+                }
+            }
+        }
     }
 }

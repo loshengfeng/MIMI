@@ -156,7 +156,8 @@ interface ApiService {
         @Query("type") type: Int,
         @Query("offset") offset: Int,
         @Query("limit") limit: Int,
-        @Query("isAdult") isAdult: Boolean = true
+        @Query("isAdult") isAdult: Boolean = true,
+        @Query("orderBy") orderBy: Int = 1
     ): Response<ApiBasePagingItem<List<MemberPostItem>>>
 
     @GET("/v1/Members/Post/{postId}/Comment")
@@ -197,6 +198,12 @@ interface ApiService {
         @Query("offset") offset: Int,
         @Query("limit") limit: Int
     ): Response<ApiBasePagingItem<List<MemberClubItem>>>
+
+    @POST("/v1/Members/Club/{clubId}/Follow")
+    suspend fun followClub(@Path("clubId") clubId: Int): Response<Void>
+
+    @DELETE("/v1/Members/Club/{clubId}/Follow")
+    suspend fun cancelFollowClub(@Path("clubId") clubId: Int): Response<Void>
 
     /**********************************************************
      *

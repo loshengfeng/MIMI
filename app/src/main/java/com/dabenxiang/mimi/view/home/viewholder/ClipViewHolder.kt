@@ -5,13 +5,15 @@ import android.text.TextUtils
 import android.view.View
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.error.PostContentItem
 import com.dabenxiang.mimi.model.enums.HomeItemType
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.nested_item_home_clip.view.*
+import java.util.*
 
 class ClipViewHolder(
     itemView: View,
@@ -24,7 +26,7 @@ class ClipViewHolder(
     private val card = itemView.layout_card!!
     private val videoImage = itemView.iv_poster!!
     private val videoTime = itemView.tv_video_time!!
-    private val profileImg = itemView.img_profile!!
+    private val avatarImg = itemView.img_avatar!!
     private val profileName = itemView.tv_name!!
     private val profileTime = itemView.tv_time!!
     private val title = itemView.tv_title!!
@@ -36,9 +38,20 @@ class ClipViewHolder(
     }
 
     override fun updated(model: MemberPostItem?) {
-        val postContentItem = Gson().fromJson(model?.content, PostContentItem::class.java)
+        val contentItem = Gson().fromJson(model?.content, ContentItem::class.java)
+        val postImageItem = contentItem.images[0]
 
-        val postImageItem = postContentItem.images[0]
+        videoTime.text = contentItem.shortVideo.length
+        profileName.text = model?.postFriendlyName
+        profileTime.text = GeneralUtils.getTimeDiff(model?.creationDate ?: Date(), Date())
+        title.text = model?.title
+
+        card.setCardBackgroundColor(
+            itemView.resources.getColor(
+                R.color.adult_color_card_background,
+                null
+            )
+        )
 
         if (!TextUtils.isEmpty(postImageItem.url)) {
             Glide.with(itemView.context)
@@ -62,19 +75,6 @@ class ClipViewHolder(
             }
         }
 
-        videoTime.text = postContentItem.shortVideo.length
-
-        profileName.text = model?.creatorId.toString()
-        profileTime.text = model?.creationDate
-        title.text = model?.title
-
-        card.setCardBackgroundColor(
-            itemView.resources.getColor(
-                R.color.adult_color_card_background,
-                null
-            )
-        )
-
         if (attachmentMap[model?.avatarAttachmentId] == null) {
             attachmentListener.onGetAttachment(
                 model?.avatarAttachmentId!!,
@@ -86,7 +86,7 @@ class ClipViewHolder(
             Glide.with(itemView.context)
                 .load(bitmap)
                 .circleCrop()
-                .into(profileImg)
+                .into(avatarImg)
         }
     }
 }

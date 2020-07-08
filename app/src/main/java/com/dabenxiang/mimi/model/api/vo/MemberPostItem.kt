@@ -3,6 +3,8 @@ package com.dabenxiang.mimi.model.api.vo
 import com.dabenxiang.mimi.model.enums.PostStatus
 import com.dabenxiang.mimi.model.enums.PostType
 import com.google.gson.annotations.SerializedName
+import java.util.*
+import kotlin.collections.ArrayList
 
 data class MemberPostItem(
 
@@ -19,7 +21,7 @@ data class MemberPostItem(
     val type: PostType = PostType.TEXT,
 
     @SerializedName("creationDate")
-    val creationDate: String = "",
+    val creationDate: Date,
 
     @SerializedName("isFavorite")
     val isFavorite: Boolean = false,
@@ -53,6 +55,9 @@ data class MemberPostItem(
 
     @SerializedName("reported")
     val reported: Boolean = false,
+
+    @SerializedName("postFriendlyName")
+    val postFriendlyName: String = "",
 
     @SerializedName("status")
     val status: PostStatus = PostStatus.ONLINE

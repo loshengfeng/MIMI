@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.view.home.viewholder.ClubViewHolder
 
 class HomeClubAdapter(
     nestedListener: HomeAdapter.EventListener,
+    private val clubListener: ClubListener,
     private val attachmentListener: HomeAdapter.AttachmentListener,
     private val attachmentMap: HashMap<Long, Bitmap>
 ) : RecyclerView.Adapter<BaseViewHolder>() {
@@ -22,7 +23,14 @@ class HomeClubAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.nested_item_home_club, parent, false)
-        return ClubViewHolder(view, clubClickListener, attachmentListener, attachmentMap)
+        return ClubViewHolder(
+            view,
+            clubClickListener,
+            parent.context,
+            clubListener,
+            attachmentListener,
+            attachmentMap
+        )
     }
 
     override fun getItemCount(): Int {
@@ -40,11 +48,20 @@ class HomeClubAdapter(
         notifyDataSetChanged()
     }
 
+    fun getMemberClubItems(): List<MemberClubItem> {
+        return memberClubItems
+    }
+
     private val clubClickListener by lazy {
         object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
                 nestedListener.onClubClick(view, memberClubItems[index])
             }
         }
+    }
+
+    interface ClubListener {
+        fun followClub(id: Int, position: Int)
+        fun cancelFollowClub(id: Int, position: Int)
     }
 }

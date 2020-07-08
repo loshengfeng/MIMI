@@ -20,6 +20,7 @@ class HomeAdapter(
     val context: Context,
     private val listener: EventListener,
     private val isAdult: Boolean,
+    private val clubListener: HomeClubAdapter.ClubListener,
     private val attachmentListener: AttachmentListener,
     private val attachmentMap: HashMap<Long, Bitmap>
 ) :
@@ -122,7 +123,7 @@ class HomeAdapter(
                         R.layout.item_home_club,
                         parent,
                         false
-                    ), listener, isAdult, attachmentListener, attachmentMap
+                    ), listener, isAdult, clubListener, attachmentListener, attachmentMap
                 )
             }
         }
