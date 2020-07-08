@@ -64,6 +64,12 @@ class HomeViewModel : BaseViewModel() {
     private var _attachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
     val attachmentResult: LiveData<ApiResult<AttachmentItem>> = _attachmentResult
 
+    private var _followClubResult = MutableLiveData<ApiResult<Int>>()
+    val followClubResult: LiveData<ApiResult<Int>> = _followClubResult
+
+    private var _cancelFollowClubResult = MutableLiveData<ApiResult<Int>>()
+    val cancelFollowClubResult: LiveData<ApiResult<Int>> = _cancelFollowClubResult
+
     fun setTopTabPosition(position: Int) {
         if (position != tabLayoutPosition.value) {
             _tabLayoutPosition.value = position
@@ -199,6 +205,36 @@ class HomeViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _attachmentResult.value = it }
+        }
+    }
+
+    fun followClub(id: Int, position: Int) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().followClub(id.toInt())
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(position))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _followClubResult.value = it }
+        }
+    }
+
+    fun cancelFollowClub(id: Int, position: Int) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().cancelFollowClub(id.toInt())
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(position))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _cancelFollowClubResult.value = it }
         }
     }
 

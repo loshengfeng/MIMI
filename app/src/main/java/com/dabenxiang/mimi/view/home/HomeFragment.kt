@@ -17,6 +17,7 @@ import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
+import com.dabenxiang.mimi.view.adapter.HomeClubAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -151,8 +152,23 @@ class HomeFragment : BaseFragment() {
         }, false)
     }
 
+    private val clubListener = object : HomeClubAdapter.ClubListener {
+        override fun followClub(id: Int, position: Int) {
+        }
+
+        override fun cancelFollowClub(id: Int, position: Int) {
+        }
+    }
+
     private val adapter by lazy {
-        HomeAdapter(requireContext(), adapterListener, false, attachmentListener, attachmentMap)
+        HomeAdapter(
+            requireContext(),
+            adapterListener,
+            false,
+            clubListener,
+            attachmentListener,
+            attachmentMap
+        )
     }
 
     private val videoListAdapter by lazy {
@@ -183,15 +199,15 @@ class HomeFragment : BaseFragment() {
         }
 
         override fun onClipClick(view: View, item: MemberPostItem) {
-            TODO("Not yet implemented")
+
         }
 
         override fun onPictureClick(view: View, item: MemberPostItem) {
-            TODO("Not yet implemented")
+
         }
 
         override fun onClubClick(view: View, item: MemberClubItem) {
-            TODO("Not yet implemented")
+
         }
 
         override fun onLoadStatisticsViewHolder(

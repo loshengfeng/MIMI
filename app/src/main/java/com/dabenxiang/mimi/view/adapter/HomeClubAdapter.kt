@@ -13,11 +13,12 @@ import com.dabenxiang.mimi.view.home.viewholder.ClubViewHolder
 
 class HomeClubAdapter(
     nestedListener: HomeAdapter.EventListener,
+    private val clubListener: ClubListener,
     private val attachmentListener: HomeAdapter.AttachmentListener,
     private val attachmentMap: HashMap<Long, Bitmap>
 ) : RecyclerView.Adapter<BaseViewHolder>() {
 
-    private var memberClubItems: List<MemberClubItem> = arrayListOf()
+    var memberClubItems: List<MemberClubItem> = arrayListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -26,6 +27,7 @@ class HomeClubAdapter(
             view,
             clubClickListener,
             parent.context,
+            clubListener,
             attachmentListener,
             attachmentMap
         )
@@ -52,5 +54,10 @@ class HomeClubAdapter(
                 nestedListener.onClubClick(view, memberClubItems[index])
             }
         }
+    }
+
+    interface ClubListener {
+        fun followClub(id: Int, position: Int)
+        fun cancelFollowClub(id: Int, position: Int)
     }
 }

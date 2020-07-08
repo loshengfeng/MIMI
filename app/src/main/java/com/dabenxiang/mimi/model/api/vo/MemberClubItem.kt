@@ -33,7 +33,7 @@ data class MemberClubItem(
     val tag: String = "",
 
     @SerializedName("isFollow")
-    val isFollow: Boolean = false
+    var isFollow: Boolean = false
 )
 
 data class PostItem(

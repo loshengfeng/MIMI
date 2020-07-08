@@ -198,6 +198,12 @@ interface ApiService {
         @Query("limit") limit: Int
     ): Response<ApiBasePagingItem<List<MemberClubItem>>>
 
+    @POST("/v1/Members/Club/{clubId}/Follow")
+    suspend fun followClub(@Path("clubId") clubId: Int): Response<Void>
+
+    @DELETE("/v1/Members/Club/{clubId}/Follow")
+    suspend fun cancelFollowClub(@Path("clubId") clubId: Int): Response<Void>
+
     /**********************************************************
      *
      *                  Members/Home/Categories

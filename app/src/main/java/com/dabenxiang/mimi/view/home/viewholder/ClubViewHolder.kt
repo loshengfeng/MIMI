@@ -10,14 +10,17 @@ import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.enums.HomeItemType
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
+import com.dabenxiang.mimi.view.adapter.HomeClubAdapter
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.nested_item_home_club.view.*
+import timber.log.Timber
 
 class ClubViewHolder(
     itemView: View,
     onClickListener: IndexViewHolderListener,
     val context: Context,
+    private val clubListener: HomeClubAdapter.ClubListener,
     private val attachmentListener: HomeAdapter.AttachmentListener,
     private val attachmentMap: HashMap<Long, Bitmap>
 ) :
@@ -52,6 +55,7 @@ class ClubViewHolder(
         title.text = postItem?.title
 
         val isFollow = model?.isFollow ?: false
+
         if (isFollow) {
             follow.text = context.getString(R.string.club_followed)
             follow.background = context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
@@ -60,6 +64,14 @@ class ClubViewHolder(
             follow.text = context.getString(R.string.club_follow)
             follow.background = context.getDrawable(R.drawable.bg_red_1_stroke_radius_16)
             follow.setTextColor(context.getColor(R.color.color_red_1))
+        }
+
+        follow.setOnClickListener {
+            if (isFollow) {
+                clubListener.cancelFollowClub(model?.id?.toInt()!!, index)
+            } else {
+                clubListener.followClub(model?.id?.toInt()!!, index)
+            }
         }
 
         if (attachmentMap[model?.avatarAttachmentId] == null) {
@@ -96,7 +108,5 @@ class ClubViewHolder(
                     .into(clubImg)
             }
         }
-
-
     }
 }

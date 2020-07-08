@@ -247,14 +247,16 @@ class HomeClubViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
     isAdult: Boolean,
+    clubListener: HomeClubAdapter.ClubListener,
     attachmentListener: HomeAdapter.AttachmentListener,
     attachmentMap: HashMap<Long, Bitmap>
 ) : HomeViewHolder<HomeTemplate.Club>(itemView, listener, isAdult) {
 
     private val recyclerView: RecyclerView = itemView.recyclerview_club
-    private val nestedAdapter by lazy {
+    val nestedAdapter by lazy {
         HomeClubAdapter(
             listener,
+            clubListener,
             attachmentListener,
             attachmentMap
         )

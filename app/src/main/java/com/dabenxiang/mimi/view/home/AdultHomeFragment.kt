@@ -18,6 +18,7 @@ import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
+import com.dabenxiang.mimi.view.adapter.HomeClubAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -173,6 +174,36 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
+        viewModel.followClubResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    when (val holder = adapter.homeViewHolderMap[HomeItemType.CLUB]) {
+                        is HomeClubViewHolder -> {
+                            val item = holder.nestedAdapter.memberClubItems[it.result]
+                            item.isFollow = true
+                            holder.updateItem(it.result)
+                        }
+                    }
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
+
+        viewModel.cancelFollowClubResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    when (val holder = adapter.homeViewHolderMap[HomeItemType.CLUB]) {
+                        is HomeClubViewHolder -> {
+                            val item = holder.nestedAdapter.memberClubItems[it.result]
+                            item.isFollow = false
+                            holder.updateItem(it.result)
+                        }
+                    }
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
+
         viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
@@ -221,7 +252,14 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val adapter by lazy {
-        HomeAdapter(requireContext(), adapterListener, true, attachmentListener, attachmentMap)
+        HomeAdapter(
+            requireContext(),
+            adapterListener,
+            true,
+            clubListener,
+            attachmentListener,
+            attachmentMap
+        )
     }
 
     private val videoListAdapter by lazy {
@@ -231,6 +269,16 @@ class AdultHomeFragment : BaseFragment() {
     private val attachmentListener = object : HomeAdapter.AttachmentListener {
         override fun onGetAttachment(id: Long, position: Int, type: HomeItemType) {
             viewModel.getAttachment(id, position, type)
+        }
+    }
+
+    private val clubListener = object : HomeClubAdapter.ClubListener {
+        override fun followClub(id: Int, position: Int) {
+            viewModel.followClub(id, position)
+        }
+
+        override fun cancelFollowClub(id: Int, position: Int) {
+            viewModel.cancelFollowClub(id, position)
         }
     }
 
@@ -252,15 +300,15 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onClipClick(view: View, item: MemberPostItem) {
-            TODO("Not yet implemented")
+
         }
 
         override fun onPictureClick(view: View, item: MemberPostItem) {
-            TODO("Not yet implemented")
+
         }
 
         override fun onClubClick(view: View, item: MemberClubItem) {
-            TODO("Not yet implemented")
+
         }
 
         override fun onLoadStatisticsViewHolder(
