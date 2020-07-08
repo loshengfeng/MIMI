@@ -309,13 +309,13 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得熱門影片
      */
     suspend fun statisticsHomeVideos(
-        statisticsType: StatisticsType = StatisticsType.NEWEST,
+        statisticsType: StatisticsType = StatisticsType.MONTH,
         category: String? = null,
         isAdult: Boolean,
         offset: Int,
         limit: Int
     ) = apiService.statisticsHomeVideos(
-        statisticsType = statisticsType.ordinal,
+        statisticsType = statisticsType.value,
         category = category,
         isAdult = isAdult,
         offset = offset,

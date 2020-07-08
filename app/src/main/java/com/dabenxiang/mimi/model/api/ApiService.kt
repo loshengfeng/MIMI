@@ -156,7 +156,8 @@ interface ApiService {
         @Query("type") type: Int,
         @Query("offset") offset: Int,
         @Query("limit") limit: Int,
-        @Query("isAdult") isAdult: Boolean = true
+        @Query("isAdult") isAdult: Boolean = true,
+        @Query("orderBy") orderBy: Int = 1
     ): Response<ApiBasePagingItem<List<MemberPostItem>>>
 
     @GET("/v1/Members/Post/{postId}/Comment")

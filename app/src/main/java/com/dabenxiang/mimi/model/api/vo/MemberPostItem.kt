@@ -54,6 +54,9 @@ data class MemberPostItem(
     @SerializedName("reported")
     val reported: Boolean = false,
 
+    @SerializedName("postFriendlyName")
+    val postFriendlyName: String = "",
+
     @SerializedName("status")
     val status: PostStatus = PostStatus.ONLINE
 )

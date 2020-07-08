@@ -64,7 +64,7 @@ class ClipViewHolder(
 
         videoTime.text = contentItem.shortVideo.length
 
-        profileName.text = model?.creatorId.toString()
+        profileName.text = model?.postFriendlyName
         profileTime.text = model?.creationDate
         title.text = model?.title
 
