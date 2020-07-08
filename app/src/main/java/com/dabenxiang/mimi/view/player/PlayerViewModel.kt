@@ -41,6 +41,8 @@ class PlayerViewModel : BaseViewModel() {
     }
 
     var videoId: Long = 0L
+    var category: String = ""
+    var episodeId: Long = -1L
 
     var currentWindow: Int = 0
     var playbackPosition: Long = 0
@@ -280,7 +282,7 @@ class PlayerViewModel : BaseViewModel() {
             flow {
                 val source = sourceList?.get(sourceListPosition.value!!)!!
                 val episode = source.videoEpisodes?.get(episodePosition.value!!)!!
-                val episodeId = episode.id!!
+                episodeId = episode.id ?: 0L
 
                 val apiRepository = domainManager.getApiRepository()
 

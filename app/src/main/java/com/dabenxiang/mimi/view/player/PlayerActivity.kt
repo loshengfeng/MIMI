@@ -22,10 +22,7 @@ import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.extension.setNot
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ExceptionResult
-import com.dabenxiang.mimi.model.api.vo.PostCommentRequest
-import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
-import com.dabenxiang.mimi.model.api.vo.Source
-import com.dabenxiang.mimi.model.api.vo.VideoEpisode
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.serializable.PlayerData
@@ -421,6 +418,7 @@ class PlayerActivity : BaseActivity() {
                 }
                 is ApiResult.Success -> {
                     val result = it.result
+                    viewModel.category = result.categories?.get(0) ?: ""
                     //Timber.d("Result: $result")
 
                     if (isFirstInit) {
@@ -682,6 +680,11 @@ class PlayerActivity : BaseActivity() {
                 }
             }
         })
+
+        iv_share.setOnClickListener {
+            GeneralUtils.copyToClipboard(baseContext, viewModel.getShareUrl(viewModel.category, viewModel.videoId, viewModel.episodeId.toString()))
+            GeneralUtils.showToast(baseContext, "already copy url")
+        }
     }
 
     override fun onStart() {
