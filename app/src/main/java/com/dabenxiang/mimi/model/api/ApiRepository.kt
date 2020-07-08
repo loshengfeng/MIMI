@@ -383,8 +383,8 @@ class ApiRepository(private val apiService: ApiService) {
      * 刪除使用者列表影片
      */
     suspend fun deleteMePlaylist(
-        ids: List<Int>
-    ) = apiService.deletePlaylist(ids)
+        videoId: Long
+    ) = apiService.deletePlaylist(videoId)
 
     /**
      * 取得使用者影片列表 0:History, 1:Favorite
