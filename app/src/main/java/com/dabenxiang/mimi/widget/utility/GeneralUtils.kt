@@ -20,6 +20,7 @@ import okhttp3.Request
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.HttpException
 import retrofit2.Response
+import java.util.*
 import java.util.regex.Pattern
 
 object GeneralUtils {
@@ -121,10 +122,32 @@ object GeneralUtils {
 
     fun getStatusBarHeight(context: Context): Int {
         var statusBarHeight = 0
-        val resourceId: Int = context.resources.getIdentifier("status_bar_height", "dimen", "android")
+        val resourceId: Int =
+            context.resources.getIdentifier("status_bar_height", "dimen", "android")
         if (resourceId > 0) {
             statusBarHeight = context.resources.getDimensionPixelSize(resourceId)
         }
         return statusBarHeight
+    }
+
+    fun getTimeDiff(startDate: Date, endDate: Date): String {
+        val time = (endDate.time - startDate.time) / 1000
+        when {
+            (time / (60 * 60 * 24 * 30)) > 0 -> {
+                return (time / (60 * 60 * 24 * 30)).toString().plus("月個前")
+            }
+            (time / (60 * 60 * 24)) > 0 -> {
+                return (time / (60 * 60 * 24)).toString().plus("天前")
+            }
+            (time / (60 * 60)) > 0 -> {
+                return (time / (60 * 60)).toString().plus("小時前")
+            }
+            (time / 60) > 0 -> {
+                return (time / 60).toString().plus("分鐘前")
+            }
+            else -> {
+                return time.toString().plus("秒鐘前")
+            }
+        }
     }
 }

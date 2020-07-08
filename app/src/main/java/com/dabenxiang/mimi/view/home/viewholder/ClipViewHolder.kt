@@ -10,8 +10,10 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.HomeItemType
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.nested_item_home_clip.view.*
+import java.util.*
 
 class ClipViewHolder(
     itemView: View,
@@ -37,8 +39,19 @@ class ClipViewHolder(
 
     override fun updated(model: MemberPostItem?) {
         val contentItem = Gson().fromJson(model?.content, ContentItem::class.java)
-
         val postImageItem = contentItem.images[0]
+
+        videoTime.text = contentItem.shortVideo.length
+        profileName.text = model?.postFriendlyName
+        profileTime.text = GeneralUtils.getTimeDiff(model?.creationDate ?: Date(), Date())
+        title.text = model?.title
+
+        card.setCardBackgroundColor(
+            itemView.resources.getColor(
+                R.color.adult_color_card_background,
+                null
+            )
+        )
 
         if (!TextUtils.isEmpty(postImageItem.url)) {
             Glide.with(itemView.context)
@@ -61,19 +74,6 @@ class ClipViewHolder(
                 }
             }
         }
-
-        videoTime.text = contentItem.shortVideo.length
-
-        profileName.text = model?.postFriendlyName
-        profileTime.text = model?.creationDate
-        title.text = model?.title
-
-        card.setCardBackgroundColor(
-            itemView.resources.getColor(
-                R.color.adult_color_card_background,
-                null
-            )
-        )
 
         if (attachmentMap[model?.avatarAttachmentId] == null) {
             attachmentListener.onGetAttachment(
