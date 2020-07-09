@@ -43,7 +43,7 @@ class PictureClipAdapter(
     private val clipClickListener by lazy {
         object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
-                nestedListener.onClipClick(view, memberPostItems)
+                nestedListener.onClipClick(view, memberPostItems, index)
             }
         }
     }

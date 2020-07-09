@@ -5,9 +5,11 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.text.TextUtils
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -33,8 +35,10 @@ class ClipAdapter(
     private val context: Context,
     private val memberPostItems: ArrayList<MemberPostItem>,
     private val clipMap: HashMap<Long, File>,
+    private val coverMap: HashMap<Long, Bitmap>,
     private var currentPosition: Int,
-    private val onGetClip: (Long, Int) -> Unit
+    private val getClip: (Long, Int) -> Unit,
+    private val getCover: (Long, Int) -> Unit
 ) : ListAdapter<MemberPostItem, ClipViewHolder>(DIFF_CALLBACK) {
 
     companion object {
@@ -70,6 +74,11 @@ class ClipAdapter(
         )
     }
 
+    override fun onViewRecycled(holder: ClipViewHolder) {
+        super.onViewRecycled(holder)
+        holder.playerView.player?.release()
+    }
+
     fun updateCurrentPosition(position: Int) {
         currentPosition = position
     }
@@ -79,21 +88,37 @@ class ClipAdapter(
     }
 
     override fun onBindViewHolder(holder: ClipViewHolder, position: Int) {
-        Timber.d("@@@onBindViewHolder position:$position, currentPosition: $currentPosition")
-        processClip(holder.playerView, position)
+        Timber.d("onBindViewHolder position:$position, currentPosition: $currentPosition")
+        val item = memberPostItems[position]
+        val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
+        takeIf { contentItem.images.isNotEmpty() }?.also {
+            contentItem.images[0].also { image ->
+                if (TextUtils.isEmpty(image.url)) {
+                    image.id.takeIf { !TextUtils.isEmpty(it) }?.toLong()?.also { id ->
+                        takeIf { coverMap.containsKey(id) }?.also {
+                            Glide.with(holder.coverView.context).load(coverMap[id]).into(holder.coverView)
+                        } ?: run { getCover(id, position) }
+                    }
+                } else {
+                    Glide.with(holder.coverView.context).load(image.url).into(holder.coverView)
+                }
+            }
+        }
+        processClip(holder.playerView, contentItem.shortVideo.id, contentItem.shortVideo.url, position)
     }
 
-    private fun processClip(playerView: PlayerView, position: Int) {
+    private fun processClip(playerView: PlayerView, id: String, url: String, position: Int) {
         Timber.d("processClip position:$position")
+        takeUnless { currentPosition == position }?.also { playerView.visibility = View.GONE }
         val item = memberPostItems[position]
         val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
         playerView.player?.also { it.playWhenReady = false }
-        if (TextUtils.isEmpty(contentItem.shortVideo.url)) {
-            val id = contentItem.shortVideo.id.toLong()
-            if (clipMap.containsKey(id)) {
-                takeIf { currentPosition == position }?.also { setupPlayer(playerView, clipMap[id]?.toURI().toString()) }
+
+        if (TextUtils.isEmpty(url)) {
+            if (clipMap.containsKey(id.toLong())) {
+                takeIf { currentPosition == position }?.also { setupPlayer(playerView, clipMap[id.toLong()]?.toURI().toString()) }
             } else {
-                onGetClip(id, position)
+                getClip(id.toLong(), position)
             }
         } else {
             takeIf { currentPosition == position }?.also { setupPlayer(playerView, contentItem.shortVideo.url) }
@@ -119,6 +144,7 @@ class ClipAdapter(
                 }
             }
         }
+        playerView.visibility = View.VISIBLE
         playerView.player?.also { it.playWhenReady = true }
     }
 

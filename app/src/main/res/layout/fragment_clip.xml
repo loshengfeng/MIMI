@@ -8,6 +8,7 @@
         android:id="@+id/rv_clip"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:stateListAnimator="@null"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
