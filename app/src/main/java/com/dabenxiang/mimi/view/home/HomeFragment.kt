@@ -141,13 +141,13 @@ class HomeFragment : BaseFragment() {
 
     private fun setupRecyclerByPosition(position: Int) {
         when (position) {
-            1 -> {
-                recyclerview.layoutManager = GridLayoutManager(requireContext(), 2)
-                recyclerview.adapter = videoListAdapter
-            }
-            else -> {
+            0 -> {
                 recyclerview.layoutManager = LinearLayoutManager(requireContext())
                 recyclerview.adapter = homeAdapter
+            }
+            else -> {
+                recyclerview.layoutManager = GridLayoutManager(requireContext(), 2)
+                recyclerview.adapter = videoListAdapter
             }
         }
     }
@@ -157,6 +157,7 @@ class HomeFragment : BaseFragment() {
             0 -> mainViewModel?.getHomeCategories()
             else -> {
                 val keyword = mainViewModel?.normal?.categories?.get(position - 1)?.name
+                Timber.d("@@keyword: $keyword")
                 viewModel.getVideos(keyword, false)
             }
         }
