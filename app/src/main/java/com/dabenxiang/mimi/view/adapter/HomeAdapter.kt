@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.HomeItemType
@@ -164,9 +165,4 @@ class HomeAdapter(
             }
         }
     }
-
-    interface AttachmentListener {
-        fun onGetAttachment(id: Long, position: Int, type: HomeItemType)
-    }
-
 }

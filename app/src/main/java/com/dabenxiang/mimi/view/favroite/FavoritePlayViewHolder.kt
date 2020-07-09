@@ -13,7 +13,6 @@ import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
-import kotlinx.android.synthetic.main.activity_player.*
 import kotlinx.android.synthetic.main.head_video_info.view.*
 
 class FavoritePlayViewHolder(

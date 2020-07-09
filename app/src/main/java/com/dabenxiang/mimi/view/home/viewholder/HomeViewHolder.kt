@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
@@ -169,7 +170,7 @@ class HomeClipViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
     isAdult: Boolean,
-    attachmentListener: HomeAdapter.AttachmentListener,
+    attachmentListener: AttachmentListener,
     attachmentMap: HashMap<Long, Bitmap>
 ) : HomeViewHolder<HomeTemplate.Clip>(itemView, listener, isAdult) {
 
@@ -208,7 +209,7 @@ class HomePictureViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
     isAdult: Boolean,
-    attachmentListener: HomeAdapter.AttachmentListener,
+    attachmentListener: AttachmentListener,
     attachmentMap: HashMap<Long, Bitmap>
 ) : HomeViewHolder<HomeTemplate.Picture>(itemView, listener, isAdult) {
 
@@ -248,7 +249,7 @@ class HomeClubViewHolder(
     listener: HomeAdapter.EventListener,
     isAdult: Boolean,
     clubListener: HomeClubAdapter.ClubListener,
-    attachmentListener: HomeAdapter.AttachmentListener,
+    attachmentListener: AttachmentListener,
     attachmentMap: HashMap<Long, Bitmap>
 ) : HomeViewHolder<HomeTemplate.Club>(itemView, listener, isAdult) {
 

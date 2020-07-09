@@ -62,7 +62,7 @@
         android:paddingEnd="9dp"
         android:paddingBottom="3dp"
         android:src="@drawable/btn_arrow_black_n"
-        android:text="@string/my_follow_follow"
+        android:text="@string/followed"
         android:textColor="@color/color_black_1_60"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@id/iv_photo"

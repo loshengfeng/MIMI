@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
@@ -210,9 +211,13 @@ class HomeFragment : BaseFragment() {
         HomeVideoListAdapter(adapterListener, false)
     }
 
-    private val attachmentListener = object : HomeAdapter.AttachmentListener {
+    private val attachmentListener = object : AttachmentListener {
         override fun onGetAttachment(id: Long, position: Int, type: HomeItemType) {
 
+        }
+
+        override fun onGetAttachment(id: Long, position: Int) {
+            TODO("Not yet implemented")
         }
     }
 

@@ -5,6 +5,7 @@ import android.text.TextUtils
 import android.view.View
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.HomeItemType
@@ -18,7 +19,7 @@ import java.util.*
 class ClipViewHolder(
     itemView: View,
     onClickListener: IndexViewHolderListener,
-    private val attachmentListener: HomeAdapter.AttachmentListener,
+    private val attachmentListener: AttachmentListener,
     private val attachmentMap: HashMap<Long, Bitmap>
 ) :
     BaseIndexViewHolder<MemberPostItem>(itemView, onClickListener) {

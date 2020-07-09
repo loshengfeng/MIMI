@@ -104,7 +104,7 @@
         tools:text="99" />
 
     <ImageView
-        android:id="@+id/iv_message"
+        android:id="@+id/iv_comment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="33dp"
@@ -113,15 +113,15 @@
         app:layout_constraintTop_toBottomOf="@+id/chip_group_tag" />
 
     <TextView
-        android:id="@+id/tv_message_count"
+        android:id="@+id/tv_comment_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="3dp"
         android:textColor="@color/color_white_1"
         android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="@+id/iv_message"
-        app:layout_constraintLeft_toRightOf="@+id/iv_message"
-        app:layout_constraintTop_toTopOf="@+id/iv_message"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_comment"
+        app:layout_constraintLeft_toRightOf="@+id/iv_comment"
+        app:layout_constraintTop_toTopOf="@+id/iv_comment"
         tools:text="99" />
 
     <ImageView

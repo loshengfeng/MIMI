@@ -10,6 +10,8 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.AdultListener
+import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
@@ -182,7 +184,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
+        viewModel.homeAttachmentResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
                     val attachmentItem = it.result
@@ -198,6 +200,17 @@ class AdultHomeFragment : BaseFragment() {
                             holder.updateItem(attachmentItem.position)
                         }
                     }
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
+
+        viewModel.commonAttachmentResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    val attachmentItem = it.result
+                    attachmentMap[attachmentItem.id] = attachmentItem.bitmap
+                    commonPagedAdapter.notifyItemChanged(it.result.position)
                 }
                 is Error -> Timber.e(it.throwable)
             }
@@ -342,16 +355,38 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val commonPagedAdapter by lazy {
-        CommonPagedAdapter(requireActivity())
+        CommonPagedAdapter(requireActivity(), adultListener, attachmentListener, attachmentMap)
     }
 
     private val videoListAdapter by lazy {
         HomeVideoListAdapter(adapterListener, true)
     }
 
-    private val attachmentListener = object : HomeAdapter.AttachmentListener {
+    private val adultListener = object : AdultListener {
+        override fun doLike() {
+
+        }
+
+        override fun follow() {
+
+        }
+
+        override fun cancelFollow() {
+
+        }
+
+        override fun more() {
+
+        }
+    }
+
+    private val attachmentListener = object : AttachmentListener {
         override fun onGetAttachment(id: Long, position: Int, type: HomeItemType) {
             viewModel.getAttachment(id, position, type)
+        }
+
+        override fun onGetAttachment(id: Long, position: Int) {
+            viewModel.getAttachment(id, position)
         }
     }
 
