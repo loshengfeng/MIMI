@@ -65,7 +65,6 @@ class ClipViewHolder(
                         index,
                         HomeItemType.CLIP
                     )
-
                 } else {
                     val bitmap = attachmentMap[postImageItem.id.toLong()]
                     Glide.with(itemView.context)

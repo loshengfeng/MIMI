@@ -234,8 +234,7 @@ class HomeFragment : BaseFragment() {
             startActivityForResult(intent, PlayerActivity.REQUEST_CODE)
         }
 
-        override fun onClipClick(view: View, item: MemberPostItem) {
-
+        override fun onClipClick(view: View, item: List<MemberPostItem>) {
         }
 
         override fun onPictureClick(view: View, item: MemberPostItem) {
@@ -243,7 +242,6 @@ class HomeFragment : BaseFragment() {
         }
 
         override fun onClubClick(view: View, item: MemberClubItem) {
-
         }
 
         override fun onLoadStatisticsViewHolder(
