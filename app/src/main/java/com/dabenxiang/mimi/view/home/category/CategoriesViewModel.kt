@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.home
+package com.dabenxiang.mimi.view.home.category
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,6 +9,8 @@ import androidx.paging.PagedList
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.home.video.VideoDataSource
+import com.dabenxiang.mimi.view.home.video.VideoFactory
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -33,16 +35,18 @@ class CategoriesViewModel : BaseViewModel() {
 
     fun setupVideoList(category: String?, isAdult: Boolean) {
         viewModelScope.launch {
-            val dataSrc = VideoListDataSource(
-                isAdult,
-                category ?: "",
-                viewModelScope,
-                domainManager.getApiRepository(),
-                pagingCallback
-            )
-            val factory = VideoListFactory(dataSrc)
+            val dataSrc =
+                VideoDataSource(
+                    isAdult,
+                    category ?: "",
+                    viewModelScope,
+                    domainManager.getApiRepository(),
+                    pagingCallback
+                )
+            val factory =
+                VideoFactory(dataSrc)
             val config = PagedList.Config.Builder()
-                .setPageSize(VideoListDataSource.PER_LIMIT.toInt())
+                .setPageSize(VideoDataSource.PER_LIMIT.toInt())
                 .build()
 
             LivePagedListBuilder(factory, config).build().asFlow().collect {

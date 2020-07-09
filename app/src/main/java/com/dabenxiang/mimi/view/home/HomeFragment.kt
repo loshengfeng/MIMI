@@ -7,6 +7,8 @@ import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
@@ -23,6 +25,7 @@ import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
@@ -50,19 +53,20 @@ class HomeFragment : BaseFragment() {
 
         requireActivity().onBackPressedDispatcher.addCallback { backToDesktop() }
         recyclerview_tab.adapter = tabAdapter
-        recyclerview_home.adapter = adapter
-        recyclerview_videos.adapter = videoListAdapter
-        refresh_home.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
+        recyclerview.layoutManager = LinearLayoutManager(requireContext())
+        recyclerview.adapter = homeAdapter
+        refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
 
-        if (mainViewModel?.normal == null)
-            mainViewModel?.loadHomeCategories()
+        if (mainViewModel?.normal == null) {
+            mainViewModel?.getHomeCategories()
+        }
     }
 
     override fun setupObservers() {
         mainViewModel?.categoriesData?.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Loading -> refresh_home.isRefreshing = true
-                is Loaded -> refresh_home.isRefreshing = false
+                is Loading -> refresh.isRefreshing = true
+                is Loaded -> refresh.isRefreshing = false
                 is Success -> {
                     val list = mutableListOf<String>()
                     list.add(getString(R.string.home))
@@ -73,7 +77,7 @@ class HomeFragment : BaseFragment() {
                             list.add(detail.name)
                         }
                         tabAdapter.submitList(list, lastPosition)
-                        loadFirstTab(mainViewModel?.normal)
+                        setupHomeData(mainViewModel?.normal)
                     }
                 }
                 is Error -> Timber.e(it.throwable)
@@ -83,17 +87,8 @@ class HomeFragment : BaseFragment() {
         viewModel.tabLayoutPosition.observe(viewLifecycleOwner, Observer { position ->
             lastPosition = position
             tabAdapter.setLastSelectedIndex(lastPosition)
-            when (position) {
-                0 -> {
-                    btn_filter.visibility = View.GONE
-                    loadFirstTab(mainViewModel?.normal)
-                }
-                else -> {
-                    btn_filter.visibility = View.VISIBLE
-                    val keyword = mainViewModel?.normal?.categories?.get(position - 1)?.name
-                    loadCategories(keyword)
-                }
-            }
+            setupRecyclerByPosition(position)
+            getData(position)
         })
 
         viewModel.videoList.observe(viewLifecycleOwner, Observer {
@@ -128,9 +123,9 @@ class HomeFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
-        refresh_home.setOnRefreshListener {
-            refresh_home.isRefreshing = false
-            mainViewModel?.loadHomeCategories()
+        refresh.setOnRefreshListener {
+            refresh.isRefreshing = false
+            getData(lastPosition)
         }
 
         iv_bg_search.setOnClickListener {
@@ -142,6 +137,46 @@ class HomeFragment : BaseFragment() {
                 )
             )
         }
+    }
+
+    private fun setupRecyclerByPosition(position: Int) {
+        when (position) {
+            0 -> {
+                recyclerview.layoutManager = LinearLayoutManager(requireContext())
+                recyclerview.adapter = homeAdapter
+            }
+            else -> {
+                recyclerview.layoutManager = GridLayoutManager(requireContext(), 2)
+                recyclerview.adapter = videoListAdapter
+            }
+        }
+    }
+
+    private fun getData(position: Int) {
+        when (position) {
+            0 -> mainViewModel?.getHomeCategories()
+            else -> {
+                val keyword = mainViewModel?.normal?.categories?.get(position - 1)?.name
+                Timber.d("@@keyword: $keyword")
+                viewModel.getVideos(keyword, false)
+            }
+        }
+    }
+
+    private fun setupHomeData(root: CategoriesItem?) {
+        val templateList = mutableListOf<HomeTemplate>()
+
+        templateList.add(HomeTemplate.Banner(imgUrl = "https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
+        templateList.add(HomeTemplate.Carousel(false))
+
+        if (root?.categories != null) {
+            for (item in root.categories) {
+                templateList.add(HomeTemplate.Header(null, item.name, item.name))
+                templateList.add(HomeTemplate.Statistics(item.name, item.name, false))
+            }
+        }
+
+        homeAdapter.submitList(templateList)
     }
 
     private val tabAdapter by lazy {
@@ -160,7 +195,7 @@ class HomeFragment : BaseFragment() {
         }
     }
 
-    private val adapter by lazy {
+    private val homeAdapter by lazy {
         HomeAdapter(
             requireContext(),
             adapterListener,
@@ -198,8 +233,7 @@ class HomeFragment : BaseFragment() {
             startActivityForResult(intent, PlayerActivity.REQUEST_CODE)
         }
 
-        override fun onClipClick(view: View, item: MemberPostItem) {
-
+        override fun onClipClick(view: View, item: List<MemberPostItem>) {
         }
 
         override fun onPictureClick(view: View, item: MemberPostItem) {
@@ -207,7 +241,6 @@ class HomeFragment : BaseFragment() {
         }
 
         override fun onClubClick(view: View, item: MemberClubItem) {
-
         }
 
         override fun onLoadStatisticsViewHolder(
@@ -233,37 +266,11 @@ class HomeFragment : BaseFragment() {
         }
 
         override fun onLoadPictureViewHolder(vh: HomePictureViewHolder) {
-            TODO("Not yet implemented")
+
         }
 
         override fun onLoadClubViewHolder(vh: HomeClubViewHolder) {
-            TODO("Not yet implemented")
+
         }
-    }
-
-    private fun loadFirstTab(root: CategoriesItem?) {
-        recyclerview_videos.visibility = View.GONE
-        refresh_home.visibility = View.VISIBLE
-
-        val templateList = mutableListOf<HomeTemplate>()
-
-        templateList.add(HomeTemplate.Banner(imgUrl = "https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
-        templateList.add(HomeTemplate.Carousel(false))
-
-        if (root?.categories != null) {
-            for (item in root.categories) {
-                templateList.add(HomeTemplate.Header(null, item.name, item.name))
-                templateList.add(HomeTemplate.Statistics(item.name, item.name, false))
-            }
-        }
-
-        adapter.submitList(templateList)
-    }
-
-    private fun loadCategories(keyword: String?) {
-        recyclerview_videos.visibility = View.VISIBLE
-        refresh_home.visibility = View.GONE
-
-        viewModel.setupVideoList(keyword, false)
     }
 }

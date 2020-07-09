@@ -43,7 +43,7 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
-    fun loadHomeCategories() {
+    fun getHomeCategories() {
         viewModelScope.launch {
             flow {
                 val resp = domainManager.getApiRepository().fetchHomeCategories()

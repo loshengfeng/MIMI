@@ -18,6 +18,10 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.home.picture.PicturePostDataSource
+import com.dabenxiang.mimi.view.home.picture.PicturePostFactory
+import com.dabenxiang.mimi.view.home.video.VideoDataSource
+import com.dabenxiang.mimi.view.home.video.VideoFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -69,6 +73,9 @@ class HomeViewModel : BaseViewModel() {
 
     private var _cancelFollowClubResult = MutableLiveData<ApiResult<Int>>()
     val cancelFollowClubResult: LiveData<ApiResult<Int>> = _cancelFollowClubResult
+
+    private val _picturePostItemList = MutableLiveData<PagedList<MemberPostItem>>()
+    val picturePostItemList: LiveData<PagedList<MemberPostItem>> = _picturePostItemList
 
     fun setTopTabPosition(position: Int) {
         if (position != tabLayoutPosition.value) {
@@ -171,26 +178,6 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-    fun setupVideoList(category: String?, isAdult: Boolean) {
-        viewModelScope.launch {
-            val dataSrc = VideoListDataSource(
-                isAdult,
-                category,
-                viewModelScope,
-                domainManager.getApiRepository(),
-                pagingCallback
-            )
-            val factory = VideoListFactory(dataSrc)
-            val config = PagedList.Config.Builder()
-                .setPageSize(VideoListDataSource.PER_LIMIT.toInt())
-                .build()
-
-            LivePagedListBuilder(factory, config).build().asFlow().collect {
-                _videoList.postValue(it)
-            }
-        }
-    }
-
     fun getAttachment(id: Long, position: Int, type: HomeItemType) {
         viewModelScope.launch {
             flow {
@@ -211,7 +198,7 @@ class HomeViewModel : BaseViewModel() {
     fun followClub(id: Int, position: Int) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().followClub(id.toInt())
+                val result = domainManager.getApiRepository().followClub(id)
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(position))
             }
@@ -226,7 +213,7 @@ class HomeViewModel : BaseViewModel() {
     fun cancelFollowClub(id: Int, position: Int) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().cancelFollowClub(id.toInt())
+                val result = domainManager.getApiRepository().cancelFollowClub(id)
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(position))
             }
@@ -236,6 +223,47 @@ class HomeViewModel : BaseViewModel() {
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _cancelFollowClubResult.value = it }
         }
+    }
+
+    fun getVideos(category: String?, isAdult: Boolean) {
+        viewModelScope.launch {
+            getVideoPagingItems(category, isAdult).asFlow()
+                .collect { _videoList.value = it }
+        }
+    }
+
+    private fun getVideoPagingItems(
+        category: String?,
+        isAdult: Boolean
+    ): LiveData<PagedList<BaseVideoItem>> {
+        val videoDataSource = VideoDataSource(
+            isAdult,
+            category,
+            viewModelScope,
+            domainManager.getApiRepository(),
+            pagingCallback
+        )
+        val videoFactory = VideoFactory(videoDataSource)
+        val config = PagedList.Config.Builder()
+            .setPrefetchDistance(4)
+            .build()
+        return LivePagedListBuilder(videoFactory, config).build()
+    }
+
+    fun getPicturePosts() {
+        viewModelScope.launch {
+            getPicturePostPagingItems().asFlow()
+                .collect { _picturePostItemList.value = it }
+        }
+    }
+
+    private fun getPicturePostPagingItems(): LiveData<PagedList<MemberPostItem>> {
+        val pictureDataSource = PicturePostDataSource(pagingCallback, viewModelScope, domainManager)
+        val pictureFactory = PicturePostFactory(pictureDataSource)
+        val config = PagedList.Config.Builder()
+            .setPrefetchDistance(4)
+            .build()
+        return LivePagedListBuilder(pictureFactory, config).build()
     }
 
     private val pagingCallback = object : PagingCallback {

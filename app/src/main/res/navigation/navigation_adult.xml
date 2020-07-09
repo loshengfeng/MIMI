@@ -18,11 +18,15 @@
             android:id="@+id/action_homeFragment_to_searchVideoFragment"
             app:destination="@id/searchVideoFragment" />
 
+        <action
+            android:id="@+id/action_adultHomeFragment_to_clipFragment"
+            app:destination="@id/clipFragment" />
+
     </fragment>
 
     <fragment
         android:id="@+id/categoriesFragment"
-        android:name="com.dabenxiang.mimi.view.home.CategoriesFragment"
+        android:name="com.dabenxiang.mimi.view.home.category.CategoriesFragment"
         tools:layout="@layout/fragment_categories">
 
         <action
@@ -35,5 +39,10 @@
         android:id="@+id/searchVideoFragment"
         android:name="com.dabenxiang.mimi.view.search.SearchVideoFragment"
         tools:layout="@layout/fragment_search_video" />
+
+    <fragment
+        android:id="@+id/clipFragment"
+        android:name="com.dabenxiang.mimi.view.clip.ClipFragment"
+        tools:layout="@layout/fragment_clip" />
 
 </navigation>
