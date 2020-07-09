@@ -375,6 +375,10 @@ class AdultHomeFragment : BaseFragment() {
 
         }
 
+        override fun comment() {
+
+        }
+
         override fun more() {
 
         }
