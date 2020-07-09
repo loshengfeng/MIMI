@@ -15,6 +15,7 @@ import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.ClipViewHolder
 import com.dabenxiang.mimi.view.player.PlayerViewModel
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
 import com.google.android.exoplayer2.source.MediaSource
@@ -34,7 +35,6 @@ class ClipAdapter(
     private val context: Context,
     private val memberPostItems: ArrayList<MemberPostItem>,
     private val clipMap: HashMap<Long, File>,
-    private val coverMap: HashMap<Long, Bitmap>,
     private var currentPosition: Int,
     private val getClip: (Long, Int) -> Unit,
     private val getCover: (Long, Int) -> Unit
@@ -90,15 +90,15 @@ class ClipAdapter(
     override fun onBindViewHolder(holder: ClipViewHolder, position: Int) {
         Timber.d("onBindViewHolder position:$position, currentPosition: $currentPosition")
         takeIf { currentPosition == position }?.also { currentViewHolder = holder }
-            ?: run { holder.playerView.visibility = View.GONE }
+            ?: run { holder.coverView.visibility = View.VISIBLE }
         val item = memberPostItems[position]
         val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
         takeIf { contentItem.images.isNotEmpty() }?.also {
             contentItem.images[0].also { image ->
                 if (TextUtils.isEmpty(image.url)) {
                     image.id.takeIf { !TextUtils.isEmpty(it) }?.toLong()?.also { id ->
-                        takeIf { coverMap.containsKey(id) }?.also {
-                            Glide.with(holder.coverView.context).load(coverMap[id]).into(holder.coverView)
+                        LruCacheUtils.getLruCache(id)?.also {
+                            Glide.with(holder.coverView.context).load(it).into(holder.coverView)
                         } ?: run { getCover(id, position) }
                     }
                 } else {
@@ -146,7 +146,9 @@ class ClipAdapter(
                 }
             }
         }
-        playerView.player?.also { it.playWhenReady = true }
+        playerView.player?.also {
+            it.seekToDefaultPosition()
+            it.playWhenReady = true }
     }
 
     private val playbackStateListener = object : Player.EventListener {
@@ -155,7 +157,7 @@ class ClipAdapter(
                 ExoPlayer.STATE_IDLE -> "ExoPlayer.STATE_IDLE"
                 ExoPlayer.STATE_BUFFERING -> "ExoPlayer.STATE_BUFFERING"
                 ExoPlayer.STATE_READY -> {
-                    currentViewHolder?.playerView?.visibility = View.VISIBLE
+                    currentViewHolder?.coverView?.visibility = View.GONE
                     "ExoPlayer.STATE_READY"
                 }
 

@@ -23,17 +23,14 @@ class ClipFragment : BaseFragment() {
 
     companion object {
         const val KEY_DATA = "data"
-        const val KEY_ATTACHMENT = "attachment"
         const val KEY_POSITION = "position"
 
         fun createBundle(
             items: ArrayList<MemberPostItem>,
-            attachments: HashMap<Long, Bitmap>,
             position: Int
         ): Bundle {
             return Bundle().also {
                 it.putSerializable(KEY_DATA, items)
-                it.putSerializable(KEY_ATTACHMENT, attachments)
                 it.putInt(KEY_POSITION, position)
             }
         }
@@ -74,9 +71,7 @@ class ClipFragment : BaseFragment() {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Error -> onApiError(it.throwable)
                 is ApiResult.Success -> {
-                    val result = it.result
-                    coverMap[result.first] = result.third
-                    rv_clip.adapter?.notifyItemChanged(result.second)
+                    rv_clip.adapter?.notifyItemChanged(it.result)
                 }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
             }
@@ -88,13 +83,11 @@ class ClipFragment : BaseFragment() {
     }
 
     override fun initSettings() {
-        (arguments?.getSerializable(KEY_ATTACHMENT) as HashMap<Long, Bitmap>).also { coverMap.putAll(it) }
         (arguments?.getSerializable(KEY_DATA) as ArrayList<MemberPostItem>).also { data ->
             rv_clip.adapter = ClipAdapter(
                 requireContext(),
                 data,
                 clipMap,
-                coverMap,
                 0,
                 { id, pos -> getClip(id, pos) },
                 { id, pos -> getCover(id, pos) })

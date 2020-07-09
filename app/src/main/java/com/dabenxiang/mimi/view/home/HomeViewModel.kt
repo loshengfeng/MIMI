@@ -65,8 +65,11 @@ class HomeViewModel : BaseViewModel() {
     val clubResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberClubItem>>>>> =
         _clubResult
 
-    private var _attachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
-    val attachmentResult: LiveData<ApiResult<AttachmentItem>> = _attachmentResult
+    private var _homeAttachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
+    val homeAttachmentResult: LiveData<ApiResult<AttachmentItem>> = _homeAttachmentResult
+
+    private var _commonAttachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
+    val commonAttachmentResult: LiveData<ApiResult<AttachmentItem>> = _commonAttachmentResult
 
     private var _followClubResult = MutableLiveData<ApiResult<Int>>()
     val followClubResult: LiveData<ApiResult<Int>> = _followClubResult
@@ -191,7 +194,24 @@ class HomeViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _attachmentResult.value = it }
+                .collect { _homeAttachmentResult.value = it }
+        }
+    }
+
+    fun getAttachment(id: Long, position: Int) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getAttachment(id)
+                if (!result.isSuccessful) throw HttpException(result)
+                val byteArray = result.body()?.bytes()
+                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
+                emit(ApiResult.success(AttachmentItem(id, bitmap, position)))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _commonAttachmentResult.value = it }
         }
     }
 

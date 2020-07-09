@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.HomeItemType
@@ -21,8 +22,7 @@ class HomeAdapter(
     private val listener: EventListener,
     private val isAdult: Boolean,
     private val clubListener: HomeClubAdapter.ClubListener,
-    private val attachmentListener: AttachmentListener,
-    private val attachmentMap: HashMap<Long, Bitmap>
+    private val attachmentListener: AttachmentListener
 ) :
     ListAdapter<HomeTemplate, BaseViewHolder>(DIFF_CALLBACK) {
 
@@ -105,7 +105,7 @@ class HomeAdapter(
                         R.layout.item_home_clip,
                         parent,
                         false
-                    ), listener, isAdult, attachmentListener, attachmentMap
+                    ), listener, isAdult, attachmentListener
                 )
             }
             HomeItemType.PICTURE -> {
@@ -114,7 +114,7 @@ class HomeAdapter(
                         R.layout.item_home_picture,
                         parent,
                         false
-                    ), listener, isAdult, attachmentListener, attachmentMap
+                    ), listener, isAdult, attachmentListener
                 )
             }
             HomeItemType.CLUB -> {
@@ -123,7 +123,7 @@ class HomeAdapter(
                         R.layout.item_home_club,
                         parent,
                         false
-                    ), listener, isAdult, clubListener, attachmentListener, attachmentMap
+                    ), listener, isAdult, clubListener, attachmentListener
                 )
             }
         }
@@ -164,9 +164,4 @@ class HomeAdapter(
             }
         }
     }
-
-    interface AttachmentListener {
-        fun onGetAttachment(id: Long, position: Int, type: HomeItemType)
-    }
-
 }

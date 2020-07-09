@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.clip
 
-import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -9,6 +8,7 @@ import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.FileUtil
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -20,8 +20,8 @@ class ClipViewModel: BaseViewModel() {
     private var _clipResult = MutableLiveData<ApiResult<Triple<Long, Int, File>>>()
     val clipResult: LiveData<ApiResult<Triple<Long, Int, File>>> = _clipResult
 
-    private var _coverResult = MutableLiveData<ApiResult<Triple<Long, Int, Bitmap>>>()
-    val coverResult: LiveData<ApiResult<Triple<Long, Int, Bitmap>>> = _coverResult
+    private var _coverResult = MutableLiveData<ApiResult<Int>>()
+    val coverResult: LiveData<ApiResult<Int>> = _coverResult
 
     fun getClip(id: Long, pos: Int) {
         viewModelScope.launch {
@@ -53,7 +53,8 @@ class ClipViewModel: BaseViewModel() {
                 if (!result.isSuccessful) throw HttpException(result)
                 val byteArray = result.body()?.bytes()
                 val bitmap = ImageUtils.bytes2Bitmap(byteArray)
-                emit(ApiResult.success(Triple(id, position, bitmap)))
+                LruCacheUtils.putLruCache(id, bitmap)
+                emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }

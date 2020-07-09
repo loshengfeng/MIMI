@@ -1,17 +1,17 @@
 package com.dabenxiang.mimi.view.home.viewholder
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.text.TextUtils
 import android.view.View
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.enums.HomeItemType
-import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeClubAdapter
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils.getLruCache
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.nested_item_home_club.view.*
 
@@ -20,8 +20,7 @@ class ClubViewHolder(
     onClickListener: IndexViewHolderListener,
     val context: Context,
     private val clubListener: HomeClubAdapter.ClubListener,
-    private val attachmentListener: HomeAdapter.AttachmentListener,
-    private val attachmentMap: HashMap<Long, Bitmap>
+    private val attachmentListener: AttachmentListener
 ) :
     BaseIndexViewHolder<MemberClubItem>(itemView, onClickListener) {
 
@@ -52,11 +51,11 @@ class ClubViewHolder(
         val isFollow = model?.isFollow ?: false
 
         if (isFollow) {
-            follow.text = context.getString(R.string.club_followed)
+            follow.text = context.getString(R.string.followed)
             follow.background = context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
             follow.setTextColor(context.getColor(R.color.color_white_1))
         } else {
-            follow.text = context.getString(R.string.club_follow)
+            follow.text = context.getString(R.string.follow)
             follow.background = context.getDrawable(R.drawable.bg_red_1_stroke_radius_16)
             follow.setTextColor(context.getColor(R.color.color_red_1))
         }
@@ -69,21 +68,21 @@ class ClubViewHolder(
             }
         }
 
-        if (attachmentMap[model?.avatarAttachmentId] == null) {
+        if (getLruCache(model?.avatarAttachmentId!!) == null) {
             attachmentListener.onGetAttachment(
-                model?.avatarAttachmentId!!,
+                model.avatarAttachmentId,
                 index,
                 HomeItemType.CLUB
             )
         } else {
-            val bitmap = attachmentMap[model?.avatarAttachmentId]
+            val bitmap = getLruCache(model.avatarAttachmentId)
             Glide.with(itemView.context)
                 .load(bitmap)
                 .circleCrop()
                 .into(avatarImg)
         }
 
-        val posts = model?.posts ?: arrayListOf()
+        val posts = model.posts
 
         if (posts.isNotEmpty()) {
             val postItem = posts[0]
@@ -97,14 +96,14 @@ class ClubViewHolder(
                     .circleCrop()
                     .into(clubImg)
             } else {
-                if (attachmentMap[imageItem?.id?.toLong()] == null) {
+                if (getLruCache(imageItem?.id?.toLong()!!) == null) {
                     attachmentListener.onGetAttachment(
-                        imageItem?.id!!.toLong(),
+                        imageItem.id.toLong(),
                         index,
                         HomeItemType.CLUB
                     )
                 } else {
-                    val bitmap = attachmentMap[imageItem?.id?.toLong()]
+                    val bitmap = getLruCache(imageItem.id.toLong())
                     Glide.with(itemView.context)
                         .load(bitmap)
                         .into(clubImg)

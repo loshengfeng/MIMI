@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.view.home
 
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
@@ -10,6 +9,8 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.AdultListener
+import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
@@ -29,6 +30,7 @@ import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils.putLruCache
 import kotlinx.android.synthetic.main.fragment_home.*
 import timber.log.Timber
 
@@ -47,7 +49,6 @@ class AdultHomeFragment : BaseFragment() {
     private val homeClipViewHolderMap = hashMapOf<Int, HomeClipViewHolder>()
     private val homePictureViewHolderMap = hashMapOf<Int, HomePictureViewHolder>()
     private val homeClubViewHolderMap = hashMapOf<Int, HomeClubViewHolder>()
-    private val attachmentMap: HashMap<Long, Bitmap> = hashMapOf()
 
     override fun getLayoutId() = R.layout.fragment_home
 
@@ -182,11 +183,11 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
+        viewModel.homeAttachmentResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
                     val attachmentItem = it.result
-                    attachmentMap[attachmentItem.id] = attachmentItem.bitmap
+                    putLruCache(attachmentItem.id, attachmentItem.bitmap)
                     when (val holder = homeAdapter.homeViewHolderMap[attachmentItem.type]) {
                         is HomeClipViewHolder -> {
                             holder.updateItem(attachmentItem.position)
@@ -198,6 +199,17 @@ class AdultHomeFragment : BaseFragment() {
                             holder.updateItem(attachmentItem.position)
                         }
                     }
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
+
+        viewModel.commonAttachmentResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    val attachmentItem = it.result
+                    putLruCache(attachmentItem.id, attachmentItem.bitmap)
+                    commonPagedAdapter.notifyItemChanged(it.result.position)
                 }
                 is Error -> Timber.e(it.throwable)
             }
@@ -336,22 +348,47 @@ class AdultHomeFragment : BaseFragment() {
             adapterListener,
             true,
             clubListener,
-            attachmentListener,
-            attachmentMap
+            attachmentListener
         )
     }
 
     private val commonPagedAdapter by lazy {
-        CommonPagedAdapter(requireActivity())
+        CommonPagedAdapter(requireActivity(), adultListener, attachmentListener)
     }
 
     private val videoListAdapter by lazy {
         HomeVideoListAdapter(adapterListener, true)
     }
 
-    private val attachmentListener = object : HomeAdapter.AttachmentListener {
+    private val adultListener = object : AdultListener {
+        override fun doLike() {
+
+        }
+
+        override fun follow() {
+
+        }
+
+        override fun cancelFollow() {
+
+        }
+
+        override fun comment() {
+
+        }
+
+        override fun more() {
+
+        }
+    }
+
+    private val attachmentListener = object : AttachmentListener {
         override fun onGetAttachment(id: Long, position: Int, type: HomeItemType) {
             viewModel.getAttachment(id, position, type)
+        }
+
+        override fun onGetAttachment(id: Long, position: Int) {
+            viewModel.getAttachment(id, position)
         }
     }
 
@@ -383,7 +420,7 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onClipClick(view: View, item: List<MemberPostItem>, position: Int) {
-            val bundle = ClipFragment.createBundle(ArrayList(item), attachmentMap, position)
+            val bundle = ClipFragment.createBundle(ArrayList(item), position)
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_adultHomeFragment_to_clipFragment,

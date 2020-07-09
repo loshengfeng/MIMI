@@ -1,16 +1,16 @@
-package com.dabenxiang.mimi.manager
+package com.dabenxiang.mimi.widget.utility
 
 import android.graphics.Bitmap
 import android.util.LruCache
 
-class LruCacheManager {
+object LruCacheUtils {
 
     private var lruCache: LruCache<Long, Bitmap>
 
     init {
         val maxMemory = (Runtime.getRuntime().maxMemory() / 1024).toInt()
         val cacheSize = maxMemory / 8
-        lruCache = LruCache<Long, Bitmap>(cacheSize)
+        lruCache = LruCache(cacheSize)
     }
 
     fun putLruCache(key: Long, bitmap: Bitmap) {
@@ -20,5 +20,4 @@ class LruCacheManager {
     fun getLruCache(key: Long): Bitmap? {
         return lruCache.get(key)
     }
-
 }

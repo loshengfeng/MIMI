@@ -7,5 +7,5 @@ data class AttachmentItem(
     var id: Long,
     var bitmap: Bitmap,
     var position: Int,
-    val type: HomeItemType
+    val type: HomeItemType? = null
 )

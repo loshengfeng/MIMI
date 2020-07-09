@@ -5,15 +5,12 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.dabenxiang.mimi.API_HOST_URL
 import com.dabenxiang.mimi.manager.AccountManager
 import com.dabenxiang.mimi.manager.DomainManager
-import com.dabenxiang.mimi.manager.LruCacheManager
 import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.google.gson.Gson
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import java.lang.StringBuilder
 
 abstract class BaseViewModel : ViewModel(), KoinComponent {
 
@@ -22,7 +19,6 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     val gson: Gson by inject()
     val toastData = MutableLiveData<String>()
     val domainManager: DomainManager by inject()
-    val lruCacheManager: LruCacheManager by inject()
 
     private val _showProgress by lazy { MutableLiveData<Boolean>() }
     val showProgress: LiveData<Boolean> get() = _showProgress
@@ -52,13 +48,13 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     fun getShareUrl(categoryURI: String, videoId: Long, episodeID: String?): String {
         val result: StringBuilder = StringBuilder()
         result.append(domainManager.getApiDomain())
-                .append("/play/")
-                .append(Uri.encode(categoryURI))
-                .append("?u=")
-                .append(videoId)
-        if (episodeID != null&& episodeID != "-1") {
+            .append("/play/")
+            .append(Uri.encode(categoryURI))
+            .append("?u=")
+            .append(videoId)
+        if (episodeID != null && episodeID != "-1") {
             result.append("&e=")
-                    .append(episodeID)
+                .append(episodeID)
         }
         return result.toString()
     }
