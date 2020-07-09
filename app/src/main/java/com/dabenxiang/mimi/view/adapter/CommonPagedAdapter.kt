@@ -11,7 +11,7 @@ import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.picturepost.PicturePostHolder
 
-class CommonAdapter(
+class CommonPagedAdapter(
     val context: Context
 ) : PagedListAdapter<MemberPostItem, BaseViewHolder>(diffCallback) {
 

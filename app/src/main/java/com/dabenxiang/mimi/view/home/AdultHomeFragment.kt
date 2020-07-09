@@ -204,7 +204,7 @@ class AdultHomeFragment : BaseFragment() {
         })
 
         viewModel.picturePostItemList.observe(viewLifecycleOwner, Observer {
-            commonAdapter.submitList(it)
+            commonPagedAdapter.submitList(it)
         })
     }
 
@@ -260,7 +260,7 @@ class AdultHomeFragment : BaseFragment() {
             }
             else -> {
                 recyclerview.layoutManager = LinearLayoutManager(requireContext())
-                recyclerview.adapter = commonAdapter
+                recyclerview.adapter = commonPagedAdapter
             }
         }
     }
@@ -275,7 +275,7 @@ class AdultHomeFragment : BaseFragment() {
             5 -> AdultTabType.TEXT
             else -> AdultTabType.CLUB
         }
-        commonAdapter.setupAdultTabType(type)
+        commonPagedAdapter.setupAdultTabType(type)
     }
 
     private fun getData(position: Int) {
@@ -341,8 +341,8 @@ class AdultHomeFragment : BaseFragment() {
         )
     }
 
-    private val commonAdapter by lazy {
-        CommonAdapter(requireActivity())
+    private val commonPagedAdapter by lazy {
+        CommonPagedAdapter(requireActivity())
     }
 
     private val videoListAdapter by lazy {
