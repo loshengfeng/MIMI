@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.favroite
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.FavoritePagingCallback
 import com.dabenxiang.mimi.manager.DomainManager
+import com.dabenxiang.mimi.model.api.vo.PlayItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -52,6 +53,11 @@ class FavoritePlayListDataSource constructor(
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect { response ->
                     pagingCallback.onTotalCount(response.list.size)
+                    val ids = ArrayList<Long>()
+                    response.list.forEach {
+                        (it as PlayItem).videoId?.let { it1 -> ids.add(it1) }
+                    }
+                    pagingCallback.onTotalVideoId(ids)
                     callback.onResult(response.list, null, response.nextKey)
                 }
         }

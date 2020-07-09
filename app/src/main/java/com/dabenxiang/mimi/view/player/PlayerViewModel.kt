@@ -565,7 +565,7 @@ class PlayerViewModel : BaseViewModel() {
             flow {
                 val resp = if (favoriteVideo.value == true)
                     domainManager.getApiRepository()
-                            .deleteMePlaylist(videoId)
+                            .deleteMePlaylist(videoId.toString())
                 else
                     domainManager.getApiRepository()
                             .postMePlaylist(PlayListRequest(videoId, 1))

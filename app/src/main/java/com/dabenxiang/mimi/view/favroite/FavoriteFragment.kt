@@ -26,6 +26,7 @@ import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_post_favorite.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import timber.log.Timber
 
 class FavoriteFragment : BaseFragment() {
 
@@ -83,7 +84,7 @@ class FavoriteFragment : BaseFragment() {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Error -> onApiError(it.throwable)
                 is ApiResult.Empty -> {
-                    // todo: reload data...
+                    viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
                 }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
             }
@@ -93,7 +94,10 @@ class FavoriteFragment : BaseFragment() {
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> refreshUI(it.result)
+                is ApiResult.Success -> {
+                    refreshUI(it.result)
+                    refreshLikeLeftIcon(it.result)
+                }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
             }
         })
@@ -102,7 +106,12 @@ class FavoriteFragment : BaseFragment() {
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> refreshUI(it.result)
+                is ApiResult.Success -> {
+                    if (viewModel.viewFavoriteStatus[it.result.tag as Long] == LikeType.DISLIKE.value) {
+                        viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
+                        GeneralUtils.showToast(requireContext(), getString(R.string.favorite_delete_favorite))
+                    }
+                }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
             }
         })
@@ -224,16 +233,16 @@ class FavoriteFragment : BaseFragment() {
                 FunctionType.LIKE -> {
                     when (item) {
                         is PlayItem -> {
-                            item.id?.let {
-                                viewModel.viewStatus[textView.id] =
-                                    viewModel.viewStatus[textView.id] ?: LikeType.DISLIKE.value
+                            item.videoId?.let {
+                                viewModel.viewStatus[it] = viewModel.viewStatus[it]
+                                        ?: if (item.like == true) LikeType.LIKE.value else LikeType.DISLIKE.value
                                 viewModel.modifyLike(textView, it)
                             }
                         }
                         is PostFavoriteItem -> {
                             item.id?.let {
-                                viewModel.viewStatus[textView.id] =
-                                    viewModel.viewStatus[textView.id] ?: LikeType.DISLIKE.value
+                                viewModel.viewStatus[it] =
+                                        viewModel.viewStatus[it] ?: LikeType.DISLIKE.value
                                 viewModel.modifyLike(textView, it)
                             }
                         }
@@ -244,16 +253,16 @@ class FavoriteFragment : BaseFragment() {
                     // 點擊後加入收藏,
                     when (item) {
                         is PlayItem -> {
-                            item.id?.let {
-                                viewModel.viewStatus[textView.id] =
-                                    viewModel.viewStatus[textView.id] ?: LikeType.DISLIKE.value
+                            item.videoId?.let {
+                                viewModel.viewFavoriteStatus[it] =
+                                        viewModel.viewFavoriteStatus[it] ?: if (item.favorite == true) LikeType.LIKE.value else LikeType.DISLIKE.value
                                 viewModel.modifyFavorite(textView, it)
                             }
                         }
                         is PostFavoriteItem -> {
                             item.id?.let {
-                                viewModel.viewStatus[textView.id] =
-                                    viewModel.viewStatus[textView.id] ?: LikeType.DISLIKE.value
+                                viewModel.viewFavoriteStatus[it] =
+                                        viewModel.viewFavoriteStatus[it] ?: LikeType.DISLIKE.value
                                 viewModel.modifyFavorite(textView, it)
                             }
                         }
@@ -292,23 +301,31 @@ class FavoriteFragment : BaseFragment() {
 
     private fun refreshUI(view: TextView) {
         var count = view.text.toString().toInt()
-        when (viewModel.viewStatus[view.id]) {
+        when (viewModel.viewStatus[view.tag as Long]) {
             LikeType.LIKE.value -> {
-                count--
-                viewModel.viewStatus[view.id] = LikeType.DISLIKE.value
+                count++
             }
             LikeType.DISLIKE.value -> {
-                count++
-                viewModel.viewStatus[view.id] = LikeType.LIKE.value
+                count--
             }
         }
         view.text = count.toString()
     }
 
+    private fun refreshLikeLeftIcon(view: TextView) {
+        val res = when (viewModel.viewStatus[view.tag as Long]) {
+            LikeType.LIKE.value -> R.drawable.ico_nice_s
+            LikeType.DISLIKE.value -> R.drawable.ico_nice_gray
+            else -> R.drawable.ico_nice_gray
+        }
+
+        view.setCompoundDrawablesRelativeWithIntrinsicBounds(res, 0, 0, 0)
+    }
+
     private val onCleanDialogListener = object : OnCleanDialogListener {
         override fun onClean() {
             // todo: 清除此頁顯示的視頻...
-            viewModel.deleteFavorite(123, listOf())
+            viewModel.deleteFavorite()
         }
     }
 
