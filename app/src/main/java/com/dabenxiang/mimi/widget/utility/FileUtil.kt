@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.os.Environment
 import android.os.StatFs
+import com.dabenxiang.mimi.App
 import timber.log.Timber
 import java.io.BufferedOutputStream
 import java.io.File
@@ -76,5 +77,13 @@ object FileUtil {
         } finally {
             scale?.recycle()
         }
+    }
+
+    fun getClipFile(fileName: String): File {
+        val dir = File("${getAppPath(App.applicationContext())}/clip")
+        if (!dir.exists()) {
+            dir.mkdirs()
+        }
+        return File(dir, "/$fileName")
     }
 }

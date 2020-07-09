@@ -13,6 +13,7 @@
         app:controller_layout_id="@layout/custom_clip_timebar"
         app:hide_on_touch="false"
         app:show_timeout="0"
+        app:default_artwork="@color/color_black_1"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="0dp" />
 
