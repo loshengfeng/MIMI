@@ -36,6 +36,8 @@ class FavoriteViewModel : BaseViewModel() {
 
     val dataCount = MutableLiveData<Int>()
 
+    val videoIDList = ArrayList<Long>()
+
     var viewStatus: MutableMap<Long, Int> = mutableMapOf()
     var viewFavoriteStatus: MutableMap<Long, Int> = mutableMapOf()
 
@@ -183,7 +185,7 @@ class FavoriteViewModel : BaseViewModel() {
                 val result = if (viewFavoriteStatus[videoID] == LikeType.DISLIKE.value) {
                     domainManager.getApiRepository().postMePlaylist(PlayListRequest(videoID, 1))
                 } else {
-                    domainManager.getApiRepository().deleteMePlaylist(videoID)
+                    domainManager.getApiRepository().deleteMePlaylist(videoID.toString())
                 }
 
                 if (!result.isSuccessful) {
@@ -221,11 +223,12 @@ class FavoriteViewModel : BaseViewModel() {
         }
     }
 
-    fun deleteFavorite(postFavoriteId: Long, ostFavoriteIds: List<Long>) {
+    fun deleteFavorite() {
+        if (videoIDList.size == 0) return
         viewModelScope.launch {
             flow {
                 // todo: 清除此頁顯示的視頻...
-                val result = domainManager.getApiRepository().deletePostFavorite(123, listOf(123))
+                val result = domainManager.getApiRepository().deleteMePlaylist(videoIDList.joinToString(separator = ","))
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }
@@ -249,6 +252,11 @@ class FavoriteViewModel : BaseViewModel() {
         override fun onThrowable(throwable: Throwable) {}
         override fun onTotalCount(count: Int) {
             viewModelScope.launch { dataCount.value = count }
+        }
+
+        override fun onTotalVideoId(ids: ArrayList<Long>) {
+            videoIDList.clear()
+            videoIDList.addAll(ids)
         }
     }
 

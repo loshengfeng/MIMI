@@ -26,6 +26,7 @@ import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_post_favorite.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import timber.log.Timber
 
 class FavoriteFragment : BaseFragment() {
 
@@ -83,7 +84,7 @@ class FavoriteFragment : BaseFragment() {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Error -> onApiError(it.throwable)
                 is ApiResult.Empty -> {
-                    // todo: reload data...
+                    viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
                 }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
             }
@@ -324,7 +325,7 @@ class FavoriteFragment : BaseFragment() {
     private val onCleanDialogListener = object : OnCleanDialogListener {
         override fun onClean() {
             // todo: 清除此頁顯示的視頻...
-            viewModel.deleteFavorite(123, listOf())
+            viewModel.deleteFavorite()
         }
     }
 

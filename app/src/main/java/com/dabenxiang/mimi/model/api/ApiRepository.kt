@@ -413,7 +413,7 @@ class ApiRepository(private val apiService: ApiService) {
      * 刪除使用者列表影片
      */
     suspend fun deleteMePlaylist(
-        videoId: Long
+        videoId: String
     ) = apiService.deletePlaylist(videoId)
 
     /**

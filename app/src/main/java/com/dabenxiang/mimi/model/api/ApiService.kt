@@ -313,7 +313,7 @@ interface ApiService {
 
     @DELETE("/v1/Members/Me/Playlist/{videoId}")
     suspend fun deletePlaylist(
-        @Path("videoId") videoId: Long
+        @Path("videoId") videoId: String
     ): Response<Void>
 
     @GET("/v1/Members/Me/Playlist/{playlistType}")
