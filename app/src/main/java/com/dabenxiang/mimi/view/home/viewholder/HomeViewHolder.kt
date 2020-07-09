@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.home.viewholder
 
-import android.graphics.Bitmap
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -170,17 +169,12 @@ class HomeClipViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
     isAdult: Boolean,
-    attachmentListener: AttachmentListener,
-    attachmentMap: HashMap<Long, Bitmap>
+    attachmentListener: AttachmentListener
 ) : HomeViewHolder<HomeTemplate.Clip>(itemView, listener, isAdult) {
 
     private val recyclerView: RecyclerView = itemView.recyclerview_clip
     private val nestedAdapter by lazy {
-        HomeClipAdapter(
-            listener,
-            attachmentListener,
-            attachmentMap
-        )
+        HomeClipAdapter(listener, attachmentListener)
     }
 
     init {
@@ -209,17 +203,12 @@ class HomePictureViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
     isAdult: Boolean,
-    attachmentListener: AttachmentListener,
-    attachmentMap: HashMap<Long, Bitmap>
+    attachmentListener: AttachmentListener
 ) : HomeViewHolder<HomeTemplate.Picture>(itemView, listener, isAdult) {
 
     private val recyclerView: RecyclerView = itemView.recyclerview_picture
     private val nestedAdapter by lazy {
-        HomePictureAdapter(
-            listener,
-            attachmentListener,
-            attachmentMap
-        )
+        HomePictureAdapter(listener, attachmentListener)
     }
 
     init {
@@ -249,18 +238,12 @@ class HomeClubViewHolder(
     listener: HomeAdapter.EventListener,
     isAdult: Boolean,
     clubListener: HomeClubAdapter.ClubListener,
-    attachmentListener: AttachmentListener,
-    attachmentMap: HashMap<Long, Bitmap>
+    attachmentListener: AttachmentListener
 ) : HomeViewHolder<HomeTemplate.Club>(itemView, listener, isAdult) {
 
     private val recyclerView: RecyclerView = itemView.recyclerview_club
-    val nestedAdapter by lazy {
-        HomeClubAdapter(
-            listener,
-            clubListener,
-            attachmentListener,
-            attachmentMap
-        )
+    private val nestedAdapter by lazy {
+        HomeClubAdapter(listener, clubListener, attachmentListener)
     }
 
     init {

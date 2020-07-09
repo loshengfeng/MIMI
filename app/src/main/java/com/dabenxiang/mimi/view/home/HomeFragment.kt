@@ -202,8 +202,7 @@ class HomeFragment : BaseFragment() {
             adapterListener,
             false,
             clubListener,
-            attachmentListener,
-            attachmentMap
+            attachmentListener
         )
     }
 

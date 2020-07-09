@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.adapter
 
-import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,8 +14,7 @@ import com.dabenxiang.mimi.view.home.viewholder.ClubViewHolder
 class HomeClubAdapter(
     nestedListener: HomeAdapter.EventListener,
     private val clubListener: ClubListener,
-    private val attachmentListener: AttachmentListener,
-    private val attachmentMap: HashMap<Long, Bitmap>
+    private val attachmentListener: AttachmentListener
 ) : RecyclerView.Adapter<BaseViewHolder>() {
 
     private var memberClubItems: List<MemberClubItem> = arrayListOf()
@@ -29,8 +27,7 @@ class HomeClubAdapter(
             clubClickListener,
             parent.context,
             clubListener,
-            attachmentListener,
-            attachmentMap
+            attachmentListener
         )
     }
 

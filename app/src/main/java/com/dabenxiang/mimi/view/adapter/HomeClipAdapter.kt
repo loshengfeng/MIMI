@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.adapter
 
-import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,8 +13,7 @@ import com.dabenxiang.mimi.view.home.viewholder.ClipViewHolder
 
 class HomeClipAdapter(
     nestedListener: HomeAdapter.EventListener,
-    private val attachmentListener: AttachmentListener,
-    private val attachmentMap: HashMap<Long, Bitmap>
+    private val attachmentListener: AttachmentListener
 ) : RecyclerView.Adapter<BaseViewHolder>() {
 
     private var memberPostItems: List<MemberPostItem> = arrayListOf()
@@ -23,7 +21,7 @@ class HomeClipAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.nested_item_home_clip, parent, false)
-        return ClipViewHolder(view, clipClickListener, attachmentListener, attachmentMap)
+        return ClipViewHolder(view, clipClickListener, attachmentListener)
     }
 
     override fun getItemCount(): Int {

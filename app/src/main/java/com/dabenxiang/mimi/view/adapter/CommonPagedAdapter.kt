@@ -2,7 +2,6 @@ package com.dabenxiang.mimi.view.adapter
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -17,14 +16,14 @@ import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.picturepost.PicturePostHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils.getLruCache
 import com.google.android.material.chip.Chip
 import java.util.*
 
 class CommonPagedAdapter(
     val context: Context,
     private val adultListener: AdultListener,
-    private val attachmentListener: AttachmentListener,
-    private val attachmentMap: HashMap<Long, Bitmap>
+    private val attachmentListener: AttachmentListener
 ) : PagedListAdapter<MemberPostItem, BaseViewHolder>(diffCallback) {
 
     companion object {
@@ -98,10 +97,10 @@ class CommonPagedAdapter(
             holder.follow.setTextColor(context.getColor(R.color.color_red_1))
         }
 
-        if (attachmentMap[item?.avatarAttachmentId] == null) {
-            attachmentListener.onGetAttachment(item?.avatarAttachmentId!!, position)
+        if (getLruCache(item?.avatarAttachmentId!!) == null) {
+            attachmentListener.onGetAttachment(item.avatarAttachmentId, position)
         } else {
-            val bitmap = attachmentMap[item?.avatarAttachmentId]
+            val bitmap = getLruCache(item.avatarAttachmentId)
             Glide.with(context)
                 .load(bitmap)
                 .circleCrop()
@@ -120,6 +119,9 @@ class CommonPagedAdapter(
             holder.tagChipGroup.addView(chip)
         }
 
+//        holder.pictureViewPager.adapter = PictureAdapter()
+
+
         holder.likeImage.setOnClickListener {
             adultListener.doLike()
         }
@@ -131,8 +133,6 @@ class CommonPagedAdapter(
         holder.moreImage.setOnClickListener {
             adultListener.more()
         }
-
     }
-
 
 }

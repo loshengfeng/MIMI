@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.view.home
 
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
@@ -31,6 +30,7 @@ import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils.putLruCache
 import kotlinx.android.synthetic.main.fragment_home.*
 import timber.log.Timber
 
@@ -49,7 +49,6 @@ class AdultHomeFragment : BaseFragment() {
     private val homeClipViewHolderMap = hashMapOf<Int, HomeClipViewHolder>()
     private val homePictureViewHolderMap = hashMapOf<Int, HomePictureViewHolder>()
     private val homeClubViewHolderMap = hashMapOf<Int, HomeClubViewHolder>()
-    private val attachmentMap: HashMap<Long, Bitmap> = hashMapOf()
 
     override fun getLayoutId() = R.layout.fragment_home
 
@@ -188,7 +187,7 @@ class AdultHomeFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     val attachmentItem = it.result
-                    attachmentMap[attachmentItem.id] = attachmentItem.bitmap
+                    putLruCache(attachmentItem.id, attachmentItem.bitmap)
                     when (val holder = homeAdapter.homeViewHolderMap[attachmentItem.type]) {
                         is HomeClipViewHolder -> {
                             holder.updateItem(attachmentItem.position)
@@ -209,7 +208,7 @@ class AdultHomeFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     val attachmentItem = it.result
-                    attachmentMap[attachmentItem.id] = attachmentItem.bitmap
+                    putLruCache(attachmentItem.id, attachmentItem.bitmap)
                     commonPagedAdapter.notifyItemChanged(it.result.position)
                 }
                 is Error -> Timber.e(it.throwable)
@@ -349,13 +348,12 @@ class AdultHomeFragment : BaseFragment() {
             adapterListener,
             true,
             clubListener,
-            attachmentListener,
-            attachmentMap
+            attachmentListener
         )
     }
 
     private val commonPagedAdapter by lazy {
-        CommonPagedAdapter(requireActivity(), adultListener, attachmentListener, attachmentMap)
+        CommonPagedAdapter(requireActivity(), adultListener, attachmentListener)
     }
 
     private val videoListAdapter by lazy {
