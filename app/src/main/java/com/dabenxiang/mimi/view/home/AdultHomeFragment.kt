@@ -16,13 +16,11 @@ import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.HomeItemType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
-import com.dabenxiang.mimi.view.adapter.HomeAdapter
-import com.dabenxiang.mimi.view.adapter.HomeClubAdapter
-import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
-import com.dabenxiang.mimi.view.adapter.TopTabAdapter
+import com.dabenxiang.mimi.view.adapter.*
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
@@ -80,7 +78,7 @@ class AdultHomeFragment : BaseFragment() {
                             list.add(detail.name)
                         }
                         tabAdapter.submitList(list, lastPosition)
-                        setupHome(mainViewModel?.adult)
+                        setupHomeData(mainViewModel?.adult)
                     }
                 }
                 is Error -> Timber.e(it.throwable)
@@ -90,9 +88,9 @@ class AdultHomeFragment : BaseFragment() {
         viewModel.tabLayoutPosition.observe(viewLifecycleOwner, Observer { position ->
             lastPosition = position
             tabAdapter.setLastSelectedIndex(lastPosition)
-
-            setupRecyclerLayout(position)
-            setupData(position)
+            setupPostTypeByPosition(position)
+            setupRecyclerByPosition(position)
+            getData(position)
         })
 
         viewModel.videoList.observe(viewLifecycleOwner, Observer {
@@ -161,7 +159,7 @@ class AdultHomeFragment : BaseFragment() {
         viewModel.followClubResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    when (val holder = adapter.homeViewHolderMap[HomeItemType.CLUB]) {
+                    when (val holder = homeAdapter.homeViewHolderMap[HomeItemType.CLUB]) {
                         is HomeClubViewHolder -> {
                             holder.updateItemByFollow(it.result, true)
                         }
@@ -174,7 +172,7 @@ class AdultHomeFragment : BaseFragment() {
         viewModel.cancelFollowClubResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    when (val holder = adapter.homeViewHolderMap[HomeItemType.CLUB]) {
+                    when (val holder = homeAdapter.homeViewHolderMap[HomeItemType.CLUB]) {
                         is HomeClubViewHolder -> {
                             holder.updateItemByFollow(it.result, false)
                         }
@@ -189,7 +187,7 @@ class AdultHomeFragment : BaseFragment() {
                 is Success -> {
                     val attachmentItem = it.result
                     attachmentMap[attachmentItem.id] = attachmentItem.bitmap
-                    when (val holder = adapter.homeViewHolderMap[attachmentItem.type]) {
+                    when (val holder = homeAdapter.homeViewHolderMap[attachmentItem.type]) {
                         is HomeClipViewHolder -> {
                             holder.updateItem(attachmentItem.position)
                         }
@@ -206,14 +204,14 @@ class AdultHomeFragment : BaseFragment() {
         })
 
         viewModel.picturePostItemList.observe(viewLifecycleOwner, Observer {
-//            dave
+            commonAdapter.submitList(it)
         })
     }
 
     override fun setupListeners() {
         refresh.setOnRefreshListener {
             refresh.isRefreshing = false
-            mainViewModel?.getHomeCategories()
+            getData(lastPosition)
         }
 
         iv_bg_search.setOnClickListener {
@@ -246,26 +244,36 @@ class AdultHomeFragment : BaseFragment() {
         recyclerview_tab.adapter = tabAdapter
         recyclerview.background = requireActivity().getDrawable(R.color.adult_color_background)
         recyclerview.layoutManager = LinearLayoutManager(requireContext())
-        recyclerview.adapter = adapter
+        recyclerview.adapter = homeAdapter
         refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
     }
 
-    private fun setupRecyclerLayout(position: Int) {
+    private fun setupRecyclerByPosition(position: Int) {
         when (position) {
+            0 -> {
+                recyclerview.layoutManager = LinearLayoutManager(requireContext())
+                recyclerview.adapter = homeAdapter
+            }
             1 -> {
                 recyclerview.layoutManager = GridLayoutManager(requireContext(), 2)
                 recyclerview.adapter = videoListAdapter
             }
             else -> {
                 recyclerview.layoutManager = LinearLayoutManager(requireContext())
-                recyclerview.adapter = adapter
+                recyclerview.adapter = commonAdapter
             }
         }
     }
 
-    private fun setupData(position: Int) {
+    private fun setupPostTypeByPosition(position: Int) {
         when (position) {
-            0 -> setupHome(mainViewModel?.adult)
+            4 -> commonAdapter.setupPostType(PostType.IMAGE)
+        }
+    }
+
+    private fun getData(position: Int) {
+        when (position) {
+            0 -> mainViewModel?.getHomeCategories()
             1 -> viewModel.getVideos(null, true)
             2 -> {
                 // TODO: 關注
@@ -273,7 +281,10 @@ class AdultHomeFragment : BaseFragment() {
             3 -> {
                 // TODO: 短視頻
             }
-            4 -> viewModel.getPicturePosts()
+            4 -> {
+                // TODO: 圖片
+                viewModel.getPicturePosts()
+            }
             5 -> {
                 // TODO: 短文
             }
@@ -283,7 +294,7 @@ class AdultHomeFragment : BaseFragment() {
         }
     }
 
-    private fun setupHome(root: CategoriesItem?) {
+    private fun setupHomeData(root: CategoriesItem?) {
         val templateList = mutableListOf<HomeTemplate>()
 
         templateList.add(HomeTemplate.Banner(imgUrl = "https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
@@ -301,7 +312,7 @@ class AdultHomeFragment : BaseFragment() {
                 }
             }
         }
-        adapter.submitList(templateList)
+        homeAdapter.submitList(templateList)
     }
 
     private val tabAdapter by lazy {
@@ -312,7 +323,7 @@ class AdultHomeFragment : BaseFragment() {
         }, true)
     }
 
-    private val adapter by lazy {
+    private val homeAdapter by lazy {
         HomeAdapter(
             requireContext(),
             adapterListener,
@@ -321,6 +332,10 @@ class AdultHomeFragment : BaseFragment() {
             attachmentListener,
             attachmentMap
         )
+    }
+
+    private val commonAdapter by lazy {
+        CommonAdapter(requireActivity())
     }
 
     private val videoListAdapter by lazy {

@@ -54,7 +54,7 @@ class HomeFragment : BaseFragment() {
         requireActivity().onBackPressedDispatcher.addCallback { backToDesktop() }
         recyclerview_tab.adapter = tabAdapter
         recyclerview.layoutManager = LinearLayoutManager(requireContext())
-        recyclerview.adapter = adapter
+        recyclerview.adapter = homeAdapter
         refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
 
         if (mainViewModel?.normal == null) {
@@ -77,7 +77,7 @@ class HomeFragment : BaseFragment() {
                             list.add(detail.name)
                         }
                         tabAdapter.submitList(list, lastPosition)
-                        setupHome(mainViewModel?.normal)
+                        setupHomeData(mainViewModel?.normal)
                     }
                 }
                 is Error -> Timber.e(it.throwable)
@@ -87,9 +87,8 @@ class HomeFragment : BaseFragment() {
         viewModel.tabLayoutPosition.observe(viewLifecycleOwner, Observer { position ->
             lastPosition = position
             tabAdapter.setLastSelectedIndex(lastPosition)
-
-            setupRecyclerLayout(position)
-            setupData(position)
+            setupRecyclerByPosition(position)
+            getData(position)
         })
 
         viewModel.videoList.observe(viewLifecycleOwner, Observer {
@@ -126,7 +125,7 @@ class HomeFragment : BaseFragment() {
     override fun setupListeners() {
         refresh.setOnRefreshListener {
             refresh.isRefreshing = false
-            mainViewModel?.getHomeCategories()
+            getData(lastPosition)
         }
 
         iv_bg_search.setOnClickListener {
@@ -140,7 +139,7 @@ class HomeFragment : BaseFragment() {
         }
     }
 
-    private fun setupRecyclerLayout(position: Int) {
+    private fun setupRecyclerByPosition(position: Int) {
         when (position) {
             1 -> {
                 recyclerview.layoutManager = GridLayoutManager(requireContext(), 2)
@@ -148,14 +147,14 @@ class HomeFragment : BaseFragment() {
             }
             else -> {
                 recyclerview.layoutManager = LinearLayoutManager(requireContext())
-                recyclerview.adapter = adapter
+                recyclerview.adapter = homeAdapter
             }
         }
     }
 
-    private fun setupData(position: Int) {
+    private fun getData(position: Int) {
         when (position) {
-            0 -> setupHome(mainViewModel?.normal)
+            0 -> mainViewModel?.getHomeCategories()
             else -> {
                 val keyword = mainViewModel?.normal?.categories?.get(position - 1)?.name
                 viewModel.getVideos(keyword, false)
@@ -163,7 +162,7 @@ class HomeFragment : BaseFragment() {
         }
     }
 
-    private fun setupHome(root: CategoriesItem?) {
+    private fun setupHomeData(root: CategoriesItem?) {
         val templateList = mutableListOf<HomeTemplate>()
 
         templateList.add(HomeTemplate.Banner(imgUrl = "https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
@@ -176,9 +175,8 @@ class HomeFragment : BaseFragment() {
             }
         }
 
-        adapter.submitList(templateList)
+        homeAdapter.submitList(templateList)
     }
-
 
     private val tabAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
@@ -196,7 +194,7 @@ class HomeFragment : BaseFragment() {
         }
     }
 
-    private val adapter by lazy {
+    private val homeAdapter by lazy {
         HomeAdapter(
             requireContext(),
             adapterListener,
