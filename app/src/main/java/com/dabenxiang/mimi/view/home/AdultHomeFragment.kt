@@ -15,8 +15,8 @@ import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.HomeItemType
-import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
@@ -266,9 +266,16 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private fun setupPostTypeByPosition(position: Int) {
-        when (position) {
-            4 -> commonAdapter.setupPostType(PostType.IMAGE)
+        val type = when (position) {
+            0 -> AdultTabType.HOME
+            1 -> AdultTabType.VIDEO
+            2 -> AdultTabType.FOLLOW
+            3 -> AdultTabType.CLIP
+            4 -> AdultTabType.PICTURE
+            5 -> AdultTabType.TEXT
+            else -> AdultTabType.CLUB
         }
+        commonAdapter.setupAdultTabType(type)
     }
 
     private fun getData(position: Int) {

@@ -7,7 +7,7 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.picturepost.PicturePostHolder
 
@@ -33,18 +33,18 @@ class CommonAdapter(
         }
     }
 
-    private var postType: PostType = PostType.TEXT
+    private var adultTabType: AdultTabType = AdultTabType.FOLLOW
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        return when (postType) {
-            PostType.IMAGE -> {
+        return when (adultTabType) {
+            AdultTabType.PICTURE -> {
                 PicturePostHolder(
                     LayoutInflater.from(parent.context)
                         .inflate(R.layout.item_picture_post, parent, false)
                 )
             }
             else -> {
-                // TODO:
+                //TODO:
                 PicturePostHolder(
                     LayoutInflater.from(parent.context)
                         .inflate(R.layout.item_picture_post, parent, false)
@@ -59,8 +59,8 @@ class CommonAdapter(
 
     }
 
-    fun setupPostType(type: PostType) {
-        postType = type
+    fun setupAdultTabType(type: AdultTabType) {
+        adultTabType = type
     }
 }
 
