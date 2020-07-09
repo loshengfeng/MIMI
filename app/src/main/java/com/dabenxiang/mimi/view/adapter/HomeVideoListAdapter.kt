@@ -44,18 +44,12 @@ class HomeVideoListAdapter(
             VIDEO -> {
                 val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.nested_item_video, parent, false)
-                VideoViewHolder(
-                    view,
-                    videoViewHolderListener
-                )
+                VideoViewHolder(view, videoViewHolderListener)
             }
             else -> {
                 val view =
                     LayoutInflater.from(parent.context).inflate(R.layout.item_banner, parent, false)
-                GridBannerHolder(
-                    view,
-                    videoViewHolderListener
-                )
+                GridBannerHolder(view, videoViewHolderListener)
             }
         }
     }

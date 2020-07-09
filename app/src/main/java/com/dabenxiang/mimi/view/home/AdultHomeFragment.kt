@@ -7,6 +7,8 @@ import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.ApiResult.*
@@ -24,6 +26,7 @@ import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
@@ -53,22 +56,19 @@ class AdultHomeFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         requireActivity().onBackPressedDispatcher.addCallback { backToDesktop() }
-        setupAdultUI()
-        recyclerview_tab.adapter = tabAdapter
-        recyclerview_home.adapter = adapter
-        recyclerview_videos.adapter = videoListAdapter
-        refresh_home.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
+
+        setupUI()
 
         if (mainViewModel?.adult == null) {
-            mainViewModel?.loadHomeCategories()
+            mainViewModel?.getHomeCategories()
         }
     }
 
     override fun setupObservers() {
         mainViewModel?.categoriesData?.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Loading -> refresh_home.isRefreshing = true
-                is Loaded -> refresh_home.isRefreshing = false
+                is Loading -> refresh.isRefreshing = true
+                is Loaded -> refresh.isRefreshing = false
                 is Success -> {
                     val list = mutableListOf<String>()
                     list.add(getString(R.string.home))
@@ -79,7 +79,7 @@ class AdultHomeFragment : BaseFragment() {
                             list.add(detail.name)
                         }
                         tabAdapter.submitList(list, lastPosition)
-                        loadFirstTab(mainViewModel?.adult)
+                        setupHome(mainViewModel?.adult)
                     }
                 }
                 is Error -> Timber.e(it.throwable)
@@ -89,24 +89,33 @@ class AdultHomeFragment : BaseFragment() {
         viewModel.tabLayoutPosition.observe(viewLifecycleOwner, Observer { position ->
             lastPosition = position
             tabAdapter.setLastSelectedIndex(lastPosition)
+
             when (position) {
-                0 -> {
-                    btn_filter.visibility = View.GONE
-                    loadFirstTab(mainViewModel?.adult)
-                }
                 1 -> {
-                    btn_filter.visibility = View.VISIBLE
-                    loadCategories(null)
-                }
-                6 -> {
-                    btn_filter.visibility = View.VISIBLE
-                    recyclerview_videos.visibility = View.VISIBLE
-                    refresh_home.visibility = View.GONE
+                    recyclerview.layoutManager = GridLayoutManager(requireContext(), 2)
+                    recyclerview.adapter = videoListAdapter
                 }
                 else -> {
-                    btn_filter.visibility = View.VISIBLE
-                    val keyword = mainViewModel?.adult?.categories?.get(position)?.name
-                    loadCategories(keyword)
+                    recyclerview.layoutManager = LinearLayoutManager(requireContext())
+                    recyclerview.adapter = adapter
+                }
+            }
+
+            when (position) {
+                0 -> setupHome(mainViewModel?.adult)
+                1 -> viewModel.getVideos(null, true)
+                2 -> {
+                    // TODO: 關注
+                }
+                3 -> {
+                    // TODO: 短視頻
+                }
+                4 -> viewModel.getPicturePosts()
+                5 -> {
+                    // TODO: 短文
+                }
+                6 -> {
+                    // TODO: 圈子
                 }
             }
         })
@@ -220,12 +229,16 @@ class AdultHomeFragment : BaseFragment() {
                 is Error -> Timber.e(it.throwable)
             }
         })
+
+        viewModel.picturePostItemList.observe(viewLifecycleOwner, Observer {
+//            dave
+        })
     }
 
     override fun setupListeners() {
-        refresh_home.setOnRefreshListener {
-            refresh_home.isRefreshing = false
-            mainViewModel?.loadHomeCategories()
+        refresh.setOnRefreshListener {
+            refresh.isRefreshing = false
+            mainViewModel?.getHomeCategories()
         }
 
         iv_bg_search.setOnClickListener {
@@ -237,6 +250,50 @@ class AdultHomeFragment : BaseFragment() {
                 )
             )
         }
+    }
+
+    private fun setupUI() {
+        layout_top.background = requireActivity().getDrawable(R.color.adult_color_status_bar)
+
+        layout_search_bar.background = requireActivity().getDrawable(R.color.adult_color_background)
+        iv_bg_search.setBtnSolidColor(requireActivity().getColor(R.color.adult_color_search_bar))
+
+        iv_search.setImageResource(R.drawable.adult_btn_search)
+        tv_search.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
+
+        btn_filter.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
+        btn_filter.setBtnSolidColor(
+            requireActivity().getColor(R.color.color_white_1_30),
+            requireActivity().getColor(R.color.color_red_1),
+            resources.getDimension(R.dimen.dp_6)
+        )
+
+        recyclerview_tab.adapter = tabAdapter
+        recyclerview.background = requireActivity().getDrawable(R.color.adult_color_background)
+        recyclerview.layoutManager = LinearLayoutManager(requireContext())
+        recyclerview.adapter = adapter
+        refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
+    }
+
+    private fun setupHome(root: CategoriesItem?) {
+        val templateList = mutableListOf<HomeTemplate>()
+
+        templateList.add(HomeTemplate.Banner(imgUrl = "https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
+        templateList.add(HomeTemplate.Carousel(true))
+
+        if (root?.categories != null) {
+            for (item in root.categories) {
+                if (item.name == "关注" || item.name == "短文") continue
+                templateList.add(HomeTemplate.Header(null, item.name, item.name))
+                when (item.name) {
+                    "蜜蜜影视" -> templateList.add(HomeTemplate.Statistics(item.name, null, true))
+                    "短视频" -> templateList.add(HomeTemplate.Clip())
+                    "图片" -> templateList.add(HomeTemplate.Picture())
+                    "圈子" -> templateList.add(HomeTemplate.Club())
+                }
+            }
+        }
+        adapter.submitList(templateList)
     }
 
     private val tabAdapter by lazy {
@@ -341,54 +398,4 @@ class AdultHomeFragment : BaseFragment() {
         }
     }
 
-    private fun setupAdultUI() {
-        layout_top.background = requireActivity().getDrawable(R.color.adult_color_status_bar)
-
-        layout_search_bar.background = requireActivity().getDrawable(R.color.adult_color_background)
-        iv_bg_search.setBtnSolidColor(requireActivity().getColor(R.color.adult_color_search_bar))
-
-        iv_search.setImageResource(R.drawable.adult_btn_search)
-        tv_search.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
-
-        recyclerview_home.background = requireActivity().getDrawable(R.color.adult_color_background)
-        recyclerview_videos.background =
-            requireActivity().getDrawable(R.color.adult_color_background)
-
-        btn_filter.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
-        btn_filter.setBtnSolidColor(
-            requireActivity().getColor(R.color.color_white_1_30),
-            requireActivity().getColor(R.color.color_red_1),
-            resources.getDimension(R.dimen.dp_6)
-        )
-    }
-
-    private fun loadFirstTab(root: CategoriesItem?) {
-        recyclerview_videos.visibility = View.GONE
-        refresh_home.visibility = View.VISIBLE
-
-        val templateList = mutableListOf<HomeTemplate>()
-
-        templateList.add(HomeTemplate.Banner(imgUrl = "https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
-        templateList.add(HomeTemplate.Carousel(true))
-
-        if (root?.categories != null) {
-            for (item in root.categories) {
-                if (item.name == "关注" || item.name == "短文") continue
-                templateList.add(HomeTemplate.Header(null, item.name, item.name))
-                when (item.name) {
-                    "蜜蜜影视" -> templateList.add(HomeTemplate.Statistics(item.name, null, true))
-                    "短视频" -> templateList.add(HomeTemplate.Clip())
-                    "图片" -> templateList.add(HomeTemplate.Picture())
-                    "圈子" -> templateList.add(HomeTemplate.Club())
-                }
-            }
-        }
-        adapter.submitList(templateList)
-    }
-
-    private fun loadCategories(keyword: String?) {
-        recyclerview_videos.visibility = View.VISIBLE
-        refresh_home.visibility = View.GONE
-        viewModel.setupVideoList(keyword, true)
-    }
 }

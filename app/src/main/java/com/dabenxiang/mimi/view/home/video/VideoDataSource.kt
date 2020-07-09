@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.home
+package com.dabenxiang.mimi.view.home.video
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
-class VideoListDataSource(
+class VideoDataSource(
     private val isAdult: Boolean,
     private val category: String?,
     private val viewModelScope: CoroutineScope,
@@ -41,7 +41,9 @@ class VideoListDataSource(
                 returnList.add(BaseVideoItem.Banner(adBanner))
 
                 if (category != null) {
-                    val result = apiRepository.searchWithCategory(category, isAdult, "0", PER_LIMIT)
+                    val result = apiRepository.searchWithCategory(category, isAdult, "0",
+                        PER_LIMIT
+                    )
                     if (!result.isSuccessful) throw HttpException(result)
 
                     val item = result.body()
@@ -58,7 +60,12 @@ class VideoListDataSource(
                         ) -> PER_LIMIT_LONG
                         else -> null
                     }
-                    emit(LoadResult(returnList, nextPageKey))
+                    emit(
+                        LoadResult(
+                            returnList,
+                            nextPageKey
+                        )
+                    )
                 } else {
                     val result = apiRepository.searchHomeVideos(
                         isAdult = isAdult,
@@ -79,7 +86,12 @@ class VideoListDataSource(
                         ) -> PER_LIMIT_LONG
                         else -> null
                     }
-                    emit(LoadResult(returnList, nextPageKey))
+                    emit(
+                        LoadResult(
+                            returnList,
+                            nextPageKey
+                        )
+                    )
                 }
             }
                 .flowOn(Dispatchers.IO)
@@ -115,7 +127,12 @@ class VideoListDataSource(
                         ) -> next + PER_LIMIT_LONG
                         else -> null
                     }
-                    emit(LoadResult(returnList, nextPageKey))
+                    emit(
+                        LoadResult(
+                            returnList,
+                            nextPageKey
+                        )
+                    )
                 } else {
                     val result = apiRepository.searchHomeVideos(
                         isAdult = isAdult,
@@ -136,7 +153,12 @@ class VideoListDataSource(
                         ) -> next + PER_LIMIT_LONG
                         else -> null
                     }
-                    emit(LoadResult(returnList, nextPageKey))
+                    emit(
+                        LoadResult(
+                            returnList,
+                            nextPageKey
+                        )
+                    )
                 }
             }
                 .flowOn(Dispatchers.IO)
