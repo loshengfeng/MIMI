@@ -35,7 +35,7 @@ class FavoriteViewModel : BaseViewModel() {
 
     val dataCount = MutableLiveData<Int>()
 
-    var viewStatus: MutableMap<Int, Int> = mutableMapOf()
+    var viewStatus: MutableMap<Long, Int> = mutableMapOf()
 
     private val _cleanResult = MutableLiveData<ApiResult<Nothing>>()
     val cleanResult: LiveData<ApiResult<Nothing>> = _cleanResult
@@ -142,21 +142,20 @@ class FavoriteViewModel : BaseViewModel() {
         }
     }
 
-    // todo: {"code":404000,"message":"can not find post : xxxxxxxx"}
-    fun modifyLike(view: TextView, postId: Long) {
+    fun modifyLike(view: TextView, videoID: Long) {
+        view.tag = videoID
+        viewStatus[videoID] = when (viewStatus[videoID]) {
+            LikeType.LIKE.value -> LikeType.DISLIKE.value
+            LikeType.DISLIKE.value -> LikeType.LIKE.value
+            else -> LikeType.LIKE.value
+        }
+
+        val likeRequest = LikeRequest(viewStatus[videoID])
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository()
-                    .addLike(postId,
-                        LikeRequest(viewStatus[view.id])
-                    )
+                    .addLike(videoID, likeRequest)
                 if (!result.isSuccessful) {
-                    viewStatus[view.id] =
-                        when (viewStatus[view.id]) {
-                            LikeType.LIKE.value -> LikeType.DISLIKE.value
-                            LikeType.DISLIKE.value -> LikeType.LIKE.value
-                            else -> LikeType.LIKE.value
-                        }
                     throw HttpException(result)
                 }
                 emit(ApiResult.success(view))
@@ -169,34 +168,33 @@ class FavoriteViewModel : BaseViewModel() {
         }
     }
 
-    // todo: {"code":404000,"message":"The specified resource does not exist."}
     fun modifyFavorite(view: TextView, postId: Long) {
-        Timber.d("addFavorite: $postId")
-        viewModelScope.launch {
-            flow {
-                val result = if (viewStatus[view.id] == LikeType.DISLIKE.value) {
-                    domainManager.getApiRepository().addFavorite(postId)
-                } else {
-                    domainManager.getApiRepository().deleteFavorite(postId)
-                }
-
-                if (!result.isSuccessful) {
-                    viewStatus[view.id] =
-                        when (viewStatus[view.id]) {
-                            LikeType.LIKE.value -> LikeType.DISLIKE.value
-                            LikeType.DISLIKE.value -> LikeType.LIKE.value
-                            else -> LikeType.LIKE.value
-                        }
-                    throw HttpException(result)
-                }
-                emit(ApiResult.success(view))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .collect { _favoriteResult.value = it }
-        }
+//        Timber.d("addFavorite: $postId")
+//        viewModelScope.launch {
+//            flow {
+//                val result = if (viewStatus[view.tag] == LikeType.DISLIKE.value) {
+//                    domainManager.getApiRepository().addFavorite(postId)
+//                } else {
+//                    domainManager.getApiRepository().deleteFavorite(postId)
+//                }
+//
+//                if (!result.isSuccessful) {
+//                    viewStatus[view.id] =
+//                        when (viewStatus[view.id]) {
+//                            LikeType.LIKE.value -> LikeType.DISLIKE.value
+//                            LikeType.DISLIKE.value -> LikeType.LIKE.value
+//                            else -> LikeType.LIKE.value
+//                        }
+//                    throw HttpException(result)
+//                }
+//                emit(ApiResult.success(view))
+//            }
+//                .flowOn(Dispatchers.IO)
+//                .onStart { emit(ApiResult.loading()) }
+//                .catch { e -> emit(ApiResult.error(e)) }
+//                .onCompletion { emit(ApiResult.loaded()) }
+//                .collect { _favoriteResult.value = it }
+//        }
     }
 
     fun report(postId: Long) {

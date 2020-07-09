@@ -13,11 +13,12 @@ import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import kotlinx.android.synthetic.main.activity_player.*
 import kotlinx.android.synthetic.main.head_video_info.view.*
 
 class FavoritePlayViewHolder(
     itemView: View,
-    listener: FavoriteAdapter.EventListener
+    val listener: FavoriteAdapter.EventListener
 ) : BaseAnyViewHolder<PlayItem>(itemView) {
 
     private val tvTitle = itemView.findViewById(R.id.tv_title) as TextView
@@ -87,6 +88,13 @@ class FavoritePlayViewHolder(
 
         tvFavorite.text = data?.favoriteCount.toString()
         tvLike.text = data?.likeCount.toString()
+        val res = if (data?.like == true) {
+            R.drawable.ico_nice_s
+        } else {
+            R.drawable.ico_nice_gray
+        }
+        tvLike.setCompoundDrawablesRelativeWithIntrinsicBounds(res, 0, 0, 0)
+
         tvMsg.text = data?.commentCount.toString()
 
     }
