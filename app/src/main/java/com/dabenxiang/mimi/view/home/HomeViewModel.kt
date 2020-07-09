@@ -181,7 +181,7 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-    fun getAttachment(id: Long, position: Int, type: HomeItemType) {
+    fun getAttachment(id: String, position: Int, type: HomeItemType) {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getAttachment(id)
@@ -198,7 +198,7 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-    fun getAttachment(id: Long, position: Int) {
+    fun getAttachment(id: String, position: Int) {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getAttachment(id)

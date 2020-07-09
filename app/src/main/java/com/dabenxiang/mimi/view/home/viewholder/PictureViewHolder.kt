@@ -57,14 +57,14 @@ class PictureViewHolder(
         } else {
             if (!TextUtils.isEmpty(postImageItem.id)) {
 
-                if (getLruCache(postImageItem.id.toLong()) == null) {
+                if (getLruCache(postImageItem.id) == null) {
                     attachmentListener.onGetAttachment(
-                        postImageItem.id.toLong(),
+                        postImageItem.id,
                         index,
                         HomeItemType.PICTURE
                     )
                 } else {
-                    val bitmap = getLruCache(postImageItem.id.toLong())
+                    val bitmap = getLruCache(postImageItem.id)
                     Glide.with(itemView.context)
                         .load(bitmap)
                         .into(pictureImage)
@@ -72,14 +72,14 @@ class PictureViewHolder(
             }
         }
 
-        if (getLruCache(model?.avatarAttachmentId!!) == null) {
+        if (getLruCache(model?.avatarAttachmentId.toString()) == null) {
             attachmentListener.onGetAttachment(
-                model.avatarAttachmentId,
+                model?.avatarAttachmentId.toString(),
                 index,
                 HomeItemType.CLIP
             )
         } else {
-            val bitmap = getLruCache(model.avatarAttachmentId)
+            val bitmap = getLruCache(model?.avatarAttachmentId.toString())
             Glide.with(itemView.context)
                 .load(bitmap)
                 .circleCrop()

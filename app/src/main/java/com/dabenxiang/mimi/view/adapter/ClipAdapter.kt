@@ -32,9 +32,9 @@ import java.io.File
 class ClipAdapter(
     private val context: Context,
     private val memberPostItems: ArrayList<MemberPostItem>,
-    private val clipMap: HashMap<Long, File>,
+    private val clipMap: HashMap<String, File>,
     private var currentPosition: Int,
-    private val onGetClip: (Long, Int) -> Unit
+    private val onGetClip: (String, Int) -> Unit
 ) : ListAdapter<MemberPostItem, ClipViewHolder>(DIFF_CALLBACK) {
 
     companion object {
@@ -89,7 +89,7 @@ class ClipAdapter(
         val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
         playerView.player?.also { it.playWhenReady = false }
         if (TextUtils.isEmpty(contentItem.shortVideo.url)) {
-            val id = contentItem.shortVideo.id.toLong()
+            val id = contentItem.shortVideo.id
             if (clipMap.containsKey(id)) {
                 takeIf { currentPosition == position }?.also { setupPlayer(playerView, clipMap[id]?.toURI().toString()) }
             } else {

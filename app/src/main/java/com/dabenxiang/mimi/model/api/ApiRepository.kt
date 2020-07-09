@@ -101,8 +101,8 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得檔案
      */
     suspend fun getAttachment(
-        id: Long
-    ) = apiService.getAttachment(id)
+        id: String
+    ) = apiService.getAttachment(id.toLong())
 
     /**
      * 刪除檔案

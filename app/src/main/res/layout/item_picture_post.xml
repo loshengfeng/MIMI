@@ -66,11 +66,11 @@
         app:layout_constraintTop_toBottomOf="@+id/img_avatar"
         tools:text="Title" />
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/view_pager_picture"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_picture"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
         android:orientation="horizontal"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -82,7 +82,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/view_pager_picture" />
+        app:layout_constraintTop_toBottomOf="@id/recycler_picture" />
 
     <ImageView
         android:id="@+id/iv_like"

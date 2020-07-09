@@ -16,10 +16,10 @@ import java.io.File
 
 class ClipViewModel: BaseViewModel() {
 
-    private var _clipResult = MutableLiveData<ApiResult<Triple<Long, Int, File>>>()
-    val clipResult: LiveData<ApiResult<Triple<Long, Int, File>>> = _clipResult
+    private var _clipResult = MutableLiveData<ApiResult<Triple<String, Int, File>>>()
+    val clipResult: LiveData<ApiResult<Triple<String, Int, File>>> = _clipResult
 
-    fun getClip(id: Long, pos: Int) {
+    fun getClip(id: String, pos: Int) {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getAttachment(id)

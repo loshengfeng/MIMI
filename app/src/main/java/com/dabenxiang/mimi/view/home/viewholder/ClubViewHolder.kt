@@ -68,21 +68,21 @@ class ClubViewHolder(
             }
         }
 
-        if (getLruCache(model?.avatarAttachmentId!!) == null) {
+        if (getLruCache(model?.avatarAttachmentId.toString()) == null) {
             attachmentListener.onGetAttachment(
-                model.avatarAttachmentId,
+                model?.avatarAttachmentId.toString(),
                 index,
                 HomeItemType.CLUB
             )
         } else {
-            val bitmap = getLruCache(model.avatarAttachmentId)
+            val bitmap = getLruCache(model?.avatarAttachmentId.toString())
             Glide.with(itemView.context)
                 .load(bitmap)
                 .circleCrop()
                 .into(avatarImg)
         }
 
-        val posts = model.posts
+        val posts = model?.posts ?: arrayListOf()
 
         if (posts.isNotEmpty()) {
             val postItem = posts[0]
@@ -96,14 +96,14 @@ class ClubViewHolder(
                     .circleCrop()
                     .into(clubImg)
             } else {
-                if (getLruCache(imageItem?.id?.toLong()!!) == null) {
+                if (getLruCache(imageItem?.id.toString()) == null) {
                     attachmentListener.onGetAttachment(
-                        imageItem.id.toLong(),
+                        imageItem?.id.toString(),
                         index,
                         HomeItemType.CLUB
                     )
                 } else {
-                    val bitmap = getLruCache(imageItem.id.toLong())
+                    val bitmap = getLruCache(imageItem?.id.toString())
                     Glide.with(itemView.context)
                         .load(bitmap)
                         .into(clubImg)

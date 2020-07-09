@@ -5,7 +5,7 @@ import android.util.LruCache
 
 object LruCacheUtils {
 
-    private var lruCache: LruCache<Long, Bitmap>
+    private var lruCache: LruCache<String, Bitmap>
 
     init {
         val maxMemory = (Runtime.getRuntime().maxMemory() / 1024).toInt()
@@ -13,11 +13,11 @@ object LruCacheUtils {
         lruCache = LruCache(cacheSize)
     }
 
-    fun putLruCache(key: Long, bitmap: Bitmap) {
+    fun putLruCache(key: String, bitmap: Bitmap) {
         lruCache.put(key, bitmap)
     }
 
-    fun getLruCache(key: Long): Bitmap? {
+    fun getLruCache(key: String): Bitmap? {
         return lruCache.get(key)
     }
 }
