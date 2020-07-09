@@ -105,7 +105,12 @@ class FavoriteFragment : BaseFragment() {
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> refreshUI(it.result)
+                is ApiResult.Success -> {
+                    if (viewModel.viewFavoriteStatus[it.result.tag as Long] == LikeType.DISLIKE.value) {
+                        viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
+                        GeneralUtils.showToast(requireContext(), getString(R.string.favorite_delete_favorite))
+                    }
+                }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
             }
         })
@@ -248,15 +253,15 @@ class FavoriteFragment : BaseFragment() {
                     when (item) {
                         is PlayItem -> {
                             item.videoId?.let {
-                                viewModel.viewStatus[it] =
-                                        viewModel.viewStatus[it] ?: LikeType.DISLIKE.value
+                                viewModel.viewFavoriteStatus[it] =
+                                        viewModel.viewFavoriteStatus[it] ?: if (item.favorite == true) LikeType.LIKE.value else LikeType.DISLIKE.value
                                 viewModel.modifyFavorite(textView, it)
                             }
                         }
                         is PostFavoriteItem -> {
                             item.id?.let {
-                                viewModel.viewStatus[it] =
-                                        viewModel.viewStatus[it] ?: LikeType.DISLIKE.value
+                                viewModel.viewFavoriteStatus[it] =
+                                        viewModel.viewFavoriteStatus[it] ?: LikeType.DISLIKE.value
                                 viewModel.modifyFavorite(textView, it)
                             }
                         }

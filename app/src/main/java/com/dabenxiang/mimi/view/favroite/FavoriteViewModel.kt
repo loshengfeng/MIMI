@@ -20,6 +20,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.FavoritePagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
+import com.dabenxiang.mimi.model.api.vo.PlayListRequest
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_ADULT
@@ -36,6 +37,7 @@ class FavoriteViewModel : BaseViewModel() {
     val dataCount = MutableLiveData<Int>()
 
     var viewStatus: MutableMap<Long, Int> = mutableMapOf()
+    var viewFavoriteStatus: MutableMap<Long, Int> = mutableMapOf()
 
     private val _cleanResult = MutableLiveData<ApiResult<Nothing>>()
     val cleanResult: LiveData<ApiResult<Nothing>> = _cleanResult
@@ -156,6 +158,12 @@ class FavoriteViewModel : BaseViewModel() {
                 val result = domainManager.getApiRepository()
                     .addLike(videoID, likeRequest)
                 if (!result.isSuccessful) {
+                    viewStatus[videoID] =
+                            when (viewStatus[videoID]) {
+                                LikeType.LIKE.value -> LikeType.DISLIKE.value
+                                LikeType.DISLIKE.value -> LikeType.LIKE.value
+                                else -> LikeType.LIKE.value
+                            }
                     throw HttpException(result)
                 }
                 emit(ApiResult.success(view))
@@ -168,33 +176,35 @@ class FavoriteViewModel : BaseViewModel() {
         }
     }
 
-    fun modifyFavorite(view: TextView, postId: Long) {
-//        Timber.d("addFavorite: $postId")
-//        viewModelScope.launch {
-//            flow {
-//                val result = if (viewStatus[view.tag] == LikeType.DISLIKE.value) {
-//                    domainManager.getApiRepository().addFavorite(postId)
-//                } else {
-//                    domainManager.getApiRepository().deleteFavorite(postId)
-//                }
-//
-//                if (!result.isSuccessful) {
-//                    viewStatus[view.id] =
-//                        when (viewStatus[view.id]) {
-//                            LikeType.LIKE.value -> LikeType.DISLIKE.value
-//                            LikeType.DISLIKE.value -> LikeType.LIKE.value
-//                            else -> LikeType.LIKE.value
-//                        }
-//                    throw HttpException(result)
-//                }
-//                emit(ApiResult.success(view))
-//            }
-//                .flowOn(Dispatchers.IO)
-//                .onStart { emit(ApiResult.loading()) }
-//                .catch { e -> emit(ApiResult.error(e)) }
-//                .onCompletion { emit(ApiResult.loaded()) }
-//                .collect { _favoriteResult.value = it }
-//        }
+    fun modifyFavorite(view: TextView, videoID: Long) {
+        view.tag = videoID
+        viewModelScope.launch {
+            flow {
+                val result = if (viewFavoriteStatus[videoID] == LikeType.DISLIKE.value) {
+                    domainManager.getApiRepository().postMePlaylist(PlayListRequest(videoID, 1))
+                } else {
+                    domainManager.getApiRepository().deleteMePlaylist(videoID)
+                }
+
+                if (!result.isSuccessful) {
+                    throw HttpException(result)
+                }
+
+                viewFavoriteStatus[videoID] =
+                        when (viewFavoriteStatus[videoID]) {
+                            LikeType.LIKE.value -> LikeType.DISLIKE.value
+                            LikeType.DISLIKE.value -> LikeType.LIKE.value
+                            else -> LikeType.LIKE.value
+                        }
+                emit(ApiResult.success(view))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect {
+                    _favoriteResult.value = it }
+        }
     }
 
     fun report(postId: Long) {
