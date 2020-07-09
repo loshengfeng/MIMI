@@ -27,12 +27,14 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.google.gson.Gson
 import timber.log.Timber
+import java.io.File
 
 class ClipAdapter(
-    val context: Context,
-    val memberPostItems: ArrayList<MemberPostItem>,
-    val videoMap: HashMap<Long, Bitmap>,
-    var currentPosition: Int
+    private val context: Context,
+    private val memberPostItems: ArrayList<MemberPostItem>,
+    private val clipMap: HashMap<Long, File>,
+    private var currentPosition: Int,
+    private val onGetClip: (Long, Int) -> Unit
 ) : ListAdapter<MemberPostItem, ClipViewHolder>(DIFF_CALLBACK) {
 
     companion object {
@@ -42,14 +44,14 @@ class ClipAdapter(
                     oldItem: MemberPostItem,
                     newItem: MemberPostItem
                 ): Boolean {
-                    return false
+                    return oldItem.id == newItem.id
                 }
 
                 override fun areContentsTheSame(
                     oldItem: MemberPostItem,
                     newItem: MemberPostItem
                 ): Boolean {
-                    return false
+                    return oldItem == newItem
                 }
             }
     }
@@ -77,49 +79,47 @@ class ClipAdapter(
     }
 
     override fun onBindViewHolder(holder: ClipViewHolder, position: Int) {
-        val item = memberPostItems[position]
-        val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
-        Timber.d("@@onBindViewHolder position:$position, content: $contentItem")
-        if (currentPosition == position) {
-            processClip(holder.playerView, position)
-        } else {
-            holder.playerView.player?.also { it.playWhenReady = false }
-        }
+        Timber.d("@@@onBindViewHolder position:$position, currentPosition: $currentPosition")
+        processClip(holder.playerView, position)
     }
 
     private fun processClip(playerView: PlayerView, position: Int) {
-        Timber.d("@@@processClip position:$position")
+        Timber.d("processClip position:$position")
         val item = memberPostItems[position]
         val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
+        playerView.player?.also { it.playWhenReady = false }
         if (TextUtils.isEmpty(contentItem.shortVideo.url)) {
-            playerView.player?.also { (it as SimpleExoPlayer).stop() }
+            val id = contentItem.shortVideo.id.toLong()
+            if (clipMap.containsKey(id)) {
+                takeIf { currentPosition == position }?.also { setupPlayer(playerView, clipMap[id]?.toURI().toString()) }
+            } else {
+                onGetClip(id, position)
+            }
         } else {
-            setupPlayer(playerView, contentItem.shortVideo.url)
+            takeIf { currentPosition == position }?.also { setupPlayer(playerView, contentItem.shortVideo.url) }
         }
     }
 
-    private fun setupPlayer(playerView: PlayerView, url: String) {
-        Timber.d("@@@setupPlayer url:$url")
-        if (playerView.player == null) {
+    private fun setupPlayer(playerView: PlayerView, uri: String) {
+        Timber.d("setupPlayer uri:$uri, tag:${playerView.tag}")
+        takeIf { playerView.player == null || playerView.tag != uri }?.also {
             val exoPlayer = SimpleExoPlayer.Builder(context).build()
             playerView.player = exoPlayer
             exoPlayer.also { player ->
                 player.repeatMode = Player.REPEAT_MODE_OFF
                 player.playWhenReady = true
                 player.volume = PlayerViewModel.volume
-//            it.seekTo(viewModel.currentWindow, viewModel.playbackPosition)
-//            it.addListener(playbackStateListener)
-//            it.addAnalyticsListener(playerAnalyticsListener)
-//
-//            initTouchListener()
+            }
+            val agent = Util.getUserAgent(context, context.getString(R.string.app_name))
+            val sourceFactory = DefaultDataSourceFactory(context, agent)
+            getMediaSource(uri, sourceFactory)?.also { mediaSource ->
+                playerView.player?.also {
+                    playerView.tag = uri
+                    (it as SimpleExoPlayer).prepare(mediaSource, true, true)
+                }
             }
         }
-        playerView.player?.also { (it as SimpleExoPlayer).stop() }
-        val agent = Util.getUserAgent(context, context.getString(R.string.app_name))
-        val sourceFactory = DefaultDataSourceFactory(context, agent)
-        getMediaSource(url, sourceFactory)?.also { mediaSource ->
-            playerView.player?.also { (it as SimpleExoPlayer).prepare(mediaSource) }
-        }
+        playerView.player?.also { it.playWhenReady = true }
     }
 
     private fun getMediaSource(
