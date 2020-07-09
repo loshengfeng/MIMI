@@ -90,34 +90,8 @@ class AdultHomeFragment : BaseFragment() {
             lastPosition = position
             tabAdapter.setLastSelectedIndex(lastPosition)
 
-            when (position) {
-                1 -> {
-                    recyclerview.layoutManager = GridLayoutManager(requireContext(), 2)
-                    recyclerview.adapter = videoListAdapter
-                }
-                else -> {
-                    recyclerview.layoutManager = LinearLayoutManager(requireContext())
-                    recyclerview.adapter = adapter
-                }
-            }
-
-            when (position) {
-                0 -> setupHome(mainViewModel?.adult)
-                1 -> viewModel.getVideos(null, true)
-                2 -> {
-                    // TODO: 關注
-                }
-                3 -> {
-                    // TODO: 短視頻
-                }
-                4 -> viewModel.getPicturePosts()
-                5 -> {
-                    // TODO: 短文
-                }
-                6 -> {
-                    // TODO: 圈子
-                }
-            }
+            setupRecyclerLayout(position)
+            setupData(position)
         })
 
         viewModel.videoList.observe(viewLifecycleOwner, Observer {
@@ -273,6 +247,39 @@ class AdultHomeFragment : BaseFragment() {
         recyclerview.layoutManager = LinearLayoutManager(requireContext())
         recyclerview.adapter = adapter
         refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
+    }
+
+    private fun setupRecyclerLayout(position: Int) {
+        when (position) {
+            1 -> {
+                recyclerview.layoutManager = GridLayoutManager(requireContext(), 2)
+                recyclerview.adapter = videoListAdapter
+            }
+            else -> {
+                recyclerview.layoutManager = LinearLayoutManager(requireContext())
+                recyclerview.adapter = adapter
+            }
+        }
+    }
+
+    private fun setupData(position: Int) {
+        when (position) {
+            0 -> setupHome(mainViewModel?.adult)
+            1 -> viewModel.getVideos(null, true)
+            2 -> {
+                // TODO: 關注
+            }
+            3 -> {
+                // TODO: 短視頻
+            }
+            4 -> viewModel.getPicturePosts()
+            5 -> {
+                // TODO: 短文
+            }
+            6 -> {
+                // TODO: 圈子
+            }
+        }
     }
 
     private fun setupHome(root: CategoriesItem?) {

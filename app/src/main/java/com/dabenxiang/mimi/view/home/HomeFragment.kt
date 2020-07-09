@@ -88,28 +88,8 @@ class HomeFragment : BaseFragment() {
             lastPosition = position
             tabAdapter.setLastSelectedIndex(lastPosition)
 
-            when (position) {
-                1 -> {
-                    recyclerview.layoutManager = GridLayoutManager(requireContext(), 2)
-                    recyclerview.adapter = videoListAdapter
-                }
-                else -> {
-                    recyclerview.layoutManager = LinearLayoutManager(requireContext())
-                    recyclerview.adapter = adapter
-                }
-            }
-
-            when (position) {
-                0 -> {
-                    btn_filter.visibility = View.GONE
-                    setupHome(mainViewModel?.normal)
-                }
-                else -> {
-                    btn_filter.visibility = View.VISIBLE
-                    val keyword = mainViewModel?.normal?.categories?.get(position - 1)?.name
-                    viewModel.getVideos(keyword, false)
-                }
-            }
+            setupRecyclerLayout(position)
+            setupData(position)
         })
 
         viewModel.videoList.observe(viewLifecycleOwner, Observer {
@@ -159,6 +139,46 @@ class HomeFragment : BaseFragment() {
             )
         }
     }
+
+    private fun setupRecyclerLayout(position: Int) {
+        when (position) {
+            1 -> {
+                recyclerview.layoutManager = GridLayoutManager(requireContext(), 2)
+                recyclerview.adapter = videoListAdapter
+            }
+            else -> {
+                recyclerview.layoutManager = LinearLayoutManager(requireContext())
+                recyclerview.adapter = adapter
+            }
+        }
+    }
+
+    private fun setupData(position: Int) {
+        when (position) {
+            0 -> setupHome(mainViewModel?.normal)
+            else -> {
+                val keyword = mainViewModel?.normal?.categories?.get(position - 1)?.name
+                viewModel.getVideos(keyword, false)
+            }
+        }
+    }
+
+    private fun setupHome(root: CategoriesItem?) {
+        val templateList = mutableListOf<HomeTemplate>()
+
+        templateList.add(HomeTemplate.Banner(imgUrl = "https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
+        templateList.add(HomeTemplate.Carousel(false))
+
+        if (root?.categories != null) {
+            for (item in root.categories) {
+                templateList.add(HomeTemplate.Header(null, item.name, item.name))
+                templateList.add(HomeTemplate.Statistics(item.name, item.name, false))
+            }
+        }
+
+        adapter.submitList(templateList)
+    }
+
 
     private val tabAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
@@ -255,21 +275,5 @@ class HomeFragment : BaseFragment() {
         override fun onLoadClubViewHolder(vh: HomeClubViewHolder) {
 
         }
-    }
-
-    private fun setupHome(root: CategoriesItem?) {
-        val templateList = mutableListOf<HomeTemplate>()
-
-        templateList.add(HomeTemplate.Banner(imgUrl = "https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
-        templateList.add(HomeTemplate.Carousel(false))
-
-        if (root?.categories != null) {
-            for (item in root.categories) {
-                templateList.add(HomeTemplate.Header(null, item.name, item.name))
-                templateList.add(HomeTemplate.Statistics(item.name, item.name, false))
-            }
-        }
-
-        adapter.submitList(templateList)
     }
 }
