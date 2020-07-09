@@ -83,12 +83,13 @@ class ClipFragment : BaseFragment() {
     }
 
     override fun initSettings() {
+        val position = arguments?.getInt(KEY_POSITION) ?: 0
         (arguments?.getSerializable(KEY_DATA) as ArrayList<MemberPostItem>).also { data ->
             rv_clip.adapter = ClipAdapter(
                 requireContext(),
                 data,
                 clipMap,
-                0,
+                position,
                 { id, pos -> getClip(id, pos) },
                 { id, pos -> getCover(id, pos) })
             (rv_clip.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
@@ -111,6 +112,7 @@ class ClipFragment : BaseFragment() {
                     }
                 }
             })
+            rv_clip.scrollToPosition(position)
         }
     }
 
