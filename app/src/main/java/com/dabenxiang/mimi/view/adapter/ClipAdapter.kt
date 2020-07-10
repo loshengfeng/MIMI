@@ -96,7 +96,17 @@ class ClipAdapter(
     override fun onBindViewHolder(holder: ClipViewHolder, position: Int) {
         Timber.d("onBindViewHolder position:$position, currentPosition: $currentPosition")
         takeIf { currentPosition == position }?.also { currentViewHolder = holder }
-            ?: run { holder.coverView.visibility = View.VISIBLE }
+            ?: run { holder.ivCover.visibility = View.VISIBLE }
+        holder.ibReplay.visibility = View.GONE
+        holder.ibReplay.setOnClickListener {
+            Timber.d("ivCover setOnClickListener")
+            exoPlayer?.also { player ->
+                player.seekTo(0)
+                player.playWhenReady = true
+            }
+            it.visibility = View.GONE
+        }
+
         val item = memberPostItems[position]
         val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
         contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
@@ -104,11 +114,11 @@ class ClipAdapter(
                 if (TextUtils.isEmpty(image.url)) {
                     image.id.takeIf { !TextUtils.isEmpty(it) }?.also { id ->
                         LruCacheUtils.getLruCache(id)?.also { bitmap ->
-                            Glide.with(holder.coverView.context).load(bitmap).into(holder.coverView)
+                            Glide.with(holder.ivCover.context).load(bitmap).into(holder.ivCover)
                         } ?: run { getCover(id, position) }
                     }
                 } else {
-                    Glide.with(holder.coverView.context).load(image.url).into(holder.coverView)
+                    Glide.with(holder.ivCover.context).load(image.url).into(holder.ivCover)
                 }
             }
         }
@@ -174,11 +184,13 @@ class ClipAdapter(
                 ExoPlayer.STATE_IDLE -> "ExoPlayer.STATE_IDLE"
                 ExoPlayer.STATE_BUFFERING -> "ExoPlayer.STATE_BUFFERING"
                 ExoPlayer.STATE_READY -> {
-                    currentViewHolder?.coverView?.visibility = View.GONE
+                    currentViewHolder?.ivCover?.visibility = View.GONE
                     "ExoPlayer.STATE_READY"
                 }
-
-                ExoPlayer.STATE_ENDED -> "ExoPlayer.STATE_ENDED"
+                ExoPlayer.STATE_ENDED -> {
+                    currentViewHolder?.ibReplay?.visibility = View.VISIBLE
+                    "ExoPlayer.STATE_ENDED"
+                }
                 else -> "UNKNOWN_STATE"
             }
             Timber.d("Changed state to $stateString playWhenReady: $playWhenReady")
