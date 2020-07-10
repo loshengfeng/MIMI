@@ -172,50 +172,53 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
+        viewModel.attachmentByTypeResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
                     val attachmentItem = it.result
-                    putLruCache(attachmentItem.id, attachmentItem.bitmap)
+                    putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
 
                     when (attachmentItem.type) {
                         AttachmentType.ADULT_HOME_CLIP -> {
                             val holder = homeAdapter.attachmentViewHolderMap[attachmentItem.type]
                             holder as HomeClipViewHolder
-                            holder.updateItem(attachmentItem.position)
+                            holder.updateItem(attachmentItem.position!!)
                         }
                         AttachmentType.ADULT_HOME_PICTURE -> {
                             val holder = homeAdapter.attachmentViewHolderMap[attachmentItem.type]
                             holder as HomePictureViewHolder
-                            holder.updateItem(attachmentItem.position)
+                            holder.updateItem(attachmentItem.position!!)
                         }
                         AttachmentType.ADULT_HOME_CLUB -> {
                             val holder = homeAdapter.attachmentViewHolderMap[attachmentItem.type]
                             holder as HomeClubViewHolder
-                            holder.updateItem(attachmentItem.position)
+                            holder.updateItem(attachmentItem.position!!)
                         }
                         AttachmentType.ADULT_PICTURE_ITEM -> {
-                            commonPagedAdapter.notifyItemChanged(attachmentItem.position)
+                            commonPagedAdapter.notifyItemChanged(attachmentItem.position!!)
+                        }
+                        else -> {
                         }
                     }
+
                 }
                 is Error -> Timber.e(it.throwable)
             }
         })
 
-        viewModel.attachmentResult2.observe(viewLifecycleOwner, Observer {
+        viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
                     val attachmentItem = it.result
-                    putLruCache(attachmentItem.id, attachmentItem.bitmap)
+                    putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
                     when (val holder =
                         commonPagedAdapter.attachmentViewHolderMap[attachmentItem.parentPosition]) {
                         is PicturePostHolder -> {
                             if (holder.pictureRecycler.tag == attachmentItem.parentPosition) {
                                 commonPagedAdapter.updateInternalItem(
                                     holder,
-                                    attachmentItem.parentPosition,
-                                    attachmentItem.position
+                                    attachmentItem.parentPosition!!,
+                                    attachmentItem.position!!
                                 )
                             }
                         }

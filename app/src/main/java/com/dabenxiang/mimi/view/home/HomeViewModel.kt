@@ -17,7 +17,6 @@ import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.vo.AttachmentItem
-import com.dabenxiang.mimi.model.vo.AttachmentItem2
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.home.picture.PicturePostDataSource
 import com.dabenxiang.mimi.view.home.picture.PicturePostFactory
@@ -66,11 +65,11 @@ class HomeViewModel : BaseViewModel() {
     val clubResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberClubItem>>>>> =
         _clubResult
 
+    private var _attachmentByTypeResult = MutableLiveData<ApiResult<AttachmentItem>>()
+    val attachmentByTypeResult: LiveData<ApiResult<AttachmentItem>> = _attachmentByTypeResult
+
     private var _attachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
     val attachmentResult: LiveData<ApiResult<AttachmentItem>> = _attachmentResult
-
-    private var _attachmentResult2 = MutableLiveData<ApiResult<AttachmentItem2>>()
-    val attachmentResult2: LiveData<ApiResult<AttachmentItem2>> = _attachmentResult2
 
     private var _followClubResult = MutableLiveData<ApiResult<Pair<Int, Boolean>>>()
     val followClubResult: LiveData<ApiResult<Pair<Int, Boolean>>> = _followClubResult
@@ -186,13 +185,19 @@ class HomeViewModel : BaseViewModel() {
                 if (!result.isSuccessful) throw HttpException(result)
                 val byteArray = result.body()?.bytes()
                 val bitmap = ImageUtils.bytes2Bitmap(byteArray)
-                emit(ApiResult.success(AttachmentItem(id, bitmap, position, type)))
+                val item = AttachmentItem(
+                    id = id,
+                    bitmap = bitmap,
+                    position = position,
+                    type = type
+                )
+                emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _attachmentResult.value = it }
+                .collect { _attachmentByTypeResult.value = it }
         }
     }
 
@@ -203,13 +208,19 @@ class HomeViewModel : BaseViewModel() {
                 if (!result.isSuccessful) throw HttpException(result)
                 val byteArray = result.body()?.bytes()
                 val bitmap = ImageUtils.bytes2Bitmap(byteArray)
-                emit(ApiResult.success(AttachmentItem2(id, bitmap, parentPosition, position)))
+                val item = AttachmentItem(
+                    id = id,
+                    bitmap = bitmap,
+                    parentPosition = parentPosition,
+                    position = position
+                )
+                emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _attachmentResult2.value = it }
+                .collect { _attachmentResult.value = it }
         }
     }
 
