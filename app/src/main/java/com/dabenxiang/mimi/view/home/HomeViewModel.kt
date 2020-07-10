@@ -72,7 +72,6 @@ class HomeViewModel : BaseViewModel() {
     private var _attachmentResult2 = MutableLiveData<ApiResult<AttachmentItem2>>()
     val attachmentResult2: LiveData<ApiResult<AttachmentItem2>> = _attachmentResult2
 
-
     private var _followClubResult = MutableLiveData<ApiResult<Pair<Int, Boolean>>>()
     val followClubResult: LiveData<ApiResult<Pair<Int, Boolean>>> = _followClubResult
 

@@ -155,7 +155,7 @@ class CommonPagedAdapter(
         }
     }
 
-    fun updateInternalItem(holder: BaseViewHolder?, position: Int, parentPosition: Int) {
+    fun updateInternalItem(holder: BaseViewHolder?, parentPosition: Int, position: Int) {
         when (holder) {
             is PicturePostHolder -> {
                 holder.pictureRecycler.adapter?.notifyDataSetChanged()

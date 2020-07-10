@@ -208,11 +208,17 @@ class AdultHomeFragment : BaseFragment() {
                 is Success -> {
                     val attachmentItem = it.result
                     putLruCache(attachmentItem.id, attachmentItem.bitmap)
-                    val holder =
-                        commonPagedAdapter.attachmentViewHolderMap[attachmentItem.parentPosition]
-                    holder as PicturePostHolder
-                    if (holder.pictureRecycler.tag == attachmentItem.parentPosition) {
-                        commonPagedAdapter.updateInternalItem(holder, attachmentItem.position, attachmentItem.parentPosition)
+                    when (val holder =
+                        commonPagedAdapter.attachmentViewHolderMap[attachmentItem.parentPosition]) {
+                        is PicturePostHolder -> {
+                            if (holder.pictureRecycler.tag == attachmentItem.parentPosition) {
+                                commonPagedAdapter.updateInternalItem(
+                                    holder,
+                                    attachmentItem.parentPosition,
+                                    attachmentItem.position
+                                )
+                            }
+                        }
                     }
                 }
                 is Error -> Timber.e(it.throwable)
