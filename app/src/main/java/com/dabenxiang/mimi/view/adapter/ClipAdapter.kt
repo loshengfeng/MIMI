@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.view.adapter
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.net.Uri
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -27,7 +26,6 @@ import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.activity_player.*
 import timber.log.Timber
 import java.io.File
 
@@ -61,6 +59,9 @@ class ClipAdapter(
 
     private var currentViewHolder: ClipViewHolder? = null
 
+    private var exoPlayer: SimpleExoPlayer? = null
+    private var lastWindowIndex = 0
+
     override fun getItemCount(): Int {
         return memberPostItems.count()
     }
@@ -75,16 +76,21 @@ class ClipAdapter(
         )
     }
 
-    override fun onViewRecycled(holder: ClipViewHolder) {
-        super.onViewRecycled(holder)
-    }
-
     fun updateCurrentPosition(position: Int) {
         currentPosition = position
     }
 
     fun getCurrentPos(): Int {
         return currentPosition
+    }
+
+    fun releasePlayer() {
+        exoPlayer?.also { player ->
+            player.playWhenReady = false
+            player.removeListener(playbackStateListener)
+            player.release()
+        }
+        exoPlayer = null
     }
 
     override fun onBindViewHolder(holder: ClipViewHolder, position: Int) {
@@ -113,7 +119,7 @@ class ClipAdapter(
         Timber.d("processClip position:$position")
         val item = memberPostItems[position]
         val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
-        playerView.player?.also { it.playWhenReady = false }
+        playerView.player?.also { it.stop() }
 
         if (TextUtils.isEmpty(url)) {
             if (clipMap.containsKey(id.toLong())) {
@@ -128,27 +134,22 @@ class ClipAdapter(
 
     private fun setupPlayer(playerView: PlayerView, uri: String) {
         Timber.d("setupPlayer uri:$uri, tag:${playerView.tag}")
-        takeIf { playerView.player == null || playerView.tag != uri }?.also {
-            val exoPlayer = SimpleExoPlayer.Builder(context).build()
-            playerView.player = exoPlayer
-            exoPlayer.also { player ->
-                player.repeatMode = Player.REPEAT_MODE_OFF
-                player.playWhenReady = true
-                player.volume = PlayerViewModel.volume
-                player.addListener(playbackStateListener)
-            }
-            val agent = Util.getUserAgent(context, context.getString(R.string.app_name))
-            val sourceFactory = DefaultDataSourceFactory(context, agent)
-            getMediaSource(uri, sourceFactory)?.also { mediaSource ->
-                playerView.player?.also {
-                    playerView.tag = uri
-                    (it as SimpleExoPlayer).prepare(mediaSource, true, true)
-                }
+        exoPlayer = SimpleExoPlayer.Builder(context).build()
+        exoPlayer?.also { player ->
+            player.repeatMode = Player.REPEAT_MODE_OFF
+            player.playWhenReady = true
+            player.volume = PlayerViewModel.volume
+            player.addListener(playbackStateListener)
+        }
+        playerView.player = exoPlayer
+        val agent = Util.getUserAgent(context, context.getString(R.string.app_name))
+        val sourceFactory = DefaultDataSourceFactory(context, agent)
+        getMediaSource(uri, sourceFactory)?.also { mediaSource ->
+            playerView.player?.also {
+                playerView.tag = uri
+                (it as SimpleExoPlayer).prepare(mediaSource, true, true)
             }
         }
-        playerView.player?.also {
-            it.seekToDefaultPosition()
-            it.playWhenReady = true }
     }
 
     private val playbackStateListener = object : Player.EventListener {
@@ -173,6 +174,10 @@ class ClipAdapter(
 
         override fun onPositionDiscontinuity(reason: Int) {
             Timber.d("onPositionDiscontinuity: $reason")
+            val latestWindowIndex: Int = exoPlayer?.currentWindowIndex ?: 0
+            if (latestWindowIndex != lastWindowIndex) {
+                lastWindowIndex = latestWindowIndex
+            }
         }
 
         override fun onTimelineChanged(timeline: Timeline, reason: Int) {
