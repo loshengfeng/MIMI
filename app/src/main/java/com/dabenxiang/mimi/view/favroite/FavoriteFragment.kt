@@ -324,7 +324,6 @@ class FavoriteFragment : BaseFragment() {
 
     private val onCleanDialogListener = object : OnCleanDialogListener {
         override fun onClean() {
-            // todo: 清除此頁顯示的視頻...
             viewModel.deleteFavorite()
         }
     }
@@ -332,11 +331,11 @@ class FavoriteFragment : BaseFragment() {
     private val onReportDialogListener = object : OnMoreDialogListener {
         override fun onReport(item: BaseItem) {
             val postId = when (item) {
-                is PlayItem -> item.id ?: 0
+                is PlayItem -> item.videoId ?: 0
                 is PostFavoriteItem -> item.postId ?: 0
                 else -> 0
             }
-            viewModel.report(postId)
+//            viewModel.report(postId)
         }
     }
 }

@@ -21,6 +21,7 @@ import com.dabenxiang.mimi.callback.FavoritePagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.PlayListRequest
+import com.dabenxiang.mimi.model.api.vo.ReportRequest
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_ADULT
@@ -209,10 +210,10 @@ class FavoriteViewModel : BaseViewModel() {
         }
     }
 
-    fun report(postId: Long) {
+    fun report(postId: Long, content: String) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().postReport(postId)
+                val result = domainManager.getApiRepository().postReport(postId,ReportRequest(content))
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }

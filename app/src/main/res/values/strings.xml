@@ -9,6 +9,8 @@
     <string name="oops">Oops!</string>
     <string name="i_know">知道了</string>
 
+    <string name="upload_succeed">上传成功</string>
+
     <!-- Nav Button -->
     <string name="nav_home">一般影视</string>
     <string name="nav_adult">成人影视</string>
@@ -115,7 +117,7 @@
     <string name="topup_pay">支付金额</string>
     <string name="title_chat_history">对话记录</string>
     <string name="edit_hint_chat">留下评论</string>
-    <string name="issue_report">問題回報</string>
+    <string name="issue_report">问题回报</string>
     <string name="resend_mail_success">重发认证信成功</string>
     <string name="gender_success">修改性别成功</string>
 
@@ -186,4 +188,15 @@
     <string name="club_follow">+关注</string>
     <string name="club_followed">已关注</string>
 
+    <!-- Problem report -->
+    <string-array name="problem_report_item">
+        <item>视频无法播放</item>
+        <item>与其他视频相同</item>
+        <item>视频标题与内容不符</item>
+        <item>垃圾内容或误导性内容</item>
+        <item>仇恨与恶意内容</item>
+        <item>有害的危险行为</item>
+    </string-array>
+
+    <string name="already_reported">您已回报过问题</string>
 </resources>
