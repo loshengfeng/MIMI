@@ -374,7 +374,8 @@ interface ApiService {
 
     @POST("/v1/Members/Post/{postId}/PostReport")
     suspend fun postReport(
-        @Path("postId") postId: Long
+        @Path("postId") postId: Long,
+        @Body body: ReportRequest
     ): Response<Void>
 
     /**********************************************************

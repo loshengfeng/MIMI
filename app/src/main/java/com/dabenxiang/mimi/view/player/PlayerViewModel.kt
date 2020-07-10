@@ -40,9 +40,10 @@ class PlayerViewModel : BaseViewModel() {
         const val StreamUrlFormat = "%s/v1/Player/%d/%d/%d?userId=%d&utcTime=%d&sign=%s"
     }
 
-    var videoId: Long = 0L
+    var videoId: Long = 0L // 一開始用最外層的id, 點選影片之後用裡面的 source id
     var category: String = ""
     var episodeId: Long = -1L
+    var isReported: Boolean = false
 
     var currentWindow: Int = 0
     var playbackPosition: Long = 0
@@ -106,6 +107,9 @@ class PlayerViewModel : BaseViewModel() {
     private val _apiAddLikeResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
     val apiAddLikeResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> =
             _apiAddLikeResult
+
+    private val _apiReportResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
+    val apiReportResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _apiReportResult
 
     fun updatedSelectedNewestComment(isNewest: Boolean) {
         _isSelectedNewestComment.value = isNewest
@@ -298,6 +302,9 @@ class PlayerViewModel : BaseViewModel() {
                 if (!isDeducted) throw Exception("點數不足")
 
                 val episodeInfo = episodeResp.body()?.content
+                isReported = episodeInfo?.reported ?: false
+                videoId = episodeInfo?.id ?: 0
+
                 val stream = episodeInfo?.videoStreams?.get(0)!!
                 val streamResp = apiRepository.getVideoStreamOfEpisode(
                     videoId,
@@ -606,6 +613,30 @@ class PlayerViewModel : BaseViewModel() {
                     .onCompletion { emit(ApiResult.loaded()) }
                     .collect {
                         _apiAddLikeResult.value = SingleLiveEvent(it)
+                    }
+        }
+    }
+
+    /**
+     * 問題回報
+     */
+    fun sentReport(content:String){
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository()
+                        .postReport(videoId, ReportRequest(content))
+                if (!resp.isSuccessful) throw HttpException(resp)
+
+                emit(ApiResult.success(null))
+            }
+                    .flowOn(Dispatchers.IO)
+                    .catch { e ->
+                        emit(ApiResult.error(e))
+                    }
+                    .onStart { emit(ApiResult.loading()) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .collect {
+                        _apiReportResult.value = SingleLiveEvent(it)
                     }
         }
     }
