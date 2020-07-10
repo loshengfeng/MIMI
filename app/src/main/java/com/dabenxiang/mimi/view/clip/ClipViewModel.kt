@@ -10,20 +10,23 @@ import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.File
 
-class ClipViewModel: BaseViewModel() {
+class ClipViewModel : BaseViewModel() {
 
-    private var _clipResult = MutableLiveData<ApiResult<Triple<Long, Int, File>>>()
-    val clipResult: LiveData<ApiResult<Triple<Long, Int, File>>> = _clipResult
+    private var _clipResult = MutableLiveData<ApiResult<Triple<String, Int, File>>>()
+    val clipResult: LiveData<ApiResult<Triple<String, Int, File>>> = _clipResult
 
     private var _coverResult = MutableLiveData<ApiResult<Int>>()
     val coverResult: LiveData<ApiResult<Int>> = _coverResult
 
-    fun getClip(id: Long, pos: Int) {
+    fun getClip(id: String, pos: Int) {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getAttachment(id)
@@ -39,14 +42,14 @@ class ClipViewModel: BaseViewModel() {
                 val file = FileUtil.getClipFile(filename)
                 FileIOUtils.writeFileFromIS(file, byteStream)
 
-                emit(ApiResult.success(Triple(id, pos, file)))
+                emit(ApiResult.success(Triple(id.toString(), pos, file)))
             }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _clipResult.value = it }
         }
     }
 
-    fun getCover(id: Long, position: Int) {
+    fun getCover(id: String, position: Int) {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getAttachment(id)
@@ -61,5 +64,4 @@ class ClipViewModel: BaseViewModel() {
                 .collect { _coverResult.value = it }
         }
     }
-
 }

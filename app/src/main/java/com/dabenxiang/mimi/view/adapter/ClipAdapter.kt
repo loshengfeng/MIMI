@@ -32,10 +32,10 @@ import java.io.File
 class ClipAdapter(
     private val context: Context,
     private val memberPostItems: ArrayList<MemberPostItem>,
-    private val clipMap: HashMap<Long, File>,
+    private val clipMap: HashMap<String, File>,
     private var currentPosition: Int,
-    private val getClip: (Long, Int) -> Unit,
-    private val getCover: (Long, Int) -> Unit
+    private val getClip: (String, Int) -> Unit,
+    private val getCover: (String, Int) -> Unit
 ) : ListAdapter<MemberPostItem, ClipViewHolder>(DIFF_CALLBACK) {
 
     companion object {
@@ -102,8 +102,8 @@ class ClipAdapter(
         takeIf { contentItem.images.isNotEmpty() }?.also {
             contentItem.images[0].also { image ->
                 if (TextUtils.isEmpty(image.url)) {
-                    image.id.takeIf { !TextUtils.isEmpty(it) }?.toLong()?.also { id ->
-                        LruCacheUtils.getLruCache(id)?.also {
+                    image.id.takeIf { !TextUtils.isEmpty(it) }?.also { id ->
+                        LruCacheUtils.getLruCache(id.toString())?.also {
                             Glide.with(holder.coverView.context).load(it).into(holder.coverView)
                         } ?: run { getCover(id, position) }
                     }
@@ -112,7 +112,13 @@ class ClipAdapter(
                 }
             }
         }
-        processClip(holder.playerView, contentItem.shortVideo.id, contentItem.shortVideo.url, position)
+
+        processClip(
+            holder.playerView,
+            contentItem.shortVideo.id,
+            contentItem.shortVideo.url,
+            position
+        )
     }
 
     private fun processClip(playerView: PlayerView, id: String, url: String, position: Int) {
@@ -122,13 +128,23 @@ class ClipAdapter(
         playerView.player?.also { it.stop() }
 
         if (TextUtils.isEmpty(url)) {
-            if (clipMap.containsKey(id.toLong())) {
-                takeIf { currentPosition == position }?.also { setupPlayer(playerView, clipMap[id.toLong()]?.toURI().toString()) }
+            if (clipMap.containsKey(id)) {
+                takeIf { currentPosition == position }?.also {
+                    setupPlayer(
+                        playerView,
+                        clipMap[id]?.toURI().toString()
+                    )
+                }
             } else {
-                getClip(id.toLong(), position)
+                getClip(id, position)
             }
         } else {
-            takeIf { currentPosition == position }?.also { setupPlayer(playerView, contentItem.shortVideo.url) }
+            takeIf { currentPosition == position }?.also {
+                setupPlayer(
+                    playerView,
+                    contentItem.shortVideo.url
+                )
+            }
         }
     }
 

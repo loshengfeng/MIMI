@@ -101,7 +101,7 @@ class FavoriteViewModel : BaseViewModel() {
         }
     }
 
-    fun getAttachment(view: ImageView, id: Long) {
+    fun getAttachment(view: ImageView, id: String) {
         if (!setImage(view, id)) {
             viewModelScope.launch {
                 flow {
@@ -128,7 +128,7 @@ class FavoriteViewModel : BaseViewModel() {
         }
     }
 
-    private fun setImage(view: ImageView, id: Long): Boolean {
+    private fun setImage(view: ImageView, id: String): Boolean {
         val bitmap = getLruCache(id)
 
         return when (getLruCache(id)) {

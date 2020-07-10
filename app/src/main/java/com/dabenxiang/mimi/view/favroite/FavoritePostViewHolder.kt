@@ -80,7 +80,7 @@ class FavoritePostViewHolder(
 
     override fun updated() {
         data?.posterAvatarAttachmentId?.let {
-            listener.onAvatarDownload(ivHead, it)
+            listener.onAvatarDownload(ivHead, it.toString())
         }
 
         tvName.text = data?.posterName

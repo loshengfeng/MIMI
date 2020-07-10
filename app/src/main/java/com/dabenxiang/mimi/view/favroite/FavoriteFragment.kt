@@ -26,7 +26,6 @@ import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_post_favorite.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import timber.log.Timber
 
 class FavoriteFragment : BaseFragment() {
 
@@ -109,7 +108,10 @@ class FavoriteFragment : BaseFragment() {
                 is ApiResult.Success -> {
                     if (viewModel.viewFavoriteStatus[it.result.tag as Long] == LikeType.DISLIKE.value) {
                         viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
-                        GeneralUtils.showToast(requireContext(), getString(R.string.favorite_delete_favorite))
+                        GeneralUtils.showToast(
+                            requireContext(),
+                            getString(R.string.favorite_delete_favorite)
+                        )
                     }
                 }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
@@ -208,7 +210,7 @@ class FavoriteFragment : BaseFragment() {
     }
 
     private val listener = object : FavoriteAdapter.EventListener {
-        override fun onAvatarDownload(view: ImageView, id: Long) {
+        override fun onAvatarDownload(view: ImageView, id: String) {
             viewModel.getAttachment(view, id)
         }
 
@@ -235,14 +237,14 @@ class FavoriteFragment : BaseFragment() {
                         is PlayItem -> {
                             item.videoId?.let {
                                 viewModel.viewStatus[it] = viewModel.viewStatus[it]
-                                        ?: if (item.like == true) LikeType.LIKE.value else LikeType.DISLIKE.value
+                                    ?: if (item.like == true) LikeType.LIKE.value else LikeType.DISLIKE.value
                                 viewModel.modifyLike(textView, it)
                             }
                         }
                         is PostFavoriteItem -> {
                             item.id?.let {
                                 viewModel.viewStatus[it] =
-                                        viewModel.viewStatus[it] ?: LikeType.DISLIKE.value
+                                    viewModel.viewStatus[it] ?: LikeType.DISLIKE.value
                                 viewModel.modifyLike(textView, it)
                             }
                         }
@@ -255,14 +257,15 @@ class FavoriteFragment : BaseFragment() {
                         is PlayItem -> {
                             item.videoId?.let {
                                 viewModel.viewFavoriteStatus[it] =
-                                        viewModel.viewFavoriteStatus[it] ?: if (item.favorite == true) LikeType.LIKE.value else LikeType.DISLIKE.value
+                                    viewModel.viewFavoriteStatus[it]
+                                        ?: if (item.favorite == true) LikeType.LIKE.value else LikeType.DISLIKE.value
                                 viewModel.modifyFavorite(textView, it)
                             }
                         }
                         is PostFavoriteItem -> {
                             item.id?.let {
                                 viewModel.viewFavoriteStatus[it] =
-                                        viewModel.viewFavoriteStatus[it] ?: LikeType.DISLIKE.value
+                                    viewModel.viewFavoriteStatus[it] ?: LikeType.DISLIKE.value
                                 viewModel.modifyFavorite(textView, it)
                             }
                         }
@@ -271,12 +274,17 @@ class FavoriteFragment : BaseFragment() {
 
                 FunctionType.SHARE -> {
                     /* 點擊後複製網址 */
-                    when(item){
-                        is PlayItem->{
-                            if (item.tags == null || item.tags.first().isEmpty() || item.videoId == null) {
+                    when (item) {
+                        is PlayItem -> {
+                            if (item.tags == null || item.tags.first()
+                                    .isEmpty() || item.videoId == null
+                            ) {
                                 GeneralUtils.showToast(requireContext(), "copy url error")
                             } else {
-                                GeneralUtils.copyToClipboard(requireContext(), viewModel.getShareUrl(item.tags[0], item.videoId, item.episode))
+                                GeneralUtils.copyToClipboard(
+                                    requireContext(),
+                                    viewModel.getShareUrl(item.tags[0], item.videoId, item.episode)
+                                )
                                 GeneralUtils.showToast(requireContext(), "already copy url")
                             }
                         }
@@ -296,7 +304,6 @@ class FavoriteFragment : BaseFragment() {
                 }
             }
         }
-
     }
 
     private fun refreshUI(view: TextView) {

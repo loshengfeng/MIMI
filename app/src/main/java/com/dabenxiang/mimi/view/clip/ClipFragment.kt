@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.adapter.ClipAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -37,7 +37,7 @@ class ClipFragment : BaseFragment() {
 
     private val viewModel: ClipViewModel by viewModels()
 
-    private val clipMap: HashMap<Long, File> = hashMapOf()
+    private val clipMap: HashMap<String, File> = hashMapOf()
 
     override val bottomNavigationVisibility = View.GONE
 
@@ -58,25 +58,25 @@ class ClipFragment : BaseFragment() {
     override fun setupObservers() {
         viewModel.clipResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> {
                     val result = it.result
                     clipMap[result.first] = result.third
                     rv_clip.adapter?.notifyItemChanged(result.second)
                 }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.coverResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> {
                     rv_clip.adapter?.notifyItemChanged(it.result)
                 }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is Error -> onApiError(it.throwable)
             }
         })
     }
@@ -119,12 +119,12 @@ class ClipFragment : BaseFragment() {
         }
     }
 
-    private fun getClip(id: Long, pos: Int) {
+    private fun getClip(id: String, pos: Int) {
         Timber.d("getClip, id: $id, position: $pos")
         viewModel.getClip(id, pos)
     }
 
-    private fun getCover(id: Long, pos: Int) {
+    private fun getCover(id: String, pos: Int) {
         Timber.d("getCover, id: $id, position: $pos")
         viewModel.getCover(id, pos)
     }

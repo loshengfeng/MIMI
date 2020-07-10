@@ -43,7 +43,7 @@ class PersonalViewModel : BaseViewModel() {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository()
-                    .getAttachment(accountManager.getProfile().avatarAttachmentId)
+                    .getAttachment(accountManager.getProfile().avatarAttachmentId.toString())
                 if (!result.isSuccessful) throw HttpException(result)
                 byteArray = result.body()?.bytes()
                 val bitmap = ImageUtils.bytes2Bitmap(byteArray)

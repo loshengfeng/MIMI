@@ -383,11 +383,11 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val attachmentListener = object : AttachmentListener {
-        override fun onGetAttachment(id: Long, position: Int, type: HomeItemType) {
+        override fun onGetAttachment(id: String, position: Int, type: HomeItemType) {
             viewModel.getAttachment(id, position, type)
         }
 
-        override fun onGetAttachment(id: Long, position: Int) {
+        override fun onGetAttachment(id: String, position: Int) {
             viewModel.getAttachment(id, position)
         }
     }
