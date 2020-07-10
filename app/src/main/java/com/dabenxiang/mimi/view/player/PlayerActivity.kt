@@ -32,6 +32,10 @@ import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.SendCommentDialog
+import com.dabenxiang.mimi.view.dialog.more.MoreDialogFragment
+import com.dabenxiang.mimi.view.dialog.more.OnMoreDialogListener
+import com.dabenxiang.mimi.view.dialog.problem.OnProblemReportDialogListener
+import com.dabenxiang.mimi.view.dialog.problem.ProblemReportDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.login.LoginActivity
 import com.dabenxiang.mimi.view.login.LoginFragment
@@ -685,6 +689,43 @@ class PlayerActivity : BaseActivity() {
             GeneralUtils.copyToClipboard(baseContext, viewModel.getShareUrl(viewModel.category, viewModel.videoId, viewModel.episodeId.toString()))
             GeneralUtils.showToast(baseContext, "already copy url")
         }
+
+        iv_more.setOnClickListener {
+            MoreDialogFragment.newInstance(BaseItem(), object : OnMoreDialogListener {
+                override fun onReport(item: BaseItem) {
+                    ProblemReportDialogFragment.newInstance(object : OnProblemReportDialogListener {
+                        override fun onReport(item: String) {
+                            if (!viewModel.isReported)
+                                viewModel.sentReport(item)
+                            else
+                                GeneralUtils.showToast(baseContext, getString(R.string.already_reported))
+                        }
+                    }).also {
+                        it.show(supportFragmentManager, ProblemReportDialogFragment::class.java.simpleName)
+                    }
+                }
+            }).also {
+                it.show(supportFragmentManager, MoreDialogFragment::class.java.simpleName)
+            }
+        }
+
+        viewModel.apiReportResult.observe(this, Observer {event->
+            event?.getContentIfNotHandled()?.also { apiResult ->
+                when (apiResult) {
+                    is ApiResult.Loading -> progressHUD.show()
+                    is ApiResult.Loaded -> {
+                        progressHUD.dismiss()
+                    }
+                    is ApiResult.Empty -> {
+                        viewModel.isReported = true
+                        GeneralUtils.showToast(this, getString(R.string.upload_succeed))
+                    }
+                    is ApiResult.Error -> {
+                        onApiError(apiResult.throwable)
+                    }
+                }
+            }
+        })
     }
 
     override fun onStart() {

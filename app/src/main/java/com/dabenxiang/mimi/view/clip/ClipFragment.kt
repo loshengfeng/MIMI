@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.clip
 
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
@@ -39,13 +38,17 @@ class ClipFragment : BaseFragment() {
     private val viewModel: ClipViewModel by viewModels()
 
     private val clipMap: HashMap<String, File> = hashMapOf()
-    private val coverMap: HashMap<String, Bitmap> = hashMapOf()
 
     override val bottomNavigationVisibility = View.GONE
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initSettings()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        (rv_clip.adapter as ClipAdapter).releasePlayer()
     }
 
     override fun getLayoutId(): Int {
@@ -99,14 +102,14 @@ class ClipFragment : BaseFragment() {
                     super.onScrollStateChanged(recyclerView, newState)
                     when (newState) {
                         RecyclerView.SCROLL_STATE_IDLE -> {
-                            val position = (rv_clip.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-                            Timber.d("SCROLL_STATE_IDLE position: $position")
+                            val currentPos = (rv_clip.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                            Timber.d("SCROLL_STATE_IDLE position: $currentPos")
                             val clipAdapter = rv_clip.adapter as ClipAdapter
                             val lastPosition = clipAdapter.getCurrentPos()
-                            takeIf { position != lastPosition }?.also {
-                                clipAdapter.updateCurrentPosition(position)
+                            takeIf { currentPos != lastPosition }?.also {
+                                clipAdapter.updateCurrentPosition(currentPos)
                                 clipAdapter.notifyItemChanged(lastPosition)
-                                clipAdapter.notifyItemChanged(position)
+                                clipAdapter.notifyItemChanged(currentPos)
                             }
                         }
                     }

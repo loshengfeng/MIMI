@@ -197,11 +197,6 @@ class AdultHomeFragment : BaseFragment() {
                         AttachmentType.ADULT_PICTURE_ITEM -> {
                             commonPagedAdapter.notifyItemChanged(attachmentItem.position)
                         }
-//                        AttachmentType.ADULT_PICTURE_INTERNAL_ITEM -> {
-//                            Timber.d("@@: ${it.result.position}")
-//                            val holder = commonPagedAdapter.attachmentViewHolderMap[attachmentItem.type]
-//                            commonPagedAdapter.updateInternalItem(holder, attachmentItem.position)
-//                        }
                     }
                 }
                 is Error -> Timber.e(it.throwable)
@@ -212,12 +207,10 @@ class AdultHomeFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     val attachmentItem = it.result
-                    Timber.d("@@parentPosition: ${attachmentItem.parentPosition}, id: ${attachmentItem.id}")
                     putLruCache(attachmentItem.id, attachmentItem.bitmap)
                     val holder =
                         commonPagedAdapter.attachmentViewHolderMap[attachmentItem.parentPosition]
                     holder as PicturePostHolder
-                    Timber.d("@@tag: ${holder.pictureRecycler.tag}")
                     if (holder.pictureRecycler.tag == attachmentItem.parentPosition) {
                         commonPagedAdapter.updateInternalItem(holder, attachmentItem.position, attachmentItem.parentPosition)
                     }
@@ -399,7 +392,6 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
-            Timber.d("@@onGetAttachment parentPosition: $parentPosition")
             viewModel.getAttachment(id, parentPosition, position)
         }
     }

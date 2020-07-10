@@ -14,7 +14,6 @@ import com.dabenxiang.mimi.model.api.vo.ImageItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.getLruCache
 import kotlinx.android.synthetic.main.item_picture.view.*
-import timber.log.Timber
 import java.util.*
 
 class PictureAdapter(
@@ -35,7 +34,6 @@ class PictureAdapter(
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
-        Timber.d("@@pa oBind parentPosition: $parentPosition")
         holder as PictureViewHolder
 
         val item = imageItems[position]
@@ -46,16 +44,8 @@ class PictureAdapter(
                 .into(holder.picture)
         } else {
             if (getLruCache(item.id) == null) {
-                Timber.d("@@pa onGet parentPosition: $parentPosition")
                 attachmentListener.onGetAttachment(item.id, parentPosition, position)
-
-//                attachmentListener.onGetAttachment(
-//                    item.id,
-//                    position,
-//                    AttachmentType.ADULT_PICTURE_INTERNAL_ITEM
-//                )
             } else {
-                Timber.d("@@pa Glide parentPosition: $parentPosition")
                 val bitmap = getLruCache(item.id)
                 Glide.with(context)
                     .load(bitmap)

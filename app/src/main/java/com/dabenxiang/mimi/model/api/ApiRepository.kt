@@ -493,8 +493,9 @@ class ApiRepository(private val apiService: ApiService) {
      * 帖子問題回報
      */
     suspend fun postReport(
-        postId: Long
-    ) = apiService.postReport(postId)
+        postId: Long,
+        body: ReportRequest
+    ) = apiService.postReport(postId, body)
 
     /**********************************************************
      *

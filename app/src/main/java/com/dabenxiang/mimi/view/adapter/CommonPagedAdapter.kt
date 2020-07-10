@@ -22,7 +22,6 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.getLruCache
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
-import timber.log.Timber
 import java.util.*
 
 class CommonPagedAdapter(
@@ -139,7 +138,7 @@ class CommonPagedAdapter(
                 context, LinearLayoutManager.HORIZONTAL, false
             )
             holder.pictureRecycler.adapter = PictureAdapter(
-                context, attachmentListener, contentItem.images, position
+                context, attachmentListener, contentItem.images ?: arrayListOf(), position
             )
         }
 
@@ -159,7 +158,6 @@ class CommonPagedAdapter(
     fun updateInternalItem(holder: BaseViewHolder?, position: Int, parentPosition: Int) {
         when (holder) {
             is PicturePostHolder -> {
-                Timber.d("@@position: $position, parentPosition: $parentPosition, tag: ${holder.pictureRecycler.tag}, adapter: ${holder.pictureRecycler.adapter}")
                 holder.pictureRecycler.adapter?.notifyDataSetChanged()
             }
         }
