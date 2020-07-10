@@ -13,10 +13,11 @@ import com.dabenxiang.mimi.model.api.vo.ApiBasePagingItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.StatisticsItem
-import com.dabenxiang.mimi.model.enums.HomeItemType
+import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.vo.AttachmentItem
+import com.dabenxiang.mimi.model.vo.AttachmentItem2
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.home.picture.PicturePostDataSource
 import com.dabenxiang.mimi.view.home.picture.PicturePostFactory
@@ -65,17 +66,15 @@ class HomeViewModel : BaseViewModel() {
     val clubResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberClubItem>>>>> =
         _clubResult
 
-    private var _homeAttachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
-    val homeAttachmentResult: LiveData<ApiResult<AttachmentItem>> = _homeAttachmentResult
+    private var _attachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
+    val attachmentResult: LiveData<ApiResult<AttachmentItem>> = _attachmentResult
 
-    private var _commonAttachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
-    val commonAttachmentResult: LiveData<ApiResult<AttachmentItem>> = _commonAttachmentResult
+    private var _attachmentResult2 = MutableLiveData<ApiResult<AttachmentItem2>>()
+    val attachmentResult2: LiveData<ApiResult<AttachmentItem2>> = _attachmentResult2
 
-    private var _followClubResult = MutableLiveData<ApiResult<Int>>()
-    val followClubResult: LiveData<ApiResult<Int>> = _followClubResult
 
-    private var _cancelFollowClubResult = MutableLiveData<ApiResult<Int>>()
-    val cancelFollowClubResult: LiveData<ApiResult<Int>> = _cancelFollowClubResult
+    private var _followClubResult = MutableLiveData<ApiResult<Pair<Int, Boolean>>>()
+    val followClubResult: LiveData<ApiResult<Pair<Int, Boolean>>> = _followClubResult
 
     private val _picturePostItemList = MutableLiveData<PagedList<MemberPostItem>>()
     val picturePostItemList: LiveData<PagedList<MemberPostItem>> = _picturePostItemList
@@ -181,7 +180,7 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-    fun getAttachment(id: String, position: Int, type: HomeItemType) {
+    fun getAttachment(id: String, position: Int, type: AttachmentType) {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getAttachment(id)
@@ -194,54 +193,43 @@ class HomeViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _homeAttachmentResult.value = it }
+                .collect { _attachmentResult.value = it }
         }
     }
 
-    fun getAttachment(id: String, position: Int) {
+    fun getAttachment(id: String, parentPosition: Int, position: Int) {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getAttachment(id)
                 if (!result.isSuccessful) throw HttpException(result)
                 val byteArray = result.body()?.bytes()
                 val bitmap = ImageUtils.bytes2Bitmap(byteArray)
-                emit(ApiResult.success(AttachmentItem(id, bitmap, position)))
+                emit(ApiResult.success(AttachmentItem2(id, bitmap, parentPosition, position)))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _commonAttachmentResult.value = it }
+                .collect { _attachmentResult2.value = it }
         }
     }
 
-    fun followClub(id: Int, position: Int) {
+    fun followClub(id: Int, position: Int, isFollow: Boolean) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().followClub(id)
+                val apiRepository = domainManager.getApiRepository()
+                val result = when {
+                    isFollow -> apiRepository.followClub(id)
+                    else -> apiRepository.cancelFollowClub(id)
+                }
                 if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(position))
+                emit(ApiResult.success(Pair(position, isFollow)))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _followClubResult.value = it }
-        }
-    }
-
-    fun cancelFollowClub(id: Int, position: Int) {
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository().cancelFollowClub(id)
-                if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(position))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _cancelFollowClubResult.value = it }
         }
     }
 

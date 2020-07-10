@@ -7,7 +7,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.HomeItemType
+import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.getLruCache
@@ -62,7 +62,7 @@ class ClipViewHolder(
                     attachmentListener.onGetAttachment(
                         postImageItem.id,
                         index,
-                        HomeItemType.CLIP
+                        AttachmentType.ADULT_HOME_CLIP
                     )
                 } else {
                     val bitmap = getLruCache(postImageItem.id)
@@ -77,7 +77,7 @@ class ClipViewHolder(
             attachmentListener.onGetAttachment(
                 model?.avatarAttachmentId.toString(),
                 index,
-                HomeItemType.CLIP
+                AttachmentType.ADULT_HOME_CLIP
             )
         } else {
             val bitmap = getLruCache(model?.avatarAttachmentId.toString())

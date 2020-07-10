@@ -17,7 +17,8 @@ import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
-import com.dabenxiang.mimi.model.enums.HomeItemType
+import com.dabenxiang.mimi.model.enums.AttachmentType
+import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
@@ -28,6 +29,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
+import com.dabenxiang.mimi.view.picturepost.PicturePostHolder
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.putLruCache
@@ -160,9 +162,9 @@ class AdultHomeFragment : BaseFragment() {
         viewModel.followClubResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    when (val holder = homeAdapter.homeViewHolderMap[HomeItemType.CLUB]) {
+                    when (val holder = homeAdapter.functionViewHolderMap[FunctionType.FOLLOW]) {
                         is HomeClubViewHolder -> {
-                            holder.updateItemByFollow(it.result, true)
+                            holder.updateItemByFollow(it.result.first, it.result.second)
                         }
                     }
                 }
@@ -170,46 +172,55 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.cancelFollowClubResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Success -> {
-                    when (val holder = homeAdapter.homeViewHolderMap[HomeItemType.CLUB]) {
-                        is HomeClubViewHolder -> {
-                            holder.updateItemByFollow(it.result, false)
-                        }
-                    }
-                }
-                is Error -> Timber.e(it.throwable)
-            }
-        })
-
-        viewModel.homeAttachmentResult.observe(viewLifecycleOwner, Observer {
+        viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
                     val attachmentItem = it.result
                     putLruCache(attachmentItem.id, attachmentItem.bitmap)
-                    when (val holder = homeAdapter.homeViewHolderMap[attachmentItem.type]) {
-                        is HomeClipViewHolder -> {
+
+                    when (attachmentItem.type) {
+                        AttachmentType.ADULT_HOME_CLIP -> {
+                            val holder = homeAdapter.attachmentViewHolderMap[attachmentItem.type]
+                            holder as HomeClipViewHolder
                             holder.updateItem(attachmentItem.position)
                         }
-                        is HomePictureViewHolder -> {
+                        AttachmentType.ADULT_HOME_PICTURE -> {
+                            val holder = homeAdapter.attachmentViewHolderMap[attachmentItem.type]
+                            holder as HomePictureViewHolder
                             holder.updateItem(attachmentItem.position)
                         }
-                        is HomeClubViewHolder -> {
+                        AttachmentType.ADULT_HOME_CLUB -> {
+                            val holder = homeAdapter.attachmentViewHolderMap[attachmentItem.type]
+                            holder as HomeClubViewHolder
                             holder.updateItem(attachmentItem.position)
                         }
+                        AttachmentType.ADULT_PICTURE_ITEM -> {
+                            commonPagedAdapter.notifyItemChanged(attachmentItem.position)
+                        }
+//                        AttachmentType.ADULT_PICTURE_INTERNAL_ITEM -> {
+//                            Timber.d("@@: ${it.result.position}")
+//                            val holder = commonPagedAdapter.attachmentViewHolderMap[attachmentItem.type]
+//                            commonPagedAdapter.updateInternalItem(holder, attachmentItem.position)
+//                        }
                     }
                 }
                 is Error -> Timber.e(it.throwable)
             }
         })
 
-        viewModel.commonAttachmentResult.observe(viewLifecycleOwner, Observer {
+        viewModel.attachmentResult2.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
                     val attachmentItem = it.result
+                    Timber.d("@@parentPosition: ${attachmentItem.parentPosition}, id: ${attachmentItem.id}")
                     putLruCache(attachmentItem.id, attachmentItem.bitmap)
-                    commonPagedAdapter.notifyItemChanged(it.result.position)
+                    val holder =
+                        commonPagedAdapter.attachmentViewHolderMap[attachmentItem.parentPosition]
+                    holder as PicturePostHolder
+                    Timber.d("@@tag: ${holder.pictureRecycler.tag}")
+                    if (holder.pictureRecycler.tag == attachmentItem.parentPosition) {
+                        commonPagedAdapter.updateInternalItem(holder, attachmentItem.position, attachmentItem.parentPosition)
+                    }
                 }
                 is Error -> Timber.e(it.throwable)
             }
@@ -383,22 +394,23 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val attachmentListener = object : AttachmentListener {
-        override fun onGetAttachment(id: String, position: Int, type: HomeItemType) {
+        override fun onGetAttachment(id: String, position: Int, type: AttachmentType) {
             viewModel.getAttachment(id, position, type)
         }
 
-        override fun onGetAttachment(id: String, position: Int) {
-            viewModel.getAttachment(id, position)
+        override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
+            Timber.d("@@onGetAttachment parentPosition: $parentPosition")
+            viewModel.getAttachment(id, parentPosition, position)
         }
     }
 
     private val clubListener = object : HomeClubAdapter.ClubListener {
         override fun followClub(id: Int, position: Int) {
-            viewModel.followClub(id, position)
+            viewModel.followClub(id, position, true)
         }
 
         override fun cancelFollowClub(id: Int, position: Int) {
-            viewModel.cancelFollowClub(id, position)
+            viewModel.followClub(id, position, false)
         }
     }
 

@@ -6,5 +6,6 @@ enum class FunctionType {
     FAVORITE,
     MSG,
     SHARE,
-    MORE
+    MORE,
+    FOLLOW
 }
