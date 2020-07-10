@@ -1,16 +1,16 @@
 package com.dabenxiang.mimi.view.home.viewholder
 
-import android.graphics.Bitmap
 import android.text.TextUtils
 import android.view.View
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.HomeItemType
-import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils.getLruCache
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.nested_item_home_picture.view.*
 import java.util.*
@@ -18,8 +18,7 @@ import java.util.*
 class PictureViewHolder(
     itemView: View,
     onClickListener: IndexViewHolderListener,
-    private val attachmentListener: HomeAdapter.AttachmentListener,
-    private val attachmentMap: HashMap<Long, Bitmap>
+    private val attachmentListener: AttachmentListener
 ) :
     BaseIndexViewHolder<MemberPostItem>(itemView, onClickListener) {
 
@@ -38,7 +37,7 @@ class PictureViewHolder(
 
     override fun updated(model: MemberPostItem?) {
         val contentItem = Gson().fromJson(model?.content, ContentItem::class.java)
-        val postImageItem = contentItem.images[0]
+        val postImageItem = takeIf { contentItem.images != null && contentItem.images.isNotEmpty() }?.let { contentItem.images?.get(0) }
 
         profileName.text = model?.postFriendlyName
         profileTime.text = GeneralUtils.getTimeDiff(model?.creationDate ?: Date(), Date())
@@ -51,35 +50,42 @@ class PictureViewHolder(
             )
         )
 
-        if (!TextUtils.isEmpty(postImageItem.url)) {
-            Glide.with(itemView.context)
-                .load(postImageItem.url)
-                .into(pictureImage)
-        } else {
-            if (!TextUtils.isEmpty(postImageItem.id)) {
-                if (attachmentMap[postImageItem.id.toLong()] == null) {
-                    attachmentListener.onGetAttachment(
-                        postImageItem.id.toLong(),
-                        index,
-                        HomeItemType.PICTURE
-                    )
-                } else {
-                    val bitmap = attachmentMap[postImageItem.id.toLong()]
-                    Glide.with(itemView.context)
-                        .load(bitmap)
-                        .into(pictureImage)
+        postImageItem?.also {
+            if (!TextUtils.isEmpty(postImageItem.url)) {
+                Glide.with(itemView.context)
+                    .load(postImageItem.url)
+                    .into(pictureImage)
+            } else {
+                if (!TextUtils.isEmpty(postImageItem.id)) {
+
+                    if (getLruCache(postImageItem.id) == null) {
+                        attachmentListener.onGetAttachment(
+                            postImageItem.id,
+                            index,
+                            HomeItemType.PICTURE
+                        )
+                    } else {
+                        val bitmap = getLruCache(postImageItem.id)
+                        Glide.with(itemView.context)
+                            .load(bitmap)
+                            .into(pictureImage)
+                    }
                 }
             }
+        } ?: run {
+            Glide.with(itemView.context)
+                .load(R.drawable.img_notlogin)
+                .into(pictureImage)
         }
 
-        if (attachmentMap[model?.avatarAttachmentId] == null) {
+        if (getLruCache(model?.avatarAttachmentId.toString()) == null) {
             attachmentListener.onGetAttachment(
-                model?.avatarAttachmentId!!,
+                model?.avatarAttachmentId.toString(),
                 index,
                 HomeItemType.CLIP
             )
         } else {
-            val bitmap = attachmentMap[model?.avatarAttachmentId]
+            val bitmap = getLruCache(model?.avatarAttachmentId.toString())
             Glide.with(itemView.context)
                 .load(bitmap)
                 .circleCrop()

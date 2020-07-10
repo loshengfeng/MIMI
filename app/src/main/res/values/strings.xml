@@ -181,12 +181,8 @@
     <string name="n_reply">%d个回复</string>
 
     <!-- Follow -->
-    <string name="my_follow_follow">已关注</string>
-
-
-    <!-- Club -->
-    <string name="club_follow">+关注</string>
-    <string name="club_followed">已关注</string>
+    <string name="follow">+关注</string>
+    <string name="followed">已关注</string>
 
     <!-- Problem report -->
     <string-array name="problem_report_item">

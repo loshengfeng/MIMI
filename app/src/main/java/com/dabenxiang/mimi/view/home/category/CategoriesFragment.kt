@@ -57,7 +57,7 @@ class CategoriesFragment : BaseFragment() {
             startActivity(intent)
         }
 
-        override fun onClipClick(view: View, item: List<MemberPostItem>) {
+        override fun onClipClick(view: View, item: List<MemberPostItem>, position: Int) {
         }
 
         override fun onPictureClick(view: View, item: MemberPostItem) {

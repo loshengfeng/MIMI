@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.view.home
 
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
@@ -10,6 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
@@ -43,8 +43,6 @@ class HomeFragment : BaseFragment() {
 
     private val homeStatisticsViewHolderMap = hashMapOf<Int, HomeStatisticsViewHolder>()
     private val statisticsMap = hashMapOf<Int, HomeTemplate.Statistics>()
-
-    private val attachmentMap: HashMap<Long, Bitmap> = hashMapOf()
 
     override fun getLayoutId() = R.layout.fragment_home
 
@@ -201,8 +199,7 @@ class HomeFragment : BaseFragment() {
             adapterListener,
             false,
             clubListener,
-            attachmentListener,
-            attachmentMap
+            attachmentListener
         )
     }
 
@@ -210,8 +207,12 @@ class HomeFragment : BaseFragment() {
         HomeVideoListAdapter(adapterListener, false)
     }
 
-    private val attachmentListener = object : HomeAdapter.AttachmentListener {
-        override fun onGetAttachment(id: Long, position: Int, type: HomeItemType) {
+    private val attachmentListener = object : AttachmentListener {
+        override fun onGetAttachment(id: String, position: Int, type: HomeItemType) {
+
+        }
+
+        override fun onGetAttachment(id: String, position: Int) {
 
         }
     }
@@ -233,7 +234,7 @@ class HomeFragment : BaseFragment() {
             startActivityForResult(intent, PlayerActivity.REQUEST_CODE)
         }
 
-        override fun onClipClick(view: View, item: List<MemberPostItem>) {
+        override fun onClipClick(view: View, item: List<MemberPostItem>, position: Int) {
         }
 
         override fun onPictureClick(view: View, item: MemberPostItem) {

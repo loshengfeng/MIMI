@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.home.viewholder
 
-import android.graphics.Bitmap
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -9,6 +8,7 @@ import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
@@ -169,17 +169,12 @@ class HomeClipViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
     isAdult: Boolean,
-    attachmentListener: HomeAdapter.AttachmentListener,
-    attachmentMap: HashMap<Long, Bitmap>
+    attachmentListener: AttachmentListener
 ) : HomeViewHolder<HomeTemplate.Clip>(itemView, listener, isAdult) {
 
     private val recyclerView: RecyclerView = itemView.recyclerview_clip
     private val nestedAdapter by lazy {
-        HomeClipAdapter(
-            listener,
-            attachmentListener,
-            attachmentMap
-        )
+        HomeClipAdapter(listener, attachmentListener)
     }
 
     init {
@@ -208,17 +203,12 @@ class HomePictureViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
     isAdult: Boolean,
-    attachmentListener: HomeAdapter.AttachmentListener,
-    attachmentMap: HashMap<Long, Bitmap>
+    attachmentListener: AttachmentListener
 ) : HomeViewHolder<HomeTemplate.Picture>(itemView, listener, isAdult) {
 
     private val recyclerView: RecyclerView = itemView.recyclerview_picture
     private val nestedAdapter by lazy {
-        HomePictureAdapter(
-            listener,
-            attachmentListener,
-            attachmentMap
-        )
+        HomePictureAdapter(listener, attachmentListener)
     }
 
     init {
@@ -248,18 +238,12 @@ class HomeClubViewHolder(
     listener: HomeAdapter.EventListener,
     isAdult: Boolean,
     clubListener: HomeClubAdapter.ClubListener,
-    attachmentListener: HomeAdapter.AttachmentListener,
-    attachmentMap: HashMap<Long, Bitmap>
+    attachmentListener: AttachmentListener
 ) : HomeViewHolder<HomeTemplate.Club>(itemView, listener, isAdult) {
 
     private val recyclerView: RecyclerView = itemView.recyclerview_club
-    val nestedAdapter by lazy {
-        HomeClubAdapter(
-            listener,
-            clubListener,
-            attachmentListener,
-            attachmentMap
-        )
+    private val nestedAdapter by lazy {
+        HomeClubAdapter(listener, clubListener, attachmentListener)
     }
 
     init {

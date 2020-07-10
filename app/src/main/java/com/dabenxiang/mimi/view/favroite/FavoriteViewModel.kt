@@ -27,6 +27,8 @@ import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_ADULT
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_NORMAL
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_SHORT_VIDEO
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils.getLruCache
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils.putLruCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -100,7 +102,7 @@ class FavoriteViewModel : BaseViewModel() {
         }
     }
 
-    fun getAttachment(view: ImageView, id: Long) {
+    fun getAttachment(view: ImageView, id: String) {
         if (!setImage(view, id)) {
             viewModelScope.launch {
                 flow {
@@ -110,7 +112,7 @@ class FavoriteViewModel : BaseViewModel() {
                     val byteArray = result.body()?.bytes()
                     val bitmap = ImageUtils.bytes2Bitmap(byteArray)
                     if (bitmap != null) {
-                        lruCacheManager.putLruCache(id, bitmap)
+                        putLruCache(id, bitmap)
                         setImage(view, id)
                     }
                     emit(ApiResult.success(Pair(view, id)))
@@ -127,10 +129,10 @@ class FavoriteViewModel : BaseViewModel() {
         }
     }
 
-    private fun setImage(view: ImageView, id: Long): Boolean {
-        val bitmap = lruCacheManager.getLruCache(id)
+    private fun setImage(view: ImageView, id: String): Boolean {
+        val bitmap = getLruCache(id)
 
-        return when (lruCacheManager.getLruCache(id)) {
+        return when (getLruCache(id)) {
             null -> false
             else -> {
                 val options: RequestOptions = RequestOptions()
@@ -162,11 +164,11 @@ class FavoriteViewModel : BaseViewModel() {
                     .addLike(videoID, likeRequest)
                 if (!result.isSuccessful) {
                     viewStatus[videoID] =
-                            when (viewStatus[videoID]) {
-                                LikeType.LIKE.value -> LikeType.DISLIKE.value
-                                LikeType.DISLIKE.value -> LikeType.LIKE.value
-                                else -> LikeType.LIKE.value
-                            }
+                        when (viewStatus[videoID]) {
+                            LikeType.LIKE.value -> LikeType.DISLIKE.value
+                            LikeType.DISLIKE.value -> LikeType.LIKE.value
+                            else -> LikeType.LIKE.value
+                        }
                     throw HttpException(result)
                 }
                 emit(ApiResult.success(view))
@@ -194,11 +196,11 @@ class FavoriteViewModel : BaseViewModel() {
                 }
 
                 viewFavoriteStatus[videoID] =
-                        when (viewFavoriteStatus[videoID]) {
-                            LikeType.LIKE.value -> LikeType.DISLIKE.value
-                            LikeType.DISLIKE.value -> LikeType.LIKE.value
-                            else -> LikeType.LIKE.value
-                        }
+                    when (viewFavoriteStatus[videoID]) {
+                        LikeType.LIKE.value -> LikeType.DISLIKE.value
+                        LikeType.DISLIKE.value -> LikeType.LIKE.value
+                        else -> LikeType.LIKE.value
+                    }
                 emit(ApiResult.success(view))
             }
                 .flowOn(Dispatchers.IO)
@@ -206,7 +208,8 @@ class FavoriteViewModel : BaseViewModel() {
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect {
-                    _favoriteResult.value = it }
+                    _favoriteResult.value = it
+                }
         }
     }
 
@@ -229,7 +232,8 @@ class FavoriteViewModel : BaseViewModel() {
         viewModelScope.launch {
             flow {
                 // todo: 清除此頁顯示的視頻...
-                val result = domainManager.getApiRepository().deleteMePlaylist(videoIDList.joinToString(separator = ","))
+                val result = domainManager.getApiRepository()
+                    .deleteMePlaylist(videoIDList.joinToString(separator = ","))
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }

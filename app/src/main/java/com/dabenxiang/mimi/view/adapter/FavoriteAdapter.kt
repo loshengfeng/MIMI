@@ -39,7 +39,7 @@ class FavoriteAdapter(
     interface EventListener {
         fun onVideoClick(item: Any)
         fun onFunctionClick(type: FunctionType, view: View, item: Any)
-        fun onAvatarDownload(view: ImageView, id: Long)
+        fun onAvatarDownload(view: ImageView, id: String)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {

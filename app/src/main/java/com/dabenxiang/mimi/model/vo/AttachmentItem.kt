@@ -4,8 +4,8 @@ import android.graphics.Bitmap
 import com.dabenxiang.mimi.model.enums.HomeItemType
 
 data class AttachmentItem(
-    var id: Long,
+    var id: String,
     var bitmap: Bitmap,
     var position: Int,
-    val type: HomeItemType
+    val type: HomeItemType? = null
 )
