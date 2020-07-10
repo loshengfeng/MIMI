@@ -37,7 +37,7 @@ class PictureViewHolder(
 
     override fun updated(model: MemberPostItem?) {
         val contentItem = Gson().fromJson(model?.content, ContentItem::class.java)
-        val postImageItem = contentItem.images[0]
+        val postImageItem = takeIf { contentItem.images != null && contentItem.images.isNotEmpty() }?.let { contentItem.images?.get(0) }
 
         profileName.text = model?.postFriendlyName
         profileTime.text = GeneralUtils.getTimeDiff(model?.creationDate ?: Date(), Date())
@@ -50,26 +50,32 @@ class PictureViewHolder(
             )
         )
 
-        if (!TextUtils.isEmpty(postImageItem.url)) {
-            Glide.with(itemView.context)
-                .load(postImageItem.url)
-                .into(pictureImage)
-        } else {
-            if (!TextUtils.isEmpty(postImageItem.id)) {
+        postImageItem?.also {
+            if (!TextUtils.isEmpty(postImageItem.url)) {
+                Glide.with(itemView.context)
+                    .load(postImageItem.url)
+                    .into(pictureImage)
+            } else {
+                if (!TextUtils.isEmpty(postImageItem.id)) {
 
-                if (getLruCache(postImageItem.id) == null) {
-                    attachmentListener.onGetAttachment(
-                        postImageItem.id,
-                        index,
-                        HomeItemType.PICTURE
-                    )
-                } else {
-                    val bitmap = getLruCache(postImageItem.id)
-                    Glide.with(itemView.context)
-                        .load(bitmap)
-                        .into(pictureImage)
+                    if (getLruCache(postImageItem.id) == null) {
+                        attachmentListener.onGetAttachment(
+                            postImageItem.id,
+                            index,
+                            HomeItemType.PICTURE
+                        )
+                    } else {
+                        val bitmap = getLruCache(postImageItem.id)
+                        Glide.with(itemView.context)
+                            .load(bitmap)
+                            .into(pictureImage)
+                    }
                 }
             }
+        } ?: run {
+            Glide.with(itemView.context)
+                .load(R.drawable.img_notlogin)
+                .into(pictureImage)
         }
 
         if (getLruCache(model?.avatarAttachmentId.toString()) == null) {

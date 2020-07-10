@@ -99,12 +99,12 @@ class ClipAdapter(
             ?: run { holder.coverView.visibility = View.VISIBLE }
         val item = memberPostItems[position]
         val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
-        takeIf { contentItem.images.isNotEmpty() }?.also {
-            contentItem.images[0].also { image ->
+        contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
+            images[0].also { image ->
                 if (TextUtils.isEmpty(image.url)) {
                     image.id.takeIf { !TextUtils.isEmpty(it) }?.also { id ->
-                        LruCacheUtils.getLruCache(id.toString())?.also {
-                            Glide.with(holder.coverView.context).load(it).into(holder.coverView)
+                        LruCacheUtils.getLruCache(id)?.also { bitmap ->
+                            Glide.with(holder.coverView.context).load(bitmap).into(holder.coverView)
                         } ?: run { getCover(id, position) }
                     }
                 } else {

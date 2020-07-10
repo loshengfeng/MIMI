@@ -128,7 +128,7 @@ class CommonPagedAdapter(
         if (holder.pictureRecycler.adapter == null) {
             holder.pictureRecycler.layoutManager = LinearLayoutManager(context)
             holder.pictureRecycler.adapter = PictureAdapter(
-                context, attachmentListener, contentItem.images
+                context, attachmentListener, contentItem.images ?: arrayListOf()
             )
         } else {
             holder.pictureRecycler.adapter?.notifyDataSetChanged()
