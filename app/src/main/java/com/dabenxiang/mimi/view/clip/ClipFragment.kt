@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.clip
 
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
@@ -7,6 +8,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -16,14 +18,20 @@ import kotlinx.android.synthetic.main.fragment_clip.*
 import timber.log.Timber
 import java.io.File
 
+
 class ClipFragment : BaseFragment() {
 
     companion object {
         const val KEY_DATA = "data"
+        const val KEY_POSITION = "position"
 
-        fun createBundle(items: ArrayList<MemberPostItem>): Bundle {
+        fun createBundle(
+            items: ArrayList<MemberPostItem>,
+            position: Int
+        ): Bundle {
             return Bundle().also {
                 it.putSerializable(KEY_DATA, items)
+                it.putInt(KEY_POSITION, position)
             }
         }
     }
@@ -31,6 +39,7 @@ class ClipFragment : BaseFragment() {
     private val viewModel: ClipViewModel by viewModels()
 
     private val clipMap: HashMap<String, File> = hashMapOf()
+    private val coverMap: HashMap<String, Bitmap> = hashMapOf()
 
     override val bottomNavigationVisibility = View.GONE
 
@@ -56,6 +65,17 @@ class ClipFragment : BaseFragment() {
                 is Error -> onApiError(it.throwable)
             }
         })
+
+        viewModel.coverResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> {
+                    rv_clip.adapter?.notifyItemChanged(it.result)
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -63,18 +83,23 @@ class ClipFragment : BaseFragment() {
     }
 
     override fun initSettings() {
+        val position = arguments?.getInt(KEY_POSITION) ?: 0
         (arguments?.getSerializable(KEY_DATA) as ArrayList<MemberPostItem>).also { data ->
-            Timber.d("initSettings: $data")
-            rv_clip.adapter =
-                ClipAdapter(requireContext(), data, clipMap, 0) { id, pos -> onGetClip(id, pos) }
+            rv_clip.adapter = ClipAdapter(
+                requireContext(),
+                data,
+                clipMap,
+                position,
+                { id, pos -> getClip(id, pos) },
+                { id, pos -> getCover(id, pos) })
+            (rv_clip.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             PagerSnapHelper().attachToRecyclerView(rv_clip)
             rv_clip.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)
                     when (newState) {
                         RecyclerView.SCROLL_STATE_IDLE -> {
-                            val position =
-                                (rv_clip.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                            val position = (rv_clip.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
                             Timber.d("SCROLL_STATE_IDLE position: $position")
                             val clipAdapter = rv_clip.adapter as ClipAdapter
                             val lastPosition = clipAdapter.getCurrentPos()
@@ -87,11 +112,17 @@ class ClipFragment : BaseFragment() {
                     }
                 }
             })
+            rv_clip.scrollToPosition(position)
         }
     }
 
-    private fun onGetClip(id: String, pos: Int) {
-        Timber.d("onGetClip, id: $id, position: $pos")
+    private fun getClip(id: String, pos: Int) {
+        Timber.d("getClip, id: $id, position: $pos")
         viewModel.getClip(id, pos)
+    }
+
+    private fun getCover(id: String, pos: Int) {
+        Timber.d("getCover, id: $id, position: $pos")
+        viewModel.getCover(id, pos)
     }
 }
