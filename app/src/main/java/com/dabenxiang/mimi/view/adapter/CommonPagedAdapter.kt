@@ -8,6 +8,8 @@ import androidx.core.content.ContextCompat
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
@@ -141,14 +143,26 @@ class CommonPagedAdapter(
                 context,
                 attachmentListener,
                 contentItem.images ?: arrayListOf(),
-                position,
-                object : PictureAdapter.PictureListener {
-                    override fun onGetPosition(position: Int) {
-                        holder.pictureCount.text = "$position/${contentItem.images?.size}"
+                position
+            )
+            LinearSnapHelper().attachToRecyclerView(holder.pictureRecycler)
+        }
+
+        holder.pictureRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                when (newState) {
+                    RecyclerView.SCROLL_STATE_IDLE -> {
+                        val currentPosition =
+                            (holder.pictureRecycler.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                        holder.pictureCount.text =
+                            "${currentPosition + 1}/${contentItem.images?.size}"
                     }
                 }
-            )
-        }
+            }
+        })
+
+        holder.pictureCount.text = "1/${contentItem.images?.size}"
 
         holder.likeImage.setOnClickListener {
             adultListener.doLike()

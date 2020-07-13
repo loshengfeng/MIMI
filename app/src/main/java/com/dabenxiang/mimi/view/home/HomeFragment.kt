@@ -212,7 +212,7 @@ class HomeFragment : BaseFragment() {
         }
 
         override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
-            TODO("Not yet implemented")
+
         }
     }
 

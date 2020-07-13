@@ -8,6 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.AttachmentListener
@@ -270,6 +271,8 @@ class AdultHomeFragment : BaseFragment() {
         recyclerview.background = requireActivity().getDrawable(R.color.adult_color_background)
         recyclerview.layoutManager = LinearLayoutManager(requireContext())
         recyclerview.adapter = homeAdapter
+        LinearSnapHelper().attachToRecyclerView(recyclerview)
+
         refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
     }
 
