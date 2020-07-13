@@ -116,6 +116,7 @@ class ClipAdapter(
         val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
 
         holder.tvTitle.text = item.title
+        holder.tvName.text = "@${item.postFriendlyName}"
 
         contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
             images[0].also { image ->
@@ -129,19 +130,6 @@ class ClipAdapter(
                     Glide.with(holder.ivCover.context).load(image.url).into(holder.ivCover)
                 }
             }
-        }
-
-        holder.cgTag.removeAllViews()
-        item.tags.forEach {
-            val chip = LayoutInflater.from(holder.cgTag.context)
-                .inflate(R.layout.chip_item, holder.cgTag, false) as Chip
-            chip.text = it
-            chip.setTextColor(context.getColor(R.color.color_white_1))
-//            chip.settext
-//            chip.chipBackgroundColor = ColorStateList.valueOf(
-//                ContextCompat.getColor(context, R.color.adult_color_status_bar)
-//            )
-            holder.cgTag.addView(chip)
         }
 
         processClip(

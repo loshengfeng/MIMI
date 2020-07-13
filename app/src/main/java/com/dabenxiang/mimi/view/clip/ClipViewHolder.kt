@@ -10,5 +10,5 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     var ibReplay = view.ib_replay!!
     var ibBack = view.ib_back!!
     var tvTitle = view.tv_title!!
-    var cgTag = view.cg_tag!!
+    var tvName = view.tv_name!!
 }

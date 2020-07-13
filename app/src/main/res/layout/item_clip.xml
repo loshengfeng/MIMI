@@ -144,22 +144,34 @@
         android:textColor="@color/color_white_1"
         android:textSize="15sp"
         android:layout_marginStart="20dp"
-        android:text="名称名称名称名称名名称名称名称名称名称名称名称名称称名称名称名称"
         app:layout_constraintEnd_toStartOf="@id/cl_panel"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/cg_tag"
+        app:layout_constraintBottom_toTopOf="@id/tv_name"
         tools:text="名称名称名称名称名名称名称名称名称名称名称名称名称称名称名称名称" />
 
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/cg_tag"
-        android:layout_width="0dp"
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="15dp"
-        android:paddingBottom="15dp"
-        android:layout_marginBottom="10dp"
-        android:layout_marginStart="20dp"
-        app:layout_constraintEnd_toStartOf="@id/cl_panel"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:textColor="@color/color_white_1"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="13dp"
+        app:layout_constraintStart_toStartOf="@id/tv_title"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:text="\@名称名称" />
+
+<!--    <com.google.android.material.chip.ChipGroup-->
+<!--        android:id="@+id/cg_tag"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:paddingTop="15dp"-->
+<!--        android:paddingBottom="15dp"-->
+<!--        android:layout_marginBottom="10dp"-->
+<!--        android:layout_marginStart="20dp"-->
+<!--        app:layout_constraintEnd_toStartOf="@id/cl_panel"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
