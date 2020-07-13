@@ -98,9 +98,13 @@ class ClipAdapter(
 
     override fun onBindViewHolder(holder: ClipViewHolder, position: Int) {
         Timber.d("onBindViewHolder position:$position, currentPosition: $currentPosition")
+        val item = memberPostItems[position]
+        val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
+        holder.onBind(item)
+
         takeIf { currentPosition == position }?.also { currentViewHolder = holder }
             ?: run { holder.ivCover.visibility = View.VISIBLE }
-        holder.ibReplay.visibility = View.GONE
+
         holder.ibReplay.setOnClickListener {
             Timber.d("ivCover setOnClickListener")
             exoPlayer?.also { player ->
@@ -111,12 +115,6 @@ class ClipAdapter(
         }
 
         holder.ibBack.setOnClickListener { clipFuncItem.onBackClick() }
-
-        val item = memberPostItems[position]
-        val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
-
-        holder.tvTitle.text = item.title
-        holder.tvName.text = "@${item.postFriendlyName}"
 
         contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
             images[0].also { image ->
