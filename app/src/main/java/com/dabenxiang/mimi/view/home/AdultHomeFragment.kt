@@ -24,13 +24,14 @@ import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.*
+import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
-import com.dabenxiang.mimi.view.picturepost.PicturePostHolder
+import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.putLruCache
@@ -399,20 +400,30 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val adultListener = object : AdultListener {
-        override fun followPost(item: MemberPostItem, position: Int, isFollow: Boolean) {
+        override fun onFollowPostClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
             viewModel.followPost(item, position, isFollow)
         }
 
-        override fun doLike(item: MemberPostItem, position: Int, isLike: Boolean) {
+        override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
             viewModel.likePost(item, position, isLike)
         }
 
-        override fun comment() {
-
+        override fun onCommentClick() {
+            // TODO:
         }
 
-        override fun more() {
+        override fun onMoreClick() {
+            // TODO:
+        }
 
+        override fun onItemClick(item: MemberPostItem) {
+            val bundle = PictureDetailFragment.createBundle(item)
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_adultHomeFragment_to_pictureDetailFragment,
+                    bundle
+                )
+            )
         }
     }
 

@@ -18,8 +18,8 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.view.picturepost.PicturePostHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.getLruCache
 import com.google.android.material.chip.Chip
@@ -176,19 +176,23 @@ class CommonPagedAdapter(
         }
 
         holder.follow.setOnClickListener {
-            adultListener.followPost(item!!, position, isFollow)
+            adultListener.onFollowPostClick(item!!, position, isFollow)
         }
 
         holder.likeImage.setOnClickListener {
-            adultListener.doLike(item!!, position, isLike)
+            adultListener.onLikeClick(item!!, position, isLike)
         }
 
         holder.commentImage.setOnClickListener {
-            adultListener.comment()
+            adultListener.onCommentClick()
         }
 
         holder.moreImage.setOnClickListener {
-            adultListener.more()
+            adultListener.onMoreClick()
+        }
+
+        holder.pictureItemLayout.setOnClickListener {
+            adultListener.onItemClick(item!!)
         }
     }
 

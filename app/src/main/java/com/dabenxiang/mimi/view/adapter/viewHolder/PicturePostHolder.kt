@@ -1,8 +1,9 @@
-package com.dabenxiang.mimi.view.picturepost
+package com.dabenxiang.mimi.view.adapter.viewHolder
 
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.google.android.material.chip.ChipGroup
@@ -10,6 +11,7 @@ import kotlinx.android.synthetic.main.item_picture_post.view.*
 
 class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
 
+    val pictureItemLayout: ConstraintLayout = itemView.layout_picture_item
     val avatarImg: ImageView = itemView.img_avatar
     val name: TextView = itemView.tv_name
     val time: TextView = itemView.tv_time
