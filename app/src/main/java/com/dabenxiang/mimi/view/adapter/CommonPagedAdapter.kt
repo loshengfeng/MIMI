@@ -138,7 +138,15 @@ class CommonPagedAdapter(
                 context, LinearLayoutManager.HORIZONTAL, false
             )
             holder.pictureRecycler.adapter = PictureAdapter(
-                context, attachmentListener, contentItem.images ?: arrayListOf(), position
+                context,
+                attachmentListener,
+                contentItem.images ?: arrayListOf(),
+                position,
+                object : PictureAdapter.PictureListener {
+                    override fun onGetPosition(position: Int) {
+                        holder.pictureCount.text = "$position/${contentItem.images?.size}"
+                    }
+                }
             )
         }
 

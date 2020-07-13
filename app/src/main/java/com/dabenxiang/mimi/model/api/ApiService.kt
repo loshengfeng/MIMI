@@ -140,11 +140,15 @@ interface ApiService {
         @Body body: EmailRequest
     ): Response<Void>
 
-    // todo
-//    @GET("/v1/Members/Me/ValidationEmail/{key}")
-//    suspend fun validationEmail(
-//        @Path("key") key: String
-//    ): Response<Void>
+    @POST("/v1/Members/{userId}/Follow")
+    suspend fun followMember(
+        @Path("userId") userId: Int
+    ): Response<Void>
+
+    @DELETE("/v1/Members/{userId}/Follow")
+    suspend fun cancelFollowMember(
+        @Path("userId") userId: Int
+    ): Response<Void>
 
     /**********************************************************
      *
@@ -360,17 +364,10 @@ interface ApiService {
     ): Response<Void>
 
     @POST("/v1/Members/Post/{postId}/Like")
-    suspend fun addLike(
+    suspend fun like(
         @Path("postId") postId: Long,
         @Body body: LikeRequest
     ): Response<Void>
-
-    // todo: not sure...
-//    @DELETE("/v1/Members/Post/{postId}/Like")
-//    suspend fun deleteLike(
-//        @Path("postId") postId: Long
-//    ) : Response<Void>
-
 
     @POST("/v1/Members/Post/{postId}/PostReport")
     suspend fun postReport(

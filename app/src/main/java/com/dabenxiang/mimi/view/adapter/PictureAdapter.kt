@@ -20,7 +20,8 @@ class PictureAdapter(
     val context: Context,
     private val attachmentListener: AttachmentListener,
     private val imageItems: ArrayList<ImageItem>,
-    private val parentPosition: Int
+    private val parentPosition: Int,
+    private val pictureListener: PictureListener
 ) : RecyclerView.Adapter<BaseViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
@@ -52,9 +53,15 @@ class PictureAdapter(
                     .into(holder.picture)
             }
         }
+
+        pictureListener.onGetPosition(position)
     }
 
     class PictureViewHolder(itemView: View) : BaseViewHolder(itemView) {
         val picture: ImageView = itemView.iv_picture
+    }
+
+    interface PictureListener {
+        fun onGetPosition(position: Int)
     }
 }

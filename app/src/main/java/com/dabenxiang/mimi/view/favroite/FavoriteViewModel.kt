@@ -41,7 +41,7 @@ class FavoriteViewModel : BaseViewModel() {
 
     val videoIDList = ArrayList<Long>()
 
-    var viewStatus: MutableMap<Long, Int> = mutableMapOf()
+    var viewStatus: MutableMap<Long, LikeType> = mutableMapOf()
     var viewFavoriteStatus: MutableMap<Long, Int> = mutableMapOf()
 
     private val _cleanResult = MutableLiveData<ApiResult<Nothing>>()
@@ -152,22 +152,22 @@ class FavoriteViewModel : BaseViewModel() {
     fun modifyLike(view: TextView, videoID: Long) {
         view.tag = videoID
         viewStatus[videoID] = when (viewStatus[videoID]) {
-            LikeType.LIKE.value -> LikeType.DISLIKE.value
-            LikeType.DISLIKE.value -> LikeType.LIKE.value
-            else -> LikeType.LIKE.value
+            LikeType.LIKE -> LikeType.DISLIKE
+            LikeType.DISLIKE -> LikeType.LIKE
+            else -> LikeType.LIKE
         }
 
-        val likeRequest = LikeRequest(viewStatus[videoID])
+        val likeRequest = LikeRequest(viewStatus[videoID]!!)
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository()
-                    .addLike(videoID, likeRequest)
+                    .like(videoID, likeRequest)
                 if (!result.isSuccessful) {
                     viewStatus[videoID] =
                         when (viewStatus[videoID]) {
-                            LikeType.LIKE.value -> LikeType.DISLIKE.value
-                            LikeType.DISLIKE.value -> LikeType.LIKE.value
-                            else -> LikeType.LIKE.value
+                            LikeType.LIKE -> LikeType.DISLIKE
+                            LikeType.DISLIKE -> LikeType.LIKE
+                            else -> LikeType.LIKE
                         }
                     throw HttpException(result)
                 }
@@ -216,7 +216,8 @@ class FavoriteViewModel : BaseViewModel() {
     fun report(postId: Long, content: String) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().postReport(postId,ReportRequest(content))
+                val result =
+                    domainManager.getApiRepository().postReport(postId, ReportRequest(content))
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }

@@ -203,12 +203,14 @@ class ApiRepository(private val apiService: ApiService) {
         body: EmailRequest
     ) = apiService.resendEmail(body)
 
-    /**
-     * 驗證信箱
-     */
-//    suspend fun validationEmail(
-//        key: String
-//    ) = apiService.validationEmail(key)
+    suspend fun followMember(userId: Int): Response<Void> {
+        return apiService.followMember(userId)
+    }
+
+    suspend fun cancelFollowMember(userId: Int): Response<Void> {
+        return apiService.cancelFollowMember(userId)
+    }
+
     /**********************************************************
      *
      *                  Members/Post
@@ -476,18 +478,10 @@ class ApiRepository(private val apiService: ApiService) {
     /**
      * 帖子喜歡/不喜歡
      */
-    suspend fun addLike(
+    suspend fun like(
         postId: Long,
         body: LikeRequest
-    ) = apiService.addLike(postId, body)
-
-    // todo: not sure...
-    /**
-     * 移除帖子的喜歡/不喜歡
-     */
-//    suspend fun deleteLike(
-//        postId: Long
-//    ) = apiService.deleteLike(postId)
+    ) = apiService.like(postId, body)
 
     /**
      * 帖子問題回報
