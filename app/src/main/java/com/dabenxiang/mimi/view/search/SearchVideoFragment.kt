@@ -59,7 +59,7 @@ class SearchVideoFragment : BaseFragment() {
                     requireActivity().getDrawable(it)
                 }
 
-            iv_back.setImageResource(
+            ib_back.setImageResource(
                 if (isAdult) {
                     R.drawable.adult_btn_back
                 } else {
@@ -112,7 +112,7 @@ class SearchVideoFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
-        iv_back.setOnClickListener {
+        ib_back.setOnClickListener {
             navigateTo(NavigateItem.Up)
         }
 

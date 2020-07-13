@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -11,7 +12,6 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.view.adapter.ClipAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import kotlinx.android.synthetic.main.fragment_clip.*
 import timber.log.Timber
@@ -88,13 +88,17 @@ class ClipFragment : BaseFragment() {
     override fun initSettings() {
         val position = arguments?.getInt(KEY_POSITION) ?: 0
         (arguments?.getSerializable(KEY_DATA) as ArrayList<MemberPostItem>).also { data ->
+            Timber.d("data: $data")
             rv_clip.adapter = ClipAdapter(
                 requireContext(),
                 data,
                 clipMap,
                 position,
-                { id, pos -> getClip(id, pos) },
-                { id, pos -> getCover(id, pos) })
+                ClipFuncItem(
+                    { id, pos -> getClip(id, pos) },
+                    { id, pos -> getCover(id, pos) },
+                    { onBackClick() })
+            )
             (rv_clip.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             PagerSnapHelper().attachToRecyclerView(rv_clip)
             rv_clip.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -127,5 +131,10 @@ class ClipFragment : BaseFragment() {
     private fun getCover(id: String, pos: Int) {
         Timber.d("getCover, id: $id, position: $pos")
         viewModel.getCover(id, pos)
+    }
+
+    private fun onBackClick() {
+        Timber.d("onBackClick")
+        Navigation.findNavController(requireView()).navigateUp()
     }
 }
