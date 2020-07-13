@@ -149,16 +149,12 @@ class CommonPagedAdapter(
         }
 
         holder.pictureRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                when (newState) {
-                    RecyclerView.SCROLL_STATE_IDLE -> {
-                        val currentPosition =
-                            (holder.pictureRecycler.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-                        holder.pictureCount.text =
-                            "${currentPosition + 1}/${contentItem.images?.size}"
-                    }
-                }
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val currentPosition =
+                    (holder.pictureRecycler.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                holder.pictureCount.text =
+                    "${currentPosition + 1}/${contentItem.images?.size}"
             }
         })
 
