@@ -14,7 +14,7 @@ import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.HomeItemType
+import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
@@ -155,7 +155,6 @@ class HomeFragment : BaseFragment() {
             0 -> mainViewModel?.getHomeCategories()
             else -> {
                 val keyword = mainViewModel?.normal?.categories?.get(position - 1)?.name
-                Timber.d("@@keyword: $keyword")
                 viewModel.getVideos(keyword, false)
             }
         }
@@ -208,12 +207,12 @@ class HomeFragment : BaseFragment() {
     }
 
     private val attachmentListener = object : AttachmentListener {
-        override fun onGetAttachment(id: String, position: Int, type: HomeItemType) {
+        override fun onGetAttachment(id: String, position: Int, type: AttachmentType) {
 
         }
 
-        override fun onGetAttachment(id: String, position: Int) {
-
+        override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
+            TODO("Not yet implemented")
         }
     }
 

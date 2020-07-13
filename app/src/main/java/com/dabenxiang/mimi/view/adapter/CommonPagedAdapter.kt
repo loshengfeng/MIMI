@@ -15,13 +15,13 @@ import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
+import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.picturepost.PicturePostHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.getLruCache
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
-import timber.log.Timber
 import java.util.*
 
 class CommonPagedAdapter(
@@ -50,6 +50,8 @@ class CommonPagedAdapter(
 
     private var adultTabType: AdultTabType = AdultTabType.FOLLOW
 
+    val attachmentViewHolderMap = hashMapOf<Int, BaseViewHolder>()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (adultTabType) {
             AdultTabType.PICTURE -> {
@@ -66,12 +68,15 @@ class CommonPagedAdapter(
                 )
             }
         }
-
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         when (holder) {
-            is PicturePostHolder -> setupPicturePost(holder, position)
+            is PicturePostHolder -> {
+                holder.pictureRecycler.tag = position
+                attachmentViewHolderMap[position] = holder
+                setupPicturePost(holder, position)
+            }
         }
     }
 
@@ -102,7 +107,11 @@ class CommonPagedAdapter(
         }
 
         if (getLruCache(item?.avatarAttachmentId.toString()) == null) {
-            attachmentListener.onGetAttachment(item?.avatarAttachmentId.toString(), position)
+            attachmentListener.onGetAttachment(
+                item?.avatarAttachmentId.toString(),
+                position,
+                AttachmentType.ADULT_PICTURE_ITEM
+            )
         } else {
             val bitmap = getLruCache(item?.avatarAttachmentId.toString())
             Glide.with(context)
@@ -124,14 +133,13 @@ class CommonPagedAdapter(
         }
 
         val contentItem = Gson().fromJson(item?.content, ContentItem::class.java)
-
         if (holder.pictureRecycler.adapter == null) {
-            holder.pictureRecycler.layoutManager = LinearLayoutManager(context)
-            holder.pictureRecycler.adapter = PictureAdapter(
-                context, attachmentListener, contentItem.images ?: arrayListOf()
+            holder.pictureRecycler.layoutManager = LinearLayoutManager(
+                context, LinearLayoutManager.HORIZONTAL, false
             )
-        } else {
-            holder.pictureRecycler.adapter?.notifyDataSetChanged()
+            holder.pictureRecycler.adapter = PictureAdapter(
+                context, attachmentListener, contentItem.images ?: arrayListOf(), position
+            )
         }
 
         holder.likeImage.setOnClickListener {
@@ -144,6 +152,14 @@ class CommonPagedAdapter(
 
         holder.moreImage.setOnClickListener {
             adultListener.more()
+        }
+    }
+
+    fun updateInternalItem(holder: BaseViewHolder?, parentPosition: Int, position: Int) {
+        when (holder) {
+            is PicturePostHolder -> {
+                holder.pictureRecycler.adapter?.notifyDataSetChanged()
+            }
         }
     }
 
