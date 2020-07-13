@@ -1,18 +1,19 @@
-package com.dabenxiang.mimi.view.adapter
+package com.dabenxiang.mimi.view.clip
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.net.Uri
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.view.adapter.viewHolder.ClipViewHolder
 import com.dabenxiang.mimi.view.player.PlayerViewModel
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.exoplayer2.*
@@ -25,6 +26,7 @@ import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
+import com.google.android.material.chip.Chip
 import com.google.gson.Gson
 import timber.log.Timber
 import java.io.File
@@ -34,9 +36,10 @@ class ClipAdapter(
     private val memberPostItems: ArrayList<MemberPostItem>,
     private val clipMap: HashMap<String, File>,
     private var currentPosition: Int,
-    private val getClip: (String, Int) -> Unit,
-    private val getCover: (String, Int) -> Unit
-) : ListAdapter<MemberPostItem, ClipViewHolder>(DIFF_CALLBACK) {
+    private val clipFuncItem: ClipFuncItem
+) : ListAdapter<MemberPostItem, ClipViewHolder>(
+    DIFF_CALLBACK
+) {
 
     companion object {
         private val DIFF_CALLBACK =
@@ -107,20 +110,38 @@ class ClipAdapter(
             it.visibility = View.GONE
         }
 
+        holder.ibBack.setOnClickListener { clipFuncItem.onBackClick() }
+
         val item = memberPostItems[position]
         val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
+
+        holder.tvTitle.text = item.title
+
         contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
             images[0].also { image ->
                 if (TextUtils.isEmpty(image.url)) {
                     image.id.takeIf { !TextUtils.isEmpty(it) }?.also { id ->
                         LruCacheUtils.getLruCache(id)?.also { bitmap ->
                             Glide.with(holder.ivCover.context).load(bitmap).into(holder.ivCover)
-                        } ?: run { getCover(id, position) }
+                        } ?: run { clipFuncItem.getCover(id, position) }
                     }
                 } else {
                     Glide.with(holder.ivCover.context).load(image.url).into(holder.ivCover)
                 }
             }
+        }
+
+        holder.cgTag.removeAllViews()
+        item.tags.forEach {
+            val chip = LayoutInflater.from(holder.cgTag.context)
+                .inflate(R.layout.chip_item, holder.cgTag, false) as Chip
+            chip.text = it
+            chip.setTextColor(context.getColor(R.color.color_white_1))
+//            chip.settext
+//            chip.chipBackgroundColor = ColorStateList.valueOf(
+//                ContextCompat.getColor(context, R.color.adult_color_status_bar)
+//            )
+            holder.cgTag.addView(chip)
         }
 
         processClip(
@@ -135,7 +156,9 @@ class ClipAdapter(
         Timber.d("processClip position:$position")
         val item = memberPostItems[position]
         val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
-        playerView.player?.also { it.stop() }
+        exoPlayer?.also {
+            it.removeListener(playbackStateListener)
+            it.stop() }
 
         if (TextUtils.isEmpty(url)) {
             if (clipMap.containsKey(id)) {
@@ -146,7 +169,7 @@ class ClipAdapter(
                     )
                 }
             } else {
-                getClip(id, position)
+                clipFuncItem.getClip(id, position)
             }
         } else {
             takeIf { currentPosition == position }?.also {
