@@ -52,7 +52,7 @@ data class MemberPostItem(
     val creatorId: Long = 0,
 
     @SerializedName("isFollow")
-    val isFollow: Boolean = false,
+    var isFollow: Boolean = false,
 
     @SerializedName("reported")
     val reported: Boolean = false,
@@ -62,4 +62,5 @@ data class MemberPostItem(
 
     @SerializedName("status")
     val status: PostStatus = PostStatus.ONLINE
+
 ): Serializable

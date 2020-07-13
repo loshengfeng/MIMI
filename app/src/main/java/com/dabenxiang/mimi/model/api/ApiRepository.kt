@@ -203,12 +203,12 @@ class ApiRepository(private val apiService: ApiService) {
         body: EmailRequest
     ) = apiService.resendEmail(body)
 
-    suspend fun followMember(userId: Int): Response<Void> {
-        return apiService.followMember(userId)
+    suspend fun followPost(userId: Long): Response<Void> {
+        return apiService.followPost(userId)
     }
 
-    suspend fun cancelFollowMember(userId: Int): Response<Void> {
-        return apiService.cancelFollowMember(userId)
+    suspend fun cancelFollowPost(userId: Long): Response<Void> {
+        return apiService.cancelFollowPost(userId)
     }
 
     /**********************************************************

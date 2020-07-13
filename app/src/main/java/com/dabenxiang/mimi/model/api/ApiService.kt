@@ -141,13 +141,13 @@ interface ApiService {
     ): Response<Void>
 
     @POST("/v1/Members/{userId}/Follow")
-    suspend fun followMember(
-        @Path("userId") userId: Int
+    suspend fun followPost(
+        @Path("userId") userId: Long
     ): Response<Void>
 
     @DELETE("/v1/Members/{userId}/Follow")
-    suspend fun cancelFollowMember(
-        @Path("userId") userId: Int
+    suspend fun cancelFollowPost(
+        @Path("userId") userId: Long
     ): Response<Void>
 
     /**********************************************************

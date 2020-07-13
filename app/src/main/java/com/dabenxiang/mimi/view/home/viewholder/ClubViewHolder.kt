@@ -61,11 +61,7 @@ class ClubViewHolder(
         }
 
         follow.setOnClickListener {
-            if (isFollow) {
-                clubListener.cancelFollowClub(model?.id?.toInt()!!, index)
-            } else {
-                clubListener.followClub(model?.id?.toInt()!!, index)
-            }
+            clubListener.followClub(model!!.id.toInt(), index, !isFollow)
         }
 
         if (getLruCache(model?.avatarAttachmentId.toString()) == null) {

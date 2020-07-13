@@ -11,6 +11,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.holder.CarouselHolderItem
 import com.dabenxiang.mimi.view.adapter.*
@@ -172,6 +173,8 @@ class HomeClipViewHolder(
     attachmentListener: AttachmentListener
 ) : HomeViewHolder<HomeTemplate.Clip>(itemView, listener, isAdult) {
 
+    private var attachmentType: AttachmentType? = null
+
     private val recyclerView: RecyclerView = itemView.recyclerview_clip
     private val nestedAdapter by lazy {
         HomeClipAdapter(listener, attachmentListener)
@@ -276,5 +279,4 @@ class HomeClubViewHolder(
         item.isFollow = result
         updateItem(position)
     }
-
 }

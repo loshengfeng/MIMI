@@ -9,7 +9,6 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
@@ -52,7 +51,7 @@ class CommonPagedAdapter(
 
     private var adultTabType: AdultTabType = AdultTabType.FOLLOW
 
-    val attachmentViewHolderMap = hashMapOf<Int, BaseViewHolder>()
+    val viewHolderMap = hashMapOf<Int, BaseViewHolder>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (adultTabType) {
@@ -76,7 +75,7 @@ class CommonPagedAdapter(
         when (holder) {
             is PicturePostHolder -> {
                 holder.pictureRecycler.tag = position
-                attachmentViewHolderMap[position] = holder
+                viewHolderMap[position] = holder
                 setupPicturePost(holder, position)
             }
         }
@@ -135,30 +134,34 @@ class CommonPagedAdapter(
         }
 
         val contentItem = Gson().fromJson(item?.content, ContentItem::class.java)
-        if (holder.pictureRecycler.adapter == null) {
+        if (holder.pictureRecycler.adapter == null || holder.pictureCount.tag != position) {
+            holder.pictureCount.tag = position
             holder.pictureRecycler.layoutManager = LinearLayoutManager(
                 context, LinearLayoutManager.HORIZONTAL, false
             )
+
             holder.pictureRecycler.adapter = PictureAdapter(
                 context,
                 attachmentListener,
                 contentItem.images ?: arrayListOf(),
                 position
             )
+            holder.pictureRecycler.onFlingListener = null
             LinearSnapHelper().attachToRecyclerView(holder.pictureRecycler)
-        }
 
-        holder.pictureRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
+            holder.pictureRecycler.setOnScrollChangeListener { _, _, _, _, _ ->
                 val currentPosition =
                     (holder.pictureRecycler.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
                 holder.pictureCount.text =
                     "${currentPosition + 1}/${contentItem.images?.size}"
             }
-        })
+        }
 
         holder.pictureCount.text = "1/${contentItem.images?.size}"
+
+        holder.follow.setOnClickListener {
+            adultListener.followPost(item!!, position, !isFollow)
+        }
 
         holder.likeImage.setOnClickListener {
             adultListener.doLike()
@@ -173,7 +176,7 @@ class CommonPagedAdapter(
         }
     }
 
-    fun updateInternalItem(holder: BaseViewHolder?, parentPosition: Int, position: Int) {
+    fun updateInternalItem(holder: BaseViewHolder) {
         when (holder) {
             is PicturePostHolder -> {
                 holder.pictureRecycler.adapter?.notifyDataSetChanged()

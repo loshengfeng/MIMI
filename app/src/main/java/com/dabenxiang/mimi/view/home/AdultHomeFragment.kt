@@ -173,6 +173,19 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
+        viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    when (commonPagedAdapter.viewHolderMap[it.result]) {
+                        is PicturePostHolder -> {
+                            commonPagedAdapter.notifyItemChanged(it.result)
+                        }
+                    }
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
+
         viewModel.attachmentByTypeResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
@@ -213,14 +226,10 @@ class AdultHomeFragment : BaseFragment() {
                     val attachmentItem = it.result
                     putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
                     when (val holder =
-                        commonPagedAdapter.attachmentViewHolderMap[attachmentItem.parentPosition]) {
+                        commonPagedAdapter.viewHolderMap[attachmentItem.parentPosition]) {
                         is PicturePostHolder -> {
                             if (holder.pictureRecycler.tag == attachmentItem.parentPosition) {
-                                commonPagedAdapter.updateInternalItem(
-                                    holder,
-                                    attachmentItem.parentPosition!!,
-                                    attachmentItem.position!!
-                                )
+                                commonPagedAdapter.updateInternalItem(holder)
                             }
                         }
                     }
@@ -377,15 +386,11 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val adultListener = object : AdultListener {
+        override fun followPost(item: MemberPostItem, position: Int, isFollow: Boolean) {
+            viewModel.followPost(item, position, isFollow)
+        }
+
         override fun doLike() {
-
-        }
-
-        override fun follow() {
-
-        }
-
-        override fun cancelFollow() {
 
         }
 
@@ -409,12 +414,8 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val clubListener = object : HomeClubAdapter.ClubListener {
-        override fun followClub(id: Int, position: Int) {
-            viewModel.followClub(id, position, true)
-        }
-
-        override fun cancelFollowClub(id: Int, position: Int) {
-            viewModel.followClub(id, position, false)
+        override fun followClub(id: Int, position: Int, isFollow: Boolean) {
+            viewModel.followClub(id, position, isFollow)
         }
     }
 

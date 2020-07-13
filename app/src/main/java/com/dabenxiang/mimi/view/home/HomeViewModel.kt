@@ -26,6 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
 class HomeViewModel : BaseViewModel() {
 
@@ -73,6 +74,9 @@ class HomeViewModel : BaseViewModel() {
 
     private var _followClubResult = MutableLiveData<ApiResult<Pair<Int, Boolean>>>()
     val followClubResult: LiveData<ApiResult<Pair<Int, Boolean>>> = _followClubResult
+
+    private var _followPostResult = MutableLiveData<ApiResult<Int>>()
+    val followPostResult: LiveData<ApiResult<Int>> = _followPostResult
 
     private val _picturePostItemList = MutableLiveData<PagedList<MemberPostItem>>()
     val picturePostItemList: LiveData<PagedList<MemberPostItem>> = _picturePostItemList
@@ -240,6 +244,26 @@ class HomeViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _followClubResult.value = it }
+        }
+    }
+
+    fun followPost(item: MemberPostItem, position: Int, isFollow: Boolean) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = when {
+                    isFollow -> apiRepository.followPost(item.creatorId)
+                    else -> apiRepository.cancelFollowPost(item.creatorId)
+                }
+                if (!result.isSuccessful) throw HttpException(result)
+                item.isFollow = isFollow
+                emit(ApiResult.success(position))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _followPostResult.value = it }
         }
     }
 
