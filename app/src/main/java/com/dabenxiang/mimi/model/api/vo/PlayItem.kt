@@ -37,10 +37,10 @@ data class PlayItem(
     val isAdult: Boolean?,
 
     @SerializedName("like")
-    val like: Boolean?,
+    var like: Boolean?,
 
     @SerializedName("likeCount")
-    val likeCount: Int?,
+    var likeCount: Int?,
 
     @SerializedName("favorite")
     val favorite: Boolean?,

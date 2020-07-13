@@ -19,9 +19,7 @@ import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.FavoritePagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.LikeRequest
-import com.dabenxiang.mimi.model.api.vo.PlayListRequest
-import com.dabenxiang.mimi.model.api.vo.ReportRequest
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_ADULT
@@ -29,6 +27,7 @@ import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_NORMAL
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_SHORT_VIDEO
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.getLruCache
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.putLruCache
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -41,8 +40,8 @@ class FavoriteViewModel : BaseViewModel() {
 
     val videoIDList = ArrayList<Long>()
 
-    var viewStatus: MutableMap<Long, Int> = mutableMapOf()
-    var viewFavoriteStatus: MutableMap<Long, Int> = mutableMapOf()
+    var currentPlayItem: PlayItem? = null
+    var currentPostItem: PostFavoriteItem? = null
 
     private val _cleanResult = MutableLiveData<ApiResult<Nothing>>()
     val cleanResult: LiveData<ApiResult<Nothing>> = _cleanResult
@@ -53,11 +52,11 @@ class FavoriteViewModel : BaseViewModel() {
     private val _postList = MutableLiveData<PagedList<Any>>()
     val postList: LiveData<PagedList<Any>> = _postList
 
-    private val _likeResult = MutableLiveData<ApiResult<TextView>>()
-    val likeResult: LiveData<ApiResult<TextView>> = _likeResult
+    private val _likeResult = MutableLiveData<ApiResult<Long>>()
+    val likeResult: LiveData<ApiResult<Long>> = _likeResult
 
-    private val _favoriteResult = MutableLiveData<ApiResult<TextView>>()
-    val favoriteResult: LiveData<ApiResult<TextView>> = _favoriteResult
+    private val _favoriteResult = MutableLiveData<ApiResult<Long>>()
+    val favoriteResult: LiveData<ApiResult<Long>> = _favoriteResult
 
     private val _reportResult = MutableLiveData<ApiResult<TextView>>()
     val reportResult: LiveData<ApiResult<TextView>> = _reportResult
@@ -103,6 +102,7 @@ class FavoriteViewModel : BaseViewModel() {
     }
 
     fun getAttachment(view: ImageView, id: String) {
+        // todo 目前沒有帖子，無法做測試，所以還沒修改
         if (!setImage(view, id)) {
             viewModelScope.launch {
                 flow {
@@ -149,43 +149,36 @@ class FavoriteViewModel : BaseViewModel() {
         }
     }
 
-    fun modifyLike(view: TextView, videoID: Long) {
-        view.tag = videoID
-        viewStatus[videoID] = when (viewStatus[videoID]) {
-            LikeType.LIKE.value -> LikeType.DISLIKE.value
-            LikeType.DISLIKE.value -> LikeType.LIKE.value
-            else -> LikeType.LIKE.value
-        }
+    fun modifyLike(videoID: Long) {
+        val likeRequest = LikeRequest(if (currentPlayItem?.like == true) LikeType.DISLIKE.value else LikeType.LIKE.value)
 
-        val likeRequest = LikeRequest(viewStatus[videoID])
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository()
                     .addLike(videoID, likeRequest)
                 if (!result.isSuccessful) {
-                    viewStatus[videoID] =
-                        when (viewStatus[videoID]) {
-                            LikeType.LIKE.value -> LikeType.DISLIKE.value
-                            LikeType.DISLIKE.value -> LikeType.LIKE.value
-                            else -> LikeType.LIKE.value
-                        }
                     throw HttpException(result)
                 }
-                emit(ApiResult.success(view))
+                emit(ApiResult.success(videoID))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
-                .collect { _likeResult.value = it }
+                .collect {
+                    currentPlayItem?.run {
+                        like = like != true
+                        likeCount = if (like == true) (likeCount ?: 0) + 1 else (likeCount ?: 0) - 1
+                    }
+                    _likeResult.value = it
+                }
         }
     }
 
-    fun modifyFavorite(view: TextView, videoID: Long) {
-        view.tag = videoID
+    fun modifyFavorite(videoID: Long) {
         viewModelScope.launch {
             flow {
-                val result = if (viewFavoriteStatus[videoID] == LikeType.DISLIKE.value) {
+                val result = if (currentPlayItem?.favorite == false) {
                     domainManager.getApiRepository().postMePlaylist(PlayListRequest(videoID, 1))
                 } else {
                     domainManager.getApiRepository().deleteMePlaylist(videoID.toString())
@@ -194,14 +187,7 @@ class FavoriteViewModel : BaseViewModel() {
                 if (!result.isSuccessful) {
                     throw HttpException(result)
                 }
-
-                viewFavoriteStatus[videoID] =
-                    when (viewFavoriteStatus[videoID]) {
-                        LikeType.LIKE.value -> LikeType.DISLIKE.value
-                        LikeType.DISLIKE.value -> LikeType.LIKE.value
-                        else -> LikeType.LIKE.value
-                    }
-                emit(ApiResult.success(view))
+                emit(ApiResult.success(videoID))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
@@ -231,7 +217,6 @@ class FavoriteViewModel : BaseViewModel() {
         if (videoIDList.size == 0) return
         viewModelScope.launch {
             flow {
-                // todo: 清除此頁顯示的視頻...
                 val result = domainManager.getApiRepository()
                     .deleteMePlaylist(videoIDList.joinToString(separator = ","))
                 if (!result.isSuccessful) throw HttpException(result)
