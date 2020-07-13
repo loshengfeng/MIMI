@@ -186,6 +186,19 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
+        viewModel.likePostResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    when (commonPagedAdapter.viewHolderMap[it.result]) {
+                        is PicturePostHolder -> {
+                            commonPagedAdapter.notifyItemChanged(it.result)
+                        }
+                    }
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
+
         viewModel.attachmentByTypeResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
@@ -390,8 +403,8 @@ class AdultHomeFragment : BaseFragment() {
             viewModel.followPost(item, position, isFollow)
         }
 
-        override fun doLike() {
-
+        override fun doLike(item: MemberPostItem, position: Int, isLike: Boolean) {
+            viewModel.likePost(item, position, isLike)
         }
 
         override fun comment() {

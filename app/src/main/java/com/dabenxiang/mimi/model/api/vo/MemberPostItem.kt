@@ -1,11 +1,11 @@
 package com.dabenxiang.mimi.model.api.vo
 
+import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostStatus
 import com.dabenxiang.mimi.model.enums.PostType
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 import java.util.*
-import kotlin.collections.ArrayList
 
 data class MemberPostItem(
 
@@ -28,10 +28,13 @@ data class MemberPostItem(
     val isFavorite: Boolean = false,
 
     @SerializedName("likeCount")
-    val likeCount: Int = 0,
+    var likeCount: Int = 0,
 
     @SerializedName("dislikeCount")
     val dislikeCount: Int = 0,
+
+    @SerializedName("likeType")
+    var likeType: LikeType = LikeType.DISLIKE,
 
     @SerializedName("favoriteCount")
     val favoriteCount: Int = 0,
@@ -63,4 +66,4 @@ data class MemberPostItem(
     @SerializedName("status")
     val status: PostStatus = PostStatus.ONLINE
 
-): Serializable
+) : Serializable

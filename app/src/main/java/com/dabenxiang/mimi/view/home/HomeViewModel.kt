@@ -9,11 +9,9 @@ import androidx.paging.PagedList
 import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.ApiBasePagingItem
-import com.dabenxiang.mimi.model.api.vo.MemberClubItem
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.StatisticsItem
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.AttachmentType
+import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.vo.AttachmentItem
@@ -26,7 +24,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import timber.log.Timber
 
 class HomeViewModel : BaseViewModel() {
 
@@ -77,6 +74,9 @@ class HomeViewModel : BaseViewModel() {
 
     private var _followPostResult = MutableLiveData<ApiResult<Int>>()
     val followPostResult: LiveData<ApiResult<Int>> = _followPostResult
+
+    private var _likePostResult = MutableLiveData<ApiResult<Int>>()
+    val likePostResult: LiveData<ApiResult<Int>> = _likePostResult
 
     private val _picturePostItemList = MutableLiveData<PagedList<MemberPostItem>>()
     val picturePostItemList: LiveData<PagedList<MemberPostItem>> = _picturePostItemList
@@ -233,8 +233,8 @@ class HomeViewModel : BaseViewModel() {
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val result = when {
-                    isFollow -> apiRepository.followClub(id)
-                    else -> apiRepository.cancelFollowClub(id)
+                    isFollow -> apiRepository.cancelFollowClub(id)
+                    else -> apiRepository.followClub(id)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(Pair(position, isFollow)))
@@ -252,8 +252,8 @@ class HomeViewModel : BaseViewModel() {
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val result = when {
-                    isFollow -> apiRepository.followPost(item.creatorId)
-                    else -> apiRepository.cancelFollowPost(item.creatorId)
+                    isFollow -> apiRepository.cancelFollowPost(item.creatorId)
+                    else -> apiRepository.followPost(item.creatorId)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
                 item.isFollow = isFollow
@@ -264,6 +264,34 @@ class HomeViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _followPostResult.value = it }
+        }
+    }
+
+    fun likePost(item: MemberPostItem, position: Int, isLike: Boolean) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val likeType = when {
+                    isLike -> LikeType.DISLIKE
+                    else -> LikeType.LIKE
+                }
+                val request = LikeRequest(likeType)
+                val result = apiRepository.like(item.id, request)
+                if (!result.isSuccessful) throw HttpException(result)
+
+                item.likeType = likeType
+                item.likeCount = when (item.likeType) {
+                    LikeType.LIKE -> item.likeCount + 1
+                    else -> item.likeCount - 1
+                }
+
+                emit(ApiResult.success(position))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _likePostResult.value = it }
         }
     }
 
