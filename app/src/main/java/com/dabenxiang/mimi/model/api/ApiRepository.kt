@@ -261,11 +261,11 @@ class ApiRepository(private val apiService: ApiService) {
         return apiService.getMembersClub(offset, limit)
     }
 
-    suspend fun followClub(clubId: Int): Response<Void> {
+    suspend fun followClub(clubId: Long): Response<Void> {
         return apiService.followClub(clubId)
     }
 
-    suspend fun cancelFollowClub(clubId: Int): Response<Void> {
+    suspend fun cancelFollowClub(clubId: Long): Response<Void> {
         return apiService.cancelFollowClub(clubId)
     }
 

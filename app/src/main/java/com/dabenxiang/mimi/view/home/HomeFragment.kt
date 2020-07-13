@@ -185,7 +185,7 @@ class HomeFragment : BaseFragment() {
     }
 
     private val clubListener = object : HomeClubAdapter.ClubListener {
-        override fun followClub(id: Int, position: Int, isFollow: Boolean) {
+        override fun followClub(item: MemberClubItem, position: Int, isFollow: Boolean) {
 
         }
     }

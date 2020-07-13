@@ -228,15 +228,16 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-    fun followClub(id: Int, position: Int, isFollow: Boolean) {
+    fun followClub(item: MemberClubItem, position: Int, isFollow: Boolean) {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val result = when {
-                    isFollow -> apiRepository.cancelFollowClub(id)
-                    else -> apiRepository.followClub(id)
+                    isFollow -> apiRepository.cancelFollowClub(item.id)
+                    else -> apiRepository.followClub(item.id)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
+                item.isFollow = !isFollow
                 emit(ApiResult.success(Pair(position, isFollow)))
             }
                 .flowOn(Dispatchers.IO)
@@ -256,7 +257,7 @@ class HomeViewModel : BaseViewModel() {
                     else -> apiRepository.followPost(item.creatorId)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
-                item.isFollow = isFollow
+                item.isFollow = !isFollow
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
