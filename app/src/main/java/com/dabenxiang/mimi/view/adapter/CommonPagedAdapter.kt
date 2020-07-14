@@ -76,7 +76,6 @@ class CommonPagedAdapter(
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         when (holder) {
             is PicturePostHolder -> {
-                Timber.d("@@hashCode: ${holder.hashCode()}, position: $position, text: ${holder.pictureCount.text}")
                 holder.pictureRecycler.tag = position
                 viewHolderMap[position] = holder
                 setupPicturePost(holder, position)
@@ -147,9 +146,7 @@ class CommonPagedAdapter(
         }
 
         val contentItem = Gson().fromJson(item?.content, ContentItem::class.java)
-        Timber.d("@@holder tag: ${holder.pictureCount.tag}, position: $position, image count: ${contentItem.images?.size}")
         if (holder.pictureRecycler.adapter == null || holder.pictureCount.tag != position) {
-            Timber.d("@@adapter init")
             holder.pictureCount.tag = position
             holder.pictureRecycler.layoutManager = LinearLayoutManager(
                 context, LinearLayoutManager.HORIZONTAL, false
@@ -167,7 +164,6 @@ class CommonPagedAdapter(
             holder.pictureRecycler.setOnScrollChangeListener { _, _, _, _, _ ->
                 val currentPosition =
                     (holder.pictureRecycler.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-                Timber.d("@@setOnScrollChangeListener")
                 holder.pictureCount.text =
                     "${currentPosition + 1}/${contentItem.images?.size}"
             }
@@ -199,7 +195,6 @@ class CommonPagedAdapter(
     fun updateInternalItem(holder: BaseViewHolder) {
         when (holder) {
             is PicturePostHolder -> {
-                Timber.d("@@updateInternalItem....")
                 holder.pictureRecycler.adapter?.notifyDataSetChanged()
             }
         }

@@ -1,66 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/color_black_4">
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.055" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_end"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.944" />
 
     <include
         android:id="@+id/toolbarContainer"
         layout="@layout/toolbar" />
 
-    <ImageView
-        android:id="@+id/iv_ad"
-        android:layout_width="match_parent"
-        android:layout_height="51dp"
-        android:src="@drawable/img_sale_banner_2"
-        app:layout_constraintTop_toBottomOf="@+id/toolbarContainer" />
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbarContainer">
 
-    <ImageView
-        android:id="@+id/img_avatar"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="16dp"
-        android:src="@drawable/icon_cs_photo"
-        app:layout_constraintLeft_toLeftOf="@+id/guideline_start"
-        app:layout_constraintTop_toBottomOf="@+id/iv_ad" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_picture_detail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-    <TextView
-        android:id="@+id/tv_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="14dp"
-        android:textColor="@color/color_white_1"
-        android:textSize="14sp"
-        app:layout_constraintLeft_toRightOf="@+id/img_avatar"
-        app:layout_constraintTop_toBottomOf="@+id/iv_ad"
-        tools:text="名称名称" />
-
-    <TextView
-        android:id="@+id/tv_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:textColor="@color/color_white_1_50"
-        android:textSize="12sp"
-        app:layout_constraintLeft_toRightOf="@+id/img_avatar"
-        app:layout_constraintTop_toBottomOf="@+id/tv_name"
-        tools:text="1小时前" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

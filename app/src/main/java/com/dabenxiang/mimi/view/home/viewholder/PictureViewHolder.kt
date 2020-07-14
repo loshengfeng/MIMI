@@ -25,8 +25,8 @@ class PictureViewHolder(
     private val card = itemView.layout_card!!
     private val pictureImage = itemView.iv_poster!!
     private val avatarImg = itemView.img_avatar!!
-    private val profileName = itemView.tv_name!!
-    private val profileTime = itemView.tv_time!!
+    private val posterName = itemView.tv_name!!
+    private val posterTime = itemView.tv_time!!
     private val title = itemView.tv_title!!
 
     init {
@@ -42,8 +42,8 @@ class PictureViewHolder(
                 contentItem.images?.get(0)
             }
 
-        profileName.text = model?.postFriendlyName
-        profileTime.text = GeneralUtils.getTimeDiff(model?.creationDate ?: Date(), Date())
+        posterName.text = model?.postFriendlyName
+        posterTime.text = GeneralUtils.getTimeDiff(model?.creationDate ?: Date(), Date())
         title.text = model?.title
 
         card.setCardBackgroundColor(

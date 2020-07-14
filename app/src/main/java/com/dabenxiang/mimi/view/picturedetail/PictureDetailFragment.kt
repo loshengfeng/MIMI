@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.picturedetail
 import android.os.Bundle
 import android.view.View
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -29,8 +30,8 @@ class PictureDetailFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val item = arguments?.getSerializable(KEY_DATA) as MemberPostItem
-        Timber.d("item: $item")
+        val memberPostItem = arguments?.getSerializable(KEY_DATA) as MemberPostItem
+        Timber.d("item: $memberPostItem")
 
         text_toolbar_title.text = getString(R.string.picture_detail_title)
         toolbarContainer.toolbar.navigationIcon =
@@ -39,6 +40,9 @@ class PictureDetailFragment : BaseFragment() {
             findNavController().navigateUp()
         }
 
+        val adapter = PictureDetailAdapter(requireContext(), memberPostItem)
+        recycler_picture_detail.layoutManager = LinearLayoutManager(context)
+        recycler_picture_detail.adapter = adapter
     }
 
     override fun getLayoutId(): Int {
