@@ -119,6 +119,15 @@ class PictureDetailAdapter(
             holder.follow.setOnClickListener {
                 onPictureDetailListener.onFollowClick(memberPostItem, position, !isFollow)
             }
+
+        } else if (holder is CommentTitleViewHolder) {
+            holder.newestComment.setOnClickListener {
+
+            }
+
+            holder.topComment.setOnClickListener {
+
+            }
         }
     }
 

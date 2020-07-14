@@ -182,6 +182,9 @@
 
     <!-- Picture Detail -->
     <string name="picture_detail_title">图片详情</string>
+    <string name="picture_detail_comment">评论</string>
+    <string name="picture_detail_comment_newest">最新</string>
+    <string name="picture_detail_comment_top">最热</string>
 
     <!-- Follow -->
     <string name="follow">+关注</string>
