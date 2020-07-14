@@ -16,7 +16,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import timber.log.Timber
 import java.io.File
 
 class ClipViewModel : BaseViewModel() {
@@ -24,8 +23,8 @@ class ClipViewModel : BaseViewModel() {
     private var _clipResult = MutableLiveData<ApiResult<Triple<String, Int, File>>>()
     val clipResult: LiveData<ApiResult<Triple<String, Int, File>>> = _clipResult
 
-    private var _coverResult = MutableLiveData<ApiResult<Int>>()
-    val coverResult: LiveData<ApiResult<Int>> = _coverResult
+    private var _bitmapResult = MutableLiveData<ApiResult<Int>>()
+    val bitmapResult: LiveData<ApiResult<Int>> = _bitmapResult
 
     private var _followResult = MutableLiveData<ApiResult<Int>>()
     val followResult: LiveData<ApiResult<Int>> = _followResult
@@ -59,7 +58,7 @@ class ClipViewModel : BaseViewModel() {
         }
     }
 
-    fun getCover(id: String, position: Int) {
+    fun getBitmap(id: String, position: Int) {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getAttachment(id)
@@ -71,7 +70,7 @@ class ClipViewModel : BaseViewModel() {
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _coverResult.value = it }
+                .collect { _bitmapResult.value = it }
         }
     }
 

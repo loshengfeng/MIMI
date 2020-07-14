@@ -114,20 +114,6 @@ class ClipAdapter(
             it.visibility = View.GONE
         }
 
-        contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
-            images[0].also { image ->
-                if (TextUtils.isEmpty(image.url)) {
-                    image.id.takeIf { !TextUtils.isEmpty(it) }?.also { id ->
-                        LruCacheUtils.getLruCache(id)?.also { bitmap ->
-                            Glide.with(holder.ivCover.context).load(bitmap).into(holder.ivCover)
-                        } ?: run { clipFuncItem.getCover(id, position) }
-                    }
-                } else {
-                    Glide.with(holder.ivCover.context).load(image.url).into(holder.ivCover)
-                }
-            }
-        }
-
         processClip(
             holder.playerView,
             contentItem.shortVideo.id,
@@ -142,11 +128,12 @@ class ClipAdapter(
         val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
         exoPlayer?.also {
             it.removeListener(playbackStateListener)
-            it.stop() }
+            it.stop()
+        }
 
         if (TextUtils.isEmpty(url)) {
             if (clipMap.containsKey(id)) {
-                takeIf { currentPosition == position }?.also {
+                takeIf { currentPosition == position}?.also {
                     setupPlayer(
                         playerView,
                         clipMap[id]?.toURI().toString()

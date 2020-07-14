@@ -69,13 +69,11 @@ class ClipFragment : BaseFragment() {
             }
         })
 
-        viewModel.coverResult.observe(viewLifecycleOwner, Observer {
+        viewModel.bitmapResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Success -> {
-                    rv_clip.adapter?.notifyItemChanged(it.result)
-                }
+                is Success -> rv_clip.adapter?.notifyItemChanged(it.result)
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -124,7 +122,7 @@ class ClipFragment : BaseFragment() {
                 position,
                 ClipFuncItem(
                     { id, pos -> getClip(id, pos) },
-                    { id, pos -> getCover(id, pos) },
+                    { id, pos -> getBitmap(id, pos) },
                     { item, pos, isFollow -> onFollowClick(item, pos, isFollow) },
                     { item, pos, isFavorite -> onFavoriteClick(item, pos, isFavorite) },
                     { item, pos, isLike -> onLikeClick(item, pos, isLike) },
@@ -164,9 +162,9 @@ class ClipFragment : BaseFragment() {
         viewModel.getClip(id, pos)
     }
 
-    private fun getCover(id: String, pos: Int) {
+    private fun getBitmap(id: String, pos: Int) {
         Timber.d("getCover, id: $id, position: $pos")
-        viewModel.getCover(id, pos)
+        viewModel.getBitmap(id, pos)
     }
 
     private fun onFollowClick(item: MemberPostItem, pos: Int, isFollow: Boolean) {
