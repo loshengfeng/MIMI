@@ -49,7 +49,7 @@ class PictureDetailFragment : BaseFragment() {
             findNavController().navigateUp()
         }
 
-        adapter = PictureDetailAdapter(requireContext(), memberPostItem, onAttachmentListener)
+        adapter = PictureDetailAdapter(requireContext(), memberPostItem, onPictureDetailListener)
         recycler_picture_detail.layoutManager = LinearLayoutManager(context)
         recycler_picture_detail.adapter = adapter
     }
@@ -69,15 +69,26 @@ class PictureDetailFragment : BaseFragment() {
                 is Error -> Timber.e(it.throwable)
             }
         })
+
+        viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> adapter?.notifyItemChanged(it.result)
+                is Error -> Timber.e(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
 
     }
 
-    private val onAttachmentListener = object : PhotoGridAdapter.OnAttachmentListener {
+    private val onPictureDetailListener = object : PictureDetailAdapter.OnPictureDetailListener {
         override fun onGetAttachment(id: String, position: Int) {
             viewModel.getAttachment(id, position)
+        }
+
+        override fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
+            viewModel.followPost(item, position, isFollow)
         }
     }
 

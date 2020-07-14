@@ -17,7 +17,7 @@ import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 class PhotoGridAdapter(
     val context: Context,
     val images: ArrayList<ImageItem>,
-    private val onAttachmentListener: OnAttachmentListener
+    private val onPictureDetailListener: PictureDetailAdapter.OnPictureDetailListener
 ) : RecyclerView.Adapter<PictureGridViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PictureGridViewHolder {
@@ -53,7 +53,7 @@ class PhotoGridAdapter(
                 .into(holder.picture)
         } else {
             if (LruCacheUtils.getLruCache(imageItem.id) == null) {
-                onAttachmentListener.onGetAttachment(imageItem.id, position)
+                onPictureDetailListener.onGetAttachment(imageItem.id, position)
             } else {
                 Glide.with(context)
                     .load(bitmap)
@@ -64,11 +64,8 @@ class PhotoGridAdapter(
         if (position == 5) {
             holder.mask.visibility = View.VISIBLE
             holder.imageCount.visibility = View.VISIBLE
-            holder.imageCount.text = StringBuilder("+").append((images.size - 5).toString()).toString()
+            holder.imageCount.text =
+                StringBuilder("+").append((images.size - 5).toString()).toString()
         }
-    }
-
-    interface OnAttachmentListener {
-        fun onGetAttachment(id: String, position: Int)
     }
 }

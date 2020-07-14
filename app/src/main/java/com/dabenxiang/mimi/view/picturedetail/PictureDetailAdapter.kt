@@ -22,7 +22,7 @@ import java.util.*
 class PictureDetailAdapter(
     val context: Context,
     private val memberPostItem: MemberPostItem,
-    private val onAttachmentListener: PhotoGridAdapter.OnAttachmentListener
+    private val onPictureDetailListener: OnPictureDetailListener
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -101,7 +101,7 @@ class PictureDetailAdapter(
                 2 -> GridLayoutManager(context, 2)
                 else -> GridLayoutManager(context, 3)
             }
-            adapter = PhotoGridAdapter(context, contentItem.images, onAttachmentListener)
+            adapter = PhotoGridAdapter(context, contentItem.images, onPictureDetailListener)
             holder.photoGrid.adapter = adapter
 
             holder.tagChipGroup.removeAllViews()
@@ -115,11 +115,20 @@ class PictureDetailAdapter(
                 )
                 holder.tagChipGroup.addView(chip)
             }
+
+            holder.follow.setOnClickListener {
+                onPictureDetailListener.onFollowClick(memberPostItem, position, !isFollow)
+            }
         }
     }
 
     fun updatePhotoGridItem(position: Int) {
         adapter?.notifyItemChanged(position)
+    }
+
+    interface OnPictureDetailListener {
+        fun onGetAttachment(id: String, position: Int)
+        fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean)
     }
 
 }
