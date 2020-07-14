@@ -63,6 +63,7 @@ class ClipFragment : BaseFragment() {
                 is Success -> {
                     val result = it.result
                     clipMap[result.first] = result.third
+                    Timber.d("clipResult notifyItemChanged: ${result.second}")
                     rv_clip.adapter?.notifyItemChanged(result.second)
                 }
                 is Error -> onApiError(it.throwable)
@@ -73,7 +74,7 @@ class ClipFragment : BaseFragment() {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Success -> rv_clip.adapter?.notifyItemChanged(it.result)
+                is Success -> rv_clip.adapter?.notifyItemChanged(it.result, ClipAdapter.PAYLOAD_UPDATE_UI)
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -82,7 +83,7 @@ class ClipFragment : BaseFragment() {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Success -> rv_clip.adapter?.notifyItemChanged(it.result)
+                is Success -> rv_clip.adapter?.notifyItemChanged(it.result, ClipAdapter.PAYLOAD_UPDATE_UI)
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -91,7 +92,7 @@ class ClipFragment : BaseFragment() {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Success -> rv_clip.adapter?.notifyItemChanged(it.result)
+                is Success -> rv_clip.adapter?.notifyItemChanged(it.result, ClipAdapter.PAYLOAD_UPDATE_UI)
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -100,7 +101,7 @@ class ClipFragment : BaseFragment() {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Success -> rv_clip.adapter?.notifyItemChanged(it.result)
+                is Success -> rv_clip.adapter?.notifyItemChanged(it.result, ClipAdapter.PAYLOAD_UPDATE_UI)
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -140,6 +141,7 @@ class ClipFragment : BaseFragment() {
                             val clipAdapter = rv_clip.adapter as ClipAdapter
                             val lastPosition = clipAdapter.getCurrentPos()
                             takeIf { currentPos != lastPosition }?.also {
+                                clipAdapter.releasePlayer()
                                 clipAdapter.updateCurrentPosition(currentPos)
                                 clipAdapter.notifyItemChanged(lastPosition)
                                 clipAdapter.notifyItemChanged(currentPos)
