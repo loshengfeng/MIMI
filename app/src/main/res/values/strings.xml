@@ -198,4 +198,5 @@
     </string-array>
 
     <string name="already_reported">您已回报过问题</string>
+    <string name="clip_username">"@%s"</string>
 </resources>

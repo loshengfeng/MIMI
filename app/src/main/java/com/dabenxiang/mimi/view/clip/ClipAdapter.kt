@@ -105,16 +105,37 @@ class ClipAdapter(
         }?: run {
             holder.onBind(item, clipFuncItem, position)
 
-            takeIf { currentPosition == position }?.also { currentViewHolder = holder }
-                ?: run { holder.ivCover.visibility = View.VISIBLE }
+            takeIf { currentPosition == position }?.also {
+                currentViewHolder = holder
+                holder.progress.visibility = View.VISIBLE
+            } ?: run {
+                holder.ivCover.visibility = View.VISIBLE
+                holder.progress.visibility = View.GONE
+            }
 
             holder.ibReplay.setOnClickListener {
-                Timber.d("ivCover setOnClickListener")
                 exoPlayer?.also { player ->
                     player.seekTo(0)
                     player.playWhenReady = true
                 }
                 it.visibility = View.GONE
+            }
+
+            holder.playerView.setOnClickListener {
+                takeIf { exoPlayer?.isPlaying ?: false }?.also {
+                    exoPlayer?.playWhenReady = false
+                    holder.ibPlay.visibility = View.VISIBLE
+                } ?: run {
+                    exoPlayer?.playWhenReady = true
+                    holder.ibPlay.visibility = View.GONE
+                }
+            }
+
+            holder.ibPlay.setOnClickListener {
+                takeIf { exoPlayer?.isPlaying ?: false }?.also {
+                    exoPlayer?.playWhenReady = false
+                    holder.ibPlay.visibility = View.VISIBLE
+                }
             }
 
             processClip(
@@ -181,6 +202,7 @@ class ClipAdapter(
                 ExoPlayer.STATE_IDLE -> "ExoPlayer.STATE_IDLE"
                 ExoPlayer.STATE_BUFFERING -> "ExoPlayer.STATE_BUFFERING"
                 ExoPlayer.STATE_READY -> {
+                    currentViewHolder?.progress?.visibility = View.GONE
                     currentViewHolder?.ivCover?.visibility = View.GONE
                     "ExoPlayer.STATE_READY"
                 }
