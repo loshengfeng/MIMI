@@ -84,7 +84,7 @@ class ClipViewModel : BaseViewModel() {
                     else -> apiRepository.cancelFollowPost(item.creatorId)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
-                item.isFollow = !isFollow
+                item.isFollow = isFollow
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)

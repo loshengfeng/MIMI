@@ -176,11 +176,11 @@ class CommonPagedAdapter(
         }
 
         holder.follow.setOnClickListener {
-            adultListener.followPost(item!!, position, isFollow)
+            adultListener.followPost(item!!, position, !isFollow)
         }
 
         holder.likeImage.setOnClickListener {
-            adultListener.doLike(item!!, position, isLike)
+            adultListener.doLike(item!!, position, !isLike)
         }
 
         holder.commentImage.setOnClickListener {
