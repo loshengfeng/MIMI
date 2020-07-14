@@ -1,21 +1,17 @@
 package com.dabenxiang.mimi.view.clip
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.net.Uri
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.player.PlayerViewModel
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
 import com.google.android.exoplayer2.source.MediaSource
@@ -26,7 +22,6 @@ import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
-import com.google.android.material.chip.Chip
 import com.google.gson.Gson
 import timber.log.Timber
 import java.io.File
@@ -58,6 +53,7 @@ class ClipAdapter(
                     return oldItem == newItem
                 }
             }
+        const val PAYLOAD_UPDATE_UI = 0
     }
 
     private var currentViewHolder: ClipViewHolder? = null
@@ -96,59 +92,51 @@ class ClipAdapter(
         exoPlayer = null
     }
 
-    override fun onBindViewHolder(holder: ClipViewHolder, position: Int) {
-        Timber.d("onBindViewHolder position:$position, currentPosition: $currentPosition")
+    override fun onBindViewHolder(holder: ClipViewHolder, position: Int, payloads: MutableList<Any>) {
+        Timber.d("onBindViewHolder position:$position, currentPosition: $currentPosition, payloads: $payloads")
         val item = memberPostItems[position]
         val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
-        holder.onBind(item)
-
-        takeIf { currentPosition == position }?.also { currentViewHolder = holder }
-            ?: run { holder.ivCover.visibility = View.VISIBLE }
-
-        holder.ibReplay.setOnClickListener {
-            Timber.d("ivCover setOnClickListener")
-            exoPlayer?.also { player ->
-                player.seekTo(0)
-                player.playWhenReady = true
-            }
-            it.visibility = View.GONE
-        }
-
-        holder.ibBack.setOnClickListener { clipFuncItem.onBackClick() }
-
-        contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
-            images[0].also { image ->
-                if (TextUtils.isEmpty(image.url)) {
-                    image.id.takeIf { !TextUtils.isEmpty(it) }?.also { id ->
-                        LruCacheUtils.getLruCache(id)?.also { bitmap ->
-                            Glide.with(holder.ivCover.context).load(bitmap).into(holder.ivCover)
-                        } ?: run { clipFuncItem.getCover(id, position) }
-                    }
-                } else {
-                    Glide.with(holder.ivCover.context).load(image.url).into(holder.ivCover)
+        payloads.takeIf { it.isNotEmpty() }?.also {
+            when(it[0] as Int) {
+                PAYLOAD_UPDATE_UI -> {
+                    holder.onBind(item, clipFuncItem, position)
                 }
             }
-        }
+        }?: run {
+            holder.onBind(item, clipFuncItem, position)
 
-        processClip(
-            holder.playerView,
-            contentItem.shortVideo.id,
-            contentItem.shortVideo.url,
-            position
-        )
+            takeIf { currentPosition == position }?.also { currentViewHolder = holder }
+                ?: run { holder.ivCover.visibility = View.VISIBLE }
+
+            holder.ibReplay.setOnClickListener {
+                Timber.d("ivCover setOnClickListener")
+                exoPlayer?.also { player ->
+                    player.seekTo(0)
+                    player.playWhenReady = true
+                }
+                it.visibility = View.GONE
+            }
+
+            processClip(
+                holder.playerView,
+                contentItem.shortVideo.id,
+                contentItem.shortVideo.url,
+                position
+            )
+        }
+    }
+
+    override fun onBindViewHolder(holder: ClipViewHolder, position: Int) {
     }
 
     private fun processClip(playerView: PlayerView, id: String, url: String, position: Int) {
         Timber.d("processClip position:$position")
         val item = memberPostItems[position]
         val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
-        exoPlayer?.also {
-            it.removeListener(playbackStateListener)
-            it.stop() }
 
         if (TextUtils.isEmpty(url)) {
             if (clipMap.containsKey(id)) {
-                takeIf { currentPosition == position }?.also {
+                takeIf { currentPosition == position}?.also {
                     setupPlayer(
                         playerView,
                         clipMap[id]?.toURI().toString()
