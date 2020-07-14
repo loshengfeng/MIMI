@@ -100,7 +100,7 @@ class ClipAdapter(
         Timber.d("onBindViewHolder position:$position, currentPosition: $currentPosition")
         val item = memberPostItems[position]
         val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
-        holder.onBind(item)
+        holder.onBind(item, clipFuncItem, position)
 
         takeIf { currentPosition == position }?.also { currentViewHolder = holder }
             ?: run { holder.ivCover.visibility = View.VISIBLE }
@@ -113,8 +113,6 @@ class ClipAdapter(
             }
             it.visibility = View.GONE
         }
-
-        holder.ibBack.setOnClickListener { clipFuncItem.onBackClick() }
 
         contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
             images[0].also { image ->

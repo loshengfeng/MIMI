@@ -25,7 +25,7 @@ data class MemberPostItem(
     val creationDate: Date,
 
     @SerializedName("isFavorite")
-    val isFavorite: Boolean = false,
+    var isFavorite: Boolean = false,
 
     @SerializedName("likeCount")
     var likeCount: Int = 0,
@@ -37,10 +37,10 @@ data class MemberPostItem(
     var likeType: LikeType = LikeType.DISLIKE,
 
     @SerializedName("favoriteCount")
-    val favoriteCount: Int = 0,
+    var favoriteCount: Int = 0,
 
     @SerializedName("commentCount")
-    val commentCount: Int = 0,
+    var commentCount: Int = 0,
 
     @SerializedName("tags")
     val tags: ArrayList<String> = arrayListOf(),

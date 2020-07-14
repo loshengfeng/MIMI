@@ -233,11 +233,11 @@ class HomeViewModel : BaseViewModel() {
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val result = when {
-                    isFollow -> apiRepository.cancelFollowClub(item.id)
-                    else -> apiRepository.followClub(item.id)
+                    isFollow -> apiRepository.followClub(item.id)
+                    else -> apiRepository.cancelFollowClub(item.id)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
-                item.isFollow = !isFollow
+                item.isFollow = isFollow
                 emit(ApiResult.success(Pair(position, isFollow)))
             }
                 .flowOn(Dispatchers.IO)
@@ -253,11 +253,11 @@ class HomeViewModel : BaseViewModel() {
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val result = when {
-                    isFollow -> apiRepository.cancelFollowPost(item.creatorId)
-                    else -> apiRepository.followPost(item.creatorId)
+                    isFollow -> apiRepository.followPost(item.creatorId)
+                    else -> apiRepository.cancelFollowPost(item.creatorId)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
-                item.isFollow = !isFollow
+                item.isFollow = isFollow
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
@@ -273,8 +273,8 @@ class HomeViewModel : BaseViewModel() {
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val likeType = when {
-                    isLike -> LikeType.DISLIKE
-                    else -> LikeType.LIKE
+                    isLike -> LikeType.LIKE
+                    else -> LikeType.DISLIKE
                 }
                 val request = LikeRequest(likeType)
                 val result = apiRepository.like(item.id, request)
