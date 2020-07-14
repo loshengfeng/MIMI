@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.OnItemClickListener
 import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
@@ -24,7 +25,6 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.getLruCache
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
-import timber.log.Timber
 import java.util.*
 
 class CommonPagedAdapter(
@@ -155,8 +155,13 @@ class CommonPagedAdapter(
             holder.pictureRecycler.adapter = PictureAdapter(
                 context,
                 attachmentListener,
-                contentItem.images ?: arrayListOf(),
-                position
+                contentItem.images,
+                position,
+                object : OnItemClickListener {
+                    override fun onItemClick() {
+                        adultListener.onItemClick(item!!)
+                    }
+                }
             )
             holder.pictureRecycler.onFlingListener = null
             LinearSnapHelper().attachToRecyclerView(holder.pictureRecycler)
@@ -187,7 +192,7 @@ class CommonPagedAdapter(
             adultListener.onMoreClick()
         }
 
-        holder.pictureItemLayout.setOnClickListener {
+        holder.picturePostItemLayout.setOnClickListener {
             adultListener.onItemClick(item!!)
         }
     }
@@ -199,5 +204,4 @@ class CommonPagedAdapter(
             }
         }
     }
-
 }

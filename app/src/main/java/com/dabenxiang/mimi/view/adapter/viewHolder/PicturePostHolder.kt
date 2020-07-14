@@ -11,7 +11,7 @@ import kotlinx.android.synthetic.main.item_picture_post.view.*
 
 class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
 
-    val pictureItemLayout: ConstraintLayout = itemView.layout_picture_item
+    val picturePostItemLayout: ConstraintLayout = itemView.layout_picture_post_item
     val avatarImg: ImageView = itemView.img_avatar
     val name: TextView = itemView.tv_name
     val time: TextView = itemView.tv_time
