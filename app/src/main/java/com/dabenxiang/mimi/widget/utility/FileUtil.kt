@@ -51,12 +51,13 @@ object FileUtil {
     }
 
     private fun getAppPath(context: Context): String {
-        return when (Environment.MEDIA_MOUNTED) {
-            Environment.getExternalStorageState() -> {
-                Environment.getExternalStorageDirectory().toString()
-            }
-            else -> context.filesDir.toString()
-        }
+//        return when (Environment.MEDIA_MOUNTED) {
+//            Environment.getExternalStorageState() -> {
+//                Environment.getExternalStorageDirectory().toString()
+//            }
+//            else -> context.filesDir.toString()
+//        }
+        return context.filesDir.toString()
     }
 
     fun saveBitmapToJpegFile(
