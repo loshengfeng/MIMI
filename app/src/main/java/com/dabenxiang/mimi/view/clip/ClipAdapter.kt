@@ -92,6 +92,11 @@ class ClipAdapter(
         exoPlayer = null
     }
 
+    fun pausePlayer() {
+        exoPlayer?.also { it.playWhenReady = false }
+        currentViewHolder?.also { it.ibPlay.visibility = View.VISIBLE }
+    }
+
     override fun onBindViewHolder(holder: ClipViewHolder, position: Int, payloads: MutableList<Any>) {
         Timber.d("onBindViewHolder position:$position, currentPosition: $currentPosition, payloads: $payloads")
         val item = memberPostItems[position]
@@ -105,16 +110,37 @@ class ClipAdapter(
         }?: run {
             holder.onBind(item, clipFuncItem, position)
 
-            takeIf { currentPosition == position }?.also { currentViewHolder = holder }
-                ?: run { holder.ivCover.visibility = View.VISIBLE }
+            takeIf { currentPosition == position }?.also {
+                currentViewHolder = holder
+                holder.progress.visibility = View.VISIBLE
+            } ?: run {
+                holder.ivCover.visibility = View.VISIBLE
+                holder.progress.visibility = View.GONE
+            }
 
             holder.ibReplay.setOnClickListener {
-                Timber.d("ivCover setOnClickListener")
                 exoPlayer?.also { player ->
                     player.seekTo(0)
                     player.playWhenReady = true
                 }
                 it.visibility = View.GONE
+            }
+
+            holder.playerView.setOnClickListener {
+                takeIf { exoPlayer?.isPlaying ?: false }?.also {
+                    exoPlayer?.playWhenReady = false
+                    holder.ibPlay.visibility = View.VISIBLE
+                } ?: run {
+                    exoPlayer?.playWhenReady = true
+                    holder.ibPlay.visibility = View.GONE
+                }
+            }
+
+            holder.ibPlay.setOnClickListener {
+                takeUnless { exoPlayer?.isPlaying ?: true }?.also {
+                    exoPlayer?.playWhenReady = true
+                    holder.ibPlay.visibility = View.GONE
+                }
             }
 
             processClip(
@@ -181,6 +207,7 @@ class ClipAdapter(
                 ExoPlayer.STATE_IDLE -> "ExoPlayer.STATE_IDLE"
                 ExoPlayer.STATE_BUFFERING -> "ExoPlayer.STATE_BUFFERING"
                 ExoPlayer.STATE_READY -> {
+                    currentViewHolder?.progress?.visibility = View.GONE
                     currentViewHolder?.ivCover?.visibility = View.GONE
                     "ExoPlayer.STATE_READY"
                 }

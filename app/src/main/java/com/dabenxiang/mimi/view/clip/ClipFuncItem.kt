@@ -8,5 +8,6 @@ data class ClipFuncItem(
     val onFollowClick: ((MemberPostItem, Int, Boolean) -> Unit) = { _, _, _ -> },
     val onFavoriteClick: ((MemberPostItem, Int, Boolean) -> Unit) = { _, _, _ -> },
     val onLikeClick: ((MemberPostItem, Int, Boolean) -> Unit) = { _, _, _ -> },
+    val onCommentClick: ((MemberPostItem) -> Unit) = { _ -> },
     val onBackClick: (() -> Unit) = {}
 )

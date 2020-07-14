@@ -201,4 +201,6 @@
     </string-array>
 
     <string name="already_reported">您已回报过问题</string>
+    <string name="clip_username">"@%s"</string>
+    <string name="clip_comment_count">"%d 评论"</string>
 </resources>

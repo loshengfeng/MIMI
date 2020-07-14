@@ -61,7 +61,7 @@
             app:layout_constraintHeight_min="36dp"
             app:layout_constraintStart_toEndOf="@id/tv_replay_name"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Jeff" />
+            tools:hint="留下评论" />
 
         <ImageView
             android:id="@+id/btn_send"

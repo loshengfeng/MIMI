@@ -40,6 +40,19 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <ImageButton
+        android:id="@+id/ib_play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/twotone_play_circle_filled_white_48"
+        android:contentDescription="@null"
+        android:background="#00000000"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <ImageButton
         android:id="@+id/ib_back"
         android:layout_width="40dp"
         android:layout_height="40dp"
@@ -158,6 +171,17 @@
         app:layout_constraintStart_toStartOf="@id/tv_title"
         app:layout_constraintBottom_toBottomOf="parent"
         tools:text="\@名称名称" />
+
+    <ProgressBar
+        android:id="@+id/progress_video"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 <!--    <com.google.android.material.chip.ChipGroup-->
 <!--        android:id="@+id/cg_tag"-->

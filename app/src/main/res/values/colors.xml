@@ -67,4 +67,6 @@
     <color name="color_gray_11">#dbdbdb</color>
     <color name="color_gray_12">#f2f2f2</color>
     <color name="color_gray_13">#ececec</color>
+
+    <color name="clip_comment_bg">#b31e233a</color>
 </resources>

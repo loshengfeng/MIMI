@@ -4,6 +4,7 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
@@ -24,17 +25,20 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     var clAvatar: ConstraintLayout = view.cl_avatar
     var ivAdd: ImageView = view.iv_add
     var ibReplay: ImageButton = view.ib_replay
+    var ibPlay: ImageButton = view.ib_play
     var ibBack: ImageButton = view.ib_back
     var tvTitle: TextView = view.tv_title
     var tvName: TextView = view.tv_name
     var tvFavorite: TextView = view.tv_favorite
     var tvLike: TextView = view.tv_like
     var tvComment: TextView = view.tv_comment
+    var progress: ProgressBar = view.progress_video
 
     fun onBind(item: MemberPostItem, clipFuncItem: ClipFuncItem, pos: Int) {
         ibReplay.visibility = View.GONE
+        ibPlay.visibility = View.GONE
         tvTitle.text = item.title
-        tvName.text = "@${item.postFriendlyName}"
+        tvName.text = String.format(tvName.context.resources.getString(R.string.clip_username), item.postFriendlyName)
         tvFavorite.text = item.favoriteCount.toString()
         tvLike.text = item.likeCount.toString()
         tvComment.text = item.commentCount.toString()
@@ -70,6 +74,8 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val favoriteRes = if (item.isFavorite) R.drawable.btn_favorite_forvideo_s else R.drawable.btn_favorite_forvideo_n
         tvFavorite.setCompoundDrawablesRelativeWithIntrinsicBounds(0, favoriteRes, 0, 0)
         tvFavorite.setOnClickListener { clipFuncItem.onFavoriteClick(item, pos, !item.isFavorite) }
+
+        tvComment.setOnClickListener { clipFuncItem.onCommentClick(item) }
 
         ivAdd.visibility = if(item.isFollow) View.GONE else View.VISIBLE
         clAvatar.setOnClickListener { clipFuncItem.onFollowClick(item, pos, !item.isFollow) }
