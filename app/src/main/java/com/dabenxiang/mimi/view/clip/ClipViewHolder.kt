@@ -75,6 +75,8 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         tvFavorite.setCompoundDrawablesRelativeWithIntrinsicBounds(0, favoriteRes, 0, 0)
         tvFavorite.setOnClickListener { clipFuncItem.onFavoriteClick(item, pos, !item.isFavorite) }
 
+        tvComment.setOnClickListener { clipFuncItem.onCommentClick(item) }
+
         ivAdd.visibility = if(item.isFollow) View.GONE else View.VISIBLE
         clAvatar.setOnClickListener { clipFuncItem.onFollowClick(item, pos, !item.isFollow) }
     }

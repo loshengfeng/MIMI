@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.dialog.comment.CommentDialogFragment
 import kotlinx.android.synthetic.main.fragment_clip.*
 import timber.log.Timber
 import java.io.File
@@ -132,6 +133,7 @@ class ClipFragment : BaseFragment() {
                     { item, pos, isFollow -> onFollowClick(item, pos, isFollow) },
                     { item, pos, isFavorite -> onFavoriteClick(item, pos, isFavorite) },
                     { item, pos, isLike -> onLikeClick(item, pos, isLike) },
+                    { item -> onCommentClick(item) },
                     { onBackClick() })
             )
             (rv_clip.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
@@ -187,5 +189,15 @@ class ClipFragment : BaseFragment() {
     private fun onLikeClick(item: MemberPostItem, pos: Int, isLike: Boolean) {
         Timber.d("onLikeClick, item:$item, pos:$pos, isLike:$isLike")
         viewModel.likePost(item, pos, isLike)
+    }
+
+    private fun onCommentClick(item: MemberPostItem) {
+        Timber.d("onCommentClick, item:$item")
+        CommentDialogFragment.newInstance(item).also {
+            it.show(
+                requireActivity().supportFragmentManager,
+                CommentDialogFragment::class.java.simpleName
+            )
+        }
     }
 }
