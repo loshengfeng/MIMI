@@ -2,11 +2,16 @@ package com.dabenxiang.mimi.view.picturedetail
 
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.ApiResult.Error
+import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_picture_detail.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
@@ -24,6 +29,10 @@ class PictureDetailFragment : BaseFragment() {
         }
     }
 
+    private val viewModel: PictureDetailViewModel by viewModels()
+
+    private var adapter: PictureDetailAdapter? = null
+
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
@@ -40,7 +49,7 @@ class PictureDetailFragment : BaseFragment() {
             findNavController().navigateUp()
         }
 
-        val adapter = PictureDetailAdapter(requireContext(), memberPostItem)
+        adapter = PictureDetailAdapter(requireContext(), memberPostItem, onAttachmentListener)
         recycler_picture_detail.layoutManager = LinearLayoutManager(context)
         recycler_picture_detail.adapter = adapter
     }
@@ -50,11 +59,26 @@ class PictureDetailFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-
+        viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    val item = it.result
+                    LruCacheUtils.putLruCache(item.id!!, item.bitmap!!)
+                    adapter?.updatePhotoGridItem(item.position!!)
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
 
+    }
+
+    private val onAttachmentListener = object : PhotoGridAdapter.OnAttachmentListener {
+        override fun onGetAttachment(id: String, position: Int) {
+            viewModel.getAttachment(id, position)
+        }
     }
 
 }

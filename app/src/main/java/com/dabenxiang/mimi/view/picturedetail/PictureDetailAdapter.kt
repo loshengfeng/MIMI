@@ -21,7 +21,8 @@ import java.util.*
 
 class PictureDetailAdapter(
     val context: Context,
-    private val memberPostItem: MemberPostItem
+    private val memberPostItem: MemberPostItem,
+    private val onAttachmentListener: PhotoGridAdapter.OnAttachmentListener
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -29,6 +30,8 @@ class PictureDetailAdapter(
         const val VIEW_TYPE_COMMENT_TITLE = 1
         const val VIEW_TYPE_COMMENT_DATA = 2
     }
+
+    var adapter: PhotoGridAdapter? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
@@ -46,6 +49,7 @@ class PictureDetailAdapter(
 //                val mView = LayoutInflater.from(context)
 //                    .inflate(R.layout.item_comment_root, parent, false)
 //                CommentDataViewHolder(mView)
+
                 val mView = LayoutInflater.from(context)
                     .inflate(R.layout.item_comment_title, parent, false)
                 CommentTitleViewHolder(mView)
@@ -97,8 +101,8 @@ class PictureDetailAdapter(
                 2 -> GridLayoutManager(context, 2)
                 else -> GridLayoutManager(context, 3)
             }
-            holder.photoGrid.setHasFixedSize(true)
-            holder.photoGrid.adapter = PhotoGridAdapter(context, contentItem.images)
+            adapter = PhotoGridAdapter(context, contentItem.images, onAttachmentListener)
+            holder.photoGrid.adapter = adapter
 
             holder.tagChipGroup.removeAllViews()
             memberPostItem.tags.forEach {
@@ -111,7 +115,11 @@ class PictureDetailAdapter(
                 )
                 holder.tagChipGroup.addView(chip)
             }
-            holder.tagChipGroup
         }
     }
+
+    fun updatePhotoGridItem(position: Int) {
+        adapter?.notifyItemChanged(position)
+    }
+
 }

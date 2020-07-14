@@ -58,7 +58,7 @@
         android:id="@+id/tv_follow"
         android:layout_width="54dp"
         android:layout_height="24dp"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="16dp"
         android:background="@drawable/bg_red_1_stroke_radius_16"
         android:gravity="center"
         android:textColor="@color/color_red_1"
