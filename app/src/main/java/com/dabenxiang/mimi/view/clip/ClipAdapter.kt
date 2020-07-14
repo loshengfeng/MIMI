@@ -92,6 +92,11 @@ class ClipAdapter(
         exoPlayer = null
     }
 
+    fun pausePlayer() {
+        exoPlayer?.also { it.playWhenReady = false }
+        currentViewHolder?.also { it.ibPlay.visibility = View.VISIBLE }
+    }
+
     override fun onBindViewHolder(holder: ClipViewHolder, position: Int, payloads: MutableList<Any>) {
         Timber.d("onBindViewHolder position:$position, currentPosition: $currentPosition, payloads: $payloads")
         val item = memberPostItems[position]
@@ -132,9 +137,9 @@ class ClipAdapter(
             }
 
             holder.ibPlay.setOnClickListener {
-                takeIf { exoPlayer?.isPlaying ?: false }?.also {
-                    exoPlayer?.playWhenReady = false
-                    holder.ibPlay.visibility = View.VISIBLE
+                takeUnless { exoPlayer?.isPlaying ?: true }?.also {
+                    exoPlayer?.playWhenReady = true
+                    holder.ibPlay.visibility = View.GONE
                 }
             }
 

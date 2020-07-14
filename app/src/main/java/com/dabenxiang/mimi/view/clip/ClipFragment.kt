@@ -51,6 +51,11 @@ class ClipFragment : BaseFragment() {
         (rv_clip.adapter as ClipAdapter).releasePlayer()
     }
 
+    override fun onPause() {
+        super.onPause()
+        (rv_clip.adapter as ClipAdapter).pausePlayer()
+    }
+
     override fun getLayoutId(): Int {
         return R.layout.fragment_clip
     }
