@@ -1,14 +1,22 @@
 package com.dabenxiang.mimi.view.dialog.comment
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
+import com.dabenxiang.mimi.view.player.CommentLoadMoreView
+import com.dabenxiang.mimi.view.player.PlayerInfoAdapter
+import com.dabenxiang.mimi.view.player.RootCommentNode
 import kotlinx.android.synthetic.main.fragment_dialog_comment.*
 
 class CommentDialogFragment: BaseDialogFragment() {
 
+    private val viewModel: CommentDialogViewModel by viewModels()
     private var data: MemberPostItem? = null
 
     companion object {
@@ -25,6 +33,52 @@ class CommentDialogFragment: BaseDialogFragment() {
         }
     }
 
+    private var loadReplyCommentBlock: (() -> Unit)? = null
+    private var loadCommentLikeBlock: (() -> Unit)? = null
+
+    private val playerInfoAdapter by lazy {
+        PlayerInfoAdapter(true, object : PlayerInfoAdapter.PlayerInfoListener {
+            override fun sendComment(replyId: Long?, replyName: String?) {
+                if (replyId != null) {
+                }
+            }
+
+            override fun expandReply(parentNode: RootCommentNode, succeededBlock: () -> Unit) {
+                loadReplyCommentBlock = succeededBlock
+                parentNode.data.id?.also {
+//                    viewModel.loadReplyComment(parentNode, it)
+                }
+            }
+
+            override fun replyComment(replyId: Long?, replyName: String?) {
+                if (replyId != null) {
+                }
+            }
+
+            override fun setCommentLikeType(replyId: Long?, isLike: Boolean, succeededBlock: () -> Unit) {
+                loadCommentLikeBlock = succeededBlock
+                replyId?.also {
+                    val type = if (isLike) 0 else 1
+//                    viewModel.postCommentLike(replyId, PostLikeRequest(type))
+                }
+            }
+
+            override fun removeCommentLikeType(replyId: Long?, succeededBlock: () -> Unit) {
+                loadCommentLikeBlock = succeededBlock
+                replyId?.also {
+//                    viewModel.deleteCommentLike(replyId)
+                }
+            }
+        }).apply {
+            loadMoreModule.apply {
+                isEnableLoadMore = true
+                isAutoLoadMore = true
+                isEnableLoadMoreIfNotFullPage = false
+                loadMoreView = CommentLoadMoreView(true)
+            }
+        }
+    }
+
     override fun isFullLayout(): Boolean {
         return true
     }
@@ -38,11 +92,28 @@ class CommentDialogFragment: BaseDialogFragment() {
         setStyle(STYLE_NO_TITLE, R.style.CommentDialog)
     }
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        dialog?.apply {
+            setCancelable(true)
+            setCanceledOnTouchOutside(true)
+        }
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         (arguments?.getSerializable(KEY_DATA) as MemberPostItem).also {
             data = it
             tv_comment_count.text = String.format(requireContext().getString(R.string.clip_comment_count), it.commentCount)
+
+            rv_comment.adapter = playerInfoAdapter
+            lifecycleScope.launchWhenResumed {
+                viewModel.setupCommentDataSource(it.id, playerInfoAdapter)
+            }
         }
     }
 }
