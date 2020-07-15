@@ -10,6 +10,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.viewholder.PictureViewHolder
+import timber.log.Timber
 
 class HomePictureAdapter(
     nestedListener: HomeAdapter.EventListener,

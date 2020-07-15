@@ -471,7 +471,13 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onPictureClick(view: View, item: MemberPostItem) {
-
+            val bundle = PictureDetailFragment.createBundle(item)
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_adultHomeFragment_to_pictureDetailFragment,
+                    bundle
+                )
+            )
         }
 
         override fun onClubClick(view: View, item: MemberClubItem) {
