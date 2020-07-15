@@ -185,7 +185,7 @@ class CommonPagedAdapter(
         }
 
         holder.commentImage.setOnClickListener {
-            adultListener.onCommentClick()
+            adultListener.onCommentClick(item!!)
         }
 
         holder.moreImage.setOnClickListener {
