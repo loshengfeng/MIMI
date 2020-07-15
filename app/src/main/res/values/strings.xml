@@ -208,6 +208,7 @@
         <item>有害的危险行为</item>
     </string-array>
 
+    <string name="problem_report">问题回报</string>
     <string name="already_reported">您已回报过问题</string>
     <string name="clip_username">"@%s"</string>
     <string name="clip_comment_count">"%d 评论"</string>

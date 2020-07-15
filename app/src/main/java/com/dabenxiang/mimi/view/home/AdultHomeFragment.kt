@@ -33,6 +33,7 @@ import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.OnChooseUploadMethodDialogListener
 import com.dabenxiang.mimi.view.home.viewholder.*
+import com.dabenxiang.mimi.view.more.MoreDialogFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
@@ -55,6 +56,8 @@ class AdultHomeFragment : BaseFragment() {
     private val homeClipViewHolderMap = hashMapOf<Int, HomeClipViewHolder>()
     private val homePictureViewHolderMap = hashMapOf<Int, HomePictureViewHolder>()
     private val homeClubViewHolderMap = hashMapOf<Int, HomeClubViewHolder>()
+
+    var moreDialog: MoreDialogFragment? = null
 
     override fun getLayoutId() = R.layout.fragment_home
 
@@ -430,7 +433,12 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onMoreClick() {
-            // TODO:
+            moreDialog = MoreDialogFragment.newInstance(onMoreDialogListener).also {
+                it.show(
+                    requireActivity().supportFragmentManager,
+                    MoreDialogFragment::class.java.simpleName
+                )
+            }
         }
 
         override fun onItemClick(item: MemberPostItem) {
@@ -441,6 +449,16 @@ class AdultHomeFragment : BaseFragment() {
                     bundle
                 )
             )
+        }
+    }
+
+    private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
+        override fun onProblemReport() {
+            // TODO: Problem Report
+        }
+
+        override fun onCancel() {
+            moreDialog?.dismiss()
         }
     }
 
