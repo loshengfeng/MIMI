@@ -106,7 +106,7 @@ class ClubViewHolder(
             }
         } else {
             Glide.with(itemView.context)
-                .load(R.drawable.img_notlogin)
+                .load(R.drawable.img_404)
                 .circleCrop()
                 .into(clubImg)
         }

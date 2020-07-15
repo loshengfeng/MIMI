@@ -197,8 +197,8 @@ interface ApiService {
      *                  Members/Club
      *
      ***********************************************************/
-    @GET("/v1/Members/Club")
-    suspend fun getMembersClub(
+    @GET("/v1/Members/Club/Post")
+    suspend fun getMembersClubPost(
         @Query("offset") offset: Int,
         @Query("limit") limit: Int
     ): Response<ApiBasePagingItem<List<MemberClubItem>>>

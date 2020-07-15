@@ -77,7 +77,7 @@ class ClipViewHolder(
             }
         } ?: run {
             Glide.with(itemView.context)
-                .load(R.drawable.img_notlogin)
+                .load(R.drawable.img_404)
                 .into(videoImage)
         }
 

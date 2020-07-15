@@ -254,11 +254,11 @@ class ApiRepository(private val apiService: ApiService) {
      *                  Members/Club
      *
      ***********************************************************/
-    suspend fun getMembersClub(
+    suspend fun getMembersClubPost(
         offset: Int,
         limit: Int
     ): Response<ApiBasePagingItem<List<MemberClubItem>>> {
-        return apiService.getMembersClub(offset, limit)
+        return apiService.getMembersClubPost(offset, limit)
     }
 
     suspend fun followClub(clubId: Long): Response<Void> {

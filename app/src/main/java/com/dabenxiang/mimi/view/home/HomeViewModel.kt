@@ -167,7 +167,7 @@ class HomeViewModel : BaseViewModel() {
     fun loadNestedClubList(position: Int) {
         viewModelScope.launch {
             flow {
-                val resp = domainManager.getApiRepository().getMembersClub(
+                val resp = domainManager.getApiRepository().getMembersClubPost(
                     offset = 0,
                     limit = PAGING_LIMIT
                 )
