@@ -5,12 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import com.dabenxiang.mimi.view.player.CommentLoadMoreView
-import com.dabenxiang.mimi.view.player.PlayerInfoAdapter
+import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import kotlinx.android.synthetic.main.fragment_dialog_comment.*
 
@@ -37,7 +40,7 @@ class CommentDialogFragment: BaseDialogFragment() {
     private var loadCommentLikeBlock: (() -> Unit)? = null
 
     private val playerInfoAdapter by lazy {
-        PlayerInfoAdapter(true, object : PlayerInfoAdapter.PlayerInfoListener {
+        CommentAdapter(true, object : CommentAdapter.PlayerInfoListener {
             override fun sendComment(replyId: Long?, replyName: String?) {
                 if (replyId != null) {
                 }
@@ -45,8 +48,12 @@ class CommentDialogFragment: BaseDialogFragment() {
 
             override fun expandReply(parentNode: RootCommentNode, succeededBlock: () -> Unit) {
                 loadReplyCommentBlock = succeededBlock
-                parentNode.data.id?.also {
-//                    viewModel.loadReplyComment(parentNode, it)
+                data?.id?.let { postId ->
+                    parentNode.data.id?.let { commentId ->
+                        Pair(postId, commentId)
+                    }?.also { (postId, commentId) ->
+                        viewModel.loadReplyComment(postId, parentNode, commentId)
+                    }
                 }
             }
 
@@ -57,16 +64,24 @@ class CommentDialogFragment: BaseDialogFragment() {
 
             override fun setCommentLikeType(replyId: Long?, isLike: Boolean, succeededBlock: () -> Unit) {
                 loadCommentLikeBlock = succeededBlock
-                replyId?.also {
-                    val type = if (isLike) 0 else 1
-//                    viewModel.postCommentLike(replyId, PostLikeRequest(type))
+                data?.id?.let { postId ->
+                    replyId?.let { replyId ->
+                        Pair(postId, replyId)
+                    }?.also { (postId, replyId) ->
+                        val type = if (isLike) 0 else 1
+                        viewModel.postCommentLike(postId, replyId, PostLikeRequest(type))
+                    }
                 }
             }
 
             override fun removeCommentLikeType(replyId: Long?, succeededBlock: () -> Unit) {
                 loadCommentLikeBlock = succeededBlock
-                replyId?.also {
-//                    viewModel.deleteCommentLike(replyId)
+                data?.id?.let { postId ->
+                    replyId?.let { replyId ->
+                        Pair(postId, replyId)
+                    }?.also { (postId, replyId) ->
+                    viewModel.deleteCommentLike(postId, replyId)
+                    }
                 }
             }
         }).apply {
@@ -115,5 +130,22 @@ class CommentDialogFragment: BaseDialogFragment() {
                 viewModel.setupCommentDataSource(it.id, playerInfoAdapter)
             }
         }
+
+        viewModel.apiLoadReplyCommentResult.observe(this, Observer { event ->
+            event.getContentIfNotHandled()?.also { apiResult ->
+                when (apiResult) {
+                    is ApiResult.Loading -> {
+//                        progressHUD.show()
+                    }
+                    is ApiResult.Empty -> {
+                        loadReplyCommentBlock?.also { it() }
+                    }
+                    is ApiResult.Loaded -> {
+                        loadReplyCommentBlock = null
+//                        progressHUD.dismiss()
+                    }
+                }
+            }
+        })
     }
 }

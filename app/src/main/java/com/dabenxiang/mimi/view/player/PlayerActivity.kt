@@ -144,7 +144,7 @@ class PlayerActivity : BaseActivity() {
     }
 
     private val playerInfoAdapter by lazy {
-        PlayerInfoAdapter(obtainIsAdult(), object : PlayerInfoAdapter.PlayerInfoListener {
+        CommentAdapter(obtainIsAdult(), object : CommentAdapter.PlayerInfoListener {
             override fun sendComment(replyId: Long?, replyName: String?) {
                 if (replyId != null) {
                     sendCommentDialog = SendCommentDialog.newInstance(

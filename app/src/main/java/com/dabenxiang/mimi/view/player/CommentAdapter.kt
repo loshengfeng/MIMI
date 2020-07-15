@@ -15,7 +15,7 @@ import com.yulichswift.roundedview.widget.RoundedTextView
 import java.text.SimpleDateFormat
 import java.util.*
 
-class PlayerInfoAdapter(isAdult: Boolean, listener: PlayerInfoListener) : BaseNodeAdapter(),
+class CommentAdapter(isAdult: Boolean, listener: PlayerInfoListener) : BaseNodeAdapter(),
     LoadMoreModule {
 
     companion object {
@@ -46,7 +46,7 @@ class PlayerInfoAdapter(isAdult: Boolean, listener: PlayerInfoListener) : BaseNo
 
 class RootCommentProvider(
     private val isAdult: Boolean,
-    private val listener: PlayerInfoAdapter.PlayerInfoListener
+    private val listener: CommentAdapter.PlayerInfoListener
 ) : BaseCommentProvider(isAdult) {
 
     override val itemViewType: Int
@@ -119,17 +119,17 @@ class RootCommentProvider(
                         position = position,
                         animate = false,
                         notify = true,
-                        parentPayload = PlayerInfoAdapter.EXPAND_COLLAPSE_PAYLOAD
+                        parentPayload = CommentAdapter.EXPAND_COLLAPSE_PAYLOAD
                     )
                 } else {
-                    val adapter = getAdapter() as? PlayerInfoAdapter
+                    val adapter = getAdapter() as? CommentAdapter
                     if (adapter != null) {
                         listener.expandReply(actualData) {
                             adapter.expand(
                                 position = position,
                                 animate = false,
                                 notify = true,
-                                parentPayload = PlayerInfoAdapter.EXPAND_COLLAPSE_PAYLOAD
+                                parentPayload = CommentAdapter.EXPAND_COLLAPSE_PAYLOAD
                             )
                         }
                     }
@@ -170,7 +170,7 @@ class RootCommentProvider(
     }
 }
 
-class NestedCommentProvider(isAdult: Boolean, val listener: PlayerInfoAdapter.PlayerInfoListener) :
+class NestedCommentProvider(isAdult: Boolean, val listener: CommentAdapter.PlayerInfoListener) :
     BaseCommentProvider(isAdult) {
     override val itemViewType: Int
         get() = 2
@@ -219,7 +219,7 @@ class NestedCommentProvider(isAdult: Boolean, val listener: PlayerInfoAdapter.Pl
                 }
             }
             R.id.btn_reply -> {
-                val adapter = getAdapter() as? PlayerInfoAdapter
+                val adapter = getAdapter() as? CommentAdapter
                 if (adapter != null) {
                     val parentNode = actualData.parentNodeRef.get()!!
                     val parentPosition = adapter.findParentNode(data)
