@@ -399,7 +399,7 @@ class PlayerViewModel : BaseViewModel() {
         }
     }
 
-    fun setupCommentDataSource(adapter: PlayerInfoAdapter) {
+    fun setupCommentDataSource(adapter: CommentAdapter) {
         viewModelScope.launch {
             val sorting = if (isSelectedNewestComment.value == true) 1 else 2
             val dataSrc = CommentDataSource(videoId, sorting, domainManager)
@@ -434,7 +434,7 @@ class PlayerViewModel : BaseViewModel() {
         }
     }
 
-    private fun setupLoadMoreResult(adapter: PlayerInfoAdapter, isEnd: Boolean) {
+    private fun setupLoadMoreResult(adapter: CommentAdapter, isEnd: Boolean) {
         if (isEnd) {
             adapter.loadMoreModule.loadMoreEnd()
         } else {
