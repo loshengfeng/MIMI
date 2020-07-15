@@ -84,12 +84,12 @@ class CommentDialogFragment: BaseDialogFragment() {
                     }
                 }
             }
-        }).apply {
+        }, true).apply {
             loadMoreModule.apply {
                 isEnableLoadMore = true
                 isAutoLoadMore = true
                 isEnableLoadMoreIfNotFullPage = false
-                loadMoreView = CommentLoadMoreView(true)
+                loadMoreView = CommentLoadMoreView(true, isClip = true)
             }
         }
     }
