@@ -83,10 +83,18 @@ class PictureDetailFragment : BaseFragment() {
                 is Error -> Timber.e(it.throwable)
             }
         })
+
+        viewModel.isRefreshing.observe(viewLifecycleOwner, Observer {
+            swipe_refresh.isRefreshing = it
+        })
+
     }
 
     override fun setupListeners() {
-
+        swipe_refresh.setOnRefreshListener {
+            // TODO: 更新評論
+            viewModel.setupRefreshing(false)
+        }
     }
 
     private val onPictureDetailListener = object : PictureDetailAdapter.OnPictureDetailListener {

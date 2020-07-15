@@ -21,6 +21,9 @@ class PictureDetailViewModel : BaseViewModel() {
     private var _followPostResult = MutableLiveData<ApiResult<Int>>()
     val followPostResult: LiveData<ApiResult<Int>> = _followPostResult
 
+    private val _isRefreshing = MutableLiveData<Boolean>().also { it.value = false }
+    val isRefreshing: LiveData<Boolean> = _isRefreshing
+
     fun getAttachment(id: String, position: Int) {
         viewModelScope.launch {
             flow {
@@ -62,4 +65,9 @@ class PictureDetailViewModel : BaseViewModel() {
                 .collect { _followPostResult.value = it }
         }
     }
+
+    fun setupRefreshing(isRefreshing: Boolean) {
+        _isRefreshing.value = isRefreshing
+    }
+
 }
