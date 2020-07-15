@@ -4,13 +4,18 @@ import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.ApiResult.Error
+import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.ImageItem
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_full_picture.*
+import timber.log.Timber
 
 class FullPictureFragment : BaseFragment() {
 
@@ -28,6 +33,8 @@ class FullPictureFragment : BaseFragment() {
 
     private val viewModel: FullPictureViewModel by viewModels()
 
+    private var adapter: FullPictureAdapter? = null
+
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
@@ -39,7 +46,7 @@ class FullPictureFragment : BaseFragment() {
         val position = arguments?.getInt(KEY_POSITION) ?: 0
         val imageItems = arguments?.getSerializable(KEY_IMAGE) as ArrayList<ImageItem>
 
-        val adapter = FullPictureAdapter(requireContext(), imageItems, position)
+        adapter = FullPictureAdapter(requireContext(), imageItems, onFullPictureListener)
         recycler_picture.layoutManager = LinearLayoutManager(
             context, LinearLayoutManager.HORIZONTAL, false
         )
@@ -63,7 +70,16 @@ class FullPictureFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-
+        viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    val item = it.result
+                    LruCacheUtils.putLruCache(item.id!!, item.bitmap!!)
+                    adapter?.notifyItemChanged(item.position!!)
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -72,5 +88,11 @@ class FullPictureFragment : BaseFragment() {
 
     override fun statusBarVisibility() {
         requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+    }
+
+    private val onFullPictureListener = object : FullPictureAdapter.OnFullPictureListener {
+        override fun onGetAttachment(id: String, position: Int) {
+            viewModel.getAttachment(id, position)
+        }
     }
 }

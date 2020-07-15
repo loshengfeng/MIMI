@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.item_full_picture.view.*
 class FullPictureAdapter(
     val context: Context,
     private val imageItems: ArrayList<ImageItem>,
-    private val currentPosition: Int
+    private val onFullPictureListener: OnFullPictureListener
 ) : RecyclerView.Adapter<FullPictureAdapter.FullPictureViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FullPictureViewHolder {
@@ -39,7 +39,7 @@ class FullPictureAdapter(
                 .into(holder.picture)
         } else {
             if (LruCacheUtils.getLruCache(imageItem.id) == null) {
-//                onPictureDetailListener.onGetAttachment(imageItem.id, position)
+                onFullPictureListener.onGetAttachment(imageItem.id, position)
             } else {
                 val bitmap = LruCacheUtils.getLruCache(imageItem.id)
                 Glide.with(context)
@@ -51,5 +51,9 @@ class FullPictureAdapter(
 
     class FullPictureViewHolder(itemView: View) : BaseViewHolder(itemView) {
         val picture: ImageView = itemView.iv_picture
+    }
+
+    interface OnFullPictureListener {
+        fun onGetAttachment(id: String, position: Int)
     }
 }
