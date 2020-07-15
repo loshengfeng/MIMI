@@ -407,8 +407,14 @@ class AdultHomeFragment : BaseFragment() {
             viewModel.likePost(item, position, isLike)
         }
 
-        override fun onCommentClick() {
-            // TODO:
+        override fun onCommentClick(item: MemberPostItem) {
+            val bundle = PictureDetailFragment.createBundle(item, 1)
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_adultHomeFragment_to_pictureDetailFragment,
+                    bundle
+                )
+            )
         }
 
         override fun onMoreClick() {
@@ -416,7 +422,7 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onItemClick(item: MemberPostItem) {
-            val bundle = PictureDetailFragment.createBundle(item)
+            val bundle = PictureDetailFragment.createBundle(item, 0)
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_adultHomeFragment_to_pictureDetailFragment,
@@ -470,7 +476,7 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onPictureClick(view: View, item: MemberPostItem) {
-            val bundle = PictureDetailFragment.createBundle(item)
+            val bundle = PictureDetailFragment.createBundle(item, 0)
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_adultHomeFragment_to_pictureDetailFragment,
