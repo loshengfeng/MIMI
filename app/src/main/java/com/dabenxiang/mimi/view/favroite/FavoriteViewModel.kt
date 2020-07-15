@@ -150,12 +150,12 @@ class FavoriteViewModel : BaseViewModel() {
     }
 
     fun modifyLike(videoID: Long) {
-        val likeRequest = LikeRequest(if (currentPlayItem?.like == true) LikeType.DISLIKE.value else LikeType.LIKE.value)
-
+        val likeType = if (currentPlayItem?.like == true) LikeType.DISLIKE else LikeType.LIKE
+        val likeRequest = LikeRequest(likeType)
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository()
-                    .addLike(videoID, likeRequest)
+                    .like(videoID, likeRequest)
                 if (!result.isSuccessful) {
                     throw HttpException(result)
                 }
