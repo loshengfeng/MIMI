@@ -128,7 +128,7 @@ class CategoriesFragment : BaseFragment() {
                     requireActivity().getDrawable(res)
                 }
 
-            iv_back.setImageResource(
+            ib_back.setImageResource(
                 if (isAdult) {
                     R.drawable.adult_btn_back
                 } else {
@@ -249,7 +249,7 @@ class CategoriesFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
-        iv_back.setOnClickListener {
+        ib_back.setOnClickListener {
             navigateTo(NavigateItem.Up)
         }
 

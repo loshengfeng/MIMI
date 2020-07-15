@@ -8,7 +8,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
-import com.dabenxiang.mimi.model.enums.HomeItemType
+import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.view.adapter.HomeClubAdapter
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.getLruCache
@@ -61,18 +61,14 @@ class ClubViewHolder(
         }
 
         follow.setOnClickListener {
-            if (isFollow) {
-                clubListener.cancelFollowClub(model?.id?.toInt()!!, index)
-            } else {
-                clubListener.followClub(model?.id?.toInt()!!, index)
-            }
+            clubListener.followClub(model!!, index, !isFollow)
         }
 
         if (getLruCache(model?.avatarAttachmentId.toString()) == null) {
             attachmentListener.onGetAttachment(
                 model?.avatarAttachmentId.toString(),
                 index,
-                HomeItemType.CLUB
+                AttachmentType.ADULT_HOME_CLUB
             )
         } else {
             val bitmap = getLruCache(model?.avatarAttachmentId.toString())
@@ -83,7 +79,6 @@ class ClubViewHolder(
         }
 
         val posts = model?.posts ?: arrayListOf()
-
         if (posts.isNotEmpty()) {
             val postItem = posts[0]
             title.text = postItem.title
@@ -100,7 +95,7 @@ class ClubViewHolder(
                     attachmentListener.onGetAttachment(
                         imageItem?.id.toString(),
                         index,
-                        HomeItemType.CLUB
+                        AttachmentType.ADULT_HOME_CLUB
                     )
                 } else {
                     val bitmap = getLruCache(imageItem?.id.toString())
@@ -111,7 +106,7 @@ class ClubViewHolder(
             }
         } else {
             Glide.with(itemView.context)
-                .load(R.drawable.img_notlogin)
+                .load(R.drawable.img_404)
                 .circleCrop()
                 .into(clubImg)
         }

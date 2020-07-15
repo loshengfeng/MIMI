@@ -4,13 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.extension.handleException
+import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
@@ -42,6 +43,9 @@ abstract class BaseFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        statusBarVisibility()
+
         progressHUD = KProgressHUD.create(context)
             .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
 
@@ -56,6 +60,10 @@ abstract class BaseFragment : Fragment() {
     abstract fun setupObservers()
 
     abstract fun setupListeners()
+
+    open fun statusBarVisibility() {
+        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+    }
 
     open fun initSettings() {}
 

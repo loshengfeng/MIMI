@@ -9,6 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.AttachmentListener
@@ -18,19 +19,21 @@ import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
-import com.dabenxiang.mimi.model.enums.HomeItemType
+import com.dabenxiang.mimi.model.enums.AttachmentType
+import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.*
+import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.OnChooseUploadMethodDialogListener
-import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
+import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.putLruCache
@@ -163,9 +166,9 @@ class AdultHomeFragment : BaseFragment() {
         viewModel.followClubResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    when (val holder = homeAdapter.homeViewHolderMap[HomeItemType.CLUB]) {
+                    when (val holder = homeAdapter.functionViewHolderMap[FunctionType.FOLLOW]) {
                         is HomeClubViewHolder -> {
-                            holder.updateItemByFollow(it.result, true)
+                            holder.updateItemByFollow(it.result.first, it.result.second)
                         }
                     }
                 }
@@ -173,12 +176,12 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.cancelFollowClubResult.observe(viewLifecycleOwner, Observer {
+        viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    when (val holder = homeAdapter.homeViewHolderMap[HomeItemType.CLUB]) {
-                        is HomeClubViewHolder -> {
-                            holder.updateItemByFollow(it.result, false)
+                    when (commonPagedAdapter.viewHolderMap[it.result]) {
+                        is PicturePostHolder -> {
+                            commonPagedAdapter.notifyItemChanged(it.result)
                         }
                     }
                 }
@@ -186,20 +189,12 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.homeAttachmentResult.observe(viewLifecycleOwner, Observer {
+        viewModel.likePostResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    val attachmentItem = it.result
-                    putLruCache(attachmentItem.id, attachmentItem.bitmap)
-                    when (val holder = homeAdapter.homeViewHolderMap[attachmentItem.type]) {
-                        is HomeClipViewHolder -> {
-                            holder.updateItem(attachmentItem.position)
-                        }
-                        is HomePictureViewHolder -> {
-                            holder.updateItem(attachmentItem.position)
-                        }
-                        is HomeClubViewHolder -> {
-                            holder.updateItem(attachmentItem.position)
+                    when (commonPagedAdapter.viewHolderMap[it.result]) {
+                        is PicturePostHolder -> {
+                            commonPagedAdapter.notifyItemChanged(it.result)
                         }
                     }
                 }
@@ -207,12 +202,53 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.commonAttachmentResult.observe(viewLifecycleOwner, Observer {
+        viewModel.attachmentByTypeResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
                     val attachmentItem = it.result
-                    putLruCache(attachmentItem.id, attachmentItem.bitmap)
-                    commonPagedAdapter.notifyItemChanged(it.result.position)
+                    putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
+
+                    when (attachmentItem.type) {
+                        AttachmentType.ADULT_HOME_CLIP -> {
+                            val holder = homeAdapter.attachmentViewHolderMap[attachmentItem.type]
+                            holder as HomeClipViewHolder
+                            holder.updateItem(attachmentItem.position!!)
+                        }
+                        AttachmentType.ADULT_HOME_PICTURE -> {
+                            val holder = homeAdapter.attachmentViewHolderMap[attachmentItem.type]
+                            holder as HomePictureViewHolder
+                            holder.updateItem(attachmentItem.position!!)
+                        }
+                        AttachmentType.ADULT_HOME_CLUB -> {
+                            val holder = homeAdapter.attachmentViewHolderMap[attachmentItem.type]
+                            holder as HomeClubViewHolder
+                            holder.updateItem(attachmentItem.position!!)
+                        }
+                        AttachmentType.ADULT_PICTURE_ITEM -> {
+                            commonPagedAdapter.notifyItemChanged(attachmentItem.position!!)
+                        }
+                        else -> {
+                        }
+                    }
+
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
+
+        viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    val attachmentItem = it.result
+                    putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
+                    when (val holder =
+                        commonPagedAdapter.viewHolderMap[attachmentItem.parentPosition]) {
+                        is PicturePostHolder -> {
+                            if (holder.pictureRecycler.tag == attachmentItem.parentPosition) {
+                                commonPagedAdapter.updateInternalItem(holder)
+                            }
+                        }
+                    }
                 }
                 is Error -> Timber.e(it.throwable)
             }
@@ -269,6 +305,8 @@ class AdultHomeFragment : BaseFragment() {
         recyclerview.background = requireActivity().getDrawable(R.color.adult_color_background)
         recyclerview.layoutManager = LinearLayoutManager(requireContext())
         recyclerview.adapter = homeAdapter
+        LinearSnapHelper().attachToRecyclerView(recyclerview)
+
         refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
     }
 
@@ -373,56 +411,58 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val adultListener = object : AdultListener {
-        override fun doLike() {
-
+        override fun onFollowPostClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
+            viewModel.followPost(item, position, isFollow)
         }
 
-        override fun follow() {
-
+        override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
+            viewModel.likePost(item, position, isLike)
         }
 
-        override fun cancelFollow() {
-
+        override fun onCommentClick() {
+            // TODO:
         }
 
-        override fun comment() {
-
+        override fun onMoreClick() {
+            // TODO:
         }
 
-        override fun more() {
-
+        override fun onItemClick(item: MemberPostItem) {
+            val bundle = PictureDetailFragment.createBundle(item)
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_adultHomeFragment_to_pictureDetailFragment,
+                    bundle
+                )
+            )
         }
     }
 
     private val attachmentListener = object : AttachmentListener {
-        override fun onGetAttachment(id: String, position: Int, type: HomeItemType) {
+        override fun onGetAttachment(id: String, position: Int, type: AttachmentType) {
             viewModel.getAttachment(id, position, type)
         }
 
-        override fun onGetAttachment(id: String, position: Int) {
-            viewModel.getAttachment(id, position)
+        override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
+            viewModel.getAttachment(id, parentPosition, position)
         }
     }
 
     private val clubListener = object : HomeClubAdapter.ClubListener {
-        override fun followClub(id: Int, position: Int) {
-            viewModel.followClub(id, position)
-        }
-
-        override fun cancelFollowClub(id: Int, position: Int) {
-            viewModel.cancelFollowClub(id, position)
+        override fun followClub(item: MemberClubItem, position: Int, isFollow: Boolean) {
+            viewModel.followClub(item, position, isFollow)
         }
     }
 
     private val adapterListener = object : HomeAdapter.EventListener {
+
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
-            val bundle = CategoriesFragment.createBundle(item.title ?: "", item.categories)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_homeFragment_to_categoriesFragment,
-                    bundle
-                )
-            )
+            when (item.title) {
+                "蜜蜜影视" -> viewModel.setTopTabPosition(1)
+                "短视频" -> viewModel.setTopTabPosition(3)
+                "图片" -> viewModel.setTopTabPosition(4)
+                "圈子" -> viewModel.setTopTabPosition(6)
+            }
         }
 
         override fun onVideoClick(view: View, item: PlayerData) {
@@ -442,7 +482,13 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onPictureClick(view: View, item: MemberPostItem) {
-
+            val bundle = PictureDetailFragment.createBundle(item)
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_adultHomeFragment_to_pictureDetailFragment,
+                    bundle
+                )
+            )
         }
 
         override fun onClubClick(view: View, item: MemberClubItem) {

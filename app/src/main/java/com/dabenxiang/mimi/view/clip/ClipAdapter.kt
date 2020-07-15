@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.adapter
+package com.dabenxiang.mimi.view.clip
 
 import android.content.Context
 import android.net.Uri
@@ -8,13 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.view.adapter.viewHolder.ClipViewHolder
 import com.dabenxiang.mimi.view.player.PlayerViewModel
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
 import com.google.android.exoplayer2.source.MediaSource
@@ -34,9 +31,10 @@ class ClipAdapter(
     private val memberPostItems: ArrayList<MemberPostItem>,
     private val clipMap: HashMap<String, File>,
     private var currentPosition: Int,
-    private val getClip: (String, Int) -> Unit,
-    private val getCover: (String, Int) -> Unit
-) : ListAdapter<MemberPostItem, ClipViewHolder>(DIFF_CALLBACK) {
+    private val clipFuncItem: ClipFuncItem
+) : ListAdapter<MemberPostItem, ClipViewHolder>(
+    DIFF_CALLBACK
+) {
 
     companion object {
         private val DIFF_CALLBACK =
@@ -55,9 +53,13 @@ class ClipAdapter(
                     return oldItem == newItem
                 }
             }
+        const val PAYLOAD_UPDATE_UI = 0
     }
 
     private var currentViewHolder: ClipViewHolder? = null
+
+    private var exoPlayer: SimpleExoPlayer? = null
+    private var lastWindowIndex = 0
 
     override fun getItemCount(): Int {
         return memberPostItems.count()
@@ -73,10 +75,6 @@ class ClipAdapter(
         )
     }
 
-    override fun onViewRecycled(holder: ClipViewHolder) {
-        super.onViewRecycled(holder)
-    }
-
     fun updateCurrentPosition(position: Int) {
         currentPosition = position
     }
@@ -85,49 +83,95 @@ class ClipAdapter(
         return currentPosition
     }
 
-    override fun onBindViewHolder(holder: ClipViewHolder, position: Int) {
-        Timber.d("onBindViewHolder position:$position, currentPosition: $currentPosition")
-        takeIf { currentPosition == position }?.also { currentViewHolder = holder }
-            ?: run { holder.coverView.visibility = View.VISIBLE }
+    fun releasePlayer() {
+        exoPlayer?.also { player ->
+            player.playWhenReady = false
+            player.removeListener(playbackStateListener)
+            player.release()
+        }
+        exoPlayer = null
+    }
+
+    fun pausePlayer() {
+        exoPlayer?.takeIf { it.isPlaying }?.also { player ->
+            player.playWhenReady = false
+            currentViewHolder?.also { it.ibPlay.visibility = View.VISIBLE }
+        }
+    }
+
+    override fun onBindViewHolder(holder: ClipViewHolder, position: Int, payloads: MutableList<Any>) {
+        Timber.d("onBindViewHolder position:$position, currentPosition: $currentPosition, payloads: $payloads")
         val item = memberPostItems[position]
         val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
-        takeIf { contentItem.images.isNotEmpty() }?.also {
-            contentItem.images[0].also { image ->
-                if (TextUtils.isEmpty(image.url)) {
-                    image.id.takeIf { !TextUtils.isEmpty(it) }?.also { id ->
-                        LruCacheUtils.getLruCache(id.toString())?.also {
-                            Glide.with(holder.coverView.context).load(it).into(holder.coverView)
-                        } ?: run { getCover(id, position) }
-                    }
-                } else {
-                    Glide.with(holder.coverView.context).load(image.url).into(holder.coverView)
+        payloads.takeIf { it.isNotEmpty() }?.also {
+            when(it[0] as Int) {
+                PAYLOAD_UPDATE_UI -> {
+                    holder.onBind(item, clipFuncItem, position)
                 }
             }
+        }?: run {
+            holder.onBind(item, clipFuncItem, position)
+
+            takeIf { currentPosition == position }?.also {
+                currentViewHolder = holder
+                holder.progress.visibility = View.VISIBLE
+            } ?: run {
+                holder.ivCover.visibility = View.VISIBLE
+                holder.progress.visibility = View.GONE
+            }
+
+            holder.ibReplay.setOnClickListener {
+                exoPlayer?.also { player ->
+                    player.seekTo(0)
+                    player.playWhenReady = true
+                }
+                it.visibility = View.GONE
+            }
+
+            holder.playerView.setOnClickListener {
+                takeIf { exoPlayer?.isPlaying ?: false }?.also {
+                    exoPlayer?.playWhenReady = false
+                    holder.ibPlay.visibility = View.VISIBLE
+                } ?: run {
+                    exoPlayer?.playWhenReady = true
+                    holder.ibPlay.visibility = View.GONE
+                }
+            }
+
+            holder.ibPlay.setOnClickListener {
+                takeUnless { exoPlayer?.isPlaying ?: true }?.also {
+                    exoPlayer?.playWhenReady = true
+                    holder.ibPlay.visibility = View.GONE
+                }
+            }
+
+            processClip(
+                holder.playerView,
+                contentItem.shortVideo.id,
+                contentItem.shortVideo.url,
+                position
+            )
         }
-        processClip(
-            holder.playerView,
-            contentItem.shortVideo.id,
-            contentItem.shortVideo.url,
-            position
-        )
+    }
+
+    override fun onBindViewHolder(holder: ClipViewHolder, position: Int) {
     }
 
     private fun processClip(playerView: PlayerView, id: String, url: String, position: Int) {
         Timber.d("processClip position:$position")
         val item = memberPostItems[position]
         val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
-        playerView.player?.also { it.playWhenReady = false }
 
         if (TextUtils.isEmpty(url)) {
             if (clipMap.containsKey(id)) {
-                takeIf { currentPosition == position }?.also {
+                takeIf { currentPosition == position}?.also {
                     setupPlayer(
                         playerView,
                         clipMap[id]?.toURI().toString()
                     )
                 }
             } else {
-                getClip(id, position)
+                clipFuncItem.getClip(id, position)
             }
         } else {
             takeIf { currentPosition == position }?.also {
@@ -141,27 +185,21 @@ class ClipAdapter(
 
     private fun setupPlayer(playerView: PlayerView, uri: String) {
         Timber.d("setupPlayer uri:$uri, tag:${playerView.tag}")
-        takeIf { playerView.player == null || playerView.tag != uri }?.also {
-            val exoPlayer = SimpleExoPlayer.Builder(context).build()
-            playerView.player = exoPlayer
-            exoPlayer.also { player ->
-                player.repeatMode = Player.REPEAT_MODE_OFF
-                player.playWhenReady = true
-                player.volume = PlayerViewModel.volume
-                player.addListener(playbackStateListener)
-            }
-            val agent = Util.getUserAgent(context, context.getString(R.string.app_name))
-            val sourceFactory = DefaultDataSourceFactory(context, agent)
-            getMediaSource(uri, sourceFactory)?.also { mediaSource ->
-                playerView.player?.also {
-                    playerView.tag = uri
-                    (it as SimpleExoPlayer).prepare(mediaSource, true, true)
-                }
-            }
+        exoPlayer = SimpleExoPlayer.Builder(context).build()
+        exoPlayer?.also { player ->
+            player.repeatMode = Player.REPEAT_MODE_OFF
+            player.playWhenReady = true
+            player.volume = PlayerViewModel.volume
+            player.addListener(playbackStateListener)
         }
-        playerView.player?.also {
-            it.seekToDefaultPosition()
-            it.playWhenReady = true
+        playerView.player = exoPlayer
+        val agent = Util.getUserAgent(context, context.getString(R.string.app_name))
+        val sourceFactory = DefaultDataSourceFactory(context, agent)
+        getMediaSource(uri, sourceFactory)?.also { mediaSource ->
+            playerView.player?.also {
+                playerView.tag = uri
+                (it as SimpleExoPlayer).prepare(mediaSource, true, true)
+            }
         }
     }
 
@@ -171,11 +209,14 @@ class ClipAdapter(
                 ExoPlayer.STATE_IDLE -> "ExoPlayer.STATE_IDLE"
                 ExoPlayer.STATE_BUFFERING -> "ExoPlayer.STATE_BUFFERING"
                 ExoPlayer.STATE_READY -> {
-                    currentViewHolder?.coverView?.visibility = View.GONE
+                    currentViewHolder?.progress?.visibility = View.GONE
+                    currentViewHolder?.ivCover?.visibility = View.GONE
                     "ExoPlayer.STATE_READY"
                 }
-
-                ExoPlayer.STATE_ENDED -> "ExoPlayer.STATE_ENDED"
+                ExoPlayer.STATE_ENDED -> {
+                    currentViewHolder?.ibReplay?.visibility = View.VISIBLE
+                    "ExoPlayer.STATE_ENDED"
+                }
                 else -> "UNKNOWN_STATE"
             }
             Timber.d("Changed state to $stateString playWhenReady: $playWhenReady")
@@ -187,6 +228,10 @@ class ClipAdapter(
 
         override fun onPositionDiscontinuity(reason: Int) {
             Timber.d("onPositionDiscontinuity: $reason")
+            val latestWindowIndex: Int = exoPlayer?.currentWindowIndex ?: 0
+            if (latestWindowIndex != lastWindowIndex) {
+                lastWindowIndex = latestWindowIndex
+            }
         }
 
         override fun onTimelineChanged(timeline: Timeline, reason: Int) {

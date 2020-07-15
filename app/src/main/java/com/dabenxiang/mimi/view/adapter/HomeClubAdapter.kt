@@ -59,7 +59,6 @@ class HomeClubAdapter(
     }
 
     interface ClubListener {
-        fun followClub(id: Int, position: Int)
-        fun cancelFollowClub(id: Int, position: Int)
+        fun followClub(item: MemberClubItem, position: Int, isFollow: Boolean)
     }
 }

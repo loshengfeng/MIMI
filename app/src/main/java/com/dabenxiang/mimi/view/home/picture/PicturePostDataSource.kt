@@ -60,8 +60,6 @@ class PicturePostDataSource(
     override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, MemberPostItem>) {
         val next = params.key
 
-        Timber.d("@@next: $next")
-
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getMembersPost(
@@ -85,7 +83,6 @@ class PicturePostDataSource(
                                 else -> null
                             }
 
-                            Timber.d("@@nextPageKey: $nextPageKey")
                             callback.onResult(list, nextPageKey)
                         }
                     }

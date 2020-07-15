@@ -140,11 +140,15 @@ interface ApiService {
         @Body body: EmailRequest
     ): Response<Void>
 
-    // todo
-//    @GET("/v1/Members/Me/ValidationEmail/{key}")
-//    suspend fun validationEmail(
-//        @Path("key") key: String
-//    ): Response<Void>
+    @POST("/v1/Members/{userId}/Follow")
+    suspend fun followPost(
+        @Path("userId") userId: Long
+    ): Response<Void>
+
+    @DELETE("/v1/Members/{userId}/Follow")
+    suspend fun cancelFollowPost(
+        @Path("userId") userId: Long
+    ): Response<Void>
 
     /**********************************************************
      *
@@ -193,17 +197,17 @@ interface ApiService {
      *                  Members/Club
      *
      ***********************************************************/
-    @GET("/v1/Members/Club")
-    suspend fun getMembersClub(
+    @GET("/v1/Members/Club/Post")
+    suspend fun getMembersClubPost(
         @Query("offset") offset: Int,
         @Query("limit") limit: Int
     ): Response<ApiBasePagingItem<List<MemberClubItem>>>
 
     @POST("/v1/Members/Club/{clubId}/Follow")
-    suspend fun followClub(@Path("clubId") clubId: Int): Response<Void>
+    suspend fun followClub(@Path("clubId") clubId: Long): Response<Void>
 
     @DELETE("/v1/Members/Club/{clubId}/Follow")
-    suspend fun cancelFollowClub(@Path("clubId") clubId: Int): Response<Void>
+    suspend fun cancelFollowClub(@Path("clubId") clubId: Long): Response<Void>
 
     /**********************************************************
      *
@@ -360,21 +364,15 @@ interface ApiService {
     ): Response<Void>
 
     @POST("/v1/Members/Post/{postId}/Like")
-    suspend fun addLike(
+    suspend fun like(
         @Path("postId") postId: Long,
         @Body body: LikeRequest
     ): Response<Void>
 
-    // todo: not sure...
-//    @DELETE("/v1/Members/Post/{postId}/Like")
-//    suspend fun deleteLike(
-//        @Path("postId") postId: Long
-//    ) : Response<Void>
-
-
     @POST("/v1/Members/Post/{postId}/PostReport")
     suspend fun postReport(
-        @Path("postId") postId: Long
+        @Path("postId") postId: Long,
+        @Body body: ReportRequest
     ): Response<Void>
 
     /**********************************************************

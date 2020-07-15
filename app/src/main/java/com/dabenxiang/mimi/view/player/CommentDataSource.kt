@@ -7,7 +7,7 @@ import retrofit2.HttpException
 import timber.log.Timber
 
 class CommentDataSource(
-    private val videoId: Long,
+    private val postId: Long,
     private val sorting: Int,
     private val domainManager: DomainManager
 ) :
@@ -24,7 +24,7 @@ class CommentDataSource(
 
             val resp = domainManager.getApiRepository()
                 .getMembersPostComment(
-                    postId = videoId,
+                    postId = postId,
                     sorting = sorting,
                     offset = nowOffset.toString(),
                     limit = PER_LIMIT

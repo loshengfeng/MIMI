@@ -7,12 +7,13 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.HomeItemType
+import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.getLruCache
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.nested_item_home_clip.view.*
+import timber.log.Timber
 import java.util.*
 
 class ClipViewHolder(
@@ -37,8 +38,9 @@ class ClipViewHolder(
     }
 
     override fun updated(model: MemberPostItem?) {
+        Timber.d("content: ${model?.content}")
         val contentItem = Gson().fromJson(model?.content, ContentItem::class.java)
-        val postImageItem = contentItem.images[0]
+        val postImageItem = takeIf { contentItem.images != null && contentItem.images.isNotEmpty() }?.let { contentItem.images?.get(0) }
 
         videoTime.text = contentItem.shortVideo.length
         profileName.text = model?.postFriendlyName
@@ -52,32 +54,39 @@ class ClipViewHolder(
             )
         )
 
-        if (!TextUtils.isEmpty(postImageItem.url)) {
-            Glide.with(itemView.context)
-                .load(postImageItem.url)
-                .into(videoImage)
-        } else {
-            if (!TextUtils.isEmpty(postImageItem.id)) {
-                if (getLruCache(postImageItem.id) == null) {
-                    attachmentListener.onGetAttachment(
-                        postImageItem.id,
-                        index,
-                        HomeItemType.CLIP
-                    )
-                } else {
-                    val bitmap = getLruCache(postImageItem.id)
-                    Glide.with(itemView.context)
-                        .load(bitmap)
-                        .into(videoImage)
+        postImageItem?.also {
+            if (!TextUtils.isEmpty(postImageItem.url)) {
+                Glide.with(itemView.context)
+                    .load(postImageItem.url)
+                    .into(videoImage)
+            } else {
+                if (!TextUtils.isEmpty(postImageItem.id)) {
+                    if (getLruCache(postImageItem.id) == null) {
+                        attachmentListener.onGetAttachment(
+                            postImageItem.id,
+                            index,
+                            AttachmentType.ADULT_CLIP
+                        )
+                    } else {
+                        val bitmap = getLruCache(postImageItem.id)
+                        Glide.with(itemView.context)
+                            .load(bitmap)
+                            .into(videoImage)
+                    }
                 }
             }
+        } ?: run {
+            Glide.with(itemView.context)
+                .load(R.drawable.img_404)
+                .into(videoImage)
         }
+
 
         if (getLruCache(model?.avatarAttachmentId.toString()) == null) {
             attachmentListener.onGetAttachment(
                 model?.avatarAttachmentId.toString(),
                 index,
-                HomeItemType.CLIP
+                AttachmentType.ADULT_HOME_CLIP
             )
         } else {
             val bitmap = getLruCache(model?.avatarAttachmentId.toString())

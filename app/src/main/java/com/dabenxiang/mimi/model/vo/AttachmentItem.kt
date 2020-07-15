@@ -1,11 +1,12 @@
 package com.dabenxiang.mimi.model.vo
 
 import android.graphics.Bitmap
-import com.dabenxiang.mimi.model.enums.HomeItemType
+import com.dabenxiang.mimi.model.enums.AttachmentType
 
 data class AttachmentItem(
-    var id: String,
-    var bitmap: Bitmap,
-    var position: Int,
-    val type: HomeItemType? = null
+    var id: String? = null,
+    var bitmap: Bitmap? = null,
+    var parentPosition: Int? = null,
+    var position: Int? = null,
+    val type: AttachmentType? = null
 )

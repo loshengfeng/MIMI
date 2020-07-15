@@ -61,13 +61,14 @@ class FavoritePlayViewHolder(
                 data!!
             )
         }
-        tvMore.setOnClickListener {
-            listener.onFunctionClick(
-                FunctionType.MORE,
-                it,
-                data!!
-            )
-        }
+        tvMore.visibility = View.GONE
+//        tvMore.setOnClickListener {
+//            listener.onFunctionClick(
+//                FunctionType.MORE,
+//                it,
+//                data!!
+//            )
+//        }
     }
 
     override fun updated() {

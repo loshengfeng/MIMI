@@ -44,6 +44,8 @@
     <color name="color_black_2_50">#80222222</color>
     <color name="color_black_3">#101428</color>
     <color name="color_black_4">#141932</color>
+    <color name="color_black_4_50">#80141932</color>
+    <color name="color_black_5">#b3000000</color>
     <color name="color_red_1">#ff4d4d</color>
     <color name="color_red_2">#e57c7c</color>
     <color name="color_red_3">#ed5063</color>
@@ -51,6 +53,7 @@
     <color name="color_red_5">#ff8f8f</color>
     <color name="color_red_6">#ff5955</color>
     <color name="color_red_7">#19ff4d4d</color>
+    <color name="color_red_8">#FFFD333D</color>
     <color name="color_gray_1">#e5e5e5</color>
     <color name="color_gray_2">#f7f7f7</color>
     <color name="color_gray_3">#d8d8d8</color>
@@ -64,4 +67,6 @@
     <color name="color_gray_11">#dbdbdb</color>
     <color name="color_gray_12">#f2f2f2</color>
     <color name="color_gray_13">#ececec</color>
+
+    <color name="clip_comment_bg">#b31e233a</color>
 </resources>

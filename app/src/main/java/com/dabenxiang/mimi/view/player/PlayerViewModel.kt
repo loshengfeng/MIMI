@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.callback.GuessLikePagingCallBack
 import com.dabenxiang.mimi.event.SingleLiveEvent
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
@@ -40,9 +41,10 @@ class PlayerViewModel : BaseViewModel() {
         const val StreamUrlFormat = "%s/v1/Player/%d/%d/%d?userId=%d&utcTime=%d&sign=%s"
     }
 
-    var videoId: Long = 0L
+    var videoId: Long = 0L // 一開始用最外層的id, 點選影片之後用裡面的 source id
     var category: String = ""
     var episodeId: Long = -1L
+    var isReported: Boolean = false
 
     var currentWindow: Int = 0
     var playbackPosition: Long = 0
@@ -101,11 +103,14 @@ class PlayerViewModel : BaseViewModel() {
 
     private val _apiAddFavoriteResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
     val apiAddFavoriteResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> =
-            _apiAddFavoriteResult
+        _apiAddFavoriteResult
 
     private val _apiAddLikeResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
     val apiAddLikeResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> =
-            _apiAddLikeResult
+        _apiAddLikeResult
+
+    private val _apiReportResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
+    val apiReportResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _apiReportResult
 
     fun updatedSelectedNewestComment(isNewest: Boolean) {
         _isSelectedNewestComment.value = isNewest
@@ -298,6 +303,9 @@ class PlayerViewModel : BaseViewModel() {
                 if (!isDeducted) throw Exception("點數不足")
 
                 val episodeInfo = episodeResp.body()?.content
+                isReported = episodeInfo?.reported ?: false
+                videoId = episodeInfo?.id ?: 0
+
                 val stream = episodeInfo?.videoStreams?.get(0)!!
                 val streamResp = apiRepository.getVideoStreamOfEpisode(
                     videoId,
@@ -560,53 +568,78 @@ class PlayerViewModel : BaseViewModel() {
     /**
      * 加入收藏與解除收藏
      */
-    fun modifyFavorite(){
+    fun modifyFavorite() {
         viewModelScope.launch {
             flow {
                 val resp = if (favoriteVideo.value == true)
                     domainManager.getApiRepository()
-                            .deleteMePlaylist(videoId.toString())
+                        .deleteMePlaylist(videoId.toString())
                 else
                     domainManager.getApiRepository()
-                            .postMePlaylist(PlayListRequest(videoId, 1))
+                        .postMePlaylist(PlayListRequest(videoId, 1))
 
                 if (!resp.isSuccessful) throw HttpException(resp)
 
                 emit(ApiResult.success(null))
             }
-                    .flowOn(Dispatchers.IO)
-                    .catch { e ->
-                        emit(ApiResult.error(e))
-                    }
-                    .onStart { emit(ApiResult.loading()) }
-                    .onCompletion { emit(ApiResult.loaded()) }
-                    .collect {
-                        _apiAddFavoriteResult.value = SingleLiveEvent(it)
-                    }
+                .flowOn(Dispatchers.IO)
+                .catch { e ->
+                    emit(ApiResult.error(e))
+                }
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect {
+                    _apiAddFavoriteResult.value = SingleLiveEvent(it)
+                }
         }
     }
 
     /**
      * 按讚、取消讚
      */
-    fun modifyLike(){
+    fun modifyLike() {
         viewModelScope.launch {
             flow {
+                val likeType = if (likeVideo.value == true) LikeType.DISLIKE else LikeType.LIKE
                 val resp = domainManager.getApiRepository()
-                        .addLike(videoId, LikeRequest(if (likeVideo.value == true) 1 else 0))
+                    .like(videoId, LikeRequest(likeType))
                 if (!resp.isSuccessful) throw HttpException(resp)
 
                 emit(ApiResult.success(null))
             }
-                    .flowOn(Dispatchers.IO)
-                    .catch { e ->
-                        emit(ApiResult.error(e))
-                    }
-                    .onStart { emit(ApiResult.loading()) }
-                    .onCompletion { emit(ApiResult.loaded()) }
-                    .collect {
-                        _apiAddLikeResult.value = SingleLiveEvent(it)
-                    }
+                .flowOn(Dispatchers.IO)
+                .catch { e ->
+                    emit(ApiResult.error(e))
+                }
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect {
+                    _apiAddLikeResult.value = SingleLiveEvent(it)
+                }
+        }
+    }
+
+    /**
+     * 問題回報
+     */
+    fun sentReport(content: String) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository()
+                    .postReport(videoId, ReportRequest(content))
+                if (!resp.isSuccessful) throw HttpException(resp)
+
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e ->
+                    emit(ApiResult.error(e))
+                }
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect {
+                    _apiReportResult.value = SingleLiveEvent(it)
+                }
         }
     }
 }

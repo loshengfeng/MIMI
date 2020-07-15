@@ -25,6 +25,10 @@
             android:id="@+id/action_adultHomeFragment_to_postArticleFragment"
             app:destination="@id/postArticleFragment" />
 
+        <action
+            android:id="@+id/action_adultHomeFragment_to_pictureDetailFragment"
+            app:destination="@id/pictureDetailFragment" />
+
     </fragment>
 
     <fragment
@@ -51,5 +55,21 @@
         android:id="@+id/postArticleFragment"
         android:name="com.dabenxiang.mimi.view.post.PostArticleFragment"
         tools:layout="@layout/fragment_post_article" />
+
+    <fragment
+        android:id="@+id/pictureDetailFragment"
+        android:name="com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment"
+        tools:layout="@layout/fragment_picture_detail">
+
+        <action
+            android:id="@+id/action_pictureDetailFragment_to_pictureFragment"
+            app:destination="@id/pictureFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/pictureFragment"
+        android:name="com.dabenxiang.mimi.view.fullpicture.FullPictureFragment"
+        tools:layout="@layout/fragment_full_picture" />
 
 </navigation>

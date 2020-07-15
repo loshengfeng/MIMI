@@ -237,14 +237,14 @@ class FavoriteFragment : BaseFragment() {
                         is PlayItem -> {
                             item.videoId?.let {
                                 viewModel.viewStatus[it] = viewModel.viewStatus[it]
-                                    ?: if (item.like == true) LikeType.LIKE.value else LikeType.DISLIKE.value
+                                    ?: if (item.like == true) LikeType.LIKE else LikeType.DISLIKE
                                 viewModel.modifyLike(textView, it)
                             }
                         }
                         is PostFavoriteItem -> {
                             item.id?.let {
                                 viewModel.viewStatus[it] =
-                                    viewModel.viewStatus[it] ?: LikeType.DISLIKE.value
+                                    viewModel.viewStatus[it] ?: LikeType.DISLIKE
                                 viewModel.modifyLike(textView, it)
                             }
                         }
@@ -309,10 +309,10 @@ class FavoriteFragment : BaseFragment() {
     private fun refreshUI(view: TextView) {
         var count = view.text.toString().toInt()
         when (viewModel.viewStatus[view.tag as Long]) {
-            LikeType.LIKE.value -> {
+            LikeType.LIKE -> {
                 count++
             }
-            LikeType.DISLIKE.value -> {
+            LikeType.DISLIKE -> {
                 count--
             }
         }
@@ -321,8 +321,8 @@ class FavoriteFragment : BaseFragment() {
 
     private fun refreshLikeLeftIcon(view: TextView) {
         val res = when (viewModel.viewStatus[view.tag as Long]) {
-            LikeType.LIKE.value -> R.drawable.ico_nice_s
-            LikeType.DISLIKE.value -> R.drawable.ico_nice_gray
+            LikeType.LIKE -> R.drawable.ico_nice_s
+            LikeType.DISLIKE -> R.drawable.ico_nice_gray
             else -> R.drawable.ico_nice_gray
         }
 
@@ -331,7 +331,6 @@ class FavoriteFragment : BaseFragment() {
 
     private val onCleanDialogListener = object : OnCleanDialogListener {
         override fun onClean() {
-            // todo: 清除此頁顯示的視頻...
             viewModel.deleteFavorite()
         }
     }
@@ -339,11 +338,11 @@ class FavoriteFragment : BaseFragment() {
     private val onReportDialogListener = object : OnMoreDialogListener {
         override fun onReport(item: BaseItem) {
             val postId = when (item) {
-                is PlayItem -> item.id ?: 0
+                is PlayItem -> item.videoId ?: 0
                 is PostFavoriteItem -> item.postId ?: 0
                 else -> 0
             }
-            viewModel.report(postId)
+//            viewModel.report(postId)
         }
     }
 }
