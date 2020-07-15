@@ -12,5 +12,4 @@ class PictureGridViewHolder(itemView: View) : BaseViewHolder(itemView) {
     val picture: ImageView = itemView.iv_picture
     val mask: View = itemView.view_mask
     val imageCount: TextView = itemView.tv_image_count
-
 }

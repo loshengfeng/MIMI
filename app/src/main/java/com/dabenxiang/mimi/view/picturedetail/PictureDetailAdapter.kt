@@ -22,7 +22,8 @@ import java.util.*
 class PictureDetailAdapter(
     val context: Context,
     private val memberPostItem: MemberPostItem,
-    private val onPictureDetailListener: OnPictureDetailListener
+    private val onPictureDetailListener: OnPictureDetailListener,
+    private val onItemClickListener: PhotoGridAdapter.OnItemClickListener
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -101,7 +102,12 @@ class PictureDetailAdapter(
                 2 -> GridLayoutManager(context, 2)
                 else -> GridLayoutManager(context, 3)
             }
-            adapter = PhotoGridAdapter(context, contentItem.images, onPictureDetailListener)
+            adapter = PhotoGridAdapter(
+                context,
+                contentItem.images,
+                onPictureDetailListener,
+                onItemClickListener
+            )
             holder.photoGrid.adapter = adapter
 
             holder.tagChipGroup.removeAllViews()

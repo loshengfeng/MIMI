@@ -13,11 +13,11 @@ import com.dabenxiang.mimi.view.picturedetail.viewholder.PictureGridViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 
-
 class PhotoGridAdapter(
     val context: Context,
     val images: ArrayList<ImageItem>,
-    private val onPictureDetailListener: PictureDetailAdapter.OnPictureDetailListener
+    private val onPictureDetailListener: PictureDetailAdapter.OnPictureDetailListener,
+    private val onItemClickListener: OnItemClickListener
 ) : RecyclerView.Adapter<PictureGridViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PictureGridViewHolder {
@@ -33,7 +33,6 @@ class PhotoGridAdapter(
 
     override fun onBindViewHolder(holder: PictureGridViewHolder, position: Int) {
         val imageItem = images[position]
-        val bitmap = LruCacheUtils.getLruCache(imageItem.id)
 
         if (images.size > 3) {
             val imgParams = holder.picture.layoutParams
@@ -55,6 +54,7 @@ class PhotoGridAdapter(
             if (LruCacheUtils.getLruCache(imageItem.id) == null) {
                 onPictureDetailListener.onGetAttachment(imageItem.id, position)
             } else {
+                val bitmap = LruCacheUtils.getLruCache(imageItem.id)
                 Glide.with(context)
                     .load(bitmap)
                     .into(holder.picture)
@@ -67,5 +67,13 @@ class PhotoGridAdapter(
             holder.imageCount.text =
                 StringBuilder("+").append((images.size - 5).toString()).toString()
         }
+
+        holder.cardView.setOnClickListener {
+            onItemClickListener.onItemClick(position, images)
+        }
+    }
+
+    interface OnItemClickListener {
+        fun onItemClick(position: Int, imageItems: ArrayList<ImageItem>)
     }
 }

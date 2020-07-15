@@ -9,8 +9,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.model.api.ApiResult.Success
+import com.dabenxiang.mimi.model.api.vo.ImageItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.fullpicture.FullPictureFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_picture_detail.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -40,7 +43,6 @@ class PictureDetailFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val memberPostItem = arguments?.getSerializable(KEY_DATA) as MemberPostItem
-        Timber.d("item: $memberPostItem")
 
         text_toolbar_title.text = getString(R.string.picture_detail_title)
         toolbarContainer.toolbar.navigationIcon =
@@ -49,7 +51,12 @@ class PictureDetailFragment : BaseFragment() {
             findNavController().navigateUp()
         }
 
-        adapter = PictureDetailAdapter(requireContext(), memberPostItem, onPictureDetailListener)
+        adapter = PictureDetailAdapter(
+            requireContext(),
+            memberPostItem,
+            onPictureDetailListener,
+            onItemClickListener
+        )
         recycler_picture_detail.layoutManager = LinearLayoutManager(context)
         recycler_picture_detail.adapter = adapter
     }
@@ -89,6 +96,18 @@ class PictureDetailFragment : BaseFragment() {
 
         override fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
             viewModel.followPost(item, position, isFollow)
+        }
+    }
+
+    private val onItemClickListener = object : PhotoGridAdapter.OnItemClickListener {
+        override fun onItemClick(position: Int, imageItems: ArrayList<ImageItem>) {
+            val bundle = FullPictureFragment.createBundle(position, imageItems)
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_pictureDetailFragment_to_pictureFragment,
+                    bundle
+                )
+            )
         }
     }
 
