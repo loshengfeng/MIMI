@@ -6,6 +6,7 @@ import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
@@ -29,6 +30,8 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
+import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.OnChooseUploadMethodDialogListener
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
@@ -270,6 +273,15 @@ class AdultHomeFragment : BaseFragment() {
                     bundle
                 )
             )
+        }
+
+        iv_post.setOnClickListener {
+            ChooseUploadMethodDialogFragment.newInstance(onChooseUploadMethodDialogListener).also {
+                it.show(
+                    requireActivity().supportFragmentManager,
+                    ChooseUploadMethodDialogFragment::class.java.simpleName
+                )
+            }
         }
     }
 
@@ -520,6 +532,18 @@ class AdultHomeFragment : BaseFragment() {
         override fun onLoadClubViewHolder(vh: HomeClubViewHolder) {
             homeClubViewHolderMap[vh.adapterPosition] = vh
             viewModel.loadNestedClubList(vh.adapterPosition)
+        }
+    }
+
+    private val onChooseUploadMethodDialogListener = object : OnChooseUploadMethodDialogListener {
+        override fun onUploadVideo() {
+        }
+
+        override fun onUploadPic() {
+        }
+
+        override fun onUploadArticle() {
+            findNavController().navigate(R.id.action_adultHomeFragment_to_postArticleFragment)
         }
     }
 }
