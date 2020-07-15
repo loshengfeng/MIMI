@@ -3,14 +3,17 @@ package com.dabenxiang.mimi.view.topup
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.AgentItem
 import com.dabenxiang.mimi.model.holder.TopUpOnlinePayItem
 import com.dabenxiang.mimi.model.holder.TopUpProxyPayItem
+import com.dabenxiang.mimi.view.adapter.TopUpAgentAdapter
 import com.dabenxiang.mimi.view.adapter.TopUpOnlinePayAdapter
-import com.dabenxiang.mimi.view.adapter.TopUpProxyPayAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.listener.AdapterEventListener
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
@@ -20,6 +23,8 @@ import timber.log.Timber
 class TopUpFragment : BaseFragment() {
 
     private val viewModel: TopUpViewModel by viewModels()
+
+    private val agentAdapter by lazy { TopUpAgentAdapter(agentListener) }
 
     private val onlinePayListener = object : AdapterEventListener<TopUpOnlinePayItem> {
         override fun onItemClick(view: View, item: TopUpOnlinePayItem) {
@@ -52,8 +57,9 @@ class TopUpFragment : BaseFragment() {
         rg_Type.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.rb_online_pay -> {
-                    layout_online_pay.visibility = View.VISIBLE
-                    rv_proxy_pay.visibility = View.GONE
+                    // 暫時不做
+//                    layout_online_pay.visibility = View.VISIBLE
+//                    rv_proxy_pay.visibility = View.GONE
                 }
                 R.id.rb_proxy_pay -> {
                     layout_online_pay.visibility = View.GONE
@@ -78,7 +84,7 @@ class TopUpFragment : BaseFragment() {
 
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
-                R.id.btn_pay -> GeneralUtils.showToast(context!!, "btnPay")
+                R.id.btn_pay -> GeneralUtils.showToast(requireContext(), "btnPay")
             }
         }.also {
             btn_pay.setOnClickListener(it)
@@ -86,9 +92,10 @@ class TopUpFragment : BaseFragment() {
     }
 
     override fun initSettings() {
-        tv_name.text = "好大一棵洋梨"
-        tv_coco.text = "200"
-        tv_subtitle.text = "副标内容副标内容"
+        val userItem = viewModel.getUserData()
+        tv_name.text = userItem.friendlyName
+        tv_coco.text = userItem.point.toString()
+        tv_subtitle.text = getString(R.string.topup_subtitle)
         tv_total.text = "¥ 50.00"
 
         GridLayoutManager(context, 2).also { layoutManager ->
@@ -113,16 +120,23 @@ class TopUpFragment : BaseFragment() {
             }
         }
 
-        val proxyPayList = mutableListOf<TopUpProxyPayItem>(
-            TopUpProxyPayItem("photo", "火热代理1", "密密1"),
-            TopUpProxyPayItem("photo", "火热代理2", "密密2"),
-            TopUpProxyPayItem("photo", "火热代理3", "密密3"),
-            TopUpProxyPayItem("photo", "火热代理4", "密密4")
-        )
+        //todo 尚未測試，因為目前沒有資料可以做測試
+        rv_proxy_pay.adapter = agentAdapter
 
-        rv_proxy_pay.adapter = TopUpProxyPayAdapter(proxyPayListener)
-        val proxyAdapter = rv_proxy_pay.adapter as TopUpProxyPayAdapter
-        proxyAdapter.setDataSrc(proxyPayList)
+        viewModel.initData()
 
+        tv_record_top_up.setOnClickListener {
+            navigateTo(NavigateItem.Destination(R.id.action_topupFragment_to_orderFragment))
+        }
+
+        viewModel.agentList.observe(viewLifecycleOwner, Observer {
+            agentAdapter.submitList(it)
+        })
+    }
+
+    private val agentListener = object : AdapterEventListener<AgentItem>{
+        override fun onItemClick(view: View, item: AgentItem) {
+
+        }
     }
 }

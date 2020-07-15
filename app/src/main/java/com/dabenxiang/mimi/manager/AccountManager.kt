@@ -34,6 +34,7 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
         pref.profileItem.userId = meItem.id ?: 0
         pref.profileItem.avatarAttachmentId = meItem.avatarAttachmentId ?: 0
         pref.profileItem.friendlyName = meItem.friendlyName ?: ""
+        pref.profileItem.point = meItem.availablePoint ?: 0
     }
 
     fun hasMemberToken(): Boolean {
