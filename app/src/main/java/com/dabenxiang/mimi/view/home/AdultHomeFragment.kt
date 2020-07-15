@@ -8,6 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.AttachmentListener
@@ -23,13 +24,13 @@ import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.*
+import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
-import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
-import com.dabenxiang.mimi.view.picturepost.PicturePostHolder
+import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.putLruCache
@@ -172,6 +173,32 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
+        viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    when (commonPagedAdapter.viewHolderMap[it.result]) {
+                        is PicturePostHolder -> {
+                            commonPagedAdapter.notifyItemChanged(it.result)
+                        }
+                    }
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
+
+        viewModel.likePostResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    when (commonPagedAdapter.viewHolderMap[it.result]) {
+                        is PicturePostHolder -> {
+                            commonPagedAdapter.notifyItemChanged(it.result)
+                        }
+                    }
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
+
         viewModel.attachmentByTypeResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
@@ -212,14 +239,10 @@ class AdultHomeFragment : BaseFragment() {
                     val attachmentItem = it.result
                     putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
                     when (val holder =
-                        commonPagedAdapter.attachmentViewHolderMap[attachmentItem.parentPosition]) {
+                        commonPagedAdapter.viewHolderMap[attachmentItem.parentPosition]) {
                         is PicturePostHolder -> {
                             if (holder.pictureRecycler.tag == attachmentItem.parentPosition) {
-                                commonPagedAdapter.updateInternalItem(
-                                    holder,
-                                    attachmentItem.parentPosition!!,
-                                    attachmentItem.position!!
-                                )
+                                commonPagedAdapter.updateInternalItem(holder)
                             }
                         }
                     }
@@ -270,6 +293,8 @@ class AdultHomeFragment : BaseFragment() {
         recyclerview.background = requireActivity().getDrawable(R.color.adult_color_background)
         recyclerview.layoutManager = LinearLayoutManager(requireContext())
         recyclerview.adapter = homeAdapter
+        LinearSnapHelper().attachToRecyclerView(recyclerview)
+
         refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
     }
 
@@ -374,24 +399,30 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val adultListener = object : AdultListener {
-        override fun doLike() {
-
+        override fun onFollowPostClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
+            viewModel.followPost(item, position, isFollow)
         }
 
-        override fun follow() {
-
+        override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
+            viewModel.likePost(item, position, isLike)
         }
 
-        override fun cancelFollow() {
-
+        override fun onCommentClick() {
+            // TODO:
         }
 
-        override fun comment() {
-
+        override fun onMoreClick() {
+            // TODO:
         }
 
-        override fun more() {
-
+        override fun onItemClick(item: MemberPostItem) {
+            val bundle = PictureDetailFragment.createBundle(item)
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_adultHomeFragment_to_pictureDetailFragment,
+                    bundle
+                )
+            )
         }
     }
 
@@ -406,24 +437,20 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val clubListener = object : HomeClubAdapter.ClubListener {
-        override fun followClub(id: Int, position: Int) {
-            viewModel.followClub(id, position, true)
-        }
-
-        override fun cancelFollowClub(id: Int, position: Int) {
-            viewModel.followClub(id, position, false)
+        override fun followClub(item: MemberClubItem, position: Int, isFollow: Boolean) {
+            viewModel.followClub(item, position, isFollow)
         }
     }
 
     private val adapterListener = object : HomeAdapter.EventListener {
+
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
-            val bundle = CategoriesFragment.createBundle(item.title ?: "", item.categories)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_homeFragment_to_categoriesFragment,
-                    bundle
-                )
-            )
+            when (item.title) {
+                "蜜蜜影视" -> viewModel.setTopTabPosition(1)
+                "短视频" -> viewModel.setTopTabPosition(3)
+                "图片" -> viewModel.setTopTabPosition(4)
+                "圈子" -> viewModel.setTopTabPosition(6)
+            }
         }
 
         override fun onVideoClick(view: View, item: PlayerData) {
@@ -443,7 +470,13 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onPictureClick(view: View, item: MemberPostItem) {
-
+            val bundle = PictureDetailFragment.createBundle(item)
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_adultHomeFragment_to_pictureDetailFragment,
+                    bundle
+                )
+            )
         }
 
         override fun onClubClick(view: View, item: MemberClubItem) {

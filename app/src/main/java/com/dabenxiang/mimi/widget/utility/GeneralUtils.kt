@@ -24,6 +24,7 @@ import retrofit2.HttpException
 import retrofit2.Response
 import java.util.*
 import java.util.regex.Pattern
+import kotlin.math.roundToInt
 
 object GeneralUtils {
 
@@ -160,5 +161,10 @@ object GeneralUtils {
                 time.toString().plus("秒鐘前")
             }
         }
+    }
+
+    fun dpToPx(context: Context, dp: Int): Int {
+        val density = context.resources.displayMetrics.density
+        return (dp.toFloat() * density).roundToInt()
     }
 }

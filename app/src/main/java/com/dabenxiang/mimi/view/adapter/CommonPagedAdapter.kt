@@ -8,16 +8,19 @@ import androidx.core.content.ContextCompat
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.OnItemClickListener
 import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
+import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.view.picturepost.PicturePostHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.getLruCache
 import com.google.android.material.chip.Chip
@@ -50,7 +53,7 @@ class CommonPagedAdapter(
 
     private var adultTabType: AdultTabType = AdultTabType.FOLLOW
 
-    val attachmentViewHolderMap = hashMapOf<Int, BaseViewHolder>()
+    val viewHolderMap = hashMapOf<Int, BaseViewHolder>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (adultTabType) {
@@ -74,7 +77,7 @@ class CommonPagedAdapter(
         when (holder) {
             is PicturePostHolder -> {
                 holder.pictureRecycler.tag = position
-                attachmentViewHolderMap[position] = holder
+                viewHolderMap[position] = holder
                 setupPicturePost(holder, position)
             }
         }
@@ -106,6 +109,16 @@ class CommonPagedAdapter(
             holder.follow.setTextColor(context.getColor(R.color.color_red_1))
         }
 
+        val likeType = item?.likeType ?: LikeType.DISLIKE
+        val isLike: Boolean
+        if (likeType == LikeType.LIKE) {
+            isLike = true
+            holder.likeImage.setImageResource(R.drawable.ico_nice_s)
+        } else {
+            isLike = false
+            holder.likeImage.setImageResource(R.drawable.ico_nice)
+        }
+
         if (getLruCache(item?.avatarAttachmentId.toString()) == null) {
             attachmentListener.onGetAttachment(
                 item?.avatarAttachmentId.toString(),
@@ -133,34 +146,62 @@ class CommonPagedAdapter(
         }
 
         val contentItem = Gson().fromJson(item?.content, ContentItem::class.java)
-        if (holder.pictureRecycler.adapter == null) {
+        if (holder.pictureRecycler.adapter == null || holder.pictureCount.tag != position) {
+            holder.pictureCount.tag = position
             holder.pictureRecycler.layoutManager = LinearLayoutManager(
                 context, LinearLayoutManager.HORIZONTAL, false
             )
+
             holder.pictureRecycler.adapter = PictureAdapter(
-                context, attachmentListener, contentItem.images ?: arrayListOf(), position
+                context,
+                attachmentListener,
+                contentItem.images,
+                position,
+                object : OnItemClickListener {
+                    override fun onItemClick() {
+                        adultListener.onItemClick(item!!)
+                    }
+                }
             )
+            holder.pictureRecycler.onFlingListener = null
+            LinearSnapHelper().attachToRecyclerView(holder.pictureRecycler)
+
+            holder.pictureRecycler.setOnScrollChangeListener { _, _, _, _, _ ->
+                val currentPosition =
+                    (holder.pictureRecycler.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                holder.pictureCount.text =
+                    "${currentPosition + 1}/${contentItem.images?.size}"
+            }
+
+            holder.pictureCount.text = "1/${contentItem.images?.size}"
+        }
+
+        holder.follow.setOnClickListener {
+            adultListener.onFollowPostClick(item!!, position, !isFollow)
         }
 
         holder.likeImage.setOnClickListener {
-            adultListener.doLike()
+            adultListener.onLikeClick(item!!, position, !isLike)
         }
 
         holder.commentImage.setOnClickListener {
-            adultListener.comment()
+            adultListener.onCommentClick()
         }
 
         holder.moreImage.setOnClickListener {
-            adultListener.more()
+            adultListener.onMoreClick()
+        }
+
+        holder.picturePostItemLayout.setOnClickListener {
+            adultListener.onItemClick(item!!)
         }
     }
 
-    fun updateInternalItem(holder: BaseViewHolder?, parentPosition: Int, position: Int) {
+    fun updateInternalItem(holder: BaseViewHolder) {
         when (holder) {
             is PicturePostHolder -> {
                 holder.pictureRecycler.adapter?.notifyDataSetChanged()
             }
         }
     }
-
 }

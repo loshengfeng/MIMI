@@ -181,6 +181,12 @@
     <string name="reply">回复</string>
     <string name="n_reply">%d个回复</string>
 
+    <!-- Picture Detail -->
+    <string name="picture_detail_title">图片详情</string>
+    <string name="picture_detail_comment">评论</string>
+    <string name="picture_detail_comment_newest">最新</string>
+    <string name="picture_detail_comment_top">最热</string>
+
     <!-- Follow -->
     <string name="follow">+关注</string>
     <string name="followed">已关注</string>
@@ -196,4 +202,6 @@
     </string-array>
 
     <string name="already_reported">您已回报过问题</string>
+    <string name="clip_username">"@%s"</string>
+    <string name="clip_comment_count">"%d 评论"</string>
 </resources>

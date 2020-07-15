@@ -203,12 +203,14 @@ class ApiRepository(private val apiService: ApiService) {
         body: EmailRequest
     ) = apiService.resendEmail(body)
 
-    /**
-     * 驗證信箱
-     */
-//    suspend fun validationEmail(
-//        key: String
-//    ) = apiService.validationEmail(key)
+    suspend fun followPost(userId: Long): Response<Void> {
+        return apiService.followPost(userId)
+    }
+
+    suspend fun cancelFollowPost(userId: Long): Response<Void> {
+        return apiService.cancelFollowPost(userId)
+    }
+
     /**********************************************************
      *
      *                  Members/Post
@@ -252,18 +254,18 @@ class ApiRepository(private val apiService: ApiService) {
      *                  Members/Club
      *
      ***********************************************************/
-    suspend fun getMembersClub(
+    suspend fun getMembersClubPost(
         offset: Int,
         limit: Int
     ): Response<ApiBasePagingItem<List<MemberClubItem>>> {
-        return apiService.getMembersClub(offset, limit)
+        return apiService.getMembersClubPost(offset, limit)
     }
 
-    suspend fun followClub(clubId: Int): Response<Void> {
+    suspend fun followClub(clubId: Long): Response<Void> {
         return apiService.followClub(clubId)
     }
 
-    suspend fun cancelFollowClub(clubId: Int): Response<Void> {
+    suspend fun cancelFollowClub(clubId: Long): Response<Void> {
         return apiService.cancelFollowClub(clubId)
     }
 
@@ -476,18 +478,10 @@ class ApiRepository(private val apiService: ApiService) {
     /**
      * 帖子喜歡/不喜歡
      */
-    suspend fun addLike(
+    suspend fun like(
         postId: Long,
         body: LikeRequest
-    ) = apiService.addLike(postId, body)
-
-    // todo: not sure...
-    /**
-     * 移除帖子的喜歡/不喜歡
-     */
-//    suspend fun deleteLike(
-//        postId: Long
-//    ) = apiService.deleteLike(postId)
+    ) = apiService.like(postId, body)
 
     /**
      * 帖子問題回報

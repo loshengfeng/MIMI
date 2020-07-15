@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="#00000000"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_comment"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:background="@drawable/bg_comment_dialog"
+        app:layout_constraintBottom_toTopOf="@id/cl_input">
+
+        <TextView
+            android:id="@+id/tv_comment_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="@color/color_white_1"
+            android:paddingVertical="10dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="50 评论"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_comment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintTop_toBottomOf="@id/tv_comment_count"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_input"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:paddingVertical="8dp"
+        android:background="@color/adult_color_status_bar"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ImageView
+            android:id="@+id/iv_bar"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="60dp"
+            android:src="@drawable/bg_black_1_30_radius_18"
+            app:layout_constraintBottom_toBottomOf="@id/et_message"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/et_message"
+            android:contentDescription="@null" />
+
+        <Space
+            android:id="@+id/space_start"
+            android:layout_width="18dp"
+            android:layout_height="1dp"
+            app:layout_constraintStart_toStartOf="@id/iv_bar"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_replay_name"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:gravity="center"
+            android:paddingVertical="6dp"
+            android:layout_marginEnd="10dp"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/color_white_1"
+            app:layout_constraintStart_toEndOf="@id/space_start"
+            app:layout_constraintEnd_toStartOf="@id/et_message"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:text="Jeff" />
+
+        <EditText
+            android:id="@+id/et_message"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="18dp"
+            android:background="@color/color_black_1_20"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:textColor="@color/color_white_1"
+            android:textSize="14sp"
+            android:hint="@string/edit_hint_chat"
+            android:textColorHint="@color/color_white_1_50"
+            android:autofillHints="@null"
+            android:inputType="text"
+            app:layout_constraintEnd_toEndOf="@id/iv_bar"
+            app:layout_constraintStart_toEndOf="@id/tv_replay_name"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:hint="留下评论" />
+
+        <ImageView
+            android:id="@+id/btn_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:src="@drawable/btn_send_n"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/iv_bar"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:contentDescription="@null" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

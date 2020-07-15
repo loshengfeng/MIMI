@@ -17,6 +17,7 @@ import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.HomeTemplate
 import com.dabenxiang.mimi.view.home.viewholder.*
+import timber.log.Timber
 
 class HomeAdapter(
     val context: Context,

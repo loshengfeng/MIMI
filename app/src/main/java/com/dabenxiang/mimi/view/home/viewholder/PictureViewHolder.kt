@@ -25,8 +25,8 @@ class PictureViewHolder(
     private val card = itemView.layout_card!!
     private val pictureImage = itemView.iv_poster!!
     private val avatarImg = itemView.img_avatar!!
-    private val profileName = itemView.tv_name!!
-    private val profileTime = itemView.tv_time!!
+    private val posterName = itemView.tv_name!!
+    private val posterTime = itemView.tv_time!!
     private val title = itemView.tv_title!!
 
     init {
@@ -38,12 +38,12 @@ class PictureViewHolder(
     override fun updated(model: MemberPostItem?) {
         val contentItem = Gson().fromJson(model?.content, ContentItem::class.java)
         val postImageItem =
-            takeIf { contentItem.images != null && contentItem.images.isNotEmpty() }?.let {
-                contentItem.images?.get(0)
+            takeIf { contentItem.images.isNotEmpty() }?.let {
+                contentItem.images.get(0)
             }
 
-        profileName.text = model?.postFriendlyName
-        profileTime.text = GeneralUtils.getTimeDiff(model?.creationDate ?: Date(), Date())
+        posterName.text = model?.postFriendlyName
+        posterTime.text = GeneralUtils.getTimeDiff(model?.creationDate ?: Date(), Date())
         title.text = model?.title
 
         card.setCardBackgroundColor(
@@ -76,7 +76,7 @@ class PictureViewHolder(
             }
         } ?: run {
             Glide.with(itemView.context)
-                .load(R.drawable.img_notlogin)
+                .load(R.drawable.img_404)
                 .into(pictureImage)
         }
 

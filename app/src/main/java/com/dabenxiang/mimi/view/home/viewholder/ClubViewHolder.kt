@@ -61,11 +61,7 @@ class ClubViewHolder(
         }
 
         follow.setOnClickListener {
-            if (isFollow) {
-                clubListener.cancelFollowClub(model?.id?.toInt()!!, index)
-            } else {
-                clubListener.followClub(model?.id?.toInt()!!, index)
-            }
+            clubListener.followClub(model!!, index, !isFollow)
         }
 
         if (getLruCache(model?.avatarAttachmentId.toString()) == null) {
@@ -110,7 +106,7 @@ class ClubViewHolder(
             }
         } else {
             Glide.with(itemView.context)
-                .load(R.drawable.img_notlogin)
+                .load(R.drawable.img_404)
                 .circleCrop()
                 .into(clubImg)
         }

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/item_color_card_background"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/picture_detail_comment"
+        android:textColor="@color/color_white_1"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="评论" />
+
+    <TextView
+        android:id="@+id/tv_comment_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/picture_detail_comment_top"
+        android:textColor="@color/color_white_1_30"
+        android:textSize="14sp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="最热" />
+
+    <TextView
+        android:id="@+id/tv_line"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:textColor="@color/color_white_1_30"
+        android:textSize="14sp"
+        app:layout_constraintRight_toLeftOf="@+id/tv_comment_top"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="|" />
+
+    <TextView
+        android:id="@+id/tv_comment_newest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:text="@string/picture_detail_comment_newest"
+        android:textColor="@color/color_red_1"
+        android:textSize="14sp"
+        app:layout_constraintRight_toLeftOf="@+id/tv_line"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="最新" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -16,14 +16,15 @@
         app:show_timeout="0"
         android:visibility="visible"
         tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp" />
+        tools:layout_editor_absoluteY="0dp" >
 
-    <ImageView
-        android:id="@+id/iv_cover"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:contentDescription="@null"
-        android:scaleType="fitCenter" />
+        <ImageView
+            android:id="@+id/iv_cover"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@null"
+            android:scaleType="fitCenter" />
+    </com.google.android.exoplayer2.ui.PlayerView>
 
     <ImageButton
         android:id="@+id/ib_replay"
@@ -39,7 +40,20 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <ImageButton
-        android:id="@+id/iv_back"
+        android:id="@+id/ib_play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/twotone_play_circle_filled_white_48"
+        android:contentDescription="@null"
+        android:background="#00000000"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <ImageButton
+        android:id="@+id/ib_back"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="12dp"
@@ -98,7 +112,6 @@
             android:gravity="center"
             android:textColor="@color/color_white_1"
             android:layout_marginTop="20dp"
-            android:text="125"
             app:layout_constraintTop_toBottomOf="@id/cl_avatar"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -112,21 +125,19 @@
             android:gravity="center"
             android:textColor="@color/color_white_1"
             android:layout_marginTop="20dp"
-            android:text="5"
             app:layout_constraintTop_toBottomOf="@id/tv_favorite"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             tools:text="5" />
 
         <TextView
-            android:id="@+id/tv_msg"
+            android:id="@+id/tv_comment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawableTop="@drawable/btn_messenger_forvideo_n"
             android:gravity="center"
             android:textColor="@color/color_white_1"
             android:layout_marginTop="20dp"
-            android:text="5"
             app:layout_constraintTop_toBottomOf="@id/tv_like"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -143,22 +154,45 @@
         android:textColor="@color/color_white_1"
         android:textSize="15sp"
         android:layout_marginStart="20dp"
-        android:text="名称名称名称名称名名称名称名称名称名称名称名称名称称名称名称名称"
         app:layout_constraintEnd_toStartOf="@id/cl_panel"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/cg_tag"
+        app:layout_constraintBottom_toTopOf="@id/tv_name"
         tools:text="名称名称名称名称名名称名称名称名称名称名称名称名称称名称名称名称" />
 
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/cg_tag"
-        android:layout_width="0dp"
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="15dp"
-        android:paddingBottom="15dp"
-        android:layout_marginBottom="10dp"
-        android:layout_marginStart="20dp"
-        app:layout_constraintEnd_toStartOf="@id/cl_panel"
+        android:textColor="@color/color_white_1"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="13dp"
+        app:layout_constraintStart_toStartOf="@id/tv_title"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:text="\@名称名称" />
+
+    <ProgressBar
+        android:id="@+id/progress_video"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+<!--    <com.google.android.material.chip.ChipGroup-->
+<!--        android:id="@+id/cg_tag"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:paddingTop="15dp"-->
+<!--        android:paddingBottom="15dp"-->
+<!--        android:layout_marginBottom="10dp"-->
+<!--        android:layout_marginStart="20dp"-->
+<!--        app:layout_constraintEnd_toStartOf="@id/cl_panel"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

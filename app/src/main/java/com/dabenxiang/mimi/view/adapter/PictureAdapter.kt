@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.OnItemClickListener
 import com.dabenxiang.mimi.model.api.vo.ImageItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.getLruCache
@@ -20,7 +21,8 @@ class PictureAdapter(
     val context: Context,
     private val attachmentListener: AttachmentListener,
     private val imageItems: ArrayList<ImageItem>,
-    private val parentPosition: Int
+    private val parentPosition: Int,
+    private val onItemClickListener: OnItemClickListener
 ) : RecyclerView.Adapter<BaseViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
@@ -51,6 +53,10 @@ class PictureAdapter(
                     .load(bitmap)
                     .into(holder.picture)
             }
+        }
+
+        holder.picture.setOnClickListener {
+            onItemClickListener.onItemClick()
         }
     }
 
