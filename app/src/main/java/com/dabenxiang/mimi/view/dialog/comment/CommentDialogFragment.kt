@@ -33,6 +33,11 @@ class CommentDialogFragment: BaseDialogFragment() {
         return R.layout.fragment_dialog_comment
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NO_TITLE, R.style.CommentDialog)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         (arguments?.getSerializable(KEY_DATA) as MemberPostItem).also {
