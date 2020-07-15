@@ -49,7 +49,7 @@
         <item name="android:background">@color/color_white_1</item>
     </style>
 
-        <style name="settingStyle_2">
+    <style name="settingStyle_2">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">14sp</item>
@@ -69,6 +69,12 @@
         <item name="android:textSize">14sp</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:textColor">@color/color_red_1</item>
+    </style>
+
+    <style name="uploadDialogButtonStyle">
+        <item name="android:background">@null</item>
+        <item name="android:textColor">@color/color_black_1</item>
+        <item name="android:textSize">16sp</item>
     </style>
 
 </resources>

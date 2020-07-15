@@ -21,6 +21,9 @@
         <action
             android:id="@+id/action_adultHomeFragment_to_clipFragment"
             app:destination="@id/clipFragment" />
+        <action
+            android:id="@+id/action_adultHomeFragment_to_postArticleFragment"
+            app:destination="@id/postArticleFragment" />
 
     </fragment>
 
@@ -44,5 +47,9 @@
         android:id="@+id/clipFragment"
         android:name="com.dabenxiang.mimi.view.clip.ClipFragment"
         tools:layout="@layout/fragment_clip" />
+    <fragment
+        android:id="@+id/postArticleFragment"
+        android:name="com.dabenxiang.mimi.view.post.PostArticleFragment"
+        tools:layout="@layout/fragment_post_article" />
 
 </navigation>
