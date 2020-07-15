@@ -29,7 +29,6 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
-import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
@@ -444,14 +443,14 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val adapterListener = object : HomeAdapter.EventListener {
+
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
-            val bundle = CategoriesFragment.createBundle(item.title ?: "", item.categories)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_homeFragment_to_categoriesFragment,
-                    bundle
-                )
-            )
+            when (item.title) {
+                "蜜蜜影视" -> viewModel.setTopTabPosition(1)
+                "短视频" -> viewModel.setTopTabPosition(3)
+                "图片" -> viewModel.setTopTabPosition(4)
+                "圈子" -> viewModel.setTopTabPosition(6)
+            }
         }
 
         override fun onVideoClick(view: View, item: PlayerData) {
