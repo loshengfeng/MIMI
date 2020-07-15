@@ -190,6 +190,14 @@
     <string name="follow">+关注</string>
     <string name="followed">已关注</string>
 
+    <!-- Post -->
+    <string name="upload_video">上传视频</string>
+    <string name="upload_photo">上传照片</string>
+    <string name="upload_article">上传短文</string>
+    <string name="upload_cancel">取消</string>
+    <string name="post_title">建立帖子</string>
+    <string name="typing_count">%1$d/%2$d</string>
+
     <!-- Problem report -->
     <string-array name="problem_report_item">
         <item>视频无法播放</item>

@@ -5,7 +5,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 interface AdultListener {
     fun onFollowPostClick(item: MemberPostItem, position: Int, isFollow: Boolean)
     fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean)
-    fun onCommentClick()
+    fun onCommentClick(item: MemberPostItem)
     fun onMoreClick()
     fun onItemClick(item: MemberPostItem)
 }

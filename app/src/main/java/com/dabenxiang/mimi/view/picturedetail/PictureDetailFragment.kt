@@ -24,10 +24,11 @@ class PictureDetailFragment : BaseFragment() {
 
     companion object {
         const val KEY_DATA = "data"
-
-        fun createBundle(item: MemberPostItem): Bundle {
+        const val KEY_POSITION = "position"
+        fun createBundle(item: MemberPostItem, position: Int): Bundle {
             return Bundle().also {
                 it.putSerializable(KEY_DATA, item)
+                it.putInt(KEY_POSITION, position)
             }
         }
     }
@@ -43,6 +44,7 @@ class PictureDetailFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val memberPostItem = arguments?.getSerializable(KEY_DATA) as MemberPostItem
+        val position = arguments?.getInt(KEY_POSITION) ?: 0
 
         text_toolbar_title.text = getString(R.string.picture_detail_title)
         toolbarContainer.toolbar.navigationIcon =
@@ -59,6 +61,7 @@ class PictureDetailFragment : BaseFragment() {
         )
         recycler_picture_detail.layoutManager = LinearLayoutManager(context)
         recycler_picture_detail.adapter = adapter
+        recycler_picture_detail.scrollToPosition(position)
     }
 
     override fun getLayoutId(): Int {
