@@ -3,19 +3,22 @@ package com.dabenxiang.mimi.view.more
 import android.os.Bundle
 import android.view.View
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import kotlinx.android.synthetic.main.fragment_more.*
 
 class MoreDialogFragment : BaseDialogFragment() {
 
     companion object {
-        fun newInstance(listener: OnMoreDialogListener): MoreDialogFragment {
+        fun newInstance(item: MemberPostItem, listener: OnMoreDialogListener): MoreDialogFragment {
             val fragment = MoreDialogFragment()
+            fragment.item = item
             fragment.listener = listener
             return fragment
         }
     }
 
+    var item: MemberPostItem? = null
     var listener: OnMoreDialogListener? = null
 
     override fun isFullLayout(): Boolean {
@@ -29,8 +32,14 @@ class MoreDialogFragment : BaseDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        tv_problem_report.setOnClickListener {
-            listener?.onProblemReport()
+        val isReport = item?.reported ?: false
+        if (isReport) {
+            tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1_50))
+        } else {
+            tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1))
+            tv_problem_report.setOnClickListener {
+                listener?.onProblemReport(item!!)
+            }
         }
 
         tv_cancel.setOnClickListener {
@@ -39,7 +48,7 @@ class MoreDialogFragment : BaseDialogFragment() {
     }
 
     interface OnMoreDialogListener {
-        fun onProblemReport()
+        fun onProblemReport(item: MemberPostItem)
         fun onCancel()
     }
 }

@@ -39,6 +39,7 @@
             android:id="@+id/rg_report_problem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:checkedButton="@+id/rb_report1"
             android:paddingStart="24dp"
             android:paddingTop="16dp"
 
@@ -46,6 +47,7 @@
             app:layout_constraintStart_toStartOf="parent">
 
             <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/rb_report1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
