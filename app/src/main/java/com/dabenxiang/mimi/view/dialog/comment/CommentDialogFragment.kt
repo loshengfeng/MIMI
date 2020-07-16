@@ -4,7 +4,10 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -130,11 +133,6 @@ class CommentDialogFragment: BaseDialogFragment() {
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_dialog_comment
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setStyle(STYLE_NO_TITLE, R.style.CommentDialog)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
