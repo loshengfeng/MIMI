@@ -208,6 +208,12 @@
         <item>有害的危险行为</item>
     </string-array>
 
+    <!-- Picture Problem $eport -->
+    <string name="picture_problem_1">圖片與內容不符</string>
+    <string name="picture_problem_2">垃圾內容或誤導性內容</string>
+    <string name="picture_problem_3">仇恨與惡意內容</string>
+    <string name="picture_problem_4">有害的危險行為</string>
+
     <string name="problem_report">问题回报</string>
     <string name="already_reported">您已回报过问题</string>
     <string name="clip_username">"@%s"</string>

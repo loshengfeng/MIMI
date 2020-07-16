@@ -36,6 +36,7 @@ import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.more.MoreDialogFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
+import com.dabenxiang.mimi.view.report.ReportDialogFragment
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.putLruCache
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -58,6 +59,7 @@ class AdultHomeFragment : BaseFragment() {
     private val homeClubViewHolderMap = hashMapOf<Int, HomeClubViewHolder>()
 
     var moreDialog: MoreDialogFragment? = null
+    var reportDialog: ReportDialogFragment? = null
 
     override fun getLayoutId() = R.layout.fragment_home
 
@@ -453,9 +455,21 @@ class AdultHomeFragment : BaseFragment() {
         }
     }
 
+    private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
+        override fun onCancel() {
+            reportDialog?.dismiss()
+        }
+    }
+
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport() {
-            // TODO: Problem Report
+            moreDialog?.dismiss()
+            reportDialog = ReportDialogFragment.newInstance(onReportDialogListener).also {
+                it.show(
+                    requireActivity().supportFragmentManager,
+                    ReportDialogFragment::class.java.simpleName
+                )
+            }
         }
 
         override fun onCancel() {
