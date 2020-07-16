@@ -52,43 +52,8 @@
             android:checkedButton="@+id/rb_report1"
             android:paddingStart="24dp"
             android:paddingTop="16dp"
-
             app:layout_constraintBottom_toTopOf="@+id/line_bottom"
-            app:layout_constraintStart_toStartOf="parent">
-
-            <com.google.android.material.radiobutton.MaterialRadioButton
-                android:id="@+id/rb_report1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:text="@string/picture_problem_1"
-                android:textColor="@color/color_black_1"
-                android:textSize="16sp" />
-
-            <com.google.android.material.radiobutton.MaterialRadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:text="@string/picture_problem_2"
-                android:textColor="@color/color_black_1"
-                android:textSize="16sp" />
-
-            <com.google.android.material.radiobutton.MaterialRadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:text="@string/picture_problem_3"
-                android:textColor="@color/color_black_1"
-                android:textSize="16sp" />
-
-            <com.google.android.material.radiobutton.MaterialRadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:text="@string/picture_problem_4"
-                android:textColor="@color/color_black_1"
-                android:textSize="16sp" />
-        </RadioGroup>
+            app:layout_constraintStart_toStartOf="parent" />
 
         <View
             android:id="@+id/line_bottom"

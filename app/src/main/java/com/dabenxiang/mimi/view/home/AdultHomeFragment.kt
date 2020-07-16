@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.home
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
@@ -30,13 +31,13 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
+import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.OnChooseUploadMethodDialogListener
 import com.dabenxiang.mimi.view.home.viewholder.*
-import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
-import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.putLruCache
@@ -467,8 +468,12 @@ class AdultHomeFragment : BaseFragment() {
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
         override fun onSend(item: MemberPostItem, content: String) {
-            reportDialog?.dismiss()
-            viewModel.sendPostReport(item, content)
+            if (TextUtils.isEmpty(content)) {
+                GeneralUtils.showToast(requireContext(), getString(R.string.report_error))
+            } else {
+                reportDialog?.dismiss()
+                viewModel.sendPostReport(item, content)
+            }
         }
 
         override fun onCancel() {

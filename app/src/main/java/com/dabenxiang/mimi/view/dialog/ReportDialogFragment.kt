@@ -3,11 +3,15 @@ package com.dabenxiang.mimi.view.dialog
 import android.os.Bundle
 import android.view.View
 import android.widget.RadioButton
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.dpToPx
+import com.google.android.material.radiobutton.MaterialRadioButton
 import kotlinx.android.synthetic.main.fragment_dialog_report.*
-import kotlinx.android.synthetic.main.fragment_dialog_report.background
+
 
 class ReportDialogFragment : BaseDialogFragment() {
 
@@ -37,7 +41,26 @@ class ReportDialogFragment : BaseDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        var reportContent = rb_report1.text.toString()
+        var reportContent = ""
+
+        val id = when (item?.type) {
+            PostType.IMAGE -> R.array.picture_problem_report_item
+            else -> R.array.video_problem_report_item
+        }
+        val problems = requireContext().resources?.getStringArray(id)
+
+        problems?.forEach {
+            val params = ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT
+            )
+            params.setMargins(0, 0, 0, dpToPx(requireContext(), 16))
+            val radioButton = MaterialRadioButton(requireContext())
+            radioButton.text = it
+            radioButton.setTextColor(requireContext().getColor(R.color.color_black_1))
+            radioButton.layoutParams = params
+            rg_report_problem.addView(radioButton)
+        }
 
         rg_report_problem.setOnCheckedChangeListener { _, checkedId ->
             val radioButton = rg_report_problem.findViewById<RadioButton>(checkedId)

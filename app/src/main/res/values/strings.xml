@@ -199,7 +199,7 @@
     <string name="typing_count">%1$d/%2$d</string>
 
     <!-- Problem report -->
-    <string-array name="problem_report_item">
+    <string-array name="video_problem_report_item">
         <item>视频无法播放</item>
         <item>与其他视频相同</item>
         <item>视频标题与内容不符</item>
@@ -208,11 +208,12 @@
         <item>有害的危险行为</item>
     </string-array>
 
-    <!-- Picture Problem $eport -->
-    <string name="picture_problem_1">图片与内容不符</string>
-    <string name="picture_problem_2">垃圾内容或误导性内容</string>
-    <string name="picture_problem_3">仇恨与恶意内容</string>
-    <string name="picture_problem_4">有害的危险行为</string>
+    <string-array name="picture_problem_report_item">
+        <item>图片与内容不符</item>
+        <item>垃圾内容或误导性内容</item>
+        <item>仇恨与恶意内容</item>
+        <item>有害的危险行为</item>
+    </string-array>
 
     <string name="problem_report">问题回报</string>
     <string name="already_reported">您已回报过问题</string>
@@ -220,4 +221,5 @@
     <string name="clip_comment_count">"%d 评论"</string>
 
     <string name="report_success">问题回报成功</string>
+    <string name="report_error">请选择回报问题</string>
 </resources>
