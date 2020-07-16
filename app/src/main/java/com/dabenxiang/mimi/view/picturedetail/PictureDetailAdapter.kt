@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.dabenxiang.mimi.view.picturedetail.viewholder.CommentContentViewHolder
 import com.dabenxiang.mimi.view.picturedetail.viewholder.CommentTitleViewHolder
@@ -22,7 +23,6 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
-import timber.log.Timber
 import java.util.*
 
 class PictureDetailAdapter(
@@ -38,24 +38,22 @@ class PictureDetailAdapter(
         const val VIEW_TYPE_COMMENT_DATA = 2
     }
 
-    var photoGridAdapter: PhotoGridAdapter? = null
+    private var photoGridAdapter: PhotoGridAdapter? = null
+    private var commentAdapter: CommentAdapter? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             VIEW_TYPE_PICTURE_DETAIL -> {
-                Timber.d("@@VIEW_TYPE_PICTURE_DETAIL.....")
                 val mView = LayoutInflater.from(context)
                     .inflate(R.layout.item_picture_detail, parent, false)
                 PictureDetailViewHolder(mView)
             }
             VIEW_TYPE_COMMENT_TITLE -> {
-                Timber.d("@@VIEW_TYPE_COMMENT_TITLE.....")
                 val mView = LayoutInflater.from(context)
                     .inflate(R.layout.item_comment_title, parent, false)
                 CommentTitleViewHolder(mView)
             }
             else -> {
-                Timber.d("@@ELSE.....")
                 val mView = LayoutInflater.from(context)
                     .inflate(R.layout.item_comment_content, parent, false)
                 CommentContentViewHolder(mView)
@@ -78,7 +76,6 @@ class PictureDetailAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is PictureDetailViewHolder -> {
-                Timber.d("@@PictureDetailViewHolder.....")
                 val contentItem = Gson().fromJson(memberPostItem.content, ContentItem::class.java)
 
                 holder.posterName.text = memberPostItem.postFriendlyName
@@ -136,21 +133,22 @@ class PictureDetailAdapter(
 
             }
             is CommentTitleViewHolder -> {
-                Timber.d("@@CommentTitleViewHolder.....")
                 holder.newestComment.setOnClickListener {
-
+                    holder.newestComment.setTextColor(context.getColor(R.color.color_red_1))
+                    holder.topComment.setTextColor(context.getColor(R.color.color_white_1_30))
+                    onPictureDetailListener.onGetCommandInfo(commentAdapter!!, CommentType.NEWEST)
                 }
 
                 holder.topComment.setOnClickListener {
-
+                    holder.topComment.setTextColor(context.getColor(R.color.color_red_1))
+                    holder.newestComment.setTextColor(context.getColor(R.color.color_white_1_30))
+                    onPictureDetailListener.onGetCommandInfo(commentAdapter!!, CommentType.TOP)
                 }
-
             }
             is CommentContentViewHolder -> {
-                Timber.d("@@CommentContentViewHolder.....")
-                val commentAdapter = CommentAdapter(true, playerInfoListener, CommentViewType.VIDEO)
+                commentAdapter = CommentAdapter(true, playerInfoListener, CommentViewType.VIDEO)
                 holder.commentRecycler.adapter = commentAdapter
-                onPictureDetailListener.onGetCommandInfo(commentAdapter)
+                onPictureDetailListener.onGetCommandInfo(commentAdapter!!, CommentType.NEWEST)
             }
         }
     }
@@ -192,7 +190,7 @@ class PictureDetailAdapter(
     interface OnPictureDetailListener {
         fun onGetAttachment(id: String, position: Int)
         fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean)
-        fun onGetCommandInfo(adapter: CommentAdapter)
+        fun onGetCommandInfo(adapter: CommentAdapter, type: CommentType)
     }
 
 }

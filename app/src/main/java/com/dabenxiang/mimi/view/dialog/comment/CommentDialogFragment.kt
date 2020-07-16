@@ -50,7 +50,6 @@ class CommentDialogFragment : BaseDialogFragment() {
     private val playerInfoAdapter by lazy {
         CommentAdapter(true, object : CommentAdapter.PlayerInfoListener {
             override fun sendComment(replyId: Long?, replyName: String?) {
-                Timber.d("@@sendComment: $replyId, $replyName")
                 showKeyboard()
                 et_message.requestFocus()
                 et_message.tag = replyId
@@ -61,7 +60,6 @@ class CommentDialogFragment : BaseDialogFragment() {
             }
 
             override fun expandReply(parentNode: RootCommentNode, succeededBlock: () -> Unit) {
-                Timber.d("@@expandReply: $parentNode")
                 loadReplyCommentBlock = succeededBlock
                 data?.id?.let { postId ->
                     parentNode.data.id?.let { commentId ->
@@ -73,7 +71,6 @@ class CommentDialogFragment : BaseDialogFragment() {
             }
 
             override fun replyComment(replyId: Long?, replyName: String?) {
-                Timber.d("@@replyComment: $replyId, $replyName")
                 takeUnless { replyId == null }?.also {
                     showKeyboard()
                     et_message.requestFocus()
@@ -90,7 +87,6 @@ class CommentDialogFragment : BaseDialogFragment() {
                 isLike: Boolean,
                 succeededBlock: () -> Unit
             ) {
-                Timber.d("@@setCommentLikeType: $replyId, $isLike")
                 loadCommentLikeBlock = succeededBlock
                 data?.id?.let { postId ->
                     replyId?.let { replyId ->
@@ -103,7 +99,6 @@ class CommentDialogFragment : BaseDialogFragment() {
             }
 
             override fun removeCommentLikeType(replyId: Long?, succeededBlock: () -> Unit) {
-                Timber.d("@@removeCommentLikeType: $replyId")
                 loadCommentLikeBlock = succeededBlock
                 data?.id?.let { postId ->
                     replyId?.let { replyId ->

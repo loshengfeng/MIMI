@@ -119,10 +119,10 @@ class PictureDetailFragment : BaseFragment() {
             viewModel.followPost(item, position, isFollow)
         }
 
-        override fun onGetCommandInfo(adapter: CommentAdapter) {
+        override fun onGetCommandInfo(adapter: CommentAdapter, type: CommentType) {
             viewModel.getCommentInfo(
                 memberPostItem!!.id,
-                CommentType.NEWEST,
+                type,
                 adapter
             )
         }
