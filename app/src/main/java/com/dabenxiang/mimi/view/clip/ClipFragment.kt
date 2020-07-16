@@ -13,7 +13,10 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.dialog.GeneralDialog
+import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.comment.CommentDialogFragment
+import com.dabenxiang.mimi.view.dialog.show
 import kotlinx.android.synthetic.main.fragment_clip.*
 import timber.log.Timber
 import java.io.File
@@ -193,7 +196,12 @@ class ClipFragment : BaseFragment() {
 
     private fun onCommentClick(item: MemberPostItem) {
         Timber.d("onCommentClick, item:$item")
+//        GeneralDialog.newInstance(GeneralDialogData(messageIcon = R.drawable.ico_new, message = "abc")).also {
+//            it.isCancelable = true
+//            it.show(requireActivity().supportFragmentManager)
+//        }
         CommentDialogFragment.newInstance(item).also {
+            it.isCancelable = true
             it.show(
                 requireActivity().supportFragmentManager,
                 CommentDialogFragment::class.java.simpleName

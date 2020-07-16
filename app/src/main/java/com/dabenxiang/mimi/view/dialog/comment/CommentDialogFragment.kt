@@ -1,21 +1,27 @@
 package com.dabenxiang.mimi.view.dialog.comment
 
+import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions.bitmapTransform
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.PostCommentRequest
 import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
-import com.dabenxiang.mimi.view.player.CommentLoadMoreView
 import com.dabenxiang.mimi.view.player.CommentAdapter
+import com.dabenxiang.mimi.view.player.CommentLoadMoreView
 import com.dabenxiang.mimi.view.player.RootCommentNode
+import jp.wasabeef.glide.transformations.BlurTransformation
 import kotlinx.android.synthetic.main.fragment_dialog_comment.*
+import timber.log.Timber
+
 
 class CommentDialogFragment: BaseDialogFragment() {
 
@@ -42,11 +48,17 @@ class CommentDialogFragment: BaseDialogFragment() {
     private val playerInfoAdapter by lazy {
         CommentAdapter(true, object : CommentAdapter.PlayerInfoListener {
             override fun sendComment(replyId: Long?, replyName: String?) {
-                if (replyId != null) {
-                }
+                Timber.d("@@sendComment: $replyId, $replyName")
+                showKeyboard()
+                et_message.tag = replyId
+                tv_replay_name.text = replyName.takeIf { it != null }?.let {
+                    tv_replay_name.visibility = View.VISIBLE
+                    String.format(requireContext().getString(R.string.clip_username), it)
+                } ?: run { "" }
             }
 
             override fun expandReply(parentNode: RootCommentNode, succeededBlock: () -> Unit) {
+                Timber.d("@@expandReply: $parentNode")
                 loadReplyCommentBlock = succeededBlock
                 data?.id?.let { postId ->
                     parentNode.data.id?.let { commentId ->
@@ -58,11 +70,19 @@ class CommentDialogFragment: BaseDialogFragment() {
             }
 
             override fun replyComment(replyId: Long?, replyName: String?) {
-                if (replyId != null) {
+                Timber.d("@@replyComment: $replyId, $replyName")
+                takeUnless { replyId == null }?.also {
+                    showKeyboard()
+                    et_message.tag = replyId
+                    tv_replay_name.text = replyName.takeIf { it != null }?.let {
+                        tv_replay_name.visibility = View.VISIBLE
+                        String.format(requireContext().getString(R.string.clip_username), it)
+                    } ?: run { "" }
                 }
             }
 
             override fun setCommentLikeType(replyId: Long?, isLike: Boolean, succeededBlock: () -> Unit) {
+                Timber.d("@@setCommentLikeType: $replyId, $isLike")
                 loadCommentLikeBlock = succeededBlock
                 data?.id?.let { postId ->
                     replyId?.let { replyId ->
@@ -75,6 +95,7 @@ class CommentDialogFragment: BaseDialogFragment() {
             }
 
             override fun removeCommentLikeType(replyId: Long?, succeededBlock: () -> Unit) {
+                Timber.d("@@removeCommentLikeType: $replyId")
                 loadCommentLikeBlock = succeededBlock
                 data?.id?.let { postId ->
                     replyId?.let { replyId ->
@@ -107,27 +128,33 @@ class CommentDialogFragment: BaseDialogFragment() {
         setStyle(STYLE_NO_TITLE, R.style.CommentDialog)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        dialog?.apply {
-            setCancelable(true)
-            setCanceledOnTouchOutside(true)
-        }
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (arguments?.getSerializable(KEY_DATA) as MemberPostItem).also {
-            data = it
-            tv_comment_count.text = String.format(requireContext().getString(R.string.clip_comment_count), it.commentCount)
+
+        Glide.with(requireContext())
+            .load(R.drawable.bg_comment_dialog)
+            .transform(BlurTransformation(25, 5))
+            .into(iv_blur)
+
+        background.setOnClickListener { dismiss() }
+
+        (arguments?.getSerializable(KEY_DATA) as MemberPostItem).also { memberPostItem ->
+            data = memberPostItem
+            tv_comment_count.text = String.format(requireContext().getString(R.string.clip_comment_count), memberPostItem.commentCount)
 
             rv_comment.adapter = playerInfoAdapter
             lifecycleScope.launchWhenResumed {
-                viewModel.setupCommentDataSource(it.id, playerInfoAdapter)
+                viewModel.setupCommentDataSource(memberPostItem.id, playerInfoAdapter)
+            }
+
+            btn_send.setOnClickListener {
+                closeKeyboard()
+                val replyId = et_message.tag?.let { it as Long }
+                viewModel.postComment(memberPostItem.id, PostCommentRequest(replyId, et_message.text.toString()))
+
+                et_message.tag = null
+                tv_replay_name.text = null
+                tv_replay_name.visibility = View.GONE
             }
         }
 
@@ -147,5 +174,17 @@ class CommentDialogFragment: BaseDialogFragment() {
                 }
             }
         })
+    }
+
+    private fun showKeyboard() {
+        val inputMethodManager =
+            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+    }
+
+    private fun closeKeyboard() {
+        val inputMethodManager =
+            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
     }
 }

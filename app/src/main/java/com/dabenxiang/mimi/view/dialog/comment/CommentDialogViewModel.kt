@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.event.SingleLiveEvent
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.PostCommentRequest
 import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.player.CommentDataSource
@@ -172,6 +173,26 @@ class CommentDialogViewModel: BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect {
                     _apiDeleteCommentLikeResult.value = SingleLiveEvent(it)
+                }
+        }
+    }
+
+    fun postComment(postId: Long, body: PostCommentRequest) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository().postMembersPostComment(postId, body)
+                if (!resp.isSuccessful) throw HttpException(resp)
+
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e ->
+                    emit(ApiResult.error(e))
+                }
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect {
+                    _apiPostCommentResult.value = SingleLiveEvent(it)
                 }
         }
     }
