@@ -625,8 +625,9 @@ class PlayerViewModel : BaseViewModel() {
     fun sentReport(content: String) {
         viewModelScope.launch {
             flow {
-                val resp = domainManager.getApiRepository()
-                    .postReport(videoId, ReportRequest(content))
+                val resp = domainManager.getApiRepository().sendPostReport(
+                    videoId, ReportRequest(content)
+                )
                 if (!resp.isSuccessful) throw HttpException(resp)
 
                 emit(ApiResult.success(null))

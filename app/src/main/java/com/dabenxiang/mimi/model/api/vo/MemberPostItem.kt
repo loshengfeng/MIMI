@@ -58,7 +58,7 @@ data class MemberPostItem(
     var isFollow: Boolean = false,
 
     @SerializedName("reported")
-    val reported: Boolean = false,
+    var reported: Boolean = false,
 
     @SerializedName("postFriendlyName")
     val postFriendlyName: String = "",

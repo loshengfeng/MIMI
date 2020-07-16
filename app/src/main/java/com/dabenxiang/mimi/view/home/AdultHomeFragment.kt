@@ -38,6 +38,7 @@ import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.report.ReportDialogFragment
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.putLruCache
 import kotlinx.android.synthetic.main.fragment_home.*
 import timber.log.Timber
@@ -260,8 +261,17 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.picturePostItemList.observe(viewLifecycleOwner, Observer {
+        viewModel.picturePostItemListResult.observe(viewLifecycleOwner, Observer {
             commonPagedAdapter.submitList(it)
+        })
+
+        viewModel.postReportResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Empty -> {
+                    GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
+                }
+                is Error -> Timber.e(it.throwable)
+            }
         })
     }
 
@@ -435,8 +445,8 @@ class AdultHomeFragment : BaseFragment() {
             )
         }
 
-        override fun onMoreClick() {
-            moreDialog = MoreDialogFragment.newInstance(onMoreDialogListener).also {
+        override fun onMoreClick(item: MemberPostItem) {
+            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
                 it.show(
                     requireActivity().supportFragmentManager,
                     MoreDialogFragment::class.java.simpleName
@@ -456,15 +466,20 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
+        override fun onSend(item: MemberPostItem, content: String) {
+            reportDialog?.dismiss()
+            viewModel.sendPostReport(item, content)
+        }
+
         override fun onCancel() {
             reportDialog?.dismiss()
         }
     }
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-        override fun onProblemReport() {
+        override fun onProblemReport(item: MemberPostItem) {
             moreDialog?.dismiss()
-            reportDialog = ReportDialogFragment.newInstance(onReportDialogListener).also {
+            reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
                 it.show(
                     requireActivity().supportFragmentManager,
                     ReportDialogFragment::class.java.simpleName

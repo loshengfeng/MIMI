@@ -189,7 +189,7 @@ class CommonPagedAdapter(
         }
 
         holder.moreImage.setOnClickListener {
-            adultListener.onMoreClick()
+            adultListener.onMoreClick(item!!)
         }
 
         holder.picturePostItemLayout.setOnClickListener {

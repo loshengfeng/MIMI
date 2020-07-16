@@ -78,8 +78,11 @@ class HomeViewModel : BaseViewModel() {
     private var _likePostResult = MutableLiveData<ApiResult<Int>>()
     val likePostResult: LiveData<ApiResult<Int>> = _likePostResult
 
-    private val _picturePostItemList = MutableLiveData<PagedList<MemberPostItem>>()
-    val picturePostItemList: LiveData<PagedList<MemberPostItem>> = _picturePostItemList
+    private val _picturePostItemListResult = MutableLiveData<PagedList<MemberPostItem>>()
+    val picturePostItemListResult: LiveData<PagedList<MemberPostItem>> = _picturePostItemListResult
+
+    private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
+    val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
 
     fun setTopTabPosition(position: Int) {
         if (position != tabLayoutPosition.value) {
@@ -303,6 +306,25 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
+
+    fun sendPostReport(item: MemberPostItem, content: String) {
+        viewModelScope.launch {
+            flow {
+                val request = ReportRequest(content)
+                val result = domainManager.getApiRepository().sendPostReport(item.id, request)
+                if (!result.isSuccessful) throw HttpException(result)
+                item.reported = true
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _postReportResult.value = it }
+        }
+    }
+
+
     private fun getVideoPagingItems(
         category: String?,
         isAdult: Boolean
@@ -324,7 +346,7 @@ class HomeViewModel : BaseViewModel() {
     fun getPicturePosts() {
         viewModelScope.launch {
             getPicturePostPagingItems().asFlow()
-                .collect { _picturePostItemList.value = it }
+                .collect { _picturePostItemListResult.value = it }
         }
     }
 
