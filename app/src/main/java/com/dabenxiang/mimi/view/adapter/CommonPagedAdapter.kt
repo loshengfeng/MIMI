@@ -49,6 +49,7 @@ class CommonPagedAdapter(
                 return oldItem == newItem
             }
         }
+        const val PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI = 0
     }
 
     private var adultTabType: AdultTabType = AdultTabType.FOLLOW
@@ -73,14 +74,29 @@ class CommonPagedAdapter(
         }
     }
 
-    override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
-        when (holder) {
+    override fun onBindViewHolder(
+        holder: BaseViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+        when(holder) {
             is PicturePostHolder -> {
-                holder.pictureRecycler.tag = position
-                viewHolderMap[position] = holder
-                setupPicturePost(holder, position)
+                payloads.takeIf { it.isNotEmpty() }?.also {
+                    when(it[0] as Int) {
+                        PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI -> {
+                            updateLikeAndFollowItem(holder, position)
+                        }
+                    }
+                } ?: run {
+                    holder.pictureRecycler.tag = position
+                    viewHolderMap[position] = holder
+                    setupPicturePost(holder, position)
+                }
             }
         }
+    }
+
+    override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
     }
 
     fun setupAdultTabType(type: AdultTabType) {
@@ -91,33 +107,9 @@ class CommonPagedAdapter(
         val item = getItem(position)
 
         holder.name.text = item?.postFriendlyName
-        holder.likeCount.text = item?.likeCount.toString()
-        holder.commentCount.text = item?.commentCount.toString()
         holder.time.text = GeneralUtils.getTimeDiff(item?.creationDate ?: Date(), Date())
         holder.title.text = item?.title
-
-        val isFollow = item?.isFollow ?: false
-        if (isFollow) {
-            holder.follow.text = context.getString(R.string.followed)
-            holder.follow.background =
-                context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
-            holder.follow.setTextColor(context.getColor(R.color.color_white_1))
-        } else {
-            holder.follow.text = context.getString(R.string.follow)
-            holder.follow.background =
-                context.getDrawable(R.drawable.bg_red_1_stroke_radius_16)
-            holder.follow.setTextColor(context.getColor(R.color.color_red_1))
-        }
-
-        val likeType = item?.likeType ?: LikeType.DISLIKE
-        val isLike: Boolean
-        if (likeType == LikeType.LIKE) {
-            isLike = true
-            holder.likeImage.setImageResource(R.drawable.ico_nice_s)
-        } else {
-            isLike = false
-            holder.likeImage.setImageResource(R.drawable.ico_nice)
-        }
+        updateLikeAndFollowItem(holder, position)
 
         if (getLruCache(item?.avatarAttachmentId.toString()) == null) {
             attachmentListener.onGetAttachment(
@@ -176,14 +168,6 @@ class CommonPagedAdapter(
             holder.pictureCount.text = "1/${contentItem.images?.size}"
         }
 
-        holder.follow.setOnClickListener {
-            adultListener.onFollowPostClick(item!!, position, !isFollow)
-        }
-
-        holder.likeImage.setOnClickListener {
-            adultListener.onLikeClick(item!!, position, !isLike)
-        }
-
         holder.commentImage.setOnClickListener {
             adultListener.onCommentClick(item!!)
         }
@@ -203,5 +187,44 @@ class CommonPagedAdapter(
                 holder.pictureRecycler.adapter?.notifyDataSetChanged()
             }
         }
+    }
+
+    private fun updateLikeAndFollowItem(holder: PicturePostHolder, position: Int) {
+        val item = getItem(position)
+
+        holder.likeCount.text = item?.likeCount.toString()
+        holder.commentCount.text = item?.commentCount.toString()
+
+        val isFollow = item?.isFollow ?: false
+        if (isFollow) {
+            holder.follow.text = context.getString(R.string.followed)
+            holder.follow.background =
+                context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
+            holder.follow.setTextColor(context.getColor(R.color.color_white_1))
+        } else {
+            holder.follow.text = context.getString(R.string.follow)
+            holder.follow.background =
+                context.getDrawable(R.drawable.bg_red_1_stroke_radius_16)
+            holder.follow.setTextColor(context.getColor(R.color.color_red_1))
+        }
+
+        val likeType = item?.likeType ?: LikeType.DISLIKE
+        val isLike: Boolean
+        if (likeType == LikeType.LIKE) {
+            isLike = true
+            holder.likeImage.setImageResource(R.drawable.ico_nice_s)
+        } else {
+            isLike = false
+            holder.likeImage.setImageResource(R.drawable.ico_nice)
+        }
+
+        holder.follow.setOnClickListener {
+            adultListener.onFollowPostClick(item!!, position, !isFollow)
+        }
+
+        holder.likeImage.setOnClickListener {
+            adultListener.onLikeClick(item!!, position, !isLike)
+        }
+
     }
 }
