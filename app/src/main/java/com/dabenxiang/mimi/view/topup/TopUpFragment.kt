@@ -1,7 +1,9 @@
 package com.dabenxiang.mimi.view.topup
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
+import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
@@ -15,16 +17,20 @@ import com.dabenxiang.mimi.view.adapter.TopUpOnlinePayAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.listener.AdapterEventListener
+import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_top_up.*
 import timber.log.Timber
+import java.lang.ClassCastException
 
 class TopUpFragment : BaseFragment() {
 
     private val viewModel: TopUpViewModel by viewModels()
 
     private val agentAdapter by lazy { TopUpAgentAdapter(agentListener) }
+
+    private var interactionListener: InteractionListener? = null
 
     private val onlinePayListener = object : AdapterEventListener<TopUpOnlinePayItem> {
         override fun onItemClick(view: View, item: TopUpOnlinePayItem) {
@@ -40,6 +46,11 @@ class TopUpFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback {
+//            backToDesktop()
+            interactionListener?.changeNavigationPosition(R.id.navigation_home)
+        }
+
         initSettings()
     }
 
@@ -132,6 +143,15 @@ class TopUpFragment : BaseFragment() {
         viewModel.agentList.observe(viewLifecycleOwner, Observer {
             agentAdapter.submitList(it)
         })
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        try {
+            interactionListener = context as InteractionListener
+        } catch (e: ClassCastException) {
+            Timber.e("TopUpFragment interaction listener can't cast")
+        }
     }
 
     private val agentListener = object : AdapterEventListener<AgentItem>{

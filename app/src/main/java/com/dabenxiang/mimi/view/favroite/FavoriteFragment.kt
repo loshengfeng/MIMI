@@ -1,8 +1,11 @@
 package com.dabenxiang.mimi.view.favroite
 
+import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
+import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
@@ -20,16 +23,21 @@ import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.dialog.more.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.more.OnMoreDialogListener
+import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_post_favorite.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import timber.log.Timber
+import java.lang.ClassCastException
 
 class FavoriteFragment : BaseFragment() {
 
     private val viewModel: FavoriteViewModel by viewModels()
 
     private val favoriteAdapter by lazy { FavoriteAdapter(listener) }
+
+    private var interactionListener: InteractionListener? = null
 
     companion object {
         const val NO_DATA = 0
@@ -59,6 +67,11 @@ class FavoriteFragment : BaseFragment() {
                 viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
             }
         }, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback { interactionListener?.changeNavigationPosition(R.id.navigation_home) }
     }
 
     override fun onResume() {
@@ -172,6 +185,15 @@ class FavoriteFragment : BaseFragment() {
         rv_content.adapter = favoriteAdapter
 
         viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        try {
+            interactionListener = context as InteractionListener
+        } catch (e: ClassCastException) {
+            Timber.e("FavoriteFragment interaction listener can't cast")
+        }
     }
 
     private fun refreshUi(size: Int) {

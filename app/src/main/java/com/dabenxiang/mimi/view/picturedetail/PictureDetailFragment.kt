@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.picturedetail
 
 import android.os.Bundle
 import android.view.View
+import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -42,6 +43,8 @@ class PictureDetailFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        requireActivity().onBackPressedDispatcher.addCallback { findNavController().navigateUp() }
 
         val memberPostItem = arguments?.getSerializable(KEY_DATA) as MemberPostItem
         val position = arguments?.getInt(KEY_POSITION) ?: 0
