@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.text.Html
@@ -68,13 +69,15 @@ class PlayerActivity : BaseActivity() {
     companion object {
         const val REQUEST_CODE = 111
         private const val KEY_PLAYER_SRC = "KEY_PLAYER_SRC"
+        private const val KEY_IS_COMMENT = "KEY_IS_COMMENT"
         private const val JUMP_TIME = 1000
         private const val SWIPE_DISTANCE_UNIT = 25
         private const val SWIPE_SOUND_LEAST = 100
 
-        fun createBundle(data: PlayerData): Bundle {
+        fun createBundle(data: PlayerData, isComment: Boolean = false): Bundle {
             return Bundle().also {
                 it.putSerializable(KEY_PLAYER_SRC, data)
+                it.putBoolean(KEY_IS_COMMENT, isComment)
             }
         }
     }
@@ -194,6 +197,11 @@ class PlayerActivity : BaseActivity() {
                     viewModel.deleteCommentLike(replyId)
                 }
             }
+
+            override fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit) {
+                viewModel.getBitmap(id.toString(), succeededBlock)
+            }
+
         }, CommentViewType.VIDEO).apply {
             loadMoreModule.apply {
                 isEnableLoadMore = true
@@ -339,6 +347,8 @@ class PlayerActivity : BaseActivity() {
             viewModel.sourceList?.get(it)?.videoEpisodes?.also { videoEpisodes ->
                 setupStream(videoEpisodes)
             }
+
+            scrollToBottom()
         })
 
         viewModel.episodePosition.observe(this, Observer {
@@ -346,6 +356,11 @@ class PlayerActivity : BaseActivity() {
                 episodeAdapter.setLastSelectedIndex(it)
                 viewModel.checkConsumeResult()
             }
+            scrollToBottom()
+        })
+
+        viewModel.isPageCallback.observe(this, Observer {
+            scrollToBottom()
         })
 
         viewModel.apiStreamResult.observe(this, Observer {
@@ -374,6 +389,7 @@ class PlayerActivity : BaseActivity() {
                         viewModel.commentCount.value = viewModel.commentCount.value?.plus(1)
 
                         viewModel.setupCommentDataSource(playerInfoAdapter)
+                        scrollToBottom()
                     }
                     is ApiResult.Error -> onApiError(it.throwable)
                 }
@@ -390,6 +406,7 @@ class PlayerActivity : BaseActivity() {
                             it()
                             null
                         }
+                        scrollToBottom()
                     }
                     is ApiResult.Error -> onApiError(it.throwable)
                 }
@@ -487,6 +504,7 @@ class PlayerActivity : BaseActivity() {
                     }
                 }
             }
+            scrollToBottom()
         })
 
         viewModel.isSelectedNewestComment.observe(this, Observer {
@@ -578,6 +596,7 @@ class PlayerActivity : BaseActivity() {
                     consumeDialog = showPointNotEnoughDialog()
                 }
             }
+            scrollToBottom()
         })
 
         viewModel.apiLoadReplyCommentResult.observe(this, Observer { event ->
@@ -605,11 +624,14 @@ class PlayerActivity : BaseActivity() {
 
         viewModel.videoList.observe(this, Observer {
             guessLikeAdapter.submitList(it)
+            scrollToBottom()
         })
 
         viewModel.recyclerViewGuessLikeVisible.observe(this, Observer {
             headGuessLike.title_guess_like.visibility = it
             headGuessLike.recyclerview_guess_like.visibility = it
+
+            scrollToBottom()
         })
 
         btn_full_screen.setOnClickListener {
@@ -1110,6 +1132,7 @@ class PlayerActivity : BaseActivity() {
     }
 
     private fun setupSourceList(list: List<Source>?) {
+        Timber.d("neo,list = ${list?.size}")
         if (list == null) {
             headSource.recyclerview_source_list.visibility = View.GONE
         } else {
@@ -1130,6 +1153,8 @@ class PlayerActivity : BaseActivity() {
 
                 sourceListAdapter.submitList(result, 0)
                 viewModel.setSourceListPosition(0)
+
+                scrollToBottom()
             }
         }
     }
@@ -1158,6 +1183,8 @@ class PlayerActivity : BaseActivity() {
 
         episodeAdapter.submitList(result, -1)
         viewModel.setStreamPosition(-1)
+
+        scrollToBottom()
     }
 
     private fun setupChipGroup(list: List<String>?) {
@@ -1316,5 +1343,10 @@ class PlayerActivity : BaseActivity() {
             }
 
         adjustPlayerSize()
+    }
+
+    private fun scrollToBottom() {
+        if (intent.extras?.getBoolean(KEY_IS_COMMENT) == true)
+            scrollView.fullScroll(View.FOCUS_DOWN)
     }
 }

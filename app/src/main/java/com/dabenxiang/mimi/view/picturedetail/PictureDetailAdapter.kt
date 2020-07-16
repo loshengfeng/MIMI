@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.picturedetail
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -183,6 +184,9 @@ class PictureDetailAdapter(
 
         }
 
+        override fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit) {
+
+        }
     }
 
     interface OnPictureDetailListener {

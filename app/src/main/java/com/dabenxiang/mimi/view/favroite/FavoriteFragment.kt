@@ -1,34 +1,42 @@
 package com.dabenxiang.mimi.view.favroite
 
+import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
-import android.widget.TextView
+import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.BaseItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.model.enums.FunctionType
-import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.adapter.FavoriteTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
+import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
+import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_post_favorite.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import timber.log.Timber
 
 class FavoriteFragment : BaseFragment() {
 
     private val viewModel: FavoriteViewModel by viewModels()
 
     private val favoriteAdapter by lazy { FavoriteAdapter(listener) }
+
+    private var interactionListener: InteractionListener? = null
+
 
     companion object {
         const val NO_DATA = 0
@@ -58,6 +66,11 @@ class FavoriteFragment : BaseFragment() {
                 viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
             }
         }, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback { interactionListener?.changeNavigationPosition(R.id.navigation_home) }
     }
 
     override fun onResume() {
@@ -91,8 +104,7 @@ class FavoriteFragment : BaseFragment() {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Error -> onApiError(it.throwable)
                 is ApiResult.Success -> {
-                    refreshUI(it.result)
-                    refreshLikeLeftIcon(it.result)
+                    favoriteAdapter.notifyDataSetChanged()
                 }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
             }
@@ -103,13 +115,11 @@ class FavoriteFragment : BaseFragment() {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Error -> onApiError(it.throwable)
                 is ApiResult.Success -> {
-                    if (viewModel.viewFavoriteStatus[it.result.tag as Long] == LikeType.DISLIKE.value) {
-                        viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
-                        GeneralUtils.showToast(
-                            requireContext(),
-                            getString(R.string.favorite_delete_favorite)
-                        )
-                    }
+                    viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
+                    GeneralUtils.showToast(
+                        requireContext(),
+                        getString(R.string.favorite_delete_favorite)
+                    )
                 }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
             }
@@ -176,6 +186,15 @@ class FavoriteFragment : BaseFragment() {
         viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        try {
+            interactionListener = context as InteractionListener
+        } catch (e: ClassCastException) {
+            Timber.e("FavoriteFragment interaction listener can't cast")
+        }
+    }
+
     private fun refreshUi(size: Int) {
         rv_content.visibility = when (size) {
             NO_DATA -> View.GONE
@@ -227,22 +246,20 @@ class FavoriteFragment : BaseFragment() {
 
 
         override fun onFunctionClick(type: FunctionType, view: View, item: Any) {
-            val textView = view as TextView
             when (type) {
                 FunctionType.LIKE -> {
                     when (item) {
                         is PlayItem -> {
+                            viewModel.currentPlayItem = item
                             item.videoId?.let {
-                                viewModel.viewStatus[it] = viewModel.viewStatus[it]
-                                    ?: if (item.like == true) LikeType.LIKE else LikeType.DISLIKE
-                                viewModel.modifyLike(textView, it)
+                                viewModel.modifyLike(it)
                             }
                         }
                         is PostFavoriteItem -> {
+                            viewModel.currentPostItem = item
                             item.id?.let {
-                                viewModel.viewStatus[it] =
-                                    viewModel.viewStatus[it] ?: LikeType.DISLIKE
-                                viewModel.modifyLike(textView, it)
+                                // todo 目前沒有 post favorite item 可以測試
+//                                viewModel.modifyLike(it)
                             }
                         }
                     }
@@ -252,18 +269,16 @@ class FavoriteFragment : BaseFragment() {
                     // 點擊後加入收藏,
                     when (item) {
                         is PlayItem -> {
+                            viewModel.currentPlayItem = item
                             item.videoId?.let {
-                                viewModel.viewFavoriteStatus[it] =
-                                    viewModel.viewFavoriteStatus[it]
-                                        ?: if (item.favorite == true) LikeType.LIKE.value else LikeType.DISLIKE.value
-                                viewModel.modifyFavorite(textView, it)
+                                viewModel.modifyFavorite(it)
                             }
                         }
                         is PostFavoriteItem -> {
+                            viewModel.currentPostItem = item
                             item.id?.let {
-                                viewModel.viewFavoriteStatus[it] =
-                                    viewModel.viewFavoriteStatus[it] ?: LikeType.DISLIKE.value
-                                viewModel.modifyFavorite(textView, it)
+                                // todo 目前沒有 post favorite item 可以測試
+//                                viewModel.modifyFavorite(it)
                             }
                         }
                     }
@@ -287,33 +302,36 @@ class FavoriteFragment : BaseFragment() {
                         }
                     }
                 }
+
+                FunctionType.MSG -> {
+                    // 點擊評論，進入播放頁面滾動到最下面
+                    when (item) {
+                        is PlayItem -> {
+                            if (item.tags == null || item.tags.first().isEmpty() || item.videoId == null) {
+                                GeneralUtils.showToast(requireContext(), getString(R.string.unexpected_error))
+                            }else{
+                                val playerData = PlayerData(item.videoId ?: 0, item.isAdult ?: false)
+                                val intent = Intent(requireContext(), PlayerActivity::class.java)
+                                intent.putExtras(PlayerActivity.createBundle(playerData,true))
+                                startActivity(intent)
+                            }
+                        }
+                    }
+                }
+
+                FunctionType.MORE -> {
+                    // 若已經檢舉過則Disable -> todo: can't determine?
+//                    MoreDialogFragment.newInstance(item as BaseItem, onReportDialogListener).also {
+//                        it.show(
+//                            activity!!.supportFragmentManager,
+//                            MoreDialogFragment::class.java.simpleName
+//                        )
+//                    }
+                }
                 else -> {
                 }
             }
         }
-    }
-
-    private fun refreshUI(view: TextView) {
-        var count = view.text.toString().toInt()
-        when (viewModel.viewStatus[view.tag as Long]) {
-            LikeType.LIKE -> {
-                count++
-            }
-            LikeType.DISLIKE -> {
-                count--
-            }
-        }
-        view.text = count.toString()
-    }
-
-    private fun refreshLikeLeftIcon(view: TextView) {
-        val res = when (viewModel.viewStatus[view.tag as Long]) {
-            LikeType.LIKE -> R.drawable.ico_nice_s
-            LikeType.DISLIKE -> R.drawable.ico_nice_gray
-            else -> R.drawable.ico_nice_gray
-        }
-
-        view.setCompoundDrawablesRelativeWithIntrinsicBounds(res, 0, 0, 0)
     }
 
     private val onCleanDialogListener = object : OnCleanDialogListener {

@@ -5,7 +5,11 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogFragment
+import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
+import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import kotlinx.android.synthetic.main.fragment_post_article.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 
@@ -89,6 +93,15 @@ class PostArticleFragment : BaseFragment() {
                 txt_hashtagCount.text = String.format(getString(R.string.typing_count, s?.length, HASHTAG_LIMIT))
             }
         })
+
+        clubLayout.setOnClickListener {
+            ChooseClubDialogFragment.newInstance(chooseClubDialogListener).also {
+                it.show(
+                    requireActivity().supportFragmentManager,
+                    ChooseUploadMethodDialogFragment::class.java.simpleName
+                )
+            }
+        }
     }
 
     override fun initSettings() {
@@ -101,5 +114,12 @@ class PostArticleFragment : BaseFragment() {
         txt_titleCount.text = String.format(getString(R.string.typing_count, INIT_VALUE, TITLE_LIMIT))
         txt_contentCount.text = String.format(getString(R.string.typing_count, INIT_VALUE, CONTENT_LIMIT))
         txt_hashtagCount.text = String.format(getString(R.string.typing_count, INIT_VALUE, HASHTAG_LIMIT))
+    }
+
+    private val chooseClubDialogListener = object : ChooseClubDialogListener {
+        override fun onChooseClub(item: MemberClubItem) {
+            txt_clubName.text = item.title
+            txt_hashtagName.text = item.tag
+        }
     }
 }

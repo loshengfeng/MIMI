@@ -10,6 +10,9 @@
     <string name="i_know">知道了</string>
 
     <string name="upload_succeed">上传成功</string>
+    <string name="unexpected_error">未预期的错误</string>
+
+    <string name="press_again_exit">再按一次离开 APP</string>
 
     <!-- Nav Button -->
     <string name="nav_home">一般影视</string>
@@ -56,6 +59,7 @@
     <string name="topup_desc">蜜币购买</string>
     <string name="topup_total">总计</string>
     <string name="topup_confirm_pay">确认支付</string>
+    <string name="topup_subtitle">会员尊享 每天无限观看</string>
 
     <!-- Favorite -->
     <string name="favorite_title">我的收藏</string>

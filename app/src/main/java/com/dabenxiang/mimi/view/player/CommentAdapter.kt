@@ -1,8 +1,11 @@
 package com.dabenxiang.mimi.view.player
 
+import android.graphics.Bitmap
+import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import com.bumptech.glide.Glide
 import com.chad.library.adapter.base.BaseNodeAdapter
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.module.LoadMoreModule
@@ -12,6 +15,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.CommentViewType
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.yulichswift.roundedview.widget.RoundedTextView
 import java.text.SimpleDateFormat
 import java.util.*
@@ -29,6 +33,7 @@ class CommentAdapter(isAdult: Boolean, listener: PlayerInfoListener, type: Comme
         fun replyComment(replyId: Long?, replyName: String?)
         fun setCommentLikeType(replyId: Long?, isLike: Boolean, succeededBlock: () -> Unit)
         fun removeCommentLikeType(replyId: Long?, succeededBlock: () -> Unit)
+        fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit)
     }
 
     init {
@@ -49,7 +54,7 @@ class RootCommentProvider(
     private val isAdult: Boolean,
     private val listener: CommentAdapter.PlayerInfoListener,
     private val type: CommentViewType
-) : BaseCommentProvider(isAdult, type) {
+) : BaseCommentProvider(isAdult, listener, type) {
 
     override val itemViewType: Int
         get() = 1
@@ -183,8 +188,7 @@ class NestedCommentProvider(
     isAdult: Boolean,
     val listener: CommentAdapter.PlayerInfoListener,
     type: CommentViewType
-) :
-    BaseCommentProvider(isAdult, type) {
+) : BaseCommentProvider(isAdult, listener, type) {
     override val itemViewType: Int
         get() = 2
 
@@ -247,6 +251,7 @@ class NestedCommentProvider(
 
 abstract class BaseCommentProvider(
     private val isAdult: Boolean,
+    private val listener: CommentAdapter.PlayerInfoListener,
     private val type: CommentViewType
 ) : BaseNodeProvider() {
 
@@ -276,6 +281,16 @@ abstract class BaseCommentProvider(
                 }
                 else -> {
                     //TODO:
+                }
+            }
+        }
+
+        holder.getView<ImageView>(R.id.iv_avatar).apply {
+            data.postAvatarAttachmentId.toString().takeIf { !TextUtils.isEmpty(it) }?.also { id ->
+                LruCacheUtils.getLruCache(id)?.also { bitmap ->
+                    Glide.with(context).load(bitmap).circleCrop().into(this)
+                } ?: run {
+                    listener.getBitmap(id.toLong()) { bitmap -> updateAvatar(holder, bitmap) }
                 }
             }
         }
@@ -337,6 +352,12 @@ abstract class BaseCommentProvider(
             0,
             0
         )
+    }
+
+    private fun updateAvatar(holder: BaseViewHolder, bitmap: Bitmap) {
+        holder.getView<ImageView>(R.id.iv_avatar).apply {
+            Glide.with(context).load(bitmap).circleCrop().into(this)
+        }
     }
 
     private fun getTextColor() = if (isAdult) R.color.color_white_1_50 else R.color.color_black_1_50

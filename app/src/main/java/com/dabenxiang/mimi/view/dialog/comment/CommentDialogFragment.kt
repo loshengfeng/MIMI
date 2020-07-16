@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.dialog.comment
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
@@ -112,6 +113,10 @@ class CommentDialogFragment : BaseDialogFragment() {
                     }
                 }
             }
+
+            override fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit) {
+                viewModel.getBitmap(id.toString(), succeededBlock)
+            }
         }, CommentViewType.CLIP).apply {
             loadMoreModule.apply {
                 isEnableLoadMore = true
@@ -128,11 +133,6 @@ class CommentDialogFragment : BaseDialogFragment() {
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_dialog_comment
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setStyle(STYLE_NO_TITLE, R.style.CommentDialog)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

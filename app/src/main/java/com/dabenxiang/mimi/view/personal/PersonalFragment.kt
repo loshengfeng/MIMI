@@ -1,7 +1,9 @@
 package com.dabenxiang.mimi.view.personal
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
+import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
@@ -18,6 +20,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
+import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_LOGIN
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
@@ -27,13 +30,19 @@ import kotlinx.android.synthetic.main.fragment_personal.*
 import kotlinx.android.synthetic.main.item_personal_is_login.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import retrofit2.HttpException
+import timber.log.Timber
+import java.lang.ClassCastException
 
 class PersonalFragment : BaseFragment() {
 
     private val viewModel: PersonalViewModel by viewModels()
+    private var interactionListener: InteractionListener? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback {
+            interactionListener?.changeNavigationPosition(R.id.navigation_home)
+        }
         initSettings()
     }
 
@@ -176,4 +185,13 @@ class PersonalFragment : BaseFragment() {
             }
         }
      }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        try {
+            interactionListener = context as InteractionListener
+        } catch (e: ClassCastException) {
+            Timber.e("PersonalFragment interaction listener can't cast")
+        }
+    }
 }

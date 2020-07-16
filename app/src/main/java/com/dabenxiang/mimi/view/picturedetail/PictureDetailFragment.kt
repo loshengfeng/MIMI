@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.picturedetail
 
 import android.os.Bundle
 import android.view.View
+import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -48,6 +49,11 @@ class PictureDetailFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         memberPostItem = arguments?.getSerializable(KEY_DATA) as MemberPostItem
+
+        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
+
+        val memberPostItem = arguments?.getSerializable(KEY_DATA) as MemberPostItem
+
         val position = arguments?.getInt(KEY_POSITION) ?: 0
 
         text_toolbar_title.text = getString(R.string.picture_detail_title)

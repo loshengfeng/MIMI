@@ -384,7 +384,7 @@ interface ApiService {
     suspend fun getAgent(
         @Query("offset") offset: Int,
         @Query("limit") limit: Int
-    ): Response<ApiBasePagingItem<AgentItem>>
+    ): Response<ApiBasePagingItem<List<AgentItem>>>
 
     /**********************************************************
      *

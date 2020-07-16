@@ -6,9 +6,11 @@ import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setupWithNavController
 import com.dabenxiang.mimi.view.base.BaseActivity
+import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : BaseActivity() {
+class MainActivity : BaseActivity(), InteractionListener {
 
     private val viewModel: MainViewModel by viewModels()
 
@@ -68,5 +70,21 @@ class MainActivity : BaseActivity() {
             bottom_navigation.itemTextColor =
                 resources.getColorStateList(R.color.normal_color_bottom_bar_item, null)
         }
+    }
+
+    override fun changeNavigationPosition(index: Int) {
+        bottom_navigation.selectedItemId = index
+    }
+
+    override fun onBackPressed() {
+        if (supportFragmentManager.backStackEntryCount == 0) {
+            if (!viewModel.needCloseApp) {
+                viewModel.startBackExitAppTimer()
+                GeneralUtils.showToast(this, getString(R.string.press_again_exit))
+            } else {
+                finish()
+            }
+        } else
+            super.onBackPressed()
     }
 }

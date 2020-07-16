@@ -9,11 +9,14 @@ import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.RootCategoriesItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
 class MainViewModel : BaseViewModel() {
+
+    var needCloseApp = false // 判斷是否需要離開 app
 
     private val _adultMode = MutableLiveData(false)
     val adultMode: LiveData<Boolean> = _adultMode
@@ -55,6 +58,20 @@ class MainViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _categoriesData.value = it }
+        }
+    }
+
+    /**
+     * 按下 back 離開的 timer
+     *
+     */
+    fun startBackExitAppTimer(){
+        needCloseApp = true
+        viewModelScope.launch {
+            for (second in 2 downTo 0) {
+                delay(1000)
+            }
+            needCloseApp = false
         }
     }
 }

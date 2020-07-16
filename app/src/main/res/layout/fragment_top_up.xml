@@ -17,7 +17,21 @@
         android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@id/layout_config"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_record_top_up"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="15dp"
+        android:gravity="center_vertical"
+        android:text="@string/personal_order"
+        android:textColor="@color/color_red_1"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@id/tv_title"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -58,13 +72,14 @@
 
         <TextView
             android:id="@+id/tv_coco"
-            android:layout_width="52dp"
+            android:layout_width="wrap_content"
             android:layout_height="20dp"
             android:layout_marginTop="2dp"
             android:background="@drawable/bg_coin"
             android:drawableStart="@drawable/ico_micoin_small"
             android:drawablePadding="2dp"
             android:paddingStart="4dp"
+            android:paddingEnd="4dp"
             android:textColor="@color/color_white_1"
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="@+id/tv_name"
@@ -119,6 +134,7 @@
         android:layout_height="40dp"
         android:layout_marginTop="30dp"
         android:background="@drawable/bg_checkbox_2"
+        android:checkedButton="@id/rb_proxy_pay"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -130,7 +146,7 @@
             android:layout_height="match_parent"
             android:background="@drawable/bg_radio_button_selector"
             android:button="@null"
-            android:checked="true"
+            android:clickable="false"
             android:gravity="center"
             android:text="@string/topup_online_pay"
             android:textColor="@color/cb_selector" />
@@ -152,7 +168,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="30dp"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -343,7 +359,7 @@
         android:layout_marginTop="30dp"
         android:layout_marginEnd="8dp"
         android:paddingBottom="12dp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
