@@ -10,7 +10,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.yulichswift.roundedview.widget.RoundedTextView
 
-class CommentLoadMoreView(private val isAdult: Boolean) : BaseLoadMoreView() {
+class CommentLoadMoreView(private val isAdult: Boolean, private val isClip: Boolean = false) : BaseLoadMoreView() {
 
     override fun getRootView(parent: ViewGroup): View {
         return LayoutInflater.from(parent.context)
@@ -61,5 +61,9 @@ class CommentLoadMoreView(private val isAdult: Boolean) : BaseLoadMoreView() {
         if (isAdult) R.color.color_white_1_50 else R.color.color_black_1_50
 
     private fun getBackground() =
-        if (isAdult) R.drawable.bg_adult_comment_bottom_radius_10 else R.drawable.bg_comment_bottom_radius_10
+        when {
+            isClip -> R.color.transparent
+            isAdult -> R.drawable.bg_adult_comment_bottom_radius_10
+            else -> R.drawable.bg_comment_bottom_radius_10
+        }
 }
