@@ -1,17 +1,26 @@
 package com.dabenxiang.mimi.view.post
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import androidx.core.view.size
+import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
+import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_post_article.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+
 
 class PostArticleFragment : BaseFragment() {
 
@@ -76,24 +85,6 @@ class PostArticleFragment : BaseFragment() {
             }
         })
 
-        edt_hashtag.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                s?.let {
-                    if (it.length > HASHTAG_LIMIT) {
-                        val content = it.toString().dropLast(1)
-                        edt_title.setText(content)
-                    }
-                }
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                txt_hashtagCount.text = String.format(getString(R.string.typing_count, s?.length, HASHTAG_LIMIT))
-            }
-        })
-
         clubLayout.setOnClickListener {
             ChooseClubDialogFragment.newInstance(chooseClubDialogListener).also {
                 it.show(
@@ -101,6 +92,18 @@ class PostArticleFragment : BaseFragment() {
                     ChooseUploadMethodDialogFragment::class.java.simpleName
                 )
             }
+        }
+
+        edt_hashtag.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE){
+                addTag(edt_hashtag.text.toString())
+                edt_hashtag.text.clear()
+            }
+            false
+        }
+
+        tv_back.setOnClickListener {
+            findNavController().popBackStack()
         }
     }
 
@@ -120,6 +123,29 @@ class PostArticleFragment : BaseFragment() {
         override fun onChooseClub(item: MemberClubItem) {
             txt_clubName.text = item.title
             txt_hashtagName.text = item.tag
+
+            val bitmap = LruCacheUtils.getLruCache(item.avatarAttachmentId.toString())
+            Glide.with(requireContext())
+                .load(bitmap)
+                .circleCrop()
+                .into(iv_avatar)
+
+            addTag(item.tag)
         }
+    }
+
+    private fun addTag(tag: String) {
+        val chip = LayoutInflater.from(requireContext()).inflate(R.layout.chip_item, chipGroup, false) as Chip
+        chip.text = tag
+        chip.setTextColor(chip.context.getColor(R.color.color_black_1_50))
+        chip.chipBackgroundColor =
+            ColorStateList.valueOf(chip.context.getColor(R.color.color_black_1_10))
+        chipGroup.addView(chip)
+
+        setTagCount()
+    }
+
+    private fun setTagCount() {
+        txt_hashtagCount.text = String.format(getString(R.string.typing_count, chipGroup.size, HASHTAG_LIMIT))
     }
 }
