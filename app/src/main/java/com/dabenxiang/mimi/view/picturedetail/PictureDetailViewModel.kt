@@ -6,11 +6,16 @@ import androidx.lifecycle.viewModelScope
 import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.player.CommentAdapter
+import com.dabenxiang.mimi.view.player.CommentDataSource
+import com.dabenxiang.mimi.view.player.RootCommentNode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 
 class PictureDetailViewModel : BaseViewModel() {
@@ -63,6 +68,48 @@ class PictureDetailViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _followPostResult.value = it }
+        }
+    }
+
+    fun getCommentInfo(postId: Long, commentType: CommentType, adapter: CommentAdapter) {
+        viewModelScope.launch {
+            val dataSrc = CommentDataSource(postId, commentType.value, domainManager)
+
+            dataSrc.loadMore().also { load ->
+                withContext(Dispatchers.Main) {
+                    load.content?.let { list ->
+                        val finalList = list.map { item ->
+                            RootCommentNode(item)
+                        }
+                        adapter.setList(finalList)
+                    }
+                }
+                setupLoadMoreResult(adapter, load.isEnd)
+            }
+
+            adapter.loadMoreModule.setOnLoadMoreListener {
+                viewModelScope.launch(Dispatchers.IO) {
+                    dataSrc.loadMore().also { load ->
+                        withContext(Dispatchers.Main) {
+                            load.content?.also { list ->
+                                val finalList = list.map { item ->
+                                    RootCommentNode(item)
+                                }
+                                adapter.addData(finalList)
+                            }
+                            setupLoadMoreResult(adapter, load.isEnd)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setupLoadMoreResult(adapter: CommentAdapter, isEnd: Boolean) {
+        if (isEnd) {
+            adapter.loadMoreModule.loadMoreEnd()
+        } else {
+            adapter.loadMoreModule.loadMoreComplete()
         }
     }
 

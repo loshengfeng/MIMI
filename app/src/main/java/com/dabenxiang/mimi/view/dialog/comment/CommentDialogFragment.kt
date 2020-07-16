@@ -9,23 +9,22 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions.bitmapTransform
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PostCommentRequest
 import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
+import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.CommentLoadMoreView
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import jp.wasabeef.glide.transformations.BlurTransformation
 import kotlinx.android.synthetic.main.fragment_dialog_comment.*
-import kotlinx.android.synthetic.main.head_no_comment.view.*
 import timber.log.Timber
 
 
-class CommentDialogFragment: BaseDialogFragment() {
+class CommentDialogFragment : BaseDialogFragment() {
 
     private val viewModel: CommentDialogViewModel by viewModels()
     private var data: MemberPostItem? = null
@@ -85,7 +84,11 @@ class CommentDialogFragment: BaseDialogFragment() {
                 }
             }
 
-            override fun setCommentLikeType(replyId: Long?, isLike: Boolean, succeededBlock: () -> Unit) {
+            override fun setCommentLikeType(
+                replyId: Long?,
+                isLike: Boolean,
+                succeededBlock: () -> Unit
+            ) {
                 Timber.d("@@setCommentLikeType: $replyId, $isLike")
                 loadCommentLikeBlock = succeededBlock
                 data?.id?.let { postId ->
@@ -105,11 +108,11 @@ class CommentDialogFragment: BaseDialogFragment() {
                     replyId?.let { replyId ->
                         Pair(postId, replyId)
                     }?.also { (postId, replyId) ->
-                    viewModel.deleteCommentLike(postId, replyId)
+                        viewModel.deleteCommentLike(postId, replyId)
                     }
                 }
             }
-        }, true).apply {
+        }, CommentViewType.CLIP).apply {
             loadMoreModule.apply {
                 isEnableLoadMore = true
                 isAutoLoadMore = true
@@ -142,7 +145,10 @@ class CommentDialogFragment: BaseDialogFragment() {
 
         (arguments?.getSerializable(KEY_DATA) as MemberPostItem).also { memberPostItem ->
             data = memberPostItem
-            tv_comment_count.text = String.format(requireContext().getString(R.string.clip_comment_count), memberPostItem.commentCount)
+            tv_comment_count.text = String.format(
+                requireContext().getString(R.string.clip_comment_count),
+                memberPostItem.commentCount
+            )
 
             rv_comment.adapter = playerInfoAdapter
             lifecycleScope.launchWhenResumed {
@@ -190,8 +196,10 @@ class CommentDialogFragment: BaseDialogFragment() {
         viewModel.apiPostCommentResult.observe(this, Observer { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
-                    is ApiResult.Loading -> {}
-                    is ApiResult.Loaded -> {}
+                    is ApiResult.Loading -> {
+                    }
+                    is ApiResult.Loaded -> {
+                    }
                     is ApiResult.Empty -> {
                         closeKeyboard()
                         et_message.text = null
@@ -207,7 +215,8 @@ class CommentDialogFragment: BaseDialogFragment() {
                         }
 
                     }
-                    is ApiResult.Error -> {}
+                    is ApiResult.Error -> {
+                    }
                 }
             }
         })
@@ -215,15 +224,18 @@ class CommentDialogFragment: BaseDialogFragment() {
         viewModel.apiCommentLikeResult.observe(this, Observer { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
-                    is ApiResult.Loading -> {}
-                    is ApiResult.Loaded -> {}
+                    is ApiResult.Loading -> {
+                    }
+                    is ApiResult.Loaded -> {
+                    }
                     is ApiResult.Empty -> {
                         loadCommentLikeBlock = loadCommentLikeBlock?.let {
                             it()
                             null
                         }
                     }
-                    is ApiResult.Error -> {}
+                    is ApiResult.Error -> {
+                    }
                 }
             }
         })
@@ -231,15 +243,18 @@ class CommentDialogFragment: BaseDialogFragment() {
         viewModel.apiDeleteCommentLikeResult.observe(this, Observer { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
-                    is ApiResult.Loading -> {}
-                    is ApiResult.Loaded -> {}
+                    is ApiResult.Loading -> {
+                    }
+                    is ApiResult.Loaded -> {
+                    }
                     is ApiResult.Empty -> {
                         loadCommentLikeBlock = loadCommentLikeBlock?.let {
                             it()
                             null
                         }
                     }
-                    is ApiResult.Error -> {}
+                    is ApiResult.Error -> {
+                    }
                 }
             }
         })

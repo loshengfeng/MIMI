@@ -26,6 +26,7 @@ import com.dabenxiang.mimi.model.api.vo.PostCommentRequest
 import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
 import com.dabenxiang.mimi.model.api.vo.Source
 import com.dabenxiang.mimi.model.api.vo.VideoEpisode
+import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.serializable.PlayerData
@@ -193,7 +194,7 @@ class PlayerActivity : BaseActivity() {
                     viewModel.deleteCommentLike(replyId)
                 }
             }
-        }).apply {
+        }, CommentViewType.VIDEO).apply {
             loadMoreModule.apply {
                 isEnableLoadMore = true
                 isAutoLoadMore = true

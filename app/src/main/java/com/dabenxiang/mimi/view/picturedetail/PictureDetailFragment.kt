@@ -11,9 +11,11 @@ import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.ImageItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.fullpicture.FullPictureFragment
+import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_picture_detail.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -37,13 +39,15 @@ class PictureDetailFragment : BaseFragment() {
 
     private var adapter: PictureDetailAdapter? = null
 
+    private var memberPostItem: MemberPostItem? = null
+
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val memberPostItem = arguments?.getSerializable(KEY_DATA) as MemberPostItem
+        memberPostItem = arguments?.getSerializable(KEY_DATA) as MemberPostItem
         val position = arguments?.getInt(KEY_POSITION) ?: 0
 
         text_toolbar_title.text = getString(R.string.picture_detail_title)
@@ -55,7 +59,7 @@ class PictureDetailFragment : BaseFragment() {
 
         adapter = PictureDetailAdapter(
             requireContext(),
-            memberPostItem,
+            memberPostItem!!,
             onPictureDetailListener,
             onItemClickListener
         )
@@ -107,6 +111,14 @@ class PictureDetailFragment : BaseFragment() {
 
         override fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
             viewModel.followPost(item, position, isFollow)
+        }
+
+        override fun onGetCommandInfo(adapter: CommentAdapter) {
+            viewModel.getCommentInfo(
+                memberPostItem!!.id,
+                CommentType.NEWEST,
+                adapter
+            )
         }
     }
 

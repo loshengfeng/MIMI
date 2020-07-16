@@ -11,12 +11,13 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
+import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.yulichswift.roundedview.widget.RoundedTextView
 import java.text.SimpleDateFormat
 import java.util.*
 
-class CommentAdapter(isAdult: Boolean, listener: PlayerInfoListener, isClip: Boolean = false) : BaseNodeAdapter(),
-    LoadMoreModule {
+class CommentAdapter(isAdult: Boolean, listener: PlayerInfoListener, type: CommentViewType) :
+    BaseNodeAdapter(), LoadMoreModule {
 
     companion object {
         const val EXPAND_COLLAPSE_PAYLOAD = 99
@@ -31,8 +32,8 @@ class CommentAdapter(isAdult: Boolean, listener: PlayerInfoListener, isClip: Boo
     }
 
     init {
-        addNodeProvider(RootCommentProvider(isAdult, listener, isClip))
-        addNodeProvider(NestedCommentProvider(isAdult, listener, isClip))
+        addNodeProvider(RootCommentProvider(isAdult, listener, type))
+        addNodeProvider(NestedCommentProvider(isAdult, listener, type))
     }
 
     override fun getItemType(data: List<BaseNode>, position: Int): Int {
@@ -47,8 +48,8 @@ class CommentAdapter(isAdult: Boolean, listener: PlayerInfoListener, isClip: Boo
 class RootCommentProvider(
     private val isAdult: Boolean,
     private val listener: CommentAdapter.PlayerInfoListener,
-    private val isClip: Boolean = false
-) : BaseCommentProvider(isAdult, isClip) {
+    private val type: CommentViewType
+) : BaseCommentProvider(isAdult, type) {
 
     override val itemViewType: Int
         get() = 1
@@ -71,31 +72,38 @@ class RootCommentProvider(
 
         holder.getView<RoundedTextView>(R.id.btn_show_comment_reply).also {
             if (!node.isExpanded && node.data.commentCount != null && node.data.commentCount > 0) {
-                val solidColor =
-                    when {
-                        isClip -> R.color.transparent
-                        isAdult -> R.color.color_white_1_10
-                        else -> R.color.color_black_1_05
-                    }.let { colorRes ->
-                        it.resources.getColor(colorRes, null)
-                    }
 
-                val pressedColor =
-                    when {
-                        isClip -> R.color.transparent
-                        isAdult -> R.color.color_white_1_30
-                        else -> R.color.color_black_1_30
-                    }.let { colorRes ->
-                        it.resources.getColor(colorRes, null)
+                val solidColor = when (type) {
+                    CommentViewType.CLIP -> R.color.transparent
+                    CommentViewType.VIDEO -> {
+                        if (isAdult) R.color.color_white_1_10
+                        else R.color.color_black_1_05
                     }
+                    else -> R.color.color_white_1_10
+                }.let { colorRes ->
+                    it.resources.getColor(colorRes, null)
+                }
+
+                val pressedColor = when (type) {
+                    CommentViewType.CLIP -> R.color.transparent
+                    CommentViewType.VIDEO -> {
+                        if (isAdult) R.color.color_white_1_30
+                        else R.color.color_black_1_30
+                    }
+                    else -> R.color.color_white_1_30
+                }.let { colorRes ->
+                    it.resources.getColor(colorRes, null)
+                }
 
                 it.setBtnSolidColor(
                     solidColor,
                     solidColor,
                     it.resources.getDimension(R.dimen.dp_10)
                 )
-                it.text =
-                    String.format(it.resources.getString(R.string.n_reply), node.data.commentCount)
+                it.text = String.format(
+                    it.resources.getString(R.string.n_reply),
+                    node.data.commentCount
+                )
 
                 it.visibility = View.VISIBLE
             } else {
@@ -171,10 +179,12 @@ class RootCommentProvider(
     }
 }
 
-class NestedCommentProvider(isAdult: Boolean,
-                            val listener: CommentAdapter.PlayerInfoListener,
-                            isClip: Boolean = false) :
-    BaseCommentProvider(isAdult, isClip) {
+class NestedCommentProvider(
+    isAdult: Boolean,
+    val listener: CommentAdapter.PlayerInfoListener,
+    type: CommentViewType
+) :
+    BaseCommentProvider(isAdult, type) {
     override val itemViewType: Int
         get() = 2
 
@@ -235,49 +245,53 @@ class NestedCommentProvider(isAdult: Boolean,
     }
 }
 
-abstract class BaseCommentProvider(private val isAdult: Boolean,
-                                   private val isClip: Boolean) : BaseNodeProvider() {
+abstract class BaseCommentProvider(
+    private val isAdult: Boolean,
+    private val type: CommentViewType
+) : BaseNodeProvider() {
 
     protected fun dataConvert(holder: BaseViewHolder, data: MembersPostCommentItem) {
         holder.getView<View>(R.id.line_Top).apply {
-            if (holder.layoutPosition == 1) {
-                visibility = View.GONE
-            } else {
-                visibility = View.VISIBLE
-
-                when {
-                    isAdult -> R.color.color_white_1
-                    else -> R.color.color_black_1_05
-                }.run {
-                    setBackgroundResource(this)
+            when (type) {
+                CommentViewType.VIDEO -> {
+                    if (holder.layoutPosition == 1) {
+                        visibility = View.GONE
+                    } else {
+                        visibility = View.VISIBLE
+                        when {
+                            isAdult -> R.color.color_white_1
+                            else -> R.color.color_black_1_05
+                        }.run {
+                            setBackgroundResource(this)
+                        }
+                    }
                 }
-            }
-
-            takeIf { isClip }?.also {
-                if (holder.layoutPosition == 0) {
-                    visibility = View.GONE
-                } else {
-                    visibility = View.VISIBLE
-                    setBackgroundResource(R.color.color_black_1_20)
+                CommentViewType.CLIP -> {
+                    if (holder.layoutPosition == 0) {
+                        visibility = View.GONE
+                    } else {
+                        visibility = View.VISIBLE
+                        setBackgroundResource(R.color.color_black_1_20)
+                    }
+                }
+                else -> {
+                    //TODO:
                 }
             }
         }
 
         holder.setBackgroundResource(
             R.id.layout_root,
-            if (isClip) {
-                R.color.transparent
-            } else {
-                if (holder.layoutPosition == 1) {
-                    if (isAdult)
-                        R.drawable.bg_adult_comment_top_radius_10
-                    else
-                        R.drawable.bg_comment_top_radius_10
-                } else {
-                    if (isAdult)
-                        R.color.color_white_1_10
-                    else
-                        R.color.color_gray_2
+            when (type) {
+                CommentViewType.VIDEO -> R.color.transparent
+                else -> {
+                    if (holder.layoutPosition == 1) {
+                        if (isAdult) R.drawable.bg_adult_comment_top_radius_10
+                        else R.drawable.bg_comment_top_radius_10
+                    } else {
+                        if (isAdult) R.color.color_white_1_10
+                        else R.color.color_gray_2
+                    }
                 }
             }
         )
@@ -303,7 +317,8 @@ abstract class BaseCommentProvider(private val isAdult: Boolean,
             holder.setText(R.id.tv_date, it)
         }
 
-        holder.getView<ImageView>(R.id.btn_more).setBackgroundResource(if (isAdult) R.drawable.btn_more_white_n else R.drawable.btn_more_gray_n)
+        holder.getView<ImageView>(R.id.btn_more)
+            .setBackgroundResource(if (isAdult) R.drawable.btn_more_white_n else R.drawable.btn_more_gray_n)
         updateLikeCountAndDislikeCount(holder, data)
     }
 
