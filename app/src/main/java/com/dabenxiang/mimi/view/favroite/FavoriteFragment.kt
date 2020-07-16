@@ -19,17 +19,15 @@ import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.adapter.FavoriteTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
+import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
-import com.dabenxiang.mimi.view.dialog.more.MoreDialogFragment
-import com.dabenxiang.mimi.view.dialog.more.OnMoreDialogListener
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_post_favorite.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import timber.log.Timber
-import java.lang.ClassCastException
 
 class FavoriteFragment : BaseFragment() {
 
@@ -38,6 +36,7 @@ class FavoriteFragment : BaseFragment() {
     private val favoriteAdapter by lazy { FavoriteAdapter(listener) }
 
     private var interactionListener: InteractionListener? = null
+
 
     companion object {
         const val NO_DATA = 0
@@ -322,12 +321,12 @@ class FavoriteFragment : BaseFragment() {
 
                 FunctionType.MORE -> {
                     // 若已經檢舉過則Disable -> todo: can't determine?
-                    MoreDialogFragment.newInstance(item as BaseItem, onReportDialogListener).also {
-                        it.show(
-                            activity!!.supportFragmentManager,
-                            MoreDialogFragment::class.java.simpleName
-                        )
-                    }
+//                    MoreDialogFragment.newInstance(item as BaseItem, onReportDialogListener).also {
+//                        it.show(
+//                            activity!!.supportFragmentManager,
+//                            MoreDialogFragment::class.java.simpleName
+//                        )
+//                    }
                 }
                 else -> {
                 }
@@ -338,17 +337,6 @@ class FavoriteFragment : BaseFragment() {
     private val onCleanDialogListener = object : OnCleanDialogListener {
         override fun onClean() {
             viewModel.deleteFavorite()
-        }
-    }
-
-    private val onReportDialogListener = object : OnMoreDialogListener {
-        override fun onReport(item: BaseItem) {
-            val postId = when (item) {
-                is PlayItem -> item.videoId ?: 0
-                is PostFavoriteItem -> item.postId ?: 0
-                else -> 0
-            }
-//            viewModel.report(postId)
         }
     }
 }

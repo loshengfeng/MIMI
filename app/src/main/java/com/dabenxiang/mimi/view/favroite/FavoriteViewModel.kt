@@ -202,7 +202,7 @@ class FavoriteViewModel : BaseViewModel() {
     fun report(postId: Long, content: String) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().postReport(postId,ReportRequest(content))
+                val result = domainManager.getApiRepository().sendPostReport(postId, ReportRequest(content))
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }

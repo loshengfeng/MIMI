@@ -1,8 +1,11 @@
 package com.dabenxiang.mimi.view.player
 
+import android.graphics.Bitmap
+import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import com.bumptech.glide.Glide
 import com.chad.library.adapter.base.BaseNodeAdapter
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.module.LoadMoreModule
@@ -11,11 +14,12 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.yulichswift.roundedview.widget.RoundedTextView
 import java.text.SimpleDateFormat
 import java.util.*
 
-class CommentAdapter(isAdult: Boolean, listener: PlayerInfoListener) : BaseNodeAdapter(),
+class CommentAdapter(isAdult: Boolean, listener: PlayerInfoListener, isClip: Boolean = false) : BaseNodeAdapter(),
     LoadMoreModule {
 
     companion object {
@@ -28,11 +32,12 @@ class CommentAdapter(isAdult: Boolean, listener: PlayerInfoListener) : BaseNodeA
         fun replyComment(replyId: Long?, replyName: String?)
         fun setCommentLikeType(replyId: Long?, isLike: Boolean, succeededBlock: () -> Unit)
         fun removeCommentLikeType(replyId: Long?, succeededBlock: () -> Unit)
+        fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit)
     }
 
     init {
-        addNodeProvider(RootCommentProvider(isAdult, listener))
-        addNodeProvider(NestedCommentProvider(isAdult, listener))
+        addNodeProvider(RootCommentProvider(isAdult, listener, isClip))
+        addNodeProvider(NestedCommentProvider(isAdult, listener, isClip))
     }
 
     override fun getItemType(data: List<BaseNode>, position: Int): Int {
@@ -46,8 +51,9 @@ class CommentAdapter(isAdult: Boolean, listener: PlayerInfoListener) : BaseNodeA
 
 class RootCommentProvider(
     private val isAdult: Boolean,
-    private val listener: CommentAdapter.PlayerInfoListener
-) : BaseCommentProvider(isAdult) {
+    private val listener: CommentAdapter.PlayerInfoListener,
+    private val isClip: Boolean = false
+) : BaseCommentProvider(isAdult, listener, isClip) {
 
     override val itemViewType: Int
         get() = 1
@@ -71,19 +77,19 @@ class RootCommentProvider(
         holder.getView<RoundedTextView>(R.id.btn_show_comment_reply).also {
             if (!node.isExpanded && node.data.commentCount != null && node.data.commentCount > 0) {
                 val solidColor =
-                    if (isAdult) {
-                        R.color.color_white_1_10
-                    } else {
-                        R.color.color_black_1_05
+                    when {
+                        isClip -> R.color.transparent
+                        isAdult -> R.color.color_white_1_10
+                        else -> R.color.color_black_1_05
                     }.let { colorRes ->
                         it.resources.getColor(colorRes, null)
                     }
 
                 val pressedColor =
-                    if (isAdult) {
-                        R.color.color_white_1_30
-                    } else {
-                        R.color.color_black_1_30
+                    when {
+                        isClip -> R.color.transparent
+                        isAdult -> R.color.color_white_1_30
+                        else -> R.color.color_black_1_30
                     }.let { colorRes ->
                         it.resources.getColor(colorRes, null)
                     }
@@ -170,8 +176,10 @@ class RootCommentProvider(
     }
 }
 
-class NestedCommentProvider(isAdult: Boolean, val listener: CommentAdapter.PlayerInfoListener) :
-    BaseCommentProvider(isAdult) {
+class NestedCommentProvider(isAdult: Boolean,
+                            val listener: CommentAdapter.PlayerInfoListener,
+                            isClip: Boolean = false) :
+    BaseCommentProvider(isAdult, listener, isClip) {
     override val itemViewType: Int
         get() = 2
 
@@ -232,7 +240,9 @@ class NestedCommentProvider(isAdult: Boolean, val listener: CommentAdapter.Playe
     }
 }
 
-abstract class BaseCommentProvider(private val isAdult: Boolean) : BaseNodeProvider() {
+abstract class BaseCommentProvider(private val isAdult: Boolean,
+                                   private val listener: CommentAdapter.PlayerInfoListener,
+                                   private val isClip: Boolean) : BaseNodeProvider() {
 
     protected fun dataConvert(holder: BaseViewHolder, data: MembersPostCommentItem) {
         holder.getView<View>(R.id.line_Top).apply {
@@ -241,26 +251,50 @@ abstract class BaseCommentProvider(private val isAdult: Boolean) : BaseNodeProvi
             } else {
                 visibility = View.VISIBLE
 
-                if (isAdult) {
-                    setBackgroundResource(R.color.color_white_1_10)
+                when {
+                    isAdult -> R.color.color_white_1
+                    else -> R.color.color_black_1_05
+                }.run {
+                    setBackgroundResource(this)
+                }
+            }
+
+            takeIf { isClip }?.also {
+                if (holder.layoutPosition == 0) {
+                    visibility = View.GONE
                 } else {
-                    setBackgroundResource(R.color.color_black_1_05)
+                    visibility = View.VISIBLE
+                    setBackgroundResource(R.color.color_black_1_20)
+                }
+            }
+        }
+
+        holder.getView<ImageView>(R.id.iv_avatar).apply {
+            data.postAvatarAttachmentId.toString().takeIf { !TextUtils.isEmpty(it) }?.also { id ->
+                LruCacheUtils.getLruCache(id)?.also { bitmap ->
+                    Glide.with(context).load(bitmap).circleCrop().into(this)
+                } ?: run {
+                    listener.getBitmap(id.toLong()) { bitmap -> updateAvatar(holder, bitmap) }
                 }
             }
         }
 
         holder.setBackgroundResource(
             R.id.layout_root,
-            if (holder.layoutPosition == 1) {
-                if (isAdult)
-                    R.drawable.bg_adult_comment_top_radius_10
-                else
-                    R.drawable.bg_comment_top_radius_10
+            if (isClip) {
+                R.color.transparent
             } else {
-                if (isAdult)
-                    R.color.color_white_1_10
-                else
-                    R.color.color_gray_2
+                if (holder.layoutPosition == 1) {
+                    if (isAdult)
+                        R.drawable.bg_adult_comment_top_radius_10
+                    else
+                        R.drawable.bg_comment_top_radius_10
+                } else {
+                    if (isAdult)
+                        R.color.color_white_1_10
+                    else
+                        R.color.color_gray_2
+                }
             }
         )
 
@@ -285,6 +319,7 @@ abstract class BaseCommentProvider(private val isAdult: Boolean) : BaseNodeProvi
             holder.setText(R.id.tv_date, it)
         }
 
+        holder.getView<ImageView>(R.id.btn_more).setBackgroundResource(if (isAdult) R.drawable.btn_more_white_n else R.drawable.btn_more_gray_n)
         updateLikeCountAndDislikeCount(holder, data)
     }
 
@@ -303,6 +338,12 @@ abstract class BaseCommentProvider(private val isAdult: Boolean) : BaseNodeProvi
             0,
             0
         )
+    }
+
+    private fun updateAvatar(holder: BaseViewHolder, bitmap: Bitmap) {
+        holder.getView<ImageView>(R.id.iv_avatar).apply {
+            Glide.with(context).load(bitmap).circleCrop().into(this)
+        }
     }
 
     private fun getTextColor() = if (isAdult) R.color.color_white_1_50 else R.color.color_black_1_50

@@ -1,16 +1,20 @@
 package com.dabenxiang.mimi.view.dialog.comment
 
+import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.event.SingleLiveEvent
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.PostCommentRequest
 import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.player.CommentDataSource
 import com.dabenxiang.mimi.view.player.NestedCommentNode
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.RootCommentNode
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -31,6 +35,9 @@ class CommentDialogViewModel: BaseViewModel() {
 
     private val _apiDeleteCommentLikeResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
     val apiDeleteCommentLikeResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _apiDeleteCommentLikeResult
+
+//    private var _bitmapResult = MutableLiveData<ApiResult<((Bitmap) -> Unit)>>()
+//    val bitmapResult: LiveData<ApiResult<((Bitmap) -> Unit)>> = _bitmapResult
 
     fun setupCommentDataSource(postId: Long, adapter: CommentAdapter) {
         viewModelScope.launch {
@@ -175,4 +182,47 @@ class CommentDialogViewModel: BaseViewModel() {
                 }
         }
     }
+
+    fun postComment(postId: Long, body: PostCommentRequest) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository().postMembersPostComment(postId, body)
+                if (!resp.isSuccessful) throw HttpException(resp)
+
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e ->
+                    emit(ApiResult.error(e))
+                }
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect {
+                    _apiPostCommentResult.value = SingleLiveEvent(it)
+                }
+        }
+    }
+
+    fun getBitmap(id: String, succeededBlock: ((Bitmap) -> Unit)) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getAttachment(id)
+                if (!result.isSuccessful) throw HttpException(result)
+                val byteArray = result.body()?.bytes()
+                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
+                LruCacheUtils.putLruCache(id, bitmap)
+                emit(ApiResult.success(bitmap))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    when(it) {
+                        is ApiResult.Success -> {
+                            succeededBlock(it.result)
+                        }
+                    }
+                }
+        }
+    }
+
 }
