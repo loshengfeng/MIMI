@@ -38,7 +38,7 @@ class PictureDetailFragment : BaseFragment() {
 
     private val viewModel: PictureDetailViewModel by viewModels()
 
-    private var adapter: PictureDetailAdapter? = null
+    private var pictureDetailAdapter: PictureDetailAdapter? = null
 
     private var memberPostItem: MemberPostItem? = null
 
@@ -63,14 +63,14 @@ class PictureDetailFragment : BaseFragment() {
             findNavController().navigateUp()
         }
 
-        adapter = PictureDetailAdapter(
+        pictureDetailAdapter = PictureDetailAdapter(
             requireContext(),
-            memberPostItem!!,
+            memberPostItem,
             onPictureDetailListener,
             onItemClickListener
         )
         recycler_picture_detail.layoutManager = LinearLayoutManager(context)
-        recycler_picture_detail.adapter = adapter
+        recycler_picture_detail.adapter = pictureDetailAdapter
         recycler_picture_detail.scrollToPosition(position)
     }
 
@@ -84,7 +84,7 @@ class PictureDetailFragment : BaseFragment() {
                 is Success -> {
                     val item = it.result
                     LruCacheUtils.putLruCache(item.id!!, item.bitmap!!)
-                    adapter?.updatePhotoGridItem(item.position!!)
+                    pictureDetailAdapter?.updatePhotoGridItem(item.position!!)
                 }
                 is Error -> Timber.e(it.throwable)
             }
@@ -92,22 +92,13 @@ class PictureDetailFragment : BaseFragment() {
 
         viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Success -> adapter?.notifyItemChanged(it.result)
+                is Success -> pictureDetailAdapter?.notifyItemChanged(it.result)
                 is Error -> Timber.e(it.throwable)
             }
         })
-
-        viewModel.isRefreshing.observe(viewLifecycleOwner, Observer {
-            swipe_refresh.isRefreshing = it
-        })
-
     }
 
     override fun setupListeners() {
-        swipe_refresh.setOnRefreshListener {
-            // TODO: 更新評論
-            viewModel.setupRefreshing(false)
-        }
     }
 
     private val onPictureDetailListener = object : PictureDetailAdapter.OnPictureDetailListener {

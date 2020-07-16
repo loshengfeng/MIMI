@@ -136,25 +136,29 @@ class PictureDetailAdapter(
                 holder.newestComment.setOnClickListener {
                     holder.newestComment.setTextColor(context.getColor(R.color.color_red_1))
                     holder.topComment.setTextColor(context.getColor(R.color.color_white_1_30))
-                    onPictureDetailListener.onGetCommandInfo(commentAdapter!!, CommentType.NEWEST)
+                    updateCommandItem(CommentType.NEWEST)
                 }
 
                 holder.topComment.setOnClickListener {
                     holder.topComment.setTextColor(context.getColor(R.color.color_red_1))
                     holder.newestComment.setTextColor(context.getColor(R.color.color_white_1_30))
-                    onPictureDetailListener.onGetCommandInfo(commentAdapter!!, CommentType.TOP)
+                    updateCommandItem(CommentType.TOP)
                 }
             }
             is CommentContentViewHolder -> {
                 commentAdapter = CommentAdapter(true, playerInfoListener, CommentViewType.VIDEO)
                 holder.commentRecycler.adapter = commentAdapter
-                onPictureDetailListener.onGetCommandInfo(commentAdapter!!, CommentType.NEWEST)
+                updateCommandItem(CommentType.NEWEST)
             }
         }
     }
 
     fun updatePhotoGridItem(position: Int) {
         photoGridAdapter?.notifyItemChanged(position)
+    }
+
+    fun updateCommandItem(type: CommentType) {
+        onPictureDetailListener.onGetCommandInfo(commentAdapter!!, type)
     }
 
     private val playerInfoListener = object : CommentAdapter.PlayerInfoListener {
