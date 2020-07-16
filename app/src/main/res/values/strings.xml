@@ -10,6 +10,7 @@
     <string name="i_know">知道了</string>
 
     <string name="upload_succeed">上传成功</string>
+    <string name="unexpected_error">未预期的错误</string>
 
     <string name="press_again_exit">再按一次离开 APP</string>
 

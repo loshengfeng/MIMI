@@ -57,6 +57,9 @@ class PlayerViewModel : BaseViewModel() {
     private val _soundLevel = MutableLiveData<Float>()
     val soundLevel: LiveData<Float> = _soundLevel
 
+    private val _isPageCallback = MutableLiveData<Boolean>() //
+    val isPageCallback: LiveData<Boolean> = _isPageCallback
+
     private val _isLoadingActive = MutableLiveData<Boolean>()
     val isLoadingActive: LiveData<Boolean> = _isLoadingActive
 
@@ -387,15 +390,19 @@ class PlayerViewModel : BaseViewModel() {
                 } else {
                     View.VISIBLE
                 }
+            _isPageCallback.value = true
         }
 
         override fun onLoading() {
+            _isPageCallback.value = true
         }
 
         override fun onLoaded() {
+            _isPageCallback.value = true
         }
 
         override fun onThrowable(throwable: Throwable) {
+            _isPageCallback.value = true
         }
     }
 

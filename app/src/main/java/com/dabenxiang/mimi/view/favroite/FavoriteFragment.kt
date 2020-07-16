@@ -304,6 +304,22 @@ class FavoriteFragment : BaseFragment() {
                     }
                 }
 
+                FunctionType.MSG -> {
+                    // 點擊評論，進入播放頁面滾動到最下面
+                    when (item) {
+                        is PlayItem -> {
+                            if (item.tags == null || item.tags.first().isEmpty() || item.videoId == null) {
+                                GeneralUtils.showToast(requireContext(), getString(R.string.unexpected_error))
+                            }else{
+                                val playerData = PlayerData(item.videoId ?: 0, item.isAdult ?: false)
+                                val intent = Intent(requireContext(), PlayerActivity::class.java)
+                                intent.putExtras(PlayerActivity.createBundle(playerData,true))
+                                startActivity(intent)
+                            }
+                        }
+                    }
+                }
+
                 FunctionType.MORE -> {
                     // 若已經檢舉過則Disable -> todo: can't determine?
                     MoreDialogFragment.newInstance(item as BaseItem, onReportDialogListener).also {
