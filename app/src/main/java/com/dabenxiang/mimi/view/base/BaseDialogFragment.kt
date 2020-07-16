@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.DialogFragment
+import com.dabenxiang.mimi.view.dialog.GeneralDialog
 
 abstract class BaseDialogFragment : DialogFragment() {
 
