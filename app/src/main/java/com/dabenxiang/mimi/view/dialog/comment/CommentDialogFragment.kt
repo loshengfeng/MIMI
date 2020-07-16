@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.dialog.comment
 
 import android.content.Context
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.viewModels
@@ -20,6 +21,7 @@ import com.dabenxiang.mimi.view.player.CommentLoadMoreView
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import jp.wasabeef.glide.transformations.BlurTransformation
 import kotlinx.android.synthetic.main.fragment_dialog_comment.*
+import kotlinx.android.synthetic.main.head_no_comment.view.*
 import timber.log.Timber
 
 
@@ -50,6 +52,7 @@ class CommentDialogFragment: BaseDialogFragment() {
             override fun sendComment(replyId: Long?, replyName: String?) {
                 Timber.d("@@sendComment: $replyId, $replyName")
                 showKeyboard()
+                et_message.requestFocus()
                 et_message.tag = replyId
                 tv_replay_name.text = replyName.takeIf { it != null }?.let {
                     tv_replay_name.visibility = View.VISIBLE
@@ -73,6 +76,7 @@ class CommentDialogFragment: BaseDialogFragment() {
                 Timber.d("@@replyComment: $replyId, $replyName")
                 takeUnless { replyId == null }?.also {
                     showKeyboard()
+                    et_message.requestFocus()
                     et_message.tag = replyId
                     tv_replay_name.text = replyName.takeIf { it != null }?.let {
                         tv_replay_name.visibility = View.VISIBLE
@@ -136,8 +140,6 @@ class CommentDialogFragment: BaseDialogFragment() {
             .transform(BlurTransformation(25, 5))
             .into(iv_blur)
 
-        background.setOnClickListener { dismiss() }
-
         (arguments?.getSerializable(KEY_DATA) as MemberPostItem).also { memberPostItem ->
             data = memberPostItem
             tv_comment_count.text = String.format(requireContext().getString(R.string.clip_comment_count), memberPostItem.commentCount)
@@ -147,17 +149,28 @@ class CommentDialogFragment: BaseDialogFragment() {
                 viewModel.setupCommentDataSource(memberPostItem.id, playerInfoAdapter)
             }
 
-            btn_send.setOnClickListener {
-                closeKeyboard()
-                val replyId = et_message.tag?.let { it as Long }
-                viewModel.postComment(memberPostItem.id, PostCommentRequest(replyId, et_message.text.toString()))
+        }
+    }
 
-                et_message.tag = null
-                tv_replay_name.text = null
-                tv_replay_name.visibility = View.GONE
+    override fun setupListeners() {
+        super.setupListeners()
+
+        background.setOnClickListener { dismiss() }
+
+        btn_send.setOnClickListener {
+            data?.id?.let { id ->
+                et_message.text.toString().takeIf { !TextUtils.isEmpty(it) }?.let { comment ->
+                    Pair(id, comment)
+                }?.also { (id, comment) ->
+                    val replyId = et_message.tag?.let { rid -> rid as Long }
+                    viewModel.postComment(id, PostCommentRequest(replyId, comment))
+                }
             }
         }
+    }
 
+    override fun setupObservers() {
+        super.setupObservers()
         viewModel.apiLoadReplyCommentResult.observe(this, Observer { event ->
             event.getContentIfNotHandled()?.also { apiResult ->
                 when (apiResult) {
@@ -169,8 +182,64 @@ class CommentDialogFragment: BaseDialogFragment() {
                     }
                     is ApiResult.Loaded -> {
                         loadReplyCommentBlock = null
-//                        progressHUD.dismiss()
                     }
+                }
+            }
+        })
+
+        viewModel.apiPostCommentResult.observe(this, Observer { event ->
+            event.getContentIfNotHandled()?.also {
+                when (it) {
+                    is ApiResult.Loading -> {}
+                    is ApiResult.Loaded -> {}
+                    is ApiResult.Empty -> {
+                        closeKeyboard()
+                        et_message.text = null
+                        et_message.tag = null
+                        tv_replay_name.text = null
+                        tv_replay_name.visibility = View.GONE
+
+//                        headNoComment.title_no_comment.visibility = View.GONE
+//                        viewModel.commentCount.value = viewModel.commentCount.value?.plus(1)
+
+                        data?.also { memberPostItem ->
+                            viewModel.setupCommentDataSource(memberPostItem.id, playerInfoAdapter)
+                        }
+
+                    }
+                    is ApiResult.Error -> {}
+                }
+            }
+        })
+
+        viewModel.apiCommentLikeResult.observe(this, Observer { event ->
+            event.getContentIfNotHandled()?.also {
+                when (it) {
+                    is ApiResult.Loading -> {}
+                    is ApiResult.Loaded -> {}
+                    is ApiResult.Empty -> {
+                        loadCommentLikeBlock = loadCommentLikeBlock?.let {
+                            it()
+                            null
+                        }
+                    }
+                    is ApiResult.Error -> {}
+                }
+            }
+        })
+
+        viewModel.apiDeleteCommentLikeResult.observe(this, Observer { event ->
+            event.getContentIfNotHandled()?.also {
+                when (it) {
+                    is ApiResult.Loading -> {}
+                    is ApiResult.Loaded -> {}
+                    is ApiResult.Empty -> {
+                        loadCommentLikeBlock = loadCommentLikeBlock?.let {
+                            it()
+                            null
+                        }
+                    }
+                    is ApiResult.Error -> {}
                 }
             }
         })
