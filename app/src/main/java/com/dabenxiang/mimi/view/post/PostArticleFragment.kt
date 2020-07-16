@@ -6,6 +6,8 @@ import android.text.TextWatcher
 import android.view.View
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.dialog.choosecircle.ChooseClubDialogFragment
+import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import kotlinx.android.synthetic.main.fragment_post_article.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 
@@ -89,6 +91,15 @@ class PostArticleFragment : BaseFragment() {
                 txt_hashtagCount.text = String.format(getString(R.string.typing_count, s?.length, HASHTAG_LIMIT))
             }
         })
+
+        clubLayout.setOnClickListener {
+            ChooseClubDialogFragment.newInstance().also {
+                it.show(
+                    requireActivity().supportFragmentManager,
+                    ChooseUploadMethodDialogFragment::class.java.simpleName
+                )
+            }
+        }
     }
 
     override fun initSettings() {
