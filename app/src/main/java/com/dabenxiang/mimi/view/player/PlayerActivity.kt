@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.text.Html
@@ -192,6 +193,10 @@ class PlayerActivity : BaseActivity() {
                 replyId?.also {
                     viewModel.deleteCommentLike(replyId)
                 }
+            }
+
+            override fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit) {
+                viewModel.getBitmap(id.toString(), succeededBlock)
             }
         }).apply {
             loadMoreModule.apply {

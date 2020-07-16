@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.player
 
 import android.content.pm.ActivityInfo
+import android.graphics.Bitmap
 import android.net.Uri
 import android.view.View
 import androidx.lifecycle.LiveData
@@ -9,6 +10,7 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
+import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.GuessLikePagingCallBack
 import com.dabenxiang.mimi.event.SingleLiveEvent
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -17,6 +19,7 @@ import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
 import com.google.android.exoplayer2.source.MediaSource
@@ -640,6 +643,29 @@ class PlayerViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect {
                     _apiReportResult.value = SingleLiveEvent(it)
+                }
+        }
+    }
+
+    fun getBitmap(id: String, succeededBlock: ((Bitmap) -> Unit)) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getAttachment(id)
+                if (!result.isSuccessful) throw HttpException(result)
+                val byteArray = result.body()?.bytes()
+                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
+                LruCacheUtils.putLruCache(id, bitmap)
+                emit(ApiResult.success(bitmap))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    when(it) {
+                        is ApiResult.Success -> {
+                            Timber.d("@@ApiResult.Success")
+                            succeededBlock(it.result)
+                        }
+                    }
                 }
         }
     }

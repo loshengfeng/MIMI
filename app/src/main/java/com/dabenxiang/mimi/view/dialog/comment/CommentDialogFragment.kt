@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.dialog.comment
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
@@ -108,6 +109,10 @@ class CommentDialogFragment: BaseDialogFragment() {
                     viewModel.deleteCommentLike(postId, replyId)
                     }
                 }
+            }
+
+            override fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit) {
+                viewModel.getBitmap(id.toString(), succeededBlock)
             }
         }, true).apply {
             loadMoreModule.apply {
