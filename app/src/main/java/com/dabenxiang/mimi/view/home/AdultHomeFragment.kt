@@ -34,6 +34,7 @@ import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.OnChooseUploadMethodDialogListener
 import com.dabenxiang.mimi.view.home.viewholder.*
+import com.dabenxiang.mimi.view.more.MoreDialogFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
@@ -58,6 +59,8 @@ class AdultHomeFragment : BaseFragment() {
     private val homeClipViewHolderMap = hashMapOf<Int, HomeClipViewHolder>()
     private val homePictureViewHolderMap = hashMapOf<Int, HomePictureViewHolder>()
     private val homeClubViewHolderMap = hashMapOf<Int, HomeClubViewHolder>()
+
+    var moreDialog: MoreDialogFragment? = null
 
     private var interactionListener: InteractionListener? = null
 
@@ -100,6 +103,7 @@ class AdultHomeFragment : BaseFragment() {
         viewModel.tabLayoutPosition.observe(viewLifecycleOwner, Observer { position ->
             lastPosition = position
             tabAdapter.setLastSelectedIndex(lastPosition)
+            recyclerview_tab.scrollToPosition(position)
             setupPostTypeByPosition(position)
             setupRecyclerByPosition(position)
             getData(position)
@@ -444,7 +448,12 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onMoreClick() {
-            // TODO:
+            moreDialog = MoreDialogFragment.newInstance(onMoreDialogListener).also {
+                it.show(
+                    requireActivity().supportFragmentManager,
+                    MoreDialogFragment::class.java.simpleName
+                )
+            }
         }
 
         override fun onItemClick(item: MemberPostItem) {
@@ -455,6 +464,16 @@ class AdultHomeFragment : BaseFragment() {
                     bundle
                 )
             )
+        }
+    }
+
+    private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
+        override fun onProblemReport() {
+            // TODO: Problem Report
+        }
+
+        override fun onCancel() {
+            moreDialog?.dismiss()
         }
     }
 
