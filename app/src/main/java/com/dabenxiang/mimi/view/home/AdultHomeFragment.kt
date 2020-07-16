@@ -98,6 +98,7 @@ class AdultHomeFragment : BaseFragment() {
         viewModel.tabLayoutPosition.observe(viewLifecycleOwner, Observer { position ->
             lastPosition = position
             tabAdapter.setLastSelectedIndex(lastPosition)
+            recyclerview_tab.scrollToPosition(position)
             setupPostTypeByPosition(position)
             setupRecyclerByPosition(position)
             getData(position)
