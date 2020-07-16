@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.report
+package com.dabenxiang.mimi.view.dialog
 
 import android.os.Bundle
 import android.view.View
@@ -6,8 +6,8 @@ import android.widget.RadioButton
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
-import kotlinx.android.synthetic.main.fragment_report.*
-import timber.log.Timber
+import kotlinx.android.synthetic.main.fragment_dialog_report.*
+import kotlinx.android.synthetic.main.fragment_dialog_report.background
 
 class ReportDialogFragment : BaseDialogFragment() {
 
@@ -31,7 +31,7 @@ class ReportDialogFragment : BaseDialogFragment() {
     }
 
     override fun getLayoutId(): Int {
-        return R.layout.fragment_report
+        return R.layout.fragment_dialog_report
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -49,6 +49,10 @@ class ReportDialogFragment : BaseDialogFragment() {
         }
 
         tv_close.setOnClickListener {
+            listener?.onCancel()
+        }
+
+        background.setOnClickListener {
             listener?.onCancel()
         }
     }

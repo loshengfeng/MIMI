@@ -1,11 +1,11 @@
-package com.dabenxiang.mimi.view.more
+package com.dabenxiang.mimi.view.dialog
 
 import android.os.Bundle
 import android.view.View
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
-import kotlinx.android.synthetic.main.fragment_more.*
+import kotlinx.android.synthetic.main.fragment_dialog_more.*
 
 class MoreDialogFragment : BaseDialogFragment() {
 
@@ -26,7 +26,7 @@ class MoreDialogFragment : BaseDialogFragment() {
     }
 
     override fun getLayoutId(): Int {
-        return R.layout.fragment_more
+        return R.layout.fragment_dialog_more
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -43,6 +43,10 @@ class MoreDialogFragment : BaseDialogFragment() {
         }
 
         tv_cancel.setOnClickListener {
+            listener?.onCancel()
+        }
+
+        background.setOnClickListener {
             listener?.onCancel()
         }
     }

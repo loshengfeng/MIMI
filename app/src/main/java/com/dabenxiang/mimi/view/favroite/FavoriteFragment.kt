@@ -8,7 +8,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.BaseItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.model.enums.FunctionType
@@ -20,8 +19,6 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
-import com.dabenxiang.mimi.view.dialog.more.MoreDialogFragment
-import com.dabenxiang.mimi.view.dialog.more.OnMoreDialogListener
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_post_favorite.*
@@ -290,16 +287,6 @@ class FavoriteFragment : BaseFragment() {
                         }
                     }
                 }
-
-                FunctionType.MORE -> {
-                    // 若已經檢舉過則Disable -> todo: can't determine?
-                    MoreDialogFragment.newInstance(item as BaseItem, onReportDialogListener).also {
-                        it.show(
-                            activity!!.supportFragmentManager,
-                            MoreDialogFragment::class.java.simpleName
-                        )
-                    }
-                }
                 else -> {
                 }
             }
@@ -332,17 +319,6 @@ class FavoriteFragment : BaseFragment() {
     private val onCleanDialogListener = object : OnCleanDialogListener {
         override fun onClean() {
             viewModel.deleteFavorite()
-        }
-    }
-
-    private val onReportDialogListener = object : OnMoreDialogListener {
-        override fun onReport(item: BaseItem) {
-            val postId = when (item) {
-                is PlayItem -> item.videoId ?: 0
-                is PostFavoriteItem -> item.postId ?: 0
-                else -> 0
-            }
-//            viewModel.report(postId)
         }
     }
 }
