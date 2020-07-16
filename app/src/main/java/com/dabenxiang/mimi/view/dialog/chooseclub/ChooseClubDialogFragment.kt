@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.dialog.choosecircle
+package com.dabenxiang.mimi.view.dialog.chooseclub
 
 import android.os.Bundle
 import android.view.View
@@ -6,8 +6,11 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.ClubListener
 import com.dabenxiang.mimi.callback.PostAttachmentListener
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
+import com.dabenxiang.mimi.view.adapter.ChooseClubAdapter
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_dialog_choose_club.*
@@ -17,12 +20,14 @@ import timber.log.Timber
 class ChooseClubDialogFragment : BaseDialogFragment() {
 
     private val viewModel: ChooseClubDialogViewModel by viewModels()
+    var chooseClubDialogListener: ChooseClubDialogListener? = null
 
     private lateinit var adapter: ChooseClubAdapter
 
     companion object {
-        fun newInstance(): ChooseClubDialogFragment {
+        fun newInstance(listener: ChooseClubDialogListener? = null): ChooseClubDialogFragment {
             val fragment = ChooseClubDialogFragment()
+            fragment.chooseClubDialogListener = listener
             return fragment
         }
     }
@@ -41,7 +46,8 @@ class ChooseClubDialogFragment : BaseDialogFragment() {
             dismiss()
         }
 
-        adapter = ChooseClubAdapter(attachmentListener)
+        adapter = ChooseClubAdapter(attachmentListener, clubListener)
+
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
 
@@ -50,6 +56,10 @@ class ChooseClubDialogFragment : BaseDialogFragment() {
 
     override fun setupObservers() {
         super.setupObservers()
+
+        viewModel.postList.observe(viewLifecycleOwner, Observer {
+            adapter.submitList(it)
+        })
 
         viewModel.memberClubItem.observe(viewLifecycleOwner, Observer {
             when(it) {
@@ -76,6 +86,13 @@ class ChooseClubDialogFragment : BaseDialogFragment() {
     private val attachmentListener = object : PostAttachmentListener {
         override fun getAttachment(id: String, position: Int) {
             viewModel.getAttachment(id, position)
+        }
+    }
+
+    private val clubListener = object : ClubListener {
+        override fun onClick(item: MemberClubItem) {
+            dismiss()
+            chooseClubDialogListener?.onChooseClub(item)
         }
     }
 }
