@@ -298,7 +298,7 @@ abstract class BaseCommentProvider(
         holder.setBackgroundResource(
             R.id.layout_root,
             when (type) {
-                CommentViewType.VIDEO -> R.color.transparent
+                CommentViewType.CLIP -> R.color.transparent
                 else -> {
                     if (holder.layoutPosition == 1) {
                         if (isAdult) R.drawable.bg_adult_comment_top_radius_10
