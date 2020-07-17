@@ -53,7 +53,6 @@ class PictureDetailFragment : BaseFragment() {
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
