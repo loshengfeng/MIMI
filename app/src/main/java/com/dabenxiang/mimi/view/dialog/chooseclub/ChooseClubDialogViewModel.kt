@@ -23,9 +23,6 @@ import retrofit2.HttpException
 
 class ChooseClubDialogViewModel: BaseViewModel() {
 
-    private val _memberClubItem = MutableLiveData<ApiResult<ApiBasePagingItem<List<MemberClubItem>>>>()
-    val memberClubItem: LiveData<ApiResult<ApiBasePagingItem<List<MemberClubItem>>>> = _memberClubItem
-
     private var _attachmentByTypeResult = MutableLiveData<ApiResult<AttachmentItem>>()
     val attachmentByTypeResult: LiveData<ApiResult<AttachmentItem>> = _attachmentByTypeResult
 

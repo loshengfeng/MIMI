@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.View
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
-import kotlinx.android.synthetic.main.fragment_dialog_choose_picker.btn_album
+import kotlinx.android.synthetic.main.fragment_dialog_choose_picker.btn_article
 import kotlinx.android.synthetic.main.fragment_dialog_choose_picker.btn_camera
 import kotlinx.android.synthetic.main.fragment_dialog_choose_picker.layout_root
 import kotlinx.android.synthetic.main.fragment_dialog_choose_upload_method.*
@@ -41,7 +41,10 @@ class ChooseUploadMethodDialogFragment : BaseDialogFragment() {
 
         View.OnClickListener { btnView ->
             when (btnView.id) {
-                R.id.btn_album -> {
+                R.id.btn_camera -> {
+                    onChooseUploadMethodDialogListener?.onUploadPic()
+                }
+                R.id.btn_article -> {
                     onChooseUploadMethodDialogListener?.onUploadArticle()
                 }
             }
@@ -50,7 +53,7 @@ class ChooseUploadMethodDialogFragment : BaseDialogFragment() {
         }.also {
             layout_root.setOnClickListener(it)
             btn_camera.setOnClickListener(it)
-            btn_album.setOnClickListener(it)
+            btn_article.setOnClickListener(it)
         }
     }
 }
