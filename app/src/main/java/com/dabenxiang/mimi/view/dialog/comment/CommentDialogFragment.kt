@@ -22,6 +22,7 @@ import com.dabenxiang.mimi.view.player.CommentLoadMoreView
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import jp.wasabeef.glide.transformations.BlurTransformation
 import kotlinx.android.synthetic.main.fragment_dialog_comment.*
+import kotlinx.android.synthetic.main.item_favorite.*
 import timber.log.Timber
 
 
@@ -150,6 +151,9 @@ class CommentDialogFragment : BaseDialogFragment() {
                 viewModel.setupCommentDataSource(memberPostItem.id, playerInfoAdapter)
             }
 
+            takeIf { memberPostItem.commentCount == 0 }?.also {
+                tv_no_data.visibility = View.VISIBLE
+            }
         }
     }
 
@@ -202,8 +206,12 @@ class CommentDialogFragment : BaseDialogFragment() {
                         tv_replay_name.text = null
                         tv_replay_name.visibility = View.GONE
 
-//                        headNoComment.title_no_comment.visibility = View.GONE
-//                        viewModel.commentCount.value = viewModel.commentCount.value?.plus(1)
+                        tv_no_data.visibility = View.GONE
+                        data?.commentCount = data?.commentCount?.let { count -> count + 1 } ?: run { 1 }
+                        tv_comment_count.text = String.format(
+                            requireContext().getString(R.string.clip_comment_count),
+                            data?.commentCount
+                        )
 
                         data?.also { memberPostItem ->
                             viewModel.setupCommentDataSource(memberPostItem.id, playerInfoAdapter)
