@@ -223,6 +223,7 @@ class AdultHomeFragment : BaseFragment() {
 
                     when (attachmentItem.type) {
                         AttachmentType.ADULT_HOME_CLIP -> {
+                            Timber.d("@@attachmentByTypeResult ADULT_HOME_CLIP")
                             val holder = homeAdapter.attachmentViewHolderMap[attachmentItem.type]
                             holder as HomeClipViewHolder
                             holder.updateItem(attachmentItem.position!!)
