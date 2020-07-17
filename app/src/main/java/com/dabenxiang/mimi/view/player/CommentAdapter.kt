@@ -284,7 +284,7 @@ abstract class BaseCommentProvider(
                         visibility = View.GONE
                     } else {
                         visibility = View.VISIBLE
-                        setBackgroundResource(R.color.color_white_1)
+                        setBackgroundResource(R.color.color_black_1_20)
                     }
                 }
             }
@@ -304,7 +304,7 @@ abstract class BaseCommentProvider(
             R.id.layout_root,
             when (type) {
                 CommentViewType.CLIP -> R.color.transparent
-                else -> {
+                CommentViewType.VIDEO -> {
                     if (holder.layoutPosition == 1) {
                         if (isAdult) R.drawable.bg_adult_comment_top_radius_10
                         else R.drawable.bg_comment_top_radius_10
@@ -312,6 +312,10 @@ abstract class BaseCommentProvider(
                         if (isAdult) R.color.color_white_1_10
                         else R.color.color_gray_2
                     }
+                }
+                else -> {
+                    if (holder.layoutPosition == 0) R.drawable.bg_adult_comment_top_radius_10
+                    else R.color.color_white_1_10
                 }
             }
         )

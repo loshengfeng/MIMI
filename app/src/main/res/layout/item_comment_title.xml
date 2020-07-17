@@ -6,7 +6,8 @@
     android:layout_height="wrap_content"
     android:background="@color/item_color_card_background"
     android:paddingStart="20dp"
-    android:paddingEnd="20dp">
+    android:paddingEnd="20dp"
+    android:paddingBottom="10dp">
 
     <TextView
         android:layout_width="wrap_content"
