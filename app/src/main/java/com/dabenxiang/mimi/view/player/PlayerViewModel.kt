@@ -669,7 +669,6 @@ class PlayerViewModel : BaseViewModel() {
                 .collect {
                     when(it) {
                         is ApiResult.Success -> {
-                            Timber.d("@@ApiResult.Success")
                             succeededBlock(it.result)
                         }
                     }

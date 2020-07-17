@@ -194,7 +194,7 @@ class AdultHomeFragment : BaseFragment() {
                 is Success -> {
                     when (commonPagedAdapter.viewHolderMap[it.result]) {
                         is PicturePostHolder -> {
-                            commonPagedAdapter.notifyItemChanged(it.result)
+                            commonPagedAdapter.notifyItemChanged(it.result, CommonPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI)
                         }
                     }
                 }
@@ -207,7 +207,7 @@ class AdultHomeFragment : BaseFragment() {
                 is Success -> {
                     when (commonPagedAdapter.viewHolderMap[it.result]) {
                         is PicturePostHolder -> {
-                            commonPagedAdapter.notifyItemChanged(it.result)
+                            commonPagedAdapter.notifyItemChanged(it.result, CommonPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI)
                         }
                     }
                 }

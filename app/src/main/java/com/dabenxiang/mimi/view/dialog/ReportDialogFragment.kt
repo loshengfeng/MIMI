@@ -12,7 +12,6 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils.dpToPx
 import com.google.android.material.radiobutton.MaterialRadioButton
 import kotlinx.android.synthetic.main.fragment_dialog_report.*
 
-
 class ReportDialogFragment : BaseDialogFragment() {
 
     companion object {

@@ -17,17 +17,17 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearSnapHelper
-import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.handleException
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.extension.setNot
-import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.api.vo.PostCommentRequest
 import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
 import com.dabenxiang.mimi.model.api.vo.Source
 import com.dabenxiang.mimi.model.api.vo.VideoEpisode
+import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.serializable.PlayerData
@@ -201,7 +201,8 @@ class PlayerActivity : BaseActivity() {
             override fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit) {
                 viewModel.getBitmap(id.toString(), succeededBlock)
             }
-        }).apply {
+
+        }, CommentViewType.VIDEO).apply {
             loadMoreModule.apply {
                 isEnableLoadMore = true
                 isAutoLoadMore = true
@@ -364,23 +365,19 @@ class PlayerActivity : BaseActivity() {
 
         viewModel.apiStreamResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD.show()
-                is ApiResult.Loaded -> progressHUD.dismiss()
-                is ApiResult.Empty -> {
-                    loadVideo()
-                }
-                is ApiResult.Error -> {
-                    onApiError(it.throwable)
-                }
+                is Loading -> progressHUD.show()
+                is Loaded -> progressHUD.dismiss()
+                is Empty -> loadVideo()
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.apiPostCommentResult.observe(this, Observer { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
-                    is ApiResult.Loading -> progressHUD.show()
-                    is ApiResult.Loaded -> progressHUD.dismiss()
-                    is ApiResult.Empty -> {
+                    is Loading -> progressHUD.show()
+                    is Loaded -> progressHUD.dismiss()
+                    is Empty -> {
                         sendCommentDialog?.dismiss()
                         sendCommentDialog = null
 
@@ -390,7 +387,7 @@ class PlayerActivity : BaseActivity() {
                         viewModel.setupCommentDataSource(playerInfoAdapter)
                         scrollToBottom()
                     }
-                    is ApiResult.Error -> onApiError(it.throwable)
+                    is Error -> onApiError(it.throwable)
                 }
             }
         })
@@ -398,16 +395,16 @@ class PlayerActivity : BaseActivity() {
         viewModel.apiCommentLikeResult.observe(this, Observer { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
-                    is ApiResult.Loading -> progressHUD.show()
-                    is ApiResult.Loaded -> progressHUD.dismiss()
-                    is ApiResult.Empty -> {
+                    is Loading -> progressHUD.show()
+                    is Loaded -> progressHUD.dismiss()
+                    is Empty -> {
                         loadCommentLikeBlock = loadCommentLikeBlock?.let {
                             it()
                             null
                         }
                         scrollToBottom()
                     }
-                    is ApiResult.Error -> onApiError(it.throwable)
+                    is Error -> onApiError(it.throwable)
                 }
             }
         })
@@ -415,15 +412,15 @@ class PlayerActivity : BaseActivity() {
         viewModel.apiDeleteCommentLikeResult.observe(this, Observer { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
-                    is ApiResult.Loading -> progressHUD.show()
-                    is ApiResult.Loaded -> progressHUD.dismiss()
-                    is ApiResult.Empty -> {
+                    is Loading -> progressHUD.show()
+                    is Loaded -> progressHUD.dismiss()
+                    is Empty -> {
                         loadCommentLikeBlock = loadCommentLikeBlock?.let {
                             it()
                             null
                         }
                     }
-                    is ApiResult.Error -> onApiError(it.throwable)
+                    is Error -> onApiError(it.throwable)
                 }
             }
         })
@@ -431,15 +428,11 @@ class PlayerActivity : BaseActivity() {
         var isFirstInit = true
         viewModel.apiVideoInfo.observe(this, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD.show()
-                is ApiResult.Loaded -> progressHUD.dismiss()
-                is ApiResult.Error -> {
-                    onApiError(it.throwable)
-                }
-                is ApiResult.Success -> {
+                is Loading -> progressHUD.show()
+                is Loaded -> progressHUD.dismiss()
+                is Success -> {
                     val result = it.result
                     viewModel.category = result.categories?.get(0) ?: ""
-                    //Timber.d("Result: $result")
 
                     if (isFirstInit) {
                         isFirstInit = false
@@ -502,6 +495,7 @@ class PlayerActivity : BaseActivity() {
                         }
                     }
                 }
+                is Error -> onApiError(it.throwable)
             }
             scrollToBottom()
         })
@@ -601,15 +595,15 @@ class PlayerActivity : BaseActivity() {
         viewModel.apiLoadReplyCommentResult.observe(this, Observer { event ->
             event.getContentIfNotHandled()?.also { apiResult ->
                 when (apiResult) {
-                    is ApiResult.Loading -> progressHUD.show()
-                    is ApiResult.Empty -> {
+                    is Loading -> progressHUD.show()
+                    is Loaded -> {
+                        loadReplyCommentBlock = null
+                        progressHUD.dismiss()
+                    }
+                    is Empty -> {
                         loadReplyCommentBlock?.also {
                             it()
                         }
-                    }
-                    is ApiResult.Loaded -> {
-                        loadReplyCommentBlock = null
-                        progressHUD.dismiss()
                     }
                 }
             }
@@ -673,8 +667,8 @@ class PlayerActivity : BaseActivity() {
         viewModel.apiAddFavoriteResult.observe(this, Observer { event ->
             event?.getContentIfNotHandled()?.also { apiResult ->
                 when (apiResult) {
-                    is ApiResult.Loading -> progressHUD.show()
-                    is ApiResult.Loaded -> {
+                    is Loading -> progressHUD.show()
+                    is Loaded -> {
                         progressHUD.dismiss()
                         viewModel.favoriteVideo.value = !(viewModel.favoriteVideo.value ?: false)
                         viewModel.favoriteVideoCount.value =
@@ -682,9 +676,7 @@ class PlayerActivity : BaseActivity() {
                                 1
                             ) else viewModel.favoriteVideoCount.value?.minus(1)
                     }
-                    is ApiResult.Error -> {
-                        onApiError(apiResult.throwable)
-                    }
+                    is Error -> onApiError(apiResult.throwable)
                 }
             }
         })
@@ -696,8 +688,8 @@ class PlayerActivity : BaseActivity() {
         viewModel.apiAddLikeResult.observe(this, Observer { event ->
             event?.getContentIfNotHandled()?.also { apiResult ->
                 when (apiResult) {
-                    is ApiResult.Loading -> progressHUD.show()
-                    is ApiResult.Loaded -> {
+                    is Loading -> progressHUD.show()
+                    is Loaded -> {
                         progressHUD.dismiss()
                         viewModel.likeVideo.value = !(viewModel.likeVideo.value ?: false)
                         viewModel.likeVideoCount.value =
@@ -705,9 +697,7 @@ class PlayerActivity : BaseActivity() {
                                 1
                             ) else viewModel.likeVideoCount.value?.minus(1)
                     }
-                    is ApiResult.Error -> {
-                        onApiError(apiResult.throwable)
-                    }
+                    is Error -> onApiError(apiResult.throwable)
                 }
             }
         })
@@ -731,17 +721,13 @@ class PlayerActivity : BaseActivity() {
         viewModel.apiReportResult.observe(this, Observer { event ->
             event?.getContentIfNotHandled()?.also { apiResult ->
                 when (apiResult) {
-                    is ApiResult.Loading -> progressHUD.show()
-                    is ApiResult.Loaded -> {
-                        progressHUD.dismiss()
-                    }
-                    is ApiResult.Empty -> {
+                    is Loading -> progressHUD.show()
+                    is Loaded -> progressHUD.dismiss()
+                    is Empty -> {
                         viewModel.isReported = true
                         GeneralUtils.showToast(this, getString(R.string.upload_succeed))
                     }
-                    is ApiResult.Error -> {
-                        onApiError(apiResult.throwable)
-                    }
+                    is Error -> onApiError(apiResult.throwable)
                 }
             }
         })
@@ -1344,7 +1330,7 @@ class PlayerActivity : BaseActivity() {
         adjustPlayerSize()
     }
 
-    private fun scrollToBottom(){
+    private fun scrollToBottom() {
         if (intent.extras?.getBoolean(KEY_IS_COMMENT) == true)
             scrollView.fullScroll(View.FOCUS_DOWN)
     }

@@ -8,13 +8,15 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult.Error
-import com.dabenxiang.mimi.model.api.ApiResult.Success
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.ImageItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.fullpicture.FullPictureFragment
+import com.dabenxiang.mimi.view.player.CommentAdapter
+import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_picture_detail.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -36,7 +38,11 @@ class PictureDetailFragment : BaseFragment() {
 
     private val viewModel: PictureDetailViewModel by viewModels()
 
-    private var adapter: PictureDetailAdapter? = null
+    private var pictureDetailAdapter: PictureDetailAdapter? = null
+
+    private var memberPostItem: MemberPostItem? = null
+
+    private var replyCommentBlock: (() -> Unit)? = null
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -44,9 +50,12 @@ class PictureDetailFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        memberPostItem = arguments?.getSerializable(KEY_DATA) as MemberPostItem
+
         requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
 
         val memberPostItem = arguments?.getSerializable(KEY_DATA) as MemberPostItem
+
         val position = arguments?.getInt(KEY_POSITION) ?: 0
 
         text_toolbar_title.text = getString(R.string.picture_detail_title)
@@ -56,14 +65,14 @@ class PictureDetailFragment : BaseFragment() {
             findNavController().navigateUp()
         }
 
-        adapter = PictureDetailAdapter(
+        pictureDetailAdapter = PictureDetailAdapter(
             requireContext(),
             memberPostItem,
             onPictureDetailListener,
             onItemClickListener
         )
         recycler_picture_detail.layoutManager = LinearLayoutManager(context)
-        recycler_picture_detail.adapter = adapter
+        recycler_picture_detail.adapter = pictureDetailAdapter
         recycler_picture_detail.scrollToPosition(position)
     }
 
@@ -77,7 +86,7 @@ class PictureDetailFragment : BaseFragment() {
                 is Success -> {
                     val item = it.result
                     LruCacheUtils.putLruCache(item.id!!, item.bitmap!!)
-                    adapter?.updatePhotoGridItem(item.position!!)
+                    pictureDetailAdapter?.updatePhotoGridItem(item.position!!)
                 }
                 is Error -> Timber.e(it.throwable)
             }
@@ -85,22 +94,22 @@ class PictureDetailFragment : BaseFragment() {
 
         viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Success -> adapter?.notifyItemChanged(it.result)
+                is Success -> pictureDetailAdapter?.notifyItemChanged(it.result)
                 is Error -> Timber.e(it.throwable)
             }
         })
 
-        viewModel.isRefreshing.observe(viewLifecycleOwner, Observer {
-            swipe_refresh.isRefreshing = it
+        viewModel.replyCommentResult.observe(viewLifecycleOwner, Observer { event ->
+            event.getContentIfNotHandled()?.also {
+                when (it) {
+                    is Empty -> replyCommentBlock?.also { it() }
+                    is Error -> Timber.e(it.throwable)
+                }
+            }
         })
-
     }
 
     override fun setupListeners() {
-        swipe_refresh.setOnRefreshListener {
-            // TODO: 更新評論
-            viewModel.setupRefreshing(false)
-        }
     }
 
     private val onPictureDetailListener = object : PictureDetailAdapter.OnPictureDetailListener {
@@ -110,6 +119,19 @@ class PictureDetailFragment : BaseFragment() {
 
         override fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
             viewModel.followPost(item, position, isFollow)
+        }
+
+        override fun onGetCommandInfo(adapter: CommentAdapter, type: CommentType) {
+            viewModel.getCommentInfo(
+                memberPostItem!!.id,
+                type,
+                adapter
+            )
+        }
+
+        override fun onGetReplyCommand(parentNode: RootCommentNode, item: MemberPostItem, succeededBlock: () -> Unit) {
+            replyCommentBlock = succeededBlock
+            viewModel.getReplyComment(parentNode, item)
         }
     }
 
