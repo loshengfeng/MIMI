@@ -23,7 +23,7 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     var ivCover: ImageView = view.iv_cover
     var ivHead: ImageView = view.iv_head
     var clAvatar: ConstraintLayout = view.cl_avatar
-    var ivAdd: ImageView = view.iv_add
+    var ivAdd: ImageView = view.iv_close
     var ibReplay: ImageButton = view.ib_replay
     var ibPlay: ImageButton = view.ib_play
     var ibBack: ImageButton = view.ib_back

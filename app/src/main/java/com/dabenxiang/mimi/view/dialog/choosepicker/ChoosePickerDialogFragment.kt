@@ -31,12 +31,12 @@ class ChoosePickerDialogFragment : BaseDialogFragment() {
             dismiss()
             when (btnView.id) {
                 R.id.btn_camera -> onChoosePickerDialogListener?.onPickFromCamera()
-                R.id.btn_album -> onChoosePickerDialogListener?.onPickFromAlbum()
+                R.id.btn_article -> onChoosePickerDialogListener?.onPickFromAlbum()
             }
         }.also {
             layout_root.setOnClickListener(it)
             btn_camera.setOnClickListener(it)
-            btn_album.setOnClickListener(it)
+            btn_article.setOnClickListener(it)
         }
     }
 }
