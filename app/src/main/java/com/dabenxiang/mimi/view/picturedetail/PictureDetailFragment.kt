@@ -229,6 +229,7 @@ class PictureDetailFragment : BaseFragment() {
             GeneralUtils.closeKeyboard(requireContext())
             layout_bar.visibility = View.VISIBLE
             layout_edit_bar.visibility = View.INVISIBLE
+            et_message.setText("")
         }
     }
 }
