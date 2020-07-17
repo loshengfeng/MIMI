@@ -7,7 +7,9 @@ import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.event.SingleLiveEvent
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
 import com.dabenxiang.mimi.model.enums.CommentType
+import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.player.CommentAdapter
@@ -30,6 +32,12 @@ class PictureDetailViewModel : BaseViewModel() {
 
     private val _replyCommentResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
     val replyCommentResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _replyCommentResult
+
+    private val _commentLikeResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
+    val commentLikeResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _commentLikeResult
+
+    private val _commentDeleteLikeResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
+    val commentDeleteLikeResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _commentDeleteLikeResult
 
     fun getAttachment(id: String, position: Int) {
         viewModelScope.launch {
@@ -80,9 +88,7 @@ class PictureDetailViewModel : BaseViewModel() {
             dataSrc.loadMore().also { load ->
                 withContext(Dispatchers.Main) {
                     load.content?.let { list ->
-                        val finalList = list.map { item ->
-                            RootCommentNode(item)
-                        }
+                        val finalList = list.map { item -> RootCommentNode(item) }
                         adapter.setList(finalList)
                     }
                 }
@@ -148,6 +154,39 @@ class PictureDetailViewModel : BaseViewModel() {
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _replyCommentResult.value = SingleLiveEvent(it) }
+        }
+    }
+
+    fun postCommentLike(commentId: Long, type: LikeType, item: MemberPostItem) {
+        viewModelScope.launch {
+            flow {
+                val request = PostLikeRequest(type.value)
+                val apiRepository = domainManager.getApiRepository()
+                val resp = apiRepository.postMembersPostCommentLike(item.id, commentId, request)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _commentLikeResult.value = SingleLiveEvent(it) }
+        }
+    }
+
+    fun deleteCommentLike(commentId: Long, item: MemberPostItem) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val resp = apiRepository.deleteMembersPostCommentLike(item.id, commentId)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _commentDeleteLikeResult.value = SingleLiveEvent(it) }
         }
     }
 

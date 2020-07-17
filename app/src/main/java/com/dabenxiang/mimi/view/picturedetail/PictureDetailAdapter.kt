@@ -167,7 +167,7 @@ class PictureDetailAdapter(
         }
 
         override fun expandReply(parentNode: RootCommentNode, succeededBlock: () -> Unit) {
-            onPictureDetailListener.onGetReplyCommand(parentNode, memberPostItem, succeededBlock)
+            onPictureDetailListener.onGetReplyCommand(parentNode, succeededBlock)
         }
 
         override fun replyComment(replyId: Long?, replyName: String?) {
@@ -179,11 +179,11 @@ class PictureDetailAdapter(
             isLike: Boolean,
             succeededBlock: () -> Unit
         ) {
-
+            onPictureDetailListener.onCommandLike(replyId, isLike, succeededBlock)
         }
 
         override fun removeCommentLikeType(replyId: Long?, succeededBlock: () -> Unit) {
-
+            onPictureDetailListener.onCommandDislike(replyId, succeededBlock)
         }
 
         override fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit) {
@@ -195,7 +195,9 @@ class PictureDetailAdapter(
         fun onGetAttachment(id: String, position: Int)
         fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean)
         fun onGetCommandInfo(adapter: CommentAdapter, type: CommentType)
-        fun onGetReplyCommand(parentNode: RootCommentNode, item: MemberPostItem, succeededBlock: () -> Unit)
+        fun onGetReplyCommand(parentNode: RootCommentNode, succeededBlock: () -> Unit)
+        fun onCommandLike(commentId: Long?, isLike: Boolean, succeededBlock: () -> Unit)
+        fun onCommandDislike(commentId: Long?, succeededBlock: () -> Unit)
     }
 
 }

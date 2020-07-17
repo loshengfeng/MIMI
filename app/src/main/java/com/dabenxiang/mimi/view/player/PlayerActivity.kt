@@ -414,12 +414,7 @@ class PlayerActivity : BaseActivity() {
                 when (it) {
                     is Loading -> progressHUD.show()
                     is Loaded -> progressHUD.dismiss()
-                    is Empty -> {
-                        loadCommentLikeBlock = loadCommentLikeBlock?.let {
-                            it()
-                            null
-                        }
-                    }
+                    is Empty -> loadCommentLikeBlock?.also { it() }
                     is Error -> onApiError(it.throwable)
                 }
             }
@@ -1331,7 +1326,8 @@ class PlayerActivity : BaseActivity() {
     }
 
     private fun scrollToBottom() {
-        if (intent.extras?.getBoolean(KEY_IS_COMMENT) == true)
+        if (intent.extras?.getBoolean(KEY_IS_COMMENT) == true) {
             scrollView.fullScroll(View.FOCUS_DOWN)
+        }
     }
 }

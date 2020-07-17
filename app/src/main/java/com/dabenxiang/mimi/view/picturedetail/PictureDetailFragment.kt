@@ -12,6 +12,7 @@ import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.ImageItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.CommentType
+import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.fullpicture.FullPictureFragment
@@ -43,6 +44,7 @@ class PictureDetailFragment : BaseFragment() {
     private var memberPostItem: MemberPostItem? = null
 
     private var replyCommentBlock: (() -> Unit)? = null
+    private var commentLikeBlock: (() -> Unit)? = null
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -107,6 +109,24 @@ class PictureDetailFragment : BaseFragment() {
                 }
             }
         })
+
+        viewModel.commentLikeResult.observe(viewLifecycleOwner, Observer { event ->
+            event.getContentIfNotHandled()?.also {
+                when (it) {
+                    is Empty -> commentLikeBlock?.also { it() }
+                    is Error -> Timber.e(it.throwable)
+                }
+            }
+        })
+
+        viewModel.commentDeleteLikeResult.observe(viewLifecycleOwner, Observer { event ->
+            event.getContentIfNotHandled()?.also {
+                when (it) {
+                    is Empty -> commentLikeBlock?.also { it() }
+                    is Error -> Timber.e(it.throwable)
+                }
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -129,9 +149,27 @@ class PictureDetailFragment : BaseFragment() {
             )
         }
 
-        override fun onGetReplyCommand(parentNode: RootCommentNode, item: MemberPostItem, succeededBlock: () -> Unit) {
+        override fun onGetReplyCommand(
+            parentNode: RootCommentNode,
+            succeededBlock: () -> Unit
+        ) {
             replyCommentBlock = succeededBlock
-            viewModel.getReplyComment(parentNode, item)
+            viewModel.getReplyComment(parentNode, memberPostItem!!)
+        }
+
+        override fun onCommandLike(
+            commentId: Long?,
+            isLike: Boolean,
+            succeededBlock: () -> Unit
+        ) {
+            commentLikeBlock = succeededBlock
+            val type = if (isLike) LikeType.LIKE else LikeType.DISLIKE
+            viewModel.postCommentLike(commentId!!, type, memberPostItem!!)
+        }
+
+        override fun onCommandDislike(commentId: Long?, succeededBlock: () -> Unit) {
+            commentLikeBlock = succeededBlock
+            viewModel.deleteCommentLike(commentId!!, memberPostItem!!)
         }
     }
 
