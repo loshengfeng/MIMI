@@ -22,8 +22,6 @@ import com.dabenxiang.mimi.view.player.CommentLoadMoreView
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import jp.wasabeef.glide.transformations.BlurTransformation
 import kotlinx.android.synthetic.main.fragment_dialog_comment.*
-import kotlinx.android.synthetic.main.item_favorite.*
-import timber.log.Timber
 
 
 class CommentDialogFragment : BaseDialogFragment() {
@@ -118,7 +116,7 @@ class CommentDialogFragment : BaseDialogFragment() {
                 isEnableLoadMore = true
                 isAutoLoadMore = true
                 isEnableLoadMoreIfNotFullPage = false
-                loadMoreView = CommentLoadMoreView(true, isClip = true)
+                loadMoreView = CommentLoadMoreView(true, CommentViewType.CLIP)
             }
         }
     }
@@ -207,7 +205,8 @@ class CommentDialogFragment : BaseDialogFragment() {
                         tv_replay_name.visibility = View.GONE
 
                         tv_no_data.visibility = View.GONE
-                        data?.commentCount = data?.commentCount?.let { count -> count + 1 } ?: run { 1 }
+                        data?.commentCount =
+                            data?.commentCount?.let { count -> count + 1 } ?: run { 1 }
                         tv_comment_count.text = String.format(
                             requireContext().getString(R.string.clip_comment_count),
                             data?.commentCount

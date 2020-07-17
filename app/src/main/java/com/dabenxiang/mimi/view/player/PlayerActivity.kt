@@ -226,7 +226,7 @@ class PlayerActivity : BaseActivity() {
         playerInfoAdapter.addHeaderView(headGuessLike)
         playerInfoAdapter.addHeaderView(headComment)
         playerInfoAdapter.addHeaderView(headNoComment)
-        playerInfoAdapter.loadMoreModule.loadMoreView = CommentLoadMoreView(isAdult)
+        playerInfoAdapter.loadMoreModule.loadMoreView = CommentLoadMoreView(isAdult, CommentViewType.VIDEO)
 
         recycler_info.adapter = playerInfoAdapter
 

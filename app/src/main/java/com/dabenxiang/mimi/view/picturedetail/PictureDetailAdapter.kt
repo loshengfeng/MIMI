@@ -18,6 +18,7 @@ import com.dabenxiang.mimi.view.picturedetail.viewholder.CommentContentViewHolde
 import com.dabenxiang.mimi.view.picturedetail.viewholder.CommentTitleViewHolder
 import com.dabenxiang.mimi.view.picturedetail.viewholder.PictureDetailViewHolder
 import com.dabenxiang.mimi.view.player.CommentAdapter
+import com.dabenxiang.mimi.view.player.CommentLoadMoreView
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
@@ -146,7 +147,17 @@ class PictureDetailAdapter(
                 }
             }
             is CommentContentViewHolder -> {
-                commentAdapter = CommentAdapter(true, playerInfoListener, CommentViewType.VIDEO)
+                commentAdapter = CommentAdapter(
+                    true, playerInfoListener, CommentViewType.VIDEO
+                ).apply {
+                    loadMoreModule.apply {
+                        isEnableLoadMore = true
+                        isAutoLoadMore = true
+                        isEnableLoadMoreIfNotFullPage = false
+                        loadMoreView = CommentLoadMoreView(true, CommentViewType.VIDEO)
+                    }
+                }
+
                 holder.commentRecycler.adapter = commentAdapter
                 updateCommandItem(CommentType.NEWEST)
             }

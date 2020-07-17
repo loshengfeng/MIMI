@@ -8,9 +8,11 @@ import com.chad.library.adapter.base.loadmore.BaseLoadMoreView
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setBtnSolidColor
+import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.yulichswift.roundedview.widget.RoundedTextView
 
-class CommentLoadMoreView(private val isAdult: Boolean, private val isClip: Boolean = false) : BaseLoadMoreView() {
+class CommentLoadMoreView(private val isAdult: Boolean, private val type: CommentViewType) :
+    BaseLoadMoreView() {
 
     override fun getRootView(parent: ViewGroup): View {
         return LayoutInflater.from(parent.context)
@@ -60,10 +62,17 @@ class CommentLoadMoreView(private val isAdult: Boolean, private val isClip: Bool
     private fun getTextColorRes() =
         if (isAdult) R.color.color_white_1_50 else R.color.color_black_1_50
 
-    private fun getBackground() =
-        when {
-            isClip -> R.color.transparent
-            isAdult -> R.drawable.bg_adult_comment_bottom_radius_10
-            else -> R.drawable.bg_comment_bottom_radius_10
+    private fun getBackground(): Int {
+        return when (type) {
+            CommentViewType.CLIP -> R.color.transparent
+            else -> {
+                return if (isAdult) {
+                    R.drawable.bg_adult_comment_bottom_radius_10
+                } else {
+                    R.drawable.bg_comment_bottom_radius_10
+                }
+            }
         }
+    }
+
 }
