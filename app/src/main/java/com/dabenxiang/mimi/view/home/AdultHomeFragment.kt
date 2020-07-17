@@ -275,6 +275,10 @@ class AdultHomeFragment : BaseFragment() {
             commonPagedAdapter.submitList(it)
         })
 
+        viewModel.clipPostItemListResult.observe(viewLifecycleOwner, Observer {
+            commonPagedAdapter.submitList(it)
+        })
+
         viewModel.postReportResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Empty -> {
@@ -388,13 +392,8 @@ class AdultHomeFragment : BaseFragment() {
             2 -> {
                 // TODO: 關注
             }
-            3 -> {
-                // TODO: 短視頻
-            }
-            4 -> {
-                // TODO: 圖片
-                viewModel.getPicturePosts()
-            }
+            3 -> viewModel.getClipPosts()
+            4 -> viewModel.getPicturePosts()
             5 -> {
                 // TODO: 短文
             }

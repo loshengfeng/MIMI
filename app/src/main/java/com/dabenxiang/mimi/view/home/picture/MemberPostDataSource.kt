@@ -12,10 +12,11 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
 
-class PicturePostDataSource(
+class MemberPostDataSource(
     private val pagingCallback: PagingCallback,
     private val viewModelScope: CoroutineScope,
-    private val domainManager: DomainManager
+    private val domainManager: DomainManager,
+    private val postType: PostType
 ) : PageKeyedDataSource<Int, MemberPostItem>() {
 
     companion object {
@@ -29,7 +30,7 @@ class PicturePostDataSource(
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getMembersPost(
-                    PostType.IMAGE, 0, PER_LIMIT
+                    postType, 0, PER_LIMIT
                 )
                 if (!result.isSuccessful) throw HttpException(result)
                 val body = result.body()
@@ -65,7 +66,7 @@ class PicturePostDataSource(
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getMembersPost(
-                    PostType.IMAGE, next, PER_LIMIT
+                    postType, next, PER_LIMIT
                 )
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(result)
