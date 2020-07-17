@@ -42,7 +42,8 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
     val commentCount: TextView = itemView.tv_comment_count
     val moreImage: ImageView = itemView.iv_more
 
-    fun onBind(item: MemberPostItem, position: Int, adultListener: AdultListener, attachmentListener: AttachmentListener) {
+    fun onBind(itemList: List<MemberPostItem>, position: Int, adultListener: AdultListener, attachmentListener: AttachmentListener) {
+        val item = itemList[position]
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         title.text = item.title
@@ -105,6 +106,10 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
 
         moreImage.setOnClickListener {
             adultListener.onMoreClick(item)
+        }
+
+        clClipPost.setOnClickListener {
+            adultListener.onClipItemClick(itemList, position)
         }
     }
 

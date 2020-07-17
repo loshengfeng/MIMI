@@ -23,6 +23,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.FunctionType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
@@ -490,6 +491,16 @@ class AdultHomeFragment : BaseFragment() {
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_adultHomeFragment_to_pictureDetailFragment,
+                    bundle
+                )
+            )
+        }
+
+        override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
+            val bundle = ClipFragment.createBundle(ArrayList(item), position)
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_adultHomeFragment_to_clipFragment,
                     bundle
                 )
             )

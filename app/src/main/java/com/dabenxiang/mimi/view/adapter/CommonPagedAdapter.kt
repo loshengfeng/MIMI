@@ -88,8 +88,7 @@ class CommonPagedAdapter(
     ) {
         when(holder) {
             is ClipPostHolder -> {
-                val item = getItem(position)
-                item?.also { holder.onBind(it, position, adultListener, attachmentListener) }
+                currentList?.also { holder.onBind(it.toList(), position, adultListener, attachmentListener) }
             }
             is PicturePostHolder -> {
                 payloads.takeIf { it.isNotEmpty() }?.also {
