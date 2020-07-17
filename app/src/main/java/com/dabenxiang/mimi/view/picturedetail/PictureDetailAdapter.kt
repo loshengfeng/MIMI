@@ -4,12 +4,14 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.OnItemClickListener
 import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.CommentType
@@ -30,7 +32,8 @@ class PictureDetailAdapter(
     val context: Context,
     private val memberPostItem: MemberPostItem,
     private val onPictureDetailListener: OnPictureDetailListener,
-    private val onItemClickListener: PhotoGridAdapter.OnItemClickListener
+    private val onPhotoGridItemClickListener: PhotoGridAdapter.OnItemClickListener,
+    private val onItemClickListener: OnItemClickListener
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -43,23 +46,31 @@ class PictureDetailAdapter(
     private var commentAdapter: CommentAdapter? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return when (viewType) {
+        val mView: View
+
+        val holder = when (viewType) {
             VIEW_TYPE_PICTURE_DETAIL -> {
-                val mView = LayoutInflater.from(context)
+                mView = LayoutInflater.from(context)
                     .inflate(R.layout.item_picture_detail, parent, false)
                 PictureDetailViewHolder(mView)
             }
             VIEW_TYPE_COMMENT_TITLE -> {
-                val mView = LayoutInflater.from(context)
+                mView = LayoutInflater.from(context)
                     .inflate(R.layout.item_comment_title, parent, false)
                 CommentTitleViewHolder(mView)
             }
             else -> {
-                val mView = LayoutInflater.from(context)
+                mView = LayoutInflater.from(context)
                     .inflate(R.layout.item_comment_content, parent, false)
                 CommentContentViewHolder(mView)
             }
         }
+
+        mView.setOnClickListener {
+            onItemClickListener.onItemClick()
+        }
+
+        return holder
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -112,7 +123,7 @@ class PictureDetailAdapter(
                     context,
                     contentItem.images,
                     onPictureDetailListener,
-                    onItemClickListener
+                    onPhotoGridItemClickListener
                 )
                 holder.photoGrid.adapter = photoGridAdapter
 
@@ -170,13 +181,13 @@ class PictureDetailAdapter(
         photoGridAdapter?.notifyItemChanged(position)
     }
 
-    fun updateCommandItem(type: CommentType) {
+    private fun updateCommandItem(type: CommentType) {
         onPictureDetailListener.onGetCommandInfo(commentAdapter!!, type)
     }
 
     private val playerInfoListener = object : CommentAdapter.PlayerInfoListener {
         override fun sendComment(replyId: Long?, replyName: String?) {
-
+            onPictureDetailListener.onReplyComment(replyId, replyName)
         }
 
         override fun expandReply(parentNode: RootCommentNode, succeededBlock: () -> Unit) {
@@ -184,7 +195,7 @@ class PictureDetailAdapter(
         }
 
         override fun replyComment(replyId: Long?, replyName: String?) {
-
+            onPictureDetailListener.onReplyComment(replyId, replyName)
         }
 
         override fun setCommentLikeType(
@@ -212,6 +223,7 @@ class PictureDetailAdapter(
         fun onCommandLike(commentId: Long?, isLike: Boolean, succeededBlock: () -> Unit)
         fun onCommandDislike(commentId: Long?, succeededBlock: () -> Unit)
         fun onGetCommandAvatar(id: Long, succeededBlock: (Bitmap) -> Unit)
+        fun onReplyComment(replyId: Long?, replyName: String?)
     }
 
 }

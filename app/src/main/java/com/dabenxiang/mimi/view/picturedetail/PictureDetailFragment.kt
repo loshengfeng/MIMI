@@ -9,6 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.OnItemClickListener
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.ImageItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -19,6 +20,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.fullpicture.FullPictureFragment
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.RootCommentNode
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_picture_detail.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -51,6 +53,7 @@ class PictureDetailFragment : BaseFragment() {
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -73,11 +76,19 @@ class PictureDetailFragment : BaseFragment() {
             requireContext(),
             memberPostItem,
             onPictureDetailListener,
+            onPhotoGridItemClickListener,
             onItemClickListener
         )
         recycler_picture_detail.layoutManager = LinearLayoutManager(context)
         recycler_picture_detail.adapter = pictureDetailAdapter
         recycler_picture_detail.scrollToPosition(position)
+
+        text_toolbar_title.setOnClickListener {
+            GeneralUtils.closeKeyboard(requireContext())
+            layout_bar.visibility = View.VISIBLE
+            layout_edit_bar.visibility = View.INVISIBLE
+        }
+
     }
 
     override fun getLayoutId(): Int {
@@ -185,9 +196,24 @@ class PictureDetailFragment : BaseFragment() {
             avatarBlock = succeededBlock
             viewModel.getAvatar(id.toString())
         }
+
+        override fun onReplyComment(replyId: Long?, replyName: String?) {
+            takeUnless { replyId == null }?.also {
+                layout_bar.visibility = View.INVISIBLE
+                layout_edit_bar.visibility = View.VISIBLE
+
+                GeneralUtils.showKeyboard(requireContext())
+                et_message.requestFocus()
+                et_message.tag = replyId
+                tv_replay_name.text = replyName.takeIf { it != null }?.let {
+                    tv_replay_name.visibility = View.VISIBLE
+                    String.format(requireContext().getString(R.string.clip_username), it)
+                } ?: run { "" }
+            }
+        }
     }
 
-    private val onItemClickListener = object : PhotoGridAdapter.OnItemClickListener {
+    private val onPhotoGridItemClickListener = object : PhotoGridAdapter.OnItemClickListener {
         override fun onItemClick(position: Int, imageItems: ArrayList<ImageItem>) {
             val bundle = FullPictureFragment.createBundle(position, imageItems)
             navigateTo(
@@ -199,4 +225,11 @@ class PictureDetailFragment : BaseFragment() {
         }
     }
 
+    private val onItemClickListener = object : OnItemClickListener {
+        override fun onItemClick() {
+            GeneralUtils.closeKeyboard(requireContext())
+            layout_bar.visibility = View.VISIBLE
+            layout_edit_bar.visibility = View.INVISIBLE
+        }
+    }
 }

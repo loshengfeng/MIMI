@@ -1,11 +1,9 @@
 package com.dabenxiang.mimi.view.dialog.comment
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -20,6 +18,7 @@ import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.CommentLoadMoreView
 import com.dabenxiang.mimi.view.player.RootCommentNode
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import jp.wasabeef.glide.transformations.BlurTransformation
 import kotlinx.android.synthetic.main.fragment_dialog_comment.*
 
@@ -49,7 +48,7 @@ class CommentDialogFragment : BaseDialogFragment() {
     private val playerInfoAdapter by lazy {
         CommentAdapter(true, object : CommentAdapter.PlayerInfoListener {
             override fun sendComment(replyId: Long?, replyName: String?) {
-                showKeyboard()
+                GeneralUtils.showKeyboard(requireContext())
                 et_message.requestFocus()
                 et_message.tag = replyId
                 tv_replay_name.text = replyName.takeIf { it != null }?.let {
@@ -71,7 +70,7 @@ class CommentDialogFragment : BaseDialogFragment() {
 
             override fun replyComment(replyId: Long?, replyName: String?) {
                 takeUnless { replyId == null }?.also {
-                    showKeyboard()
+                    GeneralUtils.showKeyboard(requireContext())
                     et_message.requestFocus()
                     et_message.tag = replyId
                     tv_replay_name.text = replyName.takeIf { it != null }?.let {
@@ -198,7 +197,7 @@ class CommentDialogFragment : BaseDialogFragment() {
                     is ApiResult.Loaded -> {
                     }
                     is ApiResult.Empty -> {
-                        closeKeyboard()
+                        GeneralUtils.closeKeyboard(requireContext())
                         et_message.text = null
                         et_message.tag = null
                         tv_replay_name.text = null
@@ -260,17 +259,5 @@ class CommentDialogFragment : BaseDialogFragment() {
                 }
             }
         })
-    }
-
-    private fun showKeyboard() {
-        val inputMethodManager =
-            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
-    }
-
-    private fun closeKeyboard() {
-        val inputMethodManager =
-            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
     }
 }
