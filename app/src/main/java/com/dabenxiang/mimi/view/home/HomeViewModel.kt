@@ -32,6 +32,8 @@ class HomeViewModel : BaseViewModel() {
         const val PAGING_LIMIT = 20
     }
 
+    var lastListIndex = 0 // 垂直recycler view 跳出後的最後一筆資料
+
     private var _videoList = MutableLiveData<PagedList<BaseVideoItem>>()
     val videoList: LiveData<PagedList<BaseVideoItem>> = _videoList
 
@@ -83,6 +85,9 @@ class HomeViewModel : BaseViewModel() {
 
     private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
     val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
+
+    private val _scrollToLastPosition = MutableLiveData<Boolean>()
+    val scrollToLastPosition: LiveData<Boolean> = _scrollToLastPosition
 
     fun setTopTabPosition(position: Int) {
         if (position != tabLayoutPosition.value) {
@@ -369,6 +374,10 @@ class HomeViewModel : BaseViewModel() {
         }
 
         override fun onThrowable(throwable: Throwable) {
+        }
+
+        override fun onSucceed() {
+            _scrollToLastPosition.postValue(true)
         }
     }
 }

@@ -249,6 +249,10 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
+        viewModel.scrollToLastPosition.observe(viewLifecycleOwner, Observer {result->
+            if (result) recyclerview.scrollToPosition(viewModel.lastListIndex)
+        })
+
         viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
@@ -283,6 +287,7 @@ class AdultHomeFragment : BaseFragment() {
 
     override fun setupListeners() {
         refresh.setOnRefreshListener {
+            viewModel.lastListIndex = 0
             refresh.isRefreshing = false
             getData(lastPosition)
         }
@@ -314,6 +319,11 @@ class AdultHomeFragment : BaseFragment() {
         } catch (e: ClassCastException) {
             Timber.e("AdultHomeFragment interaction listener can't cast")
         }
+    }
+
+    override fun onDestroyView() {
+        saveLastIndex()
+        super.onDestroyView()
     }
 
     private fun setupUI() {
@@ -612,5 +622,13 @@ class AdultHomeFragment : BaseFragment() {
         override fun onUploadArticle() {
             findNavController().navigate(R.id.action_adultHomeFragment_to_postArticleFragment)
         }
+    }
+
+    /**
+     * 儲存最後一筆滑到的 index
+     */
+    private fun saveLastIndex(){
+        val layoutManager = recyclerview.layoutManager as LinearLayoutManager
+        viewModel.lastListIndex = layoutManager.findFirstCompletelyVisibleItemPosition()
     }
 }

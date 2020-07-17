@@ -49,7 +49,9 @@ class PicturePostDataSource(
                 .flowOn(Dispatchers.IO)
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
-                .collect { callback.onResult(it.list, null, it.nextKey) }
+                .collect {
+                    pagingCallback.onSucceed()
+                    callback.onResult(it.list, null, it.nextKey) }
         }
     }
 
