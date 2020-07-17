@@ -5,5 +5,4 @@ enum class AttachmentType {
     ADULT_HOME_PICTURE,
     ADULT_HOME_CLUB,
     ADULT_PICTURE_ITEM,
-    ADULT_CLIP
 }

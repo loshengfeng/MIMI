@@ -80,6 +80,9 @@ class HomeViewModel : BaseViewModel() {
     private var _likePostResult = MutableLiveData<ApiResult<Int>>()
     val likePostResult: LiveData<ApiResult<Int>> = _likePostResult
 
+    private val _clipPostItemListResult = MutableLiveData<PagedList<MemberPostItem>>()
+    val clipPostItemListResult: LiveData<PagedList<MemberPostItem>> = _clipPostItemListResult
+
     private val _picturePostItemListResult = MutableLiveData<PagedList<MemberPostItem>>()
     val picturePostItemListResult: LiveData<PagedList<MemberPostItem>> = _picturePostItemListResult
 
@@ -346,6 +349,15 @@ class HomeViewModel : BaseViewModel() {
             .setPrefetchDistance(4)
             .build()
         return LivePagedListBuilder(videoFactory, config).build()
+    }
+
+    private fun getClipPostPagingItems(): LiveData<PagedList<MemberPostItem>> {
+        val pictureDataSource = PicturePostDataSource(pagingCallback, viewModelScope, domainManager)
+        val pictureFactory = PicturePostFactory(pictureDataSource)
+        val config = PagedList.Config.Builder()
+            .setPrefetchDistance(4)
+            .build()
+        return LivePagedListBuilder(pictureFactory, config).build()
     }
 
     fun getPicturePosts() {

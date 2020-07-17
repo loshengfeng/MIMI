@@ -23,6 +23,8 @@ class ChooseClubAdapter(
     private val clubListener: ClubListener
 ): PagedListAdapter<Any, BaseViewHolder>(diffCallback) {
 
+    private lateinit var context: Context
+
     companion object {
         private val diffCallback = object : DiffUtil.ItemCallback<Any>() {
             override fun areItemsTheSame(
@@ -37,9 +39,6 @@ class ChooseClubAdapter(
             ): Boolean = oldItem == newItem
         }
     }
-
-    private var memberClubItems: List<MemberClubItem> = arrayListOf()
-    private lateinit var context: Context
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         context = parent.context
@@ -69,11 +68,6 @@ class ChooseClubAdapter(
         holder.itemView.setOnClickListener {
             clubListener.onClick(item)
         }
-    }
-
-    fun submitList(list: List<MemberClubItem>) {
-        memberClubItems = list
-        notifyDataSetChanged()
     }
 
     fun updateItem(position: Int) {

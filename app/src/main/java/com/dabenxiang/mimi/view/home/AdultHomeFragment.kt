@@ -1,8 +1,12 @@
 package com.dabenxiang.mimi.view.home
 
 import android.content.Context
+import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.text.TextUtils
 import android.view.View
 import androidx.activity.addCallback
@@ -40,6 +44,7 @@ import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
+import com.dabenxiang.mimi.view.post.PostPicFragment.Companion.BUNDLE_PIC_URI
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.putLruCache
@@ -67,6 +72,10 @@ class AdultHomeFragment : BaseFragment() {
     var reportDialog: ReportDialogFragment? = null
 
     private var interactionListener: InteractionListener? = null
+
+    companion object {
+        private const val REQUEST_PHOTO = 10001
+    }
 
     override fun getLayoutId() = R.layout.fragment_home
 
@@ -617,6 +626,8 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onUploadPic() {
+            val takePicture = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            startActivityForResult(takePicture, REQUEST_PHOTO)
         }
 
         override fun onUploadArticle() {
@@ -627,8 +638,36 @@ class AdultHomeFragment : BaseFragment() {
     /**
      * 儲存最後一筆滑到的 index
      */
-    private fun saveLastIndex(){
+    private fun saveLastIndex() {
         val layoutManager = recyclerview.layoutManager as LinearLayoutManager
         viewModel.lastListIndex = layoutManager.findFirstCompletelyVisibleItemPosition()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == RESULT_OK) {
+            when(requestCode) {
+                REQUEST_PHOTO -> {
+                    data?.let {
+                        val uriImage: Uri?
+
+                        if (it.data != null) {
+                            uriImage = it.data
+                        } else {
+                            val extras = it.extras
+                            val imageBitmap = extras!!["data"] as Bitmap?
+                            uriImage  = Uri.parse(MediaStore.Images.Media.insertImage(requireContext().contentResolver, imageBitmap, null,null));
+                        }
+
+                        val bundle = Bundle()
+                        bundle.putString(BUNDLE_PIC_URI, uriImage.toString())
+
+                        findNavController().navigate(R.id.action_adultHomeFragment_to_postPicFragment, bundle)
+
+                    }
+                }
+            }
+        }
     }
 }

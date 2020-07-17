@@ -65,7 +65,7 @@ class ClipViewHolder(
                         attachmentListener.onGetAttachment(
                             postImageItem.id,
                             index,
-                            AttachmentType.ADULT_CLIP
+                            AttachmentType.ADULT_HOME_CLIP
                         )
                     } else {
                         val bitmap = getLruCache(postImageItem.id)

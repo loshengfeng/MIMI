@@ -19,6 +19,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.view.adapter.viewHolder.ClipPostHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -58,6 +59,12 @@ class CommonPagedAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (adultTabType) {
+            AdultTabType.CLIP -> {
+                ClipPostHolder(
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_clip_post, parent, false)
+                )
+            }
             AdultTabType.PICTURE -> {
                 PicturePostHolder(
                     LayoutInflater.from(parent.context)
@@ -80,6 +87,10 @@ class CommonPagedAdapter(
         payloads: MutableList<Any>
     ) {
         when(holder) {
+            is ClipPostHolder -> {
+                val item = getItem(position)
+                item?.also { holder.onBind(it, position, adultListener, attachmentListener) }
+            }
             is PicturePostHolder -> {
                 payloads.takeIf { it.isNotEmpty() }?.also {
                     when(it[0] as Int) {

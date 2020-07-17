@@ -28,6 +28,9 @@
         <action
             android:id="@+id/action_adultHomeFragment_to_pictureDetailFragment"
             app:destination="@id/pictureDetailFragment" />
+        <action
+            android:id="@+id/action_adultHomeFragment_to_postPicFragment"
+            app:destination="@id/postPicFragment" />
 
     </fragment>
 
@@ -71,5 +74,10 @@
         android:id="@+id/pictureFragment"
         android:name="com.dabenxiang.mimi.view.fullpicture.FullPictureFragment"
         tools:layout="@layout/fragment_full_picture" />
+    <fragment
+        android:id="@+id/postPicFragment"
+        android:name="com.dabenxiang.mimi.view.post.PostPicFragment"
+        android:label="PostPicFragment"
+        tools:layout="@layout/fragment_post_pic"/>
 
 </navigation>
