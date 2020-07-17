@@ -27,6 +27,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.FunctionType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
@@ -232,21 +233,28 @@ class AdultHomeFragment : BaseFragment() {
 
                     when (attachmentItem.type) {
                         AttachmentType.ADULT_HOME_CLIP -> {
-                            val holder = homeAdapter.attachmentViewHolderMap[attachmentItem.type]
-                            holder as HomeClipViewHolder
-                            holder.updateItem(attachmentItem.position!!)
+                            homeAdapter.attachmentViewHolderMap[attachmentItem.type]?.also { holder ->
+                                holder as HomeClipViewHolder
+                                holder.updateItem(attachmentItem.position!!)
+                            }
                         }
                         AttachmentType.ADULT_HOME_PICTURE -> {
-                            val holder = homeAdapter.attachmentViewHolderMap[attachmentItem.type]
-                            holder as HomePictureViewHolder
-                            holder.updateItem(attachmentItem.position!!)
+                            homeAdapter.attachmentViewHolderMap[attachmentItem.type]?.also { holder ->
+                                holder as HomePictureViewHolder
+                                holder.updateItem(attachmentItem.position!!)
+                            }
                         }
                         AttachmentType.ADULT_HOME_CLUB -> {
-                            val holder = homeAdapter.attachmentViewHolderMap[attachmentItem.type]
-                            holder as HomeClubViewHolder
-                            holder.updateItem(attachmentItem.position!!)
+                            homeAdapter.attachmentViewHolderMap[attachmentItem.type]?.also { holder ->
+                                holder as HomeClubViewHolder
+                                holder.updateItem(attachmentItem.position!!)
+                            }
                         }
-                        AttachmentType.ADULT_PICTURE_ITEM -> {
+                        AttachmentType.ADULT_TAB_PICTURE -> {
+                            commonPagedAdapter.notifyItemChanged(attachmentItem.position!!)
+                        }
+                        AttachmentType.ADULT_TAB_CLIP -> {
+                            Timber.d("@@attachmentItem: $attachmentItem")
                             commonPagedAdapter.notifyItemChanged(attachmentItem.position!!)
                         }
                         else -> {
@@ -281,6 +289,10 @@ class AdultHomeFragment : BaseFragment() {
         })
 
         viewModel.picturePostItemListResult.observe(viewLifecycleOwner, Observer {
+            commonPagedAdapter.submitList(it)
+        })
+
+        viewModel.clipPostItemListResult.observe(viewLifecycleOwner, Observer {
             commonPagedAdapter.submitList(it)
         })
 
@@ -397,13 +409,8 @@ class AdultHomeFragment : BaseFragment() {
             2 -> {
                 // TODO: 關注
             }
-            3 -> {
-                // TODO: 短視頻
-            }
-            4 -> {
-                // TODO: 圖片
-                viewModel.getPicturePosts()
-            }
+            3 -> viewModel.getClipPosts()
+            4 -> viewModel.getPicturePosts()
             5 -> {
                 // TODO: 短文
             }
@@ -497,6 +504,16 @@ class AdultHomeFragment : BaseFragment() {
                 )
             )
         }
+
+        override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
+            val bundle = ClipFragment.createBundle(ArrayList(item), position)
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_adultHomeFragment_to_clipFragment,
+                    bundle
+                )
+            )
+        }
     }
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
@@ -532,6 +549,9 @@ class AdultHomeFragment : BaseFragment() {
 
     private val attachmentListener = object : AttachmentListener {
         override fun onGetAttachment(id: String, position: Int, type: AttachmentType) {
+            if (type == AttachmentType.ADULT_TAB_CLIP) {
+                Timber.d("@@onGetAttachment id:$id, position:$position, type:$type")
+            }
             viewModel.getAttachment(id, position, type)
         }
 

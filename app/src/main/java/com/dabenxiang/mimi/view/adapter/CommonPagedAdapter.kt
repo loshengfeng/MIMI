@@ -88,8 +88,7 @@ class CommonPagedAdapter(
     ) {
         when(holder) {
             is ClipPostHolder -> {
-                val item = getItem(position)
-                item?.also { holder.onBind(it, position, adultListener, attachmentListener) }
+                currentList?.also { holder.onBind(it.toList(), position, adultListener, attachmentListener) }
             }
             is PicturePostHolder -> {
                 payloads.takeIf { it.isNotEmpty() }?.also {
@@ -126,7 +125,7 @@ class CommonPagedAdapter(
             attachmentListener.onGetAttachment(
                 item?.avatarAttachmentId.toString(),
                 position,
-                AttachmentType.ADULT_PICTURE_ITEM
+                AttachmentType.ADULT_TAB_PICTURE
             )
         } else {
             val bitmap = getLruCache(item?.avatarAttachmentId.toString())
