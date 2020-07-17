@@ -167,7 +167,7 @@ class PictureDetailAdapter(
         }
 
         override fun expandReply(parentNode: RootCommentNode, succeededBlock: () -> Unit) {
-
+            onPictureDetailListener.onGetReplyCommand(parentNode, memberPostItem, succeededBlock)
         }
 
         override fun replyComment(replyId: Long?, replyName: String?) {
@@ -195,6 +195,7 @@ class PictureDetailAdapter(
         fun onGetAttachment(id: String, position: Int)
         fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean)
         fun onGetCommandInfo(adapter: CommentAdapter, type: CommentType)
+        fun onGetReplyCommand(parentNode: RootCommentNode, item: MemberPostItem, succeededBlock: () -> Unit)
     }
 
 }

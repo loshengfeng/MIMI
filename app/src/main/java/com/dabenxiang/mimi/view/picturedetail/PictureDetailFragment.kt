@@ -8,8 +8,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult.Error
-import com.dabenxiang.mimi.model.api.ApiResult.Success
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.ImageItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.CommentType
@@ -17,6 +16,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.fullpicture.FullPictureFragment
 import com.dabenxiang.mimi.view.player.CommentAdapter
+import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_picture_detail.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -41,6 +41,8 @@ class PictureDetailFragment : BaseFragment() {
     private var pictureDetailAdapter: PictureDetailAdapter? = null
 
     private var memberPostItem: MemberPostItem? = null
+
+    private var replyCommentBlock: (() -> Unit)? = null
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -96,6 +98,15 @@ class PictureDetailFragment : BaseFragment() {
                 is Error -> Timber.e(it.throwable)
             }
         })
+
+        viewModel.replyCommentResult.observe(viewLifecycleOwner, Observer { event ->
+            event.getContentIfNotHandled()?.also {
+                when (it) {
+                    is Empty -> replyCommentBlock?.also { it() }
+                    is Error -> Timber.e(it.throwable)
+                }
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -116,6 +127,11 @@ class PictureDetailFragment : BaseFragment() {
                 type,
                 adapter
             )
+        }
+
+        override fun onGetReplyCommand(parentNode: RootCommentNode, item: MemberPostItem, succeededBlock: () -> Unit) {
+            replyCommentBlock = succeededBlock
+            viewModel.getReplyComment(parentNode, item)
         }
     }
 

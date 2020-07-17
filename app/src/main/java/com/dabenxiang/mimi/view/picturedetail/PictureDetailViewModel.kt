@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.blankj.utilcode.util.ImageUtils
+import com.dabenxiang.mimi.event.SingleLiveEvent
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.CommentType
@@ -11,6 +12,7 @@ import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.CommentDataSource
+import com.dabenxiang.mimi.view.player.NestedCommentNode
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -25,6 +27,9 @@ class PictureDetailViewModel : BaseViewModel() {
 
     private var _followPostResult = MutableLiveData<ApiResult<Int>>()
     val followPostResult: LiveData<ApiResult<Int>> = _followPostResult
+
+    private val _replyCommentResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
+    val replyCommentResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _replyCommentResult
 
     fun getAttachment(id: String, position: Int) {
         viewModelScope.launch {
@@ -102,11 +107,63 @@ class PictureDetailViewModel : BaseViewModel() {
         }
     }
 
+    fun getReplyComment(parentNode: RootCommentNode, item: MemberPostItem) {
+        viewModelScope.launch {
+            flow {
+                var isFirst = true
+                var total = 0L
+                var offset = 0L
+                var currentSize = 0
+                while (isFirst || replyCommentHasNextPage(total, offset, currentSize)) {
+                    isFirst = false
+                    currentSize = 0
+
+                    val apiRepository = domainManager.getApiRepository()
+                    val response = apiRepository.getMembersPostComment(
+                        postId = item.id,
+                        parentId = parentNode.data.id,
+                        sorting = 1,
+                        offset = "0",
+                        limit = "50"
+                    )
+                    if (!response.isSuccessful) throw HttpException(response)
+
+                    parentNode.nestedCommentList.clear()
+                    response.body()?.content?.map {
+                        NestedCommentNode(parentNode, it)
+                    }?.also {
+                        parentNode.nestedCommentList.addAll(it)
+                        val pagingItem = response.body()?.paging
+                        total = pagingItem?.count ?: 0L
+                        offset = pagingItem?.offset ?: 0L
+                        currentSize = it.size
+                    }
+
+                    if (currentSize == 0) {
+                        break
+                    }
+                }
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _replyCommentResult.value = SingleLiveEvent(it) }
+        }
+    }
+
     private fun setupLoadMoreResult(adapter: CommentAdapter, isEnd: Boolean) {
         if (isEnd) {
             adapter.loadMoreModule.loadMoreEnd()
         } else {
             adapter.loadMoreModule.loadMoreComplete()
+        }
+    }
+
+    private fun replyCommentHasNextPage(total: Long, offset: Long, currentSize: Int): Boolean {
+        return when {
+            currentSize < 50 -> false
+            offset >= total -> false
+            else -> true
         }
     }
 
