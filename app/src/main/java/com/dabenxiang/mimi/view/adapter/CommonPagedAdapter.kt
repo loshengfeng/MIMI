@@ -126,7 +126,7 @@ class CommonPagedAdapter(
             attachmentListener.onGetAttachment(
                 item?.avatarAttachmentId.toString(),
                 position,
-                AttachmentType.ADULT_PICTURE_ITEM
+                AttachmentType.ADULT_TAB_PICTURE
             )
         } else {
             val bitmap = getLruCache(item?.avatarAttachmentId.toString())

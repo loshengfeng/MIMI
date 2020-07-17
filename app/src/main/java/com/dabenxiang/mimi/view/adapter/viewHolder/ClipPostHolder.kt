@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.adapter.viewHolder
 
 import android.content.res.ColorStateList
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
@@ -22,6 +23,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_clip_post.view.*
+import timber.log.Timber
 import java.util.*
 
 class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
@@ -50,10 +52,10 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
             attachmentListener.onGetAttachment(
                 item.avatarAttachmentId.toString(),
                 position,
-                AttachmentType.ADULT_PICTURE_ITEM
+                AttachmentType.ADULT_TAB_CLIP
             )
         } else {
-            val bitmap = LruCacheUtils.getLruCache(item?.avatarAttachmentId.toString())
+            val bitmap = LruCacheUtils.getLruCache(item.avatarAttachmentId.toString())
             Glide.with(ivAvatar.context)
                 .load(bitmap)
                 .circleCrop()
@@ -74,6 +76,29 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
 
         val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
 
+        tvLength.text = contentItem.shortVideo.length
+        contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
+            images[0].also { image ->
+                if (TextUtils.isEmpty(image.url)) {
+                    image.id.takeIf { !TextUtils.isEmpty(it) }?.also { id ->
+                        LruCacheUtils.getLruCache(id)?.also { bitmap ->
+                            Timber.d("@@Glide id: $id, ")
+                            Glide.with(ivPhoto.context).load(bitmap).into(ivPhoto)
+                        } ?: run {
+                            Timber.d("@@onGetAttachment id:$id, position: $position")
+                            attachmentListener.onGetAttachment(
+                                id,
+                                position,
+                                AttachmentType.ADULT_TAB_CLIP
+                            )
+                        }
+                    }
+                } else {
+                    Glide.with(ivPhoto.context).load(image.url).into(ivPhoto)
+                }
+            }
+        }
+
         commentImage.setOnClickListener {
             adultListener.onCommentClick(item)
         }
@@ -81,7 +106,6 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
         moreImage.setOnClickListener {
             adultListener.onMoreClick(item)
         }
-
     }
 
     fun updateLikeAndFollowItem(item: MemberPostItem, position: Int, adultListener: AdultListener) {
