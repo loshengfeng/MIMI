@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.picturedetail
 
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
@@ -45,6 +46,7 @@ class PictureDetailFragment : BaseFragment() {
 
     private var replyCommentBlock: (() -> Unit)? = null
     private var commentLikeBlock: (() -> Unit)? = null
+    private var avatarBlock: ((Bitmap) -> Unit)? = null
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -97,6 +99,13 @@ class PictureDetailFragment : BaseFragment() {
         viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> pictureDetailAdapter?.notifyItemChanged(it.result)
+                is Error -> Timber.e(it.throwable)
+            }
+        })
+
+        viewModel.avatarResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> avatarBlock?.invoke(it.result)
                 is Error -> Timber.e(it.throwable)
             }
         })
@@ -170,6 +179,11 @@ class PictureDetailFragment : BaseFragment() {
         override fun onCommandDislike(commentId: Long?, succeededBlock: () -> Unit) {
             commentLikeBlock = succeededBlock
             viewModel.deleteCommentLike(commentId!!, memberPostItem!!)
+        }
+
+        override fun onGetCommandAvatar(id: Long, succeededBlock: (Bitmap) -> Unit) {
+            avatarBlock = succeededBlock
+            viewModel.getAvatar(id.toString())
         }
     }
 

@@ -200,7 +200,7 @@ class PictureDetailAdapter(
         }
 
         override fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit) {
-
+            onPictureDetailListener.onGetCommandAvatar(id, succeededBlock)
         }
     }
 
@@ -211,6 +211,7 @@ class PictureDetailAdapter(
         fun onGetReplyCommand(parentNode: RootCommentNode, succeededBlock: () -> Unit)
         fun onCommandLike(commentId: Long?, isLike: Boolean, succeededBlock: () -> Unit)
         fun onCommandDislike(commentId: Long?, succeededBlock: () -> Unit)
+        fun onGetCommandAvatar(id: Long, succeededBlock: (Bitmap) -> Unit)
     }
 
 }

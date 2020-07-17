@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.picturedetail
 
+import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -16,6 +17,7 @@ import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.CommentDataSource
 import com.dabenxiang.mimi.view.player.NestedCommentNode
 import com.dabenxiang.mimi.view.player.RootCommentNode
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -30,6 +32,9 @@ class PictureDetailViewModel : BaseViewModel() {
     private var _followPostResult = MutableLiveData<ApiResult<Int>>()
     val followPostResult: LiveData<ApiResult<Int>> = _followPostResult
 
+    private var _avatarResult = MutableLiveData<ApiResult<Bitmap>>()
+    val avatarResult: LiveData<ApiResult<Bitmap>> = _avatarResult
+
     private val _replyCommentResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
     val replyCommentResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _replyCommentResult
 
@@ -37,7 +42,8 @@ class PictureDetailViewModel : BaseViewModel() {
     val commentLikeResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _commentLikeResult
 
     private val _commentDeleteLikeResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
-    val commentDeleteLikeResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _commentDeleteLikeResult
+    val commentDeleteLikeResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> =
+        _commentDeleteLikeResult
 
     fun getAttachment(id: String, position: Int) {
         viewModelScope.launch {
@@ -58,6 +64,22 @@ class PictureDetailViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _attachmentResult.value = it }
+        }
+    }
+
+    fun getAvatar(id: String) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getAttachment(id)
+                if (!result.isSuccessful) throw HttpException(result)
+                val byteArray = result.body()?.bytes()
+                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
+                LruCacheUtils.putLruCache(id, bitmap)
+                emit(ApiResult.success(bitmap))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _avatarResult.value = it }
         }
     }
 
