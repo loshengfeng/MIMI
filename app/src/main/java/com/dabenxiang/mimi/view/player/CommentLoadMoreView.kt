@@ -65,13 +65,14 @@ class CommentLoadMoreView(private val isAdult: Boolean, private val type: Commen
     private fun getBackground(): Int {
         return when (type) {
             CommentViewType.CLIP -> R.color.transparent
-            else -> {
+            CommentViewType.VIDEO -> {
                 return if (isAdult) {
                     R.drawable.bg_adult_comment_bottom_radius_10
                 } else {
                     R.drawable.bg_comment_bottom_radius_10
                 }
             }
+            else -> R.drawable.bg_adult_comment_bottom_radius_10
         }
     }
 

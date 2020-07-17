@@ -148,13 +148,15 @@ class PictureDetailAdapter(
             }
             is CommentContentViewHolder -> {
                 commentAdapter = CommentAdapter(
-                    true, playerInfoListener, CommentViewType.VIDEO
+                    true,
+                    playerInfoListener,
+                    CommentViewType.COMMON
                 ).apply {
                     loadMoreModule.apply {
                         isEnableLoadMore = true
                         isAutoLoadMore = true
                         isEnableLoadMoreIfNotFullPage = false
-                        loadMoreView = CommentLoadMoreView(true, CommentViewType.VIDEO)
+                        loadMoreView = CommentLoadMoreView(true, CommentViewType.COMMON)
                     }
                 }
 

@@ -280,7 +280,12 @@ abstract class BaseCommentProvider(
                     }
                 }
                 else -> {
-                    //TODO:
+                    if (holder.layoutPosition == 0) {
+                        visibility = View.GONE
+                    } else {
+                        visibility = View.VISIBLE
+                        setBackgroundResource(R.color.color_white_1)
+                    }
                 }
             }
         }
@@ -321,7 +326,6 @@ abstract class BaseCommentProvider(
         holder.setTextColorRes(R.id.tv_like, getMessageTextColor())
         holder.setTextColorRes(R.id.tv_unlike, getMessageTextColor())
 
-        //holder.getView<ImageView>(R.id.btn_more)
         holder.setTextColorRes(R.id.btn_reply, getTextColor())
 
         holder.setGone(R.id.btn_show_comment_reply, true)
