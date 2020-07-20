@@ -47,6 +47,7 @@ class ReportDialogFragment : BaseDialogFragment() {
             is MemberPostItem -> {
                 val id = when ((item as MemberPostItem).type) {
                     PostType.IMAGE -> R.array.picture_problem_report_item
+                    PostType.TEXT -> R.array.text_problem_report_item
                     else -> R.array.video_problem_report_item
                 }
                 requireContext().resources?.getStringArray(id)

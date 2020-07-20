@@ -62,7 +62,6 @@ class MemberPostDataSource(
 
     override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, MemberPostItem>) {
         val next = params.key
-        Timber.d("@@Next: $next")
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getMembersPost(

@@ -34,6 +34,7 @@ import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.*
 import com.dabenxiang.mimi.view.adapter.viewHolder.ClipPostHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
+import com.dabenxiang.mimi.view.adapter.viewHolder.TextPostHolder
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
@@ -207,7 +208,9 @@ class AdultHomeFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     when (commonPagedAdapter.viewHolderMap[it.result]) {
-                        is ClipPostHolder, is PicturePostHolder -> {
+                        is ClipPostHolder,
+                        is PicturePostHolder,
+                        is TextPostHolder -> {
                             commonPagedAdapter.notifyItemChanged(
                                 it.result,
                                 CommonPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI
@@ -223,7 +226,9 @@ class AdultHomeFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     when (commonPagedAdapter.viewHolderMap[it.result]) {
-                        is ClipPostHolder, is PicturePostHolder -> {
+                        is ClipPostHolder,
+                        is PicturePostHolder,
+                        is TextPostHolder -> {
                             commonPagedAdapter.notifyItemChanged(
                                 it.result,
                                 CommonPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI
@@ -260,10 +265,9 @@ class AdultHomeFragment : BaseFragment() {
                                 holder.updateItem(attachmentItem.position!!)
                             }
                         }
-                        AttachmentType.ADULT_TAB_PICTURE -> {
-                            commonPagedAdapter.notifyItemChanged(attachmentItem.position!!)
-                        }
-                        AttachmentType.ADULT_TAB_CLIP -> {
+                        AttachmentType.ADULT_TAB_CLIP,
+                        AttachmentType.ADULT_TAB_PICTURE,
+                        AttachmentType.ADULT_TAB_TEXT -> {
                             commonPagedAdapter.notifyItemChanged(attachmentItem.position!!)
                         }
                         else -> {
@@ -498,6 +502,16 @@ class AdultHomeFragment : BaseFragment() {
                         )
                     )
                 }
+                AdultTabType.TEXT -> {
+                    // TODO: Dave
+                    val bundle = PictureDetailFragment.createBundle(item, 1)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_adultHomeFragment_to_pictureDetailFragment,
+                            bundle
+                        )
+                    )
+                }
                 else -> {
 
                 }
@@ -587,9 +601,6 @@ class AdultHomeFragment : BaseFragment() {
 
     private val attachmentListener = object : AttachmentListener {
         override fun onGetAttachment(id: String, position: Int, type: AttachmentType) {
-            if (type == AttachmentType.ADULT_TAB_CLIP) {
-                Timber.d("@@onGetAttachment id:$id, position:$position, type:$type")
-            }
             viewModel.getAttachment(id, position, type)
         }
 

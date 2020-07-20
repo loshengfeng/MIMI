@@ -54,7 +54,7 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView) {
         time.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         title.text = item.title
 
-        // TODO:
+        // FIXME: item.content json 資料格式有問題
         try {
             val contentItem = Gson().fromJson(item.content, TextContentItem::class.java)
             desc.text = contentItem.text
@@ -91,7 +91,7 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         commentImage.setOnClickListener {
-            item.also { adultListener.onCommentClick(it, AdultTabType.PICTURE) }
+            item.also { adultListener.onCommentClick(it, AdultTabType.TEXT) }
         }
 
         moreImage.setOnClickListener {
