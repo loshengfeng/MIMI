@@ -13,11 +13,11 @@ import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setBtnSolidColor
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.yulichswift.roundedview.widget.RoundedTextView
-import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -35,6 +35,7 @@ class CommentAdapter(isAdult: Boolean, listener: PlayerInfoListener, type: Comme
         fun setCommentLikeType(replyId: Long?, isLike: Boolean, succeededBlock: () -> Unit)
         fun removeCommentLikeType(replyId: Long?, succeededBlock: () -> Unit)
         fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit)
+        fun onMoreClick(item: MemberPostItem)
     }
 
     init {
@@ -181,6 +182,10 @@ class RootCommentProvider(
             R.id.btn_reply -> {
                 listener.sendComment(actualData.data.id, actualData.data.postName)
             }
+            R.id.btn_more -> {
+                // TODO: Dave
+//                listener.onMoreClick()
+            }
         }
     }
 }
@@ -245,6 +250,10 @@ class NestedCommentProvider(
                         listener.replyComment(parentNode.data.id, actualData.data.postName)
                     }
                 }
+            }
+            R.id.btn_more -> {
+                // TODO: Dave
+//                listener.onMoreClick()
             }
         }
     }

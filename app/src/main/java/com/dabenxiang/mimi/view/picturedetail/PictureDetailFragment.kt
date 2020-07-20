@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.picturedetail
 
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
@@ -22,11 +23,7 @@ import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
-import kotlinx.android.synthetic.main.fragment_dialog_comment.*
 import kotlinx.android.synthetic.main.fragment_picture_detail.*
-import kotlinx.android.synthetic.main.fragment_picture_detail.et_message
-import kotlinx.android.synthetic.main.fragment_picture_detail.iv_bar
-import kotlinx.android.synthetic.main.fragment_picture_detail.tv_replay_name
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import timber.log.Timber
@@ -47,6 +44,7 @@ class PictureDetailFragment : BaseFragment() {
     private val viewModel: PictureDetailViewModel by viewModels()
 
     private var pictureDetailAdapter: PictureDetailAdapter? = null
+    private var commentAdapter: CommentAdapter? = null
 
     private var memberPostItem: MemberPostItem? = null
 
@@ -143,6 +141,33 @@ class PictureDetailFragment : BaseFragment() {
                 }
             }
         })
+
+        viewModel.postCommentResult.observe(this, Observer { event ->
+            event.getContentIfNotHandled()?.also {
+                when (it) {
+                    is Empty -> {
+                        GeneralUtils.hideKeyboard(requireActivity())
+                        et_message.text = null
+                        et_message.tag = null
+                        tv_replay_name.text = null
+                        tv_replay_name.visibility = View.GONE
+
+                        layout_bar.visibility = View.VISIBLE
+                        layout_edit_bar.visibility = View.INVISIBLE
+
+                        memberPostItem?.also { memberPostItem ->
+                            viewModel.getCommentInfo(
+                                memberPostItem.id,
+                                viewModel.currentCommentType,
+                                commentAdapter!!
+                            )
+                        }
+
+                    }
+                    is Error -> Timber.e(it.throwable)
+                }
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -152,6 +177,17 @@ class PictureDetailFragment : BaseFragment() {
             GeneralUtils.showKeyboard(requireContext())
             et_message.requestFocus()
             et_message.setText("")
+        }
+
+        btn_send.setOnClickListener {
+            memberPostItem?.id?.let { id ->
+                et_message.text.toString().takeIf { !TextUtils.isEmpty(it) }?.let { comment ->
+                    Pair(id, comment)
+                }?.also { (id, comment) ->
+                    val replyId = et_message.tag?.let { rid -> rid as Long }
+                    viewModel.postComment(id, replyId, comment)
+                }
+            }
         }
     }
 
@@ -165,10 +201,11 @@ class PictureDetailFragment : BaseFragment() {
         }
 
         override fun onGetCommandInfo(adapter: CommentAdapter, type: CommentType) {
+            commentAdapter = adapter
             viewModel.getCommentInfo(
                 memberPostItem!!.id,
                 type,
-                adapter
+                commentAdapter!!
             )
         }
 

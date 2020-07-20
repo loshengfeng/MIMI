@@ -23,10 +23,7 @@ import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.extension.setNot
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.ExceptionResult
-import com.dabenxiang.mimi.model.api.vo.PostCommentRequest
-import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
-import com.dabenxiang.mimi.model.api.vo.Source
-import com.dabenxiang.mimi.model.api.vo.VideoEpisode
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
@@ -202,6 +199,9 @@ class PlayerActivity : BaseActivity() {
                 viewModel.getBitmap(id.toString(), succeededBlock)
             }
 
+            override fun onMoreClick(item: MemberPostItem) {
+
+            }
         }, CommentViewType.VIDEO).apply {
             loadMoreModule.apply {
                 isEnableLoadMore = true

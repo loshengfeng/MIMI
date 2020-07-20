@@ -10,7 +10,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.BaseItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.model.enums.FunctionType
@@ -19,7 +18,6 @@ import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.adapter.FavoriteTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
-import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.listener.InteractionListener
@@ -70,7 +68,11 @@ class FavoriteFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback { interactionListener?.changeNavigationPosition(R.id.navigation_home) }
+        requireActivity().onBackPressedDispatcher.addCallback {
+            interactionListener?.changeNavigationPosition(
+                R.id.navigation_home
+            )
+        }
     }
 
     override fun onResume() {
@@ -307,12 +309,18 @@ class FavoriteFragment : BaseFragment() {
                     // 點擊評論，進入播放頁面滾動到最下面
                     when (item) {
                         is PlayItem -> {
-                            if (item.tags == null || item.tags.first().isEmpty() || item.videoId == null) {
-                                GeneralUtils.showToast(requireContext(), getString(R.string.unexpected_error))
-                            }else{
-                                val playerData = PlayerData(item.videoId ?: 0, item.isAdult ?: false)
+                            if (item.tags == null || item.tags.first()
+                                    .isEmpty() || item.videoId == null
+                            ) {
+                                GeneralUtils.showToast(
+                                    requireContext(),
+                                    getString(R.string.unexpected_error)
+                                )
+                            } else {
+                                val playerData =
+                                    PlayerData(item.videoId ?: 0, item.isAdult ?: false)
                                 val intent = Intent(requireContext(), PlayerActivity::class.java)
-                                intent.putExtras(PlayerActivity.createBundle(playerData,true))
+                                intent.putExtras(PlayerActivity.createBundle(playerData, true))
                                 startActivity(intent)
                             }
                         }

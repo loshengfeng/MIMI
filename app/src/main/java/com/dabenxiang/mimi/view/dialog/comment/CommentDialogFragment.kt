@@ -110,6 +110,11 @@ class CommentDialogFragment : BaseDialogFragment() {
             override fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit) {
                 viewModel.getBitmap(id.toString(), succeededBlock)
             }
+
+            override fun onMoreClick(item: MemberPostItem) {
+
+            }
+
         }, CommentViewType.CLIP).apply {
             loadMoreModule.apply {
                 isEnableLoadMore = true

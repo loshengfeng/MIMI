@@ -8,6 +8,7 @@ import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.event.SingleLiveEvent
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.PostCommentRequest
 import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
 import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.LikeType
@@ -44,6 +45,13 @@ class PictureDetailViewModel : BaseViewModel() {
     private val _commentDeleteLikeResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
     val commentDeleteLikeResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> =
         _commentDeleteLikeResult
+
+    private val _postCommentResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
+    val postCommentResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _postCommentResult
+
+    private var _currentCommentType = CommentType.NEWEST
+    val currentCommentType: CommentType
+        get() = _currentCommentType
 
     fun getAttachment(id: String, position: Int) {
         viewModelScope.launch {
@@ -105,8 +113,8 @@ class PictureDetailViewModel : BaseViewModel() {
 
     fun getCommentInfo(postId: Long, commentType: CommentType, adapter: CommentAdapter) {
         viewModelScope.launch {
+            _currentCommentType = commentType
             val dataSrc = CommentDataSource(postId, commentType.value, domainManager)
-
             dataSrc.loadMore().also { load ->
                 withContext(Dispatchers.Main) {
                     load.content?.let { list ->
@@ -209,6 +217,22 @@ class PictureDetailViewModel : BaseViewModel() {
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _commentDeleteLikeResult.value = SingleLiveEvent(it) }
+        }
+    }
+
+    fun postComment(postId: Long, replyId: Long?, comment: String) {
+        viewModelScope.launch {
+            flow {
+                val request = PostCommentRequest(replyId, comment)
+                val resp = domainManager.getApiRepository().postMembersPostComment(postId, request)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _postCommentResult.value = SingleLiveEvent(it) }
         }
     }
 
