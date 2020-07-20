@@ -90,19 +90,22 @@ class CommonPagedAdapter(
         viewHolderMap[position] = holder
         when(holder) {
             is ClipPostHolder -> {
-                Timber.d("@@onBindViewHolder")
                 currentList?.also { holder.onBind(it.toList(), position, adultListener, attachmentListener) }
             }
             is PicturePostHolder -> {
                 payloads.takeIf { it.isNotEmpty() }?.also {
                     when(it[0] as Int) {
                         PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI -> {
-                            updateLikeAndFollowItem(holder, position)
+                            currentList?.also { itemList ->
+                                holder.updateLikeAndFollowItem(itemList.toList(), position, adultListener)
+                            }
                         }
                     }
                 } ?: run {
-                    holder.pictureRecycler.tag = position
-                    setupPicturePost(holder, position)
+                    currentList?.also {
+                        holder.pictureRecycler.tag = position
+                        holder.onBind(it.toList(), position, adultListener, attachmentListener)
+                    }
                 }
             }
         }
@@ -115,128 +118,11 @@ class CommonPagedAdapter(
         adultTabType = type
     }
 
-    private fun setupPicturePost(holder: PicturePostHolder, position: Int) {
-        val item = getItem(position)
-
-        holder.name.text = item?.postFriendlyName
-        holder.time.text = GeneralUtils.getTimeDiff(item?.creationDate ?: Date(), Date())
-        holder.title.text = item?.title
-        updateLikeAndFollowItem(holder, position)
-
-        if (getLruCache(item?.avatarAttachmentId.toString()) == null) {
-            attachmentListener.onGetAttachment(
-                item?.avatarAttachmentId.toString(),
-                position,
-                AttachmentType.ADULT_TAB_PICTURE
-            )
-        } else {
-            val bitmap = getLruCache(item?.avatarAttachmentId.toString())
-            Glide.with(context)
-                .load(bitmap)
-                .circleCrop()
-                .into(holder.avatarImg)
-        }
-
-        holder.tagChipGroup.removeAllViews()
-        item?.tags?.forEach {
-            val chip = LayoutInflater.from(holder.tagChipGroup.context)
-                .inflate(R.layout.chip_item, holder.tagChipGroup, false) as Chip
-            chip.text = it
-            chip.setTextColor(context.getColor(R.color.color_white_1_50))
-            chip.chipBackgroundColor = ColorStateList.valueOf(
-                ContextCompat.getColor(context, R.color.adult_color_status_bar)
-            )
-            holder.tagChipGroup.addView(chip)
-        }
-
-        val contentItem = Gson().fromJson(item?.content, ContentItem::class.java)
-        if (holder.pictureRecycler.adapter == null || holder.pictureCount.tag != position) {
-            holder.pictureCount.tag = position
-            holder.pictureRecycler.layoutManager = LinearLayoutManager(
-                context, LinearLayoutManager.HORIZONTAL, false
-            )
-
-            holder.pictureRecycler.adapter = PictureAdapter(
-                context,
-                attachmentListener,
-                contentItem.images,
-                position,
-                object : OnItemClickListener {
-                    override fun onItemClick() {
-                        item?.also { adultListener.onItemClick(item, AdultTabType.PICTURE)}
-                    }
-                }
-            )
-            holder.pictureRecycler.onFlingListener = null
-            LinearSnapHelper().attachToRecyclerView(holder.pictureRecycler)
-
-            holder.pictureRecycler.setOnScrollChangeListener { _, _, _, _, _ ->
-                val currentPosition =
-                    (holder.pictureRecycler.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-                holder.pictureCount.text =
-                    "${currentPosition + 1}/${contentItem.images?.size}"
-            }
-
-            holder.pictureCount.text = "1/${contentItem.images?.size}"
-        }
-
-        holder.commentImage.setOnClickListener {
-            item?.also { adultListener.onCommentClick(it, AdultTabType.PICTURE) }
-        }
-
-        holder.moreImage.setOnClickListener {
-            adultListener.onMoreClick(item!!)
-        }
-
-        holder.picturePostItemLayout.setOnClickListener {
-            item?.also { adultListener.onItemClick(item, AdultTabType.PICTURE)}
-        }
-    }
-
     fun updateInternalItem(holder: BaseViewHolder) {
         when (holder) {
             is PicturePostHolder -> {
                 holder.pictureRecycler.adapter?.notifyDataSetChanged()
             }
         }
-    }
-
-    private fun updateLikeAndFollowItem(holder: PicturePostHolder, position: Int) {
-        val item = getItem(position)
-
-        holder.likeCount.text = item?.likeCount.toString()
-        holder.commentCount.text = item?.commentCount.toString()
-
-        val isFollow = item?.isFollow ?: false
-        if (isFollow) {
-            holder.follow.text = context.getString(R.string.followed)
-            holder.follow.background =
-                context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
-            holder.follow.setTextColor(context.getColor(R.color.color_white_1))
-        } else {
-            holder.follow.text = context.getString(R.string.follow)
-            holder.follow.background =
-                context.getDrawable(R.drawable.bg_red_1_stroke_radius_16)
-            holder.follow.setTextColor(context.getColor(R.color.color_red_1))
-        }
-
-        val likeType = item?.likeType ?: LikeType.DISLIKE
-        val isLike: Boolean
-        if (likeType == LikeType.LIKE) {
-            isLike = true
-            holder.likeImage.setImageResource(R.drawable.ico_nice_s)
-        } else {
-            isLike = false
-            holder.likeImage.setImageResource(R.drawable.ico_nice)
-        }
-
-        holder.follow.setOnClickListener {
-            adultListener.onFollowPostClick(item!!, position, !isFollow)
-        }
-
-        holder.likeImage.setOnClickListener {
-            adultListener.onLikeClick(item!!, position, !isLike)
-        }
-
     }
 }
