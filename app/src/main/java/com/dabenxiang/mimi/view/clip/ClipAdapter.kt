@@ -147,8 +147,8 @@ class ClipAdapter(
 
             processClip(
                 holder.playerView,
-                contentItem.shortVideo.id,
-                contentItem.shortVideo.url,
+                contentItem.shortVideo?.id.toString(),
+                contentItem.shortVideo?.url.toString(),
                 position
             )
         }
@@ -177,7 +177,7 @@ class ClipAdapter(
             takeIf { currentPosition == position }?.also {
                 setupPlayer(
                     playerView,
-                    contentItem.shortVideo.url
+                    contentItem.shortVideo?.url.toString()
                 )
             }
         }

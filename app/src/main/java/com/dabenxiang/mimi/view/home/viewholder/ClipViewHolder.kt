@@ -42,7 +42,7 @@ class ClipViewHolder(
         val contentItem = Gson().fromJson(model?.content, ContentItem::class.java)
         val postImageItem = takeIf { contentItem.images != null && contentItem.images.isNotEmpty() }?.let { contentItem.images?.get(0) }
 
-        videoTime.text = contentItem.shortVideo.length
+        videoTime.text = contentItem.shortVideo?.length
         profileName.text = model?.postFriendlyName
         profileTime.text = GeneralUtils.getTimeDiff(model?.creationDate ?: Date(), Date())
         title.text = model?.title

@@ -5,8 +5,8 @@ import com.google.gson.annotations.SerializedName
 data class ContentItem(
 
     @SerializedName("images")
-    val images: ArrayList<ImageItem> = arrayListOf(),
+    val images: ArrayList<ImageItem>? = arrayListOf(),
 
     @SerializedName("shortVideos")
-    val shortVideo: ShortVideoItem
+    val shortVideo: ShortVideoItem?
 )

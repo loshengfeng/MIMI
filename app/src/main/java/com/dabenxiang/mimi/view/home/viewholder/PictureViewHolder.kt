@@ -38,8 +38,8 @@ class PictureViewHolder(
     override fun updated(model: MemberPostItem?) {
         val contentItem = Gson().fromJson(model?.content, ContentItem::class.java)
         val postImageItem =
-            takeIf { contentItem.images.isNotEmpty() }?.let {
-                contentItem.images.get(0)
+            takeIf { contentItem.images?.isNotEmpty() ?: false }?.let {
+                contentItem.images?.get(0)
             }
 
         posterName.text = model?.postFriendlyName

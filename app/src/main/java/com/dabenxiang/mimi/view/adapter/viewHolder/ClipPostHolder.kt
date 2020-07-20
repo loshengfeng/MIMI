@@ -69,7 +69,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         tagChipGroup.removeAllViews()
-        item.tags.forEach {
+        item.tags?.forEach {
             val chip = LayoutInflater.from(tagChipGroup.context)
                 .inflate(R.layout.chip_item, tagChipGroup, false) as Chip
             chip.text = it
@@ -82,8 +82,8 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
 
         val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
 
-        tvLength.text = contentItem.shortVideo.length
-        contentItem.images.takeIf { it.isNotEmpty() }?.also { images ->
+        tvLength.text = contentItem.shortVideo?.length
+        contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
             images[0].also { image ->
                 if (TextUtils.isEmpty(image.url)) {
                     image.id.takeIf { !TextUtils.isEmpty(it) }?.also { id ->

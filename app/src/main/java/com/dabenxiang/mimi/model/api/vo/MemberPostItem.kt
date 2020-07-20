@@ -42,7 +42,7 @@ data class MemberPostItem(
     var commentCount: Int = 0,
 
     @SerializedName("tags")
-    val tags: ArrayList<String> = arrayListOf(),
+    val tags: ArrayList<String>? = arrayListOf(),
 
     @SerializedName("clickThroughCount")
     val clickThroughCount: Int = 0,

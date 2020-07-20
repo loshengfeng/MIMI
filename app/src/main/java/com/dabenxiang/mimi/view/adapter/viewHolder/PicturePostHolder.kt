@@ -75,7 +75,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         tagChipGroup.removeAllViews()
-        item.tags.forEach {
+        item.tags?.forEach {
             val chip = LayoutInflater.from(tagChipGroup.context)
                 .inflate(R.layout.chip_item, tagChipGroup, false) as Chip
             chip.text = it
@@ -96,7 +96,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
             pictureRecycler.adapter = PictureAdapter(
                 pictureRecycler.context,
                 attachmentListener,
-                contentItem.images,
+                contentItem.images ?: arrayListOf(),
                 position,
                 object : OnItemClickListener {
                     override fun onItemClick() {
@@ -130,7 +130,6 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
     }
 
-
     fun updateLikeAndFollowItem(
         itemList: List<MemberPostItem>,
         position: Int,
@@ -141,7 +140,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         likeCount.text = item.likeCount.toString()
         commentCount.text = item.commentCount.toString()
 
-        val isFollow = item.isFollow ?: false
+        val isFollow = item.isFollow
         if (isFollow) {
             follow.text = follow.context.getString(R.string.followed)
             follow.background =
@@ -154,7 +153,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
             follow.setTextColor(follow.context.getColor(R.color.color_red_1))
         }
 
-        val likeType = item.likeType ?: LikeType.DISLIKE
+        val likeType = item.likeType
         val isLike: Boolean
         if (likeType == LikeType.LIKE) {
             isLike = true

@@ -115,14 +115,14 @@ class PictureDetailAdapter(
                     holder.follow.setTextColor(context.getColor(R.color.color_red_1))
                 }
 
-                holder.photoGrid.layoutManager = when (contentItem.images.size) {
+                holder.photoGrid.layoutManager = when (contentItem.images?.size) {
                     1 -> GridLayoutManager(context, 1)
                     2 -> GridLayoutManager(context, 2)
                     else -> GridLayoutManager(context, 3)
                 }
                 photoGridAdapter = PhotoGridAdapter(
                     context,
-                    contentItem.images,
+                    contentItem.images ?: arrayListOf(),
                     onPictureDetailListener,
                     onPhotoGridItemClickListener
                 )
