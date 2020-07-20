@@ -187,7 +187,7 @@ class PictureDetailAdapter(
 
     private val playerInfoListener = object : CommentAdapter.PlayerInfoListener {
         override fun sendComment(replyId: Long?, replyName: String?) {
-            onPictureDetailListener.onReplyComment(replyId, replyName)
+            onPictureDetailListener. onReplyComment(replyId, replyName)
         }
 
         override fun expandReply(parentNode: RootCommentNode, succeededBlock: () -> Unit) {
@@ -212,6 +212,10 @@ class PictureDetailAdapter(
 
         override fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit) {
             onPictureDetailListener.onGetCommandAvatar(id, succeededBlock)
+        }
+
+        override fun onMoreClick(item: MemberPostItem) {
+
         }
     }
 

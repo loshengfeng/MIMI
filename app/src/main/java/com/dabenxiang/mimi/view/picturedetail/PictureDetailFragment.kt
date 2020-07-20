@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.picturedetail
 
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
@@ -17,16 +18,14 @@ import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
+import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.fullpicture.FullPictureFragment
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
-import kotlinx.android.synthetic.main.fragment_dialog_comment.*
 import kotlinx.android.synthetic.main.fragment_picture_detail.*
-import kotlinx.android.synthetic.main.fragment_picture_detail.et_message
-import kotlinx.android.synthetic.main.fragment_picture_detail.iv_bar
-import kotlinx.android.synthetic.main.fragment_picture_detail.tv_replay_name
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import timber.log.Timber
@@ -47,12 +46,16 @@ class PictureDetailFragment : BaseFragment() {
     private val viewModel: PictureDetailViewModel by viewModels()
 
     private var pictureDetailAdapter: PictureDetailAdapter? = null
+    private var commentAdapter: CommentAdapter? = null
 
     private var memberPostItem: MemberPostItem? = null
 
     private var replyCommentBlock: (() -> Unit)? = null
     private var commentLikeBlock: (() -> Unit)? = null
     private var avatarBlock: ((Bitmap) -> Unit)? = null
+
+    var moreDialog: MoreDialogFragment? = null
+    var reportDialog: ReportDialogFragment? = null
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -85,6 +88,15 @@ class PictureDetailFragment : BaseFragment() {
         recycler_picture_detail.layoutManager = LinearLayoutManager(context)
         recycler_picture_detail.adapter = pictureDetailAdapter
         recycler_picture_detail.scrollToPosition(position)
+
+
+        if (memberPostItem.likeType == LikeType.LIKE) {
+            iv_like.setImageResource(R.drawable.ico_nice_s)
+        } else {
+            iv_like.setImageResource(R.drawable.ico_nice)
+        }
+        tv_like_count.text = memberPostItem.likeCount.toString()
+        tv_comment_count.text = memberPostItem.commentCount.toString()
     }
 
     override fun getLayoutId(): Int {
@@ -143,6 +155,61 @@ class PictureDetailFragment : BaseFragment() {
                 }
             }
         })
+
+        viewModel.postCommentResult.observe(this, Observer { event ->
+            event.getContentIfNotHandled()?.also {
+                when (it) {
+                    is Empty -> {
+                        GeneralUtils.hideKeyboard(requireActivity())
+                        et_message.text = null
+                        et_message.tag = null
+                        tv_replay_name.text = null
+                        tv_replay_name.visibility = View.GONE
+
+                        layout_bar.visibility = View.VISIBLE
+                        layout_edit_bar.visibility = View.INVISIBLE
+
+                        memberPostItem?.commentCount =
+                            memberPostItem?.commentCount?.let { count -> count + 1 } ?: run { 1 }
+                        tv_comment_count.text = memberPostItem?.commentCount.toString()
+
+                        memberPostItem?.also { memberPostItem ->
+                            viewModel.getCommentInfo(
+                                memberPostItem.id,
+                                viewModel.currentCommentType,
+                                commentAdapter!!
+                            )
+                        }
+                    }
+                    is Error -> Timber.e(it.throwable)
+                }
+            }
+        })
+
+        viewModel.likePostResult.observe(this, Observer {
+            when (it) {
+                is Success -> {
+                    val item = it.result
+                    if (item.likeType == LikeType.LIKE) {
+                        iv_like.setImageResource(R.drawable.ico_nice_s)
+                    } else {
+                        iv_like.setImageResource(R.drawable.ico_nice)
+                    }
+                    tv_like_count.text = item.likeCount.toString()
+
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
+
+        viewModel.postReportResult.observe(this, Observer {
+            when (it) {
+                is Empty -> {
+                    GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -152,6 +219,33 @@ class PictureDetailFragment : BaseFragment() {
             GeneralUtils.showKeyboard(requireContext())
             et_message.requestFocus()
             et_message.setText("")
+        }
+
+        btn_send.setOnClickListener {
+            memberPostItem?.id?.let { id ->
+                et_message.text.toString().takeIf { !TextUtils.isEmpty(it) }?.let { comment ->
+                    Pair(id, comment)
+                }?.also { (id, comment) ->
+                    val replyId = et_message.tag?.let { rid -> rid as Long }
+                    viewModel.postComment(id, replyId, comment)
+                }
+            }
+        }
+
+        iv_like.setOnClickListener {
+            val likeType = memberPostItem?.likeType
+            val isLike = likeType == LikeType.LIKE
+            viewModel.likePost(memberPostItem!!, !isLike)
+        }
+
+        iv_more.setOnClickListener {
+            moreDialog =
+                MoreDialogFragment.newInstance(memberPostItem!!, onMoreDialogListener).also {
+                    it.show(
+                        requireActivity().supportFragmentManager,
+                        MoreDialogFragment::class.java.simpleName
+                    )
+                }
         }
     }
 
@@ -165,10 +259,11 @@ class PictureDetailFragment : BaseFragment() {
         }
 
         override fun onGetCommandInfo(adapter: CommentAdapter, type: CommentType) {
+            commentAdapter = adapter
             viewModel.getCommentInfo(
                 memberPostItem!!.id,
                 type,
-                adapter
+                commentAdapter!!
             )
         }
 
@@ -234,6 +329,37 @@ class PictureDetailFragment : BaseFragment() {
             layout_bar.visibility = View.VISIBLE
             layout_edit_bar.visibility = View.INVISIBLE
             et_message.setText("")
+        }
+    }
+
+    private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
+        override fun onProblemReport(item: MemberPostItem) {
+            moreDialog?.dismiss()
+            reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
+                it.show(
+                    requireActivity().supportFragmentManager,
+                    ReportDialogFragment::class.java.simpleName
+                )
+            }
+        }
+
+        override fun onCancel() {
+            moreDialog?.dismiss()
+        }
+    }
+
+    private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
+        override fun onSend(item: MemberPostItem, content: String) {
+            if (TextUtils.isEmpty(content)) {
+                GeneralUtils.showToast(requireContext(), getString(R.string.report_error))
+            } else {
+                reportDialog?.dismiss()
+                viewModel.sendPostReport(item, content)
+            }
+        }
+
+        override fun onCancel() {
+            reportDialog?.dismiss()
         }
     }
 }
