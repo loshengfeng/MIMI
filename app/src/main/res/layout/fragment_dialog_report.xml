@@ -24,10 +24,11 @@
 
         <TextView
             android:id="@+id/tv_problem_report"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingVertical="24dp"
-            android:paddingHorizontal="16dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
             android:text="@string/problem_report"
             android:textColor="@color/color_black_1"
             android:textSize="16sp"
