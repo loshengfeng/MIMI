@@ -47,7 +47,12 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
     val commentCount: TextView = itemView.tv_comment_count
     val moreImage: ImageView = itemView.iv_more
 
-    fun onBind(itemList: List<MemberPostItem>, position: Int, adultListener: AdultListener, attachmentListener: AttachmentListener) {
+    fun onBind(
+        itemList: List<MemberPostItem>,
+        position: Int,
+        adultListener: AdultListener,
+        attachmentListener: AttachmentListener
+    ) {
         val item = itemList[position]
 
         name.text = item.postFriendlyName
@@ -70,7 +75,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         tagChipGroup.removeAllViews()
-        item.tags?.forEach {
+        item.tags.forEach {
             val chip = LayoutInflater.from(tagChipGroup.context)
                 .inflate(R.layout.chip_item, tagChipGroup, false) as Chip
             chip.text = it
@@ -95,7 +100,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
                 position,
                 object : OnItemClickListener {
                     override fun onItemClick() {
-                        item.also { adultListener.onItemClick(item, AdultTabType.PICTURE)}
+                        item.also { adultListener.onItemClick(item, AdultTabType.PICTURE) }
                     }
                 }
             )
@@ -121,12 +126,16 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         picturePostItemLayout.setOnClickListener {
-            item.also { adultListener.onItemClick(item, AdultTabType.PICTURE)}
+            item.also { adultListener.onItemClick(item, AdultTabType.PICTURE) }
         }
     }
 
 
-    fun updateLikeAndFollowItem(itemList: List<MemberPostItem>, position: Int, adultListener: AdultListener) {
+    fun updateLikeAndFollowItem(
+        itemList: List<MemberPostItem>,
+        position: Int,
+        adultListener: AdultListener
+    ) {
         val item = itemList[position]
 
         likeCount.text = item.likeCount.toString()

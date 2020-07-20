@@ -1,33 +1,19 @@
 package com.dabenxiang.mimi.view.adapter
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSnapHelper
-import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.AttachmentListener
-import com.dabenxiang.mimi.callback.OnItemClickListener
-import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
-import com.dabenxiang.mimi.model.enums.AttachmentType
-import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.adapter.viewHolder.ClipPostHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
+import com.dabenxiang.mimi.view.adapter.viewHolder.TextPostHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils.getLruCache
-import com.google.android.material.chip.Chip
-import com.google.gson.Gson
-import timber.log.Timber
-import java.util.*
 
 class CommonPagedAdapter(
     val context: Context,
@@ -72,6 +58,12 @@ class CommonPagedAdapter(
                         .inflate(R.layout.item_picture_post, parent, false)
                 )
             }
+            AdultTabType.TEXT -> {
+                TextPostHolder(
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_text_post, parent, false)
+                )
+            }
             else -> {
                 //TODO:
                 PicturePostHolder(
@@ -88,16 +80,27 @@ class CommonPagedAdapter(
         payloads: MutableList<Any>
     ) {
         viewHolderMap[position] = holder
-        when(holder) {
+        when (holder) {
             is ClipPostHolder -> {
-                currentList?.also { holder.onBind(it.toList(), position, adultListener, attachmentListener) }
+                currentList?.also {
+                    holder.onBind(
+                        it.toList(),
+                        position,
+                        adultListener,
+                        attachmentListener
+                    )
+                }
             }
             is PicturePostHolder -> {
                 payloads.takeIf { it.isNotEmpty() }?.also {
-                    when(it[0] as Int) {
+                    when (it[0] as Int) {
                         PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI -> {
                             currentList?.also { itemList ->
-                                holder.updateLikeAndFollowItem(itemList.toList(), position, adultListener)
+                                holder.updateLikeAndFollowItem(
+                                    itemList.toList(),
+                                    position,
+                                    adultListener
+                                )
                             }
                         }
                     }

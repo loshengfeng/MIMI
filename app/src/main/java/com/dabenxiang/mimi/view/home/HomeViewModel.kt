@@ -86,6 +86,9 @@ class HomeViewModel : BaseViewModel() {
     private val _picturePostItemListResult = MutableLiveData<PagedList<MemberPostItem>>()
     val picturePostItemListResult: LiveData<PagedList<MemberPostItem>> = _picturePostItemListResult
 
+    private val _textPostItemListResult = MutableLiveData<PagedList<MemberPostItem>>()
+    val textPostItemListResult: LiveData<PagedList<MemberPostItem>> = _textPostItemListResult
+
     private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
     val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
 
@@ -332,6 +335,37 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
+    fun getClipPosts() {
+        viewModelScope.launch {
+            getMemberPostPagingItems(PostType.VIDEO).asFlow()
+                .collect { _clipPostItemListResult.value = it }
+        }
+    }
+
+    fun getPicturePosts() {
+        viewModelScope.launch {
+            getMemberPostPagingItems(PostType.IMAGE).asFlow()
+                .collect { _picturePostItemListResult.value = it }
+        }
+    }
+
+    fun getTextPosts() {
+        viewModelScope.launch {
+            getMemberPostPagingItems(PostType.TEXT).asFlow()
+                .collect { _textPostItemListResult.value = it }
+        }
+    }
+
+    private fun getMemberPostPagingItems(postType: PostType): LiveData<PagedList<MemberPostItem>> {
+        val pictureDataSource =
+            MemberPostDataSource(pagingCallback, viewModelScope, domainManager, postType)
+        val pictureFactory = MemberPostFactory(pictureDataSource)
+        val config = PagedList.Config.Builder()
+            .setPrefetchDistance(4)
+            .build()
+        return LivePagedListBuilder(pictureFactory, config).build()
+    }
+
     private fun getVideoPagingItems(
         category: String?,
         isAdult: Boolean
@@ -348,29 +382,6 @@ class HomeViewModel : BaseViewModel() {
             .setPrefetchDistance(4)
             .build()
         return LivePagedListBuilder(videoFactory, config).build()
-    }
-
-    private fun getMemberPostPagingItems(postType: PostType): LiveData<PagedList<MemberPostItem>> {
-        val pictureDataSource = MemberPostDataSource(pagingCallback, viewModelScope, domainManager, postType)
-        val pictureFactory = MemberPostFactory(pictureDataSource)
-        val config = PagedList.Config.Builder()
-            .setPrefetchDistance(4)
-            .build()
-        return LivePagedListBuilder(pictureFactory, config).build()
-    }
-
-    fun getPicturePosts() {
-        viewModelScope.launch {
-            getMemberPostPagingItems(PostType.IMAGE).asFlow()
-                .collect { _picturePostItemListResult.value = it }
-        }
-    }
-
-    fun getClipPosts() {
-        viewModelScope.launch {
-            getMemberPostPagingItems(PostType.VIDEO).asFlow()
-                .collect { _clipPostItemListResult.value = it }
-        }
     }
 
     private val pagingCallback = object : PagingCallback {

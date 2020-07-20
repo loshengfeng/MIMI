@@ -208,7 +208,10 @@ class AdultHomeFragment : BaseFragment() {
                 is Success -> {
                     when (commonPagedAdapter.viewHolderMap[it.result]) {
                         is ClipPostHolder, is PicturePostHolder -> {
-                            commonPagedAdapter.notifyItemChanged(it.result, CommonPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI)
+                            commonPagedAdapter.notifyItemChanged(
+                                it.result,
+                                CommonPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI
+                            )
                         }
                     }
                 }
@@ -220,8 +223,11 @@ class AdultHomeFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     when (commonPagedAdapter.viewHolderMap[it.result]) {
-                            is ClipPostHolder,  is PicturePostHolder-> {
-                            commonPagedAdapter.notifyItemChanged(it.result, CommonPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI)
+                        is ClipPostHolder, is PicturePostHolder -> {
+                            commonPagedAdapter.notifyItemChanged(
+                                it.result,
+                                CommonPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI
+                            )
                         }
                     }
                 }
@@ -291,11 +297,15 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
+        viewModel.clipPostItemListResult.observe(viewLifecycleOwner, Observer {
+            commonPagedAdapter.submitList(it)
+        })
+
         viewModel.picturePostItemListResult.observe(viewLifecycleOwner, Observer {
             commonPagedAdapter.submitList(it)
         })
 
-        viewModel.clipPostItemListResult.observe(viewLifecycleOwner, Observer {
+        viewModel.textPostItemListResult.observe(viewLifecycleOwner, Observer {
             commonPagedAdapter.submitList(it)
         })
 
@@ -414,9 +424,7 @@ class AdultHomeFragment : BaseFragment() {
             }
             3 -> viewModel.getClipPosts()
             4 -> viewModel.getPicturePosts()
-            5 -> {
-                // TODO: 短文
-            }
+            5 -> viewModel.getTextPosts()
             6 -> {
                 // TODO: 圈子
             }
@@ -480,7 +488,7 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            when(adultTabType) {
+            when (adultTabType) {
                 AdultTabType.PICTURE -> {
                     val bundle = PictureDetailFragment.createBundle(item, 1)
                     navigateTo(
@@ -507,7 +515,7 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            when(adultTabType) {
+            when (adultTabType) {
                 AdultTabType.PICTURE -> {
                     val bundle = PictureDetailFragment.createBundle(item, 1)
                     navigateTo(

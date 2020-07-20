@@ -14,7 +14,6 @@ import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewHolder
@@ -24,10 +23,10 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_clip_post.view.*
-import timber.log.Timber
 import java.util.*
 
 class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
+
     val clClipPost: ConstraintLayout = itemView.cl_clip_post
     val ivAvatar: ImageView = itemView.img_avatar
     val name: TextView = itemView.tv_name
@@ -43,8 +42,12 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
     val commentCount: TextView = itemView.tv_comment_count
     val moreImage: ImageView = itemView.iv_more
 
-    fun onBind(itemList: List<MemberPostItem>, position: Int, adultListener: AdultListener, attachmentListener: AttachmentListener) {
-        Timber.d("@@onBind")
+    fun onBind(
+        itemList: List<MemberPostItem>,
+        position: Int,
+        adultListener: AdultListener,
+        attachmentListener: AttachmentListener
+    ) {
         val item = itemList[position]
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
@@ -66,7 +69,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         tagChipGroup.removeAllViews()
-        item.tags?.forEach {
+        item.tags.forEach {
             val chip = LayoutInflater.from(tagChipGroup.context)
                 .inflate(R.layout.chip_item, tagChipGroup, false) as Chip
             chip.text = it
@@ -79,8 +82,8 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
 
         val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
 
-        tvLength.text = contentItem.shortVideo?.length ?: "00:00"
-        contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
+        tvLength.text = contentItem.shortVideo.length
+        contentItem.images.takeIf { it.isNotEmpty() }?.also { images ->
             images[0].also { image ->
                 if (TextUtils.isEmpty(image.url)) {
                     image.id.takeIf { !TextUtils.isEmpty(it) }?.also { id ->
@@ -113,8 +116,11 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
     }
 
-    fun updateLikeAndFollowItem(item: MemberPostItem, position: Int, adultListener: AdultListener) {
-        Timber.d("@@updateLikeAndFollowItem")
+    private fun updateLikeAndFollowItem(
+        item: MemberPostItem,
+        position: Int,
+        adultListener: AdultListener
+    ) {
         likeCount.text = item.likeCount.toString()
         commentCount.text = item.commentCount.toString()
 

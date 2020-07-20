@@ -190,6 +190,9 @@
     <string name="picture_detail_comment_newest">最新</string>
     <string name="picture_detail_comment_top">最热</string>
 
+    <!-- Text Post -->
+    <string name="text">短文</string>
+
     <!-- Follow -->
     <string name="follow">+关注</string>
     <string name="followed">已关注</string>
