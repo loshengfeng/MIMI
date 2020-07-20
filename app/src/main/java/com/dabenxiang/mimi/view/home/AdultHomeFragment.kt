@@ -32,6 +32,7 @@ import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.*
+import com.dabenxiang.mimi.view.adapter.viewHolder.ClipPostHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
@@ -203,7 +204,7 @@ class AdultHomeFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     when (commonPagedAdapter.viewHolderMap[it.result]) {
-                        is PicturePostHolder -> {
+                        is ClipPostHolder, is PicturePostHolder -> {
                             commonPagedAdapter.notifyItemChanged(it.result, CommonPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI)
                         }
                     }
@@ -216,7 +217,7 @@ class AdultHomeFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     when (commonPagedAdapter.viewHolderMap[it.result]) {
-                        is PicturePostHolder -> {
+                            is ClipPostHolder,  is PicturePostHolder-> {
                             commonPagedAdapter.notifyItemChanged(it.result, CommonPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI)
                         }
                     }
@@ -476,14 +477,22 @@ class AdultHomeFragment : BaseFragment() {
             viewModel.likePost(item, position, isLike)
         }
 
-        override fun onCommentClick(item: MemberPostItem) {
-            val bundle = PictureDetailFragment.createBundle(item, 1)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_adultHomeFragment_to_pictureDetailFragment,
-                    bundle
-                )
-            )
+        override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
+            when(adultTabType) {
+                AdultTabType.PICTURE -> {
+                    val bundle = PictureDetailFragment.createBundle(item, 1)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_adultHomeFragment_to_pictureDetailFragment,
+                            bundle
+                        )
+                    )
+                }
+                else -> {
+
+                }
+            }
+
         }
 
         override fun onMoreClick(item: MemberPostItem) {
@@ -495,17 +504,34 @@ class AdultHomeFragment : BaseFragment() {
             }
         }
 
-        override fun onItemClick(item: MemberPostItem) {
-            val bundle = PictureDetailFragment.createBundle(item, 0)
+        override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
+            when(adultTabType) {
+                AdultTabType.PICTURE -> {
+                    val bundle = PictureDetailFragment.createBundle(item, 1)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_adultHomeFragment_to_pictureDetailFragment,
+                            bundle
+                        )
+                    )
+                }
+                else -> {
+
+                }
+            }
+        }
+
+        override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
+            val bundle = ClipFragment.createBundle(ArrayList(item), position)
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_adultHomeFragment_to_pictureDetailFragment,
+                    R.id.action_adultHomeFragment_to_clipFragment,
                     bundle
                 )
             )
         }
 
-        override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
+        override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {
             val bundle = ClipFragment.createBundle(ArrayList(item), position)
             navigateTo(
                 NavigateItem.Destination(
