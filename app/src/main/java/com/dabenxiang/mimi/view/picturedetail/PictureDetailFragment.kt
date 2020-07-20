@@ -22,7 +22,11 @@ import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
+import kotlinx.android.synthetic.main.fragment_dialog_comment.*
 import kotlinx.android.synthetic.main.fragment_picture_detail.*
+import kotlinx.android.synthetic.main.fragment_picture_detail.et_message
+import kotlinx.android.synthetic.main.fragment_picture_detail.iv_bar
+import kotlinx.android.synthetic.main.fragment_picture_detail.tv_replay_name
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import timber.log.Timber
@@ -81,13 +85,6 @@ class PictureDetailFragment : BaseFragment() {
         recycler_picture_detail.layoutManager = LinearLayoutManager(context)
         recycler_picture_detail.adapter = pictureDetailAdapter
         recycler_picture_detail.scrollToPosition(position)
-
-        text_toolbar_title.setOnClickListener {
-            GeneralUtils.closeKeyboard(requireContext())
-            layout_bar.visibility = View.VISIBLE
-            layout_edit_bar.visibility = View.INVISIBLE
-        }
-
     }
 
     override fun getLayoutId(): Int {
@@ -149,6 +146,13 @@ class PictureDetailFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+        iv_bar.setOnClickListener {
+            layout_edit_bar.visibility = View.VISIBLE
+            layout_bar.visibility = View.INVISIBLE
+            GeneralUtils.showKeyboard(requireContext())
+            et_message.requestFocus()
+            et_message.setText("")
+        }
     }
 
     private val onPictureDetailListener = object : PictureDetailAdapter.OnPictureDetailListener {
@@ -226,7 +230,7 @@ class PictureDetailFragment : BaseFragment() {
 
     private val onItemClickListener = object : OnItemClickListener {
         override fun onItemClick() {
-            GeneralUtils.closeKeyboard(requireContext())
+            GeneralUtils.hideKeyboard(requireActivity())
             layout_bar.visibility = View.VISIBLE
             layout_edit_bar.visibility = View.INVISIBLE
             et_message.setText("")

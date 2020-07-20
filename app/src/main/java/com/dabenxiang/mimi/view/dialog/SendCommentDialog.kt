@@ -1,11 +1,10 @@
 package com.dabenxiang.mimi.view.dialog
 
-import android.content.Context
 import android.os.Bundle
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_dialog_send_comment.*
 import java.io.Serializable
 
@@ -52,7 +51,7 @@ class SendCommentDialog(private val listener: SendCommentDialogListener) : BaseD
         val data = arguments?.getSerializable(KEY_DATA) as SendCommentData
 
         btn_send.setOnClickListener {
-            closeKeyboard()
+            GeneralUtils.hideKeyboard(requireActivity())
             listener.onSuccess(data.replyId, edit_message.text.toString())
         }
 
@@ -94,19 +93,6 @@ class SendCommentDialog(private val listener: SendCommentDialogListener) : BaseD
 
     override fun onStart() {
         super.onStart()
-
-        showKeyboard()
-    }
-
-    private fun showKeyboard() {
-        val inputMethodManager =
-            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
-    }
-
-    private fun closeKeyboard() {
-        val inputMethodManager =
-            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
+        GeneralUtils.showKeyboard(requireContext())
     }
 }

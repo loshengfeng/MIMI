@@ -9,7 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PostCommentRequest
 import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
@@ -176,13 +176,13 @@ class CommentDialogFragment : BaseDialogFragment() {
         viewModel.apiLoadReplyCommentResult.observe(this, Observer { event ->
             event.getContentIfNotHandled()?.also { apiResult ->
                 when (apiResult) {
-                    is ApiResult.Loading -> {
+                    is Loading -> {
 //                        progressHUD.show()
                     }
-                    is ApiResult.Empty -> {
+                    is Empty -> {
                         loadReplyCommentBlock?.also { it() }
                     }
-                    is ApiResult.Loaded -> {
+                    is Loaded -> {
                         loadReplyCommentBlock = null
                     }
                 }
@@ -192,12 +192,8 @@ class CommentDialogFragment : BaseDialogFragment() {
         viewModel.apiPostCommentResult.observe(this, Observer { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
-                    is ApiResult.Loading -> {
-                    }
-                    is ApiResult.Loaded -> {
-                    }
-                    is ApiResult.Empty -> {
-                        GeneralUtils.closeKeyboard(requireContext())
+                    is Empty -> {
+                        GeneralUtils.hideKeyboard(requireActivity())
                         et_message.text = null
                         et_message.tag = null
                         tv_replay_name.text = null
@@ -216,7 +212,7 @@ class CommentDialogFragment : BaseDialogFragment() {
                         }
 
                     }
-                    is ApiResult.Error -> {
+                    is Error -> {
                     }
                 }
             }
@@ -225,17 +221,13 @@ class CommentDialogFragment : BaseDialogFragment() {
         viewModel.apiCommentLikeResult.observe(this, Observer { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
-                    is ApiResult.Loading -> {
-                    }
-                    is ApiResult.Loaded -> {
-                    }
-                    is ApiResult.Empty -> {
+                    is Empty -> {
                         loadCommentLikeBlock = loadCommentLikeBlock?.let {
                             it()
                             null
                         }
                     }
-                    is ApiResult.Error -> {
+                    is Error -> {
                     }
                 }
             }
@@ -244,17 +236,13 @@ class CommentDialogFragment : BaseDialogFragment() {
         viewModel.apiDeleteCommentLikeResult.observe(this, Observer { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
-                    is ApiResult.Loading -> {
-                    }
-                    is ApiResult.Loaded -> {
-                    }
-                    is ApiResult.Empty -> {
+                    is Empty -> {
                         loadCommentLikeBlock = loadCommentLikeBlock?.let {
                             it()
                             null
                         }
                     }
-                    is ApiResult.Error -> {
+                    is Error -> {
                     }
                 }
             }
