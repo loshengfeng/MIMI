@@ -280,6 +280,8 @@ dependencies {
     androidTestImplementation "androidx.test:runner:$android_test_version"
     androidTestImplementation "androidx.test:rules:$android_test_version"
     androidTestImplementation "androidx.test.ext:junit:$android_test_ext_version"
+
+    implementation 'com.github.tizisdeepan:videoeditor:1.0.8'
 }
 
 class Version {

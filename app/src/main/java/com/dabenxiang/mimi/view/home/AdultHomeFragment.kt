@@ -1,7 +1,7 @@
 package com.dabenxiang.mimi.view.home
 
-import android.content.Context
 import android.app.Activity.RESULT_OK
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -44,13 +44,13 @@ import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
+import com.dabenxiang.mimi.view.post.EditVideoFragment.Companion.BUNDLE_VIDEO_URI
 import com.dabenxiang.mimi.view.post.PostPicFragment.Companion.BUNDLE_PIC_URI
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.putLruCache
 import kotlinx.android.synthetic.main.fragment_home.*
 import timber.log.Timber
-import java.lang.ClassCastException
 
 class AdultHomeFragment : BaseFragment() {
 
@@ -75,6 +75,7 @@ class AdultHomeFragment : BaseFragment() {
 
     companion object {
         private const val REQUEST_PHOTO = 10001
+        private const val REQUEST_VIDEO_CAPTURE = 10002
     }
 
     override fun getLayoutId() = R.layout.fragment_home
@@ -623,6 +624,11 @@ class AdultHomeFragment : BaseFragment() {
 
     private val onChooseUploadMethodDialogListener = object : OnChooseUploadMethodDialogListener {
         override fun onUploadVideo() {
+            Intent(MediaStore.ACTION_VIDEO_CAPTURE).also { takeVideoIntent ->
+                takeVideoIntent.resolveActivity(requireContext().packageManager)?.also {
+                    startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE)
+                }
+            }
         }
 
         override fun onUploadPic() {
@@ -664,8 +670,14 @@ class AdultHomeFragment : BaseFragment() {
                         bundle.putString(BUNDLE_PIC_URI, uriImage.toString())
 
                         findNavController().navigate(R.id.action_adultHomeFragment_to_postPicFragment, bundle)
-
                     }
+                }
+
+                REQUEST_VIDEO_CAPTURE -> {
+                    val videoUri: Uri? = data?.data
+                    val bundle = Bundle()
+                    bundle.putString(BUNDLE_VIDEO_URI, videoUri.toString())
+                    findNavController().navigate(R.id.action_adultHomeFragment_to_editVideoFragment, bundle)
                 }
             }
         }

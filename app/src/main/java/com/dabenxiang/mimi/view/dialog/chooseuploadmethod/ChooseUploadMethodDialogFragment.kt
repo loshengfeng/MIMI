@@ -41,6 +41,9 @@ class ChooseUploadMethodDialogFragment : BaseDialogFragment() {
 
         View.OnClickListener { btnView ->
             when (btnView.id) {
+                R.id.btn_video -> {
+                    onChooseUploadMethodDialogListener?.onUploadVideo()
+                }
                 R.id.btn_camera -> {
                     onChooseUploadMethodDialogListener?.onUploadPic()
                 }
@@ -54,6 +57,7 @@ class ChooseUploadMethodDialogFragment : BaseDialogFragment() {
             layout_root.setOnClickListener(it)
             btn_camera.setOnClickListener(it)
             btn_article.setOnClickListener(it)
+            btn_video.setOnClickListener(it)
         }
     }
 }

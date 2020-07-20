@@ -207,6 +207,8 @@
     <string name="select_pic_count">%1$d/%2$d 张图片</string>
     <string name="add_pic">添加图片</string>
     <string name="select_pics">选择照片：</string>
+    <string name="edit_video">编辑</string>
+    <string name="crop_photo">封面</string>
 
     <!-- Problem report -->
     <string-array name="video_problem_report_item">

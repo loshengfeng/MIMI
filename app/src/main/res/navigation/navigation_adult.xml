@@ -31,6 +31,12 @@
         <action
             android:id="@+id/action_adultHomeFragment_to_postPicFragment"
             app:destination="@id/postPicFragment" />
+        <action
+            android:id="@+id/action_adultHomeFragment_to_postVideoFragment"
+            app:destination="@id/postVideoFragment" />
+        <action
+            android:id="@+id/action_adultHomeFragment_to_editVideoFragment"
+            app:destination="@id/editVideoFragment" />
 
     </fragment>
 
@@ -79,5 +85,15 @@
         android:name="com.dabenxiang.mimi.view.post.PostPicFragment"
         android:label="PostPicFragment"
         tools:layout="@layout/fragment_post_pic"/>
+    <fragment
+        android:id="@+id/postVideoFragment"
+        android:name="com.dabenxiang.mimi.view.post.PostVideoFragment"
+        android:label="PostVideoFragment"
+        tools:layout="@layout/fragment_post_video" />
+    <fragment
+        android:id="@+id/editVideoFragment"
+        android:name="com.dabenxiang.mimi.view.post.EditVideoFragment"
+        android:label="EditVideoFragment"
+        tools:layout="@layout/fragment_edit_video" />
 
 </navigation>
