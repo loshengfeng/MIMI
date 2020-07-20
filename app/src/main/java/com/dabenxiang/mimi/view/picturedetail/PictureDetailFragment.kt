@@ -83,6 +83,15 @@ class PictureDetailFragment : BaseFragment() {
         recycler_picture_detail.layoutManager = LinearLayoutManager(context)
         recycler_picture_detail.adapter = pictureDetailAdapter
         recycler_picture_detail.scrollToPosition(position)
+
+
+        if (memberPostItem.likeType == LikeType.LIKE) {
+            iv_like.setImageResource(R.drawable.ico_nice_s)
+        } else {
+            iv_like.setImageResource(R.drawable.ico_nice)
+        }
+        tv_like_count.text = memberPostItem.likeCount.toString()
+        tv_comment_count.text = memberPostItem.commentCount.toString()
     }
 
     override fun getLayoutId(): Int {
@@ -155,6 +164,10 @@ class PictureDetailFragment : BaseFragment() {
                         layout_bar.visibility = View.VISIBLE
                         layout_edit_bar.visibility = View.INVISIBLE
 
+                        memberPostItem?.commentCount =
+                            memberPostItem?.commentCount?.let { count -> count + 1 } ?: run { 1 }
+                        tv_comment_count.text = memberPostItem?.commentCount.toString()
+
                         memberPostItem?.also { memberPostItem ->
                             viewModel.getCommentInfo(
                                 memberPostItem.id,
@@ -162,10 +175,25 @@ class PictureDetailFragment : BaseFragment() {
                                 commentAdapter!!
                             )
                         }
-
                     }
                     is Error -> Timber.e(it.throwable)
                 }
+            }
+        })
+
+        viewModel.likePostResult.observe(this, Observer {
+            when (it) {
+                is Success -> {
+                    val item = it.result
+                    if (item.likeType == LikeType.LIKE) {
+                        iv_like.setImageResource(R.drawable.ico_nice_s)
+                    } else {
+                        iv_like.setImageResource(R.drawable.ico_nice)
+                    }
+                    tv_like_count.text = item.likeCount.toString()
+
+                }
+                is Error -> Timber.e(it.throwable)
             }
         })
     }
@@ -188,6 +216,16 @@ class PictureDetailFragment : BaseFragment() {
                     viewModel.postComment(id, replyId, comment)
                 }
             }
+        }
+
+        iv_like.setOnClickListener {
+            val likeType = memberPostItem?.likeType
+            val isLike = likeType == LikeType.LIKE
+            viewModel.likePost(memberPostItem!!, !isLike)
+        }
+
+        iv_more.setOnClickListener {
+
         }
     }
 

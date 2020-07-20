@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.event.SingleLiveEvent
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PostCommentRequest
 import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
@@ -48,6 +49,9 @@ class PictureDetailViewModel : BaseViewModel() {
 
     private val _postCommentResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
     val postCommentResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _postCommentResult
+
+    private var _likePostResult = MutableLiveData<ApiResult<MemberPostItem>>()
+    val likePostResult: LiveData<ApiResult<MemberPostItem>> = _likePostResult
 
     private var _currentCommentType = CommentType.NEWEST
     val currentCommentType: CommentType
@@ -108,6 +112,34 @@ class PictureDetailViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _followPostResult.value = it }
+        }
+    }
+
+    fun likePost(item: MemberPostItem, isLike: Boolean) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val likeType = when {
+                    isLike -> LikeType.LIKE
+                    else -> LikeType.DISLIKE
+                }
+                val request = LikeRequest(likeType)
+                val result = apiRepository.like(item.id, request)
+                if (!result.isSuccessful) throw HttpException(result)
+
+                item.likeType = likeType
+                item.likeCount = when (item.likeType) {
+                    LikeType.LIKE -> item.likeCount + 1
+                    else -> item.likeCount - 1
+                }
+
+                emit(ApiResult.success(item))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _likePostResult.value = it }
         }
     }
 
