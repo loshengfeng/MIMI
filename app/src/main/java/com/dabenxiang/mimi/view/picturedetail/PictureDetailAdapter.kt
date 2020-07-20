@@ -129,7 +129,7 @@ class PictureDetailAdapter(
                 holder.photoGrid.adapter = photoGridAdapter
 
                 holder.tagChipGroup.removeAllViews()
-                memberPostItem.tags.forEach {
+                memberPostItem.tags?.forEach {
                     val chip = LayoutInflater.from(holder.tagChipGroup.context)
                         .inflate(R.layout.chip_item, holder.tagChipGroup, false) as Chip
                     chip.text = it

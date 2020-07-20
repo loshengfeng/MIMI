@@ -10,18 +10,18 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
-import com.dabenxiang.mimi.model.api.vo.PostCommentRequest
-import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
+import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
+import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.CommentLoadMoreView
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import jp.wasabeef.glide.transformations.BlurTransformation
 import kotlinx.android.synthetic.main.fragment_dialog_comment.*
+import timber.log.Timber
 
 
 class CommentDialogFragment : BaseDialogFragment() {
@@ -45,6 +45,53 @@ class CommentDialogFragment : BaseDialogFragment() {
 
     private var loadReplyCommentBlock: (() -> Unit)? = null
     private var loadCommentLikeBlock: (() -> Unit)? = null
+
+    var moreDialog: MoreDialogFragment? = null
+    var reportDialog: ReportDialogFragment? = null
+
+    private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
+        override fun onProblemReport(item: BaseMemberPostItem) {
+            Timber.d("@@onProblemReport")
+            moreDialog?.dismiss()
+            reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
+                Timber.d("@@ReportDialogFragment")
+                it.show(
+                    requireActivity().supportFragmentManager,
+                    ReportDialogFragment::class.java.simpleName
+                )
+            }
+        }
+
+        override fun onCancel() {
+            moreDialog?.dismiss()
+        }
+    }
+
+    private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
+        override fun onSend(item: BaseMemberPostItem, content: String) {
+            if (TextUtils.isEmpty(content)) {
+                GeneralUtils.showToast(requireContext(), getString(R.string.report_error))
+            } else {
+                reportDialog?.dismiss()
+                when (item) {
+                    is MemberPostItem -> viewModel.sendPostReport(item, content)
+                    else -> {
+                        data?.also {
+                            viewModel.sendCommentPostReport(
+                                it,
+                                (item as MembersPostCommentItem),
+                                content
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        override fun onCancel() {
+            reportDialog?.dismiss()
+        }
+    }
 
     private val playerInfoAdapter by lazy {
         CommentAdapter(true, object : CommentAdapter.PlayerInfoListener {
@@ -113,7 +160,12 @@ class CommentDialogFragment : BaseDialogFragment() {
             }
 
             override fun onMoreClick(item: MembersPostCommentItem) {
-
+                moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
+                    it.show(
+                        requireActivity().supportFragmentManager,
+                        MoreDialogFragment::class.java.simpleName
+                    )
+                }
             }
 
         }, CommentViewType.CLIP).apply {
@@ -251,6 +303,24 @@ class CommentDialogFragment : BaseDialogFragment() {
                     is Error -> {
                     }
                 }
+            }
+        })
+
+        viewModel.postReportResult.observe(this, Observer {
+            when (it) {
+                is Empty -> {
+                    GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
+
+        viewModel.postCommentReportResult.observe(this, Observer {
+            when (it) {
+                is Empty -> {
+                    GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
+                }
+                is Error -> Timber.e(it.throwable)
             }
         })
     }
