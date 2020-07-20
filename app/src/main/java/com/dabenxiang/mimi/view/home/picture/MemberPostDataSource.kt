@@ -44,7 +44,6 @@ class MemberPostDataSource(
                     ) -> PER_LIMIT
                     else -> null
                 }
-
                 emit(InitResult(memberPostItems ?: arrayListOf(), nextPageKey))
             }
                 .flowOn(Dispatchers.IO)
@@ -52,7 +51,8 @@ class MemberPostDataSource(
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect {
                     pagingCallback.onSucceed()
-                    callback.onResult(it.list, null, it.nextKey) }
+                    callback.onResult(it.list, null, it.nextKey)
+                }
         }
     }
 
@@ -62,7 +62,7 @@ class MemberPostDataSource(
 
     override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, MemberPostItem>) {
         val next = params.key
-
+        Timber.d("@@Next: $next")
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getMembersPost(

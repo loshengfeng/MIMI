@@ -12,7 +12,7 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.AttachmentListener
-import com.dabenxiang.mimi.model.api.vo.ContentItem
+import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
@@ -80,7 +80,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
             tagChipGroup.addView(chip)
         }
 
-        val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
+        val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
 
         tvLength.text = contentItem.shortVideo?.length
         contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->

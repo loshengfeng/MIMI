@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.OnItemClickListener
-import com.dabenxiang.mimi.model.api.vo.ContentItem
+import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.CommentType
@@ -89,7 +89,7 @@ class PictureDetailAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is PictureDetailViewHolder -> {
-                val contentItem = Gson().fromJson(memberPostItem.content, ContentItem::class.java)
+                val contentItem = Gson().fromJson(memberPostItem.content, MediaContentItem::class.java)
 
                 holder.posterName.text = memberPostItem.postFriendlyName
                 holder.posterTime.text =

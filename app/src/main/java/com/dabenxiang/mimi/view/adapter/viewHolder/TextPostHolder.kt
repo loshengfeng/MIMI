@@ -12,6 +12,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.TextContentItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
@@ -20,7 +21,9 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_text_post.view.*
+import java.lang.Exception
 import java.util.*
 
 class TextPostHolder(itemView: View) : BaseViewHolder(itemView) {
@@ -52,8 +55,12 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView) {
         title.text = item.title
 
         // TODO:
-//        desc.text = item.
-
+        try {
+            val contentItem = Gson().fromJson(item.content, TextContentItem::class.java)
+            desc.text = contentItem.text
+        } catch (e: Exception) {
+//            Timber.e(e)
+        }
 
         updateLikeAndFollowItem(itemList, position, adultListener)
 
@@ -61,7 +68,7 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView) {
             attachmentListener.onGetAttachment(
                 item.avatarAttachmentId.toString(),
                 position,
-                AttachmentType.ADULT_TAB_PICTURE
+                AttachmentType.ADULT_TAB_TEXT
             )
         } else {
             val bitmap = LruCacheUtils.getLruCache(item.avatarAttachmentId.toString())

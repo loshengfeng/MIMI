@@ -65,7 +65,7 @@ class CommonPagedAdapter(
                 )
             }
             else -> {
-                //TODO:
+                //TODO: 關注
                 PicturePostHolder(
                     LayoutInflater.from(parent.context)
                         .inflate(R.layout.item_picture_post, parent, false)
@@ -123,6 +123,10 @@ class CommonPagedAdapter(
                                 )
                             }
                         }
+                    }
+                }?: run {
+                    currentList?.also {
+                        holder.onBind(it.toList(), position, adultListener, attachmentListener)
                     }
                 }
             }

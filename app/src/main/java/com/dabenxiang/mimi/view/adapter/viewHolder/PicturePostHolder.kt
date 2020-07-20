@@ -15,7 +15,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.OnItemClickListener
-import com.dabenxiang.mimi.model.api.vo.ContentItem
+import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
@@ -86,7 +86,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
             tagChipGroup.addView(chip)
         }
 
-        val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
+        val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
         if (pictureRecycler.adapter == null || pictureCount.tag != position) {
             pictureCount.tag = position
             pictureRecycler.layoutManager = LinearLayoutManager(

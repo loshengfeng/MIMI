@@ -10,7 +10,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.ContentItem
+import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
@@ -49,7 +49,7 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             } ?: run { clipFuncItem.getBitmap(id, pos) }
         }
 
-        val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
+        val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
         contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
             images[0].also { image ->
                 if (TextUtils.isEmpty(image.url)) {
