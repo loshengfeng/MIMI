@@ -1,4 +1,7 @@
 package com.dabenxiang.mimi.view.textdetail
 
-class TextDetailViewModel {
+import com.dabenxiang.mimi.view.base.BaseViewModel
+
+class TextDetailViewModel : BaseViewModel() {
+
 }

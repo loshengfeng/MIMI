@@ -66,12 +66,9 @@ class PictureDetailFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         memberPostItem = arguments?.getSerializable(KEY_DATA) as MemberPostItem
+        val position = arguments?.getInt(KEY_POSITION) ?: 0
 
         requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
-
-        val memberPostItem = arguments?.getSerializable(KEY_DATA) as MemberPostItem
-
-        val position = arguments?.getInt(KEY_POSITION) ?: 0
 
         text_toolbar_title.text = getString(R.string.picture_detail_title)
         toolbarContainer.toolbar.navigationIcon =
@@ -82,7 +79,7 @@ class PictureDetailFragment : BaseFragment() {
 
         pictureDetailAdapter = PictureDetailAdapter(
             requireContext(),
-            memberPostItem,
+            memberPostItem!!,
             onPictureDetailListener,
             onPhotoGridItemClickListener,
             onItemClickListener
@@ -91,14 +88,13 @@ class PictureDetailFragment : BaseFragment() {
         recycler_picture_detail.adapter = pictureDetailAdapter
         recycler_picture_detail.scrollToPosition(position)
 
-
-        if (memberPostItem.likeType == LikeType.LIKE) {
+        if (memberPostItem!!.likeType == LikeType.LIKE) {
             iv_like.setImageResource(R.drawable.ico_nice_s)
         } else {
             iv_like.setImageResource(R.drawable.ico_nice)
         }
-        tv_like_count.text = memberPostItem.likeCount.toString()
-        tv_comment_count.text = memberPostItem.commentCount.toString()
+        tv_like_count.text = memberPostItem!!.likeCount.toString()
+        tv_comment_count.text = memberPostItem!!.commentCount.toString()
     }
 
     override fun getLayoutId(): Int {

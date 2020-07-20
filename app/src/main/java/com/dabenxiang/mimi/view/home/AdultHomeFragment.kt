@@ -49,6 +49,7 @@ import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.post.PostPicFragment.Companion.BUNDLE_PIC_URI
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
+import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.putLruCache
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -503,11 +504,10 @@ class AdultHomeFragment : BaseFragment() {
                     )
                 }
                 AdultTabType.TEXT -> {
-                    // TODO: Dave
-                    val bundle = PictureDetailFragment.createBundle(item, 1)
+                    val bundle = TextDetailFragment.createBundle(item, 1)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_adultHomeFragment_to_pictureDetailFragment,
+                            R.id.action_adultHomeFragment_to_textDetailFragment,
                             bundle
                         )
                     )
@@ -531,10 +531,19 @@ class AdultHomeFragment : BaseFragment() {
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
             when (adultTabType) {
                 AdultTabType.PICTURE -> {
-                    val bundle = PictureDetailFragment.createBundle(item, 1)
+                    val bundle = PictureDetailFragment.createBundle(item, 0)
                     navigateTo(
                         NavigateItem.Destination(
                             R.id.action_adultHomeFragment_to_pictureDetailFragment,
+                            bundle
+                        )
+                    )
+                }
+                AdultTabType.TEXT -> {
+                    val bundle = TextDetailFragment.createBundle(item, 0)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_adultHomeFragment_to_textDetailFragment,
                             bundle
                         )
                     )
