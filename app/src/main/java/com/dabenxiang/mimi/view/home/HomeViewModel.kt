@@ -332,7 +332,6 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-
     private fun getVideoPagingItems(
         category: String?,
         isAdult: Boolean

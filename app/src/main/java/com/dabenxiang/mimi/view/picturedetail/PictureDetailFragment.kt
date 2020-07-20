@@ -18,6 +18,8 @@ import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
+import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.fullpicture.FullPictureFragment
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.RootCommentNode
@@ -51,6 +53,9 @@ class PictureDetailFragment : BaseFragment() {
     private var replyCommentBlock: (() -> Unit)? = null
     private var commentLikeBlock: (() -> Unit)? = null
     private var avatarBlock: ((Bitmap) -> Unit)? = null
+
+    var moreDialog: MoreDialogFragment? = null
+    var reportDialog: ReportDialogFragment? = null
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -196,6 +201,15 @@ class PictureDetailFragment : BaseFragment() {
                 is Error -> Timber.e(it.throwable)
             }
         })
+
+        viewModel.postReportResult.observe(this, Observer {
+            when (it) {
+                is Empty -> {
+                    GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -225,7 +239,13 @@ class PictureDetailFragment : BaseFragment() {
         }
 
         iv_more.setOnClickListener {
-
+            moreDialog =
+                MoreDialogFragment.newInstance(memberPostItem!!, onMoreDialogListener).also {
+                    it.show(
+                        requireActivity().supportFragmentManager,
+                        MoreDialogFragment::class.java.simpleName
+                    )
+                }
         }
     }
 
@@ -309,6 +329,37 @@ class PictureDetailFragment : BaseFragment() {
             layout_bar.visibility = View.VISIBLE
             layout_edit_bar.visibility = View.INVISIBLE
             et_message.setText("")
+        }
+    }
+
+    private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
+        override fun onProblemReport(item: MemberPostItem) {
+            moreDialog?.dismiss()
+            reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
+                it.show(
+                    requireActivity().supportFragmentManager,
+                    ReportDialogFragment::class.java.simpleName
+                )
+            }
+        }
+
+        override fun onCancel() {
+            moreDialog?.dismiss()
+        }
+    }
+
+    private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
+        override fun onSend(item: MemberPostItem, content: String) {
+            if (TextUtils.isEmpty(content)) {
+                GeneralUtils.showToast(requireContext(), getString(R.string.report_error))
+            } else {
+                reportDialog?.dismiss()
+                viewModel.sendPostReport(item, content)
+            }
+        }
+
+        override fun onCancel() {
+            reportDialog?.dismiss()
         }
     }
 }

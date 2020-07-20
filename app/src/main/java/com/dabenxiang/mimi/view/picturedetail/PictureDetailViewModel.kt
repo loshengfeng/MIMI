@@ -7,10 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.event.SingleLiveEvent
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.LikeRequest
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.PostCommentRequest
-import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.vo.AttachmentItem
@@ -52,6 +49,9 @@ class PictureDetailViewModel : BaseViewModel() {
 
     private var _likePostResult = MutableLiveData<ApiResult<MemberPostItem>>()
     val likePostResult: LiveData<ApiResult<MemberPostItem>> = _likePostResult
+
+    private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
+    val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
 
     private var _currentCommentType = CommentType.NEWEST
     val currentCommentType: CommentType
@@ -265,6 +265,23 @@ class PictureDetailViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _postCommentResult.value = SingleLiveEvent(it) }
+        }
+    }
+
+    fun sendPostReport(item: MemberPostItem, content: String) {
+        viewModelScope.launch {
+            flow {
+                val request = ReportRequest(content)
+                val result = domainManager.getApiRepository().sendPostReport(item.id, request)
+                if (!result.isSuccessful) throw HttpException(result)
+                item.reported = true
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _postReportResult.value = it }
         }
     }
 
