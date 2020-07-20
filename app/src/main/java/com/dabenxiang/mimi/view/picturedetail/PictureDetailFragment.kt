@@ -12,8 +12,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.OnItemClickListener
 import com.dabenxiang.mimi.model.api.ApiResult.*
+import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.ImageItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -210,6 +212,15 @@ class PictureDetailFragment : BaseFragment() {
                 is Error -> Timber.e(it.throwable)
             }
         })
+
+        viewModel.postCommentReportResult.observe(this, Observer {
+            when (it) {
+                is Empty -> {
+                    GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -239,13 +250,15 @@ class PictureDetailFragment : BaseFragment() {
         }
 
         iv_more.setOnClickListener {
-            moreDialog =
-                MoreDialogFragment.newInstance(memberPostItem!!, onMoreDialogListener).also {
-                    it.show(
-                        requireActivity().supportFragmentManager,
-                        MoreDialogFragment::class.java.simpleName
-                    )
-                }
+            moreDialog = MoreDialogFragment.newInstance(
+                memberPostItem!!,
+                onMoreDialogListener
+            ).also {
+                it.show(
+                    requireActivity().supportFragmentManager,
+                    MoreDialogFragment::class.java.simpleName
+                )
+            }
         }
     }
 
@@ -309,6 +322,15 @@ class PictureDetailFragment : BaseFragment() {
                 } ?: run { "" }
             }
         }
+
+        override fun onMoreClick(item: MembersPostCommentItem) {
+            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
+                it.show(
+                    requireActivity().supportFragmentManager,
+                    MoreDialogFragment::class.java.simpleName
+                )
+            }
+        }
     }
 
     private val onPhotoGridItemClickListener = object : PhotoGridAdapter.OnItemClickListener {
@@ -333,7 +355,7 @@ class PictureDetailFragment : BaseFragment() {
     }
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-        override fun onProblemReport(item: MemberPostItem) {
+        override fun onProblemReport(item: BaseMemberPostItem) {
             moreDialog?.dismiss()
             reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
                 it.show(
@@ -349,12 +371,21 @@ class PictureDetailFragment : BaseFragment() {
     }
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
-        override fun onSend(item: MemberPostItem, content: String) {
+        override fun onSend(item: BaseMemberPostItem, content: String) {
             if (TextUtils.isEmpty(content)) {
                 GeneralUtils.showToast(requireContext(), getString(R.string.report_error))
             } else {
                 reportDialog?.dismiss()
-                viewModel.sendPostReport(item, content)
+                when (item) {
+                    is MemberPostItem -> viewModel.sendPostReport(item, content)
+                    else -> {
+                        viewModel.sendCommentPostReport(
+                            memberPostItem!!,
+                            (item as MembersPostCommentItem),
+                            content
+                        )
+                    }
+                }
             }
         }
 

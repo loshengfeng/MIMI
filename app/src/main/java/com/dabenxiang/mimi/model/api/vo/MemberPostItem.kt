@@ -4,7 +4,6 @@ import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostStatus
 import com.dabenxiang.mimi.model.enums.PostType
 import com.google.gson.annotations.SerializedName
-import java.io.Serializable
 import java.util.*
 
 data class MemberPostItem(
@@ -66,4 +65,4 @@ data class MemberPostItem(
     @SerializedName("status")
     val status: PostStatus = PostStatus.ONLINE
 
-) : Serializable
+) : BaseMemberPostItem()

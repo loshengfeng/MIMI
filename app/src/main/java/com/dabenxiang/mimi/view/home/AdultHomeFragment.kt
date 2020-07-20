@@ -1,7 +1,7 @@
 package com.dabenxiang.mimi.view.home
 
-import android.content.Context
 import android.app.Activity.RESULT_OK
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -21,13 +21,13 @@ import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.ApiResult.*
+import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.FunctionType
-import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
@@ -51,7 +51,6 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.putLruCache
 import kotlinx.android.synthetic.main.fragment_home.*
 import timber.log.Timber
-import java.lang.ClassCastException
 
 class AdultHomeFragment : BaseFragment() {
 
@@ -83,7 +82,11 @@ class AdultHomeFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireActivity().onBackPressedDispatcher.addCallback { interactionListener?.changeNavigationPosition(R.id.navigation_home) }
+        requireActivity().onBackPressedDispatcher.addCallback {
+            interactionListener?.changeNavigationPosition(
+                R.id.navigation_home
+            )
+        }
 
         setupUI()
 
@@ -204,7 +207,10 @@ class AdultHomeFragment : BaseFragment() {
                 is Success -> {
                     when (commonPagedAdapter.viewHolderMap[it.result]) {
                         is PicturePostHolder -> {
-                            commonPagedAdapter.notifyItemChanged(it.result, CommonPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI)
+                            commonPagedAdapter.notifyItemChanged(
+                                it.result,
+                                CommonPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI
+                            )
                         }
                     }
                 }
@@ -217,7 +223,10 @@ class AdultHomeFragment : BaseFragment() {
                 is Success -> {
                     when (commonPagedAdapter.viewHolderMap[it.result]) {
                         is PicturePostHolder -> {
-                            commonPagedAdapter.notifyItemChanged(it.result, CommonPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI)
+                            commonPagedAdapter.notifyItemChanged(
+                                it.result,
+                                CommonPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI
+                            )
                         }
                     }
                 }
@@ -254,7 +263,6 @@ class AdultHomeFragment : BaseFragment() {
                             commonPagedAdapter.notifyItemChanged(attachmentItem.position!!)
                         }
                         AttachmentType.ADULT_TAB_CLIP -> {
-                            Timber.d("@@attachmentItem: $attachmentItem")
                             commonPagedAdapter.notifyItemChanged(attachmentItem.position!!)
                         }
                         else -> {
@@ -266,7 +274,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.scrollToLastPosition.observe(viewLifecycleOwner, Observer {result->
+        viewModel.scrollToLastPosition.observe(viewLifecycleOwner, Observer { result ->
             if (result) recyclerview.scrollToPosition(viewModel.lastListIndex)
         })
 
@@ -517,12 +525,14 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
-        override fun onSend(item: MemberPostItem, content: String) {
+        override fun onSend(item: BaseMemberPostItem, content: String) {
             if (TextUtils.isEmpty(content)) {
                 GeneralUtils.showToast(requireContext(), getString(R.string.report_error))
             } else {
                 reportDialog?.dismiss()
-                viewModel.sendPostReport(item, content)
+                when (item) {
+                    is MemberPostItem -> viewModel.sendPostReport(item, content)
+                }
             }
         }
 
@@ -532,7 +542,7 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-        override fun onProblemReport(item: MemberPostItem) {
+        override fun onProblemReport(item: BaseMemberPostItem) {
             moreDialog?.dismiss()
             reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
                 it.show(
@@ -667,7 +677,7 @@ class AdultHomeFragment : BaseFragment() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (resultCode == RESULT_OK) {
-            when(requestCode) {
+            when (requestCode) {
                 REQUEST_PHOTO -> {
                     data?.let {
                         val uriImage: Uri?
@@ -677,13 +687,23 @@ class AdultHomeFragment : BaseFragment() {
                         } else {
                             val extras = it.extras
                             val imageBitmap = extras!!["data"] as Bitmap?
-                            uriImage  = Uri.parse(MediaStore.Images.Media.insertImage(requireContext().contentResolver, imageBitmap, null,null));
+                            uriImage = Uri.parse(
+                                MediaStore.Images.Media.insertImage(
+                                    requireContext().contentResolver,
+                                    imageBitmap,
+                                    null,
+                                    null
+                                )
+                            );
                         }
 
                         val bundle = Bundle()
                         bundle.putString(BUNDLE_PIC_URI, uriImage.toString())
 
-                        findNavController().navigate(R.id.action_adultHomeFragment_to_postPicFragment, bundle)
+                        findNavController().navigate(
+                            R.id.action_adultHomeFragment_to_postPicFragment,
+                            bundle
+                        )
 
                     }
                 }

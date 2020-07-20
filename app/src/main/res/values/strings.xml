@@ -225,6 +225,13 @@
         <item>有害的危险行为</item>
     </string-array>
 
+    <string-array name="text_problem_report_item">
+        <item>标题与内容不符</item>
+        <item>垃圾内容或误导性内容</item>
+        <item>仇恨与恶意内容</item>
+        <item>有害的危险行为</item>
+    </string-array>
+
     <string name="problem_report">问题回报</string>
     <string name="already_reported">您已回报过问题</string>
     <string name="clip_username">"@%s"</string>

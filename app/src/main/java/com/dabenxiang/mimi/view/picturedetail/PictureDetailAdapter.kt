@@ -14,6 +14,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.OnItemClickListener
 import com.dabenxiang.mimi.model.api.vo.ContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.dabenxiang.mimi.view.picturedetail.viewholder.CommentContentViewHolder
@@ -187,7 +188,7 @@ class PictureDetailAdapter(
 
     private val playerInfoListener = object : CommentAdapter.PlayerInfoListener {
         override fun sendComment(replyId: Long?, replyName: String?) {
-            onPictureDetailListener. onReplyComment(replyId, replyName)
+            onPictureDetailListener.onReplyComment(replyId, replyName)
         }
 
         override fun expandReply(parentNode: RootCommentNode, succeededBlock: () -> Unit) {
@@ -214,8 +215,8 @@ class PictureDetailAdapter(
             onPictureDetailListener.onGetCommandAvatar(id, succeededBlock)
         }
 
-        override fun onMoreClick(item: MemberPostItem) {
-
+        override fun onMoreClick(item: MembersPostCommentItem) {
+            onPictureDetailListener.onMoreClick(item)
         }
     }
 
@@ -228,6 +229,7 @@ class PictureDetailAdapter(
         fun onCommandDislike(commentId: Long?, succeededBlock: () -> Unit)
         fun onGetCommandAvatar(id: Long, succeededBlock: (Bitmap) -> Unit)
         fun onReplyComment(replyId: Long?, replyName: String?)
+        fun onMoreClick(item: MembersPostCommentItem)
     }
 
 }

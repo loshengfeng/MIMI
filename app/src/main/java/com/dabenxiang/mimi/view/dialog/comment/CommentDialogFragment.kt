@@ -11,6 +11,7 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.api.vo.PostCommentRequest
 import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
 import com.dabenxiang.mimi.model.enums.CommentViewType
@@ -111,7 +112,7 @@ class CommentDialogFragment : BaseDialogFragment() {
                 viewModel.getBitmap(id.toString(), succeededBlock)
             }
 
-            override fun onMoreClick(item: MemberPostItem) {
+            override fun onMoreClick(item: MembersPostCommentItem) {
 
             }
 

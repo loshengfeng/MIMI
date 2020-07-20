@@ -199,7 +199,7 @@ class PlayerActivity : BaseActivity() {
                 viewModel.getBitmap(id.toString(), succeededBlock)
             }
 
-            override fun onMoreClick(item: MemberPostItem) {
+            override fun onMoreClick(item: MembersPostCommentItem) {
 
             }
         }, CommentViewType.VIDEO).apply {
@@ -226,7 +226,8 @@ class PlayerActivity : BaseActivity() {
         playerInfoAdapter.addHeaderView(headGuessLike)
         playerInfoAdapter.addHeaderView(headComment)
         playerInfoAdapter.addHeaderView(headNoComment)
-        playerInfoAdapter.loadMoreModule.loadMoreView = CommentLoadMoreView(isAdult, CommentViewType.VIDEO)
+        playerInfoAdapter.loadMoreModule.loadMoreView =
+            CommentLoadMoreView(isAdult, CommentViewType.VIDEO)
 
         recycler_info.adapter = playerInfoAdapter
 

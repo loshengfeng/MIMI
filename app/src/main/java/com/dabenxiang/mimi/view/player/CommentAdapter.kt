@@ -13,7 +13,6 @@ import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setBtnSolidColor
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
@@ -35,7 +34,7 @@ class CommentAdapter(isAdult: Boolean, listener: PlayerInfoListener, type: Comme
         fun setCommentLikeType(replyId: Long?, isLike: Boolean, succeededBlock: () -> Unit)
         fun removeCommentLikeType(replyId: Long?, succeededBlock: () -> Unit)
         fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit)
-        fun onMoreClick(item: MemberPostItem)
+        fun onMoreClick(item: MembersPostCommentItem)
     }
 
     init {
@@ -69,7 +68,8 @@ class RootCommentProvider(
             R.id.tv_like,
             R.id.tv_unlike,
             R.id.btn_reply,
-            R.id.btn_show_comment_reply
+            R.id.btn_show_comment_reply,
+            R.id.btn_more
         )
     }
 
@@ -183,8 +183,7 @@ class RootCommentProvider(
                 listener.sendComment(actualData.data.id, actualData.data.postName)
             }
             R.id.btn_more -> {
-                // TODO: Dave
-//                listener.onMoreClick()
+                listener.onMoreClick(actualData.data)
             }
         }
     }
@@ -202,7 +201,7 @@ class NestedCommentProvider(
         get() = R.layout.item_comment_nested
 
     init {
-        addChildClickViewIds(R.id.tv_like, R.id.tv_unlike, R.id.btn_reply)
+        addChildClickViewIds(R.id.tv_like, R.id.tv_unlike, R.id.btn_reply, R.id.btn_more)
     }
 
     override fun convert(holder: BaseViewHolder, item: BaseNode) {
@@ -252,8 +251,7 @@ class NestedCommentProvider(
                 }
             }
             R.id.btn_more -> {
-                // TODO: Dave
-//                listener.onMoreClick()
+                listener.onMoreClick(actualData.data)
             }
         }
     }

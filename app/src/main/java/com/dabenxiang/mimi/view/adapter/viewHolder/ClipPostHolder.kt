@@ -83,10 +83,8 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
                 if (TextUtils.isEmpty(image.url)) {
                     image.id.takeIf { !TextUtils.isEmpty(it) }?.also { id ->
                         LruCacheUtils.getLruCache(id)?.also { bitmap ->
-                            Timber.d("@@Glide id: $id, ")
                             Glide.with(ivPhoto.context).load(bitmap).into(ivPhoto)
                         } ?: run {
-                            Timber.d("@@onGetAttachment id:$id, position: $position")
                             attachmentListener.onGetAttachment(
                                 id,
                                 position,

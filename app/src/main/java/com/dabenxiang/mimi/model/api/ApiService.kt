@@ -375,6 +375,13 @@ interface ApiService {
         @Body body: ReportRequest
     ): Response<Void>
 
+    @POST("/v1/Members/Post/{postId}/Comment/{commentId}/CommentReport")
+    suspend fun sendPostCommentReport(
+        @Path("postId") postId: Long,
+        @Path("commentId") commentId: Long,
+        @Body body: ReportRequest
+    ): Response<Void>
+
     /**********************************************************
      *
      *                  Ordering
