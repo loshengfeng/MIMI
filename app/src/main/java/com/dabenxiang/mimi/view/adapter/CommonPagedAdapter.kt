@@ -26,6 +26,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.getLruCache
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
+import timber.log.Timber
 import java.util.*
 
 class CommonPagedAdapter(
@@ -86,8 +87,10 @@ class CommonPagedAdapter(
         position: Int,
         payloads: MutableList<Any>
     ) {
+        viewHolderMap[position] = holder
         when(holder) {
             is ClipPostHolder -> {
+                Timber.d("@@onBindViewHolder")
                 currentList?.also { holder.onBind(it.toList(), position, adultListener, attachmentListener) }
             }
             is PicturePostHolder -> {
@@ -99,7 +102,6 @@ class CommonPagedAdapter(
                     }
                 } ?: run {
                     holder.pictureRecycler.tag = position
-                    viewHolderMap[position] = holder
                     setupPicturePost(holder, position)
                 }
             }
@@ -161,7 +163,7 @@ class CommonPagedAdapter(
                 position,
                 object : OnItemClickListener {
                     override fun onItemClick() {
-                        adultListener.onItemClick(item!!)
+                        item?.also { adultListener.onItemClick(item, AdultTabType.PICTURE)}
                     }
                 }
             )
@@ -179,7 +181,7 @@ class CommonPagedAdapter(
         }
 
         holder.commentImage.setOnClickListener {
-            adultListener.onCommentClick(item!!)
+            item?.also { adultListener.onCommentClick(it, AdultTabType.PICTURE) }
         }
 
         holder.moreImage.setOnClickListener {
@@ -187,7 +189,7 @@ class CommonPagedAdapter(
         }
 
         holder.picturePostItemLayout.setOnClickListener {
-            adultListener.onItemClick(item!!)
+            item?.also { adultListener.onItemClick(item, AdultTabType.PICTURE)}
         }
     }
 
