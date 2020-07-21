@@ -34,6 +34,9 @@ data class PostFavoriteItem(
     @SerializedName("tag")
     val tag: String?,
 
+    @SerializedName("tags")
+    val tags: List<String>?,
+
     @SerializedName("category")
     val category: String?,
 

@@ -449,9 +449,9 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得我關注的所有帖子(不分人或圈子)
      */
     suspend fun getPostFollow(
-        offset: String,
-        limit: String
-    ) = apiService.getPostFavorite(offset, limit)
+        offset: Int,
+        limit: Int
+    ) = apiService.getPostFollow(offset, limit)
 
     /**
      * 取得使用者資訊明細

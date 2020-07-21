@@ -22,7 +22,6 @@ import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
-import com.dabenxiang.mimi.model.api.MoreDialogData
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -51,13 +50,16 @@ import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
-import com.dabenxiang.mimi.view.post.PostPicFragment.Companion.BUNDLE_PIC_URI
+import com.dabenxiang.mimi.view.post.pic.PostPicFragment.Companion.BUNDLE_PIC_URI
+import com.dabenxiang.mimi.view.post.video.EditVideoFragment.Companion.BUNDLE_VIDEO_URI
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.putLruCache
+import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.android.synthetic.main.fragment_home.*
 import timber.log.Timber
+import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -84,6 +86,7 @@ class AdultHomeFragment : BaseFragment() {
 
     companion object {
         private const val REQUEST_PHOTO = 10001
+        private const val REQUEST_VIDEO_CAPTURE = 10002
     }
 
     override fun getLayoutId() = R.layout.fragment_home
@@ -130,7 +133,6 @@ class AdultHomeFragment : BaseFragment() {
             lastPosition = position
             tabAdapter.setLastSelectedIndex(lastPosition)
             recyclerview_tab.scrollToPosition(position)
-            setupPostTypeByPosition(position)
             setupRecyclerByPosition(position)
             getData(position)
         })
@@ -214,13 +216,13 @@ class AdultHomeFragment : BaseFragment() {
         viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    when (commonPagedAdapter.viewHolderMap[it.result]) {
+                    when (memberPostPagedAdapter.viewHolderMap[it.result]) {
                         is ClipPostHolder,
                         is PicturePostHolder,
                         is TextPostHolder -> {
-                            commonPagedAdapter.notifyItemChanged(
+                            memberPostPagedAdapter.notifyItemChanged(
                                 it.result,
-                                CommonPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI
+                                MemberPostPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI
                             )
                         }
                     }
@@ -232,13 +234,13 @@ class AdultHomeFragment : BaseFragment() {
         viewModel.likePostResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    when (commonPagedAdapter.viewHolderMap[it.result]) {
+                    when (memberPostPagedAdapter.viewHolderMap[it.result]) {
                         is ClipPostHolder,
                         is PicturePostHolder,
                         is TextPostHolder -> {
-                            commonPagedAdapter.notifyItemChanged(
+                            memberPostPagedAdapter.notifyItemChanged(
                                 it.result,
-                                CommonPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI
+                                MemberPostPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI
                             )
                         }
                     }
@@ -275,7 +277,7 @@ class AdultHomeFragment : BaseFragment() {
                         AttachmentType.ADULT_TAB_CLIP,
                         AttachmentType.ADULT_TAB_PICTURE,
                         AttachmentType.ADULT_TAB_TEXT -> {
-                            commonPagedAdapter.notifyItemChanged(attachmentItem.position!!)
+                            memberPostPagedAdapter.notifyItemChanged(attachmentItem.position!!)
                         }
                         else -> {
                         }
@@ -296,10 +298,10 @@ class AdultHomeFragment : BaseFragment() {
                     val attachmentItem = it.result
                     putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
                     when (val holder =
-                        commonPagedAdapter.viewHolderMap[attachmentItem.parentPosition]) {
+                        memberPostPagedAdapter.viewHolderMap[attachmentItem.parentPosition]) {
                         is PicturePostHolder -> {
                             if (holder.pictureRecycler.tag == attachmentItem.parentPosition) {
-                                commonPagedAdapter.updateInternalItem(holder)
+                                memberPostPagedAdapter.updateInternalItem(holder)
                             }
                         }
                     }
@@ -308,16 +310,20 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
+        viewModel.postFollowItemListResult.observe(viewLifecycleOwner, Observer {
+            postFollowPagedAdapter.submitList(it)
+        })
+
         viewModel.clipPostItemListResult.observe(viewLifecycleOwner, Observer {
-            commonPagedAdapter.submitList(it)
+            memberPostPagedAdapter.submitList(it)
         })
 
         viewModel.picturePostItemListResult.observe(viewLifecycleOwner, Observer {
-            commonPagedAdapter.submitList(it)
+            memberPostPagedAdapter.submitList(it)
         })
 
         viewModel.textPostItemListResult.observe(viewLifecycleOwner, Observer {
-            commonPagedAdapter.submitList(it)
+            memberPostPagedAdapter.submitList(it)
         })
 
         viewModel.clubItemListResult.observe(viewLifecycleOwner, Observer {
@@ -412,7 +418,7 @@ class AdultHomeFragment : BaseFragment() {
             }
             2,3,4,5 -> {
                 recyclerview.layoutManager = LinearLayoutManager(requireContext())
-                recyclerview.adapter = commonPagedAdapter
+                recyclerview.adapter = memberPostPagedAdapter
             }
             else -> {
                 recyclerview.layoutManager = LinearLayoutManager(requireContext())
@@ -421,26 +427,11 @@ class AdultHomeFragment : BaseFragment() {
         }
     }
 
-    private fun setupPostTypeByPosition(position: Int) {
-        val type = when (position) {
-            0 -> AdultTabType.HOME
-            1 -> AdultTabType.VIDEO
-            2 -> AdultTabType.FOLLOW
-            3 -> AdultTabType.CLIP
-            4 -> AdultTabType.PICTURE
-            5 -> AdultTabType.TEXT
-            else -> AdultTabType.CLUB
-        }
-        commonPagedAdapter.setupAdultTabType(type)
-    }
-
     private fun getData(position: Int) {
         when (position) {
             0 -> mainViewModel?.getHomeCategories()
             1 -> viewModel.getVideos(null, true)
-            2 -> {
-                // TODO: 關注
-            }
+            2 -> viewModel.getPostFollows()
             3 -> viewModel.getClipPosts()
             4 -> viewModel.getPicturePosts()
             5 -> viewModel.getTextPosts()
@@ -487,8 +478,12 @@ class AdultHomeFragment : BaseFragment() {
         )
     }
 
-    private val commonPagedAdapter by lazy {
-        CommonPagedAdapter(requireActivity(), adultListener, attachmentListener)
+    private val memberPostPagedAdapter by lazy {
+        MemberPostPagedAdapter(requireActivity(), adultListener, attachmentListener)
+    }
+
+    private val postFollowPagedAdapter by lazy {
+        PostFollowPagedAdapter(requireActivity(), adultListener, attachmentListener)
     }
 
     private val clubMemberAdapter by lazy {
@@ -721,6 +716,11 @@ class AdultHomeFragment : BaseFragment() {
 
     private val onChooseUploadMethodDialogListener = object : OnChooseUploadMethodDialogListener {
         override fun onUploadVideo() {
+            Intent(MediaStore.ACTION_VIDEO_CAPTURE).also { takeVideoIntent ->
+                takeVideoIntent.resolveActivity(requireContext().packageManager)?.also {
+                    startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE)
+                }
+            }
         }
 
         override fun onUploadPic() {
@@ -772,8 +772,26 @@ class AdultHomeFragment : BaseFragment() {
                             R.id.action_adultHomeFragment_to_postPicFragment,
                             bundle
                         )
-
                     }
+                }
+
+                REQUEST_VIDEO_CAPTURE -> {
+                    val videoUri: Uri? = data?.data
+                    val myUri = Uri.fromFile(
+                        File(
+                            UriUtils.getRealPathFromURI(
+                                requireContext(),
+                                videoUri!!
+                            )
+                        )
+                    )
+
+                    val bundle = Bundle()
+                    bundle.putString(BUNDLE_VIDEO_URI, myUri.toString())
+                    findNavController().navigate(
+                        R.id.action_adultHomeFragment_to_editVideoFragment,
+                        bundle
+                    )
                 }
             }
         }
