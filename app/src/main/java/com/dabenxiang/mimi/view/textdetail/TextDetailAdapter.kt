@@ -144,6 +144,13 @@ class TextDetailAdapter(
                 }
             }
             is CommentContentViewHolder -> {
+
+                holder.noCommentLayout.visibility = if (memberPostItem.commentCount > 0) {
+                    View.INVISIBLE
+                } else {
+                    View.VISIBLE
+                }
+
                 commentAdapter = CommentAdapter(
                     true,
                     playerInfoListener,
