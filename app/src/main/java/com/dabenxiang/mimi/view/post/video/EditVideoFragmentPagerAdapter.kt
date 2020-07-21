@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.post
+package com.dabenxiang.mimi.view.post.video
 
 import android.util.SparseArray
 import android.view.ViewGroup
@@ -13,7 +13,9 @@ class EditVideoFragmentPagerAdapter(fm: FragmentManager, private var totalTabs: 
 
     override fun getItem(position: Int): Fragment {
         return when(position) {
-            0 -> { EditVideoRangeFragment.newInstance(uri) }
+            0 -> {
+                EditVideoRangeFragment.newInstance(uri)
+            }
             1 -> { CropVideoFragment.newInstance(uri) }
             else -> EditVideoRangeFragment()
         }

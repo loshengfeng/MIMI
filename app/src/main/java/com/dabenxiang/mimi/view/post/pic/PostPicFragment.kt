@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.post
+package com.dabenxiang.mimi.view.post.pic
 
 import android.app.Activity.RESULT_OK
 import android.content.Intent
@@ -94,7 +94,9 @@ class PostPicFragment : BaseFragment() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                txt_titleCount.text = String.format(getString(R.string.typing_count, s?.length, TITLE_LIMIT))
+                txt_titleCount.text = String.format(getString(R.string.typing_count, s?.length,
+                    TITLE_LIMIT
+                ))
             }
         })
 
@@ -113,7 +115,9 @@ class PostPicFragment : BaseFragment() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                txt_contentCount.text = String.format(getString(R.string.typing_count, s?.length, CONTENT_LIMIT))
+                txt_contentCount.text = String.format(getString(R.string.typing_count, s?.length,
+                    CONTENT_LIMIT
+                ))
             }
         })
 
@@ -146,10 +150,21 @@ class PostPicFragment : BaseFragment() {
         tv_clean.visibility = View.VISIBLE
         tv_clean.text = getString(R.string.btn_send)
 
-        txt_titleCount.text = String.format(getString(R.string.typing_count, INIT_VALUE, TITLE_LIMIT))
-        txt_contentCount.text = String.format(getString(R.string.typing_count, INIT_VALUE, CONTENT_LIMIT))
-        txt_hashtagCount.text = String.format(getString(R.string.typing_count, INIT_VALUE, HASHTAG_LIMIT))
-        txt_picCount.text = String.format(getString(R.string.select_pic_count, uriList.size, PHOTO_LIMIT))
+        txt_titleCount.text = String.format(getString(R.string.typing_count,
+            INIT_VALUE,
+            TITLE_LIMIT
+        ))
+        txt_contentCount.text = String.format(getString(R.string.typing_count,
+            INIT_VALUE,
+            CONTENT_LIMIT
+        ))
+        txt_hashtagCount.text = String.format(getString(R.string.typing_count,
+            INIT_VALUE,
+            HASHTAG_LIMIT
+        ))
+        txt_picCount.text = String.format(getString(R.string.select_pic_count, uriList.size,
+            PHOTO_LIMIT
+        ))
     }
 
     private val chooseClubDialogListener = object : ChooseClubDialogListener {
@@ -181,14 +196,18 @@ class PostPicFragment : BaseFragment() {
     }
 
     private fun setTagCount() {
-        txt_hashtagCount.text = String.format(getString(R.string.typing_count, chipGroup.size, HASHTAG_LIMIT))
+        txt_hashtagCount.text = String.format(getString(R.string.typing_count, chipGroup.size,
+            HASHTAG_LIMIT
+        ))
     }
 
     private fun updateCountPicView() {
         uriList.clear()
         uriList.addAll(adapter.getData())
         adapter.notifyDataSetChanged()
-        txt_picCount.text = String.format(getString(R.string.select_pic_count, uriList.size, PHOTO_LIMIT))
+        txt_picCount.text = String.format(getString(R.string.select_pic_count, uriList.size,
+            PHOTO_LIMIT
+        ))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -221,7 +240,9 @@ class PostPicFragment : BaseFragment() {
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
             intent.action = Intent.ACTION_GET_CONTENT
 
-            startActivityForResult(Intent.createChooser(intent, getString(R.string.select_pics)), REQUEST_MUTLI_PHOTO)
+            startActivityForResult(Intent.createChooser(intent, getString(R.string.select_pics)),
+                REQUEST_MUTLI_PHOTO
+            )
         }
 
         override fun onUpdateCount() {

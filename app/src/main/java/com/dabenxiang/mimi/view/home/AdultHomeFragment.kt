@@ -44,13 +44,15 @@ import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
-import com.dabenxiang.mimi.view.post.EditVideoFragment.Companion.BUNDLE_VIDEO_URI
-import com.dabenxiang.mimi.view.post.PostPicFragment.Companion.BUNDLE_PIC_URI
+import com.dabenxiang.mimi.view.post.pic.PostPicFragment.Companion.BUNDLE_PIC_URI
+import com.dabenxiang.mimi.view.post.video.EditVideoFragment.Companion.BUNDLE_VIDEO_URI
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.putLruCache
+import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.android.synthetic.main.fragment_home.*
 import timber.log.Timber
+import java.io.File
 
 class AdultHomeFragment : BaseFragment() {
 
@@ -675,8 +677,10 @@ class AdultHomeFragment : BaseFragment() {
 
                 REQUEST_VIDEO_CAPTURE -> {
                     val videoUri: Uri? = data?.data
+                    val myUri = Uri.fromFile(File(UriUtils.getRealPathFromURI(requireContext(), videoUri!!)))
+
                     val bundle = Bundle()
-                    bundle.putString(BUNDLE_VIDEO_URI, videoUri.toString())
+                    bundle.putString(BUNDLE_VIDEO_URI, myUri.toString())
                     findNavController().navigate(R.id.action_adultHomeFragment_to_editVideoFragment, bundle)
                 }
             }

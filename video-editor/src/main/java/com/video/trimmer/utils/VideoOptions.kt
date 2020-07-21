@@ -102,6 +102,7 @@ class VideoOptions(private var ctx: Context) {
                         }
                     })
                 } catch (e: FFmpegCommandAlreadyRunningException) {
+                    Log.e(TAG, "exception: " + e.toString())
                     listener?.onError(e.toString())
                 }
             }

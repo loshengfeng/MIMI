@@ -248,7 +248,7 @@
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="0/10 张图片" />
+            android:text="@string/short_video" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"

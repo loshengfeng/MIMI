@@ -1,10 +1,11 @@
-package com.dabenxiang.mimi.view.post
+package com.dabenxiang.mimi.view.post.video
 
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.view.View
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.EditVideoListener
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.video.trimmer.interfaces.OnCropVideoListener
 import kotlinx.android.synthetic.main.fragment_crop_video.*
@@ -12,6 +13,8 @@ import java.io.File
 
 
 class CropVideoFragment : BaseFragment(), OnCropVideoListener {
+
+    private var editVideoListener: EditVideoListener? = null
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -24,7 +27,8 @@ class CropVideoFragment : BaseFragment(), OnCropVideoListener {
         private const val BUNDLE_URI = "bundle_uri"
 
         fun newInstance(uri: String): CropVideoFragment {
-            val fragment = CropVideoFragment()
+            val fragment =
+                CropVideoFragment()
             val args = Bundle()
             args.putString(BUNDLE_URI, uri)
             fragment.arguments = args
@@ -48,6 +52,10 @@ class CropVideoFragment : BaseFragment(), OnCropVideoListener {
         videoCropper.onSaveClicked()
     }
 
+    fun setEditVideoListener(editVideoListener: EditVideoListener) {
+        this.editVideoListener = editVideoListener
+    }
+
     override fun setupObservers() {
     }
 
@@ -59,9 +67,11 @@ class CropVideoFragment : BaseFragment(), OnCropVideoListener {
     }
 
     override fun getResult(uri: Uri) {
+        editVideoListener?.onFinish(uri)
     }
 
     override fun onCropStarted() {
+        editVideoListener?.onStart()
     }
 
     override fun onError(message: String) {
