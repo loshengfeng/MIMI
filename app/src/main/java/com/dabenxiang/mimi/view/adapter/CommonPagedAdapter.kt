@@ -102,23 +102,7 @@ class CommonPagedAdapter(
                 }
             }
             is TextPostHolder -> {
-                payloads.takeIf { it.isNotEmpty() }?.also {
-                    when (it[0] as Int) {
-                        PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI -> {
-                            currentList?.also { itemList ->
-                                holder.updateLikeAndFollowItem(
-                                    itemList.toList(),
-                                    position,
-                                    adultListener
-                                )
-                            }
-                        }
-                    }
-                }?: run {
-                    currentList?.also {
-                        holder.onBind(it.toList(), position, adultListener, attachmentListener)
-                    }
-                }
+                item?.also { holder.onBind(it, position, adultListener, attachmentListener) }
             }
         }
     }
