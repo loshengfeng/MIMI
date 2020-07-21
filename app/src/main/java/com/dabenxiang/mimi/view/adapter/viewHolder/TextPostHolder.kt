@@ -43,13 +43,11 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView) {
     val moreImage: ImageView = itemView.iv_more
 
     fun onBind(
-        itemList: List<MemberPostItem>,
+        item: MemberPostItem,
         position: Int,
         adultListener: AdultListener,
         attachmentListener: AttachmentListener
     ) {
-        val item = itemList[position]
-
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         title.text = item.title
@@ -62,7 +60,7 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView) {
 //            Timber.e(e)
         }
 
-        updateLikeAndFollowItem(itemList, position, adultListener)
+        updateLikeAndFollowItem(item, position, adultListener)
 
         if (LruCacheUtils.getLruCache(item.avatarAttachmentId.toString()) == null) {
             attachmentListener.onGetAttachment(
@@ -91,7 +89,7 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         commentImage.setOnClickListener {
-            item.also { adultListener.onCommentClick(it, AdultTabType.TEXT) }
+            adultListener.onCommentClick(item, AdultTabType.TEXT)
         }
 
         moreImage.setOnClickListener {
@@ -99,17 +97,15 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         textPostItemLayout.setOnClickListener {
-            item.also { adultListener.onItemClick(item, AdultTabType.TEXT) }
+            adultListener.onItemClick(item, AdultTabType.TEXT)
         }
     }
 
-    fun updateLikeAndFollowItem(
-        itemList: List<MemberPostItem>,
+    private fun updateLikeAndFollowItem(
+        item: MemberPostItem,
         position: Int,
         adultListener: AdultListener
     ) {
-        val item = itemList[position]
-
         likeCount.text = item.likeCount.toString()
         commentCount.text = item.commentCount.toString()
 
