@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cl_club_member"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/item_color_card_background"
+    android:paddingHorizontal="20dp"
+    android:paddingVertical="10dp">
+
+    <ImageView
+        android:id="@+id/iv_avatar"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/icon_cs_photo"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@null" />
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:textColor="@color/color_white_1"
+        android:textSize="14sp"
+        app:layout_constraintLeft_toRightOf="@+id/iv_avatar"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="美乳美乳美乳美乳美乳美乳美..." />
+
+    <TextView
+        android:id="@+id/tv_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="2dp"
+        android:textColor="@color/color_white_1_50"
+        android:textSize="12sp"
+        app:layout_constraintLeft_toRightOf="@+id/iv_avatar"
+        app:layout_constraintTop_toBottomOf="@+id/tv_title"
+        tools:text="美乳迷们快来加入我们的行列！美乳…" />
+
+    <TextView
+        android:id="@+id/tv_follow_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="2dp"
+        android:textColor="@color/color_white_1_50"
+        android:textSize="12sp"
+        android:text="@string/text_follow"
+        app:layout_constraintLeft_toRightOf="@+id/iv_avatar"
+        app:layout_constraintTop_toBottomOf="@+id/tv_desc"/>
+
+    <TextView
+        android:id="@+id/tv_follow_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="2dp"
+        android:textColor="@color/color_white_1"
+        android:textSize="12sp"
+        app:layout_constraintLeft_toRightOf="@+id/tv_follow_title"
+        app:layout_constraintTop_toBottomOf="@+id/tv_desc"
+        tools:text="14000"/>
+
+    <TextView
+        android:id="@+id/tv_post_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="2dp"
+        android:textColor="@color/color_white_1_50"
+        android:textSize="12sp"
+        android:text="@string/text_post"
+        app:layout_constraintLeft_toRightOf="@+id/tv_follow_count"
+        app:layout_constraintTop_toBottomOf="@+id/tv_desc"/>
+
+    <TextView
+        android:id="@+id/tv_post_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="2dp"
+        android:textColor="@color/color_white_1"
+        android:textSize="12sp"
+        app:layout_constraintLeft_toRightOf="@+id/tv_post_title"
+        app:layout_constraintTop_toBottomOf="@+id/tv_desc"
+        tools:text="19191"/>
+
+    <TextView
+        android:id="@+id/tv_follow"
+        android:layout_width="54dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/bg_red_1_stroke_radius_16"
+        android:gravity="center"
+        android:textColor="@color/color_red_1"
+        android:textSize="12sp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="+关注" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_post"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@id/tv_follow_title" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
