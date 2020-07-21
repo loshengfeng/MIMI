@@ -115,6 +115,11 @@ class FavoritePlayViewHolder(
             chip.setTextColor(chip.context.getColor(R.color.color_black_1_50))
             chip.chipBackgroundColor =
                 ColorStateList.valueOf(chip.context.getColor(R.color.color_black_1_10))
+            chip.isClickable = true
+
+            chip.setOnClickListener {
+                listener.onChipClick((it as Chip).text.toString())
+            }
             reflowGroup.addView(chip)
         }
     }

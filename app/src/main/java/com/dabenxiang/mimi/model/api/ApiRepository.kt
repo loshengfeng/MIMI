@@ -294,8 +294,9 @@ class ApiRepository(private val apiService: ApiService) {
         years: Int? = null,
         isAdult: Boolean,
         offset: String,
-        limit: String
-    ) = apiService.searchHomeVideos(category, q, country, years, isAdult, offset, limit)
+        limit: String,
+        tag: String = ""
+    ) = apiService.searchHomeVideos(category, q, country, years, isAdult, offset, limit, tag)
 
     /**
      * 取得類別影片
@@ -443,6 +444,14 @@ class ApiRepository(private val apiService: ApiService) {
         postFavoriteId: Long,
         postFavoriteIds: List<Long>
     ) = apiService.deletePostFavorite(postFavoriteId, postFavoriteIds)
+
+    /**
+     * 取得我關注的所有帖子(不分人或圈子)
+     */
+    suspend fun getPostFollow(
+        offset: String,
+        limit: String
+    ) = apiService.getPostFavorite(offset, limit)
 
     /**
      * 取得使用者資訊明細

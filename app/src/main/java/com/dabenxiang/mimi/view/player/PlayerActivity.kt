@@ -31,10 +31,7 @@ import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseActivity
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
-import com.dabenxiang.mimi.view.dialog.GeneralDialog
-import com.dabenxiang.mimi.view.dialog.GeneralDialogData
-import com.dabenxiang.mimi.view.dialog.SendCommentDialog
-import com.dabenxiang.mimi.view.dialog.show
+import com.dabenxiang.mimi.view.dialog.*
 import com.dabenxiang.mimi.view.login.LoginActivity
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -450,7 +447,9 @@ class PlayerActivity : BaseActivity() {
 
                         viewModel.sourceList = result.sources
 
-                        setupChipGroup(result.tags)
+                        if (result.tags != null)
+                            setupChipGroup(result.tags as List<String>)
+
                         setupSourceList(viewModel.sourceList)
 
                         val categoriesString = result.categories?.last()

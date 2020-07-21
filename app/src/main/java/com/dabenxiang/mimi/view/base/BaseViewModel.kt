@@ -45,7 +45,7 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
      * @param videoId 該影片 ID
      * @param episodeID 該級數 ID, 若為 null or -1 不帶, 反之加上 "&e="
      */
-    fun getShareUrl(categoryURI: String, videoId: Long, episodeID: String?): String {
+    fun getShareUrl(categoryURI: String, videoId: Long, episodeID: String? = null): String {
         val result: StringBuilder = StringBuilder()
         result.append(domainManager.getApiDomain())
             .append("/play/")

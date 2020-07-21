@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingStart="20dp"
-    android:paddingBottom="20dp"
-    android:paddingEnd="20dp">
+    android:paddingEnd="20dp"
+    android:paddingBottom="20dp">
 
     <TextView
         android:id="@+id/tv_title"
@@ -86,15 +86,27 @@
     </androidx.cardview.widget.CardView>
 
 
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/reflow_group"
+    <HorizontalScrollView
+        android:id="@+id/reflow_group_scroll"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingTop="15dp"
-        android:paddingBottom="15dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/tv_title"
-        app:layout_constraintTop_toBottomOf="@id/layout_card" />
+        app:layout_constraintTop_toBottomOf="@id/layout_card">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/reflow_group"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="parent"
+            app:selectionRequired="true"
+            app:singleLine="true"
+            app:singleSelection="true" />
+    </HorizontalScrollView>
 
     <include
         android:id="@+id/item_function"
@@ -103,6 +115,6 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/reflow_group" />
+        app:layout_constraintTop_toBottomOf="@id/reflow_group_scroll" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

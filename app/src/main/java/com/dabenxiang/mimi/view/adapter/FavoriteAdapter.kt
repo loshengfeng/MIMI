@@ -39,6 +39,7 @@ class FavoriteAdapter(
     interface EventListener {
         fun onVideoClick(item: Any)
         fun onFunctionClick(type: FunctionType, view: View, item: Any)
+        fun onChipClick(text: String)
         fun onAvatarDownload(view: ImageView, id: String)
     }
 

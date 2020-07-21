@@ -1,14 +1,18 @@
 package com.dabenxiang.mimi.view.main
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setupWithNavController
 import com.dabenxiang.mimi.view.base.BaseActivity
+import com.dabenxiang.mimi.view.home.HomeFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
 
 class MainActivity : BaseActivity(), InteractionListener {
 
@@ -76,8 +80,15 @@ class MainActivity : BaseActivity(), InteractionListener {
         bottom_navigation.selectedItemId = index
     }
 
+    override fun setAdult(isAdult: Boolean) {
+        viewModel.setAdultMode(isAdult)
+        setUiMode(isAdult)
+    }
+
+    @SuppressLint("RestrictedApi")
     override fun onBackPressed() {
-        if (supportFragmentManager.backStackEntryCount == 0) {
+        // 判斷當前的頁面是停留在 homeFragment，顯示退出 app 訊息
+        if (supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter("/").toString().toLowerCase(Locale.getDefault()) == HomeFragment::class.java.simpleName.toLowerCase(Locale.getDefault())) {
             if (!viewModel.needCloseApp) {
                 viewModel.startBackExitAppTimer()
                 GeneralUtils.showToast(this, getString(R.string.press_again_exit))

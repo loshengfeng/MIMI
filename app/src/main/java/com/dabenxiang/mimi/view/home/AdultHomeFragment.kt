@@ -22,6 +22,7 @@ import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
+import com.dabenxiang.mimi.model.api.MoreDialogData
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -54,6 +55,8 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.putLruCache
 import kotlinx.android.synthetic.main.fragment_home.*
 import timber.log.Timber
+import java.util.*
+import kotlin.collections.ArrayList
 
 class AdultHomeFragment : BaseFragment() {
 
@@ -520,7 +523,8 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onMoreClick(item: MemberPostItem) {
-            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
+            val data = MemberPostItem(id = item.id, creationDate = Date())
+            moreDialog = MoreDialogFragment.newInstance(data, onMoreDialogListener).also {
                 it.show(
                     requireActivity().supportFragmentManager,
                     MoreDialogFragment::class.java.simpleName

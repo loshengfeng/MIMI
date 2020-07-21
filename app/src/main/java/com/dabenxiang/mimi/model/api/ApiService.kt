@@ -230,7 +230,8 @@ interface ApiService {
         @Query("years") years: Int?,
         @Query("isAdult") isAdult: Boolean?,
         @Query("offset") offset: String?,
-        @Query("limit") limit: String?
+        @Query("limit") limit: String?,
+        @Query("tag") tag: String?
     ): Response<ApiBasePagingItem<VideoSearchItem>>
 
     @GET("/v1/Members/Home/Videos/SearchWithCategory")
@@ -339,6 +340,12 @@ interface ApiService {
         @Path("postFavoriteId") postFavoriteId: Long,
         @Query("postFavoriteId") postFavoriteIds: List<Long>
     ): Response<Void>
+
+    @GET("/v1/Members/Me/PostFollow")
+    suspend fun getPostFollow(
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ): Response<ApiBasePagingItem<List<PostFollowItem>>>
 
     @GET("/v1/Members/Me/Profile")
     suspend fun getProfile(): Response<ApiBaseItem<ProfileItem>>

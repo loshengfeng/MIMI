@@ -3,10 +3,10 @@ package com.dabenxiang.mimi.model.api.vo
 import com.google.gson.annotations.SerializedName
 
 data class VideoSearchItem(
-    @SerializedName("category")
-    val category: Category?,
+//    @SerializedName("category")
+//    val category: Category?,
     @SerializedName("videos")
-    val videos: List<VideoSearchDetail>?
+    val videos: List<VideoItem>?
 ) {
     data class Category(
         @SerializedName("categories")

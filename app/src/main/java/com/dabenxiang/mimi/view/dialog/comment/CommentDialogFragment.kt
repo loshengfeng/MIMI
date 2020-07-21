@@ -51,10 +51,8 @@ class CommentDialogFragment : BaseDialogFragment() {
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem) {
-            Timber.d("@@onProblemReport")
             moreDialog?.dismiss()
             reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
-                Timber.d("@@ReportDialogFragment")
                 it.show(
                     requireActivity().supportFragmentManager,
                     ReportDialogFragment::class.java.simpleName
