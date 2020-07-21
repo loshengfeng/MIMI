@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
+import timber.log.Timber
 
 class PictureDetailViewModel : BaseViewModel() {
 

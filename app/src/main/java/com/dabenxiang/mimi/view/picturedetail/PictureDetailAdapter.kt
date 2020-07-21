@@ -89,7 +89,8 @@ class PictureDetailAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is PictureDetailViewHolder -> {
-                val contentItem = Gson().fromJson(memberPostItem.content, MediaContentItem::class.java)
+                val contentItem =
+                    Gson().fromJson(memberPostItem.content, MediaContentItem::class.java)
 
                 holder.posterName.text = memberPostItem.postFriendlyName
                 holder.posterTime.text =
@@ -159,6 +160,13 @@ class PictureDetailAdapter(
                 }
             }
             is CommentContentViewHolder -> {
+
+                holder.noCommentLayout.visibility = if (memberPostItem.commentCount > 0) {
+                    View.INVISIBLE
+                } else {
+                    View.VISIBLE
+                }
+
                 commentAdapter = CommentAdapter(
                     true,
                     playerInfoListener,
