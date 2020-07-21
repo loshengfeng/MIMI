@@ -1,0 +1,111 @@
+package com.dabenxiang.mimi.view.post.video
+
+import android.net.Uri
+import android.os.Bundle
+import android.view.View
+import androidx.navigation.fragment.findNavController
+import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.EditVideoListener
+import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.post.video.PostVideoFragment.Companion.BUNDLE_COVER_URI
+import com.dabenxiang.mimi.view.post.video.PostVideoFragment.Companion.BUNDLE_TRIMMER_URI
+import com.google.android.material.tabs.TabLayout
+import kotlinx.android.synthetic.main.fragment_edit_video.*
+import kotlinx.android.synthetic.main.item_setting_bar.*
+
+
+class EditVideoFragment : BaseFragment() {
+
+    private lateinit var editVideoFragmentPagerAdapter: EditVideoFragmentPagerAdapter
+    private var videoUri = Uri.EMPTY
+
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
+
+    override fun getLayoutId(): Int {
+        return R.layout.fragment_edit_video
+    }
+
+    companion object {
+        const val BUNDLE_VIDEO_URI = "bundle_video_uri"
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initSettings()
+
+        val uri = arguments?.getString(BUNDLE_VIDEO_URI)
+        editVideoFragmentPagerAdapter =
+            EditVideoFragmentPagerAdapter(
+                childFragmentManager,
+                tabLayout!!.tabCount,
+                uri!!
+            )
+        viewPager.adapter = editVideoFragmentPagerAdapter
+        viewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabLayout))
+    }
+
+    override fun setupObservers() {
+    }
+
+    override fun setupListeners() {
+        tv_back.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
+        tv_clean.setOnClickListener {
+            val editVideoRangeFragment = editVideoFragmentPagerAdapter.getFragment(0) as EditVideoRangeFragment
+            editVideoRangeFragment.setEditVideoListener(editTrimmerVideoListener)
+            editVideoRangeFragment.save()
+        }
+
+        tabLayout.addOnTabSelectedListener(object :
+            TabLayout.OnTabSelectedListener {
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+            }
+
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                viewPager!!.currentItem = tab!!.position
+            }
+        })
+    }
+
+    override fun initSettings() {
+        super.initSettings()
+
+        tv_title.text = getString(R.string.post_title)
+        tv_clean.visibility = View.VISIBLE
+        tv_clean.text = getString(R.string.btn_send)
+    }
+
+    private val editTrimmerVideoListener = object : EditVideoListener {
+        override fun onStart() {
+            progressHUD?.show()
+        }
+
+        override fun onFinish(resourceUri: Uri) {
+            videoUri = resourceUri
+            val cropVideoFragment = editVideoFragmentPagerAdapter.getFragment(1) as CropVideoFragment
+            cropVideoFragment.setEditVideoListener(editCropVideoListener)
+            cropVideoFragment.save()
+            progressHUD?.dismiss()
+        }
+    }
+
+    private val editCropVideoListener = object : EditVideoListener {
+        override fun onStart() {
+            progressHUD?.show()
+        }
+
+        override fun onFinish(resourceUri: Uri) {
+            progressHUD?.dismiss()
+            val bundle = Bundle()
+            bundle.putString(BUNDLE_TRIMMER_URI, videoUri.toString())
+            bundle.putString(BUNDLE_COVER_URI, resourceUri.toString())
+            findNavController().navigate(R.id.action_editVideoFragment_to_postVideoFragment, bundle)
+        }
+    }
+}

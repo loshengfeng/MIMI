@@ -15,7 +15,7 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <Button
-            android:id="@+id/tv_title"
+            android:id="@+id/btn_video"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
@@ -41,8 +41,8 @@
             style="@style/uploadDialogButtonStyle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/tv_title"
-            app:layout_constraintTop_toBottomOf="@+id/tv_title" />
+            app:layout_constraintStart_toStartOf="@+id/btn_video"
+            app:layout_constraintTop_toBottomOf="@+id/btn_video" />
 
         <Button
             android:id="@+id/btn_article"
