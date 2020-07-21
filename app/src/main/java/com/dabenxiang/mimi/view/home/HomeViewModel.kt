@@ -16,6 +16,8 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.home.club.ClubDataSource
+import com.dabenxiang.mimi.view.home.club.ClubFactory
 import com.dabenxiang.mimi.view.home.memberpost.MemberPostDataSource
 import com.dabenxiang.mimi.view.home.memberpost.MemberPostFactory
 import com.dabenxiang.mimi.view.home.video.VideoDataSource
@@ -88,6 +90,9 @@ class HomeViewModel : BaseViewModel() {
 
     private val _textPostItemListResult = MutableLiveData<PagedList<MemberPostItem>>()
     val textPostItemListResult: LiveData<PagedList<MemberPostItem>> = _textPostItemListResult
+
+    private val _clubItemListResult = MutableLiveData<PagedList<MemberClubItem>>()
+    val clubItemListResult: LiveData<PagedList<MemberClubItem>> = _clubItemListResult
 
     private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
     val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
@@ -382,6 +387,20 @@ class HomeViewModel : BaseViewModel() {
             .setPrefetchDistance(4)
             .build()
         return LivePagedListBuilder(videoFactory, config).build()
+    }
+
+    fun getClubs() {
+        viewModelScope.launch {
+            getClubPagingItems().asFlow()
+                .collect { _clubItemListResult.value = it }
+        }
+    }
+
+    private fun getClubPagingItems(): LiveData<PagedList<MemberClubItem>> {
+        val clubDataSource = ClubDataSource(pagingCallback, viewModelScope, domainManager)
+        val clubFactory = ClubFactory(clubDataSource)
+        val config = PagedList.Config.Builder().setPrefetchDistance(4).build()
+        return LivePagedListBuilder(clubFactory, config).build()
     }
 
     private val pagingCallback = object : PagingCallback {
