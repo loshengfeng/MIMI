@@ -202,7 +202,6 @@ class TextDetailAdapter(
     }
 
     interface OnTextDetailListener {
-        fun onGetAttachment(id: String, position: Int)
         fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean)
         fun onGetCommandInfo(adapter: CommentAdapter, type: CommentType)
         fun onGetReplyCommand(parentNode: RootCommentNode, succeededBlock: () -> Unit)

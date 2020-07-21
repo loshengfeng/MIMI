@@ -2,26 +2,43 @@ package com.dabenxiang.mimi.view.textdetail
 
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.OnItemClickListener
+import com.dabenxiang.mimi.model.api.ApiResult.*
+import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
+import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import kotlinx.android.synthetic.main.fragment_picture_detail.*
 import kotlinx.android.synthetic.main.fragment_text_detail.*
+import kotlinx.android.synthetic.main.fragment_text_detail.et_message
+import kotlinx.android.synthetic.main.fragment_text_detail.iv_bar
+import kotlinx.android.synthetic.main.fragment_text_detail.iv_like
+import kotlinx.android.synthetic.main.fragment_text_detail.iv_more
+import kotlinx.android.synthetic.main.fragment_text_detail.layout_bar
+import kotlinx.android.synthetic.main.fragment_text_detail.layout_edit_bar
+import kotlinx.android.synthetic.main.fragment_text_detail.toolbarContainer
+import kotlinx.android.synthetic.main.fragment_text_detail.tv_comment_count
+import kotlinx.android.synthetic.main.fragment_text_detail.tv_like_count
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
+import timber.log.Timber
 
 class TextDetailFragment : BaseFragment() {
 
@@ -41,6 +58,9 @@ class TextDetailFragment : BaseFragment() {
     private val viewModel: TextDetailViewModel by viewModels()
 
     private var textDetailAdapter: TextDetailAdapter? = null
+
+    var moreDialog: MoreDialogFragment? = null
+    var reportDialog: ReportDialogFragment? = null
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -87,20 +107,80 @@ class TextDetailFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
+        viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> textDetailAdapter?.notifyItemChanged(it.result)
+                is Error -> Timber.e(it.throwable)
+            }
+        })
 
+        viewModel.likePostResult.observe(this, Observer {
+            when (it) {
+                is Success -> {
+                    val item = it.result
+                    if (item.likeType == LikeType.LIKE) {
+                        iv_like.setImageResource(R.drawable.ico_nice_s)
+                    } else {
+                        iv_like.setImageResource(R.drawable.ico_nice)
+                    }
+                    tv_like_count.text = item.likeCount.toString()
+
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
+
+        viewModel.postReportResult.observe(this, Observer {
+            when (it) {
+                is Empty -> {
+                    GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
+
+        viewModel.postCommentReportResult.observe(this, Observer {
+            when (it) {
+                is Empty -> {
+                    GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
 
+        iv_bar.setOnClickListener {
+            layout_edit_bar.visibility = View.VISIBLE
+            layout_bar.visibility = View.INVISIBLE
+            GeneralUtils.showKeyboard(requireContext())
+            et_message.requestFocus()
+            et_message.setText("")
+        }
+
+        iv_like.setOnClickListener {
+            val likeType = memberPostItem?.likeType
+            val isLike = likeType == LikeType.LIKE
+            viewModel.likePost(memberPostItem!!, !isLike)
+        }
+
+        iv_more.setOnClickListener {
+            moreDialog = MoreDialogFragment.newInstance(
+                memberPostItem!!,
+                onMoreDialogListener
+            ).also {
+                it.show(
+                    requireActivity().supportFragmentManager,
+                    MoreDialogFragment::class.java.simpleName
+                )
+            }
+        }
     }
 
     private val onTextDetailListener = object : TextDetailAdapter.OnTextDetailListener {
-        override fun onGetAttachment(id: String, position: Int) {
-
-        }
-
         override fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
-
+            viewModel.followPost(item, position, isFollow)
         }
 
         override fun onGetCommandInfo(adapter: CommentAdapter, type: CommentType) {
@@ -128,7 +208,12 @@ class TextDetailFragment : BaseFragment() {
         }
 
         override fun onMoreClick(item: MembersPostCommentItem) {
-
+            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
+                it.show(
+                    requireActivity().supportFragmentManager,
+                    MoreDialogFragment::class.java.simpleName
+                )
+            }
         }
     }
 
@@ -138,6 +223,46 @@ class TextDetailFragment : BaseFragment() {
             layout_bar.visibility = View.VISIBLE
             layout_edit_bar.visibility = View.INVISIBLE
             et_message.setText("")
+        }
+    }
+
+    private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
+        override fun onProblemReport(item: BaseMemberPostItem) {
+            moreDialog?.dismiss()
+            reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
+                it.show(
+                    requireActivity().supportFragmentManager,
+                    ReportDialogFragment::class.java.simpleName
+                )
+            }
+        }
+
+        override fun onCancel() {
+            moreDialog?.dismiss()
+        }
+    }
+
+    private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
+        override fun onSend(item: BaseMemberPostItem, content: String) {
+            if (TextUtils.isEmpty(content)) {
+                GeneralUtils.showToast(requireContext(), getString(R.string.report_error))
+            } else {
+                reportDialog?.dismiss()
+                when (item) {
+                    is MemberPostItem -> viewModel.sendPostReport(item, content)
+                    else -> {
+                        viewModel.sendCommentPostReport(
+                            memberPostItem!!,
+                            (item as MembersPostCommentItem),
+                            content
+                        )
+                    }
+                }
+            }
+        }
+
+        override fun onCancel() {
+            reportDialog?.dismiss()
         }
     }
 }
