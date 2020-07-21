@@ -16,8 +16,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.MoreDialogData
+import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.FunctionType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.model.serializable.SearchingVideoData
 import com.dabenxiang.mimi.view.adapter.SearchVideoAdapter
@@ -29,6 +32,7 @@ import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_search_video.*
 import timber.log.Timber
+import java.util.*
 
 class SearchVideoFragment : BaseFragment() {
 
@@ -274,7 +278,7 @@ class SearchVideoFragment : BaseFragment() {
 
                 FunctionType.MORE -> {
                     if (item.id != null) {
-                        val data = MoreDialogData(id = item.id)
+                        val data = MemberPostItem(id = item.id, creationDate = Date(), type = PostType.VIDEO)
                         moreDialog = MoreDialogFragment.newInstance(data, onMoreDialogListener).also {
                             it.show(
                                     requireActivity().supportFragmentManager,
@@ -308,7 +312,7 @@ class SearchVideoFragment : BaseFragment() {
     }
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-        override fun onProblemReport(item: MoreDialogData) {
+        override fun onProblemReport(item: BaseMemberPostItem) {
             moreDialog?.dismiss()
             reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
                 it.show(requireActivity().supportFragmentManager, ReportDialogFragment::class.java.simpleName)
@@ -321,12 +325,12 @@ class SearchVideoFragment : BaseFragment() {
     }
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
-        override fun onSend(item: MoreDialogData, content: String) {
+        override fun onSend(item: BaseMemberPostItem, content: String) {
             if (TextUtils.isEmpty(content)) {
                 GeneralUtils.showToast(requireContext(), getString(R.string.report_error))
             } else {
                 reportDialog?.dismiss()
-                viewModel.sendPostReport(item, content)
+                viewModel.sendPostReport(item as MemberPostItem, content)
             }
         }
 

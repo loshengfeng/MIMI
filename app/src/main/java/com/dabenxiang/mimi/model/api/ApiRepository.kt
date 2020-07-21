@@ -492,6 +492,17 @@ class ApiRepository(private val apiService: ApiService) {
         body: ReportRequest
     ) = apiService.sendPostReport(postId, body)
 
+    /**
+     * 帖子評論問題回報
+     */
+    suspend fun sendPostCommentReport(
+        postId: Long,
+        commentId: Long,
+        body: ReportRequest
+    ): Response<Void> {
+        return apiService.sendPostCommentReport(postId, commentId, body)
+    }
+
     /**********************************************************
      *
      *                  Ordering

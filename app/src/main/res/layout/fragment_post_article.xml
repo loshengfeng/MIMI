@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/color_gray_2">
+    android:layout_height="match_parent">
 
     <include
         android:id="@+id/layout_title"
@@ -28,7 +27,7 @@
         app:layout_constraintTop_toBottomOf="@+id/layout_title">
 
         <ImageView
-            android:id="@+id/imageView2"
+            android:id="@+id/iv_avatar"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginStart="12dp"
@@ -43,13 +42,13 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="15dp"
-            android:text="已选择的圈子名称"
+            android:text="@string/select_post_club_name"
             android:textColor="@color/color_black_1"
             android:textSize="14sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/txt_hashtagName"
             app:layout_constraintEnd_toStartOf="@+id/imageView3"
-            app:layout_constraintStart_toEndOf="@+id/imageView2"
+            app:layout_constraintStart_toEndOf="@+id/iv_avatar"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="已选择的圈子名称" />
 
@@ -57,7 +56,7 @@
             android:id="@+id/txt_hashtagName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="#标签名称"
+            android:text="@string/post_tag_name"
             android:textColor="@color/color_black_1"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -157,6 +156,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:layout_marginTop="15dp"
@@ -192,14 +192,28 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:layout_marginEnd="15dp"
-            android:textSize="14sp"
             android:background="@null"
+            android:textSize="14sp"
+            android:singleLine="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/txt_hashtagCount"
             app:layout_constraintStart_toEndOf="@+id/imageView4"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="请输入标签, 字数限 10 字"/>
+            tools:text="请输入标签, 字数限 10 字" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chipGroup"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/constraintLayout"
+        app:layout_constraintStart_toStartOf="@+id/constraintLayout"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
+
+    </com.google.android.material.chip.ChipGroup>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

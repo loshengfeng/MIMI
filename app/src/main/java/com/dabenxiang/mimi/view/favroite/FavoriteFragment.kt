@@ -70,7 +70,11 @@ class FavoriteFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback { interactionListener?.changeNavigationPosition(R.id.navigation_home) }
+        requireActivity().onBackPressedDispatcher.addCallback {
+            interactionListener?.changeNavigationPosition(
+                R.id.navigation_home
+            )
+        }
     }
 
     override fun onResume() {
@@ -118,8 +122,8 @@ class FavoriteFragment : BaseFragment() {
                 is ApiResult.Success -> {
                     viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
                     GeneralUtils.showToast(
-                            requireContext(),
-                            getString(R.string.favorite_delete_favorite)
+                        requireContext(),
+                        getString(R.string.favorite_delete_favorite)
                     )
                 }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
@@ -143,8 +147,8 @@ class FavoriteFragment : BaseFragment() {
                 R.id.tv_clean -> {
                     CleanDialogFragment.newInstance(onCleanDialogListener).also {
                         it.show(
-                                requireActivity().supportFragmentManager,
-                                CleanDialogFragment::class.java.simpleName
+                            requireActivity().supportFragmentManager,
+                            CleanDialogFragment::class.java.simpleName
                         )
                     }
                 }
@@ -167,8 +171,8 @@ class FavoriteFragment : BaseFragment() {
         rv_primary.adapter = primaryAdapter
 
         val primaryList = listOf(
-                getString(R.string.favorite_normal),
-                getString(R.string.favorite_adult)
+            getString(R.string.favorite_normal),
+            getString(R.string.favorite_adult)
         )
 
         primaryAdapter.submitList(primaryList, lastPrimaryIndex)
@@ -176,8 +180,8 @@ class FavoriteFragment : BaseFragment() {
         rv_secondary.adapter = secondaryAdapter
 
         val secondaryList = listOf(
-                getString(R.string.favorite_tab_mimi),
-                getString(R.string.favorite_tab_short)
+            getString(R.string.favorite_tab_mimi),
+            getString(R.string.favorite_tab_short)
         )
 
         secondaryAdapter.submitList(secondaryList, lastSecondaryIndex)
@@ -308,10 +312,16 @@ class FavoriteFragment : BaseFragment() {
                     // 點擊評論，進入播放頁面滾動到最下面
                     when (item) {
                         is PlayItem -> {
-                            if (item.tags == null || item.tags.first().isEmpty() || item.videoId == null) {
-                                GeneralUtils.showToast(requireContext(), getString(R.string.unexpected_error))
+                            if (item.tags == null || item.tags.first()
+                                    .isEmpty() || item.videoId == null
+                            ) {
+                                GeneralUtils.showToast(
+                                    requireContext(),
+                                    getString(R.string.unexpected_error)
+                                )
                             } else {
-                                val playerData = PlayerData(item.videoId ?: 0, item.isAdult
+                                val playerData =
+                                    PlayerData(item.videoId ?: 0, item.isAdult
                                         ?: false)
                                 val intent = Intent(requireContext(), PlayerActivity::class.java)
                                 intent.putExtras(PlayerActivity.createBundle(playerData, true))

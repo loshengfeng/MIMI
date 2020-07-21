@@ -5,7 +5,7 @@ import android.view.View
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
-import com.dabenxiang.mimi.model.api.vo.ContentItem
+import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
@@ -39,10 +39,10 @@ class ClipViewHolder(
 
     override fun updated(model: MemberPostItem?) {
         Timber.d("content: ${model?.content}")
-        val contentItem = Gson().fromJson(model?.content, ContentItem::class.java)
+        val contentItem = Gson().fromJson(model?.content, MediaContentItem::class.java)
         val postImageItem = takeIf { contentItem.images != null && contentItem.images.isNotEmpty() }?.let { contentItem.images?.get(0) }
 
-        videoTime.text = contentItem.shortVideo.length
+        videoTime.text = contentItem.shortVideo?.length
         profileName.text = model?.postFriendlyName
         profileTime.text = GeneralUtils.getTimeDiff(model?.creationDate ?: Date(), Date())
         title.text = model?.title
@@ -65,7 +65,7 @@ class ClipViewHolder(
                         attachmentListener.onGetAttachment(
                             postImageItem.id,
                             index,
-                            AttachmentType.ADULT_CLIP
+                            AttachmentType.ADULT_HOME_CLIP
                         )
                     } else {
                         val bitmap = getLruCache(postImageItem.id)

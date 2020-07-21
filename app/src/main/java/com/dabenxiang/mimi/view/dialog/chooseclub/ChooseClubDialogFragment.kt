@@ -61,16 +61,6 @@ class ChooseClubDialogFragment : BaseDialogFragment() {
             adapter.submitList(it)
         })
 
-        viewModel.memberClubItem.observe(viewLifecycleOwner, Observer {
-            when(it) {
-                is ApiResult.Success -> {
-                    val memberClubItems = it.result.content ?: arrayListOf()
-                    adapter.submitList(memberClubItems)
-                }
-                is ApiResult.Error -> Timber.e(it.throwable)
-            }
-        })
-
         viewModel.attachmentByTypeResult.observe(viewLifecycleOwner, Observer {
             when(it) {
                 is ApiResult.Success -> {

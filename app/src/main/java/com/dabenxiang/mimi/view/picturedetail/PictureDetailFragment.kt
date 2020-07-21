@@ -1,6 +1,8 @@
 package com.dabenxiang.mimi.view.picturedetail
 
+import android.graphics.Bitmap
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
@@ -8,15 +10,22 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.OnItemClickListener
 import com.dabenxiang.mimi.model.api.ApiResult.*
+import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.ImageItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.CommentType
+import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
+import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.fullpicture.FullPictureFragment
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.RootCommentNode
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_picture_detail.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -39,10 +48,16 @@ class PictureDetailFragment : BaseFragment() {
     private val viewModel: PictureDetailViewModel by viewModels()
 
     private var pictureDetailAdapter: PictureDetailAdapter? = null
+    private var commentAdapter: CommentAdapter? = null
 
     private var memberPostItem: MemberPostItem? = null
 
     private var replyCommentBlock: (() -> Unit)? = null
+    private var commentLikeBlock: (() -> Unit)? = null
+    private var avatarBlock: ((Bitmap) -> Unit)? = null
+
+    var moreDialog: MoreDialogFragment? = null
+    var reportDialog: ReportDialogFragment? = null
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -51,12 +66,9 @@ class PictureDetailFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         memberPostItem = arguments?.getSerializable(KEY_DATA) as MemberPostItem
+        val position = arguments?.getInt(KEY_POSITION) ?: 0
 
         requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
-
-        val memberPostItem = arguments?.getSerializable(KEY_DATA) as MemberPostItem
-
-        val position = arguments?.getInt(KEY_POSITION) ?: 0
 
         text_toolbar_title.text = getString(R.string.picture_detail_title)
         toolbarContainer.toolbar.navigationIcon =
@@ -67,13 +79,22 @@ class PictureDetailFragment : BaseFragment() {
 
         pictureDetailAdapter = PictureDetailAdapter(
             requireContext(),
-            memberPostItem,
+            memberPostItem!!,
             onPictureDetailListener,
+            onPhotoGridItemClickListener,
             onItemClickListener
         )
         recycler_picture_detail.layoutManager = LinearLayoutManager(context)
         recycler_picture_detail.adapter = pictureDetailAdapter
         recycler_picture_detail.scrollToPosition(position)
+
+        if (memberPostItem!!.likeType == LikeType.LIKE) {
+            iv_like.setImageResource(R.drawable.ico_nice_s)
+        } else {
+            iv_like.setImageResource(R.drawable.ico_nice)
+        }
+        tv_like_count.text = memberPostItem!!.likeCount.toString()
+        tv_comment_count.text = memberPostItem!!.commentCount.toString()
     }
 
     override fun getLayoutId(): Int {
@@ -99,6 +120,13 @@ class PictureDetailFragment : BaseFragment() {
             }
         })
 
+        viewModel.avatarResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> avatarBlock?.invoke(it.result)
+                is Error -> Timber.e(it.throwable)
+            }
+        })
+
         viewModel.replyCommentResult.observe(viewLifecycleOwner, Observer { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
@@ -107,9 +135,127 @@ class PictureDetailFragment : BaseFragment() {
                 }
             }
         })
+
+        viewModel.commentLikeResult.observe(viewLifecycleOwner, Observer { event ->
+            event.getContentIfNotHandled()?.also {
+                when (it) {
+                    is Empty -> commentLikeBlock?.also { it() }
+                    is Error -> Timber.e(it.throwable)
+                }
+            }
+        })
+
+        viewModel.commentDeleteLikeResult.observe(viewLifecycleOwner, Observer { event ->
+            event.getContentIfNotHandled()?.also {
+                when (it) {
+                    is Empty -> commentLikeBlock?.also { it() }
+                    is Error -> Timber.e(it.throwable)
+                }
+            }
+        })
+
+        viewModel.postCommentResult.observe(this, Observer { event ->
+            event.getContentIfNotHandled()?.also {
+                when (it) {
+                    is Empty -> {
+                        GeneralUtils.hideKeyboard(requireActivity())
+                        et_message.text = null
+                        et_message.tag = null
+                        tv_replay_name.text = null
+                        tv_replay_name.visibility = View.GONE
+
+                        layout_bar.visibility = View.VISIBLE
+                        layout_edit_bar.visibility = View.INVISIBLE
+
+                        memberPostItem?.commentCount =
+                            memberPostItem?.commentCount?.let { count -> count + 1 } ?: run { 1 }
+                        tv_comment_count.text = memberPostItem?.commentCount.toString()
+
+                        memberPostItem?.also { memberPostItem ->
+                            viewModel.getCommentInfo(
+                                memberPostItem.id,
+                                viewModel.currentCommentType,
+                                commentAdapter!!
+                            )
+                        }
+                    }
+                    is Error -> Timber.e(it.throwable)
+                }
+            }
+        })
+
+        viewModel.likePostResult.observe(this, Observer {
+            when (it) {
+                is Success -> {
+                    val item = it.result
+                    if (item.likeType == LikeType.LIKE) {
+                        iv_like.setImageResource(R.drawable.ico_nice_s)
+                    } else {
+                        iv_like.setImageResource(R.drawable.ico_nice)
+                    }
+                    tv_like_count.text = item.likeCount.toString()
+
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
+
+        viewModel.postReportResult.observe(this, Observer {
+            when (it) {
+                is Empty -> {
+                    GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
+
+        viewModel.postCommentReportResult.observe(this, Observer {
+            when (it) {
+                is Empty -> {
+                    GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
+        iv_bar.setOnClickListener {
+            layout_edit_bar.visibility = View.VISIBLE
+            layout_bar.visibility = View.INVISIBLE
+            GeneralUtils.showKeyboard(requireContext())
+            et_message.requestFocus()
+            et_message.setText("")
+        }
+
+        btn_send.setOnClickListener {
+            memberPostItem?.id?.let { id ->
+                et_message.text.toString().takeIf { !TextUtils.isEmpty(it) }?.let { comment ->
+                    Pair(id, comment)
+                }?.also { (id, comment) ->
+                    val replyId = et_message.tag?.let { rid -> rid as Long }
+                    viewModel.postComment(id, replyId, comment)
+                }
+            }
+        }
+
+        iv_like.setOnClickListener {
+            val likeType = memberPostItem?.likeType
+            val isLike = likeType == LikeType.LIKE
+            viewModel.likePost(memberPostItem!!, !isLike)
+        }
+
+        iv_more.setOnClickListener {
+            moreDialog = MoreDialogFragment.newInstance(
+                memberPostItem!!,
+                onMoreDialogListener
+            ).also {
+                it.show(
+                    requireActivity().supportFragmentManager,
+                    MoreDialogFragment::class.java.simpleName
+                )
+            }
+        }
     }
 
     private val onPictureDetailListener = object : PictureDetailAdapter.OnPictureDetailListener {
@@ -122,20 +268,68 @@ class PictureDetailFragment : BaseFragment() {
         }
 
         override fun onGetCommandInfo(adapter: CommentAdapter, type: CommentType) {
+            commentAdapter = adapter
             viewModel.getCommentInfo(
                 memberPostItem!!.id,
                 type,
-                adapter
+                commentAdapter!!
             )
         }
 
-        override fun onGetReplyCommand(parentNode: RootCommentNode, item: MemberPostItem, succeededBlock: () -> Unit) {
+        override fun onGetReplyCommand(
+            parentNode: RootCommentNode,
+            succeededBlock: () -> Unit
+        ) {
             replyCommentBlock = succeededBlock
-            viewModel.getReplyComment(parentNode, item)
+            viewModel.getReplyComment(parentNode, memberPostItem!!)
+        }
+
+        override fun onCommandLike(
+            commentId: Long?,
+            isLike: Boolean,
+            succeededBlock: () -> Unit
+        ) {
+            commentLikeBlock = succeededBlock
+            val type = if (isLike) LikeType.LIKE else LikeType.DISLIKE
+            viewModel.postCommentLike(commentId!!, type, memberPostItem!!)
+        }
+
+        override fun onCommandDislike(commentId: Long?, succeededBlock: () -> Unit) {
+            commentLikeBlock = succeededBlock
+            viewModel.deleteCommentLike(commentId!!, memberPostItem!!)
+        }
+
+        override fun onGetCommandAvatar(id: Long, succeededBlock: (Bitmap) -> Unit) {
+            avatarBlock = succeededBlock
+            viewModel.getAvatar(id.toString())
+        }
+
+        override fun onReplyComment(replyId: Long?, replyName: String?) {
+            takeUnless { replyId == null }?.also {
+                layout_bar.visibility = View.INVISIBLE
+                layout_edit_bar.visibility = View.VISIBLE
+
+                GeneralUtils.showKeyboard(requireContext())
+                et_message.requestFocus()
+                et_message.tag = replyId
+                tv_replay_name.text = replyName.takeIf { it != null }?.let {
+                    tv_replay_name.visibility = View.VISIBLE
+                    String.format(requireContext().getString(R.string.clip_username), it)
+                } ?: run { "" }
+            }
+        }
+
+        override fun onMoreClick(item: MembersPostCommentItem) {
+            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
+                it.show(
+                    requireActivity().supportFragmentManager,
+                    MoreDialogFragment::class.java.simpleName
+                )
+            }
         }
     }
 
-    private val onItemClickListener = object : PhotoGridAdapter.OnItemClickListener {
+    private val onPhotoGridItemClickListener = object : PhotoGridAdapter.OnItemClickListener {
         override fun onItemClick(position: Int, imageItems: ArrayList<ImageItem>) {
             val bundle = FullPictureFragment.createBundle(position, imageItems)
             navigateTo(
@@ -147,4 +341,52 @@ class PictureDetailFragment : BaseFragment() {
         }
     }
 
+    private val onItemClickListener = object : OnItemClickListener {
+        override fun onItemClick() {
+            GeneralUtils.hideKeyboard(requireActivity())
+            layout_bar.visibility = View.VISIBLE
+            layout_edit_bar.visibility = View.INVISIBLE
+            et_message.setText("")
+        }
+    }
+
+    private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
+        override fun onProblemReport(item: BaseMemberPostItem) {
+            moreDialog?.dismiss()
+            reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
+                it.show(
+                    requireActivity().supportFragmentManager,
+                    ReportDialogFragment::class.java.simpleName
+                )
+            }
+        }
+
+        override fun onCancel() {
+            moreDialog?.dismiss()
+        }
+    }
+
+    private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
+        override fun onSend(item: BaseMemberPostItem, content: String) {
+            if (TextUtils.isEmpty(content)) {
+                GeneralUtils.showToast(requireContext(), getString(R.string.report_error))
+            } else {
+                reportDialog?.dismiss()
+                when (item) {
+                    is MemberPostItem -> viewModel.sendPostReport(item, content)
+                    else -> {
+                        viewModel.sendCommentPostReport(
+                            memberPostItem!!,
+                            (item as MembersPostCommentItem),
+                            content
+                        )
+                    }
+                }
+            }
+        }
+
+        override fun onCancel() {
+            reportDialog?.dismiss()
+        }
+    }
 }

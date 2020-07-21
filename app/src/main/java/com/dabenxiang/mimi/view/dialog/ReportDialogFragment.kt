@@ -5,7 +5,8 @@ import android.view.View
 import android.widget.RadioButton
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.MoreDialogData
+import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.dpToPx
@@ -16,8 +17,8 @@ class ReportDialogFragment : BaseDialogFragment() {
 
     companion object {
         fun newInstance(
-                item: MoreDialogData,
-                listener: OnReportDialogListener
+            item: BaseMemberPostItem,
+            listener: OnReportDialogListener
         ): ReportDialogFragment {
             val fragment = ReportDialogFragment()
             fragment.item = item
@@ -26,7 +27,7 @@ class ReportDialogFragment : BaseDialogFragment() {
         }
     }
 
-    var item: MoreDialogData? = null
+    var item: BaseMemberPostItem? = null
     var listener: OnReportDialogListener? = null
 
     override fun isFullLayout(): Boolean {
@@ -42,11 +43,19 @@ class ReportDialogFragment : BaseDialogFragment() {
 
         var reportContent = ""
 
-        val id = when (item?.type) {
-            PostType.IMAGE -> R.array.picture_problem_report_item
-            else -> R.array.video_problem_report_item
+        val problems = when (item) {
+            is MemberPostItem -> {
+                val id = when ((item as MemberPostItem).type) {
+                    PostType.IMAGE -> R.array.picture_problem_report_item
+                    PostType.TEXT -> R.array.text_problem_report_item
+                    else -> R.array.video_problem_report_item
+                }
+                requireContext().resources?.getStringArray(id)
+            }
+            else -> {
+                requireContext().resources?.getStringArray(R.array.text_problem_report_item)
+            }
         }
-        val problems = requireContext().resources?.getStringArray(id)
 
         problems?.forEach {
             val params = ConstraintLayout.LayoutParams(
@@ -80,7 +89,7 @@ class ReportDialogFragment : BaseDialogFragment() {
     }
 
     interface OnReportDialogListener {
-        fun onSend(item: MoreDialogData, content: String)
+        fun onSend(item: BaseMemberPostItem, content: String)
         fun onCancel()
     }
 

@@ -17,8 +17,8 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.home.picture.PicturePostDataSource
-import com.dabenxiang.mimi.view.home.picture.PicturePostFactory
+import com.dabenxiang.mimi.view.home.picture.MemberPostDataSource
+import com.dabenxiang.mimi.view.home.picture.MemberPostFactory
 import com.dabenxiang.mimi.view.home.video.VideoDataSource
 import com.dabenxiang.mimi.view.home.video.VideoFactory
 import kotlinx.coroutines.Dispatchers
@@ -81,8 +81,14 @@ class HomeViewModel : BaseViewModel() {
     private var _likePostResult = MutableLiveData<ApiResult<Int>>()
     val likePostResult: LiveData<ApiResult<Int>> = _likePostResult
 
+    private val _clipPostItemListResult = MutableLiveData<PagedList<MemberPostItem>>()
+    val clipPostItemListResult: LiveData<PagedList<MemberPostItem>> = _clipPostItemListResult
+
     private val _picturePostItemListResult = MutableLiveData<PagedList<MemberPostItem>>()
     val picturePostItemListResult: LiveData<PagedList<MemberPostItem>> = _picturePostItemListResult
+
+    private val _textPostItemListResult = MutableLiveData<PagedList<MemberPostItem>>()
+    val textPostItemListResult: LiveData<PagedList<MemberPostItem>> = _textPostItemListResult
 
     private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
     val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
@@ -313,7 +319,7 @@ class HomeViewModel : BaseViewModel() {
     }
 
 
-    fun sendPostReport(item: MoreDialogData, content: String) {
+    fun sendPostReport(item: MemberPostItem, content: String) {
         viewModelScope.launch {
             flow {
                 val request = ReportRequest(content)
@@ -330,6 +336,36 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
+    fun getClipPosts() {
+        viewModelScope.launch {
+            getMemberPostPagingItems(PostType.VIDEO).asFlow()
+                .collect { _clipPostItemListResult.value = it }
+        }
+    }
+
+    fun getPicturePosts() {
+        viewModelScope.launch {
+            getMemberPostPagingItems(PostType.IMAGE).asFlow()
+                .collect { _picturePostItemListResult.value = it }
+        }
+    }
+
+    fun getTextPosts() {
+        viewModelScope.launch {
+            getMemberPostPagingItems(PostType.TEXT).asFlow()
+                .collect { _textPostItemListResult.value = it }
+        }
+    }
+
+    private fun getMemberPostPagingItems(postType: PostType): LiveData<PagedList<MemberPostItem>> {
+        val pictureDataSource =
+            MemberPostDataSource(pagingCallback, viewModelScope, domainManager, postType)
+        val pictureFactory = MemberPostFactory(pictureDataSource)
+        val config = PagedList.Config.Builder()
+            .setPrefetchDistance(4)
+            .build()
+        return LivePagedListBuilder(pictureFactory, config).build()
+    }
 
     private fun getVideoPagingItems(
         category: String?,
@@ -347,22 +383,6 @@ class HomeViewModel : BaseViewModel() {
             .setPrefetchDistance(4)
             .build()
         return LivePagedListBuilder(videoFactory, config).build()
-    }
-
-    fun getPicturePosts() {
-        viewModelScope.launch {
-            getPicturePostPagingItems().asFlow()
-                .collect { _picturePostItemListResult.value = it }
-        }
-    }
-
-    private fun getPicturePostPagingItems(): LiveData<PagedList<MemberPostItem>> {
-        val pictureDataSource = PicturePostDataSource(pagingCallback, viewModelScope, domainManager)
-        val pictureFactory = PicturePostFactory(pictureDataSource)
-        val config = PagedList.Config.Builder()
-            .setPrefetchDistance(4)
-            .build()
-        return LivePagedListBuilder(pictureFactory, config).build()
     }
 
     private val pagingCallback = object : PagingCallback {

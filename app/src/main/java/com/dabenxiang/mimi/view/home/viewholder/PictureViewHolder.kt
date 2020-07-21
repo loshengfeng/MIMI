@@ -5,7 +5,7 @@ import android.view.View
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
-import com.dabenxiang.mimi.model.api.vo.ContentItem
+import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
@@ -36,10 +36,10 @@ class PictureViewHolder(
     }
 
     override fun updated(model: MemberPostItem?) {
-        val contentItem = Gson().fromJson(model?.content, ContentItem::class.java)
+        val contentItem = Gson().fromJson(model?.content, MediaContentItem::class.java)
         val postImageItem =
-            takeIf { contentItem.images.isNotEmpty() }?.let {
-                contentItem.images.get(0)
+            takeIf { contentItem.images?.isNotEmpty() ?: false }?.let {
+                contentItem.images?.get(0)
             }
 
         posterName.text = model?.postFriendlyName

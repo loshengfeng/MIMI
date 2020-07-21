@@ -34,6 +34,7 @@ class CommentAdapter(isAdult: Boolean, listener: PlayerInfoListener, type: Comme
         fun setCommentLikeType(replyId: Long?, isLike: Boolean, succeededBlock: () -> Unit)
         fun removeCommentLikeType(replyId: Long?, succeededBlock: () -> Unit)
         fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit)
+        fun onMoreClick(item: MembersPostCommentItem)
     }
 
     init {
@@ -67,7 +68,8 @@ class RootCommentProvider(
             R.id.tv_like,
             R.id.tv_unlike,
             R.id.btn_reply,
-            R.id.btn_show_comment_reply
+            R.id.btn_show_comment_reply,
+            R.id.btn_more
         )
     }
 
@@ -180,6 +182,9 @@ class RootCommentProvider(
             R.id.btn_reply -> {
                 listener.sendComment(actualData.data.id, actualData.data.postName)
             }
+            R.id.btn_more -> {
+                listener.onMoreClick(actualData.data)
+            }
         }
     }
 }
@@ -196,7 +201,7 @@ class NestedCommentProvider(
         get() = R.layout.item_comment_nested
 
     init {
-        addChildClickViewIds(R.id.tv_like, R.id.tv_unlike, R.id.btn_reply)
+        addChildClickViewIds(R.id.tv_like, R.id.tv_unlike, R.id.btn_reply, R.id.btn_more)
     }
 
     override fun convert(holder: BaseViewHolder, item: BaseNode) {
@@ -245,6 +250,9 @@ class NestedCommentProvider(
                     }
                 }
             }
+            R.id.btn_more -> {
+                listener.onMoreClick(actualData.data)
+            }
         }
     }
 }
@@ -280,7 +288,12 @@ abstract class BaseCommentProvider(
                     }
                 }
                 else -> {
-                    //TODO:
+                    if (holder.layoutPosition == 0) {
+                        visibility = View.GONE
+                    } else {
+                        visibility = View.VISIBLE
+                        setBackgroundResource(R.color.color_black_1_20)
+                    }
                 }
             }
         }
@@ -299,7 +312,7 @@ abstract class BaseCommentProvider(
             R.id.layout_root,
             when (type) {
                 CommentViewType.CLIP -> R.color.transparent
-                else -> {
+                CommentViewType.VIDEO -> {
                     if (holder.layoutPosition == 1) {
                         if (isAdult) R.drawable.bg_adult_comment_top_radius_10
                         else R.drawable.bg_comment_top_radius_10
@@ -307,6 +320,10 @@ abstract class BaseCommentProvider(
                         if (isAdult) R.color.color_white_1_10
                         else R.color.color_gray_2
                     }
+                }
+                else -> {
+                    if (holder.layoutPosition == 0) R.drawable.bg_adult_comment_top_radius_10
+                    else R.color.color_white_1_10
                 }
             }
         )
@@ -321,7 +338,6 @@ abstract class BaseCommentProvider(
         holder.setTextColorRes(R.id.tv_like, getMessageTextColor())
         holder.setTextColorRes(R.id.tv_unlike, getMessageTextColor())
 
-        //holder.getView<ImageView>(R.id.btn_more)
         holder.setTextColorRes(R.id.btn_reply, getTextColor())
 
         holder.setGone(R.id.btn_show_comment_reply, true)

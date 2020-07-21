@@ -6,7 +6,7 @@ import android.view.View
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
-import com.dabenxiang.mimi.model.api.vo.ContentItem
+import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.view.adapter.HomeClubAdapter
@@ -83,7 +83,7 @@ class ClubViewHolder(
             val postItem = posts[0]
             title.text = postItem.title
 
-            val contentItem = Gson().fromJson(postItem.content, ContentItem::class.java)
+            val contentItem = Gson().fromJson(postItem.content, MediaContentItem::class.java)
             val imageItem = contentItem?.images?.get(0)
             if (!TextUtils.isEmpty(imageItem?.url)) {
                 Glide.with(itemView.context)

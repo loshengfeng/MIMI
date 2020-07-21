@@ -7,7 +7,9 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.provider.Settings
 import android.util.DisplayMetrics
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.fragment.app.FragmentActivity
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.manager.DomainManager
@@ -166,5 +168,29 @@ object GeneralUtils {
     fun dpToPx(context: Context, dp: Int): Int {
         val density = context.resources.displayMetrics.density
         return (dp.toFloat() * density).roundToInt()
+    }
+
+    fun hideKeyboard(activity: Activity) {
+        val view = activity.currentFocus
+        if (view != null) {
+            val inputManager =
+                activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputManager.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+    }
+
+    fun hideKeyboard(activity: FragmentActivity) {
+        val view = activity.currentFocus
+        if (view != null) {
+            val inputManager =
+                activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputManager.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+    }
+
+    fun showKeyboard(context: Context) {
+        val inputMethodManager =
+            context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
     }
 }

@@ -7,8 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.event.SingleLiveEvent
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.PostCommentRequest
-import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.player.CommentDataSource
 import com.dabenxiang.mimi.view.player.NestedCommentNode
@@ -38,6 +37,13 @@ class CommentDialogViewModel: BaseViewModel() {
 
 //    private var _bitmapResult = MutableLiveData<ApiResult<((Bitmap) -> Unit)>>()
 //    val bitmapResult: LiveData<ApiResult<((Bitmap) -> Unit)>> = _bitmapResult
+
+    private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
+    val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
+
+    private val _postCommentReportResult = MutableLiveData<ApiResult<Nothing>>()
+    val postCommentReportResult: LiveData<ApiResult<Nothing>> = _postCommentReportResult
+
 
     fun setupCommentDataSource(postId: Long, adapter: CommentAdapter) {
         viewModelScope.launch {
@@ -222,6 +228,47 @@ class CommentDialogViewModel: BaseViewModel() {
                         }
                     }
                 }
+        }
+    }
+
+    fun sendPostReport(item: MemberPostItem, content: String) {
+        viewModelScope.launch {
+            flow {
+                val request = ReportRequest(content)
+                val result = domainManager.getApiRepository().sendPostReport(item.id, request)
+                if (!result.isSuccessful) throw HttpException(result)
+                item.reported = true
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _postReportResult.value = it }
+        }
+    }
+
+    fun sendCommentPostReport(
+        postItem: MemberPostItem,
+        postCommentItem: MembersPostCommentItem,
+        content: String
+    ) {
+        viewModelScope.launch {
+            flow {
+                val request = ReportRequest(content)
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.sendPostCommentReport(
+                    postItem.id, postCommentItem.id!!, request
+                )
+                if (!result.isSuccessful) throw HttpException(result)
+                postCommentItem.reported = true
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _postCommentReportResult.value = it }
         }
     }
 

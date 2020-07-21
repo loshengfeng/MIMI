@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.ContentItem
+import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.player.PlayerViewModel
 import com.google.android.exoplayer2.*
@@ -102,7 +102,7 @@ class ClipAdapter(
     override fun onBindViewHolder(holder: ClipViewHolder, position: Int, payloads: MutableList<Any>) {
         Timber.d("onBindViewHolder position:$position, currentPosition: $currentPosition, payloads: $payloads")
         val item = memberPostItems[position]
-        val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
+        val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
         payloads.takeIf { it.isNotEmpty() }?.also {
             when(it[0] as Int) {
                 PAYLOAD_UPDATE_UI -> {
@@ -147,8 +147,8 @@ class ClipAdapter(
 
             processClip(
                 holder.playerView,
-                contentItem.shortVideo.id,
-                contentItem.shortVideo.url,
+                contentItem.shortVideo?.id.toString(),
+                contentItem.shortVideo?.url.toString(),
                 position
             )
         }
@@ -160,7 +160,7 @@ class ClipAdapter(
     private fun processClip(playerView: PlayerView, id: String, url: String, position: Int) {
         Timber.d("processClip position:$position")
         val item = memberPostItems[position]
-        val contentItem = Gson().fromJson(item.content, ContentItem::class.java)
+        val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
 
         if (TextUtils.isEmpty(url)) {
             if (clipMap.containsKey(id)) {
@@ -177,7 +177,7 @@ class ClipAdapter(
             takeIf { currentPosition == position }?.also {
                 setupPlayer(
                     playerView,
-                    contentItem.shortVideo.url
+                    contentItem.shortVideo?.url.toString()
                 )
             }
         }

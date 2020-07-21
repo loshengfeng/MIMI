@@ -1,19 +1,22 @@
 package com.dabenxiang.mimi.view.picturedetail
 
+import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.event.SingleLiveEvent
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.CommentType
+import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.CommentDataSource
 import com.dabenxiang.mimi.view.player.NestedCommentNode
 import com.dabenxiang.mimi.view.player.RootCommentNode
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -28,8 +31,34 @@ class PictureDetailViewModel : BaseViewModel() {
     private var _followPostResult = MutableLiveData<ApiResult<Int>>()
     val followPostResult: LiveData<ApiResult<Int>> = _followPostResult
 
+    private var _avatarResult = MutableLiveData<ApiResult<Bitmap>>()
+    val avatarResult: LiveData<ApiResult<Bitmap>> = _avatarResult
+
     private val _replyCommentResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
     val replyCommentResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _replyCommentResult
+
+    private val _commentLikeResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
+    val commentLikeResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _commentLikeResult
+
+    private val _commentDeleteLikeResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
+    val commentDeleteLikeResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> =
+        _commentDeleteLikeResult
+
+    private val _postCommentResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
+    val postCommentResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _postCommentResult
+
+    private var _likePostResult = MutableLiveData<ApiResult<MemberPostItem>>()
+    val likePostResult: LiveData<ApiResult<MemberPostItem>> = _likePostResult
+
+    private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
+    val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
+
+    private val _postCommentReportResult = MutableLiveData<ApiResult<Nothing>>()
+    val postCommentReportResult: LiveData<ApiResult<Nothing>> = _postCommentReportResult
+
+    private var _currentCommentType = CommentType.NEWEST
+    val currentCommentType: CommentType
+        get() = _currentCommentType
 
     fun getAttachment(id: String, position: Int) {
         viewModelScope.launch {
@@ -53,6 +82,22 @@ class PictureDetailViewModel : BaseViewModel() {
         }
     }
 
+    fun getAvatar(id: String) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getAttachment(id)
+                if (!result.isSuccessful) throw HttpException(result)
+                val byteArray = result.body()?.bytes()
+                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
+                LruCacheUtils.putLruCache(id, bitmap)
+                emit(ApiResult.success(bitmap))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _avatarResult.value = it }
+        }
+    }
+
     fun followPost(item: MemberPostItem, position: Int, isFollow: Boolean) {
         viewModelScope.launch {
             flow {
@@ -73,16 +118,42 @@ class PictureDetailViewModel : BaseViewModel() {
         }
     }
 
+    fun likePost(item: MemberPostItem, isLike: Boolean) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val likeType = when {
+                    isLike -> LikeType.LIKE
+                    else -> LikeType.DISLIKE
+                }
+                val request = LikeRequest(likeType)
+                val result = apiRepository.like(item.id, request)
+                if (!result.isSuccessful) throw HttpException(result)
+
+                item.likeType = likeType
+                item.likeCount = when (item.likeType) {
+                    LikeType.LIKE -> item.likeCount + 1
+                    else -> item.likeCount - 1
+                }
+
+                emit(ApiResult.success(item))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _likePostResult.value = it }
+        }
+    }
+
     fun getCommentInfo(postId: Long, commentType: CommentType, adapter: CommentAdapter) {
         viewModelScope.launch {
+            _currentCommentType = commentType
             val dataSrc = CommentDataSource(postId, commentType.value, domainManager)
-
             dataSrc.loadMore().also { load ->
                 withContext(Dispatchers.Main) {
                     load.content?.let { list ->
-                        val finalList = list.map { item ->
-                            RootCommentNode(item)
-                        }
+                        val finalList = list.map { item -> RootCommentNode(item) }
                         adapter.setList(finalList)
                     }
                 }
@@ -148,6 +219,96 @@ class PictureDetailViewModel : BaseViewModel() {
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _replyCommentResult.value = SingleLiveEvent(it) }
+        }
+    }
+
+    fun postCommentLike(commentId: Long, type: LikeType, item: MemberPostItem) {
+        viewModelScope.launch {
+            flow {
+                val request = PostLikeRequest(type.value)
+                val apiRepository = domainManager.getApiRepository()
+                val resp = apiRepository.postMembersPostCommentLike(item.id, commentId, request)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _commentLikeResult.value = SingleLiveEvent(it) }
+        }
+    }
+
+    fun deleteCommentLike(commentId: Long, item: MemberPostItem) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val resp = apiRepository.deleteMembersPostCommentLike(item.id, commentId)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _commentDeleteLikeResult.value = SingleLiveEvent(it) }
+        }
+    }
+
+    fun postComment(postId: Long, replyId: Long?, comment: String) {
+        viewModelScope.launch {
+            flow {
+                val request = PostCommentRequest(replyId, comment)
+                val resp = domainManager.getApiRepository().postMembersPostComment(postId, request)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _postCommentResult.value = SingleLiveEvent(it) }
+        }
+    }
+
+    fun sendPostReport(item: MemberPostItem, content: String) {
+        viewModelScope.launch {
+            flow {
+                val request = ReportRequest(content)
+                val result = domainManager.getApiRepository().sendPostReport(item.id, request)
+                if (!result.isSuccessful) throw HttpException(result)
+                item.reported = true
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _postReportResult.value = it }
+        }
+    }
+
+    fun sendCommentPostReport(
+        postItem: MemberPostItem,
+        postCommentItem: MembersPostCommentItem,
+        content: String
+    ) {
+        viewModelScope.launch {
+            flow {
+                val request = ReportRequest(content)
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.sendPostCommentReport(
+                    postItem.id, postCommentItem.id!!, request
+                )
+                if (!result.isSuccessful) throw HttpException(result)
+                postCommentItem.reported = true
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _postCommentReportResult.value = it }
         }
     }
 

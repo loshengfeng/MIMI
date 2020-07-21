@@ -145,7 +145,7 @@ class SearchVideoViewModel : BaseViewModel() {
         }
     }
 
-    fun sendPostReport(item: MoreDialogData, content: String) {
+    fun sendPostReport(item: MemberPostItem, content: String) {
         viewModelScope.launch {
             flow {
                 val request = ReportRequest(content)

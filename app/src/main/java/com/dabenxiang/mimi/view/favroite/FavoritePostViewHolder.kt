@@ -6,7 +6,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.ContentItem
+import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
@@ -91,7 +91,7 @@ class FavoritePostViewHolder(
                 Locale.getDefault()
             ).format(date)
         }
-        val contentItem = gson.fromJson(data?.content.toString(), ContentItem::class.java)
+        val contentItem = gson.fromJson(data?.content.toString(), MediaContentItem::class.java)
         tvLength.text = contentItem?.shortVideo?.length
 
         when (data?.isFollow) {

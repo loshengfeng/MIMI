@@ -4,7 +4,6 @@ import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostStatus
 import com.dabenxiang.mimi.model.enums.PostType
 import com.google.gson.annotations.SerializedName
-import java.io.Serializable
 import java.util.*
 
 data class MemberPostItem(
@@ -43,7 +42,7 @@ data class MemberPostItem(
     var commentCount: Int = 0,
 
     @SerializedName("tags")
-    val tags: ArrayList<String> = arrayListOf(),
+    val tags: ArrayList<String>? = arrayListOf(),
 
     @SerializedName("clickThroughCount")
     val clickThroughCount: Int = 0,
@@ -66,4 +65,4 @@ data class MemberPostItem(
     @SerializedName("status")
     val status: PostStatus = PostStatus.ONLINE
 
-) : Serializable
+) : BaseMemberPostItem()

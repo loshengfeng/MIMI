@@ -196,6 +196,9 @@ class PlayerActivity : BaseActivity() {
                 viewModel.getBitmap(id.toString(), succeededBlock)
             }
 
+            override fun onMoreClick(item: MembersPostCommentItem) {
+
+            }
         }, CommentViewType.VIDEO).apply {
             loadMoreModule.apply {
                 isEnableLoadMore = true
@@ -220,7 +223,8 @@ class PlayerActivity : BaseActivity() {
         playerInfoAdapter.addHeaderView(headGuessLike)
         playerInfoAdapter.addHeaderView(headComment)
         playerInfoAdapter.addHeaderView(headNoComment)
-        playerInfoAdapter.loadMoreModule.loadMoreView = CommentLoadMoreView(isAdult)
+        playerInfoAdapter.loadMoreModule.loadMoreView =
+            CommentLoadMoreView(isAdult, CommentViewType.VIDEO)
 
         recycler_info.adapter = playerInfoAdapter
 
@@ -408,12 +412,7 @@ class PlayerActivity : BaseActivity() {
                 when (it) {
                     is Loading -> progressHUD.show()
                     is Loaded -> progressHUD.dismiss()
-                    is Empty -> {
-                        loadCommentLikeBlock = loadCommentLikeBlock?.let {
-                            it()
-                            null
-                        }
-                    }
+                    is Empty -> loadCommentLikeBlock?.also { it() }
                     is Error -> onApiError(it.throwable)
                 }
             }
@@ -1327,7 +1326,8 @@ class PlayerActivity : BaseActivity() {
     }
 
     private fun scrollToBottom() {
-        if (intent.extras?.getBoolean(KEY_IS_COMMENT) == true)
+        if (intent.extras?.getBoolean(KEY_IS_COMMENT) == true) {
             scrollView.fullScroll(View.FOCUS_DOWN)
+        }
     }
 }

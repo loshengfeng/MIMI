@@ -1,8 +1,12 @@
 package com.dabenxiang.mimi.view.home
 
+import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.text.TextUtils
 import android.view.View
 import androidx.activity.addCallback
@@ -17,6 +21,7 @@ import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.ApiResult.*
+import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.MoreDialogData
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
@@ -28,7 +33,9 @@ import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.*
+import com.dabenxiang.mimi.view.adapter.viewHolder.ClipPostHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
+import com.dabenxiang.mimi.view.adapter.viewHolder.TextPostHolder
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
@@ -41,12 +48,15 @@ import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
+import com.dabenxiang.mimi.view.post.PostPicFragment.Companion.BUNDLE_PIC_URI
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
+import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.putLruCache
 import kotlinx.android.synthetic.main.fragment_home.*
 import timber.log.Timber
-import java.lang.ClassCastException
+import java.util.*
+import kotlin.collections.ArrayList
 
 class AdultHomeFragment : BaseFragment() {
 
@@ -69,12 +79,20 @@ class AdultHomeFragment : BaseFragment() {
 
     private var interactionListener: InteractionListener? = null
 
+    companion object {
+        private const val REQUEST_PHOTO = 10001
+    }
+
     override fun getLayoutId() = R.layout.fragment_home
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireActivity().onBackPressedDispatcher.addCallback { interactionListener?.changeNavigationPosition(R.id.navigation_home) }
+        requireActivity().onBackPressedDispatcher.addCallback {
+            interactionListener?.changeNavigationPosition(
+                R.id.navigation_home
+            )
+        }
 
         setupUI()
 
@@ -194,8 +212,13 @@ class AdultHomeFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     when (commonPagedAdapter.viewHolderMap[it.result]) {
-                        is PicturePostHolder -> {
-                            commonPagedAdapter.notifyItemChanged(it.result, CommonPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI)
+                        is ClipPostHolder,
+                        is PicturePostHolder,
+                        is TextPostHolder -> {
+                            commonPagedAdapter.notifyItemChanged(
+                                it.result,
+                                CommonPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI
+                            )
                         }
                     }
                 }
@@ -207,8 +230,13 @@ class AdultHomeFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     when (commonPagedAdapter.viewHolderMap[it.result]) {
-                        is PicturePostHolder -> {
-                            commonPagedAdapter.notifyItemChanged(it.result, CommonPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI)
+                        is ClipPostHolder,
+                        is PicturePostHolder,
+                        is TextPostHolder -> {
+                            commonPagedAdapter.notifyItemChanged(
+                                it.result,
+                                CommonPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI
+                            )
                         }
                     }
                 }
@@ -224,21 +252,26 @@ class AdultHomeFragment : BaseFragment() {
 
                     when (attachmentItem.type) {
                         AttachmentType.ADULT_HOME_CLIP -> {
-                            val holder = homeAdapter.attachmentViewHolderMap[attachmentItem.type]
-                            holder as HomeClipViewHolder
-                            holder.updateItem(attachmentItem.position!!)
+                            homeAdapter.attachmentViewHolderMap[attachmentItem.type]?.also { holder ->
+                                holder as HomeClipViewHolder
+                                holder.updateItem(attachmentItem.position!!)
+                            }
                         }
                         AttachmentType.ADULT_HOME_PICTURE -> {
-                            val holder = homeAdapter.attachmentViewHolderMap[attachmentItem.type]
-                            holder as HomePictureViewHolder
-                            holder.updateItem(attachmentItem.position!!)
+                            homeAdapter.attachmentViewHolderMap[attachmentItem.type]?.also { holder ->
+                                holder as HomePictureViewHolder
+                                holder.updateItem(attachmentItem.position!!)
+                            }
                         }
                         AttachmentType.ADULT_HOME_CLUB -> {
-                            val holder = homeAdapter.attachmentViewHolderMap[attachmentItem.type]
-                            holder as HomeClubViewHolder
-                            holder.updateItem(attachmentItem.position!!)
+                            homeAdapter.attachmentViewHolderMap[attachmentItem.type]?.also { holder ->
+                                holder as HomeClubViewHolder
+                                holder.updateItem(attachmentItem.position!!)
+                            }
                         }
-                        AttachmentType.ADULT_PICTURE_ITEM -> {
+                        AttachmentType.ADULT_TAB_CLIP,
+                        AttachmentType.ADULT_TAB_PICTURE,
+                        AttachmentType.ADULT_TAB_TEXT -> {
                             commonPagedAdapter.notifyItemChanged(attachmentItem.position!!)
                         }
                         else -> {
@@ -250,7 +283,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.scrollToLastPosition.observe(viewLifecycleOwner, Observer {result->
+        viewModel.scrollToLastPosition.observe(viewLifecycleOwner, Observer { result ->
             if (result) recyclerview.scrollToPosition(viewModel.lastListIndex)
         })
 
@@ -272,7 +305,15 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
+        viewModel.clipPostItemListResult.observe(viewLifecycleOwner, Observer {
+            commonPagedAdapter.submitList(it)
+        })
+
         viewModel.picturePostItemListResult.observe(viewLifecycleOwner, Observer {
+            commonPagedAdapter.submitList(it)
+        })
+
+        viewModel.textPostItemListResult.observe(viewLifecycleOwner, Observer {
             commonPagedAdapter.submitList(it)
         })
 
@@ -389,16 +430,9 @@ class AdultHomeFragment : BaseFragment() {
             2 -> {
                 // TODO: 關注
             }
-            3 -> {
-                // TODO: 短視頻
-            }
-            4 -> {
-                // TODO: 圖片
-                viewModel.getPicturePosts()
-            }
-            5 -> {
-                // TODO: 短文
-            }
+            3 -> viewModel.getClipPosts()
+            4 -> viewModel.getPicturePosts()
+            5 -> viewModel.getTextPosts()
             6 -> {
                 // TODO: 圈子
             }
@@ -461,18 +495,35 @@ class AdultHomeFragment : BaseFragment() {
             viewModel.likePost(item, position, isLike)
         }
 
-        override fun onCommentClick(item: MemberPostItem) {
-            val bundle = PictureDetailFragment.createBundle(item, 1)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_adultHomeFragment_to_pictureDetailFragment,
-                    bundle
-                )
-            )
+        override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
+            when (adultTabType) {
+                AdultTabType.PICTURE -> {
+                    val bundle = PictureDetailFragment.createBundle(item, 1)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_adultHomeFragment_to_pictureDetailFragment,
+                            bundle
+                        )
+                    )
+                }
+                AdultTabType.TEXT -> {
+                    val bundle = TextDetailFragment.createBundle(item, 1)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_adultHomeFragment_to_textDetailFragment,
+                            bundle
+                        )
+                    )
+                }
+                else -> {
+
+                }
+            }
+
         }
 
         override fun onMoreClick(item: MemberPostItem) {
-            val data = MoreDialogData(id = item.id, reported = item.reported, type = item.type)
+            val data = MemberPostItem(id = item.id, creationDate = Date())
             moreDialog = MoreDialogFragment.newInstance(data, onMoreDialogListener).also {
                 it.show(
                     requireActivity().supportFragmentManager,
@@ -481,11 +532,47 @@ class AdultHomeFragment : BaseFragment() {
             }
         }
 
-        override fun onItemClick(item: MemberPostItem) {
-            val bundle = PictureDetailFragment.createBundle(item, 0)
+        override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
+            when (adultTabType) {
+                AdultTabType.PICTURE -> {
+                    val bundle = PictureDetailFragment.createBundle(item, 0)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_adultHomeFragment_to_pictureDetailFragment,
+                            bundle
+                        )
+                    )
+                }
+                AdultTabType.TEXT -> {
+                    val bundle = TextDetailFragment.createBundle(item, 0)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_adultHomeFragment_to_textDetailFragment,
+                            bundle
+                        )
+                    )
+                }
+                else -> {
+
+                }
+            }
+        }
+
+        override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
+            val bundle = ClipFragment.createBundle(ArrayList(item), position)
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_adultHomeFragment_to_pictureDetailFragment,
+                    R.id.action_adultHomeFragment_to_clipFragment,
+                    bundle
+                )
+            )
+        }
+
+        override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {
+            val bundle = ClipFragment.createBundle(ArrayList(item), position)
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_adultHomeFragment_to_clipFragment,
                     bundle
                 )
             )
@@ -493,12 +580,14 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
-        override fun onSend(item: MoreDialogData, content: String) {
+        override fun onSend(item: BaseMemberPostItem, content: String) {
             if (TextUtils.isEmpty(content)) {
                 GeneralUtils.showToast(requireContext(), getString(R.string.report_error))
             } else {
                 reportDialog?.dismiss()
-                viewModel.sendPostReport(item, content)
+                when (item) {
+                    is MemberPostItem -> viewModel.sendPostReport(item, content)
+                }
             }
         }
 
@@ -508,7 +597,7 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-        override fun onProblemReport(item: MoreDialogData) {
+        override fun onProblemReport(item: BaseMemberPostItem) {
             moreDialog?.dismiss()
             reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
                 it.show(
@@ -619,6 +708,8 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onUploadPic() {
+            val takePicture = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            startActivityForResult(takePicture, REQUEST_PHOTO)
         }
 
         override fun onUploadArticle() {
@@ -629,8 +720,46 @@ class AdultHomeFragment : BaseFragment() {
     /**
      * 儲存最後一筆滑到的 index
      */
-    private fun saveLastIndex(){
+    private fun saveLastIndex() {
         val layoutManager = recyclerview.layoutManager as LinearLayoutManager
         viewModel.lastListIndex = layoutManager.findFirstCompletelyVisibleItemPosition()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == RESULT_OK) {
+            when (requestCode) {
+                REQUEST_PHOTO -> {
+                    data?.let {
+                        val uriImage: Uri?
+
+                        if (it.data != null) {
+                            uriImage = it.data
+                        } else {
+                            val extras = it.extras
+                            val imageBitmap = extras!!["data"] as Bitmap?
+                            uriImage = Uri.parse(
+                                MediaStore.Images.Media.insertImage(
+                                    requireContext().contentResolver,
+                                    imageBitmap,
+                                    null,
+                                    null
+                                )
+                            );
+                        }
+
+                        val bundle = Bundle()
+                        bundle.putString(BUNDLE_PIC_URI, uriImage.toString())
+
+                        findNavController().navigate(
+                            R.id.action_adultHomeFragment_to_postPicFragment,
+                            bundle
+                        )
+
+                    }
+                }
+            }
+        }
     }
 }

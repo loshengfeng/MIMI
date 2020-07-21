@@ -38,13 +38,13 @@
             android:text="@string/choose_camera"
             android:textColor="@color/color_black_1"
             android:textSize="16sp"
-            app:layout_constraintBottom_toTopOf="@id/btn_album"
+            app:layout_constraintBottom_toTopOf="@id/btn_article"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_title" />
 
         <Button
-            android:id="@+id/btn_album"
+            android:id="@+id/btn_article"
             android:layout_width="140dp"
             android:layout_height="40dp"
             android:background="@drawable/btn_red_1_radius_40"

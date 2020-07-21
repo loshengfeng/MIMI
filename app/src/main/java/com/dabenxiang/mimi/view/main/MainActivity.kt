@@ -95,7 +95,8 @@ class MainActivity : BaseActivity(), InteractionListener {
             } else {
                 finish()
             }
-        } else
+        } else {
             super.onBackPressed()
+        }
     }
 }
