@@ -22,7 +22,6 @@ import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
-import com.dabenxiang.mimi.model.api.MoreDialogData
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -48,13 +47,16 @@ import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
-import com.dabenxiang.mimi.view.post.PostPicFragment.Companion.BUNDLE_PIC_URI
+import com.dabenxiang.mimi.view.post.pic.PostPicFragment.Companion.BUNDLE_PIC_URI
+import com.dabenxiang.mimi.view.post.video.EditVideoFragment.Companion.BUNDLE_VIDEO_URI
 import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.putLruCache
+import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.android.synthetic.main.fragment_home.*
 import timber.log.Timber
+import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -81,6 +83,7 @@ class AdultHomeFragment : BaseFragment() {
 
     companion object {
         private const val REQUEST_PHOTO = 10001
+        private const val REQUEST_VIDEO_CAPTURE = 10002
     }
 
     override fun getLayoutId() = R.layout.fragment_home
@@ -705,6 +708,11 @@ class AdultHomeFragment : BaseFragment() {
 
     private val onChooseUploadMethodDialogListener = object : OnChooseUploadMethodDialogListener {
         override fun onUploadVideo() {
+            Intent(MediaStore.ACTION_VIDEO_CAPTURE).also { takeVideoIntent ->
+                takeVideoIntent.resolveActivity(requireContext().packageManager)?.also {
+                    startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE)
+                }
+            }
         }
 
         override fun onUploadPic() {
@@ -756,8 +764,16 @@ class AdultHomeFragment : BaseFragment() {
                             R.id.action_adultHomeFragment_to_postPicFragment,
                             bundle
                         )
-
                     }
+                }
+
+                REQUEST_VIDEO_CAPTURE -> {
+                    val videoUri: Uri? = data?.data
+                    val myUri = Uri.fromFile(File(UriUtils.getRealPathFromURI(requireContext(), videoUri!!)))
+
+                    val bundle = Bundle()
+                    bundle.putString(BUNDLE_VIDEO_URI, myUri.toString())
+                    findNavController().navigate(R.id.action_adultHomeFragment_to_editVideoFragment, bundle)
                 }
             }
         }
