@@ -5,6 +5,7 @@ import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
+import java.util.ArrayList
 
 interface ApiService {
 
@@ -163,6 +164,11 @@ interface ApiService {
         @Query("isAdult") isAdult: Boolean = true,
         @Query("orderBy") orderBy: Int = 1
     ): Response<ApiBasePagingItem<List<MemberPostItem>>>
+
+    @POST("/v1/Members/Post")
+    suspend fun postMembersPost(
+        @Body request: PostMemberRequest
+    ): Response<ApiBaseItem<Long>>
 
     @GET("/v1/Members/Post/{postId}/Comment")
     suspend fun getMembersPostComment(
