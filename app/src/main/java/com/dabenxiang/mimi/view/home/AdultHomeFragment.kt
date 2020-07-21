@@ -130,7 +130,6 @@ class AdultHomeFragment : BaseFragment() {
             lastPosition = position
             tabAdapter.setLastSelectedIndex(lastPosition)
             recyclerview_tab.scrollToPosition(position)
-            setupPostTypeByPosition(position)
             setupRecyclerByPosition(position)
             getData(position)
         })
@@ -309,7 +308,7 @@ class AdultHomeFragment : BaseFragment() {
         })
 
         viewModel.postFollowItemListResult.observe(viewLifecycleOwner, Observer {
-//            memberPostPagedAdapter.submitList(it)
+            postFollowPagedAdapter.submitList(it)
         })
 
         viewModel.clipPostItemListResult.observe(viewLifecycleOwner, Observer {
@@ -417,19 +416,6 @@ class AdultHomeFragment : BaseFragment() {
         }
     }
 
-    private fun setupPostTypeByPosition(position: Int) {
-        val type = when (position) {
-            0 -> AdultTabType.HOME
-            1 -> AdultTabType.VIDEO
-            2 -> AdultTabType.FOLLOW
-            3 -> AdultTabType.CLIP
-            4 -> AdultTabType.PICTURE
-            5 -> AdultTabType.TEXT
-            else -> AdultTabType.CLUB
-        }
-        memberPostPagedAdapter.setupAdultTabType(type)
-    }
-
     private fun getData(position: Int) {
         when (position) {
             0 -> mainViewModel?.getHomeCategories()
@@ -487,9 +473,9 @@ class AdultHomeFragment : BaseFragment() {
         MemberPostPagedAdapter(requireActivity(), adultListener, attachmentListener)
     }
 
-//    private val commonPagedAdapter by lazy {
-//        CommonPagedAdapter(requireActivity(), adultListener, attachmentListener)
-//    }
+    private val postFollowPagedAdapter by lazy {
+        PostFollowPagedAdapter(requireActivity(), adultListener, attachmentListener)
+    }
 
     private val videoListAdapter by lazy {
         HomeVideoListAdapter(adapterListener, true)
