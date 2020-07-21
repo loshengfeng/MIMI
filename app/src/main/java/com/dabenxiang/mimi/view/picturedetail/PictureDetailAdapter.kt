@@ -231,5 +231,4 @@ class PictureDetailAdapter(
         fun onReplyComment(replyId: Long?, replyName: String?)
         fun onMoreClick(item: MembersPostCommentItem)
     }
-
 }

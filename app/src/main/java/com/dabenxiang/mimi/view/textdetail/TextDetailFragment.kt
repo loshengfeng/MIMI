@@ -25,17 +25,7 @@ import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import kotlinx.android.synthetic.main.fragment_picture_detail.*
 import kotlinx.android.synthetic.main.fragment_text_detail.*
-import kotlinx.android.synthetic.main.fragment_text_detail.et_message
-import kotlinx.android.synthetic.main.fragment_text_detail.iv_bar
-import kotlinx.android.synthetic.main.fragment_text_detail.iv_like
-import kotlinx.android.synthetic.main.fragment_text_detail.iv_more
-import kotlinx.android.synthetic.main.fragment_text_detail.layout_bar
-import kotlinx.android.synthetic.main.fragment_text_detail.layout_edit_bar
-import kotlinx.android.synthetic.main.fragment_text_detail.toolbarContainer
-import kotlinx.android.synthetic.main.fragment_text_detail.tv_comment_count
-import kotlinx.android.synthetic.main.fragment_text_detail.tv_like_count
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import timber.log.Timber
@@ -58,9 +48,14 @@ class TextDetailFragment : BaseFragment() {
     private val viewModel: TextDetailViewModel by viewModels()
 
     private var textDetailAdapter: TextDetailAdapter? = null
+    private var commentAdapter: CommentAdapter? = null
 
     var moreDialog: MoreDialogFragment? = null
     var reportDialog: ReportDialogFragment? = null
+
+    private var replyCommentBlock: (() -> Unit)? = null
+    private var commentLikeBlock: (() -> Unit)? = null
+    private var avatarBlock: ((Bitmap) -> Unit)? = null
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -147,16 +142,90 @@ class TextDetailFragment : BaseFragment() {
                 is Error -> Timber.e(it.throwable)
             }
         })
+
+        viewModel.postCommentResult.observe(this, Observer { event ->
+            event.getContentIfNotHandled()?.also {
+                when (it) {
+                    is Empty -> {
+                        GeneralUtils.hideKeyboard(requireActivity())
+                        et_message.text = null
+                        et_message.tag = null
+                        tv_replay_name.text = null
+                        tv_replay_name.visibility = View.GONE
+
+                        layout_bar.visibility = View.VISIBLE
+                        layout_edit_bar.visibility = View.INVISIBLE
+
+                        memberPostItem?.commentCount =
+                            memberPostItem?.commentCount?.let { count -> count + 1 } ?: run { 1 }
+                        tv_comment_count.text = memberPostItem?.commentCount.toString()
+
+                        memberPostItem?.also { memberPostItem ->
+                            viewModel.getCommentInfo(
+                                memberPostItem.id,
+                                viewModel.currentCommentType,
+                                commentAdapter!!
+                            )
+                        }
+                    }
+                    is Error -> Timber.e(it.throwable)
+                }
+            }
+        })
+
+        viewModel.avatarResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> avatarBlock?.invoke(it.result)
+                is Error -> Timber.e(it.throwable)
+            }
+        })
+
+        viewModel.replyCommentResult.observe(viewLifecycleOwner, Observer { event ->
+            event.getContentIfNotHandled()?.also {
+                when (it) {
+                    is Empty -> replyCommentBlock?.also { it() }
+                    is Error -> Timber.e(it.throwable)
+                }
+            }
+        })
+
+        viewModel.commentLikeResult.observe(viewLifecycleOwner, Observer { event ->
+            event.getContentIfNotHandled()?.also {
+                when (it) {
+                    is Empty -> commentLikeBlock?.also { it() }
+                    is Error -> Timber.e(it.throwable)
+                }
+            }
+        })
+
+        viewModel.commentDeleteLikeResult.observe(viewLifecycleOwner, Observer { event ->
+            event.getContentIfNotHandled()?.also {
+                when (it) {
+                    is Empty -> commentLikeBlock?.also { it() }
+                    is Error -> Timber.e(it.throwable)
+                }
+            }
+        })
     }
 
     override fun setupListeners() {
-
         iv_bar.setOnClickListener {
             layout_edit_bar.visibility = View.VISIBLE
             layout_bar.visibility = View.INVISIBLE
             GeneralUtils.showKeyboard(requireContext())
             et_message.requestFocus()
             et_message.setText("")
+        }
+
+        btn_send.setOnClickListener {
+            memberPostItem?.id?.let { id ->
+                et_message.text.toString().takeIf { !TextUtils.isEmpty(it) }?.let { comment ->
+                    Pair(id, comment)
+                }?.also { (id, comment) ->
+                    val replyId = et_message.tag?.let { rid -> rid as Long }
+                    viewModel.postComment(id, replyId, comment)
+                }
+            }
         }
 
         iv_like.setOnClickListener {
@@ -184,27 +253,48 @@ class TextDetailFragment : BaseFragment() {
         }
 
         override fun onGetCommandInfo(adapter: CommentAdapter, type: CommentType) {
-
+            commentAdapter = adapter
+            viewModel.getCommentInfo(
+                memberPostItem!!.id,
+                type,
+                commentAdapter!!
+            )
         }
 
         override fun onGetReplyCommand(parentNode: RootCommentNode, succeededBlock: () -> Unit) {
-
+            replyCommentBlock = succeededBlock
+            viewModel.getReplyComment(parentNode, memberPostItem!!)
         }
 
         override fun onCommandLike(commentId: Long?, isLike: Boolean, succeededBlock: () -> Unit) {
-
+            commentLikeBlock = succeededBlock
+            val type = if (isLike) LikeType.LIKE else LikeType.DISLIKE
+            viewModel.postCommentLike(commentId!!, type, memberPostItem!!)
         }
 
         override fun onCommandDislike(commentId: Long?, succeededBlock: () -> Unit) {
-
+            commentLikeBlock = succeededBlock
+            viewModel.deleteCommentLike(commentId!!, memberPostItem!!)
         }
 
         override fun onGetCommandAvatar(id: Long, succeededBlock: (Bitmap) -> Unit) {
-
+            avatarBlock = succeededBlock
+            viewModel.getAvatar(id.toString())
         }
 
         override fun onReplyComment(replyId: Long?, replyName: String?) {
+            takeUnless { replyId == null }?.also {
+                layout_bar.visibility = View.INVISIBLE
+                layout_edit_bar.visibility = View.VISIBLE
 
+                GeneralUtils.showKeyboard(requireContext())
+                et_message.requestFocus()
+                et_message.tag = replyId
+                tv_replay_name.text = replyName.takeIf { it != null }?.let {
+                    tv_replay_name.visibility = View.VISIBLE
+                    String.format(requireContext().getString(R.string.clip_username), it)
+                } ?: run { "" }
+            }
         }
 
         override fun onMoreClick(item: MembersPostCommentItem) {
