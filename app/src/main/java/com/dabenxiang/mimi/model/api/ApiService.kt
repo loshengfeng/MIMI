@@ -343,8 +343,8 @@ interface ApiService {
 
     @GET("/v1/Members/Me/PostFollow")
     suspend fun getPostFollow(
-        @Query("offset") offset: String,
-        @Query("limit") limit: String
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
     ): Response<ApiBasePagingItem<List<PostFollowItem>>>
 
     @GET("/v1/Members/Me/Profile")

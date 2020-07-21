@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.view.picturedetail.viewholder
 
 import android.view.View
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_comment_content.view.*
 

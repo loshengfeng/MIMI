@@ -1,5 +1,7 @@
 package com.dabenxiang.mimi.model.api.vo
 
+import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.google.gson.annotations.SerializedName
 import java.util.*
 
@@ -14,7 +16,7 @@ data class PostFollowItem(
     val content: String?,
 
     @SerializedName("type")
-    val type: Int?,
+    val type: PostType = PostType.TEXT,
 
     @SerializedName("postFriendlyName")
     val postFriendlyName: String = "",
@@ -23,7 +25,7 @@ data class PostFollowItem(
     val creationDate: String?,
 
     @SerializedName("likeType")
-    val likeType: Int?,
+    var likeType: LikeType = LikeType.DISLIKE,
 
     @SerializedName("isFavorite")
     val isFavorite: Boolean? = false,
@@ -60,4 +62,5 @@ data class PostFollowItem(
 
     @SerializedName("reported")
     val reported: Boolean? = false
+
 ) : BaseMemberPostItem()

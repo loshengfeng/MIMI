@@ -15,7 +15,7 @@ import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.TextPostHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 
-class CommonPagedAdapter(
+class MemberPostPagedAdapter(
     val context: Context,
     private val adultListener: AdultListener,
     private val attachmentListener: AttachmentListener
@@ -81,9 +81,17 @@ class CommonPagedAdapter(
     ) {
         viewHolderMap[position] = holder
         val item = getItem(position)
-        when(holder) {
+        when (holder) {
             is ClipPostHolder -> {
-                item?.also { holder.onBind(it, currentList, position, adultListener, attachmentListener) }
+                item?.also {
+                    holder.onBind(
+                        it,
+                        currentList,
+                        position,
+                        adultListener,
+                        attachmentListener
+                    )
+                }
             }
             is PicturePostHolder -> {
                 payloads.takeIf { it.isNotEmpty() }?.also {

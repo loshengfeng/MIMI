@@ -9,7 +9,6 @@ import androidx.paging.PagedList
 import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.MoreDialogData
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
@@ -21,6 +20,8 @@ import com.dabenxiang.mimi.view.home.club.ClubDataSource
 import com.dabenxiang.mimi.view.home.club.ClubFactory
 import com.dabenxiang.mimi.view.home.memberpost.MemberPostDataSource
 import com.dabenxiang.mimi.view.home.memberpost.MemberPostFactory
+import com.dabenxiang.mimi.view.home.postfollow.PostFollowDataSource
+import com.dabenxiang.mimi.view.home.postfollow.PostFollowFactory
 import com.dabenxiang.mimi.view.home.video.VideoDataSource
 import com.dabenxiang.mimi.view.home.video.VideoFactory
 import kotlinx.coroutines.Dispatchers
@@ -82,6 +83,9 @@ class HomeViewModel : BaseViewModel() {
 
     private var _likePostResult = MutableLiveData<ApiResult<Int>>()
     val likePostResult: LiveData<ApiResult<Int>> = _likePostResult
+
+    private val _postFollowItemListResult = MutableLiveData<PagedList<PostFollowItem>>()
+    val postFollowItemListResult: LiveData<PagedList<PostFollowItem>> = _postFollowItemListResult
 
     private val _clipPostItemListResult = MutableLiveData<PagedList<MemberPostItem>>()
     val clipPostItemListResult: LiveData<PagedList<MemberPostItem>> = _clipPostItemListResult
@@ -341,6 +345,13 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
+    fun getPostFollows() {
+        viewModelScope.launch {
+            getPostFollowPagingItems().asFlow()
+                .collect { _postFollowItemListResult.value = it }
+        }
+    }
+
     fun getClipPosts() {
         viewModelScope.launch {
             getMemberPostPagingItems(PostType.VIDEO).asFlow()
@@ -360,6 +371,16 @@ class HomeViewModel : BaseViewModel() {
             getMemberPostPagingItems(PostType.TEXT).asFlow()
                 .collect { _textPostItemListResult.value = it }
         }
+    }
+
+    private fun getPostFollowPagingItems(): LiveData<PagedList<PostFollowItem>> {
+        val postFollowDataSource =
+            PostFollowDataSource(pagingCallback, viewModelScope, domainManager)
+        val pictureFactory = PostFollowFactory(postFollowDataSource)
+        val config = PagedList.Config.Builder()
+            .setPrefetchDistance(4)
+            .build()
+        return LivePagedListBuilder(pictureFactory, config).build()
     }
 
     private fun getMemberPostPagingItems(postType: PostType): LiveData<PagedList<MemberPostItem>> {
