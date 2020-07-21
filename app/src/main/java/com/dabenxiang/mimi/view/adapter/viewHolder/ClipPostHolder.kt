@@ -43,9 +43,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
     val commentCount: TextView = itemView.tv_comment_count
     val moreImage: ImageView = itemView.iv_more
 
-    fun onBind(itemList: List<MemberPostItem>, position: Int, adultListener: AdultListener, attachmentListener: AttachmentListener) {
-        Timber.d("@@onBind")
-        val item = itemList[position]
+    fun onBind(item: MemberPostItem, itemList: List<MemberPostItem>?, position: Int, adultListener: AdultListener, attachmentListener: AttachmentListener) {
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         title.text = item.title
@@ -101,7 +99,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         commentImage.setOnClickListener {
-            adultListener.onClipCommentClick(itemList, position)
+            itemList?.also { adultListener.onClipCommentClick(it, position) }
         }
 
         moreImage.setOnClickListener {
@@ -109,12 +107,12 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         clClipPost.setOnClickListener {
-            adultListener.onClipItemClick(itemList, position)
+            itemList?.also { adultListener.onClipItemClick(it, position) }
+
         }
     }
 
     fun updateLikeAndFollowItem(item: MemberPostItem, position: Int, adultListener: AdultListener) {
-        Timber.d("@@updateLikeAndFollowItem")
         likeCount.text = item.likeCount.toString()
         commentCount.text = item.commentCount.toString()
 

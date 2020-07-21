@@ -579,9 +579,6 @@ class AdultHomeFragment : BaseFragment() {
 
     private val attachmentListener = object : AttachmentListener {
         override fun onGetAttachment(id: String, position: Int, type: AttachmentType) {
-            if (type == AttachmentType.ADULT_TAB_CLIP) {
-                Timber.d("@@onGetAttachment id:$id, position:$position, type:$type")
-            }
             viewModel.getAttachment(id, position, type)
         }
 

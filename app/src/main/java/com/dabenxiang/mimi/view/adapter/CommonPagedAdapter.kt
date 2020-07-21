@@ -88,23 +88,24 @@ class CommonPagedAdapter(
         payloads: MutableList<Any>
     ) {
         viewHolderMap[position] = holder
+        val item = getItem(position)
         when(holder) {
             is ClipPostHolder -> {
-                currentList?.also { holder.onBind(it.toList(), position, adultListener, attachmentListener) }
+                item?.also { holder.onBind(it, currentList, position, adultListener, attachmentListener) }
             }
             is PicturePostHolder -> {
                 payloads.takeIf { it.isNotEmpty() }?.also {
                     when(it[0] as Int) {
                         PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI -> {
-                            currentList?.also { itemList ->
-                                holder.updateLikeAndFollowItem(itemList.toList(), position, adultListener)
+                            item?.also { item ->
+                                holder.updateLikeAndFollowItem(item, position, adultListener)
                             }
                         }
                     }
                 } ?: run {
-                    currentList?.also {
+                    item?.also {
                         holder.pictureRecycler.tag = position
-                        holder.onBind(it.toList(), position, adultListener, attachmentListener)
+                        holder.onBind(it, position, adultListener, attachmentListener)
                     }
                 }
             }
