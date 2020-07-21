@@ -10,7 +10,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.BaseItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.model.enums.FunctionType
@@ -19,11 +18,12 @@ import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.adapter.FavoriteTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
-import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
+import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.player.PlayerActivity
+import com.dabenxiang.mimi.view.search.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_post_favorite.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
@@ -76,6 +76,7 @@ class FavoriteFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
         initSettings()
+        interactionListener?.setAdult(false)
     }
 
     override fun getLayoutId(): Int {
@@ -117,8 +118,8 @@ class FavoriteFragment : BaseFragment() {
                 is ApiResult.Success -> {
                     viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
                     GeneralUtils.showToast(
-                        requireContext(),
-                        getString(R.string.favorite_delete_favorite)
+                            requireContext(),
+                            getString(R.string.favorite_delete_favorite)
                     )
                 }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
@@ -142,8 +143,8 @@ class FavoriteFragment : BaseFragment() {
                 R.id.tv_clean -> {
                     CleanDialogFragment.newInstance(onCleanDialogListener).also {
                         it.show(
-                            requireActivity().supportFragmentManager,
-                            CleanDialogFragment::class.java.simpleName
+                                requireActivity().supportFragmentManager,
+                                CleanDialogFragment::class.java.simpleName
                         )
                     }
                 }
@@ -166,8 +167,8 @@ class FavoriteFragment : BaseFragment() {
         rv_primary.adapter = primaryAdapter
 
         val primaryList = listOf(
-            getString(R.string.favorite_normal),
-            getString(R.string.favorite_adult)
+                getString(R.string.favorite_normal),
+                getString(R.string.favorite_adult)
         )
 
         primaryAdapter.submitList(primaryList, lastPrimaryIndex)
@@ -175,8 +176,8 @@ class FavoriteFragment : BaseFragment() {
         rv_secondary.adapter = secondaryAdapter
 
         val secondaryList = listOf(
-            getString(R.string.favorite_tab_mimi),
-            getString(R.string.favorite_tab_short)
+                getString(R.string.favorite_tab_mimi),
+                getString(R.string.favorite_tab_short)
         )
 
         secondaryAdapter.submitList(secondaryList, lastSecondaryIndex)
@@ -289,13 +290,13 @@ class FavoriteFragment : BaseFragment() {
                     when (item) {
                         is PlayItem -> {
                             if (item.tags == null || item.tags.first()
-                                    .isEmpty() || item.videoId == null
+                                            .isEmpty() || item.videoId == null
                             ) {
                                 GeneralUtils.showToast(requireContext(), "copy url error")
                             } else {
                                 GeneralUtils.copyToClipboard(
-                                    requireContext(),
-                                    viewModel.getShareUrl(item.tags[0], item.videoId, item.episode)
+                                        requireContext(),
+                                        viewModel.getShareUrl(item.tags[0], item.videoId, item.episode)
                                 )
                                 GeneralUtils.showToast(requireContext(), "already copy url")
                             }
@@ -309,10 +310,11 @@ class FavoriteFragment : BaseFragment() {
                         is PlayItem -> {
                             if (item.tags == null || item.tags.first().isEmpty() || item.videoId == null) {
                                 GeneralUtils.showToast(requireContext(), getString(R.string.unexpected_error))
-                            }else{
-                                val playerData = PlayerData(item.videoId ?: 0, item.isAdult ?: false)
+                            } else {
+                                val playerData = PlayerData(item.videoId ?: 0, item.isAdult
+                                        ?: false)
                                 val intent = Intent(requireContext(), PlayerActivity::class.java)
-                                intent.putExtras(PlayerActivity.createBundle(playerData,true))
+                                intent.putExtras(PlayerActivity.createBundle(playerData, true))
                                 startActivity(intent)
                             }
                         }
@@ -331,6 +333,13 @@ class FavoriteFragment : BaseFragment() {
                 else -> {
                 }
             }
+        }
+
+        override fun onChipClick(text: String) {
+            // 點擊標籤後進入 Search page
+            interactionListener?.setAdult(lastPrimaryIndex == 1)
+            val bundle = SearchVideoFragment.createBundle(tag = text)
+            navigateTo(NavigateItem.Destination(R.id.action_postFavoriteFragment_to_searchVideoFragment, bundle))
         }
     }
 

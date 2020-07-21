@@ -5,7 +5,7 @@ import android.view.View
 import android.widget.RadioButton
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.MoreDialogData
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.dpToPx
@@ -16,8 +16,8 @@ class ReportDialogFragment : BaseDialogFragment() {
 
     companion object {
         fun newInstance(
-            item: MemberPostItem,
-            listener: OnReportDialogListener
+                item: MoreDialogData,
+                listener: OnReportDialogListener
         ): ReportDialogFragment {
             val fragment = ReportDialogFragment()
             fragment.item = item
@@ -26,7 +26,7 @@ class ReportDialogFragment : BaseDialogFragment() {
         }
     }
 
-    var item: MemberPostItem? = null
+    var item: MoreDialogData? = null
     var listener: OnReportDialogListener? = null
 
     override fun isFullLayout(): Boolean {
@@ -80,7 +80,7 @@ class ReportDialogFragment : BaseDialogFragment() {
     }
 
     interface OnReportDialogListener {
-        fun onSend(item: MemberPostItem, content: String)
+        fun onSend(item: MoreDialogData, content: String)
         fun onCancel()
     }
 

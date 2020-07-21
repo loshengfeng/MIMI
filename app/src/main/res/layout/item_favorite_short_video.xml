@@ -164,6 +164,7 @@
 
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/reflow_group"
+        app:singleSelection="true"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:paddingTop="15dp"

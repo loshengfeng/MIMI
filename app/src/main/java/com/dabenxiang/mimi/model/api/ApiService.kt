@@ -230,7 +230,8 @@ interface ApiService {
         @Query("years") years: Int?,
         @Query("isAdult") isAdult: Boolean?,
         @Query("offset") offset: String?,
-        @Query("limit") limit: String?
+        @Query("limit") limit: String?,
+        @Query("tag") tag: String?
     ): Response<ApiBasePagingItem<VideoSearchItem>>
 
     @GET("/v1/Members/Home/Videos/SearchWithCategory")

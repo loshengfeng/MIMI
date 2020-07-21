@@ -19,15 +19,15 @@ data class VideoItem(
     @SerializedName("description")
     val description: String?,
     @SerializedName("favorite")
-    val favorite: Boolean?,
+    var favorite: Boolean?,
     @SerializedName("favoriteCount")
-    val favoriteCount: Long?,
+    var favoriteCount: Long?,
     @SerializedName("id")
     val id: Long?,
     @SerializedName("like")
-    val like: Boolean?,
+    var like: Boolean?,
     @SerializedName("likeCount")
-    val likeCount: Long?,
+    var likeCount: Long?,
     @SerializedName("point")
     val point: Long?,
     @SerializedName("source")
@@ -35,13 +35,17 @@ data class VideoItem(
     @SerializedName("sources")
     val sources: List<Source>?,
     @SerializedName("tags")
-    val tags: List<String>?,
+    val tags: Any?,
     @SerializedName("title")
     val title: String?,
     @SerializedName("updateTime")
     val updateTime: Date?,
     @SerializedName("years")
-    val years: Long?
+    val years: Long?,
+
+    var isAdult: Boolean = false,
+    var searchingTag: String = "", // 搜尋的 TAG
+    var searchingStr: String = "" // 搜尋的 Name
 )
 
 data class Source(

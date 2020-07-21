@@ -3,14 +3,14 @@ package com.dabenxiang.mimi.view.dialog
 import android.os.Bundle
 import android.view.View
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.MoreDialogData
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import kotlinx.android.synthetic.main.fragment_dialog_more.*
 
 class MoreDialogFragment : BaseDialogFragment() {
 
     companion object {
-        fun newInstance(item: MemberPostItem, listener: OnMoreDialogListener): MoreDialogFragment {
+        fun newInstance(item: MoreDialogData, listener: OnMoreDialogListener): MoreDialogFragment {
             val fragment = MoreDialogFragment()
             fragment.item = item
             fragment.listener = listener
@@ -18,7 +18,7 @@ class MoreDialogFragment : BaseDialogFragment() {
         }
     }
 
-    var item: MemberPostItem? = null
+    var item: MoreDialogData? = null
     var listener: OnMoreDialogListener? = null
 
     override fun isFullLayout(): Boolean {
@@ -38,7 +38,7 @@ class MoreDialogFragment : BaseDialogFragment() {
         } else {
             tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1))
             tv_problem_report.setOnClickListener {
-                listener?.onProblemReport(item!!)
+                item?.let { moreDialogData -> listener?.onProblemReport(moreDialogData) }
             }
         }
 
@@ -52,7 +52,7 @@ class MoreDialogFragment : BaseDialogFragment() {
     }
 
     interface OnMoreDialogListener {
-        fun onProblemReport(item: MemberPostItem)
+        fun onProblemReport(item: MoreDialogData)
         fun onCancel()
     }
 }

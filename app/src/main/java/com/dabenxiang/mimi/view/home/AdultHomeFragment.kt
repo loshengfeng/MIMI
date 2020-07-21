@@ -17,6 +17,7 @@ import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.ApiResult.*
+import com.dabenxiang.mimi.model.api.MoreDialogData
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -471,7 +472,8 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onMoreClick(item: MemberPostItem) {
-            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
+            val data = MoreDialogData(id = item.id, reported = item.reported, type = item.type)
+            moreDialog = MoreDialogFragment.newInstance(data, onMoreDialogListener).also {
                 it.show(
                     requireActivity().supportFragmentManager,
                     MoreDialogFragment::class.java.simpleName
@@ -491,7 +493,7 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
-        override fun onSend(item: MemberPostItem, content: String) {
+        override fun onSend(item: MoreDialogData, content: String) {
             if (TextUtils.isEmpty(content)) {
                 GeneralUtils.showToast(requireContext(), getString(R.string.report_error))
             } else {
@@ -506,7 +508,7 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-        override fun onProblemReport(item: MemberPostItem) {
+        override fun onProblemReport(item: MoreDialogData) {
             moreDialog?.dismiss()
             reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
                 it.show(

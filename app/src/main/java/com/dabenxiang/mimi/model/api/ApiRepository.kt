@@ -294,8 +294,9 @@ class ApiRepository(private val apiService: ApiService) {
         years: Int? = null,
         isAdult: Boolean,
         offset: String,
-        limit: String
-    ) = apiService.searchHomeVideos(category, q, country, years, isAdult, offset, limit)
+        limit: String,
+        tag: String = ""
+    ) = apiService.searchHomeVideos(category, q, country, years, isAdult, offset, limit, tag)
 
     /**
      * 取得類別影片

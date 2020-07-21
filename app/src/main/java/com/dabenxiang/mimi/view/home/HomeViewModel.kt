@@ -9,6 +9,7 @@ import androidx.paging.PagedList
 import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.MoreDialogData
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
@@ -312,7 +313,7 @@ class HomeViewModel : BaseViewModel() {
     }
 
 
-    fun sendPostReport(item: MemberPostItem, content: String) {
+    fun sendPostReport(item: MoreDialogData, content: String) {
         viewModelScope.launch {
             flow {
                 val request = ReportRequest(content)
