@@ -126,13 +126,24 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/chip_group_tag"
+    <HorizontalScrollView
+        android:id="@+id/reflow_group_scroll"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layout_clip" />
+        app:layout_constraintStart_toStartOf="@id/tv_title"
+        app:layout_constraintTop_toBottomOf="@id/layout_clip">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chip_group_tag"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="parent" />
+    </HorizontalScrollView>
 
     <ImageView
         android:id="@+id/iv_like"
@@ -140,7 +151,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ico_nice"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chip_group_tag" />
+        app:layout_constraintTop_toBottomOf="@+id/reflow_group_scroll" />
 
     <TextView
         android:id="@+id/tv_like_count"
@@ -161,7 +172,7 @@
         android:layout_marginStart="33dp"
         android:src="@drawable/ico_messege_adult"
         app:layout_constraintLeft_toRightOf="@+id/tv_like_count"
-        app:layout_constraintTop_toBottomOf="@+id/chip_group_tag" />
+        app:layout_constraintTop_toBottomOf="@+id/reflow_group_scroll" />
 
     <TextView
         android:id="@+id/tv_comment_count"
@@ -181,7 +192,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/btn_more_white_n"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chip_group_tag" />
+        app:layout_constraintTop_toBottomOf="@+id/reflow_group_scroll" />
 
     <View
         android:layout_width="match_parent"
