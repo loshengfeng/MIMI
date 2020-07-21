@@ -47,18 +47,11 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
     val commentCount: TextView = itemView.tv_comment_count
     val moreImage: ImageView = itemView.iv_more
 
-    fun onBind(
-        itemList: List<MemberPostItem>,
-        position: Int,
-        adultListener: AdultListener,
-        attachmentListener: AttachmentListener
-    ) {
-        val item = itemList[position]
-
+    fun onBind(item: MemberPostItem, position: Int, adultListener: AdultListener, attachmentListener: AttachmentListener) {
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate ?: Date(), Date())
         title.text = item.title
-        updateLikeAndFollowItem(itemList, position, adultListener)
+        updateLikeAndFollowItem(item, position, adultListener)
 
         if (LruCacheUtils.getLruCache(item.avatarAttachmentId.toString()) == null) {
             attachmentListener.onGetAttachment(
@@ -130,13 +123,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
     }
 
-    fun updateLikeAndFollowItem(
-        itemList: List<MemberPostItem>,
-        position: Int,
-        adultListener: AdultListener
-    ) {
-        val item = itemList[position]
-
+    fun updateLikeAndFollowItem(item: MemberPostItem, position: Int, adultListener: AdultListener) {
         likeCount.text = item.likeCount.toString()
         commentCount.text = item.commentCount.toString()
 

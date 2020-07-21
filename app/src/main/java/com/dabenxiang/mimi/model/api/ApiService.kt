@@ -341,6 +341,12 @@ interface ApiService {
         @Query("postFavoriteId") postFavoriteIds: List<Long>
     ): Response<Void>
 
+    @GET("/v1/Members/Me/PostFollow")
+    suspend fun getPostFollow(
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ): Response<ApiBasePagingItem<List<PostFollowItem>>>
+
     @GET("/v1/Members/Me/Profile")
     suspend fun getProfile(): Response<ApiBaseItem<ProfileItem>>
 
