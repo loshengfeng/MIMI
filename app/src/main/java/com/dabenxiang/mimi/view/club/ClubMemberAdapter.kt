@@ -7,11 +7,10 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
-import timber.log.Timber
 
 class ClubMemberAdapter(
     val context: Context,
-    val clubFuncItem: ClubFuncItem
+    private val clubFuncItem: ClubFuncItem
 ) : PagedListAdapter<MemberClubItem, ClubMemberViewHolder>(diffCallback) {
 
     companion object {
@@ -40,8 +39,7 @@ class ClubMemberAdapter(
     }
 
     override fun onBindViewHolder(holder: ClubMemberViewHolder, position: Int) {
-        Timber.d("@@onBindViewHolder")
         val item = getItem(position)
-        item?.also { holder.onBind(it, clubFuncItem) }
+        item?.also { holder.onBind(it, clubFuncItem, position) }
     }
 }
