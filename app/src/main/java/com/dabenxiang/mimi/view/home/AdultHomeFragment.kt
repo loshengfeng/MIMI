@@ -29,9 +29,11 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.FunctionType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
+import com.dabenxiang.mimi.model.serializable.SearchPostItem
 import com.dabenxiang.mimi.view.adapter.*
 import com.dabenxiang.mimi.view.adapter.viewHolder.ClipPostHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
@@ -52,6 +54,7 @@ import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.post.pic.PostPicFragment.Companion.BUNDLE_PIC_URI
 import com.dabenxiang.mimi.view.post.video.EditVideoFragment.Companion.BUNDLE_VIDEO_URI
+import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -79,8 +82,8 @@ class AdultHomeFragment : BaseFragment() {
     private val homePictureViewHolderMap = hashMapOf<Int, HomePictureViewHolder>()
     private val homeClubViewHolderMap = hashMapOf<Int, HomeClubViewHolder>()
 
-    var moreDialog: MoreDialogFragment? = null
-    var reportDialog: ReportDialogFragment? = null
+    private var moreDialog: MoreDialogFragment? = null
+    private var reportDialog: ReportDialogFragment? = null
 
     private var interactionListener: InteractionListener? = null
 
@@ -522,16 +525,11 @@ class AdultHomeFragment : BaseFragment() {
                         )
                     )
                 }
-                else -> {
-
-                }
             }
-
         }
 
         override fun onMoreClick(item: MemberPostItem) {
-            val data = MemberPostItem(id = item.id, creationDate = Date())
-            moreDialog = MoreDialogFragment.newInstance(data, onMoreDialogListener).also {
+            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
                 it.show(
                     requireActivity().supportFragmentManager,
                     MoreDialogFragment::class.java.simpleName
@@ -580,6 +578,17 @@ class AdultHomeFragment : BaseFragment() {
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_adultHomeFragment_to_clipFragment,
+                    bundle
+                )
+            )
+        }
+
+        override fun onChipClick(type: PostType, tag: String) {
+            val item = SearchPostItem(type, tag)
+            val bundle = SearchPostFragment.createBundle(item)
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_adultHomeFragment_to_searchPostFragment,
                     bundle
                 )
             )

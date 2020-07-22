@@ -18,6 +18,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.PictureAdapter
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -45,7 +46,12 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
     val commentCount: TextView = itemView.tv_comment_count
     val moreImage: ImageView = itemView.iv_more
 
-    fun onBind(item: MemberPostItem, position: Int, adultListener: AdultListener, attachmentListener: AttachmentListener) {
+    fun onBind(
+        item: MemberPostItem,
+        position: Int,
+        adultListener: AdultListener,
+        attachmentListener: AttachmentListener
+    ) {
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate ?: Date(), Date())
         title.text = item.title
@@ -74,6 +80,9 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
             chip.chipBackgroundColor = ColorStateList.valueOf(
                 ContextCompat.getColor(tagChipGroup.context, R.color.adult_color_status_bar)
             )
+            chip.setOnClickListener { view ->
+                adultListener.onChipClick(PostType.IMAGE, (view as Chip).text.toString())
+            }
             tagChipGroup.addView(chip)
         }
 

@@ -511,6 +511,15 @@ class ApiRepository(private val apiService: ApiService) {
         return apiService.sendPostCommentReport(postId, commentId, body)
     }
 
+    suspend fun searchPost(
+        type: PostType,
+        tag: String,
+        offset: Int,
+        limit: Int
+    ): Response<ApiBasePagingItem<List<MemberPostItem>>> {
+        return apiService.searchPost(type.value, tag, offset, limit)
+    }
+
     /**********************************************************
      *
      *                  Ordering
