@@ -16,7 +16,6 @@ import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
-import com.flurry.sdk.it
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
@@ -95,6 +94,7 @@ class FavoritePostViewHolder(
     }
 
     override fun updated(position: Int) {
+        data?.position = position
         data?.posterAvatarAttachmentId?.let {
             listener.onAvatarDownload(ivHead, it.toString())
         }

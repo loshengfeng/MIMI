@@ -91,6 +91,7 @@ class FavoriteViewModel : BaseViewModel() {
                 }
 
                 else -> {
+                    currentPostList.clear()
                     val dataSrc = FavoritePostListDataSource(
                         viewModelScope,
                         domainManager,

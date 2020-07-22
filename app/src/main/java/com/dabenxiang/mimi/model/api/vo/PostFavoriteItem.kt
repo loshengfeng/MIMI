@@ -57,6 +57,8 @@ data class PostFavoriteItem(
     var likeType: Int?,
 
     @SerializedName("commentCount")
-    val commentCount: Int?
+    val commentCount: Int?,
+
+    var position: Int = -1
 
 ) : BaseItem()

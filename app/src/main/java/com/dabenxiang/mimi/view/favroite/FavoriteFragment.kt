@@ -68,7 +68,8 @@ class FavoriteFragment : BaseFragment() {
         FavoriteTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
                 setTabPosition(TAB_SECONDARY, index)
-                viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
+                if (viewModel.currentPostList.size <= 0)
+                    viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
             }
         }, false)
     }
@@ -447,7 +448,7 @@ class FavoriteFragment : BaseFragment() {
                     }
                 }
             }
-            val bundle = ClipFragment.createBundle(memberPost, 0)
+            val bundle = ClipFragment.createBundle(memberPost, item.position)
             navigateTo(
                     NavigateItem.Destination(
                             R.id.action_postFavoriteFragment_to_clipFragment,
