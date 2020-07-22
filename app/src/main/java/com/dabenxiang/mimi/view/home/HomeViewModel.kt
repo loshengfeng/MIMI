@@ -254,7 +254,7 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-    fun getBitmap(id: String, update: ((Bitmap) -> Unit)) {
+    fun getBitmap(id: String, update: ((String) -> Unit)) {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getAttachment(id)
@@ -262,7 +262,7 @@ class HomeViewModel : BaseViewModel() {
                 val byteArray = result.body()?.bytes()
                 val bitmap = ImageUtils.bytes2Bitmap(byteArray)
                 LruCacheUtils.putLruCache(id, bitmap)
-                emit(ApiResult.success(bitmap))
+                emit(ApiResult.success(id))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }

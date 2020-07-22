@@ -8,6 +8,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
+import androidx.recyclerview.widget.PagerSnapHelper
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.model.api.ApiResult.Success
@@ -52,7 +53,7 @@ class FullPictureFragment : BaseFragment() {
         )
         recycler_picture.adapter = adapter
         recycler_picture.scrollToPosition(position)
-        LinearSnapHelper().attachToRecyclerView(recycler_picture)
+        PagerSnapHelper().attachToRecyclerView(recycler_picture)
 
         recycler_picture.setOnScrollChangeListener { _, _, _, _, _ ->
             val currentPosition =
