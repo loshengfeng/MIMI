@@ -39,6 +39,8 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.club.ClubFuncItem
+import com.dabenxiang.mimi.view.club.ClubMemberAdapter
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
@@ -323,6 +325,10 @@ class AdultHomeFragment : BaseFragment() {
             memberPostPagedAdapter.submitList(it)
         })
 
+        viewModel.clubItemListResult.observe(viewLifecycleOwner, Observer {
+            clubMemberAdapter.submitList(it)
+        })
+
         viewModel.postReportResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Empty -> {
@@ -409,9 +415,13 @@ class AdultHomeFragment : BaseFragment() {
                 recyclerview.layoutManager = GridLayoutManager(requireContext(), 2)
                 recyclerview.adapter = videoListAdapter
             }
-            else -> {
+            2, 3, 4, 5 -> {
                 recyclerview.layoutManager = LinearLayoutManager(requireContext())
                 recyclerview.adapter = memberPostPagedAdapter
+            }
+            else -> {
+                recyclerview.layoutManager = LinearLayoutManager(requireContext())
+                recyclerview.adapter = clubMemberAdapter
             }
         }
     }
@@ -424,9 +434,7 @@ class AdultHomeFragment : BaseFragment() {
             3 -> viewModel.getClipPosts()
             4 -> viewModel.getPicturePosts()
             5 -> viewModel.getTextPosts()
-            6 -> {
-                // TODO: 圈子
-            }
+            6 -> viewModel.getClubs()
         }
     }
 
@@ -471,6 +479,13 @@ class AdultHomeFragment : BaseFragment() {
 
     private val memberPostPagedAdapter by lazy {
         MemberPostPagedAdapter(requireActivity(), adultListener, attachmentListener)
+    }
+
+    private val clubMemberAdapter by lazy {
+        ClubMemberAdapter(
+            requireContext(),
+            ClubFuncItem { s: String, function: (Bitmap) -> Unit -> getBitmap(s, function) }
+        )
     }
 
     private val videoListAdapter by lazy {
@@ -775,5 +790,9 @@ class AdultHomeFragment : BaseFragment() {
                 }
             }
         }
+    }
+
+    private fun getBitmap(id: String, update: ((Bitmap) -> Unit)) {
+        viewModel.getBitmap(id, update)
     }
 }

@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.home
 
+import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
@@ -24,6 +25,7 @@ import com.dabenxiang.mimi.view.home.postfollow.PostFollowDataSource
 import com.dabenxiang.mimi.view.home.postfollow.PostFollowFactory
 import com.dabenxiang.mimi.view.home.video.VideoDataSource
 import com.dabenxiang.mimi.view.home.video.VideoFactory
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -249,6 +251,28 @@ class HomeViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _attachmentResult.value = it }
+        }
+    }
+
+    fun getBitmap(id: String, update: ((Bitmap) -> Unit)) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getAttachment(id)
+                if (!result.isSuccessful) throw HttpException(result)
+                val byteArray = result.body()?.bytes()
+                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
+                LruCacheUtils.putLruCache(id, bitmap)
+                emit(ApiResult.success(bitmap))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    when(it) {
+                        is ApiResult.Success -> {
+                            update(it.result)
+                        }
+                    }
+                }
         }
     }
 
