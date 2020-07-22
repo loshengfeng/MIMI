@@ -24,7 +24,6 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
-import com.dabenxiang.mimi.view.home.viewholder.HomeClipViewHolder
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
@@ -283,7 +282,7 @@ class FavoriteFragment : BaseFragment() {
                     startActivity(intent)
                 }
                 is PostFavoriteItem -> {
-                    // todo: 進入VAI4.1.2.1_短視頻詳細頁，wainting for 短視頻詳細頁...
+                    goShortVideoDetailPage(item)
                 }
             }
         }
@@ -368,36 +367,7 @@ class FavoriteFragment : BaseFragment() {
                             }
                         }
                         is PostFavoriteItem->{
-                            if (item.tags == null || item.tags.first()
-                                            .isEmpty() || item.postId == null
-                            ) {
-                                GeneralUtils.showToast(
-                                        requireContext(),
-                                        getString(R.string.unexpected_error)
-                                )
-                            } else {
-                                val memberPost: ArrayList<MemberPostItem> = Gson().fromJson(Gson().toJson(viewModel.currentPostList), object : TypeToken<ArrayList<MemberPostItem>>() {}.type)
-                                memberPost.forEach memberItem@{ memberItem ->
-                                    viewModel.currentPostList.forEach { postItem ->
-                                        if (postItem.id == memberItem.id) {
-                                            memberItem.avatarAttachmentId = postItem.posterAvatarAttachmentId
-                                                    ?: 0
-                                            memberItem.id = postItem.postId ?: 0
-                                            memberItem.isFavorite = true
-                                            memberItem.creatorId = postItem.posterId ?: 0
-                                            return@memberItem
-                                        }
-                                    }
-                                }
-                                val bundle = ClipFragment.createBundle(memberPost, 0)
-                                navigateTo(
-                                        NavigateItem.Destination(
-                                                R.id.action_postFavoriteFragment_to_clipFragment,
-                                                bundle
-                                        )
-                                )
-                            }
-
+                            goShortVideoDetailPage(item)
                         }
                     }
                 }
@@ -449,5 +419,42 @@ class FavoriteFragment : BaseFragment() {
         override fun onClean() {
             viewModel.deleteFavorite()
         }
+    }
+
+    /**
+     * 進到短影片的詳細頁面
+     */
+    private fun goShortVideoDetailPage(item: PostFavoriteItem) {
+
+        if (item.tags == null || item.tags.first()
+                        .isEmpty() || item.postId == null
+        ) {
+            GeneralUtils.showToast(
+                    requireContext(),
+                    getString(R.string.unexpected_error)
+            )
+        } else {
+            val memberPost: ArrayList<MemberPostItem> = Gson().fromJson(Gson().toJson(viewModel.currentPostList), object : TypeToken<ArrayList<MemberPostItem>>() {}.type)
+            memberPost.forEach memberItem@{ memberItem ->
+                viewModel.currentPostList.forEach { postItem ->
+                    if (postItem.id == memberItem.id) {
+                        memberItem.avatarAttachmentId = postItem.posterAvatarAttachmentId
+                                ?: 0
+                        memberItem.id = postItem.postId ?: 0
+                        memberItem.isFavorite = true
+                        memberItem.creatorId = postItem.posterId ?: 0
+                        return@memberItem
+                    }
+                }
+            }
+            val bundle = ClipFragment.createBundle(memberPost, 0)
+            navigateTo(
+                    NavigateItem.Destination(
+                            R.id.action_postFavoriteFragment_to_clipFragment,
+                            bundle
+                    )
+            )
+        }
+
     }
 }
