@@ -118,6 +118,18 @@ class FavoriteFragment : BaseFragment() {
             }
         })
 
+        viewModel.followResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Error -> onApiError(it.throwable)
+                is ApiResult.Success -> {
+                    favoriteAdapter.notifyDataSetChanged()
+                }
+                is ApiResult.Loaded -> progressHUD?.dismiss()
+            }
+        })
+
+
         viewModel.favoriteResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
@@ -374,6 +386,22 @@ class FavoriteFragment : BaseFragment() {
 //                            MoreDialogFragment::class.java.simpleName
 //                        )
 //                    }
+                }
+                FunctionType.FOLLOW->{
+                    // 追蹤與取消追蹤
+                    when (item) {
+                        is PostFavoriteItem->{
+                            if (item.posterId == null || item.posterId == 0L) {
+                                GeneralUtils.showToast(
+                                        requireContext(),
+                                        getString(R.string.unexpected_error)
+                                )
+                            } else {
+                                viewModel.currentPostItem = item
+                                viewModel.modifyFollow(item.posterId, item.isFollow ?: false)
+                            }
+                        }
+                    }
                 }
                 else -> {
                 }

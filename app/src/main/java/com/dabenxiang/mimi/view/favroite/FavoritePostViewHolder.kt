@@ -77,6 +77,13 @@ class FavoritePostViewHolder(
                 data!!
             )
         }
+        tvFollow.setOnClickListener {
+            listener.onFunctionClick(
+                    FunctionType.FOLLOW,
+                    it,
+                    data!!
+            )
+        }
         tvShare.visibility = View.GONE
         tvTitle.visibility = View.INVISIBLE
         tvMore.visibility = View.INVISIBLE
@@ -100,12 +107,14 @@ class FavoritePostViewHolder(
 
         when (data?.isFollow) {
             true -> {
-                tvFollow.setTextColor(tvFollow.context.getColor(R.color.color_red_1))
-                tvFollow.setBackgroundResource(R.drawable.bg_red_1_stroke_radius_16)
-            }
-            else -> {
                 tvFollow.setTextColor(tvFollow.context.getColor(R.color.color_black_1_60))
                 tvFollow.setBackgroundResource(R.drawable.bg_gray_6_radius_16)
+                tvFollow.setText(R.string.followed)
+            }
+            else -> {
+                tvFollow.setTextColor(tvFollow.context.getColor(R.color.color_red_1))
+                tvFollow.setBackgroundResource(R.drawable.bg_red_1_stroke_radius_16)
+                tvFollow.setText(R.string.follow)
             }
         }
 

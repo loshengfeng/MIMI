@@ -50,7 +50,7 @@ data class PostFavoriteItem(
     val favoriteCount: Int?,
 
     @SerializedName("isFollow")
-    val isFollow: Boolean?,
+    var isFollow: Boolean?,
 
     // 0 = like, 1= dislike
     @SerializedName("likeType")

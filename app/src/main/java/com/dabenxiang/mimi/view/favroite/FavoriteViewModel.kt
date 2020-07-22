@@ -55,6 +55,9 @@ class FavoriteViewModel : BaseViewModel() {
     private val _likeResult = MutableLiveData<ApiResult<Long>>()
     val likeResult: LiveData<ApiResult<Long>> = _likeResult
 
+    private val _followResult = MutableLiveData<ApiResult<Long>>()
+    val followResult: LiveData<ApiResult<Long>> = _followResult
+
     private val _favoriteResult = MutableLiveData<ApiResult<Long>>()
     val favoriteResult: LiveData<ApiResult<Long>> = _favoriteResult
 
@@ -244,6 +247,23 @@ class FavoriteViewModel : BaseViewModel() {
         }
     }
 
+    fun modifyFollow(posterId:Long , isFollow: Boolean) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = when {
+                    !isFollow -> apiRepository.followPost(posterId)
+                    else -> apiRepository.cancelFollowPost(posterId)
+                }
+                if (!result.isSuccessful) throw HttpException(result)
+                currentPostItem?.isFollow = !isFollow
+                emit(ApiResult.success(posterId))
+            }
+                    .flowOn(Dispatchers.IO)
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .collect { _followResult.value = it }
+        }
+    }
 
     fun report(postId: Long, content: String) {
         viewModelScope.launch {
