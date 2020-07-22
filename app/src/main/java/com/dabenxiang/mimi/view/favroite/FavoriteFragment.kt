@@ -15,6 +15,7 @@ import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.FunctionType
+import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.adapter.FavoriteTabAdapter
@@ -444,6 +445,7 @@ class FavoriteFragment : BaseFragment() {
                         memberItem.id = postItem.postId ?: 0
                         memberItem.isFavorite = true
                         memberItem.creatorId = postItem.posterId ?: 0
+                        memberItem.likeType = if (postItem.likeType == 0) LikeType.LIKE else LikeType.DISLIKE
                         return@memberItem
                     }
                 }
