@@ -1,7 +1,5 @@
 package com.dabenxiang.mimi.view.club
 
-import android.graphics.Bitmap
-
 class ClubFuncItem (
-    val getBitmap: ((String, ((Bitmap) -> Unit)) -> Unit) = { _, _ -> }
+    val getBitmap: ((String, ((String) -> Unit)) -> Unit) = { _, _ -> }
 )

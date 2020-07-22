@@ -16,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
+import androidx.recyclerview.widget.PagerSnapHelper
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.AttachmentListener
@@ -400,7 +401,7 @@ class AdultHomeFragment : BaseFragment() {
         recyclerview.background = requireActivity().getDrawable(R.color.adult_color_background)
         recyclerview.layoutManager = LinearLayoutManager(requireContext())
         recyclerview.adapter = homeAdapter
-        LinearSnapHelper().attachToRecyclerView(recyclerview)
+//        LinearSnapHelper().attachToRecyclerView(recyclerview)
 
         refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
     }
@@ -484,7 +485,7 @@ class AdultHomeFragment : BaseFragment() {
     private val clubMemberAdapter by lazy {
         ClubMemberAdapter(
             requireContext(),
-            ClubFuncItem { s: String, function: (Bitmap) -> Unit -> getBitmap(s, function) }
+            ClubFuncItem { s: String, function: (String) -> Unit -> getBitmap(s, function)}
         )
     }
 
@@ -792,7 +793,7 @@ class AdultHomeFragment : BaseFragment() {
         }
     }
 
-    private fun getBitmap(id: String, update: ((Bitmap) -> Unit)) {
+    private fun getBitmap(id: String, update: ((String) -> Unit)) {
         viewModel.getBitmap(id, update)
     }
 }

@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_club_member_post.view.*
+import timber.log.Timber
 
 /**
  * VAI4.1.6_圈子頁 滑動內容
@@ -39,7 +40,7 @@ class ClubMemberPostViewHolder(view: View) : RecyclerView.ViewHolder(view)  {
                         LruCacheUtils.getLruCache(id)?.also { bitmap ->
                             Glide.with(ivCover.context).load(bitmap).into(ivCover)
                         } ?: run {
-                            clubFuncItem.getBitmap(id) { bp -> updateCover(bp) }
+                            clubFuncItem.getBitmap(id) { id -> updateCover(id) }
                         }
                     }
                 } else {
@@ -49,7 +50,8 @@ class ClubMemberPostViewHolder(view: View) : RecyclerView.ViewHolder(view)  {
         }
     }
 
-    fun updateCover(bitmap: Bitmap) {
+    private fun updateCover(id: String) {
+        val bitmap = LruCacheUtils.getLruCache(id)
         Glide.with(ivCover.context).load(bitmap).into(ivCover)
     }
 }
