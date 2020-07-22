@@ -11,7 +11,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
+import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.FunctionType
+import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_NORMAL
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_SHORT_VIDEO
 import com.dabenxiang.mimi.view.favroite.FavoritePlayViewHolder
@@ -20,7 +22,6 @@ import com.dabenxiang.mimi.view.favroite.FavoritePostViewHolder
 class FavoriteAdapter(
     private val listener: EventListener
 ) : PagedListAdapter<Any, RecyclerView.ViewHolder>(diffCallback) {
-
     companion object {
         private val diffCallback = object : DiffUtil.ItemCallback<Any>() {
             override fun areItemsTheSame(
@@ -41,6 +42,7 @@ class FavoriteAdapter(
         fun onFunctionClick(type: FunctionType, view: View, item: Any)
         fun onChipClick(text: String)
         fun onAvatarDownload(view: ImageView, id: String)
+        fun onGetAttachment(id: String, position: Int, type: AttachmentType)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -74,7 +76,9 @@ class FavoriteAdapter(
         val item = getItem(position)
         when (holder) {
             is FavoritePlayViewHolder -> holder.bind(item as PlayItem)
-            is FavoritePostViewHolder -> holder.bind(item as PostFavoriteItem)
+            is FavoritePostViewHolder -> {
+                holder.bind(item as PostFavoriteItem, position)
+            }
         }
     }
 
@@ -83,5 +87,9 @@ class FavoriteAdapter(
             is PlayItem -> TYPE_NORMAL
             else -> TYPE_SHORT_VIDEO
         }
+    }
+
+    fun update(position: Int){
+        notifyItemChanged(position)
     }
 }

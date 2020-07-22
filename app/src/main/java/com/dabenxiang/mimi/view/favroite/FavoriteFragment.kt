@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
+import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
@@ -23,10 +24,12 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
+import com.dabenxiang.mimi.view.home.viewholder.HomeClipViewHolder
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.fragment_post_favorite.*
@@ -154,6 +157,23 @@ class FavoriteFragment : BaseFragment() {
                 is ApiResult.Loaded -> progressHUD?.dismiss()
             }
         })
+
+        viewModel.attachmentByTypeResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    val attachmentItem = it.result
+                    LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
+                    when (attachmentItem.type) {
+                        AttachmentType.ADULT_HOME_CLIP -> {
+                            favoriteAdapter.update(attachmentItem.position ?: 0)
+                        }
+                        else -> {
+                        }
+                    }
+                }
+                is ApiResult.Error -> Timber.e(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -248,6 +268,10 @@ class FavoriteFragment : BaseFragment() {
     private val listener = object : FavoriteAdapter.EventListener {
         override fun onAvatarDownload(view: ImageView, id: String) {
             viewModel.getAttachment(view, id)
+        }
+
+        override fun onGetAttachment(id: String, position: Int, type: AttachmentType) {
+            viewModel.getAttachment(id, position, type)
         }
 
         override fun onVideoClick(item: Any) {

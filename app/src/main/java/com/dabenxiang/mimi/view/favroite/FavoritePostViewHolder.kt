@@ -1,17 +1,22 @@
 package com.dabenxiang.mimi.view.favroite
 
 import android.content.res.ColorStateList
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
+import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
+import com.flurry.sdk.it
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
@@ -89,7 +94,7 @@ class FavoritePostViewHolder(
         tvMore.visibility = View.INVISIBLE
     }
 
-    override fun updated() {
+    override fun updated(position: Int) {
         data?.posterAvatarAttachmentId?.let {
             listener.onAvatarDownload(ivHead, it.toString())
         }
@@ -98,12 +103,33 @@ class FavoritePostViewHolder(
 //        tvTitle.text = data?.title
         tvTime.text = data?.postDate.let { date ->
             SimpleDateFormat(
-                "yyyy-MM-dd HH:mm",
-                Locale.getDefault()
+                    "yyyy-MM-dd HH:mm",
+                    Locale.getDefault()
             ).format(date)
         }
         val contentItem = gson.fromJson(data?.content.toString(), MediaContentItem::class.java)
         tvLength.text = contentItem?.shortVideo?.length
+
+        contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
+            images[0].also { image ->
+                if (TextUtils.isEmpty(image.url)) {
+                    image.id.takeIf { !TextUtils.isEmpty(it) }?.also { id ->
+                        LruCacheUtils.getLruCache(id)?.also { bitmap ->
+                            Glide.with(ivPhoto.context).load(bitmap).into(ivPhoto)
+                        } ?: run {
+                            listener.onGetAttachment(
+                                    image.id,
+                                    position,
+                                    AttachmentType.ADULT_HOME_CLIP
+                            )
+                        }
+                    }
+                } else {
+                    Glide.with(ivPhoto.context).load(image.url).into(ivPhoto)
+                }
+            }
+        }
+
 
         when (data?.isFollow) {
             true -> {
@@ -154,5 +180,9 @@ class FavoritePostViewHolder(
             }
             reflowGroup.addView(chip)
         }
+    }
+
+    override fun updated() {
+
     }
 }
