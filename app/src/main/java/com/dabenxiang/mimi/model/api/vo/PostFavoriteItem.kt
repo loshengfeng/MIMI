@@ -41,7 +41,7 @@ data class PostFavoriteItem(
     val category: String?,
 
     @SerializedName("likeCount")
-    val likeCount: Int?,
+    var likeCount: Int?,
 
     @SerializedName("dislikeCount")
     val dislikeCount: Int?,
@@ -50,12 +50,15 @@ data class PostFavoriteItem(
     val favoriteCount: Int?,
 
     @SerializedName("isFollow")
-    val isFollow: Boolean?,
+    var isFollow: Boolean?,
 
+    // 0 = like, 1= dislike
     @SerializedName("likeType")
-    val likeType: Int?,
+    var likeType: Int?,
 
     @SerializedName("commentCount")
-    val commentCount: Int?
+    val commentCount: Int?,
+
+    var position: Int = -1
 
 ) : BaseItem()

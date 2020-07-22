@@ -20,7 +20,9 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.FavoritePagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_ADULT
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_NORMAL
@@ -55,11 +57,17 @@ class FavoriteViewModel : BaseViewModel() {
     private val _likeResult = MutableLiveData<ApiResult<Long>>()
     val likeResult: LiveData<ApiResult<Long>> = _likeResult
 
+    private val _followResult = MutableLiveData<ApiResult<Long>>()
+    val followResult: LiveData<ApiResult<Long>> = _followResult
+
     private val _favoriteResult = MutableLiveData<ApiResult<Long>>()
     val favoriteResult: LiveData<ApiResult<Long>> = _favoriteResult
 
     private val _reportResult = MutableLiveData<ApiResult<TextView>>()
     val reportResult: LiveData<ApiResult<TextView>> = _reportResult
+
+    private var _attachmentByTypeResult = MutableLiveData<ApiResult<AttachmentItem>>()
+    val attachmentByTypeResult: LiveData<ApiResult<AttachmentItem>> = _attachmentByTypeResult
 
     fun initData(primaryType: Int, secondaryType: Int) {
         viewModelScope.launch {
@@ -83,6 +91,7 @@ class FavoriteViewModel : BaseViewModel() {
                 }
 
                 else -> {
+                    currentPostList.clear()
                     val dataSrc = FavoritePostListDataSource(
                         viewModelScope,
                         domainManager,
@@ -199,6 +208,69 @@ class FavoriteViewModel : BaseViewModel() {
         }
     }
 
+    fun removePostFavorite(id: Long) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().deleteFavorite(id)
+                if (!result.isSuccessful) {
+                    throw HttpException(result)
+                }
+                emit(ApiResult.success(id))
+            }
+                    .flowOn(Dispatchers.IO)
+                    .onStart { emit(ApiResult.loading()) }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .collect {
+                        _favoriteResult.value = it
+                    }
+        }
+    }
+
+    fun modifyPostLike(videoID: Long) {
+        val likeType = if (currentPostItem?.likeType == 0) LikeType.DISLIKE else LikeType.LIKE
+        val likeRequest = LikeRequest(likeType)
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository()
+                        .like(videoID, likeRequest)
+                if (!result.isSuccessful) {
+                    throw HttpException(result)
+                }
+                emit(ApiResult.success(videoID))
+            }
+                    .flowOn(Dispatchers.IO)
+                    .onStart { emit(ApiResult.loading()) }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .collect {
+                        currentPostItem?.let {item->
+                            item.likeType = if (item.likeType == 1) 0 else 1
+                            item.likeCount = if (item.likeType == 0) (item.likeCount ?: 0) + 1 else (item.likeCount ?: 0) - 1
+                        }
+                        _likeResult.value = it
+                    }
+        }
+    }
+
+    fun modifyFollow(posterId:Long , isFollow: Boolean) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = when {
+                    !isFollow -> apiRepository.followPost(posterId)
+                    else -> apiRepository.cancelFollowPost(posterId)
+                }
+                if (!result.isSuccessful) throw HttpException(result)
+                currentPostItem?.isFollow = !isFollow
+                emit(ApiResult.success(posterId))
+            }
+                    .flowOn(Dispatchers.IO)
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .collect { _followResult.value = it }
+        }
+    }
+
     fun report(postId: Long, content: String) {
         viewModelScope.launch {
             flow {
@@ -228,6 +300,31 @@ class FavoriteViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _cleanResult.value = it }
         }
+    }
+
+    fun getAttachment(id: String, position: Int, type: AttachmentType) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getAttachment(id)
+                if (!result.isSuccessful) throw HttpException(result)
+                val byteArray = result.body()?.bytes()
+                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
+                val item = AttachmentItem(
+                        id = id,
+                        bitmap = bitmap,
+                        position = position,
+                        type = type
+                )
+                emit(ApiResult.success(item))
+            }
+                    .flowOn(Dispatchers.IO)
+                    .onStart { emit(ApiResult.loading()) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .collect { _attachmentByTypeResult.value = it }
+        }
+
+
     }
 
     private val favoritePagingCallback = object : FavoritePagingCallback {

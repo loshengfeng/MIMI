@@ -1,16 +1,21 @@
 package com.dabenxiang.mimi.view.favroite
 
 import android.content.res.ColorStateList
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
+import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.FunctionType
+import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
@@ -76,11 +81,20 @@ class FavoritePostViewHolder(
                 data!!
             )
         }
+        tvFollow.setOnClickListener {
+            listener.onFunctionClick(
+                    FunctionType.FOLLOW,
+                    it,
+                    data!!
+            )
+        }
         tvShare.visibility = View.GONE
         tvTitle.visibility = View.INVISIBLE
+        tvMore.visibility = View.INVISIBLE
     }
 
-    override fun updated() {
+    override fun updated(position: Int) {
+        data?.position = position
         data?.posterAvatarAttachmentId?.let {
             listener.onAvatarDownload(ivHead, it.toString())
         }
@@ -89,27 +103,57 @@ class FavoritePostViewHolder(
 //        tvTitle.text = data?.title
         tvTime.text = data?.postDate.let { date ->
             SimpleDateFormat(
-                "yyyy-MM-dd HH:mm",
-                Locale.getDefault()
+                    "yyyy-MM-dd HH:mm",
+                    Locale.getDefault()
             ).format(date)
         }
         val contentItem = gson.fromJson(data?.content.toString(), MediaContentItem::class.java)
         tvLength.text = contentItem?.shortVideo?.length
 
+        contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
+            images[0].also { image ->
+                if (TextUtils.isEmpty(image.url)) {
+                    image.id.takeIf { !TextUtils.isEmpty(it) }?.also { id ->
+                        LruCacheUtils.getLruCache(id)?.also { bitmap ->
+                            Glide.with(ivPhoto.context).load(bitmap).into(ivPhoto)
+                        } ?: run {
+                            listener.onGetAttachment(
+                                    image.id,
+                                    position,
+                                    AttachmentType.ADULT_HOME_CLIP
+                            )
+                        }
+                    }
+                } else {
+                    Glide.with(ivPhoto.context).load(image.url).into(ivPhoto)
+                }
+            }
+        }
+
+
         when (data?.isFollow) {
             true -> {
-                tvFollow.setTextColor(tvFollow.context.getColor(R.color.color_red_1))
-                tvFollow.setBackgroundResource(R.drawable.bg_red_1_stroke_radius_16)
-            }
-            else -> {
                 tvFollow.setTextColor(tvFollow.context.getColor(R.color.color_black_1_60))
                 tvFollow.setBackgroundResource(R.drawable.bg_gray_6_radius_16)
+                tvFollow.setText(R.string.followed)
+            }
+            else -> {
+                tvFollow.setTextColor(tvFollow.context.getColor(R.color.color_red_1))
+                tvFollow.setBackgroundResource(R.drawable.bg_red_1_stroke_radius_16)
+                tvFollow.setText(R.string.follow)
             }
         }
 
         setupChipGroup(data?.tags)
 
         tvLike.text = data?.likeCount.toString()
+        val res = if (data?.likeType == LikeType.LIKE.value) {
+            R.drawable.ico_nice_s
+        } else {
+            R.drawable.ico_nice_gray
+        }
+        tvLike.setCompoundDrawablesRelativeWithIntrinsicBounds(res, 0, 0, 0)
+
         tvFavorite.text = data?.favoriteCount.toString()
         tvMsg.text = data?.commentCount.toString()
     }
@@ -136,5 +180,9 @@ class FavoritePostViewHolder(
             }
             reflowGroup.addView(chip)
         }
+    }
+
+    override fun updated() {
+
     }
 }

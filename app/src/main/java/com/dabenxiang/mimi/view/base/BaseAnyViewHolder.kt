@@ -11,5 +11,11 @@ abstract class BaseAnyViewHolder<M : Any>(itemView: View) : BaseViewHolder(itemV
         updated()
     }
 
+    fun bind(bind: M?, position: Int) {
+        data = bind
+        updated(position)
+    }
+
     abstract fun updated()
+    open fun updated(position: Int) {}
 }

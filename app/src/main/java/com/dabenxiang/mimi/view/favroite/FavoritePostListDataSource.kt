@@ -40,9 +40,9 @@ class FavoritePostListDataSource constructor(
 
                 val nextPageKey = when {
                     hasNextPage(
-                        item?.paging?.count ?: 0,
-                        item?.paging?.offset ?: 0,
-                        playListItems?.size ?: 0
+                        item.paging.count,
+                        item.paging.offset,
+                        playListItems.size
                     ) -> PER_LIMIT_LONG
                     else -> null
                 }
@@ -77,7 +77,7 @@ class FavoritePostListDataSource constructor(
         val next = params.key
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().getPostFavorite("0", PER_LIMIT)
+                val result = domainManager.getApiRepository().getPostFavorite(next.toString(), PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(result)
             }

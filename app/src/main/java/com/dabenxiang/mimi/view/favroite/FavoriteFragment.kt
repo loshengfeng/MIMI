@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
+import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
@@ -28,6 +29,7 @@ import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.fragment_post_favorite.*
@@ -67,7 +69,8 @@ class FavoriteFragment : BaseFragment() {
         FavoriteTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
                 setTabPosition(TAB_SECONDARY, index)
-                viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
+                if (viewModel.currentPostList.size <= 0)
+                    viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
             }
         }, false)
     }
@@ -119,6 +122,18 @@ class FavoriteFragment : BaseFragment() {
             }
         })
 
+        viewModel.followResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Error -> onApiError(it.throwable)
+                is ApiResult.Success -> {
+                    favoriteAdapter.notifyDataSetChanged()
+                }
+                is ApiResult.Loaded -> progressHUD?.dismiss()
+            }
+        })
+
+
         viewModel.favoriteResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
@@ -141,6 +156,23 @@ class FavoriteFragment : BaseFragment() {
                 is ApiResult.Success -> {
                 }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
+            }
+        })
+
+        viewModel.attachmentByTypeResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    val attachmentItem = it.result
+                    LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
+                    when (attachmentItem.type) {
+                        AttachmentType.ADULT_HOME_CLIP -> {
+                            favoriteAdapter.update(attachmentItem.position ?: 0)
+                        }
+                        else -> {
+                        }
+                    }
+                }
+                is ApiResult.Error -> Timber.e(it.throwable)
             }
         })
     }
@@ -239,6 +271,10 @@ class FavoriteFragment : BaseFragment() {
             viewModel.getAttachment(view, id)
         }
 
+        override fun onGetAttachment(id: String, position: Int, type: AttachmentType) {
+            viewModel.getAttachment(id, position, type)
+        }
+
         override fun onVideoClick(item: Any) {
             when (item) {
                 is PlayItem -> {
@@ -248,7 +284,7 @@ class FavoriteFragment : BaseFragment() {
                     startActivity(intent)
                 }
                 is PostFavoriteItem -> {
-                    // todo: 進入VAI4.1.2.1_短視頻詳細頁，wainting for 短視頻詳細頁...
+                    goShortVideoDetailPage(item)
                 }
             }
         }
@@ -266,9 +302,8 @@ class FavoriteFragment : BaseFragment() {
                         }
                         is PostFavoriteItem -> {
                             viewModel.currentPostItem = item
-                            item.id?.let {
-                                // todo 目前沒有 post favorite item 可以測試
-//                                viewModel.modifyLike(it)
+                            item.postId?.let {
+                                viewModel.modifyPostLike(it)
                             }
                         }
                     }
@@ -285,9 +320,8 @@ class FavoriteFragment : BaseFragment() {
                         }
                         is PostFavoriteItem -> {
                             viewModel.currentPostItem = item
-                            item.id?.let {
-                                // todo 目前沒有 post favorite item 可以測試
-//                                viewModel.modifyFavorite(it)
+                            item.postId?.let {
+                                viewModel.removePostFavorite(it)
                             }
                         }
                     }
@@ -335,36 +369,7 @@ class FavoriteFragment : BaseFragment() {
                             }
                         }
                         is PostFavoriteItem->{
-                            if (item.tags == null || item.tags.first()
-                                            .isEmpty() || item.postId == null
-                            ) {
-                                GeneralUtils.showToast(
-                                        requireContext(),
-                                        getString(R.string.unexpected_error)
-                                )
-                            } else {
-                                val memberPost: ArrayList<MemberPostItem> = Gson().fromJson(Gson().toJson(viewModel.currentPostList), object : TypeToken<ArrayList<MemberPostItem>>() {}.type)
-                                memberPost.forEach memberItem@{ memberItem ->
-                                    viewModel.currentPostList.forEach { postItem ->
-                                        if (postItem.id == memberItem.id) {
-                                            memberItem.avatarAttachmentId = postItem.posterAvatarAttachmentId
-                                                    ?: 0
-                                            memberItem.id = postItem.postId ?: 0
-                                            memberItem.isFavorite = true
-                                            memberItem.creatorId = postItem.posterId ?: 0
-                                            return@memberItem
-                                        }
-                                    }
-                                }
-                                val bundle = ClipFragment.createBundle(memberPost, 0)
-                                navigateTo(
-                                        NavigateItem.Destination(
-                                                R.id.action_postFavoriteFragment_to_clipFragment,
-                                                bundle
-                                        )
-                                )
-                            }
-
+                            goShortVideoDetailPage(item)
                         }
                     }
                 }
@@ -377,6 +382,22 @@ class FavoriteFragment : BaseFragment() {
 //                            MoreDialogFragment::class.java.simpleName
 //                        )
 //                    }
+                }
+                FunctionType.FOLLOW->{
+                    // 追蹤與取消追蹤
+                    when (item) {
+                        is PostFavoriteItem->{
+                            if (item.posterId == null || item.posterId == 0L) {
+                                GeneralUtils.showToast(
+                                        requireContext(),
+                                        getString(R.string.unexpected_error)
+                                )
+                            } else {
+                                viewModel.currentPostItem = item
+                                viewModel.modifyFollow(item.posterId, item.isFollow ?: false)
+                            }
+                        }
+                    }
                 }
                 else -> {
                 }
@@ -400,5 +421,42 @@ class FavoriteFragment : BaseFragment() {
         override fun onClean() {
             viewModel.deleteFavorite()
         }
+    }
+
+    /**
+     * 進到短影片的詳細頁面
+     */
+    private fun goShortVideoDetailPage(item: PostFavoriteItem) {
+
+        if (item.tags == null || item.tags.first()
+                        .isEmpty() || item.postId == null
+        ) {
+            GeneralUtils.showToast(
+                    requireContext(),
+                    getString(R.string.unexpected_error)
+            )
+        } else {
+            val memberPost: ArrayList<MemberPostItem> = Gson().fromJson(Gson().toJson(viewModel.currentPostList), object : TypeToken<ArrayList<MemberPostItem>>() {}.type)
+            memberPost.forEach memberItem@{ memberItem ->
+                viewModel.currentPostList.forEach { postItem ->
+                    if (postItem.id == memberItem.id) {
+                        memberItem.avatarAttachmentId = postItem.posterAvatarAttachmentId
+                                ?: 0
+                        memberItem.id = postItem.postId ?: 0
+                        memberItem.isFavorite = true
+                        memberItem.creatorId = postItem.posterId ?: 0
+                        return@memberItem
+                    }
+                }
+            }
+            val bundle = ClipFragment.createBundle(memberPost, item.position)
+            navigateTo(
+                    NavigateItem.Destination(
+                            R.id.action_postFavoriteFragment_to_clipFragment,
+                            bundle
+                    )
+            )
+        }
+
     }
 }

@@ -135,7 +135,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/bg_gray_12_radius_6"
                 android:contentDescription="@null"
                 android:src="@drawable/btn_play_n"
                 app:layout_constraintBottom_toBottomOf="@id/iv_photo"

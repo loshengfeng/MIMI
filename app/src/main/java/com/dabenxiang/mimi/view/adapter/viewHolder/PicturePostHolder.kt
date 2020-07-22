@@ -7,9 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSnapHelper
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
@@ -107,7 +105,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
                 }
             )
             pictureRecycler.onFlingListener = null
-            LinearSnapHelper().attachToRecyclerView(pictureRecycler)
+            PagerSnapHelper().attachToRecyclerView(pictureRecycler)
 
             pictureRecycler.setOnScrollChangeListener { _, _, _, _, _ ->
                 val currentPosition =
