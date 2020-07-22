@@ -72,8 +72,7 @@ class FavoriteFragment : BaseFragment() {
         FavoriteTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
                 setTabPosition(TAB_SECONDARY, index)
-                if (viewModel.currentPostList.size <= 0)
-                    viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
+                viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
             }
         }, false)
     }
