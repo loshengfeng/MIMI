@@ -266,9 +266,8 @@ class FavoriteFragment : BaseFragment() {
                         }
                         is PostFavoriteItem -> {
                             viewModel.currentPostItem = item
-                            item.id?.let {
-                                // todo 目前沒有 post favorite item 可以測試
-//                                viewModel.modifyLike(it)
+                            item.postId?.let {
+                                viewModel.modifyPostLike(it)
                             }
                         }
                     }
@@ -285,9 +284,8 @@ class FavoriteFragment : BaseFragment() {
                         }
                         is PostFavoriteItem -> {
                             viewModel.currentPostItem = item
-                            item.id?.let {
-                                // todo 目前沒有 post favorite item 可以測試
-//                                viewModel.modifyFavorite(it)
+                            item.postId?.let {
+                                viewModel.removePostFavorite(it)
                             }
                         }
                     }

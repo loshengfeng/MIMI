@@ -199,6 +199,52 @@ class FavoriteViewModel : BaseViewModel() {
         }
     }
 
+    fun removePostFavorite(id: Long) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().deleteFavorite(id)
+                if (!result.isSuccessful) {
+                    throw HttpException(result)
+                }
+                emit(ApiResult.success(id))
+            }
+                    .flowOn(Dispatchers.IO)
+                    .onStart { emit(ApiResult.loading()) }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .collect {
+                        _favoriteResult.value = it
+                    }
+        }
+    }
+
+    fun modifyPostLike(videoID: Long) {
+        val likeType = if (currentPostItem?.likeType == 0) LikeType.DISLIKE else LikeType.LIKE
+        val likeRequest = LikeRequest(likeType)
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository()
+                        .like(videoID, likeRequest)
+                if (!result.isSuccessful) {
+                    throw HttpException(result)
+                }
+                emit(ApiResult.success(videoID))
+            }
+                    .flowOn(Dispatchers.IO)
+                    .onStart { emit(ApiResult.loading()) }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .collect {
+                        currentPostItem?.let {item->
+                            item.likeType = if (item.likeType == 1) 0 else 1
+                            item.likeCount = if (item.likeType == 0) (item.likeCount ?: 0) + 1 else (item.likeCount ?: 0) - 1
+                        }
+                        _likeResult.value = it
+                    }
+        }
+    }
+
+
     fun report(postId: Long, content: String) {
         viewModelScope.launch {
             flow {

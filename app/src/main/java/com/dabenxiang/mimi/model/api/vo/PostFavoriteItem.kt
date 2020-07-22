@@ -41,7 +41,7 @@ data class PostFavoriteItem(
     val category: String?,
 
     @SerializedName("likeCount")
-    val likeCount: Int?,
+    var likeCount: Int?,
 
     @SerializedName("dislikeCount")
     val dislikeCount: Int?,
@@ -52,8 +52,9 @@ data class PostFavoriteItem(
     @SerializedName("isFollow")
     val isFollow: Boolean?,
 
+    // 0 = like, 1= dislike
     @SerializedName("likeType")
-    val likeType: Int?,
+    var likeType: Int?,
 
     @SerializedName("commentCount")
     val commentCount: Int?

@@ -9,6 +9,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.model.enums.FunctionType
+import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
 import com.google.android.material.chip.Chip
@@ -78,6 +79,7 @@ class FavoritePostViewHolder(
         }
         tvShare.visibility = View.GONE
         tvTitle.visibility = View.INVISIBLE
+        tvMore.visibility = View.INVISIBLE
     }
 
     override fun updated() {
@@ -110,6 +112,13 @@ class FavoritePostViewHolder(
         setupChipGroup(data?.tags)
 
         tvLike.text = data?.likeCount.toString()
+        val res = if (data?.likeType == LikeType.LIKE.value) {
+            R.drawable.ico_nice_s
+        } else {
+            R.drawable.ico_nice_gray
+        }
+        tvLike.setCompoundDrawablesRelativeWithIntrinsicBounds(res, 0, 0, 0)
+
         tvFavorite.text = data?.favoriteCount.toString()
         tvMsg.text = data?.commentCount.toString()
     }
