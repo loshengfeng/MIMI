@@ -485,7 +485,9 @@ class AdultHomeFragment : BaseFragment() {
     private val clubMemberAdapter by lazy {
         ClubMemberAdapter(
             requireContext(),
-            ClubFuncItem { s: String, function: (String) -> Unit -> getBitmap(s, function)}
+            ClubFuncItem(
+                { id, function -> getBitmap(id, function) },
+                { item, isFollow, function -> clubFollow(item, isFollow, function) })
         )
     }
 
@@ -795,5 +797,9 @@ class AdultHomeFragment : BaseFragment() {
 
     private fun getBitmap(id: String, update: ((String) -> Unit)) {
         viewModel.getBitmap(id, update)
+    }
+
+    private fun clubFollow(memberClubItem: MemberClubItem, isFollow: Boolean, update: (Boolean) -> Unit) {
+        viewModel.clubFollow(memberClubItem, isFollow, update)
     }
 }

@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.club
 
-import android.graphics.Bitmap
 import android.text.TextUtils
 import android.view.View
 import com.bumptech.glide.Glide
@@ -29,7 +28,21 @@ class ClubMemberViewHolder(view: View) : BaseViewHolder(view) {
         tvDesc.text = item.description
         tvFollowCount.text = item.followerCount.toString()
         tvPostCount.text = item.postCount.toString()
-        updateFollowItem(item)
+
+        val isFollow = item.isFollow ?: false
+        if (isFollow) {
+            tvFollow.text = tvFollow.context.getString(R.string.followed)
+            tvFollow.background = tvFollow.context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
+            tvFollow.setTextColor(tvFollow.context.getColor(R.color.color_white_1))
+        } else {
+            tvFollow.text = tvFollow.context.getString(R.string.follow)
+            tvFollow.background = tvFollow.context.getDrawable(R.drawable.bg_red_1_stroke_radius_16)
+            tvFollow.setTextColor(tvFollow.context.getColor(R.color.color_red_1))
+        }
+
+        tvFollow.setOnClickListener {
+            clubFuncItem.onFollowClick(item, !(item.isFollow ?: false)) { isFollow -> updateFollowItem(isFollow) }
+        }
 
         if (rvPost.adapter == null || rvPost.tag != position) {
             rvPost.tag = position
@@ -47,15 +60,13 @@ class ClubMemberViewHolder(view: View) : BaseViewHolder(view) {
     }
 
     private fun updateAvatar(id: String) {
-        Timber.d("@@updateAvatar id: $id")
         takeIf { ivAvatar.tag == id }?.also {
             val bitmap = LruCacheUtils.getLruCache(id)
             Glide.with(ivAvatar.context).load(bitmap).circleCrop().into(ivAvatar)
         }
     }
 
-    private fun updateFollowItem(item: MemberClubItem) {
-        val isFollow = item.isFollow ?: false
+    private fun updateFollowItem(isFollow: Boolean) {
         if (isFollow) {
             tvFollow.text = tvFollow.context.getString(R.string.followed)
             tvFollow.background = tvFollow.context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
