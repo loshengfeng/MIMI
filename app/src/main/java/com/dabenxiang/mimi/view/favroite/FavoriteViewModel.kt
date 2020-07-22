@@ -27,7 +27,6 @@ import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_NORMAL
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_SHORT_VIDEO
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.getLruCache
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.putLruCache
-import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -42,6 +41,7 @@ class FavoriteViewModel : BaseViewModel() {
 
     var currentPlayItem: PlayItem? = null
     var currentPostItem: PostFavoriteItem? = null
+    var currentPostList: ArrayList<PostFavoriteItem> = ArrayList()
 
     private val _cleanResult = MutableLiveData<ApiResult<Nothing>>()
     val cleanResult: LiveData<ApiResult<Nothing>> = _cleanResult
@@ -247,6 +247,10 @@ class FavoriteViewModel : BaseViewModel() {
         override fun onTotalVideoId(ids: ArrayList<Long>) {
             videoIDList.clear()
             videoIDList.addAll(ids)
+        }
+
+        override fun onReceiveResponse(response: ArrayList<PostFavoriteItem>) {
+            currentPostList.addAll(response)
         }
     }
 

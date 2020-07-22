@@ -1,7 +1,9 @@
 package com.dabenxiang.mimi.view.clip
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
+import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
@@ -13,10 +15,12 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.comment.CommentDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
+import com.dabenxiang.mimi.view.listener.InteractionListener
 import kotlinx.android.synthetic.main.fragment_clip.*
 import timber.log.Timber
 import java.io.File
@@ -42,11 +46,14 @@ class ClipFragment : BaseFragment() {
 
     private val clipMap: HashMap<String, File> = hashMapOf()
     private val memberPostItems: ArrayList<MemberPostItem> = arrayListOf()
+    private var interactionListener: InteractionListener? = null
 
     override val bottomNavigationVisibility = View.GONE
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
+
         initSettings()
     }
 
@@ -161,6 +168,15 @@ class ClipFragment : BaseFragment() {
                 }
             })
             rv_clip.scrollToPosition(position)
+        }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        try {
+            interactionListener = context as InteractionListener
+        } catch (e: ClassCastException) {
+            Timber.e("ClipFragment interaction listener can't cast")
         }
     }
 

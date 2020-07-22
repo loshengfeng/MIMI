@@ -76,6 +76,8 @@ class FavoritePostViewHolder(
                 data!!
             )
         }
+        tvShare.visibility = View.GONE
+        tvTitle.visibility = View.INVISIBLE
     }
 
     override fun updated() {
@@ -84,7 +86,7 @@ class FavoritePostViewHolder(
         }
 
         tvName.text = data?.posterName
-        tvTitle.text = data?.title
+//        tvTitle.text = data?.title
         tvTime.text = data?.postDate.let { date ->
             SimpleDateFormat(
                 "yyyy-MM-dd HH:mm",

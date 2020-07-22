@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.model.enums.FunctionType
@@ -19,12 +20,15 @@ import com.dabenxiang.mimi.view.adapter.FavoriteTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.fragment_post_favorite.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import timber.log.Timber
@@ -328,6 +332,38 @@ class FavoriteFragment : BaseFragment() {
                                 intent.putExtras(PlayerActivity.createBundle(playerData, true))
                                 startActivity(intent)
                             }
+                        }
+                        is PostFavoriteItem->{
+                            if (item.tags == null || item.tags.first()
+                                            .isEmpty() || item.postId == null
+                            ) {
+                                GeneralUtils.showToast(
+                                        requireContext(),
+                                        getString(R.string.unexpected_error)
+                                )
+                            } else {
+                                val memberPost: ArrayList<MemberPostItem> = Gson().fromJson(Gson().toJson(viewModel.currentPostList), object : TypeToken<ArrayList<MemberPostItem>>() {}.type)
+                                memberPost.forEach memberItem@{ memberItem ->
+                                    viewModel.currentPostList.forEach { postItem ->
+                                        if (postItem.id == memberItem.id) {
+                                            memberItem.avatarAttachmentId = postItem.posterAvatarAttachmentId
+                                                    ?: 0
+                                            memberItem.id = postItem.postId ?: 0
+                                            memberItem.isFavorite = true
+                                            memberItem.creatorId = postItem.posterId ?: 0
+                                            return@memberItem
+                                        }
+                                    }
+                                }
+                                val bundle = ClipFragment.createBundle(memberPost, 0)
+                                navigateTo(
+                                        NavigateItem.Destination(
+                                                R.id.action_postFavoriteFragment_to_clipFragment,
+                                                bundle
+                                        )
+                                )
+                            }
+
                         }
                     }
                 }

@@ -9,7 +9,7 @@ import java.util.*
 data class MemberPostItem(
 
     @SerializedName("id")
-    val id: Long = 0,
+    var id: Long = 0,
 
     @SerializedName("title")
     val title: String = "",
@@ -48,10 +48,10 @@ data class MemberPostItem(
     val clickThroughCount: Int = 0,
 
     @SerializedName("avatarAttachmentId")
-    val avatarAttachmentId: Long = 0,
+    var avatarAttachmentId: Long = 0,
 
     @SerializedName("creatorId")
-    val creatorId: Long = 0,
+    var creatorId: Long = 0,
 
     @SerializedName("isFollow")
     var isFollow: Boolean = false,
