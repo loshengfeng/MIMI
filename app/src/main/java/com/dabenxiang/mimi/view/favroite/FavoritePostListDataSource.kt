@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.favroite
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.FavoritePagingCallback
 import com.dabenxiang.mimi.manager.DomainManager
+import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -34,6 +35,8 @@ class FavoritePostListDataSource constructor(
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()
                 val playListItems = item?.content
+
+                pagingCallback.onReceiveResponse(playListItems as ArrayList<PostFavoriteItem>)
 
                 val nextPageKey = when {
                     hasNextPage(
@@ -85,6 +88,7 @@ class FavoritePostListDataSource constructor(
                 .collect { response ->
                     response.body()?.also { item ->
                         item.content?.also { list ->
+                            pagingCallback.onReceiveResponse(list as ArrayList<PostFavoriteItem>)
                             val nextPageKey = when {
                                 hasNextPage(
                                     item.paging.count,

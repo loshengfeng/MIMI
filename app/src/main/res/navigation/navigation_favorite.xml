@@ -12,9 +12,16 @@
         <action
             android:id="@+id/action_postFavoriteFragment_to_searchVideoFragment"
             app:destination="@id/searchVideoFragment" />
+        <action
+            android:id="@+id/action_postFavoriteFragment_to_clipFragment"
+            app:destination="@id/clipFragment" />
     </fragment>
     <fragment
         android:id="@+id/searchVideoFragment"
         android:name="com.dabenxiang.mimi.view.search.SearchVideoFragment"
         android:label="SearchVideoFragment" />
+    <fragment
+        android:id="@+id/clipFragment"
+        android:name="com.dabenxiang.mimi.view.clip.ClipFragment"
+        android:label="ClipFragment" />
 </navigation>
