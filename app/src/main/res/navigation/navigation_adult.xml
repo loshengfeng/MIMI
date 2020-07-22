@@ -41,18 +41,25 @@
             android:id="@+id/action_adultHomeFragment_to_editVideoFragment"
             app:destination="@id/editVideoFragment" />
 
+        <action
+            android:id="@+id/action_adultHomeFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+
     </fragment>
 
     <fragment
         android:id="@+id/categoriesFragment"
         android:name="com.dabenxiang.mimi.view.home.category.CategoriesFragment"
         tools:layout="@layout/fragment_categories">
-
         <action
             android:id="@+id/action_categoriesFragment_to_searchVideoFragment"
             app:destination="@id/searchVideoFragment" />
-
     </fragment>
+
+    <fragment
+        android:id="@+id/searchPostFragment"
+        android:name="com.dabenxiang.mimi.view.search.post.SearchPostFragment"
+        tools:layout="@layout/fragment_search_post" />
 
     <fragment
         android:id="@+id/searchVideoFragment"
@@ -98,7 +105,7 @@
         android:id="@+id/postVideoFragment"
         android:name="com.dabenxiang.mimi.view.post.video.PostVideoFragment"
         android:label="PostVideoFragment"
-        tools:layout="@layout/fragment_post_video" >
+        tools:layout="@layout/fragment_post_video">
         <action
             android:id="@+id/action_postVideoFragment_self"
             app:destination="@id/postVideoFragment" />
@@ -107,7 +114,7 @@
         android:id="@+id/editVideoFragment"
         android:name="com.dabenxiang.mimi.view.post.video.EditVideoFragment"
         android:label="EditVideoFragment"
-        tools:layout="@layout/fragment_edit_video" >
+        tools:layout="@layout/fragment_edit_video">
         <action
             android:id="@+id/action_editVideoFragment_to_postVideoFragment"
             app:destination="@id/postVideoFragment" />

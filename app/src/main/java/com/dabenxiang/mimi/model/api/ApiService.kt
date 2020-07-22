@@ -389,6 +389,17 @@ interface ApiService {
         @Body body: ReportRequest
     ): Response<Void>
 
+    @GET("/v1/Members/Post")
+    suspend fun searchPost(
+        @Query("type") type: Int,
+        @Query("tag") tag: String,
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int,
+        @Query("orderBy") orderBy: Int = 1,
+        @Query("isFullContent") isFullContent: Boolean = false,
+        @Query("isAdult") isAdult: Boolean = true
+    ): Response<ApiBasePagingItem<List<MemberPostItem>>>
+
     /**********************************************************
      *
      *                  Ordering
