@@ -15,6 +15,9 @@ import com.dabenxiang.mimi.widget.utility.LruCacheUtils.getLruCache
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.nested_item_home_club.view.*
 
+/**
+ * VAI4.1_成人視頻 圈子內容
+ */
 class ClubViewHolder(
     itemView: View,
     onClickListener: IndexViewHolderListener,

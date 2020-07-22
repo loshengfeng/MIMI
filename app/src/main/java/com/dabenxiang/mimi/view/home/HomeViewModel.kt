@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.home
 
+import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
@@ -9,7 +10,6 @@ import androidx.paging.PagedList
 import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.MoreDialogData
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
@@ -21,8 +21,11 @@ import com.dabenxiang.mimi.view.home.club.ClubDataSource
 import com.dabenxiang.mimi.view.home.club.ClubFactory
 import com.dabenxiang.mimi.view.home.memberpost.MemberPostDataSource
 import com.dabenxiang.mimi.view.home.memberpost.MemberPostFactory
+import com.dabenxiang.mimi.view.home.postfollow.PostFollowDataSource
+import com.dabenxiang.mimi.view.home.postfollow.PostFollowFactory
 import com.dabenxiang.mimi.view.home.video.VideoDataSource
 import com.dabenxiang.mimi.view.home.video.VideoFactory
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -82,6 +85,9 @@ class HomeViewModel : BaseViewModel() {
 
     private var _likePostResult = MutableLiveData<ApiResult<Int>>()
     val likePostResult: LiveData<ApiResult<Int>> = _likePostResult
+
+    private val _postFollowItemListResult = MutableLiveData<PagedList<MemberPostItem>>()
+    val postFollowItemListResult: LiveData<PagedList<MemberPostItem>> = _postFollowItemListResult
 
     private val _clipPostItemListResult = MutableLiveData<PagedList<MemberPostItem>>()
     val clipPostItemListResult: LiveData<PagedList<MemberPostItem>> = _clipPostItemListResult
@@ -248,6 +254,28 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
+    fun getBitmap(id: String, update: ((Bitmap) -> Unit)) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getAttachment(id)
+                if (!result.isSuccessful) throw HttpException(result)
+                val byteArray = result.body()?.bytes()
+                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
+                LruCacheUtils.putLruCache(id, bitmap)
+                emit(ApiResult.success(bitmap))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    when(it) {
+                        is ApiResult.Success -> {
+                            update(it.result)
+                        }
+                    }
+                }
+        }
+    }
+
     fun followClub(item: MemberClubItem, position: Int, isFollow: Boolean) {
         viewModelScope.launch {
             flow {
@@ -341,6 +369,13 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
+    fun getPostFollows() {
+        viewModelScope.launch {
+            getPostFollowPagingItems().asFlow()
+                .collect { _postFollowItemListResult.value = it }
+        }
+    }
+
     fun getClipPosts() {
         viewModelScope.launch {
             getMemberPostPagingItems(PostType.VIDEO).asFlow()
@@ -360,6 +395,16 @@ class HomeViewModel : BaseViewModel() {
             getMemberPostPagingItems(PostType.TEXT).asFlow()
                 .collect { _textPostItemListResult.value = it }
         }
+    }
+
+    private fun getPostFollowPagingItems(): LiveData<PagedList<MemberPostItem>> {
+        val postFollowDataSource =
+            PostFollowDataSource(pagingCallback, viewModelScope, domainManager)
+        val pictureFactory = PostFollowFactory(postFollowDataSource)
+        val config = PagedList.Config.Builder()
+            .setPrefetchDistance(4)
+            .build()
+        return LivePagedListBuilder(pictureFactory, config).build()
     }
 
     private fun getMemberPostPagingItems(postType: PostType): LiveData<PagedList<MemberPostItem>> {

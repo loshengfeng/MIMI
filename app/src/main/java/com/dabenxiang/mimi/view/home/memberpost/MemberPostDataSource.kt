@@ -83,7 +83,6 @@ class MemberPostDataSource(
                                 ) -> next + PER_LIMIT
                                 else -> null
                             }
-
                             callback.onResult(list, nextPageKey)
                         }
                     }

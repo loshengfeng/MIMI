@@ -178,6 +178,7 @@ class PictureDetailFragment : BaseFragment() {
                                 commentAdapter!!
                             )
                         }
+                        pictureDetailAdapter?.notifyItemChanged(2)
                     }
                     is Error -> Timber.e(it.throwable)
                 }

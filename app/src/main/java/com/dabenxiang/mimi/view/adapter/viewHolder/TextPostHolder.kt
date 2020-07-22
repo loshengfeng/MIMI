@@ -23,7 +23,6 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_text_post.view.*
-import java.lang.Exception
 import java.util.*
 
 class TextPostHolder(itemView: View) : BaseViewHolder(itemView) {
@@ -100,6 +99,7 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView) {
             adultListener.onItemClick(item, AdultTabType.TEXT)
         }
     }
+
 
     private fun updateLikeAndFollowItem(
         item: MemberPostItem,

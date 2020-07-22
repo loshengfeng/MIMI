@@ -236,6 +236,9 @@ class HomePictureViewHolder(
     }
 }
 
+/**
+ * VAI4.1_成人視頻 圈子分類
+ */
 class HomeClubViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,

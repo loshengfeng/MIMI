@@ -63,6 +63,9 @@ data class MemberPostItem(
     val postFriendlyName: String = "",
 
     @SerializedName("status")
-    val status: PostStatus = PostStatus.ONLINE
+    val status: PostStatus? = PostStatus.ONLINE,
+
+    @SerializedName("category")
+    val category: String? = "string"
 
 ) : BaseMemberPostItem()

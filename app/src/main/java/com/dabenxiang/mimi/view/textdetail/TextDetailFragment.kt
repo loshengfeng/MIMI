@@ -167,6 +167,7 @@ class TextDetailFragment : BaseFragment() {
                                 commentAdapter!!
                             )
                         }
+                        textDetailAdapter?.notifyItemChanged(2)
                     }
                     is Error -> Timber.e(it.throwable)
                 }
