@@ -1112,7 +1112,6 @@ class PlayerActivity : BaseActivity() {
     }
 
     private fun setupSourceList(list: List<Source>?) {
-        Timber.d("neo,list = ${list?.size}")
         if (list == null) {
             headSource.recyclerview_source_list.visibility = View.GONE
         } else {

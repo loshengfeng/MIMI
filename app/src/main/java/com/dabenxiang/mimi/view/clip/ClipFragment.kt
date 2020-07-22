@@ -131,7 +131,6 @@ class ClipFragment : BaseFragment() {
         val position = arguments?.getInt(KEY_POSITION) ?: 0
         (arguments?.getSerializable(KEY_DATA) as ArrayList<MemberPostItem>).also { data ->
             Timber.d("data: $data")
-            Timber.d("neo, aaa ${data[0].creatorId}")
             memberPostItems.addAll(data)
             rv_clip.adapter = ClipAdapter(
                 requireContext(),
