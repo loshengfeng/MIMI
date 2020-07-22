@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.search
+package com.dabenxiang.mimi.view.search.video
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,7 +8,6 @@ import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.dabenxiang.mimi.callback.SearchVideoPagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.MoreDialogData
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
@@ -48,7 +47,8 @@ class SearchVideoViewModel : BaseViewModel() {
     private fun getVideoPagingItems(
             isAdult: Boolean
     ): LiveData<PagedList<VideoItem>> {
-        val searchVideoDataSource = SearchVideoListDataSource(
+        val searchVideoDataSource =
+            SearchVideoListDataSource(
                 viewModelScope,
                 domainManager,
                 domainManager.getApiRepository(),
@@ -56,8 +56,11 @@ class SearchVideoViewModel : BaseViewModel() {
                 isAdult,
                 searchingTag,
                 searchingStr
-        )
-        val videoFactory = SearchVideoFactory(searchVideoDataSource)
+            )
+        val videoFactory =
+            SearchVideoFactory(
+                searchVideoDataSource
+            )
         val config = PagedList.Config.Builder()
                 .setPrefetchDistance(4)
                 .build()

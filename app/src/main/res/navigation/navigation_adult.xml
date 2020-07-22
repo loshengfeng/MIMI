@@ -56,7 +56,7 @@
 
     <fragment
         android:id="@+id/searchVideoFragment"
-        android:name="com.dabenxiang.mimi.view.search.SearchVideoFragment"
+        android:name="com.dabenxiang.mimi.view.search.video.SearchVideoFragment"
         tools:layout="@layout/fragment_search_video" />
 
     <fragment
