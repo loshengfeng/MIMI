@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.search
+package com.dabenxiang.mimi.view.search.video
 
 import android.content.Intent
 import android.os.Bundle
@@ -15,7 +15,6 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.MoreDialogData
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem

@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.search
+package com.dabenxiang.mimi.view.search.video
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.SearchVideoPagingCallback
@@ -56,8 +56,11 @@ class SearchVideoListDataSource(
                     ) -> PER_LIMIT_LONG
                     else -> null
                 }
-                emit(Pair<LoadResult, Long>(LoadResult(videos
-                        ?: ArrayList(), nextPageKey), totalCount))
+                emit(Pair<LoadResult, Long>(
+                    LoadResult(
+                        videos
+                            ?: ArrayList(), nextPageKey
+                    ), totalCount))
             }
                     .flowOn(Dispatchers.IO)
                     .catch { e ->

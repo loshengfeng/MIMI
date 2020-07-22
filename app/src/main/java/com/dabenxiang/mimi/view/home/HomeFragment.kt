@@ -28,7 +28,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.player.PlayerActivity
-import com.dabenxiang.mimi.view.search.SearchVideoFragment
+import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import kotlinx.android.synthetic.main.fragment_home.*
 import timber.log.Timber
 

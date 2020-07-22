@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.search
+package com.dabenxiang.mimi.view.search.video
 
 import androidx.paging.DataSource
 import com.dabenxiang.mimi.model.api.vo.VideoItem
