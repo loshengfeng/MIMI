@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.core.view.size
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,11 +18,13 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.ScrollPicAdapterListener
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
+import com.dabenxiang.mimi.model.api.vo.PostMemberRequest
 import com.dabenxiang.mimi.view.adapter.ScrollPicAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
+import com.dabenxiang.mimi.view.home.HomeViewModel
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_post_article.chipGroup
@@ -41,6 +44,9 @@ class PostPicFragment : BaseFragment() {
 
     companion object {
         const val BUNDLE_PIC_URI = "bundle_pic_uri"
+        const val UPLOAD_PIC = "upload_pic"
+        const val MEMBER_REQUEST = "member_request"
+        const val PIC_URI = "pic_uri"
 
         private const val TITLE_LIMIT = 60
         private const val CONTENT_LIMIT = 2000
@@ -49,6 +55,7 @@ class PostPicFragment : BaseFragment() {
         private const val PHOTO_LIMIT = 10
 
         private const val REQUEST_MUTLI_PHOTO = 1001
+        private const val TYPE_IMAGE = 2
     }
 
     override val bottomNavigationVisibility: Int
@@ -61,6 +68,8 @@ class PostPicFragment : BaseFragment() {
     private val uriList = arrayListOf<String>()
 
     private lateinit var adapter: ScrollPicAdapter
+
+    private val viewModel: HomeViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -77,6 +86,7 @@ class PostPicFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
+
     }
 
     override fun setupListeners() {
@@ -140,6 +150,44 @@ class PostPicFragment : BaseFragment() {
 
         tv_back.setOnClickListener {
             findNavController().popBackStack()
+        }
+
+        tv_clean.setOnClickListener {
+            val title = edt_title.text.toString()
+            val content = edt_content.text.toString()
+
+            if (title.isBlank()) {
+                return@setOnClickListener
+            }
+
+            if (content.isBlank()) {
+                return@setOnClickListener
+            }
+
+            if (chipGroup.childCount == (0)) {
+                return@setOnClickListener
+            }
+
+            //TODO 上面的判斷需要空白提示 UI
+
+            val tags = arrayListOf<String>()
+
+            for (i in 0 until chipGroup.childCount) {
+                val chip = chipGroup.getChildAt(i)
+                chip as Chip
+                tags.add(chip.text.toString())
+            }
+
+            val request = PostMemberRequest(
+                title = title,
+                type = TYPE_IMAGE,
+                tags = tags
+            )
+
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(UPLOAD_PIC, true)
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(MEMBER_REQUEST, request)
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(PIC_URI, adapter.getData())
+            findNavController().navigateUp()
         }
     }
 

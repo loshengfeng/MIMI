@@ -73,6 +73,9 @@
     <color name="color_gray_13">#ececec</color>
 
     <color name="color_yellow_1">#ffb24d</color>
+    <color name="color_yellow_2">#ffc600</color>
+
+    <color name="color_blue_1">#3d4d9b</color>
 
     <color name="clip_comment_bg">#b31e233a</color>
 </resources>
