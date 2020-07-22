@@ -16,7 +16,9 @@ import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.serializable.PlayerData
+import com.dabenxiang.mimi.model.serializable.SearchPostItem
 import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.adapter.FavoriteTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -405,16 +407,26 @@ class FavoriteFragment : BaseFragment() {
             }
         }
 
-        override fun onChipClick(text: String) {
+        override fun onChipClick(text: String, type: Int?) {
             // 點擊標籤後進入 Search page
-            interactionListener?.setAdult(lastPrimaryIndex == 1)
-            val bundle = SearchVideoFragment.createBundle(tag = text)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_postFavoriteFragment_to_searchVideoFragment,
-                    bundle
+            interactionListener?.setAdult(lastPrimaryIndex == TYPE_ADULT)
+            if (lastSecondaryIndex == TYPE_MIMI) {
+                val bundle = SearchVideoFragment.createBundle(tag = text)
+                navigateTo(
+                        NavigateItem.Destination(
+                                R.id.action_postFavoriteFragment_to_searchVideoFragment,
+                                bundle
+                        )
                 )
-            )
+            } else {
+                val bundle = SearchPostFragment.createBundle(SearchPostItem(PostType.getTypeByValue(type), text))
+                navigateTo(
+                        NavigateItem.Destination(
+                                R.id.action_postFavoriteFragment_to_searchPostFragment,
+                                bundle
+                        )
+                )
+            }
         }
     }
 

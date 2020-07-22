@@ -13,5 +13,18 @@ enum class PostType(val value: Int) {
     VIDEO(4),
 
     @SerializedName("8")
-    VIDEO_ON_DEMAND(8)
+    VIDEO_ON_DEMAND(8);
+
+    companion object {
+        fun getTypeByValue(target: Int?): PostType {
+            var result: PostType = TEXT
+            values().forEach {
+                if (it.value == target) {
+                    result = it
+                }
+            }
+
+            return result
+        }
+    }
 }

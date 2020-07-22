@@ -15,6 +15,9 @@
         <action
             android:id="@+id/action_postFavoriteFragment_to_clipFragment"
             app:destination="@id/clipFragment" />
+        <action
+            android:id="@+id/action_postFavoriteFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
     </fragment>
     <fragment
         android:id="@+id/searchVideoFragment"
@@ -24,4 +27,8 @@
         android:id="@+id/clipFragment"
         android:name="com.dabenxiang.mimi.view.clip.ClipFragment"
         android:label="ClipFragment" />
+    <fragment
+        android:id="@+id/searchPostFragment"
+        android:name="com.dabenxiang.mimi.view.search.post.SearchPostFragment"
+        android:label="SearchPostFragment" />
 </navigation>

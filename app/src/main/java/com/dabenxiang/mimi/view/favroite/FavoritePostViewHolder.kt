@@ -144,7 +144,7 @@ class FavoritePostViewHolder(
             }
         }
 
-        setupChipGroup(data?.tags)
+        setupChipGroup(data?.tags, data?.type)
 
         tvLike.text = data?.likeCount.toString()
         val res = if (data?.likeType == LikeType.LIKE.value) {
@@ -158,7 +158,7 @@ class FavoritePostViewHolder(
         tvMsg.text = data?.commentCount.toString()
     }
 
-    private fun setupChipGroup(list: List<String>?) {
+    private fun setupChipGroup(list: List<String>?, type: Int?) {
         reflowGroup.reflow_group.removeAllViews()
 
         if (list == null) {
@@ -176,7 +176,7 @@ class FavoritePostViewHolder(
                 ColorStateList.valueOf(chip.context.getColor(R.color.color_black_1_10))
             chip.isClickable = true
             chip.setOnClickListener {
-                listener.onChipClick((it as Chip).text.toString())
+                listener.onChipClick((it as Chip).text.toString(), type)
             }
             reflowGroup.addView(chip)
         }
