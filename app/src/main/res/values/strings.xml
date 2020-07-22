@@ -219,6 +219,10 @@
     <string name="edit_video">编辑</string>
     <string name="crop_photo">封面</string>
     <string name="short_video">短视频</string>
+    <string name="post_success">发帖成功</string>
+    <string name="view_post">查看发帖</string>
+    <string name="post_uploading">上传中…</string>
+
 
     <!-- Problem report -->
     <string-array name="video_problem_report_item">

@@ -211,7 +211,7 @@ class PostVideoFragment : BaseFragment() {
             when(requestCode) {
                 REQUEST_VIDEO_CAPTURE -> {
                     val videoUri: Uri? = data?.data
-                    val myUri = Uri.fromFile(File(UriUtils.getRealPathFromURI(requireContext(), videoUri!!)))
+                    val myUri = Uri.fromFile(File(UriUtils.getPath(requireContext(), videoUri!!)))
                     val bundle = Bundle()
                     bundle.putString(EditVideoFragment.BUNDLE_VIDEO_URI, myUri.toString())
                     findNavController().navigate(R.id.action_postVideoFragment_self, bundle)
