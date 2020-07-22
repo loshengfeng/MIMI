@@ -345,7 +345,7 @@ interface ApiService {
     suspend fun getPostFollow(
         @Query("offset") offset: Int,
         @Query("limit") limit: Int
-    ): Response<ApiBasePagingItem<List<PostFollowItem>>>
+    ): Response<ApiBasePagingItem<List<MemberPostItem>>>
 
     @GET("/v1/Members/Me/Profile")
     suspend fun getProfile(): Response<ApiBaseItem<ProfileItem>>

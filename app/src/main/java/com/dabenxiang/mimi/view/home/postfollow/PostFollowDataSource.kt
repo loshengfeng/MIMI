@@ -3,8 +3,7 @@ package com.dabenxiang.mimi.view.home.postfollow
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.manager.DomainManager
-import com.dabenxiang.mimi.model.api.vo.PostFollowItem
-import com.dabenxiang.mimi.view.home.memberpost.MemberPostDataSource
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -15,7 +14,7 @@ class PostFollowDataSource(
     private val pagingCallback: PagingCallback,
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager
-) : PageKeyedDataSource<Int, PostFollowItem>() {
+) : PageKeyedDataSource<Int, MemberPostItem>() {
 
     companion object {
         const val PER_LIMIT = 20
@@ -23,26 +22,25 @@ class PostFollowDataSource(
 
     override fun loadInitial(
         params: LoadInitialParams<Int>,
-        callback: LoadInitialCallback<Int, PostFollowItem>
+        callback: LoadInitialCallback<Int, MemberPostItem>
     ) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().getPostFollow(
-                    0, PER_LIMIT
-                )
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.getPostFollow(0, PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
                 val body = result.body()
-                val postFollowItems = body?.content
+                val memberPostItems = body?.content
 
                 val nextPageKey = when {
                     hasNextPage(
                         body?.paging?.count ?: 0,
                         body?.paging?.offset ?: 0,
-                        postFollowItems?.size ?: 0
-                    ) -> MemberPostDataSource.PER_LIMIT
+                        memberPostItems?.size ?: 0
+                    ) -> PER_LIMIT
                     else -> null
                 }
-                emit(InitResult(postFollowItems ?: arrayListOf(), nextPageKey))
+                emit(InitResult(memberPostItems ?: arrayListOf(), nextPageKey))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> pagingCallback.onThrowable(e) }
@@ -54,17 +52,16 @@ class PostFollowDataSource(
         }
     }
 
-    override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, PostFollowItem>) {
+    override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, MemberPostItem>) {
 
     }
 
-    override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, PostFollowItem>) {
+    override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, MemberPostItem>) {
         val next = params.key
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().getPostFollow(
-                    next, PER_LIMIT
-                )
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.getPostFollow(next, PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(result)
             }
@@ -91,11 +88,13 @@ class PostFollowDataSource(
 
     private fun hasNextPage(total: Long, offset: Long, currentSize: Int): Boolean {
         return when {
-            currentSize < MemberPostDataSource.PER_LIMIT -> false
+            currentSize < PER_LIMIT -> false
             offset >= total -> false
             else -> true
         }
     }
 
-    private data class InitResult(val list: List<PostFollowItem>, val nextKey: Int?)
+    private data class InitResult(val list: List<MemberPostItem>, val nextKey: Int?)
+
+
 }

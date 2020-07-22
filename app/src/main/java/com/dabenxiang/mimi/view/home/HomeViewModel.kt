@@ -84,8 +84,8 @@ class HomeViewModel : BaseViewModel() {
     private var _likePostResult = MutableLiveData<ApiResult<Int>>()
     val likePostResult: LiveData<ApiResult<Int>> = _likePostResult
 
-    private val _postFollowItemListResult = MutableLiveData<PagedList<PostFollowItem>>()
-    val postFollowItemListResult: LiveData<PagedList<PostFollowItem>> = _postFollowItemListResult
+    private val _postFollowItemListResult = MutableLiveData<PagedList<MemberPostItem>>()
+    val postFollowItemListResult: LiveData<PagedList<MemberPostItem>> = _postFollowItemListResult
 
     private val _clipPostItemListResult = MutableLiveData<PagedList<MemberPostItem>>()
     val clipPostItemListResult: LiveData<PagedList<MemberPostItem>> = _clipPostItemListResult
@@ -373,7 +373,7 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-    private fun getPostFollowPagingItems(): LiveData<PagedList<PostFollowItem>> {
+    private fun getPostFollowPagingItems(): LiveData<PagedList<MemberPostItem>> {
         val postFollowDataSource =
             PostFollowDataSource(pagingCallback, viewModelScope, domainManager)
         val pictureFactory = PostFollowFactory(postFollowDataSource)

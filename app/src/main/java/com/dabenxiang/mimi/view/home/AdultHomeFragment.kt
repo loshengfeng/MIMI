@@ -308,7 +308,7 @@ class AdultHomeFragment : BaseFragment() {
         })
 
         viewModel.postFollowItemListResult.observe(viewLifecycleOwner, Observer {
-            postFollowPagedAdapter.submitList(it)
+            memberPostPagedAdapter.submitList(it)
         })
 
         viewModel.clipPostItemListResult.observe(viewLifecycleOwner, Observer {
@@ -471,10 +471,6 @@ class AdultHomeFragment : BaseFragment() {
 
     private val memberPostPagedAdapter by lazy {
         MemberPostPagedAdapter(requireActivity(), adultListener, attachmentListener)
-    }
-
-    private val postFollowPagedAdapter by lazy {
-        PostFollowPagedAdapter(requireActivity(), adultListener, attachmentListener)
     }
 
     private val videoListAdapter by lazy {
