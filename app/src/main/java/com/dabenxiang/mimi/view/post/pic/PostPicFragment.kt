@@ -181,6 +181,7 @@ class PostPicFragment : BaseFragment() {
             val request = PostMemberRequest(
                 title = title,
                 type = TYPE_IMAGE,
+                content = content,
                 tags = tags
             )
 

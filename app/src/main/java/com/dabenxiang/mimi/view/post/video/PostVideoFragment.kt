@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.post.video
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -19,6 +20,7 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.EditVideoAdapterListener
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
+import com.dabenxiang.mimi.model.api.vo.PostMemberRequest
 import com.dabenxiang.mimi.view.adapter.viewHolder.ScrollVideoAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogFragment
@@ -39,6 +41,7 @@ import kotlinx.android.synthetic.main.fragment_post_article.txt_titleCount
 import kotlinx.android.synthetic.main.fragment_post_pic.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 
 class PostVideoFragment : BaseFragment() {
@@ -53,8 +56,15 @@ class PostVideoFragment : BaseFragment() {
         private const val HASHTAG_LIMIT = 10
         private const val INIT_VALUE = 0
         private const val VIDEO_LIMIT = 1
+        private const val TYPE_VIDEO = 3
 
         private const val REQUEST_MUTLI_PHOTO = 1001
+
+        const val UPLOAD_VIDEO = "upload_video"
+        const val MEMBER_REQUEST = "member_request"
+        const val COVER_URI = "cover_uri"
+        const val VIDEO_URI = "video_uir"
+        const val VIDEO_LENGTH = "video_length"
     }
 
     override val bottomNavigationVisibility: Int
@@ -68,11 +78,14 @@ class PostVideoFragment : BaseFragment() {
 
     private lateinit var adapter: ScrollVideoAdapter
 
+    private var trimmerUri: String? = String()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         initSettings()
 
+        trimmerUri = arguments?.getString(BUNDLE_TRIMMER_URI)
         val picUri = arguments?.getString(BUNDLE_COVER_URI)
         uriList.add(picUri.toString())
 
@@ -146,6 +159,59 @@ class PostVideoFragment : BaseFragment() {
 
         tv_back.setOnClickListener {
             findNavController().popBackStack()
+        }
+
+        tv_clean.setOnClickListener {
+            val title = edt_title.text.toString()
+            val content = edt_content.text.toString()
+
+//            if (title.isBlank()) {
+//                return@setOnClickListener
+//            }
+//
+//            if (content.isBlank()) {
+//                return@setOnClickListener
+//            }
+//
+//            if (chipGroup.childCount == (0)) {
+//                return@setOnClickListener
+//            }
+
+            //TODO 上面的判斷需要空白提示 UI
+
+            val tags = arrayListOf<String>()
+
+            for (i in 0 until chipGroup.childCount) {
+                val chip = chipGroup.getChildAt(i)
+                chip as Chip
+                tags.add(chip.text.toString())
+            }
+
+            val request = PostMemberRequest(
+                title = title,
+                type = TYPE_VIDEO,
+                content = content,
+                tags = tags
+            )
+
+            val retriever = MediaMetadataRetriever()
+            retriever.setDataSource(context, Uri.parse( trimmerUri))
+            val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+            val timeInMillisec: Long = time.toLong()
+            retriever.release()
+
+
+            val length = String.format("%02d:%02d:%02d",
+                TimeUnit.MILLISECONDS.toHours(timeInMillisec),
+                TimeUnit.MILLISECONDS.toMinutes(timeInMillisec) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(timeInMillisec)),
+                TimeUnit.MILLISECONDS.toSeconds(timeInMillisec) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(timeInMillisec)));
+
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(UPLOAD_VIDEO, true)
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(MEMBER_REQUEST, request)
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(COVER_URI, adapter.getData())
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(VIDEO_URI, trimmerUri)
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(VIDEO_LENGTH, length)
+            findNavController().navigateUp()
         }
     }
 

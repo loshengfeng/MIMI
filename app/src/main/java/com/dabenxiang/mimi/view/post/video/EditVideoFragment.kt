@@ -6,6 +6,7 @@ import android.view.View
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.EditVideoListener
+import com.dabenxiang.mimi.model.api.vo.PostMemberRequest
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.post.video.PostVideoFragment.Companion.BUNDLE_COVER_URI
 import com.dabenxiang.mimi.view.post.video.PostVideoFragment.Companion.BUNDLE_TRIMMER_URI
@@ -33,6 +34,22 @@ class EditVideoFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initSettings()
+
+        val isNeedVideoUpload = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>(PostVideoFragment.UPLOAD_VIDEO)
+
+        if (isNeedVideoUpload?.value != null) {
+            val memberRequest = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<PostMemberRequest>(PostVideoFragment.MEMBER_REQUEST)
+            val coverUri = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<String>>(PostVideoFragment.COVER_URI)
+            val videoUri = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>(PostVideoFragment.VIDEO_URI)
+            val length = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>(PostVideoFragment.VIDEO_LENGTH)
+
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(PostVideoFragment.UPLOAD_VIDEO, true)
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(PostVideoFragment.MEMBER_REQUEST, memberRequest?.value)
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(PostVideoFragment.COVER_URI, coverUri?.value)
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(PostVideoFragment.VIDEO_URI, videoUri?.value)
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(PostVideoFragment.VIDEO_LENGTH, length?.value)
+            findNavController().navigateUp()
+        }
 
         val uri = arguments?.getString(BUNDLE_VIDEO_URI)
         editVideoFragmentPagerAdapter =
