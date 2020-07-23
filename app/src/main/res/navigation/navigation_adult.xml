@@ -40,11 +40,12 @@
         <action
             android:id="@+id/action_adultHomeFragment_to_editVideoFragment"
             app:destination="@id/editVideoFragment" />
-
         <action
             android:id="@+id/action_adultHomeFragment_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
-
+        <action
+            android:id="@+id/action_adultHomeFragment_to_clubDetailFragment"
+            app:destination="@id/clubDetailFragment" />
     </fragment>
 
     <fragment
@@ -132,4 +133,9 @@
             android:id="@+id/action_editVideoFragment_to_postVideoFragment"
             app:destination="@id/postVideoFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/clubDetailFragment"
+        android:name="com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment"
+        android:label="ClubDetailFragment"
+        tools:layout="@layout/fragment_club_detail" />
 </navigation>

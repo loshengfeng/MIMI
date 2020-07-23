@@ -197,6 +197,7 @@
     <!-- Club -->
     <string name="picture">图片</string>
     <string name="video">视频</string>
+    <string name="empty_post">目前尚无贴文</string>
 
     <!-- Follow -->
     <string name="follow">+关注</string>
