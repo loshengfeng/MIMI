@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -170,6 +169,9 @@ class FavoriteFragment : BaseFragment() {
                         AttachmentType.ADULT_HOME_CLIP -> {
                             favoriteAdapter.update(attachmentItem.position ?: 0)
                         }
+                        AttachmentType.ADULT_AVATAR->{
+                            favoriteAdapter.update(attachmentItem.position ?: 0)
+                        }
                         else -> {
                         }
                     }
@@ -269,9 +271,6 @@ class FavoriteFragment : BaseFragment() {
     }
 
     private val listener = object : FavoriteAdapter.EventListener {
-        override fun onAvatarDownload(view: ImageView, id: String) {
-            viewModel.getAttachment(view, id)
-        }
 
         override fun onGetAttachment(id: String, position: Int, type: AttachmentType) {
             viewModel.getAttachment(id, position, type)

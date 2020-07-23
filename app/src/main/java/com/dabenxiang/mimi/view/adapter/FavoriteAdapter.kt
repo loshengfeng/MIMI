@@ -40,7 +40,6 @@ class FavoriteAdapter(
         fun onVideoClick(item: Any)
         fun onFunctionClick(type: FunctionType, view: View, item: Any)
         fun onChipClick(text: String, type: Int? = -1)
-        fun onAvatarDownload(view: ImageView, id: String)
         fun onGetAttachment(id: String, position: Int, type: AttachmentType)
     }
 

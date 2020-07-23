@@ -7,6 +7,12 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.load.MultiTransformation
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import com.bumptech.glide.request.RequestOptions
+import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
@@ -96,7 +102,23 @@ class FavoritePostViewHolder(
     override fun updated(position: Int) {
         data?.position = position
         data?.posterAvatarAttachmentId?.let {
-            listener.onAvatarDownload(ivHead, it.toString())
+            LruCacheUtils.getLruCache(it.toString())?.also { bitmap ->
+                val options: RequestOptions = RequestOptions()
+                        .transform(MultiTransformation(CenterCrop(), CircleCrop()))
+                        .placeholder(R.drawable.default_profile_picture)
+                        .error(R.drawable.default_profile_picture)
+                        .priority(Priority.NORMAL)
+
+                Glide.with(App.self).load(bitmap)
+                        .apply(options)
+                        .into(ivHead)
+            } ?: run {
+                listener.onGetAttachment(
+                        it.toString(),
+                        position,
+                        AttachmentType.ADULT_AVATAR
+                )
+            }
         }
 
         tvName.text = data?.posterName
