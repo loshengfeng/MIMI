@@ -97,6 +97,9 @@
         <action
             android:id="@+id/action_pictureDetailFragment_to_pictureFragment"
             app:destination="@id/pictureFragment" />
+        <action
+            android:id="@+id/action_pictureDetailFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
     </fragment>
 
     <fragment
@@ -107,7 +110,11 @@
     <fragment
         android:id="@+id/textDetailFragment"
         android:name="com.dabenxiang.mimi.view.textdetail.TextDetailFragment"
-        tools:layout="@layout/fragment_text_detail" />
+        tools:layout="@layout/fragment_text_detail" >
+        <action
+            android:id="@+id/action_textDetailFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/postPicFragment"

@@ -18,6 +18,8 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.serializable.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
@@ -25,6 +27,7 @@ import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.fullpicture.FullPictureFragment
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.RootCommentNode
+import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_picture_detail.*
@@ -327,6 +330,17 @@ class PictureDetailFragment : BaseFragment() {
                     MoreDialogFragment::class.java.simpleName
                 )
             }
+        }
+
+        override fun onChipClick(type: PostType, tag: String) {
+            val item = SearchPostItem(type, tag)
+            val bundle = SearchPostFragment.createBundle(item)
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_pictureDetailFragment_to_searchPostFragment,
+                    bundle
+                )
+            )
         }
     }
 

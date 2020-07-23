@@ -16,6 +16,7 @@ import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.api.vo.TextContentItem
 import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.CommentViewType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.picturedetail.viewholder.CommentContentViewHolder
 import com.dabenxiang.mimi.view.picturedetail.viewholder.CommentTitleViewHolder
 import com.dabenxiang.mimi.view.player.CommentAdapter
@@ -123,6 +124,9 @@ class TextDetailAdapter(
                     chip.chipBackgroundColor = ColorStateList.valueOf(
                         ContextCompat.getColor(context, R.color.adult_color_status_bar)
                     )
+                    chip.setOnClickListener { view ->
+                        onTextDetailListener.onChipClick(PostType.TEXT, (view as Chip).text.toString())
+                    }
                     holder.tagChipGroup.addView(chip)
                 }
 
@@ -217,5 +221,6 @@ class TextDetailAdapter(
         fun onGetCommandAvatar(id: Long, succeededBlock: (Bitmap) -> Unit)
         fun onReplyComment(replyId: Long?, replyName: String?)
         fun onMoreClick(item: MembersPostCommentItem)
+        fun onChipClick(type: PostType, tag: String)
     }
 }
