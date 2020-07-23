@@ -14,6 +14,7 @@ import timber.log.Timber
  * VAI4.1.6_圈子頁
  */
 class ClubMemberViewHolder(view: View) : BaseViewHolder(view) {
+    val clMemberPost = view.cl_club_member
     val ivAvatar = view.iv_avatar
     val tvTitle = view.tv_title
     val tvDesc = view.tv_desc
@@ -57,6 +58,10 @@ class ClubMemberViewHolder(view: View) : BaseViewHolder(view) {
                 clubFuncItem.getBitmap(item.avatarAttachmentId.toString()) { id -> updateAvatar(id) }
             }
         } ?: run { Glide.with(ivAvatar.context).load(ivAvatar.context.getDrawable(R.drawable.icon_cs_photo)).centerCrop().into(ivAvatar) }
+
+        clMemberPost.setOnClickListener {
+            clubFuncItem.onItemClick(item)
+        }
     }
 
     private fun updateAvatar(id: String) {

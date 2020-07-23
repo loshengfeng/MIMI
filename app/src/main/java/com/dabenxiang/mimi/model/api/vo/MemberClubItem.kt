@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.model.api.vo
 
 import com.dabenxiang.mimi.model.enums.PostType
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class MemberClubItem(
 
@@ -34,7 +35,7 @@ data class MemberClubItem(
 
     @SerializedName("isFollow")
     var isFollow: Boolean = false
-)
+): Serializable
 
 data class PostItem(
     @SerializedName("id")
@@ -48,4 +49,4 @@ data class PostItem(
 
     @SerializedName("content")
     val content: String = ""
-)
+): Serializable
