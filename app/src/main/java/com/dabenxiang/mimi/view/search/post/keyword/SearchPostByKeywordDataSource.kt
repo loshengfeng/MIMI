@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.search.post
+package com.dabenxiang.mimi.view.search.post.keyword
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.SearchPagingCallback
@@ -12,12 +12,12 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
-class SearchPostDataSource(
+class SearchPostByKeywordDataSource(
     private val pagingCallback: SearchPagingCallback,
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
     private val type: PostType = PostType.TEXT,
-    private val tag: String = "",
+    private val keyword: String = "",
     private val isPostFollow: Boolean
 ) : PageKeyedDataSource<Int, MemberPostItem>() {
 
@@ -32,13 +32,11 @@ class SearchPostDataSource(
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
-
                 val result = if (isPostFollow) {
-                    apiRepository.searchPostFollow(tag, 0, PER_LIMIT)
+                    apiRepository.searchPostFollowByKeyword(keyword, 0, PER_LIMIT)
                 } else {
-                    apiRepository.searchPost(type, tag, 0, PER_LIMIT)
+                    apiRepository.searchPostByKeyword(type, keyword, 0, PER_LIMIT)
                 }
-
                 if (!result.isSuccessful) throw HttpException(result)
                 val body = result.body()
                 val memberPostItems = body?.content
@@ -52,7 +50,12 @@ class SearchPostDataSource(
                 }
                 val count = body?.paging?.count ?: 0
                 pagingCallback.onTotalCount(count)
-                emit(InitResult(memberPostItems ?: arrayListOf(), nextPageKey))
+                emit(
+                    InitResult(
+                        memberPostItems ?: arrayListOf(),
+                        nextPageKey
+                    )
+                )
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> pagingCallback.onThrowable(e) }
@@ -74,9 +77,15 @@ class SearchPostDataSource(
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val result = if (isPostFollow) {
-                    apiRepository.searchPostFollow(tag, 0, PER_LIMIT)
+                    apiRepository.searchPostFollowByKeyword(
+                        keyword, 0,
+                        PER_LIMIT
+                    )
                 } else {
-                    apiRepository.searchPost(type, tag, 0, PER_LIMIT)
+                    apiRepository.searchPostByKeyword(
+                        type, keyword, 0,
+                        PER_LIMIT
+                    )
                 }
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(result)

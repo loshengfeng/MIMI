@@ -54,25 +54,42 @@ class SearchPostFragment : BaseFragment() {
     private var reportDialog: ReportDialogFragment? = null
 
     private var currentPostType: PostType = PostType.TEXT
+    private var mTag: String = ""
+    private var searchText: String = ""
     private var keyword: String = ""
+
     private var isPostFollow: Boolean = false
+
+    private var adapter: MemberPostPagedAdapter? = null
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         (arguments?.getSerializable(KEY_DATA) as SearchPostItem).also {
             currentPostType = it.type
-            keyword = it.keyword
             isPostFollow = it.isPostFollow
+            mTag = it.tag
+            searchText = it.searchText
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        adapter = MemberPostPagedAdapter(
+            requireContext(), adultListener, attachmentListener, mTag
+        )
+        recyclerview_content.layoutManager = LinearLayoutManager(requireContext())
+        recyclerview_content.adapter = adapter
+
+        if (!TextUtils.isEmpty(mTag)) {
+            viewModel.getSearchPostsByTag(currentPostType, mTag, isPostFollow)
         }
 
-        recyclerview_content.layoutManager = LinearLayoutManager(requireContext())
-        recyclerview_content.adapter = memberPostPagedAdapter
-
-        viewModel.getSearchPosts(currentPostType, keyword, isPostFollow)
+        if (!TextUtils.isEmpty(searchText)) {
+            viewModel.getSearchPostsByKeyword(currentPostType, searchText, isPostFollow)
+        }
     }
 
     override fun getLayoutId(): Int {
@@ -95,10 +112,10 @@ class SearchPostFragment : BaseFragment() {
                     val attachmentItem = it.result
                     LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
                     when (val holder =
-                        memberPostPagedAdapter.viewHolderMap[attachmentItem.parentPosition]) {
+                        adapter?.viewHolderMap?.get(attachmentItem.parentPosition)) {
                         is PicturePostHolder -> {
                             if (holder.pictureRecycler.tag == attachmentItem.parentPosition) {
-                                memberPostPagedAdapter.updateInternalItem(holder)
+                                adapter?.updateInternalItem(holder)
                             }
                         }
                     }
@@ -110,11 +127,11 @@ class SearchPostFragment : BaseFragment() {
         viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    when (memberPostPagedAdapter.viewHolderMap[it.result]) {
+                    when (adapter?.viewHolderMap?.get(it.result)) {
                         is ClipPostHolder,
                         is PicturePostHolder,
                         is TextPostHolder -> {
-                            memberPostPagedAdapter.notifyItemChanged(
+                            adapter?.notifyItemChanged(
                                 it.result,
                                 MemberPostPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI
                             )
@@ -128,11 +145,11 @@ class SearchPostFragment : BaseFragment() {
         viewModel.likePostResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    when (memberPostPagedAdapter.viewHolderMap[it.result]) {
+                    when (adapter?.viewHolderMap?.get(it.result)) {
                         is ClipPostHolder,
                         is PicturePostHolder,
                         is TextPostHolder -> {
-                            memberPostPagedAdapter.notifyItemChanged(
+                            adapter?.notifyItemChanged(
                                 it.result,
                                 MemberPostPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI
                             )
@@ -143,8 +160,12 @@ class SearchPostFragment : BaseFragment() {
             }
         })
 
-        viewModel.searchPostItemListResult.observe(viewLifecycleOwner, Observer {
-            memberPostPagedAdapter.submitList(it)
+        viewModel.searchPostItemByTagListResult.observe(viewLifecycleOwner, Observer {
+            adapter?.submitList(it)
+        })
+
+        viewModel.searchPostItemByKeywordListResult.observe(viewLifecycleOwner, Observer {
+            adapter?.submitList(it)
         })
 
         viewModel.searchTotalCount.observe(viewLifecycleOwner, Observer { count ->
@@ -162,12 +183,14 @@ class SearchPostFragment : BaseFragment() {
         }
 
         tv_search.setOnClickListener {
-            viewModel.getSearchPosts(currentPostType, edit_search.text.toString(), isPostFollow)
+            updateData(true)
+            GeneralUtils.hideKeyboard(requireActivity())
+            viewModel.getSearchPostsByKeyword(
+                currentPostType,
+                edit_search.text.toString(),
+                isPostFollow
+            )
         }
-    }
-
-    private val memberPostPagedAdapter by lazy {
-        MemberPostPagedAdapter(requireActivity(), adultListener, attachmentListener, keyword)
     }
 
     private fun getSearchText(
@@ -355,9 +378,22 @@ class SearchPostFragment : BaseFragment() {
         }
 
         override fun onChipClick(type: PostType, tag: String) {
-            currentPostType = type
-            keyword = tag
-            viewModel.getSearchPosts(type, tag, isPostFollow)
+            updateData(false)
+            viewModel.getSearchPostsByTag(type, tag, isPostFollow)
+        }
+    }
+
+    private fun updateData(isSearchText: Boolean) {
+        if (isSearchText) {
+            searchText = edit_search.text.toString()
+            mTag = ""
+            keyword = edit_search.text.toString()
+            adapter?.setupTag(mTag)
+        } else {
+            searchText = ""
+            mTag = tag.toString()
+            keyword = tag.toString()
+            adapter?.setupTag(mTag)
         }
     }
 }

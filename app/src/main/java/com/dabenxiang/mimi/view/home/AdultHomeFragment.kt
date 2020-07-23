@@ -127,12 +127,24 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private fun handleBackStackData() {
-        val isNeedPicUpload = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>(PostPicFragment.UPLOAD_PIC)
-        val isNeedVideoUpload = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>(PostVideoFragment.UPLOAD_VIDEO)
+        val isNeedPicUpload =
+            findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>(
+                PostPicFragment.UPLOAD_PIC
+            )
+        val isNeedVideoUpload =
+            findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>(
+                PostVideoFragment.UPLOAD_VIDEO
+            )
 
         if (isNeedPicUpload?.value != null) {
-            val memberRequest = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<PostMemberRequest>(PostPicFragment.MEMBER_REQUEST)
-            val picUriList = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<String>>(PostPicFragment.PIC_URI)
+            val memberRequest =
+                findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<PostMemberRequest>(
+                    PostPicFragment.MEMBER_REQUEST
+                )
+            val picUriList =
+                findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<String>>(
+                    PostPicFragment.PIC_URI
+                )
 
             showSnackBar()
             postMemberRequest = memberRequest!!.value!!
@@ -143,8 +155,14 @@ class AdultHomeFragment : BaseFragment() {
         } else if (isNeedVideoUpload?.value != null) {
             showSnackBar()
 
-            val memberRequest = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<PostMemberRequest>(PostVideoFragment.MEMBER_REQUEST)
-            val coverUri = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<String>>(PostVideoFragment.COVER_URI)
+            val memberRequest =
+                findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<PostMemberRequest>(
+                    PostVideoFragment.MEMBER_REQUEST
+                )
+            val coverUri =
+                findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<String>>(
+                    PostVideoFragment.COVER_URI
+                )
 
             postMemberRequest = memberRequest!!.value!!
             viewModel.postAttachment(coverUri?.value!![0], requireContext(), TYPE_COVER)
@@ -159,7 +177,7 @@ class AdultHomeFragment : BaseFragment() {
 
         val snackView: View = layoutInflater.inflate(R.layout.snackbar_upload, null)
         snackbarLayout.addView(snackView, 0)
-        snackbarLayout.setPadding(15,0,15,0)
+        snackbarLayout.setPadding(15, 0, 15, 0)
         snackbarLayout.setBackgroundColor(Color.TRANSPARENT)
         snackbar?.show()
     }
@@ -432,9 +450,12 @@ class AdultHomeFragment : BaseFragment() {
         })
 
         viewModel.postCoverResult.observe(viewLifecycleOwner, Observer {
-            when(it) {
+            when (it) {
                 is Success -> {
-                    val videoUri = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>(PostVideoFragment.VIDEO_URI)
+                    val videoUri =
+                        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>(
+                            PostVideoFragment.VIDEO_URI
+                        )
                     picParameter.id = it.result.toString()
                     viewModel.postAttachment(videoUri?.value!!, requireContext(), TYPE_VIDEO)
 
@@ -447,9 +468,12 @@ class AdultHomeFragment : BaseFragment() {
         })
 
         viewModel.postVideoResult.observe(viewLifecycleOwner, Observer {
-            when(it) {
+            when (it) {
                 is Success -> {
-                    val videoLength = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>(PostVideoFragment.VIDEO_LENGTH)
+                    val videoLength =
+                        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>(
+                            PostVideoFragment.VIDEO_LENGTH
+                        )
 
                     val mediaItem = MediaItem()
                     val videoParameter = VideoParameter(
@@ -476,7 +500,8 @@ class AdultHomeFragment : BaseFragment() {
 
         viewModel.postVideoMemberResult.observe(viewLifecycleOwner, Observer {
             val snackbarLayout: Snackbar.SnackbarLayout = snackbar?.view as Snackbar.SnackbarLayout
-            val progressBar = snackbarLayout.findViewById(R.id.contentLoadingProgressBar) as ContentLoadingProgressBar
+            val progressBar =
+                snackbarLayout.findViewById(R.id.contentLoadingProgressBar) as ContentLoadingProgressBar
             val imgSuccess = snackbarLayout.findViewById(R.id.iv_success) as ImageView
 
             val txtSuccess = snackbarLayout.findViewById(R.id.txt_postSuccess) as TextView

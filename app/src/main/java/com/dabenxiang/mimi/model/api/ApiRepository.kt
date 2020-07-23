@@ -516,21 +516,38 @@ class ApiRepository(private val apiService: ApiService) {
         return apiService.sendPostCommentReport(postId, commentId, body)
     }
 
-    suspend fun searchPost(
+    suspend fun searchPostByTag(
         type: PostType,
         tag: String,
         offset: Int,
         limit: Int
     ): Response<ApiBasePagingItem<List<MemberPostItem>>> {
-        return apiService.searchPost(type.value, tag, offset, limit)
+        return apiService.searchPostByTag(type.value, tag, offset, limit)
     }
 
-    suspend fun searchPostFollow(
+    suspend fun searchPostFollowByTag(
         tag: String,
         offset: Int,
         limit: Int
     ): Response<ApiBasePagingItem<List<MemberPostItem>>> {
-        return apiService.searchPostFollow(tag, offset, limit)
+        return apiService.searchPostFollowByTag(tag, offset, limit)
+    }
+
+    suspend fun searchPostByKeyword(
+        type: PostType,
+        keyword: String,
+        offset: Int,
+        limit: Int
+    ): Response<ApiBasePagingItem<List<MemberPostItem>>> {
+        return apiService.searchPostByKeyword(type.value, keyword, offset, limit)
+    }
+
+    suspend fun searchPostFollowByKeyword(
+        keyword: String,
+        offset: Int,
+        limit: Int
+    ): Response<ApiBasePagingItem<List<MemberPostItem>>> {
+        return apiService.searchPostFollowByKeyword(keyword, offset, limit)
     }
 
     /**********************************************************

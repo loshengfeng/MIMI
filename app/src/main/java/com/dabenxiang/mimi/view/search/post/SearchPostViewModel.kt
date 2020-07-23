@@ -16,6 +16,10 @@ import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.search.post.keyword.SearchPostByKeywordDataSource
+import com.dabenxiang.mimi.view.search.post.keyword.SearchPostByKeywordFactory
+import com.dabenxiang.mimi.view.search.post.tag.SearchPostByTagDataSource
+import com.dabenxiang.mimi.view.search.post.tag.SearchPostByTagFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -26,8 +30,13 @@ class SearchPostViewModel : BaseViewModel() {
     private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
     val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
 
-    private val _searchPostItemListResult = MutableLiveData<PagedList<MemberPostItem>>()
-    val searchPostItemListResult: LiveData<PagedList<MemberPostItem>> = _searchPostItemListResult
+    private val _searchPostItemByTagListResult = MutableLiveData<PagedList<MemberPostItem>>()
+    val searchPostItemByTagListResult: LiveData<PagedList<MemberPostItem>> =
+        _searchPostItemByTagListResult
+
+    private val _searchPostItemByKeywordListResult = MutableLiveData<PagedList<MemberPostItem>>()
+    val searchPostItemByKeywordListResult: LiveData<PagedList<MemberPostItem>> =
+        _searchPostItemByKeywordListResult
 
     private var _attachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
     val attachmentResult: LiveData<ApiResult<AttachmentItem>> = _attachmentResult
@@ -129,32 +138,58 @@ class SearchPostViewModel : BaseViewModel() {
         }
     }
 
-    fun getSearchPosts(type: PostType, tag: String, isPostFollow: Boolean) {
+    fun getSearchPostsByTag(type: PostType, tag: String, isPostFollow: Boolean) {
         viewModelScope.launch {
-            getSearchPostPagingItems(type, tag, isPostFollow).asFlow()
-                .collect { _searchPostItemListResult.value = it }
+            getSearchPostByTagPagingItems(type, tag, isPostFollow).asFlow()
+                .collect { _searchPostItemByTagListResult.value = it }
         }
     }
 
-    private fun getSearchPostPagingItems(
+    fun getSearchPostsByKeyword(type: PostType, keyword: String, isPostFollow: Boolean) {
+        viewModelScope.launch {
+            getSearchPostByKeywordPagingItems(type, keyword, isPostFollow).asFlow()
+                .collect { _searchPostItemByKeywordListResult.value = it }
+        }
+    }
+
+    private fun getSearchPostByTagPagingItems(
         type: PostType,
         tag: String,
         isPostFollow: Boolean
     ): LiveData<PagedList<MemberPostItem>> {
-        val searchPostDataSource =
-            SearchPostDataSource(
-                pagingCallback,
-                viewModelScope,
-                domainManager,
-                type,
-                tag,
-                isPostFollow
-            )
-        val searchPostFactory = SearchPostFactory(searchPostDataSource)
+        val dataSource = SearchPostByTagDataSource(
+            pagingCallback,
+            viewModelScope,
+            domainManager,
+            type,
+            tag,
+            isPostFollow
+        )
+        val factory = SearchPostByTagFactory(dataSource)
         val config = PagedList.Config.Builder()
             .setPrefetchDistance(4)
             .build()
-        return LivePagedListBuilder(searchPostFactory, config).build()
+        return LivePagedListBuilder(factory, config).build()
+    }
+
+    private fun getSearchPostByKeywordPagingItems(
+        type: PostType,
+        tag: String,
+        isPostFollow: Boolean
+    ): LiveData<PagedList<MemberPostItem>> {
+        val dataSource = SearchPostByKeywordDataSource(
+            pagingCallback,
+            viewModelScope,
+            domainManager,
+            type,
+            tag,
+            isPostFollow
+        )
+        val factory = SearchPostByKeywordFactory(dataSource)
+        val config = PagedList.Config.Builder()
+            .setPrefetchDistance(4)
+            .build()
+        return LivePagedListBuilder(factory, config).build()
     }
 
     private val pagingCallback = object : SearchPagingCallback {

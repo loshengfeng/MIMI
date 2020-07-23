@@ -54,7 +54,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         position: Int,
         adultListener: AdultListener,
         attachmentListener: AttachmentListener,
-        keyword: String
+        tag: String
     ) {
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate ?: Date(), Date())
@@ -83,10 +83,10 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
             chip.chipBackgroundColor = ColorStateList.valueOf(
                 ContextCompat.getColor(tagChipGroup.context, R.color.adult_color_status_bar)
             )
-            if (TextUtils.isEmpty(keyword)) {
+            if (TextUtils.isEmpty(tag)) {
                 chip.setTextColor(tagChipGroup.context.getColor(R.color.color_white_1_50))
             } else {
-                if (it == keyword) {
+                if (it == tag) {
                     chip.setTextColor(chip.context.getColor(R.color.color_red_1))
                 } else {
                     chip.setTextColor(tagChipGroup.context.getColor(R.color.color_white_1_50))

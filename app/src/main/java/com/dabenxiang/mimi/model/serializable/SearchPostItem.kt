@@ -5,6 +5,7 @@ import java.io.Serializable
 
 data class SearchPostItem(
     val type: PostType = PostType.TEXT,
-    val keyword: String = "",
-    val isPostFollow: Boolean = false
+    val tag: String = "",
+    val isPostFollow: Boolean = false,
+    val searchText: String = ""
 ) : Serializable

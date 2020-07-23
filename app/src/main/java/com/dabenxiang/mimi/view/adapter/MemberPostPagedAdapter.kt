@@ -19,7 +19,7 @@ class MemberPostPagedAdapter(
     val context: Context,
     private val adultListener: AdultListener,
     private val attachmentListener: AttachmentListener,
-    private val keyword: String = ""
+    var mTag: String = ""
 ) : PagedListAdapter<MemberPostItem, BaseViewHolder>(diffCallback) {
 
     companion object {
@@ -95,7 +95,7 @@ class MemberPostPagedAdapter(
                         position,
                         adultListener,
                         attachmentListener,
-                        keyword
+                        mTag
                     )
                 }
             }
@@ -111,12 +111,20 @@ class MemberPostPagedAdapter(
                 } ?: run {
                     item?.also {
                         holder.pictureRecycler.tag = position
-                        holder.onBind(it, position, adultListener, attachmentListener, keyword)
+                        holder.onBind(it, position, adultListener, attachmentListener, mTag)
                     }
                 }
             }
             is TextPostHolder -> {
-                item?.also { holder.onBind(it, position, adultListener, attachmentListener, keyword) }
+                item?.also {
+                    holder.onBind(
+                        it,
+                        position,
+                        adultListener,
+                        attachmentListener,
+                        mTag
+                    )
+                }
             }
         }
     }
@@ -130,5 +138,9 @@ class MemberPostPagedAdapter(
                 holder.pictureRecycler.adapter?.notifyDataSetChanged()
             }
         }
+    }
+
+    fun setupTag(tag: String) {
+        mTag = tag
     }
 }

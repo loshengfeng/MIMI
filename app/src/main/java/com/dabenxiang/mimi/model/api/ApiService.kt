@@ -5,7 +5,6 @@ import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
-import java.util.ArrayList
 
 interface ApiService {
 
@@ -395,7 +394,7 @@ interface ApiService {
     ): Response<Void>
 
     @GET("/v1/Members/Post")
-    suspend fun searchPost(
+    suspend fun searchPostByTag(
         @Query("type") type: Int,
         @Query("tag") tag: String,
         @Query("offset") offset: Int,
@@ -406,8 +405,30 @@ interface ApiService {
     ): Response<ApiBasePagingItem<List<MemberPostItem>>>
 
     @GET("/v1/Members/Post")
-    suspend fun searchPostFollow(
+    suspend fun searchPostFollowByTag(
         @Query("tag") tag: String,
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int,
+        @Query("orderBy") orderBy: Int = 1,
+        @Query("isFullContent") isFullContent: Boolean = false,
+        @Query("isAdult") isAdult: Boolean = true
+    ): Response<ApiBasePagingItem<List<MemberPostItem>>>
+
+
+    @GET("/v1/Members/Post")
+    suspend fun searchPostByKeyword(
+        @Query("type") type: Int,
+        @Query("key") key: String,
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int,
+        @Query("orderBy") orderBy: Int = 1,
+        @Query("isFullContent") isFullContent: Boolean = false,
+        @Query("isAdult") isAdult: Boolean = true
+    ): Response<ApiBasePagingItem<List<MemberPostItem>>>
+
+    @GET("/v1/Members/Post")
+    suspend fun searchPostFollowByKeyword(
+        @Query("key") key: String,
         @Query("offset") offset: Int,
         @Query("limit") limit: Int,
         @Query("orderBy") orderBy: Int = 1,
