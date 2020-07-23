@@ -56,7 +56,7 @@ class SearchPostFragment : BaseFragment() {
     private var currentPostType: PostType = PostType.TEXT
     private var mTag: String = ""
     private var searchText: String = ""
-    private var keyword: String = ""
+    private var searchKeyword: String = ""
 
     private var isPostFollow: Boolean = false
 
@@ -169,7 +169,7 @@ class SearchPostFragment : BaseFragment() {
         })
 
         viewModel.searchTotalCount.observe(viewLifecycleOwner, Observer { count ->
-            txt_result.text = getSearchText(currentPostType, keyword, count, isPostFollow)
+            txt_result.text = getSearchText(currentPostType, searchKeyword, count, isPostFollow)
         })
     }
 
@@ -183,8 +183,8 @@ class SearchPostFragment : BaseFragment() {
         }
 
         tv_search.setOnClickListener {
-            updateData(true)
             GeneralUtils.hideKeyboard(requireActivity())
+            updateTag("")
             viewModel.getSearchPostsByKeyword(
                 currentPostType,
                 edit_search.text.toString(),
@@ -378,22 +378,23 @@ class SearchPostFragment : BaseFragment() {
         }
 
         override fun onChipClick(type: PostType, tag: String) {
-            updateData(false)
+            updateTag(tag)
             viewModel.getSearchPostsByTag(type, tag, isPostFollow)
         }
     }
 
-    private fun updateData(isSearchText: Boolean) {
-        if (isSearchText) {
+    private fun updateTag(tag: String) {
+        if (TextUtils.isEmpty(tag)) {
             searchText = edit_search.text.toString()
-            mTag = ""
-            keyword = edit_search.text.toString()
-            adapter?.setupTag(mTag)
+            mTag = tag
+            searchKeyword = edit_search.text.toString()
+            adapter?.setupTag(tag)
         } else {
             searchText = ""
-            mTag = tag.toString()
-            keyword = tag.toString()
-            adapter?.setupTag(mTag)
+            mTag = tag
+            searchKeyword = tag
+            adapter?.setupTag(tag)
+            edit_search.setText("")
         }
     }
 }
