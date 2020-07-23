@@ -276,7 +276,7 @@ class SearchPostFragment : BaseFragment() {
                     val bundle = PictureDetailFragment.createBundle(item, 1)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_adultHomeFragment_to_pictureDetailFragment,
+                            R.id.action_searchPostFragment_to_pictureDetailFragment,
                             bundle
                         )
                     )
@@ -285,7 +285,7 @@ class SearchPostFragment : BaseFragment() {
                     val bundle = TextDetailFragment.createBundle(item, 1)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_adultHomeFragment_to_textDetailFragment,
+                            R.id.action_searchPostFragment_to_textDetailFragment,
                             bundle
                         )
                     )
@@ -310,7 +310,7 @@ class SearchPostFragment : BaseFragment() {
                     val bundle = PictureDetailFragment.createBundle(item, 0)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_adultHomeFragment_to_pictureDetailFragment,
+                            R.id.action_searchPostFragment_to_pictureDetailFragment,
                             bundle
                         )
                     )
@@ -319,13 +319,12 @@ class SearchPostFragment : BaseFragment() {
                     val bundle = TextDetailFragment.createBundle(item, 0)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_adultHomeFragment_to_textDetailFragment,
+                            R.id.action_searchPostFragment_to_textDetailFragment,
                             bundle
                         )
                     )
                 }
                 else -> {
-
                 }
             }
         }
@@ -334,31 +333,27 @@ class SearchPostFragment : BaseFragment() {
             val bundle = ClipFragment.createBundle(ArrayList(item), position)
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_adultHomeFragment_to_clipFragment,
+                    R.id.action_searchPostFragment_to_clipFragment,
                     bundle
                 )
             )
         }
 
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {
+            // TODO: Sion Wang
             val bundle = ClipFragment.createBundle(ArrayList(item), position)
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_adultHomeFragment_to_clipFragment,
+                    R.id.action_searchPostFragment_to_clipFragment,
                     bundle
                 )
             )
         }
 
-        override fun onChipClick(type: PostType, tag: String) {
-            val item = SearchPostItem(type, tag)
-            val bundle = createBundle(item)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_adultHomeFragment_to_searchPostFragment,
-                    bundle
-                )
-            )
+        override fun onChipClick(postType: PostType, tag: String) {
+            type = postType
+            keyword = tag
+            viewModel.getSearchPosts(postType, tag)
         }
     }
 }
