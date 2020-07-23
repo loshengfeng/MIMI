@@ -45,7 +45,7 @@ class HomeViewModel : BaseViewModel() {
         const val PAGING_LIMIT = 20
         const val TYPE_PIC = "type_pic"
         const val TYPE_COVER = "type_cover"
-        const val TYPE_VIDEO = "TYPE_VIDEO"
+        const val TYPE_VIDEO = "type_video"
     }
 
     var lastListIndex = 0 // 垂直recycler view 跳出後的最後一筆資料

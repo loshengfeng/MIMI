@@ -19,6 +19,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.ScrollPicAdapterListener
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.PostMemberRequest
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.ScrollPicAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogFragment
@@ -55,7 +56,6 @@ class PostPicFragment : BaseFragment() {
         private const val PHOTO_LIMIT = 10
 
         private const val REQUEST_MUTLI_PHOTO = 1001
-        private const val TYPE_IMAGE = 2
     }
 
     override val bottomNavigationVisibility: Int
@@ -180,7 +180,7 @@ class PostPicFragment : BaseFragment() {
 
             val request = PostMemberRequest(
                 title = title,
-                type = TYPE_IMAGE,
+                type = PostType.IMAGE.value,
                 content = content,
                 tags = tags
             )
