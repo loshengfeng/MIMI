@@ -49,6 +49,9 @@ import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.OnChooseUploadMethodDialogListener
+import com.dabenxiang.mimi.view.home.HomeViewModel.Companion.TYPE_COVER
+import com.dabenxiang.mimi.view.home.HomeViewModel.Companion.TYPE_PIC
+import com.dabenxiang.mimi.view.home.HomeViewModel.Companion.TYPE_VIDEO
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
@@ -56,6 +59,7 @@ import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.post.pic.PostPicFragment
 import com.dabenxiang.mimi.view.post.pic.PostPicFragment.Companion.BUNDLE_PIC_URI
 import com.dabenxiang.mimi.view.post.video.EditVideoFragment.Companion.BUNDLE_VIDEO_URI
+import com.dabenxiang.mimi.view.post.video.PostVideoFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
@@ -95,6 +99,7 @@ class AdultHomeFragment : BaseFragment() {
     private var postMemberRequest = PostMemberRequest()
 
     private var snackbar: Snackbar? = null
+    private var picParameter = PicParameter()
 
     companion object {
         private const val REQUEST_PHOTO = 10001
@@ -118,36 +123,45 @@ class AdultHomeFragment : BaseFragment() {
             mainViewModel?.getHomeCategories()
         }
 
-        val isNeedUpload =
-            findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>(
-                PostPicFragment.UPLOAD_PIC
-            )
-        val memberRequest =
-            findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<PostMemberRequest>(
-                PostPicFragment.MEMBER_REQUEST
-            )
-        val picUriList =
-            findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<String>>(
-                PostPicFragment.PIC_URI
-            )
-        if (isNeedUpload?.value != null) {
-            snackbar = Snackbar.make(testView, "", Snackbar.LENGTH_INDEFINITE)
-            val snackbarLayout: Snackbar.SnackbarLayout = snackbar?.view as Snackbar.SnackbarLayout
-            val textView = snackbarLayout.findViewById(R.id.snackbar_text) as TextView
-            textView.visibility = View.INVISIBLE
+        handleBackStackData()
+    }
 
-            val snackView: View = layoutInflater.inflate(R.layout.snackbar_upload, null)
-            snackbarLayout.addView(snackView, 0)
-            snackbarLayout.setPadding(15, 0, 15, 0)
-            snackbarLayout.setBackgroundColor(Color.TRANSPARENT)
-            snackbar?.show()
+    private fun handleBackStackData() {
+        val isNeedPicUpload = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>(PostPicFragment.UPLOAD_PIC)
+        val isNeedVideoUpload = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>(PostVideoFragment.UPLOAD_VIDEO)
 
+        if (isNeedPicUpload?.value != null) {
+            val memberRequest = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<PostMemberRequest>(PostPicFragment.MEMBER_REQUEST)
+            val picUriList = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<String>>(PostPicFragment.PIC_URI)
+
+            showSnackBar()
             postMemberRequest = memberRequest!!.value!!
 
             uploadPicUri.addAll(picUriList!!.value!!)
             val pic = uploadPicUri[uploadCurrentPicPosition]
-            viewModel.postAttachment(pic, requireContext())
+            viewModel.postAttachment(pic, requireContext(), TYPE_PIC)
+        } else if (isNeedVideoUpload?.value != null) {
+            showSnackBar()
+
+            val memberRequest = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<PostMemberRequest>(PostVideoFragment.MEMBER_REQUEST)
+            val coverUri = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<String>>(PostVideoFragment.COVER_URI)
+
+            postMemberRequest = memberRequest!!.value!!
+            viewModel.postAttachment(coverUri?.value!![0], requireContext(), TYPE_COVER)
         }
+    }
+
+    private fun showSnackBar() {
+        snackbar = Snackbar.make(testView, "", Snackbar.LENGTH_INDEFINITE)
+        val snackbarLayout: Snackbar.SnackbarLayout = snackbar?.view as Snackbar.SnackbarLayout
+        val textView = snackbarLayout.findViewById(R.id.snackbar_text) as TextView
+        textView.visibility = View.INVISIBLE
+
+        val snackView: View = layoutInflater.inflate(R.layout.snackbar_upload, null)
+        snackbarLayout.addView(snackView, 0)
+        snackbarLayout.setPadding(15,0,15,0)
+        snackbarLayout.setBackgroundColor(Color.TRANSPARENT)
+        snackbar?.show()
     }
 
     override fun setupObservers() {
@@ -390,10 +404,11 @@ class AdultHomeFragment : BaseFragment() {
 
                     if (uploadCurrentPicPosition > uploadPicUri.size - 1) {
 
-                        val picItem = PicItem()
+                        val mediaItem = MediaItem()
+                        mediaItem.textContent = postMemberRequest.content
 
                         for (item in uploadPicItem) {
-                            picItem.picParameter.add(
+                            mediaItem.picParameter.add(
                                 PicParameter(
                                     id = item.id.toString(),
                                     ext = item.ext
@@ -401,13 +416,52 @@ class AdultHomeFragment : BaseFragment() {
                             )
                         }
 
-                        val content = Gson().toJson(picItem)
+                        val content = Gson().toJson(mediaItem)
                         Timber.d("Post pic content item : $content")
                         viewModel.postPic(postMemberRequest, content)
                     } else {
                         val pic = uploadPicUri[uploadCurrentPicPosition]
-                        viewModel.postAttachment(pic, requireContext())
+                        viewModel.postAttachment(pic, requireContext(), TYPE_PIC)
                     }
+                }
+                is Error -> {
+                    onApiError(it.throwable)
+                    //TODO 中斷上傳 and reset
+                }
+            }
+        })
+
+        viewModel.postCoverResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is Success -> {
+                    val videoUri = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>(PostVideoFragment.VIDEO_URI)
+                    picParameter.id = it.result.toString()
+                    viewModel.postAttachment(videoUri?.value!!, requireContext(), TYPE_VIDEO)
+
+                }
+                is Error -> {
+                    onApiError(it.throwable)
+                    //TODO 中斷上傳 and reset
+                }
+            }
+        })
+
+        viewModel.postVideoResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is Success -> {
+                    val videoLength = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>(PostVideoFragment.VIDEO_LENGTH)
+
+                    val mediaItem = MediaItem()
+                    val videoParameter = VideoParameter(
+                        id = it.result.toString(),
+                        length = videoLength?.value!!
+                    )
+                    mediaItem.picParameter.add(picParameter)
+                    mediaItem.videoParameter = videoParameter
+                    mediaItem.textContent = postMemberRequest.content
+                    val content = Gson().toJson(mediaItem)
+                    Timber.d("Post video content item : $content")
+                    viewModel.postPic(postMemberRequest, content)
                 }
                 is Error -> {
                     onApiError(it.throwable)
@@ -418,33 +472,20 @@ class AdultHomeFragment : BaseFragment() {
 
         viewModel.uploadPicItem.observe(viewLifecycleOwner, Observer {
             uploadPicItem.add(it)
-
-//            snackbar = Snackbar.make(testView, "", Snackbar.LENGTH_INDEFINITE)
-//            val snackbarLayout: Snackbar.SnackbarLayout = snackbar?.view as Snackbar.SnackbarLayout
-//            val textView = snackbarLayout.findViewById(R.id.snackbar_text) as TextView
-//            textView.visibility = View.INVISIBLE
-//
-//            val snackView: View = layoutInflater.inflate(R.layout.snackbar_upload, null)
-//            snackbarLayout.addView(snackView, 0)
-//            snackbarLayout.setPadding(15,0,15,0)
-//            snackbarLayout.setBackgroundColor(Color.TRANSPARENT)
-//            snackbar?.show()
         })
 
-        viewModel.postPicMemberResult.observe(viewLifecycleOwner, Observer {
-            val snackBarLayout: Snackbar.SnackbarLayout = snackbar?.view as Snackbar.SnackbarLayout
-            val progressBar =
-                snackBarLayout.findViewById(R.id.contentLoadingProgressBar) as ContentLoadingProgressBar
-            val imgSuccess = snackBarLayout.findViewById(R.id.iv_success) as ImageView
+        viewModel.postVideoMemberResult.observe(viewLifecycleOwner, Observer {
+            val snackbarLayout: Snackbar.SnackbarLayout = snackbar?.view as Snackbar.SnackbarLayout
+            val progressBar = snackbarLayout.findViewById(R.id.contentLoadingProgressBar) as ContentLoadingProgressBar
+            val imgSuccess = snackbarLayout.findViewById(R.id.iv_success) as ImageView
 
-            val txtSuccess = snackBarLayout.findViewById(R.id.txt_postSuccess) as TextView
-            val txtUploading = snackBarLayout.findViewById(R.id.txt_uploading) as TextView
+            val txtSuccess = snackbarLayout.findViewById(R.id.txt_postSuccess) as TextView
+            val txtUploading = snackbarLayout.findViewById(R.id.txt_uploading) as TextView
 
-            val imgCancel = snackBarLayout.findViewById(R.id.iv_cancel) as ImageView
-            val txtCancel = snackBarLayout.findViewById(R.id.txt_cancel) as TextView
-            val imgPost = snackBarLayout.findViewById(R.id.iv_viewPost) as ImageView
-            val txtPost = snackBarLayout.findViewById(R.id.txt_viewPost) as TextView
-
+            val imgCancel = snackbarLayout.findViewById(R.id.iv_cancel) as ImageView
+            val txtCancel = snackbarLayout.findViewById(R.id.txt_cancel) as TextView
+            val imgPost = snackbarLayout.findViewById(R.id.iv_viewPost) as ImageView
+            val txtPost = snackbarLayout.findViewById(R.id.txt_viewPost) as TextView
 
             progressBar.visibility = View.GONE
             imgSuccess.visibility = View.VISIBLE
@@ -460,6 +501,10 @@ class AdultHomeFragment : BaseFragment() {
 
             uploadCurrentPicPosition = 0
             uploadPicUri.clear()
+        })
+
+        viewModel.uploadCoverItem.observe(viewLifecycleOwner, Observer {
+            picParameter = it
         })
     }
 
