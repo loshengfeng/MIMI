@@ -57,7 +57,7 @@ class FavoritePlayListDataSource constructor(
                     response.list.forEach {
                         (it as PlayItem).videoId?.let { it1 -> ids.add(it1) }
                     }
-                    pagingCallback.onTotalVideoId(ids)
+                    pagingCallback.onTotalVideoId(ids, true)
                     callback.onResult(response.list, null, response.nextKey)
                 }
         }
@@ -89,6 +89,12 @@ class FavoritePlayListDataSource constructor(
                 .collect { response ->
                     response.body()?.also { item ->
                         item.content?.also { list ->
+                            val ids = ArrayList<Long>()
+                            list.forEach {
+                                it.videoId?.let { it1 -> ids.add(it1) }
+                            }
+                            pagingCallback.onTotalVideoId(ids,false)
+
                             val nextPageKey = when {
                                 hasNextPage(
                                     item.paging.count,

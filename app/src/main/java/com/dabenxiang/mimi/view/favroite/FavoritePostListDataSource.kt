@@ -57,6 +57,11 @@ class FavoritePostListDataSource constructor(
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect { response ->
                     pagingCallback.onTotalCount(response.list.size)
+                    val ids = ArrayList<Long>()
+                    response.list.forEach {
+                        (it as PostFavoriteItem).id?.let { it1 -> ids.add(it1) }
+                    }
+                    pagingCallback.onTotalVideoId(ids,true)
                     callback.onResult(response.list, null, response.nextKey)
                 }
         }
@@ -88,6 +93,12 @@ class FavoritePostListDataSource constructor(
                 .collect { response ->
                     response.body()?.also { item ->
                         item.content?.also { list ->
+
+                            val ids = ArrayList<Long>()
+                            list.forEach {
+                                it.id?.let { it1 -> ids.add(it1) }
+                            }
+                            pagingCallback.onTotalVideoId(ids, false)
                             pagingCallback.onReceiveResponse(list as ArrayList<PostFavoriteItem>)
                             val nextPageKey = when {
                                 hasNextPage(

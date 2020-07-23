@@ -447,9 +447,8 @@ class ApiRepository(private val apiService: ApiService) {
      * 移除我的帖子收藏
      */
     suspend fun deletePostFavorite(
-        postFavoriteId: Long,
-        postFavoriteIds: List<Long>
-    ) = apiService.deletePostFavorite(postFavoriteId, postFavoriteIds)
+        postFavoriteIds: String
+    ) = apiService.deletePostFavorite(postFavoriteIds)
 
     /**
      * 取得我關注的所有帖子(不分人或圈子)
