@@ -9,66 +9,75 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="wrap_content"
         android:background="@color/adult_color_background"
         android:elevation="10dp">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/toolbar_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:contentScrim="?attr/colorPrimary"
+            android:layout_height="130dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/cl_toolbar"
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                app:layout_collapseMode="pin"
-                app:layout_scrollFlags="scroll|enterAlways" >
+                android:elevation="1dp"
+                android:background="@color/adult_color_background"
+                app:contentInsetStart="0dp"
+                app:layout_collapseMode="pin">
 
-                <ImageButton
-                    android:id="@+id/ib_back"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:background="@drawable/adult_btn_back"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    android:contentDescription="@null" />
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingHorizontal="16dp">
 
-                <ImageView
-                    android:id="@+id/iv_avatar"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/icon_cs_photo"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    android:contentDescription="@null" />
+                    <ImageButton
+                        android:id="@+id/ib_back"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/adult_btn_back"
+                        android:contentDescription="@null"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    android:id="@+id/tv_follow"
-                    android:layout_width="54dp"
-                    android:layout_height="24dp"
-                    android:layout_marginEnd="16dp"
-                    android:background="@drawable/bg_red_1_stroke_radius_16"
-                    android:gravity="center"
-                    android:textColor="@color/color_red_1"
-                    android:textSize="12sp"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    tools:text="+关注" />
+                    <ImageView
+                        android:id="@+id/iv_avatar"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginVertical="10dp"
+                        android:background="@drawable/icon_cs_photo"
+                        android:contentDescription="@null"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    <TextView
+                        android:id="@+id/tv_follow"
+                        android:layout_width="54dp"
+                        android:layout_height="24dp"
+                        android:background="@drawable/bg_red_1_stroke_radius_16"
+                        android:gravity="center"
+                        android:textColor="@color/color_red_1"
+                        android:textSize="12sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:text="+关注" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.appcompat.widget.Toolbar>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cl_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_gravity="bottom"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:layout_collapseMode="parallax">
 
                 <TextView
@@ -154,43 +163,44 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tabLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:orientation="horizontal"
-                app:tabMinWidth="70dp"
-                app:tabGravity="center"
-                app:tabIndicatorColor="@color/adult_color_bottom_bar_item"
-                app:tabIndicatorFullWidth="false"
-                app:tabIndicatorHeight="3dp"
-                app:tabMode="fixed"
-                app:tabSelectedTextColor="@color/color_white_1"
-                app:tabTextColor="@color/color_white_1">
-
-                <com.google.android.material.tabs.TabItem
-                    android:id="@+id/ti_hottest"
-                    android:layout_width="100dp"
-                    android:layout_height="20dp"
-                    android:clickable="false"
-                    android:text="@string/hottest" />
-
-                <com.google.android.material.tabs.TabItem
-                    android:id="@+id/ti_newest"
-                    android:layout_width="100dp"
-                    android:layout_height="20dp"
-                    android:clickable="false"
-                    android:text="@string/newest" />
-
-                <com.google.android.material.tabs.TabItem
-                    android:id="@+id/ti_video"
-                    android:layout_width="100dp"
-                    android:layout_height="20dp"
-                    android:clickable="false"
-                    android:text="@string/video" />
-            </com.google.android.material.tabs.TabLayout>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:orientation="horizontal"
+            app:tabMinWidth="70dp"
+            app:tabGravity="center"
+            app:tabIndicatorColor="@color/adult_color_bottom_bar_item"
+            app:tabIndicatorFullWidth="false"
+            app:tabIndicatorHeight="3dp"
+            app:tabMode="fixed"
+            app:tabSelectedTextColor="@color/color_white_1"
+            app:tabTextColor="@color/color_white_1">
+
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/ti_hottest"
+                android:layout_width="100dp"
+                android:layout_height="20dp"
+                android:clickable="false"
+                android:text="@string/hottest" />
+
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/ti_newest"
+                android:layout_width="100dp"
+                android:layout_height="20dp"
+                android:clickable="false"
+                android:text="@string/newest" />
+
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/ti_video"
+                android:layout_width="100dp"
+                android:layout_height="20dp"
+                android:clickable="false"
+                android:text="@string/video" />
+        </com.google.android.material.tabs.TabLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
