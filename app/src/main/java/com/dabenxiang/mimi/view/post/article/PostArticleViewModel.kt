@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.PostMemberRequest
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -12,10 +13,6 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
 class PostArticleViewModel: BaseViewModel() {
-
-    companion object {
-        private const val TYPE_TEXT = 1
-    }
 
     private val _postArticleResult = MutableLiveData<ApiResult<Long>>()
     val postArticleResult: LiveData<ApiResult<Long>> = _postArticleResult
@@ -26,7 +23,7 @@ class PostArticleViewModel: BaseViewModel() {
                 val request = PostMemberRequest(
                     title = title,
                     content = content,
-                    type = TYPE_TEXT,
+                    type = PostType.TEXT.value,
                     tags = tags
                 )
 

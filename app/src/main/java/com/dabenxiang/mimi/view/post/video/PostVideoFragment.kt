@@ -21,6 +21,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.EditVideoAdapterListener
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.PostMemberRequest
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.ScrollVideoAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogFragment
@@ -55,10 +56,6 @@ class PostVideoFragment : BaseFragment() {
         private const val CONTENT_LIMIT = 2000
         private const val HASHTAG_LIMIT = 10
         private const val INIT_VALUE = 0
-        private const val VIDEO_LIMIT = 1
-        private const val TYPE_VIDEO = 3
-
-        private const val REQUEST_MUTLI_PHOTO = 1001
 
         const val UPLOAD_VIDEO = "upload_video"
         const val MEMBER_REQUEST = "member_request"
@@ -165,17 +162,17 @@ class PostVideoFragment : BaseFragment() {
             val title = edt_title.text.toString()
             val content = edt_content.text.toString()
 
-//            if (title.isBlank()) {
-//                return@setOnClickListener
-//            }
-//
-//            if (content.isBlank()) {
-//                return@setOnClickListener
-//            }
-//
-//            if (chipGroup.childCount == (0)) {
-//                return@setOnClickListener
-//            }
+            if (title.isBlank()) {
+                return@setOnClickListener
+            }
+
+            if (content.isBlank()) {
+                return@setOnClickListener
+            }
+
+            if (chipGroup.childCount == (0)) {
+                return@setOnClickListener
+            }
 
             //TODO 上面的判斷需要空白提示 UI
 
@@ -189,7 +186,7 @@ class PostVideoFragment : BaseFragment() {
 
             val request = PostMemberRequest(
                 title = title,
-                type = TYPE_VIDEO,
+                type = PostType.VIDEO.value,
                 content = content,
                 tags = tags
             )
