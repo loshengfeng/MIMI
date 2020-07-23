@@ -406,6 +406,16 @@ interface ApiService {
         @Query("isAdult") isAdult: Boolean = true
     ): Response<ApiBasePagingItem<List<MemberPostItem>>>
 
+    @GET("/v1/Members/Post")
+    suspend fun searchPostFollow(
+        @Query("tag") tag: String,
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int,
+        @Query("orderBy") orderBy: Int = 1,
+        @Query("isFullContent") isFullContent: Boolean = false,
+        @Query("isAdult") isAdult: Boolean = true
+    ): Response<ApiBasePagingItem<List<MemberPostItem>>>
+
     /**********************************************************
      *
      *                  Ordering

@@ -129,19 +129,27 @@ class SearchPostViewModel : BaseViewModel() {
         }
     }
 
-    fun getSearchPosts(type: PostType, tag: String) {
+    fun getSearchPosts(type: PostType, tag: String, isPostFollow: Boolean) {
         viewModelScope.launch {
-            getSearchPostPagingItems(type, tag).asFlow()
+            getSearchPostPagingItems(type, tag, isPostFollow).asFlow()
                 .collect { _searchPostItemListResult.value = it }
         }
     }
 
     private fun getSearchPostPagingItems(
         type: PostType,
-        tag: String
+        tag: String,
+        isPostFollow: Boolean
     ): LiveData<PagedList<MemberPostItem>> {
         val searchPostDataSource =
-            SearchPostDataSource(pagingCallback, viewModelScope, domainManager, type, tag)
+            SearchPostDataSource(
+                pagingCallback,
+                viewModelScope,
+                domainManager,
+                type,
+                tag,
+                isPostFollow
+            )
         val searchPostFactory = SearchPostFactory(searchPostDataSource)
         val config = PagedList.Config.Builder()
             .setPrefetchDistance(4)

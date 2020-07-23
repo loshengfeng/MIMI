@@ -53,8 +53,9 @@ class SearchPostFragment : BaseFragment() {
     private var moreDialog: MoreDialogFragment? = null
     private var reportDialog: ReportDialogFragment? = null
 
-    private var type: PostType = PostType.TEXT
+    private var currentPostType: PostType = PostType.TEXT
     private var keyword: String = ""
+    private var isPostFollow: Boolean = false
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -63,14 +64,15 @@ class SearchPostFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         (arguments?.getSerializable(KEY_DATA) as SearchPostItem).also {
-            type = it.type
+            currentPostType = it.type
             keyword = it.keyword
+            isPostFollow = it.isPostFollow
         }
 
         recyclerview_content.layoutManager = LinearLayoutManager(requireContext())
         recyclerview_content.adapter = memberPostPagedAdapter
 
-        viewModel.getSearchPosts(type, keyword)
+        viewModel.getSearchPosts(currentPostType, keyword, isPostFollow)
     }
 
     override fun getLayoutId(): Int {
@@ -146,7 +148,7 @@ class SearchPostFragment : BaseFragment() {
         })
 
         viewModel.searchTotalCount.observe(viewLifecycleOwner, Observer { count ->
-            txt_result.text = getSearchText(type, keyword, count)
+            txt_result.text = getSearchText(currentPostType, keyword, count, isPostFollow)
         })
     }
 
@@ -160,7 +162,7 @@ class SearchPostFragment : BaseFragment() {
         }
 
         tv_search.setOnClickListener {
-            viewModel.getSearchPosts(type, edit_search.text.toString())
+            viewModel.getSearchPosts(currentPostType, edit_search.text.toString(), isPostFollow)
         }
     }
 
@@ -171,7 +173,8 @@ class SearchPostFragment : BaseFragment() {
     private fun getSearchText(
         type: PostType,
         keyword: String,
-        count: Long = 0
+        count: Long = 0,
+        isPostFollow: Boolean
     ): SpannableStringBuilder {
 
         val word = SpannableStringBuilder()
@@ -183,14 +186,15 @@ class SearchPostFragment : BaseFragment() {
             .append(" ")
             .append(getString(R.string.search_keyword_3))
 
-        val typeText = when (type) {
-            PostType.TEXT -> getString(R.string.search_type_text)
-            PostType.IMAGE -> getString(R.string.search_type_picture)
-            PostType.VIDEO -> getString(R.string.search_type_clip)
-            else -> ""
+        if (!isPostFollow) {
+            val typeText = when (type) {
+                PostType.TEXT -> getString(R.string.search_type_text)
+                PostType.IMAGE -> getString(R.string.search_type_picture)
+                PostType.VIDEO -> getString(R.string.search_type_clip)
+                else -> ""
+            }
+            word.append(typeText)
         }
-
-        word.append(typeText)
 
         word.setSpan(
             ForegroundColorSpan(
@@ -350,10 +354,10 @@ class SearchPostFragment : BaseFragment() {
             )
         }
 
-        override fun onChipClick(postType: PostType, tag: String) {
-            type = postType
+        override fun onChipClick(type: PostType, tag: String) {
+            currentPostType = type
             keyword = tag
-            viewModel.getSearchPosts(postType, tag)
+            viewModel.getSearchPosts(type, tag, isPostFollow)
         }
     }
 }

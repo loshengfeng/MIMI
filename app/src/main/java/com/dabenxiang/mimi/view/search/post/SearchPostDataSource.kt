@@ -17,7 +17,8 @@ class SearchPostDataSource(
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
     private val type: PostType = PostType.TEXT,
-    private val tag: String = ""
+    private val tag: String = "",
+    private val isPostFollow: Boolean
 ) : PageKeyedDataSource<Int, MemberPostItem>() {
 
     companion object {
@@ -31,12 +32,13 @@ class SearchPostDataSource(
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
-                val result = apiRepository.searchPost(
-                    type,
-                    tag,
-                    0,
-                    PER_LIMIT
-                )
+
+                val result = if (isPostFollow) {
+                    apiRepository.searchPostFollow(tag, 0, PER_LIMIT)
+                } else {
+                    apiRepository.searchPost(type, tag, 0, PER_LIMIT)
+                }
+
                 if (!result.isSuccessful) throw HttpException(result)
                 val body = result.body()
                 val memberPostItems = body?.content
@@ -71,12 +73,11 @@ class SearchPostDataSource(
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
-                val result = apiRepository.searchPost(
-                    type,
-                    tag,
-                    next,
-                    PER_LIMIT
-                )
+                val result = if (isPostFollow) {
+                    apiRepository.searchPostFollow(tag, 0, PER_LIMIT)
+                } else {
+                    apiRepository.searchPost(type, tag, 0, PER_LIMIT)
+                }
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(result)
             }

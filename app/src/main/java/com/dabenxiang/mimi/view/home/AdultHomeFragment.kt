@@ -117,9 +117,18 @@ class AdultHomeFragment : BaseFragment() {
             mainViewModel?.getHomeCategories()
         }
 
-        val isNeedUpload = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>(PostPicFragment.UPLOAD_PIC)
-        val memberRequest = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<PostMemberRequest>(PostPicFragment.MEMBER_REQUEST)
-        val picUriList = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<String>>(PostPicFragment.PIC_URI)
+        val isNeedUpload =
+            findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>(
+                PostPicFragment.UPLOAD_PIC
+            )
+        val memberRequest =
+            findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<PostMemberRequest>(
+                PostPicFragment.MEMBER_REQUEST
+            )
+        val picUriList =
+            findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<String>>(
+                PostPicFragment.PIC_URI
+            )
         if (isNeedUpload?.value != null) {
             snackbar = Snackbar.make(testView, "", Snackbar.LENGTH_INDEFINITE)
             val snackbarLayout: Snackbar.SnackbarLayout = snackbar?.view as Snackbar.SnackbarLayout
@@ -128,7 +137,7 @@ class AdultHomeFragment : BaseFragment() {
 
             val snackView: View = layoutInflater.inflate(R.layout.snackbar_upload, null)
             snackbarLayout.addView(snackView, 0)
-            snackbarLayout.setPadding(15,0,15,0)
+            snackbarLayout.setPadding(15, 0, 15, 0)
             snackbarLayout.setBackgroundColor(Color.TRANSPARENT)
             snackbar?.show()
 
@@ -373,7 +382,7 @@ class AdultHomeFragment : BaseFragment() {
         })
 
         viewModel.postPicResult.observe(viewLifecycleOwner, Observer {
-            when(it) {
+            when (it) {
                 is Success -> {
                     uploadPicItem[uploadCurrentPicPosition].id = it.result
                     uploadCurrentPicPosition += 1
@@ -422,17 +431,18 @@ class AdultHomeFragment : BaseFragment() {
         })
 
         viewModel.postPicMemberResult.observe(viewLifecycleOwner, Observer {
-            val snackbarLayout: Snackbar.SnackbarLayout = snackbar?.view as Snackbar.SnackbarLayout
-            val progressBar = snackbarLayout.findViewById(R.id.contentLoadingProgressBar) as ContentLoadingProgressBar
-            val imgSuccess = snackbarLayout.findViewById(R.id.iv_success) as ImageView
+            val snackBarLayout: Snackbar.SnackbarLayout = snackbar?.view as Snackbar.SnackbarLayout
+            val progressBar =
+                snackBarLayout.findViewById(R.id.contentLoadingProgressBar) as ContentLoadingProgressBar
+            val imgSuccess = snackBarLayout.findViewById(R.id.iv_success) as ImageView
 
-            val txtSuccess = snackbarLayout.findViewById(R.id.txt_postSuccess) as TextView
-            val txtUploading = snackbarLayout.findViewById(R.id.txt_uploading) as TextView
+            val txtSuccess = snackBarLayout.findViewById(R.id.txt_postSuccess) as TextView
+            val txtUploading = snackBarLayout.findViewById(R.id.txt_uploading) as TextView
 
-            val imgCancel = snackbarLayout.findViewById(R.id.iv_cancel) as ImageView
-            val txtCancel = snackbarLayout.findViewById(R.id.txt_cancel) as TextView
-            val imgPost = snackbarLayout.findViewById(R.id.iv_viewPost) as ImageView
-            val txtPost = snackbarLayout.findViewById(R.id.txt_viewPost) as TextView
+            val imgCancel = snackBarLayout.findViewById(R.id.iv_cancel) as ImageView
+            val txtCancel = snackBarLayout.findViewById(R.id.txt_cancel) as TextView
+            val imgPost = snackBarLayout.findViewById(R.id.iv_viewPost) as ImageView
+            val txtPost = snackBarLayout.findViewById(R.id.txt_viewPost) as TextView
 
 
             progressBar.visibility = View.GONE
@@ -597,7 +607,7 @@ class AdultHomeFragment : BaseFragment() {
     private val clubMemberAdapter by lazy {
         ClubMemberAdapter(
             requireContext(),
-            ClubFuncItem { s: String, function: (String) -> Unit -> getBitmap(s, function)}
+            ClubFuncItem { s: String, function: (String) -> Unit -> getBitmap(s, function) }
         )
     }
 
@@ -634,6 +644,8 @@ class AdultHomeFragment : BaseFragment() {
                         )
                     )
                 }
+                else -> {
+                }
             }
         }
 
@@ -667,7 +679,6 @@ class AdultHomeFragment : BaseFragment() {
                     )
                 }
                 else -> {
-
                 }
             }
         }
@@ -694,7 +705,11 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onChipClick(type: PostType, tag: String) {
-            val item = SearchPostItem(type, tag)
+            val item = when (lastPosition) {
+                2 -> SearchPostItem(type, tag, true)
+                else -> SearchPostItem(type, tag)
+            }
+
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
                 NavigateItem.Destination(
