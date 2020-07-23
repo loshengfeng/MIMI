@@ -9,19 +9,14 @@ import androidx.paging.PagedList
 import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.ApiBasePagingItem
-import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.favroite.FavoritePostListDataSource
-import com.dabenxiang.mimi.view.favroite.FavoritePostListFactory
-import com.dabenxiang.mimi.view.home.HomeViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
-class ChooseClubDialogViewModel: BaseViewModel() {
+class ChooseClubDialogViewModel : BaseViewModel() {
 
     private var _attachmentByTypeResult = MutableLiveData<ApiResult<AttachmentItem>>()
     val attachmentByTypeResult: LiveData<ApiResult<AttachmentItem>> = _attachmentByTypeResult
@@ -75,6 +70,10 @@ class ChooseClubDialogViewModel: BaseViewModel() {
         }
 
         override fun onLoaded() {
+        }
+
+        override fun onSucceed() {
+
         }
 
         override fun onThrowable(throwable: Throwable) {

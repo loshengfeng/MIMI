@@ -1,5 +1,5 @@
 package com.dabenxiang.mimi.callback
 
-interface SearchVideoPagingCallback : PagingCallback {
+interface SearchPagingCallback : PagingCallback {
     fun onTotalCount(count: Long)
 }

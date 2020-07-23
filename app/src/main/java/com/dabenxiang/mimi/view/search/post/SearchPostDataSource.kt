@@ -1,7 +1,7 @@
 package com.dabenxiang.mimi.view.search.post
 
 import androidx.paging.PageKeyedDataSource
-import com.dabenxiang.mimi.callback.PagingCallback
+import com.dabenxiang.mimi.callback.SearchPagingCallback
 import com.dabenxiang.mimi.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
 class SearchPostDataSource(
-    private val pagingCallback: PagingCallback,
+    private val pagingCallback: SearchPagingCallback,
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
     private val type: PostType = PostType.TEXT,
@@ -48,6 +48,8 @@ class SearchPostDataSource(
                     ) -> PER_LIMIT
                     else -> null
                 }
+                val count = body?.paging?.count ?: 0
+                pagingCallback.onTotalCount(count)
                 emit(InitResult(memberPostItems ?: arrayListOf(), nextPageKey))
             }
                 .flowOn(Dispatchers.IO)

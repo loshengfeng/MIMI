@@ -1,8 +1,12 @@
 package com.dabenxiang.mimi.view.search.post
 
 import android.os.Bundle
+import android.text.SpannableStringBuilder
+import android.text.Spanned
 import android.text.TextUtils
+import android.text.style.ForegroundColorSpan
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -140,6 +144,10 @@ class SearchPostFragment : BaseFragment() {
         viewModel.searchPostItemListResult.observe(viewLifecycleOwner, Observer {
             memberPostPagedAdapter.submitList(it)
         })
+
+        viewModel.searchTotalCount.observe(viewLifecycleOwner, Observer { count ->
+            txt_result.text = getSearchText(type, keyword, count)
+        })
     }
 
     override fun setupListeners() {
@@ -158,6 +166,56 @@ class SearchPostFragment : BaseFragment() {
 
     private val memberPostPagedAdapter by lazy {
         MemberPostPagedAdapter(requireActivity(), adultListener, attachmentListener)
+    }
+
+    private fun getSearchText(
+        type: PostType,
+        keyword: String,
+        count: Long = 0
+    ): SpannableStringBuilder {
+
+        val word = SpannableStringBuilder()
+            .append(getString(R.string.search_keyword_1))
+            .append(keyword)
+            .append(getString(R.string.search_keyword_2))
+            .append(" ")
+            .append(count.toString())
+            .append(" ")
+            .append(getString(R.string.search_keyword_3))
+
+        val typeText = when (type) {
+            PostType.TEXT -> getString(R.string.search_type_text)
+            PostType.IMAGE -> getString(R.string.search_type_picture)
+            PostType.VIDEO -> getString(R.string.search_type_clip)
+            else -> ""
+        }
+
+        word.append(typeText)
+
+        word.setSpan(
+            ForegroundColorSpan(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.color_red_1
+                )
+            ), word.indexOf("\"") + 1,
+            word.lastIndexOf("\""),
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        word.setSpan(
+            ForegroundColorSpan(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.color_red_1
+                )
+            ),
+            word.indexOf(getString(R.string.search_text_1)) + 1,
+            word.lastIndexOf(getString(R.string.search_text_2)),
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        return word
     }
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
@@ -232,6 +290,8 @@ class SearchPostFragment : BaseFragment() {
                         )
                     )
                 }
+                else -> {
+                }
             }
         }
 
@@ -292,7 +352,7 @@ class SearchPostFragment : BaseFragment() {
 
         override fun onChipClick(type: PostType, tag: String) {
             val item = SearchPostItem(type, tag)
-            val bundle = SearchPostFragment.createBundle(item)
+            val bundle = createBundle(item)
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_adultHomeFragment_to_searchPostFragment,

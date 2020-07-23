@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.blankj.utilcode.util.ImageUtils
-import com.dabenxiang.mimi.callback.PagingCallback
+import com.dabenxiang.mimi.callback.SearchPagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -20,7 +20,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import timber.log.Timber
 
 class SearchPostViewModel : BaseViewModel() {
 
@@ -38,6 +37,9 @@ class SearchPostViewModel : BaseViewModel() {
 
     private var _likePostResult = MutableLiveData<ApiResult<Int>>()
     val likePostResult: LiveData<ApiResult<Int>> = _likePostResult
+
+    private val _searchTotalCount = MutableLiveData<Long>()
+    val searchTotalCount: LiveData<Long> = _searchTotalCount
 
     fun sendPostReport(item: MemberPostItem, content: String) {
         viewModelScope.launch {
@@ -147,7 +149,11 @@ class SearchPostViewModel : BaseViewModel() {
         return LivePagedListBuilder(searchPostFactory, config).build()
     }
 
-    private val pagingCallback = object : PagingCallback {
+    private val pagingCallback = object : SearchPagingCallback {
+        override fun onTotalCount(count: Long) {
+            _searchTotalCount.postValue(count)
+        }
+
         override fun onLoading() {
             setShowProgress(true)
         }
@@ -157,10 +163,6 @@ class SearchPostViewModel : BaseViewModel() {
         }
 
         override fun onThrowable(throwable: Throwable) {
-        }
-
-        override fun onSucceed() {
-
         }
     }
 }

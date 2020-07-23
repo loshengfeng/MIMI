@@ -1,9 +1,8 @@
 package com.dabenxiang.mimi.view.search.video
 
 import androidx.paging.PageKeyedDataSource
-import com.dabenxiang.mimi.callback.SearchVideoPagingCallback
+import com.dabenxiang.mimi.callback.SearchPagingCallback
 import com.dabenxiang.mimi.manager.DomainManager
-import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,13 +12,12 @@ import retrofit2.HttpException
 import timber.log.Timber
 
 class SearchVideoListDataSource(
-        private val viewModelScope: CoroutineScope,
-        private val domainManager: DomainManager,
-        private val apiRepository: ApiRepository,
-        private val pagingCallback: SearchVideoPagingCallback,
-        private val isAdult: Boolean = false,
-        private val tag: String = "",
-        private val name: String = ""
+    private val viewModelScope: CoroutineScope,
+    private val domainManager: DomainManager,
+    private val pagingCallback: SearchPagingCallback,
+    private val isAdult: Boolean = false,
+    private val tag: String = "",
+    private val name: String = ""
 ) : PageKeyedDataSource<Long, VideoItem>() {
 
     companion object {
@@ -30,17 +28,17 @@ class SearchVideoListDataSource(
     private data class LoadResult(val list: List<VideoItem>, val nextKey: Long?)
 
     override fun loadInitial(
-            params: LoadInitialParams<Long>,
-            callback: LoadInitialCallback<Long, VideoItem>
+        params: LoadInitialParams<Long>,
+        callback: LoadInitialCallback<Long, VideoItem>
     ) {
         viewModelScope.launch {
             flow {
-                val result = apiRepository.searchHomeVideos(
-                        q = name,
-                        isAdult = isAdult,
-                        offset = "0",
-                        limit = PER_LIMIT,
-                        tag = tag
+                val result = domainManager.getApiRepository().searchHomeVideos(
+                    q = name,
+                    isAdult = isAdult,
+                    offset = "0",
+                    limit = PER_LIMIT,
+                    tag = tag
                 )
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()
@@ -50,27 +48,23 @@ class SearchVideoListDataSource(
                 pagingCallback.onTotalCount(totalCount)
                 val nextPageKey = when {
                     hasNextPage(
-                            totalCount,
-                            item?.paging?.offset ?: 0,
-                            videos?.size ?: 0
+                        totalCount,
+                        item?.paging?.offset ?: 0,
+                        videos?.size ?: 0
                     ) -> PER_LIMIT_LONG
                     else -> null
                 }
-                emit(Pair<LoadResult, Long>(
-                    LoadResult(
-                        videos
-                            ?: ArrayList(), nextPageKey
-                    ), totalCount))
+                emit(
+                    Pair(LoadResult(videos ?: ArrayList(), nextPageKey), totalCount)
+                )
             }
-                    .flowOn(Dispatchers.IO)
-                    .catch { e ->
-                        pagingCallback.onThrowable(e)
-                    }
-                    .onCompletion { pagingCallback.onLoaded() }
-                    .collect {
-                        pagingCallback.onSucceed()
-                        it.first.run { callback.onResult(list, null, nextKey) }
-                    }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> pagingCallback.onThrowable(e) }
+                .onCompletion { pagingCallback.onLoaded() }
+                .collect {
+                    pagingCallback.onSucceed()
+                    it.first.run { callback.onResult(list, null, nextKey) }
+                }
 
         }
     }
@@ -80,49 +74,49 @@ class SearchVideoListDataSource(
     }
 
     override fun loadAfter(
-            params: LoadParams<Long>,
-            callback: LoadCallback<Long, VideoItem>
+        params: LoadParams<Long>,
+        callback: LoadCallback<Long, VideoItem>
     ) {
         Timber.d("loadAfter")
         val next = params.key
 
         viewModelScope.launch {
             flow {
-                val result = apiRepository.searchHomeVideos(
-                        q = name,
-                        isAdult = isAdult,
-                        offset = next.toString(),
-                        limit = PER_LIMIT,
-                        tag = tag
+                val result = domainManager.getApiRepository().searchHomeVideos(
+                    q = name,
+                    isAdult = isAdult,
+                    offset = next.toString(),
+                    limit = PER_LIMIT,
+                    tag = tag
                 )
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(result)
             }
-                    .flowOn(Dispatchers.IO)
-                    .catch { e ->
-                        pagingCallback.onThrowable(e)
-                    }
-                    .onCompletion { pagingCallback.onLoaded() }
-                    .collect {
-                        pagingCallback.onSucceed()
-                        it.body()?.run {
-                            content?.run {
-                                val nextPageKey = when {
-                                    hasNextPage(
-                                            paging.count ?: 0,
-                                            paging.offset ?: 0,
-                                            videos?.size ?: 0
-                                    ) -> next + (videos?.size ?: 0)
-                                    else -> null
-                                }
+                .flowOn(Dispatchers.IO)
+                .catch { e ->
+                    pagingCallback.onThrowable(e)
+                }
+                .onCompletion { pagingCallback.onLoaded() }
+                .collect {
+                    pagingCallback.onSucceed()
+                    it.body()?.run {
+                        content?.run {
+                            val nextPageKey = when {
+                                hasNextPage(
+                                    paging.count ?: 0,
+                                    paging.offset ?: 0,
+                                    videos?.size ?: 0
+                                ) -> next + (videos?.size ?: 0)
+                                else -> null
+                            }
 
-                                if (videos != null) {
-                                    adjustData(videos)
-                                    callback.onResult(videos, nextPageKey)
-                                }
+                            if (videos != null) {
+                                adjustData(videos)
+                                callback.onResult(videos, nextPageKey)
                             }
                         }
                     }
+                }
         }
     }
 

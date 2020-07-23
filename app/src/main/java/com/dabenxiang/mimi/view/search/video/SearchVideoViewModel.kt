@@ -6,7 +6,7 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.dabenxiang.mimi.callback.SearchVideoPagingCallback
+import com.dabenxiang.mimi.callback.SearchPagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
@@ -44,30 +44,28 @@ class SearchVideoViewModel : BaseViewModel() {
     private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
     val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
 
-    private fun getVideoPagingItems(
-            isAdult: Boolean
-    ): LiveData<PagedList<VideoItem>> {
+    private fun getVideoPagingItems(isAdult: Boolean): LiveData<PagedList<VideoItem>> {
         val searchVideoDataSource =
             SearchVideoListDataSource(
                 viewModelScope,
                 domainManager,
-                domainManager.getApiRepository(),
                 pagingCallback,
                 isAdult,
                 searchingTag,
                 searchingStr
             )
-        val videoFactory =
-            SearchVideoFactory(
-                searchVideoDataSource
-            )
+        val videoFactory = SearchVideoFactory(searchVideoDataSource)
         val config = PagedList.Config.Builder()
-                .setPrefetchDistance(4)
-                .build()
+            .setPrefetchDistance(4)
+            .build()
         return LivePagedListBuilder(videoFactory, config).build()
     }
 
-    private val pagingCallback = object : SearchVideoPagingCallback {
+    private val pagingCallback = object : SearchPagingCallback {
+        override fun onTotalCount(count: Long) {
+            _searchingTotalCount.postValue(count)
+        }
+
         override fun onLoading() {
             setShowProgress(true)
         }
@@ -78,10 +76,6 @@ class SearchVideoViewModel : BaseViewModel() {
 
         override fun onThrowable(throwable: Throwable) {
         }
-
-        override fun onTotalCount(count: Long) {
-            _searchingTotalCount.postValue(count)
-        }
     }
 
     fun cleanSearchText() {
@@ -91,9 +85,9 @@ class SearchVideoViewModel : BaseViewModel() {
     fun getSearchList() {
         viewModelScope.launch {
             getVideoPagingItems(isAdult).asFlow()
-                    .collect {
-                        _searchingListResult.value = it
-                    }
+                .collect {
+                    _searchingListResult.value = it
+                }
         }
     }
 
@@ -103,7 +97,7 @@ class SearchVideoViewModel : BaseViewModel() {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository()
-                        .like(videoID, likeRequest)
+                    .like(videoID, likeRequest)
                 if (!result.isSuccessful) {
                     throw HttpException(result)
                 }
@@ -113,11 +107,11 @@ class SearchVideoViewModel : BaseViewModel() {
                 }
                 emit(ApiResult.success(videoID))
             }
-                    .flowOn(Dispatchers.IO)
-                    .onStart { emit(ApiResult.loading()) }
-                    .catch { e -> emit(ApiResult.error(e)) }
-                    .onCompletion { emit(ApiResult.loaded()) }
-                    .collect { _likeResult.value = it }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _likeResult.value = it }
         }
     }
 
@@ -136,15 +130,15 @@ class SearchVideoViewModel : BaseViewModel() {
                 currentItem?.run {
                     favorite = favorite != true
                     favoriteCount = if (favorite == true) (favoriteCount
-                            ?: 0) + 1 else (favoriteCount ?: 0) - 1
+                        ?: 0) + 1 else (favoriteCount ?: 0) - 1
                 }
                 emit(ApiResult.success(videoID))
             }
-                    .flowOn(Dispatchers.IO)
-                    .onStart { emit(ApiResult.loading()) }
-                    .catch { e -> emit(ApiResult.error(e)) }
-                    .onCompletion { emit(ApiResult.loaded()) }
-                    .collect { _favoriteResult.value = it }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _favoriteResult.value = it }
         }
     }
 
@@ -157,11 +151,11 @@ class SearchVideoViewModel : BaseViewModel() {
                 item.reported = true
                 emit(ApiResult.success(null))
             }
-                    .flowOn(Dispatchers.IO)
-                    .onStart { emit(ApiResult.loading()) }
-                    .onCompletion { emit(ApiResult.loaded()) }
-                    .catch { e -> emit(ApiResult.error(e)) }
-                    .collect { _postReportResult.value = it }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _postReportResult.value = it }
         }
     }
 }
