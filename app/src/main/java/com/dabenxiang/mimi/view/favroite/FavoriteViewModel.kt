@@ -225,6 +225,9 @@ class FavoriteViewModel : BaseViewModel() {
         }
     }
 
+    /**
+     * 刪除所有該tab下除了短視頻的影片
+     */
     fun deleteFavorite() {
         if (videoIDList.size == 0) return
         viewModelScope.launch {
@@ -239,6 +242,26 @@ class FavoriteViewModel : BaseViewModel() {
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _cleanResult.value = it }
+        }
+    }
+
+    /**
+     * 刪除全部的短視頻影片
+     */
+    fun deleteAllPostFavorite(){
+        if (videoIDList.size == 0) return
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository()
+                        .deletePostFavorite(videoIDList.joinToString(separator = ","))
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(null))
+            }
+                    .flowOn(Dispatchers.IO)
+                    .onStart { emit(ApiResult.loading()) }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .collect { _cleanResult.value = it }
         }
     }
 
@@ -281,8 +304,9 @@ class FavoriteViewModel : BaseViewModel() {
             viewModelScope.launch { dataCount.value = count }
         }
 
-        override fun onTotalVideoId(ids: ArrayList<Long>) {
-            videoIDList.clear()
+        override fun onTotalVideoId(ids: ArrayList<Long>, clear: Boolean) {
+            if (clear)
+                videoIDList.clear()
             videoIDList.addAll(ids)
         }
 

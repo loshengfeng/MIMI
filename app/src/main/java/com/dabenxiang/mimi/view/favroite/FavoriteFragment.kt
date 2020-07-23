@@ -106,6 +106,7 @@ class FavoriteFragment : BaseFragment() {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Error -> onApiError(it.throwable)
                 is ApiResult.Empty -> {
+                    viewModel.videoIDList.clear()
                     viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
                 }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
@@ -430,7 +431,11 @@ class FavoriteFragment : BaseFragment() {
 
     private val onCleanDialogListener = object : OnCleanDialogListener {
         override fun onClean() {
-            viewModel.deleteFavorite()
+            if(lastPrimaryIndex == TYPE_ADULT && lastSecondaryIndex == TYPE_SHORT_VIDEO) {
+                viewModel.deleteAllPostFavorite()
+            } else {
+                viewModel.deleteFavorite()
+            }
         }
     }
 

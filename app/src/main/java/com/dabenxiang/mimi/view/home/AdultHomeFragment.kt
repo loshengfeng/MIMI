@@ -44,6 +44,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.club.ClubFuncItem
 import com.dabenxiang.mimi.view.club.ClubMemberAdapter
+import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
@@ -523,7 +524,6 @@ class AdultHomeFragment : BaseFragment() {
         recyclerview.background = requireActivity().getDrawable(R.color.adult_color_background)
         recyclerview.layoutManager = LinearLayoutManager(requireContext())
         recyclerview.adapter = homeAdapter
-//        LinearSnapHelper().attachToRecyclerView(recyclerview)
 
         refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
     }
@@ -607,7 +607,10 @@ class AdultHomeFragment : BaseFragment() {
     private val clubMemberAdapter by lazy {
         ClubMemberAdapter(
             requireContext(),
-            ClubFuncItem { s: String, function: (String) -> Unit -> getBitmap(s, function) }
+            ClubFuncItem(
+                { item -> onItemClick(item) },
+                { id, function -> getBitmap(id, function) },
+                { item, isFollow, function -> clubFollow(item, isFollow, function) })
         )
     }
 
@@ -920,7 +923,20 @@ class AdultHomeFragment : BaseFragment() {
         }
     }
 
+    private fun onItemClick(item: MemberClubItem) {
+        val bundle = ClubDetailFragment.createBundle(item)
+        findNavController().navigate(R.id.action_adultHomeFragment_to_clubDetailFragment, bundle)
+    }
+
     private fun getBitmap(id: String, update: ((String) -> Unit)) {
         viewModel.getBitmap(id, update)
+    }
+
+    private fun clubFollow(
+        memberClubItem: MemberClubItem,
+        isFollow: Boolean,
+        update: (Boolean) -> Unit
+    ) {
+        viewModel.clubFollow(memberClubItem, isFollow, update)
     }
 }
