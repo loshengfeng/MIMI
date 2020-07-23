@@ -43,7 +43,14 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
     val commentCount: TextView = itemView.tv_comment_count
     val moreImage: ImageView = itemView.iv_more
 
-    fun onBind(item: MemberPostItem, itemList: List<MemberPostItem>?, position: Int, adultListener: AdultListener, attachmentListener: AttachmentListener) {
+    fun onBind(
+        item: MemberPostItem,
+        itemList: List<MemberPostItem>?,
+        position: Int,
+        adultListener: AdultListener,
+        attachmentListener: AttachmentListener,
+        keyword: String
+    ) {
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         title.text = item.title
@@ -68,13 +75,23 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
             val chip = LayoutInflater.from(tagChipGroup.context)
                 .inflate(R.layout.chip_item, tagChipGroup, false) as Chip
             chip.text = it
-            chip.setTextColor(tagChipGroup.context.getColor(R.color.color_white_1_50))
             chip.chipBackgroundColor = ColorStateList.valueOf(
                 ContextCompat.getColor(tagChipGroup.context, R.color.adult_color_status_bar)
             )
+            if (TextUtils.isEmpty(keyword)) {
+                chip.setTextColor(tagChipGroup.context.getColor(R.color.color_white_1_50))
+            } else {
+                if (it == keyword) {
+                    chip.setTextColor(chip.context.getColor(R.color.color_red_1))
+                } else {
+                    chip.setTextColor(tagChipGroup.context.getColor(R.color.color_white_1_50))
+                }
+            }
+
             chip.setOnClickListener { view ->
                 adultListener.onChipClick(PostType.VIDEO, (view as Chip).text.toString())
             }
+
             tagChipGroup.addView(chip)
         }
 
@@ -115,7 +132,11 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
     }
 
-    private fun updateLikeAndFollowItem(item: MemberPostItem, position: Int, adultListener: AdultListener) {
+    private fun updateLikeAndFollowItem(
+        item: MemberPostItem,
+        position: Int,
+        adultListener: AdultListener
+    ) {
         likeCount.text = item.likeCount.toString()
         commentCount.text = item.commentCount.toString()
 

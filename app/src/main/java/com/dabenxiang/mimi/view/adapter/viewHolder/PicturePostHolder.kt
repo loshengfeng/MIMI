@@ -1,13 +1,16 @@
 package com.dabenxiang.mimi.view.adapter.viewHolder
 
 import android.content.res.ColorStateList
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.*
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
@@ -50,7 +53,8 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         item: MemberPostItem,
         position: Int,
         adultListener: AdultListener,
-        attachmentListener: AttachmentListener
+        attachmentListener: AttachmentListener,
+        keyword: String
     ) {
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate ?: Date(), Date())
@@ -76,10 +80,18 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
             val chip = LayoutInflater.from(tagChipGroup.context)
                 .inflate(R.layout.chip_item, tagChipGroup, false) as Chip
             chip.text = it
-            chip.setTextColor(tagChipGroup.context.getColor(R.color.color_white_1_50))
             chip.chipBackgroundColor = ColorStateList.valueOf(
                 ContextCompat.getColor(tagChipGroup.context, R.color.adult_color_status_bar)
             )
+            if (TextUtils.isEmpty(keyword)) {
+                chip.setTextColor(tagChipGroup.context.getColor(R.color.color_white_1_50))
+            } else {
+                if (it == keyword) {
+                    chip.setTextColor(chip.context.getColor(R.color.color_red_1))
+                } else {
+                    chip.setTextColor(tagChipGroup.context.getColor(R.color.color_white_1_50))
+                }
+            }
             chip.setOnClickListener { view ->
                 adultListener.onChipClick(PostType.IMAGE, (view as Chip).text.toString())
             }

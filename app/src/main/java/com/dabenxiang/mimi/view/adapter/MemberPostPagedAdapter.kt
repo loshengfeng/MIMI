@@ -18,7 +18,8 @@ import com.dabenxiang.mimi.view.base.BaseViewHolder
 class MemberPostPagedAdapter(
     val context: Context,
     private val adultListener: AdultListener,
-    private val attachmentListener: AttachmentListener
+    private val attachmentListener: AttachmentListener,
+    private val keyword: String = ""
 ) : PagedListAdapter<MemberPostItem, BaseViewHolder>(diffCallback) {
 
     companion object {
@@ -93,7 +94,8 @@ class MemberPostPagedAdapter(
                         currentList,
                         position,
                         adultListener,
-                        attachmentListener
+                        attachmentListener,
+                        keyword
                     )
                 }
             }
@@ -109,12 +111,12 @@ class MemberPostPagedAdapter(
                 } ?: run {
                     item?.also {
                         holder.pictureRecycler.tag = position
-                        holder.onBind(it, position, adultListener, attachmentListener)
+                        holder.onBind(it, position, adultListener, attachmentListener, keyword)
                     }
                 }
             }
             is TextPostHolder -> {
-                item?.also { holder.onBind(it, position, adultListener, attachmentListener) }
+                item?.also { holder.onBind(it, position, adultListener, attachmentListener, keyword) }
             }
         }
     }

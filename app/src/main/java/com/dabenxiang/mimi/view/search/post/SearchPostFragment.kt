@@ -167,7 +167,7 @@ class SearchPostFragment : BaseFragment() {
     }
 
     private val memberPostPagedAdapter by lazy {
-        MemberPostPagedAdapter(requireActivity(), adultListener, attachmentListener)
+        MemberPostPagedAdapter(requireActivity(), adultListener, attachmentListener, keyword)
     }
 
     private fun getSearchText(
