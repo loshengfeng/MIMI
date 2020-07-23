@@ -209,6 +209,16 @@ interface ApiService {
         @Query("limit") limit: Int
     ): Response<ApiBasePagingItem<List<MemberClubItem>>>
 
+    @GET("/v1/Members/Post")
+    suspend fun getMembersPost(
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int,
+        @Query("tag") tag: String = "",
+        @Query("orderBy") orderBy: Int = 1,
+        @Query("isAdult") isAdult: Boolean = true,
+        @Query("isFullContent") isFullContent: Boolean = false
+    ): Response<ApiBasePagingItem<List<MemberPostItem>>>
+
     @POST("/v1/Members/Club/{clubId}/Follow")
     suspend fun followClub(@Path("clubId") clubId: Long): Response<Void>
 
