@@ -3,7 +3,6 @@ package com.dabenxiang.mimi.view.search.video
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.SearchVideoPagingCallback
 import com.dabenxiang.mimi.manager.DomainManager
-import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +14,6 @@ import timber.log.Timber
 class SearchVideoListDataSource(
         private val viewModelScope: CoroutineScope,
         private val domainManager: DomainManager,
-        private val apiRepository: ApiRepository,
         private val pagingCallback: SearchVideoPagingCallback,
         private val isAdult: Boolean = false,
         private val tag: String = "",
@@ -35,7 +33,7 @@ class SearchVideoListDataSource(
     ) {
         viewModelScope.launch {
             flow {
-                val result = apiRepository.searchHomeVideos(
+                val result = domainManager.getApiRepository().searchHomeVideos(
                         q = name,
                         isAdult = isAdult,
                         offset = "0",
@@ -88,7 +86,7 @@ class SearchVideoListDataSource(
 
         viewModelScope.launch {
             flow {
-                val result = apiRepository.searchHomeVideos(
+                val result = domainManager.getApiRepository().searchHomeVideos(
                         q = name,
                         isAdult = isAdult,
                         offset = next.toString(),

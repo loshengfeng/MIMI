@@ -51,7 +51,6 @@ class SearchVideoViewModel : BaseViewModel() {
             SearchVideoListDataSource(
                 viewModelScope,
                 domainManager,
-                domainManager.getApiRepository(),
                 pagingCallback,
                 isAdult,
                 searchingTag,
