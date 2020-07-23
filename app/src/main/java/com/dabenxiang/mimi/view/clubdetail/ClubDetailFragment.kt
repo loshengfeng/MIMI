@@ -6,6 +6,7 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.paging.PagedList
 import com.bumptech.glide.Glide
+import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.AttachmentListener
@@ -27,9 +28,11 @@ import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
+import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_club_detail.*
+import kotlinx.android.synthetic.main.fragment_messenger.*
 
-class ClubDetailFragment() : BaseFragment() {
+class ClubDetailFragment : BaseFragment() {
 
     companion object {
         const val KEY_DATA = "data"
@@ -41,6 +44,8 @@ class ClubDetailFragment() : BaseFragment() {
                 it.putSerializable(KEY_DATA, item)
             }
         }
+
+        val tabTitle = arrayListOf( App.self.getString(R.string.hottest), App.self.getString(R.string.newest), App.self.getString(R.string.video))
     }
 
     private val viewModel: ClubDetailViewModel by viewModels()
@@ -49,9 +54,6 @@ class ClubDetailFragment() : BaseFragment() {
 
     private var moreDialog: MoreDialogFragment? = null
     private var reportDialog: ReportDialogFragment? = null
-
-    private var type: PostType = PostType.TEXT
-    private var keyword: String = ""
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -82,7 +84,15 @@ class ClubDetailFragment() : BaseFragment() {
         val bitmap = LruCacheUtils.getLruCache(memberClubItem.avatarAttachmentId.toString())
         bitmap?.also { Glide.with(requireContext()).load(it).circleCrop().into(iv_avatar) }
 
+        viewPager.isUserInputEnabled = false
+
         viewPager.adapter = ClubPagerAdapter(ClubDetailFuncItem { orderBy, function -> getPost(orderBy, function) }, attachmentListener, adultListener)
+
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            tab.text = tabTitle[position]
+            viewPager.setCurrentItem(tab.position, true)
+        }.attach()
+
     }
 
     override fun setupObservers() {
