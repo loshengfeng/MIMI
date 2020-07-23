@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.home
 
-import android.graphics.Bitmap
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
@@ -16,6 +17,7 @@ import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.vo.AttachmentItem
+import com.dabenxiang.mimi.model.vo.UploadPicItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.home.club.ClubDataSource
 import com.dabenxiang.mimi.view.home.club.ClubFactory
@@ -26,10 +28,15 @@ import com.dabenxiang.mimi.view.home.postfollow.PostFollowFactory
 import com.dabenxiang.mimi.view.home.video.VideoDataSource
 import com.dabenxiang.mimi.view.home.video.VideoFactory
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
+import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
+import java.io.File
+import java.net.URLEncoder
+
 
 class HomeViewModel : BaseViewModel() {
 
@@ -106,6 +113,15 @@ class HomeViewModel : BaseViewModel() {
 
     private val _scrollToLastPosition = MutableLiveData<Boolean>()
     val scrollToLastPosition: LiveData<Boolean> = _scrollToLastPosition
+
+    private val _postPicResult = MutableLiveData<ApiResult<Long>>()
+    val postPicResult: LiveData<ApiResult<Long>> = _postPicResult
+
+    private val _uploadPicItem = MutableLiveData<UploadPicItem>()
+    val uploadPicItem: LiveData<UploadPicItem> = _uploadPicItem
+
+    private val _postPicMemberResult = MutableLiveData<ApiResult<Long>>()
+    val postPicMemberResult: LiveData<ApiResult<Long>> = _postPicMemberResult
 
     fun setTopTabPosition(position: Int) {
         if (position != tabLayoutPosition.value) {
@@ -463,6 +479,52 @@ class HomeViewModel : BaseViewModel() {
 
         override fun onSucceed() {
             _scrollToLastPosition.postValue(true)
+        }
+    }
+
+    fun postAttachment(pic: String, context: Context) {
+        viewModelScope.launch {
+            flow {
+                val realPath = UriUtils.getPath(context, Uri.parse(pic))
+                val fileNameSplit = realPath?.split("/")
+                val fileName = fileNameSplit?.last()
+                val extSplit = fileName?.split(".")
+                val ext = "." + extSplit?.last()
+
+                val uploadPicItem = UploadPicItem(ext = ext)
+                _uploadPicItem.postValue(uploadPicItem)
+
+                Timber.d("Upload photo path : $realPath")
+                Timber.d("Upload photo ext : $ext")
+
+                val result = domainManager.getApiRepository().postAttachment(
+                    File(realPath),
+                    fileName = URLEncoder.encode(fileName, "UTF-8")
+                )
+
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(result.body()?.content))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _postPicResult.postValue(it) }
+        }
+    }
+
+    fun postPic(request: PostMemberRequest, content: String) {
+        viewModelScope.launch {
+            flow {
+                request.content = content
+                Timber.d("Post member request : $request")
+                val resp = domainManager.getApiRepository().postMembersPost(request)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(resp.body()?.content))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _postPicMemberResult.value = it }
         }
     }
 }

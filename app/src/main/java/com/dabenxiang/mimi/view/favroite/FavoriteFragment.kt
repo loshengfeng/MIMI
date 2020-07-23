@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -15,7 +14,10 @@ import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.FunctionType
+import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.serializable.PlayerData
+import com.dabenxiang.mimi.model.serializable.SearchPostItem
 import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.adapter.FavoriteTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -69,8 +71,7 @@ class FavoriteFragment : BaseFragment() {
         FavoriteTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
                 setTabPosition(TAB_SECONDARY, index)
-                if (viewModel.currentPostList.size <= 0)
-                    viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
+                viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
             }
         }, false)
     }
@@ -166,6 +167,9 @@ class FavoriteFragment : BaseFragment() {
                     LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
                     when (attachmentItem.type) {
                         AttachmentType.ADULT_HOME_CLIP -> {
+                            favoriteAdapter.update(attachmentItem.position ?: 0)
+                        }
+                        AttachmentType.ADULT_AVATAR->{
                             favoriteAdapter.update(attachmentItem.position ?: 0)
                         }
                         else -> {
@@ -267,9 +271,6 @@ class FavoriteFragment : BaseFragment() {
     }
 
     private val listener = object : FavoriteAdapter.EventListener {
-        override fun onAvatarDownload(view: ImageView, id: String) {
-            viewModel.getAttachment(view, id)
-        }
 
         override fun onGetAttachment(id: String, position: Int, type: AttachmentType) {
             viewModel.getAttachment(id, position, type)
@@ -404,16 +405,26 @@ class FavoriteFragment : BaseFragment() {
             }
         }
 
-        override fun onChipClick(text: String) {
+        override fun onChipClick(text: String, type: Int?) {
             // 點擊標籤後進入 Search page
-            interactionListener?.setAdult(lastPrimaryIndex == 1)
-            val bundle = SearchVideoFragment.createBundle(tag = text)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_postFavoriteFragment_to_searchVideoFragment,
-                    bundle
+            interactionListener?.setAdult(lastPrimaryIndex == TYPE_ADULT)
+            if (lastSecondaryIndex == TYPE_MIMI) {
+                val bundle = SearchVideoFragment.createBundle(tag = text)
+                navigateTo(
+                        NavigateItem.Destination(
+                                R.id.action_postFavoriteFragment_to_searchVideoFragment,
+                                bundle
+                        )
                 )
-            )
+            } else {
+                val bundle = SearchPostFragment.createBundle(SearchPostItem(PostType.getTypeByValue(type), text))
+                navigateTo(
+                        NavigateItem.Destination(
+                                R.id.action_postFavoriteFragment_to_searchPostFragment,
+                                bundle
+                        )
+                )
+            }
         }
     }
 
@@ -445,6 +456,7 @@ class FavoriteFragment : BaseFragment() {
                         memberItem.id = postItem.postId ?: 0
                         memberItem.isFavorite = true
                         memberItem.creatorId = postItem.posterId ?: 0
+                        memberItem.likeType = if (postItem.likeType == 0) LikeType.LIKE else LikeType.DISLIKE
                         return@memberItem
                     }
                 }

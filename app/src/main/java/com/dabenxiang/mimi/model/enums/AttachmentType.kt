@@ -7,4 +7,5 @@ enum class AttachmentType {
     ADULT_TAB_CLIP,
     ADULT_TAB_PICTURE,
     ADULT_TAB_TEXT,
+    ADULT_AVATAR
 }

@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.favroite
 
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,14 +8,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.blankj.utilcode.util.ImageUtils
-import com.bumptech.glide.Glide
-import com.bumptech.glide.Priority
-import com.bumptech.glide.load.MultiTransformation
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.CircleCrop
-import com.bumptech.glide.request.RequestOptions
-import com.dabenxiang.mimi.App
-import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.FavoritePagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
@@ -27,13 +18,10 @@ import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_ADULT
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_NORMAL
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_SHORT_VIDEO
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils.getLruCache
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils.putLruCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import timber.log.Timber
 
 class FavoriteViewModel : BaseViewModel() {
 
@@ -106,54 +94,6 @@ class FavoriteViewModel : BaseViewModel() {
                     LivePagedListBuilder(factory, config).build().asFlow()
                         .collect { _postList.postValue(it) }
                 }
-            }
-        }
-    }
-
-    fun getAttachment(view: ImageView, id: String) {
-        // todo 目前沒有帖子，無法做測試，所以還沒修改
-        if (!setImage(view, id)) {
-            viewModelScope.launch {
-                flow {
-                    val result = domainManager.getApiRepository().getAttachment(id)
-                    if (!result.isSuccessful) throw HttpException(result)
-
-                    val byteArray = result.body()?.bytes()
-                    val bitmap = ImageUtils.bytes2Bitmap(byteArray)
-                    if (bitmap != null) {
-                        putLruCache(id, bitmap)
-                        setImage(view, id)
-                    }
-                    emit(ApiResult.success(Pair(view, id)))
-                }
-                    .catch { e -> emit(ApiResult.error(e)) }
-                    .collect { resp ->
-                        when (resp) {
-                            is ApiResult.Error -> Timber.e(resp.throwable)
-                            is ApiResult.Success -> {
-                            }
-                        }
-                    }
-            }
-        }
-    }
-
-    private fun setImage(view: ImageView, id: String): Boolean {
-        val bitmap = getLruCache(id)
-
-        return when (getLruCache(id)) {
-            null -> false
-            else -> {
-                val options: RequestOptions = RequestOptions()
-                    .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                    .placeholder(R.mipmap.ic_launcher)
-                    .error(R.mipmap.ic_launcher)
-                    .priority(Priority.NORMAL)
-
-                Glide.with(App.self).load(bitmap)
-                    .apply(options)
-                    .into(view)
-                true
             }
         }
     }

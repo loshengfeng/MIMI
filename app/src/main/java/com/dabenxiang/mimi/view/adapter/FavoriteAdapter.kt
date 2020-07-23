@@ -13,7 +13,6 @@ import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.FunctionType
-import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_NORMAL
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_SHORT_VIDEO
 import com.dabenxiang.mimi.view.favroite.FavoritePlayViewHolder
@@ -40,8 +39,7 @@ class FavoriteAdapter(
     interface EventListener {
         fun onVideoClick(item: Any)
         fun onFunctionClick(type: FunctionType, view: View, item: Any)
-        fun onChipClick(text: String)
-        fun onAvatarDownload(view: ImageView, id: String)
+        fun onChipClick(text: String, type: Int? = -1)
         fun onGetAttachment(id: String, position: Int, type: AttachmentType)
     }
 

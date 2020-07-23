@@ -8,9 +8,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.core.view.size
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.ArticleItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogFragment
@@ -18,11 +22,14 @@ import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_post_article.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 
 
 class PostArticleFragment : BaseFragment() {
+
+    private val viewModel: PostArticleViewModel by viewModels()
 
     companion object {
         private const val TITLE_LIMIT = 60
@@ -44,6 +51,15 @@ class PostArticleFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
+        viewModel.postArticleResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is ApiResult.Success -> {
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -108,6 +124,38 @@ class PostArticleFragment : BaseFragment() {
 
         tv_back.setOnClickListener {
             findNavController().popBackStack()
+        }
+
+        tv_clean.setOnClickListener {
+            val title = edt_title.text.toString()
+            val content = edt_content.text.toString()
+
+            if (title.isBlank()) {
+                return@setOnClickListener
+            }
+
+            if (content.isBlank()) {
+                return@setOnClickListener
+            }
+
+            if (chipGroup.childCount == (0)) {
+                return@setOnClickListener
+            }
+
+            //TODO 上面的判斷需要空白提示 UI
+
+            val requestContent = ArticleItem(content)
+
+            val tags = arrayListOf<String>()
+
+            for (i in 0 until chipGroup.childCount) {
+                val chip = chipGroup.getChildAt(i)
+                chip as Chip
+                tags.add(chip.text.toString())
+            }
+
+            val jsonString = Gson().toJson(requestContent)
+            viewModel.postArticle(title, jsonString, tags)
         }
     }
 

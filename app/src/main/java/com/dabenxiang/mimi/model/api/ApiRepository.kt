@@ -224,6 +224,12 @@ class ApiRepository(private val apiService: ApiService) {
         return apiService.getMembersPost(type.value, offset, limit)
     }
 
+    suspend fun postMembersPost(
+        body: PostMemberRequest
+    ): Response<ApiBaseItem<Long>> {
+        return apiService.postMembersPost(body)
+    }
+
     suspend fun getMembersPostComment(
         postId: Long,
         parentId: Long? = null,
