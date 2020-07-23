@@ -12,6 +12,7 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.ReportRequest
+import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.AttachmentItem
@@ -37,6 +38,9 @@ class SearchPostViewModel : BaseViewModel() {
     private val _searchPostItemByKeywordListResult = MutableLiveData<PagedList<MemberPostItem>>()
     val searchPostItemByKeywordListResult: LiveData<PagedList<MemberPostItem>> =
         _searchPostItemByKeywordListResult
+
+    private var _attachmentByTypeResult = MutableLiveData<ApiResult<AttachmentItem>>()
+    val attachmentByTypeResult: LiveData<ApiResult<AttachmentItem>> = _attachmentByTypeResult
 
     private var _attachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
     val attachmentResult: LiveData<ApiResult<AttachmentItem>> = _attachmentResult
@@ -64,6 +68,29 @@ class SearchPostViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _postReportResult.value = it }
+        }
+    }
+
+    fun getAttachment(id: String, position: Int, type: AttachmentType) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getAttachment(id)
+                if (!result.isSuccessful) throw HttpException(result)
+                val byteArray = result.body()?.bytes()
+                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
+                val item = AttachmentItem(
+                    id = id,
+                    bitmap = bitmap,
+                    position = position,
+                    type = type
+                )
+                emit(ApiResult.success(item))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _attachmentByTypeResult.value = it }
         }
     }
 

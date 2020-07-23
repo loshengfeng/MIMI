@@ -106,6 +106,25 @@ class SearchPostFragment : BaseFragment() {
             }
         })
 
+        viewModel.attachmentByTypeResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    val attachmentItem = it.result
+                    LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
+                    when (attachmentItem.type) {
+                        AttachmentType.ADULT_TAB_CLIP,
+                        AttachmentType.ADULT_TAB_PICTURE,
+                        AttachmentType.ADULT_TAB_TEXT -> {
+                            adapter?.notifyItemChanged(attachmentItem.position!!)
+                        }
+                        else -> {
+                        }
+                    }
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
+
         viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
@@ -280,7 +299,7 @@ class SearchPostFragment : BaseFragment() {
 
     private val attachmentListener = object : AttachmentListener {
         override fun onGetAttachment(id: String, position: Int, type: AttachmentType) {
-
+            viewModel.getAttachment(id, position, type)
         }
 
         override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
