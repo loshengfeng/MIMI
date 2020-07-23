@@ -16,6 +16,7 @@ import com.dabenxiang.mimi.model.api.vo.TextContentItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
@@ -84,6 +85,9 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView) {
             chip.chipBackgroundColor = ColorStateList.valueOf(
                 ContextCompat.getColor(tagChipGroup.context, R.color.adult_color_status_bar)
             )
+            chip.setOnClickListener { view ->
+                adultListener.onChipClick(PostType.TEXT, (view as Chip).text.toString())
+            }
             tagChipGroup.addView(chip)
         }
 
