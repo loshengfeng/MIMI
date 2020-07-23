@@ -137,5 +137,18 @@
         android:id="@+id/clubDetailFragment"
         android:name="com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment"
         android:label="ClubDetailFragment"
-        tools:layout="@layout/fragment_club_detail" />
+        tools:layout="@layout/fragment_club_detail">
+        <action
+            android:id="@+id/action_clubDetailFragment_to_clipFragment"
+            app:destination="@id/clipFragment" />
+        <action
+            android:id="@+id/action_clubDetailFragment_to_pictureDetailFragment"
+            app:destination="@id/pictureDetailFragment" />
+        <action
+            android:id="@+id/action_clubDetailFragment_to_textDetailFragment"
+            app:destination="@id/textDetailFragment" />
+        <action
+            android:id="@+id/action_clubDetailFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+    </fragment>
 </navigation>

@@ -8,6 +8,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
+import retrofit2.http.Query
 import java.io.File
 
 class ApiRepository(private val apiService: ApiService) {
@@ -265,6 +266,17 @@ class ApiRepository(private val apiService: ApiService) {
         limit: Int
     ): Response<ApiBasePagingItem<List<MemberClubItem>>> {
         return apiService.getMembersClubPost(offset, limit)
+    }
+
+    suspend fun getMembersPost(
+        offset: Int,
+        limit: Int,
+        tag: String,
+        orderBy: Int,
+        isAdult: Boolean = true,
+        isFullContent: Boolean = false
+    ): Response<ApiBasePagingItem<List<MemberPostItem>>> {
+        return apiService.getMembersPost(offset, limit, tag, orderBy, isAdult, isFullContent)
     }
 
     suspend fun followClub(clubId: Long): Response<Void> {
