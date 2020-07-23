@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.search.post
 
+import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
@@ -177,6 +178,10 @@ class SearchPostViewModel : BaseViewModel() {
             getSearchPostByKeywordPagingItems(type, keyword, isPostFollow).asFlow()
                 .collect { _searchPostItemByKeywordListResult.value = it }
         }
+    }
+
+    fun isSearchTextEmpty(keyword: String): Boolean {
+        return TextUtils.isEmpty(keyword)
     }
 
     private fun getSearchPostByTagPagingItems(

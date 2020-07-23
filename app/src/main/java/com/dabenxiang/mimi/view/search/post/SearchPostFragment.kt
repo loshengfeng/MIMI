@@ -203,6 +203,7 @@ class SearchPostFragment : BaseFragment() {
 
         tv_search.setOnClickListener {
             GeneralUtils.hideKeyboard(requireActivity())
+            if (viewModel.isSearchTextEmpty(edit_search.text.toString())) return@setOnClickListener
             updateTag("")
             viewModel.getSearchPostsByKeyword(
                 currentPostType,
