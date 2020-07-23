@@ -43,6 +43,9 @@ class HomeViewModel : BaseViewModel() {
     companion object {
         const val CAROUSEL_LIMIT = 5
         const val PAGING_LIMIT = 20
+        const val TYPE_PIC = "type_pic"
+        const val TYPE_COVER = "type_cover"
+        const val TYPE_VIDEO = "TYPE_VIDEO"
     }
 
     var lastListIndex = 0 // 垂直recycler view 跳出後的最後一筆資料
@@ -117,11 +120,20 @@ class HomeViewModel : BaseViewModel() {
     private val _postPicResult = MutableLiveData<ApiResult<Long>>()
     val postPicResult: LiveData<ApiResult<Long>> = _postPicResult
 
+    private val _postCoverResult = MutableLiveData<ApiResult<Long>>()
+    val postCoverResult: LiveData<ApiResult<Long>> = _postCoverResult
+
+    private val _postVideoResult = MutableLiveData<ApiResult<Long>>()
+    val postVideoResult: LiveData<ApiResult<Long>> = _postVideoResult
+
     private val _uploadPicItem = MutableLiveData<UploadPicItem>()
     val uploadPicItem: LiveData<UploadPicItem> = _uploadPicItem
 
-    private val _postPicMemberResult = MutableLiveData<ApiResult<Long>>()
-    val postPicMemberResult: LiveData<ApiResult<Long>> = _postPicMemberResult
+    private val _uploadCoverItem = MutableLiveData<PicParameter>()
+    val uploadCoverItem: LiveData<PicParameter> = _uploadCoverItem
+
+    private val _postVideoMemberResult = MutableLiveData<ApiResult<Long>>()
+    val postVideoMemberResult: LiveData<ApiResult<Long>> = _postVideoMemberResult
 
     fun setTopTabPosition(position: Int) {
         if (position != tabLayoutPosition.value) {
@@ -482,7 +494,7 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-    fun postAttachment(pic: String, context: Context) {
+    fun postAttachment(pic: String, context: Context, type: String) {
         viewModelScope.launch {
             flow {
                 val realPath = UriUtils.getPath(context, Uri.parse(pic))
@@ -491,8 +503,13 @@ class HomeViewModel : BaseViewModel() {
                 val extSplit = fileName?.split(".")
                 val ext = "." + extSplit?.last()
 
-                val uploadPicItem = UploadPicItem(ext = ext)
-                _uploadPicItem.postValue(uploadPicItem)
+                if (type == TYPE_PIC) {
+                    val uploadPicItem = UploadPicItem(ext = ext)
+                    _uploadPicItem.postValue(uploadPicItem)
+                } else if (type == TYPE_COVER) {
+                    val picParameter = PicParameter(ext = ext)
+                    _uploadCoverItem.postValue(picParameter)
+                }
 
                 Timber.d("Upload photo path : $realPath")
                 Timber.d("Upload photo ext : $ext")
@@ -507,7 +524,15 @@ class HomeViewModel : BaseViewModel() {
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _postPicResult.postValue(it) }
+                .collect {
+                    if (type == TYPE_PIC) {
+                        _postPicResult.postValue(it)
+                    } else if (type == TYPE_COVER) {
+                        _postCoverResult.postValue(it)
+                    } else if (type == TYPE_VIDEO) {
+                        _postVideoResult.postValue(it)
+                    }
+                }
         }
     }
 
@@ -524,7 +549,7 @@ class HomeViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _postPicMemberResult.value = it }
+                .collect { _postVideoMemberResult.value = it }
         }
     }
 }

@@ -180,7 +180,7 @@ class VideoCropper @JvmOverloads constructor(context: Context, attrs: AttributeS
 
                     cropTime = String.format("%02d:%02d:%02d",
                             TimeUnit.MILLISECONDS.toHours(currentTime),
-                            TimeUnit.MILLISECONDS.toMinutes(currentTime) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(currentTime)), // The change is in this line
+                            TimeUnit.MILLISECONDS.toMinutes(currentTime) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(currentTime)),
                             TimeUnit.MILLISECONDS.toSeconds(currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(currentTime)));
 
 
