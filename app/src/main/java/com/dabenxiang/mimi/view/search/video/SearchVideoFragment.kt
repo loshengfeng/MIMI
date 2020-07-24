@@ -79,83 +79,83 @@ class SearchVideoFragment : BaseFragment() {
             }
 
             txt_result.setTextColor(
-                    if (viewModel.isAdult) {
-                        ContextCompat.getColor(requireContext(), android.R.color.white)
-                    } else {
-                        ContextCompat.getColor(requireContext(), android.R.color.black)
-                    }
+                if (viewModel.isAdult) {
+                    ContextCompat.getColor(requireContext(), android.R.color.white)
+                } else {
+                    ContextCompat.getColor(requireContext(), android.R.color.black)
+                }
             )
 
             layout_frame.background =
-                    if (viewModel.isAdult) {
-                        R.color.adult_color_background
-                    } else {
-                        R.color.normal_color_background
-                    }.let {
-                        requireActivity().getDrawable(it)
-                    }
+                if (viewModel.isAdult) {
+                    R.color.adult_color_background
+                } else {
+                    R.color.normal_color_background
+                }.let {
+                    requireActivity().getDrawable(it)
+                }
 
             recyclerview_content.layoutManager = LinearLayoutManager(requireContext())
             recyclerview_content.adapter = videoListAdapter
 
             recyclerview_content.background =
-                    if (viewModel.isAdult) {
-                        R.color.adult_color_background
-                    } else {
-                        R.color.normal_color_background
-                    }.let {
-                        requireActivity().getDrawable(it)
-                    }
+                if (viewModel.isAdult) {
+                    R.color.adult_color_background
+                } else {
+                    R.color.normal_color_background
+                }.let {
+                    requireActivity().getDrawable(it)
+                }
 
             layout_top.background =
-                    if (viewModel.isAdult) {
-                        R.color.adult_color_status_bar
-                    } else {
-                        R.color.normal_color_status_bar
-                    }.let {
-                        requireActivity().getDrawable(it)
-                    }
+                if (viewModel.isAdult) {
+                    R.color.adult_color_status_bar
+                } else {
+                    R.color.normal_color_status_bar
+                }.let {
+                    requireActivity().getDrawable(it)
+                }
 
             ib_back.setImageResource(
-                    if (viewModel.isAdult) {
-                        R.drawable.adult_btn_back
-                    } else {
-                        R.drawable.normal_btn_back
-                    }
+                if (viewModel.isAdult) {
+                    R.drawable.adult_btn_back
+                } else {
+                    R.drawable.normal_btn_back
+                }
             )
 
             iv_search_bar.setImageResource(
-                    if (viewModel.isAdult) {
-                        R.drawable.bg_black_1_30_radius_18
-                    } else {
-                        R.drawable.bg_white_1_65625_border_gray_11_radius_18
-                    }
+                if (viewModel.isAdult) {
+                    R.drawable.bg_black_1_30_radius_18
+                } else {
+                    R.drawable.bg_white_1_65625_border_gray_11_radius_18
+                }
             )
 
             iv_search.setImageResource(
-                    if (viewModel.isAdult) {
-                        R.drawable.adult_btn_search
-                    } else {
-                        R.drawable.normal_btn_search
-                    }
+                if (viewModel.isAdult) {
+                    R.drawable.adult_btn_search
+                } else {
+                    R.drawable.normal_btn_search
+                }
             )
 
             edit_search.setTextColor(
-                    if (viewModel.isAdult) {
-                        R.color.adult_color_text
-                    } else {
-                        R.color.normal_color_text
-                    }.let {
-                        requireActivity().getColor(it)
-                    }
+                if (viewModel.isAdult) {
+                    R.color.adult_color_text
+                } else {
+                    R.color.normal_color_text
+                }.let {
+                    requireActivity().getColor(it)
+                }
             )
 
             iv_clean.setImageResource(
-                    if (viewModel.isAdult) {
-                        R.drawable.btn_close_white
-                    } else {
-                        R.drawable.btn_close_gray
-                    }
+                if (viewModel.isAdult) {
+                    R.drawable.btn_close_white
+                } else {
+                    R.drawable.btn_close_gray
+                }
             )
         }
     }
@@ -225,7 +225,10 @@ class SearchVideoFragment : BaseFragment() {
                 viewModel.searchingStr = edit_search.text.toString()
                 viewModel.getSearchList()
             } else {
-                GeneralUtils.showToast(requireContext(), getString(R.string.search_video_input_empty_toast))
+                GeneralUtils.showToast(
+                    requireContext(),
+                    getString(R.string.search_video_input_empty_toast)
+                )
             }
         }
     }
@@ -262,7 +265,10 @@ class SearchVideoFragment : BaseFragment() {
                     if (item.tags == null || (item.tags as String).isEmpty() || item.id == null) {
                         GeneralUtils.showToast(requireContext(), "copy url error")
                     } else {
-                        GeneralUtils.copyToClipboard(requireContext(), viewModel.getShareUrl(item.tags, item.id))
+                        GeneralUtils.copyToClipboard(
+                            requireContext(),
+                            viewModel.getShareUrl(item.tags, item.id)
+                        )
                         GeneralUtils.showToast(requireContext(), "already copy url")
                     }
                 }
@@ -277,15 +283,23 @@ class SearchVideoFragment : BaseFragment() {
 
                 FunctionType.MORE -> {
                     if (item.id != null) {
-                        val data = MemberPostItem(id = item.id, creationDate = Date(), type = PostType.VIDEO)
-                        moreDialog = MoreDialogFragment.newInstance(data, onMoreDialogListener).also {
-                            it.show(
+                        val data = MemberPostItem(
+                            id = item.id,
+                            creationDate = Date(),
+                            type = PostType.VIDEO
+                        )
+                        moreDialog =
+                            MoreDialogFragment.newInstance(data, onMoreDialogListener).also {
+                                it.show(
                                     requireActivity().supportFragmentManager,
                                     MoreDialogFragment::class.java.simpleName
-                            )
-                        }
+                                )
+                            }
                     } else {
-                        GeneralUtils.showToast(requireContext(), getString(R.string.unexpected_error))
+                        GeneralUtils.showToast(
+                            requireContext(),
+                            getString(R.string.unexpected_error)
+                        )
                     }
                 }
                 else -> {
@@ -304,9 +318,29 @@ class SearchVideoFragment : BaseFragment() {
      * 產生搜尋結果的效果文字
      */
     private fun genResultText(count: Long = 0): SpannableString {
-        val word = SpannableString(getString(R.string.search_video_result, if (viewModel.searchingTag.isNotBlank()) viewModel.searchingTag else viewModel.searchingStr, count))
-        word.setSpan(ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.color_red_1)), word.indexOf("\"") + 1, word.lastIndexOf("\""), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        word.setSpan(ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.color_red_1)), word.indexOf("到") + 1, word.lastIndexOf("个"), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        val word = SpannableString(
+            getString(
+                R.string.search_video_result,
+                if (viewModel.searchingTag.isNotBlank()) viewModel.searchingTag else viewModel.searchingStr,
+                count
+            )
+        )
+        word.setSpan(
+            ForegroundColorSpan(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.color_red_1
+                )
+            ), word.indexOf("\"") + 1, word.lastIndexOf("\""), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        word.setSpan(
+            ForegroundColorSpan(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.color_red_1
+                )
+            ), word.indexOf("到") + 1, word.lastIndexOf("个"), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
         return word
     }
 
@@ -314,7 +348,10 @@ class SearchVideoFragment : BaseFragment() {
         override fun onProblemReport(item: BaseMemberPostItem) {
             moreDialog?.dismiss()
             reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
-                it.show(requireActivity().supportFragmentManager, ReportDialogFragment::class.java.simpleName)
+                it.show(
+                    requireActivity().supportFragmentManager,
+                    ReportDialogFragment::class.java.simpleName
+                )
             }
         }
 

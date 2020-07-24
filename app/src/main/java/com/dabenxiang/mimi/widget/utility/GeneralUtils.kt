@@ -7,6 +7,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.provider.Settings
 import android.util.DisplayMetrics
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
@@ -24,6 +25,7 @@ import okhttp3.Request
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.HttpException
 import retrofit2.Response
+import timber.log.Timber
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.math.roundToInt

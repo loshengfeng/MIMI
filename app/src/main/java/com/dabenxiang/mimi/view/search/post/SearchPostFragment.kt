@@ -77,6 +77,13 @@ class SearchPostFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        if (TextUtils.isEmpty(mTag) && TextUtils.isEmpty(searchText)) {
+            line.visibility = View.INVISIBLE
+        } else {
+            line.visibility = View.VISIBLE
+        }
+
         adapter = MemberPostPagedAdapter(
             requireContext(), adultListener, attachmentListener, mTag
         )
@@ -203,7 +210,13 @@ class SearchPostFragment : BaseFragment() {
 
         tv_search.setOnClickListener {
             GeneralUtils.hideKeyboard(requireActivity())
-            if (viewModel.isSearchTextEmpty(edit_search.text.toString())) return@setOnClickListener
+            if (viewModel.isSearchTextEmpty(edit_search.text.toString())) {
+                GeneralUtils.showToast(
+                    requireContext(),
+                    getString(R.string.search_input_empty_toast)
+                )
+                return@setOnClickListener
+            }
             updateTag("")
             viewModel.getSearchPostsByKeyword(
                 currentPostType,
