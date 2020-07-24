@@ -5,11 +5,13 @@ import android.view.View
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.getLruCache
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.nested_item_home_clip.view.*
@@ -19,7 +21,7 @@ import java.util.*
 class ClipViewHolder(
     itemView: View,
     onClickListener: IndexViewHolderListener,
-    private val attachmentListener: AttachmentListener
+    private val memberPostFuncItem: MemberPostFuncItem
 ) :
     BaseIndexViewHolder<MemberPostItem>(itemView, onClickListener) {
 
@@ -56,44 +58,39 @@ class ClipViewHolder(
 
         postImageItem?.also {
             if (!TextUtils.isEmpty(postImageItem.url)) {
-                Glide.with(itemView.context)
-                    .load(postImageItem.url)
-                    .into(videoImage)
+                Glide.with(itemView.context).load(postImageItem.url).into(videoImage)
             } else {
                 if (!TextUtils.isEmpty(postImageItem.id)) {
-                    if (getLruCache(postImageItem.id) == null) {
-                        attachmentListener.onGetAttachment(
-                            postImageItem.id,
-                            index,
-                            AttachmentType.ADULT_HOME_CLIP
-                        )
+                    val imageId = postImageItem.id
+                    if (getLruCache(imageId) == null) {
+                        memberPostFuncItem.getBitmap(imageId) { id -> updateImage(id) }
                     } else {
-                        val bitmap = getLruCache(postImageItem.id)
-                        Glide.with(itemView.context)
-                            .load(bitmap)
-                            .into(videoImage)
+                        updateImage(imageId)
                     }
                 }
             }
         } ?: run {
             Glide.with(itemView.context)
-                .load(R.drawable.img_404)
+                .load(R.drawable.img_nopic_03)
                 .into(videoImage)
         }
 
 
+        val avatarId = model?.avatarAttachmentId.toString()
         if (getLruCache(model?.avatarAttachmentId.toString()) == null) {
-            attachmentListener.onGetAttachment(
-                model?.avatarAttachmentId.toString(),
-                index,
-                AttachmentType.ADULT_HOME_CLIP
-            )
+            memberPostFuncItem.getBitmap(avatarId) { id -> updateAvatar(id) }
         } else {
-            val bitmap = getLruCache(model?.avatarAttachmentId.toString())
-            Glide.with(itemView.context)
-                .load(bitmap)
-                .circleCrop()
-                .into(avatarImg)
+            updateAvatar(avatarId)
         }
+    }
+
+    private fun updateImage(id: String) {
+        val bitmap = getLruCache(id)
+        Glide.with(videoImage.context).load(bitmap).into(videoImage)
+    }
+
+    private fun updateAvatar(id: String) {
+        val bitmap = getLruCache(id)
+        Glide.with(avatarImg.context).load(bitmap).circleCrop().into(avatarImg)
     }
 }

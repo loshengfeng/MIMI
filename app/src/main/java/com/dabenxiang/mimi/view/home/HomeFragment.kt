@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
@@ -196,7 +197,15 @@ class HomeFragment : BaseFragment() {
             adapterListener,
             false,
             clubListener,
-            attachmentListener
+            memberPostFuncItem
+        )
+    }
+
+    private val memberPostFuncItem by lazy {
+        MemberPostFuncItem(
+            {},
+            { id, function -> getBitmap(id, function) },
+            { _, _, _ -> }
         )
     }
 
@@ -270,5 +279,9 @@ class HomeFragment : BaseFragment() {
         override fun onLoadClubViewHolder(vh: HomeClubViewHolder) {
 
         }
+    }
+
+    private fun getBitmap(id: String, update: ((String) -> Unit)) {
+        viewModel.getBitmap(id, update)
     }
 }

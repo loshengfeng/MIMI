@@ -18,7 +18,6 @@ class ClubPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
     fun onBind(
         position: Int,
         clubDetailFuncItem: ClubDetailFuncItem,
-        attachmentListener: AttachmentListener,
         adultListener: AdultListener
     ) {
         if (rvPost.adapter == null || rvPost.tag != position) {
@@ -27,7 +26,6 @@ class ClubPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
                 MemberPostPagedAdapter(
                     rvPost.context,
                     adultListener,
-                    attachmentListener,
                     "",
                     MemberPostFuncItem(onItemClick = {},
                         getBitmap = clubDetailFuncItem.getBitmap,
