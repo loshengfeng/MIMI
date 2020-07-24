@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -65,6 +66,14 @@ class SearchPostFragment : BaseFragment() {
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
+    private val memberPostFuncItem by lazy {
+        MemberPostFuncItem(
+            {},
+            { id, function -> getBitmap(id, function) },
+            { _, _, _ -> }
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (arguments?.getSerializable(KEY_DATA) as SearchPostItem).also {
@@ -78,7 +87,7 @@ class SearchPostFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         adapter = MemberPostPagedAdapter(
-            requireContext(), adultListener, attachmentListener, mTag
+            requireContext(), adultListener, attachmentListener, mTag, memberPostFuncItem
         )
         recyclerview_content.layoutManager = LinearLayoutManager(requireContext())
         recyclerview_content.adapter = adapter
@@ -416,5 +425,9 @@ class SearchPostFragment : BaseFragment() {
             adapter?.setupTag(tag)
             edit_search.setText("")
         }
+    }
+
+    private fun getBitmap(id: String, update: ((String) -> Unit)) {
+        viewModel.getBitmap(id, update)
     }
 }

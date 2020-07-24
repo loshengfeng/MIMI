@@ -16,6 +16,7 @@ import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -49,6 +50,28 @@ class ClubDetailViewModel: BaseViewModel() {
                      _memberPostListResult.value = it
                  }
          }
+    }
+
+    fun getBitmap(id: String, update: ((String) -> Unit)) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getAttachment(id)
+                if (!result.isSuccessful) throw HttpException(result)
+                val byteArray = result.body()?.bytes()
+                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
+                LruCacheUtils.putLruCache(id, bitmap)
+                emit(ApiResult.success(id))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    when(it) {
+                        is ApiResult.Success -> {
+                            update(it.result)
+                        }
+                    }
+                }
+        }
     }
 
     private fun getMemberPostPagingItems(tag: String, orderBy: OrderBy): LiveData<PagedList<MemberPostItem>> {
