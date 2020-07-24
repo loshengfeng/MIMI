@@ -36,15 +36,16 @@ class ClubMemberPostViewHolder(view: View) : RecyclerView.ViewHolder(view)  {
         contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
             images[0].also { image ->
                 if (TextUtils.isEmpty(image.url)) {
-                    image.id.takeIf { !TextUtils.isEmpty(it) }?.also { id ->
+                    image.id.takeIf { !TextUtils.isEmpty(it) && it != LruCacheUtils.ZERO_ID }?.also { id ->
                         LruCacheUtils.getLruCache(id)?.also { bitmap ->
                             Glide.with(ivCover.context).load(bitmap).into(ivCover)
                         } ?: run {
                             clubFuncItem.getBitmap(id) { id -> updateCover(id) }
                         }
-                    }
+                    } ?: run { Glide.with(ivCover.context).load(R.drawable.img_nopic_03).into(ivCover) }
                 } else {
-                    Glide.with(ivCover.context).load(image.url).into(ivCover)
+                    Glide.with(ivCover.context)
+                        .load(image.url).placeholder(R.drawable.img_nopic_03).into(ivCover)
                 }
             }
         }

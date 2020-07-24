@@ -43,23 +43,24 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         tvLike.text = item.likeCount.toString()
         tvComment.text = item.commentCount.toString()
 
-        item.avatarAttachmentId.toString().takeIf { !TextUtils.isEmpty(it) }?.also { id ->
+        item.avatarAttachmentId.toString().takeIf { !TextUtils.isEmpty(it) && it != LruCacheUtils.ZERO_ID }?.also { id ->
             LruCacheUtils.getLruCache(id)?.also { bitmap ->
                 Glide.with(ivHead.context).load(bitmap).circleCrop().into(ivHead)
             } ?: run { clipFuncItem.getBitmap(id, pos) }
-        }
+        } ?: run { Glide.with(ivHead.context).load(R.drawable.icon_cs_photo).circleCrop().into(ivHead)}
 
         val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
         contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
             images[0].also { image ->
                 if (TextUtils.isEmpty(image.url)) {
-                    image.id.takeIf { !TextUtils.isEmpty(it) }?.also { id ->
+                    image.id.takeIf { !TextUtils.isEmpty(it) && it != LruCacheUtils.ZERO_ID }?.also { id ->
                         LruCacheUtils.getLruCache(id)?.also { bitmap ->
                             Glide.with(ivCover.context).load(bitmap).into(ivCover)
                         } ?: run { clipFuncItem.getBitmap(id, pos) }
-                    }
+                    } ?: run { Glide.with(ivCover.context).load(R.drawable.img_nopic_03).into(ivCover) }
                 } else {
-                    Glide.with(ivCover.context).load(image.url).into(ivCover)
+                    Glide.with(ivCover.context)
+                        .load(image.url).placeholder(R.drawable.img_nopic_03).into(ivCover)
                 }
             }
         }

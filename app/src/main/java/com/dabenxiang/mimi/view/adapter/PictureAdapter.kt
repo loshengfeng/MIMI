@@ -53,13 +53,16 @@ class PictureAdapter(
         ) {
             if (!TextUtils.isEmpty(item.url)) {
                 Glide.with(picture.context)
-                    .load(item.url)
-                    .into(picture)
+                    .load(item.url).placeholder(R.drawable.img_nopic_03).into(picture)
             } else {
-                if (LruCacheUtils.getLruCache(item.id) == null) {
-                    memberPostFuncItem.getBitmap(item.id) { id -> updatePicture(id)}
+                if (!TextUtils.isEmpty(item.id) && item.id != LruCacheUtils.ZERO_ID) {
+                    if (LruCacheUtils.getLruCache(item.id) == null) {
+                        memberPostFuncItem.getBitmap(item.id) { id -> updatePicture(id)}
+                    } else {
+                        updatePicture(item.id)
+                    }
                 } else {
-                    updatePicture(item.id)
+                    Glide.with(picture.context).load(R.drawable.img_nopic_03).into(picture)
                 }
             }
 

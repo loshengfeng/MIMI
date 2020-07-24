@@ -12,6 +12,7 @@ import com.dabenxiang.mimi.model.pref.Pref
 import com.google.gson.Gson
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import timber.log.Timber
 
 abstract class BaseViewModel : ViewModel(), KoinComponent {
 

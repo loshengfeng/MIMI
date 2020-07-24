@@ -5,6 +5,8 @@ import android.util.LruCache
 
 object LruCacheUtils {
 
+    const val ZERO_ID = "0"
+
     private var lruCache: LruCache<String, Bitmap>
 
     init {

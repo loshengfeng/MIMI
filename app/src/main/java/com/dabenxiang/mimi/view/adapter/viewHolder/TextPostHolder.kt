@@ -66,10 +66,14 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView) {
         updateLikeAndFollowItem(item, position, adultListener)
 
         val avatarId = item.avatarAttachmentId.toString()
-        if (LruCacheUtils.getLruCache(avatarId) == null) {
-            memberPostFuncItem.getBitmap(avatarId) { id -> updateAvatar(id) }
+        if (avatarId != LruCacheUtils.ZERO_ID) {
+            if (LruCacheUtils.getLruCache(avatarId) == null) {
+                memberPostFuncItem.getBitmap(avatarId) { id -> updateAvatar(id) }
+            } else {
+                updateAvatar(avatarId)
+            }
         } else {
-            updateAvatar(avatarId)
+            Glide.with(avatarImg.context).load(R.drawable.icon_cs_photo).circleCrop().into(avatarImg)
         }
 
         tagChipGroup.removeAllViews()

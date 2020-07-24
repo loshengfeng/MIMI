@@ -93,13 +93,14 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
         contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
             images[0].also { image ->
                 if (TextUtils.isEmpty(image.url)) {
-                    image.id.takeIf { !TextUtils.isEmpty(it) }?.also { id ->
+                    image.id.takeIf { !TextUtils.isEmpty(it) && it != "0" }?.also { id ->
                         LruCacheUtils.getLruCache(id)?.also { bitmap ->
                             Glide.with(ivPhoto.context).load(bitmap).into(ivPhoto)
                         } ?: run { memberPostFuncItem.getBitmap(id) { id -> updatePicture(id) } }
-                    }
+                    } ?: run { Glide.with(ivPhoto.context).load(R.drawable.img_nopic_03).into(ivPhoto) }
                 } else {
-                    Glide.with(ivPhoto.context).load(image.url).into(ivPhoto)
+                    Glide.with(ivPhoto.context)
+                        .load(image.url).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
                 }
             }
         }

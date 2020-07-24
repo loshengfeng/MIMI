@@ -86,7 +86,7 @@ class RootCommentProvider(
         holder.getView<RoundedTextView>(R.id.btn_show_comment_reply).also {
             Timber.i("CommentAdapter node.isExpanded=${node.isExpanded}")
             Timber.i("CommentAdapternode.data.commentCount=${node.data}")
-            if (!node.isExpanded && node.data.commentCount != null && node.data.commentCount >= 0) {
+            if (!node.isExpanded && node.data.commentCount != null && node.data.commentCount > 0) {
                 val solidColor = when (type) {
                     CommentViewType.CLIP -> R.color.transparent
                     CommentViewType.VIDEO -> {
