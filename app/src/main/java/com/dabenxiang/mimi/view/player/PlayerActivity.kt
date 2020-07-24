@@ -16,6 +16,7 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.handleException
@@ -44,6 +45,7 @@ import com.google.android.material.chip.Chip
 import com.kaopiz.kprogresshud.KProgressHUD
 import kotlinx.android.synthetic.main.activity_player.*
 import kotlinx.android.synthetic.main.custom_playback_control.*
+import kotlinx.android.synthetic.main.fragment_home.view.*
 import kotlinx.android.synthetic.main.head_comment.view.*
 import kotlinx.android.synthetic.main.head_guess_like.view.*
 import kotlinx.android.synthetic.main.head_no_comment.view.*
@@ -141,8 +143,10 @@ class PlayerActivity : BaseActivity() {
     }
 
     private val playerInfoAdapter by lazy {
+        Timber.i("playerInfoAdapter")
         CommentAdapter(obtainIsAdult(), object : CommentAdapter.PlayerInfoListener {
             override fun sendComment(replyId: Long?, replyName: String?) {
+                Timber.i("playerInfoAdapter sendComment")
                 if (replyId != null) {
                     sendCommentDialog = SendCommentDialog.newInstance(
                         obtainIsAdult(),
@@ -155,6 +159,7 @@ class PlayerActivity : BaseActivity() {
             }
 
             override fun expandReply(parentNode: RootCommentNode, succeededBlock: () -> Unit) {
+                Timber.i("playerInfoAdapter expandReply")
                 loadReplyCommentBlock = succeededBlock
                 parentNode.data.id?.also {
                     viewModel.loadReplyComment(parentNode, it)
@@ -162,6 +167,7 @@ class PlayerActivity : BaseActivity() {
             }
 
             override fun replyComment(replyId: Long?, replyName: String?) {
+                Timber.i("playerInfoAdapter replyComment")
                 if (replyId != null) {
                     sendCommentDialog = SendCommentDialog.newInstance(
                         obtainIsAdult(),
@@ -178,6 +184,7 @@ class PlayerActivity : BaseActivity() {
                 isLike: Boolean,
                 succeededBlock: () -> Unit
             ) {
+                Timber.i("playerInfoAdapter setCommentLikeType")
                 loadCommentLikeBlock = succeededBlock
                 replyId?.also {
                     val type = if (isLike) 0 else 1
@@ -193,11 +200,12 @@ class PlayerActivity : BaseActivity() {
             }
 
             override fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit) {
+                Timber.i("playerInfoAdapter getBitmap")
                 viewModel.getBitmap(id.toString(), succeededBlock)
             }
 
             override fun onMoreClick(item: MembersPostCommentItem) {
-
+                Timber.i("playerInfoAdapter onMoreClick")
             }
         }, CommentViewType.VIDEO).apply {
             loadMoreModule.apply {
@@ -467,6 +475,7 @@ class PlayerActivity : BaseActivity() {
                     viewModel.availablePoint = result.availablePoint ?: 0L
 
                     if (result.commentCount == 0L) {
+                        Timber.i(" apiVideoInfo result.commentCount == 0L")
                         headNoComment.title_no_comment.visibility = View.VISIBLE
                         headNoComment.title_no_comment.setTextColor(titleColor)
                         val bgColor =

@@ -17,6 +17,7 @@ import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.yulichswift.roundedview.widget.RoundedTextView
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -75,11 +76,17 @@ class RootCommentProvider(
 
     override fun convert(holder: BaseViewHolder, item: BaseNode) {
         val node = item as RootCommentNode
+
+        item.childNode?.forEach {
+            Timber.i("CommentAdapter convert childNode=$it")
+        }
+
         dataConvert(holder, node.data)
 
         holder.getView<RoundedTextView>(R.id.btn_show_comment_reply).also {
-            if (!node.isExpanded && node.data.commentCount != null && node.data.commentCount > 0) {
-
+            Timber.i("CommentAdapter node.isExpanded=${node.isExpanded}")
+            Timber.i("CommentAdapternode.data.commentCount=${node.data}")
+            if (!node.isExpanded && node.data.commentCount != null && node.data.commentCount >= 0) {
                 val solidColor = when (type) {
                     CommentViewType.CLIP -> R.color.transparent
                     CommentViewType.VIDEO -> {
@@ -114,16 +121,17 @@ class RootCommentProvider(
 
                 it.visibility = View.VISIBLE
             } else {
+                Timber.i("CommentAdapter View.GONE")
                 it.visibility = View.GONE
             }
         }
     }
 
     override fun convert(holder: BaseViewHolder, data: BaseNode, payloads: List<Any>) {
-//        Timber.d("Payloads: $payloads, Data: $data")
-//        (data as RootCommentNode).also {
-//            Timber.d("IsExpanded: ${it.isExpanded}")
-//        }
+        Timber.d("CommentAdapter convert Payloads: $payloads, Data: $data")
+        (data as RootCommentNode).also {
+            Timber.d("IsExpanded: ${it.isExpanded}")
+        }
     }
 
     override fun onChildClick(holder: BaseViewHolder, view: View, data: BaseNode, position: Int) {
