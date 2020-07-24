@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.*
@@ -692,7 +693,15 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val memberPostPagedAdapter by lazy {
-        MemberPostPagedAdapter(requireActivity(), adultListener, attachmentListener)
+        MemberPostPagedAdapter(requireActivity(), adultListener, "", memberPostFuncItem)
+    }
+
+    private val memberPostFuncItem by lazy {
+        MemberPostFuncItem(
+            {},
+            { id, function -> getBitmap(id, function) },
+            { _, _, _ -> }
+        )
     }
 
     private val clubMemberAdapter by lazy {

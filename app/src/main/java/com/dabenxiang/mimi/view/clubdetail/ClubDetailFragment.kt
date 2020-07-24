@@ -86,7 +86,10 @@ class ClubDetailFragment : BaseFragment() {
 
         viewPager.isUserInputEnabled = false
 
-        viewPager.adapter = ClubPagerAdapter(ClubDetailFuncItem { orderBy, function -> getPost(orderBy, function) }, attachmentListener, adultListener)
+        viewPager.adapter =
+            ClubPagerAdapter(ClubDetailFuncItem({ orderBy, function -> getPost(orderBy, function) },
+                { id, function -> getBitmap(id, function) }), attachmentListener, adultListener
+            )
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = tabTitle[position]
@@ -246,5 +249,9 @@ class ClubDetailFragment : BaseFragment() {
 
     private fun getPost(orderBy: OrderBy, update: ((PagedList<MemberPostItem>) -> Unit)) {
         viewModel.getMemberPosts(memberClubItem.tag, orderBy, update)
+    }
+
+    private fun getBitmap(id: String, update: ((String) -> Unit)) {
+        viewModel.getBitmap(id, update)
     }
 }

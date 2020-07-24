@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.TextContentItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
@@ -47,8 +48,8 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView) {
         item: MemberPostItem,
         position: Int,
         adultListener: AdultListener,
-        attachmentListener: AttachmentListener,
-        tag: String
+        tag: String,
+        memberPostFuncItem: MemberPostFuncItem
     ) {
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
@@ -64,18 +65,11 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView) {
 
         updateLikeAndFollowItem(item, position, adultListener)
 
-        if (LruCacheUtils.getLruCache(item.avatarAttachmentId.toString()) == null) {
-            attachmentListener.onGetAttachment(
-                item.avatarAttachmentId.toString(),
-                position,
-                AttachmentType.ADULT_TAB_TEXT
-            )
+        val avatarId = item.avatarAttachmentId.toString()
+        if (LruCacheUtils.getLruCache(avatarId) == null) {
+            memberPostFuncItem.getBitmap(avatarId) { id -> updateAvatar(id) }
         } else {
-            val bitmap = LruCacheUtils.getLruCache(item.avatarAttachmentId.toString())
-            Glide.with(avatarImg.context)
-                .load(bitmap)
-                .circleCrop()
-                .into(avatarImg)
+            updateAvatar(avatarId)
         }
 
         tagChipGroup.removeAllViews()
@@ -114,6 +108,10 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
     }
 
+    private fun updateAvatar(id: String) {
+        val bitmap = LruCacheUtils.getLruCache(id)
+        Glide.with(avatarImg.context).load(bitmap).circleCrop().into(avatarImg)
+    }
 
     private fun updateLikeAndFollowItem(
         item: MemberPostItem,

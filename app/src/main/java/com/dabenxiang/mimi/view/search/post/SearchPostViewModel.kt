@@ -22,6 +22,7 @@ import com.dabenxiang.mimi.view.search.post.keyword.SearchPostByKeywordDataSourc
 import com.dabenxiang.mimi.view.search.post.keyword.SearchPostByKeywordFactory
 import com.dabenxiang.mimi.view.search.post.tag.SearchPostByTagDataSource
 import com.dabenxiang.mimi.view.search.post.tag.SearchPostByTagFactory
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -238,6 +239,28 @@ class SearchPostViewModel : BaseViewModel() {
         }
 
         override fun onThrowable(throwable: Throwable) {
+        }
+    }
+
+    fun getBitmap(id: String, update: ((String) -> Unit)) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getAttachment(id)
+                if (!result.isSuccessful) throw HttpException(result)
+                val byteArray = result.body()?.bytes()
+                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
+                LruCacheUtils.putLruCache(id, bitmap)
+                emit(ApiResult.success(id))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    when(it) {
+                        is ApiResult.Success -> {
+                            update(it.result)
+                        }
+                    }
+                }
         }
     }
 }

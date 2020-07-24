@@ -15,6 +15,7 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.OnItemClickListener
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -53,26 +54,19 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         item: MemberPostItem,
         position: Int,
         adultListener: AdultListener,
-        attachmentListener: AttachmentListener,
-        tag: String
+        tag: String,
+        memberPostFuncItem: MemberPostFuncItem = MemberPostFuncItem()
     ) {
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate ?: Date(), Date())
         title.text = item.title
         updateLikeAndFollowItem(item, position, adultListener)
 
-        if (LruCacheUtils.getLruCache(item.avatarAttachmentId.toString()) == null) {
-            attachmentListener.onGetAttachment(
-                item.avatarAttachmentId.toString(),
-                position,
-                AttachmentType.ADULT_TAB_PICTURE
-            )
+        val avatarId = item.avatarAttachmentId.toString()
+        if (LruCacheUtils.getLruCache(avatarId) == null) {
+            memberPostFuncItem.getBitmap(avatarId) { id -> updateAvatar(id) }
         } else {
-            val bitmap = LruCacheUtils.getLruCache(item.avatarAttachmentId.toString())
-            Glide.with(avatarImg.context)
-                .load(bitmap)
-                .circleCrop()
-                .into(avatarImg)
+            updateAvatar(avatarId)
         }
 
         tagChipGroup.removeAllViews()
@@ -107,15 +101,13 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
 
             pictureRecycler.adapter = PictureAdapter(
                 pictureRecycler.context,
-                attachmentListener,
                 contentItem.images ?: arrayListOf(),
-                position,
                 object : OnItemClickListener {
                     override fun onItemClick() {
                         item.also { adultListener.onItemClick(item, AdultTabType.PICTURE) }
                     }
-                }
-            )
+                },
+                memberPostFuncItem)
             pictureRecycler.onFlingListener = null
             PagerSnapHelper().attachToRecyclerView(pictureRecycler)
 
@@ -140,6 +132,11 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         picturePostItemLayout.setOnClickListener {
             item.also { adultListener.onItemClick(item, AdultTabType.PICTURE) }
         }
+    }
+
+    private fun updateAvatar(id: String) {
+        val bitmap = LruCacheUtils.getLruCache(id)
+        Glide.with(avatarImg.context).load(bitmap).circleCrop().into(avatarImg)
     }
 
     fun updateLikeAndFollowItem(item: MemberPostItem, position: Int, adultListener: AdultListener) {
