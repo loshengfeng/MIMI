@@ -96,7 +96,7 @@ class SearchPostFragment : BaseFragment() {
         }
 
         adapter = MemberPostPagedAdapter(
-            requireContext(), adultListener, attachmentListener, mTag, memberPostFuncItem
+            requireContext(), adultListener, mTag, memberPostFuncItem
         )
         recycler_search_result.layoutManager = LinearLayoutManager(requireContext())
         recycler_search_result.adapter = adapter

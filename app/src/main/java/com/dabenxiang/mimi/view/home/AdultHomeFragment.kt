@@ -688,7 +688,7 @@ class AdultHomeFragment : BaseFragment() {
             adapterListener,
             true,
             clubListener,
-            attachmentListener
+            memberPostFuncItem
         )
     }
 

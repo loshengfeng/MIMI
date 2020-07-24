@@ -6,6 +6,7 @@ import android.view.View
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
@@ -23,7 +24,7 @@ class ClubViewHolder(
     onClickListener: IndexViewHolderListener,
     val context: Context,
     private val clubListener: HomeClubAdapter.ClubListener,
-    private val attachmentListener: AttachmentListener
+    private val memberPostFuncItem: MemberPostFuncItem
 ) :
     BaseIndexViewHolder<MemberClubItem>(itemView, onClickListener) {
 
@@ -67,18 +68,11 @@ class ClubViewHolder(
             clubListener.followClub(model!!, index, !isFollow)
         }
 
+        val avatarId = model?.avatarAttachmentId.toString()
         if (getLruCache(model?.avatarAttachmentId.toString()) == null) {
-            attachmentListener.onGetAttachment(
-                model?.avatarAttachmentId.toString(),
-                index,
-                AttachmentType.ADULT_HOME_CLUB
-            )
+            memberPostFuncItem.getBitmap(avatarId) { id -> updateAvatar(id) }
         } else {
-            val bitmap = getLruCache(model?.avatarAttachmentId.toString())
-            Glide.with(itemView.context)
-                .load(bitmap)
-                .circleCrop()
-                .into(avatarImg)
+            updateAvatar(avatarId)
         }
 
         val posts = model?.posts ?: arrayListOf()
@@ -94,17 +88,11 @@ class ClubViewHolder(
                     .circleCrop()
                     .into(clubImg)
             } else {
-                if (getLruCache(imageItem?.id.toString()) == null) {
-                    attachmentListener.onGetAttachment(
-                        imageItem?.id.toString(),
-                        index,
-                        AttachmentType.ADULT_HOME_CLUB
-                    )
+                val imageId = imageItem?.id.toString()
+                if (getLruCache(imageId) == null) {
+                    memberPostFuncItem.getBitmap(imageId) { id -> updateImage(id)}
                 } else {
-                    val bitmap = getLruCache(imageItem?.id.toString())
-                    Glide.with(itemView.context)
-                        .load(bitmap)
-                        .into(clubImg)
+                    updateImage(imageId)
                 }
             }
         } else {
@@ -114,5 +102,15 @@ class ClubViewHolder(
                 .into(clubImg)
         }
 
+    }
+
+    private fun updateImage(id: String) {
+        val bitmap = getLruCache(id)
+        Glide.with(clubImg.context).load(bitmap).into(clubImg)
+    }
+
+    private fun updateAvatar(id: String) {
+        val bitmap = getLruCache(id)
+        Glide.with(avatarImg.context).load(bitmap).circleCrop().into(avatarImg)
     }
 }

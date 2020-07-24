@@ -9,12 +9,10 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
-import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
-import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.serializable.SearchPostItem
@@ -30,7 +28,6 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_club_detail.*
-import kotlinx.android.synthetic.main.fragment_messenger.*
 
 class ClubDetailFragment : BaseFragment() {
 
@@ -88,7 +85,7 @@ class ClubDetailFragment : BaseFragment() {
 
         viewPager.adapter =
             ClubPagerAdapter(ClubDetailFuncItem({ orderBy, function -> getPost(orderBy, function) },
-                { id, function -> getBitmap(id, function) }), attachmentListener, adultListener
+                { id, function -> getBitmap(id, function) }), adultListener
             )
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
@@ -102,16 +99,6 @@ class ClubDetailFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
-    }
-
-    private val attachmentListener = object : AttachmentListener {
-        override fun onGetAttachment(id: String, position: Int, type: AttachmentType) {
-
-        }
-
-        override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
-            viewModel.getAttachment(id, parentPosition, position)
-        }
     }
 
     private val adultListener = object : AdultListener {
@@ -143,6 +130,7 @@ class ClubDetailFragment : BaseFragment() {
                         )
                     )
                 }
+                else -> { }
             }
         }
 

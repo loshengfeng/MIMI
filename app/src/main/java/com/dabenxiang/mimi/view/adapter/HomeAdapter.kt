@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
@@ -17,14 +17,13 @@ import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.HomeTemplate
 import com.dabenxiang.mimi.view.home.viewholder.*
-import timber.log.Timber
 
 class HomeAdapter(
     val context: Context,
     private val listener: EventListener,
     private val isAdult: Boolean,
     private val clubListener: HomeClubAdapter.ClubListener,
-    private val attachmentListener: AttachmentListener
+    private val memberPostFuncItem: MemberPostFuncItem
 ) : ListAdapter<HomeTemplate, BaseViewHolder>(DIFF_CALLBACK) {
 
     companion object {
@@ -94,7 +93,7 @@ class HomeAdapter(
                         R.layout.item_home_clip,
                         parent,
                         false
-                    ), listener, isAdult, attachmentListener
+                    ), listener, isAdult, memberPostFuncItem
                 )
             }
             HomeItemType.PICTURE -> {
@@ -103,7 +102,7 @@ class HomeAdapter(
                         R.layout.item_home_picture,
                         parent,
                         false
-                    ), listener, isAdult, attachmentListener
+                    ), listener, isAdult, memberPostFuncItem
                 )
             }
             HomeItemType.CLUB -> {
@@ -112,7 +111,7 @@ class HomeAdapter(
                         R.layout.item_home_club,
                         parent,
                         false
-                    ), listener, isAdult, clubListener, attachmentListener
+                    ), listener, isAdult, clubListener, memberPostFuncItem
                 )
             }
         }
