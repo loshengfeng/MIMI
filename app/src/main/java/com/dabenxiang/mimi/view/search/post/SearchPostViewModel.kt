@@ -218,13 +218,15 @@ class SearchPostViewModel : BaseViewModel() {
 
     fun updateSearchHistory(keyword: String) {
         val searchHistoryItem = pref.searchHistoryItem
-        if (searchHistoryItem.searchHistory.size == 10) {
-            searchHistoryItem.searchHistory.removeAt(0)
-            searchHistoryItem.searchHistory.add(keyword)
-        } else {
-            searchHistoryItem.searchHistory.add(keyword)
+        if (!searchHistoryItem.searchHistory.contains(keyword)) {
+            if (searchHistoryItem.searchHistory.size == 10) {
+                searchHistoryItem.searchHistory.removeAt(0)
+                searchHistoryItem.searchHistory.add(keyword)
+            } else {
+                searchHistoryItem.searchHistory.add(keyword)
+            }
+            pref.searchHistoryItem = searchHistoryItem
         }
-        pref.searchHistoryItem = searchHistoryItem
     }
 
     private fun getSearchPostByTagPagingItems(

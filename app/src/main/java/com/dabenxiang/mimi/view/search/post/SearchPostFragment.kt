@@ -16,7 +16,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
-import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
@@ -349,16 +348,6 @@ class SearchPostFragment : BaseFragment() {
         }
     }
 
-    private val attachmentListener = object : AttachmentListener {
-        override fun onGetAttachment(id: String, position: Int, type: AttachmentType) {
-            viewModel.getAttachment(id, position, type)
-        }
-
-        override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
-            viewModel.getAttachment(id, parentPosition, position)
-        }
-    }
-
     private val adultListener = object : AdultListener {
         override fun onFollowPostClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
             viewModel.followPost(item, position, isFollow)
@@ -475,7 +464,7 @@ class SearchPostFragment : BaseFragment() {
 
     private fun getSearchHistory() {
         chip_group_search_text.removeAllViews()
-        val searchHistories = viewModel.getSearchHistory()
+        val searchHistories = viewModel.getSearchHistory().asReversed()
         searchHistories.forEach { text ->
             val chip = LayoutInflater.from(chip_group_search_text.context)
                 .inflate(R.layout.chip_item, chip_group_search_text, false) as Chip
