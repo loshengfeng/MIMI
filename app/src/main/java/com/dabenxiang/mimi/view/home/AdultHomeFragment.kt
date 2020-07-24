@@ -542,13 +542,34 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         iv_bg_search.setOnClickListener {
-            val bundle = SearchVideoFragment.createBundle("")
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_homeFragment_to_searchVideoFragment,
-                    bundle
+            // TODO: Dave
+            if (lastPosition == 0 || lastPosition == 1) {
+                val bundle = SearchVideoFragment.createBundle()
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_homeFragment_to_searchVideoFragment,
+                        bundle
+                    )
                 )
-            )
+            } else {
+                val item: SearchPostItem = when (lastPosition) {
+                    2 -> SearchPostItem(isPostFollow = true)
+                    3 -> SearchPostItem(type = PostType.VIDEO)
+                    4 -> SearchPostItem(type = PostType.IMAGE)
+                    5 -> SearchPostItem(type = PostType.TEXT)
+                    else -> {
+                        // TODO: 圈子搜尋
+                        SearchPostItem(type = PostType.TEXT)
+                    }
+                }
+                val bundle = SearchPostFragment.createBundle(item)
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_homeFragment_to_searchPostFragment,
+                        bundle
+                    )
+                )
+            }
         }
 
         iv_post.setOnClickListener {
