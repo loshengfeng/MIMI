@@ -79,16 +79,18 @@ class SearchPostFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         if (TextUtils.isEmpty(mTag) && TextUtils.isEmpty(searchText)) {
-            line.visibility = View.INVISIBLE
+            layout_search_history.visibility = View.VISIBLE
+            layout_search_text.visibility = View.INVISIBLE
         } else {
-            line.visibility = View.VISIBLE
+            layout_search_history.visibility = View.INVISIBLE
+            layout_search_text.visibility = View.VISIBLE
         }
 
         adapter = MemberPostPagedAdapter(
             requireContext(), adultListener, attachmentListener, mTag
         )
-        recyclerview_content.layoutManager = LinearLayoutManager(requireContext())
-        recyclerview_content.adapter = adapter
+        recycler_search_result.layoutManager = LinearLayoutManager(requireContext())
+        recycler_search_result.adapter = adapter
 
         if (!TextUtils.isEmpty(mTag)) {
             viewModel.getSearchPostsByTag(currentPostType, mTag, isPostFollow)
@@ -195,7 +197,7 @@ class SearchPostFragment : BaseFragment() {
         })
 
         viewModel.searchTotalCount.observe(viewLifecycleOwner, Observer { count ->
-            txt_result.text = getSearchText(currentPostType, searchKeyword, count, isPostFollow)
+            tv_search_text.text = getSearchText(currentPostType, searchKeyword, count, isPostFollow)
         })
     }
 
@@ -208,6 +210,10 @@ class SearchPostFragment : BaseFragment() {
             edit_search.setText("")
         }
 
+        iv_clear_search_text.setOnClickListener {
+            // TODO: Dave
+        }
+
         tv_search.setOnClickListener {
             GeneralUtils.hideKeyboard(requireActivity())
             if (viewModel.isSearchTextEmpty(edit_search.text.toString())) {
@@ -217,6 +223,8 @@ class SearchPostFragment : BaseFragment() {
                 )
                 return@setOnClickListener
             }
+            layout_search_history.visibility = View.INVISIBLE
+            layout_search_text.visibility = View.VISIBLE
             updateTag("")
             viewModel.getSearchPostsByKeyword(
                 currentPostType,
@@ -411,6 +419,8 @@ class SearchPostFragment : BaseFragment() {
         }
 
         override fun onChipClick(type: PostType, tag: String) {
+            layout_search_history.visibility = View.INVISIBLE
+            layout_search_text.visibility = View.VISIBLE
             updateTag(tag)
             viewModel.getSearchPostsByTag(type, tag, isPostFollow)
         }
