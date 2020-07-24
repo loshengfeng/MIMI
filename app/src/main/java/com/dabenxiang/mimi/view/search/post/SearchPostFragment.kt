@@ -9,6 +9,7 @@ import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -92,33 +93,10 @@ class SearchPostFragment : BaseFragment() {
 
         if (TextUtils.isEmpty(mTag) && TextUtils.isEmpty(searchText)) {
             layout_search_history.visibility = View.VISIBLE
-            layout_search_text.visibility = View.INVISIBLE
-
-            chip_group_search_text.removeAllViews()
-            val searchHistories = viewModel.getSearchHistory()
-            searchHistories.forEach { text ->
-                val chip = LayoutInflater.from(chip_group_search_text.context)
-                    .inflate(R.layout.chip_item, chip_group_search_text, false) as Chip
-                chip.text = text
-                chip.setTextColor(requireContext().getColor(R.color.color_white_1_50))
-                chip.chipBackgroundColor = ColorStateList.valueOf(
-                    ContextCompat.getColor(requireContext(), R.color.color_black_6)
-                )
-                chip.setOnClickListener {
-                    edit_search.setText(text)
-                    layout_search_history.visibility = View.INVISIBLE
-                    layout_search_text.visibility = View.VISIBLE
-                    updateTag("")
-                    viewModel.getSearchPostsByKeyword(
-                        currentPostType,
-                        edit_search.text.toString(),
-                        isPostFollow
-                    )
-                }
-                chip_group_search_text.addView(chip)
-            }
+            layout_search_text.visibility = View.GONE
+            getSearchHistory()
         } else {
-            layout_search_history.visibility = View.INVISIBLE
+            layout_search_history.visibility = View.GONE
             layout_search_text.visibility = View.VISIBLE
         }
 
@@ -260,7 +238,7 @@ class SearchPostFragment : BaseFragment() {
                 )
                 return@setOnClickListener
             }
-            layout_search_history.visibility = View.INVISIBLE
+            layout_search_history.visibility = View.GONE
             layout_search_text.visibility = View.VISIBLE
             updateTag("")
 
@@ -271,6 +249,18 @@ class SearchPostFragment : BaseFragment() {
                 edit_search.text.toString(),
                 isPostFollow
             )
+        }
+
+        edit_search.addTextChangedListener {
+            if (it.toString() == "" && !TextUtils.isEmpty(mTag)) {
+                layout_search_history.visibility = View.GONE
+                layout_search_text.visibility = View.VISIBLE
+            } else if (it.toString() == "") {
+                layout_search_history.visibility = View.VISIBLE
+                layout_search_text.visibility = View.GONE
+                getSearchHistory()
+                adapter?.submitList(null)
+            }
         }
     }
 
@@ -459,8 +449,6 @@ class SearchPostFragment : BaseFragment() {
         }
 
         override fun onChipClick(type: PostType, tag: String) {
-            layout_search_history.visibility = View.INVISIBLE
-            layout_search_text.visibility = View.VISIBLE
             updateTag(tag)
             viewModel.getSearchPostsByTag(type, tag, isPostFollow)
         }
@@ -483,5 +471,31 @@ class SearchPostFragment : BaseFragment() {
 
     private fun getBitmap(id: String, update: ((String) -> Unit)) {
         viewModel.getBitmap(id, update)
+    }
+
+    private fun getSearchHistory() {
+        chip_group_search_text.removeAllViews()
+        val searchHistories = viewModel.getSearchHistory()
+        searchHistories.forEach { text ->
+            val chip = LayoutInflater.from(chip_group_search_text.context)
+                .inflate(R.layout.chip_item, chip_group_search_text, false) as Chip
+            chip.text = text
+            chip.setTextColor(requireContext().getColor(R.color.color_white_1_50))
+            chip.chipBackgroundColor = ColorStateList.valueOf(
+                ContextCompat.getColor(requireContext(), R.color.color_black_6)
+            )
+            chip.setOnClickListener {
+                edit_search.setText(text)
+                layout_search_history.visibility = View.GONE
+                layout_search_text.visibility = View.VISIBLE
+                updateTag("")
+                viewModel.getSearchPostsByKeyword(
+                    currentPostType,
+                    edit_search.text.toString(),
+                    isPostFollow
+                )
+            }
+            chip_group_search_text.addView(chip)
+        }
     }
 }
