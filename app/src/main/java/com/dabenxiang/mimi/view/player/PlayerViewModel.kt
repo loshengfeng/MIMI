@@ -421,6 +421,7 @@ class PlayerViewModel : BaseViewModel() {
                             RootCommentNode(item)
                         }
                         adapter.setList(finalList)
+                        adapter.notifyDataSetChanged()
                     }
                 }
                 setupLoadMoreResult(adapter, load.isEnd)
@@ -435,6 +436,7 @@ class PlayerViewModel : BaseViewModel() {
                                     RootCommentNode(item)
                                 }
                                 adapter.addData(finalList)
+                                adapter.notifyDataSetChanged()
                             }
                             setupLoadMoreResult(adapter, load.isEnd)
                         }
@@ -445,6 +447,7 @@ class PlayerViewModel : BaseViewModel() {
     }
 
     private fun setupLoadMoreResult(adapter: CommentAdapter, isEnd: Boolean) {
+        Timber.i("setupLoadMoreResult adapter isEnd=$isEnd")
         if (isEnd) {
             adapter.loadMoreModule.loadMoreEnd()
         } else {
@@ -453,6 +456,7 @@ class PlayerViewModel : BaseViewModel() {
     }
 
     fun loadReplyComment(parentNode: RootCommentNode, commentId: Long) {
+        Timber.i("loadReplyComment loadReplyComment")
         viewModelScope.launch {
             flow {
                 var isFirst = true
@@ -476,9 +480,13 @@ class PlayerViewModel : BaseViewModel() {
 
                     parentNode.nestedCommentList.clear()
                     resp.body()?.content?.map {
+                        Timber.i("loadReplyComment content node=$it")
                         NestedCommentNode(parentNode, it)
                     }?.also {
                         parentNode.nestedCommentList.addAll(it)
+                        it.forEach {
+                            Timber.i("loadReplyComment node=$it")
+                        }
 
                         val pagingItem = resp.body()?.paging
                         total = pagingItem?.count ?: 0L
@@ -500,6 +508,7 @@ class PlayerViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect {
+                    Timber.i("loadReplyComment result=$it")
                     _apiLoadReplyCommentResult.value = SingleLiveEvent(it)
                 }
         }
