@@ -184,6 +184,10 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
+        viewModel.showProgress.observe(viewLifecycleOwner, Observer { showProgress ->
+            showProgress?.takeUnless { it }?.also { refresh.isRefreshing = it }
+        })
+
         mainViewModel?.categoriesData?.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Loading -> refresh.isRefreshing = true
@@ -210,6 +214,7 @@ class AdultHomeFragment : BaseFragment() {
             tabAdapter.setLastSelectedIndex(lastPosition)
             recyclerview_tab.scrollToPosition(position)
             setupRecyclerByPosition(position)
+            refresh.isRefreshing = true
             getData(position)
         })
 
@@ -537,7 +542,7 @@ class AdultHomeFragment : BaseFragment() {
     override fun setupListeners() {
         refresh.setOnRefreshListener {
             viewModel.lastListIndex = 0
-            refresh.isRefreshing = false
+            refresh.isRefreshing = true
             getData(lastPosition)
         }
 
@@ -853,16 +858,6 @@ class AdultHomeFragment : BaseFragment() {
 
         override fun onCancel() {
             moreDialog?.dismiss()
-        }
-    }
-
-    private val attachmentListener = object : AttachmentListener {
-        override fun onGetAttachment(id: String, position: Int, type: AttachmentType) {
-            viewModel.getAttachment(id, position, type)
-        }
-
-        override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
-            viewModel.getAttachment(id, parentPosition, position)
         }
     }
 

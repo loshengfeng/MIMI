@@ -49,6 +49,7 @@ class PhotoGridAdapter(
         if (!TextUtils.isEmpty(imageItem.url)) {
             Glide.with(context)
                 .load(imageItem.url)
+                .placeholder(R.drawable.img_nopic_03)
                 .into(holder.picture)
         } else {
             if (LruCacheUtils.getLruCache(imageItem.id) == null) {

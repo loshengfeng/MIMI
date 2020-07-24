@@ -93,33 +93,32 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
-        if (pictureRecycler.adapter == null || pictureCount.tag != position) {
-            pictureCount.tag = position
-            pictureRecycler.layoutManager = LinearLayoutManager(
-                pictureRecycler.context, LinearLayoutManager.HORIZONTAL, false
-            )
+        pictureCount.tag = position
+        pictureRecycler.layoutManager = LinearLayoutManager(
+            pictureRecycler.context, LinearLayoutManager.HORIZONTAL, false
+        )
 
-            pictureRecycler.adapter = PictureAdapter(
-                pictureRecycler.context,
-                contentItem.images ?: arrayListOf(),
-                object : OnItemClickListener {
-                    override fun onItemClick() {
-                        item.also { adultListener.onItemClick(item, AdultTabType.PICTURE) }
-                    }
-                },
-                memberPostFuncItem)
-            pictureRecycler.onFlingListener = null
-            PagerSnapHelper().attachToRecyclerView(pictureRecycler)
+        pictureRecycler.adapter = PictureAdapter(
+            pictureRecycler.context,
+            contentItem.images ?: arrayListOf(),
+            object : OnItemClickListener {
+                override fun onItemClick() {
+                    item.also { adultListener.onItemClick(item, AdultTabType.PICTURE) }
+                }
+            },
+            memberPostFuncItem
+        )
+        pictureRecycler.onFlingListener = null
+        PagerSnapHelper().attachToRecyclerView(pictureRecycler)
 
-            pictureRecycler.setOnScrollChangeListener { _, _, _, _, _ ->
-                val currentPosition =
-                    (pictureRecycler.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-                pictureCount.text =
-                    "${currentPosition + 1}/${contentItem.images?.size}"
-            }
-
-            pictureCount.text = "1/${contentItem.images?.size}"
+        pictureRecycler.setOnScrollChangeListener { _, _, _, _, _ ->
+            val currentPosition =
+                (pictureRecycler.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+            pictureCount.text =
+                "${currentPosition + 1}/${contentItem.images?.size}"
         }
+
+        pictureCount.text = "1/${contentItem.images?.size}"
 
         commentImage.setOnClickListener {
             item.also { adultListener.onCommentClick(it, AdultTabType.PICTURE) }
