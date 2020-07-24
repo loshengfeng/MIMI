@@ -45,6 +45,7 @@ import com.google.android.material.chip.Chip
 import com.kaopiz.kprogresshud.KProgressHUD
 import kotlinx.android.synthetic.main.activity_player.*
 import kotlinx.android.synthetic.main.custom_playback_control.*
+import kotlinx.android.synthetic.main.fragment_home.view.*
 import kotlinx.android.synthetic.main.head_comment.view.*
 import kotlinx.android.synthetic.main.head_guess_like.view.*
 import kotlinx.android.synthetic.main.head_no_comment.view.*
@@ -210,7 +211,7 @@ class PlayerActivity : BaseActivity() {
             loadMoreModule.apply {
                 isEnableLoadMore = true
                 isAutoLoadMore = true
-                isEnableLoadMoreIfNotFullPage = true
+                isEnableLoadMoreIfNotFullPage = false
             }
         }
     }

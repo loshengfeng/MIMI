@@ -83,11 +83,10 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/player_view">
 
-        <ScrollView
+        <androidx.core.widget.NestedScrollView
             android:id="@+id/scrollView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:minHeight="100dp"
             app:layout_constraintBottom_toTopOf="@id/bottom_func_bar"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -97,9 +96,10 @@
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
                 android:orientation="vertical"
-                android:layout_gravity="bottom"
+                android:layout_gravity="fill_vertical"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-        </ScrollView>
+        </androidx.core.widget.NestedScrollView>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/bottom_func_bar"

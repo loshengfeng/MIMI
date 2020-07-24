@@ -421,7 +421,6 @@ class PlayerViewModel : BaseViewModel() {
                             RootCommentNode(item)
                         }
                         adapter.setList(finalList)
-                        adapter.notifyDataSetChanged()
                     }
                 }
                 setupLoadMoreResult(adapter, load.isEnd)
@@ -436,7 +435,6 @@ class PlayerViewModel : BaseViewModel() {
                                     RootCommentNode(item)
                                 }
                                 adapter.addData(finalList)
-                                adapter.notifyDataSetChanged()
                             }
                             setupLoadMoreResult(adapter, load.isEnd)
                         }
