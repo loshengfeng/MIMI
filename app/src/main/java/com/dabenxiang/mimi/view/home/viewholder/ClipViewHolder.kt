@@ -12,6 +12,7 @@ import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils.ZERO_ID
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.getLruCache
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.nested_item_home_clip.view.*
@@ -58,21 +59,22 @@ class ClipViewHolder(
 
         postImageItem?.also {
             if (!TextUtils.isEmpty(postImageItem.url)) {
-                Glide.with(itemView.context).load(postImageItem.url).into(videoImage)
+                Glide.with(itemView.context)
+                    .load(postImageItem.url).placeholder(R.drawable.img_nopic_03).into(videoImage)
             } else {
-                if (!TextUtils.isEmpty(postImageItem.id)) {
+                if (!TextUtils.isEmpty(postImageItem.id) && postImageItem.id != ZERO_ID) {
                     val imageId = postImageItem.id
                     if (getLruCache(imageId) == null) {
                         memberPostFuncItem.getBitmap(imageId) { id -> updateImage(id) }
                     } else {
                         updateImage(imageId)
                     }
+                } else {
+                    Glide.with(itemView.context).load(R.drawable.img_nopic_03).into(videoImage)
                 }
             }
         } ?: run {
-            Glide.with(itemView.context)
-                .load(R.drawable.img_nopic_03)
-                .into(videoImage)
+            Glide.with(itemView.context).load(R.drawable.img_nopic_03).into(videoImage)
         }
 
 

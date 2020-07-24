@@ -24,7 +24,6 @@ class ClubMemberViewHolder(view: View) : BaseViewHolder(view) {
     val rvPost = view.rv_post
 
     fun onBind(item: MemberClubItem, clubFuncItem: ClubFuncItem, position: Int) {
-        Timber.d("@@onBind, pos: $position, avatarId: ${item.avatarAttachmentId}")
         tvTitle.text = item.title
         tvDesc.text = item.description
         tvFollowCount.text = item.followerCount.toString()
@@ -50,7 +49,7 @@ class ClubMemberViewHolder(view: View) : BaseViewHolder(view) {
             rvPost.adapter = ClubMemberPostAdapter(rvPost.context, item.posts, clubFuncItem)
         }
 
-        item.avatarAttachmentId.toString().takeIf { !TextUtils.isEmpty(it) && it.toLong() != 0L }?.also { id ->
+        item.avatarAttachmentId.toString().takeIf { !TextUtils.isEmpty(it) && it != LruCacheUtils.ZERO_ID }?.also { id ->
             LruCacheUtils.getLruCache(id)?.also { bitmap ->
                 Glide.with(ivAvatar.context).load(bitmap).circleCrop().into(ivAvatar)
             } ?: run {

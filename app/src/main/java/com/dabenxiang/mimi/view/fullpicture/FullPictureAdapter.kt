@@ -35,16 +35,13 @@ class FullPictureAdapter(
 
         if (!TextUtils.isEmpty(imageItem.url)) {
             Glide.with(context)
-                .load(imageItem.url)
-                .into(holder.picture)
+                .load(imageItem.url).placeholder(R.drawable.img_nopic_03).into(holder.picture)
         } else {
             if (LruCacheUtils.getLruCache(imageItem.id) == null) {
                 onFullPictureListener.onGetAttachment(imageItem.id, position)
             } else {
                 val bitmap = LruCacheUtils.getLruCache(imageItem.id)
-                Glide.with(context)
-                    .load(bitmap)
-                    .into(holder.picture)
+                Glide.with(context).load(bitmap).into(holder.picture)
             }
         }
     }

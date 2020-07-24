@@ -85,19 +85,20 @@ class ClubViewHolder(
             if (!TextUtils.isEmpty(imageItem?.url)) {
                 Glide.with(itemView.context)
                     .load(imageItem?.url)
+                    .placeholder(R.drawable.img_nopic_03)
                     .circleCrop()
                     .into(clubImg)
             } else {
                 val imageId = imageItem?.id.toString()
                 if (getLruCache(imageId) == null) {
-                    memberPostFuncItem.getBitmap(imageId) { id -> updateImage(id)}
+                    memberPostFuncItem.getBitmap(imageId) { id -> updateImage(id) }
                 } else {
                     updateImage(imageId)
                 }
             }
         } else {
             Glide.with(itemView.context)
-                .load(R.drawable.img_404)
+                .load(R.drawable.img_nopic_03)
                 .circleCrop()
                 .into(clubImg)
         }
