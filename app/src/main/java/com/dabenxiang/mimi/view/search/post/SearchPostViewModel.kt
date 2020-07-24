@@ -17,6 +17,7 @@ import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.AttachmentItem
+import com.dabenxiang.mimi.model.vo.SearchHistoryItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.search.post.keyword.SearchPostByKeywordDataSource
 import com.dabenxiang.mimi.view.search.post.keyword.SearchPostByKeywordFactory
@@ -181,8 +182,49 @@ class SearchPostViewModel : BaseViewModel() {
         }
     }
 
+    fun getBitmap(id: String, update: ((String) -> Unit)) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getAttachment(id)
+                if (!result.isSuccessful) throw HttpException(result)
+                val byteArray = result.body()?.bytes()
+                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
+                LruCacheUtils.putLruCache(id, bitmap)
+                emit(ApiResult.success(id))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    when (it) {
+                        is ApiResult.Success -> {
+                            update(it.result)
+                        }
+                    }
+                }
+        }
+    }
+
     fun isSearchTextEmpty(keyword: String): Boolean {
         return TextUtils.isEmpty(keyword)
+    }
+
+    fun getSearchHistory(): ArrayList<String> {
+        return pref.searchHistoryItem.searchHistory
+    }
+
+    fun clearSearchHistory() {
+        pref.searchHistoryItem = SearchHistoryItem()
+    }
+
+    fun updateSearchHistory(keyword: String) {
+        val searchHistoryItem = pref.searchHistoryItem
+        if (searchHistoryItem.searchHistory.size == 10) {
+            searchHistoryItem.searchHistory.removeAt(0)
+            searchHistoryItem.searchHistory.add(keyword)
+        } else {
+            searchHistoryItem.searchHistory.add(keyword)
+        }
+        pref.searchHistoryItem = searchHistoryItem
     }
 
     private fun getSearchPostByTagPagingItems(
@@ -239,28 +281,6 @@ class SearchPostViewModel : BaseViewModel() {
         }
 
         override fun onThrowable(throwable: Throwable) {
-        }
-    }
-
-    fun getBitmap(id: String, update: ((String) -> Unit)) {
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository().getAttachment(id)
-                if (!result.isSuccessful) throw HttpException(result)
-                val byteArray = result.body()?.bytes()
-                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
-                LruCacheUtils.putLruCache(id, bitmap)
-                emit(ApiResult.success(id))
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect {
-                    when(it) {
-                        is ApiResult.Success -> {
-                            update(it.result)
-                        }
-                    }
-                }
         }
     }
 }

@@ -1,10 +1,12 @@
 package com.dabenxiang.mimi.view.search.post
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.TextUtils
 import android.text.style.ForegroundColorSpan
+import android.view.LayoutInflater
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
@@ -35,6 +37,7 @@ import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
+import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_post.*
 import timber.log.Timber
 
@@ -90,6 +93,30 @@ class SearchPostFragment : BaseFragment() {
         if (TextUtils.isEmpty(mTag) && TextUtils.isEmpty(searchText)) {
             layout_search_history.visibility = View.VISIBLE
             layout_search_text.visibility = View.INVISIBLE
+
+            chip_group_search_text.removeAllViews()
+            val searchHistories = viewModel.getSearchHistory()
+            searchHistories.forEach { text ->
+                val chip = LayoutInflater.from(chip_group_search_text.context)
+                    .inflate(R.layout.chip_item, chip_group_search_text, false) as Chip
+                chip.text = text
+                chip.setTextColor(requireContext().getColor(R.color.color_white_1_50))
+                chip.chipBackgroundColor = ColorStateList.valueOf(
+                    ContextCompat.getColor(requireContext(), R.color.color_black_6)
+                )
+                chip.setOnClickListener {
+                    edit_search.setText(text)
+                    layout_search_history.visibility = View.INVISIBLE
+                    layout_search_text.visibility = View.VISIBLE
+                    updateTag("")
+                    viewModel.getSearchPostsByKeyword(
+                        currentPostType,
+                        edit_search.text.toString(),
+                        isPostFollow
+                    )
+                }
+                chip_group_search_text.addView(chip)
+            }
         } else {
             layout_search_history.visibility = View.INVISIBLE
             layout_search_text.visibility = View.VISIBLE
@@ -220,7 +247,8 @@ class SearchPostFragment : BaseFragment() {
         }
 
         iv_clear_search_text.setOnClickListener {
-            // TODO: Dave
+            chip_group_search_text.removeAllViews()
+            viewModel.clearSearchHistory()
         }
 
         tv_search.setOnClickListener {
@@ -235,6 +263,9 @@ class SearchPostFragment : BaseFragment() {
             layout_search_history.visibility = View.INVISIBLE
             layout_search_text.visibility = View.VISIBLE
             updateTag("")
+
+            viewModel.updateSearchHistory(edit_search.text.toString())
+
             viewModel.getSearchPostsByKeyword(
                 currentPostType,
                 edit_search.text.toString(),

@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import com.dabenxiang.mimi.manager.AccountManager
 import com.dabenxiang.mimi.manager.DomainManager
 import com.dabenxiang.mimi.model.api.ExceptionResult
+import com.dabenxiang.mimi.model.pref.Pref
 import com.google.gson.Gson
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -17,8 +18,10 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     val app: Application by inject()
     val accountManager: AccountManager by inject()
     val gson: Gson by inject()
-    val toastData = MutableLiveData<String>()
     val domainManager: DomainManager by inject()
+    val pref: Pref by inject()
+
+    val toastData = MutableLiveData<String>()
 
     private val _showProgress by lazy { MutableLiveData<Boolean>() }
     val showProgress: LiveData<Boolean> get() = _showProgress
