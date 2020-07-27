@@ -14,13 +14,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
-import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.OnItemClickListener
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
-import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.PictureAdapter
@@ -31,6 +29,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_picture_post.view.*
+import timber.log.Timber
 import java.util.*
 
 class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
@@ -60,7 +59,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate ?: Date(), Date())
         title.text = item.title
-        updateLikeAndFollowItem(item, position, adultListener)
+        updateLikeAndFollowItem(item, memberPostFuncItem)
 
         val avatarId = item.avatarAttachmentId.toString()
         if (LruCacheUtils.getLruCache(avatarId) == null) {
@@ -138,7 +137,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         Glide.with(avatarImg.context).load(bitmap).circleCrop().into(avatarImg)
     }
 
-    fun updateLikeAndFollowItem(item: MemberPostItem, position: Int, adultListener: AdultListener) {
+    fun updateLikeAndFollowItem(item: MemberPostItem, memberPostFuncItem: MemberPostFuncItem) {
         likeCount.text = item.likeCount.toString()
         commentCount.text = item.commentCount.toString()
 
@@ -156,22 +155,43 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         val likeType = item.likeType
-        val isLike: Boolean
         if (likeType == LikeType.LIKE) {
-            isLike = true
             likeImage.setImageResource(R.drawable.ico_nice_s)
         } else {
-            isLike = false
             likeImage.setImageResource(R.drawable.ico_nice)
         }
 
         follow.setOnClickListener {
-            adultListener.onFollowPostClick(item, position, !isFollow)
+            memberPostFuncItem.onFollowClick(item, !item.isFollow) { isFollow -> updateFollow(isFollow)}
         }
 
         likeImage.setOnClickListener {
-            adultListener.onLikeClick(item, position, !isLike)
+            val isLike = item.likeType == LikeType.LIKE
+            memberPostFuncItem.onLikeClick(item, !isLike) { like, count -> updateLike(like, count) }
         }
+    }
+
+    private fun updateFollow(isFollow: Boolean) {
+        Timber.d("@@updateFollow: $isFollow")
+        if (isFollow) {
+            follow.text = follow.context.getString(R.string.followed)
+            follow.background = follow.context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
+            follow.setTextColor(follow.context.getColor(R.color.color_white_1))
+        } else {
+            follow.text = follow.context.getString(R.string.follow)
+            follow.background = follow.context.getDrawable(R.drawable.bg_red_1_stroke_radius_16)
+            follow.setTextColor(follow.context.getColor(R.color.color_red_1))
+        }
+    }
+
+    private fun updateLike(isLike: Boolean, count: Int) {
+        Timber.d("@@updateLike: $isLike")
+        if (isLike) {
+            likeImage.setImageResource(R.drawable.ico_nice_s)
+        } else {
+            likeImage.setImageResource(R.drawable.ico_nice)
+        }
+        likeCount.text = count.toString()
     }
 
 }

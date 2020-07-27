@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
@@ -23,24 +22,24 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_clip_post.view.*
+import timber.log.Timber
 import java.util.*
 
 class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
 
-    val clClipPost: ConstraintLayout = itemView.cl_clip_post
-    val ivAvatar: ImageView = itemView.img_avatar
-    val name: TextView = itemView.tv_name
-    val time: TextView = itemView.tv_time
-    val follow: TextView = itemView.tv_follow
-    val title: TextView = itemView.tv_title
-    val ivPhoto: ImageView = itemView.iv_photo
-    val tvLength: TextView = itemView.tv_length
-    val tagChipGroup: ChipGroup = itemView.chip_group_tag
-    val likeImage: ImageView = itemView.iv_like
-    val likeCount: TextView = itemView.tv_like_count
-    val commentImage: ImageView = itemView.iv_comment
-    val commentCount: TextView = itemView.tv_comment_count
-    val moreImage: ImageView = itemView.iv_more
+    private val ivAvatar: ImageView = itemView.img_avatar
+    private val name: TextView = itemView.tv_name
+    private val time: TextView = itemView.tv_time
+    private val follow: TextView = itemView.tv_follow
+    private val title: TextView = itemView.tv_title
+    private val ivPhoto: ImageView = itemView.iv_photo
+    private val tvLength: TextView = itemView.tv_length
+    private val tagChipGroup: ChipGroup = itemView.chip_group_tag
+    private val likeImage: ImageView = itemView.iv_like
+    private val likeCount: TextView = itemView.tv_like_count
+    private val commentImage: ImageView = itemView.iv_comment
+    private val commentCount: TextView = itemView.tv_comment_count
+    private val moreImage: ImageView = itemView.iv_more
 
     fun onBind(
         item: MemberPostItem,
@@ -53,7 +52,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         title.text = item.title
-        updateLikeAndFollowItem(item, position, adultListener)
+        updateLikeAndFollowItem(item, memberPostFuncItem)
 
         val avatarId = item.avatarAttachmentId.toString()
         if (LruCacheUtils.getLruCache(avatarId) == null) {
@@ -113,9 +112,8 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
             adultListener.onMoreClick(item)
         }
 
-        clClipPost.setOnClickListener {
+        ivPhoto.setOnClickListener {
             itemList?.also { adultListener.onClipItemClick(it, position) }
-
         }
     }
 
@@ -131,14 +129,12 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
 
     private fun updateLikeAndFollowItem(
         item: MemberPostItem,
-        position: Int,
-        adultListener: AdultListener
+        memberPostFuncItem: MemberPostFuncItem
     ) {
         likeCount.text = item.likeCount.toString()
         commentCount.text = item.commentCount.toString()
 
-        val isFollow = item.isFollow ?: false
-        if (isFollow) {
+        if (item.isFollow) {
             follow.text = follow.context.getString(R.string.followed)
             follow.background = follow.context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
             follow.setTextColor(follow.context.getColor(R.color.color_white_1))
@@ -149,21 +145,42 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         val likeType = item.likeType
-        val isLike: Boolean
         if (likeType == LikeType.LIKE) {
-            isLike = true
             likeImage.setImageResource(R.drawable.ico_nice_s)
         } else {
-            isLike = false
             likeImage.setImageResource(R.drawable.ico_nice)
         }
 
         follow.setOnClickListener {
-            adultListener.onFollowPostClick(item, position, !isFollow)
+            memberPostFuncItem.onFollowClick(item, !(item.isFollow)) { isFollow -> updateFollow(isFollow) }
         }
 
         likeImage.setOnClickListener {
-            adultListener.onLikeClick(item, position, !isLike)
+            val isLike = item.likeType == LikeType.LIKE
+            memberPostFuncItem.onLikeClick(item, !isLike) { like, count -> updateLike(like, count)}
         }
+    }
+
+    private fun updateFollow(isFollow: Boolean) {
+        Timber.d("@@updateFollow: $isFollow")
+        if (isFollow) {
+            follow.text = follow.context.getString(R.string.followed)
+            follow.background = follow.context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
+            follow.setTextColor(follow.context.getColor(R.color.color_white_1))
+        } else {
+            follow.text = follow.context.getString(R.string.follow)
+            follow.background = follow.context.getDrawable(R.drawable.bg_red_1_stroke_radius_16)
+            follow.setTextColor(follow.context.getColor(R.color.color_red_1))
+        }
+    }
+
+    private fun updateLike(isLike: Boolean, count: Int) {
+        Timber.d("@@updateLike: $isLike")
+        if (isLike) {
+            likeImage.setImageResource(R.drawable.ico_nice_s)
+        } else {
+            likeImage.setImageResource(R.drawable.ico_nice)
+        }
+        likeCount.text = count.toString()
     }
 }

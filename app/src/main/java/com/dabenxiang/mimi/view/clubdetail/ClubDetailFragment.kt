@@ -4,11 +4,14 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.paging.PagedList
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -28,6 +31,9 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_club_detail.*
+import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.android.synthetic.main.item_club_pager.*
+import timber.log.Timber
 
 class ClubDetailFragment : BaseFragment() {
 
@@ -61,11 +67,52 @@ class ClubDetailFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setUpUI()
+    }
 
+    private fun setUpUI() {
         tv_title.text = memberClubItem.title
         tv_desc.text = memberClubItem.description
         tv_follow_count.text = memberClubItem.followerCount.toString()
         tv_post_count.text = memberClubItem.postCount.toString()
+        updateFollow()
+        val bitmap = LruCacheUtils.getLruCache(memberClubItem.avatarAttachmentId.toString())
+        bitmap?.also { Glide.with(requireContext()).load(it).circleCrop().into(iv_avatar) }
+
+        viewPager.isUserInputEnabled = false
+
+        viewPager.adapter =
+            ClubPagerAdapter(
+                ClubDetailFuncItem({ orderBy, function -> getPost(orderBy, function) },
+                    { id, function -> getBitmap(id, function) },
+                    { item, isFollow, func -> followMember(item, isFollow, func) },
+                    { item, isLike, func -> likePost(item, isLike, func)}),
+                adultListener
+            )
+
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            tab.text = tabTitle[position]
+            viewPager.setCurrentItem(tab.position, true)
+        }.attach()
+    }
+
+    override fun setupObservers() {
+        viewModel.followClubResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Success -> {
+                    updateFollow()
+                }
+                is ApiResult.Error -> Timber.e(it.throwable)
+            }
+        })
+    }
+
+    override fun setupListeners() {
+        ib_back.setOnClickListener { findNavController().navigateUp() }
+        tv_follow.setOnClickListener { viewModel.followClub(memberClubItem, !memberClubItem.isFollow) }
+    }
+
+    private fun updateFollow() {
         val isFollow = memberClubItem.isFollow ?: false
         if (isFollow) {
             tv_follow.text = requireContext().getString(R.string.followed)
@@ -78,27 +125,6 @@ class ClubDetailFragment : BaseFragment() {
                 requireContext().getDrawable(R.drawable.bg_red_1_stroke_radius_16)
             tv_follow.setTextColor(requireContext().getColor(R.color.color_red_1))
         }
-        val bitmap = LruCacheUtils.getLruCache(memberClubItem.avatarAttachmentId.toString())
-        bitmap?.also { Glide.with(requireContext()).load(it).circleCrop().into(iv_avatar) }
-
-        viewPager.isUserInputEnabled = false
-
-        viewPager.adapter =
-            ClubPagerAdapter(ClubDetailFuncItem({ orderBy, function -> getPost(orderBy, function) },
-                { id, function -> getBitmap(id, function) }), adultListener
-            )
-
-        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-            tab.text = tabTitle[position]
-            viewPager.setCurrentItem(tab.position, true)
-        }.attach()
-
-    }
-
-    override fun setupObservers() {
-    }
-
-    override fun setupListeners() {
     }
 
     private val adultListener = object : AdultListener {
@@ -241,5 +267,13 @@ class ClubDetailFragment : BaseFragment() {
 
     private fun getBitmap(id: String, update: ((String) -> Unit)) {
         viewModel.getBitmap(id, update)
+    }
+
+    private fun followMember(memberPostItem: MemberPostItem, isFollow: Boolean, update: (Boolean) -> Unit) {
+        viewModel.followMember(memberPostItem, isFollow, update)
+    }
+
+    private fun likePost(memberPostItem: MemberPostItem, isLike: Boolean, update: (Boolean, Int) -> Unit) {
+        viewModel.likePost(memberPostItem, isLike, update)
     }
 }
