@@ -78,7 +78,7 @@ class FullPictureFragment : BaseFragment() {
                     LruCacheUtils.putLruCache(item.id!!, item.bitmap!!)
                     adapter?.notifyItemChanged(item.position!!)
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
     }

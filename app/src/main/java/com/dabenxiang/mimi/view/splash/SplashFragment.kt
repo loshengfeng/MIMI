@@ -104,7 +104,7 @@ class SplashFragment : BaseFragment() {
                         }
                     }
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
         viewModel.autoLogin()

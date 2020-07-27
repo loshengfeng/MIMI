@@ -206,7 +206,7 @@ class AdultHomeFragment : BaseFragment() {
                         setupHomeData(mainViewModel?.adult)
                     }
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -232,7 +232,7 @@ class AdultHomeFragment : BaseFragment() {
                         response.result.content?.statisticsItemToCarouselHolderItem(carousel!!.isAdult)
                     viewHolder?.submitList(carouselHolderItems)
                 }
-                is Error -> Timber.e(response.throwable)
+                is Error -> onApiError(response.throwable)
             }
         })
 
@@ -245,7 +245,7 @@ class AdultHomeFragment : BaseFragment() {
                         response.result.content?.statisticsItemToVideoItem(statistics!!.isAdult)
                     viewHolder?.submitList(videoHolderItems)
                 }
-                is Error -> Timber.e(response.throwable)
+                is Error -> onApiError(response.throwable)
             }
         })
 
@@ -256,7 +256,7 @@ class AdultHomeFragment : BaseFragment() {
                     val memberPostItems = response.result.content ?: arrayListOf()
                     viewHolder?.submitList(memberPostItems)
                 }
-                is Error -> Timber.e(response.throwable)
+                is Error -> onApiError(response.throwable)
             }
         })
 
@@ -267,7 +267,7 @@ class AdultHomeFragment : BaseFragment() {
                     val memberPostItems = response.result.content ?: arrayListOf()
                     viewHolder?.submitList(memberPostItems)
                 }
-                is Error -> Timber.e(response.throwable)
+                is Error -> onApiError(response.throwable)
             }
         })
 
@@ -278,7 +278,7 @@ class AdultHomeFragment : BaseFragment() {
                     val memberClubItems = response.result.content ?: arrayListOf()
                     viewHolder?.submitList(memberClubItems)
                 }
-                is Error -> Timber.e(response.throwable)
+                is Error -> onApiError(response.throwable)
             }
         })
 
@@ -291,7 +291,7 @@ class AdultHomeFragment : BaseFragment() {
                         }
                     }
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -309,7 +309,7 @@ class AdultHomeFragment : BaseFragment() {
                         }
                     }
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -327,7 +327,7 @@ class AdultHomeFragment : BaseFragment() {
                         }
                     }
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -366,7 +366,7 @@ class AdultHomeFragment : BaseFragment() {
                     }
 
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -388,7 +388,7 @@ class AdultHomeFragment : BaseFragment() {
                         }
                     }
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -417,7 +417,7 @@ class AdultHomeFragment : BaseFragment() {
                 is Empty -> {
                     GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 

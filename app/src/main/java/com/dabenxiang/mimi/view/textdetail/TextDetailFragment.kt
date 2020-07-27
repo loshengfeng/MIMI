@@ -108,7 +108,7 @@ class TextDetailFragment : BaseFragment() {
         viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> textDetailAdapter?.notifyItemChanged(it.result)
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -124,7 +124,7 @@ class TextDetailFragment : BaseFragment() {
                     tv_like_count.text = item.likeCount.toString()
 
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -133,7 +133,7 @@ class TextDetailFragment : BaseFragment() {
                 is Empty -> {
                     GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -142,7 +142,7 @@ class TextDetailFragment : BaseFragment() {
                 is Empty -> {
                     GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -172,7 +172,7 @@ class TextDetailFragment : BaseFragment() {
                         }
                         textDetailAdapter?.notifyItemChanged(2)
                     }
-                    is Error -> Timber.e(it.throwable)
+                    is Error -> onApiError(it.throwable)
                 }
             }
         })
@@ -180,7 +180,7 @@ class TextDetailFragment : BaseFragment() {
         viewModel.avatarResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> avatarBlock?.invoke(it.result)
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -188,7 +188,7 @@ class TextDetailFragment : BaseFragment() {
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> replyCommentBlock?.also { it() }
-                    is Error -> Timber.e(it.throwable)
+                    is Error -> onApiError(it.throwable)
                 }
             }
         })
@@ -197,7 +197,7 @@ class TextDetailFragment : BaseFragment() {
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> commentLikeBlock?.also { it() }
-                    is Error -> Timber.e(it.throwable)
+                    is Error -> onApiError(it.throwable)
                 }
             }
         })
@@ -206,7 +206,7 @@ class TextDetailFragment : BaseFragment() {
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> commentLikeBlock?.also { it() }
-                    is Error -> Timber.e(it.throwable)
+                    is Error -> onApiError(it.throwable)
                 }
             }
         })

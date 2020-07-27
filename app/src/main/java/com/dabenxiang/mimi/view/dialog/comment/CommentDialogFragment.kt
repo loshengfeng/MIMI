@@ -268,8 +268,7 @@ class CommentDialogFragment : BaseDialogFragment() {
                         }
 
                     }
-                    is Error -> {
-                    }
+                    is Error -> onApiError(it.throwable)
                 }
             }
         })
@@ -283,8 +282,7 @@ class CommentDialogFragment : BaseDialogFragment() {
                             null
                         }
                     }
-                    is Error -> {
-                    }
+                    is Error -> onApiError(it.throwable)
                 }
             }
         })
@@ -298,8 +296,7 @@ class CommentDialogFragment : BaseDialogFragment() {
                             null
                         }
                     }
-                    is Error -> {
-                    }
+                    is Error -> onApiError(it.throwable)
                 }
             }
         })
@@ -309,7 +306,7 @@ class CommentDialogFragment : BaseDialogFragment() {
                 is Empty -> {
                     GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -318,7 +315,7 @@ class CommentDialogFragment : BaseDialogFragment() {
                 is Empty -> {
                     GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
     }
