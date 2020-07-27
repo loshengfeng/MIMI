@@ -21,12 +21,16 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.kaopiz.kprogresshud.KProgressHUD
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
+import timber.log.Timber
 import java.net.UnknownHostException
 
 abstract class BaseFragment : Fragment() {
 
     open var mainViewModel: MainViewModel? = null
     var progressHUD: KProgressHUD? = null
+
+    var mView: View? = null
+    var firstCreateView = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +42,11 @@ abstract class BaseFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(getLayoutId(), container, false)
+        takeIf { mView == null }?.let {
+            firstCreateView = true
+            mView = inflater.inflate(getLayoutId(), container, false)
+        }
+        return mView
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -53,6 +61,11 @@ abstract class BaseFragment : Fragment() {
 
         setupListeners()
         setupObservers()
+
+        takeIf { firstCreateView }?.run {
+            setupFirstTime()
+            firstCreateView = false
+        }
     }
 
     abstract fun getLayoutId(): Int
@@ -60,6 +73,8 @@ abstract class BaseFragment : Fragment() {
     abstract fun setupObservers()
 
     abstract fun setupListeners()
+
+    open fun setupFirstTime() {}
 
     open fun statusBarVisibility() {
         requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
