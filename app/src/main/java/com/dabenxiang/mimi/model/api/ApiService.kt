@@ -92,20 +92,19 @@ interface ApiService {
     suspend fun getChat(
         @Query("offset") offset: String,
         @Query("limit") limit: String
-    ): Response<ApiBasePagingItem<List<String>>>
+    ): Response<ApiBasePagingItem<List<ChatListItem>>>
 
     @POST("/v1/Members/Me/Chats/Message")
     suspend fun postMessage(
         @Body request: MsgRequest
     ): Response<ApiBaseItem<List<String>>>
 
-    @GET("/v1/Members/Me/Chats/Message")
+    @GET("/v1/Members/Me/Chats/{chatId}")
     suspend fun getMessage(
-        @Query("chatId") chatId: Int,
-        @Query("lastReadTime") lastReadTime: String,
+        @Path("chatId") chatId: Long,
         @Query("offset") offset: String,
         @Query("limit") limit: String
-    ): Response<ApiBasePagingItem<List<String>>>
+    ): Response<ApiBasePagingItem<List<ChatContentItem>>>
 
     /**********************************************************
      *

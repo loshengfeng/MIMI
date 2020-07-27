@@ -155,11 +155,10 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得訊息
      */
     suspend fun getMessage(
-        chatId: Int,
-        lastReadTime: String,
+        chatId: Long,
         offset: String,
         limit: String
-    ) = apiService.getMessage(chatId, lastReadTime, offset, limit)
+    ) = apiService.getMessage(chatId, offset, limit)
 
     /**********************************************************
      *

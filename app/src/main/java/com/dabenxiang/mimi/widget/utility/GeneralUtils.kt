@@ -7,7 +7,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.provider.Settings
 import android.util.DisplayMetrics
-import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
@@ -25,7 +24,7 @@ import okhttp3.Request
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.HttpException
 import retrofit2.Response
-import timber.log.Timber
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
@@ -194,5 +193,15 @@ object GeneralUtils {
         val inputMethodManager =
             context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+    }
+
+    fun diffTime(d1: Date, d2:Date): Boolean {
+        var result = false
+//        val sdf = SimpleDateFormat("dd/MM/yyyy")
+//        Date(t1)
+//        val date1: Date = sdf.parse(t1)
+//        val date2: Date = sdf.parse(t2)
+        result = d1.after(d2)
+        return result
     }
 }
