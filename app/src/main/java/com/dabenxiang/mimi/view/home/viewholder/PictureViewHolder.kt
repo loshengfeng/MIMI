@@ -5,6 +5,7 @@ import android.view.View
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
@@ -18,7 +19,7 @@ import java.util.*
 class PictureViewHolder(
     itemView: View,
     onClickListener: IndexViewHolderListener,
-    private val attachmentListener: AttachmentListener
+    private val memberPostFuncItem: MemberPostFuncItem
 ) :
     BaseIndexViewHolder<MemberPostItem>(itemView, onClickListener) {
 
@@ -60,17 +61,11 @@ class PictureViewHolder(
                     .into(pictureImage)
             } else {
                 if (!TextUtils.isEmpty(postImageItem.id)) {
-                    if (getLruCache(postImageItem.id) == null) {
-                        attachmentListener.onGetAttachment(
-                            postImageItem.id,
-                            index,
-                            AttachmentType.ADULT_HOME_PICTURE
-                        )
+                    val imageId = postImageItem.id
+                    if (getLruCache(imageId) == null) {
+                        memberPostFuncItem.getBitmap(imageId) { id -> updateImage(id) }
                     } else {
-                        val bitmap = getLruCache(postImageItem.id)
-                        Glide.with(itemView.context)
-                            .load(bitmap)
-                            .into(pictureImage)
+                        updateImage(imageId)
                     }
                 }
             }
@@ -80,18 +75,21 @@ class PictureViewHolder(
                 .into(pictureImage)
         }
 
-        if (getLruCache(model?.avatarAttachmentId.toString()) == null) {
-            attachmentListener.onGetAttachment(
-                model?.avatarAttachmentId.toString(),
-                index,
-                AttachmentType.ADULT_HOME_PICTURE
-            )
+        val avatarId = model?.avatarAttachmentId.toString()
+        if (getLruCache(avatarId) == null) {
+            memberPostFuncItem.getBitmap(avatarId) { id -> updateAvatar(id) }
         } else {
-            val bitmap = getLruCache(model?.avatarAttachmentId.toString())
-            Glide.with(itemView.context)
-                .load(bitmap)
-                .circleCrop()
-                .into(avatarImg)
+            updateAvatar(avatarId)
         }
+    }
+
+    private fun updateImage(id: String) {
+        val bitmap = getLruCache(id)
+        Glide.with(pictureImage.context).load(bitmap).into(pictureImage)
+    }
+
+    private fun updateAvatar(id: String) {
+        val bitmap = getLruCache(id)
+        Glide.with(avatarImg.context).load(bitmap).circleCrop().into(avatarImg)
     }
 }

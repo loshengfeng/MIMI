@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.*
@@ -128,12 +129,24 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private fun handleBackStackData() {
-        val isNeedPicUpload = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>(PostPicFragment.UPLOAD_PIC)
-        val isNeedVideoUpload = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>(PostVideoFragment.UPLOAD_VIDEO)
+        val isNeedPicUpload =
+            findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>(
+                PostPicFragment.UPLOAD_PIC
+            )
+        val isNeedVideoUpload =
+            findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>(
+                PostVideoFragment.UPLOAD_VIDEO
+            )
 
         if (isNeedPicUpload?.value != null) {
-            val memberRequest = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<PostMemberRequest>(PostPicFragment.MEMBER_REQUEST)
-            val picUriList = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<String>>(PostPicFragment.PIC_URI)
+            val memberRequest =
+                findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<PostMemberRequest>(
+                    PostPicFragment.MEMBER_REQUEST
+                )
+            val picUriList =
+                findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<String>>(
+                    PostPicFragment.PIC_URI
+                )
 
             showSnackBar()
             postMemberRequest = memberRequest!!.value!!
@@ -144,8 +157,14 @@ class AdultHomeFragment : BaseFragment() {
         } else if (isNeedVideoUpload?.value != null) {
             showSnackBar()
 
-            val memberRequest = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<PostMemberRequest>(PostVideoFragment.MEMBER_REQUEST)
-            val coverUri = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<String>>(PostVideoFragment.COVER_URI)
+            val memberRequest =
+                findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<PostMemberRequest>(
+                    PostVideoFragment.MEMBER_REQUEST
+                )
+            val coverUri =
+                findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<String>>(
+                    PostVideoFragment.COVER_URI
+                )
 
             postMemberRequest = memberRequest!!.value!!
             viewModel.postAttachment(coverUri?.value!![0], requireContext(), TYPE_COVER)
@@ -160,12 +179,16 @@ class AdultHomeFragment : BaseFragment() {
 
         val snackView: View = layoutInflater.inflate(R.layout.snackbar_upload, null)
         snackbarLayout.addView(snackView, 0)
-        snackbarLayout.setPadding(15,0,15,0)
+        snackbarLayout.setPadding(15, 0, 15, 0)
         snackbarLayout.setBackgroundColor(Color.TRANSPARENT)
         snackbar?.show()
     }
 
     override fun setupObservers() {
+        viewModel.showProgress.observe(viewLifecycleOwner, Observer { showProgress ->
+            showProgress?.takeUnless { it }?.also { refresh.isRefreshing = it }
+        })
+
         mainViewModel?.categoriesData?.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Loading -> refresh.isRefreshing = true
@@ -192,6 +215,7 @@ class AdultHomeFragment : BaseFragment() {
             tabAdapter.setLastSelectedIndex(lastPosition)
             recyclerview_tab.scrollToPosition(position)
             setupRecyclerByPosition(position)
+            refresh.isRefreshing = true
             getData(position)
         })
 
@@ -433,9 +457,12 @@ class AdultHomeFragment : BaseFragment() {
         })
 
         viewModel.postCoverResult.observe(viewLifecycleOwner, Observer {
-            when(it) {
+            when (it) {
                 is Success -> {
-                    val videoUri = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>(PostVideoFragment.VIDEO_URI)
+                    val videoUri =
+                        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>(
+                            PostVideoFragment.VIDEO_URI
+                        )
                     picParameter.id = it.result.toString()
                     viewModel.postAttachment(videoUri?.value!!, requireContext(), TYPE_VIDEO)
 
@@ -448,9 +475,12 @@ class AdultHomeFragment : BaseFragment() {
         })
 
         viewModel.postVideoResult.observe(viewLifecycleOwner, Observer {
-            when(it) {
+            when (it) {
                 is Success -> {
-                    val videoLength = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>(PostVideoFragment.VIDEO_LENGTH)
+                    val videoLength =
+                        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>(
+                            PostVideoFragment.VIDEO_LENGTH
+                        )
 
                     val mediaItem = MediaItem()
                     val videoParameter = VideoParameter(
@@ -477,7 +507,8 @@ class AdultHomeFragment : BaseFragment() {
 
         viewModel.postVideoMemberResult.observe(viewLifecycleOwner, Observer {
             val snackbarLayout: Snackbar.SnackbarLayout = snackbar?.view as Snackbar.SnackbarLayout
-            val progressBar = snackbarLayout.findViewById(R.id.contentLoadingProgressBar) as ContentLoadingProgressBar
+            val progressBar =
+                snackbarLayout.findViewById(R.id.contentLoadingProgressBar) as ContentLoadingProgressBar
             val imgSuccess = snackbarLayout.findViewById(R.id.iv_success) as ImageView
 
             val txtSuccess = snackbarLayout.findViewById(R.id.txt_postSuccess) as TextView
@@ -520,18 +551,39 @@ class AdultHomeFragment : BaseFragment() {
     override fun setupListeners() {
         refresh.setOnRefreshListener {
             viewModel.lastListIndex = 0
-            refresh.isRefreshing = false
+            refresh.isRefreshing = true
             getData(lastPosition)
         }
 
         iv_bg_search.setOnClickListener {
-            val bundle = SearchVideoFragment.createBundle("")
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_homeFragment_to_searchVideoFragment,
-                    bundle
+            // TODO: Dave
+            if (lastPosition == 0 || lastPosition == 1) {
+                val bundle = SearchVideoFragment.createBundle()
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_homeFragment_to_searchVideoFragment,
+                        bundle
+                    )
                 )
-            )
+            } else {
+                val item: SearchPostItem = when (lastPosition) {
+                    2 -> SearchPostItem(isPostFollow = true)
+                    3 -> SearchPostItem(type = PostType.VIDEO)
+                    4 -> SearchPostItem(type = PostType.IMAGE)
+                    5 -> SearchPostItem(type = PostType.TEXT)
+                    else -> {
+                        // TODO: 圈子搜尋
+                        SearchPostItem(type = PostType.TEXT)
+                    }
+                }
+                val bundle = SearchPostFragment.createBundle(item)
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_homeFragment_to_searchPostFragment,
+                        bundle
+                    )
+                )
+            }
         }
 
         iv_post.setOnClickListener {
@@ -650,12 +702,20 @@ class AdultHomeFragment : BaseFragment() {
             adapterListener,
             true,
             clubListener,
-            attachmentListener
+            memberPostFuncItem
         )
     }
 
     private val memberPostPagedAdapter by lazy {
-        MemberPostPagedAdapter(requireActivity(), adultListener, attachmentListener)
+        MemberPostPagedAdapter(requireActivity(), adultListener, "", memberPostFuncItem)
+    }
+
+    private val memberPostFuncItem by lazy {
+        MemberPostFuncItem(
+            {},
+            { id, function -> getBitmap(id, function) },
+            { _, _, _ -> }
+        )
     }
 
     private val clubMemberAdapter by lazy {
@@ -807,16 +867,6 @@ class AdultHomeFragment : BaseFragment() {
 
         override fun onCancel() {
             moreDialog?.dismiss()
-        }
-    }
-
-    private val attachmentListener = object : AttachmentListener {
-        override fun onGetAttachment(id: String, position: Int, type: AttachmentType) {
-            viewModel.getAttachment(id, position, type)
-        }
-
-        override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
-            viewModel.getAttachment(id, parentPosition, position)
         }
     }
 

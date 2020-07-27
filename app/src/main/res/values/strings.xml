@@ -274,6 +274,8 @@
     <string name="search_type_clip">视频</string>
     <string name="search_type_picture">图片</string>
     <string name="search_type_text">文字</string>
+    <string name="search_history">历史搜索</string>
+
 
     <!--  Search video  -->
     <string name="search_video_result">搜索\"%s\", 共找到 %,d 个视频</string>

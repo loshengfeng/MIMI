@@ -83,7 +83,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/player_view">
 
-        <ScrollView
+        <androidx.core.widget.NestedScrollView
             android:id="@+id/scrollView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -93,11 +93,13 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_info"
                 android:layout_width="match_parent"
-                android:nestedScrollingEnabled="false"
                 android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
                 android:orientation="vertical"
+                android:layout_gravity="fill_vertical"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-        </ScrollView>
+        </androidx.core.widget.NestedScrollView>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/bottom_func_bar"
@@ -105,22 +107,39 @@
             android:layout_height="50dp"
             app:layout_constraintBottom_toBottomOf="parent">
 
-            <com.yulichswift.roundedview.widget.RoundedTextView
+<!--            <com.yulichswift.roundedview.widget.RoundedTextView-->
+<!--                android:id="@+id/btn_write_comment"-->
+<!--                android:layout_width="91dp"-->
+<!--                android:layout_height="36dp"-->
+<!--                android:layout_marginStart="10dp"-->
+<!--                android:clickable="true"-->
+<!--                android:text="@string/write_comment"-->
+<!--                android:textColor="@color/color_black_1_30"-->
+<!--                app:btn_corner_radius="standard"-->
+<!--                app:btn_pressed_color="darker"-->
+<!--                app:btn_solid_color="@color/color_white_1_65625"-->
+<!--                app:btn_stroke_color="@color/color_gray_11"-->
+<!--                app:btn_stroke_width="1dp"-->
+<!--                app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toTopOf="parent" />-->
+
+            <EditText
                 android:id="@+id/btn_write_comment"
                 android:layout_width="91dp"
                 android:layout_height="36dp"
                 android:layout_marginStart="10dp"
                 android:clickable="true"
-                android:text="@string/write_comment"
+                android:hint="@string/write_comment"
                 android:textColor="@color/color_black_1_30"
-                app:btn_corner_radius="standard"
-                app:btn_pressed_color="darker"
-                app:btn_solid_color="@color/color_white_1_65625"
-                app:btn_stroke_color="@color/color_gray_11"
-                app:btn_stroke_width="1dp"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:inputType="text"
+                android:imeOptions="actionSend"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:focusable="true" />
 
             <TextView
                 android:id="@+id/tv_like"

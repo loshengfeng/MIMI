@@ -7,7 +7,7 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
-import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.ClipPostHolder
@@ -18,7 +18,8 @@ import com.dabenxiang.mimi.view.base.BaseViewHolder
 class MemberPostPagedAdapter(
     val context: Context,
     private val adultListener: AdultListener,
-    private val attachmentListener: AttachmentListener
+    private var mTag: String = "",
+    private val memberPostFuncItem: MemberPostFuncItem = MemberPostFuncItem()
 ) : PagedListAdapter<MemberPostItem, BaseViewHolder>(diffCallback) {
 
     companion object {
@@ -93,7 +94,8 @@ class MemberPostPagedAdapter(
                         currentList,
                         position,
                         adultListener,
-                        attachmentListener
+                        mTag,
+                        memberPostFuncItem
                     )
                 }
             }
@@ -102,19 +104,27 @@ class MemberPostPagedAdapter(
                     when (it[0] as Int) {
                         PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI -> {
                             item?.also { item ->
-                                holder.updateLikeAndFollowItem(item, position, adultListener)
+                                holder.updateLikeAndFollowItem(item, memberPostFuncItem)
                             }
                         }
                     }
                 } ?: run {
                     item?.also {
                         holder.pictureRecycler.tag = position
-                        holder.onBind(it, position, adultListener, attachmentListener)
+                        holder.onBind(it, position, adultListener, mTag, memberPostFuncItem)
                     }
                 }
             }
             is TextPostHolder -> {
-                item?.also { holder.onBind(it, position, adultListener, attachmentListener) }
+                item?.also {
+                    holder.onBind(
+                        it,
+                        position,
+                        adultListener,
+                        mTag,
+                        memberPostFuncItem
+                    )
+                }
             }
         }
     }
@@ -128,5 +138,9 @@ class MemberPostPagedAdapter(
                 holder.pictureRecycler.adapter?.notifyDataSetChanged()
             }
         }
+    }
+
+    fun setupTag(tag: String) {
+        mTag = tag
     }
 }

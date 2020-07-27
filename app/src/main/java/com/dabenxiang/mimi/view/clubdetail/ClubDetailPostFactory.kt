@@ -1,12 +1,12 @@
-package com.dabenxiang.mimi.view.search.post
+package com.dabenxiang.mimi.view.clubdetail
 
 import androidx.paging.DataSource
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 
-class SearchPostFactory constructor(
-    private val searchPostDataSource: SearchPostDataSource
+class ClubDetailPostFactory constructor(
+    private val clubDetailPostDataSource: ClubDetailPostDataSource
 ) : DataSource.Factory<Int, MemberPostItem>() {
     override fun create(): DataSource<Int, MemberPostItem> {
-        return searchPostDataSource
+        return clubDetailPostDataSource
     }
 }

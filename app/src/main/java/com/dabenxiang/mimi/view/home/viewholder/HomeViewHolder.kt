@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
@@ -170,14 +171,14 @@ class HomeClipViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
     isAdult: Boolean,
-    attachmentListener: AttachmentListener
+    memberPostFuncItem: MemberPostFuncItem
 ) : HomeViewHolder<HomeTemplate.Clip>(itemView, listener, isAdult) {
 
     private var attachmentType: AttachmentType? = null
 
     private val recyclerView: RecyclerView = itemView.recyclerview_clip
     private val nestedAdapter by lazy {
-        HomeClipAdapter(listener, attachmentListener)
+        HomeClipAdapter(listener, memberPostFuncItem)
     }
 
     init {
@@ -206,12 +207,12 @@ class HomePictureViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
     isAdult: Boolean,
-    attachmentListener: AttachmentListener
+    memberPostFuncItem: MemberPostFuncItem
 ) : HomeViewHolder<HomeTemplate.Picture>(itemView, listener, isAdult) {
 
     private val recyclerView: RecyclerView = itemView.recyclerview_picture
     private val nestedAdapter by lazy {
-        HomePictureAdapter(listener, attachmentListener)
+        HomePictureAdapter(listener, memberPostFuncItem)
     }
 
     init {
@@ -244,12 +245,12 @@ class HomeClubViewHolder(
     listener: HomeAdapter.EventListener,
     isAdult: Boolean,
     clubListener: HomeClubAdapter.ClubListener,
-    attachmentListener: AttachmentListener
+    memberPostFuncItem: MemberPostFuncItem
 ) : HomeViewHolder<HomeTemplate.Club>(itemView, listener, isAdult) {
 
     private val recyclerView: RecyclerView = itemView.recyclerview_club
     private val nestedAdapter by lazy {
-        HomeClubAdapter(listener, clubListener, attachmentListener)
+        HomeClubAdapter(listener, clubListener, memberPostFuncItem)
     }
 
     init {

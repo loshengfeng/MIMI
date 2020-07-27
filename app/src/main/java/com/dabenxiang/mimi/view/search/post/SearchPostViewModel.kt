@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.search.post
 
+import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
@@ -12,10 +13,17 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.ReportRequest
+import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.AttachmentItem
+import com.dabenxiang.mimi.model.vo.SearchHistoryItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.search.post.keyword.SearchPostByKeywordDataSource
+import com.dabenxiang.mimi.view.search.post.keyword.SearchPostByKeywordFactory
+import com.dabenxiang.mimi.view.search.post.tag.SearchPostByTagDataSource
+import com.dabenxiang.mimi.view.search.post.tag.SearchPostByTagFactory
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -26,8 +34,16 @@ class SearchPostViewModel : BaseViewModel() {
     private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
     val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
 
-    private val _searchPostItemListResult = MutableLiveData<PagedList<MemberPostItem>>()
-    val searchPostItemListResult: LiveData<PagedList<MemberPostItem>> = _searchPostItemListResult
+    private val _searchPostItemByTagListResult = MutableLiveData<PagedList<MemberPostItem>>()
+    val searchPostItemByTagListResult: LiveData<PagedList<MemberPostItem>> =
+        _searchPostItemByTagListResult
+
+    private val _searchPostItemByKeywordListResult = MutableLiveData<PagedList<MemberPostItem>>()
+    val searchPostItemByKeywordListResult: LiveData<PagedList<MemberPostItem>> =
+        _searchPostItemByKeywordListResult
+
+    private var _attachmentByTypeResult = MutableLiveData<ApiResult<AttachmentItem>>()
+    val attachmentByTypeResult: LiveData<ApiResult<AttachmentItem>> = _attachmentByTypeResult
 
     private var _attachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
     val attachmentResult: LiveData<ApiResult<AttachmentItem>> = _attachmentResult
@@ -55,6 +71,29 @@ class SearchPostViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _postReportResult.value = it }
+        }
+    }
+
+    fun getAttachment(id: String, position: Int, type: AttachmentType) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getAttachment(id)
+                if (!result.isSuccessful) throw HttpException(result)
+                val byteArray = result.body()?.bytes()
+                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
+                val item = AttachmentItem(
+                    id = id,
+                    bitmap = bitmap,
+                    position = position,
+                    type = type
+                )
+                emit(ApiResult.success(item))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _attachmentByTypeResult.value = it }
         }
     }
 
@@ -129,32 +168,105 @@ class SearchPostViewModel : BaseViewModel() {
         }
     }
 
-    fun getSearchPosts(type: PostType, tag: String, isPostFollow: Boolean) {
+    fun getSearchPostsByTag(type: PostType, tag: String, isPostFollow: Boolean) {
         viewModelScope.launch {
-            getSearchPostPagingItems(type, tag, isPostFollow).asFlow()
-                .collect { _searchPostItemListResult.value = it }
+            getSearchPostByTagPagingItems(type, tag, isPostFollow).asFlow()
+                .collect { _searchPostItemByTagListResult.value = it }
         }
     }
 
-    private fun getSearchPostPagingItems(
+    fun getSearchPostsByKeyword(type: PostType, keyword: String, isPostFollow: Boolean) {
+        viewModelScope.launch {
+            getSearchPostByKeywordPagingItems(type, keyword, isPostFollow).asFlow()
+                .collect { _searchPostItemByKeywordListResult.value = it }
+        }
+    }
+
+    fun getBitmap(id: String, update: ((String) -> Unit)) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getAttachment(id)
+                if (!result.isSuccessful) throw HttpException(result)
+                val byteArray = result.body()?.bytes()
+                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
+                LruCacheUtils.putLruCache(id, bitmap)
+                emit(ApiResult.success(id))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    when (it) {
+                        is ApiResult.Success -> {
+                            update(it.result)
+                        }
+                    }
+                }
+        }
+    }
+
+    fun isSearchTextEmpty(keyword: String): Boolean {
+        return TextUtils.isEmpty(keyword)
+    }
+
+    fun getSearchHistory(): ArrayList<String> {
+        return pref.searchHistoryItem.searchHistory
+    }
+
+    fun clearSearchHistory() {
+        pref.searchHistoryItem = SearchHistoryItem()
+    }
+
+    fun updateSearchHistory(keyword: String) {
+        val searchHistoryItem = pref.searchHistoryItem
+        if (!searchHistoryItem.searchHistory.contains(keyword)) {
+            if (searchHistoryItem.searchHistory.size == 10) {
+                searchHistoryItem.searchHistory.removeAt(0)
+                searchHistoryItem.searchHistory.add(keyword)
+            } else {
+                searchHistoryItem.searchHistory.add(keyword)
+            }
+            pref.searchHistoryItem = searchHistoryItem
+        }
+    }
+
+    private fun getSearchPostByTagPagingItems(
         type: PostType,
         tag: String,
         isPostFollow: Boolean
     ): LiveData<PagedList<MemberPostItem>> {
-        val searchPostDataSource =
-            SearchPostDataSource(
-                pagingCallback,
-                viewModelScope,
-                domainManager,
-                type,
-                tag,
-                isPostFollow
-            )
-        val searchPostFactory = SearchPostFactory(searchPostDataSource)
+        val dataSource = SearchPostByTagDataSource(
+            pagingCallback,
+            viewModelScope,
+            domainManager,
+            type,
+            tag,
+            isPostFollow
+        )
+        val factory = SearchPostByTagFactory(dataSource)
         val config = PagedList.Config.Builder()
             .setPrefetchDistance(4)
             .build()
-        return LivePagedListBuilder(searchPostFactory, config).build()
+        return LivePagedListBuilder(factory, config).build()
+    }
+
+    private fun getSearchPostByKeywordPagingItems(
+        type: PostType,
+        tag: String,
+        isPostFollow: Boolean
+    ): LiveData<PagedList<MemberPostItem>> {
+        val dataSource = SearchPostByKeywordDataSource(
+            pagingCallback,
+            viewModelScope,
+            domainManager,
+            type,
+            tag,
+            isPostFollow
+        )
+        val factory = SearchPostByKeywordFactory(dataSource)
+        val config = PagedList.Config.Builder()
+            .setPrefetchDistance(4)
+            .build()
+        return LivePagedListBuilder(factory, config).build()
     }
 
     private val pagingCallback = object : SearchPagingCallback {

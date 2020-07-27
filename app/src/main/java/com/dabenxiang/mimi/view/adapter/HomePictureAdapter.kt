@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
@@ -14,7 +15,7 @@ import timber.log.Timber
 
 class HomePictureAdapter(
     nestedListener: HomeAdapter.EventListener,
-    private val attachmentListener: AttachmentListener
+    private val memberPostFuncItem: MemberPostFuncItem
 ) : RecyclerView.Adapter<BaseViewHolder>() {
 
     private var memberPostItems: List<MemberPostItem> = arrayListOf()
@@ -22,7 +23,7 @@ class HomePictureAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.nested_item_home_picture, parent, false)
-        return PictureViewHolder(view, pictureClickListener, attachmentListener)
+        return PictureViewHolder(view, pictureClickListener, memberPostFuncItem)
     }
 
     override fun getItemCount(): Int {

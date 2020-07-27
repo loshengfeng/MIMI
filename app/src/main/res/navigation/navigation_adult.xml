@@ -19,6 +19,10 @@
             app:destination="@id/searchVideoFragment" />
 
         <action
+            android:id="@+id/action_homeFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+
+        <action
             android:id="@+id/action_adultHomeFragment_to_clipFragment"
             app:destination="@id/clipFragment" />
 
@@ -63,7 +67,7 @@
     <fragment
         android:id="@+id/searchPostFragment"
         android:name="com.dabenxiang.mimi.view.search.post.SearchPostFragment"
-        tools:layout="@layout/fragment_search_post" >
+        tools:layout="@layout/fragment_search_post">
 
         <action
             android:id="@+id/action_searchPostFragment_to_pictureDetailFragment"
@@ -113,7 +117,7 @@
     <fragment
         android:id="@+id/textDetailFragment"
         android:name="com.dabenxiang.mimi.view.textdetail.TextDetailFragment"
-        tools:layout="@layout/fragment_text_detail" >
+        tools:layout="@layout/fragment_text_detail">
         <action
             android:id="@+id/action_textDetailFragment_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
@@ -147,7 +151,20 @@
         android:id="@+id/clubDetailFragment"
         android:name="com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment"
         android:label="ClubDetailFragment"
-        tools:layout="@layout/fragment_club_detail" />
+        tools:layout="@layout/fragment_club_detail">
+        <action
+            android:id="@+id/action_clubDetailFragment_to_clipFragment"
+            app:destination="@id/clipFragment" />
+        <action
+            android:id="@+id/action_clubDetailFragment_to_pictureDetailFragment"
+            app:destination="@id/pictureDetailFragment" />
+        <action
+            android:id="@+id/action_clubDetailFragment_to_textDetailFragment"
+            app:destination="@id/textDetailFragment" />
+        <action
+            android:id="@+id/action_clubDetailFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+    </fragment>
     <fragment
         android:id="@+id/myPostFragment"
         android:name="com.dabenxiang.mimi.view.mypost.MyPostFragment"

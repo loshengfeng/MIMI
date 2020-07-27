@@ -1,24 +1,23 @@
-package com.dabenxiang.mimi.view.search.post
+package com.dabenxiang.mimi.view.clubdetail
 
 import androidx.paging.PageKeyedDataSource
-import com.dabenxiang.mimi.callback.SearchPagingCallback
+import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.view.home.postfollow.PostFollowDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
-class SearchPostDataSource(
-    private val pagingCallback: SearchPagingCallback,
+class ClubDetailPostDataSource(
+    private val pagingCallback: PagingCallback,
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
-    private val type: PostType = PostType.TEXT,
-    private val tag: String = "",
-    private val isPostFollow: Boolean
+    private val tag: String,
+    private val orderBy: OrderBy
 ) : PageKeyedDataSource<Int, MemberPostItem>() {
 
     companion object {
@@ -31,17 +30,13 @@ class SearchPostDataSource(
     ) {
         viewModelScope.launch {
             flow {
-                val apiRepository = domainManager.getApiRepository()
-
-                val result = if (isPostFollow) {
-                    apiRepository.searchPostFollow(tag, 0, PER_LIMIT)
-                } else {
-                    apiRepository.searchPost(type, tag, 0, PER_LIMIT)
-                }
-
+                val result = domainManager.getApiRepository().getMembersPost(
+                    0, PER_LIMIT, tag, orderBy.value
+                )
                 if (!result.isSuccessful) throw HttpException(result)
                 val body = result.body()
                 val memberPostItems = body?.content
+
                 val nextPageKey = when {
                     hasNextPage(
                         body?.paging?.count ?: 0,
@@ -50,8 +45,6 @@ class SearchPostDataSource(
                     ) -> PER_LIMIT
                     else -> null
                 }
-                val count = body?.paging?.count ?: 0
-                pagingCallback.onTotalCount(count)
                 emit(InitResult(memberPostItems ?: arrayListOf(), nextPageKey))
             }
                 .flowOn(Dispatchers.IO)
@@ -72,12 +65,9 @@ class SearchPostDataSource(
         val next = params.key
         viewModelScope.launch {
             flow {
-                val apiRepository = domainManager.getApiRepository()
-                val result = if (isPostFollow) {
-                    apiRepository.searchPostFollow(tag, 0, PER_LIMIT)
-                } else {
-                    apiRepository.searchPost(type, tag, 0, PER_LIMIT)
-                }
+                val result = domainManager.getApiRepository().getMembersPost(
+                    next, PER_LIMIT, tag, orderBy.value
+                )
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(result)
             }
@@ -104,7 +94,7 @@ class SearchPostDataSource(
 
     private fun hasNextPage(total: Long, offset: Long, currentSize: Int): Boolean {
         return when {
-            currentSize < PostFollowDataSource.PER_LIMIT -> false
+            currentSize < PER_LIMIT -> false
             offset >= total -> false
             else -> true
         }

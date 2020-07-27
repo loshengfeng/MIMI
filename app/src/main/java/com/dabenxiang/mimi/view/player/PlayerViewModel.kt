@@ -118,6 +118,9 @@ class PlayerViewModel : BaseViewModel() {
     private val _apiReportResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
     val apiReportResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _apiReportResult
 
+    private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
+    val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
+
     fun updatedSelectedNewestComment(isNewest: Boolean) {
         _isSelectedNewestComment.value = isNewest
     }
@@ -445,6 +448,7 @@ class PlayerViewModel : BaseViewModel() {
     }
 
     private fun setupLoadMoreResult(adapter: CommentAdapter, isEnd: Boolean) {
+        Timber.i("setupLoadMoreResult adapter isEnd=$isEnd")
         if (isEnd) {
             adapter.loadMoreModule.loadMoreEnd()
         } else {
@@ -453,6 +457,7 @@ class PlayerViewModel : BaseViewModel() {
     }
 
     fun loadReplyComment(parentNode: RootCommentNode, commentId: Long) {
+        Timber.i("loadReplyComment loadReplyComment")
         viewModelScope.launch {
             flow {
                 var isFirst = true
@@ -476,9 +481,13 @@ class PlayerViewModel : BaseViewModel() {
 
                     parentNode.nestedCommentList.clear()
                     resp.body()?.content?.map {
+                        Timber.i("loadReplyComment content node=$it")
                         NestedCommentNode(parentNode, it)
                     }?.also {
                         parentNode.nestedCommentList.addAll(it)
+                        it.forEach {
+                            Timber.i("loadReplyComment node=$it")
+                        }
 
                         val pagingItem = resp.body()?.paging
                         total = pagingItem?.count ?: 0L
@@ -500,6 +509,7 @@ class PlayerViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect {
+                    Timber.i("loadReplyComment result=$it")
                     _apiLoadReplyCommentResult.value = SingleLiveEvent(it)
                 }
         }
@@ -673,6 +683,23 @@ class PlayerViewModel : BaseViewModel() {
                         }
                     }
                 }
+        }
+    }
+
+    fun sendPostReport(item: MemberPostItem, content: String) {
+        viewModelScope.launch {
+            flow {
+                val request = ReportRequest(content)
+                val result = domainManager.getApiRepository().sendPostReport(item.id, request)
+                if (!result.isSuccessful) throw HttpException(result)
+                item.reported = true
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _postReportResult.value = it }
         }
     }
 }

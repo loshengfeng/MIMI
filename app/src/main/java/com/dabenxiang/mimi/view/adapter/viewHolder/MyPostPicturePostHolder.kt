@@ -111,9 +111,7 @@ class MyPostPicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
 
             pictureRecycler.adapter = PictureAdapter(
                 pictureRecycler.context,
-                attachmentListener,
                 contentItem.images ?: arrayListOf(),
-                position,
                 object : OnItemClickListener {
                     override fun onItemClick() {
                         item.also { myPostListener.onItemClick(item, AdultTabType.PICTURE) }

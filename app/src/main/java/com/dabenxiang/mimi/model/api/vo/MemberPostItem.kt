@@ -21,7 +21,7 @@ data class MemberPostItem(
     val type: PostType = PostType.TEXT,
 
     @SerializedName("creationDate")
-    val creationDate: Date,
+    val creationDate: Date = Date(),
 
     @SerializedName("isFavorite")
     var isFavorite: Boolean = false,

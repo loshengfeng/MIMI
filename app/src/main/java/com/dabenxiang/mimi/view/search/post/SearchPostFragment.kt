@@ -1,19 +1,22 @@
 package com.dabenxiang.mimi.view.search.post
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.TextUtils
 import android.text.style.ForegroundColorSpan
+import android.view.LayoutInflater
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
-import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -34,6 +37,7 @@ import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
+import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_post.*
 import timber.log.Timber
 
@@ -54,25 +58,60 @@ class SearchPostFragment : BaseFragment() {
     private var reportDialog: ReportDialogFragment? = null
 
     private var currentPostType: PostType = PostType.TEXT
-    private var keyword: String = ""
+    private var mTag: String = ""
+    private var searchText: String = ""
+    private var searchKeyword: String = ""
+
     private var isPostFollow: Boolean = false
+
+    private var adapter: MemberPostPagedAdapter? = null
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
+    private val memberPostFuncItem by lazy {
+        MemberPostFuncItem(
+            {},
+            { id, function -> getBitmap(id, function) },
+            { _, _, _ -> }
+        )
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        (arguments?.getSerializable(KEY_DATA) as SearchPostItem).also {
+            currentPostType = it.type
+            isPostFollow = it.isPostFollow
+            mTag = it.tag
+            searchText = it.searchText
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        (arguments?.getSerializable(KEY_DATA) as SearchPostItem).also {
-            currentPostType = it.type
-            keyword = it.keyword
-            isPostFollow = it.isPostFollow
+        if (TextUtils.isEmpty(mTag) && TextUtils.isEmpty(searchText)) {
+            layout_search_history.visibility = View.VISIBLE
+            layout_search_text.visibility = View.GONE
+            getSearchHistory()
+        } else {
+            layout_search_history.visibility = View.GONE
+            layout_search_text.visibility = View.VISIBLE
         }
 
-        recyclerview_content.layoutManager = LinearLayoutManager(requireContext())
-        recyclerview_content.adapter = memberPostPagedAdapter
+        adapter = MemberPostPagedAdapter(
+            requireContext(), adultListener, mTag, memberPostFuncItem
+        )
+        recycler_search_result.layoutManager = LinearLayoutManager(requireContext())
+        recycler_search_result.adapter = adapter
 
-        viewModel.getSearchPosts(currentPostType, keyword, isPostFollow)
+        if (!TextUtils.isEmpty(mTag)) {
+            viewModel.getSearchPostsByTag(currentPostType, mTag, isPostFollow)
+        }
+
+        if (!TextUtils.isEmpty(searchText)) {
+            viewModel.getSearchPostsByKeyword(currentPostType, searchText, isPostFollow)
+        }
     }
 
     override fun getLayoutId(): Int {
@@ -89,16 +128,35 @@ class SearchPostFragment : BaseFragment() {
             }
         })
 
+        viewModel.attachmentByTypeResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    val attachmentItem = it.result
+                    LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
+                    when (attachmentItem.type) {
+                        AttachmentType.ADULT_TAB_CLIP,
+                        AttachmentType.ADULT_TAB_PICTURE,
+                        AttachmentType.ADULT_TAB_TEXT -> {
+                            adapter?.notifyItemChanged(attachmentItem.position!!)
+                        }
+                        else -> {
+                        }
+                    }
+                }
+                is Error -> Timber.e(it.throwable)
+            }
+        })
+
         viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
                     val attachmentItem = it.result
                     LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
                     when (val holder =
-                        memberPostPagedAdapter.viewHolderMap[attachmentItem.parentPosition]) {
+                        adapter?.viewHolderMap?.get(attachmentItem.parentPosition)) {
                         is PicturePostHolder -> {
                             if (holder.pictureRecycler.tag == attachmentItem.parentPosition) {
-                                memberPostPagedAdapter.updateInternalItem(holder)
+                                adapter?.updateInternalItem(holder)
                             }
                         }
                     }
@@ -110,11 +168,11 @@ class SearchPostFragment : BaseFragment() {
         viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    when (memberPostPagedAdapter.viewHolderMap[it.result]) {
+                    when (adapter?.viewHolderMap?.get(it.result)) {
                         is ClipPostHolder,
                         is PicturePostHolder,
                         is TextPostHolder -> {
-                            memberPostPagedAdapter.notifyItemChanged(
+                            adapter?.notifyItemChanged(
                                 it.result,
                                 MemberPostPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI
                             )
@@ -128,11 +186,11 @@ class SearchPostFragment : BaseFragment() {
         viewModel.likePostResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    when (memberPostPagedAdapter.viewHolderMap[it.result]) {
+                    when (adapter?.viewHolderMap?.get(it.result)) {
                         is ClipPostHolder,
                         is PicturePostHolder,
                         is TextPostHolder -> {
-                            memberPostPagedAdapter.notifyItemChanged(
+                            adapter?.notifyItemChanged(
                                 it.result,
                                 MemberPostPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI
                             )
@@ -143,12 +201,16 @@ class SearchPostFragment : BaseFragment() {
             }
         })
 
-        viewModel.searchPostItemListResult.observe(viewLifecycleOwner, Observer {
-            memberPostPagedAdapter.submitList(it)
+        viewModel.searchPostItemByTagListResult.observe(viewLifecycleOwner, Observer {
+            adapter?.submitList(it)
+        })
+
+        viewModel.searchPostItemByKeywordListResult.observe(viewLifecycleOwner, Observer {
+            adapter?.submitList(it)
         })
 
         viewModel.searchTotalCount.observe(viewLifecycleOwner, Observer { count ->
-            txt_result.text = getSearchText(currentPostType, keyword, count, isPostFollow)
+            tv_search_text.text = getSearchText(currentPostType, searchKeyword, count, isPostFollow)
         })
     }
 
@@ -161,13 +223,44 @@ class SearchPostFragment : BaseFragment() {
             edit_search.setText("")
         }
 
-        tv_search.setOnClickListener {
-            viewModel.getSearchPosts(currentPostType, edit_search.text.toString(), isPostFollow)
+        iv_clear_search_text.setOnClickListener {
+            chip_group_search_text.removeAllViews()
+            viewModel.clearSearchHistory()
         }
-    }
 
-    private val memberPostPagedAdapter by lazy {
-        MemberPostPagedAdapter(requireActivity(), adultListener, attachmentListener)
+        tv_search.setOnClickListener {
+            GeneralUtils.hideKeyboard(requireActivity())
+            if (viewModel.isSearchTextEmpty(edit_search.text.toString())) {
+                GeneralUtils.showToast(
+                    requireContext(),
+                    getString(R.string.search_input_empty_toast)
+                )
+                return@setOnClickListener
+            }
+            layout_search_history.visibility = View.GONE
+            layout_search_text.visibility = View.VISIBLE
+            updateTag("")
+
+            viewModel.updateSearchHistory(edit_search.text.toString())
+
+            viewModel.getSearchPostsByKeyword(
+                currentPostType,
+                edit_search.text.toString(),
+                isPostFollow
+            )
+        }
+
+        edit_search.addTextChangedListener {
+            if (it.toString() == "" && !TextUtils.isEmpty(mTag)) {
+                layout_search_history.visibility = View.GONE
+                layout_search_text.visibility = View.VISIBLE
+            } else if (it.toString() == "") {
+                layout_search_history.visibility = View.VISIBLE
+                layout_search_text.visibility = View.GONE
+                getSearchHistory()
+                adapter?.submitList(null)
+            }
+        }
     }
 
     private fun getSearchText(
@@ -252,16 +345,6 @@ class SearchPostFragment : BaseFragment() {
 
         override fun onCancel() {
             moreDialog?.dismiss()
-        }
-    }
-
-    private val attachmentListener = object : AttachmentListener {
-        override fun onGetAttachment(id: String, position: Int, type: AttachmentType) {
-
-        }
-
-        override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
-            viewModel.getAttachment(id, parentPosition, position)
         }
     }
 
@@ -355,9 +438,53 @@ class SearchPostFragment : BaseFragment() {
         }
 
         override fun onChipClick(type: PostType, tag: String) {
-            currentPostType = type
-            keyword = tag
-            viewModel.getSearchPosts(type, tag, isPostFollow)
+            updateTag(tag)
+            viewModel.getSearchPostsByTag(type, tag, isPostFollow)
+        }
+    }
+
+    private fun updateTag(tag: String) {
+        if (TextUtils.isEmpty(tag)) {
+            searchText = edit_search.text.toString()
+            mTag = tag
+            searchKeyword = edit_search.text.toString()
+            adapter?.setupTag(tag)
+        } else {
+            searchText = ""
+            mTag = tag
+            searchKeyword = tag
+            adapter?.setupTag(tag)
+            edit_search.setText("")
+        }
+    }
+
+    private fun getBitmap(id: String, update: ((String) -> Unit)) {
+        viewModel.getBitmap(id, update)
+    }
+
+    private fun getSearchHistory() {
+        chip_group_search_text.removeAllViews()
+        val searchHistories = viewModel.getSearchHistory().asReversed()
+        searchHistories.forEach { text ->
+            val chip = LayoutInflater.from(chip_group_search_text.context)
+                .inflate(R.layout.chip_item, chip_group_search_text, false) as Chip
+            chip.text = text
+            chip.setTextColor(requireContext().getColor(R.color.color_white_1_50))
+            chip.chipBackgroundColor = ColorStateList.valueOf(
+                ContextCompat.getColor(requireContext(), R.color.color_black_6)
+            )
+            chip.setOnClickListener {
+                edit_search.setText(text)
+                layout_search_history.visibility = View.GONE
+                layout_search_text.visibility = View.VISIBLE
+                updateTag("")
+                viewModel.getSearchPostsByKeyword(
+                    currentPostType,
+                    edit_search.text.toString(),
+                    isPostFollow
+                )
+            }
+            chip_group_search_text.addView(chip)
         }
     }
 }
