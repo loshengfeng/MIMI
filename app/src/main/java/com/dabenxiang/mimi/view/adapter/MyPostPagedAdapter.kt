@@ -6,20 +6,17 @@ import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AdultListener
-import com.dabenxiang.mimi.callback.MemberPostFuncItem
+import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.view.adapter.viewHolder.ClipPostHolder
-import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
-import com.dabenxiang.mimi.view.adapter.viewHolder.TextPostHolder
+import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 
-class MemberPostPagedAdapter(
+class MyPostPagedAdapter(
     val context: Context,
-    private val adultListener: AdultListener,
-    private var mTag: String = "",
-    private val memberPostFuncItem: MemberPostFuncItem = MemberPostFuncItem()
+    private val myPostListener: MyPostFragment.MyPostListener,
+    private val attachmentListener: AttachmentListener
 ) : PagedListAdapter<MemberPostItem, BaseViewHolder>(diffCallback) {
 
     companion object {
@@ -59,21 +56,21 @@ class MemberPostPagedAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (viewType) {
             VIEW_TYPE_CLIP -> {
-                ClipPostHolder(
+                MyPostClipPostHolder(
                     LayoutInflater.from(parent.context)
-                        .inflate(R.layout.item_clip_post, parent, false)
+                        .inflate(R.layout.item_my_post_clip_post, parent, false)
                 )
             }
             VIEW_TYPE_PICTURE -> {
-                PicturePostHolder(
+                MyPostPicturePostHolder(
                     LayoutInflater.from(parent.context)
-                        .inflate(R.layout.item_picture_post, parent, false)
+                        .inflate(R.layout.item_my_post_picture_post, parent, false)
                 )
             }
             else -> {
-                TextPostHolder(
+                MyPostTextPostHolder(
                     LayoutInflater.from(parent.context)
-                        .inflate(R.layout.item_text_post, parent, false)
+                        .inflate(R.layout.item_my_post_text_post, parent, false)
                 )
             }
         }
@@ -86,45 +83,37 @@ class MemberPostPagedAdapter(
     ) {
         viewHolderMap[position] = holder
         val item = getItem(position)
+
         when (holder) {
-            is ClipPostHolder -> {
+            is MyPostClipPostHolder -> {
                 item?.also {
                     holder.onBind(
                         it,
                         currentList,
                         position,
-                        adultListener,
-                        mTag,
-                        memberPostFuncItem
+                        myPostListener,
+                        attachmentListener
                     )
                 }
             }
-            is PicturePostHolder -> {
+            is MyPostPicturePostHolder -> {
                 payloads.takeIf { it.isNotEmpty() }?.also {
                     when (it[0] as Int) {
                         PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI -> {
                             item?.also { item ->
-                                holder.updateLikeAndFollowItem(item, memberPostFuncItem)
+                                holder.updateLikeAndFollowItem(item, position, myPostListener)
                             }
                         }
                     }
                 } ?: run {
                     item?.also {
                         holder.pictureRecycler.tag = position
-                        holder.onBind(it, position, adultListener, mTag, memberPostFuncItem)
+                        holder.onBind(it, position, myPostListener, attachmentListener)
                     }
                 }
             }
-            is TextPostHolder -> {
-                item?.also {
-                    holder.onBind(
-                        it,
-                        position,
-                        adultListener,
-                        mTag,
-                        memberPostFuncItem
-                    )
-                }
+            is MyPostTextPostHolder -> {
+                item?.also { holder.onBind(it, position, myPostListener, attachmentListener) }
             }
         }
     }
@@ -140,7 +129,10 @@ class MemberPostPagedAdapter(
         }
     }
 
-    fun setupTag(tag: String) {
-        mTag = tag
+    fun updateFavoriteItem(memberPostItem: MemberPostItem, position: Int) {
+        val item = getItem(position)
+        item?.isFavorite = memberPostItem.isFavorite
+        item?.favoriteCount = memberPostItem.favoriteCount
+        notifyItemChanged(position)
     }
 }

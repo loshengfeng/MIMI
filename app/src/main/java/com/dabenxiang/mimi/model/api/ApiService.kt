@@ -373,6 +373,19 @@ interface ApiService {
      *                  Members/Post
      *
      ***********************************************************/
+    @GET("/v1/Members/Me/Post")
+    suspend fun getMyPost(
+        @Query("isAdult") isAdult: Boolean = true,
+        @Query("status") status: Int = 1,
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
+    ): Response<ApiBasePagingItem<List<MemberPostItem>>>
+
+    /**********************************************************
+     *
+     *                  Members/Post
+     *
+     ***********************************************************/
     @POST("/v1/Members/Post/{postId}/Favorite")
     suspend fun addFavorite(
         @Path("postId") postId: Long

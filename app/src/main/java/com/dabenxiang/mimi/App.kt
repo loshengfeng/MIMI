@@ -12,6 +12,8 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import timber.log.Timber
+import tw.gov.president.manager.data.ConfigData
+import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
 
 class App : Application() {
 
@@ -52,5 +54,16 @@ class App : Application() {
             androidContext(this@App)
             modules(module)
         }
+
+        val configData = ConfigData(
+            BuildConfig.API_HOST,
+            BuildConfig.FLAVOR,
+            BuildConfig.BUILD_TYPE,
+            BuildConfig.DEBUG,
+            BuildConfig.APPLICATION_ID,
+            BuildConfig.VERSION_CODE.toString(),
+            BuildConfig.VERSION_CODE.toLong()
+        )
+        SendLogManager.init(configData)
     }
 }

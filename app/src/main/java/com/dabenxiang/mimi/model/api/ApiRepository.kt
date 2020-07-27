@@ -480,6 +480,17 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun updateProfile(
         body: ProfileRequest
     ) = apiService.updateProfile(body)
+    /**********************************************************
+     *
+     *                  Members/Post
+     *
+     ***********************************************************/
+    suspend fun getMyPost(
+        isAdult: Boolean = true,
+        status: Int = 1,
+        offset: Int,
+        limit: Int
+    ) = apiService.getMyPost(isAdult, status, offset, limit)
 
     /**********************************************************
      *
