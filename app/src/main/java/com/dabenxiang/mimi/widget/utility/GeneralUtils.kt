@@ -26,6 +26,8 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.HttpException
 import retrofit2.Response
 import timber.log.Timber
+import java.io.PrintWriter
+import java.io.StringWriter
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
@@ -194,5 +196,23 @@ object GeneralUtils {
         val inputMethodManager =
             context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+    }
+
+    fun getExceptionDetail(t: Throwable): String {
+        return when (t) {
+            is HttpException -> {
+                val data = getHttpExceptionData(t)
+                "$data, ${t.localizedMessage}"
+            }
+            else -> getStackTrace(t)
+        }
+    }
+
+    private fun getStackTrace(t: Throwable): String {
+        val sw = StringWriter(256)
+        val pw = PrintWriter(sw, false)
+        t.printStackTrace(pw)
+        pw.flush()
+        return sw.toString()
     }
 }
