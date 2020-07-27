@@ -4,10 +4,8 @@ import android.os.Bundle
 import android.view.View
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
-import kotlinx.android.synthetic.main.fragment_dialog_more.*
+import kotlinx.android.synthetic.main.fragment_dialog_my_post_more.*
 
 class MyPostMoreDialogFragment : BaseDialogFragment() {
 
@@ -51,17 +49,27 @@ class MyPostMoreDialogFragment : BaseDialogFragment() {
 //            }
 //        }
 
-        tv_cancel.setOnClickListener {
-            listener?.onCancel()
+//        tv_cancel.setOnClickListener {
+//            listener?.onCancel()
+//        }
+//
+//        background.setOnClickListener {
+//            listener?.onCancel()
+//        }
+
+        tv_delete.setOnClickListener {
+            listener?.onDelete(item!!)
+            dismiss()
         }
 
-        background.setOnClickListener {
+        tv_cancel.setOnClickListener {
             listener?.onCancel()
         }
     }
 
     interface OnMoreDialogListener {
         fun onProblemReport(item: BaseMemberPostItem)
+        fun onDelete(item: BaseMemberPostItem)
         fun onCancel()
     }
 }

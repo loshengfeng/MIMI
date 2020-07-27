@@ -125,7 +125,6 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         handleBackStackData()
-        showSnackBar()
     }
 
     private fun handleBackStackData() {

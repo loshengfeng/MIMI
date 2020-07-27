@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.blankj.utilcode.util.ImageUtils
@@ -39,6 +40,9 @@ class MyPostViewModel: BaseViewModel() {
     private var _favoriteResult = MutableLiveData<ApiResult<FavoriteItem>>()
     val favoriteResult: LiveData<ApiResult<FavoriteItem>> = _favoriteResult
 
+    private var _deletePostResult = MutableLiveData<ApiResult<Nothing>>()
+    val deletePostResult: LiveData<ApiResult<Nothing>> = _deletePostResult
+
     fun getMyPost() {
         viewModelScope.launch {
             getMyPostPagingItems().asFlow()
@@ -47,13 +51,19 @@ class MyPostViewModel: BaseViewModel() {
     }
 
     private fun getMyPostPagingItems(): LiveData<PagedList<MemberPostItem>> {
-        val myPostDataSource = MyPostDataSource(pagingCallback, viewModelScope, domainManager)
-        val myPostFactory = MyPostFactory(myPostDataSource)
+        val dataSourceFactory = object : DataSource.Factory<Int, MemberPostItem>() {
+            override fun create(): DataSource<Int, MemberPostItem> {
+                return MyPostDataSource(pagingCallback, viewModelScope, domainManager)
+            }
+        }
+
         val config = PagedList.Config.Builder()
             .setPrefetchDistance(4)
             .build()
-        return LivePagedListBuilder(myPostFactory, config).build()
+        return LivePagedListBuilder(dataSourceFactory, config).build()
     }
+
+    fun invalidateDataSource() = _myPostItemListResult.value?.dataSource?.invalidate()
 
     private val pagingCallback = object : PagingCallback {
         override fun onLoading() {
@@ -168,6 +178,20 @@ class MyPostViewModel: BaseViewModel() {
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _favoriteResult.value = it }
+        }
+    }
+
+    fun deletePost(item: MemberPostItem) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.deleteMyPost(item.id)
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _deletePostResult.value = it }
         }
     }
 }
