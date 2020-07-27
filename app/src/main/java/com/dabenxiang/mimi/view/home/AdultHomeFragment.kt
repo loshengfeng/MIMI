@@ -535,6 +535,14 @@ class AdultHomeFragment : BaseFragment() {
             imgPost.visibility = View.VISIBLE
             txtPost.visibility = View.VISIBLE
 
+            imgPost.setOnClickListener {
+                findNavController().navigate(R.id.action_adultHomeFragment_to_myPostFragment)
+            }
+
+            txtPost.setOnClickListener {
+                findNavController().navigate(R.id.action_adultHomeFragment_to_myPostFragment)
+            }
+
             uploadCurrentPicPosition = 0
             uploadPicUri.clear()
         })

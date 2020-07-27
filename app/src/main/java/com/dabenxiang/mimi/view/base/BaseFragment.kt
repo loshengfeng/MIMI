@@ -17,7 +17,7 @@ import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.main.MainViewModel
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.showToast
 import com.kaopiz.kprogresshud.KProgressHUD
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
@@ -89,7 +89,7 @@ abstract class BaseFragment : Fragment() {
             navigationTaskJoinOrRun {
                 findNavController().also { navController ->
                     when (item) {
-                        NavigateItem.Up -> navController.navigateUp() //.popBackStack()
+                        NavigateItem.Up -> navController.navigateUp()
                         is NavigateItem.PopBackStack -> navController.popBackStack(
                             item.fragmentId,
                             item.inclusive
@@ -131,13 +131,6 @@ abstract class BaseFragment : Fragment() {
 
     fun backToDesktop() {
         activity?.moveTaskToBack(true)
-        /*
-        startActivity(
-            Intent(Intent.ACTION_MAIN).also {
-                it.addCategory(Intent.CATEGORY_DEFAULT)
-                it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            })
-        */
     }
 
     open fun onApiError(
@@ -155,7 +148,7 @@ abstract class BaseFragment : Fragment() {
                 if (errorHandler.throwable is UnknownHostException) {
                     showCrashDialog(HttpErrorMsgType.CHECK_NETWORK)
                 } else {
-                    GeneralUtils.showToast(requireContext(), errorHandler.throwable.toString())
+                    showToast(requireContext(), errorHandler.throwable.toString())
                 }
             }
         }

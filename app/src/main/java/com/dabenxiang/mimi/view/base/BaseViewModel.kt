@@ -5,24 +5,24 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.dabenxiang.mimi.PROJECT_NAME
 import com.dabenxiang.mimi.manager.AccountManager
 import com.dabenxiang.mimi.manager.DomainManager
 import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.pref.Pref
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.getExceptionDetail
 import com.google.gson.Gson
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import timber.log.Timber
+import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
 
 abstract class BaseViewModel : ViewModel(), KoinComponent {
 
     val app: Application by inject()
-    val accountManager: AccountManager by inject()
     val gson: Gson by inject()
-    val domainManager: DomainManager by inject()
     val pref: Pref by inject()
-
-    val toastData = MutableLiveData<String>()
+    val accountManager: AccountManager by inject()
+    val domainManager: DomainManager by inject()
 
     private val _showProgress by lazy { MutableLiveData<Boolean>() }
     val showProgress: LiveData<Boolean> get() = _showProgress
@@ -32,11 +32,14 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     }
 
     fun processException(exceptionResult: ExceptionResult) {
-        // todo: send log but API haven't ready...
-//        when (exceptionResult) {
-//            is ExceptionResult.Crash -> deviceManager.sendCrashReport(AppUtils.getExceptionDetail(exceptionResult.throwable))
-//            is ExceptionResult.HttpError -> deviceManager.sendCrashReport(AppUtils.getExceptionDetail(exceptionResult.httpExceptionItem.httpExceptionClone))
-//        }
+        when (exceptionResult) {
+            is ExceptionResult.Crash -> {
+                sendCrashReport(getExceptionDetail(exceptionResult.throwable))
+            }
+            is ExceptionResult.HttpError -> {
+                sendCrashReport(getExceptionDetail(exceptionResult.httpExceptionItem.httpExceptionClone))
+            }
+        }
     }
 
     fun logoutLocal() {
@@ -61,5 +64,9 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
                 .append(episodeID)
         }
         return result.toString()
+    }
+
+    private fun sendCrashReport(data: String) {
+        SendLogManager.e(PROJECT_NAME, data)
     }
 }

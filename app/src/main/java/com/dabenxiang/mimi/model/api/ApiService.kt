@@ -371,6 +371,24 @@ interface ApiService {
 
     /**********************************************************
      *
+     *                  Members/Me/Post
+     *
+     ***********************************************************/
+    @GET("/v1/Members/Me/Post")
+    suspend fun getMyPost(
+        @Query("isAdult") isAdult: Boolean = true,
+        @Query("status") status: Int = 1,
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
+    ): Response<ApiBasePagingItem<List<MemberPostItem>>>
+
+    @DELETE("/v1/Members/Me/Post/{postId}")
+    suspend fun deleteMyPost(
+        @Path("postId") postId: Long
+    ): Response<Void>
+
+    /**********************************************************
+     *
      *                  Members/Post
      *
      ***********************************************************/
