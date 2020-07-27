@@ -139,6 +139,23 @@ project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     }
 }
 
+def gitBranch() {
+    def branch = ""
+    def proc = "git rev-parse --abbrev-ref HEAD".execute()
+    proc.in.eachLine { line -> branch = line }
+    proc.err.eachLine { line -> println line }
+    proc.waitFor()
+    branch
+}
+
+def isWithSubmoduleBranch() {
+    if (gitBranch().contains("dev_sub")) {
+        return true
+    } else {
+        return false
+    }
+}
+
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
@@ -252,17 +269,46 @@ dependencies {
     implementation "androidx.viewpager2:viewpager2:$viewpager2_version"
     implementation 'com.to.aboomy:pager2banner:0.0.5'
 
+    // RoundedView
     implementation "com.github.yulichswift:RoundedViews:$rounded_views_version"
 
     // ExoPlayer
     implementation "com.google.android.exoplayer:exoplayer:$exoplayer_version"
     implementation "com.google.android.exoplayer:extension-rtmp:$exoplayer_version"
 
-    // WWW.RECYCLERVIEW.ORG
+    // BaseRecyclerViewAdapterHelper
     implementation "com.github.CymChad:BaseRecyclerViewAdapterHelper:$base_recycler_view_adapter_helper_version"
 
     // Domain GoLib
     implementation project(path: ':domain_libs')
+
+    // Video Editor
+    implementation project(path: ':video-editor')
+
+    // Application Provider
+    implementation "com.github.florent37:applicationprovider:$application_provider_version"
+
+    // Log
+    if (isWithSubmoduleBranch()) {
+        println "sub_project dep !!  "
+        implementation project(path: ':BaseManager')
+        implementation project(path: ':DeviceInfoProvider')
+        implementation project(path: ':logmanager')
+        implementation project(path: ':utils_device')
+        implementation project(path: ':utils_api_result')
+        implementation project(path: ':utils_general')
+        implementation project(path: ':utils_loglevel')
+        implementation project(path: ':utils_gson_factory')
+    } else {
+        implementation "org.cks.utils:BaseManager:$log_version"
+        implementation "org.cks.utils:DeviceInfoProvider:$log_version"
+        implementation "org.cks.utils:logmanager:$log_version"
+        implementation "org.cks.utils:utils_device:$log_version"
+        implementation "org.cks.utils:utils_api_result:$log_version"
+        implementation "org.cks.utils:utils_general:$log_version"
+        implementation "org.cks.utils:utils_loglevel:$log_version"
+        implementation "org.cks.utils:utils_gson_factory:$log_version"
+    }
 
     // Test
     testImplementation "io.mockk:mockk:$mokk_version"
@@ -280,8 +326,6 @@ dependencies {
     androidTestImplementation "androidx.test:runner:$android_test_version"
     androidTestImplementation "androidx.test:rules:$android_test_version"
     androidTestImplementation "androidx.test.ext:junit:$android_test_ext_version"
-
-    implementation project(path: ':video-editor')
 }
 
 class Version {
@@ -322,32 +366,4 @@ task increaseVersion {
         increaseVersion()
     }
 }
-
-def decreaseVersion() {
-    Properties versionProps = new Properties()
-
-    def file = file('version.properties')
-    versionProps.load(new FileInputStream(file))
-
-    def preCode = versionProps['VERSION_CODE'].toInteger() - 1
-    versionProps['VERSION_CODE'] = preCode.toString()
-
-    def preBuild = versionProps['VERSION_NAME_BUILD'].toInteger() - 1
-
-    versionProps['VERSION_NAME_BUILD'] = preBuild.toString()
-    versionProps.store(file.newWriter(), null)
-
-    def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD']
-
-    println "Decrease $buildVersionName"
-}
-
-task decreaseVersion {
-    doLast {
-        decreaseVersion()
-    }
-}
-
-
-
 
