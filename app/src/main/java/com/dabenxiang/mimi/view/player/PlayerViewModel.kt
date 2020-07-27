@@ -92,7 +92,7 @@ class PlayerViewModel : BaseViewModel() {
     private val _consumeResult = MutableLiveData<VideoConsumeResult>()
     val consumeResult: LiveData<VideoConsumeResult> = _consumeResult
 
-    private val _sourceListPosition = MutableLiveData<Int>()
+    private val _sourceListPosition = MutableLiveData<Int>().also { it.value =-1 }
     val sourceListPosition: LiveData<Int> = _sourceListPosition
 
     private val _episodePosition = MutableLiveData<Int>()
@@ -357,14 +357,17 @@ class PlayerViewModel : BaseViewModel() {
     }
 
     fun setSourceListPosition(position: Int) {
+        Timber.i("setSourceListPosition position=$position   _sourceListPosition=${_sourceListPosition.value}")
         if (position != _sourceListPosition.value) {
-            _sourceListPosition.value = position
+            _sourceListPosition.postValue(position)
         }
     }
 
     fun setStreamPosition(position: Int) {
+
+        Timber.i("setStreamPosition position=${position}  _episodePosition.value =${_episodePosition.value}")
         if (position != _episodePosition.value) {
-            _episodePosition.value = position
+            _episodePosition.postValue(position)
         }
     }
 

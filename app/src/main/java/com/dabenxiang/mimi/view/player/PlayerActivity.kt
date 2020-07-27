@@ -5,15 +5,16 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.ColorStateList
-import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.text.Html
 import android.text.TextUtils
-import android.view.*
+import android.view.MotionEvent
+import android.view.Surface
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -48,10 +49,7 @@ import com.google.android.exoplayer2.util.Util
 import com.google.android.material.chip.Chip
 import com.kaopiz.kprogresshud.KProgressHUD
 import kotlinx.android.synthetic.main.activity_player.*
-import kotlinx.android.synthetic.main.activity_player.btn_send
-import kotlinx.android.synthetic.main.activity_player.tv_replay_name
 import kotlinx.android.synthetic.main.custom_playback_control.*
-import kotlinx.android.synthetic.main.fragment_dialog_send_comment.*
 import kotlinx.android.synthetic.main.head_comment.view.*
 import kotlinx.android.synthetic.main.head_guess_like.view.*
 import kotlinx.android.synthetic.main.head_no_comment.view.*
@@ -59,6 +57,7 @@ import kotlinx.android.synthetic.main.head_source.view.*
 import kotlinx.android.synthetic.main.head_video_info.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.net.UnknownHostException
@@ -103,6 +102,7 @@ class PlayerActivity : BaseActivity() {
     private val sourceListAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
+                Timber.i("TopTabAdapter onClickItemIndex")
                 viewModel.setSourceListPosition(index)
             }
         }, obtainIsAdult())
@@ -111,6 +111,7 @@ class PlayerActivity : BaseActivity() {
     private val episodeAdapter by lazy {
         SelectEpisodeAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
+                Timber.i("SelectEpisodeAdapter onClickItemIndex")
                 viewModel.setStreamPosition(index)
             }
         }, obtainIsAdult())
@@ -365,8 +366,10 @@ class PlayerActivity : BaseActivity() {
         })
 
         viewModel.sourceListPosition.observe(this, Observer {
+            if(it == -1) return@Observer
             sourceListAdapter.setLastSelectedIndex(it)
             viewModel.sourceList?.get(it)?.videoEpisodes?.also { videoEpisodes ->
+                Timber.i("videoEpisodes =$videoEpisodes")
                 setupStream(videoEpisodes)
             }
 
@@ -374,6 +377,7 @@ class PlayerActivity : BaseActivity() {
         })
 
         viewModel.episodePosition.observe(this, Observer {
+            Timber.i("episodePosition =$it")
             if (it >= 0) {
                 episodeAdapter.setLastSelectedIndex(it)
                 viewModel.checkConsumeResult()
@@ -686,16 +690,6 @@ class PlayerActivity : BaseActivity() {
                 })
             }
 
-//        et_message.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
-//            if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
-//                viewModel.postComment(PostCommentRequest(currentReplyId, et_message.text.toString()))
-//                currentReplyId = null
-//                et_message.text.clear()
-//                return@OnKeyListener true
-//            }
-//            false
-//        })
-
         btn_write_comment.setOnClickListener {
             currentReplyId = null
             currentreplyName = null
@@ -793,6 +787,7 @@ class PlayerActivity : BaseActivity() {
         this.addKeyboardToggleListener {shown->
             if(!shown) commentEditorToggle(false)
         }
+
     }
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
@@ -1262,11 +1257,14 @@ class PlayerActivity : BaseActivity() {
                         result.add(it)
                     }
                 }
-
+                Timber.i("setupSourceList =${result[0]}")
                 sourceListAdapter.submitList(result, 0)
                 viewModel.setSourceListPosition(0)
-
                 scrollToBottom()
+                CoroutineScope(Dispatchers.IO).launch {
+                    delay(2000)
+                    viewModel.setStreamPosition(0)
+                }
             }
         }
     }
@@ -1274,11 +1272,13 @@ class PlayerActivity : BaseActivity() {
     private fun setupStream(list: List<VideoEpisode>) {
         val result = mutableListOf<String>()
         // 成人取得Streaming邏輯不同
+        Timber.i("setupStream =${list.size}")
         if (obtainIsAdult()) {
             if (list.size == 1) {
                 val videoStreams = list[0].videoStreams
                 if (videoStreams != null && videoStreams.isNotEmpty()) {
                     for (item in videoStreams) {
+                        Timber.i("videoStreams =${item.id}")
                         if (item.id != null) {
                             result.add(item.streamName ?: "")
                         }
