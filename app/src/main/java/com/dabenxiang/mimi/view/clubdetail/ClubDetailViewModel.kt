@@ -78,6 +78,28 @@ class ClubDetailViewModel: BaseViewModel() {
         }
     }
 
+    fun followMember(item: MemberPostItem, isFollow: Boolean, update: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = when {
+                    isFollow -> apiRepository.followPost(item.creatorId)
+                    else -> apiRepository.cancelFollowPost(item.creatorId)
+                }
+                if (!result.isSuccessful) throw HttpException(result)
+                item.isFollow = isFollow
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    when(it) {
+                        is ApiResult.Empty -> update(isFollow)
+                    }
+                }
+        }
+    }
+
     private fun getMemberPostPagingItems(tag: String, orderBy: OrderBy): LiveData<PagedList<MemberPostItem>> {
         val clubDetailPostDataSource =
             ClubDetailPostDataSource(pagingCallback, viewModelScope, domainManager, tag, orderBy)
@@ -156,6 +178,39 @@ class ClubDetailViewModel: BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _likePostResult.value = it }
+        }
+    }
+
+    fun likePost(item: MemberPostItem, isLike: Boolean, update: (Boolean, Int) -> Unit) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val likeType = when {
+                    isLike -> LikeType.LIKE
+                    else -> LikeType.DISLIKE
+                }
+                val request = LikeRequest(likeType)
+                val result = apiRepository.like(item.id, request)
+                if (!result.isSuccessful) throw HttpException(result)
+
+                item.likeType = likeType
+                item.likeCount = when (item.likeType) {
+                    LikeType.LIKE -> item.likeCount + 1
+                    else -> item.likeCount - 1
+                }
+                emit(ApiResult.success(item.likeCount))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    when(it) {
+                        is ApiResult.Success -> {
+                            update(isLike, it.result)
+                        }
+                    }
+                }
         }
     }
 

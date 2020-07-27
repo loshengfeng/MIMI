@@ -105,7 +105,7 @@ class MemberPostPagedAdapter(
                     when (it[0] as Int) {
                         PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI -> {
                             item?.also { item ->
-                                holder.updateLikeAndFollowItem(item, position, adultListener)
+                                holder.updateLikeAndFollowItem(item, memberPostFuncItem)
                             }
                         }
                     }

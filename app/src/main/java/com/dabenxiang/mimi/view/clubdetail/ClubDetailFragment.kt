@@ -82,8 +82,12 @@ class ClubDetailFragment : BaseFragment() {
         viewPager.isUserInputEnabled = false
 
         viewPager.adapter =
-            ClubPagerAdapter(ClubDetailFuncItem({ orderBy, function -> getPost(orderBy, function) },
-                { id, function -> getBitmap(id, function) }), adultListener
+            ClubPagerAdapter(
+                ClubDetailFuncItem({ orderBy, function -> getPost(orderBy, function) },
+                    { id, function -> getBitmap(id, function) },
+                    { item, isFollow, func -> followMember(item, isFollow, func) },
+                    { item, isLike, func -> likePost(item, isLike, func)}),
+                adultListener
             )
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
@@ -263,5 +267,13 @@ class ClubDetailFragment : BaseFragment() {
 
     private fun getBitmap(id: String, update: ((String) -> Unit)) {
         viewModel.getBitmap(id, update)
+    }
+
+    private fun followMember(memberPostItem: MemberPostItem, isFollow: Boolean, update: (Boolean) -> Unit) {
+        viewModel.followMember(memberPostItem, isFollow, update)
+    }
+
+    private fun likePost(memberPostItem: MemberPostItem, isLike: Boolean, update: (Boolean, Int) -> Unit) {
+        viewModel.likePost(memberPostItem, isLike, update)
     }
 }
