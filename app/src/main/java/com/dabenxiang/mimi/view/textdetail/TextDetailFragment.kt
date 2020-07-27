@@ -31,7 +31,6 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_text_detail.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
-import timber.log.Timber
 
 class TextDetailFragment : BaseFragment() {
 
@@ -98,6 +97,8 @@ class TextDetailFragment : BaseFragment() {
 
         tv_like_count.text = memberPostItem!!.likeCount.toString()
         tv_comment_count.text = memberPostItem!!.commentCount.toString()
+
+        viewModel.getPostDetail(memberPostItem!!)
     }
 
     override fun getLayoutId(): Int {
@@ -208,6 +209,16 @@ class TextDetailFragment : BaseFragment() {
                     is Empty -> commentLikeBlock?.also { it() }
                     is Error -> onApiError(it.throwable)
                 }
+            }
+        })
+
+        viewModel.postDetailResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    val item = it.result.content
+                    textDetailAdapter?.updateContent(item!!)
+                }
+                is Error -> onApiError(it.throwable)
             }
         })
     }

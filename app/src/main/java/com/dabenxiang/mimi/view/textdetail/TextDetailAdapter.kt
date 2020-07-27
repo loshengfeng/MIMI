@@ -125,7 +125,10 @@ class TextDetailAdapter(
                         ContextCompat.getColor(context, R.color.adult_color_status_bar)
                     )
                     chip.setOnClickListener { view ->
-                        onTextDetailListener.onChipClick(PostType.TEXT, (view as Chip).text.toString())
+                        onTextDetailListener.onChipClick(
+                            PostType.TEXT,
+                            (view as Chip).text.toString()
+                        )
                     }
                     holder.tagChipGroup.addView(chip)
                 }
@@ -172,6 +175,11 @@ class TextDetailAdapter(
                 updateCommandItem(CommentType.NEWEST)
             }
         }
+    }
+
+    fun updateContent(item: MemberPostItem) {
+        memberPostItem.content = item.content
+        notifyItemChanged(VIEW_TYPE_TEXT_DETAIL)
     }
 
     private fun updateCommandItem(type: CommentType) {
