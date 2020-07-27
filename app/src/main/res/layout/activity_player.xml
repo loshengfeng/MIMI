@@ -107,35 +107,16 @@
             android:layout_height="50dp"
             app:layout_constraintBottom_toBottomOf="parent">
 
-<!--            <com.yulichswift.roundedview.widget.RoundedTextView-->
-<!--                android:id="@+id/btn_write_comment"-->
-<!--                android:layout_width="91dp"-->
-<!--                android:layout_height="36dp"-->
-<!--                android:layout_marginStart="10dp"-->
-<!--                android:clickable="true"-->
-<!--                android:text="@string/write_comment"-->
-<!--                android:textColor="@color/color_black_1_30"-->
-<!--                app:btn_corner_radius="standard"-->
-<!--                app:btn_pressed_color="darker"-->
-<!--                app:btn_solid_color="@color/color_white_1_65625"-->
-<!--                app:btn_stroke_color="@color/color_gray_11"-->
-<!--                app:btn_stroke_width="1dp"-->
-<!--                app:layout_constraintBottom_toBottomOf="parent"-->
-<!--                app:layout_constraintStart_toStartOf="parent"-->
-<!--                app:layout_constraintTop_toTopOf="parent" />-->
-
-            <EditText
+            <TextView
                 android:id="@+id/btn_write_comment"
                 android:layout_width="91dp"
                 android:layout_height="36dp"
                 android:layout_marginStart="10dp"
                 android:clickable="true"
-                android:hint="@string/write_comment"
+                android:text="@string/write_comment"
                 android:textColor="@color/color_black_1_30"
                 android:textSize="12sp"
                 android:gravity="center"
-                android:inputType="text"
-                android:imeOptions="actionSend"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -200,6 +181,85 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:src="@drawable/btn_more_gray_n" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/bottom_func_input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/adult_color_status_bar"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintVertical_bias="1.0">
+
+            <ImageView
+                android:id="@+id/iv_bar"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="60dp"
+                android:contentDescription="@null"
+                android:src="@drawable/bg_black_1_30_radius_18"
+                app:layout_constraintBottom_toBottomOf="@id/et_message"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/et_message" />
+
+            <Space
+                android:id="@+id/space_start"
+                android:layout_width="18dp"
+                android:layout_height="1dp"
+                app:layout_constraintStart_toStartOf="@id/iv_bar"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_replay_name"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginEnd="10dp"
+                android:gravity="center"
+                android:textColor="@color/color_white_1"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/et_message"
+                app:layout_constraintStart_toEndOf="@id/space_start"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Jeff" />
+
+            <EditText
+                android:id="@+id/et_message"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="18dp"
+                android:layout_marginVertical="10dp"
+                android:autofillHints="@null"
+                android:background="@color/color_black_1_20"
+                android:hint="@string/edit_hint_chat"
+                android:inputType="text"
+                android:textColor="@color/color_white_1"
+                android:textColorHint="@color/color_white_1_50"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/iv_bar"
+                app:layout_constraintStart_toEndOf="@id/tv_replay_name"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:hint="留下评论" />
+
+            <ImageView
+                android:id="@+id/btn_send"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@null"
+                android:paddingVertical="10dp"
+                android:src="@drawable/btn_send_n"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/iv_bar"
+                app:layout_constraintTop_toTopOf="parent" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

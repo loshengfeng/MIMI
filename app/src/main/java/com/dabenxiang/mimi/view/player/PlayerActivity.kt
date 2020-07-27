@@ -1,11 +1,11 @@
 package com.dabenxiang.mimi.view.player
 
 import android.annotation.SuppressLint
-import android.app.PendingIntent.getActivity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.hardware.SensorManager
 import android.os.Bundle
@@ -13,6 +13,7 @@ import android.text.Html
 import android.text.TextUtils
 import android.view.*
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -20,6 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearSnapHelper
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.extension.addKeyboardToggleListener
 import com.dabenxiang.mimi.extension.handleException
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.extension.setNot
@@ -28,6 +30,7 @@ import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
@@ -51,7 +54,9 @@ import kotlinx.android.synthetic.main.head_guess_like.view.*
 import kotlinx.android.synthetic.main.head_no_comment.view.*
 import kotlinx.android.synthetic.main.head_source.view.*
 import kotlinx.android.synthetic.main.head_video_info.view.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.net.UnknownHostException
 import java.text.SimpleDateFormat
@@ -152,14 +157,7 @@ class PlayerActivity : BaseActivity() {
                 currentReplyId =null
                 if (replyId != null) {
                     currentReplyId = replyId
-                    CoroutineScope(Dispatchers.Main).launch {
-                        btn_write_comment.let {
-                            it.requestFocusFromTouch()
-                            val lManager: InputMethodManager =
-                                getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                            lManager.showSoftInput(it, 0)
-                        }
-                    }
+                    commentEditorOpen()
                 }
             }
 
@@ -176,15 +174,7 @@ class PlayerActivity : BaseActivity() {
                 currentReplyId =null
                 if (replyId != null) {
                     currentReplyId = replyId
-                    CoroutineScope(Dispatchers.Main).launch {
-                        btn_write_comment.let {
-                            it.requestFocusFromTouch()
-                            val lManager: InputMethodManager =
-                                getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                            lManager.showSoftInput(it, 0)
-                        }
-                    }
-
+                    commentEditorOpen()
                 }
             }
 
@@ -327,8 +317,17 @@ class PlayerActivity : BaseActivity() {
             }
         )
 
+        bottom_func_bar.setBackgroundResource(
+            if (isAdult) {
+                R.drawable.bg_adult_top_line
+            } else {
+                R.drawable.bg_gray_2_top_line
+            }
+        )
+
         if (isAdult) {
             btn_write_comment.setTextColor(getColor(R.color.color_white_1_30))
+            et_message.setTextColor(getColor(R.color.color_white_1_30))
 //            btn_write_comment.setBtnSolidColor(getColor(R.color.color_black_1_20))
         }
 
@@ -398,9 +397,13 @@ class PlayerActivity : BaseActivity() {
                         viewModel.commentCount.value = viewModel.commentCount.value?.plus(1)
 
                         viewModel.setupCommentDataSource(playerInfoAdapter)
+                        commentEditorToggle(false)
                         scrollToBottom()
                     }
-                    is Error -> onApiError(it.throwable)
+                    is Error -> {
+                        commentEditorToggle(false)
+                        onApiError(it.throwable)
+                    }
                 }
             }
         })
@@ -665,15 +668,29 @@ class PlayerActivity : BaseActivity() {
                 })
             }
 
-        btn_write_comment.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
-            if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
-                viewModel.postComment(PostCommentRequest(currentReplyId, btn_write_comment.text.toString()))
+//        et_message.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
+//            if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
+//                viewModel.postComment(PostCommentRequest(currentReplyId, et_message.text.toString()))
+//                currentReplyId = null
+//                et_message.text.clear()
+//                return@OnKeyListener true
+//            }
+//            false
+//        })
+
+        btn_write_comment.setOnClickListener {
+            currentReplyId = null
+            commentEditorOpen()
+            commentEditorToggle(true)
+        }
+
+        btn_send.setOnClickListener {
+            if (et_message.text.isNotEmpty()){
+                viewModel.postComment(PostCommentRequest(currentReplyId, et_message.text.toString()))
                 currentReplyId = null
-                btn_write_comment.text.clear()
-                return@OnKeyListener true
+                et_message.text.clear()
             }
-            false
-        })
+        }
 
         tv_favorite.setOnClickListener {
             viewModel.modifyFavorite()
@@ -730,7 +747,7 @@ class PlayerActivity : BaseActivity() {
         }
 
         iv_more.setOnClickListener {
-            moreDialog = MoreDialogFragment.newInstance(MemberPostItem(id=obtainVideoId()), onMoreDialogListener).also {
+            moreDialog = MoreDialogFragment.newInstance(MemberPostItem(id=obtainVideoId(), type = PostType.VIDEO), onMoreDialogListener).also {
                 it.show(
                     supportFragmentManager,
                     MoreDialogFragment::class.java.simpleName
@@ -751,6 +768,11 @@ class PlayerActivity : BaseActivity() {
                 }
             }
         })
+
+        //Detect key keyboard shown/hide
+        this.addKeyboardToggleListener {shown->
+            if(!shown) commentEditorToggle(false)
+        }
     }
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
@@ -784,6 +806,34 @@ class PlayerActivity : BaseActivity() {
         override fun onCancel() {
             moreDialog?.dismiss()
         }
+    }
+
+    private fun commentEditorToggle(enable:Boolean){
+        when(enable){
+            true -> {
+                bottom_func_input.visibility = View.VISIBLE
+                bottom_func_bar.visibility = View.GONE
+            }
+            else ->{
+                bottom_func_input.visibility = View.GONE
+                bottom_func_bar.visibility = View.VISIBLE
+            }
+        }
+
+    }
+
+    private fun isEditorToggle() = bottom_func_input.visibility == View.VISIBLE
+
+    private fun commentEditorOpen(){
+        CoroutineScope(Dispatchers.Main).launch {
+            et_message.let {
+                it.requestFocusFromTouch()
+                val lManager: InputMethodManager =
+                    getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                lManager.showSoftInput(it, 0)
+            }
+        }
+        commentEditorToggle(true)
     }
 
     override fun onStart() {
