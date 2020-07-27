@@ -213,16 +213,6 @@ class HomeFragment : BaseFragment() {
         HomeVideoListAdapter(adapterListener, false)
     }
 
-    private val attachmentListener = object : AttachmentListener {
-        override fun onGetAttachment(id: String, position: Int, type: AttachmentType) {
-
-        }
-
-        override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
-
-        }
-    }
-
     private val adapterListener = object : HomeAdapter.EventListener {
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
             val bundle = CategoriesFragment.createBundle(item.title, item.categories)
