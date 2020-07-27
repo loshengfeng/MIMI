@@ -623,8 +623,8 @@ class AdultHomeFragment : BaseFragment() {
         iv_search.setImageResource(R.drawable.adult_btn_search)
         tv_search.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
 
-        btn_filter.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
-        btn_filter.setBtnSolidColor(
+        btn_ranking.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
+        btn_ranking.setBtnSolidColor(
             requireActivity().getColor(R.color.color_white_1_30),
             requireActivity().getColor(R.color.color_red_1),
             resources.getDimension(R.dimen.dp_6)
