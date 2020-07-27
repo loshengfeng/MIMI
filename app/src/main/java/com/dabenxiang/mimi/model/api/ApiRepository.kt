@@ -8,6 +8,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
+import retrofit2.http.Query
 import java.io.File
 
 class ApiRepository(private val apiService: ApiService) {
@@ -469,6 +470,17 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun updateProfile(
         body: ProfileRequest
     ) = apiService.updateProfile(body)
+    /**********************************************************
+     *
+     *                  Members/Post
+     *
+     ***********************************************************/
+    suspend fun getMyPost(
+        isAdult: Boolean = true,
+        status: Int = 1,
+        offset: Int,
+        limit: Int
+    ) = apiService.getMyPost(isAdult, status, offset, limit)
 
     /**********************************************************
      *

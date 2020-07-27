@@ -46,6 +46,9 @@
         <action
             android:id="@+id/action_adultHomeFragment_to_clubDetailFragment"
             app:destination="@id/clubDetailFragment" />
+        <action
+            android:id="@+id/action_adultHomeFragment_to_myPostFragment"
+            app:destination="@id/myPostFragment" />
     </fragment>
 
     <fragment
@@ -145,4 +148,22 @@
         android:name="com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment"
         android:label="ClubDetailFragment"
         tools:layout="@layout/fragment_club_detail" />
+    <fragment
+        android:id="@+id/myPostFragment"
+        android:name="com.dabenxiang.mimi.view.mypost.MyPostFragment"
+        android:label="MyPostFragment"
+        tools:layout="@layout/fragment_my_post" >
+        <action
+            android:id="@+id/action_myPostFragment_to_clipFragment"
+            app:destination="@id/clipFragment" />
+        <action
+            android:id="@+id/action_myPostFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_myPostFragment_to_textDetailFragment"
+            app:destination="@id/textDetailFragment" />
+        <action
+            android:id="@+id/action_myPostFragment_to_pictureDetailFragment"
+            app:destination="@id/pictureDetailFragment" />
+    </fragment>
 </navigation>
