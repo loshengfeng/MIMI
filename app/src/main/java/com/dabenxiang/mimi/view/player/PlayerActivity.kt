@@ -48,7 +48,10 @@ import com.google.android.exoplayer2.util.Util
 import com.google.android.material.chip.Chip
 import com.kaopiz.kprogresshud.KProgressHUD
 import kotlinx.android.synthetic.main.activity_player.*
+import kotlinx.android.synthetic.main.activity_player.btn_send
+import kotlinx.android.synthetic.main.activity_player.tv_replay_name
 import kotlinx.android.synthetic.main.custom_playback_control.*
+import kotlinx.android.synthetic.main.fragment_dialog_send_comment.*
 import kotlinx.android.synthetic.main.head_comment.view.*
 import kotlinx.android.synthetic.main.head_guess_like.view.*
 import kotlinx.android.synthetic.main.head_no_comment.view.*
@@ -93,6 +96,7 @@ class PlayerActivity : BaseActivity() {
     private var loadReplyCommentBlock: (() -> Unit)? = null
     private var loadCommentLikeBlock: (() -> Unit)? = null
     private var currentReplyId:Long? = null
+    private var currentreplyName:String? = null
     private var moreDialog: MoreDialogFragment? = null
     var reportDialog: ReportDialogFragment? = null
 
@@ -155,8 +159,10 @@ class PlayerActivity : BaseActivity() {
             override fun sendComment(replyId: Long?, replyName: String?) {
                 Timber.i("playerInfoAdapter sendComment")
                 currentReplyId =null
+                currentreplyName =null
                 if (replyId != null) {
                     currentReplyId = replyId
+                    currentreplyName = replyName
                     commentEditorOpen()
                 }
             }
@@ -172,8 +178,10 @@ class PlayerActivity : BaseActivity() {
             override fun replyComment(replyId: Long?, replyName: String?) {
                 Timber.i("playerInfoAdapter replyComment")
                 currentReplyId =null
+                currentreplyName =null
                 if (replyId != null) {
                     currentReplyId = replyId
+                    currentreplyName = replyName
                     commentEditorOpen()
                 }
             }
@@ -392,7 +400,8 @@ class PlayerActivity : BaseActivity() {
                     is Loading -> progressHUD.show()
                     is Loaded -> progressHUD.dismiss()
                     is Empty -> {
-                        currentReplyId =null
+                        currentReplyId = null
+                        currentreplyName = null
                         headNoComment.title_no_comment.visibility = View.GONE
                         viewModel.commentCount.value = viewModel.commentCount.value?.plus(1)
 
@@ -538,6 +547,15 @@ class PlayerActivity : BaseActivity() {
         iv_share.setImageResource(if (isAdult) R.drawable.btn_share_white_n else R.drawable.btn_share_gray_n)
         iv_more.setImageResource(if (isAdult) R.drawable.btn_more_white_n else R.drawable.btn_more_gray_n)
 
+        tv_replay_name.setTextColor(if (obtainIsAdult()) {
+            R.color.color_white_1
+        } else {
+            R.color.color_black_1
+        }.let {
+            getColor(it)
+        })
+
+
         headComment.tv_newest.setOnClickListener {
             viewModel.updatedSelectedNewestComment(true)
             lifecycleScope.launch {
@@ -680,6 +698,7 @@ class PlayerActivity : BaseActivity() {
 
         btn_write_comment.setOnClickListener {
             currentReplyId = null
+            currentreplyName = null
             commentEditorOpen()
             commentEditorToggle(true)
         }
@@ -688,6 +707,7 @@ class PlayerActivity : BaseActivity() {
             if (et_message.text.isNotEmpty()){
                 viewModel.postComment(PostCommentRequest(currentReplyId, et_message.text.toString()))
                 currentReplyId = null
+                currentreplyName = null
                 et_message.text.clear()
             }
         }
@@ -822,10 +842,18 @@ class PlayerActivity : BaseActivity() {
 
     }
 
-    private fun isEditorToggle() = bottom_func_input.visibility == View.VISIBLE
-
     private fun commentEditorOpen(){
         CoroutineScope(Dispatchers.Main).launch {
+
+            tv_replay_name.let {
+                if (currentreplyName == null) {
+                    tv_replay_name.visibility = View.GONE
+                } else {
+                    tv_replay_name.text = "@$currentreplyName"
+                }
+
+             tv_replay_name.visibility = View.VISIBLE
+            }
             et_message.let {
                 it.requestFocusFromTouch()
                 val lManager: InputMethodManager =
