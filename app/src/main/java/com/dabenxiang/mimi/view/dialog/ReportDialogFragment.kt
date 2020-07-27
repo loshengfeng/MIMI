@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.dialog
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import android.widget.RadioButton
@@ -13,6 +14,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils.dpToPx
 import com.google.android.material.radiobutton.MaterialRadioButton
 import kotlinx.android.synthetic.main.fragment_dialog_report.*
 import timber.log.Timber
+
 
 class ReportDialogFragment : BaseDialogFragment() {
 
@@ -58,10 +60,19 @@ class ReportDialogFragment : BaseDialogFragment() {
             }
         }
 
+        val colorStateList = ColorStateList(
+            arrayOf(
+                intArrayOf(-android.R.attr.state_enabled),
+                intArrayOf(android.R.attr.state_enabled)
+            ), intArrayOf(
+                requireContext().getColor(R.color.color_black_1) //disabled
+                , requireContext().getColor(R.color.color_red_1) //enabled
+            )
+        )
+
         problems?.forEach {
-            Timber.i("problems= $it")
             val params = ConstraintLayout.LayoutParams(
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                ConstraintLayout.LayoutParams.MATCH_PARENT,
                 ConstraintLayout.LayoutParams.WRAP_CONTENT
             )
             params.setMargins(0, 0, 0, dpToPx(requireContext(), 16))
@@ -69,9 +80,10 @@ class ReportDialogFragment : BaseDialogFragment() {
             radioButton.text = it
             radioButton.setTextColor(requireContext().getColor(R.color.color_black_1))
             radioButton.layoutParams = params
+            radioButton.buttonTintList = colorStateList
+            radioButton.invalidate()
             rg_report_problem.addView(radioButton)
         }
-
         rg_report_problem.setOnCheckedChangeListener { _, checkedId ->
             val radioButton = rg_report_problem.findViewById<RadioButton>(checkedId)
             reportContent = radioButton.text.toString()

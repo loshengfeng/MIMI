@@ -793,14 +793,12 @@ class PlayerActivity : BaseActivity() {
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
         override fun onSend(item: BaseMemberPostItem, content: String) {
-            Timber.i("onReportDialogListener isReported=${viewModel.isReported}")
             if(viewModel.isReported){
                 GeneralUtils.showToast(App.applicationContext(), getString(R.string.already_reported))
                 reportDialog?.dismiss()
             }else if (TextUtils.isEmpty(content)) {
                 GeneralUtils.showToast(App.applicationContext(), getString(R.string.report_error))
             } else {
-                Timber.i("onReportDialogListener else")
                 reportDialog?.dismiss()
                 when (item) {
                     is MemberPostItem -> viewModel.sentReport(content)
