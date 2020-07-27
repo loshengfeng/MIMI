@@ -12,6 +12,7 @@ import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.dpToPx
 import com.google.android.material.radiobutton.MaterialRadioButton
 import kotlinx.android.synthetic.main.fragment_dialog_report.*
+import timber.log.Timber
 
 class ReportDialogFragment : BaseDialogFragment() {
 
@@ -58,6 +59,7 @@ class ReportDialogFragment : BaseDialogFragment() {
         }
 
         problems?.forEach {
+            Timber.i("problems= $it")
             val params = ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ConstraintLayout.LayoutParams.WRAP_CONTENT

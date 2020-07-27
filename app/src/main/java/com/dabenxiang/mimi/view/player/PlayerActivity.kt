@@ -15,6 +15,7 @@ import android.view.Surface
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -97,7 +98,7 @@ class PlayerActivity : BaseActivity() {
     private var currentReplyId:Long? = null
     private var currentreplyName:String? = null
     private var moreDialog: MoreDialogFragment? = null
-    var reportDialog: ReportDialogFragment? = null
+    private var reportDialog: ReportDialogFragment? = null
 
     private val sourceListAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
@@ -792,12 +793,17 @@ class PlayerActivity : BaseActivity() {
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
         override fun onSend(item: BaseMemberPostItem, content: String) {
-            if (TextUtils.isEmpty(content)) {
+            Timber.i("onReportDialogListener isReported=${viewModel.isReported}")
+            if(viewModel.isReported){
+                GeneralUtils.showToast(App.applicationContext(), getString(R.string.already_reported))
+                reportDialog?.dismiss()
+            }else if (TextUtils.isEmpty(content)) {
                 GeneralUtils.showToast(App.applicationContext(), getString(R.string.report_error))
             } else {
+                Timber.i("onReportDialogListener else")
                 reportDialog?.dismiss()
                 when (item) {
-                    is MemberPostItem -> viewModel.sendPostReport(item, content)
+                    is MemberPostItem -> viewModel.sentReport(content)
                 }
             }
         }
@@ -816,6 +822,7 @@ class PlayerActivity : BaseActivity() {
                     ReportDialogFragment::class.java.simpleName
                 )
             }
+
         }
 
         override fun onCancel() {
