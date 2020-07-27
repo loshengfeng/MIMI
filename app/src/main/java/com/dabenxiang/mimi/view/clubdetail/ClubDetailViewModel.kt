@@ -10,6 +10,7 @@ import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.ReportRequest
 import com.dabenxiang.mimi.model.enums.LikeType
@@ -38,6 +39,9 @@ class ClubDetailViewModel: BaseViewModel() {
 
     private var _likePostResult = MutableLiveData<ApiResult<Int>>()
     val likePostResult: LiveData<ApiResult<Int>> = _likePostResult
+
+    private var _followClubResult = MutableLiveData<ApiResult<Boolean>>()
+    val followClubResult: LiveData<ApiResult<Boolean>> = _followClubResult
 
     private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
     val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
@@ -69,6 +73,28 @@ class ClubDetailViewModel: BaseViewModel() {
                         is ApiResult.Success -> {
                             update(it.result)
                         }
+                    }
+                }
+        }
+    }
+
+    fun followMember(item: MemberPostItem, isFollow: Boolean, update: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = when {
+                    isFollow -> apiRepository.followPost(item.creatorId)
+                    else -> apiRepository.cancelFollowPost(item.creatorId)
+                }
+                if (!result.isSuccessful) throw HttpException(result)
+                item.isFollow = isFollow
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    when(it) {
+                        is ApiResult.Empty -> update(isFollow)
                     }
                 }
         }
@@ -155,6 +181,39 @@ class ClubDetailViewModel: BaseViewModel() {
         }
     }
 
+    fun likePost(item: MemberPostItem, isLike: Boolean, update: (Boolean, Int) -> Unit) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val likeType = when {
+                    isLike -> LikeType.LIKE
+                    else -> LikeType.DISLIKE
+                }
+                val request = LikeRequest(likeType)
+                val result = apiRepository.like(item.id, request)
+                if (!result.isSuccessful) throw HttpException(result)
+
+                item.likeType = likeType
+                item.likeCount = when (item.likeType) {
+                    LikeType.LIKE -> item.likeCount + 1
+                    else -> item.likeCount - 1
+                }
+                emit(ApiResult.success(item.likeCount))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    when(it) {
+                        is ApiResult.Success -> {
+                            update(isLike, it.result)
+                        }
+                    }
+                }
+        }
+    }
+
     fun sendPostReport(item: MemberPostItem, content: String) {
         viewModelScope.launch {
             flow {
@@ -169,6 +228,26 @@ class ClubDetailViewModel: BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _postReportResult.value = it }
+        }
+    }
+
+    fun followClub(item: MemberClubItem, isFollow: Boolean) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = when {
+                    isFollow -> apiRepository.followClub(item.id)
+                    else -> apiRepository.cancelFollowClub(item.id)
+                }
+                if (!result.isSuccessful) throw HttpException(result)
+                item.isFollow = isFollow
+                emit(ApiResult.success(isFollow))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _followClubResult.value = it }
         }
     }
 
