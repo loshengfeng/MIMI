@@ -10,6 +10,7 @@ import android.graphics.Bitmap
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.text.Html
+import android.text.TextUtils
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
@@ -17,6 +18,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearSnapHelper
+import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.handleException
 import com.dabenxiang.mimi.extension.setBtnSolidColor
@@ -31,9 +33,7 @@ import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseActivity
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
-import com.dabenxiang.mimi.view.dialog.GeneralDialog
-import com.dabenxiang.mimi.view.dialog.GeneralDialogData
-import com.dabenxiang.mimi.view.dialog.show
+import com.dabenxiang.mimi.view.dialog.*
 import com.dabenxiang.mimi.view.login.LoginActivity
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -88,6 +88,8 @@ class PlayerActivity : BaseActivity() {
     private var loadReplyCommentBlock: (() -> Unit)? = null
     private var loadCommentLikeBlock: (() -> Unit)? = null
     private var currentReplyId:Long? = null
+    private var moreDialog: MoreDialogFragment? = null
+    var reportDialog: ReportDialogFragment? = null
 
     private val sourceListAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
@@ -728,7 +730,12 @@ class PlayerActivity : BaseActivity() {
         }
 
         iv_more.setOnClickListener {
-
+            moreDialog = MoreDialogFragment.newInstance(MemberPostItem(id=obtainVideoId()), onMoreDialogListener).also {
+                it.show(
+                    supportFragmentManager,
+                    MoreDialogFragment::class.java.simpleName
+                )
+            }
         }
 
         viewModel.apiReportResult.observe(this, Observer { event ->
@@ -744,6 +751,39 @@ class PlayerActivity : BaseActivity() {
                 }
             }
         })
+    }
+
+    private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
+        override fun onSend(item: BaseMemberPostItem, content: String) {
+            if (TextUtils.isEmpty(content)) {
+                GeneralUtils.showToast(App.applicationContext(), getString(R.string.report_error))
+            } else {
+                reportDialog?.dismiss()
+                when (item) {
+                    is MemberPostItem -> viewModel.sendPostReport(item, content)
+                }
+            }
+        }
+
+        override fun onCancel() {
+            reportDialog?.dismiss()
+        }
+    }
+
+    private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
+        override fun onProblemReport(item: BaseMemberPostItem) {
+            moreDialog?.dismiss()
+            reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
+                it.show(
+                    supportFragmentManager,
+                    ReportDialogFragment::class.java.simpleName
+                )
+            }
+        }
+
+        override fun onCancel() {
+            moreDialog?.dismiss()
+        }
     }
 
     override fun onStart() {
@@ -1088,6 +1128,10 @@ class PlayerActivity : BaseActivity() {
         }
     }
 
+    private fun obtainVideoId(): Long {
+        return (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerData?)?.videoId ?: 0
+    }
+
     private fun obtainIsAdult(): Boolean {
         return (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerData?)?.isAdult ?: false
     }
@@ -1340,4 +1384,5 @@ class PlayerActivity : BaseActivity() {
             scrollView.fullScroll(View.FOCUS_DOWN)
         }
     }
+
 }
