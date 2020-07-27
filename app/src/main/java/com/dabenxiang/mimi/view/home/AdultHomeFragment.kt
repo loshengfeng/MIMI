@@ -9,7 +9,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.TextUtils
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.addCallback
@@ -111,7 +113,11 @@ class AdultHomeFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Timber.d("@@onViewCreated")
+    }
 
+    override fun setupFirstTime() {
+        Timber.d("@@setupFirstTime")
         requireActivity().onBackPressedDispatcher.addCallback {
             interactionListener?.changeNavigationPosition(
                 R.id.navigation_home
@@ -123,9 +129,7 @@ class AdultHomeFragment : BaseFragment() {
         if (mainViewModel?.adult == null) {
             mainViewModel?.getHomeCategories()
         }
-
         handleBackStackData()
-        showSnackBar()
     }
 
     private fun handleBackStackData() {

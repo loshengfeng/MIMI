@@ -122,6 +122,15 @@ class MyPostFragment : BaseFragment() {
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
+
+        viewModel.deletePostResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is ApiResult.Success -> viewModel.invalidateDataSource()
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -204,11 +213,15 @@ class MyPostFragment : BaseFragment() {
         override fun onCancel() {
             moreDialog?.dismiss()
         }
+
+        override fun onDelete(item: BaseMemberPostItem) {
+            viewModel.deletePost(item as MemberPostItem)
+        }
     }
 
     private val myPostListener = object : MyPostListener {
         override fun onMoreClick(item: MemberPostItem) {
-            moreDialog = MyPostMoreDialogFragment.newInstance(null, onMoreDialogListener).also {
+            moreDialog = MyPostMoreDialogFragment.newInstance(item, onMoreDialogListener).also {
                 it.show(
                     requireActivity().supportFragmentManager,
                     MoreDialogFragment::class.java.simpleName

@@ -371,7 +371,7 @@ interface ApiService {
 
     /**********************************************************
      *
-     *                  Members/Post
+     *                  Members/Me/Post
      *
      ***********************************************************/
     @GET("/v1/Members/Me/Post")
@@ -381,6 +381,11 @@ interface ApiService {
         @Query("offset") offset: Int,
         @Query("limit") limit: Int
     ): Response<ApiBasePagingItem<List<MemberPostItem>>>
+
+    @DELETE("/v1/Members/Me/Post/{postId}")
+    suspend fun deleteMyPost(
+        @Path("postId") postId: Long
+    ): Response<Void>
 
     /**********************************************************
      *

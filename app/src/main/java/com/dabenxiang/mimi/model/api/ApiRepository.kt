@@ -483,7 +483,7 @@ class ApiRepository(private val apiService: ApiService) {
     ) = apiService.updateProfile(body)
     /**********************************************************
      *
-     *                  Members/Post
+     *                  Members/Me/Post
      *
      ***********************************************************/
     suspend fun getMyPost(
@@ -492,6 +492,10 @@ class ApiRepository(private val apiService: ApiService) {
         offset: Int,
         limit: Int
     ) = apiService.getMyPost(isAdult, status, offset, limit)
+
+    suspend fun deleteMyPost(
+        postId: Long
+    ) = apiService.deleteMyPost(postId)
 
     /**********************************************************
      *
