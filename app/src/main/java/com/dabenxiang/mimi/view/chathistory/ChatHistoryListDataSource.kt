@@ -49,12 +49,9 @@ class ChatHistoryListDataSource(
                 emit(InitResult(messages ?: ArrayList(), nextPageKey))
             }
                     .flowOn(Dispatchers.IO)
-                    .onStart {
-                        pagingCallback.onLoading() }
-                    .catch { e ->
-                        pagingCallback.onThrowable(e) }
-                    .onCompletion {
-                        pagingCallback.onLoaded() }
+                    .onStart { pagingCallback.onLoading() }
+                    .catch { e -> pagingCallback.onThrowable(e) }
+                    .onCompletion { pagingCallback.onLoaded() }
                     .collect {response->
                         pagingCallback.onSucceed()
                         callback.onResult(response.list, null, response.nextKey)
