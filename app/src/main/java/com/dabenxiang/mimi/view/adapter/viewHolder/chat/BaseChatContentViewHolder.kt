@@ -48,6 +48,6 @@ open class BaseChatContentViewHolder(
                 listener.onGetAttachment(it, position)
             }
         }
-        txtTime.text = data?.payload?.sendTime?.let { date -> SimpleDateFormat("YYYY-MM-dd mm:ss", Locale.getDefault()).format(date) }
+        txtTime.text = data?.payload?.sendTime?.let { date -> SimpleDateFormat("YYYY-MM-dd HH:mm", Locale.getDefault()).format(date) }
     }
 }
