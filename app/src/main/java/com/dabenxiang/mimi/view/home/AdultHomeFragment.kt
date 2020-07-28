@@ -217,6 +217,17 @@ class AdultHomeFragment : BaseFragment() {
         viewModel.tabLayoutPosition.observe(viewLifecycleOwner, Observer { position ->
             lastPosition = position
             tabAdapter.setLastSelectedIndex(lastPosition)
+            when(position){
+                0-> {
+                    btn_filter.visibility =View.GONE
+                    btn_ranking.visibility =View.VISIBLE
+                }
+                else -> {
+                    btn_filter.visibility =View.VISIBLE
+                    btn_ranking.visibility =View.GONE
+                }
+
+            }
             recyclerview_tab.scrollToPosition(position)
             setupRecyclerByPosition(position)
             refresh.isRefreshing = true
@@ -623,12 +634,19 @@ class AdultHomeFragment : BaseFragment() {
         iv_search.setImageResource(R.drawable.adult_btn_search)
         tv_search.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
 
-        btn_ranking.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
-        btn_ranking.setBtnSolidColor(
+        btn_filter.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
+        btn_filter.setBtnSolidColor(
             requireActivity().getColor(R.color.color_white_1_30),
             requireActivity().getColor(R.color.color_red_1),
             resources.getDimension(R.dimen.dp_6)
         )
+
+        btn_filter.visibility =View.GONE
+        btn_ranking.visibility =View.VISIBLE
+
+        btn_ranking.setOnClickListener {
+
+        }
 
         recyclerview_tab.adapter = tabAdapter
         recyclerview.background = requireActivity().getDrawable(R.color.adult_color_background)

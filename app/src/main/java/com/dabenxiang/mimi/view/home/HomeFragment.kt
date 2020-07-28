@@ -55,6 +55,7 @@ class HomeFragment : BaseFragment() {
         recyclerview.layoutManager = LinearLayoutManager(requireContext())
         recyclerview.adapter = homeAdapter
         refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
+        btn_ranking.visibility =View.GONE
 
         if (mainViewModel?.normal == null) {
             mainViewModel?.getHomeCategories()

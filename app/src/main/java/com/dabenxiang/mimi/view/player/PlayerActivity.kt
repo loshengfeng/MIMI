@@ -793,17 +793,14 @@ class PlayerActivity : BaseActivity() {
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
         override fun onSend(item: BaseMemberPostItem, content: String) {
-            if(viewModel.isReported){
-                GeneralUtils.showToast(App.applicationContext(), getString(R.string.already_reported))
-                reportDialog?.dismiss()
-            }else if (TextUtils.isEmpty(content)) {
+            if (TextUtils.isEmpty(content)) {
                 GeneralUtils.showToast(App.applicationContext(), getString(R.string.report_error))
             } else {
-                reportDialog?.dismiss()
                 when (item) {
                     is MemberPostItem -> viewModel.sentReport(content)
                 }
             }
+            reportDialog?.dismiss()
         }
 
         override fun onCancel() {
@@ -813,14 +810,17 @@ class PlayerActivity : BaseActivity() {
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem) {
-            moreDialog?.dismiss()
-            reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
-                it.show(
-                    supportFragmentManager,
-                    ReportDialogFragment::class.java.simpleName
-                )
+            if(viewModel.isReported){
+                GeneralUtils.showToast(App.applicationContext(), getString(R.string.already_reported))
+            } else{
+                reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
+                    it.show(
+                        supportFragmentManager,
+                        ReportDialogFragment::class.java.simpleName
+                    )
+                }
             }
-
+            moreDialog?.dismiss()
         }
 
         override fun onCancel() {
