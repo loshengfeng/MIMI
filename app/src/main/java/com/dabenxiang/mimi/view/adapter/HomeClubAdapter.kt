@@ -10,12 +10,13 @@ import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.view.club.ClubFuncItem
 import com.dabenxiang.mimi.view.home.viewholder.ClubViewHolder
 
 class HomeClubAdapter(
     nestedListener: HomeAdapter.EventListener,
-    private val clubListener: ClubListener,
-    private val memberPostFuncItem: MemberPostFuncItem
+    private val memberPostFuncItem: MemberPostFuncItem,
+    private val clubFuncItem: ClubFuncItem
 ) : RecyclerView.Adapter<BaseViewHolder>() {
 
     private var memberClubItems: List<MemberClubItem> = arrayListOf()
@@ -27,8 +28,7 @@ class HomeClubAdapter(
             view,
             clubClickListener,
             parent.context,
-            clubListener,
-            memberPostFuncItem
+            clubFuncItem
         )
     }
 

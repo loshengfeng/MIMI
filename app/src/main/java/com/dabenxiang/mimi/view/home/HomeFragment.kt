@@ -26,6 +26,7 @@ import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.club.ClubFuncItem
 import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.player.PlayerActivity
@@ -47,9 +48,7 @@ class HomeFragment : BaseFragment() {
 
     override fun getLayoutId() = R.layout.fragment_home
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+    override fun setupFirstTime() {
         requireActivity().onBackPressedDispatcher.addCallback { backToDesktop() }
         recyclerview_tab.adapter = tabAdapter
         recyclerview.layoutManager = LinearLayoutManager(requireContext())
@@ -82,13 +81,6 @@ class HomeFragment : BaseFragment() {
                 }
                 is Error -> onApiError(it.throwable)
             }
-        })
-
-        viewModel.tabLayoutPosition.observe(viewLifecycleOwner, Observer { position ->
-            lastPosition = position
-            tabAdapter.setLastSelectedIndex(lastPosition)
-            setupRecyclerByPosition(position)
-            getData(position)
         })
 
         viewModel.videoList.observe(viewLifecycleOwner, Observer {
@@ -181,15 +173,19 @@ class HomeFragment : BaseFragment() {
     private val tabAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
-                viewModel.setTopTabPosition(index)
+                setTab(index)
             }
         }, false)
     }
 
-    private val clubListener = object : HomeClubAdapter.ClubListener {
-        override fun followClub(item: MemberClubItem, position: Int, isFollow: Boolean) {
-
-        }
+    private fun setTab(index: Int) {
+        Timber.d("@@setTab: $index")
+        lastPosition = index
+        tabAdapter.setLastSelectedIndex(lastPosition)
+        recyclerview_tab.scrollToPosition(index)
+        setupRecyclerByPosition(index)
+        refresh.isRefreshing = true
+        getData(index)
     }
 
     private val homeAdapter by lazy {
@@ -197,8 +193,8 @@ class HomeFragment : BaseFragment() {
             requireContext(),
             adapterListener,
             false,
-            clubListener,
-            memberPostFuncItem
+            memberPostFuncItem,
+            ClubFuncItem()
         )
     }
 
