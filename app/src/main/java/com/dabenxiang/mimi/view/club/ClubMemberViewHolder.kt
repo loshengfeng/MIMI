@@ -8,7 +8,6 @@ import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_club_member.view.*
-import timber.log.Timber
 
 /**
  * VAI4.1.6_圈子頁
@@ -46,7 +45,7 @@ class ClubMemberViewHolder(view: View) : BaseViewHolder(view) {
 
         if (rvPost.adapter == null || rvPost.tag != position) {
             rvPost.tag = position
-            rvPost.adapter = ClubMemberPostAdapter(rvPost.context, item.posts, clubFuncItem)
+            rvPost.adapter = ClubMemberPostAdapter(rvPost.context, item.posts, item, clubFuncItem)
         }
 
         item.avatarAttachmentId.toString().takeIf { !TextUtils.isEmpty(it) && it != LruCacheUtils.ZERO_ID }?.also { id ->
