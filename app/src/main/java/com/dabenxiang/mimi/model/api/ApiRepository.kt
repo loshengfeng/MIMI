@@ -8,6 +8,8 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
+import retrofit2.http.Body
+import retrofit2.http.Path
 import retrofit2.http.Query
 import java.io.File
 
@@ -255,6 +257,10 @@ class ApiRepository(private val apiService: ApiService) {
         commentId: Long
     ) = apiService.deleteMembersPostCommentLike(postId, commentId)
 
+    suspend fun updatePost(
+        postId: Long,
+        request: PostMemberRequest
+    ) = apiService.updatePost(postId, request)
 
     /**********************************************************
      *

@@ -6,6 +6,7 @@ import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.MultiTransformation
@@ -135,7 +136,7 @@ class PersonalFragment : BaseFragment() {
                 R.id.tv_follow -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
                 R.id.tv_topup_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_orderFragment))
                 R.id.tv_chat_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_chatHistoryFragment))
-                R.id.tv_my_post -> GeneralUtils.showToast(requireContext(), "My post")
+                R.id.tv_my_post -> findNavController().navigate(R.id.action_personalFragment_to_myPostFragment)
                 R.id.tv_setting -> navigateTo(
                     NavigateItem.Destination(
                         R.id.action_personalFragment_to_settingFragment,

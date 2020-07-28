@@ -16,10 +16,13 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ArticleItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
+import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.EDIT
+import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.MEMBER_DATA
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
@@ -56,6 +59,7 @@ class PostArticleFragment : BaseFragment() {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Loaded -> progressHUD?.dismiss()
                 is ApiResult.Success -> {
+                    findNavController().navigateUp()
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
@@ -127,6 +131,8 @@ class PostArticleFragment : BaseFragment() {
         }
 
         tv_clean.setOnClickListener {
+            val isEdit = arguments?.getBoolean(EDIT)
+
             val title = edt_title.text.toString()
             val content = edt_content.text.toString()
 
@@ -155,14 +161,21 @@ class PostArticleFragment : BaseFragment() {
             }
 
             val jsonString = Gson().toJson(requestContent)
-            viewModel.postArticle(title, jsonString, tags)
+
+            if (isEdit != null) {
+                val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
+                viewModel.updateArticle(title, jsonString, tags, item)
+            } else {
+                viewModel.postArticle(title, jsonString, tags)
+            }
         }
     }
 
     override fun initSettings() {
         super.initSettings()
 
-        tv_title.text = getString(R.string.post_title)
+        val isEdit = arguments?.getBoolean(EDIT)
+
         tv_clean.visibility = View.VISIBLE
         tv_clean.text = getString(R.string.btn_send)
 
@@ -176,6 +189,38 @@ class PostArticleFragment : BaseFragment() {
         ))
         txt_hashtagCount.text = String.format(getString(R.string.typing_count,
             INIT_VALUE,
+            HASHTAG_LIMIT
+        ))
+
+        if (isEdit != null) {
+            tv_title.text = getString(R.string.edit_post_title)
+            setUI()
+        } else {
+            tv_title.text = getString(R.string.post_title)
+        }
+    }
+
+    private fun setUI() {
+        val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
+        val articleItem = Gson().fromJson(item.content, ArticleItem::class.java)
+
+        edt_title.setText(item.title)
+        edt_content.setText(articleItem.text)
+
+        for (tag in item.tags!!) {
+            addTag(tag)
+        }
+
+        txt_titleCount.text = String.format(getString(R.string.typing_count,
+            item.title.length,
+            TITLE_LIMIT
+        ))
+        txt_contentCount.text = String.format(getString(R.string.typing_count,
+            articleItem.text.length,
+            CONTENT_LIMIT
+        ))
+        txt_hashtagCount.text = String.format(getString(R.string.typing_count,
+            item.tags.size,
             HASHTAG_LIMIT
         ))
     }

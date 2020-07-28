@@ -197,6 +197,12 @@ interface ApiService {
         @Path("commentId") commentId: Long
     ): Response<Void>
 
+    @PUT("/v1/Members/Post/{id}")
+    suspend fun updatePost(
+        @Path("id") postId: Long,
+        @Body request: PostMemberRequest
+    ): Response<ApiBaseItem<Long>>
+
     /**********************************************************
      *
      *                  Members/Club

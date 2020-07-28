@@ -35,28 +35,6 @@ class MyPostMoreDialogFragment : BaseDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        val isReport = when (item) {
-//            is MemberPostItem -> (item as MemberPostItem).reported
-//            else -> (item as MembersPostCommentItem).reported
-//        } ?: false
-//
-//        if (isReport) {
-//            tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1_50))
-//        } else {
-//            tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1))
-//            tv_problem_report.setOnClickListener {
-//                listener?.onProblemReport(item!!)
-//            }
-//        }
-
-//        tv_cancel.setOnClickListener {
-//            listener?.onCancel()
-//        }
-//
-//        background.setOnClickListener {
-//            listener?.onCancel()
-//        }
-
         tv_delete.setOnClickListener {
             listener?.onDelete(item!!)
             dismiss()
@@ -65,10 +43,14 @@ class MyPostMoreDialogFragment : BaseDialogFragment() {
         tv_cancel.setOnClickListener {
             listener?.onCancel()
         }
+
+        tv_edit.setOnClickListener {
+            listener?.onEdit(item!!)
+        }
     }
 
     interface OnMoreDialogListener {
-        fun onProblemReport(item: BaseMemberPostItem)
+        fun onEdit(item: BaseMemberPostItem)
         fun onDelete(item: BaseMemberPostItem)
         fun onCancel()
     }
