@@ -1,6 +1,11 @@
 package com.dabenxiang.mimi.view.chatcontent
 
+import android.app.Activity.RESULT_OK
+import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -9,15 +14,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
-import com.dabenxiang.mimi.model.api.vo.MQTTChatItem
+import com.dabenxiang.mimi.model.enums.ChatMessageType
 import com.dabenxiang.mimi.view.adapter.ChatContentAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
-import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_chat_content.*
 import timber.log.Timber
 
 class ChatContentFragment : BaseFragment() {
+
+    private val INTENT_SELECT_IMG: Int = 100
 
     private val viewModel: ChatContentViewModel by viewModels()
     private val adapter by lazy { ChatContentAdapter(listener) }
@@ -45,7 +52,7 @@ class ChatContentFragment : BaseFragment() {
             textTitle.text = data.name
             data.id?.let { id ->
                 viewModel.getChatContent(id)
-                viewModel.init(id.toString())
+                viewModel.initMQTT(id.toString())
                 viewModel.connect()
             }
         }
@@ -77,6 +84,19 @@ class ChatContentFragment : BaseFragment() {
             }
         })
 
+        viewModel.postAttachmentResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    viewModel.publishMsg(it.result.id.toString(), it.result.ext)
+                }
+                is ApiResult.Error -> Timber.e(it.throwable)
+            }
+        })
+        viewModel.fileAttachmentTooLarge.observe(viewLifecycleOwner, Observer { result ->
+            if (result) {
+                GeneralUtils.showToast(requireContext(), getString(R.string.chat_content_file_too_large))
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -87,8 +107,55 @@ class ChatContentFragment : BaseFragment() {
         }
 
         btnSend.setOnClickListener {
-            val mqttData = MQTTChatItem("", editChat.text.toString(), "2020-07-28T11:26:04+00:00", 0)
-            viewModel.publishMsg(Gson().toJson(mqttData))
+            if (editChat.text.isNotEmpty()) {
+                viewModel.messageType = ChatMessageType.TEXT.ordinal
+                viewModel.publishMsg(editChat.text.toString())
+                editChat.text.clear()
+            }
         }
+        btnAdd.setOnClickListener {
+            openChooser()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (resultCode == RESULT_OK) {
+            data?.let {
+                val uriImage: Uri?
+
+                uriImage = if (it.data != null) {
+                    it.data
+                } else {
+                    val extras = it.extras
+                    val imageBitmap = extras!!["data"] as Bitmap?
+                    Uri.parse(MediaStore.Images.Media.insertImage(requireContext().contentResolver, imageBitmap, null, null));
+                }
+
+                if (uriImage == null) {
+                    return
+                }
+                viewModel.postAttachment(uriImage, requireContext())
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    /**
+     * 打開多媒體選擇器
+     */
+    private fun openChooser() {
+        val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        galleryIntent.type = "image/* video/*"
+
+        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        val videoIntent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
+
+        val chooser = Intent(Intent.ACTION_CHOOSER)
+        chooser.putExtra(Intent.EXTRA_INTENT, galleryIntent)
+        chooser.putExtra(Intent.EXTRA_TITLE, requireContext().getString(R.string.chat_content_media_chooser))
+
+        val intentArray = arrayOf(cameraIntent, videoIntent)
+        chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
+        startActivityForResult(chooser, INTENT_SELECT_IMG)
     }
 }

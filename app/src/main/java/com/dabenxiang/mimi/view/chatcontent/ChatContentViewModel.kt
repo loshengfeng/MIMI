@@ -1,5 +1,7 @@
 package com.dabenxiang.mimi.view.chatcontent
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
@@ -11,12 +13,16 @@ import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ChatContentItem
+import com.dabenxiang.mimi.model.api.vo.MQTTChatItem
+import com.dabenxiang.mimi.model.enums.ChatMessageType
 import com.dabenxiang.mimi.model.manager.mqtt.ConnectCallback
 import com.dabenxiang.mimi.model.manager.mqtt.ExtendedCallback
 import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager
 import com.dabenxiang.mimi.model.manager.mqtt.SubscribeCallback
 import com.dabenxiang.mimi.model.vo.AttachmentItem
+import com.dabenxiang.mimi.model.vo.UploadPicItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -26,6 +32,10 @@ import org.eclipse.paho.client.mqttv3.MqttMessage
 import org.koin.core.inject
 import retrofit2.HttpException
 import timber.log.Timber
+import java.io.File
+import java.net.URLConnection
+import java.net.URLEncoder
+import java.text.SimpleDateFormat
 import java.util.*
 
 class ChatContentViewModel : BaseViewModel() {
@@ -40,10 +50,18 @@ class ChatContentViewModel : BaseViewModel() {
     private var _attachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
     val attachmentResult: LiveData<ApiResult<AttachmentItem>> = _attachmentResult
 
+    private var _postAttachmentResult = MutableLiveData<ApiResult<UploadPicItem>>()
+    val postAttachmentResult: LiveData<ApiResult<UploadPicItem>> = _postAttachmentResult
+
+    private var _fileAttachmentTooLarge = MutableLiveData<Boolean>()
+    val fileAttachmentTooLarge: LiveData<Boolean> = _fileAttachmentTooLarge
+
+    private val FILE_LIMIT = 5
     private val mqttManager: MQTTManager by inject()
     private val serverUrl = BuildConfig.MQTT_HOST
     private val clientId = UUID.randomUUID().toString()
     var topic: String = ""
+    var messageType: Int = ChatMessageType.TEXT.ordinal
 
 
     private val pagingCallback = object : PagingCallback {
@@ -62,6 +80,15 @@ class ChatContentViewModel : BaseViewModel() {
         override fun onSucceed() {
             super.onSucceed()
         }
+    }
+
+    private fun isImageFile(path: String?): Boolean {
+        val mimeType: String = URLConnection.guessContentTypeFromName(path)
+        return mimeType != null && mimeType.startsWith("image")
+    }
+
+    private fun getTimeFormatForPush(): String {
+        return SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault()).format(Date())
     }
 
     fun getChatContent(chatId: Long) {
@@ -110,7 +137,48 @@ class ChatContentViewModel : BaseViewModel() {
         }
     }
 
-    fun init(id: String) {
+    /**
+     * 上傳影片 or 圖片
+     */
+    fun postAttachment(uri: Uri, context: Context) {
+        viewModelScope.launch {
+            val realPath = UriUtils.getPath(context, uri)
+            val file = File(realPath)
+            if (file.length() / 1024.0 / 1024.0 > FILE_LIMIT) {
+                _fileAttachmentTooLarge.value = true
+            } else {
+                flow {
+                    val fileNameSplit = realPath?.split("/")
+                    val fileName = fileNameSplit?.last()
+                    val extSplit = fileName?.split(".")
+                    val ext = "." + extSplit?.last()
+
+                    Timber.d("Upload photo path : $realPath")
+                    Timber.d("Upload photo ext : $ext")
+                    val result = if (isImageFile(realPath)) {
+                        messageType = ChatMessageType.IMAGE.ordinal
+                        domainManager.getApiRepository().postAttachment(File(realPath), fileName = URLEncoder.encode(fileName, "UTF-8"), type = "image/*")
+                    } else {
+                        messageType = ChatMessageType.BINARY.ordinal
+                        domainManager.getApiRepository().postAttachment(File(realPath), fileName = URLEncoder.encode(fileName, "UTF-8"), type = "video/*")
+                    }
+
+                    if (!result.isSuccessful) throw HttpException(result)
+                    val uploadPicItem = UploadPicItem(ext = ext, id = result.body()?.content ?: 0)
+                    emit(ApiResult.success(uploadPicItem))
+                }
+                        .flowOn(Dispatchers.IO)
+                        .onStart { emit(ApiResult.loading()) }
+                        .onCompletion { emit(ApiResult.loaded()) }
+                        .catch { e -> emit(ApiResult.error(e)) }
+                        .collect {
+                            _postAttachmentResult.value = it
+                        }
+            }
+        }
+    }
+
+    fun initMQTT(id: String) {
         topic = PREFIX_CHAT + id
         mqttManager.init(serverUrl, clientId, object : ExtendedCallback {
             override fun onConnectComplete(reconnect: Boolean, serverURI: String) {
@@ -166,7 +234,8 @@ class ChatContentViewModel : BaseViewModel() {
         })
     }
 
-    fun publishMsg(message: String) {
-        mqttManager.publishMessage(topic, message)
+    fun publishMsg(message: String, ext: String = "") {
+        val mqttData = MQTTChatItem(ext, message, getTimeFormatForPush(), messageType)
+        mqttManager.publishMessage(topic, gson.toJson(mqttData))
     }
 }

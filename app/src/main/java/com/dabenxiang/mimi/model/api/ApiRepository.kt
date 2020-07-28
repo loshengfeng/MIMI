@@ -76,10 +76,11 @@ class ApiRepository(private val apiService: ApiService) {
      */
     suspend fun postAttachment(
         file: File,
-        fileName: String
+        fileName: String,
+        type: String = MEDIA_TYPE_IMAGE
     ): Response<ApiBaseItem<Long>> {
         val requestFile = MultipartBody.Part.createFormData(
-            FILE, fileName, file.asRequestBody(MEDIA_TYPE_IMAGE.toMediaTypeOrNull())
+            FILE, fileName, file.asRequestBody(type.toMediaTypeOrNull())
         )
         return apiService.postAttachment(requestFile)
     }
