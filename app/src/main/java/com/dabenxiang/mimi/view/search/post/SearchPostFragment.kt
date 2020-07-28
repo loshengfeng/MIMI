@@ -8,6 +8,7 @@ import android.text.TextUtils
 import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
@@ -42,7 +43,6 @@ import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
-import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_search_post.*
 import kotlinx.android.synthetic.main.fragment_search_post.tv_search
 
@@ -259,29 +259,16 @@ class SearchPostFragment : BaseFragment() {
         }
 
         tv_search.setOnClickListener {
-            GeneralUtils.hideKeyboard(requireActivity())
-            if (viewModel.isSearchTextEmpty(edit_search.text.toString())) {
-                GeneralUtils.showToast(
-                    requireContext(),
-                    getString(R.string.search_input_empty_toast)
-                )
-                return@setOnClickListener
-            }
-            layout_search_history.visibility = View.GONE
-            layout_search_text.visibility = View.VISIBLE
-            updateTag("")
+            search()
+        }
 
-            viewModel.updateSearchHistory(edit_search.text.toString())
-
-            if (isClub) {
-                progressHUD?.show()
-                viewModel.getClubs(edit_search.text.toString())
-            } else {
-                viewModel.getSearchPostsByKeyword(
-                    currentPostType,
-                    edit_search.text.toString(),
-                    isPostFollow
-                )
+        edit_search.setOnEditorActionListener { v, actionId, event ->
+            when(actionId) {
+                EditorInfo.IME_ACTION_SEARCH -> {
+                    search()
+                    true
+                }
+                else -> false
             }
         }
 
@@ -295,6 +282,33 @@ class SearchPostFragment : BaseFragment() {
                 getSearchHistory()
                 adapter?.submitList(null)
             }
+        }
+    }
+
+    private fun search() {
+        GeneralUtils.hideKeyboard(requireActivity())
+        if (viewModel.isSearchTextEmpty(edit_search.text.toString())) {
+            GeneralUtils.showToast(
+                requireContext(),
+                getString(R.string.search_input_empty_toast)
+            )
+            return
+        }
+        layout_search_history.visibility = View.GONE
+        layout_search_text.visibility = View.VISIBLE
+        updateTag("")
+
+        viewModel.updateSearchHistory(edit_search.text.toString())
+
+        if (isClub) {
+            viewModel.getClubs(edit_search.text.toString())
+            progressHUD?.show()
+        } else {
+            viewModel.getSearchPostsByKeyword(
+                currentPostType,
+                edit_search.text.toString(),
+                isPostFollow
+            )
         }
     }
 
@@ -546,11 +560,16 @@ class SearchPostFragment : BaseFragment() {
                 layout_search_history.visibility = View.GONE
                 layout_search_text.visibility = View.VISIBLE
                 updateTag("")
-                viewModel.getSearchPostsByKeyword(
-                    currentPostType,
-                    edit_search.text.toString(),
-                    isPostFollow
-                )
+                if (isClub) {
+                    viewModel.getClubs(edit_search.text.toString())
+                    progressHUD?.show()
+                } else {
+                    viewModel.getSearchPostsByKeyword(
+                        currentPostType,
+                        edit_search.text.toString(),
+                        isPostFollow
+                    )
+                }
             }
             chip_group_search_text.addView(chip)
         }
