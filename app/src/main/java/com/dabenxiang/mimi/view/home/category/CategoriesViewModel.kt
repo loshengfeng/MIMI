@@ -40,7 +40,7 @@ class CategoriesViewModel : BaseViewModel() {
                     isAdult,
                     category ?: "",
                     viewModelScope,
-                    domainManager.getApiRepository(),
+                    domainManager,
                     pagingCallback
                 )
             val factory =

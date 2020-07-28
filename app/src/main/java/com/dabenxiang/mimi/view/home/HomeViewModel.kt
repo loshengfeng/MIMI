@@ -319,9 +319,6 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-
-
-
     fun sendPostReport(item: MemberPostItem, content: String) {
         viewModelScope.launch {
             flow {
@@ -395,7 +392,7 @@ class HomeViewModel : BaseViewModel() {
             isAdult,
             category,
             viewModelScope,
-            domainManager.getApiRepository(),
+            domainManager,
             pagingCallback
         )
         val videoFactory = VideoFactory(videoDataSource)

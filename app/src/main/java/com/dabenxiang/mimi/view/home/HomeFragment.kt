@@ -44,6 +44,9 @@ class HomeFragment : BaseFragment() {
     private val homeStatisticsViewHolderMap = hashMapOf<Int, HomeStatisticsViewHolder>()
     private val statisticsMap = hashMapOf<Int, HomeTemplate.Statistics>()
 
+    private var width  = 0
+    private var height = 0
+
     override fun getLayoutId() = R.layout.fragment_home
 
     override fun setupFirstTime() {
@@ -52,6 +55,9 @@ class HomeFragment : BaseFragment() {
         setupRecyclerByPosition(0)
         refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
         btn_ranking.visibility = View.GONE
+
+        width = GeneralUtils.getScreenSize(requireActivity()).first
+        height = GeneralUtils.getScreenSize(requireActivity()).second
 
         if (mainViewModel?.normal == null) {
             mainViewModel?.getHomeCategories()
@@ -310,8 +316,6 @@ class HomeFragment : BaseFragment() {
 
         override fun onLoadBannerViewHolder(vh: HomeBannerViewHolder) {
             homeBannerViewHolderMap[vh.adapterPosition] = vh
-            val width = GeneralUtils.getScreenSize(requireActivity()).first
-            val height = GeneralUtils.getScreenSize(requireActivity()).second
             mainViewModel?.getAd(
                 vh.adapterPosition,
                 (width * 0.333).toInt(),

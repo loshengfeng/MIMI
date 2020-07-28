@@ -77,7 +77,6 @@ class AdultHomeFragment : BaseFragment() {
     private val viewModel: HomeViewModel by viewModels()
 
     private val homeBannerViewHolderMap = hashMapOf<Int, HomeBannerViewHolder>()
-
     private val homeCarouselViewHolderMap = hashMapOf<Int, HomeCarouselViewHolder>()
     private val carouselMap = hashMapOf<Int, HomeTemplate.Carousel>()
 
@@ -96,8 +95,11 @@ class AdultHomeFragment : BaseFragment() {
     private var uploadPicUri = arrayListOf<String>()
     private var postMemberRequest = PostMemberRequest()
 
-    private var snackbar: Snackbar? = null
+    private var snackBar: Snackbar? = null
     private var picParameter = PicParameter()
+
+    private var width = 0
+    private var height = 0
 
     companion object {
         private const val REQUEST_PHOTO = 10001
@@ -112,6 +114,9 @@ class AdultHomeFragment : BaseFragment() {
                 R.id.navigation_home
             )
         }
+
+        width = GeneralUtils.getScreenSize(requireActivity()).first
+        height = GeneralUtils.getScreenSize(requireActivity()).second
 
         setupUI()
 
@@ -165,16 +170,16 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private fun showSnackBar() {
-        snackbar = Snackbar.make(testView, "", Snackbar.LENGTH_INDEFINITE)
-        val snackbarLayout: Snackbar.SnackbarLayout = snackbar?.view as Snackbar.SnackbarLayout
-        val textView = snackbarLayout.findViewById(R.id.snackbar_text) as TextView
+        snackBar = Snackbar.make(testView, "", Snackbar.LENGTH_INDEFINITE)
+        val snackBarLayout: Snackbar.SnackbarLayout = snackBar?.view as Snackbar.SnackbarLayout
+        val textView = snackBarLayout.findViewById(R.id.snackbar_text) as TextView
         textView.visibility = View.INVISIBLE
 
         val snackView: View = layoutInflater.inflate(R.layout.snackbar_upload, null)
-        snackbarLayout.addView(snackView, 0)
-        snackbarLayout.setPadding(15, 0, 15, 0)
-        snackbarLayout.setBackgroundColor(Color.TRANSPARENT)
-        snackbar?.show()
+        snackBarLayout.addView(snackView, 0)
+        snackBarLayout.setPadding(15, 0, 15, 0)
+        snackBarLayout.setBackgroundColor(Color.TRANSPARENT)
+        snackBar?.show()
     }
 
     override fun setupObservers() {
@@ -405,7 +410,7 @@ class AdultHomeFragment : BaseFragment() {
         })
 
         viewModel.postVideoMemberResult.observe(viewLifecycleOwner, Observer {
-            val snackBarLayout: Snackbar.SnackbarLayout = snackbar?.view as Snackbar.SnackbarLayout
+            val snackBarLayout: Snackbar.SnackbarLayout = snackBar?.view as Snackbar.SnackbarLayout
             val progressBar =
                 snackBarLayout.findViewById(R.id.contentLoadingProgressBar) as ContentLoadingProgressBar
             val imgSuccess = snackBarLayout.findViewById(R.id.iv_success) as ImageView
@@ -547,7 +552,8 @@ class AdultHomeFragment : BaseFragment() {
                 rv_home.visibility = View.VISIBLE
                 takeIf { rv_home.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_home.background = requireActivity().getDrawable(R.color.adult_color_background)
+                    rv_home.background =
+                        requireActivity().getDrawable(R.color.adult_color_background)
                     rv_home.layoutManager = LinearLayoutManager(requireContext())
                     rv_home.adapter = homeAdapter
                     mainViewModel?.getHomeCategories()
@@ -557,18 +563,21 @@ class AdultHomeFragment : BaseFragment() {
                 rv_first.visibility = View.VISIBLE
                 takeIf { rv_first.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_first.background = requireActivity().getDrawable(R.color.adult_color_background)
+                    rv_first.background =
+                        requireActivity().getDrawable(R.color.adult_color_background)
                     rv_first.layoutManager = GridLayoutManager(requireContext(), 2)
                     rv_first.adapter = videoListAdapter
                     viewModel.getVideos(null, true)
-                }
 
+                    mainViewModel?.getAd(width, height)
+                }
             }
             2 -> {
                 rv_second.visibility = View.VISIBLE
                 takeIf { rv_second.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_second.background = requireActivity().getDrawable(R.color.adult_color_background)
+                    rv_second.background =
+                        requireActivity().getDrawable(R.color.adult_color_background)
                     rv_second.layoutManager = LinearLayoutManager(requireContext())
                     rv_second.adapter = followPostPagedAdapter
                     viewModel.getPostFollows()
@@ -578,7 +587,8 @@ class AdultHomeFragment : BaseFragment() {
                 rv_third.visibility = View.VISIBLE
                 takeIf { rv_third.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_third.background = requireActivity().getDrawable(R.color.adult_color_background)
+                    rv_third.background =
+                        requireActivity().getDrawable(R.color.adult_color_background)
                     rv_third.layoutManager = LinearLayoutManager(requireContext())
                     rv_third.adapter = clipPostPagedAdapter
                     viewModel.getClipPosts()
@@ -588,7 +598,8 @@ class AdultHomeFragment : BaseFragment() {
                 rv_fourth.visibility = View.VISIBLE
                 takeIf { rv_fourth.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_fourth.background = requireActivity().getDrawable(R.color.adult_color_background)
+                    rv_fourth.background =
+                        requireActivity().getDrawable(R.color.adult_color_background)
                     rv_fourth.layoutManager = LinearLayoutManager(requireContext())
                     rv_fourth.adapter = picturePostPagedAdapter
                     viewModel.getPicturePosts()
@@ -598,7 +609,8 @@ class AdultHomeFragment : BaseFragment() {
                 rv_fifth.visibility = View.VISIBLE
                 takeIf { rv_fifth.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_fifth.background = requireActivity().getDrawable(R.color.adult_color_background)
+                    rv_fifth.background =
+                        requireActivity().getDrawable(R.color.adult_color_background)
                     rv_fifth.layoutManager = LinearLayoutManager(requireContext())
                     rv_fifth.adapter = textPostPagedAdapter
                     viewModel.getTextPosts()
@@ -608,7 +620,8 @@ class AdultHomeFragment : BaseFragment() {
                 rv_sixth.visibility = View.VISIBLE
                 takeIf { rv_sixth.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_sixth.background = requireActivity().getDrawable(R.color.adult_color_background)
+                    rv_sixth.background =
+                        requireActivity().getDrawable(R.color.adult_color_background)
                     rv_sixth.layoutManager = LinearLayoutManager(requireContext())
                     rv_sixth.adapter = clubMemberAdapter
                     viewModel.getClubs()
@@ -632,9 +645,7 @@ class AdultHomeFragment : BaseFragment() {
     private fun setupHomeData(root: CategoriesItem?) {
         val templateList = mutableListOf<HomeTemplate>()
 
-        // TODO: Dave
         templateList.add(HomeTemplate.Banner(AdItem()))
-//        templateList.add(HomeTemplate.Banner(imgUrl = "https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
         templateList.add(HomeTemplate.Carousel(true))
 
         if (root?.categories != null) {
@@ -902,8 +913,6 @@ class AdultHomeFragment : BaseFragment() {
 
         override fun onLoadBannerViewHolder(vh: HomeBannerViewHolder) {
             homeBannerViewHolderMap[vh.adapterPosition] = vh
-            val width = GeneralUtils.getScreenSize(requireActivity()).first
-            val height = GeneralUtils.getScreenSize(requireActivity()).second
             mainViewModel?.getAd(
                 vh.adapterPosition,
                 (width * 0.333).toInt(),
