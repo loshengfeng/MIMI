@@ -15,6 +15,7 @@ import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.HomeItemType
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.view.club.ClubFuncItem
 import com.dabenxiang.mimi.view.home.HomeTemplate
 import com.dabenxiang.mimi.view.home.viewholder.*
 
@@ -22,8 +23,8 @@ class HomeAdapter(
     val context: Context,
     private val listener: EventListener,
     private val isAdult: Boolean,
-    private val clubListener: HomeClubAdapter.ClubListener,
-    private val memberPostFuncItem: MemberPostFuncItem
+    private val memberPostFuncItem: MemberPostFuncItem,
+    private val clubFuncItem: ClubFuncItem
 ) : ListAdapter<HomeTemplate, BaseViewHolder>(DIFF_CALLBACK) {
 
     companion object {
@@ -111,7 +112,7 @@ class HomeAdapter(
                         R.layout.item_home_club,
                         parent,
                         false
-                    ), listener, isAdult, clubListener, memberPostFuncItem
+                    ), listener, isAdult, memberPostFuncItem, clubFuncItem
                 )
             }
         }

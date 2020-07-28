@@ -9,9 +9,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.TextUtils
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.addCallback
@@ -23,24 +21,21 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
-import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.AdultTabType
-import com.dabenxiang.mimi.model.enums.AttachmentType
-import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.model.serializable.SearchPostItem
 import com.dabenxiang.mimi.model.vo.UploadPicItem
-import com.dabenxiang.mimi.view.adapter.*
-import com.dabenxiang.mimi.view.adapter.viewHolder.ClipPostHolder
-import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
-import com.dabenxiang.mimi.view.adapter.viewHolder.TextPostHolder
+import com.dabenxiang.mimi.view.adapter.HomeAdapter
+import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
+import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter
+import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
@@ -67,14 +62,12 @@ import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils.putLruCache
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_home.*
 import timber.log.Timber
 import java.io.File
-
 
 class AdultHomeFragment : BaseFragment() {
 
@@ -111,13 +104,7 @@ class AdultHomeFragment : BaseFragment() {
 
     override fun getLayoutId() = R.layout.fragment_home
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        Timber.d("@@onViewCreated")
-    }
-
     override fun setupFirstTime() {
-        Timber.d("@@setupFirstTime")
         requireActivity().onBackPressedDispatcher.addCallback {
             interactionListener?.changeNavigationPosition(
                 R.id.navigation_home
@@ -214,15 +201,6 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.tabLayoutPosition.observe(viewLifecycleOwner, Observer { position ->
-            lastPosition = position
-            tabAdapter.setLastSelectedIndex(lastPosition)
-            recyclerview_tab.scrollToPosition(position)
-            setupRecyclerByPosition(position)
-            refresh.isRefreshing = true
-            getData(position)
-        })
-
         viewModel.videoList.observe(viewLifecycleOwner, Observer {
             videoListAdapter.submitList(it)
         })
@@ -286,130 +264,20 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.followClubResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Success -> {
-                    when (val holder = homeAdapter.functionViewHolderMap[FunctionType.FOLLOW]) {
-                        is HomeClubViewHolder -> {
-                            holder.updateItemByFollow(it.result.first, it.result.second)
-                        }
-                    }
-                }
-                is Error -> Timber.e(it.throwable)
-            }
-        })
-
-        viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Success -> {
-                    when (memberPostPagedAdapter.viewHolderMap[it.result]) {
-                        is ClipPostHolder,
-                        is PicturePostHolder,
-                        is TextPostHolder -> {
-                            memberPostPagedAdapter.notifyItemChanged(
-                                it.result,
-                                MemberPostPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI
-                            )
-                        }
-                    }
-                }
-                is Error -> Timber.e(it.throwable)
-            }
-        })
-
-        viewModel.likePostResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Success -> {
-                    when (memberPostPagedAdapter.viewHolderMap[it.result]) {
-                        is ClipPostHolder,
-                        is PicturePostHolder,
-                        is TextPostHolder -> {
-                            memberPostPagedAdapter.notifyItemChanged(
-                                it.result,
-                                MemberPostPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI
-                            )
-                        }
-                    }
-                }
-                is Error -> Timber.e(it.throwable)
-            }
-        })
-
-        viewModel.attachmentByTypeResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Success -> {
-                    val attachmentItem = it.result
-                    putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
-
-                    when (attachmentItem.type) {
-                        AttachmentType.ADULT_HOME_CLIP -> {
-                            homeAdapter.attachmentViewHolderMap[attachmentItem.type]?.also { holder ->
-                                holder as HomeClipViewHolder
-                                holder.updateItem(attachmentItem.position!!)
-                            }
-                        }
-                        AttachmentType.ADULT_HOME_PICTURE -> {
-                            homeAdapter.attachmentViewHolderMap[attachmentItem.type]?.also { holder ->
-                                holder as HomePictureViewHolder
-                                holder.updateItem(attachmentItem.position!!)
-                            }
-                        }
-                        AttachmentType.ADULT_HOME_CLUB -> {
-                            homeAdapter.attachmentViewHolderMap[attachmentItem.type]?.also { holder ->
-                                holder as HomeClubViewHolder
-                                holder.updateItem(attachmentItem.position!!)
-                            }
-                        }
-                        AttachmentType.ADULT_TAB_CLIP,
-                        AttachmentType.ADULT_TAB_PICTURE,
-                        AttachmentType.ADULT_TAB_TEXT -> {
-                            memberPostPagedAdapter.notifyItemChanged(attachmentItem.position!!)
-                        }
-                        else -> {
-                        }
-                    }
-
-                }
-                is Error -> Timber.e(it.throwable)
-            }
-        })
-
-        viewModel.scrollToLastPosition.observe(viewLifecycleOwner, Observer { result ->
-            if (result) recyclerview.scrollToPosition(viewModel.lastListIndex)
-        })
-
-        viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Success -> {
-                    val attachmentItem = it.result
-                    putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
-                    when (val holder =
-                        memberPostPagedAdapter.viewHolderMap[attachmentItem.parentPosition]) {
-                        is PicturePostHolder -> {
-                            if (holder.pictureRecycler.tag == attachmentItem.parentPosition) {
-                                memberPostPagedAdapter.updateInternalItem(holder)
-                            }
-                        }
-                    }
-                }
-                is Error -> Timber.e(it.throwable)
-            }
-        })
-
         viewModel.postFollowItemListResult.observe(viewLifecycleOwner, Observer {
-            memberPostPagedAdapter.submitList(it)
+            followPostPagedAdapter.submitList(it)
         })
 
         viewModel.clipPostItemListResult.observe(viewLifecycleOwner, Observer {
-            memberPostPagedAdapter.submitList(it)
+            clipPostPagedAdapter.submitList(it)
         })
 
         viewModel.picturePostItemListResult.observe(viewLifecycleOwner, Observer {
-            memberPostPagedAdapter.submitList(it)
+            picturePostPagedAdapter.submitList(it)
         })
 
         viewModel.textPostItemListResult.observe(viewLifecycleOwner, Observer {
-            memberPostPagedAdapter.submitList(it)
+            textPostPagedAdapter.submitList(it)
         })
 
         viewModel.clubItemListResult.observe(viewLifecycleOwner, Observer {
@@ -648,9 +516,21 @@ class AdultHomeFragment : BaseFragment() {
                 recyclerview.layoutManager = GridLayoutManager(requireContext(), 2)
                 recyclerview.adapter = videoListAdapter
             }
-            2, 3, 4, 5 -> {
+            2 -> {
                 recyclerview.layoutManager = LinearLayoutManager(requireContext())
-                recyclerview.adapter = memberPostPagedAdapter
+                recyclerview.adapter = followPostPagedAdapter
+            }
+            3 -> {
+                recyclerview.layoutManager = LinearLayoutManager(requireContext())
+                recyclerview.adapter = clipPostPagedAdapter
+            }
+            4 -> {
+                recyclerview.layoutManager = LinearLayoutManager(requireContext())
+                recyclerview.adapter = picturePostPagedAdapter
+            }
+            5 -> {
+                recyclerview.layoutManager = LinearLayoutManager(requireContext())
+                recyclerview.adapter = textPostPagedAdapter
             }
             else -> {
                 recyclerview.layoutManager = LinearLayoutManager(requireContext())
@@ -695,9 +575,20 @@ class AdultHomeFragment : BaseFragment() {
     private val tabAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
-                viewModel.setTopTabPosition(index)
+//                viewModel.setTopTabPosition(index)
+                Timber.d("@@onClickItemIndex: $index")
+                setTab(index)
             }
         }, true)
+    }
+
+    private fun setTab(index: Int) {
+        lastPosition = index
+        tabAdapter.setLastSelectedIndex(lastPosition)
+        recyclerview_tab.scrollToPosition(index)
+        setupRecyclerByPosition(index)
+        refresh.isRefreshing = true
+        getData(index)
     }
 
     private val homeAdapter by lazy {
@@ -705,30 +596,47 @@ class AdultHomeFragment : BaseFragment() {
             requireContext(),
             adapterListener,
             true,
-            clubListener,
-            memberPostFuncItem
+            memberPostFuncItem,
+            clubFuncItem
         )
     }
 
-    private val memberPostPagedAdapter by lazy {
+    private val followPostPagedAdapter by lazy {
+        MemberPostPagedAdapter(requireActivity(), adultListener, "", memberPostFuncItem)
+    }
+
+    private val clipPostPagedAdapter by lazy {
+        MemberPostPagedAdapter(requireActivity(), adultListener, "", memberPostFuncItem)
+    }
+
+    private val picturePostPagedAdapter by lazy {
+        MemberPostPagedAdapter(requireActivity(), adultListener, "", memberPostFuncItem)
+    }
+
+    private val textPostPagedAdapter by lazy {
         MemberPostPagedAdapter(requireActivity(), adultListener, "", memberPostFuncItem)
     }
 
     private val memberPostFuncItem by lazy {
         MemberPostFuncItem(
             {},
-            { id, function -> getBitmap(id, function) },
-            { _, _, _ -> }
+            { id, func -> getBitmap(id, func) },
+            { item, isFollow, func -> followMember(item, isFollow, func) },
+            { item, isLike, func -> likePost(item, isLike, func) }
         )
+    }
+
+    private val clubFuncItem by lazy {
+        ClubFuncItem(
+            { item -> onItemClick(item) },
+            { id, function -> getBitmap(id, function) },
+            { item, isFollow, function -> clubFollow(item, isFollow, function) })
     }
 
     private val clubMemberAdapter by lazy {
         ClubMemberAdapter(
             requireContext(),
-            ClubFuncItem(
-                { item -> onItemClick(item) },
-                { id, function -> getBitmap(id, function) },
-                { item, isFollow, function -> clubFollow(item, isFollow, function) })
+            clubFuncItem
         )
     }
 
@@ -738,11 +646,11 @@ class AdultHomeFragment : BaseFragment() {
 
     private val adultListener = object : AdultListener {
         override fun onFollowPostClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
-            viewModel.followPost(item, position, isFollow)
+            //replace by closure
         }
 
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
-            viewModel.likePost(item, position, isLike)
+            //replace by closure
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
@@ -874,21 +782,18 @@ class AdultHomeFragment : BaseFragment() {
         }
     }
 
-    private val clubListener = object : HomeClubAdapter.ClubListener {
-        override fun followClub(item: MemberClubItem, position: Int, isFollow: Boolean) {
-            viewModel.followClub(item, position, isFollow)
-        }
-    }
-
     private val adapterListener = object : HomeAdapter.EventListener {
 
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
-            when (item.title) {
-                "蜜蜜影视" -> viewModel.setTopTabPosition(1)
-                "短视频" -> viewModel.setTopTabPosition(3)
-                "图片" -> viewModel.setTopTabPosition(4)
-                "圈子" -> viewModel.setTopTabPosition(6)
+            Timber.d("@@onHeaderItemClick ${item.title}}")
+            val position = when (item.title) {
+                "蜜蜜影视" -> 1
+                "短视频" -> 3
+                "图片" -> 4
+                "圈子" -> 6
+                else -> 1
             }
+            setTab(position)
         }
 
         override fun onVideoClick(view: View, item: PlayerData) {
@@ -1018,7 +923,7 @@ class AdultHomeFragment : BaseFragment() {
 
                 REQUEST_VIDEO_CAPTURE -> {
                     val videoUri: Uri? = data?.data
-                    val myUri = Uri.fromFile(File(UriUtils.getPath(requireContext(), videoUri!!)))
+                    val myUri = Uri.fromFile(File(UriUtils.getPath(requireContext(), videoUri!!) ?: ""))
 
                     val bundle = Bundle()
                     bundle.putString(BUNDLE_VIDEO_URI, myUri.toString())
@@ -1038,6 +943,14 @@ class AdultHomeFragment : BaseFragment() {
 
     private fun getBitmap(id: String, update: ((String) -> Unit)) {
         viewModel.getBitmap(id, update)
+    }
+
+    private fun followMember(memberPostItem: MemberPostItem, isFollow: Boolean, update: (Boolean) -> Unit) {
+        viewModel.followMember(memberPostItem, isFollow, update)
+    }
+
+    private fun likePost(memberPostItem: MemberPostItem, isLike: Boolean, update: (Boolean, Int) -> Unit) {
+        viewModel.likePost(memberPostItem, isLike, update)
     }
 
     private fun clubFollow(

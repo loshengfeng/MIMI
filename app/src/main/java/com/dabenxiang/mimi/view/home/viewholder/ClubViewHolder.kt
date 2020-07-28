@@ -12,6 +12,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.view.adapter.HomeClubAdapter
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
+import com.dabenxiang.mimi.view.club.ClubFuncItem
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.getLruCache
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.nested_item_home_club.view.*
@@ -23,8 +24,7 @@ class ClubViewHolder(
     itemView: View,
     onClickListener: IndexViewHolderListener,
     val context: Context,
-    private val clubListener: HomeClubAdapter.ClubListener,
-    private val memberPostFuncItem: MemberPostFuncItem
+    private val clubFuncItem: ClubFuncItem
 ) :
     BaseIndexViewHolder<MemberClubItem>(itemView, onClickListener) {
 
@@ -53,24 +53,18 @@ class ClubViewHolder(
         postCount.text = model?.postCount.toString()
 
         val isFollow = model?.isFollow ?: false
-
-        if (isFollow) {
-            follow.text = context.getString(R.string.followed)
-            follow.background = context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
-            follow.setTextColor(context.getColor(R.color.color_white_1))
-        } else {
-            follow.text = context.getString(R.string.follow)
-            follow.background = context.getDrawable(R.drawable.bg_red_1_stroke_radius_16)
-            follow.setTextColor(context.getColor(R.color.color_red_1))
-        }
+        updateFollow(isFollow)
 
         follow.setOnClickListener {
-            clubListener.followClub(model!!, index, !isFollow)
+            model?.also {
+                val follow = it.isFollow ?: false
+                clubFuncItem.onFollowClick(it, !follow) { isFollow -> updateFollow(isFollow) }
+            }
         }
 
         val avatarId = model?.avatarAttachmentId.toString()
         if (getLruCache(model?.avatarAttachmentId.toString()) == null) {
-            memberPostFuncItem.getBitmap(avatarId) { id -> updateAvatar(id) }
+            clubFuncItem.getBitmap(avatarId) { id -> updateAvatar(id) }
         } else {
             updateAvatar(avatarId)
         }
@@ -91,7 +85,7 @@ class ClubViewHolder(
             } else {
                 val imageId = imageItem?.id.toString()
                 if (getLruCache(imageId) == null) {
-                    memberPostFuncItem.getBitmap(imageId) { id -> updateImage(id) }
+                    clubFuncItem.getBitmap(imageId) { id -> updateImage(id) }
                 } else {
                     updateImage(imageId)
                 }
@@ -113,5 +107,17 @@ class ClubViewHolder(
     private fun updateAvatar(id: String) {
         val bitmap = getLruCache(id)
         Glide.with(avatarImg.context).load(bitmap).circleCrop().into(avatarImg)
+    }
+
+    private fun updateFollow(isFollow: Boolean) {
+        if (isFollow) {
+            follow.text = context.getString(R.string.followed)
+            follow.background = context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
+            follow.setTextColor(context.getColor(R.color.color_white_1))
+        } else {
+            follow.text = context.getString(R.string.follow)
+            follow.background = context.getDrawable(R.drawable.bg_red_1_stroke_radius_16)
+            follow.setTextColor(context.getColor(R.color.color_red_1))
+        }
     }
 }
