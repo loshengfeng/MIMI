@@ -105,6 +105,15 @@ class ClubDetailFragment : BaseFragment() {
                 is ApiResult.Error -> Timber.e(it.throwable)
             }
         })
+
+        viewModel.postReportResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Empty -> {
+                    GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
+                }
+                is ApiResult.Error -> Timber.e(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -128,13 +137,9 @@ class ClubDetailFragment : BaseFragment() {
     }
 
     private val adultListener = object : AdultListener {
-        override fun onFollowPostClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
-            viewModel.followPost(item, position, isFollow)
-        }
+        override fun onFollowPostClick(item: MemberPostItem, position: Int, isFollow: Boolean) {}
 
-        override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
-            viewModel.likePost(item, position, isLike)
-        }
+        override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {}
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
             when (adultTabType) {
@@ -142,7 +147,7 @@ class ClubDetailFragment : BaseFragment() {
                     val bundle = PictureDetailFragment.createBundle(item, 1)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_adultHomeFragment_to_pictureDetailFragment,
+                            R.id.action_clubDetailFragment_to_pictureDetailFragment,
                             bundle
                         )
                     )
@@ -151,7 +156,7 @@ class ClubDetailFragment : BaseFragment() {
                     val bundle = TextDetailFragment.createBundle(item, 1)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_adultHomeFragment_to_textDetailFragment,
+                            R.id.action_clubDetailFragment_to_textDetailFragment,
                             bundle
                         )
                     )

@@ -164,6 +164,10 @@ interface ApiService {
         @Query("orderBy") orderBy: Int = 1
     ): Response<ApiBasePagingItem<List<MemberPostItem>>>
 
+
+    @GET("/v1/Members/Post/{id}")
+    suspend fun getMemberPostDetail(@Path("id") postId: Long): Response<ApiBaseItem<MemberPostItem>>
+
     @POST("/v1/Members/Post")
     suspend fun postMembersPost(
         @Body request: PostMemberRequest

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cl_clip_post"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:background="@color/item_color_card_background"
     android:paddingStart="20dp"
     android:paddingTop="10dp"
@@ -79,19 +79,20 @@
             android:id="@+id/cv_photo"
             android:layout_width="0dp"
             android:layout_height="180dp"
-            app:cardCornerRadius="6dp"
             app:cardBackgroundColor="@color/item_color_card_background"
+            app:cardCornerRadius="6dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent">
+
             <ImageView
                 android:id="@+id/iv_photo"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:contentDescription="@null"
                 android:scaleType="centerCrop"
-                android:src="@drawable/img_nopic_03"/>
+                android:src="@drawable/img_nopic_03" />
         </androidx.cardview.widget.CardView>
 
         <TextView
@@ -100,8 +101,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginBottom="6dp"
-            android:elevation="2dp"
             android:background="@drawable/bg_black_1_50_radius_4"
+            android:elevation="2dp"
             android:paddingStart="6dp"
             android:paddingTop="2dp"
             android:paddingEnd="6dp"
@@ -117,8 +118,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:contentDescription="@null"
-            android:src="@drawable/btn_play_n"
             android:elevation="2dp"
+            android:src="@drawable/btn_play_n"
             app:layout_constraintBottom_toBottomOf="@id/cv_photo"
             app:layout_constraintEnd_toEndOf="@id/cv_photo"
             app:layout_constraintStart_toStartOf="@id/cv_photo"

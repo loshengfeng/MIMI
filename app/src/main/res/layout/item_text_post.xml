@@ -113,8 +113,8 @@
                 android:paddingEnd="16dp"
                 android:textColor="@color/color_white_1"
                 android:textSize="14sp"
-                app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_text"
                 tools:text="名称名称" />
 
@@ -122,14 +122,24 @@
 
     </androidx.cardview.widget.CardView>
 
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/chip_group_tag"
+    <HorizontalScrollView
+        android:id="@+id/sv_hip_group_tag"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layout_card" />
+        app:layout_constraintTop_toBottomOf="@id/layout_card">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chip_group_tag"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="parent" />
+    </HorizontalScrollView>
 
     <ImageView
         android:id="@+id/iv_like"
@@ -137,7 +147,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ico_nice"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chip_group_tag" />
+        app:layout_constraintTop_toBottomOf="@+id/sv_hip_group_tag" />
 
     <TextView
         android:id="@+id/tv_like_count"
@@ -158,7 +168,7 @@
         android:layout_marginStart="33dp"
         android:src="@drawable/ico_messege_adult"
         app:layout_constraintLeft_toRightOf="@+id/tv_like_count"
-        app:layout_constraintTop_toBottomOf="@+id/chip_group_tag" />
+        app:layout_constraintTop_toBottomOf="@+id/sv_hip_group_tag" />
 
     <TextView
         android:id="@+id/tv_comment_count"
@@ -178,7 +188,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/btn_more_white_n"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chip_group_tag" />
+        app:layout_constraintTop_toBottomOf="@+id/sv_hip_group_tag" />
 
     <View
         android:layout_width="match_parent"

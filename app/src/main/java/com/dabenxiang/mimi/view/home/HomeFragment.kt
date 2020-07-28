@@ -79,7 +79,7 @@ class HomeFragment : BaseFragment() {
                         setupHomeData(mainViewModel?.normal)
                     }
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -103,7 +103,7 @@ class HomeFragment : BaseFragment() {
                         response.result.content?.statisticsItemToCarouselHolderItem(carousel!!.isAdult)
                     viewHolder?.submitList(carouselHolderItems)
                 }
-                is Error -> Timber.e(response.throwable)
+                is Error -> onApiError(response.throwable)
             }
         })
 
@@ -116,7 +116,7 @@ class HomeFragment : BaseFragment() {
                         response.result.content?.statisticsItemToVideoItem(statistics!!.isAdult)
                     viewHolder?.submitList(videoHolderItems)
                 }
-                is Error -> Timber.e(response.throwable)
+                is Error -> onApiError(response.throwable)
             }
         })
     }
@@ -211,16 +211,6 @@ class HomeFragment : BaseFragment() {
 
     private val videoListAdapter by lazy {
         HomeVideoListAdapter(adapterListener, false)
-    }
-
-    private val attachmentListener = object : AttachmentListener {
-        override fun onGetAttachment(id: String, position: Int, type: AttachmentType) {
-
-        }
-
-        override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
-
-        }
     }
 
     private val adapterListener = object : HomeAdapter.EventListener {

@@ -124,7 +124,7 @@ class SearchPostFragment : BaseFragment() {
                 is Empty -> {
                     GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -143,7 +143,7 @@ class SearchPostFragment : BaseFragment() {
                         }
                     }
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -161,7 +161,7 @@ class SearchPostFragment : BaseFragment() {
                         }
                     }
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -179,7 +179,7 @@ class SearchPostFragment : BaseFragment() {
                         }
                     }
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -197,7 +197,7 @@ class SearchPostFragment : BaseFragment() {
                         }
                     }
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 

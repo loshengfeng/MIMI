@@ -31,7 +31,6 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_text_detail.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
-import timber.log.Timber
 
 class TextDetailFragment : BaseFragment() {
 
@@ -98,6 +97,8 @@ class TextDetailFragment : BaseFragment() {
 
         tv_like_count.text = memberPostItem!!.likeCount.toString()
         tv_comment_count.text = memberPostItem!!.commentCount.toString()
+
+        viewModel.getPostDetail(memberPostItem!!)
     }
 
     override fun getLayoutId(): Int {
@@ -108,7 +109,7 @@ class TextDetailFragment : BaseFragment() {
         viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> textDetailAdapter?.notifyItemChanged(it.result)
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -124,7 +125,7 @@ class TextDetailFragment : BaseFragment() {
                     tv_like_count.text = item.likeCount.toString()
 
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -133,7 +134,7 @@ class TextDetailFragment : BaseFragment() {
                 is Empty -> {
                     GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -142,7 +143,7 @@ class TextDetailFragment : BaseFragment() {
                 is Empty -> {
                     GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -172,7 +173,7 @@ class TextDetailFragment : BaseFragment() {
                         }
                         textDetailAdapter?.notifyItemChanged(2)
                     }
-                    is Error -> Timber.e(it.throwable)
+                    is Error -> onApiError(it.throwable)
                 }
             }
         })
@@ -180,7 +181,7 @@ class TextDetailFragment : BaseFragment() {
         viewModel.avatarResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> avatarBlock?.invoke(it.result)
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -188,7 +189,7 @@ class TextDetailFragment : BaseFragment() {
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> replyCommentBlock?.also { it() }
-                    is Error -> Timber.e(it.throwable)
+                    is Error -> onApiError(it.throwable)
                 }
             }
         })
@@ -197,7 +198,7 @@ class TextDetailFragment : BaseFragment() {
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> commentLikeBlock?.also { it() }
-                    is Error -> Timber.e(it.throwable)
+                    is Error -> onApiError(it.throwable)
                 }
             }
         })
@@ -206,8 +207,18 @@ class TextDetailFragment : BaseFragment() {
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> commentLikeBlock?.also { it() }
-                    is Error -> Timber.e(it.throwable)
+                    is Error -> onApiError(it.throwable)
                 }
+            }
+        })
+
+        viewModel.postDetailResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    val item = it.result.content
+                    textDetailAdapter?.updateContent(item!!)
+                }
+                is Error -> onApiError(it.throwable)
             }
         })
     }

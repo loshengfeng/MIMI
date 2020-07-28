@@ -54,7 +54,7 @@
             app:btn_pressed_color="darker"
             app:btn_solid_color="@color/normal_color_search_bar"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/btn_filter"
+            app:layout_constraintEnd_toStartOf="@id/btn_ranking"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -80,7 +80,7 @@
             app:layout_constraintTop_toTopOf="@id/iv_bg_search" />
 
         <com.yulichswift.roundedview.widget.RoundedTextView
-            android:id="@+id/btn_filter"
+            android:id="@+id/btn_ranking"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:clickable="true"

@@ -9,7 +9,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.TextUtils
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.addCallback
@@ -111,7 +113,11 @@ class AdultHomeFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Timber.d("@@onViewCreated")
+    }
 
+    override fun setupFirstTime() {
+        Timber.d("@@setupFirstTime")
         requireActivity().onBackPressedDispatcher.addCallback {
             interactionListener?.changeNavigationPosition(
                 R.id.navigation_home
@@ -123,7 +129,6 @@ class AdultHomeFragment : BaseFragment() {
         if (mainViewModel?.adult == null) {
             mainViewModel?.getHomeCategories()
         }
-
         handleBackStackData()
     }
 
@@ -205,7 +210,7 @@ class AdultHomeFragment : BaseFragment() {
                         setupHomeData(mainViewModel?.adult)
                     }
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -231,7 +236,7 @@ class AdultHomeFragment : BaseFragment() {
                         response.result.content?.statisticsItemToCarouselHolderItem(carousel!!.isAdult)
                     viewHolder?.submitList(carouselHolderItems)
                 }
-                is Error -> Timber.e(response.throwable)
+                is Error -> onApiError(response.throwable)
             }
         })
 
@@ -244,7 +249,7 @@ class AdultHomeFragment : BaseFragment() {
                         response.result.content?.statisticsItemToVideoItem(statistics!!.isAdult)
                     viewHolder?.submitList(videoHolderItems)
                 }
-                is Error -> Timber.e(response.throwable)
+                is Error -> onApiError(response.throwable)
             }
         })
 
@@ -255,7 +260,7 @@ class AdultHomeFragment : BaseFragment() {
                     val memberPostItems = response.result.content ?: arrayListOf()
                     viewHolder?.submitList(memberPostItems)
                 }
-                is Error -> Timber.e(response.throwable)
+                is Error -> onApiError(response.throwable)
             }
         })
 
@@ -266,7 +271,7 @@ class AdultHomeFragment : BaseFragment() {
                     val memberPostItems = response.result.content ?: arrayListOf()
                     viewHolder?.submitList(memberPostItems)
                 }
-                is Error -> Timber.e(response.throwable)
+                is Error -> onApiError(response.throwable)
             }
         })
 
@@ -277,7 +282,7 @@ class AdultHomeFragment : BaseFragment() {
                     val memberClubItems = response.result.content ?: arrayListOf()
                     viewHolder?.submitList(memberClubItems)
                 }
-                is Error -> Timber.e(response.throwable)
+                is Error -> onApiError(response.throwable)
             }
         })
 
@@ -290,7 +295,7 @@ class AdultHomeFragment : BaseFragment() {
                         }
                     }
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -308,7 +313,7 @@ class AdultHomeFragment : BaseFragment() {
                         }
                     }
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -326,7 +331,7 @@ class AdultHomeFragment : BaseFragment() {
                         }
                     }
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -365,7 +370,7 @@ class AdultHomeFragment : BaseFragment() {
                     }
 
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -387,7 +392,7 @@ class AdultHomeFragment : BaseFragment() {
                         }
                     }
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -416,7 +421,7 @@ class AdultHomeFragment : BaseFragment() {
                 is Empty -> {
                     GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -618,8 +623,8 @@ class AdultHomeFragment : BaseFragment() {
         iv_search.setImageResource(R.drawable.adult_btn_search)
         tv_search.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
 
-        btn_filter.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
-        btn_filter.setBtnSolidColor(
+        btn_ranking.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
+        btn_ranking.setBtnSolidColor(
             requireActivity().getColor(R.color.color_white_1_30),
             requireActivity().getColor(R.color.color_red_1),
             resources.getDimension(R.dimen.dp_6)

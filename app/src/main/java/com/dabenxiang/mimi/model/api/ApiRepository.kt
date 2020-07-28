@@ -8,9 +8,6 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.Path
-import retrofit2.http.Query
 import java.io.File
 
 class ApiRepository(private val apiService: ApiService) {
@@ -225,6 +222,10 @@ class ApiRepository(private val apiService: ApiService) {
         limit: Int
     ): Response<ApiBasePagingItem<List<MemberPostItem>>> {
         return apiService.getMembersPost(type.value, offset, limit)
+    }
+
+    suspend fun getMemberPostDetail(postId: Long): Response<ApiBaseItem<MemberPostItem>> {
+        return apiService.getMemberPostDetail(postId)
     }
 
     suspend fun postMembersPost(
@@ -487,6 +488,7 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun updateProfile(
         body: ProfileRequest
     ) = apiService.updateProfile(body)
+
     /**********************************************************
      *
      *                  Members/Me/Post
