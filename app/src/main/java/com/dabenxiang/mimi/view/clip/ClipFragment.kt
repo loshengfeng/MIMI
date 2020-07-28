@@ -27,14 +27,17 @@ class ClipFragment : BaseFragment() {
     companion object {
         const val KEY_DATA = "data"
         const val KEY_POSITION = "position"
+        const val KEY_SHOW_COMMENT = "show_comment"
 
         fun createBundle(
             items: ArrayList<MemberPostItem>,
-            position: Int
+            position: Int,
+            showComment: Boolean = false
         ): Bundle {
             return Bundle().also {
                 it.putSerializable(KEY_DATA, items)
                 it.putInt(KEY_POSITION, position)
+                it.putBoolean(KEY_SHOW_COMMENT, showComment)
             }
         }
     }
@@ -177,6 +180,11 @@ class ClipFragment : BaseFragment() {
                 }
             })
             rv_third.scrollToPosition(position)
+
+            (arguments?.getSerializable(KEY_SHOW_COMMENT) as Boolean).takeIf { it }?.also {
+                val item = data[position]
+                showCommentDialog(item)
+            }
         }
     }
 
@@ -221,6 +229,10 @@ class ClipFragment : BaseFragment() {
 
     private fun onCommentClick(item: MemberPostItem) {
         Timber.d("onCommentClick, item:$item")
+        showCommentDialog(item)
+    }
+
+    private fun showCommentDialog(item: MemberPostItem) {
         CommentDialogFragment.newInstance(item).also {
             it.isCancelable = true
             it.show(

@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseViewHolder
@@ -47,7 +48,8 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
         position: Int,
         adultListener: AdultListener,
         tag: String,
-        memberPostFuncItem: MemberPostFuncItem
+        memberPostFuncItem: MemberPostFuncItem,
+        isClipList: Boolean
     ) {
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
@@ -105,7 +107,10 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         commentImage.setOnClickListener {
-            itemList?.also { adultListener.onClipCommentClick(it, position) }
+            when (isClipList) {
+                true -> itemList?.also { adultListener.onClipCommentClick(it, position) }
+                false -> adultListener.onCommentClick(item, AdultTabType.CLIP)
+            }
         }
 
         moreImage.setOnClickListener {
@@ -113,7 +118,10 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         ivPhoto.setOnClickListener {
-            itemList?.also { adultListener.onClipItemClick(it, position) }
+            when (isClipList) {
+                true -> itemList?.also { adultListener.onClipItemClick(it, position) }
+                false -> adultListener.onItemClick(item, AdultTabType.CLIP)
+            }
         }
     }
 
