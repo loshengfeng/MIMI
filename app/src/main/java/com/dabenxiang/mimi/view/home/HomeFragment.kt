@@ -49,8 +49,7 @@ class HomeFragment : BaseFragment() {
     override fun setupFirstTime() {
         requireActivity().onBackPressedDispatcher.addCallback { backToDesktop() }
         recyclerview_tab.adapter = tabAdapter
-        recyclerview.layoutManager = LinearLayoutManager(requireContext())
-        recyclerview.adapter = homeAdapter
+        setupRecyclerByPosition(0)
         refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
         btn_ranking.visibility = View.GONE
 
@@ -60,6 +59,10 @@ class HomeFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
+        viewModel.showProgress.observe(viewLifecycleOwner, Observer { showProgress ->
+            showProgress?.takeUnless { it }?.also { refresh.isRefreshing = it }
+        })
+
         mainViewModel?.categoriesData?.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Loading -> refresh.isRefreshing = true
@@ -92,7 +95,12 @@ class HomeFragment : BaseFragment() {
         })
 
         viewModel.videoList.observe(viewLifecycleOwner, Observer {
-            videoListAdapter.submitList(it)
+            when(lastPosition) {
+                1 -> movieListAdapter.submitList(it)
+                2 -> dramaListAdapter.submitList(it)
+                3 -> varietyListAdapter.submitList(it)
+                else -> animationListAdapter.submitList(it)
+            }
         })
 
         viewModel.carouselResult.observe(viewLifecycleOwner, Observer {
@@ -124,7 +132,7 @@ class HomeFragment : BaseFragment() {
 
     override fun setupListeners() {
         refresh.setOnRefreshListener {
-            refresh.isRefreshing = false
+            refresh.isRefreshing = true
             getData(lastPosition)
         }
 
@@ -140,14 +148,60 @@ class HomeFragment : BaseFragment() {
     }
 
     private fun setupRecyclerByPosition(position: Int) {
+
+        rv_home.visibility = View.GONE
+        rv_first.visibility = View.GONE
+        rv_second.visibility = View.GONE
+        rv_third.visibility = View.GONE
+        rv_fourth.visibility = View.GONE
+        rv_fifth.visibility = View.GONE
+        rv_sixth.visibility = View.GONE
+
         when (position) {
             0 -> {
-                recyclerview.layoutManager = LinearLayoutManager(requireContext())
-                recyclerview.adapter = homeAdapter
+                rv_home.visibility = View.VISIBLE
+                takeIf { rv_home.adapter == null }?.also {
+                    refresh.isRefreshing = true
+                    rv_home.layoutManager = LinearLayoutManager(requireContext())
+                    rv_home.adapter = homeAdapter
+                    getData(position)
+                }
+            }
+            1 -> {
+                rv_first.visibility = View.VISIBLE
+                takeIf { rv_first.adapter == null }?.also {
+                    refresh.isRefreshing = true
+                    rv_first.layoutManager = GridLayoutManager(requireContext(), 2)
+                    rv_first.adapter = movieListAdapter
+                    getData(position)
+                }
+            }
+            2 -> {
+                rv_second.visibility = View.VISIBLE
+                takeIf { rv_second.adapter == null }?.also {
+                    refresh.isRefreshing = true
+                    rv_second.layoutManager = GridLayoutManager(requireContext(), 2)
+                    rv_second.adapter = dramaListAdapter
+                    getData(position)
+                }
+            }
+            3 -> {
+                rv_third.visibility = View.VISIBLE
+                takeIf { rv_third.adapter == null }?.also {
+                    refresh.isRefreshing = true
+                    rv_third.layoutManager = GridLayoutManager(requireContext(), 2)
+                    rv_third.adapter = varietyListAdapter
+                    getData(position)
+                }
             }
             else -> {
-                recyclerview.layoutManager = GridLayoutManager(requireContext(), 2)
-                recyclerview.adapter = videoListAdapter
+                rv_fourth.visibility = View.VISIBLE
+                takeIf { rv_fourth.adapter == null }?.also {
+                    refresh.isRefreshing = true
+                    rv_fourth.layoutManager = GridLayoutManager(requireContext(), 2)
+                    rv_fourth.adapter = animationListAdapter
+                    getData(position)
+                }
             }
         }
     }
@@ -191,8 +245,6 @@ class HomeFragment : BaseFragment() {
         tabAdapter.setLastSelectedIndex(lastPosition)
         recyclerview_tab.scrollToPosition(index)
         setupRecyclerByPosition(index)
-        refresh.isRefreshing = true
-        getData(index)
     }
 
     private val homeAdapter by lazy {
@@ -213,7 +265,19 @@ class HomeFragment : BaseFragment() {
         )
     }
 
-    private val videoListAdapter by lazy {
+    private val movieListAdapter by lazy {
+        HomeVideoListAdapter(adapterListener, false)
+    }
+
+    private val dramaListAdapter by lazy {
+        HomeVideoListAdapter(adapterListener, false)
+    }
+
+    private val varietyListAdapter by lazy {
+        HomeVideoListAdapter(adapterListener, false)
+    }
+
+    private val animationListAdapter by lazy {
         HomeVideoListAdapter(adapterListener, false)
     }
 

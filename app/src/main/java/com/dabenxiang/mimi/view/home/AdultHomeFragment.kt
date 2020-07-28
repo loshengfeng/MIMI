@@ -503,11 +503,6 @@ class AdultHomeFragment : BaseFragment() {
         }
     }
 
-    override fun onDestroyView() {
-        saveLastIndex()
-        super.onDestroyView()
-    }
-
     private fun setupUI() {
         layout_top.background = requireActivity().getDrawable(R.color.adult_color_status_bar)
 
@@ -532,42 +527,92 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         recyclerview_tab.adapter = tabAdapter
-        recyclerview.background = requireActivity().getDrawable(R.color.adult_color_background)
-        recyclerview.layoutManager = LinearLayoutManager(requireContext())
-        recyclerview.adapter = homeAdapter
+        setupRecyclerByPosition(0)
 
         refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
     }
 
     private fun setupRecyclerByPosition(position: Int) {
+
+        rv_home.visibility = View.GONE
+        rv_first.visibility = View.GONE
+        rv_second.visibility = View.GONE
+        rv_third.visibility = View.GONE
+        rv_fourth.visibility = View.GONE
+        rv_fifth.visibility = View.GONE
+        rv_sixth.visibility = View.GONE
+
         when (position) {
             0 -> {
-                recyclerview.layoutManager = LinearLayoutManager(requireContext())
-                recyclerview.adapter = homeAdapter
+                rv_home.visibility = View.VISIBLE
+                takeIf { rv_home.adapter == null }?.also {
+                    refresh.isRefreshing = true
+                    rv_home.background = requireActivity().getDrawable(R.color.adult_color_background)
+                    rv_home.layoutManager = LinearLayoutManager(requireContext())
+                    rv_home.adapter = homeAdapter
+                    mainViewModel?.getHomeCategories()
+                }
             }
             1 -> {
-                recyclerview.layoutManager = GridLayoutManager(requireContext(), 2)
-                recyclerview.adapter = videoListAdapter
+                rv_first.visibility = View.VISIBLE
+                takeIf { rv_first.adapter == null }?.also {
+                    refresh.isRefreshing = true
+                    rv_first.background = requireActivity().getDrawable(R.color.adult_color_background)
+                    rv_first.layoutManager = GridLayoutManager(requireContext(), 2)
+                    rv_first.adapter = videoListAdapter
+                    viewModel.getVideos(null, true)
+                }
+
             }
             2 -> {
-                recyclerview.layoutManager = LinearLayoutManager(requireContext())
-                recyclerview.adapter = followPostPagedAdapter
+                rv_second.visibility = View.VISIBLE
+                takeIf { rv_second.adapter == null }?.also {
+                    refresh.isRefreshing = true
+                    rv_second.background = requireActivity().getDrawable(R.color.adult_color_background)
+                    rv_second.layoutManager = LinearLayoutManager(requireContext())
+                    rv_second.adapter = followPostPagedAdapter
+                    viewModel.getPostFollows()
+                }
             }
             3 -> {
-                recyclerview.layoutManager = LinearLayoutManager(requireContext())
-                recyclerview.adapter = clipPostPagedAdapter
+                rv_third.visibility = View.VISIBLE
+                takeIf { rv_third.adapter == null }?.also {
+                    refresh.isRefreshing = true
+                    rv_third.background = requireActivity().getDrawable(R.color.adult_color_background)
+                    rv_third.layoutManager = LinearLayoutManager(requireContext())
+                    rv_third.adapter = clipPostPagedAdapter
+                    viewModel.getClipPosts()
+                }
             }
             4 -> {
-                recyclerview.layoutManager = LinearLayoutManager(requireContext())
-                recyclerview.adapter = picturePostPagedAdapter
+                rv_fourth.visibility = View.VISIBLE
+                takeIf { rv_fourth.adapter == null }?.also {
+                    refresh.isRefreshing = true
+                    rv_fourth.background = requireActivity().getDrawable(R.color.adult_color_background)
+                    rv_fourth.layoutManager = LinearLayoutManager(requireContext())
+                    rv_fourth.adapter = picturePostPagedAdapter
+                    viewModel.getPicturePosts()
+                }
             }
             5 -> {
-                recyclerview.layoutManager = LinearLayoutManager(requireContext())
-                recyclerview.adapter = textPostPagedAdapter
+                rv_fifth.visibility = View.VISIBLE
+                takeIf { rv_fifth.adapter == null }?.also {
+                    refresh.isRefreshing = true
+                    rv_fifth.background = requireActivity().getDrawable(R.color.adult_color_background)
+                    rv_fifth.layoutManager = LinearLayoutManager(requireContext())
+                    rv_fifth.adapter = textPostPagedAdapter
+                    viewModel.getTextPosts()
+                }
             }
             else -> {
-                recyclerview.layoutManager = LinearLayoutManager(requireContext())
-                recyclerview.adapter = clubMemberAdapter
+                rv_sixth.visibility = View.VISIBLE
+                takeIf { rv_sixth.adapter == null }?.also {
+                    refresh.isRefreshing = true
+                    rv_sixth.background = requireActivity().getDrawable(R.color.adult_color_background)
+                    rv_sixth.layoutManager = LinearLayoutManager(requireContext())
+                    rv_sixth.adapter = clubMemberAdapter
+                    viewModel.getClubs()
+                }
             }
         }
     }
@@ -610,8 +655,6 @@ class AdultHomeFragment : BaseFragment() {
     private val tabAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
-//                viewModel.setTopTabPosition(index)
-                Timber.d("@@onClickItemIndex: $index")
                 setTab(index)
             }
         }, true)
@@ -622,8 +665,6 @@ class AdultHomeFragment : BaseFragment() {
         tabAdapter.setLastSelectedIndex(lastPosition)
         recyclerview_tab.scrollToPosition(index)
         setupRecyclerByPosition(index)
-        refresh.isRefreshing = true
-        getData(index)
     }
 
     private val homeAdapter by lazy {
@@ -923,14 +964,6 @@ class AdultHomeFragment : BaseFragment() {
         }
     }
 
-    /**
-     * 儲存最後一筆滑到的 index
-     */
-    private fun saveLastIndex() {
-        val layoutManager = recyclerview.layoutManager as LinearLayoutManager
-        viewModel.lastListIndex = layoutManager.findFirstCompletelyVisibleItemPosition()
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -940,19 +973,19 @@ class AdultHomeFragment : BaseFragment() {
                     data?.let {
                         val uriImage: Uri?
 
-                        if (it.data != null) {
-                            uriImage = it.data
+                        uriImage = if (it.data != null) {
+                            it.data
                         } else {
                             val extras = it.extras
-                            val imageBitmap = extras!!["data"] as Bitmap?
-                            uriImage = Uri.parse(
+                            val imageBitmap = extras?.let { ex -> ex["data"] as Bitmap }
+                            Uri.parse(
                                 MediaStore.Images.Media.insertImage(
                                     requireContext().contentResolver,
                                     imageBitmap,
                                     null,
                                     null
                                 )
-                            );
+                            )
                         }
 
                         val bundle = Bundle()
