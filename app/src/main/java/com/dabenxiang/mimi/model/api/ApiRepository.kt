@@ -636,5 +636,6 @@ class ApiRepository(private val apiService: ApiService) {
         utcTime: Long? = null,
         sign: String? = null
     ) = apiService.getVideoStreamM3u8(streamId, userId, utcTime, sign)
+
 }
 

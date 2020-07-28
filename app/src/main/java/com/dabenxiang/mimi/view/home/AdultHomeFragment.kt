@@ -353,7 +353,6 @@ class AdultHomeFragment : BaseFragment() {
                         )
                     picParameter.id = it.result.toString()
                     viewModel.postAttachment(videoUri?.value!!, requireContext(), TYPE_VIDEO)
-
                 }
                 is Error -> {
                     onApiError(it.throwable)
@@ -513,8 +512,8 @@ class AdultHomeFragment : BaseFragment() {
             resources.getDimension(R.dimen.dp_6)
         )
 
-        btn_filter.visibility =View.GONE
-        btn_ranking.visibility =View.VISIBLE
+        btn_filter.visibility = View.GONE
+        btn_ranking.visibility = View.VISIBLE
 
         btn_ranking.setOnClickListener {
 
@@ -945,7 +944,8 @@ class AdultHomeFragment : BaseFragment() {
 
                 REQUEST_VIDEO_CAPTURE -> {
                     val videoUri: Uri? = data?.data
-                    val myUri = Uri.fromFile(File(UriUtils.getPath(requireContext(), videoUri!!) ?: ""))
+                    val myUri =
+                        Uri.fromFile(File(UriUtils.getPath(requireContext(), videoUri!!) ?: ""))
 
                     val bundle = Bundle()
                     bundle.putString(BUNDLE_VIDEO_URI, myUri.toString())
@@ -967,11 +967,19 @@ class AdultHomeFragment : BaseFragment() {
         viewModel.getBitmap(id, update)
     }
 
-    private fun followMember(memberPostItem: MemberPostItem, isFollow: Boolean, update: (Boolean) -> Unit) {
+    private fun followMember(
+        memberPostItem: MemberPostItem,
+        isFollow: Boolean,
+        update: (Boolean) -> Unit
+    ) {
         viewModel.followMember(memberPostItem, isFollow, update)
     }
 
-    private fun likePost(memberPostItem: MemberPostItem, isLike: Boolean, update: (Boolean, Int) -> Unit) {
+    private fun likePost(
+        memberPostItem: MemberPostItem,
+        isLike: Boolean,
+        update: (Boolean, Int) -> Unit
+    ) {
         viewModel.likePost(memberPostItem, isLike, update)
     }
 

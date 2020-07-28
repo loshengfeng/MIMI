@@ -518,4 +518,5 @@ interface ApiService {
         @Path("utcTime") utcTime: Long?,
         @Path("sign") sign: String?
     ): Response<Void>
+
 }
