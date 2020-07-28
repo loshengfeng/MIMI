@@ -63,6 +63,7 @@ import com.dabenxiang.mimi.view.post.pic.PostPicFragment
 import com.dabenxiang.mimi.view.post.pic.PostPicFragment.Companion.BUNDLE_PIC_URI
 import com.dabenxiang.mimi.view.post.video.EditVideoFragment.Companion.BUNDLE_VIDEO_URI
 import com.dabenxiang.mimi.view.post.video.PostVideoFragment
+import com.dabenxiang.mimi.view.ranking.RankingFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
@@ -645,6 +646,13 @@ class AdultHomeFragment : BaseFragment() {
         btn_ranking.visibility =View.VISIBLE
 
         btn_ranking.setOnClickListener {
+            val bundle = RankingFragment.createBundle()
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_adultHomeFragment_to_rankingFragment,
+                    bundle
+                )
+            )
 
         }
 

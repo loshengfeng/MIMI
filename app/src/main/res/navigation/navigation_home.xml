@@ -48,4 +48,10 @@
         android:id="@+id/searchVideoFragment"
         android:name="com.dabenxiang.mimi.view.search.video.SearchVideoFragment"
         tools:layout="@layout/fragment_search_video" />
+
+    <fragment
+        android:id="@+id/rankingFragment"
+        android:name="com.dabenxiang.mimi.view.ranking.RankingFragment"
+        tools:layout="@layout/fragment_ranking" />
+
 </navigation>
