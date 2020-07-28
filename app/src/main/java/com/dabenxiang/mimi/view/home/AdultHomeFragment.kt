@@ -76,6 +76,8 @@ class AdultHomeFragment : BaseFragment() {
 
     private val viewModel: HomeViewModel by viewModels()
 
+    private val homeBannerViewHolderMap = hashMapOf<Int, HomeBannerViewHolder>()
+
     private val homeCarouselViewHolderMap = hashMapOf<Int, HomeCarouselViewHolder>()
     private val carouselMap = hashMapOf<Int, HomeTemplate.Carousel>()
 
@@ -176,10 +178,6 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.showProgress.observe(viewLifecycleOwner, Observer { showProgress ->
-            showProgress?.takeUnless { it }?.also { refresh.isRefreshing = it }
-        })
-
         mainViewModel?.categoriesData?.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Loading -> refresh.isRefreshing = true
@@ -199,6 +197,20 @@ class AdultHomeFragment : BaseFragment() {
                 }
                 is Error -> onApiError(it.throwable)
             }
+        })
+
+        mainViewModel?.getAdHomeResult?.observe(viewLifecycleOwner, Observer {
+            when (val response = it.second) {
+                is Success -> {
+                    val viewHolder = homeBannerViewHolderMap[it.first]
+                    viewHolder?.updateItem(response.result)
+                }
+                is Error -> onApiError(response.throwable)
+            }
+        })
+
+        viewModel.showProgress.observe(viewLifecycleOwner, Observer { showProgress ->
+            showProgress?.takeUnless { it }?.also { refresh.isRefreshing = it }
         })
 
         viewModel.videoList.observe(viewLifecycleOwner, Observer {
@@ -575,7 +587,9 @@ class AdultHomeFragment : BaseFragment() {
     private fun setupHomeData(root: CategoriesItem?) {
         val templateList = mutableListOf<HomeTemplate>()
 
-        templateList.add(HomeTemplate.Banner(imgUrl = "https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
+        // TODO: Dave
+        templateList.add(HomeTemplate.Banner(AdItem()))
+//        templateList.add(HomeTemplate.Banner(imgUrl = "https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
         templateList.add(HomeTemplate.Carousel(true))
 
         if (root?.categories != null) {
@@ -804,9 +818,7 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val adapterListener = object : HomeAdapter.EventListener {
-
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
-            Timber.d("@@onHeaderItemClick ${item.title}}")
             val position = when (item.title) {
                 "蜜蜜影视" -> 1
                 "短视频" -> 3
@@ -845,6 +857,17 @@ class AdultHomeFragment : BaseFragment() {
 
         override fun onClubClick(view: View, item: MemberClubItem) {
 
+        }
+
+        override fun onLoadBannerViewHolder(vh: HomeBannerViewHolder) {
+            homeBannerViewHolderMap[vh.adapterPosition] = vh
+            val width = GeneralUtils.getScreenSize(requireActivity()).first
+            val height = GeneralUtils.getScreenSize(requireActivity()).second
+            mainViewModel?.getAd(
+                vh.adapterPosition,
+                (width * 0.333).toInt(),
+                (height * 0.0245).toInt()
+            )
         }
 
         override fun onLoadStatisticsViewHolder(

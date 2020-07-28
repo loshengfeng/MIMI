@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.view.home
 
 import android.content.Intent
-import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
@@ -9,18 +8,16 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.ApiResult.*
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
-import com.dabenxiang.mimi.view.adapter.HomeClubAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -31,8 +28,8 @@ import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_home.*
-import timber.log.Timber
 
 class HomeFragment : BaseFragment() {
 
@@ -40,6 +37,7 @@ class HomeFragment : BaseFragment() {
 
     private var lastPosition = 0
 
+    private val homeBannerViewHolderMap = hashMapOf<Int, HomeBannerViewHolder>()
     private val homeCarouselViewHolderMap = hashMapOf<Int, HomeCarouselViewHolder>()
     private val carouselMap = hashMapOf<Int, HomeTemplate.Carousel>()
 
@@ -54,7 +52,7 @@ class HomeFragment : BaseFragment() {
         recyclerview.layoutManager = LinearLayoutManager(requireContext())
         recyclerview.adapter = homeAdapter
         refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
-        btn_ranking.visibility =View.GONE
+        btn_ranking.visibility = View.GONE
 
         if (mainViewModel?.normal == null) {
             mainViewModel?.getHomeCategories()
@@ -80,6 +78,16 @@ class HomeFragment : BaseFragment() {
                     }
                 }
                 is Error -> onApiError(it.throwable)
+            }
+        })
+
+        mainViewModel?.getAdHomeResult?.observe(viewLifecycleOwner, Observer {
+            when (val response = it.second) {
+                is Success -> {
+                    val viewHolder = homeBannerViewHolderMap[it.first]
+                    viewHolder?.updateItem(response.result)
+                }
+                is Error -> onApiError(response.throwable)
             }
         })
 
@@ -157,7 +165,7 @@ class HomeFragment : BaseFragment() {
     private fun setupHomeData(root: CategoriesItem?) {
         val templateList = mutableListOf<HomeTemplate>()
 
-        templateList.add(HomeTemplate.Banner(imgUrl = "https://tspimg.tstartel.com/upload/material/95/28511/mie_201909111854090.png"))
+        templateList.add(HomeTemplate.Banner(AdItem()))
         templateList.add(HomeTemplate.Carousel(false))
 
         if (root?.categories != null) {
@@ -179,7 +187,6 @@ class HomeFragment : BaseFragment() {
     }
 
     private fun setTab(index: Int) {
-        Timber.d("@@setTab: $index")
         lastPosition = index
         tabAdapter.setLastSelectedIndex(lastPosition)
         recyclerview_tab.scrollToPosition(index)
@@ -235,6 +242,17 @@ class HomeFragment : BaseFragment() {
         }
 
         override fun onClubClick(view: View, item: MemberClubItem) {
+        }
+
+        override fun onLoadBannerViewHolder(vh: HomeBannerViewHolder) {
+            homeBannerViewHolderMap[vh.adapterPosition] = vh
+            val width = GeneralUtils.getScreenSize(requireActivity()).first
+            val height = GeneralUtils.getScreenSize(requireActivity()).second
+            mainViewModel?.getAd(
+                vh.adapterPosition,
+                (width * 0.333).toInt(),
+                (height * 0.0245).toInt()
+            )
         }
 
         override fun onLoadStatisticsViewHolder(

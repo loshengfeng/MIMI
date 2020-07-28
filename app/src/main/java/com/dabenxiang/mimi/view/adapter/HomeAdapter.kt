@@ -153,6 +153,7 @@ class HomeAdapter(
         fun onClipClick(view: View, item: List<MemberPostItem>, position: Int)
         fun onPictureClick(view: View, item: MemberPostItem)
         fun onClubClick(view: View, item: MemberClubItem)
+        fun onLoadBannerViewHolder(vh: HomeBannerViewHolder)
         fun onLoadStatisticsViewHolder(vh: HomeStatisticsViewHolder, src: HomeTemplate.Statistics)
         fun onLoadCarouselViewHolder(vh: HomeCarouselViewHolder, src: HomeTemplate.Carousel)
         fun onLoadClipViewHolder(vh: HomeClipViewHolder)

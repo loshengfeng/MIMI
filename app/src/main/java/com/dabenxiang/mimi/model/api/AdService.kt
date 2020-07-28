@@ -1,6 +1,6 @@
 package com.dabenxiang.mimi.model.api
 
-import com.dabenxiang.mimi.model.api.vo.AdInfo
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.ApiBaseItem
 import retrofit2.Response
 import retrofit2.http.GET
@@ -14,6 +14,6 @@ interface AdService {
     suspend fun getAD(
         @Query("w") width: Int,
         @Query("h") height: Int
-    ): Response<ApiBaseItem<AdInfo>>
+    ): Response<ApiBaseItem<AdItem>>
 
 }

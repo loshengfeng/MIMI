@@ -83,10 +83,15 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
         val url = request.url
         val host = url.host
 
-        val newDomain = if (url.toString().startsWith("https://ad-api.")) {
-            domainManager.getAdDomain()
-        } else {
-            domainManager.getApiDomain()
+        val newDomain = when {
+            url.toString().startsWith("https://ad-api.")
+                    || url.toString().startsWith("http://ad-api.")
+                    || url.toString().contains("http://api.promotion.dev-121.silkrode.io") -> {
+                domainManager.getAdDomain()
+            }
+            else -> {
+                domainManager.getApiDomain()
+            }
         }
 
         val newHost = newDomain.toHttpUrlOrNull()?.host
@@ -105,8 +110,12 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
             hasMemberToken -> pref.memberToken.accessToken
             else -> pref.publicToken.accessToken
         }
-        val auth = StringBuilder(ApiRepository.BEARER).append(accessToken).toString()
-        requestBuilder.addHeader(ApiRepository.AUTHORIZATION, auth)
+
+        if (!url.toString().contains("/v1/Business/Ads")) {
+            val auth = StringBuilder(ApiRepository.BEARER).append(accessToken).toString()
+            requestBuilder.addHeader(ApiRepository.AUTHORIZATION, auth)
+        }
+
         return requestBuilder.build()
     }
 

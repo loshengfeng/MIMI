@@ -76,11 +76,11 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
 
     fun getAdDomain(): String {
         return when (BuildConfig.FLAVOR) {
-            FLAVOR_DEV -> BuildConfig.API_HOST
+            FLAVOR_DEV -> BuildConfig.AD_API_HOST
             else -> {
                 val domains = getDomain()
                 if (domains.isEmpty()) {
-                    BuildConfig.API_HOST
+                    BuildConfig.AD_API_HOST
                 } else {
                     StringBuilder("https://ad-api.").append(getDomain()).toString()
                 }

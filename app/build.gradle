@@ -46,6 +46,7 @@ android {
         versionName version.versionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
+        buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
         buildConfigField "String", "LOCAL_SOCKET_HOST", "\"${getLocalIPv4()}\""
         buildConfigField "int", "LOCAL_SOCKET_PORT", "8080"
         archivesBaseName = "$applicationName-v$versionName"
@@ -76,16 +77,19 @@ android {
     productFlavors {
         dev {
             buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
+            buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
             buildConfigField "String", "MQTT_HOST", '"ws://10.1.1.121:8083"'
         }
 
         sit {
             buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
+            buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
             buildConfigField "String", "MQTT_HOST", '"ws://10.1.1.121:8083"'
         }
 
         prod {
             buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
+            buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
             buildConfigField "String", "MQTT_HOST", '"ws://10.1.1.121:8083"'
         }
     }

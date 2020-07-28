@@ -2,7 +2,7 @@ package com.dabenxiang.mimi.model.api.vo
 
 import com.google.gson.annotations.SerializedName
 
-data class AdInfo(
+data class AdItem(
     @SerializedName("href")
     val href: String = "",
 

@@ -12,11 +12,9 @@ import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
-import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
-import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.model.vo.UploadPicItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.home.club.ClubDataSource
@@ -35,9 +33,7 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.File
-import java.lang.Exception
 import java.net.URLEncoder
-
 
 class HomeViewModel : BaseViewModel() {
 
@@ -223,7 +219,7 @@ class HomeViewModel : BaseViewModel() {
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    when(it) {
+                    when (it) {
                         is ApiResult.Success -> {
                             update(it.result)
                         }
@@ -247,7 +243,7 @@ class HomeViewModel : BaseViewModel() {
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    when(it) {
+                    when (it) {
                         is ApiResult.Success -> {
                             update(it.result)
                         }
@@ -273,7 +269,7 @@ class HomeViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    when(it) {
+                    when (it) {
                         is ApiResult.Empty -> {
                             update(isFollow)
                         }
@@ -307,7 +303,7 @@ class HomeViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    when(it) {
+                    when (it) {
                         is ApiResult.Success -> {
                             update(isLike, it.result)
                         }
