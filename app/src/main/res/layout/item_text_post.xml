@@ -11,6 +11,7 @@
     android:paddingEnd="20dp"
     android:paddingBottom="10dp">
 
+
     <ImageView
         android:id="@+id/img_avatar"
         android:layout_width="40dp"
@@ -75,6 +76,20 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/gl_title_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.18" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/gl_title_end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.953" />
+
             <TextView
                 android:id="@+id/tv_text"
                 android:layout_width="54dp"
@@ -91,15 +106,17 @@
 
             <TextView
                 android:id="@+id/tv_title"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:textColor="@color/color_white_1"
                 android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="@+id/tv_text"
-                app:layout_constraintLeft_toRightOf="@+id/tv_text"
+                app:layout_constraintEnd_toEndOf="@+id/gl_title_end"
+                app:layout_constraintStart_toStartOf="@+id/gl_title_start"
                 app:layout_constraintTop_toTopOf="@+id/tv_text"
-                tools:text="名称" />
+                tools:text="名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称" />
 
             <TextView
                 android:id="@+id/tv_text_desc"
@@ -108,6 +125,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
+                android:ellipsize="end"
                 android:maxLines="3"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
@@ -116,7 +134,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_text"
-                tools:text="名称名称" />
+                tools:text="名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
