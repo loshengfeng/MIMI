@@ -29,7 +29,6 @@ class ClubMemberAdapter(
                 return oldItem == newItem
             }
         }
-        const val PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI = 0
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClubMemberViewHolder {
