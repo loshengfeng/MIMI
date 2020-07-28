@@ -12,12 +12,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.OnItemClickListener
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
 import com.dabenxiang.mimi.view.picturedetail.viewholder.CommentContentViewHolder
 import com.dabenxiang.mimi.view.picturedetail.viewholder.CommentTitleViewHolder
 import com.dabenxiang.mimi.view.picturedetail.viewholder.PictureDetailViewHolder
@@ -35,13 +37,15 @@ class PictureDetailAdapter(
     private val memberPostItem: MemberPostItem,
     private val onPictureDetailListener: OnPictureDetailListener,
     private val onPhotoGridItemClickListener: PhotoGridAdapter.OnItemClickListener,
-    private val onItemClickListener: OnItemClickListener
+    private val onItemClickListener: OnItemClickListener,
+    private var mAdItem: AdItem? = null
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
         const val VIEW_TYPE_PICTURE_DETAIL = 0
         const val VIEW_TYPE_COMMENT_TITLE = 1
         const val VIEW_TYPE_COMMENT_DATA = 2
+        const val VIEW_TYPE_AD = 3
     }
 
     private var photoGridAdapter: PhotoGridAdapter? = null
@@ -51,6 +55,11 @@ class PictureDetailAdapter(
         val mView: View
 
         val holder = when (viewType) {
+            VIEW_TYPE_AD -> {
+                mView = LayoutInflater.from(context)
+                    .inflate(R.layout.item_ad, parent, false)
+                AdHolder(mView)
+            }
             VIEW_TYPE_PICTURE_DETAIL -> {
                 mView = LayoutInflater.from(context)
                     .inflate(R.layout.item_picture_detail, parent, false)
@@ -77,8 +86,9 @@ class PictureDetailAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return when (position) {
-            0 -> VIEW_TYPE_PICTURE_DETAIL
-            1 -> VIEW_TYPE_COMMENT_TITLE
+            0 -> VIEW_TYPE_AD
+            1 -> VIEW_TYPE_PICTURE_DETAIL
+            2 -> VIEW_TYPE_COMMENT_TITLE
             else -> VIEW_TYPE_COMMENT_DATA
         }
     }
@@ -89,6 +99,11 @@ class PictureDetailAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
+            is AdHolder -> {
+                mAdItem?.also {
+                    Glide.with(context).load(it.href).into(holder.adImg)
+                }
+            }
             is PictureDetailViewHolder -> {
                 val contentItem =
                     Gson().fromJson(memberPostItem.content, MediaContentItem::class.java)
@@ -140,7 +155,10 @@ class PictureDetailAdapter(
                         ContextCompat.getColor(context, R.color.adult_color_status_bar)
                     )
                     chip.setOnClickListener { view ->
-                        onPictureDetailListener.onChipClick(PostType.IMAGE, (view as Chip).text.toString())
+                        onPictureDetailListener.onChipClick(
+                            PostType.IMAGE,
+                            (view as Chip).text.toString()
+                        )
                     }
                     holder.tagChipGroup.addView(chip)
                 }
@@ -192,6 +210,10 @@ class PictureDetailAdapter(
 
     fun updatePhotoGridItem(position: Int) {
         photoGridAdapter?.notifyItemChanged(position)
+    }
+
+    fun setupAdItem(item: AdItem) {
+        mAdItem = item
     }
 
     private fun updateCommandItem(type: CommentType) {
