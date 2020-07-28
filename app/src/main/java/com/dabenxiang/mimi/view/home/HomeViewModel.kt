@@ -54,9 +54,6 @@ class HomeViewModel : BaseViewModel() {
     private var _videoList = MutableLiveData<PagedList<BaseVideoItem>>()
     val videoList: LiveData<PagedList<BaseVideoItem>> = _videoList
 
-    private var _tabLayoutPosition = MutableLiveData<Int>()
-    val tabLayoutPosition: LiveData<Int> = _tabLayoutPosition
-
     private var _carouselResult =
         MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<StatisticsItem>>>>>()
     val carouselResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<StatisticsItem>>>>> =
@@ -82,21 +79,6 @@ class HomeViewModel : BaseViewModel() {
     val clubResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberClubItem>>>>> =
         _clubResult
 
-    private var _attachmentByTypeResult = MutableLiveData<ApiResult<AttachmentItem>>()
-    val attachmentByTypeResult: LiveData<ApiResult<AttachmentItem>> = _attachmentByTypeResult
-
-    private var _attachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
-    val attachmentResult: LiveData<ApiResult<AttachmentItem>> = _attachmentResult
-
-    private var _followClubResult = MutableLiveData<ApiResult<Pair<Int, Boolean>>>()
-    val followClubResult: LiveData<ApiResult<Pair<Int, Boolean>>> = _followClubResult
-
-    private var _followPostResult = MutableLiveData<ApiResult<Int>>()
-    val followPostResult: LiveData<ApiResult<Int>> = _followPostResult
-
-    private var _likePostResult = MutableLiveData<ApiResult<Int>>()
-    val likePostResult: LiveData<ApiResult<Int>> = _likePostResult
-
     private val _postFollowItemListResult = MutableLiveData<PagedList<MemberPostItem>>()
     val postFollowItemListResult: LiveData<PagedList<MemberPostItem>> = _postFollowItemListResult
 
@@ -115,9 +97,6 @@ class HomeViewModel : BaseViewModel() {
     private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
     val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
 
-    private val _scrollToLastPosition = MutableLiveData<Boolean>()
-    val scrollToLastPosition: LiveData<Boolean> = _scrollToLastPosition
-
     private val _postPicResult = MutableLiveData<ApiResult<Long>>()
     val postPicResult: LiveData<ApiResult<Long>> = _postPicResult
 
@@ -135,12 +114,6 @@ class HomeViewModel : BaseViewModel() {
 
     private val _postVideoMemberResult = MutableLiveData<ApiResult<Long>>()
     val postVideoMemberResult: LiveData<ApiResult<Long>> = _postVideoMemberResult
-
-    fun setTopTabPosition(position: Int) {
-        if (position != tabLayoutPosition.value) {
-            _tabLayoutPosition.value = position
-        }
-    }
 
     fun loadNestedStatisticsListForCarousel(position: Int, src: HomeTemplate.Carousel) {
         viewModelScope.launch {
@@ -237,52 +210,6 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-    fun getAttachment(id: String, position: Int, type: AttachmentType) {
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository().getAttachment(id)
-                if (!result.isSuccessful) throw HttpException(result)
-                val byteArray = result.body()?.bytes()
-                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
-                val item = AttachmentItem(
-                    id = id,
-                    bitmap = bitmap,
-                    position = position,
-                    type = type
-                )
-                emit(ApiResult.success(item))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _attachmentByTypeResult.value = it }
-        }
-    }
-
-    fun getAttachment(id: String, parentPosition: Int, position: Int) {
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository().getAttachment(id)
-                if (!result.isSuccessful) throw HttpException(result)
-                val byteArray = result.body()?.bytes()
-                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
-                val item = AttachmentItem(
-                    id = id,
-                    bitmap = bitmap,
-                    parentPosition = parentPosition,
-                    position = position
-                )
-                emit(ApiResult.success(item))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _attachmentResult.value = it }
-        }
-    }
-
     fun getBitmap(id: String, update: ((String) -> Unit)) {
         viewModelScope.launch {
             flow {
@@ -329,27 +256,7 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-    fun followClub(item: MemberClubItem, position: Int, isFollow: Boolean) {
-        viewModelScope.launch {
-            flow {
-                val apiRepository = domainManager.getApiRepository()
-                val result = when {
-                    isFollow -> apiRepository.followClub(item.id)
-                    else -> apiRepository.cancelFollowClub(item.id)
-                }
-                if (!result.isSuccessful) throw HttpException(result)
-                item.isFollow = isFollow
-                emit(ApiResult.success(Pair(position, isFollow)))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _followClubResult.value = it }
-        }
-    }
-
-    fun followPost(item: MemberPostItem, position: Int, isFollow: Boolean) {
+    fun followMember(item: MemberPostItem, isFollow: Boolean, update: (Boolean) -> Unit) {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
@@ -359,17 +266,23 @@ class HomeViewModel : BaseViewModel() {
                 }
                 if (!result.isSuccessful) throw HttpException(result)
                 item.isFollow = isFollow
-                emit(ApiResult.success(position))
+                emit(ApiResult.success(null))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _followPostResult.value = it }
+                .collect {
+                    when(it) {
+                        is ApiResult.Empty -> {
+                            update(isFollow)
+                        }
+                    }
+                }
         }
     }
 
-    fun likePost(item: MemberPostItem, position: Int, isLike: Boolean) {
+    fun likePost(item: MemberPostItem, isLike: Boolean, update: (Boolean, Int) -> Unit) {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
@@ -387,13 +300,19 @@ class HomeViewModel : BaseViewModel() {
                     else -> item.likeCount - 1
                 }
 
-                emit(ApiResult.success(position))
+                emit(ApiResult.success(item.likeCount))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _likePostResult.value = it }
+                .collect {
+                    when(it) {
+                        is ApiResult.Success -> {
+                            update(isLike, it.result)
+                        }
+                    }
+                }
         }
     }
 
@@ -515,7 +434,6 @@ class HomeViewModel : BaseViewModel() {
         }
 
         override fun onSucceed() {
-            _scrollToLastPosition.postValue(true)
         }
     }
 

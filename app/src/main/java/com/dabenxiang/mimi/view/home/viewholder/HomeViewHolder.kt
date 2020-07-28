@@ -16,6 +16,7 @@ import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.holder.CarouselHolderItem
 import com.dabenxiang.mimi.view.adapter.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.view.club.ClubFuncItem
 import com.dabenxiang.mimi.view.home.HomeTemplate
 import com.dabenxiang.mimi.widget.view.ViewPagerIndicator
 import com.to.aboomy.pager2banner.Banner
@@ -254,14 +255,14 @@ class HomeClubViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
     isAdult: Boolean,
-    clubListener: HomeClubAdapter.ClubListener,
-    memberPostFuncItem: MemberPostFuncItem
+    memberPostFuncItem: MemberPostFuncItem,
+    clubFuncItem: ClubFuncItem
 ) : HomeViewHolder<HomeTemplate.Club>(itemView, listener, isAdult) {
 
     private val progressBar: ProgressBar = itemView.progress_club
     private val recyclerView: RecyclerView = itemView.recyclerview_club
     private val nestedAdapter by lazy {
-        HomeClubAdapter(listener, clubListener, memberPostFuncItem)
+        HomeClubAdapter(listener, memberPostFuncItem, clubFuncItem)
     }
 
     init {
