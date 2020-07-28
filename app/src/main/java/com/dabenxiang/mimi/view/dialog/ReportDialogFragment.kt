@@ -62,11 +62,15 @@ class ReportDialogFragment : BaseDialogFragment() {
 
         val colorStateList = ColorStateList(
             arrayOf(
-                intArrayOf(-android.R.attr.state_enabled),
-                intArrayOf(android.R.attr.state_enabled)
+                intArrayOf(-android.R.attr.state_enabled), //disabled
+                intArrayOf(-android.R.attr.state_checked), //unchecked
+                intArrayOf(android.R.attr.state_checked), //unchecked
+                intArrayOf(android.R.attr.state_pressed) //pressed
             ), intArrayOf(
-                requireContext().getColor(R.color.color_black_1) //disabled
-                , requireContext().getColor(R.color.color_red_1) //enabled
+                requireContext().getColor(R.color.color_gray_1),
+                requireContext().getColor(R.color.color_black_1), //unchecked
+                requireContext().getColor(R.color.color_red_1), //unchecked
+                requireContext().getColor(R.color.color_red_1) //pressed
             )
         )
 
