@@ -11,12 +11,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.OnItemClickListener
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.api.vo.TextContentItem
 import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
+import com.dabenxiang.mimi.view.picturedetail.PictureDetailAdapter
 import com.dabenxiang.mimi.view.picturedetail.viewholder.CommentContentViewHolder
 import com.dabenxiang.mimi.view.picturedetail.viewholder.CommentTitleViewHolder
 import com.dabenxiang.mimi.view.player.CommentAdapter
@@ -33,13 +36,15 @@ class TextDetailAdapter(
     val context: Context,
     private val memberPostItem: MemberPostItem,
     private val onTextDetailListener: OnTextDetailListener,
-    private val onItemClickListener: OnItemClickListener
+    private val onItemClickListener: OnItemClickListener,
+    private var mAdItem: AdItem? = null
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
         const val VIEW_TYPE_TEXT_DETAIL = 0
         const val VIEW_TYPE_COMMENT_TITLE = 1
         const val VIEW_TYPE_COMMENT_DATA = 2
+        const val VIEW_TYPE_AD = 3
     }
 
     private var commentAdapter: CommentAdapter? = null
@@ -48,6 +53,11 @@ class TextDetailAdapter(
         val mView: View
 
         val holder = when (viewType) {
+            VIEW_TYPE_AD -> {
+                mView = LayoutInflater.from(context)
+                    .inflate(R.layout.item_ad, parent, false)
+                AdHolder(mView)
+            }
             VIEW_TYPE_TEXT_DETAIL -> {
                 mView = LayoutInflater.from(context)
                     .inflate(R.layout.item_text_detail, parent, false)
@@ -74,18 +84,24 @@ class TextDetailAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return when (position) {
-            0 -> VIEW_TYPE_TEXT_DETAIL
-            1 -> VIEW_TYPE_COMMENT_TITLE
+            0 -> PictureDetailAdapter.VIEW_TYPE_AD
+            1 -> VIEW_TYPE_TEXT_DETAIL
+            2 -> VIEW_TYPE_COMMENT_TITLE
             else -> VIEW_TYPE_COMMENT_DATA
         }
     }
 
     override fun getItemCount(): Int {
-        return 3
+        return 4
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
+            is AdHolder -> {
+                mAdItem?.also {
+                    Glide.with(context).load(it.href).into(holder.adImg)
+                }
+            }
             is TextDetailViewHolder -> {
                 val contentItem =
                     Gson().fromJson(memberPostItem.content, TextContentItem::class.java)
@@ -151,7 +167,6 @@ class TextDetailAdapter(
                 }
             }
             is CommentContentViewHolder -> {
-
                 holder.noCommentLayout.visibility = if (memberPostItem.commentCount > 0) {
                     View.INVISIBLE
                 } else {
@@ -180,6 +195,10 @@ class TextDetailAdapter(
     fun updateContent(item: MemberPostItem) {
         memberPostItem.content = item.content
         notifyItemChanged(VIEW_TYPE_TEXT_DETAIL)
+    }
+
+    fun setupAdItem(item: AdItem) {
+        mAdItem = item
     }
 
     private fun updateCommandItem(type: CommentType) {
