@@ -350,6 +350,22 @@ class ApiRepository(private val apiService: ApiService) {
         limit = limit
     )
 
+    /**
+     * 取得影片排行
+     */
+    suspend fun getRankingList(
+        statisticsType: StatisticsType = StatisticsType.TODAY,
+        postType: PostType,
+        offset: String,
+        limit: String
+    ) = apiService.getRankingList(
+        statisticsType = statisticsType.value,
+        postType = postType.value,
+        offset = offset,
+        limit = limit
+    )
+
+
     /**********************************************************
      *
      *                  Me
