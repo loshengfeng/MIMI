@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.view.player
 
 import android.annotation.SuppressLint
-import android.app.PendingIntent.getActivity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -11,8 +10,12 @@ import android.hardware.SensorManager
 import android.os.Bundle
 import android.text.Html
 import android.text.TextUtils
-import android.view.*
+import android.view.MotionEvent
+import android.view.Surface
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -20,6 +23,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearSnapHelper
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.extension.addKeyboardToggleListener
 import com.dabenxiang.mimi.extension.handleException
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.extension.setNot
@@ -28,6 +32,7 @@ import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
@@ -51,7 +56,10 @@ import kotlinx.android.synthetic.main.head_guess_like.view.*
 import kotlinx.android.synthetic.main.head_no_comment.view.*
 import kotlinx.android.synthetic.main.head_source.view.*
 import kotlinx.android.synthetic.main.head_video_info.view.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.net.UnknownHostException
 import java.text.SimpleDateFormat
@@ -88,12 +96,14 @@ class PlayerActivity : BaseActivity() {
     private var loadReplyCommentBlock: (() -> Unit)? = null
     private var loadCommentLikeBlock: (() -> Unit)? = null
     private var currentReplyId:Long? = null
+    private var currentreplyName:String? = null
     private var moreDialog: MoreDialogFragment? = null
-    var reportDialog: ReportDialogFragment? = null
+    private var reportDialog: ReportDialogFragment? = null
 
     private val sourceListAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
+                Timber.i("TopTabAdapter onClickItemIndex")
                 viewModel.setSourceListPosition(index)
             }
         }, obtainIsAdult())
@@ -102,6 +112,7 @@ class PlayerActivity : BaseActivity() {
     private val episodeAdapter by lazy {
         SelectEpisodeAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
+                Timber.i("SelectEpisodeAdapter onClickItemIndex")
                 viewModel.setStreamPosition(index)
             }
         }, obtainIsAdult())
@@ -150,16 +161,11 @@ class PlayerActivity : BaseActivity() {
             override fun sendComment(replyId: Long?, replyName: String?) {
                 Timber.i("playerInfoAdapter sendComment")
                 currentReplyId =null
+                currentreplyName =null
                 if (replyId != null) {
                     currentReplyId = replyId
-                    CoroutineScope(Dispatchers.Main).launch {
-                        btn_write_comment.let {
-                            it.requestFocusFromTouch()
-                            val lManager: InputMethodManager =
-                                getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                            lManager.showSoftInput(it, 0)
-                        }
-                    }
+                    currentreplyName = replyName
+                    commentEditorOpen()
                 }
             }
 
@@ -174,17 +180,11 @@ class PlayerActivity : BaseActivity() {
             override fun replyComment(replyId: Long?, replyName: String?) {
                 Timber.i("playerInfoAdapter replyComment")
                 currentReplyId =null
+                currentreplyName =null
                 if (replyId != null) {
                     currentReplyId = replyId
-                    CoroutineScope(Dispatchers.Main).launch {
-                        btn_write_comment.let {
-                            it.requestFocusFromTouch()
-                            val lManager: InputMethodManager =
-                                getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                            lManager.showSoftInput(it, 0)
-                        }
-                    }
-
+                    currentreplyName = replyName
+                    commentEditorOpen()
                 }
             }
 
@@ -327,8 +327,17 @@ class PlayerActivity : BaseActivity() {
             }
         )
 
+        bottom_func_bar.setBackgroundResource(
+            if (isAdult) {
+                R.drawable.bg_adult_top_line
+            } else {
+                R.drawable.bg_gray_2_top_line
+            }
+        )
+
         if (isAdult) {
             btn_write_comment.setTextColor(getColor(R.color.color_white_1_30))
+            et_message.setTextColor(getColor(R.color.color_white_1_30))
 //            btn_write_comment.setBtnSolidColor(getColor(R.color.color_black_1_20))
         }
 
@@ -358,8 +367,10 @@ class PlayerActivity : BaseActivity() {
         })
 
         viewModel.sourceListPosition.observe(this, Observer {
+            if(it == -1) return@Observer
             sourceListAdapter.setLastSelectedIndex(it)
             viewModel.sourceList?.get(it)?.videoEpisodes?.also { videoEpisodes ->
+                Timber.i("videoEpisodes =$videoEpisodes")
                 setupStream(videoEpisodes)
             }
 
@@ -367,6 +378,7 @@ class PlayerActivity : BaseActivity() {
         })
 
         viewModel.episodePosition.observe(this, Observer {
+            Timber.i("episodePosition =$it")
             if (it >= 0) {
                 episodeAdapter.setLastSelectedIndex(it)
                 viewModel.checkConsumeResult()
@@ -393,14 +405,19 @@ class PlayerActivity : BaseActivity() {
                     is Loading -> progressHUD.show()
                     is Loaded -> progressHUD.dismiss()
                     is Empty -> {
-                        currentReplyId =null
+                        currentReplyId = null
+                        currentreplyName = null
                         headNoComment.title_no_comment.visibility = View.GONE
                         viewModel.commentCount.value = viewModel.commentCount.value?.plus(1)
 
                         viewModel.setupCommentDataSource(playerInfoAdapter)
+                        commentEditorToggle(false)
                         scrollToBottom()
                     }
-                    is Error -> onApiError(it.throwable)
+                    is Error -> {
+                        commentEditorToggle(false)
+                        onApiError(it.throwable)
+                    }
                 }
             }
         })
@@ -535,6 +552,15 @@ class PlayerActivity : BaseActivity() {
         iv_share.setImageResource(if (isAdult) R.drawable.btn_share_white_n else R.drawable.btn_share_gray_n)
         iv_more.setImageResource(if (isAdult) R.drawable.btn_more_white_n else R.drawable.btn_more_gray_n)
 
+        tv_replay_name.setTextColor(if (obtainIsAdult()) {
+            R.color.color_white_1
+        } else {
+            R.color.color_black_1
+        }.let {
+            getColor(it)
+        })
+
+
         headComment.tv_newest.setOnClickListener {
             viewModel.updatedSelectedNewestComment(true)
             lifecycleScope.launch {
@@ -665,15 +691,21 @@ class PlayerActivity : BaseActivity() {
                 })
             }
 
-        btn_write_comment.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
-            if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
-                viewModel.postComment(PostCommentRequest(currentReplyId, btn_write_comment.text.toString()))
+        btn_write_comment.setOnClickListener {
+            currentReplyId = null
+            currentreplyName = null
+            commentEditorOpen()
+            commentEditorToggle(true)
+        }
+
+        btn_send.setOnClickListener {
+            if (et_message.text.isNotEmpty()){
+                viewModel.postComment(PostCommentRequest(currentReplyId, et_message.text.toString()))
                 currentReplyId = null
-                btn_write_comment.text.clear()
-                return@OnKeyListener true
+                currentreplyName = null
+                et_message.text.clear()
             }
-            false
-        })
+        }
 
         tv_favorite.setOnClickListener {
             viewModel.modifyFavorite()
@@ -730,7 +762,7 @@ class PlayerActivity : BaseActivity() {
         }
 
         iv_more.setOnClickListener {
-            moreDialog = MoreDialogFragment.newInstance(MemberPostItem(id=obtainVideoId()), onMoreDialogListener).also {
+            moreDialog = MoreDialogFragment.newInstance(MemberPostItem(id=obtainVideoId(), type = PostType.VIDEO), onMoreDialogListener).also {
                 it.show(
                     supportFragmentManager,
                     MoreDialogFragment::class.java.simpleName
@@ -751,6 +783,12 @@ class PlayerActivity : BaseActivity() {
                 }
             }
         })
+
+        //Detect key keyboard shown/hide
+        this.addKeyboardToggleListener {shown->
+            if(!shown) commentEditorToggle(false)
+        }
+
     }
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
@@ -758,11 +796,11 @@ class PlayerActivity : BaseActivity() {
             if (TextUtils.isEmpty(content)) {
                 GeneralUtils.showToast(App.applicationContext(), getString(R.string.report_error))
             } else {
-                reportDialog?.dismiss()
                 when (item) {
-                    is MemberPostItem -> viewModel.sendPostReport(item, content)
+                    is MemberPostItem -> viewModel.sentReport(content)
                 }
             }
+            reportDialog?.dismiss()
         }
 
         override fun onCancel() {
@@ -772,18 +810,58 @@ class PlayerActivity : BaseActivity() {
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem) {
-            moreDialog?.dismiss()
-            reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
-                it.show(
-                    supportFragmentManager,
-                    ReportDialogFragment::class.java.simpleName
-                )
+            if(viewModel.isReported){
+                GeneralUtils.showToast(App.applicationContext(), getString(R.string.already_reported))
+            } else{
+                reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
+                    it.show(
+                        supportFragmentManager,
+                        ReportDialogFragment::class.java.simpleName
+                    )
+                }
             }
+            moreDialog?.dismiss()
         }
 
         override fun onCancel() {
             moreDialog?.dismiss()
         }
+    }
+
+    private fun commentEditorToggle(enable:Boolean){
+        when(enable){
+            true -> {
+                bottom_func_input.visibility = View.VISIBLE
+                bottom_func_bar.visibility = View.GONE
+            }
+            else ->{
+                bottom_func_input.visibility = View.GONE
+                bottom_func_bar.visibility = View.VISIBLE
+            }
+        }
+
+    }
+
+    private fun commentEditorOpen(){
+        CoroutineScope(Dispatchers.Main).launch {
+
+            tv_replay_name.let {
+                if (currentreplyName == null) {
+                    tv_replay_name.visibility = View.GONE
+                } else {
+                    tv_replay_name.text = "@$currentreplyName"
+                }
+
+             tv_replay_name.visibility = View.VISIBLE
+            }
+            et_message.let {
+                it.requestFocusFromTouch()
+                val lManager: InputMethodManager =
+                    getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                lManager.showSoftInput(it, 0)
+            }
+        }
+        commentEditorToggle(true)
     }
 
     override fun onStart() {
@@ -1184,11 +1262,14 @@ class PlayerActivity : BaseActivity() {
                         result.add(it)
                     }
                 }
-
+                Timber.i("setupSourceList =${result[0]}")
                 sourceListAdapter.submitList(result, 0)
                 viewModel.setSourceListPosition(0)
-
                 scrollToBottom()
+                CoroutineScope(Dispatchers.IO).launch {
+                    delay(2000)
+                    viewModel.setStreamPosition(0)
+                }
             }
         }
     }
@@ -1196,11 +1277,13 @@ class PlayerActivity : BaseActivity() {
     private fun setupStream(list: List<VideoEpisode>) {
         val result = mutableListOf<String>()
         // 成人取得Streaming邏輯不同
+        Timber.i("setupStream =${list.size}")
         if (obtainIsAdult()) {
             if (list.size == 1) {
                 val videoStreams = list[0].videoStreams
                 if (videoStreams != null && videoStreams.isNotEmpty()) {
                     for (item in videoStreams) {
+                        Timber.i("videoStreams =${item.id}")
                         if (item.id != null) {
                             result.add(item.streamName ?: "")
                         }

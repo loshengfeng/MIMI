@@ -31,6 +31,9 @@
         <action
             android:id="@+id/action_personalFragment_to_settingFragment"
             app:destination="@id/settingFragment" />
+        <action
+            android:id="@+id/action_personalFragment_to_myPostFragment"
+            app:destination="@id/myPostFragment" />
 
     </fragment>
 
@@ -90,4 +93,9 @@
         android:id="@+id/chatContentFragment"
         android:name="com.dabenxiang.mimi.view.chatcontent.ChatContentFragment"
         android:label="ChatContentFragment" />
+    <fragment
+        android:id="@+id/myPostFragment"
+        android:name="com.dabenxiang.mimi.view.mypost.MyPostFragment"
+        android:label="MyPostFragment"
+        tools:layout="@layout/fragment_my_post"/>
 </navigation>

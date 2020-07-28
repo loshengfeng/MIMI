@@ -9,11 +9,12 @@ import kotlinx.android.synthetic.main.item_banner.view.*
 
 class GridBannerHolder(itemView: View, onClickListener: IndexViewHolderListener) :
     BaseIndexViewHolder<BaseVideoItem.Banner>(itemView, onClickListener) {
+
     private val ivPoster: ImageView = itemView.iv_poster
 
     override fun updated(model: BaseVideoItem.Banner?) {
         Glide.with(itemView.context)
-            .load(model?.imgUrl)
+            .load(model?.adItem?.href)
             .into(ivPoster)
     }
 }

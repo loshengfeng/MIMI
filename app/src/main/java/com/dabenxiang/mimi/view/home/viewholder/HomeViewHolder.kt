@@ -2,21 +2,22 @@ package com.dabenxiang.mimi.view.home.viewholder
 
 import android.view.View
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.holder.CarouselHolderItem
 import com.dabenxiang.mimi.view.adapter.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.view.club.ClubFuncItem
 import com.dabenxiang.mimi.view.home.HomeTemplate
 import com.dabenxiang.mimi.widget.view.ViewPagerIndicator
 import com.to.aboomy.pager2banner.Banner
@@ -93,8 +94,14 @@ class HomeBannerViewHolder(itemView: View, listener: HomeAdapter.EventListener, 
     private val ivPoster: ImageView = itemView.iv_poster
 
     override fun updated() {
+        data?.also {
+            nestedListener.onLoadBannerViewHolder(this)
+        }
+    }
+
+    fun updateItem(item: AdItem) {
         Glide.with(itemView.context)
-            .load(data?.imgUrl)
+            .load(item.href)
             .into(ivPoster)
     }
 }
@@ -103,8 +110,7 @@ class HomeCarouselViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
     isAdult: Boolean
-) :
-    HomeViewHolder<HomeTemplate.Carousel>(itemView, listener, isAdult) {
+) : HomeViewHolder<HomeTemplate.Carousel>(itemView, listener, isAdult) {
 
     private val banner: Banner = itemView.banner
     private val pagerIndicator: ViewPagerIndicator = itemView.pager_indicator
@@ -137,9 +143,9 @@ class HomeStatisticsViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
     isAdult: Boolean
-) :
-    HomeViewHolder<HomeTemplate.Statistics>(itemView, listener, isAdult) {
+) : HomeViewHolder<HomeTemplate.Statistics>(itemView, listener, isAdult) {
 
+    private val progressBar: ProgressBar = itemView.progress_statistics
     private val recyclerView: RecyclerView = itemView.recyclerview_statistics
     private val nestedAdapter by lazy {
         HomeStatisticsAdapter(nestedListener, isAdult)
@@ -165,6 +171,10 @@ class HomeStatisticsViewHolder(
     fun submitList(list: List<BaseVideoItem.Video>?) {
         nestedAdapter.submitList(list)
     }
+
+    fun hideProgressBar() {
+        progressBar.visibility = View.GONE
+    }
 }
 
 class HomeClipViewHolder(
@@ -174,8 +184,7 @@ class HomeClipViewHolder(
     memberPostFuncItem: MemberPostFuncItem
 ) : HomeViewHolder<HomeTemplate.Clip>(itemView, listener, isAdult) {
 
-    private var attachmentType: AttachmentType? = null
-
+    private val progressBar: ProgressBar = itemView.progress_clip
     private val recyclerView: RecyclerView = itemView.recyclerview_clip
     private val nestedAdapter by lazy {
         HomeClipAdapter(listener, memberPostFuncItem)
@@ -198,8 +207,8 @@ class HomeClipViewHolder(
         nestedAdapter.submitList(list)
     }
 
-    fun updateItem(position: Int) {
-        nestedAdapter.notifyItemChanged(position)
+    fun hideProgressBar() {
+        progressBar.visibility = View.GONE
     }
 }
 
@@ -210,6 +219,7 @@ class HomePictureViewHolder(
     memberPostFuncItem: MemberPostFuncItem
 ) : HomeViewHolder<HomeTemplate.Picture>(itemView, listener, isAdult) {
 
+    private val progressBar: ProgressBar = itemView.progress_picture
     private val recyclerView: RecyclerView = itemView.recyclerview_picture
     private val nestedAdapter by lazy {
         HomePictureAdapter(listener, memberPostFuncItem)
@@ -232,8 +242,8 @@ class HomePictureViewHolder(
         nestedAdapter.submitList(list)
     }
 
-    fun updateItem(position: Int) {
-        nestedAdapter.notifyItemChanged(position)
+    fun hideProgressBar() {
+        progressBar.visibility = View.GONE
     }
 }
 
@@ -244,13 +254,14 @@ class HomeClubViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
     isAdult: Boolean,
-    clubListener: HomeClubAdapter.ClubListener,
-    memberPostFuncItem: MemberPostFuncItem
+    memberPostFuncItem: MemberPostFuncItem,
+    clubFuncItem: ClubFuncItem
 ) : HomeViewHolder<HomeTemplate.Club>(itemView, listener, isAdult) {
 
+    private val progressBar: ProgressBar = itemView.progress_club
     private val recyclerView: RecyclerView = itemView.recyclerview_club
     private val nestedAdapter by lazy {
-        HomeClubAdapter(listener, clubListener, memberPostFuncItem)
+        HomeClubAdapter(listener, memberPostFuncItem, clubFuncItem)
     }
 
     init {
@@ -274,13 +285,7 @@ class HomeClubViewHolder(
         return nestedAdapter.getMemberClubItems()[position]
     }
 
-    fun updateItem(position: Int) {
-        nestedAdapter.notifyItemChanged(position)
-    }
-
-    fun updateItemByFollow(position: Int, result: Boolean) {
-        val item = getItem(position)
-        item.isFollow = result
-        updateItem(position)
+    fun hideProgressBar() {
+        progressBar.visibility = View.GONE
     }
 }

@@ -112,21 +112,21 @@ class PictureDetailFragment : BaseFragment() {
                     LruCacheUtils.putLruCache(item.id!!, item.bitmap!!)
                     pictureDetailAdapter?.updatePhotoGridItem(item.position!!)
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> pictureDetailAdapter?.notifyItemChanged(it.result)
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.avatarResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> avatarBlock?.invoke(it.result)
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -134,7 +134,7 @@ class PictureDetailFragment : BaseFragment() {
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> replyCommentBlock?.also { it() }
-                    is Error -> Timber.e(it.throwable)
+                    is Error -> onApiError(it.throwable)
                 }
             }
         })
@@ -143,7 +143,7 @@ class PictureDetailFragment : BaseFragment() {
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> commentLikeBlock?.also { it() }
-                    is Error -> Timber.e(it.throwable)
+                    is Error -> onApiError(it.throwable)
                 }
             }
         })
@@ -152,7 +152,7 @@ class PictureDetailFragment : BaseFragment() {
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> commentLikeBlock?.also { it() }
-                    is Error -> Timber.e(it.throwable)
+                    is Error -> onApiError(it.throwable)
                 }
             }
         })
@@ -183,7 +183,7 @@ class PictureDetailFragment : BaseFragment() {
                         }
                         pictureDetailAdapter?.notifyItemChanged(2)
                     }
-                    is Error -> Timber.e(it.throwable)
+                    is Error -> onApiError(it.throwable)
                 }
             }
         })
@@ -200,7 +200,7 @@ class PictureDetailFragment : BaseFragment() {
                     tv_like_count.text = item.likeCount.toString()
 
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -209,7 +209,7 @@ class PictureDetailFragment : BaseFragment() {
                 is Empty -> {
                     GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -218,7 +218,7 @@ class PictureDetailFragment : BaseFragment() {
                 is Empty -> {
                     GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
                 }
-                is Error -> Timber.e(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
     }

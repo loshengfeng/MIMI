@@ -162,7 +162,6 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
     }
 
     private fun updateFollow(isFollow: Boolean) {
-        Timber.d("@@updateFollow: $isFollow")
         if (isFollow) {
             follow.text = follow.context.getString(R.string.followed)
             follow.background = follow.context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)

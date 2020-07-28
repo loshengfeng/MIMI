@@ -24,6 +24,9 @@ import retrofit2.HttpException
 
 class TextDetailViewModel : BaseViewModel() {
 
+    private var _postDetailResult = MutableLiveData<ApiResult<ApiBaseItem<MemberPostItem>>>()
+    val postDetailResult: LiveData<ApiResult<ApiBaseItem<MemberPostItem>>> = _postDetailResult
+
     private var _followPostResult = MutableLiveData<ApiResult<Int>>()
     val followPostResult: LiveData<ApiResult<Int>> = _followPostResult
 
@@ -55,6 +58,22 @@ class TextDetailViewModel : BaseViewModel() {
     private var _currentCommentType = CommentType.NEWEST
     val currentCommentType: CommentType
         get() = _currentCommentType
+
+    fun getPostDetail(item: MemberPostItem) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.getMemberPostDetail(item.id)
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(result.body()))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _postDetailResult.value = it }
+        }
+    }
 
     fun followPost(item: MemberPostItem, position: Int, isFollow: Boolean) {
         viewModelScope.launch {

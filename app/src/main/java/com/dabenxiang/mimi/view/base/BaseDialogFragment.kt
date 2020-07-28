@@ -10,8 +10,22 @@ import android.view.ViewGroup
 import android.view.Window
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.ViewModelProvider
+import com.dabenxiang.mimi.extension.handleException
+import com.dabenxiang.mimi.model.api.ExceptionResult
+import com.dabenxiang.mimi.view.main.MainViewModel
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
 abstract class BaseDialogFragment : DialogFragment() {
+
+    open var mainViewModel: MainViewModel? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        activity?.let {
+            mainViewModel = ViewModelProvider(it).get(MainViewModel::class.java)
+        }
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
@@ -29,7 +43,6 @@ abstract class BaseDialogFragment : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupListeners()
         setupObservers()
     }
@@ -63,5 +76,28 @@ abstract class BaseDialogFragment : DialogFragment() {
     open fun setupObservers() {}
 
     open fun setupListeners() {}
+
+    open fun onApiError(
+        throwable: Throwable,
+        onHttpErrorBlock: ((ExceptionResult.HttpError) -> Unit)? = null
+    ) {
+        when (val errorHandler =
+            throwable.handleException { ex -> mainViewModel?.processException(ex) }) {
+            is ExceptionResult.HttpError -> {
+                if (onHttpErrorBlock == null) handleHttpError(errorHandler)
+                else onHttpErrorBlock(errorHandler)
+            }
+            is ExceptionResult.Crash -> {
+                GeneralUtils.showToast(requireContext(), errorHandler.throwable.toString())
+            }
+        }
+    }
+
+    open fun handleHttpError(errorHandler: ExceptionResult.HttpError) {
+        GeneralUtils.showToast(
+            requireContext(),
+            errorHandler.httpExceptionItem.errorItem.toString()
+        )
+    }
 
 }

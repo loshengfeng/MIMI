@@ -15,7 +15,7 @@ data class MemberPostItem(
     val title: String = "",
 
     @SerializedName("content")
-    val content: String = "",
+    var content: String = "",
 
     @SerializedName("type")
     val type: PostType = PostType.TEXT,

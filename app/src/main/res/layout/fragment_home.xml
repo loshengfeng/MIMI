@@ -54,7 +54,7 @@
             app:btn_pressed_color="darker"
             app:btn_solid_color="@color/normal_color_search_bar"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/btn_filter"
+            app:layout_constraintEnd_toStartOf="@id/btn_ranking"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -98,6 +98,23 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/iv_bg_search" />
 
+        <com.yulichswift.roundedview.widget.RoundedTextView
+            android:id="@+id/btn_ranking"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:clickable="true"
+            android:drawableStart="@drawable/ico_ranking"
+            android:paddingStart="6dp"
+            android:paddingEnd="12dp"
+            android:singleLine="true"
+            android:textColor="@color/color_black_1"
+            android:textSize="14sp"
+            app:btn_corner_radius="6dp"
+            app:layout_constraintBottom_toBottomOf="@id/iv_bg_search"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/iv_bg_search"
+            android:visibility="gone" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -108,11 +125,59 @@
         app:layout_constraintTop_toBottomOf="@id/layout_search_bar"
         tools:layout_editor_absoluteX="0dp">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerview"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/normal_color_background" />
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_home"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/normal_color_background"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_first"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/normal_color_background"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_second"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/normal_color_background"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_third"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/normal_color_background"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_fourth"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/normal_color_background"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_fifth"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/normal_color_background"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_sixth"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/normal_color_background"
+                android:visibility="gone" />
+        </FrameLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

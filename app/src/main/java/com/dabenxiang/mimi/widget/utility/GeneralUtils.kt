@@ -24,6 +24,8 @@ import okhttp3.Request
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.HttpException
 import retrofit2.Response
+import java.io.PrintWriter
+import java.io.StringWriter
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
@@ -195,13 +197,21 @@ object GeneralUtils {
         inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
     }
 
-    fun diffTime(d1: Date, d2:Date): Boolean {
-        var result = false
-//        val sdf = SimpleDateFormat("dd/MM/yyyy")
-//        Date(t1)
-//        val date1: Date = sdf.parse(t1)
-//        val date2: Date = sdf.parse(t2)
-        result = d1.after(d2)
-        return result
+    fun getExceptionDetail(t: Throwable): String {
+        return when (t) {
+            is HttpException -> {
+                val data = getHttpExceptionData(t)
+                "$data, ${t.localizedMessage}"
+            }
+            else -> getStackTrace(t)
+        }
+    }
+
+    private fun getStackTrace(t: Throwable): String {
+        val sw = StringWriter(256)
+        val pw = PrintWriter(sw, false)
+        t.printStackTrace(pw)
+        pw.flush()
+        return sw.toString()
     }
 }

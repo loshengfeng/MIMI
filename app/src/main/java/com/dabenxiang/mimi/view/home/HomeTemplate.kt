@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.home
 
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.enums.HomeItemType
 
 sealed class HomeTemplate(val type: HomeItemType) {
@@ -16,7 +17,7 @@ sealed class HomeTemplate(val type: HomeItemType) {
         val isAdult: Boolean
     ) : HomeTemplate(HomeItemType.STATISTICS)
 
-    data class Banner(val imgUrl: String?) : HomeTemplate(HomeItemType.BANNER)
+    data class Banner(val adItem: AdItem) : HomeTemplate(HomeItemType.BANNER)
     data class Carousel(val isAdult: Boolean) : HomeTemplate(HomeItemType.CAROUSEL)
 
     class Clip : HomeTemplate(HomeItemType.CLIP)

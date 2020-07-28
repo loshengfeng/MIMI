@@ -8,7 +8,6 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
-import retrofit2.http.Query
 import java.io.File
 
 class ApiRepository(private val apiService: ApiService) {
@@ -225,6 +224,10 @@ class ApiRepository(private val apiService: ApiService) {
         return apiService.getMembersPost(type.value, offset, limit)
     }
 
+    suspend fun getMemberPostDetail(postId: Long): Response<ApiBaseItem<MemberPostItem>> {
+        return apiService.getMemberPostDetail(postId)
+    }
+
     suspend fun postMembersPost(
         body: PostMemberRequest
     ): Response<ApiBaseItem<Long>> {
@@ -255,6 +258,10 @@ class ApiRepository(private val apiService: ApiService) {
         commentId: Long
     ) = apiService.deleteMembersPostCommentLike(postId, commentId)
 
+    suspend fun updatePost(
+        postId: Long,
+        request: PostMemberRequest
+    ) = apiService.updatePost(postId, request)
 
     /**********************************************************
      *
@@ -481,9 +488,10 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun updateProfile(
         body: ProfileRequest
     ) = apiService.updateProfile(body)
+
     /**********************************************************
      *
-     *                  Members/Post
+     *                  Members/Me/Post
      *
      ***********************************************************/
     suspend fun getMyPost(
@@ -492,6 +500,10 @@ class ApiRepository(private val apiService: ApiService) {
         offset: Int,
         limit: Int
     ) = apiService.getMyPost(isAdult, status, offset, limit)
+
+    suspend fun deleteMyPost(
+        postId: Long
+    ) = apiService.deleteMyPost(postId)
 
     /**********************************************************
      *
@@ -624,5 +636,6 @@ class ApiRepository(private val apiService: ApiService) {
         utcTime: Long? = null,
         sign: String? = null
     ) = apiService.getVideoStreamM3u8(streamId, userId, utcTime, sign)
+
 }
 

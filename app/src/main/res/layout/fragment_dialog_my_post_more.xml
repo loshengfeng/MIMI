@@ -23,7 +23,7 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <TextView
-            android:id="@+id/tv_problem_report2"
+            android:id="@+id/tv_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="start"
@@ -38,7 +38,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tv_problem_report"
+            android:id="@+id/tv_delete"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="start"
@@ -51,7 +51,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintBottom_toBottomOf="@id/line"
-            app:layout_constraintTop_toBottomOf="@id/tv_problem_report2" />
+            app:layout_constraintTop_toBottomOf="@id/tv_edit" />
 
         <View
             android:id="@+id/line"
@@ -60,7 +60,7 @@
             android:background="@color/color_gray_13"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_problem_report" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_delete" />
 
         <TextView
             android:id="@+id/tv_cancel"

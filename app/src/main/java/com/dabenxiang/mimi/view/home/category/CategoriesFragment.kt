@@ -61,11 +61,15 @@ class CategoriesFragment : BaseFragment() {
         }
 
         override fun onPictureClick(view: View, item: MemberPostItem) {
-            TODO("Not yet implemented")
+
         }
 
         override fun onClubClick(view: View, item: MemberClubItem) {
-            TODO("Not yet implemented")
+
+        }
+
+        override fun onLoadBannerViewHolder(vh: HomeBannerViewHolder) {
+
         }
 
         override fun onLoadStatisticsViewHolder(

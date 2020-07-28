@@ -209,6 +209,7 @@
     <string name="upload_article">上传短文</string>
     <string name="upload_cancel">取消</string>
     <string name="post_title">建立帖子</string>
+    <string name="edit_post_title">编辑帖子</string>
     <string name="typing_count">%1$d/%2$d</string>
     <string name="select_post_club_name">已选择的圈子名称</string>
     <string name="post_tag_name"> #标签名称</string>

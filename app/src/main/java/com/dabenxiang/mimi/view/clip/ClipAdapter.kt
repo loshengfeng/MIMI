@@ -32,9 +32,7 @@ class ClipAdapter(
     private val clipMap: HashMap<String, File>,
     private var currentPosition: Int,
     private val clipFuncItem: ClipFuncItem
-) : ListAdapter<MemberPostItem, ClipViewHolder>(
-    DIFF_CALLBACK
-) {
+) : ListAdapter<MemberPostItem, ClipViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         private val DIFF_CALLBACK =
@@ -99,17 +97,21 @@ class ClipAdapter(
         }
     }
 
-    override fun onBindViewHolder(holder: ClipViewHolder, position: Int, payloads: MutableList<Any>) {
+    override fun onBindViewHolder(
+        holder: ClipViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
         Timber.d("onBindViewHolder position:$position, currentPosition: $currentPosition, payloads: $payloads")
         val item = memberPostItems[position]
         val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
         payloads.takeIf { it.isNotEmpty() }?.also {
-            when(it[0] as Int) {
+            when (it[0] as Int) {
                 PAYLOAD_UPDATE_UI -> {
                     holder.onBind(item, clipFuncItem, position)
                 }
             }
-        }?: run {
+        } ?: run {
             holder.onBind(item, clipFuncItem, position)
 
             takeIf { currentPosition == position }?.also {
@@ -164,7 +166,7 @@ class ClipAdapter(
 
         if (TextUtils.isEmpty(url)) {
             if (clipMap.containsKey(id)) {
-                takeIf { currentPosition == position}?.also {
+                takeIf { currentPosition == position }?.also {
                     setupPlayer(
                         playerView,
                         clipMap[id]?.toURI().toString()

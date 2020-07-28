@@ -163,6 +163,10 @@ interface ApiService {
         @Query("orderBy") orderBy: Int = 1
     ): Response<ApiBasePagingItem<List<MemberPostItem>>>
 
+
+    @GET("/v1/Members/Post/{id}")
+    suspend fun getMemberPostDetail(@Path("id") postId: Long): Response<ApiBaseItem<MemberPostItem>>
+
     @POST("/v1/Members/Post")
     suspend fun postMembersPost(
         @Body request: PostMemberRequest
@@ -195,6 +199,12 @@ interface ApiService {
         @Path("postId") postId: Long,
         @Path("commentId") commentId: Long
     ): Response<Void>
+
+    @PUT("/v1/Members/Post/{id}")
+    suspend fun updatePost(
+        @Path("id") postId: Long,
+        @Body request: PostMemberRequest
+    ): Response<ApiBaseItem<Long>>
 
     /**********************************************************
      *
@@ -370,7 +380,7 @@ interface ApiService {
 
     /**********************************************************
      *
-     *                  Members/Post
+     *                  Members/Me/Post
      *
      ***********************************************************/
     @GET("/v1/Members/Me/Post")
@@ -380,6 +390,11 @@ interface ApiService {
         @Query("offset") offset: Int,
         @Query("limit") limit: Int
     ): Response<ApiBasePagingItem<List<MemberPostItem>>>
+
+    @DELETE("/v1/Members/Me/Post/{postId}")
+    suspend fun deleteMyPost(
+        @Path("postId") postId: Long
+    ): Response<Void>
 
     /**********************************************************
      *
@@ -502,4 +517,5 @@ interface ApiService {
         @Path("utcTime") utcTime: Long?,
         @Path("sign") sign: String?
     ): Response<Void>
+
 }

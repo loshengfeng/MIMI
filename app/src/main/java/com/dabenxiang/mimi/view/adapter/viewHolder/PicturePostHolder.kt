@@ -162,6 +162,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         follow.setOnClickListener {
+            Timber.d("@@onFollowClick")
             memberPostFuncItem.onFollowClick(item, !item.isFollow) { isFollow -> updateFollow(isFollow)}
         }
 

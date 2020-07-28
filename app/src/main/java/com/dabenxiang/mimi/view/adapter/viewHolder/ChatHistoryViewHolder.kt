@@ -37,7 +37,7 @@ class ChatHistoryViewHolder(
     }
 
     override fun updated(position: Int) {
-        if (data?.lastReadTime == null || data?.lastMessageTime == null || GeneralUtils.diffTime(data?.lastReadTime!!, data?.lastMessageTime!!)) {
+        if (data?.lastReadTime == null || data?.lastMessageTime == null || data?.lastReadTime!!.after(data?.lastMessageTime!!)) {
             btnChatHistory.setBackgroundResource(R.drawable.btn_chat_history)
             imgIsNew.visibility = View.INVISIBLE
         } else {

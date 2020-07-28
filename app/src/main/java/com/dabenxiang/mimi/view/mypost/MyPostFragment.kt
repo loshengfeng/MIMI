@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
@@ -40,6 +41,11 @@ class MyPostFragment : BaseFragment() {
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
+
+    companion object {
+        const val EDIT = "edit"
+        const val MEMBER_DATA = "member_data"
+    }
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_my_post
@@ -122,6 +128,15 @@ class MyPostFragment : BaseFragment() {
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
+
+        viewModel.deletePostResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is ApiResult.Success -> viewModel.invalidateDataSource()
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -191,24 +206,29 @@ class MyPostFragment : BaseFragment() {
     }
 
     private val onMoreDialogListener = object : MyPostMoreDialogFragment.OnMoreDialogListener {
-        override fun onProblemReport(item: BaseMemberPostItem) {
-            moreDialog?.dismiss()
-//            reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
-//                it.show(
-//                    requireActivity().supportFragmentManager,
-//                    ReportDialogFragment::class.java.simpleName
-//                )
-//            }
-        }
-
         override fun onCancel() {
             moreDialog?.dismiss()
+        }
+
+        override fun onDelete(item: BaseMemberPostItem) {
+            viewModel.deletePost(item as MemberPostItem)
+        }
+
+        override fun onEdit(item: BaseMemberPostItem) {
+            item as MemberPostItem
+            if (item.type == PostType.TEXT) {
+                val bundle = Bundle()
+                bundle.putBoolean(EDIT, true)
+                bundle.putSerializable(MEMBER_DATA, item)
+                findNavController().navigate(R.id.action_myPostFragment_to_postArticleFragment, bundle)
+                moreDialog?.dismiss()
+            }
         }
     }
 
     private val myPostListener = object : MyPostListener {
         override fun onMoreClick(item: MemberPostItem) {
-            moreDialog = MyPostMoreDialogFragment.newInstance(null, onMoreDialogListener).also {
+            moreDialog = MyPostMoreDialogFragment.newInstance(item, onMoreDialogListener).also {
                 it.show(
                     requireActivity().supportFragmentManager,
                     MoreDialogFragment::class.java.simpleName
