@@ -69,7 +69,11 @@
     <fragment
         android:id="@+id/chatHistoryFragment"
         android:name="com.dabenxiang.mimi.view.chathistory.ChatHistoryFragment"
-        tools:layout="@layout/fragment_chat_history" />
+        tools:layout="@layout/fragment_chat_history" >
+        <action
+            android:id="@+id/action_chatHistoryFragment_to_chatContentFragment"
+            app:destination="@id/chatContentFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/messengerFragment"
@@ -82,4 +86,8 @@
         tools:layout="@layout/fragment_change_password">
 
     </fragment>
+    <fragment
+        android:id="@+id/chatContentFragment"
+        android:name="com.dabenxiang.mimi.view.chatcontent.ChatContentFragment"
+        android:label="ChatContentFragment" />
 </navigation>
