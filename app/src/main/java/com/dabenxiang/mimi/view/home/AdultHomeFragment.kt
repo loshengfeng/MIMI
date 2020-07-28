@@ -9,9 +9,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.TextUtils
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.addCallback
@@ -23,7 +21,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
-import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.ApiResult.*
@@ -242,6 +239,10 @@ class AdultHomeFragment : BaseFragment() {
 
         viewModel.videosResult.observe(viewLifecycleOwner, Observer {
             when (val response = it.second) {
+                is Loaded -> {
+                    val viewHolder = homeStatisticsViewHolderMap[it.first]
+                    viewHolder?.hideProgressBar()
+                }
                 is Success -> {
                     val viewHolder = homeStatisticsViewHolderMap[it.first]
                     val statistics = statisticsMap[it.first]
@@ -255,6 +256,10 @@ class AdultHomeFragment : BaseFragment() {
 
         viewModel.clipsResult.observe(viewLifecycleOwner, Observer {
             when (val response = it.second) {
+                is Loaded -> {
+                    val viewHolder = homeClipViewHolderMap[it.first]
+                    viewHolder?.hideProgressBar()
+                }
                 is Success -> {
                     val viewHolder = homeClipViewHolderMap[it.first]
                     val memberPostItems = response.result.content ?: arrayListOf()
@@ -266,6 +271,10 @@ class AdultHomeFragment : BaseFragment() {
 
         viewModel.pictureResult.observe(viewLifecycleOwner, Observer {
             when (val response = it.second) {
+                is Loaded -> {
+                    val viewHolder = homePictureViewHolderMap[it.first]
+                    viewHolder?.hideProgressBar()
+                }
                 is Success -> {
                     val viewHolder = homePictureViewHolderMap[it.first]
                     val memberPostItems = response.result.content ?: arrayListOf()
@@ -277,6 +286,10 @@ class AdultHomeFragment : BaseFragment() {
 
         viewModel.clubResult.observe(viewLifecycleOwner, Observer {
             when (val response = it.second) {
+                is Loaded -> {
+                    val viewHolder = homeClubViewHolderMap[it.first]
+                    viewHolder?.hideProgressBar()
+                }
                 is Success -> {
                     val viewHolder = homeClubViewHolderMap[it.first]
                     val memberClubItems = response.result.content ?: arrayListOf()
