@@ -162,7 +162,6 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         follow.setOnClickListener {
-            Timber.d("@@onFollowClick")
             memberPostFuncItem.onFollowClick(item, !item.isFollow) { isFollow -> updateFollow(isFollow)}
         }
 
@@ -173,7 +172,6 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
     }
 
     private fun updateFollow(isFollow: Boolean) {
-        Timber.d("@@updateFollow: $isFollow")
         if (isFollow) {
             follow.text = follow.context.getString(R.string.followed)
             follow.background = follow.context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
@@ -186,7 +184,6 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
     }
 
     private fun updateLike(isLike: Boolean, count: Int) {
-        Timber.d("@@updateLike: $isLike")
         if (isLike) {
             likeImage.setImageResource(R.drawable.ico_nice_s)
         } else {

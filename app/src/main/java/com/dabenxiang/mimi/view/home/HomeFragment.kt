@@ -44,9 +44,6 @@ class HomeFragment : BaseFragment() {
     private val homeStatisticsViewHolderMap = hashMapOf<Int, HomeStatisticsViewHolder>()
     private val statisticsMap = hashMapOf<Int, HomeTemplate.Statistics>()
 
-    private var width  = 0
-    private var height = 0
-
     override fun getLayoutId() = R.layout.fragment_home
 
     override fun setupFirstTime() {
@@ -56,8 +53,8 @@ class HomeFragment : BaseFragment() {
         refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
         btn_ranking.visibility = View.GONE
 
-        width = GeneralUtils.getScreenSize(requireActivity()).first
-        height = GeneralUtils.getScreenSize(requireActivity()).second
+        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
+        viewModel.adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
 
         if (mainViewModel?.normal == null) {
             mainViewModel?.getHomeCategories()
@@ -101,7 +98,7 @@ class HomeFragment : BaseFragment() {
         })
 
         viewModel.videoList.observe(viewLifecycleOwner, Observer {
-            when(lastPosition) {
+            when (lastPosition) {
                 1 -> movieListAdapter.submitList(it)
                 2 -> dramaListAdapter.submitList(it)
                 3 -> varietyListAdapter.submitList(it)
@@ -318,8 +315,8 @@ class HomeFragment : BaseFragment() {
             homeBannerViewHolderMap[vh.adapterPosition] = vh
             mainViewModel?.getAd(
                 vh.adapterPosition,
-                (width * 0.333).toInt(),
-                (height * 0.0245).toInt()
+                viewModel.adWidth,
+                viewModel.adHeight
             )
         }
 

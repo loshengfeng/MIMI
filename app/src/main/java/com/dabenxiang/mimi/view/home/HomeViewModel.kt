@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.blankj.utilcode.util.ImageUtils
-import com.dabenxiang.mimi.callback.PagingCallback
+import com.dabenxiang.mimi.callback.PostPagingCallBack
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
@@ -44,6 +44,9 @@ class HomeViewModel : BaseViewModel() {
         const val TYPE_COVER = "type_cover"
         const val TYPE_VIDEO = "type_video"
     }
+
+    var adWidth = 0
+    var adHeight = 0
 
     var lastListIndex = 0 // 垂直recycler view 跳出後的最後一筆資料
 
@@ -366,7 +369,7 @@ class HomeViewModel : BaseViewModel() {
 
     private fun getPostFollowPagingItems(): LiveData<PagedList<MemberPostItem>> {
         val postFollowDataSource =
-            PostFollowDataSource(pagingCallback, viewModelScope, domainManager)
+            PostFollowDataSource(pagingCallback, viewModelScope, domainManager, adWidth, adHeight)
         val pictureFactory = PostFollowFactory(postFollowDataSource)
         val config = PagedList.Config.Builder()
             .setPrefetchDistance(4)
@@ -376,7 +379,14 @@ class HomeViewModel : BaseViewModel() {
 
     private fun getMemberPostPagingItems(postType: PostType): LiveData<PagedList<MemberPostItem>> {
         val pictureDataSource =
-            MemberPostDataSource(pagingCallback, viewModelScope, domainManager, postType)
+            MemberPostDataSource(
+                pagingCallback,
+                viewModelScope,
+                domainManager,
+                postType,
+                adWidth,
+                adHeight
+            )
         val pictureFactory = MemberPostFactory(pictureDataSource)
         val config = PagedList.Config.Builder()
             .setPrefetchDistance(4)
@@ -389,11 +399,7 @@ class HomeViewModel : BaseViewModel() {
         isAdult: Boolean
     ): LiveData<PagedList<BaseVideoItem>> {
         val videoDataSource = VideoDataSource(
-            isAdult,
-            category,
-            viewModelScope,
-            domainManager,
-            pagingCallback
+            isAdult, category, viewModelScope, domainManager, pagingCallback, adWidth, adHeight
         )
         val videoFactory = VideoFactory(videoDataSource)
         val config = PagedList.Config.Builder()
@@ -410,13 +416,15 @@ class HomeViewModel : BaseViewModel() {
     }
 
     private fun getClubPagingItems(): LiveData<PagedList<MemberClubItem>> {
-        val clubDataSource = ClubDataSource(pagingCallback, viewModelScope, domainManager)
+        val clubDataSource = ClubDataSource(
+            pagingCallback, viewModelScope, domainManager, adWidth, adHeight
+        )
         val clubFactory = ClubFactory(clubDataSource)
         val config = PagedList.Config.Builder().setPrefetchDistance(4).build()
         return LivePagedListBuilder(clubFactory, config).build()
     }
 
-    private val pagingCallback = object : PagingCallback {
+    private val pagingCallback = object : PostPagingCallBack {
         override fun onLoading() {
             setShowProgress(true)
         }
@@ -426,9 +434,11 @@ class HomeViewModel : BaseViewModel() {
         }
 
         override fun onThrowable(throwable: Throwable) {
+
         }
 
-        override fun onSucceed() {
+        override fun onGetAd(adItem: AdItem) {
+            setupAdItem(adItem)
         }
     }
 
@@ -463,12 +473,10 @@ class HomeViewModel : BaseViewModel() {
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    if (type == TYPE_PIC) {
-                        _postPicResult.postValue(it)
-                    } else if (type == TYPE_COVER) {
-                        _postCoverResult.postValue(it)
-                    } else if (type == TYPE_VIDEO) {
-                        _postVideoResult.postValue(it)
+                    when (type) {
+                        TYPE_PIC -> _postPicResult.postValue(it)
+                        TYPE_COVER -> _postCoverResult.postValue(it)
+                        TYPE_VIDEO -> _postVideoResult.postValue(it)
                     }
                 }
         }

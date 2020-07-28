@@ -16,6 +16,9 @@ import kotlinx.coroutines.launch
 
 class CategoriesViewModel : BaseViewModel() {
 
+    var adWidth = 0
+    var adHeight = 0
+
     private val _videoList = MutableLiveData<PagedList<BaseVideoItem>>()
     val videoList: LiveData<PagedList<BaseVideoItem>> = _videoList
 
@@ -41,7 +44,9 @@ class CategoriesViewModel : BaseViewModel() {
                     category ?: "",
                     viewModelScope,
                     domainManager,
-                    pagingCallback
+                    pagingCallback,
+                    adWidth,
+                    adHeight
                 )
             val factory =
                 VideoFactory(dataSrc)

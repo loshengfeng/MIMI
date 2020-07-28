@@ -98,9 +98,6 @@ class AdultHomeFragment : BaseFragment() {
     private var snackBar: Snackbar? = null
     private var picParameter = PicParameter()
 
-    private var width = 0
-    private var height = 0
-
     companion object {
         private const val REQUEST_PHOTO = 10001
         private const val REQUEST_VIDEO_CAPTURE = 10002
@@ -115,8 +112,8 @@ class AdultHomeFragment : BaseFragment() {
             )
         }
 
-        width = GeneralUtils.getScreenSize(requireActivity()).first
-        height = GeneralUtils.getScreenSize(requireActivity()).second
+        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
+        viewModel.adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
 
         setupUI()
 
@@ -450,6 +447,10 @@ class AdultHomeFragment : BaseFragment() {
         viewModel.uploadCoverItem.observe(viewLifecycleOwner, Observer {
             picParameter = it
         })
+
+        viewModel.getAdItem.observe(viewLifecycleOwner, Observer {
+            updateAd(it)
+        })
     }
 
     override fun setupListeners() {
@@ -569,7 +570,7 @@ class AdultHomeFragment : BaseFragment() {
                     rv_first.adapter = videoListAdapter
                     viewModel.getVideos(null, true)
 
-                    mainViewModel?.getAd(width, height)
+                    mainViewModel?.getAd(viewModel.adWidth, viewModel.adHeight)
                 }
             }
             2 -> {
@@ -663,19 +664,44 @@ class AdultHomeFragment : BaseFragment() {
         homeAdapter.submitList(templateList)
     }
 
+    private fun setTab(index: Int) {
+        lastPosition = index
+        tabAdapter.setLastSelectedIndex(lastPosition)
+        recyclerview_tab.scrollToPosition(index)
+        setupRecyclerByPosition(index)
+    }
+
+    private fun updateAd(item: AdItem) {
+        when (lastPosition) {
+            2 -> {
+                followPostPagedAdapter.setupAdItem(item)
+                followPostPagedAdapter.notifyItemChanged(0)
+            }
+            3 -> {
+                clipPostPagedAdapter.setupAdItem(item)
+                clipPostPagedAdapter.notifyItemChanged(0)
+            }
+            4 -> {
+                picturePostPagedAdapter.setupAdItem(item)
+                picturePostPagedAdapter.notifyItemChanged(0)
+            }
+            5 -> {
+                textPostPagedAdapter.setupAdItem(item)
+                textPostPagedAdapter.notifyItemChanged(0)
+            }
+            6 -> {
+                clubMemberAdapter.setupAdItem(item)
+                clubMemberAdapter.notifyItemChanged(0)
+            }
+        }
+    }
+
     private val tabAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
                 setTab(index)
             }
         }, true)
-    }
-
-    private fun setTab(index: Int) {
-        lastPosition = index
-        tabAdapter.setLastSelectedIndex(lastPosition)
-        recyclerview_tab.scrollToPosition(index)
-        setupRecyclerByPosition(index)
     }
 
     private val homeAdapter by lazy {
@@ -915,8 +941,8 @@ class AdultHomeFragment : BaseFragment() {
             homeBannerViewHolderMap[vh.adapterPosition] = vh
             mainViewModel?.getAd(
                 vh.adapterPosition,
-                (width * 0.333).toInt(),
-                (height * 0.0245).toInt()
+                viewModel.adWidth,
+                viewModel.adHeight
             )
         }
 

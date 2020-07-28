@@ -2,7 +2,9 @@ package com.dabenxiang.mimi.view.home.club
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
+import com.dabenxiang.mimi.callback.PostPagingCallBack
 import com.dabenxiang.mimi.manager.DomainManager
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.view.home.memberpost.MemberPostDataSource
 import kotlinx.coroutines.CoroutineScope
@@ -13,9 +15,11 @@ import retrofit2.HttpException
 import timber.log.Timber
 
 class ClubDataSource (
-    private val pagingCallback: PagingCallback,
+    private val pagingCallback: PostPagingCallBack,
     private val viewModelScope: CoroutineScope,
-    private val domainManager: DomainManager
+    private val domainManager: DomainManager,
+    private val adWidth: Int,
+    private val adHeight: Int
 ) : PageKeyedDataSource<Int, MemberClubItem>() {
 
     companion object {
@@ -28,6 +32,10 @@ class ClubDataSource (
     ) {
         viewModelScope.launch {
             flow {
+                val adRepository = domainManager.getAdRepository()
+                val adItem = adRepository.getAD(adWidth, adHeight).body()?.content ?: AdItem()
+                pagingCallback.onGetAd(adItem)
+
                 val result = domainManager.getApiRepository().getMembersClubPost(
                     offset = 0,
                     limit = PER_LIMIT

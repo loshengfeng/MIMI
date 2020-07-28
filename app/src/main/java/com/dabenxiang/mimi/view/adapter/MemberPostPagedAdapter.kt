@@ -5,11 +5,14 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.ClipPostHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.TextPostHolder
@@ -19,7 +22,8 @@ class MemberPostPagedAdapter(
     val context: Context,
     private val adultListener: AdultListener,
     private var mTag: String = "",
-    private val memberPostFuncItem: MemberPostFuncItem = MemberPostFuncItem()
+    private val memberPostFuncItem: MemberPostFuncItem = MemberPostFuncItem(),
+    private var mAdItem: AdItem? = null
 ) : PagedListAdapter<MemberPostItem, BaseViewHolder>(diffCallback) {
 
     companion object {
@@ -27,6 +31,7 @@ class MemberPostPagedAdapter(
         const val VIEW_TYPE_CLIP = 0
         const val VIEW_TYPE_PICTURE = 1
         const val VIEW_TYPE_TEXT = 2
+        const val VIEW_TYPE_AD = 3
 
         val diffCallback = object : DiffUtil.ItemCallback<MemberPostItem>() {
             override fun areItemsTheSame(
@@ -48,16 +53,26 @@ class MemberPostPagedAdapter(
     val viewHolderMap = hashMapOf<Int, BaseViewHolder>()
 
     override fun getItemViewType(position: Int): Int {
-        val item = getItem(position)
-        return when (item?.type) {
-            PostType.VIDEO -> VIEW_TYPE_CLIP
-            PostType.IMAGE -> VIEW_TYPE_PICTURE
-            else -> VIEW_TYPE_TEXT
+        return if (position == 0) {
+            VIEW_TYPE_AD
+        } else {
+            val item = getItem(position)
+            when (item?.type) {
+                PostType.VIDEO -> VIEW_TYPE_CLIP
+                PostType.IMAGE -> VIEW_TYPE_PICTURE
+                else -> VIEW_TYPE_TEXT
+            }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (viewType) {
+            VIEW_TYPE_AD -> {
+                AdHolder(
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_ad, parent, false)
+                )
+            }
             VIEW_TYPE_CLIP -> {
                 ClipPostHolder(
                     LayoutInflater.from(parent.context)
@@ -87,6 +102,11 @@ class MemberPostPagedAdapter(
         viewHolderMap[position] = holder
         val item = getItem(position)
         when (holder) {
+            is AdHolder -> {
+                mAdItem?.also {
+                    Glide.with(context).load(it.href).into(holder.adImg)
+                }
+            }
             is ClipPostHolder -> {
                 item?.also {
                     holder.onBind(
@@ -142,5 +162,9 @@ class MemberPostPagedAdapter(
 
     fun setupTag(tag: String) {
         mTag = tag
+    }
+
+    fun setupAdItem(item: AdItem) {
+        mAdItem = item
     }
 }

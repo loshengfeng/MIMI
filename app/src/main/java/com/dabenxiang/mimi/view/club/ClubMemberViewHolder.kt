@@ -8,7 +8,6 @@ import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_club_member.view.*
-import timber.log.Timber
 
 /**
  * VAI4.1.6_圈子頁
@@ -32,7 +31,8 @@ class ClubMemberViewHolder(view: View) : BaseViewHolder(view) {
         val isFollow = item.isFollow ?: false
         if (isFollow) {
             tvFollow.text = tvFollow.context.getString(R.string.followed)
-            tvFollow.background = tvFollow.context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
+            tvFollow.background =
+                tvFollow.context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
             tvFollow.setTextColor(tvFollow.context.getColor(R.color.color_white_1))
         } else {
             tvFollow.text = tvFollow.context.getString(R.string.follow)
@@ -41,7 +41,10 @@ class ClubMemberViewHolder(view: View) : BaseViewHolder(view) {
         }
 
         tvFollow.setOnClickListener {
-            clubFuncItem.onFollowClick(item, !(item.isFollow ?: false)) { isFollow -> updateFollowItem(isFollow) }
+            clubFuncItem.onFollowClick(
+                item,
+                !(item.isFollow ?: false)
+            ) { isFollow -> updateFollowItem(isFollow) }
         }
 
         if (rvPost.adapter == null || rvPost.tag != position) {
@@ -49,14 +52,19 @@ class ClubMemberViewHolder(view: View) : BaseViewHolder(view) {
             rvPost.adapter = ClubMemberPostAdapter(rvPost.context, item.posts, clubFuncItem)
         }
 
-        item.avatarAttachmentId.toString().takeIf { !TextUtils.isEmpty(it) && it != LruCacheUtils.ZERO_ID }?.also { id ->
+        item.avatarAttachmentId.toString()
+            .takeIf { !TextUtils.isEmpty(it) && it != LruCacheUtils.ZERO_ID }?.also { id ->
             LruCacheUtils.getLruCache(id)?.also { bitmap ->
                 Glide.with(ivAvatar.context).load(bitmap).circleCrop().into(ivAvatar)
             } ?: run {
                 ivAvatar.tag = id
                 clubFuncItem.getBitmap(item.avatarAttachmentId.toString()) { id -> updateAvatar(id) }
             }
-        } ?: run { Glide.with(ivAvatar.context).load(ivAvatar.context.getDrawable(R.drawable.icon_cs_photo)).centerCrop().into(ivAvatar) }
+        } ?: run {
+            Glide.with(ivAvatar.context)
+                .load(ivAvatar.context.getDrawable(R.drawable.icon_cs_photo)).centerCrop()
+                .into(ivAvatar)
+        }
 
         clMemberPost.setOnClickListener {
             clubFuncItem.onItemClick(item)
@@ -73,7 +81,8 @@ class ClubMemberViewHolder(view: View) : BaseViewHolder(view) {
     private fun updateFollowItem(isFollow: Boolean) {
         if (isFollow) {
             tvFollow.text = tvFollow.context.getString(R.string.followed)
-            tvFollow.background = tvFollow.context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
+            tvFollow.background =
+                tvFollow.context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
             tvFollow.setTextColor(tvFollow.context.getColor(R.color.color_white_1))
         } else {
             tvFollow.text = tvFollow.context.getString(R.string.follow)

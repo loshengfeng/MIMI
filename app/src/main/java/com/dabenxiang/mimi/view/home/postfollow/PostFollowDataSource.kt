@@ -1,8 +1,9 @@
 package com.dabenxiang.mimi.view.home.postfollow
 
 import androidx.paging.PageKeyedDataSource
-import com.dabenxiang.mimi.callback.PagingCallback
+import com.dabenxiang.mimi.callback.PostPagingCallBack
 import com.dabenxiang.mimi.manager.DomainManager
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -11,9 +12,11 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
 class PostFollowDataSource(
-    private val pagingCallback: PagingCallback,
+    private val pagingCallback: PostPagingCallBack,
     private val viewModelScope: CoroutineScope,
-    private val domainManager: DomainManager
+    private val domainManager: DomainManager,
+    private val adWidth: Int,
+    private val adHeight: Int
 ) : PageKeyedDataSource<Int, MemberPostItem>() {
 
     companion object {
@@ -26,6 +29,10 @@ class PostFollowDataSource(
     ) {
         viewModelScope.launch {
             flow {
+                val adRepository = domainManager.getAdRepository()
+                val adItem = adRepository.getAD(adWidth, adHeight).body()?.content ?: AdItem()
+                pagingCallback.onGetAd(adItem)
+
                 val apiRepository = domainManager.getApiRepository()
                 val result = apiRepository.getPostFollow(0, PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)

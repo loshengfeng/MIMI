@@ -109,11 +109,11 @@
             android:singleLine="true"
             android:textColor="@color/color_black_1"
             android:textSize="14sp"
+            android:visibility="gone"
             app:btn_corner_radius="6dp"
             app:layout_constraintBottom_toBottomOf="@id/iv_bg_search"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/iv_bg_search"
-            android:visibility="gone" />
+            app:layout_constraintTop_toTopOf="@id/iv_bg_search" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

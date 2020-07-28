@@ -174,7 +174,6 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
     }
 
     private fun updateLike(isLike: Boolean, count: Int) {
-        Timber.d("@@updateLike: $isLike")
         if (isLike) {
             likeImage.setImageResource(R.drawable.ico_nice_s)
         } else {

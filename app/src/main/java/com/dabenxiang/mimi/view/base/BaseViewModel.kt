@@ -9,6 +9,7 @@ import com.dabenxiang.mimi.PROJECT_NAME
 import com.dabenxiang.mimi.manager.AccountManager
 import com.dabenxiang.mimi.manager.DomainManager
 import com.dabenxiang.mimi.model.api.ExceptionResult
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getExceptionDetail
 import com.google.gson.Gson
@@ -27,8 +28,15 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     private val _showProgress by lazy { MutableLiveData<Boolean>() }
     val showProgress: LiveData<Boolean> get() = _showProgress
 
+    private val _getAdItem by lazy { MutableLiveData<AdItem>() }
+    val getAdItem: LiveData<AdItem> get() = _getAdItem
+
     fun setShowProgress(show: Boolean) {
         _showProgress.value = show
+    }
+
+    fun setupAdItem(item: AdItem) {
+        _getAdItem.postValue(item)
     }
 
     fun processException(exceptionResult: ExceptionResult) {
