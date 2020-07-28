@@ -15,7 +15,6 @@ import com.dabenxiang.mimi.view.home.viewholder.ClubViewHolder
 
 class HomeClubAdapter(
     nestedListener: HomeAdapter.EventListener,
-    private val memberPostFuncItem: MemberPostFuncItem,
     private val clubFuncItem: ClubFuncItem
 ) : RecyclerView.Adapter<BaseViewHolder>() {
 
@@ -57,9 +56,5 @@ class HomeClubAdapter(
                 nestedListener.onClubClick(view, memberClubItems[index])
             }
         }
-    }
-
-    interface ClubListener {
-        fun followClub(item: MemberClubItem, position: Int, isFollow: Boolean)
     }
 }

@@ -5,4 +5,5 @@ interface PagingCallback {
     fun onLoaded()
     fun onSucceed() {}
     fun onThrowable(throwable: Throwable)
+    fun onTotalCount(count: Long) {}
 }

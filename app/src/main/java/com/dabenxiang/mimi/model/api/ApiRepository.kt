@@ -275,6 +275,14 @@ class ApiRepository(private val apiService: ApiService) {
         return apiService.getMembersClubPost(offset, limit)
     }
 
+    suspend fun getMembersClubPost(
+        offset: Int,
+        limit: Int,
+        keyword: String
+    ): Response<ApiBasePagingItem<List<MemberClubItem>>> {
+        return apiService.getMembersClubPost(offset, limit, keyword)
+    }
+
     suspend fun getMembersPost(
         offset: Int,
         limit: Int,
