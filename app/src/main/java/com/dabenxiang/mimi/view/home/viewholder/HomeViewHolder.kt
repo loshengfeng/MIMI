@@ -2,17 +2,16 @@ package com.dabenxiang.mimi.view.home.viewholder
 
 import android.view.View
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.holder.CarouselHolderItem
 import com.dabenxiang.mimi.view.adapter.*
@@ -103,8 +102,7 @@ class HomeCarouselViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
     isAdult: Boolean
-) :
-    HomeViewHolder<HomeTemplate.Carousel>(itemView, listener, isAdult) {
+) : HomeViewHolder<HomeTemplate.Carousel>(itemView, listener, isAdult) {
 
     private val banner: Banner = itemView.banner
     private val pagerIndicator: ViewPagerIndicator = itemView.pager_indicator
@@ -137,9 +135,9 @@ class HomeStatisticsViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
     isAdult: Boolean
-) :
-    HomeViewHolder<HomeTemplate.Statistics>(itemView, listener, isAdult) {
+) : HomeViewHolder<HomeTemplate.Statistics>(itemView, listener, isAdult) {
 
+    private val progressBar: ProgressBar = itemView.progress_statistics
     private val recyclerView: RecyclerView = itemView.recyclerview_statistics
     private val nestedAdapter by lazy {
         HomeStatisticsAdapter(nestedListener, isAdult)
@@ -165,6 +163,10 @@ class HomeStatisticsViewHolder(
     fun submitList(list: List<BaseVideoItem.Video>?) {
         nestedAdapter.submitList(list)
     }
+
+    fun hideProgressBar() {
+        progressBar.visibility = View.GONE
+    }
 }
 
 class HomeClipViewHolder(
@@ -174,8 +176,7 @@ class HomeClipViewHolder(
     memberPostFuncItem: MemberPostFuncItem
 ) : HomeViewHolder<HomeTemplate.Clip>(itemView, listener, isAdult) {
 
-    private var attachmentType: AttachmentType? = null
-
+    private val progressBar: ProgressBar = itemView.progress_clip
     private val recyclerView: RecyclerView = itemView.recyclerview_clip
     private val nestedAdapter by lazy {
         HomeClipAdapter(listener, memberPostFuncItem)
@@ -201,6 +202,10 @@ class HomeClipViewHolder(
     fun updateItem(position: Int) {
         nestedAdapter.notifyItemChanged(position)
     }
+
+    fun hideProgressBar() {
+        progressBar.visibility = View.GONE
+    }
 }
 
 class HomePictureViewHolder(
@@ -210,6 +215,7 @@ class HomePictureViewHolder(
     memberPostFuncItem: MemberPostFuncItem
 ) : HomeViewHolder<HomeTemplate.Picture>(itemView, listener, isAdult) {
 
+    private val progressBar: ProgressBar = itemView.progress_picture
     private val recyclerView: RecyclerView = itemView.recyclerview_picture
     private val nestedAdapter by lazy {
         HomePictureAdapter(listener, memberPostFuncItem)
@@ -235,6 +241,10 @@ class HomePictureViewHolder(
     fun updateItem(position: Int) {
         nestedAdapter.notifyItemChanged(position)
     }
+
+    fun hideProgressBar() {
+        progressBar.visibility = View.GONE
+    }
 }
 
 /**
@@ -248,6 +258,7 @@ class HomeClubViewHolder(
     memberPostFuncItem: MemberPostFuncItem
 ) : HomeViewHolder<HomeTemplate.Club>(itemView, listener, isAdult) {
 
+    private val progressBar: ProgressBar = itemView.progress_club
     private val recyclerView: RecyclerView = itemView.recyclerview_club
     private val nestedAdapter by lazy {
         HomeClubAdapter(listener, clubListener, memberPostFuncItem)
@@ -276,6 +287,10 @@ class HomeClubViewHolder(
 
     fun updateItem(position: Int) {
         nestedAdapter.notifyItemChanged(position)
+    }
+
+    fun hideProgressBar() {
+        progressBar.visibility = View.GONE
     }
 
     fun updateItemByFollow(position: Int, result: Boolean) {
