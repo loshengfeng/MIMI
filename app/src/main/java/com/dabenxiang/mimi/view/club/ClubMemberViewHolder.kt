@@ -49,7 +49,7 @@ class ClubMemberViewHolder(view: View) : BaseViewHolder(view) {
 
         if (rvPost.adapter == null || rvPost.tag != position) {
             rvPost.tag = position
-            rvPost.adapter = ClubMemberPostAdapter(rvPost.context, item.posts, clubFuncItem)
+            rvPost.adapter = ClubMemberPostAdapter(rvPost.context, item.posts, item, clubFuncItem)
         }
 
         item.avatarAttachmentId.toString()

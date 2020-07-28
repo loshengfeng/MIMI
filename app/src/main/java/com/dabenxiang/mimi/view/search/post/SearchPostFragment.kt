@@ -8,6 +8,7 @@ import android.text.TextUtils
 import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
@@ -19,6 +20,7 @@ import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
@@ -31,6 +33,9 @@ import com.dabenxiang.mimi.view.adapter.viewHolder.TextPostHolder
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.club.ClubFuncItem
+import com.dabenxiang.mimi.view.club.ClubMemberAdapter
+import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
@@ -39,7 +44,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_post.*
-import timber.log.Timber
+import kotlinx.android.synthetic.main.fragment_search_post.tv_search
 
 class SearchPostFragment : BaseFragment() {
 
@@ -63,8 +68,23 @@ class SearchPostFragment : BaseFragment() {
     private var searchKeyword: String = ""
 
     private var isPostFollow: Boolean = false
+    private var isClub: Boolean = false
 
     private var adapter: MemberPostPagedAdapter? = null
+
+    private val clubMemberAdapter by lazy {
+        ClubMemberAdapter(
+            requireContext(),
+            clubFuncItem
+        )
+    }
+
+    private val clubFuncItem by lazy {
+        ClubFuncItem(
+            { item -> onItemClick(item) },
+            { id, function -> getBitmap(id, function) },
+            { item, isFollow, function -> clubFollow(item, isFollow, function) })
+    }
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -84,6 +104,7 @@ class SearchPostFragment : BaseFragment() {
             isPostFollow = it.isPostFollow
             mTag = it.tag
             searchText = it.searchText
+            isClub = it.isClub
         }
     }
 
@@ -103,7 +124,9 @@ class SearchPostFragment : BaseFragment() {
             requireContext(), adultListener, mTag, memberPostFuncItem
         )
         recycler_search_result.layoutManager = LinearLayoutManager(requireContext())
-        recycler_search_result.adapter = adapter
+
+        takeIf { isClub }?.also { recycler_search_result.adapter = clubMemberAdapter }
+            ?: run { recycler_search_result.adapter = adapter }
 
         if (!TextUtils.isEmpty(mTag)) {
             viewModel.getSearchPostsByTag(currentPostType, mTag, isPostFollow)
@@ -119,6 +142,9 @@ class SearchPostFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
+        viewModel.showProgress.observe(viewLifecycleOwner, Observer { showProgress ->
+            showProgress?.takeUnless { it }?.also { progressHUD?.dismiss() }
+        })
         viewModel.postReportResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Empty -> {
@@ -212,6 +238,10 @@ class SearchPostFragment : BaseFragment() {
         viewModel.searchTotalCount.observe(viewLifecycleOwner, Observer { count ->
             tv_search_text.text = getSearchText(currentPostType, searchKeyword, count, isPostFollow)
         })
+
+        viewModel.clubItemListResult.observe(viewLifecycleOwner, Observer {
+            clubMemberAdapter.submitList(it)
+        })
     }
 
     override fun setupListeners() {
@@ -229,25 +259,17 @@ class SearchPostFragment : BaseFragment() {
         }
 
         tv_search.setOnClickListener {
-            GeneralUtils.hideKeyboard(requireActivity())
-            if (viewModel.isSearchTextEmpty(edit_search.text.toString())) {
-                GeneralUtils.showToast(
-                    requireContext(),
-                    getString(R.string.search_input_empty_toast)
-                )
-                return@setOnClickListener
+            search()
+        }
+
+        edit_search.setOnEditorActionListener { v, actionId, event ->
+            when(actionId) {
+                EditorInfo.IME_ACTION_SEARCH -> {
+                    search()
+                    true
+                }
+                else -> false
             }
-            layout_search_history.visibility = View.GONE
-            layout_search_text.visibility = View.VISIBLE
-            updateTag("")
-
-            viewModel.updateSearchHistory(edit_search.text.toString())
-
-            viewModel.getSearchPostsByKeyword(
-                currentPostType,
-                edit_search.text.toString(),
-                isPostFollow
-            )
         }
 
         edit_search.addTextChangedListener {
@@ -260,6 +282,33 @@ class SearchPostFragment : BaseFragment() {
                 getSearchHistory()
                 adapter?.submitList(null)
             }
+        }
+    }
+
+    private fun search() {
+        GeneralUtils.hideKeyboard(requireActivity())
+        if (viewModel.isSearchTextEmpty(edit_search.text.toString())) {
+            GeneralUtils.showToast(
+                requireContext(),
+                getString(R.string.search_input_empty_toast)
+            )
+            return
+        }
+        layout_search_history.visibility = View.GONE
+        layout_search_text.visibility = View.VISIBLE
+        updateTag("")
+
+        viewModel.updateSearchHistory(edit_search.text.toString())
+
+        if (isClub) {
+            viewModel.getClubs(edit_search.text.toString())
+            progressHUD?.show()
+        } else {
+            viewModel.getSearchPostsByKeyword(
+                currentPostType,
+                edit_search.text.toString(),
+                isPostFollow
+            )
         }
     }
 
@@ -279,7 +328,9 @@ class SearchPostFragment : BaseFragment() {
             .append(" ")
             .append(getString(R.string.search_keyword_3))
 
-        if (!isPostFollow) {
+        if (isClub) word.append(getString(R.string.search_type_club))
+
+        if (!isPostFollow && !isClub) {
             val typeText = when (type) {
                 PostType.TEXT -> getString(R.string.search_type_text)
                 PostType.IMAGE -> getString(R.string.search_type_picture)
@@ -377,6 +428,15 @@ class SearchPostFragment : BaseFragment() {
                         )
                     )
                 }
+                AdultTabType.CLIP -> {
+                    val bundle = ClipFragment.createBundle(arrayListOf(item), 0, true)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_clubDetailFragment_to_clipFragment,
+                            bundle
+                        )
+                    )
+                }
                 else -> {
                 }
             }
@@ -411,6 +471,15 @@ class SearchPostFragment : BaseFragment() {
                         )
                     )
                 }
+                AdultTabType.CLIP -> {
+                    val bundle = ClipFragment.createBundle(arrayListOf(item), 0)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_clubDetailFragment_to_clipFragment,
+                            bundle
+                        )
+                    )
+                }
                 else -> {
                 }
             }
@@ -427,7 +496,6 @@ class SearchPostFragment : BaseFragment() {
         }
 
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {
-            // TODO: Sion Wang
             val bundle = ClipFragment.createBundle(ArrayList(item), position)
             navigateTo(
                 NavigateItem.Destination(
@@ -462,6 +530,20 @@ class SearchPostFragment : BaseFragment() {
         viewModel.getBitmap(id, update)
     }
 
+    private fun clubFollow(
+        memberClubItem: MemberClubItem,
+        isFollow: Boolean,
+        update: (Boolean) -> Unit
+    ) {
+        viewModel.clubFollow(memberClubItem, isFollow, update)
+    }
+
+    private fun onItemClick(item: MemberClubItem) {
+        val bundle = ClubDetailFragment.createBundle(item)
+        findNavController().navigate(R.id.action_searchPostFragment_to_clubDetailFragment, bundle)
+    }
+
+
     private fun getSearchHistory() {
         chip_group_search_text.removeAllViews()
         val searchHistories = viewModel.getSearchHistory().asReversed()
@@ -478,11 +560,16 @@ class SearchPostFragment : BaseFragment() {
                 layout_search_history.visibility = View.GONE
                 layout_search_text.visibility = View.VISIBLE
                 updateTag("")
-                viewModel.getSearchPostsByKeyword(
-                    currentPostType,
-                    edit_search.text.toString(),
-                    isPostFollow
-                )
+                if (isClub) {
+                    viewModel.getClubs(edit_search.text.toString())
+                    progressHUD?.show()
+                } else {
+                    viewModel.getSearchPostsByKeyword(
+                        currentPostType,
+                        edit_search.text.toString(),
+                        isPostFollow
+                    )
+                }
             }
             chip_group_search_text.addView(chip)
         }

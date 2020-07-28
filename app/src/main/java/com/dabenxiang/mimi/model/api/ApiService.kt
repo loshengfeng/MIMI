@@ -217,6 +217,13 @@ interface ApiService {
         @Query("limit") limit: Int
     ): Response<ApiBasePagingItem<List<MemberClubItem>>>
 
+    @GET("/v1/Members/Club/Post")
+    suspend fun getMembersClubPost(
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int,
+        @Query("keyword") keyword: String
+    ): Response<ApiBasePagingItem<List<MemberClubItem>>>
+
     @GET("/v1/Members/Post")
     suspend fun getMembersPost(
         @Query("offset") offset: Int,

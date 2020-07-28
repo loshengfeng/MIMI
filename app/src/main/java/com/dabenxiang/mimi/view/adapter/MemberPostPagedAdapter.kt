@@ -23,7 +23,8 @@ class MemberPostPagedAdapter(
     private val adultListener: AdultListener,
     private var mTag: String = "",
     private val memberPostFuncItem: MemberPostFuncItem = MemberPostFuncItem(),
-    private var mAdItem: AdItem? = null
+    private var mAdItem: AdItem? = null,
+    private val isClipList: Boolean = false
 ) : PagedListAdapter<MemberPostItem, BaseViewHolder>(diffCallback) {
 
     companion object {
@@ -115,7 +116,8 @@ class MemberPostPagedAdapter(
                         position,
                         adultListener,
                         mTag,
-                        memberPostFuncItem
+                        memberPostFuncItem,
+                        isClipList
                     )
                 }
             }

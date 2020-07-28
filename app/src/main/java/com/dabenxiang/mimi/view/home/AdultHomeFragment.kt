@@ -475,10 +475,7 @@ class AdultHomeFragment : BaseFragment() {
                     3 -> SearchPostItem(type = PostType.VIDEO)
                     4 -> SearchPostItem(type = PostType.IMAGE)
                     5 -> SearchPostItem(type = PostType.TEXT)
-                    else -> {
-                        // TODO: SION 圈子搜尋
-                        SearchPostItem(type = PostType.TEXT)
-                    }
+                    else -> SearchPostItem(isClub = true)
                 }
                 val bundle = SearchPostFragment.createBundle(item)
                 navigateTo(
@@ -719,7 +716,7 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val clipPostPagedAdapter by lazy {
-        MemberPostPagedAdapter(requireActivity(), adultListener, "", memberPostFuncItem)
+        MemberPostPagedAdapter(requireActivity(), adultListener, "", memberPostFuncItem, null, true)
     }
 
     private val picturePostPagedAdapter by lazy {
@@ -786,6 +783,15 @@ class AdultHomeFragment : BaseFragment() {
                         )
                     )
                 }
+                AdultTabType.CLIP -> {
+                    val bundle = ClipFragment.createBundle(arrayListOf(item), 0, true)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_adultHomeFragment_to_clipFragment,
+                            bundle
+                        )
+                    )
+                }
                 else -> {
                 }
             }
@@ -820,6 +826,15 @@ class AdultHomeFragment : BaseFragment() {
                         )
                     )
                 }
+                AdultTabType.CLIP -> {
+                    val bundle = ClipFragment.createBundle(arrayListOf(item), 0)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_adultHomeFragment_to_clipFragment,
+                            bundle
+                        )
+                    )
+                }
                 else -> {
                 }
             }
@@ -836,8 +851,7 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {
-            // TODO: Sion Wang
-            val bundle = ClipFragment.createBundle(ArrayList(item), position)
+            val bundle = ClipFragment.createBundle(ArrayList(item), position, true)
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_adultHomeFragment_to_clipFragment,
