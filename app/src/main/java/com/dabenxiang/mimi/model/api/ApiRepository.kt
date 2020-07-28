@@ -258,6 +258,10 @@ class ApiRepository(private val apiService: ApiService) {
         commentId: Long
     ) = apiService.deleteMembersPostCommentLike(postId, commentId)
 
+    suspend fun updatePost(
+        postId: Long,
+        request: PostMemberRequest
+    ) = apiService.updatePost(postId, request)
 
     /**********************************************************
      *

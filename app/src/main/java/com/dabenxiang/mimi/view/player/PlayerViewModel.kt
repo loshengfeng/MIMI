@@ -92,7 +92,7 @@ class PlayerViewModel : BaseViewModel() {
     private val _consumeResult = MutableLiveData<VideoConsumeResult>()
     val consumeResult: LiveData<VideoConsumeResult> = _consumeResult
 
-    private val _sourceListPosition = MutableLiveData<Int>()
+    private val _sourceListPosition = MutableLiveData<Int>().also { it.value =-1 }
     val sourceListPosition: LiveData<Int> = _sourceListPosition
 
     private val _episodePosition = MutableLiveData<Int>()
@@ -256,6 +256,10 @@ class PlayerViewModel : BaseViewModel() {
                 if (!isDeducted) throw Exception("點數不足")
 
                 val episodeInfo = episodeResp.body()?.content
+                Timber.i("episodeInfo =$episodeInfo")
+                isReported = episodeInfo?.reported ?: false
+                Timber.i("isReported =$isReported")
+
                 val videoStreamsSize = episodeInfo?.videoStreams?.size ?: 0
                 val selectedEpisodeIndex = episodePosition.value ?: 0
 
@@ -312,7 +316,9 @@ class PlayerViewModel : BaseViewModel() {
                 if (!isDeducted) throw Exception("點數不足")
 
                 val episodeInfo = episodeResp.body()?.content
+                Timber.i("episodeInfo =$episodeInfo")
                 isReported = episodeInfo?.reported ?: false
+                Timber.i("isReported =$isReported")
                 videoId = episodeInfo?.id ?: 0
 
                 val stream = episodeInfo?.videoStreams?.get(0)!!
@@ -357,14 +363,17 @@ class PlayerViewModel : BaseViewModel() {
     }
 
     fun setSourceListPosition(position: Int) {
+        Timber.i("setSourceListPosition position=$position   _sourceListPosition=${_sourceListPosition.value}")
         if (position != _sourceListPosition.value) {
-            _sourceListPosition.value = position
+            _sourceListPosition.postValue(position)
         }
     }
 
     fun setStreamPosition(position: Int) {
+
+        Timber.i("setStreamPosition position=${position}  _episodePosition.value =${_episodePosition.value}")
         if (position != _episodePosition.value) {
-            _episodePosition.value = position
+            _episodePosition.postValue(position)
         }
     }
 
@@ -683,23 +692,6 @@ class PlayerViewModel : BaseViewModel() {
                         }
                     }
                 }
-        }
-    }
-
-    fun sendPostReport(item: MemberPostItem, content: String) {
-        viewModelScope.launch {
-            flow {
-                val request = ReportRequest(content)
-                val result = domainManager.getApiRepository().sendPostReport(item.id, request)
-                if (!result.isSuccessful) throw HttpException(result)
-                item.reported = true
-                emit(ApiResult.success(null))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _postReportResult.value = it }
         }
     }
 }
