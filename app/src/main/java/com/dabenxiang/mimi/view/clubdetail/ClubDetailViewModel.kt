@@ -24,12 +24,6 @@ import retrofit2.HttpException
 
 class ClubDetailViewModel: BaseViewModel() {
 
-    private val _scrollToLastPosition = MutableLiveData<Boolean>()
-    val scrollToLastPosition: LiveData<Boolean> = _scrollToLastPosition
-
-    private val _memberPostListResult = MutableLiveData<PagedList<MemberPostItem>>()
-    val memberPostListResult: LiveData<PagedList<MemberPostItem>> = _memberPostListResult
-
     private var _followClubResult = MutableLiveData<ApiResult<Boolean>>()
     val followClubResult: LiveData<ApiResult<Boolean>> = _followClubResult
 
@@ -41,7 +35,6 @@ class ClubDetailViewModel: BaseViewModel() {
              getMemberPostPagingItems(tag, orderBy).asFlow()
                  .collect {
                      update(it)
-                     _memberPostListResult.value = it
                  }
          }
     }
@@ -183,7 +176,6 @@ class ClubDetailViewModel: BaseViewModel() {
         }
 
         override fun onSucceed() {
-            _scrollToLastPosition.postValue(true)
         }
     }
 }

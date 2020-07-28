@@ -34,14 +34,18 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
     val goLibVersion
         get() = _goLibVersion
 
-    fun getApiRepository(): ApiRepository {
+    private val apiRepo by lazy {
         val apiService = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create(gson))
             .client(okHttpClient)
             .baseUrl(getApiDomain())
             .build()
             .create(ApiService::class.java)
-        return ApiRepository(apiService)
+        ApiRepository(apiService)
+    }
+
+    fun getApiRepository(): ApiRepository {
+        return apiRepo
     }
 
     fun getAdRepository(): AdRepository {

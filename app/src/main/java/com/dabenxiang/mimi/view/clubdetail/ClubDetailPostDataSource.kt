@@ -5,7 +5,6 @@ import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.OrderBy
-import com.dabenxiang.mimi.model.enums.PostType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*

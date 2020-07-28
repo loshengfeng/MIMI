@@ -255,14 +255,13 @@ class HomeClubViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
     isAdult: Boolean,
-    memberPostFuncItem: MemberPostFuncItem,
     clubFuncItem: ClubFuncItem
 ) : HomeViewHolder<HomeTemplate.Club>(itemView, listener, isAdult) {
 
     private val progressBar: ProgressBar = itemView.progress_club
     private val recyclerView: RecyclerView = itemView.recyclerview_club
     private val nestedAdapter by lazy {
-        HomeClubAdapter(listener, memberPostFuncItem, clubFuncItem)
+        HomeClubAdapter(listener, clubFuncItem)
     }
 
     init {

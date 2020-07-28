@@ -80,6 +80,10 @@
         <action
             android:id="@+id/action_searchPostFragment_to_clipFragment"
             app:destination="@id/clipFragment" />
+
+        <action
+            android:id="@+id/action_searchPostFragment_to_clubDetailFragment"
+            app:destination="@id/clubDetailFragment" />
     </fragment>
 
     <fragment

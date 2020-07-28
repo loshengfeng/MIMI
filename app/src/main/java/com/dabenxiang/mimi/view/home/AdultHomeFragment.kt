@@ -457,10 +457,7 @@ class AdultHomeFragment : BaseFragment() {
                     3 -> SearchPostItem(type = PostType.VIDEO)
                     4 -> SearchPostItem(type = PostType.IMAGE)
                     5 -> SearchPostItem(type = PostType.TEXT)
-                    else -> {
-                        // TODO: SION 圈子搜尋
-                        SearchPostItem(type = PostType.TEXT)
-                    }
+                    else -> SearchPostItem(isClub = true)
                 }
                 val bundle = SearchPostFragment.createBundle(item)
                 navigateTo(

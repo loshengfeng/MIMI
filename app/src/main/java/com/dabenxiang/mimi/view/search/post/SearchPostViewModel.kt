@@ -8,17 +8,24 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.blankj.utilcode.util.ImageUtils
+import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.callback.SearchPagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.ReportRequest
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.model.vo.SearchHistoryItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.clubdetail.ClubDetailPostDataSource
+import com.dabenxiang.mimi.view.clubdetail.ClubDetailPostFactory
+import com.dabenxiang.mimi.view.home.club.ClubDataSource
+import com.dabenxiang.mimi.view.home.club.ClubFactory
 import com.dabenxiang.mimi.view.search.post.keyword.SearchPostByKeywordDataSource
 import com.dabenxiang.mimi.view.search.post.keyword.SearchPostByKeywordFactory
 import com.dabenxiang.mimi.view.search.post.tag.SearchPostByTagDataSource
@@ -28,11 +35,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
 class SearchPostViewModel : BaseViewModel() {
 
     private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
     val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
+
+    private val _clubItemListResult = MutableLiveData<PagedList<MemberClubItem>>()
+    val clubItemListResult: LiveData<PagedList<MemberClubItem>> = _clubItemListResult
 
     private val _searchPostItemByTagListResult = MutableLiveData<PagedList<MemberPostItem>>()
     val searchPostItemByTagListResult: LiveData<PagedList<MemberPostItem>> =
@@ -204,6 +215,30 @@ class SearchPostViewModel : BaseViewModel() {
         }
     }
 
+    fun clubFollow(item: MemberClubItem, isFollow: Boolean, update: ((Boolean) -> Unit)) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = when {
+                    isFollow -> apiRepository.followClub(item.id)
+                    else -> apiRepository.cancelFollowClub(item.id)
+                }
+                if (!result.isSuccessful) throw HttpException(result)
+                item.isFollow = isFollow
+                emit(ApiResult.success(isFollow))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    when(it) {
+                        is ApiResult.Success -> {
+                            update(it.result)
+                        }
+                    }
+                }
+        }
+    }
+
     fun isSearchTextEmpty(keyword: String): Boolean {
         return TextUtils.isEmpty(keyword)
     }
@@ -269,6 +304,20 @@ class SearchPostViewModel : BaseViewModel() {
         return LivePagedListBuilder(factory, config).build()
     }
 
+    fun getClubs(keyword: String) {
+        viewModelScope.launch {
+            getClubPagingItems(keyword).asFlow()
+                .collect { _clubItemListResult.value = it }
+        }
+    }
+
+    private fun getClubPagingItems(keyword: String): LiveData<PagedList<MemberClubItem>> {
+        val clubDataSource = ClubDataSource(pagingCallback, viewModelScope, domainManager, keyword)
+        val clubFactory = ClubFactory(clubDataSource)
+        val config = PagedList.Config.Builder().setPrefetchDistance(4).build()
+        return LivePagedListBuilder(clubFactory, config).build()
+    }
+
     private val pagingCallback = object : SearchPagingCallback {
         override fun onTotalCount(count: Long) {
             _searchTotalCount.postValue(count)
@@ -283,6 +332,7 @@ class SearchPostViewModel : BaseViewModel() {
         }
 
         override fun onThrowable(throwable: Throwable) {
+            setShowProgress(false)
         }
     }
 }
