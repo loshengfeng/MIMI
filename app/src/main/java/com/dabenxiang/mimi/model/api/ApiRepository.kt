@@ -290,7 +290,7 @@ class ApiRepository(private val apiService: ApiService) {
         orderBy: Int,
         isAdult: Boolean = true,
         isFullContent: Boolean = false
-    ): Response<ApiBasePagingItem<List<MemberPostItem>>> {
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
         return apiService.getMembersPost(offset, limit, tag, orderBy, isAdult, isFullContent)
     }
 

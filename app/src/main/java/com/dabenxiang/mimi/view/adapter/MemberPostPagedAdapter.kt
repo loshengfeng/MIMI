@@ -52,9 +52,6 @@ class MemberPostPagedAdapter(
     val viewHolderMap = hashMapOf<Int, BaseViewHolder>()
 
     override fun getItemViewType(position: Int): Int {
-//        return if (position == 0) {
-//            VIEW_TYPE_AD
-//        } else {
         val item = getItem(position)
         return when (item?.type) {
             PostType.VIDEO -> VIEW_TYPE_CLIP
@@ -62,7 +59,6 @@ class MemberPostPagedAdapter(
             PostType.AD -> VIEW_TYPE_AD
             else -> VIEW_TYPE_TEXT
         }
-//        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {

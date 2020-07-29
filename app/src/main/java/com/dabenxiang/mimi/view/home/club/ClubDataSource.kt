@@ -7,7 +7,6 @@ import com.dabenxiang.mimi.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.view.home.memberpost.MemberPostDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -57,7 +56,7 @@ class ClubDataSource(
                         body?.paging?.count ?: 0,
                         body?.paging?.offset ?: 0,
                         memberClubItems?.size ?: 0
-                    ) -> MemberPostDataSource.PER_LIMIT
+                    ) -> PER_LIMIT
                     else -> null
                 }
                 pagingCallback.onTotalCount(body?.paging?.count ?: 0)
@@ -148,7 +147,7 @@ class ClubDataSource(
 
     private fun hasNextPage(total: Long, offset: Long, currentSize: Int): Boolean {
         return when {
-            currentSize < MemberPostDataSource.PER_LIMIT -> false
+            currentSize < PER_LIMIT -> false
             offset >= total -> false
             else -> true
         }

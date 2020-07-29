@@ -232,7 +232,7 @@ interface ApiService {
         @Query("orderBy") orderBy: Int = 1,
         @Query("isAdult") isAdult: Boolean = true,
         @Query("isFullContent") isFullContent: Boolean = false
-    ): Response<ApiBasePagingItem<List<MemberPostItem>>>
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     @POST("/v1/Members/Club/{clubId}/Follow")
     suspend fun followClub(@Path("clubId") clubId: Long): Response<Void>
