@@ -14,24 +14,26 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.RankingFuncItem
 import com.dabenxiang.mimi.model.api.vo.PostStatisticsItem
+import com.dabenxiang.mimi.model.api.vo.RankingItem
+import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_ranking.view.*
 
-class RankingAdapter(private val context: Context,
-                     private val rankingFuncItem: RankingFuncItem = RankingFuncItem())
-    : PagedListAdapter<PostStatisticsItem, RecyclerView.ViewHolder>(diffCallback) {
+class RankingVideosAdapter(private val context: Context,
+                           private val rankingFuncItem: RankingFuncItem = RankingFuncItem())
+    : PagedListAdapter<StatisticsItem, RecyclerView.ViewHolder>(diffCallback) {
 
     companion object {
-        private val diffCallback = object : DiffUtil.ItemCallback<PostStatisticsItem>() {
+        private val diffCallback = object : DiffUtil.ItemCallback<StatisticsItem>() {
             override fun areItemsTheSame(
-                oldItem: PostStatisticsItem,
-                newItem: PostStatisticsItem
+                oldItem: StatisticsItem,
+                newItem: StatisticsItem
             ): Boolean = oldItem.id == newItem.id
 
             override fun areContentsTheSame(
-                oldItem: PostStatisticsItem,
-                newItem: PostStatisticsItem
+                oldItem: StatisticsItem,
+                newItem: StatisticsItem
             ): Boolean = oldItem == newItem
         }
     }
@@ -54,15 +56,10 @@ class RankingAdapter(private val context: Context,
         val hot:TextView = itemView.tv_hot
         val ranking:TextView = itemView.tv_no
 
-        private fun updatePicture(id: String) {
-            val bitmap = LruCacheUtils.getLruCache(id)
-            Glide.with(picture.context).load(bitmap).into(picture)
-        }
-
         fun bind(
             context: Context,
             position: Int,
-            item: PostStatisticsItem,
+            item: StatisticsItem,
             rankingFuncItem: RankingFuncItem
         ) {
 
@@ -80,21 +77,23 @@ class RankingAdapter(private val context: Context,
                 }
             }
 
-            val avatarId = item.avatarAttachmentId.toString()
-            if (avatarId != LruCacheUtils.ZERO_ID) {
-                if (LruCacheUtils.getLruCache(avatarId) == null) {
-                    rankingFuncItem.getBitmap(avatarId, position)
-                } else {
-                    updatePicture(avatarId)
-                }
-            } else {
-                Glide.with(picture.context).load(R.color.color_white_1_50).circleCrop().into(picture)
+//            val avatarId = item.avatarAttachmentId.toString()
+//            if (avatarId != LruCacheUtils.ZERO_ID) {
+//                if (LruCacheUtils.getLruCache(avatarId) == null) {
+//                    rankingFuncItem.getBitmap(avatarId, position)
+//                } else {
+//                    updatePicture(avatarId)
+//                }
+//            } else {
+//                Glide.with(picture.context).load(R.color.color_white_1_50).circleCrop().into(picture)
+//            }
+            item.cover?.let {
+                Glide.with(picture.context).load(it).circleCrop().into(picture)
             }
-
             title.text = item.title
-            hot.text = item.count.toString()
+            hot.text = item.count?.toString() ?: "0"
             layout.setOnClickListener {
-                rankingFuncItem.onItemClick(item)
+                rankingFuncItem.onVideoItemClick(item)
             }
         }
     }

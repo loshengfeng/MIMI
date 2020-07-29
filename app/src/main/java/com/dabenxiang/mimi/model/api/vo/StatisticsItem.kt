@@ -14,5 +14,11 @@ data class StatisticsItem(
     val cover: String?,
 
     @SerializedName("source")
-    val source: String?
+    val source: String?,
+
+    @SerializedName("count")
+    val count: Int? = 0,
+
+    @SerializedName("years")
+    val years: Int? = 0
 )

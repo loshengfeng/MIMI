@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.ranking
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
@@ -9,9 +10,12 @@ import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.RankingFuncItem
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.RankingAdapter
+import com.dabenxiang.mimi.view.adapter.RankingVideosAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_picture_detail.toolbarContainer
 import kotlinx.android.synthetic.main.fragment_ranking.*
@@ -29,10 +33,29 @@ class RankingFragment : BaseFragment() {
 
     private val viewModel: RankingViewModel by viewModels()
 
+    private val videosAdapter by  lazy {
+        RankingVideosAdapter(requireActivity(),
+            RankingFuncItem(
+                onVideoItemClick = {
+                    val playerData = PlayerData(it.id!!, true)
+                    val intent = Intent(requireContext(), PlayerActivity::class.java)
+                    intent.putExtras(PlayerActivity.createBundle(playerData))
+                    startActivity(intent)
+                },
+                getBitmap = { id, position -> viewModel.getBitmap(id= id, position = position) }
+            )
+        )
+    }
+
     private val adapter by  lazy {
         RankingAdapter(requireActivity(),
             RankingFuncItem(
-                onItemClick = {},
+                onItemClick = {
+//                    val playerData = PlayerData(it.id!!, true)
+//                    val intent = Intent(requireContext(), PlayerActivity::class.java)
+//                    intent.putExtras(PlayerActivity.createBundle(playerData))
+//                    startActivity(intent)
+                },
                 getBitmap = { id, position -> viewModel.getBitmap(id= id, position = position) }
             )
         )
@@ -50,12 +73,12 @@ class RankingFragment : BaseFragment() {
             findNavController().navigateUp()
         }
 
-        rv_ranking_content.adapter = adapter
+        rv_ranking_content.adapter = videosAdapter
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.getRanking()
+        viewModel.getRankingList()
     }
 
 
@@ -64,6 +87,11 @@ class RankingFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
+
+        viewModel.rankingVideosList.observe(viewLifecycleOwner, Observer {
+            videosAdapter.submitList(it)
+        })
+
         viewModel.rankingList.observe(viewLifecycleOwner, Observer {
             adapter.submitList(it)
         })
@@ -85,6 +113,7 @@ class RankingFragment : BaseFragment() {
 
         tab_temporal_filter.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
+
                 viewModel.setStatisticsTypeFunction(tab.position)
             }
 
@@ -94,6 +123,12 @@ class RankingFragment : BaseFragment() {
 
         tab_type_filter.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
+                if(tab.position ==0) {
+                    rv_ranking_content.adapter = videosAdapter
+                }else{
+                    rv_ranking_content.adapter = adapter
+                }
+
                 viewModel.setPostType(tab.position)
             }
 
@@ -103,7 +138,7 @@ class RankingFragment : BaseFragment() {
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
-            viewModel.getRanking()
+            viewModel.getRankingList()
         }
 
     }

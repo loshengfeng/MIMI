@@ -9,7 +9,8 @@ import androidx.paging.PagedList
 import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.RankingItem
+import com.dabenxiang.mimi.model.api.vo.PostStatisticsItem
+import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.StatisticsType
 import com.dabenxiang.mimi.view.base.BaseViewModel
@@ -24,45 +25,82 @@ import retrofit2.HttpException
 
 class RankingViewModel : BaseViewModel() {
 
-    private val _rankingList = MutableLiveData<PagedList<RankingItem>>()
-    val rankingList: LiveData<PagedList<RankingItem>> = _rankingList
+    private val _rankingList = MutableLiveData<PagedList<PostStatisticsItem>>()
+    val rankingList: LiveData<PagedList<PostStatisticsItem>> = _rankingList
+
+    private val _rankingVideosList = MutableLiveData<PagedList<StatisticsItem>>()
+    val rankingVideosList: LiveData<PagedList<StatisticsItem>> = _rankingVideosList
+
     private var _bitmapResult = MutableLiveData<ApiResult<Int>>()
     val bitmapResult: LiveData<ApiResult<Int>> = _bitmapResult
 
     var statisticsTypeSelected: StatisticsType = StatisticsType.TODAY
-    var postTypeSelected: PostType= PostType.TEXT
+    var postTypeSelected: PostType = PostType.VIDEO_ON_DEMAND
 
     fun setPostType(position: Int) {
-        postTypeSelected = when(position){
-            1 ->PostType.VIDEO
-            2 ->PostType.IMAGE
-            else-> PostType.TEXT
+        postTypeSelected = when (position) {
+            1 -> PostType.VIDEO
+            2 -> PostType.IMAGE
+            else -> PostType.VIDEO_ON_DEMAND
         }
-        getRanking(statisticsTypeSelected, postTypeSelected)
+        getRankingList()
     }
 
     fun setStatisticsTypeFunction(position: Int) {
-        statisticsTypeSelected= when(position){
-            1 ->StatisticsType.TODAY
-            2 ->StatisticsType.WEEK
-            else-> StatisticsType.MONTH
+        statisticsTypeSelected = when (position) {
+            1 -> StatisticsType.TODAY
+            2 -> StatisticsType.WEEK
+            else -> StatisticsType.MONTH
         }
-        getRanking(statisticsTypeSelected, postTypeSelected)
+        getRankingList()
     }
 
-    fun getRanking(statisticsType: StatisticsType = StatisticsType.TODAY, postType: PostType= PostType.VIDEO) {
+    fun getRankingList() {
         viewModelScope.launch {
-            val dataSrc = RankingDataSource(viewModelScope, domainManager, pagingCallback, statisticsType, postType)
-            dataSrc.isInvalid
-            val factory = RankingFactory(dataSrc)
-            val config = PagedList.Config.Builder()
-                .setPageSize(RankingDataSource.PER_LIMIT.toInt())
-                .build()
-
-            LivePagedListBuilder(factory, config).build().asFlow().collect {
-                _rankingList.postValue(it)
+            if (postTypeSelected == PostType.VIDEO_ON_DEMAND) {
+                getVideosRanking()
+            } else {
+                getRanking()
             }
         }
+    }
+
+    private suspend fun getRanking() {
+        val dataSrc = RankingDataSource(
+            viewModelScope,
+            domainManager,
+            pagingCallback,
+            statisticsTypeSelected,
+            postTypeSelected
+        )
+        dataSrc.isInvalid
+        val factory = RankingFactory(dataSrc)
+        val config = PagedList.Config.Builder()
+            .setPageSize(RankingDataSource.PER_LIMIT.toInt())
+            .build()
+
+        LivePagedListBuilder(factory, config).build().asFlow().collect {
+            _rankingList.postValue(it)
+        }
+    }
+
+    private suspend fun getVideosRanking() {
+        val dataSrc = RankingVideosDataSource(
+            viewModelScope,
+            domainManager,
+            pagingCallback,
+            statisticsTypeSelected
+        )
+        dataSrc.isInvalid
+        val factory = RankingVideosFactory(dataSrc)
+        val config = PagedList.Config.Builder()
+            .setPageSize(RankingDataSource.PER_LIMIT.toInt())
+            .build()
+
+        LivePagedListBuilder(factory, config).build().asFlow().collect {
+            _rankingVideosList.postValue(it)
+        }
+
     }
 
     private val pagingCallback = object : PagingCallback {
