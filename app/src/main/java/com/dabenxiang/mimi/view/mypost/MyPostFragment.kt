@@ -7,15 +7,14 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.serializable.SearchPostItem
+import com.dabenxiang.mimi.model.vo.PostAttachmentItem
 import com.dabenxiang.mimi.view.adapter.MyPostPagedAdapter
 import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -24,9 +23,11 @@ import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.comment.MyPostMoreDialogFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
+import com.dabenxiang.mimi.view.post.pic.PostPicFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_my_post.*
 import timber.log.Timber
 
@@ -39,12 +40,22 @@ class MyPostFragment : BaseFragment() {
 
     private val viewModel: MyPostViewModel by viewModels()
 
+    private val picParameterList = arrayListOf<PicParameter>()
+    private val uploadPicList = arrayListOf<PicParameter>()
+    private var deletePicList = arrayListOf<String>()
+
+    private var postMemberRequest = PostMemberRequest()
+
+    private var uploadCurrentPicPosition = 0
+    private var deleteCurrentPicPosition = 0
+
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
     companion object {
         const val EDIT = "edit"
         const val MEMBER_DATA = "member_data"
+        const val TYPE_PIC = "type_pic"
     }
 
     override fun getLayoutId(): Int {
@@ -60,6 +71,59 @@ class MyPostFragment : BaseFragment() {
         recyclerView.adapter =  adapter
 
         viewModel.getMyPost()
+
+        val isNeedPicUpload =
+            findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>(
+                PostPicFragment.UPLOAD_PIC
+            )
+        if (isNeedPicUpload?.value != null) {
+            deletePicList = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<String>>(PostPicFragment.DELETE_ATTACHMENT)?.value!!
+            val memberRequest =
+                findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<PostMemberRequest>(
+                    PostPicFragment.MEMBER_REQUEST
+                )
+            val picList = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<PostAttachmentItem>>(
+                PostPicFragment.PIC_URI
+            )
+
+            postMemberRequest = memberRequest!!.value!!
+
+            for (pic in picList?.value!!) {
+                if (pic.attachmentId.isBlank()) {
+                    uploadPicList.add(PicParameter(url = pic.uri))
+                } else {
+                    val picParameter = PicParameter(id = pic.attachmentId, ext = pic.ext)
+                    picParameterList.add(picParameter)
+                }
+            }
+
+            if (uploadPicList.isNotEmpty()) {
+                val pic = uploadPicList[uploadCurrentPicPosition]
+                viewModel.postAttachment(pic.url, requireContext(), TYPE_PIC)
+            } else {
+                val mediaItem = MediaItem()
+
+                for (pic in picList.value!!) {
+                    mediaItem.picParameter.add(
+                        PicParameter(
+                            id = pic.attachmentId,
+                            ext = pic.ext
+                        )
+                    )
+                }
+
+                mediaItem.textContent = postMemberRequest.content
+
+                val content = Gson().toJson(mediaItem)
+                Timber.d("Post pic content item : $content")
+
+                val postId =
+                    findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Long>(
+                        PostPicFragment.POST_ID
+                    )
+                viewModel.postPic(postId?.value!!, postMemberRequest, content)
+            }
+        }
     }
 
     override fun setupObservers() {
@@ -137,62 +201,59 @@ class MyPostFragment : BaseFragment() {
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
+
+        viewModel.uploadPicItem.observe(viewLifecycleOwner, Observer {
+            uploadPicList[uploadCurrentPicPosition] = it
+        })
+
+        viewModel.postPicResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Success -> {
+                    uploadPicList[uploadCurrentPicPosition].id = it.result.toString()
+                    uploadCurrentPicPosition += 1
+
+                    if (uploadCurrentPicPosition > uploadPicList.size - 1) {
+                        val mediaItem = MediaItem()
+                        mediaItem.textContent = postMemberRequest.content
+                        mediaItem.picParameter.addAll(picParameterList)
+                        mediaItem.picParameter.addAll(uploadPicList)
+
+                        val content = Gson().toJson(mediaItem)
+                        Timber.d("Post pic content item : $content")
+
+                        val postId =
+                            findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Long>(
+                                PostPicFragment.POST_ID
+                            )
+                        viewModel.postPic(postId?.value!!, postMemberRequest, content)
+                    } else {
+                        val pic = uploadPicList[uploadCurrentPicPosition]
+                        viewModel.postAttachment(pic.url, requireContext(), TYPE_PIC)
+                    }
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.postVideoMemberResult.observe(viewLifecycleOwner, Observer {
+            if (deletePicList.isNotEmpty()) {
+                viewModel.deleteAttachment(deletePicList[deleteCurrentPicPosition])
+            } else {
+                //TODO UI
+            }
+        })
+
+        viewModel.postDeleteAttachment.observe(viewLifecycleOwner, Observer {
+            deleteCurrentPicPosition += 1
+            if (deleteCurrentPicPosition > deletePicList.size - 1) {
+                //TODO finish
+            } else {
+                viewModel.deleteAttachment(deletePicList[deleteCurrentPicPosition])
+            }
+        })
     }
 
     override fun setupListeners() {
-    }
-
-    private fun addTag(tag: String) {
-
-    }
-
-    private val adultListener = object : AdultListener {
-        override fun onFollowPostClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
-        }
-
-        override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
-        }
-
-        override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            when (adultTabType) {
-                AdultTabType.PICTURE -> {
-                    val bundle = PictureDetailFragment.createBundle(item, 1)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_adultHomeFragment_to_pictureDetailFragment,
-                            bundle
-                        )
-                    )
-                }
-                AdultTabType.TEXT -> {
-                    val bundle = TextDetailFragment.createBundle(item, 1)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_adultHomeFragment_to_textDetailFragment,
-                            bundle
-                        )
-                    )
-                }
-                else -> {
-                }
-            }
-        }
-
-        override fun onMoreClick(item: MemberPostItem) {
-
-        }
-
-        override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
-        }
-
-        override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
-        }
-
-        override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {
-        }
-
-        override fun onChipClick(type: PostType, tag: String) {
-        }
     }
 
     private val attachmentListener = object : AttachmentListener {
@@ -221,8 +282,14 @@ class MyPostFragment : BaseFragment() {
                 bundle.putBoolean(EDIT, true)
                 bundle.putSerializable(MEMBER_DATA, item)
                 findNavController().navigate(R.id.action_myPostFragment_to_postArticleFragment, bundle)
-                moreDialog?.dismiss()
+            } else if (item.type == PostType.IMAGE) {
+                var bundle = Bundle()
+                bundle.putBoolean(EDIT, true)
+                bundle.putSerializable(MEMBER_DATA, item)
+                findNavController().navigate(R.id.action_myPostFragment_to_postPicFragment, bundle)
             }
+
+            moreDialog?.dismiss()
         }
     }
 

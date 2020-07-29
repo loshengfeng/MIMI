@@ -185,5 +185,8 @@
         <action
             android:id="@+id/action_myPostFragment_to_postArticleFragment"
             app:destination="@id/postArticleFragment" />
+        <action
+            android:id="@+id/action_myPostFragment_to_postPicFragment"
+            app:destination="@id/postPicFragment" />
     </fragment>
 </navigation>
