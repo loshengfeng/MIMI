@@ -13,7 +13,6 @@ import com.dabenxiang.mimi.view.adapter.RankingAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.google.android.material.tabs.TabLayout
-import kotlinx.android.synthetic.main.fragment_clip.*
 import kotlinx.android.synthetic.main.fragment_picture_detail.toolbarContainer
 import kotlinx.android.synthetic.main.fragment_ranking.*
 import kotlinx.android.synthetic.main.toolbar.*

@@ -3,7 +3,6 @@ package com.dabenxiang.mimi.view.ranking
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.manager.DomainManager
-import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.model.api.vo.RankingItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.StatisticsType
@@ -99,10 +98,12 @@ class RankingDataSource constructor(
     }
 
     private fun hasNextPage(total: Long, offset: Long, currentSize: Int): Boolean {
-        return when {
-            currentSize < PER_LIMIT_LONG -> false
-            offset >= total -> false
-            else -> true
-        }
+        // Spec: Only show 10 data
+        return false
+//        return when {
+//            currentSize < PER_LIMIT_LONG -> false
+//            offset >= total -> false
+//            else -> true
+//        }
     }
 }

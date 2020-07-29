@@ -9,13 +9,10 @@ import androidx.paging.PagedList
 import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.model.api.vo.RankingItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.StatisticsType
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.order.OrderListDataSource
-import com.dabenxiang.mimi.view.order.OrderListFactory
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
@@ -33,13 +30,13 @@ class RankingViewModel : BaseViewModel() {
     val bitmapResult: LiveData<ApiResult<Int>> = _bitmapResult
 
     var statisticsTypeSelected: StatisticsType = StatisticsType.TODAY
-    var postTypeSelected: PostType= PostType.VIDEO
+    var postTypeSelected: PostType= PostType.TEXT
 
     fun setPostType(position: Int) {
         postTypeSelected = when(position){
-            1 ->PostType.VIDEO_ON_DEMAND
+            1 ->PostType.VIDEO
             2 ->PostType.IMAGE
-            else-> PostType.VIDEO
+            else-> PostType.TEXT
         }
         getRanking(statisticsTypeSelected, postTypeSelected)
     }
