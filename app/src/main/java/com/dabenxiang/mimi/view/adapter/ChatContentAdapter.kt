@@ -39,7 +39,7 @@ class ChatContentAdapter(
     interface EventListener {
         fun onGetAttachment(id: String, position: Int)
         fun onImageClick(bitmap: Bitmap)
-        fun onVideoClick()
+        fun onVideoClick(item: ChatContentItem?, position: Int)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {

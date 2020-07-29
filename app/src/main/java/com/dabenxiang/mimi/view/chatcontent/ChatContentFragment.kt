@@ -13,8 +13,11 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.ChatContentItem
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.enums.ChatMessageType
+import com.dabenxiang.mimi.model.enums.VideoDownloadStatusType
+import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.adapter.ChatContentAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
@@ -23,6 +26,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_chat_content.*
 import timber.log.Timber
+import java.io.File
 
 class ChatContentFragment : BaseFragment() {
 
@@ -31,9 +35,11 @@ class ChatContentFragment : BaseFragment() {
     private lateinit var imagePreviewDialog: ImagePreviewDialogFragment
     private val viewModel: ChatContentViewModel by viewModels()
     private val adapter by lazy { ChatContentAdapter(listener) }
+
+
     private val listener = object : ChatContentAdapter.EventListener {
         override fun onGetAttachment(id: String, position: Int) {
-            viewModel.getAttachment(id, position)
+            viewModel.getAttachment(requireContext(), id, position)
         }
 
         override fun onImageClick(bitmap: Bitmap) {
@@ -45,8 +51,32 @@ class ChatContentFragment : BaseFragment() {
             }
         }
 
-        override fun onVideoClick() {
-
+        override fun onVideoClick(item: ChatContentItem?, position: Int) {
+            item?.run {
+                if (payload?.content == null || payload.ext == null) {
+                    GeneralUtils.showToast(requireContext(), getString(R.string.image_preview_file_invlid))
+                } else {
+                    // init videoCache
+                    viewModel.videoCache[payload.content] = item
+                    if (!File(viewModel.getVideoPath(requireContext(), payload.content, payload.ext)).exists()) {
+                        item.downloadStatus = VideoDownloadStatusType.DOWNLOADING
+                        item.position = position
+                        // update videoCache
+                        viewModel.videoCache[payload.content] = item
+                        viewModel.getAttachment(requireContext(), payload.content, position, viewModel.TAG_VIDEO)
+                    } else {
+                        viewModel.videoCache[payload.content]?.let { cacheItem ->
+                            if (cacheItem.payload?.content == null || cacheItem.payload.ext == null) {
+                                GeneralUtils.showToast(requireContext(), getString(R.string.image_preview_file_invlid))
+                            } else {
+                                if (cacheItem.downloadStatus == VideoDownloadStatusType.FINISH) {
+                                    GeneralUtils.openPlayerIntent(requireContext(), viewModel.getVideoPath(requireContext(), cacheItem.payload.content, cacheItem.payload.ext))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -91,10 +121,28 @@ class ChatContentFragment : BaseFragment() {
 
         viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
             when (it) {
+                is ApiResult.Loading -> {
+                    // 更新為下載中
+                    val fileName = it.arg as String
+                    viewModel.videoCache[fileName]?.downloadStatus = VideoDownloadStatusType.DOWNLOADING
+                    viewModel.videoCache[fileName]?.position?.let { position ->
+                        adapter.update(position)
+                    }
+                }
                 is ApiResult.Success -> {
-                    val attachmentItem = it.result
-                    LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
-                    adapter.update(attachmentItem.position ?: 0)
+                    when (it.result) {
+                        is AttachmentItem -> {
+                            val attachmentItem = it.result
+                            LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
+                            adapter.update(attachmentItem.position ?: -1)
+                        }
+                        is String -> {
+                            val fileName = it.result.substringBefore(".").substringAfterLast("/")
+                            viewModel.videoCache[fileName]?.downloadStatus = VideoDownloadStatusType.FINISH
+                            adapter.update(viewModel.videoCache[fileName]?.position
+                                    ?: -1)
+                        }
+                    }
                 }
                 is ApiResult.Error -> Timber.e(it.throwable)
             }

@@ -287,6 +287,8 @@
     <!--  Chat Content  -->
     <string name="chat_content_media_chooser">请选择档案</string>
     <string name="chat_content_file_too_large">档案不得超过 5MB</string>
+    <string name="chat_content_file_downloading">下载中</string>
+    <string name="chat_content_file_download_finish">下载完成</string>
 
     <!--  Image Preview  -->
     <string name="image_preview_file_invlid">档案已失效</string>
