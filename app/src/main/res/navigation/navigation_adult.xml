@@ -84,6 +84,10 @@
         <action
             android:id="@+id/action_searchPostFragment_to_clipFragment"
             app:destination="@id/clipFragment" />
+
+        <action
+            android:id="@+id/action_searchPostFragment_to_clubDetailFragment"
+            app:destination="@id/clubDetailFragment" />
     </fragment>
 
     <fragment
@@ -189,6 +193,12 @@
         <action
             android:id="@+id/action_myPostFragment_to_postArticleFragment"
             app:destination="@id/postArticleFragment" />
+        <action
+            android:id="@+id/action_myPostFragment_to_postPicFragment"
+            app:destination="@id/postPicFragment" />
+        <action
+            android:id="@+id/action_myPostFragment_to_postVideoFragment"
+            app:destination="@id/postVideoFragment" />
     </fragment>
 
     <fragment

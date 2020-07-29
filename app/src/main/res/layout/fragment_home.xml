@@ -109,11 +109,11 @@
             android:singleLine="true"
             android:textColor="@color/color_black_1"
             android:textSize="14sp"
+            android:visibility="gone"
             app:btn_corner_radius="6dp"
             app:layout_constraintBottom_toBottomOf="@id/iv_bg_search"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/iv_bg_search"
-            android:visibility="gone" />
+            app:layout_constraintTop_toTopOf="@id/iv_bg_search" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -125,11 +125,59 @@
         app:layout_constraintTop_toBottomOf="@id/layout_search_bar"
         tools:layout_editor_absoluteX="0dp">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerview"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/normal_color_background" />
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_home"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/normal_color_background"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_first"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/normal_color_background"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_second"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/normal_color_background"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_third"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/normal_color_background"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_fourth"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/normal_color_background"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_fifth"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/normal_color_background"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_sixth"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/normal_color_background"
+                android:visibility="gone" />
+        </FrameLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

@@ -9,6 +9,7 @@ import com.dabenxiang.mimi.PROJECT_NAME
 import com.dabenxiang.mimi.manager.AccountManager
 import com.dabenxiang.mimi.manager.DomainManager
 import com.dabenxiang.mimi.model.api.ExceptionResult
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getExceptionDetail
 import com.google.gson.Gson

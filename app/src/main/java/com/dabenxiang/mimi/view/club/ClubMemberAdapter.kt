@@ -5,15 +5,21 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
+import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
+import com.dabenxiang.mimi.view.base.BaseViewHolder
 
 class ClubMemberAdapter(
     val context: Context,
     private val clubFuncItem: ClubFuncItem
-) : PagedListAdapter<MemberClubItem, ClubMemberViewHolder>(diffCallback) {
+) : PagedListAdapter<MemberClubItem, BaseViewHolder>(diffCallback) {
 
     companion object {
+        const val VIEW_TYPE_AD = 0
+        const val VIEW_TYPE_CLUB = 1
         val diffCallback = object : DiffUtil.ItemCallback<MemberClubItem>() {
             override fun areItemsTheSame(
                 oldItem: MemberClubItem,
@@ -31,14 +37,40 @@ class ClubMemberAdapter(
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClubMemberViewHolder {
-        return ClubMemberViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.item_club_member, parent, false)
-        )
+    override fun getItemViewType(position: Int): Int {
+        val item = getItem(position)
+        return if (item?.type == PostType.AD) {
+            VIEW_TYPE_AD
+        } else {
+            VIEW_TYPE_CLUB
+        }
     }
 
-    override fun onBindViewHolder(holder: ClubMemberViewHolder, position: Int) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
+        return when (viewType) {
+            VIEW_TYPE_AD -> {
+                AdHolder(
+                    LayoutInflater.from(parent.context).inflate(R.layout.item_ad, parent, false)
+                )
+            }
+            else -> {
+                ClubMemberViewHolder(
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_club_member, parent, false)
+                )
+            }
+        }
+    }
+
+    override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         val item = getItem(position)
-        item?.also { holder.onBind(it, clubFuncItem, position) }
+        when (holder) {
+            is AdHolder -> {
+                Glide.with(context).load(item?.adItem?.href).into(holder.adImg)
+            }
+            is ClubMemberViewHolder -> {
+                item?.also { holder.onBind(it, clubFuncItem, position) }
+            }
+        }
     }
 }

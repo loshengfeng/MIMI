@@ -31,8 +31,6 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_club_detail.*
-import kotlinx.android.synthetic.main.fragment_home.*
-import kotlinx.android.synthetic.main.item_club_pager.*
 import timber.log.Timber
 
 class ClubDetailFragment : BaseFragment() {
@@ -48,7 +46,11 @@ class ClubDetailFragment : BaseFragment() {
             }
         }
 
-        val tabTitle = arrayListOf( App.self.getString(R.string.hottest), App.self.getString(R.string.newest), App.self.getString(R.string.video))
+        val tabTitle = arrayListOf(
+            App.self.getString(R.string.hottest),
+            App.self.getString(R.string.newest),
+            App.self.getString(R.string.video)
+        )
     }
 
     private val viewModel: ClubDetailViewModel by viewModels()
@@ -65,8 +67,12 @@ class ClubDetailFragment : BaseFragment() {
         return R.layout.fragment_club_detail
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun setupFirstTime() {
+        super.setupFirstTime()
+
+        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
+        viewModel.adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
+
         setUpUI()
     }
 
@@ -86,7 +92,7 @@ class ClubDetailFragment : BaseFragment() {
                 ClubDetailFuncItem({ orderBy, function -> getPost(orderBy, function) },
                     { id, function -> getBitmap(id, function) },
                     { item, isFollow, func -> followMember(item, isFollow, func) },
-                    { item, isLike, func -> likePost(item, isLike, func)}),
+                    { item, isLike, func -> likePost(item, isLike, func) }),
                 adultListener
             )
 
@@ -98,7 +104,7 @@ class ClubDetailFragment : BaseFragment() {
 
     override fun setupObservers() {
         viewModel.followClubResult.observe(viewLifecycleOwner, Observer {
-            when(it) {
+            when (it) {
                 is ApiResult.Success -> {
                     updateFollow()
                 }
@@ -118,7 +124,12 @@ class ClubDetailFragment : BaseFragment() {
 
     override fun setupListeners() {
         ib_back.setOnClickListener { findNavController().navigateUp() }
-        tv_follow.setOnClickListener { viewModel.followClub(memberClubItem, !memberClubItem.isFollow) }
+        tv_follow.setOnClickListener {
+            viewModel.followClub(
+                memberClubItem,
+                !memberClubItem.isFollow
+            )
+        }
     }
 
     private fun updateFollow() {
@@ -161,7 +172,17 @@ class ClubDetailFragment : BaseFragment() {
                         )
                     )
                 }
-                else -> { }
+                AdultTabType.CLIP -> {
+                    val bundle = ClipFragment.createBundle(arrayListOf(item), 0, true)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_clubDetailFragment_to_clipFragment,
+                            bundle
+                        )
+                    )
+                }
+                else -> {
+                }
             }
         }
 
@@ -194,6 +215,15 @@ class ClubDetailFragment : BaseFragment() {
                         )
                     )
                 }
+                AdultTabType.CLIP -> {
+                    val bundle = ClipFragment.createBundle(arrayListOf(item), 0)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_clubDetailFragment_to_clipFragment,
+                            bundle
+                        )
+                    )
+                }
                 else -> {
 
                 }
@@ -211,7 +241,6 @@ class ClubDetailFragment : BaseFragment() {
         }
 
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {
-            // TODO: Sion Wang
             val bundle = ClipFragment.createBundle(ArrayList(item), position)
             navigateTo(
                 NavigateItem.Destination(
@@ -274,11 +303,19 @@ class ClubDetailFragment : BaseFragment() {
         viewModel.getBitmap(id, update)
     }
 
-    private fun followMember(memberPostItem: MemberPostItem, isFollow: Boolean, update: (Boolean) -> Unit) {
+    private fun followMember(
+        memberPostItem: MemberPostItem,
+        isFollow: Boolean,
+        update: (Boolean) -> Unit
+    ) {
         viewModel.followMember(memberPostItem, isFollow, update)
     }
 
-    private fun likePost(memberPostItem: MemberPostItem, isLike: Boolean, update: (Boolean, Int) -> Unit) {
+    private fun likePost(
+        memberPostItem: MemberPostItem,
+        isLike: Boolean,
+        update: (Boolean, Int) -> Unit
+    ) {
         viewModel.likePost(memberPostItem, isLike, update)
     }
 }

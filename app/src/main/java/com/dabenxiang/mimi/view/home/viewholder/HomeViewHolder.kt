@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
@@ -93,8 +94,14 @@ class HomeBannerViewHolder(itemView: View, listener: HomeAdapter.EventListener, 
     private val ivPoster: ImageView = itemView.iv_poster
 
     override fun updated() {
+        data?.also {
+            nestedListener.onLoadBannerViewHolder(this)
+        }
+    }
+
+    fun updateItem(item: AdItem) {
         Glide.with(itemView.context)
-            .load(data?.imgUrl)
+            .load(item.href)
             .into(ivPoster)
     }
 }
@@ -200,10 +207,6 @@ class HomeClipViewHolder(
         nestedAdapter.submitList(list)
     }
 
-    fun updateItem(position: Int) {
-        nestedAdapter.notifyItemChanged(position)
-    }
-
     fun hideProgressBar() {
         progressBar.visibility = View.GONE
     }
@@ -239,10 +242,6 @@ class HomePictureViewHolder(
         nestedAdapter.submitList(list)
     }
 
-    fun updateItem(position: Int) {
-        nestedAdapter.notifyItemChanged(position)
-    }
-
     fun hideProgressBar() {
         progressBar.visibility = View.GONE
     }
@@ -255,14 +254,13 @@ class HomeClubViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
     isAdult: Boolean,
-    memberPostFuncItem: MemberPostFuncItem,
     clubFuncItem: ClubFuncItem
 ) : HomeViewHolder<HomeTemplate.Club>(itemView, listener, isAdult) {
 
     private val progressBar: ProgressBar = itemView.progress_club
     private val recyclerView: RecyclerView = itemView.recyclerview_club
     private val nestedAdapter by lazy {
-        HomeClubAdapter(listener, memberPostFuncItem, clubFuncItem)
+        HomeClubAdapter(listener, clubFuncItem)
     }
 
     init {
@@ -286,17 +284,7 @@ class HomeClubViewHolder(
         return nestedAdapter.getMemberClubItems()[position]
     }
 
-    fun updateItem(position: Int) {
-        nestedAdapter.notifyItemChanged(position)
-    }
-
     fun hideProgressBar() {
         progressBar.visibility = View.GONE
-    }
-
-    fun updateItemByFollow(position: Int, result: Boolean) {
-        val item = getItem(position)
-        item.isFollow = result
-        updateItem(position)
     }
 }

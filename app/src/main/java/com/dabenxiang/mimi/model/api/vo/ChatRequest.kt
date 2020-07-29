@@ -4,8 +4,8 @@ import com.google.gson.annotations.SerializedName
 
 data class ChatRequest(
     @SerializedName("userId")
-    val userId: Int?,
+    val userId: Long?,
 
     @SerializedName("name")
-    val name: String?
+    val name: String? = ""
 )

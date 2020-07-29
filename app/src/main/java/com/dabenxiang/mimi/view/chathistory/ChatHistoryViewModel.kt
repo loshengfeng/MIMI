@@ -2,111 +2,86 @@ package com.dabenxiang.mimi.view.chathistory
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import androidx.paging.LivePagedListBuilder
+import androidx.paging.PagedList
+import com.blankj.utilcode.util.ImageUtils
+import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.view.adapter.ChatHistoryAdapter
+import com.dabenxiang.mimi.model.api.vo.ChatListItem
+import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import retrofit2.HttpException
 
 class ChatHistoryViewModel : BaseViewModel() {
+    private val _chatHistory = MutableLiveData<PagedList<ChatListItem>>()
+    val chatHistory: LiveData<PagedList<ChatListItem>> = _chatHistory
 
-    private val _fakeChatHistory = MutableLiveData<ArrayList<ChatHistoryAdapter.FakeChatHistory>>()
-    val fakeChatHistory: LiveData<ArrayList<ChatHistoryAdapter.FakeChatHistory>> = _fakeChatHistory
+    private var _attachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
+    val attachmentResult: LiveData<ApiResult<AttachmentItem>> = _attachmentResult
 
-    fun getFakeChatHistory() {
+    private val pagingCallback = object : PagingCallback {
+        override fun onLoading() {
+
+        }
+
+        override fun onLoaded() {
+
+        }
+
+        override fun onThrowable(throwable: Throwable) {
+
+        }
+
+        override fun onSucceed() {
+            super.onSucceed()
+        }
+    }
+
+    private fun getChatHistoryPagingItems(): LiveData<PagedList<ChatListItem>> {
+        val dataSrc = ChatHistoryListDataSource(
+                viewModelScope,
+                domainManager,
+                pagingCallback
+        )
+        val factory = ChatHistoryListFactory(dataSrc)
+        val config = PagedList.Config.Builder()
+                .setPageSize(ChatHistoryListDataSource.PER_LIMIT.toInt())
+                .build()
+
+        return LivePagedListBuilder(factory, config).build()
+    }
+
+    fun getChatList() {
+        viewModelScope.launch {
+            getChatHistoryPagingItems().asFlow()
+                    .collect { _chatHistory.postValue(it) }
+        }
+    }
+
+    fun getAttachment(id: String, position: Int) {
         viewModelScope.launch {
             flow {
-                // TODO Api? Room?
-                val array = arrayListOf<ChatHistoryAdapter.FakeChatHistory>()
-
-                array.add(
-                    ChatHistoryAdapter.FakeChatHistory(
-                        "",
-                        "可拉可拉",
-                        "安安 **娘",
-                        "https://7.share.photo.xuite.net/fishyang33/175a993/6279035/1097556504_l.jpg",
-                        "2020-3-3",
-                        false
-                    )
+                val result = domainManager.getApiRepository().getAttachment(id)
+                if (!result.isSuccessful) throw HttpException(result)
+                val byteArray = result.body()?.bytes()
+                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
+                val item = AttachmentItem(
+                        id = id,
+                        bitmap = bitmap,
+                        position = position
                 )
-                array.add(
-                    ChatHistoryAdapter.FakeChatHistory(
-                        "",
-                        "袋龍",
-                        "安安 幹**",
-                        "https://7.share.photo.xuite.net/fishyang33/175a97b/6279035/1097557504_l.jpg",
-                        "2020-3-2",
-                        true
-                    )
-                )
-                array.add(
-                    ChatHistoryAdapter.FakeChatHistory(
-                        "",
-                        "毛球",
-                        "**********",
-                        "https://7.share.photo.xuite.net/fishyang33/175a90d/6279035/1097657746_o.jpg",
-                        "2020-3-2",
-                        false
-                    )
-                )
-                array.add(
-                    ChatHistoryAdapter.FakeChatHistory(
-                        "",
-                        "巴大蝴",
-                        "小智在哪裏？",
-                        "https://7.share.photo.xuite.net/fishyang33/175a90d/6279035/1097658258_o.jpg",
-                        "2020-3-2",
-                        false
-                    )
-                )
-                array.add(
-                    ChatHistoryAdapter.FakeChatHistory(
-                        "",
-                        "鐵甲蛹",
-                        "硬啦",
-                        "https://7.share.photo.xuite.net/fishyang33/175a9fd/6279035/1097656194_l.jpg",
-                        "2020-3-1",
-                        true
-                    )
-                )
-                array.add(
-                    ChatHistoryAdapter.FakeChatHistory(
-                        "",
-                        "鬼斯",
-                        "安安 **娘",
-                        "https://7.share.photo.xuite.net/fishyang33/175a915/6279035/1097656218_l.jpg",
-                        "2020-3-1",
-                        false
-                    )
-                )
-                array.add(
-                    ChatHistoryAdapter.FakeChatHistory(
-                        "",
-                        "皮卡丘",
-                        "皮卡皮卡",
-                        "https://attach.setn.com/newsimages/2015/08/31/328024-XXL.jpg",
-                        "2020-2-28",
-                        false
-                    )
-                )
-
-                emit(ApiResult.success(array))
+                emit(ApiResult.success(item))
             }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { resp ->
-                    when (resp) {
-                        is ApiResult.Loading -> Timber.d("Loading")
-                        is ApiResult.Error -> Timber.e(resp.throwable)
-                        is ApiResult.Success -> _fakeChatHistory.value = resp.result
-                        is ApiResult.Loaded -> Timber.d("Loaded")
-                    }
-                }
+                    .flowOn(Dispatchers.IO)
+                    .onStart { emit(ApiResult.loading()) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .collect { _attachmentResult.value = it }
         }
     }
 }

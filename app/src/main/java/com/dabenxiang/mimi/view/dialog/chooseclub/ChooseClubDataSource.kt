@@ -98,7 +98,7 @@ class ChooseClubDataSource constructor(
                                 ) -> next + 1
                                 else -> null
                             }
-                            callback.onResult(list, nextPageKey?.toInt())
+                            callback.onResult(list as List<Any>, nextPageKey?.toInt())
                         }
                     }
                 }

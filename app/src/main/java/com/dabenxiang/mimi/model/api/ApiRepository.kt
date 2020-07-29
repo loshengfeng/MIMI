@@ -75,10 +75,11 @@ class ApiRepository(private val apiService: ApiService) {
      */
     suspend fun postAttachment(
         file: File,
-        fileName: String
+        fileName: String,
+        type: String = MEDIA_TYPE_IMAGE
     ): Response<ApiBaseItem<Long>> {
         val requestFile = MultipartBody.Part.createFormData(
-            FILE, fileName, file.asRequestBody(MEDIA_TYPE_IMAGE.toMediaTypeOrNull())
+            FILE, fileName, file.asRequestBody(type.toMediaTypeOrNull())
         )
         return apiService.postAttachment(requestFile)
     }
@@ -154,11 +155,10 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得訊息
      */
     suspend fun getMessage(
-        chatId: Int,
-        lastReadTime: String,
+        chatId: Long,
         offset: String,
         limit: String
-    ) = apiService.getMessage(chatId, lastReadTime, offset, limit)
+    ) = apiService.getMessage(chatId, offset, limit)
 
     /**********************************************************
      *
@@ -220,7 +220,7 @@ class ApiRepository(private val apiService: ApiService) {
         type: PostType,
         offset: Int,
         limit: Int
-    ): Response<ApiBasePagingItem<List<MemberPostItem>>> {
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
         return apiService.getMembersPost(type.value, offset, limit)
     }
 
@@ -271,8 +271,16 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun getMembersClubPost(
         offset: Int,
         limit: Int
-    ): Response<ApiBasePagingItem<List<MemberClubItem>>> {
+    ): Response<ApiBasePagingItem<ArrayList<MemberClubItem>>> {
         return apiService.getMembersClubPost(offset, limit)
+    }
+
+    suspend fun getMembersClubPost(
+        offset: Int,
+        limit: Int,
+        keyword: String
+    ): Response<ApiBasePagingItem<ArrayList<MemberClubItem>>> {
+        return apiService.getMembersClubPost(offset, limit, keyword)
     }
 
     suspend fun getMembersPost(
@@ -282,7 +290,7 @@ class ApiRepository(private val apiService: ApiService) {
         orderBy: Int,
         isAdult: Boolean = true,
         isFullContent: Boolean = false
-    ): Response<ApiBasePagingItem<List<MemberPostItem>>> {
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
         return apiService.getMembersPost(offset, limit, tag, orderBy, isAdult, isFullContent)
     }
 
@@ -556,7 +564,7 @@ class ApiRepository(private val apiService: ApiService) {
         tag: String,
         offset: Int,
         limit: Int
-    ): Response<ApiBasePagingItem<List<MemberPostItem>>> {
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
         return apiService.searchPostByTag(type.value, tag, offset, limit)
     }
 
@@ -564,7 +572,7 @@ class ApiRepository(private val apiService: ApiService) {
         tag: String,
         offset: Int,
         limit: Int
-    ): Response<ApiBasePagingItem<List<MemberPostItem>>> {
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
         return apiService.searchPostFollowByTag(tag, offset, limit)
     }
 
@@ -573,7 +581,7 @@ class ApiRepository(private val apiService: ApiService) {
         keyword: String,
         offset: Int,
         limit: Int
-    ): Response<ApiBasePagingItem<List<MemberPostItem>>> {
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
         return apiService.searchPostByKeyword(type.value, keyword, offset, limit)
     }
 
@@ -581,7 +589,7 @@ class ApiRepository(private val apiService: ApiService) {
         keyword: String,
         offset: Int,
         limit: Int
-    ): Response<ApiBasePagingItem<List<MemberPostItem>>> {
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
         return apiService.searchPostFollowByKeyword(keyword, offset, limit)
     }
 
@@ -636,5 +644,6 @@ class ApiRepository(private val apiService: ApiService) {
         utcTime: Long? = null,
         sign: String? = null
     ) = apiService.getVideoStreamM3u8(streamId, userId, utcTime, sign)
+
 }
 

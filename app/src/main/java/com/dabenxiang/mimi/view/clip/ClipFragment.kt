@@ -27,14 +27,17 @@ class ClipFragment : BaseFragment() {
     companion object {
         const val KEY_DATA = "data"
         const val KEY_POSITION = "position"
+        const val KEY_SHOW_COMMENT = "show_comment"
 
         fun createBundle(
             items: ArrayList<MemberPostItem>,
-            position: Int
+            position: Int,
+            showComment: Boolean = false
         ): Bundle {
             return Bundle().also {
                 it.putSerializable(KEY_DATA, items)
                 it.putInt(KEY_POSITION, position)
+                it.putBoolean(KEY_SHOW_COMMENT, showComment)
             }
         }
     }
@@ -56,12 +59,12 @@ class ClipFragment : BaseFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        (rv_clip.adapter as ClipAdapter).releasePlayer()
+        (rv_third.adapter as ClipAdapter).releasePlayer()
     }
 
     override fun onPause() {
         super.onPause()
-        (rv_clip.adapter as ClipAdapter).pausePlayer()
+        (rv_third.adapter as ClipAdapter).pausePlayer()
     }
 
     override fun getLayoutId(): Int {
@@ -77,7 +80,7 @@ class ClipFragment : BaseFragment() {
                     val result = it.result
                     clipMap[result.first] = result.third
                     Timber.d("clipResult notifyItemChanged: ${result.second}")
-                    rv_clip.adapter?.notifyItemChanged(result.second)
+                    rv_third.adapter?.notifyItemChanged(result.second)
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -87,7 +90,7 @@ class ClipFragment : BaseFragment() {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Success -> rv_clip.adapter?.notifyItemChanged(
+                is Success -> rv_third.adapter?.notifyItemChanged(
                     it.result,
                     ClipAdapter.PAYLOAD_UPDATE_UI
                 )
@@ -99,7 +102,7 @@ class ClipFragment : BaseFragment() {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Success -> rv_clip.adapter?.notifyItemChanged(
+                is Success -> rv_third.adapter?.notifyItemChanged(
                     it.result,
                     ClipAdapter.PAYLOAD_UPDATE_UI
                 )
@@ -111,7 +114,7 @@ class ClipFragment : BaseFragment() {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Success -> rv_clip.adapter?.notifyItemChanged(
+                is Success -> rv_third.adapter?.notifyItemChanged(
                     it.result,
                     ClipAdapter.PAYLOAD_UPDATE_UI
                 )
@@ -123,7 +126,7 @@ class ClipFragment : BaseFragment() {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Success -> rv_clip.adapter?.notifyItemChanged(
+                is Success -> rv_third.adapter?.notifyItemChanged(
                     it.result,
                     ClipAdapter.PAYLOAD_UPDATE_UI
                 )
@@ -140,7 +143,7 @@ class ClipFragment : BaseFragment() {
         val position = arguments?.getInt(KEY_POSITION) ?: 0
         (arguments?.getSerializable(KEY_DATA) as ArrayList<MemberPostItem>).also { data ->
             memberPostItems.addAll(data)
-            rv_clip.adapter = ClipAdapter(
+            rv_third.adapter = ClipAdapter(
                 requireContext(),
                 memberPostItems,
                 clipMap,
@@ -154,17 +157,17 @@ class ClipFragment : BaseFragment() {
                     { item -> onCommentClick(item) },
                     { onBackClick() })
             )
-            (rv_clip.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-            PagerSnapHelper().attachToRecyclerView(rv_clip)
-            rv_clip.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            (rv_third.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+            PagerSnapHelper().attachToRecyclerView(rv_third)
+            rv_third.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)
                     when (newState) {
                         RecyclerView.SCROLL_STATE_IDLE -> {
                             val currentPos =
-                                (rv_clip.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                                (rv_third.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
                             Timber.d("SCROLL_STATE_IDLE position: $currentPos")
-                            val clipAdapter = rv_clip.adapter as ClipAdapter
+                            val clipAdapter = rv_third.adapter as ClipAdapter
                             val lastPosition = clipAdapter.getCurrentPos()
                             takeIf { currentPos != lastPosition }?.also {
                                 clipAdapter.releasePlayer()
@@ -176,7 +179,12 @@ class ClipFragment : BaseFragment() {
                     }
                 }
             })
-            rv_clip.scrollToPosition(position)
+            rv_third.scrollToPosition(position)
+
+            (arguments?.getSerializable(KEY_SHOW_COMMENT) as Boolean).takeIf { it }?.also {
+                val item = data[position]
+                showCommentDialog(item)
+            }
         }
     }
 
@@ -221,6 +229,10 @@ class ClipFragment : BaseFragment() {
 
     private fun onCommentClick(item: MemberPostItem) {
         Timber.d("onCommentClick, item:$item")
+        showCommentDialog(item)
+    }
+
+    private fun showCommentDialog(item: MemberPostItem) {
         CommentDialogFragment.newInstance(item).also {
             it.isCancelable = true
             it.show(

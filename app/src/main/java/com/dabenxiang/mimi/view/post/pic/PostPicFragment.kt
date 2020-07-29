@@ -16,18 +16,22 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.ScrollPicAdapterListener
+import com.dabenxiang.mimi.callback.PostPicItemListener
+import com.dabenxiang.mimi.model.api.vo.MediaItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PostMemberRequest
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.vo.PostAttachmentItem
 import com.dabenxiang.mimi.view.adapter.ScrollPicAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
-import com.dabenxiang.mimi.view.home.HomeViewModel
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_post_article.chipGroup
 import kotlinx.android.synthetic.main.fragment_post_article.clubLayout
 import kotlinx.android.synthetic.main.fragment_post_article.edt_content
@@ -48,6 +52,8 @@ class PostPicFragment : BaseFragment() {
         const val UPLOAD_PIC = "upload_pic"
         const val MEMBER_REQUEST = "member_request"
         const val PIC_URI = "pic_uri"
+        const val DELETE_ATTACHMENT = "delete_attachment"
+        const val POST_ID = "post_id"
 
         private const val TITLE_LIMIT = 60
         private const val CONTENT_LIMIT = 2000
@@ -65,22 +71,22 @@ class PostPicFragment : BaseFragment() {
         return R.layout.fragment_post_pic
     }
 
-    private val uriList = arrayListOf<String>()
+    var attachmentList = arrayListOf<PostAttachmentItem>()
+    var deletePicList = arrayListOf<String>()
+
+    private var postId: Long = 0
 
     private lateinit var adapter: ScrollPicAdapter
 
-    private val viewModel: HomeViewModel by viewModels()
+    private val viewModel: PostPicViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val uri = arguments?.getString(BUNDLE_PIC_URI)
-        uriList.add(uri!!)
-
         initSettings()
 
-        adapter = ScrollPicAdapter(listener)
-        adapter.submitList(uriList)
+        adapter = ScrollPicAdapter(postPicItemListener)
+        adapter.submitList(attachmentList)
         recyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         recyclerView.adapter = adapter
     }
@@ -188,6 +194,8 @@ class PostPicFragment : BaseFragment() {
             findNavController().previousBackStackEntry?.savedStateHandle?.set(UPLOAD_PIC, true)
             findNavController().previousBackStackEntry?.savedStateHandle?.set(MEMBER_REQUEST, request)
             findNavController().previousBackStackEntry?.savedStateHandle?.set(PIC_URI, adapter.getData())
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(DELETE_ATTACHMENT, deletePicList)
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(POST_ID, postId)
             findNavController().navigateUp()
         }
     }
@@ -195,7 +203,7 @@ class PostPicFragment : BaseFragment() {
     override fun initSettings() {
         super.initSettings()
 
-        tv_title.text = getString(R.string.post_title)
+        val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
         tv_clean.visibility = View.VISIBLE
         tv_clean.text = getString(R.string.btn_send)
 
@@ -211,7 +219,54 @@ class PostPicFragment : BaseFragment() {
             INIT_VALUE,
             HASHTAG_LIMIT
         ))
-        txt_picCount.text = String.format(getString(R.string.select_pic_count, uriList.size,
+        txt_picCount.text = String.format(getString(R.string.select_pic_count, attachmentList.size,
+            PHOTO_LIMIT
+        ))
+
+        if (isEdit!!) {
+            tv_title.text = getString(R.string.edit_post_title)
+            setUI()
+        } else {
+            tv_title.text = getString(R.string.post_title)
+            val uri = arguments?.getString(BUNDLE_PIC_URI)
+            val postAttachmentItem = PostAttachmentItem(uri = uri!!)
+            attachmentList.add(postAttachmentItem)
+        }
+    }
+
+    private fun setUI() {
+        val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+        val mediaItem = Gson().fromJson(item.content, MediaItem::class.java)
+
+        postId = item.id
+
+        edt_title.setText(item.title)
+
+        for (tag in item.tags!!) {
+            addTag(tag)
+        }
+
+        txt_titleCount.text = String.format(getString(R.string.typing_count,
+            item.title.length,
+            TITLE_LIMIT
+        ))
+        txt_contentCount.text = String.format(getString(R.string.typing_count,
+            mediaItem.textContent.length,
+            CONTENT_LIMIT
+        ))
+        txt_hashtagCount.text = String.format(getString(R.string.typing_count,
+            item.tags.size,
+            HASHTAG_LIMIT
+        ))
+
+        for (pic in mediaItem.picParameter) {
+            val postAttachmentItem = PostAttachmentItem()
+            postAttachmentItem.attachmentId = pic.id
+            postAttachmentItem.ext = pic.ext
+            attachmentList.add(postAttachmentItem)
+        }
+
+        txt_picCount.text = String.format(getString(R.string.select_pic_count, attachmentList.size,
             PHOTO_LIMIT
         ))
     }
@@ -251,10 +306,10 @@ class PostPicFragment : BaseFragment() {
     }
 
     private fun updateCountPicView() {
-        uriList.clear()
-        uriList.addAll(adapter.getData())
+        attachmentList.clear()
+        attachmentList.addAll(adapter.getData())
         adapter.notifyDataSetChanged()
-        txt_picCount.text = String.format(getString(R.string.select_pic_count, uriList.size,
+        txt_picCount.text = String.format(getString(R.string.select_pic_count, attachmentList.size,
             PHOTO_LIMIT
         ))
     }
@@ -269,33 +324,50 @@ class PostPicFragment : BaseFragment() {
                     val item = clipData.getItemAt(i)
                     val uri = item.uri
                     val uriDataList = adapter.getData()
-                    uriDataList.add(uri.toString())
+                    val postAttachmentItem = PostAttachmentItem(uri = uri.toString())
+                    uriDataList.add(postAttachmentItem)
                 }
 
                 updateCountPicView()
             } else {
                 val uri = data?.data
                 val uriDataList = adapter.getData()
-                uriDataList.add(uri.toString())
+                val postAttachmentItem = PostAttachmentItem(uri = uri.toString())
+                uriDataList.add(postAttachmentItem)
                 updateCountPicView()
             }
         }
     }
 
-    private val listener = object : ScrollPicAdapterListener {
-        override fun onAddPic() {
-            val intent = Intent()
-            intent.type = "image/*"
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-            intent.action = Intent.ACTION_GET_CONTENT
+    private val postPicItemListener by lazy {
+        PostPicItemListener(
+            { id, function -> getBitmap(id, function) },
+            { item -> handleDeletePic(item) },
+            { updateCountPicView() },
+            { addPic() }
+        )
+    }
 
-            startActivityForResult(Intent.createChooser(intent, getString(R.string.select_pics)),
-                REQUEST_MUTLI_PHOTO
-            )
-        }
+    private fun getBitmap(id: String, update: ((String) -> Unit)) {
+        viewModel.getBitmap(id, update)
+    }
 
-        override fun onUpdateCount() {
-            updateCountPicView()
+    private fun handleDeletePic(item: PostAttachmentItem) {
+        for (data in attachmentList) {
+            if (item.attachmentId == data.attachmentId) {
+                deletePicList.add(item.attachmentId)
+            }
         }
+    }
+
+    private fun addPic() {
+        val intent = Intent()
+        intent.type = "image/*"
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        intent.action = Intent.ACTION_GET_CONTENT
+
+        startActivityForResult(Intent.createChooser(intent, getString(R.string.select_pics)),
+            REQUEST_MUTLI_PHOTO
+        )
     }
 }

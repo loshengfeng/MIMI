@@ -12,11 +12,9 @@ import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
-import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
-import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.model.vo.UploadPicItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.home.club.ClubDataSource
@@ -35,9 +33,7 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.File
-import java.lang.Exception
 import java.net.URLEncoder
-
 
 class HomeViewModel : BaseViewModel() {
 
@@ -48,6 +44,9 @@ class HomeViewModel : BaseViewModel() {
         const val TYPE_COVER = "type_cover"
         const val TYPE_VIDEO = "type_video"
     }
+
+    var adWidth = 0
+    var adHeight = 0
 
     var lastListIndex = 0 // 垂直recycler view 跳出後的最後一筆資料
 
@@ -65,18 +64,18 @@ class HomeViewModel : BaseViewModel() {
         _videosResult
 
     private var _clipsResult =
-        MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberPostItem>>>>>()
-    val clipsResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberPostItem>>>>> =
+        MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<ArrayList<MemberPostItem>>>>>()
+    val clipsResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<ArrayList<MemberPostItem>>>>> =
         _clipsResult
 
     private var _pictureResult =
-        MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberPostItem>>>>>()
-    val pictureResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberPostItem>>>>> =
+        MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<ArrayList<MemberPostItem>>>>>()
+    val pictureResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<ArrayList<MemberPostItem>>>>> =
         _pictureResult
 
     private var _clubResult =
-        MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberClubItem>>>>>()
-    val clubResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberClubItem>>>>> =
+        MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<ArrayList<MemberClubItem>>>>>()
+    val clubResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<ArrayList<MemberClubItem>>>>> =
         _clubResult
 
     private val _postFollowItemListResult = MutableLiveData<PagedList<MemberPostItem>>()
@@ -223,7 +222,7 @@ class HomeViewModel : BaseViewModel() {
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    when(it) {
+                    when (it) {
                         is ApiResult.Success -> {
                             update(it.result)
                         }
@@ -247,7 +246,7 @@ class HomeViewModel : BaseViewModel() {
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    when(it) {
+                    when (it) {
                         is ApiResult.Success -> {
                             update(it.result)
                         }
@@ -273,7 +272,7 @@ class HomeViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    when(it) {
+                    when (it) {
                         is ApiResult.Empty -> {
                             update(isFollow)
                         }
@@ -307,7 +306,7 @@ class HomeViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    when(it) {
+                    when (it) {
                         is ApiResult.Success -> {
                             update(isLike, it.result)
                         }
@@ -322,7 +321,6 @@ class HomeViewModel : BaseViewModel() {
                 .collect { _videoList.value = it }
         }
     }
-
 
     fun sendPostReport(item: MemberPostItem, content: String) {
         viewModelScope.launch {
@@ -371,7 +369,7 @@ class HomeViewModel : BaseViewModel() {
 
     private fun getPostFollowPagingItems(): LiveData<PagedList<MemberPostItem>> {
         val postFollowDataSource =
-            PostFollowDataSource(pagingCallback, viewModelScope, domainManager)
+            PostFollowDataSource(pagingCallback, viewModelScope, domainManager, adWidth, adHeight)
         val pictureFactory = PostFollowFactory(postFollowDataSource)
         val config = PagedList.Config.Builder()
             .setPrefetchDistance(4)
@@ -381,7 +379,14 @@ class HomeViewModel : BaseViewModel() {
 
     private fun getMemberPostPagingItems(postType: PostType): LiveData<PagedList<MemberPostItem>> {
         val pictureDataSource =
-            MemberPostDataSource(pagingCallback, viewModelScope, domainManager, postType)
+            MemberPostDataSource(
+                pagingCallback,
+                viewModelScope,
+                domainManager,
+                postType,
+                adWidth,
+                adHeight
+            )
         val pictureFactory = MemberPostFactory(pictureDataSource)
         val config = PagedList.Config.Builder()
             .setPrefetchDistance(4)
@@ -394,11 +399,7 @@ class HomeViewModel : BaseViewModel() {
         isAdult: Boolean
     ): LiveData<PagedList<BaseVideoItem>> {
         val videoDataSource = VideoDataSource(
-            isAdult,
-            category,
-            viewModelScope,
-            domainManager.getApiRepository(),
-            pagingCallback
+            isAdult, category, viewModelScope, domainManager, pagingCallback, adWidth, adHeight
         )
         val videoFactory = VideoFactory(videoDataSource)
         val config = PagedList.Config.Builder()
@@ -415,7 +416,9 @@ class HomeViewModel : BaseViewModel() {
     }
 
     private fun getClubPagingItems(): LiveData<PagedList<MemberClubItem>> {
-        val clubDataSource = ClubDataSource(pagingCallback, viewModelScope, domainManager)
+        val clubDataSource = ClubDataSource(
+            pagingCallback, viewModelScope, domainManager, adWidth, adHeight
+        )
         val clubFactory = ClubFactory(clubDataSource)
         val config = PagedList.Config.Builder().setPrefetchDistance(4).build()
         return LivePagedListBuilder(clubFactory, config).build()
@@ -431,9 +434,7 @@ class HomeViewModel : BaseViewModel() {
         }
 
         override fun onThrowable(throwable: Throwable) {
-        }
 
-        override fun onSucceed() {
         }
     }
 
@@ -468,12 +469,10 @@ class HomeViewModel : BaseViewModel() {
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    if (type == TYPE_PIC) {
-                        _postPicResult.postValue(it)
-                    } else if (type == TYPE_COVER) {
-                        _postCoverResult.postValue(it)
-                    } else if (type == TYPE_VIDEO) {
-                        _postVideoResult.postValue(it)
+                    when (type) {
+                        TYPE_PIC -> _postPicResult.postValue(it)
+                        TYPE_COVER -> _postCoverResult.postValue(it)
+                        TYPE_VIDEO -> _postVideoResult.postValue(it)
                     }
                 }
         }

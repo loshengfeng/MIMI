@@ -13,23 +13,29 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.core.view.size
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.EditVideoAdapterListener
+import com.dabenxiang.mimi.callback.PostVideoItemListener
+import com.dabenxiang.mimi.model.api.vo.MediaItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PostMemberRequest
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.vo.PostVideoAttachment
 import com.dabenxiang.mimi.view.adapter.viewHolder.ScrollVideoAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.chip.Chip
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_post_article.chipGroup
 import kotlinx.android.synthetic.main.fragment_post_article.clubLayout
 import kotlinx.android.synthetic.main.fragment_post_article.edt_content
@@ -56,12 +62,15 @@ class PostVideoFragment : BaseFragment() {
         private const val CONTENT_LIMIT = 2000
         private const val HASHTAG_LIMIT = 10
         private const val INIT_VALUE = 0
+        const val POST_ID = "post_id"
 
         const val UPLOAD_VIDEO = "upload_video"
         const val MEMBER_REQUEST = "member_request"
         const val COVER_URI = "cover_uri"
         const val VIDEO_URI = "video_uir"
         const val VIDEO_LENGTH = "video_length"
+        const val VIDEO_DATA = "video_data"
+        const val DELETE_ATTACHMENT = "delete_attachment"
     }
 
     override val bottomNavigationVisibility: Int
@@ -71,23 +80,24 @@ class PostVideoFragment : BaseFragment() {
         return R.layout.fragment_post_video
     }
 
-    private val uriList = arrayListOf<String>()
+    private val videoAttachmentList = arrayListOf<PostVideoAttachment>()
+    private val deleteVideoList = arrayListOf<PostVideoAttachment>()
 
     private lateinit var adapter: ScrollVideoAdapter
 
-    private var trimmerUri: String? = String()
+//    private var trimmerUri: String? = String()
+
+    private var postId: Long = 0
+
+    private val viewModel: PostVideoViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         initSettings()
 
-        trimmerUri = arguments?.getString(BUNDLE_TRIMMER_URI)
-        val picUri = arguments?.getString(BUNDLE_COVER_URI)
-        uriList.add(picUri.toString())
-
-        adapter = ScrollVideoAdapter(listener)
-        adapter.submitList(uriList)
+        adapter = ScrollVideoAdapter(postPicItemListener)
+        adapter.submitList(videoAttachmentList)
         recyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         recyclerView.adapter = adapter
     }
@@ -191,23 +201,24 @@ class PostVideoFragment : BaseFragment() {
                 tags = tags
             )
 
-            val retriever = MediaMetadataRetriever()
-            retriever.setDataSource(context, Uri.parse( trimmerUri))
-            val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-            val timeInMillisec: Long = time.toLong()
-            retriever.release()
-
-
-            val length = String.format("%02d:%02d:%02d",
-                TimeUnit.MILLISECONDS.toHours(timeInMillisec),
-                TimeUnit.MILLISECONDS.toMinutes(timeInMillisec) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(timeInMillisec)),
-                TimeUnit.MILLISECONDS.toSeconds(timeInMillisec) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(timeInMillisec)));
+            if (videoAttachmentList[0].videoAttachmentId.isBlank()) {
+                val retriever = MediaMetadataRetriever()
+                retriever.setDataSource(context, Uri.parse(videoAttachmentList[0].videoUrl))
+                val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                val timeInMillisec: Long = time.toLong()
+                retriever.release()
+                val length = String.format("%02d:%02d:%02d",
+                    TimeUnit.MILLISECONDS.toHours(timeInMillisec),
+                    TimeUnit.MILLISECONDS.toMinutes(timeInMillisec) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(timeInMillisec)),
+                    TimeUnit.MILLISECONDS.toSeconds(timeInMillisec) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(timeInMillisec)));
+                videoAttachmentList[0].length = length
+            }
 
             findNavController().previousBackStackEntry?.savedStateHandle?.set(UPLOAD_VIDEO, true)
             findNavController().previousBackStackEntry?.savedStateHandle?.set(MEMBER_REQUEST, request)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(COVER_URI, adapter.getData())
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(VIDEO_URI, trimmerUri)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(VIDEO_LENGTH, length)
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(VIDEO_DATA, videoAttachmentList)
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(DELETE_ATTACHMENT, deleteVideoList)
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(POST_ID, postId)
             findNavController().navigateUp()
         }
     }
@@ -215,7 +226,8 @@ class PostVideoFragment : BaseFragment() {
     override fun initSettings() {
         super.initSettings()
 
-        tv_title.text = getString(R.string.post_title)
+        val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
+
         tv_clean.visibility = View.VISIBLE
         tv_clean.text = getString(R.string.btn_send)
 
@@ -231,6 +243,51 @@ class PostVideoFragment : BaseFragment() {
             INIT_VALUE,
             HASHTAG_LIMIT
         ))
+
+        if (isEdit!!) {
+            tv_title.text = getString(R.string.edit_post_title)
+            setUI()
+        } else {
+            tv_title.text = getString(R.string.post_title)
+            val trimmerUri = arguments?.getString(BUNDLE_TRIMMER_URI)
+            val picUri = arguments?.getString(BUNDLE_COVER_URI)
+            val postVideoAttachment = PostVideoAttachment(videoUrl = trimmerUri!!, picUrl = picUri!!)
+            videoAttachmentList.add(postVideoAttachment)
+        }
+    }
+
+    private fun setUI() {
+        val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+        val mediaItem = Gson().fromJson(item.content, MediaItem::class.java)
+
+        postId = item.id
+
+        edt_title.setText(item.title)
+
+        for (tag in item.tags!!) {
+            addTag(tag)
+        }
+
+        txt_titleCount.text = String.format(getString(R.string.typing_count,
+            item.title.length,
+            TITLE_LIMIT
+        ))
+        txt_contentCount.text = String.format(getString(R.string.typing_count,
+            mediaItem.textContent.length,
+            CONTENT_LIMIT
+        ))
+        txt_hashtagCount.text = String.format(getString(R.string.typing_count,
+            item.tags.size,
+            HASHTAG_LIMIT
+        ))
+
+        val postVideoAttachment = PostVideoAttachment(
+            videoAttachmentId = mediaItem.videoParameter.id,
+            length = mediaItem.videoParameter.length,
+            picAttachmentId = mediaItem.picParameter[0].id,
+            ext = mediaItem.picParameter[0].ext
+        )
+        videoAttachmentList.add(postVideoAttachment)
     }
 
     private val chooseClubDialogListener = object : ChooseClubDialogListener {
@@ -283,13 +340,32 @@ class PostVideoFragment : BaseFragment() {
         }
     }
 
-    private val listener = object : EditVideoAdapterListener {
-        override fun onOpeRecorder() {
-            Intent(MediaStore.ACTION_VIDEO_CAPTURE).also { takeVideoIntent ->
-                takeVideoIntent.resolveActivity(requireContext().packageManager)?.also {
-                    startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE)
-                }
+    private fun getBitmap(id: String, update: ((String) -> Unit)) {
+        viewModel.getBitmap(id, update)
+    }
+
+    private fun openRecorder() {
+        Intent(MediaStore.ACTION_VIDEO_CAPTURE).also { takeVideoIntent ->
+            takeVideoIntent.resolveActivity(requireContext().packageManager)?.also {
+                startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE)
             }
         }
+    }
+
+    private fun deleteVideo(item: PostVideoAttachment) {
+        deleteVideoList.clear()
+        if (item.videoAttachmentId ==  videoAttachmentList[0].videoAttachmentId) {
+            deleteVideoList.add(item)
+        }
+
+        videoAttachmentList.clear()
+    }
+
+    private val postPicItemListener by lazy {
+        PostVideoItemListener(
+            { id, function -> getBitmap(id, function) },
+            { openRecorder() },
+            { item -> deleteVideo(item) }
+        )
     }
 }

@@ -10,8 +10,6 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.AttachmentType
-import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.HomeItemType
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.base.BaseViewHolder
@@ -45,9 +43,6 @@ class HomeAdapter(
                 }
             }
     }
-
-    val attachmentViewHolderMap: HashMap<AttachmentType, BaseViewHolder> = hashMapOf()
-    val functionViewHolderMap: HashMap<FunctionType, BaseViewHolder> = hashMapOf()
 
     override fun getItemViewType(position: Int): Int {
         return position
@@ -112,7 +107,7 @@ class HomeAdapter(
                         R.layout.item_home_club,
                         parent,
                         false
-                    ), listener, isAdult, memberPostFuncItem, clubFuncItem
+                    ), listener, isAdult, clubFuncItem
                 )
             }
         }
@@ -139,18 +134,14 @@ class HomeAdapter(
             }
             HomeItemType.CLIP -> {
                 holder as HomeClipViewHolder
-                attachmentViewHolderMap[AttachmentType.ADULT_HOME_CLIP] = holder
                 holder.bind(template)
             }
             HomeItemType.PICTURE -> {
                 holder as HomePictureViewHolder
-                attachmentViewHolderMap[AttachmentType.ADULT_HOME_PICTURE] = holder
                 holder.bind(template)
             }
             HomeItemType.CLUB -> {
                 holder as HomeClubViewHolder
-                attachmentViewHolderMap[AttachmentType.ADULT_HOME_CLUB] = holder
-                functionViewHolderMap[FunctionType.FOLLOW] = holder
                 holder.bind(template)
             }
         }
@@ -162,6 +153,7 @@ class HomeAdapter(
         fun onClipClick(view: View, item: List<MemberPostItem>, position: Int)
         fun onPictureClick(view: View, item: MemberPostItem)
         fun onClubClick(view: View, item: MemberClubItem)
+        fun onLoadBannerViewHolder(vh: HomeBannerViewHolder)
         fun onLoadStatisticsViewHolder(vh: HomeStatisticsViewHolder, src: HomeTemplate.Statistics)
         fun onLoadCarouselViewHolder(vh: HomeCarouselViewHolder, src: HomeTemplate.Carousel)
         fun onLoadClipViewHolder(vh: HomeClipViewHolder)

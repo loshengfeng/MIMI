@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.ApiBaseItem
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.RootCategoriesItem
@@ -23,6 +24,12 @@ class MainViewModel : BaseViewModel() {
 
     private val _categoriesData = MutableLiveData<ApiResult<ApiBaseItem<RootCategoriesItem>>>()
     val categoriesData: LiveData<ApiResult<ApiBaseItem<RootCategoriesItem>>> = _categoriesData
+
+    private val _getAdResult = MutableLiveData<ApiResult<AdItem>>()
+    val getAdResult: LiveData<ApiResult<AdItem>> = _getAdResult
+
+    private val _getAdHomeResult = MutableLiveData<Pair<Int, ApiResult<AdItem>>>()
+    val getAdHomeResult: LiveData<Pair<Int, ApiResult<AdItem>>> = _getAdHomeResult
 
     private var _normal: CategoriesItem? = null
     val normal
@@ -61,11 +68,41 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
+    fun getAd(position: Int, width: Int, height: Int) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getAdRepository().getAD(width, height)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(resp.body()?.content))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _getAdHomeResult.value = Pair(position, it) }
+        }
+    }
+
+    fun getAd(width: Int, height: Int) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getAdRepository().getAD(width, height)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(resp.body()?.content))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _getAdResult.value = it }
+        }
+    }
+
     /**
      * 按下 back 離開的 timer
      *
      */
-    fun startBackExitAppTimer(){
+    fun startBackExitAppTimer() {
         needCloseApp = true
         viewModelScope.launch {
             for (second in 2 downTo 0) {
@@ -74,4 +111,5 @@ class MainViewModel : BaseViewModel() {
             needCloseApp = false
         }
     }
+
 }

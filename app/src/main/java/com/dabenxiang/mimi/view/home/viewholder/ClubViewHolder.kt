@@ -62,6 +62,10 @@ class ClubViewHolder(
             }
         }
 
+        clubImg.setOnClickListener {
+            model?.also { clubFuncItem.onItemClick(it) }
+        }
+
         val avatarId = model?.avatarAttachmentId.toString()
         if (getLruCache(model?.avatarAttachmentId.toString()) == null) {
             clubFuncItem.getBitmap(avatarId) { id -> updateAvatar(id) }

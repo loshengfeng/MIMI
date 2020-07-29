@@ -2,6 +2,8 @@ package com.dabenxiang.mimi.manager
 
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.BuildConfig
+import com.dabenxiang.mimi.model.api.AdRepository
+import com.dabenxiang.mimi.model.api.AdService
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiService
 import com.dabenxiang.mimi.model.vo.domain.DomainInputItem
@@ -32,14 +34,28 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
     val goLibVersion
         get() = _goLibVersion
 
-    fun getApiRepository(): ApiRepository {
+    private val apiRepo by lazy {
         val apiService = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create(gson))
             .client(okHttpClient)
             .baseUrl(getApiDomain())
             .build()
             .create(ApiService::class.java)
-        return ApiRepository(apiService)
+        ApiRepository(apiService)
+    }
+
+    fun getApiRepository(): ApiRepository {
+        return apiRepo
+    }
+
+    fun getAdRepository(): AdRepository {
+        val adService = Retrofit.Builder()
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .client(okHttpClient)
+            .baseUrl(getAdDomain())
+            .build()
+            .create(AdService::class.java)
+        return AdRepository(adService)
     }
 
     fun changeApiDomainIndex() {
@@ -57,6 +73,20 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
                     BuildConfig.API_HOST
                 } else {
                     StringBuilder("https://api.").append(getDomain()).toString()
+                }
+            }
+        }
+    }
+
+    fun getAdDomain(): String {
+        return when (BuildConfig.FLAVOR) {
+            FLAVOR_DEV -> BuildConfig.AD_API_HOST
+            else -> {
+                val domains = getDomain()
+                if (domains.isEmpty()) {
+                    BuildConfig.AD_API_HOST
+                } else {
+                    StringBuilder("https://ad-api.").append(getDomain()).toString()
                 }
             }
         }

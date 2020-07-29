@@ -55,7 +55,7 @@ class SearchVideoFragment : BaseFragment() {
     var reportDialog: ReportDialogFragment? = null
 
     private val videoListAdapter by lazy {
-        SearchVideoAdapter(adapterListener)
+        SearchVideoAdapter(requireContext(), adapterListener)
     }
 
     override fun getLayoutId(): Int {
@@ -67,6 +67,10 @@ class SearchVideoFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
+        viewModel.adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
+
         requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
 
         viewModel.isAdult = mainViewModel?.adultMode?.value ?: false

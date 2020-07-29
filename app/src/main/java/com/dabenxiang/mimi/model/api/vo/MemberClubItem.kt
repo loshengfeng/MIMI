@@ -34,8 +34,12 @@ data class MemberClubItem(
     val tag: String = "",
 
     @SerializedName("isFollow")
-    var isFollow: Boolean = false
-): Serializable
+    var isFollow: Boolean = false,
+
+    var type: PostType? = null,
+    var adItem: AdItem? = null
+
+) : Serializable
 
 data class PostItem(
     @SerializedName("id")
@@ -49,4 +53,4 @@ data class PostItem(
 
     @SerializedName("content")
     val content: String = ""
-): Serializable
+) : Serializable

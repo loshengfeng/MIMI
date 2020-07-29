@@ -18,8 +18,7 @@ import com.dabenxiang.mimi.view.home.viewholder.VideoViewHolder
 class HomeVideoListAdapter(
     private val nestedListener: HomeAdapter.EventListener,
     private val isAdult: Boolean
-) :
-    PagedListAdapter<BaseVideoItem, BaseViewHolder>(diffCallback) {
+) : PagedListAdapter<BaseVideoItem, BaseViewHolder>(diffCallback) {
 
     companion object {
         val diffCallback = object : DiffUtil.ItemCallback<BaseVideoItem>() {
@@ -99,4 +98,5 @@ class HomeVideoListAdapter(
             }
         }
     }
+
 }

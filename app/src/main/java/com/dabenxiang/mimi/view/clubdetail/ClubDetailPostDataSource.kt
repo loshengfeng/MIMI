@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.clubdetail
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.manager.DomainManager
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.model.enums.PostType
@@ -17,7 +18,9 @@ class ClubDetailPostDataSource(
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
     private val tag: String,
-    private val orderBy: OrderBy
+    private val orderBy: OrderBy,
+    private val adWidth: Int,
+    private val adHeight: Int
 ) : PageKeyedDataSource<Int, MemberPostItem>() {
 
     companion object {
@@ -30,12 +33,16 @@ class ClubDetailPostDataSource(
     ) {
         viewModelScope.launch {
             flow {
+                val adRepository = domainManager.getAdRepository()
+                val adItem = adRepository.getAD(adWidth, adHeight).body()?.content ?: AdItem()
+
                 val result = domainManager.getApiRepository().getMembersPost(
                     0, PER_LIMIT, tag, orderBy.value
                 )
                 if (!result.isSuccessful) throw HttpException(result)
                 val body = result.body()
                 val memberPostItems = body?.content
+                memberPostItems?.add(0, MemberPostItem(type = PostType.AD, adItem = adItem))
 
                 val nextPageKey = when {
                     hasNextPage(
@@ -50,10 +57,7 @@ class ClubDetailPostDataSource(
                 .flowOn(Dispatchers.IO)
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
-                .collect {
-                    pagingCallback.onSucceed()
-                    callback.onResult(it.list, null, it.nextKey)
-                }
+                .collect { callback.onResult(it.list, null, it.nextKey) }
         }
     }
 

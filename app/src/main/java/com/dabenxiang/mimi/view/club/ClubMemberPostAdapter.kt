@@ -6,11 +6,13 @@ import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.PostItem
 
 class ClubMemberPostAdapter(
     val context: Context,
     private val postItemList: ArrayList<PostItem>,
+    private val clubItem: MemberClubItem,
     private val clubFuncItem: ClubFuncItem
 ) : PagedListAdapter<PostItem, ClubMemberPostViewHolder>(diffCallback) {
 
@@ -30,7 +32,6 @@ class ClubMemberPostAdapter(
                 return oldItem == newItem
             }
         }
-        const val PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI = 0
     }
 
     override fun getItemCount(): Int {
@@ -45,6 +46,6 @@ class ClubMemberPostAdapter(
 
     override fun onBindViewHolder(holder: ClubMemberPostViewHolder, position: Int) {
         val item = postItemList[position]
-        holder.onBind(item, clubFuncItem)
+        holder.onBind(item, clubItem, clubFuncItem)
     }
 }
