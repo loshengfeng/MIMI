@@ -121,6 +121,9 @@ class PlayerViewModel : BaseViewModel() {
     private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
     val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
 
+    private val _getAdResult = MutableLiveData<ApiResult<AdItem>>()
+    val getAdResult: LiveData<ApiResult<AdItem>> = _getAdResult
+
     fun updatedSelectedNewestComment(isNewest: Boolean) {
         _isSelectedNewestComment.value = isNewest
     }
@@ -199,6 +202,21 @@ class PlayerViewModel : BaseViewModel() {
                 }
             }
             else -> null
+        }
+    }
+
+    fun getAd(width: Int, height: Int) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getAdRepository().getAD(width, height)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(resp.body()?.content))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _getAdResult.value = it }
         }
     }
 
