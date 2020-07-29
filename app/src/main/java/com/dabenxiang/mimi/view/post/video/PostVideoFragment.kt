@@ -11,7 +11,9 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
+import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
+import androidx.core.content.ContextCompat
 import androidx.core.view.size
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -46,6 +48,8 @@ import kotlinx.android.synthetic.main.fragment_post_article.txt_contentCount
 import kotlinx.android.synthetic.main.fragment_post_article.txt_hashtagCount
 import kotlinx.android.synthetic.main.fragment_post_article.txt_titleCount
 import kotlinx.android.synthetic.main.fragment_post_pic.*
+import kotlinx.android.synthetic.main.fragment_post_pic.txt_clubName
+import kotlinx.android.synthetic.main.fragment_post_pic.txt_hashtagName
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -66,9 +70,6 @@ class PostVideoFragment : BaseFragment() {
 
         const val UPLOAD_VIDEO = "upload_video"
         const val MEMBER_REQUEST = "member_request"
-        const val COVER_URI = "cover_uri"
-        const val VIDEO_URI = "video_uir"
-        const val VIDEO_LENGTH = "video_length"
         const val VIDEO_DATA = "video_data"
         const val DELETE_ATTACHMENT = "delete_attachment"
     }
@@ -84,8 +85,6 @@ class PostVideoFragment : BaseFragment() {
     private val deleteVideoList = arrayListOf<PostVideoAttachment>()
 
     private lateinit var adapter: ScrollVideoAdapter
-
-//    private var trimmerUri: String? = String()
 
     private var postId: Long = 0
 
@@ -313,6 +312,16 @@ class PostVideoFragment : BaseFragment() {
         chip.setTextColor(chip.context.getColor(R.color.color_black_1_50))
         chip.chipBackgroundColor =
             ColorStateList.valueOf(chip.context.getColor(R.color.color_black_1_10))
+
+        if (chipGroup.size >= 1) {
+            chip.closeIcon = ContextCompat.getDrawable(requireContext(), R.drawable.btn_close_circle_small_black_n)
+            chip.isCloseIconVisible = true
+            chip.setCloseIconSizeResource(R.dimen.dp_24)
+            chip.setOnCloseIconClickListener {
+                chipGroup.removeView(it)
+            }
+        }
+
         chipGroup.addView(chip)
 
         setTagCount()

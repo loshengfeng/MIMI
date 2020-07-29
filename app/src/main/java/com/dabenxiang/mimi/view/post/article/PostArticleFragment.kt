@@ -7,6 +7,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import androidx.core.content.ContextCompat
 import androidx.core.view.size
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -246,6 +247,16 @@ class PostArticleFragment : BaseFragment() {
         chip.setTextColor(chip.context.getColor(R.color.color_black_1_50))
         chip.chipBackgroundColor =
             ColorStateList.valueOf(chip.context.getColor(R.color.color_black_1_10))
+
+        if (chipGroup.size >= 1) {
+            chip.closeIcon = ContextCompat.getDrawable(requireContext(), R.drawable.btn_close_circle_small_black_n)
+            chip.isCloseIconVisible = true
+            chip.setCloseIconSizeResource(R.dimen.dp_24)
+            chip.setOnCloseIconClickListener {
+                chipGroup.removeView(it)
+            }
+        }
+
         chipGroup.addView(chip)
 
         setTagCount()
