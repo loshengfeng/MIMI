@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.adapter
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
@@ -37,6 +38,8 @@ class ChatContentAdapter(
 
     interface EventListener {
         fun onGetAttachment(id: String, position: Int)
+        fun onImageClick(bitmap: Bitmap)
+        fun onVideoClick()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -91,12 +94,10 @@ class ChatContentAdapter(
                         ), listener
                 )
             }
-
-            //todo 更換影像用ui
             ChatAdapterViewType.SENDER_IMAGE.ordinal -> {
                 ChatContentImageViewHolder(
                         layoutInflater.inflate(
-                                R.layout.item_chat_content_sender_file,
+                                R.layout.item_chat_content_sender_image,
                                 parent,
                                 false
                         ), listener

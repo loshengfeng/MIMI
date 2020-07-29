@@ -17,6 +17,8 @@ import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.enums.ChatMessageType
 import com.dabenxiang.mimi.view.adapter.ChatContentAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
+import com.dabenxiang.mimi.view.dialog.preview.ImagePreviewDialogFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_chat_content.*
@@ -26,11 +28,25 @@ class ChatContentFragment : BaseFragment() {
 
     private val INTENT_SELECT_IMG: Int = 100
 
+    private lateinit var imagePreviewDialog: ImagePreviewDialogFragment
     private val viewModel: ChatContentViewModel by viewModels()
     private val adapter by lazy { ChatContentAdapter(listener) }
     private val listener = object : ChatContentAdapter.EventListener {
         override fun onGetAttachment(id: String, position: Int) {
             viewModel.getAttachment(id, position)
+        }
+
+        override fun onImageClick(bitmap: Bitmap) {
+            imagePreviewDialog = ImagePreviewDialogFragment.newInstance(bitmap, null).also {
+                it.show(
+                        requireActivity().supportFragmentManager,
+                        MoreDialogFragment::class.java.simpleName
+                )
+            }
+        }
+
+        override fun onVideoClick() {
+
         }
     }
 
