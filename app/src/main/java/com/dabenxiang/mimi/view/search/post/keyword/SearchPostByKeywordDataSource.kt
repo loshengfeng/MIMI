@@ -89,12 +89,12 @@ class SearchPostByKeywordDataSource(
                 val apiRepository = domainManager.getApiRepository()
                 val result = if (isPostFollow) {
                     apiRepository.searchPostFollowByKeyword(
-                        keyword, 0,
+                        keyword, next,
                         PER_LIMIT
                     )
                 } else {
                     apiRepository.searchPostByKeyword(
-                        type, keyword, 0,
+                        type, keyword, next,
                         PER_LIMIT
                     )
                 }
