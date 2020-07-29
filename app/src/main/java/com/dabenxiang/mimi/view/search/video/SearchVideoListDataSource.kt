@@ -3,7 +3,9 @@ package com.dabenxiang.mimi.view.search.video
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.SearchPagingCallback
 import com.dabenxiang.mimi.manager.DomainManager
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
+import com.dabenxiang.mimi.model.enums.PostType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -17,7 +19,9 @@ class SearchVideoListDataSource(
     private val pagingCallback: SearchPagingCallback,
     private val isAdult: Boolean = false,
     private val tag: String = "",
-    private val name: String = ""
+    private val name: String = "",
+    private val adWidth: Int,
+    private val adHeight: Int
 ) : PageKeyedDataSource<Long, VideoItem>() {
 
     companion object {
@@ -33,6 +37,9 @@ class SearchVideoListDataSource(
     ) {
         viewModelScope.launch {
             flow {
+                val adRepository = domainManager.getAdRepository()
+                val adItem = adRepository.getAD(adWidth, adHeight).body()?.content ?: AdItem()
+
                 val result = domainManager.getApiRepository().searchHomeVideos(
                     q = name,
                     isAdult = isAdult,
@@ -54,9 +61,16 @@ class SearchVideoListDataSource(
                     ) -> PER_LIMIT_LONG
                     else -> null
                 }
-                emit(
-                    Pair(LoadResult(videos ?: ArrayList(), nextPageKey), totalCount)
-                )
+
+                val list = mutableListOf<VideoItem>()
+                videos?.forEachIndexed { index, videoItem ->
+                    if (index % 2 == 0 && index != 0) {
+                        val item = VideoItem(type = PostType.AD, adItem = adItem)
+                        list.add(item)
+                    }
+                    list.add(videoItem)
+                }
+                emit(Pair(LoadResult(list, nextPageKey), totalCount))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> pagingCallback.onThrowable(e) }
@@ -65,7 +79,6 @@ class SearchVideoListDataSource(
                     pagingCallback.onSucceed()
                     it.first.run { callback.onResult(list, null, nextKey) }
                 }
-
         }
     }
 
@@ -77,11 +90,13 @@ class SearchVideoListDataSource(
         params: LoadParams<Long>,
         callback: LoadCallback<Long, VideoItem>
     ) {
-        Timber.d("loadAfter")
         val next = params.key
 
         viewModelScope.launch {
             flow {
+                val adRepository = domainManager.getAdRepository()
+                val adItem = adRepository.getAD(adWidth, adHeight).body()?.content ?: AdItem()
+
                 val result = domainManager.getApiRepository().searchHomeVideos(
                     q = name,
                     isAdult = isAdult,
@@ -90,32 +105,35 @@ class SearchVideoListDataSource(
                     tag = tag
                 )
                 if (!result.isSuccessful) throw HttpException(result)
-                emit(result)
+
+                val body = result.body()
+                val videos = body?.content?.videos
+                val nextPageKey = when {
+                    hasNextPage(
+                        body?.paging?.count ?: 0,
+                        body?.paging?.offset ?: 0,
+                        videos?.size ?: 0
+                    ) -> next + (videos?.size ?: 0)
+                    else -> null
+                }
+
+                val list = mutableListOf<VideoItem>()
+                videos?.forEachIndexed { index, videoItem ->
+                    if (index % 2 == 0) {
+                        val item = VideoItem(type = PostType.AD, adItem = adItem)
+                        list.add(item)
+                    }
+                    list.add(videoItem)
+                }
+
+                emit(Pair(list, nextPageKey))
             }
                 .flowOn(Dispatchers.IO)
-                .catch { e ->
-                    pagingCallback.onThrowable(e)
-                }
+                .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect {
                     pagingCallback.onSucceed()
-                    it.body()?.run {
-                        content?.run {
-                            val nextPageKey = when {
-                                hasNextPage(
-                                    paging.count ?: 0,
-                                    paging.offset ?: 0,
-                                    videos?.size ?: 0
-                                ) -> next + (videos?.size ?: 0)
-                                else -> null
-                            }
-
-                            if (videos != null) {
-                                adjustData(videos)
-                                callback.onResult(videos, nextPageKey)
-                            }
-                        }
-                    }
+                    callback.onResult(it.first, it.second)
                 }
         }
     }
