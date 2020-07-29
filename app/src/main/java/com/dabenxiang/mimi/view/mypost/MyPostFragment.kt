@@ -15,6 +15,7 @@ import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.serializable.SearchPostItem
 import com.dabenxiang.mimi.model.vo.PostAttachmentItem
+import com.dabenxiang.mimi.model.vo.PostVideoAttachment
 import com.dabenxiang.mimi.view.adapter.MyPostPagedAdapter
 import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -22,8 +23,10 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.comment.MyPostMoreDialogFragment
+import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.TYPE_VIDEO
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.post.pic.PostPicFragment
+import com.dabenxiang.mimi.view.post.video.PostVideoFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
@@ -43,6 +46,8 @@ class MyPostFragment : BaseFragment() {
     private val picParameterList = arrayListOf<PicParameter>()
     private val uploadPicList = arrayListOf<PicParameter>()
     private var deletePicList = arrayListOf<String>()
+    private var uploadVideoList = arrayListOf<PostVideoAttachment>()
+    private var deleteVideoItem = arrayListOf<PostVideoAttachment>()
 
     private var postMemberRequest = PostMemberRequest()
 
@@ -76,6 +81,12 @@ class MyPostFragment : BaseFragment() {
             findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>(
                 PostPicFragment.UPLOAD_PIC
             )
+
+        val isNeedVideoUpload =
+            findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>(
+                PostVideoFragment.UPLOAD_VIDEO
+            )
+
         if (isNeedPicUpload?.value != null) {
             deletePicList = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<String>>(PostPicFragment.DELETE_ATTACHMENT)?.value!!
             val memberRequest =
@@ -121,6 +132,47 @@ class MyPostFragment : BaseFragment() {
                     findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Long>(
                         PostPicFragment.POST_ID
                     )
+                viewModel.postPic(postId?.value!!, postMemberRequest, content)
+            }
+        } else if (isNeedVideoUpload?.value != null) {
+            deleteVideoItem = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<PostVideoAttachment>>(PostVideoFragment.DELETE_ATTACHMENT)?.value!!
+            uploadVideoList= findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<PostVideoAttachment>>(PostVideoFragment.VIDEO_DATA)?.value!!
+
+            val memberRequest =
+                findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<PostMemberRequest>(
+                    PostVideoFragment.MEMBER_REQUEST
+                )
+
+            postMemberRequest = memberRequest!!.value!!
+
+            if (uploadVideoList[0].picAttachmentId.isBlank()) {
+                viewModel.postAttachment(uploadVideoList[0].picUrl, requireContext(), TYPE_PIC)
+            } else {
+                val postId =
+                    findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Long>(
+                        PostVideoFragment.POST_ID
+                    )
+
+                val mediaItem = MediaItem()
+
+                val videoParameter = VideoParameter(
+                    id = uploadVideoList[0].videoAttachmentId,
+                    length = uploadVideoList[0].length
+                )
+
+                val picParameter = PicParameter(
+                    id = uploadVideoList[0].picAttachmentId,
+                    ext = uploadVideoList[0].ext
+                )
+
+                mediaItem.textContent = postMemberRequest.content
+                mediaItem.videoParameter = videoParameter
+                mediaItem.picParameter.add(picParameter)
+
+                mediaItem.textContent = postMemberRequest.content
+                val content = Gson().toJson(mediaItem)
+                Timber.d("Post video content item : $content")
+
                 viewModel.postPic(postId?.value!!, postMemberRequest, content)
             }
         }
@@ -238,8 +290,11 @@ class MyPostFragment : BaseFragment() {
         viewModel.postVideoMemberResult.observe(viewLifecycleOwner, Observer {
             if (deletePicList.isNotEmpty()) {
                 viewModel.deleteAttachment(deletePicList[deleteCurrentPicPosition])
+            } else if (deleteVideoItem.isNotEmpty()) {
+                viewModel.deleteVideoAttachment(deleteVideoItem[0].picAttachmentId, TYPE_PIC)
             } else {
                 //TODO UI
+
             }
         })
 
@@ -249,6 +304,67 @@ class MyPostFragment : BaseFragment() {
                 //TODO finish
             } else {
                 viewModel.deleteAttachment(deletePicList[deleteCurrentPicPosition])
+            }
+        })
+
+        viewModel.uploadCoverItem.observe(viewLifecycleOwner, Observer {
+            uploadVideoList[0].ext = it.ext
+        })
+
+        viewModel.postCoverResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Success -> {
+                    uploadVideoList[0].picAttachmentId = it.result.toString()
+                    viewModel.postAttachment(uploadVideoList[0].videoUrl, requireContext(), TYPE_VIDEO)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.postVideoResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Success -> {
+                    uploadVideoList[0].videoAttachmentId = it.result.toString()
+
+                    val postId =
+                        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Long>(
+                            PostVideoFragment.POST_ID
+                        )
+
+                    val mediaItem = MediaItem()
+                    val videoParameter = VideoParameter(
+                        id = uploadVideoList[0].videoAttachmentId,
+                        length = uploadVideoList[0].length
+                    )
+
+                    val picParameter = PicParameter(
+                        id = uploadVideoList[0].picAttachmentId,
+                        ext = uploadVideoList[0].ext
+                    )
+
+                    mediaItem.picParameter.add(picParameter)
+                    mediaItem.videoParameter = videoParameter
+                    mediaItem.textContent = postMemberRequest.content
+                    val content = Gson().toJson(mediaItem)
+                    Timber.d("Post video content item : $content")
+
+                    viewModel.postPic(postId?.value!!, postMemberRequest, content)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.postDeleteCoverAttachment.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Success -> viewModel.deleteVideoAttachment(deleteVideoItem[0].picAttachmentId, TYPE_VIDEO)
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.postDeleteVideoAttachment.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Success -> "" //TODO UI
+                is ApiResult.Error -> onApiError(it.throwable)
             }
         })
     }
@@ -283,10 +399,15 @@ class MyPostFragment : BaseFragment() {
                 bundle.putSerializable(MEMBER_DATA, item)
                 findNavController().navigate(R.id.action_myPostFragment_to_postArticleFragment, bundle)
             } else if (item.type == PostType.IMAGE) {
-                var bundle = Bundle()
+                val bundle = Bundle()
                 bundle.putBoolean(EDIT, true)
                 bundle.putSerializable(MEMBER_DATA, item)
                 findNavController().navigate(R.id.action_myPostFragment_to_postPicFragment, bundle)
+            } else if (item.type == PostType.VIDEO) {
+                val bundle = Bundle()
+                bundle.putBoolean(EDIT, true)
+                bundle.putSerializable(MEMBER_DATA, item)
+                findNavController().navigate(R.id.action_myPostFragment_to_postVideoFragment, bundle)
             }
 
             moreDialog?.dismiss()

@@ -52,7 +52,6 @@ class PostPicFragment : BaseFragment() {
         const val UPLOAD_PIC = "upload_pic"
         const val MEMBER_REQUEST = "member_request"
         const val PIC_URI = "pic_uri"
-        const val IS_EDIT = "is_edit"
         const val DELETE_ATTACHMENT = "delete_attachment"
         const val POST_ID = "post_id"
 
@@ -342,7 +341,7 @@ class PostPicFragment : BaseFragment() {
 
     private val postPicItemListener by lazy {
         PostPicItemListener(
-            {id, function -> getBitmap(id, function) },
+            { id, function -> getBitmap(id, function) },
             { item -> handleDeletePic(item) },
             { updateCountPicView() },
             { addPic() }
