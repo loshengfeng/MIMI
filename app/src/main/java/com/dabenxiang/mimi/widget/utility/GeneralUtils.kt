@@ -5,6 +5,8 @@ import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.provider.Settings
 import android.util.DisplayMetrics
 import android.view.inputmethod.InputMethodManager
@@ -26,7 +28,6 @@ import retrofit2.HttpException
 import retrofit2.Response
 import java.io.PrintWriter
 import java.io.StringWriter
-import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
@@ -205,6 +206,13 @@ object GeneralUtils {
             }
             else -> getStackTrace(t)
         }
+    }
+
+    fun openWebView(context: Context, url: String) {
+        val intent = Intent(Intent.ACTION_VIEW);
+        val url = Uri.parse(url)
+        intent.data = url
+        context.startActivity(intent)
     }
 
     private fun getStackTrace(t: Throwable): String {

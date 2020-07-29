@@ -1,76 +1,105 @@
 package com.dabenxiang.mimi.model.api.vo
 
+import com.dabenxiang.mimi.model.enums.PostType
 import com.google.gson.annotations.SerializedName
 import java.util.*
 
 data class VideoItem(
+
     @SerializedName("availablePoint")
-    val availablePoint: Long?,
+    val availablePoint: Long = 0,
+
     @SerializedName("categories")
-    val categories: List<String>?,
+    val categories: List<String> = arrayListOf(),
+
     @SerializedName("commentCount")
-    val commentCount: Long?,
+    val commentCount: Long = 0,
+
     @SerializedName("country")
-    val country: String?,
+    val country: String = "",
+
     @SerializedName("cover")
-    val cover: String?,
+    val cover: String? = "",
+
     @SerializedName("deducted")
-    val deducted: Boolean?,
+    val deducted: Boolean? = false,
+
     @SerializedName("description")
-    val description: String?,
+    val description: String? = "",
+
     @SerializedName("favorite")
-    var favorite: Boolean?,
+    var favorite: Boolean? = false,
+
     @SerializedName("favoriteCount")
-    var favoriteCount: Long?,
+    var favoriteCount: Long? = 0,
+
     @SerializedName("id")
-    val id: Long?,
+    val id: Long? = 0,
+
     @SerializedName("like")
-    var like: Boolean?,
+    var like: Boolean? = false,
+
     @SerializedName("likeCount")
-    var likeCount: Long?,
+    var likeCount: Long? = 0,
+
     @SerializedName("point")
-    val point: Long?,
+    val point: Long? = 0,
+
     @SerializedName("source")
-    val source: String?,
+    val source: String? = "",
+
     @SerializedName("sources")
-    val sources: List<Source>?,
+    val sources: List<Source>? = arrayListOf(),
+
     @SerializedName("tags")
-    val tags: Any?,
+    val tags: Any? = null,
+
     @SerializedName("title")
-    val title: String?,
+    val title: String? = "",
+
     @SerializedName("updateTime")
-    val updateTime: Date?,
+    val updateTime: Date? = Date(),
+
     @SerializedName("years")
-    val years: Long?,
+    val years: Long? = 0,
 
     var isAdult: Boolean = false,
     var searchingTag: String = "", // 搜尋的 TAG
-    var searchingStr: String = "" // 搜尋的 Name
+    var searchingStr: String = "", // 搜尋的 Name
+
+    var type: PostType? = null,
+    val adItem: AdItem? = null
 )
 
 data class Source(
     @SerializedName("name")
-    val name: String?,
+    val name: String? = "",
+
     @SerializedName("videoEpisodes")
-    val videoEpisodes: List<VideoEpisode>?
+    val videoEpisodes: List<VideoEpisode>? = arrayListOf()
 )
 
 data class VideoEpisode(
     @SerializedName("episode")
-    val episode: String?,
+    val episode: String? = "",
+
     @SerializedName("id")
-    val id: Long?,
+    val id: Long? = 0,
+
     @SerializedName("source")
-    val source: String?,
+    val source: String? = "",
+
     @SerializedName("videoStreams")
-    val videoStreams: List<VideoStream>?
+    val videoStreams: List<VideoStream>? = arrayListOf()
 )
 
 data class VideoStream(
     @SerializedName("episodePublishTime")
-    val episodePublishTime: String?,
+    val episodePublishTime: String? = "",
+
     @SerializedName("id")
-    val id: Long?,
+    val id: Long? = 0,
+
     @SerializedName("streamName")
-    val streamName: String?
+    val streamName: String? = ""
 )

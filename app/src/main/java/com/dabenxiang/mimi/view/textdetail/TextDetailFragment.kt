@@ -348,6 +348,10 @@ class TextDetailFragment : BaseFragment() {
                 )
             )
         }
+
+        override fun onOpenWebView(url: String) {
+            GeneralUtils.openWebView(requireContext(), url)
+        }
     }
 
     private val onItemClickListener = object : OnItemClickListener {

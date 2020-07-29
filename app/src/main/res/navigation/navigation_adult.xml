@@ -53,6 +53,10 @@
         <action
             android:id="@+id/action_adultHomeFragment_to_myPostFragment"
             app:destination="@id/myPostFragment" />
+
+        <action
+            android:id="@+id/action_adultHomeFragment_to_rankingFragment"
+            app:destination="@id/rankingFragment" />
     </fragment>
 
     <fragment
@@ -196,4 +200,10 @@
             android:id="@+id/action_myPostFragment_to_postVideoFragment"
             app:destination="@id/postVideoFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/rankingFragment"
+        android:name="com.dabenxiang.mimi.view.ranking.RankingFragment"
+        android:label="RankingFragment"
+        tools:layout="@layout/fragment_ranking" />
 </navigation>

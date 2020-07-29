@@ -24,6 +24,9 @@ class SearchVideoViewModel : BaseViewModel() {
     var searchingStr = ""
     var isAdult = false
 
+    var adWidth = 0
+    var adHeight = 0
+
     var currentItem: VideoItem? = null
 
     private val _searchTextLiveData = EditTextMutableLiveData()
@@ -52,7 +55,9 @@ class SearchVideoViewModel : BaseViewModel() {
                 pagingCallback,
                 isAdult,
                 searchingTag,
-                searchingStr
+                searchingStr,
+                adWidth,
+                adHeight
             )
         val videoFactory = SearchVideoFactory(searchVideoDataSource)
         val config = PagedList.Config.Builder()

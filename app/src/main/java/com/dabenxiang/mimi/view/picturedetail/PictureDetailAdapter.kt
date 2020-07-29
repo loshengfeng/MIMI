@@ -100,8 +100,11 @@ class PictureDetailAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is AdHolder -> {
-                mAdItem?.also {
-                    Glide.with(context).load(it.href).into(holder.adImg)
+                mAdItem?.also { item ->
+                    Glide.with(context).load(item.href).into(holder.adImg)
+                    holder.adImg.setOnClickListener {
+                        onPictureDetailListener.onOpenWebView(item.target)
+                    }
                 }
             }
             is PictureDetailViewHolder -> {
@@ -265,5 +268,6 @@ class PictureDetailAdapter(
         fun onReplyComment(replyId: Long?, replyName: String?)
         fun onMoreClick(item: MembersPostCommentItem)
         fun onChipClick(type: PostType, tag: String)
+        fun onOpenWebView(url: String)
     }
 }

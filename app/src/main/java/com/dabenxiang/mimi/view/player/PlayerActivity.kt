@@ -774,12 +774,16 @@ class PlayerActivity : BaseActivity() {
         }
 
         iv_more.setOnClickListener {
+
             moreDialog = MoreDialogFragment.newInstance(
                 MemberPostItem(
                     id = obtainVideoId(),
-                    type = PostType.VIDEO
+                    type = PostType.VIDEO,
+                    reported= viewModel.isReported
+
                 ), onMoreDialogListener
             ).also {
+
                 it.show(
                     supportFragmentManager,
                     MoreDialogFragment::class.java.simpleName
@@ -794,7 +798,7 @@ class PlayerActivity : BaseActivity() {
                     is Loaded -> progressHUD.dismiss()
                     is Empty -> {
                         viewModel.isReported = true
-                        GeneralUtils.showToast(this, getString(R.string.upload_succeed))
+                        GeneralUtils.showToast(this, getString(R.string.report_success))
                     }
                     is Error -> onApiError(apiResult.throwable)
                 }
@@ -1301,7 +1305,7 @@ class PlayerActivity : BaseActivity() {
                 viewModel.setSourceListPosition(0)
                 scrollToBottom()
                 CoroutineScope(Dispatchers.IO).launch {
-                    delay(2000)
+                    delay(500)
                     viewModel.setStreamPosition(0)
                 }
             }
