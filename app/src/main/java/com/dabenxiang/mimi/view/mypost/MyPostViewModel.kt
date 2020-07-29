@@ -1,5 +1,7 @@
 package com.dabenxiang.mimi.view.mypost
 
+import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,15 +15,23 @@ import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.PicParameter
+import com.dabenxiang.mimi.model.api.vo.PostMemberRequest
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.vo.AttachmentItem
+import com.dabenxiang.mimi.model.vo.UploadPicItem
 import com.dabenxiang.mimi.model.vo.mqtt.FavoriteItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.home.HomeViewModel
+import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
+import java.io.File
+import java.net.URLEncoder
 
 class MyPostViewModel: BaseViewModel() {
 
@@ -42,6 +52,18 @@ class MyPostViewModel: BaseViewModel() {
 
     private var _deletePostResult = MutableLiveData<ApiResult<Nothing>>()
     val deletePostResult: LiveData<ApiResult<Nothing>> = _deletePostResult
+
+    private val _uploadPicItem = MutableLiveData<PicParameter>()
+    val uploadPicItem: LiveData<PicParameter> = _uploadPicItem
+
+    private val _postPicResult = MutableLiveData<ApiResult<Long>>()
+    val postPicResult: LiveData<ApiResult<Long>> = _postPicResult
+
+    private val _postVideoMemberResult = MutableLiveData<ApiResult<Long>>()
+    val postVideoMemberResult: LiveData<ApiResult<Long>> = _postVideoMemberResult
+
+    private val _postDeleteAttachment = MutableLiveData<ApiResult<Nothing>>()
+    val postDeleteAttachment: LiveData<ApiResult<Nothing>> = _postDeleteAttachment
 
     fun getMyPost() {
         viewModelScope.launch {
@@ -192,6 +214,78 @@ class MyPostViewModel: BaseViewModel() {
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _deletePostResult.value = it }
+        }
+    }
+
+    fun postAttachment(pic: String, context: Context, type: String) {
+        viewModelScope.launch {
+            flow {
+                val realPath = UriUtils.getPath(context, Uri.parse(pic))
+                val fileNameSplit = realPath?.split("/")
+                val fileName = fileNameSplit?.last()
+                val extSplit = fileName?.split(".")
+                val ext = "." + extSplit?.last()
+
+                if (type == HomeViewModel.TYPE_PIC) {
+                    val picParameter = PicParameter(ext = ext)
+                    _uploadPicItem.postValue(picParameter)
+                } else if (type == HomeViewModel.TYPE_COVER) {
+                    val picParameter = PicParameter(ext = ext)
+//                    _uploadCoverItem.postValue(picParameter)
+                }
+
+                Timber.d("Upload photo path : $realPath")
+                Timber.d("Upload photo ext : $ext")
+
+                val result = domainManager.getApiRepository().postAttachment(
+                    File(realPath),
+                    fileName = URLEncoder.encode(fileName, "UTF-8")
+                )
+
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(result.body()?.content))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    if (type == HomeViewModel.TYPE_PIC) {
+                        _postPicResult.postValue(it)
+                    } else if (type == HomeViewModel.TYPE_COVER) {
+//                        _postCoverResult.postValue(it)
+                    } else if (type == HomeViewModel.TYPE_VIDEO) {
+//                        _postVideoResult.postValue(it)
+                    }
+                }
+        }
+    }
+
+    fun postPic(id: Long, request: PostMemberRequest, content: String) {
+        viewModelScope.launch {
+            flow {
+                request.content = content
+                Timber.d("Post member request : $request")
+                val resp = domainManager.getApiRepository().updatePost(id, request)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(resp.body()?.content))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _postVideoMemberResult.value = it }
+        }
+    }
+
+    fun deleteAttachment(id: String) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository().deleteAttachment(id)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _postDeleteAttachment.value = it }
         }
     }
 }

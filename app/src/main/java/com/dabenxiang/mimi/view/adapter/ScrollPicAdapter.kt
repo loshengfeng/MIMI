@@ -2,17 +2,21 @@ package com.dabenxiang.mimi.view.adapter
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.ScrollPicAdapterListener
+import com.dabenxiang.mimi.callback.PostPicItemListener
+import com.dabenxiang.mimi.model.vo.PostAttachmentItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_add_pic.view.*
 import kotlinx.android.synthetic.main.item_pic.view.*
 
-class ScrollPicAdapter(private val listener: ScrollPicAdapterListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ScrollPicAdapter(private val postPicItemListener: PostPicItemListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
         private const val TYPE_ADD = 0
@@ -20,7 +24,7 @@ class ScrollPicAdapter(private val listener: ScrollPicAdapterListener) : Recycle
         private const val PIC_LIMIT = 10
     }
 
-    private val uriList = arrayListOf<String>()
+    private val attachmentList = arrayListOf<PostAttachmentItem>()
     private lateinit var context: Context
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -42,15 +46,15 @@ class ScrollPicAdapter(private val listener: ScrollPicAdapterListener) : Recycle
     }
 
     override fun getItemCount(): Int {
-        return if (uriList.size >= PIC_LIMIT) {
+        return if (attachmentList.size >= PIC_LIMIT) {
             PIC_LIMIT
         } else {
-            uriList.size + 1
+            attachmentList.size + 1
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (uriList.size >= PIC_LIMIT) {
+        return if (attachmentList.size >= PIC_LIMIT) {
             TYPE_IMG
         } else {
             return when(position) {
@@ -61,9 +65,9 @@ class ScrollPicAdapter(private val listener: ScrollPicAdapterListener) : Recycle
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (uriList.size >= PIC_LIMIT) {
+        if (attachmentList.size >= PIC_LIMIT) {
             holder as PicViewHolder
-            holder.bind(uriList[(position)], position)
+            holder.bind(attachmentList[(position)], position)
         } else {
             when(position) {
                 0 -> {
@@ -72,19 +76,19 @@ class ScrollPicAdapter(private val listener: ScrollPicAdapterListener) : Recycle
                 }
                 else -> {
                     holder as PicViewHolder
-                    holder.bind(uriList[(position - 1)], position)
+                    holder.bind(attachmentList[(position - 1)], position)
                 }
             }
         }
     }
 
-    fun submitList(uriList: ArrayList<String>) {
-        this.uriList.addAll(uriList)
+    fun submitList(uriList: ArrayList<PostAttachmentItem>) {
+        this.attachmentList.addAll(uriList)
         notifyDataSetChanged()
     }
 
-    fun getData(): ArrayList<String> {
-        return uriList
+    fun getData(): ArrayList<PostAttachmentItem> {
+        return attachmentList
     }
 
     inner class AddViewHolder(itemView: View) : BaseViewHolder(itemView) {
@@ -93,7 +97,7 @@ class ScrollPicAdapter(private val listener: ScrollPicAdapterListener) : Recycle
         private val imgAdd = itemView.iv_add
 
         fun bind() {
-            if (uriList.isEmpty()) {
+            if (attachmentList.isEmpty()) {
                 pic.visibility = View.VISIBLE
                 addStr.visibility = View.VISIBLE
                 imgAdd.visibility = View.GONE
@@ -104,7 +108,7 @@ class ScrollPicAdapter(private val listener: ScrollPicAdapterListener) : Recycle
             }
 
             itemView.setOnClickListener {
-                listener.onAddPic()
+                postPicItemListener.onAddPic()
             }
         }
     }
@@ -113,15 +117,31 @@ class ScrollPicAdapter(private val listener: ScrollPicAdapterListener) : Recycle
         private val imgPic = itemView.img_pic
         private val close = itemView.iv_close
 
-        fun bind(uriStr: String, position: Int) {
-            val uriP = Uri.parse(uriStr)
-
-            imgPic.setImageURI(uriP)
+        fun bind(item: PostAttachmentItem, position: Int) {
+            if (item.attachmentId.isEmpty()) {
+                val uriP = Uri.parse(item.uri)
+                imgPic.setImageURI(uriP)
+            } else {
+                if (LruCacheUtils.getLruCache(item.attachmentId) == null) {
+                    postPicItemListener.getBitmap(item.attachmentId) { id ->
+                        val bitmap = LruCacheUtils.getLruCache(id)
+                        Glide.with(context).load(bitmap).into(imgPic)
+                    }
+                } else {
+                    val bitmap = LruCacheUtils.getLruCache(item.attachmentId)
+                    Glide.with(context).load(bitmap).into(imgPic)
+                }
+            }
 
             close.setOnClickListener {
-                uriList.removeAt(position - 1)
+                postPicItemListener.onDelete(item)
+                if (attachmentList.size >= PIC_LIMIT) {
+                    attachmentList.removeAt(position)
+                } else {
+                    attachmentList.removeAt(position - 1)
+                }
+                postPicItemListener.onUpdate()
                 notifyDataSetChanged()
-                listener.onUpdateCount()
             }
         }
     }
