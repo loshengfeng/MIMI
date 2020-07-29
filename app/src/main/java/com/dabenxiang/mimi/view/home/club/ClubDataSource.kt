@@ -51,7 +51,6 @@ class ClubDataSource(
                 if (!result.isSuccessful) throw HttpException(result)
                 val body = result.body()
                 val memberClubItems = body?.content
-                memberClubItems?.add(0, MemberClubItem(type = PostType.AD, adItem = adItem))
 
                 val nextPageKey = when {
                     hasNextPage(
@@ -62,13 +61,27 @@ class ClubDataSource(
                     else -> null
                 }
                 pagingCallback.onTotalCount(body?.paging?.count ?: 0)
-                emit(Pair(memberClubItems ?: arrayListOf(), nextPageKey))
+
+                if (!TextUtils.isEmpty(keyword)) {
+                    val list = mutableListOf<MemberClubItem>()
+                    memberClubItems?.forEachIndexed { index, memberClubItem ->
+                        if (index % 2 == 0 && index != 0) {
+                            val item = MemberClubItem(type = PostType.AD, adItem = adItem)
+                            list.add(item)
+                        }
+                        list.add(memberClubItem)
+                    }
+                    emit(Pair(list, nextPageKey))
+                } else {
+                    memberClubItems?.add(0, MemberClubItem(type = PostType.AD, adItem = adItem))
+                    emit(Pair(memberClubItems, nextPageKey))
+                }
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect { (items, nextKey) ->
-                    callback.onResult(items, null, nextKey)
+                    callback.onResult(items ?: arrayListOf(), null, nextKey)
                 }
         }
     }
@@ -77,12 +90,16 @@ class ClubDataSource(
         val next = params.key
         viewModelScope.launch {
             flow {
+                var adItem: AdItem? = null
+
                 val result = if (TextUtils.isEmpty(keyword)) {
                     domainManager.getApiRepository().getMembersClubPost(
                         offset = next,
                         limit = PER_LIMIT
                     )
                 } else {
+                    val adRepository = domainManager.getAdRepository()
+                    adItem = adRepository.getAD(adWidth, adHeight).body()?.content ?: AdItem()
                     domainManager.getApiRepository().getMembersClubPost(
                         offset = next,
                         limit = PER_LIMIT,
@@ -90,26 +107,38 @@ class ClubDataSource(
                     )
                 }
                 if (!result.isSuccessful) throw HttpException(result)
-                emit(result)
+
+                val body = result.body()
+                val memberClubItems = body?.content
+
+                val nextPageKey = when {
+                    hasNextPage(
+                        body?.paging?.count ?: 0,
+                        body?.paging?.offset ?: 0,
+                        memberClubItems?.size ?: 0
+                    ) -> next + PER_LIMIT
+                    else -> null
+                }
+
+                if (!TextUtils.isEmpty(keyword)) {
+                    val list = mutableListOf<MemberClubItem>()
+                    memberClubItems?.forEachIndexed { index, memberClubItem ->
+                        if (index % 2 == 0) {
+                            val item = MemberClubItem(type = PostType.AD, adItem = adItem)
+                            list.add(item)
+                        }
+                        list.add(memberClubItem)
+                    }
+                    emit(Pair(list, nextPageKey))
+                } else {
+                    emit(Pair(memberClubItems, nextPageKey))
+                }
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
-                .collect {
-                    it.body()?.also { item ->
-                        item.content?.also { list ->
-                            val nextPageKey = when {
-                                hasNextPage(
-                                    item.paging.count,
-                                    item.paging.offset,
-                                    list.size
-                                ) -> next + PER_LIMIT
-                                else -> null
-                            }
-
-                            callback.onResult(list, nextPageKey)
-                        }
-                    }
+                .collect { (items, nextKey) ->
+                    callback.onResult(items!!, nextKey)
                 }
         }
     }

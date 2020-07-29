@@ -7,7 +7,6 @@ import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.home.postfollow.PostFollowDataSource
-import com.dabenxiang.mimi.view.search.post.tag.SearchPostByTagDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -104,7 +103,7 @@ class SearchPostByKeywordDataSource(
                         body?.paging?.count ?: 0,
                         body?.paging?.offset ?: 0,
                         memberPostItems?.size ?: 0
-                    ) -> next + SearchPostByTagDataSource.PER_LIMIT
+                    ) -> next + PER_LIMIT
                     else -> null
                 }
 

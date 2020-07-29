@@ -316,7 +316,7 @@ class SearchPostViewModel : BaseViewModel() {
 
     private fun getClubPagingItems(keyword: String): LiveData<PagedList<MemberClubItem>> {
         val clubDataSource =
-            ClubDataSource(postPagingCallback, viewModelScope, domainManager, 0, 0, keyword)
+            ClubDataSource(postPagingCallback, viewModelScope, domainManager, adWidth, adHeight, keyword)
         val clubFactory = ClubFactory(clubDataSource)
         val config = PagedList.Config.Builder().setPrefetchDistance(4).build()
         return LivePagedListBuilder(clubFactory, config).build()

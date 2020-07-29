@@ -274,7 +274,7 @@
     <string name="search_keyword_3">个</string>
     <string name="search_type_clip">视频</string>
     <string name="search_type_picture">图片</string>
-    <string name="search_type_text">文字</string>
+    <string name="search_type_text">短文</string>
     <string name="search_type_club">圈子</string>
     <string name="search_history">历史搜索</string>
 

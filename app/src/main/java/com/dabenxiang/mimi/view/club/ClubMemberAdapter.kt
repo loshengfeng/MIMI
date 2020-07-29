@@ -66,9 +66,7 @@ class ClubMemberAdapter(
         val item = getItem(position)
         when (holder) {
             is AdHolder -> {
-                item?.adItem?.also {
-                    Glide.with(context).load(it.href).into(holder.adImg)
-                }
+                Glide.with(context).load(item?.adItem?.href).into(holder.adImg)
             }
             is ClubMemberViewHolder -> {
                 item?.also { holder.onBind(it, clubFuncItem, position) }
