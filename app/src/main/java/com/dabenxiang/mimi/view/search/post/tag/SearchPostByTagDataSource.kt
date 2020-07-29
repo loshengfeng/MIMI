@@ -12,7 +12,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import timber.log.Timber
 
 class SearchPostByTagDataSource(
     private val pagingCallback: SearchPagingCallback,
@@ -60,7 +59,7 @@ class SearchPostByTagDataSource(
 
                 val list = mutableListOf<MemberPostItem>()
                 memberPostItems?.forEachIndexed { index, memberPostItem ->
-                    if (index % 2 == 0) {
+                    if (index % 2 == 0 && index != 0) {
                         val item = MemberPostItem(type = PostType.AD, adItem = adItem)
                         list.add(item)
                     }
@@ -72,9 +71,7 @@ class SearchPostByTagDataSource(
                 .flowOn(Dispatchers.IO)
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
-                .collect {
-                    callback.onResult(it.list, null, it.nextKey)
-                }
+                .collect { callback.onResult(it.list, null, it.nextKey) }
         }
     }
 
@@ -118,7 +115,7 @@ class SearchPostByTagDataSource(
                     list.add(memberPostItem)
                 }
 
-                emit(SearchResult(memberPostItems!!, nextPageKey))
+                emit(SearchResult(list, nextPageKey))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> pagingCallback.onThrowable(e) }
