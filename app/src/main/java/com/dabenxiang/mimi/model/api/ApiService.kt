@@ -282,6 +282,16 @@ interface ApiService {
         @Query("limit") limit: Int
     ): Response<ApiBasePagingItem<List<StatisticsItem>>>
 
+    @GET("/v1/Members/Home/Videos/PostStatistics")
+    suspend fun getRankingList(
+        @Query("statisticsType") statisticsType: Int,
+        @Query("postType") postType: Int,
+        @Query("offset") offset: String?,
+        @Query("limit") limit: String?
+    ): Response<ApiBasePagingItem<List<RankingItem>>>
+
+
+
     /**********************************************************
      *
      *                  Members/Me
