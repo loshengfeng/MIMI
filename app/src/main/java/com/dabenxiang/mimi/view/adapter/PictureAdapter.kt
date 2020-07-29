@@ -9,7 +9,6 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.OnItemClickListener
 import com.dabenxiang.mimi.model.api.vo.ImageItem
@@ -37,10 +36,8 @@ class PictureAdapter(
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         holder as PictureViewHolder
-
         val item = imageItems[position]
         holder.onBind(item, onItemClickListener, memberPostFuncItem)
-
     }
 
     class PictureViewHolder(itemView: View) : BaseViewHolder(itemView) {

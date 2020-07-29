@@ -359,6 +359,10 @@ class PictureDetailFragment : BaseFragment() {
                 )
             )
         }
+
+        override fun onOpenWebView(url: String) {
+            GeneralUtils.openWebView(requireContext(), url)
+        }
     }
 
     private val onPhotoGridItemClickListener = object : PhotoGridAdapter.OnItemClickListener {
