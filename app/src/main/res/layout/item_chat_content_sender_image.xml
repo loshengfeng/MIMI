@@ -19,6 +19,7 @@
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_marginStart="12dp"
+        android:background="@drawable/bg_gray_6_radius_16"
         app:layout_constraintStart_toEndOf="@id/iv_head"
         app:layout_constraintTop_toTopOf="@id/iv_head" />
 

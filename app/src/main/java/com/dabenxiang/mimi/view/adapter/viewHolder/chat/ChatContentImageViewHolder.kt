@@ -1,28 +1,30 @@
 package com.dabenxiang.mimi.view.adapter.viewHolder.chat
 
+import android.graphics.Bitmap
 import android.view.View
 import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
-import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.adapter.ChatContentAdapter
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
-import timber.log.Timber
 
 
 class ChatContentImageViewHolder(
         itemView: View,
         listener: ChatContentAdapter.EventListener
 ) : BaseChatContentViewHolder(itemView, listener) {
-    val imgFile = itemView.findViewById(R.id.img_file) as ImageView
+    private val imgFile = itemView.findViewById(R.id.img_file) as ImageView
+    private var bitmap: Bitmap? = null
 
     init {
+        imgFile.setOnClickListener {
+            bitmap?.let { listener.onImageClick(it) }
+        }
     }
 
     override fun updated() {
@@ -30,21 +32,24 @@ class ChatContentImageViewHolder(
 
     override fun updated(position: Int) {
         super.updated(position)
+        Glide.with(App.self)
+                .load(R.drawable.bg_gray_6_radius_16)
+                .into(imgFile)
+
         data?.payload?.content?.let {
-            Timber.d("neo, content = ${it}")
             LruCacheUtils.getLruCache(it)?.also { bitmap ->
                 val options: RequestOptions = RequestOptions()
-                        .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                        .placeholder(R.drawable.default_profile_picture)
-                        .error(R.drawable.default_profile_picture)
+                        .transform(CenterCrop(), RoundedCorners(16))
+                        .placeholder(R.drawable.bg_gray_6_radius_16)
+                        .error(R.drawable.bg_gray_6_radius_16)
                         .priority(Priority.NORMAL)
 
                 Glide.with(App.self)
                         .load(bitmap)
-                        .transform(CenterCrop(), RoundedCorners(16))
+                        .apply(options)
                         .into(imgFile)
+                this.bitmap = bitmap
             } ?: run {
-                Timber.d("neo,conten = ${it}")
                 listener.onGetAttachment(it, position)
             }
         }
