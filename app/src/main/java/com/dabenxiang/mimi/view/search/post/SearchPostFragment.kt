@@ -110,6 +110,7 @@ class SearchPostFragment : BaseFragment() {
             ?: run { recycler_search_result.adapter = adapter }
 
         if (!TextUtils.isEmpty(mTag)) {
+            updateTag(mTag)
             viewModel.getSearchPostsByTag(currentPostType, mTag, isPostFollow)
         }
 
