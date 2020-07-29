@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
 class SearchPostByKeywordDataSource(
     private val pagingCallback: SearchPagingCallback,
@@ -84,6 +85,7 @@ class SearchPostByKeywordDataSource(
 
     override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, MemberPostItem>) {
         val next = params.key
+
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()

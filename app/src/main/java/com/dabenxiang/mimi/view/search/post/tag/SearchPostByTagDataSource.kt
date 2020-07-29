@@ -57,10 +57,16 @@ class SearchPostByTagDataSource(
                 val count = body?.paging?.count ?: 0
                 pagingCallback.onTotalCount(count)
 
-                val item = MemberPostItem(type = PostType.AD, adItem = adItem)
-                memberPostItems?.add(0, item)
+                val list = mutableListOf<MemberPostItem>()
+                memberPostItems?.forEachIndexed { index, memberPostItem ->
+                    if (index % 2 == 0) {
+                        val item = MemberPostItem(type = PostType.AD, adItem = adItem)
+                        list.add(item)
+                    }
+                    list.add(memberPostItem)
+                }
 
-                emit(InitResult(memberPostItems ?: arrayListOf(), nextPageKey))
+                emit(SearchResult(list, nextPageKey))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> pagingCallback.onThrowable(e) }
@@ -77,6 +83,9 @@ class SearchPostByTagDataSource(
         val next = params.key
         viewModelScope.launch {
             flow {
+                val adRepository = domainManager.getAdRepository()
+                val adItem = adRepository.getAD(adWidth, adHeight).body()?.content ?: AdItem()
+
                 val apiRepository = domainManager.getApiRepository()
                 val result = if (isPostFollow) {
                     apiRepository.searchPostFollowByTag(tag, 0, PER_LIMIT)
@@ -84,26 +93,34 @@ class SearchPostByTagDataSource(
                     apiRepository.searchPostByTag(type, tag, 0, PER_LIMIT)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
-                emit(result)
+
+                val body = result.body()
+                val memberPostItems = body?.content
+
+                val nextPageKey = when {
+                    hasNextPage(
+                        body?.paging?.count ?: 0,
+                        body?.paging?.offset ?: 0,
+                        memberPostItems?.size ?: 0
+                    ) -> next + PER_LIMIT
+                    else -> null
+                }
+
+                val list = mutableListOf<MemberPostItem>()
+                memberPostItems?.forEachIndexed { index, memberPostItem ->
+                    if (index % 2 == 0) {
+                        val item = MemberPostItem(type = PostType.AD, adItem = adItem)
+                        list.add(item)
+                    }
+                    list.add(memberPostItem)
+                }
+
+                emit(SearchResult(memberPostItems!!, nextPageKey))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
-                .collect {
-                    it.body()?.also { item ->
-                        item.content?.also { list ->
-                            val nextPageKey = when {
-                                hasNextPage(
-                                    item.paging.count,
-                                    item.paging.offset,
-                                    list.size
-                                ) -> next + PER_LIMIT
-                                else -> null
-                            }
-                            callback.onResult(list, nextPageKey)
-                        }
-                    }
-                }
+                .collect { callback.onResult(it.list, it.nextKey) }
         }
     }
 
@@ -115,6 +132,6 @@ class SearchPostByTagDataSource(
         }
     }
 
-    private data class InitResult(val list: List<MemberPostItem>, val nextKey: Int?)
+    private data class SearchResult(val list: List<MemberPostItem>, val nextKey: Int?)
 
 }
