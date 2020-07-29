@@ -220,7 +220,7 @@ class ApiRepository(private val apiService: ApiService) {
         type: PostType,
         offset: Int,
         limit: Int
-    ): Response<ApiBasePagingItem<List<MemberPostItem>>> {
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
         return apiService.getMembersPost(type.value, offset, limit)
     }
 
@@ -271,7 +271,7 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun getMembersClubPost(
         offset: Int,
         limit: Int
-    ): Response<ApiBasePagingItem<List<MemberClubItem>>> {
+    ): Response<ApiBasePagingItem<ArrayList<MemberClubItem>>> {
         return apiService.getMembersClubPost(offset, limit)
     }
 
@@ -279,7 +279,7 @@ class ApiRepository(private val apiService: ApiService) {
         offset: Int,
         limit: Int,
         keyword: String
-    ): Response<ApiBasePagingItem<List<MemberClubItem>>> {
+    ): Response<ApiBasePagingItem<ArrayList<MemberClubItem>>> {
         return apiService.getMembersClubPost(offset, limit, keyword)
     }
 
@@ -290,7 +290,7 @@ class ApiRepository(private val apiService: ApiService) {
         orderBy: Int,
         isAdult: Boolean = true,
         isFullContent: Boolean = false
-    ): Response<ApiBasePagingItem<List<MemberPostItem>>> {
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
         return apiService.getMembersPost(offset, limit, tag, orderBy, isAdult, isFullContent)
     }
 
@@ -357,6 +357,22 @@ class ApiRepository(private val apiService: ApiService) {
         offset = offset,
         limit = limit
     )
+
+    /**
+     * 取得影片排行
+     */
+    suspend fun getRankingList(
+        statisticsType: StatisticsType = StatisticsType.TODAY,
+        postType: PostType,
+        offset: String,
+        limit: String
+    ) = apiService.getRankingList(
+        statisticsType = statisticsType.value,
+        postType = postType.value,
+        offset = offset,
+        limit = limit
+    )
+
 
     /**********************************************************
      *
@@ -564,7 +580,7 @@ class ApiRepository(private val apiService: ApiService) {
         tag: String,
         offset: Int,
         limit: Int
-    ): Response<ApiBasePagingItem<List<MemberPostItem>>> {
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
         return apiService.searchPostByTag(type.value, tag, offset, limit)
     }
 
@@ -572,7 +588,7 @@ class ApiRepository(private val apiService: ApiService) {
         tag: String,
         offset: Int,
         limit: Int
-    ): Response<ApiBasePagingItem<List<MemberPostItem>>> {
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
         return apiService.searchPostFollowByTag(tag, offset, limit)
     }
 
@@ -581,7 +597,7 @@ class ApiRepository(private val apiService: ApiService) {
         keyword: String,
         offset: Int,
         limit: Int
-    ): Response<ApiBasePagingItem<List<MemberPostItem>>> {
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
         return apiService.searchPostByKeyword(type.value, keyword, offset, limit)
     }
 
@@ -589,7 +605,7 @@ class ApiRepository(private val apiService: ApiService) {
         keyword: String,
         offset: Int,
         limit: Int
-    ): Response<ApiBasePagingItem<List<MemberPostItem>>> {
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
         return apiService.searchPostFollowByKeyword(keyword, offset, limit)
     }
 

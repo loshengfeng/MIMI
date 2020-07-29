@@ -1,10 +1,11 @@
 package com.dabenxiang.mimi.view.home.postfollow
 
 import androidx.paging.PageKeyedDataSource
-import com.dabenxiang.mimi.callback.PostPagingCallBack
+import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.PostType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -12,7 +13,7 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
 class PostFollowDataSource(
-    private val pagingCallback: PostPagingCallBack,
+    private val pagingCallback: PagingCallback,
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
     private val adWidth: Int,
@@ -31,13 +32,13 @@ class PostFollowDataSource(
             flow {
                 val adRepository = domainManager.getAdRepository()
                 val adItem = adRepository.getAD(adWidth, adHeight).body()?.content ?: AdItem()
-                pagingCallback.onGetAd(adItem)
 
                 val apiRepository = domainManager.getApiRepository()
                 val result = apiRepository.getPostFollow(0, PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
                 val body = result.body()
                 val memberPostItems = body?.content
+                memberPostItems?.add(0, MemberPostItem(type = PostType.AD, adItem = adItem))
 
                 val nextPageKey = when {
                     hasNextPage(
@@ -53,7 +54,6 @@ class PostFollowDataSource(
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect {
-                    pagingCallback.onSucceed()
                     callback.onResult(it.list, null, it.nextKey)
                 }
         }

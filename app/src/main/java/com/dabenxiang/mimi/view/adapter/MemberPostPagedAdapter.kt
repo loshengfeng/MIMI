@@ -9,7 +9,6 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
-import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
@@ -23,7 +22,6 @@ class MemberPostPagedAdapter(
     private val adultListener: AdultListener,
     private var mTag: String = "",
     private val memberPostFuncItem: MemberPostFuncItem = MemberPostFuncItem(),
-    private var mAdItem: AdItem? = null,
     private val isClipList: Boolean = false
 ) : PagedListAdapter<MemberPostItem, BaseViewHolder>(diffCallback) {
 
@@ -54,15 +52,12 @@ class MemberPostPagedAdapter(
     val viewHolderMap = hashMapOf<Int, BaseViewHolder>()
 
     override fun getItemViewType(position: Int): Int {
-        return if (position == 0) {
-            VIEW_TYPE_AD
-        } else {
-            val item = getItem(position)
-            when (item?.type) {
-                PostType.VIDEO -> VIEW_TYPE_CLIP
-                PostType.IMAGE -> VIEW_TYPE_PICTURE
-                else -> VIEW_TYPE_TEXT
-            }
+        val item = getItem(position)
+        return when (item?.type) {
+            PostType.VIDEO -> VIEW_TYPE_CLIP
+            PostType.IMAGE -> VIEW_TYPE_PICTURE
+            PostType.AD -> VIEW_TYPE_AD
+            else -> VIEW_TYPE_TEXT
         }
     }
 
@@ -104,9 +99,7 @@ class MemberPostPagedAdapter(
         val item = getItem(position)
         when (holder) {
             is AdHolder -> {
-                mAdItem?.also {
-                    Glide.with(context).load(it.href).into(holder.adImg)
-                }
+                Glide.with(context).load(item?.adItem?.href).into(holder.adImg)
             }
             is ClipPostHolder -> {
                 item?.also {
@@ -164,9 +157,5 @@ class MemberPostPagedAdapter(
 
     fun setupTag(tag: String) {
         mTag = tag
-    }
-
-    fun setupAdItem(item: AdItem) {
-        mAdItem = item
     }
 }

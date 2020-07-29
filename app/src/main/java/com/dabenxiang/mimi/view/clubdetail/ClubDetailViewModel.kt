@@ -22,7 +22,10 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
-class ClubDetailViewModel: BaseViewModel() {
+class ClubDetailViewModel : BaseViewModel() {
+
+    var adWidth = 0
+    var adHeight = 0
 
     private var _followClubResult = MutableLiveData<ApiResult<Boolean>>()
     val followClubResult: LiveData<ApiResult<Boolean>> = _followClubResult
@@ -30,18 +33,31 @@ class ClubDetailViewModel: BaseViewModel() {
     private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
     val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
 
-    fun getMemberPosts(tag: String, orderBy: OrderBy, update: ((PagedList<MemberPostItem>) -> Unit)) {
-         viewModelScope.launch {
-             getMemberPostPagingItems(tag, orderBy).asFlow()
-                 .collect {
-                     update(it)
-                 }
-         }
+    fun getMemberPosts(
+        tag: String,
+        orderBy: OrderBy,
+        update: ((PagedList<MemberPostItem>) -> Unit)
+    ) {
+        viewModelScope.launch {
+            getMemberPostPagingItems(tag, orderBy).asFlow()
+                .collect { update(it) }
+        }
     }
 
-    private fun getMemberPostPagingItems(tag: String, orderBy: OrderBy): LiveData<PagedList<MemberPostItem>> {
+    private fun getMemberPostPagingItems(
+        tag: String,
+        orderBy: OrderBy
+    ): LiveData<PagedList<MemberPostItem>> {
         val clubDetailPostDataSource =
-            ClubDetailPostDataSource(pagingCallback, viewModelScope, domainManager, tag, orderBy)
+            ClubDetailPostDataSource(
+                pagingCallback,
+                viewModelScope,
+                domainManager,
+                tag,
+                orderBy,
+                adWidth,
+                adHeight
+            )
         val clubDetailPostFactory = ClubDetailPostFactory(clubDetailPostDataSource)
         val config = PagedList.Config.Builder()
             .setPrefetchDistance(4)
@@ -62,7 +78,7 @@ class ClubDetailViewModel: BaseViewModel() {
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    when(it) {
+                    when (it) {
                         is ApiResult.Success -> {
                             update(it.result)
                         }
@@ -86,7 +102,7 @@ class ClubDetailViewModel: BaseViewModel() {
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    when(it) {
+                    when (it) {
                         is ApiResult.Empty -> update(isFollow)
                     }
                 }
@@ -117,7 +133,7 @@ class ClubDetailViewModel: BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    when(it) {
+                    when (it) {
                         is ApiResult.Success -> {
                             update(isLike, it.result)
                         }

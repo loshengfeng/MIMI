@@ -32,6 +32,7 @@ import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.model.serializable.SearchPostItem
 import com.dabenxiang.mimi.model.vo.PostAttachmentItem
+import com.dabenxiang.mimi.model.vo.PostVideoAttachment
 import com.dabenxiang.mimi.model.vo.UploadPicItem
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
@@ -59,6 +60,7 @@ import com.dabenxiang.mimi.view.post.pic.PostPicFragment
 import com.dabenxiang.mimi.view.post.pic.PostPicFragment.Companion.BUNDLE_PIC_URI
 import com.dabenxiang.mimi.view.post.video.EditVideoFragment.Companion.BUNDLE_VIDEO_URI
 import com.dabenxiang.mimi.view.post.video.PostVideoFragment
+import com.dabenxiang.mimi.view.ranking.RankingFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
@@ -94,6 +96,7 @@ class AdultHomeFragment : BaseFragment() {
     private var interactionListener: InteractionListener? = null
     private var uploadPicItem = arrayListOf<UploadPicItem>()
     private var uploadPicUri = arrayListOf<PostAttachmentItem>()
+    private var uploadVideoUri = arrayListOf<PostVideoAttachment>()
     private var postMemberRequest = PostMemberRequest()
 
     private var snackBar: Snackbar? = null
@@ -109,8 +112,6 @@ class AdultHomeFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Timber.d("@@onViewCreated")
-
         handleBackStackData()
 //        showSnackBar()
     }
@@ -165,13 +166,13 @@ class AdultHomeFragment : BaseFragment() {
                 findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<PostMemberRequest>(
                     PostVideoFragment.MEMBER_REQUEST
                 )
-            val coverUri =
-                findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<String>>(
-                    PostVideoFragment.COVER_URI
-                )
+            uploadVideoUri =
+                findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<PostVideoAttachment>>(
+                    PostVideoFragment.VIDEO_DATA
+                )?.value!!
 
             postMemberRequest = memberRequest!!.value!!
-            viewModel.postAttachment(coverUri?.value!![0], requireContext(), TYPE_COVER)
+            viewModel.postAttachment(uploadVideoUri[0].picUrl, requireContext(), TYPE_COVER)
         }
     }
 
@@ -377,12 +378,8 @@ class AdultHomeFragment : BaseFragment() {
         viewModel.postCoverResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    val videoUri =
-                        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>(
-                            PostVideoFragment.VIDEO_URI
-                        )
                     picParameter.id = it.result.toString()
-                    viewModel.postAttachment(videoUri?.value!!, requireContext(), TYPE_VIDEO)
+                    viewModel.postAttachment(uploadVideoUri[0].videoUrl, requireContext(), TYPE_VIDEO)
                 }
                 is Error -> {
                     onApiError(it.throwable)
@@ -394,15 +391,10 @@ class AdultHomeFragment : BaseFragment() {
         viewModel.postVideoResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    val videoLength =
-                        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>(
-                            PostVideoFragment.VIDEO_LENGTH
-                        )
-
                     val mediaItem = MediaItem()
                     val videoParameter = VideoParameter(
                         id = it.result.toString(),
-                        length = videoLength?.value!!
+                        length = uploadVideoUri[0].length
                     )
                     mediaItem.picParameter.add(picParameter)
                     mediaItem.videoParameter = videoParameter
@@ -462,10 +454,6 @@ class AdultHomeFragment : BaseFragment() {
 
         viewModel.uploadCoverItem.observe(viewLifecycleOwner, Observer {
             picParameter = it
-        })
-
-        viewModel.getAdItem.observe(viewLifecycleOwner, Observer {
-            updateAd(it)
         })
     }
 
@@ -542,6 +530,13 @@ class AdultHomeFragment : BaseFragment() {
         btn_ranking.visibility = View.VISIBLE
 
         btn_ranking.setOnClickListener {
+            val bundle = RankingFragment.createBundle()
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_adultHomeFragment_to_rankingFragment,
+                    bundle
+                )
+            )
 
         }
 
@@ -684,30 +679,30 @@ class AdultHomeFragment : BaseFragment() {
         setupRecyclerByPosition(index)
     }
 
-    private fun updateAd(item: AdItem) {
-        when (lastPosition) {
-            2 -> {
-                followPostPagedAdapter.setupAdItem(item)
-                followPostPagedAdapter.notifyItemChanged(0)
-            }
-            3 -> {
-                clipPostPagedAdapter.setupAdItem(item)
-                clipPostPagedAdapter.notifyItemChanged(0)
-            }
-            4 -> {
-                picturePostPagedAdapter.setupAdItem(item)
-                picturePostPagedAdapter.notifyItemChanged(0)
-            }
-            5 -> {
-                textPostPagedAdapter.setupAdItem(item)
-                textPostPagedAdapter.notifyItemChanged(0)
-            }
-            6 -> {
-                clubMemberAdapter.setupAdItem(item)
-                clubMemberAdapter.notifyItemChanged(0)
-            }
-        }
-    }
+//    private fun updateAd(item: AdItem) {
+//        when (lastPosition) {
+//            2 -> {
+//                followPostPagedAdapter.setupAdItem(item)
+//                followPostPagedAdapter.notifyItemChanged(0)
+//            }
+//            3 -> {
+//                clipPostPagedAdapter.setupAdItem(item)
+//                clipPostPagedAdapter.notifyItemChanged(0)
+//            }
+//            4 -> {
+//                picturePostPagedAdapter.setupAdItem(item)
+//                picturePostPagedAdapter.notifyItemChanged(0)
+//            }
+//            5 -> {
+//                textPostPagedAdapter.setupAdItem(item)
+//                textPostPagedAdapter.notifyItemChanged(0)
+//            }
+//            6 -> {
+//                clubMemberAdapter.setupAdItem(item)
+//                clubMemberAdapter.notifyItemChanged(0)
+//            }
+//        }
+//    }
 
     private val tabAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
@@ -732,7 +727,7 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val clipPostPagedAdapter by lazy {
-        MemberPostPagedAdapter(requireActivity(), adultListener, "", memberPostFuncItem, null, true)
+        MemberPostPagedAdapter(requireActivity(), adultListener, "", memberPostFuncItem, true)
     }
 
     private val picturePostPagedAdapter by lazy {

@@ -1,7 +1,7 @@
 package com.dabenxiang.mimi.view.home.memberpost
 
 import androidx.paging.PageKeyedDataSource
-import com.dabenxiang.mimi.callback.PostPagingCallBack
+import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
 class MemberPostDataSource(
-    private val pagingCallback: PostPagingCallBack,
+    private val pagingCallback: PagingCallback,
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
     private val postType: PostType,
@@ -33,7 +33,6 @@ class MemberPostDataSource(
             flow {
                 val adRepository = domainManager.getAdRepository()
                 val adItem = adRepository.getAD(adWidth, adHeight).body()?.content ?: AdItem()
-                pagingCallback.onGetAd(adItem)
 
                 val result = domainManager.getApiRepository().getMembersPost(
                     postType, 0, PER_LIMIT
@@ -41,6 +40,7 @@ class MemberPostDataSource(
                 if (!result.isSuccessful) throw HttpException(result)
                 val body = result.body()
                 val memberPostItems = body?.content
+                memberPostItems?.add(0, MemberPostItem(type = PostType.AD, adItem = adItem))
 
                 val nextPageKey = when {
                     hasNextPage(

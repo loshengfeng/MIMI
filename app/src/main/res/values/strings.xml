@@ -153,7 +153,7 @@
     <string name="text_search">搜寻</string>
     <string name="text_follow">关注</string>
     <string name="text_post">帖子</string>
-
+    <string name="text_ranking">排行榜</string>
     <string-array name="filter_gender">
         <item>女</item>
         <item>男</item>
@@ -274,7 +274,7 @@
     <string name="search_keyword_3">个</string>
     <string name="search_type_clip">视频</string>
     <string name="search_type_picture">图片</string>
-    <string name="search_type_text">文字</string>
+    <string name="search_type_text">短文</string>
     <string name="search_type_club">圈子</string>
     <string name="search_history">历史搜索</string>
 
@@ -283,7 +283,7 @@
     <string name="search_video_result">搜索\"%s\", 共找到 %,d 个视频</string>
     <string name="search_video_btn">搜索</string>
     <string name="search_video_input_empty_toast">请输入搜寻文字</string>
-
+    
     <!--  Chat Content  -->
     <string name="chat_content_media_chooser">请选择档案</string>
     <string name="chat_content_file_too_large">档案不得超过 5MB</string>
@@ -292,4 +292,9 @@
 
     <!--  Image Preview  -->
     <string name="image_preview_file_invlid">档案已失效</string>
+
+    <!-- Ranking  -->
+    <string name="ranking_day">日排行</string>
+    <string name="ranking_week">周排行</string>
+    <string name="ranking_moon">月排行</string>
 </resources>

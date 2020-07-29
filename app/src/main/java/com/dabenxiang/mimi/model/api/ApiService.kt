@@ -161,7 +161,7 @@ interface ApiService {
         @Query("limit") limit: Int,
         @Query("isAdult") isAdult: Boolean = true,
         @Query("orderBy") orderBy: Int = 1
-    ): Response<ApiBasePagingItem<List<MemberPostItem>>>
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
 
     @GET("/v1/Members/Post/{id}")
@@ -215,14 +215,14 @@ interface ApiService {
     suspend fun getMembersClubPost(
         @Query("offset") offset: Int,
         @Query("limit") limit: Int
-    ): Response<ApiBasePagingItem<List<MemberClubItem>>>
+    ): Response<ApiBasePagingItem<ArrayList<MemberClubItem>>>
 
     @GET("/v1/Members/Club/Post")
     suspend fun getMembersClubPost(
         @Query("offset") offset: Int,
         @Query("limit") limit: Int,
         @Query("keyword") keyword: String
-    ): Response<ApiBasePagingItem<List<MemberClubItem>>>
+    ): Response<ApiBasePagingItem<ArrayList<MemberClubItem>>>
 
     @GET("/v1/Members/Post")
     suspend fun getMembersPost(
@@ -232,7 +232,7 @@ interface ApiService {
         @Query("orderBy") orderBy: Int = 1,
         @Query("isAdult") isAdult: Boolean = true,
         @Query("isFullContent") isFullContent: Boolean = false
-    ): Response<ApiBasePagingItem<List<MemberPostItem>>>
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     @POST("/v1/Members/Club/{clubId}/Follow")
     suspend fun followClub(@Path("clubId") clubId: Long): Response<Void>
@@ -281,6 +281,16 @@ interface ApiService {
         @Query("offset") offset: Int,
         @Query("limit") limit: Int
     ): Response<ApiBasePagingItem<List<StatisticsItem>>>
+
+    @GET("/v1/Members/Home/Videos/PostStatistics")
+    suspend fun getRankingList(
+        @Query("statisticsType") statisticsType: Int,
+        @Query("postType") postType: Int,
+        @Query("offset") offset: String?,
+        @Query("limit") limit: String?
+    ): Response<ApiBasePagingItem<List<RankingItem>>>
+
+
 
     /**********************************************************
      *
@@ -375,7 +385,7 @@ interface ApiService {
     suspend fun getPostFollow(
         @Query("offset") offset: Int,
         @Query("limit") limit: Int
-    ): Response<ApiBasePagingItem<List<MemberPostItem>>>
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     @GET("/v1/Members/Me/Profile")
     suspend fun getProfile(): Response<ApiBaseItem<ProfileItem>>
@@ -446,7 +456,7 @@ interface ApiService {
         @Query("orderBy") orderBy: Int = 1,
         @Query("isFullContent") isFullContent: Boolean = false,
         @Query("isAdult") isAdult: Boolean = true
-    ): Response<ApiBasePagingItem<List<MemberPostItem>>>
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     @GET("/v1/Members/Post")
     suspend fun searchPostFollowByTag(
@@ -456,7 +466,7 @@ interface ApiService {
         @Query("orderBy") orderBy: Int = 1,
         @Query("isFullContent") isFullContent: Boolean = false,
         @Query("isAdult") isAdult: Boolean = true
-    ): Response<ApiBasePagingItem<List<MemberPostItem>>>
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
 
     @GET("/v1/Members/Post")
@@ -468,7 +478,7 @@ interface ApiService {
         @Query("orderBy") orderBy: Int = 1,
         @Query("isFullContent") isFullContent: Boolean = false,
         @Query("isAdult") isAdult: Boolean = true
-    ): Response<ApiBasePagingItem<List<MemberPostItem>>>
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     @GET("/v1/Members/Post")
     suspend fun searchPostFollowByKeyword(
@@ -478,7 +488,7 @@ interface ApiService {
         @Query("orderBy") orderBy: Int = 1,
         @Query("isFullContent") isFullContent: Boolean = false,
         @Query("isAdult") isAdult: Boolean = true
-    ): Response<ApiBasePagingItem<List<MemberPostItem>>>
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     /**********************************************************
      *

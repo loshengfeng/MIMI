@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.post.video
 
+import android.os.Parcelable
 import android.util.SparseArray
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
@@ -36,5 +37,9 @@ class EditVideoFragmentPagerAdapter(fm: FragmentManager, private var totalTabs: 
 
     fun getFragment(position: Int): Fragment? {
         return fragmentArray.get(position)
+    }
+
+    override fun saveState(): Parcelable? {
+        return null
     }
 }

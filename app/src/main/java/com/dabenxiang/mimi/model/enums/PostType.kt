@@ -13,7 +13,9 @@ enum class PostType(val value: Int) {
     VIDEO(4),
 
     @SerializedName("8")
-    VIDEO_ON_DEMAND(8);
+    VIDEO_ON_DEMAND(8),
+
+    AD(1024);
 
     companion object {
         fun getTypeByValue(target: Int?): PostType {

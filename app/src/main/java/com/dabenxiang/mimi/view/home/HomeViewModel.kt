@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.blankj.utilcode.util.ImageUtils
-import com.dabenxiang.mimi.callback.PostPagingCallBack
+import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
@@ -64,18 +64,18 @@ class HomeViewModel : BaseViewModel() {
         _videosResult
 
     private var _clipsResult =
-        MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberPostItem>>>>>()
-    val clipsResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberPostItem>>>>> =
+        MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<ArrayList<MemberPostItem>>>>>()
+    val clipsResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<ArrayList<MemberPostItem>>>>> =
         _clipsResult
 
     private var _pictureResult =
-        MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberPostItem>>>>>()
-    val pictureResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberPostItem>>>>> =
+        MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<ArrayList<MemberPostItem>>>>>()
+    val pictureResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<ArrayList<MemberPostItem>>>>> =
         _pictureResult
 
     private var _clubResult =
-        MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberClubItem>>>>>()
-    val clubResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<MemberClubItem>>>>> =
+        MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<ArrayList<MemberClubItem>>>>>()
+    val clubResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<ArrayList<MemberClubItem>>>>> =
         _clubResult
 
     private val _postFollowItemListResult = MutableLiveData<PagedList<MemberPostItem>>()
@@ -424,7 +424,7 @@ class HomeViewModel : BaseViewModel() {
         return LivePagedListBuilder(clubFactory, config).build()
     }
 
-    private val pagingCallback = object : PostPagingCallBack {
+    private val pagingCallback = object : PagingCallback {
         override fun onLoading() {
             setShowProgress(true)
         }
@@ -435,10 +435,6 @@ class HomeViewModel : BaseViewModel() {
 
         override fun onThrowable(throwable: Throwable) {
 
-        }
-
-        override fun onGetAd(adItem: AdItem) {
-            setupAdItem(adItem)
         }
     }
 
