@@ -44,7 +44,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_post.*
-import kotlinx.android.synthetic.main.fragment_search_post.tv_search
+import timber.log.Timber
 
 class SearchPostFragment : BaseFragment() {
 
@@ -72,30 +72,8 @@ class SearchPostFragment : BaseFragment() {
 
     private var adapter: MemberPostPagedAdapter? = null
 
-    private val clubMemberAdapter by lazy {
-        ClubMemberAdapter(
-            requireContext(),
-            clubFuncItem
-        )
-    }
-
-    private val clubFuncItem by lazy {
-        ClubFuncItem(
-            { item -> onItemClick(item) },
-            { id, function -> getBitmap(id, function) },
-            { item, isFollow, function -> clubFollow(item, isFollow, function) })
-    }
-
     override val bottomNavigationVisibility: Int
         get() = View.GONE
-
-    private val memberPostFuncItem by lazy {
-        MemberPostFuncItem(
-            {},
-            { id, function -> getBitmap(id, function) },
-            { _, _, _ -> }
-        )
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -110,6 +88,9 @@ class SearchPostFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
+        viewModel.adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
 
         if (TextUtils.isEmpty(mTag) && TextUtils.isEmpty(searchText)) {
             layout_search_history.visibility = View.VISIBLE
@@ -129,6 +110,7 @@ class SearchPostFragment : BaseFragment() {
             ?: run { recycler_search_result.adapter = adapter }
 
         if (!TextUtils.isEmpty(mTag)) {
+            updateTag(mTag)
             viewModel.getSearchPostsByTag(currentPostType, mTag, isPostFollow)
         }
 
@@ -263,7 +245,7 @@ class SearchPostFragment : BaseFragment() {
         }
 
         edit_search.setOnEditorActionListener { v, actionId, event ->
-            when(actionId) {
+            when (actionId) {
                 EditorInfo.IME_ACTION_SEARCH -> {
                     search()
                     true
@@ -364,6 +346,28 @@ class SearchPostFragment : BaseFragment() {
         )
 
         return word
+    }
+
+    private val clubMemberAdapter by lazy {
+        ClubMemberAdapter(
+            requireContext(),
+            clubFuncItem
+        )
+    }
+
+    private val clubFuncItem by lazy {
+        ClubFuncItem(
+            { item -> onItemClick(item) },
+            { id, function -> getBitmap(id, function) },
+            { item, isFollow, function -> clubFollow(item, isFollow, function) })
+    }
+
+    private val memberPostFuncItem by lazy {
+        MemberPostFuncItem(
+            {},
+            { id, function -> getBitmap(id, function) },
+            { _, _, _ -> }
+        )
     }
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {

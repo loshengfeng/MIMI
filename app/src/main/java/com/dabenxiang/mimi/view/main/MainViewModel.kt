@@ -98,7 +98,6 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
-
     /**
      * 按下 back 離開的 timer
      *

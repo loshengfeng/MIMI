@@ -66,6 +66,8 @@ data class MemberPostItem(
     val status: PostStatus? = PostStatus.ONLINE,
 
     @SerializedName("category")
-    val category: String? = "string"
+    val category: String? = "",
+
+    val adItem: AdItem?= null
 
 ) : BaseMemberPostItem()

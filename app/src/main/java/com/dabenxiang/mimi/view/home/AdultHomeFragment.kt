@@ -112,6 +112,7 @@ class AdultHomeFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Timber.d("@@onViewCreated")
+        
         handleBackStackData()
 //        showSnackBar()
     }
@@ -455,10 +456,6 @@ class AdultHomeFragment : BaseFragment() {
         viewModel.uploadCoverItem.observe(viewLifecycleOwner, Observer {
             picParameter = it
         })
-
-        viewModel.getAdItem.observe(viewLifecycleOwner, Observer {
-            updateAd(it)
-        })
     }
 
     override fun setupListeners() {
@@ -676,30 +673,30 @@ class AdultHomeFragment : BaseFragment() {
         setupRecyclerByPosition(index)
     }
 
-    private fun updateAd(item: AdItem) {
-        when (lastPosition) {
-            2 -> {
-                followPostPagedAdapter.setupAdItem(item)
-                followPostPagedAdapter.notifyItemChanged(0)
-            }
-            3 -> {
-                clipPostPagedAdapter.setupAdItem(item)
-                clipPostPagedAdapter.notifyItemChanged(0)
-            }
-            4 -> {
-                picturePostPagedAdapter.setupAdItem(item)
-                picturePostPagedAdapter.notifyItemChanged(0)
-            }
-            5 -> {
-                textPostPagedAdapter.setupAdItem(item)
-                textPostPagedAdapter.notifyItemChanged(0)
-            }
-            6 -> {
-                clubMemberAdapter.setupAdItem(item)
-                clubMemberAdapter.notifyItemChanged(0)
-            }
-        }
-    }
+//    private fun updateAd(item: AdItem) {
+//        when (lastPosition) {
+//            2 -> {
+//                followPostPagedAdapter.setupAdItem(item)
+//                followPostPagedAdapter.notifyItemChanged(0)
+//            }
+//            3 -> {
+//                clipPostPagedAdapter.setupAdItem(item)
+//                clipPostPagedAdapter.notifyItemChanged(0)
+//            }
+//            4 -> {
+//                picturePostPagedAdapter.setupAdItem(item)
+//                picturePostPagedAdapter.notifyItemChanged(0)
+//            }
+//            5 -> {
+//                textPostPagedAdapter.setupAdItem(item)
+//                textPostPagedAdapter.notifyItemChanged(0)
+//            }
+//            6 -> {
+//                clubMemberAdapter.setupAdItem(item)
+//                clubMemberAdapter.notifyItemChanged(0)
+//            }
+//        }
+//    }
 
     private val tabAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
@@ -724,7 +721,7 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val clipPostPagedAdapter by lazy {
-        MemberPostPagedAdapter(requireActivity(), adultListener, "", memberPostFuncItem, null, true)
+        MemberPostPagedAdapter(requireActivity(), adultListener, "", memberPostFuncItem, true)
     }
 
     private val picturePostPagedAdapter by lazy {

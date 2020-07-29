@@ -28,15 +28,8 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     private val _showProgress by lazy { MutableLiveData<Boolean>() }
     val showProgress: LiveData<Boolean> get() = _showProgress
 
-    private val _getAdItem by lazy { MutableLiveData<AdItem>() }
-    val getAdItem: LiveData<AdItem> get() = _getAdItem
-
     fun setShowProgress(show: Boolean) {
         _showProgress.value = show
-    }
-
-    fun setupAdItem(item: AdItem) {
-        _getAdItem.postValue(item)
     }
 
     fun processException(exceptionResult: ExceptionResult) {

@@ -274,7 +274,7 @@
     <string name="search_keyword_3">个</string>
     <string name="search_type_clip">视频</string>
     <string name="search_type_picture">图片</string>
-    <string name="search_type_text">文字</string>
+    <string name="search_type_text">短文</string>
     <string name="search_type_club">圈子</string>
     <string name="search_history">历史搜索</string>
 
@@ -287,4 +287,7 @@
     <!--  Chat Content  -->
     <string name="chat_content_media_chooser">请选择档案</string>
     <string name="chat_content_file_too_large">档案不得超过 5MB</string>
+
+    <!--  Image Preview  -->
+    <string name="image_preview_file_invlid">档案已失效</string>
 </resources>

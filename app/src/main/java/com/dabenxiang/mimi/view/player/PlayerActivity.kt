@@ -15,12 +15,12 @@ import android.view.Surface
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearSnapHelper
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.addKeyboardToggleListener
@@ -56,6 +56,7 @@ import kotlinx.android.synthetic.main.head_guess_like.view.*
 import kotlinx.android.synthetic.main.head_no_comment.view.*
 import kotlinx.android.synthetic.main.head_source.view.*
 import kotlinx.android.synthetic.main.head_video_info.view.*
+import kotlinx.android.synthetic.main.item_ad.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -95,8 +96,8 @@ class PlayerActivity : BaseActivity() {
 
     private var loadReplyCommentBlock: (() -> Unit)? = null
     private var loadCommentLikeBlock: (() -> Unit)? = null
-    private var currentReplyId:Long? = null
-    private var currentreplyName:String? = null
+    private var currentReplyId: Long? = null
+    private var currentreplyName: String? = null
     private var moreDialog: MoreDialogFragment? = null
     private var reportDialog: ReportDialogFragment? = null
 
@@ -135,6 +136,10 @@ class PlayerActivity : BaseActivity() {
         KProgressHUD.create(this).setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
     }
 
+    private val adInfo by lazy {
+        layoutInflater.inflate(R.layout.item_ad, recycler_info.parent as ViewGroup, false)
+    }
+
     private val headVideoInfo by lazy {
         layoutInflater.inflate(R.layout.head_video_info, recycler_info.parent as ViewGroup, false)
     }
@@ -160,8 +165,8 @@ class PlayerActivity : BaseActivity() {
         CommentAdapter(obtainIsAdult(), object : CommentAdapter.PlayerInfoListener {
             override fun sendComment(replyId: Long?, replyName: String?) {
                 Timber.i("playerInfoAdapter sendComment")
-                currentReplyId =null
-                currentreplyName =null
+                currentReplyId = null
+                currentreplyName = null
                 if (replyId != null) {
                     currentReplyId = replyId
                     currentreplyName = replyName
@@ -179,8 +184,8 @@ class PlayerActivity : BaseActivity() {
 
             override fun replyComment(replyId: Long?, replyName: String?) {
                 Timber.i("playerInfoAdapter replyComment")
-                currentReplyId =null
-                currentreplyName =null
+                currentReplyId = null
+                currentreplyName = null
                 if (replyId != null) {
                     currentReplyId = replyId
                     currentreplyName = replyName
@@ -235,6 +240,7 @@ class PlayerActivity : BaseActivity() {
 
         val isAdult = obtainIsAdult()
 
+        playerInfoAdapter.addHeaderView(adInfo)
         playerInfoAdapter.addHeaderView(headVideoInfo)
         playerInfoAdapter.addHeaderView(headSource)
         playerInfoAdapter.addHeaderView(headGuessLike)
@@ -260,6 +266,7 @@ class PlayerActivity : BaseActivity() {
             }.let {
                 getColor(it)
             }
+
         headVideoInfo.tv_title.setTextColor(titleColor)
         headSource.title_source.setTextColor(titleColor)
         headGuessLike.title_guess_like.setTextColor(titleColor)
@@ -367,7 +374,7 @@ class PlayerActivity : BaseActivity() {
         })
 
         viewModel.sourceListPosition.observe(this, Observer {
-            if(it == -1) return@Observer
+            if (it == -1) return@Observer
             sourceListAdapter.setLastSelectedIndex(it)
             viewModel.sourceList?.get(it)?.videoEpisodes?.also { videoEpisodes ->
                 Timber.i("videoEpisodes =$videoEpisodes")
@@ -699,8 +706,13 @@ class PlayerActivity : BaseActivity() {
         }
 
         btn_send.setOnClickListener {
-            if (et_message.text.isNotEmpty()){
-                viewModel.postComment(PostCommentRequest(currentReplyId, et_message.text.toString()))
+            if (et_message.text.isNotEmpty()) {
+                viewModel.postComment(
+                    PostCommentRequest(
+                        currentReplyId,
+                        et_message.text.toString()
+                    )
+                )
                 currentReplyId = null
                 currentreplyName = null
                 et_message.text.clear()
@@ -762,7 +774,12 @@ class PlayerActivity : BaseActivity() {
         }
 
         iv_more.setOnClickListener {
-            moreDialog = MoreDialogFragment.newInstance(MemberPostItem(id=obtainVideoId(), type = PostType.VIDEO), onMoreDialogListener).also {
+            moreDialog = MoreDialogFragment.newInstance(
+                MemberPostItem(
+                    id = obtainVideoId(),
+                    type = PostType.VIDEO
+                ), onMoreDialogListener
+            ).also {
                 it.show(
                     supportFragmentManager,
                     MoreDialogFragment::class.java.simpleName
@@ -784,11 +801,25 @@ class PlayerActivity : BaseActivity() {
             }
         })
 
+        viewModel.getAdResult.observe(this, Observer {
+            when (it) {
+                is Success -> {
+                    Glide.with(this)
+                        .load(it.result.href)
+                        .into(adInfo.iv_ad)
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
         //Detect key keyboard shown/hide
-        this.addKeyboardToggleListener {shown->
-            if(!shown) commentEditorToggle(false)
+        this.addKeyboardToggleListener { shown ->
+            if (!shown) commentEditorToggle(false)
         }
 
+        val adWidth = ((GeneralUtils.getScreenSize(this).first) * 0.333).toInt()
+        val adHeight = (GeneralUtils.getScreenSize(this).second * 0.0245).toInt()
+        viewModel.getAd(adWidth, adHeight)
     }
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
@@ -810,9 +841,12 @@ class PlayerActivity : BaseActivity() {
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem) {
-            if(viewModel.isReported){
-                GeneralUtils.showToast(App.applicationContext(), getString(R.string.already_reported))
-            } else{
+            if (viewModel.isReported) {
+                GeneralUtils.showToast(
+                    App.applicationContext(),
+                    getString(R.string.already_reported)
+                )
+            } else {
                 reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
                     it.show(
                         supportFragmentManager,
@@ -828,13 +862,13 @@ class PlayerActivity : BaseActivity() {
         }
     }
 
-    private fun commentEditorToggle(enable:Boolean){
-        when(enable){
+    private fun commentEditorToggle(enable: Boolean) {
+        when (enable) {
             true -> {
                 bottom_func_input.visibility = View.VISIBLE
                 bottom_func_bar.visibility = View.GONE
             }
-            else ->{
+            else -> {
                 bottom_func_input.visibility = View.GONE
                 bottom_func_bar.visibility = View.VISIBLE
             }
@@ -842,7 +876,7 @@ class PlayerActivity : BaseActivity() {
 
     }
 
-    private fun commentEditorOpen(){
+    private fun commentEditorOpen() {
         CoroutineScope(Dispatchers.Main).launch {
 
             tv_replay_name.let {
@@ -852,7 +886,7 @@ class PlayerActivity : BaseActivity() {
                     tv_replay_name.text = "@$currentreplyName"
                 }
 
-             tv_replay_name.visibility = View.VISIBLE
+                tv_replay_name.visibility = View.VISIBLE
             }
             et_message.let {
                 it.requestFocusFromTouch()
