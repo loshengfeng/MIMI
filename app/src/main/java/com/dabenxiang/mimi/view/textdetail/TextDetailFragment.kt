@@ -59,6 +59,9 @@ class TextDetailFragment : BaseFragment() {
     private var commentLikeBlock: (() -> Unit)? = null
     private var avatarBlock: ((Bitmap) -> Unit)? = null
 
+    private var adWidth = 0
+    private var adHeight = 0
+
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
@@ -70,6 +73,9 @@ class TextDetailFragment : BaseFragment() {
         val position = arguments?.getInt(PictureDetailFragment.KEY_POSITION) ?: 0
 
         requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
+
+        adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
+        adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
 
         text_toolbar_title.text = getString(R.string.text_detail_title)
         toolbarContainer.toolbar.navigationIcon =
@@ -99,6 +105,7 @@ class TextDetailFragment : BaseFragment() {
         tv_comment_count.text = memberPostItem!!.commentCount.toString()
 
         viewModel.getPostDetail(memberPostItem!!)
+        mainViewModel?.getAd(adWidth, adHeight)
     }
 
     override fun getLayoutId(): Int {
@@ -217,6 +224,16 @@ class TextDetailFragment : BaseFragment() {
                 is Success -> {
                     val item = it.result.content
                     textDetailAdapter?.updateContent(item!!)
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
+        mainViewModel?.getAdResult?.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    textDetailAdapter?.setupAdItem(it.result)
+                    textDetailAdapter?.notifyItemChanged(0)
                 }
                 is Error -> onApiError(it.throwable)
             }

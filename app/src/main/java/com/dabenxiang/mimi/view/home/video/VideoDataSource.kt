@@ -3,7 +3,6 @@ package com.dabenxiang.mimi.view.home.video
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.manager.DomainManager
-import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.holder.searchItemToVideoItem
@@ -19,7 +18,9 @@ class VideoDataSource(
     private val category: String?,
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
-    private val pagingCallback: PagingCallback
+    private val pagingCallback: PagingCallback,
+    private val adWidth: Int,
+    private val adHeight: Int
 ) : PageKeyedDataSource<Long, BaseVideoItem>() {
 
     companion object {
@@ -36,8 +37,7 @@ class VideoDataSource(
         viewModelScope.launch {
             flow {
                 val returnList = mutableListOf<BaseVideoItem>()
-
-                val result = domainManager.getAdRepository().getAD(375, 53)
+                val result = domainManager.getAdRepository().getAD(adWidth, adHeight)
                 val item = result.body()?.content ?: AdItem()
                 returnList.add(BaseVideoItem.Banner(item))
 
@@ -69,7 +69,7 @@ class VideoDataSource(
                         )
                     )
                 } else {
-                    val result =  domainManager.getApiRepository().searchHomeVideos(
+                    val result = domainManager.getApiRepository().searchHomeVideos(
                         isAdult = isAdult,
                         offset = "0",
                         limit = PER_LIMIT
@@ -109,7 +109,7 @@ class VideoDataSource(
             flow {
                 val returnList = mutableListOf<BaseVideoItem>()
                 if (category != null) {
-                    val result =  domainManager.getApiRepository().searchWithCategory(
+                    val result = domainManager.getApiRepository().searchWithCategory(
                         category,
                         isAdult,
                         next.toString(),
@@ -136,7 +136,7 @@ class VideoDataSource(
                         )
                     )
                 } else {
-                    val result =  domainManager.getApiRepository().searchHomeVideos(
+                    val result = domainManager.getApiRepository().searchHomeVideos(
                         isAdult = isAdult,
                         offset = next.toString(),
                         limit = PER_LIMIT

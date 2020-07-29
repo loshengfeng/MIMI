@@ -7,5 +7,6 @@ data class SearchPostItem(
     val type: PostType = PostType.TEXT,
     val tag: String = "",
     val isPostFollow: Boolean = false,
-    val searchText: String = ""
+    val searchText: String = "",
+    val isClub: Boolean = false
 ) : Serializable

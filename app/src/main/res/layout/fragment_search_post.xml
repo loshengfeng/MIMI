@@ -33,6 +33,7 @@
             android:src="@drawable/bg_black_1_30_radius_18"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -49,7 +50,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/iv_clean"
             app:layout_constraintStart_toEndOf="@id/iv_search"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:imeOptions="actionSearch"/>
 
         <ImageView
             android:id="@+id/iv_search"
@@ -76,7 +78,8 @@
             android:id="@+id/tv_search"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="10dp"
             android:text="@string/search_btn"
             android:textColor="@color/color_red_1"
             app:layout_constraintBottom_toBottomOf="parent"

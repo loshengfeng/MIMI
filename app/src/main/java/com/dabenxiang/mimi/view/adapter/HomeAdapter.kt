@@ -107,7 +107,7 @@ class HomeAdapter(
                         R.layout.item_home_club,
                         parent,
                         false
-                    ), listener, isAdult, memberPostFuncItem, clubFuncItem
+                    ), listener, isAdult, clubFuncItem
                 )
             }
         }

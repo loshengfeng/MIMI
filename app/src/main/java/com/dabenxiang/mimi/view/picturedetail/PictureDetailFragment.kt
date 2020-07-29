@@ -33,7 +33,6 @@ import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_picture_detail.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
-import timber.log.Timber
 
 class PictureDetailFragment : BaseFragment() {
 
@@ -59,8 +58,11 @@ class PictureDetailFragment : BaseFragment() {
     private var commentLikeBlock: (() -> Unit)? = null
     private var avatarBlock: ((Bitmap) -> Unit)? = null
 
-    var moreDialog: MoreDialogFragment? = null
-    var reportDialog: ReportDialogFragment? = null
+    private var moreDialog: MoreDialogFragment? = null
+    private var reportDialog: ReportDialogFragment? = null
+
+    private var adWidth = 0
+    private var adHeight = 0
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -72,6 +74,9 @@ class PictureDetailFragment : BaseFragment() {
         val position = arguments?.getInt(KEY_POSITION) ?: 0
 
         requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
+
+        adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
+        adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
 
         text_toolbar_title.text = getString(R.string.picture_detail_title)
         toolbarContainer.toolbar.navigationIcon =
@@ -98,6 +103,8 @@ class PictureDetailFragment : BaseFragment() {
         }
         tv_like_count.text = memberPostItem!!.likeCount.toString()
         tv_comment_count.text = memberPostItem!!.commentCount.toString()
+
+        mainViewModel?.getAd(adWidth, adHeight)
     }
 
     override fun getLayoutId(): Int {
@@ -217,6 +224,16 @@ class PictureDetailFragment : BaseFragment() {
             when (it) {
                 is Empty -> {
                     GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
+        mainViewModel?.getAdResult?.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    pictureDetailAdapter?.setupAdItem(it.result)
+                    pictureDetailAdapter?.notifyItemChanged(0)
                 }
                 is Error -> onApiError(it.throwable)
             }

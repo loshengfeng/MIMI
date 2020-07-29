@@ -65,8 +65,8 @@ class ClubDetailFragment : BaseFragment() {
         return R.layout.fragment_club_detail
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun setupFirstTime() {
+        super.setupFirstTime()
         setUpUI()
     }
 
@@ -161,6 +161,15 @@ class ClubDetailFragment : BaseFragment() {
                         )
                     )
                 }
+                AdultTabType.CLIP -> {
+                    val bundle = ClipFragment.createBundle(arrayListOf(item), 0, true)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_clubDetailFragment_to_clipFragment,
+                            bundle
+                        )
+                    )
+                }
                 else -> { }
             }
         }
@@ -194,6 +203,15 @@ class ClubDetailFragment : BaseFragment() {
                         )
                     )
                 }
+                AdultTabType.CLIP -> {
+                    val bundle = ClipFragment.createBundle(arrayListOf(item), 0)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_clubDetailFragment_to_clipFragment,
+                            bundle
+                        )
+                    )
+                }
                 else -> {
 
                 }
@@ -211,7 +229,6 @@ class ClubDetailFragment : BaseFragment() {
         }
 
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {
-            // TODO: Sion Wang
             val bundle = ClipFragment.createBundle(ArrayList(item), position)
             navigateTo(
                 NavigateItem.Destination(
