@@ -7,15 +7,14 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 
 class ClubMemberAdapter(
     val context: Context,
-    private val clubFuncItem: ClubFuncItem,
-    private var mAdItem: AdItem? = null
+    private val clubFuncItem: ClubFuncItem
 ) : PagedListAdapter<MemberClubItem, BaseViewHolder>(diffCallback) {
 
     companion object {
@@ -39,7 +38,8 @@ class ClubMemberAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position == 0) {
+        val item = getItem(position)
+        return if (item?.type == PostType.AD) {
             VIEW_TYPE_AD
         } else {
             VIEW_TYPE_CLUB
@@ -66,7 +66,7 @@ class ClubMemberAdapter(
         val item = getItem(position)
         when (holder) {
             is AdHolder -> {
-                mAdItem?.also {
+                item?.adItem?.also {
                     Glide.with(context).load(it.href).into(holder.adImg)
                 }
             }
@@ -74,9 +74,5 @@ class ClubMemberAdapter(
                 item?.also { holder.onBind(it, clubFuncItem, position) }
             }
         }
-    }
-
-    fun setupAdItem(item: AdItem) {
-        mAdItem = item
     }
 }

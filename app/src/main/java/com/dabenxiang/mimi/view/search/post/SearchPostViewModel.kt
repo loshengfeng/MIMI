@@ -9,19 +9,18 @@ import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.callback.PostPagingCallBack
 import com.dabenxiang.mimi.callback.SearchPagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.api.vo.LikeRequest
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.ReportRequest
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
-import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.model.vo.SearchHistoryItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.clubdetail.ClubDetailPostDataSource
-import com.dabenxiang.mimi.view.clubdetail.ClubDetailPostFactory
 import com.dabenxiang.mimi.view.home.club.ClubDataSource
 import com.dabenxiang.mimi.view.home.club.ClubFactory
 import com.dabenxiang.mimi.view.search.post.keyword.SearchPostByKeywordDataSource
@@ -33,7 +32,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import timber.log.Timber
 
 class SearchPostViewModel : BaseViewModel() {
 
@@ -65,6 +63,9 @@ class SearchPostViewModel : BaseViewModel() {
 
     private val _searchTotalCount = MutableLiveData<Long>()
     val searchTotalCount: LiveData<Long> = _searchTotalCount
+
+    var adWidth = 0
+    var adHeight = 0
 
     fun sendPostReport(item: MemberPostItem, content: String) {
         viewModelScope.launch {
@@ -228,7 +229,7 @@ class SearchPostViewModel : BaseViewModel() {
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    when(it) {
+                    when (it) {
                         is ApiResult.Success -> {
                             update(it.result)
                         }
@@ -273,7 +274,9 @@ class SearchPostViewModel : BaseViewModel() {
             domainManager,
             type,
             tag,
-            isPostFollow
+            isPostFollow,
+            adWidth,
+            adHeight
         )
         val factory = SearchPostByTagFactory(dataSource)
         val config = PagedList.Config.Builder()
@@ -293,7 +296,9 @@ class SearchPostViewModel : BaseViewModel() {
             domainManager,
             type,
             tag,
-            isPostFollow
+            isPostFollow,
+            adWidth,
+            adHeight
         )
         val factory = SearchPostByKeywordFactory(dataSource)
         val config = PagedList.Config.Builder()
@@ -310,7 +315,8 @@ class SearchPostViewModel : BaseViewModel() {
     }
 
     private fun getClubPagingItems(keyword: String): LiveData<PagedList<MemberClubItem>> {
-        val clubDataSource = ClubDataSource(postPagingCallback, viewModelScope, domainManager, 0, 0, keyword)
+        val clubDataSource =
+            ClubDataSource(postPagingCallback, viewModelScope, domainManager, 0, 0, keyword)
         val clubFactory = ClubFactory(clubDataSource)
         val config = PagedList.Config.Builder().setPrefetchDistance(4).build()
         return LivePagedListBuilder(clubFactory, config).build()
@@ -334,12 +340,9 @@ class SearchPostViewModel : BaseViewModel() {
         }
     }
 
-    private val postPagingCallback = object : PostPagingCallBack {
+    private val postPagingCallback = object : PagingCallback {
         override fun onTotalCount(count: Long) {
             _searchTotalCount.postValue(count)
-        }
-
-        override fun onGetAd(adItem: AdItem) {
         }
 
         override fun onLoading() {

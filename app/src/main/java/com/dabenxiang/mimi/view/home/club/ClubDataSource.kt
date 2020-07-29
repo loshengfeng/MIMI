@@ -2,10 +2,11 @@ package com.dabenxiang.mimi.view.home.club
 
 import android.text.TextUtils
 import androidx.paging.PageKeyedDataSource
-import com.dabenxiang.mimi.callback.PostPagingCallBack
+import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.home.memberpost.MemberPostDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,8 +14,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
-class ClubDataSource (
-    private val pagingCallback: PostPagingCallBack,
+class ClubDataSource(
+    private val pagingCallback: PagingCallback,
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
     private val adWidth: Int,
@@ -34,7 +35,6 @@ class ClubDataSource (
             flow {
                 val adRepository = domainManager.getAdRepository()
                 val adItem = adRepository.getAD(adWidth, adHeight).body()?.content ?: AdItem()
-                pagingCallback.onGetAd(adItem)
 
                 val result = if (TextUtils.isEmpty(keyword)) {
                     domainManager.getApiRepository().getMembersClubPost(
@@ -51,6 +51,7 @@ class ClubDataSource (
                 if (!result.isSuccessful) throw HttpException(result)
                 val body = result.body()
                 val memberClubItems = body?.content
+                memberClubItems?.add(0, MemberClubItem(type = PostType.AD, adItem = adItem))
 
                 val nextPageKey = when {
                     hasNextPage(
@@ -67,7 +68,6 @@ class ClubDataSource (
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect { (items, nextKey) ->
-                    pagingCallback.onSucceed()
                     callback.onResult(items, null, nextKey)
                 }
         }
