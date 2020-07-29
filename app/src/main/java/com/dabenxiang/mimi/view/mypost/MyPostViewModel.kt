@@ -65,6 +65,27 @@ class MyPostViewModel: BaseViewModel() {
     private val _postDeleteAttachment = MutableLiveData<ApiResult<Nothing>>()
     val postDeleteAttachment: LiveData<ApiResult<Nothing>> = _postDeleteAttachment
 
+    private val _postDeleteVideoAttachment = MutableLiveData<ApiResult<Nothing>>()
+    val postDeleteVideoAttachment: LiveData<ApiResult<Nothing>> = _postDeleteVideoAttachment
+
+    private val _postDeleteCoverAttachment = MutableLiveData<ApiResult<Nothing>>()
+    val postDeleteCoverAttachment: LiveData<ApiResult<Nothing>> = _postDeleteCoverAttachment
+
+    private val _uploadCoverItem = MutableLiveData<PicParameter>()
+    val uploadCoverItem: LiveData<PicParameter> = _uploadCoverItem
+
+    private val _postCoverResult = MutableLiveData<ApiResult<Long>>()
+    val postCoverResult: LiveData<ApiResult<Long>> = _postCoverResult
+
+    private val _postVideoResult = MutableLiveData<ApiResult<Long>>()
+    val postVideoResult: LiveData<ApiResult<Long>> = _postVideoResult
+
+    companion object {
+        const val TYPE_PIC = "type_pic"
+        const val TYPE_COVER = "type_cover"
+        const val TYPE_VIDEO = "type_video"
+    }
+
     fun getMyPost() {
         viewModelScope.launch {
             getMyPostPagingItems().asFlow()
@@ -231,7 +252,7 @@ class MyPostViewModel: BaseViewModel() {
                     _uploadPicItem.postValue(picParameter)
                 } else if (type == HomeViewModel.TYPE_COVER) {
                     val picParameter = PicParameter(ext = ext)
-//                    _uploadCoverItem.postValue(picParameter)
+                    _uploadCoverItem.postValue(picParameter)
                 }
 
                 Timber.d("Upload photo path : $realPath")
@@ -248,12 +269,12 @@ class MyPostViewModel: BaseViewModel() {
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    if (type == HomeViewModel.TYPE_PIC) {
+                    if (type == TYPE_PIC) {
                         _postPicResult.postValue(it)
-                    } else if (type == HomeViewModel.TYPE_COVER) {
-//                        _postCoverResult.postValue(it)
-                    } else if (type == HomeViewModel.TYPE_VIDEO) {
-//                        _postVideoResult.postValue(it)
+                    } else if (type == TYPE_COVER) {
+                        _postCoverResult.postValue(it)
+                    } else if (type == TYPE_VIDEO) {
+                        _postVideoResult.postValue(it)
                     }
                 }
         }
@@ -286,6 +307,25 @@ class MyPostViewModel: BaseViewModel() {
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _postDeleteAttachment.value = it }
+        }
+    }
+
+    fun deleteVideoAttachment(id: String, type: String) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository().deleteAttachment(id)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    if (type == TYPE_COVER) {
+                        _postDeleteCoverAttachment.postValue(it)
+                    } else if (type == TYPE_VIDEO) {
+                        _postDeleteVideoAttachment.postValue(it)
+                    }
+                }
         }
     }
 }

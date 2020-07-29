@@ -6,12 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.EditVideoAdapterListener
+import com.dabenxiang.mimi.callback.PostVideoItemListener
+import com.dabenxiang.mimi.model.vo.PostVideoAttachment
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_pic.view.*
 
-class ScrollVideoAdapter(private val listener: EditVideoAdapterListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ScrollVideoAdapter(private val listener: PostVideoItemListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
         private const val TYPE_ADD = 0
@@ -19,7 +23,7 @@ class ScrollVideoAdapter(private val listener: EditVideoAdapterListener) : Recyc
         private const val VIDEO_LIMIT = 1
     }
 
-    private val uriList = arrayListOf<String>()
+    private val uriList = arrayListOf<PostVideoAttachment>()
     private lateinit var context: Context
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -60,12 +64,12 @@ class ScrollVideoAdapter(private val listener: EditVideoAdapterListener) : Recyc
         }
     }
 
-    fun submitList(uriList: ArrayList<String>) {
+    fun submitList(uriList: ArrayList<PostVideoAttachment>) {
         this.uriList.addAll(uriList)
         notifyDataSetChanged()
     }
 
-    fun getData(): ArrayList<String> {
+    fun getData(): ArrayList<PostVideoAttachment> {
         return uriList
     }
 
@@ -73,7 +77,7 @@ class ScrollVideoAdapter(private val listener: EditVideoAdapterListener) : Recyc
 
         fun bind() {
             itemView.setOnClickListener {
-                listener.onOpeRecorder()
+                listener.onOpenRecorder()
             }
         }
     }
@@ -82,12 +86,24 @@ class ScrollVideoAdapter(private val listener: EditVideoAdapterListener) : Recyc
         private val imgPic = itemView.img_pic
         private val close = itemView.iv_close
 
-        fun bind(uriStr: String, position: Int) {
-            val uriP = Uri.parse(uriStr)
-
-            imgPic.setImageURI(uriP)
+        fun bind(postVideoAttachment: PostVideoAttachment, position: Int) {
+            if (postVideoAttachment.picAttachmentId.isEmpty()) {
+                val uriP = Uri.parse(postVideoAttachment.picUrl)
+                imgPic.setImageURI(uriP)
+            } else {
+                if (LruCacheUtils.getLruCache(postVideoAttachment.picAttachmentId) == null) {
+                    listener.getBitmap(postVideoAttachment.picAttachmentId) { id ->
+                        val bitmap = LruCacheUtils.getLruCache(id)
+                        Glide.with(context).load(bitmap).into(imgPic)
+                    }
+                } else {
+                    val bitmap = LruCacheUtils.getLruCache(postVideoAttachment.picAttachmentId)
+                    Glide.with(context).load(bitmap).into(imgPic)
+                }
+            }
 
             close.setOnClickListener {
+                listener.onDelete(postVideoAttachment)
                 uriList.removeAt(position)
                 notifyDataSetChanged()
             }
