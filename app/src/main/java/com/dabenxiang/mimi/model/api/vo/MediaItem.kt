@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class MediaItem (
     @SerializedName("images")
-    val picParameter: ArrayList<PicParameter> = arrayListOf(),
+    var picParameter: ArrayList<PicParameter> = arrayListOf(),
 
     @SerializedName("shortVideos")
     var videoParameter: VideoParameter = VideoParameter(),

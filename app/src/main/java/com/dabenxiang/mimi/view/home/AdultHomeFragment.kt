@@ -31,6 +31,7 @@ import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.model.serializable.SearchPostItem
+import com.dabenxiang.mimi.model.vo.PostAttachmentItem
 import com.dabenxiang.mimi.model.vo.UploadPicItem
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
@@ -92,7 +93,7 @@ class AdultHomeFragment : BaseFragment() {
 
     private var interactionListener: InteractionListener? = null
     private var uploadPicItem = arrayListOf<UploadPicItem>()
-    private var uploadPicUri = arrayListOf<String>()
+    private var uploadPicUri = arrayListOf<PostAttachmentItem>()
     private var postMemberRequest = PostMemberRequest()
 
     private var snackBar: Snackbar? = null
@@ -104,6 +105,15 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     override fun getLayoutId() = R.layout.fragment_home
+
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        Timber.d("@@onViewCreated")
+
+        handleBackStackData()
+//        showSnackBar()
+    }
 
     override fun setupFirstTime() {
         requireActivity().onBackPressedDispatcher.addCallback {
@@ -120,7 +130,7 @@ class AdultHomeFragment : BaseFragment() {
         if (mainViewModel?.adult == null) {
             mainViewModel?.getHomeCategories()
         }
-        handleBackStackData()
+
     }
 
     private fun handleBackStackData() {
@@ -139,16 +149,15 @@ class AdultHomeFragment : BaseFragment() {
                     PostPicFragment.MEMBER_REQUEST
                 )
             val picUriList =
-                findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<String>>(
+                findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<PostAttachmentItem>>(
                     PostPicFragment.PIC_URI
                 )
 
-            showSnackBar()
             postMemberRequest = memberRequest!!.value!!
 
             uploadPicUri.addAll(picUriList!!.value!!)
             val pic = uploadPicUri[uploadCurrentPicPosition]
-            viewModel.postAttachment(pic, requireContext(), TYPE_PIC)
+            viewModel.postAttachment(pic.uri, requireContext(), TYPE_PIC)
         } else if (isNeedVideoUpload?.value != null) {
             showSnackBar()
 
@@ -177,6 +186,13 @@ class AdultHomeFragment : BaseFragment() {
         snackBarLayout.setPadding(15, 0, 15, 0)
         snackBarLayout.setBackgroundColor(Color.TRANSPARENT)
         snackBar?.show()
+
+        val imgCancel = snackBarLayout.findViewById(R.id.iv_cancel) as ImageView
+        val txtCancel = snackBarLayout.findViewById(R.id.txt_cancel) as TextView
+
+        txtCancel.setOnClickListener {
+            findNavController().navigate(R.id.action_adultHomeFragment_to_myPostFragment)
+        }
     }
 
     override fun setupObservers() {
@@ -348,7 +364,7 @@ class AdultHomeFragment : BaseFragment() {
                         viewModel.postPic(postMemberRequest, content)
                     } else {
                         val pic = uploadPicUri[uploadCurrentPicPosition]
-                        viewModel.postAttachment(pic, requireContext(), TYPE_PIC)
+                        viewModel.postAttachment(pic.uri, requireContext(), TYPE_PIC)
                     }
                 }
                 is Error -> {
