@@ -766,7 +766,7 @@ class AdultHomeFragment : BaseFragment() {
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
             when (adultTabType) {
                 AdultTabType.PICTURE -> {
-                    val bundle = PictureDetailFragment.createBundle(item, 1)
+                    val bundle = PictureDetailFragment.createBundle(item, 2)
                     navigateTo(
                         NavigateItem.Destination(
                             R.id.action_adultHomeFragment_to_pictureDetailFragment,
@@ -775,7 +775,7 @@ class AdultHomeFragment : BaseFragment() {
                     )
                 }
                 AdultTabType.TEXT -> {
-                    val bundle = TextDetailFragment.createBundle(item, 1)
+                    val bundle = TextDetailFragment.createBundle(item, 2)
                     navigateTo(
                         NavigateItem.Destination(
                             R.id.action_adultHomeFragment_to_textDetailFragment,
