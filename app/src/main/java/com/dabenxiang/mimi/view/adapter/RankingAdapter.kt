@@ -98,7 +98,7 @@ class RankingAdapter(private val context: Context,
                     }
                 }
             }
-            
+
             title.text = item.title
             hot.text = item.count.toString()
             layout.setOnClickListener {
