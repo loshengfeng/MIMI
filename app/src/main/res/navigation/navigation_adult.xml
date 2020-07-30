@@ -209,5 +209,9 @@
         <action
             android:id="@+id/action_rankingFragment_to_clipFragment"
             app:destination="@id/clipFragment" />
+
+        <action
+            android:id="@+id/action_rankingFragment_to_pictureDetailFragment"
+            app:destination="@id/pictureDetailFragment" />
    </fragment>
 </navigation>

@@ -18,6 +18,7 @@ import com.dabenxiang.mimi.view.adapter.RankingVideosAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_picture_detail.toolbarContainer
@@ -55,10 +56,6 @@ class RankingFragment : BaseFragment() {
         RankingAdapter(requireActivity(),
             RankingFuncItem(
                 onItemClick = {
-//                    val playerData = PlayerData(it.id!!, true)
-//                    val intent = Intent(requireContext(), PlayerActivity::class.java)
-//                    intent.putExtras(PlayerActivity.createBundle(playerData))
-//                    startActivity(intent)
 
                     when (viewModel.postTypeSelected) {
                         PostType.VIDEO -> {
@@ -68,7 +65,7 @@ class RankingFragment : BaseFragment() {
                                         id = it.id!!,
                                         content = it.content
                                     )
-                                ), 0, true
+                                ), 0, false
                             )
                             navigateTo(
                                 NavigateItem.Destination(
@@ -78,6 +75,19 @@ class RankingFragment : BaseFragment() {
                             )
                         }
                         PostType.IMAGE -> {
+                            val bundle = PictureDetailFragment.createBundle(
+                                MemberPostItem(
+                                    id = it.id!!,
+                                    content = it.content
+                                ), 0)
+                            navigateTo(
+                                NavigateItem.Destination(
+                                    R.id.action_rankingFragment_to_pictureDetailFragment,
+                                    bundle
+                                )
+                            )
+
+
 
                         }
                     }
@@ -129,7 +139,7 @@ class RankingFragment : BaseFragment() {
         })
     }
 
-    fun setupAdapter() {
+    private fun setupAdapter() {
        Timber.i("post type=${tab_type_filter.selectedTabPosition} ")
         rv_ranking_content.adapter = if (tab_type_filter.selectedTabPosition == 0) videosAdapter else adapter
         viewModel.setStatisticsTypeFunction(tab_temporal_filter.selectedTabPosition)
