@@ -89,6 +89,11 @@ class SearchVideoFragment : BaseFragment() {
         viewModel.isAdult = mainViewModel?.adultMode?.value ?: false
 
         (arguments?.getSerializable(KEY_DATA) as SearchingVideoData?)?.also { data ->
+            if (data.tag.isNotBlank()) {
+                viewModel.searchingTag = data.tag
+                tv_search_text.text = genResultText()
+                viewModel.getSearchList()
+            }
 
             if (TextUtils.isEmpty(viewModel.searchingTag) && TextUtils.isEmpty(viewModel.searchingStr)) {
                 layout_search_history.visibility = View.VISIBLE
@@ -97,12 +102,6 @@ class SearchVideoFragment : BaseFragment() {
             } else {
                 layout_search_history.visibility = View.GONE
                 layout_search_text.visibility = View.VISIBLE
-            }
-
-            if (data.tag.isNotBlank()) {
-                viewModel.searchingTag = data.tag
-                tv_search_text.text = genResultText()
-                viewModel.getSearchList()
             }
 
             iv_clear_search_text.background =
