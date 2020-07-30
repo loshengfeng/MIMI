@@ -35,6 +35,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.club.ClubFuncItem
 import com.dabenxiang.mimi.view.club.ClubMemberAdapter
+import com.dabenxiang.mimi.view.club.MiMiLinearLayoutManager
 import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
@@ -105,7 +106,9 @@ class SearchPostFragment : BaseFragment() {
         )
         recycler_search_result.layoutManager = LinearLayoutManager(requireContext())
 
-        takeIf { isClub }?.also { recycler_search_result.adapter = clubMemberAdapter }
+        takeIf { isClub }?.also {
+            recycler_search_result.layoutManager = MiMiLinearLayoutManager(requireContext())
+            recycler_search_result.adapter = clubMemberAdapter }
             ?: run { recycler_search_result.adapter = adapter }
 
         if (!TextUtils.isEmpty(mTag)) {
@@ -262,6 +265,7 @@ class SearchPostFragment : BaseFragment() {
                 layout_search_text.visibility = View.GONE
                 getSearchHistory()
                 adapter?.submitList(null)
+                clubMemberAdapter.submitList(null)
             }
         }
     }

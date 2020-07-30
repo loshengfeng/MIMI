@@ -5,23 +5,32 @@ import com.google.gson.annotations.SerializedName
 data class RankingItem(
 
     @SerializedName("id")
-    val id: Long = 0,
+    val id: Long? = 0,
 
     @SerializedName("title")
-    val title: String = "",
+    val title: String? = "",
 
     @SerializedName("type")
-    val type: Int = 0,
+    val type: Int? = 0,
 
     @SerializedName("content")
-    val content: String = "",
+    val content: String? = "",
 
     @SerializedName("avatarAttachmentId")
-    val avatarAttachmentId: Long = 0,
+    val avatarAttachmentId: Long? = 0,
 
     @SerializedName("count")
-    val count: Int = 0,
+    val count: Int? = 0,
 
     @SerializedName("creatorId")
-    val creatorId: Long = 0
+    val creatorId: Long? = 0,
+
+    @SerializedName("cover")
+    val cover: String? = "",
+
+    @SerializedName("source")
+    val source: String? ="",
+
+    @SerializedName("years")
+    val years: Int? = 0
 )

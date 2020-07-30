@@ -1,15 +1,18 @@
 package com.dabenxiang.mimi.view.search.video
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.TextUtils
 import android.text.style.ForegroundColorSpan
+import android.view.LayoutInflater
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
-import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,7 +32,19 @@ import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_video.*
+import kotlinx.android.synthetic.main.fragment_search_video.chip_group_search_text
+import kotlinx.android.synthetic.main.fragment_search_video.edit_search
+import kotlinx.android.synthetic.main.fragment_search_video.ib_back
+import kotlinx.android.synthetic.main.fragment_search_video.iv_clean
+import kotlinx.android.synthetic.main.fragment_search_video.iv_clear_search_text
+import kotlinx.android.synthetic.main.fragment_search_video.iv_search
+import kotlinx.android.synthetic.main.fragment_search_video.iv_search_bar
+import kotlinx.android.synthetic.main.fragment_search_video.layout_search_history
+import kotlinx.android.synthetic.main.fragment_search_video.layout_search_text
+import kotlinx.android.synthetic.main.fragment_search_video.tv_search
+import kotlinx.android.synthetic.main.fragment_search_video.tv_search_text
 import timber.log.Timber
 import java.util.*
 
@@ -71,18 +86,41 @@ class SearchVideoFragment : BaseFragment() {
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
 
-        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
-
         viewModel.isAdult = mainViewModel?.adultMode?.value ?: false
 
         (arguments?.getSerializable(KEY_DATA) as SearchingVideoData?)?.also { data ->
+
+            if (TextUtils.isEmpty(viewModel.searchingTag) && TextUtils.isEmpty(viewModel.searchingStr)) {
+                layout_search_history.visibility = View.VISIBLE
+                layout_search_text.visibility = View.GONE
+                getSearchHistory()
+            } else {
+                layout_search_history.visibility = View.GONE
+                layout_search_text.visibility = View.VISIBLE
+            }
+
             if (data.tag.isNotBlank()) {
                 viewModel.searchingTag = data.tag
-                txt_result.text = genResultText()
+                tv_search_text.text = genResultText()
                 viewModel.getSearchList()
             }
 
-            txt_result.setTextColor(
+            iv_clear_search_text.background =
+                    if (viewModel.isAdult) {
+                        ContextCompat.getDrawable(requireContext(), R.drawable.btn_trash_white_n)
+                    } else {
+                        ContextCompat.getDrawable(requireContext(), R.drawable.btn_trash_n)
+                    }
+
+            txt_history_title.setTextColor(
+                    if (viewModel.isAdult) {
+                        ContextCompat.getColor(requireContext(), android.R.color.white)
+                    } else {
+                        ContextCompat.getColor(requireContext(), android.R.color.black)
+                    }
+            )
+
+            tv_search_text.setTextColor(
                 if (viewModel.isAdult) {
                     ContextCompat.getColor(requireContext(), android.R.color.white)
                 } else {
@@ -172,12 +210,12 @@ class SearchVideoFragment : BaseFragment() {
         })
 
         viewModel.searchingListResult.observe(viewLifecycleOwner, Observer {
-            txt_result.text = genResultText()
+            tv_search_text.text = genResultText()
             videoListAdapter.submitList(it)
         })
 
         viewModel.searchingTotalCount.observe(viewLifecycleOwner, Observer { count ->
-            txt_result.text = genResultText(count)
+            tv_search_text.text = genResultText(count)
         })
 
         viewModel.likeResult.observe(viewLifecycleOwner, Observer {
@@ -224,16 +262,51 @@ class SearchVideoFragment : BaseFragment() {
         }
 
         tv_search.setOnClickListener {
-            if (edit_search.text.isNotBlank()) {
-                viewModel.searchingTag = ""
-                viewModel.searchingStr = edit_search.text.toString()
-                viewModel.getSearchList()
-            } else {
-                GeneralUtils.showToast(
+            searchText()
+        }
+
+        iv_clear_search_text.setOnClickListener {
+            chip_group_search_text.removeAllViews()
+            viewModel.clearSearchHistory()
+        }
+
+        edit_search.addTextChangedListener {
+            if (it.toString() == "" && !TextUtils.isEmpty(viewModel.searchingTag)) {
+                layout_search_history.visibility = View.GONE
+                layout_search_text.visibility = View.VISIBLE
+            } else if (it.toString() == "") {
+                layout_search_history.visibility = View.VISIBLE
+                layout_search_text.visibility = View.GONE
+                getSearchHistory()
+                videoListAdapter.submitList(null)
+            }
+        }
+
+        edit_search.setOnEditorActionListener { v, actionId, event ->
+            when (actionId) {
+                EditorInfo.IME_ACTION_SEARCH -> {
+                    searchText()
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
+    private fun searchText() {
+        if (edit_search.text.isNotBlank()) {
+            layout_search_history.visibility = View.GONE
+            layout_search_text.visibility = View.VISIBLE
+            viewModel.searchingTag = ""
+            viewModel.searchingStr = edit_search.text.toString()
+            viewModel.getSearchList()
+            viewModel.updateSearchHistory(viewModel.searchingStr)
+            GeneralUtils.hideKeyboard(requireActivity())
+        } else {
+            GeneralUtils.showToast(
                     requireContext(),
                     getString(R.string.search_video_input_empty_toast)
-                )
-            }
+            )
         }
     }
 
@@ -312,6 +385,10 @@ class SearchVideoFragment : BaseFragment() {
         }
 
         override fun onChipClick(text: String) {
+            viewModel.searchingTag = text
+            viewModel.searchingStr = ""
+            viewModel.getSearchList()
+            GeneralUtils.hideKeyboard(requireActivity())
         }
 
         override fun onAvatarDownload(view: ImageView, id: String) {
@@ -376,6 +453,39 @@ class SearchVideoFragment : BaseFragment() {
 
         override fun onCancel() {
             reportDialog?.dismiss()
+        }
+    }
+
+    private fun getSearchHistory() {
+        chip_group_search_text.removeAllViews()
+        val searchHistories = viewModel.getSearchHistory().asReversed()
+        searchHistories.forEach { text ->
+            val chip = LayoutInflater.from(chip_group_search_text.context)
+                    .inflate(R.layout.chip_item, chip_group_search_text, false) as Chip
+            chip.text = text
+
+            if (viewModel.isAdult) {
+                chip.chipBackgroundColor = ColorStateList.valueOf(
+                        ContextCompat.getColor(requireContext(), R.color.color_black_6)
+                )
+                chip.setTextColor(requireContext().getColor(R.color.color_white_1_50))
+            } else {
+                chip.chipBackgroundColor = ColorStateList.valueOf(
+                        ContextCompat.getColor(requireContext(), R.color.color_black_1_10)
+                )
+                chip.setTextColor(requireContext().getColor(R.color.color_black_1_50))
+            }
+
+            chip.setOnClickListener {
+                edit_search.setText(text)
+                layout_search_history.visibility = View.GONE
+                layout_search_text.visibility = View.VISIBLE
+                viewModel.searchingStr = text
+                viewModel.searchingTag = ""
+                viewModel.getSearchList()
+                GeneralUtils.hideKeyboard(requireActivity())
+            }
+            chip_group_search_text.addView(chip)
         }
     }
 }

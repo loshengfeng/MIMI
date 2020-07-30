@@ -10,6 +10,9 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ChatContentListDataSource(
         private val viewModelScope: CoroutineScope,
@@ -58,7 +61,9 @@ class ChatContentListDataSource(
                     .onCompletion { pagingCallback.onLoaded() }
                     .collect { response ->
                         pagingCallback.onSucceed()
-                        callback.onResult(response.list, null, response.nextKey)
+                        val result = adjustData(response.list)
+                        pagingCallback.onTotalCount(result.size.toLong())
+                        callback.onResult(result, null, response.nextKey)
                     }
 
         }
@@ -93,6 +98,7 @@ class ChatContentListDataSource(
                     .collect {
                         pagingCallback.onSucceed()
                         it.body()?.run {
+                            Timber.d("neo,content = ${content?.size}")
                             content?.run {
                                 val nextPageKey = when {
                                     hasNextPage(
@@ -102,8 +108,9 @@ class ChatContentListDataSource(
                                     ) -> next + (size)
                                     else -> null
                                 }
-
-                                callback.onResult(content, nextPageKey)
+                                val result = adjustData(content)
+                                pagingCallback.onTotalCount(result.size.toLong())
+                                callback.onResult(result, nextPageKey)
                             }
                         }
                     }
@@ -116,5 +123,25 @@ class ChatContentListDataSource(
             offset >= total -> false
             else -> true
         }
+    }
+
+    private fun adjustData(list: List<ChatContentItem>): List<ChatContentItem> {
+        val result: ArrayList<ChatContentItem> = ArrayList()
+        var lastDate: String = ""
+        for (i: Int in list.indices) {
+            val item = list[i]
+            item.payload?.sendTime?.let { date ->
+                val currentDate = SimpleDateFormat("YYYY-MM-dd", Locale.getDefault()).format(date)
+                if (lastDate.isNotEmpty() && lastDate != currentDate) {
+                    result.add(ChatContentItem(dateTitle = lastDate))
+                }
+                result.add(item)
+                lastDate = currentDate
+                if (i == list.size - 1) {
+                    result.add(ChatContentItem(dateTitle = lastDate))
+                }
+            }
+        }
+        return result
     }
 }

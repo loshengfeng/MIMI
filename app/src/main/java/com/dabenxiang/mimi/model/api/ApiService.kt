@@ -293,7 +293,7 @@ interface ApiService {
         @Query("postType") postType: Int,
         @Query("offset") offset: String?,
         @Query("limit") limit: String?
-    ): Response<ApiBasePagingItem<List<RankingItem>>>
+    ): Response<ApiBasePagingItem<List<PostStatisticsItem>>>
 
 
 

@@ -337,7 +337,9 @@ class PlayerViewModel : BaseViewModel() {
                 Timber.i("episodeInfo =$episodeInfo")
                 isReported = episodeInfo?.reported ?: false
                 Timber.i("isReported =$isReported")
-                videoId = episodeInfo?.id ?: 0
+
+                // 目前不貌似不支援將集數加入收藏，若未來有支援，直接打開即可
+//                videoId = episodeInfo?.id ?: 0
 
                 val stream = episodeInfo?.videoStreams?.get(0)!!
                 val streamResp = apiRepository.getVideoStreamOfEpisode(
