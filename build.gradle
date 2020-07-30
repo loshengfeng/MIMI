@@ -51,6 +51,7 @@ buildscript {
     ext.base_recycler_view_adapter_helper_version = '3.0.4'
     ext.log_version = '0.0.1'
     ext.application_provider_version = '1.0.5'
+    ext.work_version = '2.3.4'
     repositories {
         google()
         jcenter()
