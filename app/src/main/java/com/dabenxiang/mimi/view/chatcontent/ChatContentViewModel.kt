@@ -4,10 +4,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import androidx.paging.LivePagedListBuilder
-import androidx.paging.PagedList
 import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.callback.PagingCallback
@@ -48,11 +45,12 @@ class ChatContentViewModel : BaseViewModel() {
         const val PREFIX_CHAT = "/chat/"
     }
 
+    private val PER_LIMIT = "10"
     val TAG_IMAGE = 0
     val TAG_VIDEO = 1
 
-    private val _chatListResult = MutableLiveData<PagedList<ChatContentItem>>()
-    val chatListResult: LiveData<PagedList<ChatContentItem>> = _chatListResult
+    private val _chatListResult = MutableLiveData<ApiResult<ArrayList<ChatContentItem>>>()
+    val chatListResult: LiveData<ApiResult<ArrayList<ChatContentItem>>> = _chatListResult
 
     private var _attachmentResult = MutableLiveData<ApiResult<out Any>>()
     val attachmentResult: LiveData<ApiResult<out Any>> = _attachmentResult
@@ -72,8 +70,11 @@ class ChatContentViewModel : BaseViewModel() {
     private val clientId = UUID.randomUUID().toString()
     var topic: String = ""
     var messageType: Int = ChatMessageType.TEXT.ordinal
+    var isLoading: Boolean = false
+    var chatId: Long = -1
+    var offset: Int = 0
+    var noMore: Boolean = false
 
-    //    var videoCache: HashMap<Int, ChatContentItem> = HashMap()
     var videoCache: HashMap<String, ChatContentItem> = HashMap()
 
 
@@ -115,22 +116,65 @@ class ChatContentViewModel : BaseViewModel() {
         return SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault()).format(Date())
     }
 
-    fun getChatContent(chatId: Long) {
-        viewModelScope.launch {
-            val dataSrc = ChatContentListDataSource(
-                    viewModelScope,
-                    domainManager,
-                    chatId,
-                    pagingCallback
-            )
-            dataSrc.isInvalid
-            val factory = ChatContentListFactory(dataSrc)
-            val config = PagedList.Config.Builder()
-                    .setPageSize(ChatContentListDataSource.PER_LIMIT.toInt())
-                    .build()
+    private fun hasNextPage(total: Long, offset: Long, currentSize: Int): Boolean {
+        return when {
+            currentSize < PER_LIMIT.toInt() -> false
+            offset >= total -> false
+            else -> true
+        }
+    }
 
-            LivePagedListBuilder(factory, config).build().asFlow()
-                    .collect { _chatListResult.postValue(it) }
+    private fun adjustData(list: ArrayList<ChatContentItem>): ArrayList<ChatContentItem> {
+        val result: ArrayList<ChatContentItem> = ArrayList()
+        var lastDate: String = ""
+        for (i: Int in list.indices) {
+            val item = list[i]
+            item.payload?.sendTime?.let { date ->
+                val currentDate = SimpleDateFormat("YYYY-MM-dd", Locale.getDefault()).format(date)
+                if (lastDate.isNotEmpty() && lastDate != currentDate) {
+                    result.add(ChatContentItem(dateTitle = lastDate))
+                }
+                result.add(item)
+                lastDate = currentDate
+                if (i == list.size - 1) {
+                    result.add(ChatContentItem(dateTitle = lastDate))
+                }
+            }
+        }
+        return result
+    }
+
+    fun getChatContent() {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getMessage(
+                        chatId,
+                        offset = offset.toString(),
+                        limit = PER_LIMIT
+                )
+                if (!result.isSuccessful) throw HttpException(result)
+                val item = result.body()
+                val size = item?.content?.size ?: 0
+                val messages = adjustData(item?.content as ArrayList<ChatContentItem>)
+                val totalCount = item.paging.count
+                val nextPageKey = when {
+                    hasNextPage(totalCount, item.paging.offset, size) -> if (offset == 0) PER_LIMIT else (PER_LIMIT.toInt() + size)
+                    else -> null
+                }
+                if (nextPageKey != null) {
+                    offset = nextPageKey.toString().toInt()
+                } else {
+                    noMore = true
+                }
+
+                emit(ApiResult.success(messages))
+            }
+                    .flowOn(Dispatchers.IO)
+                    .onStart { emit(ApiResult.loading()) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .collect { _chatListResult.value = it }
+
         }
     }
 

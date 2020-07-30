@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ChatContentItem
@@ -97,7 +98,8 @@ class ChatContentFragment : BaseFragment() {
             data as ChatListItem
             textTitle.text = data.name
             data.id?.let { id ->
-                viewModel.getChatContent(id)
+                viewModel.chatId = id
+                viewModel.getChatContent()
                 viewModel.initMQTT(id.toString())
                 viewModel.connect()
             }
@@ -117,7 +119,15 @@ class ChatContentFragment : BaseFragment() {
     override fun setupObservers() {
         Timber.d("${ChatContentFragment::class.java.simpleName}_setupObservers")
 
-        viewModel.chatListResult.observe(viewLifecycleOwner, Observer { adapter.submitList(it) })
+        viewModel.chatListResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    viewModel.isLoading = false
+                    adapter.setData(it.result)
+                }
+                is ApiResult.Error -> Timber.e(it.throwable)
+            }
+        })
 
         viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
             when (it) {
@@ -180,6 +190,25 @@ class ChatContentFragment : BaseFragment() {
         btnAdd.setOnClickListener {
             openChooser()
         }
+
+        recyclerContent.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val linearLayoutManager: LinearLayoutManager = recyclerView.layoutManager as LinearLayoutManager
+
+                if (!viewModel.isLoading && !viewModel.noMore) {
+                    if (linearLayoutManager != null && linearLayoutManager.findLastCompletelyVisibleItemPosition() == adapter.itemCount - 4) {
+                        //bottom of list!
+                        viewModel.getChatContent()
+                        viewModel.isLoading = true
+                    }
+                }
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+            }
+        })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
