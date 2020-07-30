@@ -29,25 +29,27 @@ class MemberFollowListDataSource constructor(
     ) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().getMemberFollow("0", PER_LIMIT)
+                val result = domainManager.getApiRepository().getMyMemberFollow("0", PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()
-                val clubs = item?.content
+                val members = item?.content
 
                 val nextPageKey = when {
                     hasNextPage(
                         item?.paging?.count ?: 0,
                         item?.paging?.offset ?: 0,
-                        clubs?.size ?: 0
+                        members?.size ?: 0
                     ) -> PER_LIMIT_LONG
                     else -> null
                 }
-                emit(InitResult(clubs ?: arrayListOf(), nextPageKey))
+                emit(InitResult(members ?: arrayListOf(), nextPageKey))
             }
                 .flowOn(Dispatchers.IO)
+                .onStart { pagingCallback.onLoading() }
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect { response ->
+                    pagingCallback.onTotalCount(response.list.size.toLong())
                     callback.onResult(response.list, null, response.nextKey)
                 }
         }
@@ -66,12 +68,12 @@ class MemberFollowListDataSource constructor(
         val next = params.key
         viewModelScope.launch {
             flow {
-                val result =
-                    domainManager.getApiRepository().getMemberFollow(next.toString(), PER_LIMIT)
+                val result = domainManager.getApiRepository().getMyMemberFollow(next.toString(), PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(result)
             }
                 .flowOn(Dispatchers.IO)
+                .onStart { pagingCallback.onLoading() }
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect { response ->
@@ -85,7 +87,7 @@ class MemberFollowListDataSource constructor(
                                 ) -> next + PER_LIMIT_LONG
                                 else -> null
                             }
-
+                            pagingCallback.onTotalCount(list.size.toLong())
                             callback.onResult(list, nextPageKey)
                         }
                     }

@@ -4,26 +4,26 @@ import com.google.gson.annotations.SerializedName
 
 data class ClubFollowItem(
     @SerializedName("id")
-    val id: Int?,
+    val id: Long = 0,
 
     @SerializedName("clubId")
-    val clubId: Int?,
+    val clubId: Long = 0,
 
     @SerializedName("name")
-    val name: String?,
+    val name: String = "",
 
     @SerializedName("description")
-    val description: String?,
+    val description: String = "",
 
     @SerializedName("tag")
-    val tag: String?,
+    val tag: String = "",
 
     @SerializedName("avatarAttachmentId")
-    val avatarAttachmentId: Int?,
+    val avatarAttachmentId: Long = 0,
 
     @SerializedName("followerCount")
-    val followerCount: Int?,
+    val followerCount: Int = 0,
 
     @SerializedName("postCount")
-    val postCount: Int?
+    val postCount: Int = 0
 )

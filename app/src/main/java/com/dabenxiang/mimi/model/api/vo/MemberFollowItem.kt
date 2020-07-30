@@ -4,14 +4,14 @@ import com.google.gson.annotations.SerializedName
 
 data class MemberFollowItem(
     @SerializedName("id")
-    val id: Int?,
+    val id: Long = 0,
 
     @SerializedName("userId")
-    val userId: Int?,
+    val userId: Long = 0,
 
     @SerializedName("friendlyName")
-    val friendlyName: String?,
+    val friendlyName: String = "",
 
     @SerializedName("avatarAttachmentId")
-    val avatarAttachmentId: Int?
+    val avatarAttachmentId: Long = 0
 )

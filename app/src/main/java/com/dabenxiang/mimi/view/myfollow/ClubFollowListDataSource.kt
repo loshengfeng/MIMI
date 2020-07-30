@@ -29,7 +29,7 @@ class ClubFollowListDataSource constructor(
     ) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().getClubFollow("0", PER_LIMIT)
+                val result = domainManager.getApiRepository().getMyClubFollow("0", PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()
                 val clubs = item?.content
@@ -46,9 +46,11 @@ class ClubFollowListDataSource constructor(
 
             }
                 .flowOn(Dispatchers.IO)
+                .onStart { pagingCallback.onLoading() }
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect { response ->
+                    pagingCallback.onTotalCount(response.list.size.toLong())
                     callback.onResult(response.list, null, response.nextKey)
                 }
         }
@@ -65,11 +67,12 @@ class ClubFollowListDataSource constructor(
         viewModelScope.launch {
             flow {
                 val result =
-                    domainManager.getApiRepository().getClubFollow(next.toString(), PER_LIMIT)
+                    domainManager.getApiRepository().getMyClubFollow(next.toString(), PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(result)
             }
                 .flowOn(Dispatchers.IO)
+                .onStart { pagingCallback.onLoading() }
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect { response ->
@@ -83,7 +86,7 @@ class ClubFollowListDataSource constructor(
                                 ) -> next + PER_LIMIT_LONG
                                 else -> null
                             }
-
+                            pagingCallback.onTotalCount(list.size.toLong())
                             callback.onResult(list, nextPageKey)
                         }
                     }

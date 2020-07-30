@@ -62,7 +62,12 @@
     <fragment
         android:id="@+id/myFollowFragment"
         android:name="com.dabenxiang.mimi.view.myfollow.MyFollowFragment"
-        tools:layout="@layout/fragment_my_follow"/>
+        tools:layout="@layout/fragment_my_follow">
+
+        <action
+            android:id="@+id/action_myFollowFragment_to_clubDetailFragment"
+            app:destination="@id/clubDetailFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/orderFragment"
@@ -98,4 +103,10 @@
         android:name="com.dabenxiang.mimi.view.mypost.MyPostFragment"
         android:label="MyPostFragment"
         tools:layout="@layout/fragment_my_post"/>
+
+    <fragment
+        android:id="@+id/clubDetailFragment"
+        android:name="com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment"
+        android:label="ClubDetailFragment"
+        tools:layout="@layout/fragment_club_detail"/>
 </navigation>
