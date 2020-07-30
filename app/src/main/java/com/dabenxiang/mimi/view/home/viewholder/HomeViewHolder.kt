@@ -19,6 +19,7 @@ import com.dabenxiang.mimi.view.adapter.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.club.ClubFuncItem
 import com.dabenxiang.mimi.view.home.HomeTemplate
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.view.ViewPagerIndicator
 import com.to.aboomy.pager2banner.Banner
 import kotlinx.android.synthetic.main.item_banner.view.*
@@ -103,6 +104,9 @@ class HomeBannerViewHolder(itemView: View, listener: HomeAdapter.EventListener, 
         Glide.with(itemView.context)
             .load(item.href)
             .into(ivPoster)
+        ivPoster.setOnClickListener { view ->
+            GeneralUtils.openWebView(view.context, item.target)
+        }
     }
 }
 

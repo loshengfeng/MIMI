@@ -114,6 +114,9 @@ class HomeViewModel : BaseViewModel() {
     private val _postVideoMemberResult = MutableLiveData<ApiResult<Long>>()
     val postVideoMemberResult: LiveData<ApiResult<Long>> = _postVideoMemberResult
 
+    private val _totalCountResult = MutableLiveData<Int>()
+    val totalCountResult: LiveData<Int> = _totalCountResult
+
     fun loadNestedStatisticsListForCarousel(position: Int, src: HomeTemplate.Carousel) {
         viewModelScope.launch {
             flow {
@@ -435,6 +438,11 @@ class HomeViewModel : BaseViewModel() {
 
         override fun onThrowable(throwable: Throwable) {
 
+        }
+
+        override fun onTotalCount(count: Long) {
+            Timber.d("@@onTotalCount $count")
+            _totalCountResult.postValue(count.toInt())
         }
     }
 
