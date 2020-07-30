@@ -63,6 +63,9 @@ class ChatContentViewModel : BaseViewModel() {
     private var _fileAttachmentTooLarge = MutableLiveData<Boolean>()
     val fileAttachmentTooLarge: LiveData<Boolean> = _fileAttachmentTooLarge
 
+    private var _remakeContentResult = MutableLiveData<Boolean>()
+    val remakeContentResult: LiveData<Boolean> = _remakeContentResult
+
     private val FILE_LIMIT = 5
     private val mqttManager: MQTTManager by inject()
     private val serverUrl = BuildConfig.MQTT_HOST
@@ -90,13 +93,24 @@ class ChatContentViewModel : BaseViewModel() {
         override fun onSucceed() {
             super.onSucceed()
         }
+
+        override fun onTotalCount(count: Long) {
+            super.onTotalCount(count)
+            _remakeContentResult.value = true
+        }
     }
 
+    /**
+     * 判斷是檔案是否為圖像檔案
+     */
     private fun isImageFile(path: String?): Boolean {
         val mimeType: String = URLConnection.guessContentTypeFromName(path)
-        return mimeType != null && mimeType.startsWith("image")
+        return mimeType.startsWith("image")
     }
 
+    /**
+     * 取得要送訊息的時間格式
+     */
     private fun getTimeFormatForPush(): String {
         return SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault()).format(Date())
     }

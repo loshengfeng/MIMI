@@ -5,12 +5,12 @@ import com.google.gson.annotations.SerializedName
 
 data class ChatContentItem(
         @SerializedName("username")
-        val username: String?,
+        val username: String? = "",
 
         @SerializedName("payload")
-        val payload: ChatContentPayloadItem?,
+        val payload: ChatContentPayloadItem? = null,
 
-        val dateTitle: String?,
+        val dateTitle: String? = "",
         var downloadStatus: VideoDownloadStatusType = VideoDownloadStatusType.NORMAL,
         var position: Int = -1
 )
