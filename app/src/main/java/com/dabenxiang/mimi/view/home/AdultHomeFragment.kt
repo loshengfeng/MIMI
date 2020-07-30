@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.view.View
@@ -113,6 +114,7 @@ class AdultHomeFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         handleBackStackData()
+        showSnackBar()
     }
 
     override fun setupFirstTime() {
@@ -450,6 +452,10 @@ class AdultHomeFragment : BaseFragment() {
 
             uploadCurrentPicPosition = 0
             uploadPicUri.clear()
+
+            Handler().postDelayed({
+                snackBar?.dismiss()
+            }, 3000)
         })
 
         viewModel.uploadCoverItem.observe(viewLifecycleOwner, Observer {

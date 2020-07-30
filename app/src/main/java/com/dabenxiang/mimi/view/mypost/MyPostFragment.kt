@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.mypost
 
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -599,6 +600,10 @@ class MyPostFragment : BaseFragment() {
 
         uploadCurrentPicPosition = 0
         deleteCurrentPicPosition = 0
+
+        Handler().postDelayed({
+            snackBar?.dismiss()
+        }, 3000)
     }
 
     private fun resetAndCancelJob(t: Throwable) {
