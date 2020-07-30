@@ -37,13 +37,13 @@ class RankingViewModel : BaseViewModel() {
     var statisticsTypeSelected: StatisticsType = StatisticsType.TODAY
     var postTypeSelected: PostType = PostType.VIDEO_ON_DEMAND
 
+
     fun setPostType(position: Int) {
         postTypeSelected = when (position) {
             1 -> PostType.VIDEO
             2 -> PostType.IMAGE
             else -> PostType.VIDEO_ON_DEMAND
         }
-        getRankingList()
     }
 
     fun setStatisticsTypeFunction(position: Int) {
@@ -52,7 +52,6 @@ class RankingViewModel : BaseViewModel() {
             2 -> StatisticsType.WEEK
             else -> StatisticsType.MONTH
         }
-        getRankingList()
     }
 
     fun getRankingList() {

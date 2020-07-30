@@ -77,18 +77,8 @@ class RankingVideosAdapter(private val context: Context,
                 }
             }
 
-//            val avatarId = item.avatarAttachmentId.toString()
-//            if (avatarId != LruCacheUtils.ZERO_ID) {
-//                if (LruCacheUtils.getLruCache(avatarId) == null) {
-//                    rankingFuncItem.getBitmap(avatarId, position)
-//                } else {
-//                    updatePicture(avatarId)
-//                }
-//            } else {
-//                Glide.with(picture.context).load(R.color.color_white_1_50).circleCrop().into(picture)
-//            }
             item.cover?.let {
-                Glide.with(picture.context).load(it).circleCrop().into(picture)
+                Glide.with(picture.context).load(it).centerCrop().into(picture)
             }
             title.text = item.title
             hot.text = item.count?.toString() ?: "0"
