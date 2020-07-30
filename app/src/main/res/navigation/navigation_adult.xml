@@ -205,5 +205,9 @@
         android:id="@+id/rankingFragment"
         android:name="com.dabenxiang.mimi.view.ranking.RankingFragment"
         android:label="RankingFragment"
-        tools:layout="@layout/fragment_ranking" />
+        tools:layout="@layout/fragment_ranking" >
+        <action
+            android:id="@+id/action_rankingFragment_to_clipFragment"
+            app:destination="@id/clipFragment" />
+   </fragment>
 </navigation>
