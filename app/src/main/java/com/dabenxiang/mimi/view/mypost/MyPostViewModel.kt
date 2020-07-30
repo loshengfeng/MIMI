@@ -26,6 +26,7 @@ import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.home.HomeViewModel
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -79,6 +80,8 @@ class MyPostViewModel: BaseViewModel() {
 
     private val _postVideoResult = MutableLiveData<ApiResult<Long>>()
     val postVideoResult: LiveData<ApiResult<Long>> = _postVideoResult
+
+    private var job = Job()
 
     companion object {
         const val TYPE_PIC = "type_pic"
@@ -327,5 +330,9 @@ class MyPostViewModel: BaseViewModel() {
                     }
                 }
         }
+    }
+
+    fun cancelJob() {
+        job.cancel()
     }
 }

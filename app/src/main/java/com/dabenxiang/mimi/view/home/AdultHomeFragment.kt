@@ -113,7 +113,6 @@ class AdultHomeFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         handleBackStackData()
-//        showSnackBar()
     }
 
     override fun setupFirstTime() {
@@ -177,7 +176,7 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private fun showSnackBar() {
-        snackBar = Snackbar.make(testView, "", Snackbar.LENGTH_INDEFINITE)
+        snackBar = Snackbar.make(snackBarLayout, "", Snackbar.LENGTH_INDEFINITE)
         val snackBarLayout: Snackbar.SnackbarLayout = snackBar?.view as Snackbar.SnackbarLayout
         val textView = snackBarLayout.findViewById(R.id.snackbar_text) as TextView
         textView.visibility = View.INVISIBLE
@@ -193,6 +192,10 @@ class AdultHomeFragment : BaseFragment() {
 
         txtCancel.setOnClickListener {
             findNavController().navigate(R.id.action_adultHomeFragment_to_myPostFragment)
+        }
+
+        imgCancel.setOnClickListener {
+            viewModel.cancelJob()
         }
     }
 
@@ -369,8 +372,7 @@ class AdultHomeFragment : BaseFragment() {
                     }
                 }
                 is Error -> {
-                    onApiError(it.throwable)
-                    //TODO 中斷上傳 and reset
+                    resetAndCancelJob(it.throwable)
                 }
             }
         })
@@ -382,8 +384,7 @@ class AdultHomeFragment : BaseFragment() {
                     viewModel.postAttachment(uploadVideoUri[0].videoUrl, requireContext(), TYPE_VIDEO)
                 }
                 is Error -> {
-                    onApiError(it.throwable)
-                    //TODO 中斷上傳 and reset
+                    resetAndCancelJob(it.throwable)
                 }
             }
         })
@@ -404,8 +405,7 @@ class AdultHomeFragment : BaseFragment() {
                     viewModel.postPic(postMemberRequest, content)
                 }
                 is Error -> {
-                    onApiError(it.throwable)
-                    //TODO 中斷上傳 and reset
+                    resetAndCancelJob(it.throwable)
                 }
             }
         })
@@ -1105,5 +1105,14 @@ class AdultHomeFragment : BaseFragment() {
         update: (Boolean) -> Unit
     ) {
         viewModel.clubFollow(memberClubItem, isFollow, update)
+    }
+
+    private fun resetAndCancelJob(t: Throwable) {
+        onApiError(t)
+        viewModel.cancelJob()
+        snackBar?.dismiss()
+        uploadCurrentPicPosition = 0
+        uploadPicUri.clear()
+        //TODO show error toast
     }
 }
