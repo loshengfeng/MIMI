@@ -224,7 +224,7 @@
     <string name="post_success">发帖成功</string>
     <string name="view_post">查看发帖</string>
     <string name="post_uploading">上传中…</string>
-
+    <string name="whether_to_discard_content">是否舍弃内容</string>
 
     <!-- Problem report -->
     <string-array name="video_problem_report_item">

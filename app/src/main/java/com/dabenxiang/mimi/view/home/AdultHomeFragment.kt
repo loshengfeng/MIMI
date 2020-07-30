@@ -46,8 +46,7 @@ import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.club.ClubFuncItem
 import com.dabenxiang.mimi.view.club.ClubMemberAdapter
 import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
-import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
-import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
+import com.dabenxiang.mimi.view.dialog.*
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.OnChooseUploadMethodDialogListener
 import com.dabenxiang.mimi.view.home.HomeViewModel.Companion.TYPE_COVER
@@ -193,12 +192,27 @@ class AdultHomeFragment : BaseFragment() {
         val txtCancel = snackBarLayout.findViewById(R.id.txt_cancel) as TextView
 
         txtCancel.setOnClickListener {
-            findNavController().navigate(R.id.action_adultHomeFragment_to_myPostFragment)
+            cancelDialog()
         }
 
         imgCancel.setOnClickListener {
-            viewModel.cancelJob()
+            cancelDialog()
         }
+    }
+
+    private fun cancelDialog() {
+        GeneralDialog.newInstance(
+            GeneralDialogData(
+                titleRes = R.string.whether_to_discard_content,
+                messageIcon = R.drawable.ico_default_photo,
+                firstBtn = getString(R.string.btn_cancel),
+                secondBtn = getString(R.string.btn_confirm),
+                isMessageIcon = false,
+                secondBlock = {
+                    findNavController().navigate(R.id.action_adultHomeFragment_to_myPostFragment)
+                }
+            )
+        ).show(requireActivity().supportFragmentManager)
     }
 
     override fun setupObservers() {
@@ -543,7 +557,6 @@ class AdultHomeFragment : BaseFragment() {
                     bundle
                 )
             )
-
         }
 
         recyclerview_tab.adapter = tabAdapter
