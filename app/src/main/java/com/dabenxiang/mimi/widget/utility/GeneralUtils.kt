@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.provider.MediaStore
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
@@ -221,5 +222,15 @@ object GeneralUtils {
         t.printStackTrace(pw)
         pw.flush()
         return sw.toString()
+    }
+
+    /**
+     * 開啟app play video
+     */
+    fun openPlayerIntent(context: Context, path: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(path))
+        intent.putExtra(MediaStore.EXTRA_FINISH_ON_COMPLETION, false)
+        intent.setDataAndType(Uri.parse(path), "video/*")
+        context.startActivity(intent)
     }
 }

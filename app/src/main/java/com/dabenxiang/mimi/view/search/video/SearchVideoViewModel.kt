@@ -10,6 +10,7 @@ import com.dabenxiang.mimi.callback.SearchPagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.vo.SearchHistoryItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.EditTextLiveData
 import com.dabenxiang.mimi.widget.utility.EditTextMutableLiveData
@@ -161,6 +162,27 @@ class SearchVideoViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _postReportResult.value = it }
+        }
+    }
+
+    fun getSearchHistory(): ArrayList<String> {
+        return pref.searchHistoryItem.searchHistory
+    }
+
+    fun clearSearchHistory() {
+        pref.searchHistoryItem = SearchHistoryItem()
+    }
+
+    fun updateSearchHistory(keyword: String) {
+        val searchHistoryItem = pref.searchHistoryItem
+        if (!searchHistoryItem.searchHistory.contains(keyword)) {
+            if (searchHistoryItem.searchHistory.size == 10) {
+                searchHistoryItem.searchHistory.removeAt(0)
+                searchHistoryItem.searchHistory.add(keyword)
+            } else {
+                searchHistoryItem.searchHistory.add(keyword)
+            }
+            pref.searchHistoryItem = searchHistoryItem
         }
     }
 }

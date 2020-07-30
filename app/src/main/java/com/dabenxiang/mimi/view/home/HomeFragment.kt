@@ -121,6 +121,10 @@ class HomeFragment : BaseFragment() {
 
         viewModel.videosResult.observe(viewLifecycleOwner, Observer {
             when (val response = it.second) {
+                is Loaded -> {
+                    val viewHolder = homeStatisticsViewHolderMap[it.first]
+                    viewHolder?.hideProgressBar()
+                }
                 is Success -> {
                     val viewHolder = homeStatisticsViewHolderMap[it.first]
                     val statistics = statisticsMap[it.first]

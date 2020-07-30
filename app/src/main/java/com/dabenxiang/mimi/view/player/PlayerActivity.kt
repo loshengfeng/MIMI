@@ -811,6 +811,10 @@ class PlayerActivity : BaseActivity() {
                     Glide.with(this)
                         .load(it.result.href)
                         .into(adInfo.iv_ad)
+
+                    adInfo.iv_ad.setOnClickListener { view ->
+                        GeneralUtils.openWebView(this, it.result.target)
+                    }
                 }
                 is Error -> onApiError(it.throwable)
             }

@@ -9,14 +9,17 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import androidx.core.content.ContextCompat
 import androidx.core.view.size
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.PostPicItemListener
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MediaItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -32,6 +35,7 @@ import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.fragment_post_article.*
 import kotlinx.android.synthetic.main.fragment_post_article.chipGroup
 import kotlinx.android.synthetic.main.fragment_post_article.clubLayout
 import kotlinx.android.synthetic.main.fragment_post_article.edt_content
@@ -42,6 +46,9 @@ import kotlinx.android.synthetic.main.fragment_post_article.txt_contentCount
 import kotlinx.android.synthetic.main.fragment_post_article.txt_hashtagCount
 import kotlinx.android.synthetic.main.fragment_post_article.txt_titleCount
 import kotlinx.android.synthetic.main.fragment_post_pic.*
+import kotlinx.android.synthetic.main.fragment_post_pic.txt_clubName
+import kotlinx.android.synthetic.main.fragment_post_pic.txt_hashtagName
+import kotlinx.android.synthetic.main.fragment_post_pic.txt_placeholder
 import kotlinx.android.synthetic.main.item_setting_bar.*
 
 
@@ -92,7 +99,36 @@ class PostPicFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
+        viewModel.clubItemResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Success -> {
+                    txt_clubName.text = it.result.first().title
+                    txt_hashtagName.text = it.result.first().tag
 
+                    txt_placeholder.visibility = View.GONE
+                    txt_clubName.visibility = View.VISIBLE
+                    txt_hashtagName.visibility = View.VISIBLE
+
+                    if (LruCacheUtils.getLruCache(it.result.first().avatarAttachmentId.toString()) == null) {
+                        viewModel.getBitmapForClub(it.result.first().avatarAttachmentId.toString())
+                    } else {
+                        val bitmap = LruCacheUtils.getLruCache(it.result.first().avatarAttachmentId.toString())
+                        Glide.with(requireContext()).load(bitmap).circleCrop().into(iv_avatar)
+                    }
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.bitmapResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Success -> {
+                    val bitmap = LruCacheUtils.getLruCache(it.result)
+                    Glide.with(requireContext()).load(bitmap).circleCrop().into(iv_avatar)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -231,6 +267,9 @@ class PostPicFragment : BaseFragment() {
             val uri = arguments?.getString(BUNDLE_PIC_URI)
             val postAttachmentItem = PostAttachmentItem(uri = uri!!)
             attachmentList.add(postAttachmentItem)
+            txt_picCount.text = String.format(getString(R.string.select_pic_count, attachmentList.size,
+                PHOTO_LIMIT
+            ))
         }
     }
 
@@ -241,6 +280,7 @@ class PostPicFragment : BaseFragment() {
         postId = item.id
 
         edt_title.setText(item.title)
+        edt_content.setText(mediaItem.textContent)
 
         for (tag in item.tags!!) {
             addTag(tag)
@@ -273,6 +313,8 @@ class PostPicFragment : BaseFragment() {
 
     private val chooseClubDialogListener = object : ChooseClubDialogListener {
         override fun onChooseClub(item: MemberClubItem) {
+            txt_clubName.text = item.title
+            txt_hashtagName.text = item.tag
 
             val bitmap = LruCacheUtils.getLruCache(item.avatarAttachmentId.toString())
             Glide.with(requireContext())
@@ -294,6 +336,18 @@ class PostPicFragment : BaseFragment() {
         chip.setTextColor(chip.context.getColor(R.color.color_black_1_50))
         chip.chipBackgroundColor =
             ColorStateList.valueOf(chip.context.getColor(R.color.color_black_1_10))
+
+        if (chipGroup.size >= 1) {
+            chip.closeIcon = ContextCompat.getDrawable(requireContext(), R.drawable.btn_close_circle_small_black_n)
+            chip.isCloseIconVisible = true
+            chip.setCloseIconSizeResource(R.dimen.dp_24)
+            chip.setOnCloseIconClickListener {
+                chipGroup.removeView(it)
+            }
+        } else {
+            viewModel.getClub(tag)
+        }
+
         chipGroup.addView(chip)
 
         setTagCount()

@@ -39,7 +39,7 @@ class ChatContentAdapter(
     interface EventListener {
         fun onGetAttachment(id: String, position: Int)
         fun onImageClick(bitmap: Bitmap)
-        fun onVideoClick()
+        fun onVideoClick(item: ChatContentItem?, position: Int)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -127,7 +127,7 @@ class ChatContentAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
         when (holder) {
-            is ChatContentDateTitleViewHolder -> holder.bind(item, position)
+            is ChatContentDateTitleViewHolder -> holder.bind(item)
             is ChatContentTextViewHolder -> holder.bind(item, position)
             is ChatContentImageViewHolder -> holder.bind(item, position)
             is ChatContentFileViewHolder -> holder.bind(item, position)

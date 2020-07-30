@@ -28,6 +28,7 @@ import com.dabenxiang.mimi.view.home.video.VideoFactory
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -113,6 +114,11 @@ class HomeViewModel : BaseViewModel() {
 
     private val _postVideoMemberResult = MutableLiveData<ApiResult<Long>>()
     val postVideoMemberResult: LiveData<ApiResult<Long>> = _postVideoMemberResult
+
+    private val _totalCountResult = MutableLiveData<Int>()
+    val totalCountResult: LiveData<Int> = _totalCountResult
+
+    private var job = Job()
 
     fun loadNestedStatisticsListForCarousel(position: Int, src: HomeTemplate.Carousel) {
         viewModelScope.launch {
@@ -436,10 +442,15 @@ class HomeViewModel : BaseViewModel() {
         override fun onThrowable(throwable: Throwable) {
 
         }
+
+        override fun onTotalCount(count: Long) {
+            Timber.d("@@onTotalCount $count")
+            _totalCountResult.postValue(count.toInt())
+        }
     }
 
     fun postAttachment(pic: String, context: Context, type: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(context = job) {
             flow {
                 val realPath = UriUtils.getPath(context, Uri.parse(pic))
                 val fileNameSplit = realPath?.split("/")
@@ -479,7 +490,7 @@ class HomeViewModel : BaseViewModel() {
     }
 
     fun postPic(request: PostMemberRequest, content: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(context = job) {
             flow {
                 request.content = content
                 Timber.d("Post member request : $request")
@@ -493,5 +504,9 @@ class HomeViewModel : BaseViewModel() {
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _postVideoMemberResult.value = it }
         }
+    }
+
+    fun cancelJob() {
+        job.cancel()
     }
 }

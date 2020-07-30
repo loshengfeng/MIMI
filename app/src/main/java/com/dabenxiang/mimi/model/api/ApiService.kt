@@ -211,6 +211,11 @@ interface ApiService {
      *                  Members/Club
      *
      ***********************************************************/
+    @GET("/v1/Members/Club")
+    suspend fun getMembersClub(
+        @Query("tag") tag: String
+    ): Response<ApiBasePagingItem<ArrayList<MemberClubItem>>>
+
     @GET("/v1/Members/Club/Post")
     suspend fun getMembersClubPost(
         @Query("offset") offset: Int,
@@ -288,7 +293,7 @@ interface ApiService {
         @Query("postType") postType: Int,
         @Query("offset") offset: String?,
         @Query("limit") limit: String?
-    ): Response<ApiBasePagingItem<List<RankingItem>>>
+    ): Response<ApiBasePagingItem<List<PostStatisticsItem>>>
 
 
 
@@ -534,5 +539,4 @@ interface ApiService {
         @Path("utcTime") utcTime: Long?,
         @Path("sign") sign: String?
     ): Response<Void>
-
 }

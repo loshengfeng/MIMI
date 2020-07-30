@@ -268,6 +268,12 @@ class ApiRepository(private val apiService: ApiService) {
      *                  Members/Club
      *
      ***********************************************************/
+    suspend fun getMembersClub(
+        tag: String
+    ): Response<ApiBasePagingItem<ArrayList<MemberClubItem>>> {
+        return apiService.getMembersClub(tag)
+    }
+
     suspend fun getMembersClubPost(
         offset: Int,
         limit: Int
@@ -660,6 +666,5 @@ class ApiRepository(private val apiService: ApiService) {
         utcTime: Long? = null,
         sign: String? = null
     ) = apiService.getVideoStreamM3u8(streamId, userId, utcTime, sign)
-
 }
 

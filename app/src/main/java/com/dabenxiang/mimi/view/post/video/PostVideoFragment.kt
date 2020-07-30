@@ -12,14 +12,17 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import androidx.core.content.ContextCompat
 import androidx.core.view.size
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.PostVideoItemListener
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MediaItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -46,6 +49,8 @@ import kotlinx.android.synthetic.main.fragment_post_article.txt_contentCount
 import kotlinx.android.synthetic.main.fragment_post_article.txt_hashtagCount
 import kotlinx.android.synthetic.main.fragment_post_article.txt_titleCount
 import kotlinx.android.synthetic.main.fragment_post_pic.*
+import kotlinx.android.synthetic.main.fragment_post_pic.txt_clubName
+import kotlinx.android.synthetic.main.fragment_post_pic.txt_hashtagName
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -66,9 +71,6 @@ class PostVideoFragment : BaseFragment() {
 
         const val UPLOAD_VIDEO = "upload_video"
         const val MEMBER_REQUEST = "member_request"
-        const val COVER_URI = "cover_uri"
-        const val VIDEO_URI = "video_uir"
-        const val VIDEO_LENGTH = "video_length"
         const val VIDEO_DATA = "video_data"
         const val DELETE_ATTACHMENT = "delete_attachment"
     }
@@ -84,8 +86,6 @@ class PostVideoFragment : BaseFragment() {
     private val deleteVideoList = arrayListOf<PostVideoAttachment>()
 
     private lateinit var adapter: ScrollVideoAdapter
-
-//    private var trimmerUri: String? = String()
 
     private var postId: Long = 0
 
@@ -103,6 +103,36 @@ class PostVideoFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
+        viewModel.clubItemResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Success -> {
+                    txt_clubName.text = it.result.first().title
+                    txt_hashtagName.text = it.result.first().tag
+
+                    txt_placeholder.visibility = View.GONE
+                    txt_clubName.visibility = View.VISIBLE
+                    txt_hashtagName.visibility = View.VISIBLE
+
+                    if (LruCacheUtils.getLruCache(it.result.first().avatarAttachmentId.toString()) == null) {
+                        viewModel.getBitmapForClub(it.result.first().avatarAttachmentId.toString())
+                    } else {
+                        val bitmap = LruCacheUtils.getLruCache(it.result.first().avatarAttachmentId.toString())
+                        Glide.with(requireContext()).load(bitmap).circleCrop().into(iv_avatar)
+                    }
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.bitmapResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Success -> {
+                    val bitmap = LruCacheUtils.getLruCache(it.result)
+                    Glide.with(requireContext()).load(bitmap).circleCrop().into(iv_avatar)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -263,6 +293,7 @@ class PostVideoFragment : BaseFragment() {
         postId = item.id
 
         edt_title.setText(item.title)
+        edt_content.setText(mediaItem.textContent)
 
         for (tag in item.tags!!) {
             addTag(tag)
@@ -292,6 +323,8 @@ class PostVideoFragment : BaseFragment() {
 
     private val chooseClubDialogListener = object : ChooseClubDialogListener {
         override fun onChooseClub(item: MemberClubItem) {
+            txt_clubName.text = item.title
+            txt_hashtagName.text = item.tag
 
             val bitmap = LruCacheUtils.getLruCache(item.avatarAttachmentId.toString())
             Glide.with(requireContext())
@@ -313,6 +346,18 @@ class PostVideoFragment : BaseFragment() {
         chip.setTextColor(chip.context.getColor(R.color.color_black_1_50))
         chip.chipBackgroundColor =
             ColorStateList.valueOf(chip.context.getColor(R.color.color_black_1_10))
+
+        if (chipGroup.size >= 1) {
+            chip.closeIcon = ContextCompat.getDrawable(requireContext(), R.drawable.btn_close_circle_small_black_n)
+            chip.isCloseIconVisible = true
+            chip.setCloseIconSizeResource(R.dimen.dp_24)
+            chip.setOnCloseIconClickListener {
+                chipGroup.removeView(it)
+            }
+        } else {
+             viewModel.getClub(tag)
+        }
+
         chipGroup.addView(chip)
 
         setTagCount()

@@ -22,6 +22,7 @@ import com.dabenxiang.mimi.model.manager.mqtt.SubscribeCallback
 import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.model.vo.UploadPicItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -33,10 +34,13 @@ import org.koin.core.inject
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.File
+import java.io.FileOutputStream
+import java.lang.Exception
 import java.net.URLConnection
 import java.net.URLEncoder
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.HashMap
 
 class ChatContentViewModel : BaseViewModel() {
 
@@ -44,11 +48,14 @@ class ChatContentViewModel : BaseViewModel() {
         const val PREFIX_CHAT = "/chat/"
     }
 
+    val TAG_IMAGE = 0
+    val TAG_VIDEO = 1
+
     private val _chatListResult = MutableLiveData<PagedList<ChatContentItem>>()
     val chatListResult: LiveData<PagedList<ChatContentItem>> = _chatListResult
 
-    private var _attachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
-    val attachmentResult: LiveData<ApiResult<AttachmentItem>> = _attachmentResult
+    private var _attachmentResult = MutableLiveData<ApiResult<out Any>>()
+    val attachmentResult: LiveData<ApiResult<out Any>> = _attachmentResult
 
     private var _postAttachmentResult = MutableLiveData<ApiResult<UploadPicItem>>()
     val postAttachmentResult: LiveData<ApiResult<UploadPicItem>> = _postAttachmentResult
@@ -56,12 +63,18 @@ class ChatContentViewModel : BaseViewModel() {
     private var _fileAttachmentTooLarge = MutableLiveData<Boolean>()
     val fileAttachmentTooLarge: LiveData<Boolean> = _fileAttachmentTooLarge
 
+    private var _remakeContentResult = MutableLiveData<Boolean>()
+    val remakeContentResult: LiveData<Boolean> = _remakeContentResult
+
     private val FILE_LIMIT = 5
     private val mqttManager: MQTTManager by inject()
     private val serverUrl = BuildConfig.MQTT_HOST
     private val clientId = UUID.randomUUID().toString()
     var topic: String = ""
     var messageType: Int = ChatMessageType.TEXT.ordinal
+
+    //    var videoCache: HashMap<Int, ChatContentItem> = HashMap()
+    var videoCache: HashMap<String, ChatContentItem> = HashMap()
 
 
     private val pagingCallback = object : PagingCallback {
@@ -80,13 +93,24 @@ class ChatContentViewModel : BaseViewModel() {
         override fun onSucceed() {
             super.onSucceed()
         }
+
+        override fun onTotalCount(count: Long) {
+            super.onTotalCount(count)
+            _remakeContentResult.value = true
+        }
     }
 
+    /**
+     * 判斷是檔案是否為圖像檔案
+     */
     private fun isImageFile(path: String?): Boolean {
         val mimeType: String = URLConnection.guessContentTypeFromName(path)
-        return mimeType != null && mimeType.startsWith("image")
+        return mimeType.startsWith("image")
     }
 
+    /**
+     * 取得要送訊息的時間格式
+     */
     private fun getTimeFormatForPush(): String {
         return SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault()).format(Date())
     }
@@ -110,31 +134,61 @@ class ChatContentViewModel : BaseViewModel() {
         }
     }
 
+    // todo 加上最後讀取時間api
     fun setLastRead() {
 
     }
 
-    fun getAttachment(id: String, position: Int) {
-        Timber.d("neo, id = ${id}")
+    fun getAttachment(context: Context, id: String, position: Int, type: Int = TAG_IMAGE) {
+        var fileName = ""
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getAttachment(id)
                 if (!result.isSuccessful) throw HttpException(result)
                 val byteArray = result.body()?.bytes()
-                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
-                val item = AttachmentItem(
-                        id = id,
-                        bitmap = bitmap,
-                        position = position
-                )
-                emit(ApiResult.success(item))
+                if (type == TAG_IMAGE) {
+                    val bitmap = ImageUtils.bytes2Bitmap(byteArray)
+                    val item = AttachmentItem(
+                            id = id,
+                            bitmap = bitmap,
+                            position = position
+                    )
+                    emit(ApiResult.success(item))
+                } else {
+                    fileName = result.headers()["Content-Disposition"]?.substringAfter("UTF-8''").toString()
+                    if (fileName == null || fileName.isEmpty() || byteArray == null) throw Exception("File name or array error")
+
+                    val path = "${FileUtil.getVideoFolderPath(context)}$fileName"
+                    if (!File(path).exists()) {
+                        convertByteToVideo(context, byteArray, fileName)
+                    }
+                    emit(ApiResult.success(path))
+                }
             }
                     .flowOn(Dispatchers.IO)
-                    .onStart { emit(ApiResult.loading()) }
+                    .onStart { emit(ApiResult.loading(fileName)) }
                     .onCompletion { emit(ApiResult.loaded()) }
                     .catch { e -> emit(ApiResult.error(e)) }
                     .collect { _attachmentResult.value = it }
         }
+    }
+
+    /**
+     * 將 byteArray 寫入 Video
+     */
+    private fun convertByteToVideo(context: Context, streamArray: ByteArray, fileName: String): String {
+        val path = getVideoPath(context, fileName)
+        val out = FileOutputStream(path)
+        out.write(streamArray)
+        out.close()
+        return path
+    }
+
+    /**
+     * 根據檔案名稱取得影片的路徑
+     */
+    fun getVideoPath(context: Context, fileName: String, ext: String = ""): String {
+        return "${FileUtil.getVideoFolderPath(context)}$fileName$ext"
     }
 
     /**
