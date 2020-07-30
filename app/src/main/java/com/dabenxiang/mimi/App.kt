@@ -13,6 +13,7 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import timber.log.Timber
 import tw.gov.president.manager.data.ConfigData
+import com.dabenxiang.mimi.manager.update.di.updatemanagerModule
 import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
 
 class App : Application() {
@@ -46,7 +47,8 @@ class App : Application() {
         val module = listOf(
             appModule,
             apiModule,
-            managerModule
+            managerModule,
+            updatemanagerModule
         )
 
         startKoin {

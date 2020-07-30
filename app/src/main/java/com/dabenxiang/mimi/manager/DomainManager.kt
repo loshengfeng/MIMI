@@ -16,14 +16,18 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
 
-class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClient) {
+open class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClient) {
 
     companion object {
         const val MIMI_PROJECT_ID = "815e22a6"
+        const val DOWNLOAD_SERVER_PROJECT_ID = "WaumJF6y"
         const val PROMO_CODE = "xxx"
         const val VALIDATION_URL = "/v1/Members/ValidateEmail"
         const val FLAVOR_DEV = "dev"
         const val FLAVOR_SIT = "sit"
+        const val TOKEN_PREFIX = "Basic "
+        const val BEARER_PREFIX = "Bearer "
+        const val AUTHORIZATION = "Authorization"
     }
 
     private var _goLibVersion = ""
@@ -64,7 +68,7 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
         }
     }
 
-    fun getApiDomain(): String {
+    open fun getApiDomain(): String {
         return when (BuildConfig.FLAVOR) {
             FLAVOR_DEV -> BuildConfig.API_HOST
             else -> {
@@ -92,7 +96,7 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
         }
     }
 
-    private fun getDomain(): String {
+    fun getDomain(): String {
         return when {
             currentDomainIndex < domainList.size -> domainList[currentDomainIndex]
             else -> {

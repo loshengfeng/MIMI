@@ -2,10 +2,12 @@ package com.dabenxiang.mimi.widget.utility
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.PendingIntent
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageInstaller
 import android.net.Uri
 import android.provider.Settings
 import android.util.DisplayMetrics
@@ -14,10 +16,12 @@ import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.BuildConfig
+import com.dabenxiang.mimi.PACKAGE_INSTALLED_ACTION
 import com.dabenxiang.mimi.manager.DomainManager
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.vo.error.ErrorItem
 import com.dabenxiang.mimi.model.api.vo.error.HttpExceptionItem
+import com.dabenxiang.mimi.view.main.MainActivity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -26,6 +30,8 @@ import okhttp3.Request
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.HttpException
 import retrofit2.Response
+import timber.log.Timber
+import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.util.*
@@ -222,4 +228,49 @@ object GeneralUtils {
         pw.flush()
         return sw.toString()
     }
+
+
+    fun installApk(context: Context, path: String) {
+        val session: PackageInstaller.Session?
+        try {
+            Timber.d("installApk: $path")
+            val packageInstaller = context.packageManager.packageInstaller
+            val sessionParams =
+                PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
+            val sessionId = packageInstaller.createSession(sessionParams)
+            session = packageInstaller.openSession(sessionId)
+
+            addApkToInstallSession(path, session)
+            Timber.d("session: $session")
+            val intent = Intent(context, MainActivity::class.java)
+            intent.action = PACKAGE_INSTALLED_ACTION
+            Timber.d("intent: $intent")
+            val pendingIntent = PendingIntent.getActivity(context, 1010, intent, 0)
+            session.commit(pendingIntent.intentSender)
+        } catch (e: java.lang.Exception) {
+            Timber.d("installApk: $e")
+            e.printStackTrace()
+        }
+    }
+
+    private fun addApkToInstallSession(apkName: String, session: PackageInstaller.Session) {
+        val packageInSession = session.openWrite("package", 0, -1)
+        val buffer = ByteArray(65535)
+        File(apkName).inputStream().let {
+            Timber.d("input stream: $it")
+            it.buffered().let { input ->
+                while (true) {
+                    val sz = input.read(buffer)
+                    if (sz <= 0) break
+                    Timber.d("input sz: $sz")
+                    packageInSession.write(buffer, 0, sz)
+                }
+                input.close()
+            }
+            it.close()
+            packageInSession.close()
+        }
+    }
+
+
 }

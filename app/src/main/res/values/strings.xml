@@ -295,4 +295,15 @@
     <string name="ranking_day">日排行</string>
     <string name="ranking_week">周排行</string>
     <string name="ranking_moon">月排行</string>
+
+    <!-- Version check  -->
+    <string name="check_version">检查版本…</string>
+    <string name="update_version">%d%%  更新中…</string>
+    <string name="updated_version_title">已有更新版本，是否立即更新</string>
+    <string name="update_immediately">立即更新</string>
+    <string name="remind_later">稍后提醒</string>
+    <string name="install_apk_failed_alert">安装apk失败，请手动安装</string>
+    <string name="setting_version">版本：%s</string>
+    <string name="confirm">确定</string>
+    <string name="cancel">取消</string>
 </resources>

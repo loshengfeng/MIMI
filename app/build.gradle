@@ -292,6 +292,9 @@ dependencies {
     // Application Provider
     implementation "com.github.florent37:applicationprovider:$application_provider_version"
 
+    // Work
+    implementation "androidx.work:work-runtime-ktx:$work_version"
+
     // Log
     if (isWithSubmoduleBranch()) {
         println "sub_project dep !!  "
@@ -307,6 +310,7 @@ dependencies {
         implementation "org.cks.utils:BaseManager:$log_version"
         implementation "org.cks.utils:DeviceInfoProvider:$log_version"
         implementation "org.cks.utils:logmanager:$log_version"
+//        implementation "org.cks.utils:updatemanager:$log_version"
         implementation "org.cks.utils:utils_device:$log_version"
         implementation "org.cks.utils:utils_api_result:$log_version"
         implementation "org.cks.utils:utils_general:$log_version"
