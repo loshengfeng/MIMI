@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.clubdetail
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
+import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -65,6 +66,11 @@ class ClubDetailFragment : BaseFragment() {
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_club_detail
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
     }
 
     override fun setupFirstTime() {
