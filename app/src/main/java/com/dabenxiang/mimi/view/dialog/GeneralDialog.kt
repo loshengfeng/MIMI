@@ -23,7 +23,8 @@ class GeneralDialogData(
     val firstBlock: (() -> Unit)? = null,
     val secondBtn: String = "",
     val secondBlock: (() -> Unit)? = null,
-    val closeBlock: (() -> Unit)? = null
+    val closeBlock: (() -> Unit)? = null,
+    val isMessageIcon: Boolean = true
 ) : Serializable
 
 fun GeneralDialog.show(manager: FragmentManager): GeneralDialog {
@@ -62,6 +63,12 @@ class GeneralDialog : BaseDialogFragment() {
             }
 
             iv_message.setImageResource(data.messageIcon)
+            iv_message.visibility =
+                if (data.isMessageIcon) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
 
             if (data.isHtml)
                 tv_message.text = Html.fromHtml(data.message, Html.FROM_HTML_MODE_COMPACT)

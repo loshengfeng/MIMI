@@ -1,7 +1,12 @@
 package com.dabenxiang.mimi.view.mypost
 
+import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -21,8 +26,11 @@ import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.dialog.GeneralDialog
+import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.comment.MyPostMoreDialogFragment
+import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.TYPE_VIDEO
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.post.pic.PostPicFragment
@@ -30,6 +38,7 @@ import com.dabenxiang.mimi.view.post.video.PostVideoFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_my_post.*
 import timber.log.Timber
@@ -53,6 +62,8 @@ class MyPostFragment : BaseFragment() {
 
     private var uploadCurrentPicPosition = 0
     private var deleteCurrentPicPosition = 0
+
+    private var snackBar: Snackbar? = null
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -88,6 +99,7 @@ class MyPostFragment : BaseFragment() {
             )
 
         if (isNeedPicUpload?.value != null) {
+            showSnackBar()
             deletePicList = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<String>>(PostPicFragment.DELETE_ATTACHMENT)?.value!!
             val memberRequest =
                 findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<PostMemberRequest>(
@@ -135,6 +147,7 @@ class MyPostFragment : BaseFragment() {
                 viewModel.postPic(postId?.value!!, postMemberRequest, content)
             }
         } else if (isNeedVideoUpload?.value != null) {
+            showSnackBar()
             deleteVideoItem = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<PostVideoAttachment>>(PostVideoFragment.DELETE_ATTACHMENT)?.value!!
             uploadVideoList= findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<PostVideoAttachment>>(PostVideoFragment.VIDEO_DATA)?.value!!
 
@@ -283,25 +296,29 @@ class MyPostFragment : BaseFragment() {
                         viewModel.postAttachment(pic.url, requireContext(), TYPE_PIC)
                     }
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is ApiResult.Error -> resetAndCancelJob(it.throwable)
             }
         })
 
         viewModel.postVideoMemberResult.observe(viewLifecycleOwner, Observer {
-            if (deletePicList.isNotEmpty()) {
-                viewModel.deleteAttachment(deletePicList[deleteCurrentPicPosition])
-            } else if (deleteVideoItem.isNotEmpty()) {
-                viewModel.deleteVideoAttachment(deleteVideoItem[0].picAttachmentId, TYPE_PIC)
-            } else {
-                //TODO UI
-
+            when(it) {
+                is ApiResult.Success -> {
+                    if (deletePicList.isNotEmpty()) {
+                        viewModel.deleteAttachment(deletePicList[deleteCurrentPicPosition])
+                    } else if (deleteVideoItem.isNotEmpty()) {
+                        viewModel.deleteVideoAttachment(deleteVideoItem[0].picAttachmentId, TYPE_PIC)
+                    } else {
+                        finishSnackBar()
+                    }
+                }
+                is ApiResult.Error -> resetAndCancelJob(it.throwable)
             }
         })
 
         viewModel.postDeleteAttachment.observe(viewLifecycleOwner, Observer {
             deleteCurrentPicPosition += 1
             if (deleteCurrentPicPosition > deletePicList.size - 1) {
-                //TODO finish
+                finishSnackBar()
             } else {
                 viewModel.deleteAttachment(deletePicList[deleteCurrentPicPosition])
             }
@@ -317,7 +334,7 @@ class MyPostFragment : BaseFragment() {
                     uploadVideoList[0].picAttachmentId = it.result.toString()
                     viewModel.postAttachment(uploadVideoList[0].videoUrl, requireContext(), TYPE_VIDEO)
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is ApiResult.Error -> resetAndCancelJob(it.throwable)
             }
         })
 
@@ -350,7 +367,7 @@ class MyPostFragment : BaseFragment() {
 
                     viewModel.postPic(postId?.value!!, postMemberRequest, content)
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is ApiResult.Error -> resetAndCancelJob(it.throwable)
             }
         })
 
@@ -363,7 +380,7 @@ class MyPostFragment : BaseFragment() {
 
         viewModel.postDeleteVideoAttachment.observe(viewLifecycleOwner, Observer {
             when(it) {
-                is ApiResult.Success -> "" //TODO UI
+                is ApiResult.Success -> finishSnackBar()
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
@@ -524,5 +541,95 @@ class MyPostFragment : BaseFragment() {
         fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType)
         fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType)
         fun onFavoriteClick(item: MemberPostItem, position: Int, isFavorite: Boolean, type: AttachmentType)
+    }
+
+    private fun showSnackBar() {
+        snackBar = Snackbar.make(snackBarLayout, "", Snackbar.LENGTH_INDEFINITE)
+        val snackBarLayout: Snackbar.SnackbarLayout = snackBar?.view as Snackbar.SnackbarLayout
+        val textView = snackBarLayout.findViewById(R.id.snackbar_text) as TextView
+        textView.visibility = View.INVISIBLE
+
+        val snackView: View = layoutInflater.inflate(R.layout.snackbar_upload, null)
+        snackBarLayout.addView(snackView, 0)
+        snackBarLayout.setPadding(15, 0, 15, 0)
+        snackBarLayout.setBackgroundColor(Color.TRANSPARENT)
+        snackBar?.show()
+
+        val imgCancel = snackBarLayout.findViewById(R.id.iv_cancel) as ImageView
+        val txtCancel = snackBarLayout.findViewById(R.id.txt_cancel) as TextView
+
+        txtCancel.setOnClickListener {
+            cancelDialog()
+        }
+
+        imgCancel.setOnClickListener {
+            cancelDialog()
+        }
+    }
+
+    private fun cancelDialog() {
+        GeneralDialog.newInstance(
+            GeneralDialogData(
+                titleRes = R.string.whether_to_discard_content,
+                messageIcon = R.drawable.ico_default_photo,
+                firstBtn = getString(R.string.btn_cancel),
+                secondBtn = getString(R.string.btn_confirm),
+                isMessageIcon = false,
+                secondBlock = {
+                    viewModel.cancelJob()
+                }
+            )
+        ).show(requireActivity().supportFragmentManager)
+    }
+
+    private fun finishSnackBar() {
+        val snackBarLayout: Snackbar.SnackbarLayout = snackBar?.view as Snackbar.SnackbarLayout
+        val progressBar =
+            snackBarLayout.findViewById(R.id.contentLoadingProgressBar) as ContentLoadingProgressBar
+        val imgSuccess = snackBarLayout.findViewById(R.id.iv_success) as ImageView
+
+        val txtSuccess = snackBarLayout.findViewById(R.id.txt_postSuccess) as TextView
+        val txtUploading = snackBarLayout.findViewById(R.id.txt_uploading) as TextView
+
+        val imgCancel = snackBarLayout.findViewById(R.id.iv_cancel) as ImageView
+        val txtCancel = snackBarLayout.findViewById(R.id.txt_cancel) as TextView
+        val imgPost = snackBarLayout.findViewById(R.id.iv_viewPost) as ImageView
+        val txtPost = snackBarLayout.findViewById(R.id.txt_viewPost) as TextView
+
+        progressBar.visibility = View.GONE
+        imgSuccess.visibility = View.VISIBLE
+
+        txtSuccess.visibility = View.VISIBLE
+        txtUploading.visibility = View.GONE
+
+        imgCancel.visibility = View.GONE
+        txtCancel.visibility = View.GONE
+
+        imgPost.visibility = View.VISIBLE
+        txtPost.visibility = View.VISIBLE
+
+        imgPost.setOnClickListener {
+            findNavController().navigate(R.id.action_adultHomeFragment_to_myPostFragment)
+        }
+
+        txtPost.setOnClickListener {
+            findNavController().navigate(R.id.action_adultHomeFragment_to_myPostFragment)
+        }
+
+        uploadCurrentPicPosition = 0
+        deleteCurrentPicPosition = 0
+
+        Handler().postDelayed({
+            snackBar?.dismiss()
+        }, 3000)
+    }
+
+    private fun resetAndCancelJob(t: Throwable) {
+        onApiError(t)
+        viewModel.cancelJob()
+        snackBar?.dismiss()
+        uploadCurrentPicPosition = 0
+        deleteCurrentPicPosition = 0
+        //TODO show error toast
     }
 }

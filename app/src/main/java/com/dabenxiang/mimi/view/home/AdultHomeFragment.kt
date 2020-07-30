@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.view.View
@@ -46,8 +47,7 @@ import com.dabenxiang.mimi.view.club.ClubFuncItem
 import com.dabenxiang.mimi.view.club.ClubMemberAdapter
 import com.dabenxiang.mimi.view.club.MiMiLinearLayoutManager
 import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
-import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
-import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
+import com.dabenxiang.mimi.view.dialog.*
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.OnChooseUploadMethodDialogListener
 import com.dabenxiang.mimi.view.home.HomeViewModel.Companion.TYPE_COVER
@@ -114,7 +114,7 @@ class AdultHomeFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         handleBackStackData()
-//        showSnackBar()
+        showSnackBar()
     }
 
     override fun setupFirstTime() {
@@ -178,7 +178,7 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private fun showSnackBar() {
-        snackBar = Snackbar.make(testView, "", Snackbar.LENGTH_INDEFINITE)
+        snackBar = Snackbar.make(snackBarLayout, "", Snackbar.LENGTH_INDEFINITE)
         val snackBarLayout: Snackbar.SnackbarLayout = snackBar?.view as Snackbar.SnackbarLayout
         val textView = snackBarLayout.findViewById(R.id.snackbar_text) as TextView
         textView.visibility = View.INVISIBLE
@@ -193,8 +193,27 @@ class AdultHomeFragment : BaseFragment() {
         val txtCancel = snackBarLayout.findViewById(R.id.txt_cancel) as TextView
 
         txtCancel.setOnClickListener {
-            findNavController().navigate(R.id.action_adultHomeFragment_to_myPostFragment)
+            cancelDialog()
         }
+
+        imgCancel.setOnClickListener {
+            cancelDialog()
+        }
+    }
+
+    private fun cancelDialog() {
+        GeneralDialog.newInstance(
+            GeneralDialogData(
+                titleRes = R.string.whether_to_discard_content,
+                messageIcon = R.drawable.ico_default_photo,
+                firstBtn = getString(R.string.btn_cancel),
+                secondBtn = getString(R.string.btn_confirm),
+                isMessageIcon = false,
+                secondBlock = {
+                    findNavController().navigate(R.id.action_adultHomeFragment_to_myPostFragment)
+                }
+            )
+        ).show(requireActivity().supportFragmentManager)
     }
 
     override fun setupObservers() {
@@ -370,8 +389,7 @@ class AdultHomeFragment : BaseFragment() {
                     }
                 }
                 is Error -> {
-                    onApiError(it.throwable)
-                    //TODO 中斷上傳 and reset
+                    resetAndCancelJob(it.throwable)
                 }
             }
         })
@@ -383,8 +401,7 @@ class AdultHomeFragment : BaseFragment() {
                     viewModel.postAttachment(uploadVideoUri[0].videoUrl, requireContext(), TYPE_VIDEO)
                 }
                 is Error -> {
-                    onApiError(it.throwable)
-                    //TODO 中斷上傳 and reset
+                    resetAndCancelJob(it.throwable)
                 }
             }
         })
@@ -405,8 +422,7 @@ class AdultHomeFragment : BaseFragment() {
                     viewModel.postPic(postMemberRequest, content)
                 }
                 is Error -> {
-                    onApiError(it.throwable)
-                    //TODO 中斷上傳 and reset
+                    resetAndCancelJob(it.throwable)
                 }
             }
         })
@@ -451,6 +467,10 @@ class AdultHomeFragment : BaseFragment() {
 
             uploadCurrentPicPosition = 0
             uploadPicUri.clear()
+
+            Handler().postDelayed({
+                snackBar?.dismiss()
+            }, 3000)
         })
 
         viewModel.uploadCoverItem.observe(viewLifecycleOwner, Observer {
@@ -542,7 +562,6 @@ class AdultHomeFragment : BaseFragment() {
                     bundle
                 )
             )
-
         }
 
         recyclerview_tab.adapter = tabAdapter
@@ -1108,5 +1127,14 @@ class AdultHomeFragment : BaseFragment() {
         update: (Boolean) -> Unit
     ) {
         viewModel.clubFollow(memberClubItem, isFollow, update)
+    }
+
+    private fun resetAndCancelJob(t: Throwable) {
+        onApiError(t)
+        viewModel.cancelJob()
+        snackBar?.dismiss()
+        uploadCurrentPicPosition = 0
+        uploadPicUri.clear()
+        //TODO show error toast
     }
 }
