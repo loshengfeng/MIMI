@@ -11,6 +11,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
 class ClubMemberAdapter(
     val context: Context,
@@ -67,6 +68,9 @@ class ClubMemberAdapter(
         when (holder) {
             is AdHolder -> {
                 Glide.with(context).load(item?.adItem?.href).into(holder.adImg)
+                holder.adImg.setOnClickListener { view ->
+                    GeneralUtils.openWebView(view.context, item?.adItem?.target ?: "")
+                }
             }
             is ClubMemberViewHolder -> {
                 item?.also { holder.onBind(it, clubFuncItem, position) }

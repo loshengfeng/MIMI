@@ -5,6 +5,7 @@ import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.item_banner.view.*
 
 class GridBannerHolder(itemView: View, onClickListener: IndexViewHolderListener) :
@@ -16,5 +17,9 @@ class GridBannerHolder(itemView: View, onClickListener: IndexViewHolderListener)
         Glide.with(itemView.context)
             .load(model?.adItem?.href)
             .into(ivPoster)
+
+        ivPoster.setOnClickListener { view ->
+            GeneralUtils.openWebView(view.context, model?.adItem?.target ?: "")
+        }
     }
 }

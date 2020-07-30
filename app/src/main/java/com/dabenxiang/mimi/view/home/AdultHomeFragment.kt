@@ -577,8 +577,6 @@ class AdultHomeFragment : BaseFragment() {
                     rv_first.layoutManager = GridLayoutManager(requireContext(), 2)
                     rv_first.adapter = videoListAdapter
                     viewModel.getVideos(null, true)
-
-                    mainViewModel?.getAd(viewModel.adWidth, viewModel.adHeight)
                 }
             }
             2 -> {

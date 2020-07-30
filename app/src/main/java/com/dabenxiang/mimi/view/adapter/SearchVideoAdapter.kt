@@ -16,6 +16,7 @@ import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.SearchVideoViewHolder
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
 class SearchVideoAdapter(
     val context: Context,
@@ -74,6 +75,9 @@ class SearchVideoAdapter(
         when (holder) {
             is AdHolder -> {
                 Glide.with(context).load(item?.adItem?.href).into(holder.adImg)
+                holder.adImg.setOnClickListener {
+                    GeneralUtils.openWebView(context, item?.adItem?.target ?: "")
+                }
             }
             is SearchVideoViewHolder -> holder.bind(item as VideoItem)
         }

@@ -16,6 +16,7 @@ import com.dabenxiang.mimi.view.adapter.viewHolder.ClipPostHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.TextPostHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
 class MemberPostPagedAdapter(
     val context: Context,
@@ -100,6 +101,9 @@ class MemberPostPagedAdapter(
         when (holder) {
             is AdHolder -> {
                 Glide.with(context).load(item?.adItem?.href).into(holder.adImg)
+                holder.adImg.setOnClickListener {
+                    GeneralUtils.openWebView(context, item?.adItem?.target ?: "")
+                }
             }
             is ClipPostHolder -> {
                 item?.also {
