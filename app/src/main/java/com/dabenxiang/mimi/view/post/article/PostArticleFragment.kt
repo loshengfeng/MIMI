@@ -7,6 +7,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.size
 import androidx.fragment.app.viewModels
@@ -182,18 +183,19 @@ class PostArticleFragment : BaseFragment() {
             val content = edt_content.text.toString()
 
             if (title.isBlank()) {
+                Toast.makeText(requireContext(), R.string.post_warning_title, Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (content.isBlank()) {
+                Toast.makeText(requireContext(), R.string.post_warning_content, Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            if (chipGroup.childCount == (0)) {
+            if (chipGroup.childCount == 0) {
+                Toast.makeText(requireContext(), R.string.post_warning_tag, Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-
-            //TODO 上面的判斷需要空白提示 UI
 
             val requestContent = ArticleItem(content)
 

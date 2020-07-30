@@ -9,6 +9,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.size
 import androidx.fragment.app.viewModels
@@ -38,11 +39,9 @@ import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_post_article.*
 import kotlinx.android.synthetic.main.fragment_post_article.chipGroup
 import kotlinx.android.synthetic.main.fragment_post_article.clubLayout
-import kotlinx.android.synthetic.main.fragment_post_article.edt_content
 import kotlinx.android.synthetic.main.fragment_post_article.edt_hashtag
 import kotlinx.android.synthetic.main.fragment_post_article.edt_title
 import kotlinx.android.synthetic.main.fragment_post_article.iv_avatar
-import kotlinx.android.synthetic.main.fragment_post_article.txt_contentCount
 import kotlinx.android.synthetic.main.fragment_post_article.txt_hashtagCount
 import kotlinx.android.synthetic.main.fragment_post_article.txt_titleCount
 import kotlinx.android.synthetic.main.fragment_post_pic.*
@@ -152,27 +151,6 @@ class PostPicFragment : BaseFragment() {
             }
         })
 
-        edt_content.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                s?.let {
-                    if (it.length > CONTENT_LIMIT) {
-                        val content = it.toString().dropLast(1)
-                        edt_title.setText(content)
-
-                    }
-                }
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                txt_contentCount.text = String.format(getString(R.string.typing_count, s?.length,
-                    CONTENT_LIMIT
-                ))
-            }
-        })
-
         clubLayout.setOnClickListener {
             ChooseClubDialogFragment.newInstance(chooseClubDialogListener).also {
                 it.show(
@@ -196,21 +174,21 @@ class PostPicFragment : BaseFragment() {
 
         tv_clean.setOnClickListener {
             val title = edt_title.text.toString()
-            val content = edt_content.text.toString()
 
             if (title.isBlank()) {
+                Toast.makeText(requireContext(), R.string.post_warning_title, Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            if (content.isBlank()) {
+            if (chipGroup.childCount == 0) {
+                Toast.makeText(requireContext(), R.string.post_warning_tag, Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            if (chipGroup.childCount == (0)) {
+            if (adapter.getData().isEmpty()) {
+                Toast.makeText(requireContext(), R.string.post_warning_pic, Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-
-            //TODO 上面的判斷需要空白提示 UI
 
             val tags = arrayListOf<String>()
 
@@ -223,7 +201,6 @@ class PostPicFragment : BaseFragment() {
             val request = PostMemberRequest(
                 title = title,
                 type = PostType.IMAGE.value,
-                content = content,
                 tags = tags
             )
 
@@ -246,10 +223,6 @@ class PostPicFragment : BaseFragment() {
         txt_titleCount.text = String.format(getString(R.string.typing_count,
             INIT_VALUE,
             TITLE_LIMIT
-        ))
-        txt_contentCount.text = String.format(getString(R.string.typing_count,
-            INIT_VALUE,
-            CONTENT_LIMIT
         ))
         txt_hashtagCount.text = String.format(getString(R.string.typing_count,
             INIT_VALUE,
@@ -280,7 +253,6 @@ class PostPicFragment : BaseFragment() {
         postId = item.id
 
         edt_title.setText(item.title)
-        edt_content.setText(mediaItem.textContent)
 
         for (tag in item.tags!!) {
             addTag(tag)
@@ -289,10 +261,6 @@ class PostPicFragment : BaseFragment() {
         txt_titleCount.text = String.format(getString(R.string.typing_count,
             item.title.length,
             TITLE_LIMIT
-        ))
-        txt_contentCount.text = String.format(getString(R.string.typing_count,
-            mediaItem.textContent.length,
-            CONTENT_LIMIT
         ))
         txt_hashtagCount.text = String.format(getString(R.string.typing_count,
             item.tags.size,
