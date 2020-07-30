@@ -43,6 +43,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.club.ClubFuncItem
 import com.dabenxiang.mimi.view.club.ClubMemberAdapter
+import com.dabenxiang.mimi.view.club.MiMiLinearLayoutManager
 import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
@@ -461,6 +462,10 @@ class AdultHomeFragment : BaseFragment() {
         viewModel.uploadCoverItem.observe(viewLifecycleOwner, Observer {
             picParameter = it
         })
+
+        viewModel.totalCountResult.observe(viewLifecycleOwner, Observer { totalCount ->
+            takeIf { rv_sixth.visibility == View.VISIBLE }?.also { clubMemberAdapter.totalCount = totalCount }
+        })
     }
 
     override fun setupListeners() {
@@ -630,7 +635,7 @@ class AdultHomeFragment : BaseFragment() {
                     refresh.isRefreshing = true
                     rv_sixth.background =
                         requireActivity().getDrawable(R.color.adult_color_background)
-                    rv_sixth.layoutManager = LinearLayoutManager(requireContext())
+                    rv_sixth.layoutManager = MiMiLinearLayoutManager(requireContext())
                     rv_sixth.adapter = clubMemberAdapter
                     viewModel.getClubs()
                 }
