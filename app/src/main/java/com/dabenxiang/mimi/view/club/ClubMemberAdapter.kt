@@ -2,7 +2,9 @@ package com.dabenxiang.mimi.view.club
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.bumptech.glide.Glide
@@ -12,6 +14,8 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.view.home.club.ClubDataSource
+import kotlinx.android.synthetic.main.item_list_loading.view.*
 
 class ClubMemberAdapter(
     val context: Context,
@@ -21,6 +25,7 @@ class ClubMemberAdapter(
     companion object {
         const val VIEW_TYPE_AD = 0
         const val VIEW_TYPE_CLUB = 1
+        const val VIEW_TYPE_FOOTER = 2
         val diffCallback = object : DiffUtil.ItemCallback<MemberClubItem>() {
             override fun areItemsTheSame(
                 oldItem: MemberClubItem,
@@ -38,12 +43,26 @@ class ClubMemberAdapter(
         }
     }
 
-    override fun getItemViewType(position: Int): Int {
-        val item = getItem(position)
-        return if (item?.type == PostType.AD) {
-            VIEW_TYPE_AD
+    var totalCount = 0
+
+    override fun getItemCount(): Int {
+        return if(currentList?.size ?: 0 >= ClubDataSource.PER_LIMIT) {
+            super.getItemCount() + 1
         } else {
-            VIEW_TYPE_CLUB
+            super.getItemCount()
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return if (position < currentList?.size ?: 0) {
+            val item = getItem(position)
+            if (item?.type == PostType.AD) {
+                VIEW_TYPE_AD
+            } else {
+                VIEW_TYPE_CLUB
+            }
+        } else {
+            VIEW_TYPE_FOOTER
         }
     }
 
@@ -54,26 +73,38 @@ class ClubMemberAdapter(
                     LayoutInflater.from(parent.context).inflate(R.layout.item_ad, parent, false)
                 )
             }
-            else -> {
+            VIEW_TYPE_CLUB -> {
                 ClubMemberViewHolder(
                     LayoutInflater.from(parent.context)
                         .inflate(R.layout.item_club_member, parent, false)
                 )
             }
+            else -> {
+                ListLoadingViewHolder(LayoutInflater.from(parent.context)
+                    .inflate(R.layout.item_list_loading, parent, false))
+            }
         }
     }
 
+    class ListLoadingViewHolder(view: View) : BaseViewHolder(view) {
+        val progressBar: ProgressBar = view.progress_bar
+    }
+
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
-        val item = getItem(position)
         when (holder) {
             is AdHolder -> {
+                val item = getItem(position)
                 Glide.with(context).load(item?.adItem?.href).into(holder.adImg)
                 holder.adImg.setOnClickListener { view ->
                     GeneralUtils.openWebView(view.context, item?.adItem?.target ?: "")
                 }
             }
             is ClubMemberViewHolder -> {
+                val item = getItem(position)
                 item?.also { holder.onBind(it, clubFuncItem, position) }
+            }
+            is ListLoadingViewHolder -> {
+                if (position >= totalCount) holder.progressBar.visibility = View.GONE
             }
         }
     }
