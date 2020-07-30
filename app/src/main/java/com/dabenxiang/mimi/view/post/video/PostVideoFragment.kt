@@ -15,12 +15,14 @@ import android.view.inputmethod.EditorInfo
 import androidx.core.content.ContextCompat
 import androidx.core.view.size
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.PostVideoItemListener
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MediaItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -101,6 +103,36 @@ class PostVideoFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
+        viewModel.clubItemResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Success -> {
+                    txt_clubName.text = it.result.first().title
+                    txt_hashtagName.text = it.result.first().tag
+
+                    txt_placeholder.visibility = View.GONE
+                    txt_clubName.visibility = View.VISIBLE
+                    txt_hashtagName.visibility = View.VISIBLE
+
+                    if (LruCacheUtils.getLruCache(it.result.first().avatarAttachmentId.toString()) == null) {
+                        viewModel.getBitmapForClub(it.result.first().avatarAttachmentId.toString())
+                    } else {
+                        val bitmap = LruCacheUtils.getLruCache(it.result.first().avatarAttachmentId.toString())
+                        Glide.with(requireContext()).load(bitmap).circleCrop().into(iv_avatar)
+                    }
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.bitmapResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Success -> {
+                    val bitmap = LruCacheUtils.getLruCache(it.result)
+                    Glide.with(requireContext()).load(bitmap).circleCrop().into(iv_avatar)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -291,6 +323,8 @@ class PostVideoFragment : BaseFragment() {
 
     private val chooseClubDialogListener = object : ChooseClubDialogListener {
         override fun onChooseClub(item: MemberClubItem) {
+            txt_clubName.text = item.title
+            txt_hashtagName.text = item.tag
 
             val bitmap = LruCacheUtils.getLruCache(item.avatarAttachmentId.toString())
             Glide.with(requireContext())
@@ -320,6 +354,8 @@ class PostVideoFragment : BaseFragment() {
             chip.setOnCloseIconClickListener {
                 chipGroup.removeView(it)
             }
+        } else {
+             viewModel.getClub(tag)
         }
 
         chipGroup.addView(chip)
