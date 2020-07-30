@@ -11,7 +11,6 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
-import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import androidx.core.content.ContextCompat
 import androidx.core.view.size
@@ -262,6 +261,7 @@ class PostVideoFragment : BaseFragment() {
         postId = item.id
 
         edt_title.setText(item.title)
+        edt_content.setText(mediaItem.textContent)
 
         for (tag in item.tags!!) {
             addTag(tag)

@@ -242,6 +242,7 @@ class PostPicFragment : BaseFragment() {
         postId = item.id
 
         edt_title.setText(item.title)
+        edt_content.setText(mediaItem.textContent)
 
         for (tag in item.tags!!) {
             addTag(tag)
