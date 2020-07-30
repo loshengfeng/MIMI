@@ -51,13 +51,10 @@ class ClipViewModel : BaseViewModel() {
                 val file = FileUtil.getClipFile(filename)
                 FileIOUtils.writeFileFromIS(file, byteStream)
 
-                emit(
-                        ApiResult.success(Triple(id, pos, file)))
+                emit(ApiResult.success(Triple(id, pos, file)))
             }
-                .catch { e ->
-                    emit(ApiResult.error(e)) }
-                .collect {
-                    _clipResult.value = it }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _clipResult.value = it }
         }
     }
 

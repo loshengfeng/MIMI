@@ -28,6 +28,19 @@ import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_post_article.*
+import kotlinx.android.synthetic.main.fragment_post_article.chipGroup
+import kotlinx.android.synthetic.main.fragment_post_article.clubLayout
+import kotlinx.android.synthetic.main.fragment_post_article.edt_content
+import kotlinx.android.synthetic.main.fragment_post_article.edt_hashtag
+import kotlinx.android.synthetic.main.fragment_post_article.edt_title
+import kotlinx.android.synthetic.main.fragment_post_article.iv_avatar
+import kotlinx.android.synthetic.main.fragment_post_article.txt_clubName
+import kotlinx.android.synthetic.main.fragment_post_article.txt_contentCount
+import kotlinx.android.synthetic.main.fragment_post_article.txt_hashtagCount
+import kotlinx.android.synthetic.main.fragment_post_article.txt_hashtagName
+import kotlinx.android.synthetic.main.fragment_post_article.txt_placeholder
+import kotlinx.android.synthetic.main.fragment_post_article.txt_titleCount
+import kotlinx.android.synthetic.main.fragment_post_pic.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 
 
@@ -61,6 +74,37 @@ class PostArticleFragment : BaseFragment() {
                 is ApiResult.Loaded -> progressHUD?.dismiss()
                 is ApiResult.Success -> {
                     findNavController().navigateUp()
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.clubItemResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Success -> {
+                    txt_clubName.text = it.result.first().title
+                    txt_hashtagName.text = it.result.first().tag
+
+                    txt_placeholder.visibility = View.GONE
+                    txt_clubName.visibility = View.VISIBLE
+                    txt_hashtagName.visibility = View.VISIBLE
+
+                    if (LruCacheUtils.getLruCache(it.result.first().avatarAttachmentId.toString()) == null) {
+                        viewModel.getBitmap(it.result.first().avatarAttachmentId.toString())
+                    } else {
+                        val bitmap = LruCacheUtils.getLruCache(it.result.first().avatarAttachmentId.toString())
+                        Glide.with(requireContext()).load(bitmap).circleCrop().into(iv_avatar)
+                    }
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.bitmapResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Success -> {
+                    val bitmap = LruCacheUtils.getLruCache(it.result)
+                    Glide.with(requireContext()).load(bitmap).circleCrop().into(iv_avatar)
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
@@ -238,6 +282,10 @@ class PostArticleFragment : BaseFragment() {
                 .into(iv_avatar)
 
             addTag(item.tag)
+
+            txt_placeholder.visibility = View.GONE
+            txt_clubName.visibility = View.VISIBLE
+            txt_hashtagName.visibility = View.VISIBLE
         }
     }
 
@@ -255,6 +303,8 @@ class PostArticleFragment : BaseFragment() {
             chip.setOnCloseIconClickListener {
                 chipGroup.removeView(it)
             }
+        } else {
+            viewModel.getClub(tag)
         }
 
         chipGroup.addView(chip)

@@ -54,7 +54,7 @@
             app:btn_pressed_color="darker"
             app:btn_solid_color="@color/normal_color_search_bar"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/btn_ranking"
+            app:layout_constraintEnd_toStartOf="@id/barrier"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -78,6 +78,13 @@
             app:layout_constraintBottom_toBottomOf="@id/iv_bg_search"
             app:layout_constraintStart_toEndOf="@id/iv_search"
             app:layout_constraintTop_toTopOf="@id/iv_bg_search" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier"
+            app:barrierDirection="left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="btn_filter,btn_ranking"/>
 
         <com.yulichswift.roundedview.widget.RoundedTextView
             android:id="@+id/btn_filter"
@@ -181,7 +188,7 @@
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/testView"
+        android:id="@+id/snackBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"

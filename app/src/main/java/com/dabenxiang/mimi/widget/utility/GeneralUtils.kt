@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.provider.MediaStore
 import android.content.Intent
 import android.content.pm.PackageInstaller
 import android.net.Uri
@@ -229,7 +230,6 @@ object GeneralUtils {
         return sw.toString()
     }
 
-
     fun installApk(context: Context, path: String) {
         val session: PackageInstaller.Session?
         try {
@@ -272,5 +272,13 @@ object GeneralUtils {
         }
     }
 
-
+    /**
+     * 開啟app play video
+     */
+    fun openPlayerIntent(context: Context, path: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(path))
+        intent.putExtra(MediaStore.EXTRA_FINISH_ON_COMPLETION, false)
+        intent.setDataAndType(Uri.parse(path), "video/*")
+        context.startActivity(intent)
+    }
 }

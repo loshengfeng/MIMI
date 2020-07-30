@@ -44,7 +44,7 @@
 
     </com.google.android.material.tabs.TabLayout>
 
-    <androidx.viewpager.widget.ViewPager
+    <com.dabenxiang.mimi.view.post.video.EditVideoViewPager
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="500dp"

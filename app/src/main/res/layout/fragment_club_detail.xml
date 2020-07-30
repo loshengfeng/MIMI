@@ -48,7 +48,7 @@
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:layout_marginVertical="10dp"
-                        android:background="@drawable/icon_cs_photo"
+                        android:background="@drawable/img_avatar_a_01"
                         android:contentDescription="@null"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"

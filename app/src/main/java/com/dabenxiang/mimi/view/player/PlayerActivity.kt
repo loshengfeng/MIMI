@@ -10,10 +10,7 @@ import android.hardware.SensorManager
 import android.os.Bundle
 import android.text.Html
 import android.text.TextUtils
-import android.view.MotionEvent
-import android.view.Surface
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
@@ -66,7 +63,6 @@ import java.net.UnknownHostException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs
-import kotlin.math.min
 import kotlin.math.round
 
 class PlayerActivity : BaseActivity() {
@@ -1475,15 +1471,20 @@ class PlayerActivity : BaseActivity() {
             params.width = ViewGroup.LayoutParams.MATCH_PARENT
             params.height = 0
             player_view.layoutParams = params
-
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
         } else {
             val params = player_view.layoutParams
             params.width = ViewGroup.LayoutParams.MATCH_PARENT
-            params.height =
-                min(screenSize.first, screenSize.second) - GeneralUtils.getStatusBarHeight(
-                    baseContext
-                )
+//            params.height =
+//                min(screenSize.first, screenSize.second) - GeneralUtils.getStatusBarHeight(
+//                    baseContext
+//                )
+            params.height = ViewGroup.LayoutParams.MATCH_PARENT
             player_view.layoutParams = params
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+            var windowParams = window.attributes
+            windowParams.flags = windowParams.flags or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+            window.attributes = windowParams
         }
     }
 

@@ -32,9 +32,9 @@ object FileUtil {
     }
 
     fun getVideoFolderPath(context: Context): String {
-        val path = StringBuilder(getAppPath(context))
+        val path = StringBuilder(getMediaMountedAppPath(context))
             .append(File.separator)
-            .append(CryptUtils.decodeBase64("RWFnbGVIb3JzZQ=="))
+            .append(CryptUtils.decodeBase64("TUlNSQ=="))
             .append(File.separator)
             .append(CryptUtils.decodeBase64("VmlkZW8="))
             .append(File.separator)
@@ -59,6 +59,15 @@ object FileUtil {
 //            else -> context.filesDir.toString()
 //        }
         return context.filesDir.toString()
+    }
+
+    private fun getMediaMountedAppPath(context: Context): String {
+        return when (Environment.MEDIA_MOUNTED) {
+            Environment.getExternalStorageState() -> {
+                Environment.getExternalStorageDirectory().toString()
+            }
+            else -> context.filesDir.toString()
+        }
     }
 
     fun saveBitmapToJpegFile(

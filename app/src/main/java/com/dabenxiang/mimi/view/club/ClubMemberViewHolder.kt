@@ -62,7 +62,7 @@ class ClubMemberViewHolder(view: View) : BaseViewHolder(view) {
             }
         } ?: run {
             Glide.with(ivAvatar.context)
-                .load(ivAvatar.context.getDrawable(R.drawable.icon_cs_photo)).centerCrop()
+                .load(ivAvatar.context.getDrawable(R.drawable.img_avatar_a_01)).centerCrop()
                 .into(ivAvatar)
         }
 
