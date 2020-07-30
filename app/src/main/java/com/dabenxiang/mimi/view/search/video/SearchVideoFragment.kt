@@ -312,6 +312,9 @@ class SearchVideoFragment : BaseFragment() {
         }
 
         override fun onChipClick(text: String) {
+            viewModel.searchingTag = text
+            viewModel.searchingStr = ""
+            viewModel.getSearchList()
         }
 
         override fun onAvatarDownload(view: ImageView, id: String) {
