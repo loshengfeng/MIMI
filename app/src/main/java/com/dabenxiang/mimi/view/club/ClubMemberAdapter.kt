@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.bumptech.glide.Glide
@@ -87,7 +87,7 @@ class ClubMemberAdapter(
     }
 
     class ListLoadingViewHolder(view: View) : BaseViewHolder(view) {
-        val progressBar: ProgressBar = view.progress_bar
+        val clLoading: ConstraintLayout = view.cl_loading
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
@@ -104,7 +104,7 @@ class ClubMemberAdapter(
                 item?.also { holder.onBind(it, clubFuncItem, position) }
             }
             is ListLoadingViewHolder -> {
-                if (position >= totalCount) holder.progressBar.visibility = View.GONE
+                if (position >= totalCount) holder.clLoading.visibility = View.GONE
             }
         }
     }
