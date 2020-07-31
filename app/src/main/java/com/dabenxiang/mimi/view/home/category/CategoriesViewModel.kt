@@ -7,12 +7,16 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.dabenxiang.mimi.callback.PagingCallback
+import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.VideoSearchItem
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.home.video.VideoDataSource
 import com.dabenxiang.mimi.view.home.video.VideoFactory
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 class CategoriesViewModel : BaseViewModel() {
 
@@ -21,6 +25,9 @@ class CategoriesViewModel : BaseViewModel() {
 
     private val _videoList = MutableLiveData<PagedList<BaseVideoItem>>()
     val videoList: LiveData<PagedList<BaseVideoItem>> = _videoList
+
+    private val _getCategoryDetailResult = MutableLiveData<ApiResult<VideoSearchItem>>()
+    val getCategoryDetailResult: LiveData<ApiResult<VideoSearchItem>> = _getCategoryDetailResult
 
     private val filterPositionDataList by lazy {
         val map = mutableMapOf<Int, MutableLiveData<Int>>()
@@ -57,6 +64,26 @@ class CategoriesViewModel : BaseViewModel() {
             LivePagedListBuilder(factory, config).build().asFlow().collect {
                 _videoList.postValue(it)
             }
+        }
+    }
+
+    fun getCategoryDetail(category: String, isAdult: Boolean) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository().searchHomeVideos(
+                    category = category,
+                    isAdult = isAdult,
+                    offset = "0",
+                    limit = "1"
+                )
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(resp.body()?.content))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _getCategoryDetailResult.value = it }
         }
     }
 

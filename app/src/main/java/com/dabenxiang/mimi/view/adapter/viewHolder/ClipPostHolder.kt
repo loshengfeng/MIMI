@@ -24,6 +24,7 @@ import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_clip_post.view.*
 import timber.log.Timber
+import java.lang.Exception
 import java.util.*
 
 class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
@@ -88,10 +89,15 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
             tagChipGroup.addView(chip)
         }
 
-        val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
+        var contentItem: MediaContentItem? = null
+        try {
+            contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
 
-        tvLength.text = contentItem.shortVideo?.length
-        contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
+        tvLength.text = contentItem?.shortVideo?.length
+        contentItem?.images?.takeIf { it.isNotEmpty() }?.also { images ->
             images[0].also { image ->
                 if (TextUtils.isEmpty(image.url)) {
                     image.id.takeIf { !TextUtils.isEmpty(it) && it != "0" }?.also { id ->

@@ -444,7 +444,6 @@ class HomeViewModel : BaseViewModel() {
         }
 
         override fun onTotalCount(count: Long) {
-            Timber.d("@@onTotalCount $count")
             _totalCountResult.postValue(count.toInt())
         }
     }

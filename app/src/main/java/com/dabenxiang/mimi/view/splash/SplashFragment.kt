@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.model.api.ApiResult.Empty
 import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import kotlinx.android.synthetic.main.fragment_splash.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

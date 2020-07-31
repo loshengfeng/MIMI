@@ -25,6 +25,7 @@ import com.google.android.exoplayer2.util.Util
 import com.google.gson.Gson
 import timber.log.Timber
 import java.io.File
+import java.lang.Exception
 
 class ClipAdapter(
     private val context: Context,
@@ -104,7 +105,14 @@ class ClipAdapter(
     ) {
         Timber.d("onBindViewHolder position:$position, currentPosition: $currentPosition, payloads: $payloads")
         val item = memberPostItems[position]
-        val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
+
+        var contentItem: MediaContentItem? = null
+        try {
+            contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
         payloads.takeIf { it.isNotEmpty() }?.also {
             when (it[0] as Int) {
                 PAYLOAD_UPDATE_UI -> {
@@ -149,8 +157,8 @@ class ClipAdapter(
 
             processClip(
                 holder.playerView,
-                contentItem.shortVideo?.id.toString(),
-                contentItem.shortVideo?.url.toString(),
+                contentItem?.shortVideo?.id.toString(),
+                contentItem?.shortVideo?.url.toString(),
                 position
             )
         }
@@ -179,7 +187,7 @@ class ClipAdapter(
             takeIf { currentPosition == position }?.also {
                 setupPlayer(
                     playerView,
-                    contentItem.shortVideo?.url.toString()
+                    contentItem?.shortVideo?.url.toString()
                 )
             }
         }
