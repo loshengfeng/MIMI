@@ -15,7 +15,6 @@ import timber.log.Timber
 import tw.gov.president.manager.data.ConfigData
 import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
 import tw.gov.president.manager.submanager.update.di.UpdateManagerProvider
-import tw.gov.president.manager.submanager.update.di.updatemanagerModule
 
 class App : Application() {
 
@@ -48,8 +47,7 @@ class App : Application() {
         val module = listOf(
             appModule,
             apiModule,
-            managerModule,
-            updatemanagerModule
+            managerModule
         )
 
         startKoin {

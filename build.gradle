@@ -49,8 +49,10 @@ buildscript {
     ext.exoplayer_version = '2.11.7'
     ext.rounded_views_version = '1.3.0'
     ext.base_recycler_view_adapter_helper_version = '3.0.4'
-    ext.log_version = '0.0.1'
-    ext.update_version = '0.0.1'
+    ext.cks_log_version = '0.0.3'
+    ext.cks_update_version = '0.0.3'
+    ext.cks_utils = '0.0.1'
+    ext.cks_provider = '0.0.1'
     ext.application_provider_version = '1.0.5'
     ext.work_version = '2.3.4'
     repositories {
