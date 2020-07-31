@@ -99,7 +99,10 @@ class ChatContentFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
+        requireActivity().onBackPressedDispatcher.addCallback {
+            viewModel.setLastRead()
+            navigateTo(NavigateItem.Up)
+        }
         initSettings()
         arguments?.getSerializable(KEY_CHAT_LIST_ITEM)?.let { data ->
             data as ChatListItem
