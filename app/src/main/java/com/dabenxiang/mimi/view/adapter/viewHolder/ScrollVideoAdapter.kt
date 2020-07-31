@@ -35,7 +35,7 @@ class ScrollVideoAdapter(private val listener: PostVideoItemListener) : Recycler
                 return AddViewHolder(view)
             }
             TYPE_VIDEO -> {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_pic, parent, false)
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_video, parent, false)
                 return PicViewHolder(view)
             }
         }
