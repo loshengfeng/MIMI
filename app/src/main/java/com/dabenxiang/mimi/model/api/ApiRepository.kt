@@ -160,6 +160,17 @@ class ApiRepository(private val apiService: ApiService) {
         limit: String
     ) = apiService.getMessage(chatId, offset, limit)
 
+    /**
+     * 調整訊息已讀時間
+     */
+    suspend fun setLastReadMessageTime(
+            chatId: Long
+    ): Response<Void> {
+        val body = HashMap<String, Long>()
+        body["chatId"] = chatId
+        return apiService.setLastReadMessageTime(body)
+    }
+
     /**********************************************************
      *
      *                  Functions

@@ -141,7 +141,9 @@ class ChatContentViewModel : BaseViewModel() {
                 val messages = adjustData(item?.content as ArrayList<ChatContentItem>)
                 val totalCount = item.paging.count
                 val nextPageKey = when {
-                    hasNextPage(totalCount, item.paging.offset, size) -> { if (offset == 0) size else (offset + size) }
+                    hasNextPage(totalCount, item.paging.offset, size) -> {
+                        if (offset == 0) size else (offset + size)
+                    }
                     else -> null
                 }
 
@@ -164,7 +166,20 @@ class ChatContentViewModel : BaseViewModel() {
 
     // todo 加上最後讀取時間api
     fun setLastRead() {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().setLastReadMessageTime(chatId)
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(null))
+            }
+                    .flowOn(Dispatchers.IO)
+                    .onStart { emit(ApiResult.loading()) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .collect {
 
+                    }
+        }
     }
 
     fun getAttachment(context: Context, id: String, position: Int, type: Int = TAG_IMAGE) {
@@ -258,7 +273,8 @@ class ChatContentViewModel : BaseViewModel() {
                     }
 
                     if (!result.isSuccessful) throw HttpException(result)
-                    val uploadPicItem = UploadPicItem(ext = ext, id = result.body()?.content ?: 0)
+                    val uploadPicItem = UploadPicItem(ext = ext, id = result.body()?.content
+                            ?: 0)
                     emit(ApiResult.success(uploadPicItem))
                 }
                         .flowOn(Dispatchers.IO)
