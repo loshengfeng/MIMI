@@ -7,6 +7,9 @@ data class ChatContentItem(
         @SerializedName("username")
         val username: String? = "",
 
+        @SerializedName("avatarAttachmentId")
+        val avatarAttachmentId: String? = "",
+
         @SerializedName("payload")
         val payload: ChatContentPayloadItem? = null,
 

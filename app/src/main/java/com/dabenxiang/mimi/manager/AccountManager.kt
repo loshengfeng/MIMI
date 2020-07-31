@@ -137,7 +137,8 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
                         deviceId = GeneralUtils.getAndroidID(),
                         account = userName,
                         password = password,
-                        friendlyName = meItem?.friendlyName ?: ""
+                        friendlyName = meItem?.friendlyName ?: "",
+                        avatarAttachmentId = meItem?.avatarAttachmentId ?: 0
                     )
                 )
             }

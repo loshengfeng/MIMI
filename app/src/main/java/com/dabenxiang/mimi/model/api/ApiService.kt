@@ -106,6 +106,11 @@ interface ApiService {
         @Query("limit") limit: String
     ): Response<ApiBasePagingItem<List<ChatContentItem>>>
 
+    @PUT("/v1/Members/Me/Chats/LastRead")
+    suspend fun setLastReadMessageTime(
+        @Body body: HashMap<String, Long>
+    ): Response<Void>
+
     /**********************************************************
      *
      *                  Functions
