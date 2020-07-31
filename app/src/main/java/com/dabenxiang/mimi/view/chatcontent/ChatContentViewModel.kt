@@ -163,8 +163,7 @@ class ChatContentViewModel : BaseViewModel() {
 
         }
     }
-
-    // todo 加上最後讀取時間api
+    
     fun setLastRead() {
         viewModelScope.launch {
             flow {
