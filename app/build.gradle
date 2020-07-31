@@ -5,6 +5,7 @@ apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 
 android {
+
     Version version = readVersion()
 
     signingConfigs {
@@ -21,21 +22,6 @@ android {
 
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
-
-    kapt {
-        correctErrorTypes = true
-        arguments {
-            arg("room.schemaLocation", "$projectDir/schemas".toString())
-        }
-    }
-
-    androidExtensions {
-        experimental = true
-    }
-
-    lintOptions {
-        disable 'MissingDefaultResource'
-    }
 
     def getLocalIPv4 = { ->
         def ip4s = []
@@ -65,13 +51,12 @@ android {
         buildConfigField "int", "LOCAL_SOCKET_PORT", "8080"
         archivesBaseName = "$applicationName-v$versionName"
         ndk {
-            abiFilters "armeabi-v7a", "arm64-v8a"
+            abiFilters "armeabi-v7a", "arm64-v8a" // todo: select one
         }
     }
 
     buildTypes {
         debug {
-            matchingFallbacks = ['release', 'debug']
             zipAlignEnabled false
             minifyEnabled false
             debuggable true
@@ -80,7 +65,6 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            matchingFallbacks = ['release', 'debug']
             zipAlignEnabled true
             minifyEnabled true
             debuggable false
@@ -88,44 +72,22 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
+    }
 
-        prod_debug.initWith(buildTypes.debug)
-        sit_debug.initWith(buildTypes.debug)
-        dev_debug.initWith(buildTypes.debug)
-
-        prod_release.initWith(buildTypes.release)
-        sit_release.initWith(buildTypes.release)
-        dev_release.initWith(buildTypes.release)
-
-        prod_debug {
+    productFlavors {
+        dev {
             buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
             buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
             buildConfigField "String", "MQTT_HOST", '"ws://10.1.1.121:8083"'
         }
 
-        prod_release {
+        sit {
             buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
             buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
             buildConfigField "String", "MQTT_HOST", '"ws://10.1.1.121:8083"'
         }
 
-        sit_debug {
-            buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
-            buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
-            buildConfigField "String", "MQTT_HOST", '"ws://10.1.1.121:8083"'
-        }
-        sit_release {
-            buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
-            buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
-            buildConfigField "String", "MQTT_HOST", '"ws://10.1.1.121:8083"'
-        }
-
-        dev_debug {
-            buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
-            buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
-            buildConfigField "String", "MQTT_HOST", '"ws://10.1.1.121:8083"'
-        }
-        dev_release {
+        prod {
             buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
             buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
             buildConfigField "String", "MQTT_HOST", '"ws://10.1.1.121:8083"'
@@ -133,47 +95,6 @@ android {
     }
 
     flavorDimensions "normal"
-    productFlavors {
-        mimi {
-            dimension = "normal"
-        }
-    }
-
-    variantFilter { variant ->
-        def flavorName = variant.name
-//        println "Show  flavorName !!  " + flavorName//
-        def buildTypename = variant.buildType.name.toString()
-//        println "Show  buildTypename !!  " + buildTypename//
-        def isDev = buildTypename.contains("dev")
-        if (buildTypename.equals('release') || buildTypename.equals('debug')) {
-//            println "Show match  buildtype "+variant.buildType.name
-            variant.setIgnore(true)
-        }
-    }
-
-    applicationVariants.all { variant ->
-        def flavorName = variant.flavorName
-//        println "Show  flavorName !!  " + flavorName//
-        def buildTypename = variant.buildType.name.toString()
-//        println "Show  buildTypename !!  " + buildTypename
-    }
-
-//    sourceSets {
-//        main {
-//            manifest.srcFile 'AndroidManifest.xml'
-//            aidl.srcDirs = []
-//            assets.srcDirs = ['src/main/assets']
-//            java.srcDirs = []
-//            jni.srcDirs = []
-//            renderscript.srcDirs = []
-//            res.srcDirs = []
-//            resources.srcDirs = []
-//            jniLibs.srcDirs = []
-//        }
-//        mimi {
-//
-//        }
-//    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -184,13 +105,32 @@ android {
         jvmTarget = "1.8"
     }
 
+    kapt {
+        correctErrorTypes = true
+        arguments {
+            arg("room.schemaLocation", "$projectDir/schemas".toString())
+        }
+    }
+
+    kapt {
+        correctErrorTypes = true
+        arguments {
+            arg("room.schemaLocation", "$projectDir/schemas".toString())
+        }
+    }
+
+    androidExtensions {
+        experimental = true
+    }
+
     testOptions {
         unitTests.returnDefaultValues = true
     }
 
-    packagingOptions {
-        exclude 'LICENSE'
+    lintOptions {
+        disable 'MissingDefaultResource'
     }
+
 }
 
 project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
@@ -398,35 +338,30 @@ class Version {
 }
 
 Version readVersion() {
-    readVersion('version.properties')
-}
-
-Version readVersion(String version_properties_path) {
     Properties defaultVersionProps = new Properties()
-    def pfile = file(version_properties_path)
-    if (!pfile.exists()) {
-        pfile = file('version.properties')
-    }
-    defaultVersionProps.load(new FileInputStream(pfile))
+    defaultVersionProps.load(new FileInputStream(file('version.properties')))
     def defaultBuildVersionCode = defaultVersionProps['VERSION_CODE']
     def defaultBuildVersionName = defaultVersionProps['VERSION_NAME_PREFIX'] + "." + defaultVersionProps['VERSION_NAME_BUILD']
+
     return new Version(versionCode: defaultBuildVersionCode, versionName: defaultBuildVersionName)
 }
 
 def increaseVersion() {
-    increaseVersion('version.properties')
-}
-
-def increaseVersion(String version_properties_path) {
     Properties versionProps = new Properties()
-    def file = file(version_properties_path)
+
+    def file = file('version.properties')
     versionProps.load(new FileInputStream(file))
+
     def nextCode = versionProps['VERSION_CODE'].toInteger() + 1
     versionProps['VERSION_CODE'] = nextCode.toString()
+
     def nextBuild = versionProps['VERSION_NAME_BUILD'].toInteger() + 1
+
     versionProps['VERSION_NAME_BUILD'] = nextBuild.toString()
     versionProps.store(file.newWriter(), null)
+
     def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD']
+
     println "Increase $buildVersionName"
 }
 

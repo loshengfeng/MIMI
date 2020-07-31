@@ -38,14 +38,14 @@ open class BaseChatContentViewHolder(
 
     override fun updated(position: Int) {
         super.updated(position)
-        val avatarId = if (TextUtils.equals(pref.profileItem.userId.toString(), data?.username)) {
+        val avatarId = if (!TextUtils.equals(pref.profileItem.userId.toString(), data?.username)) {
             pref.profileItem.avatarAttachmentId.toString()
         } else {
-            data?.avatarAttachmentId
+            listener.getSenderAvatar()
         }
 
         avatarId.let {
-            LruCacheUtils.getLruCache(avatarId.toString())?.also { bitmap ->
+            LruCacheUtils.getLruCache(avatarId)?.also { bitmap ->
                 val options: RequestOptions = RequestOptions()
                         .transform(MultiTransformation(CenterCrop(), CircleCrop()))
                         .placeholder(R.drawable.default_profile_picture)
@@ -56,7 +56,7 @@ open class BaseChatContentViewHolder(
                         .apply(options)
                         .into(ivHead)
             } ?: run {
-                listener.onGetAvatarAttachment(avatarId.toString(), position)
+                listener.onGetAvatarAttachment(avatarId, position)
             }
         }
         txtTime.text = data?.payload?.sendTime?.let { date -> SimpleDateFormat("YYYY-MM-dd HH:mm", Locale.getDefault()).format(date) }
