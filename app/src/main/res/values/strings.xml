@@ -233,6 +233,7 @@
     <string name="post_warning_tag">请选择圈子</string>
     <string name="post_warning_pic">请选择照片</string>
     <string name="post_warning_video">请选择影片</string>
+    <string name="post_warning_tag_limit">标签已满</string>
 
     <!-- Problem report -->
     <string-array name="video_problem_report_item">

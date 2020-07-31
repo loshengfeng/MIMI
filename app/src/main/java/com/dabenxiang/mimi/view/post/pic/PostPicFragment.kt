@@ -33,6 +33,7 @@ import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.post.article.PostArticleFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
@@ -65,7 +66,7 @@ class PostPicFragment : BaseFragment() {
         private const val CONTENT_LIMIT = 2000
         private const val HASHTAG_LIMIT = 10
         private const val INIT_VALUE = 0
-        private const val PHOTO_LIMIT = 10
+        private const val PHOTO_LIMIT = 20
 
         private const val REQUEST_MUTLI_PHOTO = 1001
     }
@@ -162,8 +163,12 @@ class PostPicFragment : BaseFragment() {
 
         edt_hashtag.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE){
-                addTag(edt_hashtag.text.toString())
-                edt_hashtag.text.clear()
+                if (chipGroup.size == HASHTAG_LIMIT) {
+                    Toast.makeText(requireContext(), R.string.post_warning_tag_limit, Toast.LENGTH_SHORT).show()
+                } else {
+                    addTag(edt_hashtag.text.toString())
+                    edt_hashtag.text.clear()
+                }
             }
             false
         }
