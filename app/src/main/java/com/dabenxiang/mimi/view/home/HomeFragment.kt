@@ -147,7 +147,7 @@ class HomeFragment : BaseFragment() {
             takeIf { lastTabPosition > 0 }?.also {
                 val category = mainViewModel?.normal?.categories?.get(lastTabPosition - 1)
                 category?.also {
-                    val bundle = CategoriesFragment.createBundle(it.name, it.name)
+                    val bundle = CategoriesFragment.createBundle(it.name, it.name, category)
                     navigateTo(
                         NavigateItem.Destination(
                             R.id.action_homeFragment_to_categoriesFragment,
@@ -308,7 +308,8 @@ class HomeFragment : BaseFragment() {
 
     private val adapterListener = object : HomeAdapter.EventListener {
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
-            val bundle = CategoriesFragment.createBundle(item.title, item.categories)
+
+            val bundle = CategoriesFragment.createBundle(item.title, item.categories, mainViewModel?.getCategory(item.title, false))
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_homeFragment_to_categoriesFragment,

@@ -57,6 +57,10 @@
         <action
             android:id="@+id/action_adultHomeFragment_to_rankingFragment"
             app:destination="@id/rankingFragment" />
+
+        <action
+            android:id="@+id/action_adultHomeFragment_to_categoriesFragment"
+            app:destination="@id/categoriesFragment" />
     </fragment>
 
     <fragment

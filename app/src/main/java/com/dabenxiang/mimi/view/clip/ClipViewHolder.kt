@@ -17,6 +17,7 @@ import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_clip.view.*
+import java.lang.Exception
 
 class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     var playerView: PlayerView = view.player_view
@@ -49,8 +50,13 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             } ?: run { clipFuncItem.getBitmap(id, pos) }
         } ?: run { Glide.with(ivHead.context).load(R.drawable.icon_cs_photo).circleCrop().into(ivHead)}
 
-        val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
-        contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
+        var contentItem: MediaContentItem? = null
+        try {
+            contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        contentItem?.images?.takeIf { it.isNotEmpty() }?.also { images ->
             images[0].also { image ->
                 if (TextUtils.isEmpty(image.url)) {
                     image.id.takeIf { !TextUtils.isEmpty(it) && it != LruCacheUtils.ZERO_ID }?.also { id ->
