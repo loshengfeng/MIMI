@@ -9,6 +9,8 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.view.get
+import androidx.core.view.isEmpty
 import androidx.core.view.size
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -35,6 +37,8 @@ import kotlinx.android.synthetic.main.item_setting_bar.*
 class PostArticleFragment : BaseFragment() {
 
     private val viewModel: PostArticleViewModel by viewModels()
+
+    private var haveMainTag = false
 
     companion object {
         private const val TITLE_LIMIT = 60
@@ -246,7 +250,7 @@ class PostArticleFragment : BaseFragment() {
         edt_content.setText(articleItem.text)
 
         for (tag in item.tags!!) {
-            addTag(tag)
+            addEditTag(tag)
         }
 
         txt_titleCount.text = String.format(getString(R.string.typing_count,
@@ -274,15 +278,18 @@ class PostArticleFragment : BaseFragment() {
                 .circleCrop()
                 .into(iv_avatar)
 
-            addTag(item.tag)
-
-            txt_placeholder.visibility = View.GONE
-            txt_clubName.visibility = View.VISIBLE
-            txt_hashtagName.visibility = View.VISIBLE
+            if (chipGroup.size == HASHTAG_LIMIT) {
+                Toast.makeText(requireContext(), R.string.post_warning_tag_limit, Toast.LENGTH_SHORT).show()
+            } else {
+                addTag(item.tag, true)
+                txt_placeholder.visibility = View.GONE
+                txt_clubName.visibility = View.VISIBLE
+                txt_hashtagName.visibility = View.VISIBLE
+            }
         }
     }
 
-    private fun addTag(tag: String) {
+    private fun addEditTag(tag: String) {
         val chip = LayoutInflater.from(requireContext()).inflate(R.layout.chip_item, chipGroup, false) as Chip
         chip.text = tag
         chip.setTextColor(chip.context.getColor(R.color.color_black_1_50))
@@ -301,8 +308,50 @@ class PostArticleFragment : BaseFragment() {
         }
 
         chipGroup.addView(chip)
-
         setTagCount()
+    }
+
+    private fun addTag(tag: String, isMainTag: Boolean = false) {
+        val chip = LayoutInflater.from(requireContext()).inflate(R.layout.chip_item, chipGroup, false) as Chip
+        chip.text = tag
+        chip.setTextColor(chip.context.getColor(R.color.color_black_1_50))
+        chip.chipBackgroundColor =
+            ColorStateList.valueOf(chip.context.getColor(R.color.color_black_1_10))
+
+        if (isMainTag) {
+            if (haveMainTag) {
+                val mainTag = chipGroup[0] as Chip
+                mainTag.text = tag
+            } else {
+                haveMainTag = true
+
+                if (chipGroup.isEmpty()) {
+                    chipGroup.addView(chip)
+                    setTagCount()
+                } else {
+                    val chipList = arrayListOf<Chip>()
+                    for (i in 0 until chipGroup.size) {
+                        val chipItem = chipGroup[i] as Chip
+                        chipList.add(chipItem)
+                    }
+
+                    chipGroup.removeAllViews()
+                    chipGroup.addView(chip)
+                    for (tagItem in chipList) {
+                        chipGroup.addView(tagItem)
+                    }
+                }
+            }
+        } else {
+            chip.closeIcon = ContextCompat.getDrawable(requireContext(), R.drawable.btn_close_circle_small_black_n)
+            chip.isCloseIconVisible = true
+            chip.setCloseIconSizeResource(R.dimen.dp_24)
+            chip.setOnCloseIconClickListener {
+                chipGroup.removeView(it)
+            }
+            chipGroup.addView(chip)
+            setTagCount()
+        }
     }
 
     private fun setTagCount() {
