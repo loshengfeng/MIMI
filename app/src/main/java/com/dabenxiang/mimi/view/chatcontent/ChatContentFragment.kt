@@ -106,6 +106,7 @@ class ChatContentFragment : BaseFragment() {
                 viewModel.getChatContent()
                 viewModel.initMQTT()
                 viewModel.connect()
+                viewModel.setLastRead()
             }
         }
     }
