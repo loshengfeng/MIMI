@@ -141,9 +141,10 @@ class ChatContentViewModel : BaseViewModel() {
                 val messages = adjustData(item?.content as ArrayList<ChatContentItem>)
                 val totalCount = item.paging.count
                 val nextPageKey = when {
-                    hasNextPage(totalCount, item.paging.offset, size) -> if (offset == 0) PER_LIMIT else (PER_LIMIT.toInt() + size)
+                    hasNextPage(totalCount, item.paging.offset, size) -> { if (offset == 0) size else (offset + size) }
                     else -> null
                 }
+
                 if (nextPageKey != null) {
                     offset = nextPageKey.toString().toInt()
                 } else {
