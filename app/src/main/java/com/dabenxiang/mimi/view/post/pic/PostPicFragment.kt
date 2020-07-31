@@ -29,17 +29,17 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PostMemberRequest
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.PostAttachmentItem
+import com.dabenxiang.mimi.model.vo.ViewerItem
 import com.dabenxiang.mimi.view.adapter.ScrollPicAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.view.post.article.PostArticleFragment
+import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment.Companion.VIEWER_DATA
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.fragment_post_article.*
 import kotlinx.android.synthetic.main.fragment_post_article.chipGroup
 import kotlinx.android.synthetic.main.fragment_post_article.clubLayout
 import kotlinx.android.synthetic.main.fragment_post_article.edt_hashtag
@@ -67,7 +67,6 @@ class PostPicFragment : BaseFragment() {
         const val POST_ID = "post_id"
 
         private const val TITLE_LIMIT = 60
-        private const val CONTENT_LIMIT = 2000
         private const val HASHTAG_LIMIT = 10
         private const val INIT_VALUE = 0
         private const val PHOTO_LIMIT = 20
@@ -82,8 +81,8 @@ class PostPicFragment : BaseFragment() {
         return R.layout.fragment_post_pic
     }
 
-    var attachmentList = arrayListOf<PostAttachmentItem>()
-    var deletePicList = arrayListOf<String>()
+    private var attachmentList = arrayListOf<PostAttachmentItem>()
+    private var deletePicList = arrayListOf<String>()
 
     private var postId: Long = 0
 
@@ -222,8 +221,8 @@ class PostPicFragment : BaseFragment() {
         }
     }
 
-    override fun initSettings() {
-        super.initSettings()
+    override fun setupFirstTime() {
+        super.setupFirstTime()
 
         val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
         tv_clean.visibility = View.VISIBLE
@@ -417,7 +416,8 @@ class PostPicFragment : BaseFragment() {
             { id, function -> getBitmap(id, function) },
             { item -> handleDeletePic(item) },
             { updateCountPicView() },
-            { addPic() }
+            { addPic() },
+            { viewerItem -> openViewerPage(viewerItem) }
         )
     }
 
@@ -442,5 +442,11 @@ class PostPicFragment : BaseFragment() {
         startActivityForResult(Intent.createChooser(intent, getString(R.string.select_pics)),
             REQUEST_MUTLI_PHOTO
         )
+    }
+
+    private fun openViewerPage(viewerItem: ViewerItem) {
+        val bundle = Bundle()
+        bundle.putSerializable(VIEWER_DATA, viewerItem)
+        findNavController().navigate(R.id.action_postPicFragment_to_postViewerFragment, bundle)
     }
 }

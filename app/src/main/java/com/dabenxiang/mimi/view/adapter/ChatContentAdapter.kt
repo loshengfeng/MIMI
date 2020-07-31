@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.adapter
 
 import android.graphics.Bitmap
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -12,6 +13,9 @@ import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.view.adapter.viewHolder.chat.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ChatContentAdapter(
         private val listener: EventListener
@@ -172,6 +176,15 @@ class ChatContentAdapter(
     }
 
     fun insertItem(item: ChatContentItem, index: Int = 0) {
+        // 判斷需不需要先加上時間 Title
+        if (this.data.size > 0) {
+            val lastItemDate = this.data[0].payload?.sendTime?.let { time -> SimpleDateFormat("YYYY-MM-dd", Locale.getDefault()).format(time) }
+            val currentItemDate = item.payload?.sendTime?.let { time -> SimpleDateFormat("YYYY-MM-dd", Locale.getDefault()).format(time) }
+            if (!TextUtils.equals(lastItemDate, currentItemDate)) {
+                this.data.add(index, ChatContentItem(dateTitle = currentItemDate))
+            }
+        }
+
         this.data.add(index, item)
         notifyDataSetChanged()
     }

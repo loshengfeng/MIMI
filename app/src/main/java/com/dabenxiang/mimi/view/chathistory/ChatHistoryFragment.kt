@@ -66,6 +66,15 @@ class ChatHistoryFragment : BaseFragment() {
                 is ApiResult.Error -> Timber.e(it.throwable)
             }
         })
+
+        viewModel.pagingResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Loaded,
+                is ApiResult.Error -> {
+                    swipeRefreshLayout.isRefreshing = false
+                }
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -76,6 +85,10 @@ class ChatHistoryFragment : BaseFragment() {
         }.also {
             tv_back.setOnClickListener(it)
         }
+
+        swipeRefreshLayout.setOnRefreshListener {
+            viewModel.getChatList()
+        }
     }
 
     override fun initSettings() {
@@ -84,6 +97,7 @@ class ChatHistoryFragment : BaseFragment() {
         rv_content.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         rv_content.adapter = adapter
         viewModel.getChatList()
+        swipeRefreshLayout.setColorSchemeColors(swipeRefreshLayout.context.getColor(R.color.color_red_1))
     }
 
     private fun refreshUi(size: Int) {

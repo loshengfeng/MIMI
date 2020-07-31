@@ -135,7 +135,11 @@
         android:id="@+id/postPicFragment"
         android:name="com.dabenxiang.mimi.view.post.pic.PostPicFragment"
         android:label="PostPicFragment"
-        tools:layout="@layout/fragment_post_pic" />
+        tools:layout="@layout/fragment_post_pic" >
+        <action
+            android:id="@+id/action_postPicFragment_to_postViewerFragment"
+            app:destination="@id/postViewerFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/postVideoFragment"
@@ -145,6 +149,9 @@
         <action
             android:id="@+id/action_postVideoFragment_self"
             app:destination="@id/postVideoFragment" />
+        <action
+            android:id="@+id/action_postVideoFragment_to_postViewerFragment"
+            app:destination="@id/postViewerFragment" />
     </fragment>
     <fragment
         android:id="@+id/editVideoFragment"
@@ -214,4 +221,8 @@
             android:id="@+id/action_rankingFragment_to_pictureDetailFragment"
             app:destination="@id/pictureDetailFragment" />
    </fragment>
+    <fragment
+        android:id="@+id/postViewerFragment"
+        android:name="com.dabenxiang.mimi.view.post.viewer.PostViewerFragment"
+        android:label="PostViewerFragment" />
 </navigation>
