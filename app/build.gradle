@@ -5,7 +5,6 @@ apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 
 android {
-
     Version version = readVersion()
 
     signingConfigs {
@@ -20,8 +19,12 @@ android {
         }
     }
 
+    androidExtensions {
+        experimental = true
+    }
+
     compileSdkVersion 29
-    buildToolsVersion "29.0.3"
+    buildToolsVersion "30.0.1"
 
     def getLocalIPv4 = { ->
         def ip4s = []
@@ -54,6 +57,7 @@ android {
 
     buildTypes {
         debug {
+            matchingFallbacks = ['release', 'debug']
             zipAlignEnabled false
             minifyEnabled false
             debuggable true
@@ -62,6 +66,7 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
+            matchingFallbacks = ['release', 'debug']
             zipAlignEnabled true
             minifyEnabled true
             debuggable false
@@ -69,23 +74,76 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
-    }
 
-    productFlavors {
-        dev {
+        prod_debug.initWith(buildTypes.debug)
+        sit_debug.initWith(buildTypes.debug)
+        dev_debug.initWith(buildTypes.debug)
+
+        prod_release.initWith(buildTypes.release)
+        sit_release.initWith(buildTypes.release)
+        dev_release.initWith(buildTypes.release)
+
+        prod_debug {
             buildConfigField "String", "API_HOST", '"http://10.1.1.121:12080/"'
         }
 
-        sit {
+        prod_release {
             buildConfigField "String", "API_HOST", '"http://10.1.1.121:12080/"'
         }
 
-        prod {
+        sit_debug {
+            buildConfigField "String", "API_HOST", '"http://10.1.1.121:12080/"'
+        }
+        sit_release {
+            buildConfigField "String", "API_HOST", '"http://10.1.1.121:12080/"'
+        }
+
+        dev_debug {
+            buildConfigField "String", "API_HOST", '"http://10.1.1.121:12080/"'
+        }
+        dev_release {
             buildConfigField "String", "API_HOST", '"http://10.1.1.121:12080/"'
         }
     }
 
     flavorDimensions "normal"
+    productFlavors {
+        mimi {
+            dimension = "normal"
+        }
+    }
+
+    variantFilter { variant ->
+        def flavorName = variant.name
+//        println "Show  flavorName !!  " + flavorName//
+        def buildTypename = variant.buildType.name.toString()
+//        println "Show  buildTypename !!  " + buildTypename//
+        def isDev = buildTypename.contains("dev")
+        if (buildTypename.equals('release') || buildTypename.equals('debug')) {
+//            println "Show match  buildtype "+variant.buildType.name
+            variant.setIgnore(true)
+        }
+    }
+
+    applicationVariants.all { variant ->
+        def flavorName = variant.flavorName
+//        println "Show  flavorName !!  " + flavorName//
+        def buildTypename = variant.buildType.name.toString()
+//        println "Show  buildTypename !!  " + buildTypename
+    }
+
+    sourceSets {
+        main {
+            aidl.srcDirs = []
+            assets.srcDirs = ['src/main/assets']
+            java.srcDirs = []
+            jni.srcDirs = []
+            renderscript.srcDirs = []
+            res.srcDirs = []
+            resources.srcDirs = []
+            jniLibs.srcDirs = []
+        }
+    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -99,17 +157,17 @@ android {
         }
     }
 
-    androidExtensions {
-        experimental = true
-    }
-
     testOptions {
         unitTests.returnDefaultValues = true
+    }
+
+    packagingOptions {
+        exclude 'LICENSE'
     }
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
     // AndroidX
@@ -235,30 +293,35 @@ class Version {
 }
 
 Version readVersion() {
+    readVersion('version.properties')
+}
+
+Version readVersion(String version_properties_path) {
     Properties defaultVersionProps = new Properties()
-    defaultVersionProps.load(new FileInputStream(file('version.properties')))
+    def pfile = file(version_properties_path)
+    if (!pfile.exists()) {
+        pfile = file('version.properties')
+    }
+    defaultVersionProps.load(new FileInputStream(pfile))
     def defaultBuildVersionCode = defaultVersionProps['VERSION_CODE']
     def defaultBuildVersionName = defaultVersionProps['VERSION_NAME_PREFIX'] + "." + defaultVersionProps['VERSION_NAME_BUILD']
-
     return new Version(versionCode: defaultBuildVersionCode, versionName: defaultBuildVersionName)
 }
 
 def increaseVersion() {
+    increaseVersion('version.properties')
+}
+
+def increaseVersion(String version_properties_path) {
     Properties versionProps = new Properties()
-
-    def file = file('version.properties')
+    def file = file(version_properties_path)
     versionProps.load(new FileInputStream(file))
-
     def nextCode = versionProps['VERSION_CODE'].toInteger() + 1
     versionProps['VERSION_CODE'] = nextCode.toString()
-
     def nextBuild = versionProps['VERSION_NAME_BUILD'].toInteger() + 1
-
     versionProps['VERSION_NAME_BUILD'] = nextBuild.toString()
     versionProps.store(file.newWriter(), null)
-
     def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD']
-
     println "Increase $buildVersionName"
 }
 
@@ -269,21 +332,19 @@ task increaseVersion {
 }
 
 def decreaseVersion() {
+    decreaseVersion('version.properties')
+}
+
+def decreaseVersion(String version_properties_path) {
     Properties versionProps = new Properties()
-
-    def file = file('version.properties')
+    def file = file(version_properties_path)
     versionProps.load(new FileInputStream(file))
-
     def preCode = versionProps['VERSION_CODE'].toInteger() - 1
     versionProps['VERSION_CODE'] = preCode.toString()
-
     def preBuild = versionProps['VERSION_NAME_BUILD'].toInteger() - 1
-
     versionProps['VERSION_NAME_BUILD'] = preBuild.toString()
     versionProps.store(file.newWriter(), null)
-
     def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD']
-
     println "Decrease $buildVersionName"
 }
 
