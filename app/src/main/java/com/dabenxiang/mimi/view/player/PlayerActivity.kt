@@ -110,7 +110,7 @@ class PlayerActivity : BaseActivity() {
     private val episodeAdapter by lazy {
         SelectEpisodeAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
-                Timber.i("SelectEpisodeAdapter onClickItemIndex")
+                Timber.i("SelectEpisodeAdapter onClickItemIndex $index")
                 viewModel.setStreamPosition(index)
             }
         }, obtainIsAdult())
@@ -1180,6 +1180,9 @@ class PlayerActivity : BaseActivity() {
                 else -> "UNKNOWN_STATE"
             }
             Timber.d("Changed state to $stateString playWhenReady: $playWhenReady")
+            if(playbackState == ExoPlayer.STATE_ENDED && (viewModel.episodePosition.value!! < episodeAdapter.itemCount - 1)) {
+                viewModel.setStreamPosition(viewModel.episodePosition.value!! + 1)
+            }
         }
 
         override fun onLoadingChanged(isLoading: Boolean) {
@@ -1340,6 +1343,10 @@ class PlayerActivity : BaseActivity() {
                 if (item.id != null) {
                     result.add(item.episode ?: "")
                 }
+            }
+            result.sort()
+            for(i in 0..(result.size - 1)) {
+                Timber.d("${result.get(i)}")
             }
         }
 
