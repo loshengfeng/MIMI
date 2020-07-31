@@ -8,7 +8,14 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.load.MultiTransformation
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.AgentItem
 import com.dabenxiang.mimi.model.holder.TopUpOnlinePayItem
 import com.dabenxiang.mimi.model.holder.TopUpProxyPayItem
@@ -22,7 +29,6 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_top_up.*
 import timber.log.Timber
-import java.lang.ClassCastException
 
 class TopUpFragment : BaseFragment() {
 
@@ -32,22 +38,9 @@ class TopUpFragment : BaseFragment() {
 
     private var interactionListener: InteractionListener? = null
 
-    private val onlinePayListener = object : AdapterEventListener<TopUpOnlinePayItem> {
-        override fun onItemClick(view: View, item: TopUpOnlinePayItem) {
-            Timber.d("${TopUpFragment::class.java.simpleName}_onlinePayListener_onItemClick_item: $item")
-        }
-    }
-
-    private val proxyPayListener = object : AdapterEventListener<TopUpProxyPayItem> {
-        override fun onItemClick(view: View, item: TopUpProxyPayItem) {
-            Timber.d("${TopUpFragment::class.java.simpleName}_proxyPayListener_onItemClick_item: $item")
-        }
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback {
-//            backToDesktop()
             interactionListener?.changeNavigationPosition(R.id.navigation_home)
         }
 
@@ -59,7 +52,37 @@ class TopUpFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        Timber.d("${TopUpFragment::class.java.simpleName}_setupObservers")
+        viewModel.meItem.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> {
+                    tv_name.text = it.result.friendlyName
+                    tv_coco.text = it.result.availablePoint.toString()
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.avatar.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> {
+                    val options: RequestOptions = RequestOptions()
+                        .transform(MultiTransformation(CenterCrop(), CircleCrop()))
+                        .placeholder(R.drawable.ico_default_photo)
+                        .error(R.drawable.ico_default_photo)
+                        .priority(Priority.NORMAL)
+
+
+                    Glide.with(this).load(it.result)
+                        .apply(options)
+                        .into(iv_photo)
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -131,14 +154,19 @@ class TopUpFragment : BaseFragment() {
             }
         }
 
-        //todo 尚未測試，因為目前沒有資料可以做測試
+        // TODO: 尚未測試，因為目前沒有資料可以做測試
         rv_proxy_pay.adapter = agentAdapter
 
         viewModel.initData()
 
+        // TODO: 目前這階段無需開發訂單管理功能, 因此暫時隱藏起來
+        tv_record_top_up.visibility = View.GONE
+
         tv_record_top_up.setOnClickListener {
             navigateTo(NavigateItem.Destination(R.id.action_topupFragment_to_orderFragment))
         }
+
+        viewModel.getMe()
 
         viewModel.agentList.observe(viewLifecycleOwner, Observer {
             agentAdapter.submitList(it)
@@ -154,9 +182,21 @@ class TopUpFragment : BaseFragment() {
         }
     }
 
-    private val agentListener = object : AdapterEventListener<AgentItem>{
+    private val agentListener = object : AdapterEventListener<AgentItem> {
         override fun onItemClick(view: View, item: AgentItem) {
 
+        }
+    }
+
+    private val onlinePayListener = object : AdapterEventListener<TopUpOnlinePayItem> {
+        override fun onItemClick(view: View, item: TopUpOnlinePayItem) {
+            Timber.d("${TopUpFragment::class.java.simpleName}_onlinePayListener_onItemClick_item: $item")
+        }
+    }
+
+    private val proxyPayListener = object : AdapterEventListener<TopUpProxyPayItem> {
+        override fun onItemClick(view: View, item: TopUpProxyPayItem) {
+            Timber.d("${TopUpFragment::class.java.simpleName}_proxyPayListener_onItemClick_item: $item")
         }
     }
 }

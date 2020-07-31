@@ -32,7 +32,6 @@ import kotlinx.android.synthetic.main.item_personal_is_login.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import retrofit2.HttpException
 import timber.log.Timber
-import java.lang.ClassCastException
 
 class PersonalFragment : BaseFragment() {
 
@@ -60,9 +59,6 @@ class PersonalFragment : BaseFragment() {
                     progressHUD?.dismiss()
 
                     val meItem = it.result
-                    viewModel.accountManager.setupProfile(meItem)
-
-                    viewModel.getAttachment()
                     tv_name.text = meItem.friendlyName.toString()
                     tv_Point.text = meItem.availablePoint.toString()
 
@@ -83,20 +79,14 @@ class PersonalFragment : BaseFragment() {
                 is Success -> {
                     val options: RequestOptions = RequestOptions()
                         .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                        .placeholder(R.mipmap.ic_launcher)
-                        .error(R.mipmap.ic_launcher)
+                        .placeholder(R.drawable.ico_default_photo)
+                        .error(R.drawable.ico_default_photo)
                         .priority(Priority.NORMAL)
-
                     Glide.with(this).load(it.result)
                         .apply(options)
                         .into(iv_photo)
                 }
-                is Error -> onApiError(it.throwable, onHttpErrorBlock = { httpError ->
-                    when (httpError.httpExceptionItem.errorItem.code) {
-                        // todo: confirm by jeff...
-//                        ErrorCode.NOT_FOUND -> { viewModel.toastData.value = "no photo"}
-                    }
-                })
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -174,7 +164,7 @@ class PersonalFragment : BaseFragment() {
         tv_version_is_login.text = BuildConfig.VERSION_NAME
         tv_version_is_not_login.text = BuildConfig.VERSION_NAME
 
-        when(viewModel.accountManager.isLogin()) {
+        when (viewModel.accountManager.isLogin()) {
             true -> {
                 item_is_Login.visibility = View.VISIBLE
                 item_is_not_Login.visibility = View.GONE
@@ -185,7 +175,7 @@ class PersonalFragment : BaseFragment() {
                 item_is_not_Login.visibility = View.VISIBLE
             }
         }
-     }
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
