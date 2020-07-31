@@ -17,9 +17,9 @@ import kotlinx.coroutines.launch
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import timber.log.Timber
-import com.dabenxiang.mimi.manager.update.VersionManager
-import com.dabenxiang.mimi.manager.update.callback.DownloadProgressCallback
-import com.dabenxiang.mimi.manager.update.data.VersionStatus
+import tw.gov.president.manager.submanager.update.VersionManager
+import tw.gov.president.manager.submanager.update.callback.DownloadProgressCallback
+import tw.gov.president.manager.submanager.update.data.VersionStatus
 
 class SplashViewModel : BaseViewModel(), KoinComponent {
 

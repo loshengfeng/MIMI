@@ -310,12 +310,12 @@ dependencies {
         implementation "org.cks.utils:BaseManager:$log_version"
         implementation "org.cks.utils:DeviceInfoProvider:$log_version"
         implementation "org.cks.utils:logmanager:$log_version"
-//        implementation "org.cks.utils:updatemanager:$log_version"
         implementation "org.cks.utils:utils_device:$log_version"
         implementation "org.cks.utils:utils_api_result:$log_version"
         implementation "org.cks.utils:utils_general:$log_version"
         implementation "org.cks.utils:utils_loglevel:$log_version"
         implementation "org.cks.utils:utils_gson_factory:$log_version"
+        implementation "org.cks.utils:updatemanager:$update_version"
     }
 
     // Test

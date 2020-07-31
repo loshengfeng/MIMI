@@ -24,8 +24,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import com.dabenxiang.mimi.manager.update.callback.DownloadProgressCallback
-import com.dabenxiang.mimi.manager.update.data.VersionStatus
+import tw.gov.president.manager.submanager.update.callback.DownloadProgressCallback
+import tw.gov.president.manager.submanager.update.data.VersionStatus
 
 class SplashFragment : BaseFragment() {
 
