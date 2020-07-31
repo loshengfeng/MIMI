@@ -27,6 +27,7 @@ class MemberFollowAdapter(
     }
 
     interface EventListener {
+        fun onDetail(item: MemberFollowItem)
         fun onGetAttachment(id: String, position: Int)
         fun onCancelFollow(userId:Long)
     }

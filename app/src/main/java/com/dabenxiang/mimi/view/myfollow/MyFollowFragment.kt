@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.myfollow
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
@@ -8,18 +9,19 @@ import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
+import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
 import com.dabenxiang.mimi.view.adapter.ClubFollowAdapter
+import com.dabenxiang.mimi.view.adapter.FavoriteTabAdapter
 import com.dabenxiang.mimi.view.adapter.MemberFollowAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
-import com.google.android.material.tabs.TabLayout
-import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_my_follow.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import timber.log.Timber
@@ -32,6 +34,21 @@ class MyFollowFragment : BaseFragment() {
         const val NO_DATA = 0
         const val TYPE_MEMBER = 0
         const val TYPE_CLUB = 1
+        var lastTab = TYPE_MEMBER
+    }
+
+    private val primaryAdapter by lazy {
+        FavoriteTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
+            override fun onClickItemIndex(view: View, index: Int) {
+                setTabPosition(index)
+                viewModel.initData(lastTab)
+            }
+        })
+    }
+
+    private fun setTabPosition(index: Int) {
+        lastTab = index
+        primaryAdapter.setLastSelectedIndex(lastTab)
     }
 
     private val clubFollowAdapter by lazy { ClubFollowAdapter(clubFollowListener) }
@@ -51,6 +68,10 @@ class MyFollowFragment : BaseFragment() {
 
     private val memberFollowAdapter by lazy { MemberFollowAdapter(memberFollowListener) }
     private val memberFollowListener = object : MemberFollowAdapter.EventListener {
+        override fun onDetail(item: MemberFollowItem) {
+            //todo
+        }
+
         override fun onGetAttachment(id: String, position: Int) {
             viewModel.getAttachment(id, position)
         }
@@ -59,6 +80,8 @@ class MyFollowFragment : BaseFragment() {
             viewModel.cancelFollowMember(userId)
         }
     }
+
+    private var interactionListener: InteractionListener? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -70,6 +93,15 @@ class MyFollowFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
         initSettings()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        try {
+            interactionListener = context as InteractionListener
+        } catch (e: ClassCastException) {
+            Timber.e("AdultHomeFragment interaction listener can't cast")
+        }
     }
 
     override fun getLayoutId(): Int {
@@ -104,7 +136,7 @@ class MyFollowFragment : BaseFragment() {
                 is ApiResult.Success -> {
                     val attachmentItem = it.result
                     LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
-                    when (tl_type.selectedTabPosition) {
+                    when (lastTab) {
                         TYPE_MEMBER -> memberFollowAdapter.update(attachmentItem.position ?: 0)
                         TYPE_CLUB -> clubFollowAdapter.update(attachmentItem.position ?: 0)
                     }
@@ -139,7 +171,7 @@ class MyFollowFragment : BaseFragment() {
 
     private val onCleanDialogListener = object : OnCleanDialogListener {
         override fun onClean() {
-            if (tl_type.selectedTabPosition == TYPE_MEMBER) {
+            if (lastTab == TYPE_MEMBER) {
                 viewModel.cleanAllFollowMember()
             } else {
                 viewModel.cleanAllFollowClub()
@@ -153,7 +185,7 @@ class MyFollowFragment : BaseFragment() {
                 R.id.tv_back -> navigateTo(NavigateItem.Up)
                 R.id.tv_clean -> CleanDialogFragment.newInstance(
                     onCleanDialogListener,
-                    if (tl_type.selectedTabPosition == TYPE_MEMBER)
+                    if (lastTab == TYPE_MEMBER)
                         R.string.follow_clean_member_dlg_msg
                     else
                         R.string.follow_clean_club_dlg_msg
@@ -169,34 +201,31 @@ class MyFollowFragment : BaseFragment() {
             tv_clean.setOnClickListener(it)
         }
 
-        tl_type.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab) {
-                when (tab.position) {
-                    TYPE_MEMBER -> viewModel.initData(tab.position)
-                    TYPE_CLUB -> viewModel.initData(tab.position)
-                }
-            }
-
-            override fun onTabReselected(tab: TabLayout.Tab?) {}
-
-            override fun onTabUnselected(tab: TabLayout.Tab?) {}
-        })
-
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
-            viewModel.initData(tl_type.selectedTabPosition)
+            viewModel.initData(lastTab)
         }
     }
 
     override fun initSettings() {
         super.initSettings()
+
+        rv_primary.adapter = primaryAdapter
+
+        val primaryList = listOf(
+            getString(R.string.follow_people),
+            getString(R.string.follow_circle)
+        )
+
+        primaryAdapter.submitList(primaryList, FavoriteFragment.lastPrimaryIndex)
+
         tv_clean.visibility = View.VISIBLE
         tv_title.setText(R.string.follow_title)
         tv_all.text = getString(R.string.follow_clubs_total_num, "0")
 
         rv_content.adapter = memberFollowAdapter
 
-        viewModel.initData(tl_type.selectedTabPosition)
+        viewModel.initData(lastTab)
     }
 
     private fun refreshUi(witch: Int, size: Int) {

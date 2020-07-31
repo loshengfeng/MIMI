@@ -27,6 +27,7 @@ class MemberFollowViewHolder(
     private val tvFollow: TextView = itemView.tv_follow
 
     init {
+        itemView.setOnClickListener { data?.let { data -> listener.onDetail(data) } }
         tvFollow.setOnClickListener { data?.userId?.let { userId -> listener.onCancelFollow(userId) } }
     }
 

@@ -8,7 +8,7 @@ import com.dabenxiang.mimi.view.favroite.FavoriteTabHolder
 
 class FavoriteTabAdapter(
     private val listener: BaseIndexViewHolder.IndexViewHolderListener,
-    private val isPrimary: Boolean
+    private val isPrimary: Boolean = true
 ) : BaseTabAdapter<String, FavoriteTabHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavoriteTabHolder {
