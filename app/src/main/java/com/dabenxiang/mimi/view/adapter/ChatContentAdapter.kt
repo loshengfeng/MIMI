@@ -170,6 +170,11 @@ class ChatContentAdapter(
         notifyDataSetChanged()
     }
 
+    fun insertItem(item: ChatContentItem, index: Int = 0) {
+        this.data.add(index, item)
+        notifyDataSetChanged()
+    }
+
     override fun getItemCount(): Int {
         return data.size
     }
