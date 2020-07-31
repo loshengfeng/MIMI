@@ -32,12 +32,14 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PostMemberRequest
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.PostVideoAttachment
+import com.dabenxiang.mimi.model.vo.ViewerItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.ScrollVideoAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.chip.Chip
@@ -238,8 +240,8 @@ class PostVideoFragment : BaseFragment() {
         }
     }
 
-    override fun initSettings() {
-        super.initSettings()
+    override fun setupFirstTime() {
+        super.setupFirstTime()
 
         val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
 
@@ -428,7 +430,14 @@ class PostVideoFragment : BaseFragment() {
         PostVideoItemListener(
             { id, function -> getBitmap(id, function) },
             { openRecorder() },
-            { item -> deleteVideo(item) }
+            { item -> deleteVideo(item) },
+            { viewerItem -> openViewerPage(viewerItem) }
         )
+    }
+
+    private fun openViewerPage(viewerItem: ViewerItem) {
+        val bundle = Bundle()
+        bundle.putSerializable(PostViewerFragment.VIEWER_DATA, viewerItem)
+        findNavController().navigate(R.id.action_postVideoFragment_to_postViewerFragment, bundle)
     }
 }
