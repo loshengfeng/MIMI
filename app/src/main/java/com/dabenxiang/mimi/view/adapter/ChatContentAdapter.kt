@@ -20,6 +20,7 @@ class ChatContentAdapter(
     private var data = ArrayList<ChatContentItem>()
 
     interface EventListener {
+        fun onGetAvatarAttachment(id: String, position: Int)
         fun onGetAttachment(id: String, position: Int)
         fun onImageClick(bitmap: Bitmap)
         fun onVideoClick(item: ChatContentItem?, position: Int)

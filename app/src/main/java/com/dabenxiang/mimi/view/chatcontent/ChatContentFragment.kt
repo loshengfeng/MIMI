@@ -39,6 +39,10 @@ class ChatContentFragment : BaseFragment() {
 
 
     private val listener = object : ChatContentAdapter.EventListener {
+        override fun onGetAvatarAttachment(id: String, position: Int) {
+            viewModel.getAttachment(requireContext(), id, position)
+        }
+
         override fun onGetAttachment(id: String, position: Int) {
             viewModel.getAttachment(requireContext(), id, position)
         }

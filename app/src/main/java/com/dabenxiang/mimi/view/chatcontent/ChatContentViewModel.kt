@@ -342,7 +342,7 @@ class ChatContentViewModel : BaseViewModel() {
     fun pushMsgWithCacheData(message: String, ext: String = "") {
         val sendTime = getTimeFormatForPush()
 
-        _cachePushData.value = ChatContentItem(pref.profileItem.userId.toString(), ChatContentPayloadItem(messageType, message, convertStringToDate(sendTime), ext))
+        _cachePushData.value = ChatContentItem(pref.profileItem.userId.toString(), payload = ChatContentPayloadItem(messageType, message, convertStringToDate(sendTime), ext))
         publishMsg(message, ext, sendTime)
     }
 }
