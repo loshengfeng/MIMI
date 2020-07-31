@@ -2,17 +2,15 @@ package com.dabenxiang.mimi.view.chatcontent
 
 import android.content.Context
 import android.net.Uri
+import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import androidx.paging.LivePagedListBuilder
-import androidx.paging.PagedList
 import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.BuildConfig
-import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ChatContentItem
+import com.dabenxiang.mimi.model.api.vo.ChatContentPayloadItem
 import com.dabenxiang.mimi.model.api.vo.MQTTChatItem
 import com.dabenxiang.mimi.model.enums.ChatMessageType
 import com.dabenxiang.mimi.model.manager.mqtt.ConnectCallback
@@ -35,9 +33,9 @@ import retrofit2.HttpException
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
-import java.lang.Exception
 import java.net.URLConnection
 import java.net.URLEncoder
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.HashMap
@@ -48,11 +46,12 @@ class ChatContentViewModel : BaseViewModel() {
         const val PREFIX_CHAT = "/chat/"
     }
 
+    private val PER_LIMIT = "10"
     val TAG_IMAGE = 0
     val TAG_VIDEO = 1
 
-    private val _chatListResult = MutableLiveData<PagedList<ChatContentItem>>()
-    val chatListResult: LiveData<PagedList<ChatContentItem>> = _chatListResult
+    private val _chatListResult = MutableLiveData<ApiResult<ArrayList<ChatContentItem>>>()
+    val chatListResult: LiveData<ApiResult<ArrayList<ChatContentItem>>> = _chatListResult
 
     private var _attachmentResult = MutableLiveData<ApiResult<out Any>>()
     val attachmentResult: LiveData<ApiResult<out Any>> = _attachmentResult
@@ -63,8 +62,8 @@ class ChatContentViewModel : BaseViewModel() {
     private var _fileAttachmentTooLarge = MutableLiveData<Boolean>()
     val fileAttachmentTooLarge: LiveData<Boolean> = _fileAttachmentTooLarge
 
-    private var _remakeContentResult = MutableLiveData<Boolean>()
-    val remakeContentResult: LiveData<Boolean> = _remakeContentResult
+    private var _cachePushData = MutableLiveData<ChatContentItem>()
+    val cachePushData: LiveData<ChatContentItem> = _cachePushData
 
     private val FILE_LIMIT = 5
     private val mqttManager: MQTTManager by inject()
@@ -72,33 +71,12 @@ class ChatContentViewModel : BaseViewModel() {
     private val clientId = UUID.randomUUID().toString()
     var topic: String = ""
     var messageType: Int = ChatMessageType.TEXT.ordinal
+    var isLoading: Boolean = false
+    var chatId: Long = -1
+    var offset: Int = 0
+    var noMore: Boolean = false
 
-    //    var videoCache: HashMap<Int, ChatContentItem> = HashMap()
     var videoCache: HashMap<String, ChatContentItem> = HashMap()
-
-
-    private val pagingCallback = object : PagingCallback {
-        override fun onLoading() {
-
-        }
-
-        override fun onLoaded() {
-
-        }
-
-        override fun onThrowable(throwable: Throwable) {
-
-        }
-
-        override fun onSucceed() {
-            super.onSucceed()
-        }
-
-        override fun onTotalCount(count: Long) {
-            super.onTotalCount(count)
-            _remakeContentResult.value = true
-        }
-    }
 
     /**
      * 判斷是檔案是否為圖像檔案
@@ -115,22 +93,72 @@ class ChatContentViewModel : BaseViewModel() {
         return SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault()).format(Date())
     }
 
-    fun getChatContent(chatId: Long) {
-        viewModelScope.launch {
-            val dataSrc = ChatContentListDataSource(
-                    viewModelScope,
-                    domainManager,
-                    chatId,
-                    pagingCallback
-            )
-            dataSrc.isInvalid
-            val factory = ChatContentListFactory(dataSrc)
-            val config = PagedList.Config.Builder()
-                    .setPageSize(ChatContentListDataSource.PER_LIMIT.toInt())
-                    .build()
+    /**
+     * 計算是否有下一頁需要撈取聊天訊息
+     */
+    private fun hasNextPage(total: Long, offset: Long, currentSize: Int): Boolean {
+        return when {
+            currentSize < PER_LIMIT.toInt() -> false
+            offset >= total -> false
+            else -> true
+        }
+    }
 
-            LivePagedListBuilder(factory, config).build().asFlow()
-                    .collect { _chatListResult.postValue(it) }
+    /**
+     * insert Time Title
+     */
+    private fun adjustData(list: ArrayList<ChatContentItem>): ArrayList<ChatContentItem> {
+        val result: ArrayList<ChatContentItem> = ArrayList()
+        var lastDate: String = ""
+        for (i: Int in list.indices) {
+            val item = list[i]
+            item.payload?.sendTime?.let { date ->
+                val currentDate = SimpleDateFormat("YYYY-MM-dd", Locale.getDefault()).format(date)
+                if (lastDate.isNotEmpty() && lastDate != currentDate) {
+                    result.add(ChatContentItem(dateTitle = lastDate))
+                }
+                result.add(item)
+                lastDate = currentDate
+                if (i == list.size - 1) {
+                    result.add(ChatContentItem(dateTitle = lastDate))
+                }
+            }
+        }
+        return result
+    }
+
+    fun getChatContent() {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getMessage(
+                        chatId,
+                        offset = offset.toString(),
+                        limit = PER_LIMIT
+                )
+                if (!result.isSuccessful) throw HttpException(result)
+                val item = result.body()
+                val size = item?.content?.size ?: 0
+                val messages = adjustData(item?.content as ArrayList<ChatContentItem>)
+                val totalCount = item.paging.count
+                val nextPageKey = when {
+                    hasNextPage(totalCount, item.paging.offset, size) -> { if (offset == 0) size else (offset + size) }
+                    else -> null
+                }
+
+                if (nextPageKey != null) {
+                    offset = nextPageKey.toString().toInt()
+                } else {
+                    noMore = true
+                }
+
+                emit(ApiResult.success(messages))
+            }
+                    .flowOn(Dispatchers.IO)
+                    .onStart { emit(ApiResult.loading()) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .collect { _chatListResult.value = it }
+
         }
     }
 
@@ -184,6 +212,18 @@ class ChatContentViewModel : BaseViewModel() {
         return path
     }
 
+    private fun convertStringToDate(dtStart: String): Date? {
+        val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+        var date: Date? = null
+        try {
+            date = format.parse(dtStart)
+            System.out.println(date)
+        } catch (e: ParseException) {
+            e.printStackTrace()
+        }
+        return date
+    }
+
     /**
      * 根據檔案名稱取得影片的路徑
      */
@@ -232,8 +272,8 @@ class ChatContentViewModel : BaseViewModel() {
         }
     }
 
-    fun initMQTT(id: String) {
-        topic = PREFIX_CHAT + id
+    fun initMQTT() {
+        topic = PREFIX_CHAT + chatId
         mqttManager.init(serverUrl, clientId, object : ExtendedCallback {
             override fun onConnectComplete(reconnect: Boolean, serverURI: String) {
                 Timber.d("Connect: $serverURI")
@@ -246,6 +286,9 @@ class ChatContentViewModel : BaseViewModel() {
             override fun onMessageArrived(topic: String, message: MqttMessage) {
                 Timber.d("Incoming topic:: $topic")
                 Timber.d("Incoming message:: ${String(message.payload)}")
+                val messageItem: ChatContentItem = gson.fromJson(String(message.payload), ChatContentItem::class.java)
+                if (!TextUtils.equals(messageItem.username, pref.profileItem.userId.toString()))
+                    _cachePushData.value = messageItem
             }
 
             override fun onConnectionLost(cause: Throwable) {
@@ -288,8 +331,18 @@ class ChatContentViewModel : BaseViewModel() {
         })
     }
 
-    fun publishMsg(message: String, ext: String = "") {
-        val mqttData = MQTTChatItem(ext, message, getTimeFormatForPush(), messageType)
+    fun publishMsg(message: String, ext: String = "", sendTime: String) {
+        val mqttData = MQTTChatItem(ext, message, sendTime, messageType)
         mqttManager.publishMessage(topic, gson.toJson(mqttData))
+    }
+
+    /**
+     * 傳送資料時，先做一個假得顯示在螢幕上
+     */
+    fun pushMsgWithCacheData(message: String, ext: String = "") {
+        val sendTime = getTimeFormatForPush()
+
+        _cachePushData.value = ChatContentItem(pref.profileItem.userId.toString(), payload = ChatContentPayloadItem(messageType, message, convertStringToDate(sendTime), ext))
+        publishMsg(message, ext, sendTime)
     }
 }

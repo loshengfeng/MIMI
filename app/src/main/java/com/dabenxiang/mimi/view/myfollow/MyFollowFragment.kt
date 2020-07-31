@@ -28,6 +28,9 @@ class MyFollowFragment : BaseFragment() {
 
     private val memberFollowAdapter by lazy { MemberFollowAdapter() }
 
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initSettings()

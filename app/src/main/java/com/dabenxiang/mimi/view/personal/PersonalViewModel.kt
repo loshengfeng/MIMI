@@ -30,7 +30,12 @@ class PersonalViewModel : BaseViewModel() {
             flow {
                 val result = domainManager.getApiRepository().getMe()
                 if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(result.body()?.content))
+                val meItem = result.body()?.content
+                meItem?.let {
+                    accountManager.setupProfile(it)
+                    getAttachment(it.avatarAttachmentId!!)
+                }
+                emit(ApiResult.success(meItem))
             }
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
@@ -39,11 +44,11 @@ class PersonalViewModel : BaseViewModel() {
         }
     }
 
-    fun getAttachment() {
+    fun getAttachment(id: Long) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository()
-                    .getAttachment(accountManager.getProfile().avatarAttachmentId.toString())
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.getAttachment(id.toString())
                 if (!result.isSuccessful) throw HttpException(result)
                 byteArray = result.body()?.bytes()
                 val bitmap = ImageUtils.bytes2Bitmap(byteArray)

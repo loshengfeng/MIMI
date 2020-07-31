@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ChatContentItem
@@ -38,6 +39,10 @@ class ChatContentFragment : BaseFragment() {
 
 
     private val listener = object : ChatContentAdapter.EventListener {
+        override fun onGetAvatarAttachment(id: String, position: Int) {
+            viewModel.getAttachment(requireContext(), id, position)
+        }
+
         override fun onGetAttachment(id: String, position: Int) {
             viewModel.getAttachment(requireContext(), id, position)
         }
@@ -97,8 +102,9 @@ class ChatContentFragment : BaseFragment() {
             data as ChatListItem
             textTitle.text = data.name
             data.id?.let { id ->
-                viewModel.getChatContent(id)
-                viewModel.initMQTT(id.toString())
+                viewModel.chatId = id
+                viewModel.getChatContent()
+                viewModel.initMQTT()
                 viewModel.connect()
             }
         }
@@ -117,7 +123,15 @@ class ChatContentFragment : BaseFragment() {
     override fun setupObservers() {
         Timber.d("${ChatContentFragment::class.java.simpleName}_setupObservers")
 
-        viewModel.chatListResult.observe(viewLifecycleOwner, Observer { adapter.submitList(it) })
+        viewModel.chatListResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    viewModel.isLoading = false
+                    adapter.setData(it.result)
+                }
+                is ApiResult.Error -> Timber.e(it.throwable)
+            }
+        })
 
         viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
             when (it) {
@@ -151,7 +165,7 @@ class ChatContentFragment : BaseFragment() {
         viewModel.postAttachmentResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Success -> {
-                    viewModel.publishMsg(it.result.id.toString(), it.result.ext)
+                    viewModel.pushMsgWithCacheData(it.result.id.toString(), it.result.ext)
                 }
                 is ApiResult.Error -> Timber.e(it.throwable)
             }
@@ -160,6 +174,10 @@ class ChatContentFragment : BaseFragment() {
             if (result) {
                 GeneralUtils.showToast(requireContext(), getString(R.string.chat_content_file_too_large))
             }
+        })
+
+        viewModel.cachePushData.observe(viewLifecycleOwner, Observer {
+            adapter.insertItem(it)
         })
     }
 
@@ -173,13 +191,32 @@ class ChatContentFragment : BaseFragment() {
         btnSend.setOnClickListener {
             if (editChat.text.isNotEmpty()) {
                 viewModel.messageType = ChatMessageType.TEXT.ordinal
-                viewModel.publishMsg(editChat.text.toString())
+                viewModel.pushMsgWithCacheData(editChat.text.toString())
                 editChat.text.clear()
             }
         }
         btnAdd.setOnClickListener {
             openChooser()
         }
+
+        recyclerContent.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val linearLayoutManager: LinearLayoutManager = recyclerView.layoutManager as LinearLayoutManager
+
+                if (!viewModel.isLoading && !viewModel.noMore) {
+                    if (linearLayoutManager != null && linearLayoutManager.findLastCompletelyVisibleItemPosition() == adapter.itemCount - 4) {
+                        //bottom of list!
+                        viewModel.getChatContent()
+                        viewModel.isLoading = true
+                    }
+                }
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+            }
+        })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
