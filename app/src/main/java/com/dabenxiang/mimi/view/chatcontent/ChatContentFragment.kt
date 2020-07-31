@@ -100,7 +100,7 @@ class ChatContentFragment : BaseFragment() {
             data.id?.let { id ->
                 viewModel.chatId = id
                 viewModel.getChatContent()
-                viewModel.initMQTT(id.toString())
+                viewModel.initMQTT()
                 viewModel.connect()
             }
         }
@@ -161,7 +161,7 @@ class ChatContentFragment : BaseFragment() {
         viewModel.postAttachmentResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Success -> {
-                    viewModel.publishMsg(it.result.id.toString(), it.result.ext)
+                    viewModel.pushMsgWithCacheData(it.result.id.toString(), it.result.ext)
                 }
                 is ApiResult.Error -> Timber.e(it.throwable)
             }
@@ -170,6 +170,10 @@ class ChatContentFragment : BaseFragment() {
             if (result) {
                 GeneralUtils.showToast(requireContext(), getString(R.string.chat_content_file_too_large))
             }
+        })
+
+        viewModel.cachePushData.observe(viewLifecycleOwner, Observer {
+            adapter.insertItem(it)
         })
     }
 
@@ -183,7 +187,7 @@ class ChatContentFragment : BaseFragment() {
         btnSend.setOnClickListener {
             if (editChat.text.isNotEmpty()) {
                 viewModel.messageType = ChatMessageType.TEXT.ordinal
-                viewModel.publishMsg(editChat.text.toString())
+                viewModel.pushMsgWithCacheData(editChat.text.toString())
                 editChat.text.clear()
             }
         }
