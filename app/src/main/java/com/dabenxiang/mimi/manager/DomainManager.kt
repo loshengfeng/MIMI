@@ -16,7 +16,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
 
-open class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClient) {
+class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClient) {
 
     companion object {
         const val MIMI_PROJECT_ID = "815e22a6"
