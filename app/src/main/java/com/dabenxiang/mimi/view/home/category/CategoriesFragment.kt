@@ -8,6 +8,7 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
+import com.blankj.utilcode.util.AppUtils
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
@@ -33,7 +34,7 @@ class CategoriesFragment : BaseFragment() {
         const val KEY_DATA = "data"
         const val KEY_CATEGORY = "category"
 
-        fun createBundle(title: String, categories: String, item: CategoriesItem?): Bundle {
+        fun createBundle(title: String, categories: String?, item: CategoriesItem?): Bundle {
             val data = CategoriesData()
             data.title = title
             data.categories = categories
@@ -202,26 +203,18 @@ class CategoriesFragment : BaseFragment() {
                 videoListAdapter.submitList(it)
             })
 
+            if (isAdult) {
+                recyclerview_content.setPadding(0, GeneralUtils.dpToPx(requireContext(), 50), 0, 0)
+            }
+
             viewModel.setupVideoList(data.categories, isAdult)
 
             viewModel.getCategoryDetail(data.title, isAdult)
             progressHUD?.show()
         }
 
-//        (arguments?.getSerializable(KEY_CATEGORY) as CategoriesItem?)?.also { item ->
-//            item.categories?.forEach { category ->
-//                Timber.d("------------name: ${category.name}-------------")
-//                run(category)
-//            }
-//        }
     }
 
-    private fun run(item: CategoriesItem) {
-        Timber.d("name: ${item.name}")
-        item.categories?.forEach { category ->
-            run(category)
-        }
-    }
 
     private var filterViewList: List<RecyclerView> = listOf()
     private var filterAdapterList = mutableMapOf<Int, FilterTabAdapter>()

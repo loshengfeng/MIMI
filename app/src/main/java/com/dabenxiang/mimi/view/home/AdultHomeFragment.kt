@@ -567,6 +567,13 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         btn_filter.setOnClickListener {
+            val bundle = CategoriesFragment.createBundle(getString(R.string.favorite_tab_mimi), null, mainViewModel?.adult?.categories?.get(0))
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_adultHomeFragment_to_categoriesFragment,
+                    bundle
+                )
+            )
         }
 
         recyclerview_tab.adapter = tabAdapter

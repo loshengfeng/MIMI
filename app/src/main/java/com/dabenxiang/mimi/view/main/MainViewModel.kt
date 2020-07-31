@@ -113,7 +113,7 @@ class MainViewModel : BaseViewModel() {
     }
 
     fun getCategory(title: String, isAdult: Boolean): CategoriesItem? {
-        val item = if (isAdult) _normal else _adult
+        val item = if (isAdult) _adult else _normal
         var result: CategoriesItem? = null
             item?.categories?.forEach {
             if(it.name == title) {

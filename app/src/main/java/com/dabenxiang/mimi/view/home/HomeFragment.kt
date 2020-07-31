@@ -30,6 +30,7 @@ import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_home.*
+import timber.log.Timber
 
 class HomeFragment : BaseFragment() {
 
@@ -308,7 +309,6 @@ class HomeFragment : BaseFragment() {
 
     private val adapterListener = object : HomeAdapter.EventListener {
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
-
             val bundle = CategoriesFragment.createBundle(item.title, item.categories, mainViewModel?.getCategory(item.title, false))
             navigateTo(
                 NavigateItem.Destination(
