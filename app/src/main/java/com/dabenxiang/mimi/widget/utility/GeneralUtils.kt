@@ -5,9 +5,9 @@ import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.provider.MediaStore
 import android.content.Intent
 import android.net.Uri
+import android.provider.MediaStore
 import android.provider.Settings
 import android.util.DisplayMetrics
 import android.view.inputmethod.InputMethodManager
@@ -90,10 +90,12 @@ object GeneralUtils {
     }
 
     fun getLibEnv(): String {
-        return when (BuildConfig.FLAVOR) {
-            DomainManager.FLAVOR_DEV -> "d"
-            DomainManager.FLAVOR_SIT -> "s"
-            else -> "p"
+        if (BuildConfig.BUILD_TYPE.contains(DomainManager.BUILDTYPE_DEV)) {
+            return "d"
+        } else if (BuildConfig.BUILD_TYPE.contains(DomainManager.BUILDTYPE_SIT)) {
+            return "s"
+        } else {
+            return "p"
         }
     }
 
