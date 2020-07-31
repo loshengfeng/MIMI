@@ -38,6 +38,7 @@ class ChatContentFragment : BaseFragment() {
     private lateinit var imagePreviewDialog: ImagePreviewDialogFragment
     private val viewModel: ChatContentViewModel by viewModels()
     private val adapter by lazy { ChatContentAdapter(listener) }
+    private var senderAvatarId = ""
 
 
     private val listener = object : ChatContentAdapter.EventListener {
@@ -85,6 +86,10 @@ class ChatContentFragment : BaseFragment() {
                 }
             }
         }
+
+        override fun getSenderAvatar(): String {
+            return senderAvatarId
+        }
     }
 
     companion object {
@@ -107,6 +112,7 @@ class ChatContentFragment : BaseFragment() {
         arguments?.getSerializable(KEY_CHAT_LIST_ITEM)?.let { data ->
             data as ChatListItem
             textTitle.text = data.name
+            senderAvatarId = data.avatarAttachmentId.toString()
             data.id?.let { id ->
                 viewModel.chatId = id
                 viewModel.getChatContent()
