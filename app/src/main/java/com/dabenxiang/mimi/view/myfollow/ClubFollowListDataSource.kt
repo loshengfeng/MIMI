@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.myfollow
 
 import androidx.paging.PageKeyedDataSource
+import com.dabenxiang.mimi.callback.MyFollowPagingCallback
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
@@ -13,7 +14,7 @@ import retrofit2.HttpException
 class ClubFollowListDataSource constructor(
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
-    private val pagingCallback: PagingCallback
+    private val pagingCallback: MyFollowPagingCallback
 ) : PageKeyedDataSource<Long, ClubFollowItem>() {
 
     companion object {
@@ -43,14 +44,18 @@ class ClubFollowListDataSource constructor(
                     else -> null
                 }
                 emit(InitResult(clubs ?: arrayListOf(), nextPageKey))
-
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { pagingCallback.onLoading() }
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect { response ->
-                    pagingCallback.onTotalCount(response.list.size.toLong())
+                    pagingCallback.onTotalCount(response.list.size.toLong(), true)
+                    val idList = ArrayList<Long>()
+                    response.list.forEach {
+                        idList.add(it.clubId)
+                    }
+                    pagingCallback.onIdList(idList, true)
                     callback.onResult(response.list, null, response.nextKey)
                 }
         }
@@ -59,8 +64,7 @@ class ClubFollowListDataSource constructor(
     override fun loadBefore(
         params: LoadParams<Long>,
         callback: LoadCallback<Long, ClubFollowItem>
-    ) {
-    }
+    ) {}
 
     override fun loadAfter(params: LoadParams<Long>, callback: LoadCallback<Long, ClubFollowItem>) {
         val next = params.key
@@ -86,7 +90,12 @@ class ClubFollowListDataSource constructor(
                                 ) -> next + PER_LIMIT_LONG
                                 else -> null
                             }
-                            pagingCallback.onTotalCount(list.size.toLong())
+                            pagingCallback.onTotalCount(list.size.toLong(), false)
+                            val idList = ArrayList<Long>()
+                            list.forEach {
+                                idList.add(it.clubId)
+                            }
+                            pagingCallback.onIdList(idList, false)
                             callback.onResult(list, nextPageKey)
                         }
                     }

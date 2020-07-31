@@ -13,9 +13,13 @@ import com.dabenxiang.mimi.view.adapter.MemberFollowAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
+import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
+import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
+import com.dabenxiang.mimi.view.favroite.FavoriteFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.tabs.TabLayout
+import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_my_follow.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import timber.log.Timber
@@ -73,6 +77,10 @@ class MyFollowFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
+        viewModel.showProgress.observe(viewLifecycleOwner, Observer {
+            layout_refresh.isRefreshing = it
+        })
+
         viewModel.clubCount.observe(viewLifecycleOwner, Observer {
             refreshUi(TYPE_CLUB, it)
         })
@@ -119,14 +127,42 @@ class MyFollowFragment : BaseFragment() {
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
+
+        viewModel.cleanResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Loading -> layout_refresh.isRefreshing = true
+                is ApiResult.Loaded -> layout_refresh.isRefreshing = false
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+    }
+
+    private val onCleanDialogListener = object : OnCleanDialogListener {
+        override fun onClean() {
+            if (tl_type.selectedTabPosition == TYPE_MEMBER) {
+                viewModel.cleanAllFollowMember()
+            } else {
+                viewModel.cleanAllFollowClub()
+            }
+        }
     }
 
     override fun setupListeners() {
         View.OnClickListener { btnView ->
             when (btnView.id) {
                 R.id.tv_back -> navigateTo(NavigateItem.Up)
-                //todo: clean all
-                R.id.tv_clean -> GeneralUtils.showToast(requireContext(), "Clean")
+                R.id.tv_clean -> CleanDialogFragment.newInstance(
+                    onCleanDialogListener,
+                    if (tl_type.selectedTabPosition == TYPE_MEMBER)
+                        R.string.follow_clean_member_dlg_msg
+                    else
+                        R.string.follow_clean_club_dlg_msg
+                ).also {
+                    it.show(
+                        requireActivity().supportFragmentManager,
+                        CleanDialogFragment::class.java.simpleName
+                    )
+                }
             }
         }.also {
             tv_back.setOnClickListener(it)
@@ -173,6 +209,8 @@ class MyFollowFragment : BaseFragment() {
             NO_DATA -> View.VISIBLE
             else -> View.GONE
         }
+
+        tv_clean.isEnabled = size != NO_DATA
 
         tv_all.text =
             if (witch == TYPE_MEMBER)

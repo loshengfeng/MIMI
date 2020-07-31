@@ -67,7 +67,7 @@
 
         <action
             android:id="@+id/action_myFollowFragment_to_clubDetailFragment"
-            app:destination="@id/navigation_detail_club" />
+            app:destination="@id/navigation_detail_club"/>
     </fragment>
 
     <fragment

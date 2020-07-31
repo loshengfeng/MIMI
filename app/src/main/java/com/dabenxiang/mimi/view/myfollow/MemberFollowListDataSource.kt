@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.myfollow
 
 import androidx.paging.PageKeyedDataSource
+import com.dabenxiang.mimi.callback.MyFollowPagingCallback
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
@@ -13,7 +14,7 @@ import retrofit2.HttpException
 class MemberFollowListDataSource constructor(
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
-    private val pagingCallback: PagingCallback
+    private val pagingCallback: MyFollowPagingCallback
 ) : PageKeyedDataSource<Long, MemberFollowItem>() {
 
     companion object {
@@ -49,7 +50,12 @@ class MemberFollowListDataSource constructor(
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect { response ->
-                    pagingCallback.onTotalCount(response.list.size.toLong())
+                    pagingCallback.onTotalCount(response.list.size.toLong(), true)
+                    val idList = ArrayList<Long>()
+                    response.list.forEach {
+                        idList.add(it.userId)
+                    }
+                    pagingCallback.onIdList(idList, true)
                     callback.onResult(response.list, null, response.nextKey)
                 }
         }
@@ -68,7 +74,8 @@ class MemberFollowListDataSource constructor(
         val next = params.key
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().getMyMemberFollow(next.toString(), PER_LIMIT)
+                val result =
+                    domainManager.getApiRepository().getMyMemberFollow(next.toString(), PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(result)
             }
@@ -87,7 +94,12 @@ class MemberFollowListDataSource constructor(
                                 ) -> next + PER_LIMIT_LONG
                                 else -> null
                             }
-                            pagingCallback.onTotalCount(list.size.toLong())
+                            pagingCallback.onTotalCount(list.size.toLong(), false)
+                            val idList = ArrayList<Long>()
+                            list.forEach {
+                                idList.add(it.userId)
+                            }
+                            pagingCallback.onIdList(idList, false)
                             callback.onResult(list, nextPageKey)
                         }
                     }
