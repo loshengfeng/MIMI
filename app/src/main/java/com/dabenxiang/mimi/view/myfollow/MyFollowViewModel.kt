@@ -10,6 +10,7 @@ import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
 import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
@@ -36,6 +37,9 @@ class MyFollowViewModel : BaseViewModel() {
 
     private var _attachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
     val attachmentResult: LiveData<ApiResult<AttachmentItem>> = _attachmentResult
+
+    private val _clubDetail = MutableLiveData<ApiResult<ArrayList<MemberClubItem>>>()
+    val clubDetail: LiveData<ApiResult<ArrayList<MemberClubItem>>> = _clubDetail
 
     fun initData(type: Int) {
         viewModelScope.launch {
@@ -169,6 +173,17 @@ class MyFollowViewModel : BaseViewModel() {
         }
     }
 
-    fun getClubDetail(clubId: Long) {
+    fun getClub(tag:String) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository().getMembersClub(tag)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(resp.body()?.content))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _clubDetail.value = it }
+        }
     }
+
 }

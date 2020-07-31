@@ -5,6 +5,8 @@
     android:id="@+id/navigation_adult"
     app:startDestination="@id/adultHomeFragment">
 
+    <include app:graph="@navigation/navigation_detail_club" />
+
     <fragment
         android:id="@+id/adultHomeFragment"
         android:name="com.dabenxiang.mimi.view.home.AdultHomeFragment"
@@ -49,7 +51,7 @@
             app:destination="@id/searchPostFragment" />
         <action
             android:id="@+id/action_adultHomeFragment_to_clubDetailFragment"
-            app:destination="@id/clubDetailFragment" />
+            app:destination="@id/navigation_detail_club" />
         <action
             android:id="@+id/action_adultHomeFragment_to_myPostFragment"
             app:destination="@id/myPostFragment" />
@@ -69,28 +71,6 @@
     </fragment>
 
     <fragment
-        android:id="@+id/searchPostFragment"
-        android:name="com.dabenxiang.mimi.view.search.post.SearchPostFragment"
-        tools:layout="@layout/fragment_search_post">
-
-        <action
-            android:id="@+id/action_searchPostFragment_to_pictureDetailFragment"
-            app:destination="@id/pictureDetailFragment" />
-
-        <action
-            android:id="@+id/action_searchPostFragment_to_textDetailFragment"
-            app:destination="@id/textDetailFragment" />
-
-        <action
-            android:id="@+id/action_searchPostFragment_to_clipFragment"
-            app:destination="@id/clipFragment" />
-
-        <action
-            android:id="@+id/action_searchPostFragment_to_clubDetailFragment"
-            app:destination="@id/clubDetailFragment" />
-    </fragment>
-
-    <fragment
         android:id="@+id/searchVideoFragment"
         android:name="com.dabenxiang.mimi.view.search.video.SearchVideoFragment"
         tools:layout="@layout/fragment_search_video" />
@@ -106,30 +86,9 @@
         tools:layout="@layout/fragment_post_article" />
 
     <fragment
-        android:id="@+id/pictureDetailFragment"
-        android:name="com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment"
-        tools:layout="@layout/fragment_picture_detail">
-        <action
-            android:id="@+id/action_pictureDetailFragment_to_pictureFragment"
-            app:destination="@id/pictureFragment" />
-        <action
-            android:id="@+id/action_pictureDetailFragment_to_searchPostFragment"
-            app:destination="@id/searchPostFragment" />
-    </fragment>
-
-    <fragment
         android:id="@+id/pictureFragment"
         android:name="com.dabenxiang.mimi.view.fullpicture.FullPictureFragment"
         tools:layout="@layout/fragment_full_picture" />
-
-    <fragment
-        android:id="@+id/textDetailFragment"
-        android:name="com.dabenxiang.mimi.view.textdetail.TextDetailFragment"
-        tools:layout="@layout/fragment_text_detail">
-        <action
-            android:id="@+id/action_textDetailFragment_to_searchPostFragment"
-            app:destination="@id/searchPostFragment" />
-    </fragment>
 
     <fragment
         android:id="@+id/postPicFragment"
@@ -154,24 +113,6 @@
         <action
             android:id="@+id/action_editVideoFragment_to_postVideoFragment"
             app:destination="@id/postVideoFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/clubDetailFragment"
-        android:name="com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment"
-        android:label="ClubDetailFragment"
-        tools:layout="@layout/fragment_club_detail">
-        <action
-            android:id="@+id/action_clubDetailFragment_to_clipFragment"
-            app:destination="@id/clipFragment" />
-        <action
-            android:id="@+id/action_clubDetailFragment_to_pictureDetailFragment"
-            app:destination="@id/pictureDetailFragment" />
-        <action
-            android:id="@+id/action_clubDetailFragment_to_textDetailFragment"
-            app:destination="@id/textDetailFragment" />
-        <action
-            android:id="@+id/action_clubDetailFragment_to_searchPostFragment"
-            app:destination="@id/searchPostFragment" />
     </fragment>
     <fragment
         android:id="@+id/myPostFragment"

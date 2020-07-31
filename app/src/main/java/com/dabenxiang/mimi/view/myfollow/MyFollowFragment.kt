@@ -1,13 +1,13 @@
 package com.dabenxiang.mimi.view.myfollow
 
+import android.os.Bundle
 import android.view.View
+import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
-import com.dabenxiang.mimi.model.api.vo.MemberClubItem
-import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
 import com.dabenxiang.mimi.view.adapter.ClubFollowAdapter
 import com.dabenxiang.mimi.view.adapter.MemberFollowAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -33,13 +33,7 @@ class MyFollowFragment : BaseFragment() {
     private val clubFollowAdapter by lazy { ClubFollowAdapter(clubFollowListener) }
     private val clubFollowListener = object : ClubFollowAdapter.EventListener {
         override fun onDetail(item: ClubFollowItem) {
-//            val bundle = ClubDetailFragment.createBundle()
-//            navigateTo(
-//                NavigateItem.Destination(
-//                    R.id.action_myFollowFragment_to_clubDetailFragment,
-//                    bundle
-//                )
-//            )
+            viewModel.getClub(item.tag)
         }
 
         override fun onGetAttachment(id: String, position: Int) {
@@ -59,6 +53,13 @@ class MyFollowFragment : BaseFragment() {
 
         override fun onCancelFollow(userId: Long) {
             viewModel.cancelFollowMember(userId)
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback {
+            navigateTo(NavigateItem.Up)
         }
     }
 
@@ -101,6 +102,21 @@ class MyFollowFragment : BaseFragment() {
                     }
                 }
                 is ApiResult.Error -> Timber.e(it.throwable)
+            }
+        })
+
+        viewModel.clubDetail.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    val bundle = ClubDetailFragment.createBundle(it.result[0])
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_myFollowFragment_to_clubDetailFragment,
+                            bundle
+                        )
+                    )
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
             }
         })
     }

@@ -17,7 +17,7 @@ class ClubFollowListDataSource constructor(
 ) : PageKeyedDataSource<Long, ClubFollowItem>() {
 
     companion object {
-        const val PER_LIMIT = "20"
+        const val PER_LIMIT = "10"
         val PER_LIMIT_LONG = PER_LIMIT.toLong()
     }
 
