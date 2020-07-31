@@ -47,9 +47,9 @@
             android:layout_height="20dp"
             android:layout_marginTop="2dp"
             android:background="@drawable/bg_coin"
-            android:gravity="center"
             android:drawableStart="@drawable/ico_micoin_small"
             android:drawablePadding="2dp"
+            android:gravity="center"
             android:paddingStart="4dp"
             android:paddingEnd="6dp"
             android:textColor="@color/color_white_1"
@@ -111,6 +111,7 @@
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:text="@string/personal_order"
+            android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_follow" />
 
@@ -142,10 +143,10 @@
             android:layout_marginEnd="46dp"
             android:background="@drawable/ico_new"
             android:gravity="center"
-            android:visibility="gone"
             android:text="N"
             android:textColor="@color/color_white_1"
             android:textSize="10sp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/tv_chat_history"
             app:layout_constraintEnd_toEndOf="@id/tv_chat_history"
             app:layout_constraintTop_toTopOf="@id/tv_chat_history" />

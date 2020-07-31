@@ -66,7 +66,7 @@ class SettingFragment : BaseFragment() {
                     tv_account.text = viewModel.profileData?.username
                     var img: Drawable? = null
 
-                    if(viewModel.isEmailConfirmed()) {
+                    if (viewModel.isEmailConfirmed()) {
                         img = requireContext().resources.getDrawable(R.drawable.ico_checked)
                         btn_resend.visibility = View.GONE
                     } else {
@@ -116,11 +116,11 @@ class SettingFragment : BaseFragment() {
             }
         })
 
-        viewModel.putResult.observe(viewLifecycleOwner, Observer { it ->
+        viewModel.putResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Empty -> viewModel.bitmap?.also { it1 -> setupPhoto(it1) }
+                is Empty -> viewModel.bitmap?.also { bitmap -> setupPhoto(bitmap) }
                 is Error -> onApiError(it.throwable)
             }
         })
