@@ -171,6 +171,11 @@ class ApiRepository(private val apiService: ApiService) {
         return apiService.setLastReadMessageTime(body)
     }
 
+    /**
+     * 取的未否有未讀訊息
+     */
+    suspend fun getUnread() = apiService.getUnread()
+
     /**********************************************************
      *
      *                  Functions
@@ -350,7 +355,7 @@ class ApiRepository(private val apiService: ApiService) {
         category: String? = null,
         q: String? = null,
         country: String? = null,
-        years: Int? = null,
+        years: String? = null,
         isAdult: Boolean,
         offset: String,
         limit: String,

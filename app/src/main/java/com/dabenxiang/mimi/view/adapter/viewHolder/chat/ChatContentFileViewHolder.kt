@@ -54,6 +54,10 @@ class ChatContentFileViewHolder(
                 txtDownloadState.visibility = View.VISIBLE
                 txtDownloadState.text = context.getString(R.string.chat_content_file_download_finish)
             }
+            VideoDownloadStatusType.UPLOADING -> {
+                txtDownloadState.visibility = View.VISIBLE
+                txtDownloadState.text = context.getString(R.string.chat_content_file_uploading)
+            }
         }
     }
 }

@@ -31,11 +31,9 @@ import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
-import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.comment.MyPostMoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.listener.InteractionListener
-import com.dabenxiang.mimi.view.myfollow.MyFollowFragment
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.TYPE_VIDEO
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.USER_ID_ME
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
@@ -152,8 +150,6 @@ class MyPostFragment : BaseFragment() {
         tv_title.isSelected = isAdultTheme
         tv_back.isSelected = isAdultTheme
 
-        viewModel.getMyPost(userId, isAdult)
-
         val isNeedPicUpload =
             findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>(
                 PostPicFragment.UPLOAD_PIC
@@ -265,6 +261,11 @@ class MyPostFragment : BaseFragment() {
                 viewModel.postPic(postId?.value!!, postMemberRequest, content)
             }
         }
+    }
+
+    override fun setupFirstTime() {
+        super.setupFirstTime()
+        viewModel.getMyPost()
     }
 
     override fun setupObservers() {
@@ -636,12 +637,7 @@ class MyPostFragment : BaseFragment() {
             }
         }
 
-        override fun onFavoriteClick(
-            item: MemberPostItem,
-            position: Int,
-            isFavorite: Boolean,
-            type: AttachmentType
-        ) {
+        override fun onFavoriteClick(item: MemberPostItem, position: Int, isFavorite: Boolean, type: AttachmentType) {
             viewModel.favoritePost(item, position, isFavorite, type)
         }
 

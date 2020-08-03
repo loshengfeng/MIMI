@@ -12,7 +12,7 @@ data class MemberPostItem(
     var id: Long = 0,
 
     @SerializedName("title")
-    val title: String = "",
+    var title: String = "",
 
     @SerializedName("content")
     var content: String = "",
@@ -42,7 +42,7 @@ data class MemberPostItem(
     var commentCount: Int = 0,
 
     @SerializedName("tags")
-    val tags: ArrayList<String>? = arrayListOf(),
+    var tags: ArrayList<String>? = arrayListOf(),
 
     @SerializedName("clickThroughCount")
     val clickThroughCount: Int = 0,

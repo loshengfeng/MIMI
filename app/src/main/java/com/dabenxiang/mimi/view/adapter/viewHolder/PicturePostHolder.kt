@@ -29,7 +29,6 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_picture_post.view.*
-import timber.log.Timber
 import java.util.*
 
 class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
@@ -130,6 +129,10 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         picturePostItemLayout.setOnClickListener {
             item.also { adultListener.onItemClick(item, AdultTabType.PICTURE) }
         }
+
+        avatarImg.setOnClickListener {
+            adultListener.onAvatarClick()
+        }
     }
 
     private fun updateAvatar(id: String) {
@@ -162,7 +165,11 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         follow.setOnClickListener {
-            memberPostFuncItem.onFollowClick(item, !item.isFollow) { isFollow -> updateFollow(isFollow)}
+            memberPostFuncItem.onFollowClick(item, !item.isFollow) { isFollow ->
+                updateFollow(
+                    isFollow
+                )
+            }
         }
 
         likeImage.setOnClickListener {

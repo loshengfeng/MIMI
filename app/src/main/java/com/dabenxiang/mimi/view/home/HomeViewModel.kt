@@ -118,6 +118,9 @@ class HomeViewModel : BaseViewModel() {
     private val _totalCountResult = MutableLiveData<Int>()
     val totalCountResult: LiveData<Int> = _totalCountResult
 
+    private val _postArticleResult = MutableLiveData<ApiResult<Long>>()
+    val postArticleResult: LiveData<ApiResult<Long>> = _postArticleResult
+
     private var job = Job()
 
     fun loadNestedStatisticsListForCarousel(position: Int, src: HomeTemplate.Carousel) {
@@ -505,7 +508,35 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
+    fun postArticle(title: String, content: String, tags: ArrayList<String>) {
+        viewModelScope.launch {
+            flow {
+                val request = PostMemberRequest(
+                    title = title,
+                    content = content,
+                    type = PostType.TEXT.value,
+                    tags = tags
+                )
+
+                val resp = domainManager.getApiRepository().postMembersPost(request)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(resp.body()?.content))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _postArticleResult.value = it }
+        }
+    }
+
     fun cancelJob() {
         job.cancel()
+    }
+
+    fun clearLiveDataValue() {
+        _postPicResult.value = null
+        _postCoverResult.value = null
+        _postVideoResult.value = null
     }
 }

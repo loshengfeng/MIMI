@@ -221,6 +221,11 @@ class PlayerActivity : BaseActivity() {
             override fun onMoreClick(item: MembersPostCommentItem) {
                 Timber.i("playerInfoAdapter onMoreClick")
             }
+
+            override fun onAvatarClick() {
+                // TODO:
+                Timber.d("onAvatarClick nav to member post")
+            }
         }, CommentViewType.VIDEO).apply {
             loadMoreModule.apply {
                 isEnableLoadMore = true

@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.model.api.vo.ChatContentItem
 import com.dabenxiang.mimi.model.api.vo.ChatContentPayloadItem
 import com.dabenxiang.mimi.model.api.vo.MQTTChatItem
 import com.dabenxiang.mimi.model.enums.ChatMessageType
+import com.dabenxiang.mimi.model.enums.VideoDownloadStatusType
 import com.dabenxiang.mimi.model.manager.mqtt.ConnectCallback
 import com.dabenxiang.mimi.model.manager.mqtt.ExtendedCallback
 import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager
@@ -65,6 +66,9 @@ class ChatContentViewModel : BaseViewModel() {
     private var _cachePushData = MutableLiveData<ChatContentItem>()
     val cachePushData: LiveData<ChatContentItem> = _cachePushData
 
+    private var _updatePushData = MutableLiveData<ChatContentItem>()
+    val updatePushData: LiveData<ChatContentItem> = _updatePushData
+
     private val FILE_LIMIT = 5
     private val mqttManager: MQTTManager by inject()
     private val serverUrl = BuildConfig.MQTT_HOST
@@ -77,6 +81,7 @@ class ChatContentViewModel : BaseViewModel() {
     var noMore: Boolean = false
 
     var videoCache: HashMap<String, ChatContentItem> = HashMap()
+    var fileUploadCache: HashMap<String, Int> = HashMap()
 
     /**
      * 判斷是檔案是否為圖像檔案
@@ -163,7 +168,7 @@ class ChatContentViewModel : BaseViewModel() {
 
         }
     }
-    
+
     fun setLastRead() {
         viewModelScope.launch {
             flow {
@@ -247,31 +252,48 @@ class ChatContentViewModel : BaseViewModel() {
 
     /**
      * 上傳影片 or 圖片
+     * 流程：Step 1 -> 判斷是否大於可上傳限制
+     *      Step 2 -> 根據圖片或是影片，做一個假的 Message 先放到列表上
+     *      Step 3 -> 利用 AttachmentID 當作 key 去儲存上傳檔案 uri 的 HashCode
+     *      Step 4 -> 上傳成功就 push message to MQTT Server
+     *      Step 5 -> 接收到 MQTT message receiver 時,更新原本列表上的 cache item ( 在 Mqtt receiver 做 )
      */
     fun postAttachment(uri: Uri, context: Context) {
         viewModelScope.launch {
             val realPath = UriUtils.getPath(context, uri)
             val file = File(realPath)
+            val fileNameSplit = realPath?.split("/")
+            val fileName = fileNameSplit?.last()
+            val extSplit = fileName?.split(".")
+            val ext = "." + extSplit?.last()
+
+            // Step 1
             if (file.length() / 1024.0 / 1024.0 > FILE_LIMIT) {
                 _fileAttachmentTooLarge.value = true
             } else {
-                flow {
-                    val fileNameSplit = realPath?.split("/")
-                    val fileName = fileNameSplit?.last()
-                    val extSplit = fileName?.split(".")
-                    val ext = "." + extSplit?.last()
+                val isImage = isImageFile(realPath)
+                messageType = if (isImage) {
+                    ChatMessageType.IMAGE.ordinal
+                } else {
+                    ChatMessageType.BINARY.ordinal
+                }
 
+                // Step 2
+                genCacheData("", ext, "", uri.hashCode(), VideoDownloadStatusType.UPLOADING)
+
+                flow {
                     Timber.d("Upload photo path : $realPath")
                     Timber.d("Upload photo ext : $ext")
-                    val result = if (isImageFile(realPath)) {
-                        messageType = ChatMessageType.IMAGE.ordinal
-                        domainManager.getApiRepository().postAttachment(File(realPath), fileName = URLEncoder.encode(fileName, "UTF-8"), type = "image/*")
-                    } else {
-                        messageType = ChatMessageType.BINARY.ordinal
-                        domainManager.getApiRepository().postAttachment(File(realPath), fileName = URLEncoder.encode(fileName, "UTF-8"), type = "video/*")
-                    }
+                    val type = if (isImage) "image/*" else "video/*"
+                    val result = domainManager.getApiRepository().postAttachment(File(realPath), fileName = URLEncoder.encode(fileName, "UTF-8"), type = type)
 
                     if (!result.isSuccessful) throw HttpException(result)
+
+                    // Step 3
+                    fileUploadCache[result.body()?.content.toString()] = uri.hashCode()
+                    // Step 4
+                    publishMsg((result.body()?.content ?: 0).toString(), ext)
+
                     val uploadPicItem = UploadPicItem(ext = ext, id = result.body()?.content
                             ?: 0)
                     emit(ApiResult.success(uploadPicItem))
@@ -304,6 +326,9 @@ class ChatContentViewModel : BaseViewModel() {
                 val messageItem: ChatContentItem = gson.fromJson(String(message.payload), ChatContentItem::class.java)
                 if (!TextUtils.equals(messageItem.username, pref.profileItem.userId.toString()))
                     _cachePushData.value = messageItem
+                else {
+                    _updatePushData.value = messageItem
+                }
             }
 
             override fun onConnectionLost(cause: Throwable) {
@@ -346,18 +371,35 @@ class ChatContentViewModel : BaseViewModel() {
         })
     }
 
-    fun publishMsg(message: String, ext: String = "", sendTime: String) {
-        val mqttData = MQTTChatItem(ext, message, sendTime, messageType)
+    fun publishMsg(message: String, ext: String = "", sendTime: String = "") {
+        val pushTime = if (TextUtils.isEmpty(sendTime)) {
+            getTimeFormatForPush()
+        } else
+            sendTime
+        val mqttData = MQTTChatItem(ext, message, pushTime, messageType)
         mqttManager.publishMessage(topic, gson.toJson(mqttData))
     }
 
     /**
-     * 傳送資料時，先做一個假得顯示在螢幕上
+     * 傳送資料時，先做一個假的訊息顯示在列表上
      */
     fun pushMsgWithCacheData(message: String, ext: String = "") {
         val sendTime = getTimeFormatForPush()
-
-        _cachePushData.value = ChatContentItem(pref.profileItem.userId.toString(), payload = ChatContentPayloadItem(messageType, message, convertStringToDate(sendTime), ext))
+        genCacheData(message, ext, sendTime)
         publishMsg(message, ext, sendTime)
+    }
+
+    fun genCacheData(message: String, ext: String = "", sendTime: String = "", mediaHashcode: Int = 0, downloadStatusType: VideoDownloadStatusType = VideoDownloadStatusType.NORMAL) {
+        val payload = ChatContentPayloadItem(messageType, message, if (TextUtils.isEmpty(sendTime)) null else convertStringToDate(sendTime), ext)
+        val chatContentItem = ChatContentItem(pref.profileItem.userId.toString(), payload = payload, mediaHashCode = mediaHashcode, downloadStatus = downloadStatusType)
+        _cachePushData.value = chatContentItem
+    }
+
+    fun genTextCacheData() {
+
+    }
+
+    fun genMediaCacheData() {
+
     }
 }

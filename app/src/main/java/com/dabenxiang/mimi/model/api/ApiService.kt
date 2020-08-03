@@ -111,6 +111,9 @@ interface ApiService {
         @Body body: HashMap<String, Long>
     ): Response<Void>
 
+    @GET("/v1/Members/Me/Chats/UnRead")
+    suspend fun getUnread(): Response<ApiBaseItem<Int>>
+
     /**********************************************************
      *
      *                  Functions
@@ -275,7 +278,7 @@ interface ApiService {
         @Query("category") category: String?,
         @Query("q") q: String?,
         @Query("country") country: String?,
-        @Query("years") years: Int?,
+        @Query("years") years: String?,
         @Query("isAdult") isAdult: Boolean?,
         @Query("offset") offset: String?,
         @Query("limit") limit: String?,

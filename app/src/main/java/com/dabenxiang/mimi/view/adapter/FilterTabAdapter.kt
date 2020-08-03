@@ -15,15 +15,15 @@ class FilterTabAdapter(
     BaseTabAdapter<String, FilterTabHolder>() {
 
     interface FilterTabAdapterListener {
-        fun onSelectedFilterTab(recyclerView: RecyclerView, position: Int)
+        fun onSelectedFilterTab(recyclerView: RecyclerView, position: Int, keyword: String)
     }
 
     private var attachedRecyclerView: RecyclerView? = null
 
     private val holderListener = object : BaseIndexViewHolder.IndexViewHolderListener {
-        override fun onClickItemIndex(view: View, position: Int) {
+        override fun onClickItemIndex(view: View, index: Int) {
             attachedRecyclerView?.also {
-                listener.onSelectedFilterTab(it, position)
+                listener.onSelectedFilterTab(it, index, tabList?.get(index) ?: "")
             }
         }
     }
