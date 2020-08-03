@@ -1,9 +1,12 @@
 package com.dabenxiang.mimi.model.api.vo
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.android.parcel.Parcelize
 import java.io.Serializable
 import java.util.*
 
+@Parcelize
 data class PostMemberRequest (
     @SerializedName("title")
     val title: String = "",
@@ -19,4 +22,4 @@ data class PostMemberRequest (
 
     @SerializedName("tags")
     val tags: ArrayList<String> = arrayListOf()
-): Serializable
+): Serializable, Parcelable

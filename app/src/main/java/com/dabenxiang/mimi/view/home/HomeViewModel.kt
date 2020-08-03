@@ -509,4 +509,10 @@ class HomeViewModel : BaseViewModel() {
     fun cancelJob() {
         job.cancel()
     }
+
+    fun clearLiveDataValue() {
+        _postPicResult.value = null
+        _postCoverResult.value = null
+        _postVideoResult.value = null
+    }
 }

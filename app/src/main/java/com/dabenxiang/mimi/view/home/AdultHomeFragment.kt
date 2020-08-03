@@ -110,11 +110,10 @@ class AdultHomeFragment : BaseFragment() {
 
     override fun getLayoutId() = R.layout.fragment_home
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         handleBackStackData()
-//        showSnackBar()
+        showSnackBar()
     }
 
     override fun setupFirstTime() {
@@ -136,43 +135,27 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private fun handleBackStackData() {
-        val isNeedPicUpload =
-            findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>(
-                PostPicFragment.UPLOAD_PIC
-            )
-        val isNeedVideoUpload =
-            findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>(
-                PostVideoFragment.UPLOAD_VIDEO
-            )
+        val isNeedPicUpload = arguments?.getBoolean(PostPicFragment.UPLOAD_PIC)
+        val isNeedVideoUpload = arguments?.getBoolean(PostVideoFragment.UPLOAD_VIDEO)
 
-        if (isNeedPicUpload?.value != null) {
-            val memberRequest =
-                findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<PostMemberRequest>(
-                    PostPicFragment.MEMBER_REQUEST
-                )
-            val picUriList =
-                findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<PostAttachmentItem>>(
-                    PostPicFragment.PIC_URI
-                )
+        if (isNeedPicUpload != null && isNeedPicUpload) {
+            arguments?.remove(PostPicFragment.UPLOAD_PIC)
 
-            postMemberRequest = memberRequest!!.value!!
+            val memberRequest = arguments?.getParcelable<PostMemberRequest>(PostPicFragment.MEMBER_REQUEST)
+            val picUriList = arguments?.getParcelableArrayList<PostAttachmentItem>(PostPicFragment.PIC_URI)
 
-            uploadPicUri.addAll(picUriList!!.value!!)
+            postMemberRequest = memberRequest!!
+
+            uploadPicUri.addAll(picUriList!!)
             val pic = uploadPicUri[uploadCurrentPicPosition]
             viewModel.postAttachment(pic.uri, requireContext(), TYPE_PIC)
-        } else if (isNeedVideoUpload?.value != null) {
+        } else if (isNeedVideoUpload != null && isNeedVideoUpload) {
+            arguments?.remove(PostVideoFragment.UPLOAD_VIDEO)
             showSnackBar()
 
-            val memberRequest =
-                findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<PostMemberRequest>(
-                    PostVideoFragment.MEMBER_REQUEST
-                )
-            uploadVideoUri =
-                findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<PostVideoAttachment>>(
-                    PostVideoFragment.VIDEO_DATA
-                )?.value!!
-
-            postMemberRequest = memberRequest!!.value!!
+            val memberRequest = arguments?.getParcelable<PostMemberRequest>(PostVideoFragment.MEMBER_REQUEST)
+            uploadVideoUri = arguments?.getParcelableArrayList<PostVideoAttachment>(PostVideoFragment.VIDEO_DATA)!!
+            postMemberRequest = memberRequest!!
             viewModel.postAttachment(uploadVideoUri[0].picUrl, requireContext(), TYPE_COVER)
         }
     }
@@ -382,6 +365,7 @@ class AdultHomeFragment : BaseFragment() {
 
                         val content = Gson().toJson(mediaItem)
                         Timber.d("Post pic content item : $content")
+                        viewModel.clearLiveDataValue()
                         viewModel.postPic(postMemberRequest, content)
                     } else {
                         val pic = uploadPicUri[uploadCurrentPicPosition]
@@ -398,6 +382,7 @@ class AdultHomeFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     picParameter.id = it.result.toString()
+                    viewModel.clearLiveDataValue()
                     viewModel.postAttachment(uploadVideoUri[0].videoUrl, requireContext(), TYPE_VIDEO)
                 }
                 is Error -> {
@@ -419,6 +404,7 @@ class AdultHomeFragment : BaseFragment() {
                     mediaItem.textContent = postMemberRequest.content
                     val content = Gson().toJson(mediaItem)
                     Timber.d("Post video content item : $content")
+                    viewModel.clearLiveDataValue()
                     viewModel.postPic(postMemberRequest, content)
                 }
                 is Error -> {

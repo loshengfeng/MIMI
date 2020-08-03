@@ -1,17 +1,15 @@
 package com.dabenxiang.mimi.view.home.viewholder
 
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.ZERO_ID
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils.getLruCache
 import com.google.gson.Gson

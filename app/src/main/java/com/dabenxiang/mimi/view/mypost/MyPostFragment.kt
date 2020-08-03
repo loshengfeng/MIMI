@@ -86,8 +86,6 @@ class MyPostFragment : BaseFragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter =  adapter
 
-        viewModel.getMyPost()
-
         val isNeedPicUpload =
             findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>(
                 PostPicFragment.UPLOAD_PIC
@@ -189,6 +187,11 @@ class MyPostFragment : BaseFragment() {
                 viewModel.postPic(postId?.value!!, postMemberRequest, content)
             }
         }
+    }
+
+    override fun setupFirstTime() {
+        super.setupFirstTime()
+        viewModel.getMyPost()
     }
 
     override fun setupObservers() {

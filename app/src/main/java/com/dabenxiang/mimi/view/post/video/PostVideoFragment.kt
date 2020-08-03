@@ -183,7 +183,7 @@ class PostVideoFragment : BaseFragment() {
         }
 
         tv_back.setOnClickListener {
-            findNavController().popBackStack()
+            findNavController().navigate(R.id.action_postVideoFragment_to_adultHomeFragment)
         }
 
         tv_clean.setOnClickListener {
@@ -231,12 +231,13 @@ class PostVideoFragment : BaseFragment() {
                 videoAttachmentList[0].length = length
             }
 
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(UPLOAD_VIDEO, true)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(MEMBER_REQUEST, request)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(VIDEO_DATA, videoAttachmentList)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(DELETE_ATTACHMENT, deleteVideoList)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(POST_ID, postId)
-            findNavController().navigateUp()
+            val bundle = Bundle()
+            bundle.putBoolean(UPLOAD_VIDEO, true)
+            bundle.putParcelable(MEMBER_REQUEST, request)
+            bundle.putParcelableArrayList(VIDEO_DATA, videoAttachmentList)
+            bundle.putParcelableArrayList(DELETE_ATTACHMENT, deleteVideoList)
+            bundle.putLong(POST_ID, postId)
+            findNavController().navigate(R.id.action_postVideoFragment_to_adultHomeFragment, bundle)
         }
     }
 
@@ -399,7 +400,7 @@ class PostVideoFragment : BaseFragment() {
                     val myUri = Uri.fromFile(File(UriUtils.getPath(requireContext(), videoUri!!)))
                     val bundle = Bundle()
                     bundle.putString(EditVideoFragment.BUNDLE_VIDEO_URI, myUri.toString())
-                    findNavController().navigate(R.id.action_postVideoFragment_self, bundle)
+                    findNavController().navigate(R.id.action_postVideoFragment_to_editVideoFragment, bundle)
                 }
             }
         }

@@ -212,12 +212,13 @@ class PostPicFragment : BaseFragment() {
                 tags = tags
             )
 
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(UPLOAD_PIC, true)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(MEMBER_REQUEST, request)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(PIC_URI, adapter.getData())
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(DELETE_ATTACHMENT, deletePicList)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(POST_ID, postId)
-            findNavController().navigateUp()
+            val bundle = Bundle()
+            bundle.putBoolean(UPLOAD_PIC, true)
+            bundle.putParcelable(MEMBER_REQUEST, request)
+            bundle.putParcelableArrayList(PIC_URI, adapter.getData())
+            bundle.putStringArrayList(DELETE_ATTACHMENT, deletePicList)
+            bundle.putLong(POST_ID, postId)
+            findNavController().navigate(R.id.action_postPicFragment_to_adultHomeFragment, bundle)
         }
     }
 
