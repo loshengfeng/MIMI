@@ -9,7 +9,9 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.ClubFollowViewHolder
 
-class ClubFollowAdapter : PagedListAdapter<ClubFollowItem, RecyclerView.ViewHolder>(diffCallback) {
+class ClubFollowAdapter(
+    val listener: EventListener
+) : PagedListAdapter<ClubFollowItem, RecyclerView.ViewHolder>(diffCallback) {
     companion object {
         private val diffCallback = object : DiffUtil.ItemCallback<ClubFollowItem>() {
             override fun areItemsTheSame(
@@ -24,15 +26,27 @@ class ClubFollowAdapter : PagedListAdapter<ClubFollowItem, RecyclerView.ViewHold
         }
     }
 
+    interface EventListener {
+        fun onDetail(item: ClubFollowItem)
+        fun onGetAttachment(id: String, position: Int)
+        fun onCancelFollow(clubId:Long)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return ClubFollowViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.item_follow, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.item_follow_club, parent, false),
+            listener
         )
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val item = getItem(position)
         when (holder) {
-            is ClubFollowViewHolder -> holder.bind(getItem(position)!!)
+            is ClubFollowViewHolder -> holder.bind(item, position)
         }
+    }
+
+    fun update(position: Int) {
+        notifyItemChanged(position)
     }
 }

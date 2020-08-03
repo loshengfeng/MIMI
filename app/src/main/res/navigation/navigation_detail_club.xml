@@ -2,33 +2,39 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/navigation_favorite"
-    app:startDestination="@id/postFavoriteFragment">
-
-    <include app:graph="@navigation/navigation_detail_club" />
+    android:id="@+id/navigation_detail_club"
+    app:startDestination="@id/clubDetailFragment">
 
     <fragment
-        android:id="@+id/postFavoriteFragment"
-        android:name="com.dabenxiang.mimi.view.favroite.FavoriteFragment"
-        tools:layout="@layout/fragment_post_favorite">
+        android:id="@+id/clubDetailFragment"
+        android:name="com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment"
+        android:label="ClubDetailFragment"
+        tools:layout="@layout/fragment_club_detail">
         <action
-            android:id="@+id/action_postFavoriteFragment_to_searchVideoFragment"
-            app:destination="@id/searchVideoFragment" />
-        <action
-            android:id="@+id/action_postFavoriteFragment_to_clipFragment"
+            android:id="@+id/action_clubDetailFragment_to_clipFragment"
             app:destination="@id/clipFragment" />
         <action
-            android:id="@+id/action_postFavoriteFragment_to_searchPostFragment"
+            android:id="@+id/action_clubDetailFragment_to_pictureDetailFragment"
+            app:destination="@id/pictureDetailFragment" />
+        <action
+            android:id="@+id/action_clubDetailFragment_to_textDetailFragment"
+            app:destination="@id/textDetailFragment" />
+        <action
+            android:id="@+id/action_clubDetailFragment_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
     </fragment>
+
     <fragment
-        android:id="@+id/searchVideoFragment"
-        android:name="com.dabenxiang.mimi.view.search.video.SearchVideoFragment"
-        android:label="SearchVideoFragment" />
-    <fragment
-        android:id="@+id/clipFragment"
-        android:name="com.dabenxiang.mimi.view.clip.ClipFragment"
-        android:label="ClipFragment" />
+        android:id="@+id/pictureDetailFragment"
+        android:name="com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment"
+        tools:layout="@layout/fragment_picture_detail">
+        <action
+            android:id="@+id/action_pictureDetailFragment_to_pictureFragment"
+            app:destination="@id/pictureFragment" />
+        <action
+            android:id="@+id/action_pictureDetailFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/searchPostFragment"
@@ -49,19 +55,7 @@
 
         <action
             android:id="@+id/action_searchPostFragment_to_clubDetailFragment"
-            app:destination="@id/navigation_detail_club" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/pictureDetailFragment"
-        android:name="com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment"
-        tools:layout="@layout/fragment_picture_detail">
-        <action
-            android:id="@+id/action_pictureDetailFragment_to_pictureFragment"
-            app:destination="@id/pictureFragment" />
-        <action
-            android:id="@+id/action_pictureDetailFragment_to_searchPostFragment"
-            app:destination="@id/searchPostFragment" />
+            app:destination="@id/clubDetailFragment" />
     </fragment>
 
     <fragment
@@ -77,5 +71,10 @@
         android:id="@+id/pictureFragment"
         android:name="com.dabenxiang.mimi.view.fullpicture.FullPictureFragment"
         tools:layout="@layout/fragment_full_picture" />
+
+    <fragment
+        android:id="@+id/clipFragment"
+        android:name="com.dabenxiang.mimi.view.clip.ClipFragment"
+        tools:layout="@layout/fragment_clip" />
 
 </navigation>
