@@ -17,7 +17,7 @@
         tools:text="99" />
 
     <TextView
-        android:id="@+id/tv_favorite"
+        android:id="@+id/iv_favorite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
@@ -36,7 +36,7 @@
         android:drawableStart="@drawable/ico_messege_adult_gray"
         android:drawablePadding="3dp"
         android:gravity="center"
-        app:layout_constraintStart_toEndOf="@id/tv_favorite"
+        app:layout_constraintStart_toEndOf="@id/iv_favorite"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="99" />
 
@@ -66,6 +66,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_favorite" />
+        app:layout_constraintTop_toBottomOf="@id/iv_favorite" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

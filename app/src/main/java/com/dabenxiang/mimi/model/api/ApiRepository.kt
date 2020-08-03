@@ -240,6 +240,15 @@ class ApiRepository(private val apiService: ApiService) {
         return apiService.getMembersPost(type.value, offset, limit)
     }
 
+    suspend fun getMembersPost(
+        offset: Int,
+        limit: Int,
+        creatorId:Long,
+        isAdult: Boolean
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
+        return apiService.getMembersPost(offset, limit,creatorId,isAdult)
+    }
+
     suspend fun getMemberPostDetail(postId: Long): Response<ApiBaseItem<MemberPostItem>> {
         return apiService.getMemberPostDetail(postId)
     }

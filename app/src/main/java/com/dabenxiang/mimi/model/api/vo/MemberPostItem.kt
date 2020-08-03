@@ -68,6 +68,9 @@ data class MemberPostItem(
     @SerializedName("category")
     val category: String? = "",
 
-    val adItem: AdItem?= null
+    val adItem: AdItem? = null,
+
+    @SerializedName("isFullContent")
+    val isFullContent: Boolean = false
 
 ) : BaseMemberPostItem()

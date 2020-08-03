@@ -41,6 +41,19 @@
         tools:text="1小时前" />
 
     <TextView
+        android:id="@+id/tv_follow"
+        android:layout_width="54dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/bg_red_1_stroke_radius_16"
+        android:gravity="center"
+        android:textColor="@color/color_red_1"
+        android:textSize="12sp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="+关注" />
+
+    <TextView
         android:id="@+id/tv_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -150,7 +163,7 @@
         tools:text="99" />
 
     <ImageView
-        android:id="@+id/tv_favorite"
+        android:id="@+id/iv_favorite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="33dp"
@@ -164,9 +177,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="3dp"
         android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="@+id/tv_favorite"
-        app:layout_constraintLeft_toRightOf="@+id/tv_favorite"
-        app:layout_constraintTop_toTopOf="@+id/tv_favorite"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_favorite"
+        app:layout_constraintLeft_toRightOf="@+id/iv_favorite"
+        app:layout_constraintTop_toTopOf="@+id/iv_favorite"
         tools:text="99" />
 
     <ImageView
