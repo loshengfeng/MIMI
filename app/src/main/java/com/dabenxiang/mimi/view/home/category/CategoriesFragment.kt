@@ -198,6 +198,9 @@ class CategoriesFragment : BaseFragment() {
             )
 
             recyclerview_content.adapter = videoListAdapter
+            if (isAdult) {
+                recyclerview_content.setPadding(0, GeneralUtils.dpToPx(requireContext(), 50), 0, 0)
+            }
 
             viewModel.getCategoryDetail(data.title, isAdult)
             if (isAdult) {
@@ -221,15 +224,22 @@ class CategoriesFragment : BaseFragment() {
                 is ApiResult.Success -> {
                     progressHUD?.dismiss()
                     Timber.d("getCategoryDetailResult: ${it.result}")
-
                     (arguments?.getSerializable(KEY_CATEGORY) as CategoriesItem?)?.also { data ->
+                        var notEmptyCount = 0
                         val typeList = arrayListOf<String>()
                         data.categories?.forEach { item ->
                             typeList.add(item.name)
                         }
+                        takeIf { typeList.isNotEmpty() }?.also { notEmptyCount++ }
+                        val areasCategory = it.result.category?.areas ?: arrayListOf()
+                        takeIf { areasCategory.isNotEmpty() }?.also { notEmptyCount++ }
+                        val yearsCategory = it.result.category?.years ?: arrayListOf()
+                        takeIf { yearsCategory.isNotEmpty() }?.also { notEmptyCount++ }
                         setupFilter(0, typeList)
-                        setupFilter(1, it.result.category?.areas ?: arrayListOf())
-                        setupFilter(2, it.result.category?.years ?: arrayListOf())
+                        setupFilter(1, areasCategory)
+                        setupFilter(2, yearsCategory)
+
+                        recyclerview_content.setPadding(0, GeneralUtils.dpToPx(requireContext(), 50) * notEmptyCount, 0, 0)
                     }
 
                 }
