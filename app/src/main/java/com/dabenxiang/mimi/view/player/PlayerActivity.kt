@@ -558,7 +558,7 @@ class PlayerActivity : BaseActivity() {
         )
 
         tv_like.setTextColor(titleColor)
-        tv_favorite.setTextColor(titleColor)
+        iv_favorite.setTextColor(titleColor)
         tv_comment.setTextColor(titleColor)
 
         iv_share.setImageResource(if (isAdult) R.drawable.btn_share_white_n else R.drawable.btn_share_gray_n)
@@ -614,11 +614,11 @@ class PlayerActivity : BaseActivity() {
                     }
             }
 
-            tv_favorite.setCompoundDrawablesRelativeWithIntrinsicBounds(res, 0, 0, 0)
+            iv_favorite.setCompoundDrawablesRelativeWithIntrinsicBounds(res, 0, 0, 0)
         })
 
         viewModel.favoriteVideoCount.observe(this, Observer {
-            tv_favorite.text = it.toString()
+            iv_favorite.text = it.toString()
         })
 
         viewModel.commentCount.observe(this, Observer {
@@ -724,7 +724,7 @@ class PlayerActivity : BaseActivity() {
             }
         }
 
-        tv_favorite.setOnClickListener {
+        iv_favorite.setOnClickListener {
             viewModel.modifyFavorite()
         }
 

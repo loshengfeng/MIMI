@@ -34,7 +34,7 @@ import timber.log.Timber
 import java.io.File
 import java.net.URLEncoder
 
-class MyPostViewModel: BaseViewModel() {
+class MyPostViewModel : BaseViewModel() {
 
     private val _myPostItemListResult = MutableLiveData<PagedList<MemberPostItem>>()
     val myPostItemListResult: LiveData<PagedList<MemberPostItem>> = _myPostItemListResult
@@ -50,6 +50,9 @@ class MyPostViewModel: BaseViewModel() {
 
     private var _favoriteResult = MutableLiveData<ApiResult<FavoriteItem>>()
     val favoriteResult: LiveData<ApiResult<FavoriteItem>> = _favoriteResult
+
+    private var _followResult = MutableLiveData<ApiResult<FavoriteItem>>()
+    val followResult: LiveData<ApiResult<FavoriteItem>> = _followResult
 
     private var _deletePostResult = MutableLiveData<ApiResult<Nothing>>()
     val deletePostResult: LiveData<ApiResult<Nothing>> = _deletePostResult
@@ -87,19 +90,20 @@ class MyPostViewModel: BaseViewModel() {
         const val TYPE_PIC = "type_pic"
         const val TYPE_COVER = "type_cover"
         const val TYPE_VIDEO = "type_video"
+        const val USER_ID_ME: Long = -1
     }
 
-    fun getMyPost() {
+    fun getMyPost(userId: Long = USER_ID_ME, isAdult: Boolean = false) {
         viewModelScope.launch {
-            getMyPostPagingItems().asFlow()
+            getMyPostPagingItems(userId, isAdult).asFlow()
                 .collect { _myPostItemListResult.value = it }
         }
     }
 
-    private fun getMyPostPagingItems(): LiveData<PagedList<MemberPostItem>> {
+    private fun getMyPostPagingItems(userId: Long, isAdult: Boolean): LiveData<PagedList<MemberPostItem>> {
         val dataSourceFactory = object : DataSource.Factory<Int, MemberPostItem>() {
             override fun create(): DataSource<Int, MemberPostItem> {
-                return MyPostDataSource(pagingCallback, viewModelScope, domainManager)
+                return MyPostDataSource(userId, isAdult, pagingCallback, viewModelScope, domainManager)
             }
         }
 
@@ -121,6 +125,7 @@ class MyPostViewModel: BaseViewModel() {
         }
 
         override fun onThrowable(throwable: Throwable) {
+            Timber.e(throwable)
         }
 
         override fun onSucceed() {
@@ -202,7 +207,12 @@ class MyPostViewModel: BaseViewModel() {
         }
     }
 
-    fun favoritePost(item: MemberPostItem, position: Int, isFavorite: Boolean, type: AttachmentType) {
+    fun favoritePost(
+        item: MemberPostItem,
+        position: Int,
+        isFavorite: Boolean,
+        type: AttachmentType
+    ) {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
@@ -224,6 +234,31 @@ class MyPostViewModel: BaseViewModel() {
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _favoriteResult.value = it }
+        }
+    }
+
+    fun followPost(item: MemberPostItem, position: Int, isFollow: Boolean) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = when {
+                    isFollow -> apiRepository.followPost(item.creatorId)
+                    else -> apiRepository.cancelFollowPost(item.creatorId)
+                }
+                if (!result.isSuccessful) throw HttpException(result)
+                item.isFollow = isFollow
+                val followItem = FavoriteItem(
+                    id = item.id.toString(),
+                    position = position,
+                    memberPostItem = item
+                )
+                emit(ApiResult.success(followItem))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _followResult.value = it }
         }
     }
 

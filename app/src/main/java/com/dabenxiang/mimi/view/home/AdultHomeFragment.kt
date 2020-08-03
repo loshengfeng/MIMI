@@ -148,8 +148,10 @@ class AdultHomeFragment : BaseFragment() {
         if (isNeedPicUpload != null && isNeedPicUpload) {
             arguments?.remove(PostPicFragment.UPLOAD_PIC)
 
-            val memberRequest = arguments?.getParcelable<PostMemberRequest>(PostPicFragment.MEMBER_REQUEST)
-            val picUriList = arguments?.getParcelableArrayList<PostAttachmentItem>(PostPicFragment.PIC_URI)
+            val memberRequest =
+                arguments?.getParcelable<PostMemberRequest>(PostPicFragment.MEMBER_REQUEST)
+            val picUriList =
+                arguments?.getParcelableArrayList<PostAttachmentItem>(PostPicFragment.PIC_URI)
 
             postMemberRequest = memberRequest!!
 
@@ -164,7 +166,8 @@ class AdultHomeFragment : BaseFragment() {
             arguments?.remove(PostVideoFragment.UPLOAD_VIDEO)
             showSnackBar()
 
-            val memberRequest = arguments?.getParcelable<PostMemberRequest>(PostVideoFragment.MEMBER_REQUEST)
+            val memberRequest =
+                arguments?.getParcelable<PostMemberRequest>(PostVideoFragment.MEMBER_REQUEST)
             uploadVideoUri = arguments?.getParcelableArrayList(PostVideoFragment.VIDEO_DATA)!!
             postMemberRequest = memberRequest!!
             memberPostItem.title = memberRequest.title
@@ -410,7 +413,11 @@ class AdultHomeFragment : BaseFragment() {
                 is Success -> {
                     picParameter.id = it.result.toString()
                     viewModel.clearLiveDataValue()
-                    viewModel.postAttachment(uploadVideoUri[0].videoUrl, requireContext(), TYPE_VIDEO)
+                    viewModel.postAttachment(
+                        uploadVideoUri[0].videoUrl,
+                        requireContext(),
+                        TYPE_VIDEO
+                    )
                 }
                 is Error -> {
                     resetAndCancelJob(it.throwable)
@@ -448,7 +455,7 @@ class AdultHomeFragment : BaseFragment() {
         })
 
         viewModel.postVideoMemberResult.observe(viewLifecycleOwner, Observer {
-            when(it) {
+            when (it) {
                 is Success -> setSnackBarPostStatus(it.result)
                 is Error -> onApiError(it.throwable)
             }
@@ -459,11 +466,13 @@ class AdultHomeFragment : BaseFragment() {
         })
 
         viewModel.totalCountResult.observe(viewLifecycleOwner, Observer { totalCount ->
-            takeIf { rv_sixth.visibility == View.VISIBLE }?.also { clubMemberAdapter.totalCount = totalCount }
+            takeIf { rv_sixth.visibility == View.VISIBLE }?.also {
+                clubMemberAdapter.totalCount = totalCount
+            }
         })
 
         viewModel.postArticleResult.observe(viewLifecycleOwner, Observer {
-            when(it) {
+            when (it) {
                 is Success -> {
                     postType = PostType.TEXT
                     setSnackBarPostStatus(it.result)
@@ -842,7 +851,8 @@ class AdultHomeFragment : BaseFragment() {
             {},
             { id, func -> getBitmap(id, func) },
             { item, isFollow, func -> followMember(item, isFollow, func) },
-            { item, isLike, func -> likePost(item, isLike, func) }
+            { item, isLike, func -> likePost(item, isLike, func) },
+            { item, isFavorite, func -> favoritePost(item, isFavorite, func) }
         )
     }
 
@@ -1201,6 +1211,14 @@ class AdultHomeFragment : BaseFragment() {
         update: (Boolean, Int) -> Unit
     ) {
         viewModel.likePost(memberPostItem, isLike, update)
+    }
+
+    private fun favoritePost(
+        memberPostItem: MemberPostItem,
+        isFavorite: Boolean,
+        update: (Boolean, Int) -> Unit
+    ) {
+        viewModel.favoritePost(memberPostItem, isFavorite, update)
     }
 
     private fun clubFollow(
