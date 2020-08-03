@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.adapter
 
 import android.graphics.Bitmap
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -12,6 +13,10 @@ import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.view.adapter.viewHolder.chat.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class ChatContentAdapter(
         private val listener: EventListener
@@ -24,6 +29,7 @@ class ChatContentAdapter(
         fun onGetAttachment(id: String, position: Int)
         fun onImageClick(bitmap: Bitmap)
         fun onVideoClick(item: ChatContentItem?, position: Int)
+        fun getSenderAvatar(): String
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -172,8 +178,34 @@ class ChatContentAdapter(
     }
 
     fun insertItem(item: ChatContentItem, index: Int = 0) {
+        // 判斷需不需要先加上時間 Title
+        if (this.data.size > 0) {
+            val lastItemDate = this.data[0].payload?.sendTime?.let { time -> SimpleDateFormat("YYYY-MM-dd", Locale.getDefault()).format(time) }
+            val currentItemDate = item.payload?.sendTime?.let { time -> SimpleDateFormat("YYYY-MM-dd", Locale.getDefault()).format(time) }
+            if (currentItemDate != null && !TextUtils.equals(lastItemDate, currentItemDate)) {
+                this.data.add(index, ChatContentItem(dateTitle = currentItemDate))
+            }
+        }
+
         this.data.add(index, item)
         notifyDataSetChanged()
+    }
+
+    /**
+     * 根據暫存的 cache map 去更新上一次德暫存 item
+     */
+    fun updateCacheData(item: ChatContentItem, uploadCache: HashMap<String, Int>) {
+        var updateIndex = -1
+        for (i: Int in 0 until this.data.size) {
+            if (this.data[i].mediaHashCode == uploadCache[item.payload?.content] ?: -1) {
+                updateIndex = i
+                break
+            }
+        }
+        if (updateIndex != -1) {
+            this.data[updateIndex] = item
+            notifyDataSetChanged()
+        }
     }
 
     override fun getItemCount(): Int {

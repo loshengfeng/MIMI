@@ -23,7 +23,6 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_clip_post.view.*
-import timber.log.Timber
 import java.util.*
 
 class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
@@ -58,7 +57,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
 
         val avatarId = item.avatarAttachmentId.toString()
         if (LruCacheUtils.getLruCache(avatarId) == null) {
-            memberPostFuncItem.getBitmap(avatarId) { id -> updateAvatar(id)}
+            memberPostFuncItem.getBitmap(avatarId) { id -> updateAvatar(id) }
         } else {
             updateAvatar(item.avatarAttachmentId.toString())
         }
@@ -88,17 +87,24 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
             tagChipGroup.addView(chip)
         }
 
-        val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
+        var contentItem: MediaContentItem? = null
+        try {
+            contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
 
-        tvLength.text = contentItem.shortVideo?.length
-        contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
+        tvLength.text = contentItem?.shortVideo?.length
+        contentItem?.images?.takeIf { it.isNotEmpty() }?.also { images ->
             images[0].also { image ->
                 if (TextUtils.isEmpty(image.url)) {
                     image.id.takeIf { !TextUtils.isEmpty(it) && it != "0" }?.also { id ->
                         LruCacheUtils.getLruCache(id)?.also { bitmap ->
                             Glide.with(ivPhoto.context).load(bitmap).into(ivPhoto)
                         } ?: run { memberPostFuncItem.getBitmap(id) { id -> updatePicture(id) } }
-                    } ?: run { Glide.with(ivPhoto.context).load(R.drawable.img_nopic_03).into(ivPhoto) }
+                    } ?: run {
+                        Glide.with(ivPhoto.context).load(R.drawable.img_nopic_03).into(ivPhoto)
+                    }
                 } else {
                     Glide.with(ivPhoto.context)
                         .load(image.url).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
@@ -122,6 +128,10 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
                 true -> itemList?.also { adultListener.onClipItemClick(it, position) }
                 false -> adultListener.onItemClick(item, AdultTabType.CLIP)
             }
+        }
+
+        ivAvatar.setOnClickListener {
+            adultListener.onAvatarClick()
         }
     }
 
@@ -160,12 +170,16 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         follow.setOnClickListener {
-            memberPostFuncItem.onFollowClick(item, !(item.isFollow)) { isFollow -> updateFollow(isFollow) }
+            memberPostFuncItem.onFollowClick(item, !(item.isFollow)) { isFollow ->
+                updateFollow(
+                    isFollow
+                )
+            }
         }
 
         likeImage.setOnClickListener {
             val isLike = item.likeType == LikeType.LIKE
-            memberPostFuncItem.onLikeClick(item, !isLike) { like, count -> updateLike(like, count)}
+            memberPostFuncItem.onLikeClick(item, !isLike) { like, count -> updateLike(like, count) }
         }
     }
 

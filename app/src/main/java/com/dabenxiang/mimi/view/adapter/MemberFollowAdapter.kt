@@ -7,11 +7,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
-import com.dabenxiang.mimi.view.adapter.viewHolder.ClubFollowViewHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.MemberFollowViewHolder
 
-class MemberFollowAdapter :
-    PagedListAdapter<MemberFollowItem, RecyclerView.ViewHolder>(diffCallback) {
+class MemberFollowAdapter(
+    private val listener: EventListener
+) : PagedListAdapter<MemberFollowItem, RecyclerView.ViewHolder>(diffCallback) {
     companion object {
         private val diffCallback = object : DiffUtil.ItemCallback<MemberFollowItem>() {
             override fun areItemsTheSame(
@@ -26,15 +26,27 @@ class MemberFollowAdapter :
         }
     }
 
+    interface EventListener {
+        fun onDetail(item: MemberFollowItem)
+        fun onGetAttachment(id: String, position: Int)
+        fun onCancelFollow(userId:Long)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return ClubFollowViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.item_follow, parent, false)
+        return MemberFollowViewHolder(
+            LayoutInflater.from(parent.context).inflate(R.layout.item_follow_member, parent, false),
+            listener
         )
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val item = getItem(position)
         when (holder) {
-            is MemberFollowViewHolder -> holder.bind(getItem(position)!!)
+            is MemberFollowViewHolder -> holder.bind(item, position)
         }
+    }
+
+    fun update(position: Int) {
+        notifyItemChanged(position)
     }
 }

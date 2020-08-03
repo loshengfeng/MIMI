@@ -53,6 +53,7 @@ import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.OnChooseUploadMethodDi
 import com.dabenxiang.mimi.view.home.HomeViewModel.Companion.TYPE_COVER
 import com.dabenxiang.mimi.view.home.HomeViewModel.Companion.TYPE_PIC
 import com.dabenxiang.mimi.view.home.HomeViewModel.Companion.TYPE_VIDEO
+import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
@@ -118,14 +119,15 @@ class AdultHomeFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         handleBackStackData()
 //        showSnackBar()
-    }
 
-    override fun setupFirstTime() {
         requireActivity().onBackPressedDispatcher.addCallback {
             interactionListener?.changeNavigationPosition(
                 R.id.navigation_home
             )
         }
+    }
+
+    override fun setupFirstTime() {
 
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
@@ -621,6 +623,19 @@ class AdultHomeFragment : BaseFragment() {
             )
         }
 
+        btn_filter.setOnClickListener {
+            val category = mainViewModel?.adult?.categories?.get(0)
+            category?.also {
+                val bundle = CategoriesFragment.createBundle(it.name, it.name, category)
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_homeFragment_to_categoriesFragment,
+                        bundle
+                    )
+                )
+            }
+        }
+
         recyclerview_tab.adapter = tabAdapter
         setupRecyclerByPosition(0)
 
@@ -637,8 +652,12 @@ class AdultHomeFragment : BaseFragment() {
         rv_fifth.visibility = View.GONE
         rv_sixth.visibility = View.GONE
 
+        btn_ranking.visibility = View.GONE
+        btn_filter.visibility = View.GONE
+
         when (position) {
             0 -> {
+                btn_ranking.visibility = View.VISIBLE
                 rv_home.visibility = View.VISIBLE
                 takeIf { rv_home.adapter == null }?.also {
                     refresh.isRefreshing = true
@@ -650,6 +669,7 @@ class AdultHomeFragment : BaseFragment() {
                 }
             }
             1 -> {
+                btn_filter.visibility = View.VISIBLE
                 rv_first.visibility = View.VISIBLE
                 takeIf { rv_first.adapter == null }?.also {
                     refresh.isRefreshing = true
@@ -963,6 +983,11 @@ class AdultHomeFragment : BaseFragment() {
                     bundle
                 )
             )
+        }
+
+        override fun onAvatarClick() {
+            // TODO:
+            Timber.d("onAvatarClick nav to member post")
         }
     }
 

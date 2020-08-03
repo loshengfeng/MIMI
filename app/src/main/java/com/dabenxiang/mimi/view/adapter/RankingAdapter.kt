@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.adapter
 
 import android.content.Context
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,9 +14,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.RankingFuncItem
+import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.PostStatisticsItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_ranking.view.*
 
 class RankingAdapter(private val context: Context,
@@ -80,15 +83,20 @@ class RankingAdapter(private val context: Context,
                 }
             }
 
-            val avatarId = item.avatarAttachmentId.toString()
-            if (avatarId != LruCacheUtils.ZERO_ID) {
-                if (LruCacheUtils.getLruCache(avatarId) == null) {
-                    rankingFuncItem.getBitmap(avatarId, position)
-                } else {
-                    updatePicture(avatarId)
+            val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
+            contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
+                images[0].also { image ->
+                    if (TextUtils.isEmpty(image.url)) {
+                        image.id.takeIf { !TextUtils.isEmpty(it) && it != LruCacheUtils.ZERO_ID }?.also { id ->
+                            LruCacheUtils.getLruCache(id)?.also { bitmap ->
+                                Glide.with(picture.context).load(bitmap).into(picture)
+                            } ?: run {   rankingFuncItem.getBitmap(id, position) }
+                        } ?: run { Glide.with(picture.context).load(R.drawable.img_nopic_03).into(picture) }
+                    } else {
+                        Glide.with(picture.context)
+                            .load(image.url).placeholder(R.drawable.img_nopic_03).into(picture)
+                    }
                 }
-            } else {
-                Glide.with(picture.context).load(R.color.color_white_1_50).circleCrop().into(picture)
             }
 
             title.text = item.title

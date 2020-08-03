@@ -518,6 +518,10 @@ class SearchPostFragment : BaseFragment() {
             updateTag(tag)
             viewModel.getSearchPostsByTag(type, tag, isPostFollow)
         }
+
+        override fun onAvatarClick() {
+            TODO("Not yet implemented")
+        }
     }
 
     private fun updateTag(tag: String) {

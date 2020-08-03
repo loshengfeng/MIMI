@@ -171,6 +171,11 @@ class ApiRepository(private val apiService: ApiService) {
         return apiService.setLastReadMessageTime(body)
     }
 
+    /**
+     * 取的未否有未讀訊息
+     */
+    suspend fun getUnread() = apiService.getUnread()
+
     /**********************************************************
      *
      *                  Functions
@@ -341,7 +346,7 @@ class ApiRepository(private val apiService: ApiService) {
         category: String? = null,
         q: String? = null,
         country: String? = null,
-        years: Int? = null,
+        years: String? = null,
         isAdult: Boolean,
         offset: String,
         limit: String,
@@ -411,32 +416,32 @@ class ApiRepository(private val apiService: ApiService) {
     /**
      * 取得我關注的圈子
      */
-    suspend fun getClubFollow(
+    suspend fun getMyClubFollow(
         offset: String,
         limit: String
-    ) = apiService.getClubFollow(offset, limit)
+    ) = apiService.getMyClubFollow(offset, limit)
 
     /**
      * 移除我關注的圈子
      */
-    suspend fun deleteClubFollow(
-        clubId: Int
-    ) = apiService.deleteClubFollow(clubId)
+    suspend fun cancelMyClubFollow(
+        clubId: Long
+    ) = apiService.cancelMyClubFollow(clubId)
 
     /**
      * 取得我關注的人
      */
-    suspend fun getMemberFollow(
+    suspend fun getMyMemberFollow(
         offset: String,
         limit: String
-    ) = apiService.getMemberFollow(offset, limit)
+    ) = apiService.getMyMemberFollow(offset, limit)
 
     /**
      * 移除我關注的人
      */
-    suspend fun deleteMemberFollow(
-        userId: Int
-    ) = apiService.deleteMemberFollow(userId)
+    suspend fun cancelMyMemberFollow(
+        userId: Long
+    ) = apiService.cancelMyMemberFollow(userId)
 
     /**
      * 取得使用者充值紀錄(需登入帳號)

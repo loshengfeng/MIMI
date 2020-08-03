@@ -6,6 +6,7 @@ import android.os.Environment
 import android.os.StatFs
 import com.dabenxiang.mimi.App
 import timber.log.Timber
+import tw.gov.president.manager.submanager.update.APKDownloaderManager
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -95,5 +96,17 @@ object FileUtil {
             dir.mkdirs()
         }
         return File(dir, "/$fileName")
+    }
+
+    @Suppress(
+        "NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS",
+        "RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS"
+    )
+    fun deleteExternalFile(context: Context) {
+        File(context.getExternalFilesDir(APKDownloaderManager.TYPE_APK)?.absolutePath).let {
+            while (it.listFiles().iterator().hasNext()) {
+                it.listFiles().iterator().next().delete()
+            }
+        }
     }
 }

@@ -4,51 +4,38 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/color_gray_2">
+    android:background="@color/color_white_1">
 
     <include
         android:id="@+id/layout_title"
         layout="@layout/item_setting_bar"
         android:layout_width="0dp"
-        android:layout_height="42dp"
+        android:layout_height="56dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tl_type"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_tab"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="44dp"
-        android:layout_marginEnd="30dp"
-        android:background="@color/color_gray_2"
+        android:layout_height="@dimen/app_bar_height"
+        android:background="@color/normal_color_status_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layout_title"
-        app:tabGravity="fill"
-        app:tabIndicatorColor="@color/color_red_1"
-        app:tabIndicatorFullWidth="true"
-        app:tabIndicatorHeight="4dp"
-        app:tabMode="fixed"
-        app:tabSelectedTextColor="@color/color_black_1"
-        app:tabTextAppearance="@style/favorite_tab_item_text"
-        app:tabTextColor="@color/color_black_1_50">
+        app:layout_constraintTop_toBottomOf="@id/layout_title">
 
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/ti_people"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_primary"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:text="@string/follow_people" />
-
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/ti_circle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:text="@string/follow_circle" />
-    </com.google.android.material.tabs.TabLayout>
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:orientation="horizontal"
+            android:paddingStart="20dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="RtlSymmetry" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:id="@+id/tv_all"
@@ -60,7 +47,7 @@
         android:textSize="14sp"
         app:layout_constraintBottom_toTopOf="@id/item_no_data"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tl_type"
+        app:layout_constraintTop_toBottomOf="@id/layout_tab"
         tools:text="全部关注2人" />
 
     <include

@@ -21,6 +21,7 @@ val apiModule = module {
     single { provideOkHttpClient(get(), get()) }
     single { provideApiService(get()) }
     single { provideApiRepository(get()) }
+
 }
 
 fun provideAuthInterceptor(pref: Pref): AuthInterceptor {
