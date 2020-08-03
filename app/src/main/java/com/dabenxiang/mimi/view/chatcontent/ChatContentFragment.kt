@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.TextUtils
 import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
@@ -34,6 +35,7 @@ import java.io.File
 class ChatContentFragment : BaseFragment() {
 
     private val INTENT_SELECT_IMG: Int = 100
+    private val PRELOAD_ITEM: Int = 4
 
     private lateinit var imagePreviewDialog: ImagePreviewDialogFragment
     private val viewModel: ChatContentViewModel by viewModels()
@@ -177,12 +179,10 @@ class ChatContentFragment : BaseFragment() {
 
         viewModel.postAttachmentResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Success -> {
-                    viewModel.pushMsgWithCacheData(it.result.id.toString(), it.result.ext)
-                }
                 is ApiResult.Error -> Timber.e(it.throwable)
             }
         })
+
         viewModel.fileAttachmentTooLarge.observe(viewLifecycleOwner, Observer { result ->
             if (result) {
                 GeneralUtils.showToast(requireContext(), getString(R.string.chat_content_file_too_large))
@@ -191,6 +191,12 @@ class ChatContentFragment : BaseFragment() {
 
         viewModel.cachePushData.observe(viewLifecycleOwner, Observer {
             adapter.insertItem(it)
+        })
+
+        viewModel.updatePushData.observe(viewLifecycleOwner, Observer {
+            if (!TextUtils.isEmpty(it.payload?.ext)) {
+                adapter.updateCacheData(it, viewModel.fileUploadCache)
+            }
         })
     }
 
@@ -218,7 +224,7 @@ class ChatContentFragment : BaseFragment() {
                 val linearLayoutManager: LinearLayoutManager = recyclerView.layoutManager as LinearLayoutManager
 
                 if (!viewModel.isLoading && !viewModel.noMore) {
-                    if (linearLayoutManager != null && linearLayoutManager.findLastCompletelyVisibleItemPosition() == adapter.itemCount - 4) {
+                    if (linearLayoutManager != null && linearLayoutManager.findLastCompletelyVisibleItemPosition() == adapter.itemCount - PRELOAD_ITEM) {
                         //bottom of list!
                         viewModel.getChatContent()
                         viewModel.isLoading = true
