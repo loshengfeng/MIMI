@@ -274,7 +274,7 @@ class PostPicFragment : BaseFragment() {
             TITLE_LIMIT
         ))
         txt_hashtagCount.text = String.format(getString(R.string.typing_count,
-            item.tags.size,
+            item.tags?.size,
             HASHTAG_LIMIT
         ))
 

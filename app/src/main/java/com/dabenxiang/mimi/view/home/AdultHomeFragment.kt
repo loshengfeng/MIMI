@@ -78,6 +78,7 @@ class AdultHomeFragment : BaseFragment() {
 
     private var lastPosition = 0
     private var uploadCurrentPicPosition = 0
+    private var postType = PostType.TEXT
 
     private val viewModel: HomeViewModel by viewModels()
 
@@ -100,6 +101,7 @@ class AdultHomeFragment : BaseFragment() {
     private var uploadPicUri = arrayListOf<PostAttachmentItem>()
     private var uploadVideoUri = arrayListOf<PostVideoAttachment>()
     private var postMemberRequest = PostMemberRequest()
+    private val memberPostItem = MemberPostItem()
 
     private var snackBar: Snackbar? = null
     private var picParameter = PicParameter()
@@ -107,6 +109,7 @@ class AdultHomeFragment : BaseFragment() {
     companion object {
         private const val REQUEST_PHOTO = 10001
         private const val REQUEST_VIDEO_CAPTURE = 10002
+
     }
 
     override fun getLayoutId() = R.layout.fragment_home
@@ -114,7 +117,7 @@ class AdultHomeFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         handleBackStackData()
-        showSnackBar()
+//        showSnackBar()
     }
 
     override fun setupFirstTime() {
@@ -151,13 +154,19 @@ class AdultHomeFragment : BaseFragment() {
             uploadPicUri.addAll(picUriList!!)
             val pic = uploadPicUri[uploadCurrentPicPosition]
             viewModel.postAttachment(pic.uri, requireContext(), TYPE_PIC)
+
+            memberPostItem.title = memberRequest.title
+            memberPostItem.tags = memberRequest.tags
+            postType = PostType.IMAGE
         } else if (isNeedVideoUpload != null && isNeedVideoUpload) {
             arguments?.remove(PostVideoFragment.UPLOAD_VIDEO)
             showSnackBar()
 
             val memberRequest = arguments?.getParcelable<PostMemberRequest>(PostVideoFragment.MEMBER_REQUEST)
-            uploadVideoUri = arguments?.getParcelableArrayList<PostVideoAttachment>(PostVideoFragment.VIDEO_DATA)!!
+            uploadVideoUri = arguments?.getParcelableArrayList(PostVideoFragment.VIDEO_DATA)!!
             postMemberRequest = memberRequest!!
+            memberPostItem.title = memberRequest.title
+            memberPostItem.tags = memberRequest.tags
             viewModel.postAttachment(uploadVideoUri[0].picUrl, requireContext(), TYPE_COVER)
         } else if (isNeedArticleUpload != null && isNeedArticleUpload) {
             arguments?.remove(PostArticleFragment.UPLOAD_ARTICLE)
@@ -167,7 +176,11 @@ class AdultHomeFragment : BaseFragment() {
             val request = arguments?.getString(PostArticleFragment.REQUEST)
             val tags = arguments?.getStringArrayList(PostArticleFragment.TAG)
 
-            viewModel.postArticle(title!!, request!!, tags!!)
+            memberPostItem.title = title!!
+            memberPostItem.content = request!!
+            memberPostItem.tags = tags
+
+            viewModel.postArticle(title, request, tags!!)
         }
     }
 
@@ -376,6 +389,7 @@ class AdultHomeFragment : BaseFragment() {
 
                         val content = Gson().toJson(mediaItem)
                         Timber.d("Post pic content item : $content")
+                        memberPostItem.content = content
                         viewModel.clearLiveDataValue()
                         viewModel.postPic(postMemberRequest, content)
                     } else {
@@ -414,9 +428,12 @@ class AdultHomeFragment : BaseFragment() {
                     mediaItem.videoParameter = videoParameter
                     mediaItem.textContent = postMemberRequest.content
                     val content = Gson().toJson(mediaItem)
+                    memberPostItem.content = content
                     Timber.d("Post video content item : $content")
                     viewModel.clearLiveDataValue()
                     viewModel.postPic(postMemberRequest, content)
+
+                    postType = PostType.VIDEO
                 }
                 is Error -> {
                     resetAndCancelJob(it.throwable)
@@ -430,7 +447,7 @@ class AdultHomeFragment : BaseFragment() {
 
         viewModel.postVideoMemberResult.observe(viewLifecycleOwner, Observer {
             when(it) {
-                is Success -> setSnackBarPostStatus()
+                is Success -> setSnackBarPostStatus(it.result)
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -445,13 +462,16 @@ class AdultHomeFragment : BaseFragment() {
 
         viewModel.postArticleResult.observe(viewLifecycleOwner, Observer {
             when(it) {
-                is Success -> setSnackBarPostStatus()
+                is Success -> {
+                    postType = PostType.TEXT
+                    setSnackBarPostStatus(it.result)
+                }
                 is Error -> onApiError(it.throwable)
             }
         })
     }
 
-    private fun setSnackBarPostStatus() {
+    private fun setSnackBarPostStatus(postId: Long = 0) {
         val snackBarLayout: Snackbar.SnackbarLayout = snackBar?.view as Snackbar.SnackbarLayout
         val progressBar =
             snackBarLayout.findViewById(R.id.contentLoadingProgressBar) as ContentLoadingProgressBar
@@ -482,7 +502,33 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         txtPost.setOnClickListener {
-            findNavController().navigate(R.id.action_adultHomeFragment_to_myPostFragment)
+            if (postType == PostType.TEXT) {
+                memberPostItem.id = postId
+                val bundle = TextDetailFragment.createBundle(memberPostItem, -1)
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_adultHomeFragment_to_textDetailFragment,
+                        bundle
+                    )
+                )
+            } else if (postType == PostType.IMAGE) {
+                memberPostItem.id = postId
+                val bundle = PictureDetailFragment.createBundle(memberPostItem, -1)
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_adultHomeFragment_to_pictureDetailFragment,
+                        bundle
+                    )
+                )
+            } else if (postType == PostType.VIDEO) {
+                val bundle = ClipFragment.createBundle(arrayListOf(memberPostItem), -1, false)
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_adultHomeFragment_to_clipFragment,
+                        bundle
+                    )
+                )
+            }
         }
 
         uploadCurrentPicPosition = 0
