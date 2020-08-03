@@ -36,6 +36,7 @@ class CommentAdapter(isAdult: Boolean, listener: PlayerInfoListener, type: Comme
         fun removeCommentLikeType(replyId: Long?, succeededBlock: () -> Unit)
         fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit)
         fun onMoreClick(item: MembersPostCommentItem)
+        fun onAvatarClick()
     }
 
     init {
@@ -66,6 +67,7 @@ class RootCommentProvider(
 
     init {
         addChildClickViewIds(
+            R.id.iv_avatar,
             R.id.tv_like,
             R.id.tv_unlike,
             R.id.btn_reply,
@@ -137,6 +139,10 @@ class RootCommentProvider(
     override fun onChildClick(holder: BaseViewHolder, view: View, data: BaseNode, position: Int) {
         val actualData = data as RootCommentNode
         when (view.id) {
+            R.id.iv_avatar -> {
+                // TODO:
+                listener.onAvatarClick()
+            }
             R.id.btn_show_comment_reply -> {
                 if (actualData.isExpanded) {
                     getAdapter()?.expandOrCollapse(
@@ -209,7 +215,13 @@ class NestedCommentProvider(
         get() = R.layout.item_comment_nested
 
     init {
-        addChildClickViewIds(R.id.tv_like, R.id.tv_unlike, R.id.btn_reply, R.id.btn_more)
+        addChildClickViewIds(
+            R.id.iv_avatar,
+            R.id.tv_like,
+            R.id.tv_unlike,
+            R.id.btn_reply,
+            R.id.btn_more
+        )
     }
 
     override fun convert(holder: BaseViewHolder, item: BaseNode) {
@@ -219,6 +231,10 @@ class NestedCommentProvider(
     override fun onChildClick(holder: BaseViewHolder, view: View, data: BaseNode, position: Int) {
         val actualData = data as NestedCommentNode
         when (view.id) {
+            R.id.iv_avatar -> {
+                // TODO:
+                listener.onAvatarClick()
+            }
             R.id.tv_like -> {
                 val isLike = true
                 if (isRemoveLikeData(actualData.data, isLike)) {

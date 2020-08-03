@@ -567,13 +567,16 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         btn_filter.setOnClickListener {
-            val bundle = CategoriesFragment.createBundle(getString(R.string.favorite_tab_mimi), null, mainViewModel?.adult?.categories?.get(0))
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_adultHomeFragment_to_categoriesFragment,
-                    bundle
+            val category = mainViewModel?.adult?.categories?.get(0)
+            category?.also {
+                val bundle = CategoriesFragment.createBundle(it.name, it.name, category)
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_homeFragment_to_categoriesFragment,
+                        bundle
+                    )
                 )
-            )
+            }
         }
 
         recyclerview_tab.adapter = tabAdapter
@@ -923,6 +926,11 @@ class AdultHomeFragment : BaseFragment() {
                     bundle
                 )
             )
+        }
+
+        override fun onAvatarClick() {
+            // TODO:
+            Timber.d("onAvatarClick nav to member post")
         }
     }
 

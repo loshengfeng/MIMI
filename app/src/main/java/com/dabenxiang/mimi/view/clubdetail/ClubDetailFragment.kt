@@ -266,6 +266,11 @@ class ClubDetailFragment : BaseFragment() {
                 )
             )
         }
+
+        override fun onAvatarClick() {
+            // TODO:
+            Timber.d("onAvatarClick nav to member post")
+        }
     }
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {

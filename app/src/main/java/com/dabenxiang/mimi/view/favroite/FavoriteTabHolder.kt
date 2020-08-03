@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.item_tab.view.*
 class FavoriteTabHolder(
     itemView: View,
     listener: IndexViewHolderListener,
-    var isPrimary: Boolean
+    private var isPrimary: Boolean = true
 ) : BaseIndexViewHolder<String>(itemView, listener) {
 
     private val tvTitle: TextView = itemView.tv_title

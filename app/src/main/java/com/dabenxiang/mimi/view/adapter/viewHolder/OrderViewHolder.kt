@@ -27,12 +27,6 @@ class OrderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     }
 
     companion object {
-        fun create(parent: ViewGroup): ClubFollowViewHolder {
-            val view =
-                LayoutInflater.from(parent.context).inflate(R.layout.item_order, parent, false)
-            return ClubFollowViewHolder(view)
-        }
-
         const val NONE = 0
         const val ALIPAY = 1
         const val WECHAT = 2
