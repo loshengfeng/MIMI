@@ -103,7 +103,13 @@
     <fragment
         android:id="@+id/postArticleFragment"
         android:name="com.dabenxiang.mimi.view.post.article.PostArticleFragment"
-        tools:layout="@layout/fragment_post_article" />
+        tools:layout="@layout/fragment_post_article" >
+        <action
+            android:id="@+id/action_postArticleFragment_to_adultHomeFragment"
+            app:destination="@id/adultHomeFragment"
+            app:popUpTo="@+id/adultHomeFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 
     <fragment
         android:id="@+id/pictureDetailFragment"

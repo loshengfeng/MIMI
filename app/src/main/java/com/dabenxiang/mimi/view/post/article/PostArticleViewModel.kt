@@ -27,28 +27,6 @@ class PostArticleViewModel: BaseViewModel() {
     private val _bitmapResult = MutableLiveData<ApiResult<String>>()
     val bitmapResult: LiveData<ApiResult<String>> = _bitmapResult
 
-    fun postArticle(title: String, content: String, tags: ArrayList<String>) {
-        viewModelScope.launch {
-            flow {
-                val request = PostMemberRequest(
-                    title = title,
-                    content = content,
-                    type = PostType.TEXT.value,
-                    tags = tags
-                )
-
-                val resp = domainManager.getApiRepository().postMembersPost(request)
-                if (!resp.isSuccessful) throw HttpException(resp)
-                emit(ApiResult.success(resp.body()?.content))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _postArticleResult.value = it }
-        }
-    }
-
     fun updateArticle(title: String, content: String, tags: ArrayList<String>, item: MemberPostItem) {
         viewModelScope.launch {
             flow {
