@@ -17,12 +17,14 @@ import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.AgentItem
+import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.holder.TopUpOnlinePayItem
 import com.dabenxiang.mimi.model.holder.TopUpProxyPayItem
 import com.dabenxiang.mimi.view.adapter.TopUpAgentAdapter
 import com.dabenxiang.mimi.view.adapter.TopUpOnlinePayAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
 import com.dabenxiang.mimi.view.listener.AdapterEventListener
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -79,6 +81,25 @@ class TopUpFragment : BaseFragment() {
                     Glide.with(this).load(it.result)
                         .apply(options)
                         .into(iv_photo)
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.createChatRoomResult.observe(viewLifecycleOwner, Observer {
+            when(it){
+                is Success -> {
+                    viewModel.currentItem?.let { item ->
+                        ChatListItem(item.agentId?.toLong(), item.merchantName, avatarAttachmentId = item.avatarAttachmentId?.toLong())
+                    }?.also {
+                        val bundle = ChatContentFragment.createBundle(it)
+                        navigateTo(
+                                NavigateItem.Destination(
+                                        R.id.action_topupFragment_to_chatContentFragment,
+                                        bundle
+                                )
+                        )
+                    }
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -184,7 +205,7 @@ class TopUpFragment : BaseFragment() {
 
     private val agentListener = object : AdapterEventListener<AgentItem> {
         override fun onItemClick(view: View, item: AgentItem) {
-
+            viewModel.createChatRoom(item)
         }
     }
 
