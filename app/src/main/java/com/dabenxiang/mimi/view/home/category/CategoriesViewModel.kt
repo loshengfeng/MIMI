@@ -51,7 +51,7 @@ class CategoriesViewModel : BaseViewModel() {
             val dataSrc =
                 VideoDataSource(
                     isAdult,
-                    category ?: "",
+                    category,
                     viewModelScope,
                     domainManager,
                     pagingCallback,

@@ -199,10 +199,12 @@ class CategoriesFragment : BaseFragment() {
 
             recyclerview_content.adapter = videoListAdapter
 
-
-            viewModel.setupVideoList(data.categories, isAdult)
-
             viewModel.getCategoryDetail(data.title, isAdult)
+            if (isAdult) {
+                viewModel.getVideoFilterList(null, null, null, isAdult)
+            } else {
+                viewModel.setupVideoList(data.categories, isAdult)
+            }
             progressHUD?.show()
         }
     }
@@ -218,7 +220,7 @@ class CategoriesFragment : BaseFragment() {
             when (it) {
                 is ApiResult.Success -> {
                     progressHUD?.dismiss()
-                    Timber.d("@@getCategoryDetailResult: ${it.result}")
+                    Timber.d("getCategoryDetailResult: ${it.result}")
 
                     (arguments?.getSerializable(KEY_CATEGORY) as CategoriesItem?)?.also { data ->
                         val typeList = arrayListOf<String>()
@@ -288,10 +290,12 @@ class CategoriesFragment : BaseFragment() {
                     lastPosition?.takeIf { it < list.size }?.let { list[it] }.also {
                         when(index) {
                             0 -> {
-                                it.takeUnless { it == "全部" }?.also { key ->
-                                    filterKeyList.add("${data.title},$key")
-                                } ?: run { filterKeyList.add(data.title) }
-
+                                val key = it.takeUnless { it == "全部" }?.let { key ->
+                                    if (isAdult) key else "${data.title},$key"
+                                } ?: let {
+                                    if (isAdult) null else data.title
+                                }
+                                filterKeyList.add(key)
                             }
                             else -> {
                                 it.takeUnless { it == "全部" }?.also { key ->
@@ -302,8 +306,8 @@ class CategoriesFragment : BaseFragment() {
                     }
                 }
 
-                viewModel.getVideoFilterList(filterKeyList[0], filterKeyList[1], filterKeyList[2], isAdult)
                 progressHUD?.show()
+                viewModel.getVideoFilterList(filterKeyList[0], filterKeyList[1], filterKeyList[2], isAdult)
             }
         }, isAdult)
         adapter.submitList(list, 0)
