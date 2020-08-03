@@ -21,6 +21,7 @@ import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_my_follow.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
@@ -69,7 +70,14 @@ class MyFollowFragment : BaseFragment() {
     private val memberFollowAdapter by lazy { MemberFollowAdapter(memberFollowListener) }
     private val memberFollowListener = object : MemberFollowAdapter.EventListener {
         override fun onDetail(item: MemberFollowItem) {
-            //todo
+            val bundle = MyPostFragment.createBundle(
+                item.userId, item.friendlyName,
+                isAdult = true,
+                isAdultTheme = false
+            )
+            navigateTo(
+                NavigateItem.Destination(R.id.action_myFollowFragment_to_navigation_my_post, bundle)
+            )
         }
 
         override fun onGetAttachment(id: String, position: Int) {
@@ -103,7 +111,7 @@ class MyFollowFragment : BaseFragment() {
         try {
             interactionListener = context as InteractionListener
         } catch (e: ClassCastException) {
-            Timber.e("AdultHomeFragment interaction listener can't cast")
+            Timber.e("MyFollowFragment interaction listener can't cast")
         }
     }
 
