@@ -26,6 +26,9 @@ class CategoriesViewModel : BaseViewModel() {
     private val _videoList = MutableLiveData<PagedList<BaseVideoItem>>()
     val videoList: LiveData<PagedList<BaseVideoItem>> = _videoList
 
+    private val _filterList = MutableLiveData<PagedList<BaseVideoItem>>()
+    val filterList: LiveData<PagedList<BaseVideoItem>> = _filterList
+
     private val _getCategoryDetailResult = MutableLiveData<ApiResult<VideoSearchItem>>()
     val getCategoryDetailResult: LiveData<ApiResult<VideoSearchItem>> = _getCategoryDetailResult
 
@@ -63,6 +66,32 @@ class CategoriesViewModel : BaseViewModel() {
 
             LivePagedListBuilder(factory, config).build().asFlow().collect {
                 _videoList.postValue(it)
+            }
+        }
+    }
+
+    fun getVideoFilterList(category: String?, country: String?, years: String?, isAdult: Boolean) {
+        viewModelScope.launch {
+            val dataSrc =
+                CategoriesDataSource(
+                    isAdult = isAdult,
+                    category = category,
+                    country = country,
+                    years = years,
+                    viewModelScope = viewModelScope,
+                    domainManager = domainManager,
+                    pagingCallback = pagingCallback,
+                    adWidth = adWidth,
+                    adHeight = adHeight
+                )
+            val factory =
+                CategoriesFactory(dataSrc)
+            val config = PagedList.Config.Builder()
+                .setPageSize(VideoDataSource.PER_LIMIT.toInt())
+                .build()
+
+            LivePagedListBuilder(factory, config).build().asFlow().collect {
+                _filterList.postValue(it)
             }
         }
     }
