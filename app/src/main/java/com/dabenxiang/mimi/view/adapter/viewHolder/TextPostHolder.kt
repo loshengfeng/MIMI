@@ -109,6 +109,10 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView) {
         textPostItemLayout.setOnClickListener {
             adultListener.onItemClick(item, AdultTabType.TEXT)
         }
+
+        avatarImg.setOnClickListener {
+            adultListener.onAvatarClick()
+        }
     }
 
     private fun updateAvatar(id: String) {
