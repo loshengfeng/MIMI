@@ -268,7 +268,7 @@ interface ApiService {
         @Query("category") category: String?,
         @Query("q") q: String?,
         @Query("country") country: String?,
-        @Query("years") years: Int?,
+        @Query("years") years: String?,
         @Query("isAdult") isAdult: Boolean?,
         @Query("offset") offset: String?,
         @Query("limit") limit: String?,

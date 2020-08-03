@@ -341,7 +341,7 @@ class ApiRepository(private val apiService: ApiService) {
         category: String? = null,
         q: String? = null,
         country: String? = null,
-        years: Int? = null,
+        years: String? = null,
         isAdult: Boolean,
         offset: String,
         limit: String,
