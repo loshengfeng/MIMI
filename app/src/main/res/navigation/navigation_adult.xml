@@ -5,6 +5,8 @@
     android:id="@+id/navigation_adult"
     app:startDestination="@id/adultHomeFragment">
 
+    <include app:graph="@navigation/navigation_detail_club" />
+
     <fragment
         android:id="@+id/adultHomeFragment"
         android:name="com.dabenxiang.mimi.view.home.AdultHomeFragment"
@@ -49,7 +51,7 @@
             app:destination="@id/searchPostFragment" />
         <action
             android:id="@+id/action_adultHomeFragment_to_clubDetailFragment"
-            app:destination="@id/clubDetailFragment" />
+            app:destination="@id/navigation_detail_club" />
         <action
             android:id="@+id/action_adultHomeFragment_to_myPostFragment"
             app:destination="@id/myPostFragment" />
@@ -57,6 +59,9 @@
         <action
             android:id="@+id/action_adultHomeFragment_to_rankingFragment"
             app:destination="@id/rankingFragment" />
+        <action
+            android:id="@+id/action_adultHomeFragment_to_categoriesFragment"
+            app:destination="@id/categoriesFragment" />
     </fragment>
 
     <fragment
@@ -87,7 +92,7 @@
 
         <action
             android:id="@+id/action_searchPostFragment_to_clubDetailFragment"
-            app:destination="@id/clubDetailFragment" />
+            app:destination="@id/navigation_detail_club" />
     </fragment>
 
     <fragment
@@ -135,7 +140,11 @@
         android:id="@+id/postPicFragment"
         android:name="com.dabenxiang.mimi.view.post.pic.PostPicFragment"
         android:label="PostPicFragment"
-        tools:layout="@layout/fragment_post_pic" />
+        tools:layout="@layout/fragment_post_pic" >
+        <action
+            android:id="@+id/action_postPicFragment_to_postViewerFragment"
+            app:destination="@id/postViewerFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/postVideoFragment"
@@ -145,6 +154,9 @@
         <action
             android:id="@+id/action_postVideoFragment_self"
             app:destination="@id/postVideoFragment" />
+        <action
+            android:id="@+id/action_postVideoFragment_to_postViewerFragment"
+            app:destination="@id/postViewerFragment" />
     </fragment>
     <fragment
         android:id="@+id/editVideoFragment"
@@ -154,24 +166,6 @@
         <action
             android:id="@+id/action_editVideoFragment_to_postVideoFragment"
             app:destination="@id/postVideoFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/clubDetailFragment"
-        android:name="com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment"
-        android:label="ClubDetailFragment"
-        tools:layout="@layout/fragment_club_detail">
-        <action
-            android:id="@+id/action_clubDetailFragment_to_clipFragment"
-            app:destination="@id/clipFragment" />
-        <action
-            android:id="@+id/action_clubDetailFragment_to_pictureDetailFragment"
-            app:destination="@id/pictureDetailFragment" />
-        <action
-            android:id="@+id/action_clubDetailFragment_to_textDetailFragment"
-            app:destination="@id/textDetailFragment" />
-        <action
-            android:id="@+id/action_clubDetailFragment_to_searchPostFragment"
-            app:destination="@id/searchPostFragment" />
     </fragment>
     <fragment
         android:id="@+id/myPostFragment"
@@ -214,4 +208,8 @@
             android:id="@+id/action_rankingFragment_to_pictureDetailFragment"
             app:destination="@id/pictureDetailFragment" />
    </fragment>
+    <fragment
+        android:id="@+id/postViewerFragment"
+        android:name="com.dabenxiang.mimi.view.post.viewer.PostViewerFragment"
+        android:label="PostViewerFragment" />
 </navigation>

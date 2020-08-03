@@ -79,7 +79,7 @@
     <string name="personal_not_login_tips_3">若尚未成为会员，赶紧注册体验更多内容</string>
     <string name="personal_topup">充值去 ></string>
     <string name="personal_follow">我的关注</string>
-    <string name="personal_order">充值记录</string>
+    <string name="personal_order">充值管理</string>
     <string name="personal_topup_now">现在充值去</string>
     <string name="personal_my_post">我的帖子</string>
     <string name="personal_chat_history">对话记录</string>
@@ -147,8 +147,11 @@
     <string name="follow_title">我的关注</string>
     <string name="follow_people">关注的人</string>
     <string name="follow_circle">关注的圈子</string>
-    <string name="follow_all">全部关注%s人</string>
+    <string name="follow_members_total_num">全部关注%s人</string>
+    <string name="follow_clubs_total_num">全部关注%s圈子</string>
     <string name="follow_clean">清除</string>
+    <string name="follow_clean_member_dlg_msg">是否要清除所有关注的人</string>
+    <string name="follow_clean_club_dlg_msg">是否要清除所有关注的圈子</string>
     <string name="text_more">更多</string>
     <string name="text_search">搜寻</string>
     <string name="text_follow">关注</string>
@@ -225,6 +228,15 @@
     <string name="view_post">查看发帖</string>
     <string name="post_uploading">上传中…</string>
     <string name="whether_to_discard_content">是否舍弃内容</string>
+    <string name="post_hint_title">请输入标题(必填)</string>
+    <string name="post_hint_content">请输入内容(必填)</string>
+    <string name="post_hint_tag">请输入标签, 字数限 10 字</string>
+    <string name="post_warning_title">请输入标题</string>
+    <string name="post_warning_content">请输入内容</string>
+    <string name="post_warning_tag">请选择圈子</string>
+    <string name="post_warning_pic">请选择照片</string>
+    <string name="post_warning_video">请选择影片</string>
+    <string name="post_warning_tag_limit">标签已满</string>
 
     <!-- Problem report -->
     <string-array name="video_problem_report_item">
@@ -289,6 +301,7 @@
     <string name="chat_content_file_too_large">档案不得超过 5MB</string>
     <string name="chat_content_file_downloading">下载中</string>
     <string name="chat_content_file_download_finish">下载完成</string>
+    <string name="chat_content_file_uploading">上傳中</string>
 
     <!--  Image Preview  -->
     <string name="image_preview_file_invlid">档案已失效</string>
@@ -297,4 +310,15 @@
     <string name="ranking_day">日排行</string>
     <string name="ranking_week">周排行</string>
     <string name="ranking_moon">月排行</string>
+
+    <!-- Version check  -->
+    <string name="check_version">检查版本…</string>
+    <string name="update_version">%d%%  更新中…</string>
+    <string name="updated_version_title">已有更新版本，是否立即更新</string>
+    <string name="update_immediately">立即更新</string>
+    <string name="remind_later">稍后提醒</string>
+    <string name="install_apk_failed_alert">安装apk失败，请手动安装</string>
+    <string name="setting_version">版本：%s</string>
+    <string name="confirm">确定</string>
+    <string name="cancel">取消</string>
 </resources>

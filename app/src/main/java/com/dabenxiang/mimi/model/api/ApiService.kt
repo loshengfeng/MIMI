@@ -106,6 +106,14 @@ interface ApiService {
         @Query("limit") limit: String
     ): Response<ApiBasePagingItem<List<ChatContentItem>>>
 
+    @PUT("/v1/Members/Me/Chats/LastRead")
+    suspend fun setLastReadMessageTime(
+        @Body body: HashMap<String, Long>
+    ): Response<Void>
+
+    @GET("/v1/Members/Me/Chats/UnRead")
+    suspend fun getUnread(): Response<ApiBaseItem<Int>>
+
     /**********************************************************
      *
      *                  Functions
@@ -263,7 +271,7 @@ interface ApiService {
         @Query("category") category: String?,
         @Query("q") q: String?,
         @Query("country") country: String?,
-        @Query("years") years: Int?,
+        @Query("years") years: String?,
         @Query("isAdult") isAdult: Boolean?,
         @Query("offset") offset: String?,
         @Query("limit") limit: String?,
@@ -311,25 +319,25 @@ interface ApiService {
     ): Response<Void>
 
     @GET("/v1/Members/Me/ClubFollow")
-    suspend fun getClubFollow(
+    suspend fun getMyClubFollow(
         @Query("offset") offset: String,
         @Query("limit") limit: String
     ): Response<ApiBasePagingItem<List<ClubFollowItem>>>
 
     @DELETE("/v1/Members/Me/ClubFollow/{clubId}")
-    suspend fun deleteClubFollow(
-        @Path("clubId") id: Int
+    suspend fun cancelMyClubFollow(
+        @Path("clubId") id: Long
     ): Response<Void>
 
     @GET("/v1/Members/Me/MemberFollow")
-    suspend fun getMemberFollow(
+    suspend fun getMyMemberFollow(
         @Query("offset") offset: String,
         @Query("limit") limit: String
     ): Response<ApiBasePagingItem<List<MemberFollowItem>>>
 
     @DELETE("/v1/Members/Me/MemberFollow/{userId}")
-    suspend fun deleteMemberFollow(
-        @Path("userId") id: Int
+    suspend fun cancelMyMemberFollow(
+        @Path("userId") id: Long
     ): Response<Void>
 
     @GET("/v1/Members/Me/Order")

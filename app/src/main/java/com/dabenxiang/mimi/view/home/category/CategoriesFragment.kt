@@ -8,7 +8,10 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
+import com.blankj.utilcode.util.AppUtils
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.serializable.CategoriesData
@@ -29,14 +32,16 @@ class CategoriesFragment : BaseFragment() {
 
     companion object {
         const val KEY_DATA = "data"
+        const val KEY_CATEGORY = "category"
 
-        fun createBundle(title: String, categories: String): Bundle {
+        fun createBundle(title: String, categories: String?, item: CategoriesItem?): Bundle {
             val data = CategoriesData()
             data.title = title
             data.categories = categories
 
             return Bundle().also {
                 it.putSerializable(KEY_DATA, data)
+                it.putSerializable(KEY_CATEGORY, item)
             }
         }
     }
@@ -107,6 +112,9 @@ class CategoriesFragment : BaseFragment() {
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
+    private val isAdult by lazy { mainViewModel?.adultMode?.value ?: false }
+    private val data by lazy {  arguments?.getSerializable(KEY_DATA) as CategoriesData }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -115,8 +123,6 @@ class CategoriesFragment : BaseFragment() {
 
         (arguments?.getSerializable(KEY_DATA) as CategoriesData?)?.also { data ->
             tv_title.text = data.title
-
-            val isAdult = mainViewModel?.adultMode?.value ?: false
 
             recyclerview_content.background =
                 if (isAdult) {
@@ -194,65 +200,64 @@ class CategoriesFragment : BaseFragment() {
 
             recyclerview_content.adapter = videoListAdapter
 
-            viewModel.videoList.observe(viewLifecycleOwner, Observer {
-                videoListAdapter.submitList(it)
-            })
+            if (isAdult) {
+                recyclerview_content.setPadding(0, GeneralUtils.dpToPx(requireContext(), 50), 0, 0)
+            }
 
-            loadCategories(data.categories, isAdult)
+            viewModel.getCategoryDetail(data.title, isAdult)
+            if (isAdult) {
+                viewModel.getVideoFilterList(null, null, null, isAdult)
+            } else {
+                viewModel.setupVideoList(data.categories, isAdult)
+            }
+            progressHUD?.show()
         }
     }
 
-    private fun loadCategories(keyword: String?, isAdult: Boolean) {
-        viewModel.setupVideoList(keyword, isAdult)
-    }
+    private var filterViewList: List<RecyclerView> = listOf()
+    private var filterAdapterList = mutableMapOf<Int, FilterTabAdapter>()
+    private var filterDataList: ArrayList<List<String>> = arrayListOf()
 
     override fun setupObservers() {
-        val isAdult = mainViewModel?.adultMode?.value ?: false
+        filterViewList = listOf(filter_0, filter_1, filter_2)
 
-        val filterViewList = listOf(filter_0, filter_1, filter_2)
-        val filterAdapterList = mutableMapOf<Int, FilterTabAdapter>()
-
-        mainViewModel?.categoriesData?.observe(viewLifecycleOwner, Observer { categories ->
-
-            // TODO: Fake data
-            repeat(3) { i ->
-                val years = mutableListOf<String>()
-                repeat(8) { y ->
-                    years.add("${2020 - y}")
-                }
-
-                val adapter = FilterTabAdapter(object : FilterTabAdapter.FilterTabAdapterListener {
-                    override fun onSelectedFilterTab(recyclerView: RecyclerView, position: Int) {
-                        viewModel.updatedFilterPosition(i, position)
-                    }
-                }, isAdult)
-                adapter.submitList(years, 0)
-
-                filterViewList[i].adapter = adapter
-                filterAdapterList[i] = adapter
-
-                // TODO: Observer last position
-                viewModel.filterPositionData(i)?.observe(viewLifecycleOwner, Observer { position ->
-                    adapter.setLastSelectedIndex(position)
-
-                    val sb = StringBuilder()
-                    var isFirst = true
-                    for (j in 0..3) {
-                        val lastPosition = viewModel.filterPositionData(j)?.value
-                        if (lastPosition != null) {
-                            if (isFirst) {
-                                isFirst = false
-                            } else {
-                                sb.append(", ")
-                            }
-
-                            sb.append(years[lastPosition])
+        viewModel.getCategoryDetailResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    progressHUD?.dismiss()
+                    Timber.d("getCategoryDetailResult: ${it.result}")
+                    (arguments?.getSerializable(KEY_CATEGORY) as CategoriesItem?)?.also { data ->
+                        var notEmptyCount = 0
+                        val typeList = arrayListOf<String>()
+                        data.categories?.forEach { item ->
+                            typeList.add(item.name)
                         }
+                        takeIf { typeList.isNotEmpty() }?.also { notEmptyCount++ }
+                        val areasCategory = it.result.category?.areas ?: arrayListOf()
+                        takeIf { areasCategory.isNotEmpty() }?.also { notEmptyCount++ }
+                        val yearsCategory = it.result.category?.years ?: arrayListOf()
+                        takeIf { yearsCategory.isNotEmpty() }?.also { notEmptyCount++ }
+                        setupFilter(0, typeList)
+                        setupFilter(1, areasCategory)
+                        setupFilter(2, yearsCategory)
+
+                        recyclerview_content.setPadding(0, GeneralUtils.dpToPx(requireContext(), 50) * notEmptyCount, 0, 0)
                     }
 
-                    tv_collapsing_filter.text = sb.toString()
-                })
+                }
+                is ApiResult.Error -> {
+                    progressHUD?.dismiss()
+                }
             }
+        })
+
+        viewModel.videoList.observe(viewLifecycleOwner, Observer {
+            videoListAdapter.submitList(it)
+        })
+
+        viewModel.filterList.observe(viewLifecycleOwner, Observer {
+            progressHUD?.dismiss()
+            videoListAdapter.submitList(it)
         })
     }
 
@@ -282,6 +287,64 @@ class CategoriesFragment : BaseFragment() {
         super.onPause()
 
         recyclerview_content.removeOnScrollListener(onScrollListener)
+    }
+
+    private fun setupFilter(index: Int, list: List<String>) {
+        filterDataList.add(index, list)
+        val adapter = FilterTabAdapter(object : FilterTabAdapter.FilterTabAdapterListener {
+            override fun onSelectedFilterTab(recyclerView: RecyclerView, position: Int, keyword: String) {
+                viewModel.updatedFilterPosition(index, position)
+
+                val filterKeyList: ArrayList<String?> = arrayListOf()
+                filterDataList.forEachIndexed { index, list ->
+                    val lastPosition = viewModel.filterPositionData(index)?.value
+
+                    lastPosition?.takeIf { it < list.size }?.let { list[it] }.also {
+                        when(index) {
+                            0 -> {
+                                val key = it.takeUnless { it == "全部" }?.let { key ->
+                                    if (isAdult) key else "${data.title},$key"
+                                } ?: let {
+                                    if (isAdult) null else data.title
+                                }
+                                filterKeyList.add(key)
+                            }
+                            else -> {
+                                it.takeUnless { it == "全部" }?.also { key ->
+                                    filterKeyList.add(key)
+                                } ?: run { filterKeyList.add(null) }
+                            }
+                        }
+                    }
+                }
+
+                progressHUD?.show()
+                viewModel.getVideoFilterList(filterKeyList[0], filterKeyList[1], filterKeyList[2], isAdult)
+            }
+        }, isAdult)
+        adapter.submitList(list, 0)
+
+        filterViewList[index].adapter = adapter
+        filterAdapterList[index] = adapter
+        if (list.isEmpty()) {
+            filterViewList[index].visibility = View.GONE
+        }
+
+        viewModel.filterPositionData(index)?.observe(viewLifecycleOwner, Observer { position ->
+            adapter.setLastSelectedIndex(position)
+
+            val sb = StringBuilder()
+            filterDataList.forEachIndexed { index, list ->
+                val lastPosition = viewModel.filterPositionData(index)?.value
+                lastPosition?.takeIf { it < list.size }?.let { list[it] }?.also {
+                    if (index == 0) {
+                        sb.append(it)
+                    } else {
+                        sb.append(", ").append(it)
+                    }
+                }
+            }.takeIf { sb.isNotEmpty() }?.run { tv_collapsing_filter.text = sb.toString() }
+        })
     }
 
     private val onScrollListener = object : RecyclerView.OnScrollListener() {

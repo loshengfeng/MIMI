@@ -9,6 +9,7 @@ import com.dabenxiang.mimi.widget.factory.EnumTypeAdapterFactory
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import org.koin.dsl.module
+import tw.gov.president.manager.submanager.update.VersionManager
 
 val managerModule = module {
     single { provideDomainManager(get()) }

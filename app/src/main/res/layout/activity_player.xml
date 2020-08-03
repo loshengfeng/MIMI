@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:visibility="visible"
+        android:background="#000000"
         app:controller_layout_id="@layout/custom_playback_control"
         app:fastforward_increment="30000"
         app:layout_constraintDimensionRatio="h,16:9"

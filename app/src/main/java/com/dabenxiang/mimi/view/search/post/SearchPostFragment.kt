@@ -9,6 +9,7 @@ import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
@@ -88,6 +89,7 @@ class SearchPostFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
 
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
@@ -515,6 +517,10 @@ class SearchPostFragment : BaseFragment() {
         override fun onChipClick(type: PostType, tag: String) {
             updateTag(tag)
             viewModel.getSearchPostsByTag(type, tag, isPostFollow)
+        }
+
+        override fun onAvatarClick() {
+            TODO("Not yet implemented")
         }
     }
 

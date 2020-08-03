@@ -33,6 +33,7 @@ import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_picture_detail.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
+import timber.log.Timber
 
 class PictureDetailFragment : BaseFragment() {
 
@@ -362,6 +363,11 @@ class PictureDetailFragment : BaseFragment() {
 
         override fun onOpenWebView(url: String) {
             GeneralUtils.openWebView(requireContext(), url)
+        }
+
+        override fun onAvatarClick() {
+            // TODO:
+            Timber.d("onAvatarClick nav to member post")
         }
     }
 

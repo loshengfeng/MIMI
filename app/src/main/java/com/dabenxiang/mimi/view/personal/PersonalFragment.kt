@@ -32,7 +32,6 @@ import kotlinx.android.synthetic.main.item_personal_is_login.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import retrofit2.HttpException
 import timber.log.Timber
-import java.lang.ClassCastException
 
 class PersonalFragment : BaseFragment() {
 
@@ -51,6 +50,11 @@ class PersonalFragment : BaseFragment() {
         return R.layout.fragment_personal
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.getUnread()
+    }
+
     override fun setupObservers() {
         viewModel.meItem.observe(viewLifecycleOwner, Observer {
             when (it) {
@@ -60,17 +64,8 @@ class PersonalFragment : BaseFragment() {
                     progressHUD?.dismiss()
 
                     val meItem = it.result
-                    viewModel.accountManager.setupProfile(meItem)
-
-                    viewModel.getAttachment()
                     tv_name.text = meItem.friendlyName.toString()
                     tv_Point.text = meItem.availablePoint.toString()
-
-                    // todo: confirm by Jeff...
-                    tv_new.visibility = when (meItem.hasNewMessage) {
-                        true -> View.VISIBLE
-                        else -> View.GONE
-                    }
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -83,20 +78,14 @@ class PersonalFragment : BaseFragment() {
                 is Success -> {
                     val options: RequestOptions = RequestOptions()
                         .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                        .placeholder(R.mipmap.ic_launcher)
-                        .error(R.mipmap.ic_launcher)
+                        .placeholder(R.drawable.ico_default_photo)
+                        .error(R.drawable.ico_default_photo)
                         .priority(Priority.NORMAL)
-
                     Glide.with(this).load(it.result)
                         .apply(options)
                         .into(iv_photo)
                 }
-                is Error -> onApiError(it.throwable, onHttpErrorBlock = { httpError ->
-                    when (httpError.httpExceptionItem.errorItem.code) {
-                        // todo: confirm by jeff...
-//                        ErrorCode.NOT_FOUND -> { viewModel.toastData.value = "no photo"}
-                    }
-                })
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -125,6 +114,15 @@ class PersonalFragment : BaseFragment() {
                         }
                     }
                 }
+            }
+        })
+
+        viewModel.unreadResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    tv_new.visibility = if (it.result == 0) View.INVISIBLE else View.VISIBLE
+                }
+                is Error -> onApiError(it.throwable)
             }
         })
     }
@@ -174,7 +172,7 @@ class PersonalFragment : BaseFragment() {
         tv_version_is_login.text = BuildConfig.VERSION_NAME
         tv_version_is_not_login.text = BuildConfig.VERSION_NAME
 
-        when(viewModel.accountManager.isLogin()) {
+        when (viewModel.accountManager.isLogin()) {
             true -> {
                 item_is_Login.visibility = View.VISIBLE
                 item_is_not_Login.visibility = View.GONE
@@ -185,7 +183,7 @@ class PersonalFragment : BaseFragment() {
                 item_is_not_Login.visibility = View.VISIBLE
             }
         }
-     }
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

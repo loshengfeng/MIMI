@@ -4,15 +4,40 @@ import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.dabenxiang.mimi.APK_NAME
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import org.koin.core.KoinComponent
+import org.koin.core.inject
+import timber.log.Timber
+import tw.gov.president.manager.submanager.update.VersionManager
+import tw.gov.president.manager.submanager.update.callback.DownloadProgressCallback
+import tw.gov.president.manager.submanager.update.data.VersionStatus
 
-class SplashViewModel : BaseViewModel() {
+class SplashViewModel : BaseViewModel(), KoinComponent {
 
     private val _autoLoginResult = MutableLiveData<ApiResult<Nothing>>()
     val autoLoginResult: LiveData<ApiResult<Nothing>> = _autoLoginResult
+    private val _versionStatus = MutableLiveData<VersionStatus>()
+    val versionStatus: LiveData<VersionStatus> = _versionStatus
+    private val _apiError: MutableLiveData<Boolean> = MutableLiveData()
+    val apiError: LiveData<Boolean> = _apiError
+
+    private val versionManager: VersionManager by inject()
+
+    private val handler = CoroutineExceptionHandler { _, throwable ->
+        Timber.e("$throwable")
+
+        _apiError.postValue(true)
+    }
+
 
     fun autoLogin() {
         if (accountManager.hasMemberToken()) {
@@ -32,5 +57,39 @@ class SplashViewModel : BaseViewModel() {
     private suspend fun signIn(account: String, password: String) {
         accountManager.signIn(account, password)
             .collect { _autoLoginResult.value = it }
+    }
+
+    fun checkVersion() {
+        viewModelScope.launch(handler) {
+            Timber.i("checkVersion")
+            flow {
+                val versionStatus = versionManager.checkVersion()
+                delay(100)
+                emit(versionStatus)
+            }.flowOn(Dispatchers.IO).collect {
+                Timber.i("checkVersion = $it")
+                _versionStatus.value = it
+            }
+        }
+    }
+
+    fun isUpgradeApp(): Boolean {
+        val recordTimestamp = versionManager.getRecordTimestamp()
+        val hour = ((System.currentTimeMillis() - recordTimestamp) / 1000) / 60 / 60
+        val result = hour > 24
+        return result
+    }
+
+    fun updateApp(progressCallback: DownloadProgressCallback) {
+        viewModelScope.launch {
+            flow {
+                versionManager.updateApp(APK_NAME, progressCallback)
+                emit(null)
+            }.flowOn(Dispatchers.IO).collect { Timber.d("Update!") }
+        }
+    }
+
+    fun setupRecordTimestamp() {
+        versionManager.setupRecordTimestamp()
     }
 }

@@ -25,12 +25,20 @@ class PersonalViewModel : BaseViewModel() {
     private val _imageBitmap = MutableLiveData<ApiResult<Bitmap>>()
     val imageBitmap: LiveData<ApiResult<Bitmap>> = _imageBitmap
 
+    private val _unreadResult = MutableLiveData<ApiResult<Int>>()
+    val unreadResult: LiveData<ApiResult<Int>> = _unreadResult
+
     fun getMe() {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getMe()
                 if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(result.body()?.content))
+                val meItem = result.body()?.content
+                meItem?.let {
+                    accountManager.setupProfile(it)
+                    getAttachment(it.avatarAttachmentId!!)
+                }
+                emit(ApiResult.success(meItem))
             }
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
@@ -39,11 +47,11 @@ class PersonalViewModel : BaseViewModel() {
         }
     }
 
-    fun getAttachment() {
+    fun getAttachment(id: Long) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository()
-                    .getAttachment(accountManager.getProfile().avatarAttachmentId.toString())
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.getAttachment(id.toString())
                 if (!result.isSuccessful) throw HttpException(result)
                 byteArray = result.body()?.bytes()
                 val bitmap = ImageUtils.bytes2Bitmap(byteArray)
@@ -61,6 +69,21 @@ class PersonalViewModel : BaseViewModel() {
             accountManager.signOut().collect {
                 _apiSignOut.value = it
             }
+        }
+    }
+
+    fun getUnread(){
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.getUnread()
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(result.body()?.content as Int))
+            }
+                    .onStart { emit(ApiResult.loading()) }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .collect { _unreadResult.value = it }
         }
     }
 }

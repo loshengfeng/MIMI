@@ -6,6 +6,7 @@
     app:startDestination="@id/personalFragment">
 
     <include app:graph="@navigation/navigation_login" />
+    <include app:graph="@navigation/navigation_detail_club" />
 
     <fragment
         android:id="@+id/personalFragment"
@@ -62,7 +63,12 @@
     <fragment
         android:id="@+id/myFollowFragment"
         android:name="com.dabenxiang.mimi.view.myfollow.MyFollowFragment"
-        tools:layout="@layout/fragment_my_follow"/>
+        tools:layout="@layout/fragment_my_follow">
+
+        <action
+            android:id="@+id/action_myFollowFragment_to_clubDetailFragment"
+            app:destination="@id/navigation_detail_club"/>
+    </fragment>
 
     <fragment
         android:id="@+id/orderFragment"

@@ -155,6 +155,10 @@ class TextDetailAdapter(
                 holder.follow.setOnClickListener {
                     onTextDetailListener.onFollowClick(memberPostItem, position, !isFollow)
                 }
+
+                holder.avatarImg.setOnClickListener {
+                    onTextDetailListener.onAvatarClick()
+                }
             }
             is CommentTitleViewHolder -> {
                 holder.newestComment.setOnClickListener {
@@ -240,6 +244,10 @@ class TextDetailAdapter(
         override fun onMoreClick(item: MembersPostCommentItem) {
             onTextDetailListener.onMoreClick(item)
         }
+
+        override fun onAvatarClick() {
+            onTextDetailListener.onAvatarClick()
+        }
     }
 
     interface OnTextDetailListener {
@@ -253,5 +261,6 @@ class TextDetailAdapter(
         fun onMoreClick(item: MembersPostCommentItem)
         fun onChipClick(type: PostType, tag: String)
         fun onOpenWebView(url: String)
+        fun onAvatarClick()
     }
 }

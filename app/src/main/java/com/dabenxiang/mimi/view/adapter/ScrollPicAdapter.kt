@@ -11,6 +11,7 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.PostPicItemListener
 import com.dabenxiang.mimi.model.vo.PostAttachmentItem
+import com.dabenxiang.mimi.model.vo.ViewerItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_add_pic.view.*
@@ -118,9 +119,11 @@ class ScrollPicAdapter(private val postPicItemListener: PostPicItemListener) : R
         private val close = itemView.iv_close
 
         fun bind(item: PostAttachmentItem, position: Int) {
+            val viewItem = ViewerItem()
             if (item.attachmentId.isEmpty()) {
                 val uriP = Uri.parse(item.uri)
                 imgPic.setImageURI(uriP)
+                viewItem.url = item.uri
             } else {
                 if (LruCacheUtils.getLruCache(item.attachmentId) == null) {
                     postPicItemListener.getBitmap(item.attachmentId) { id ->
@@ -131,6 +134,8 @@ class ScrollPicAdapter(private val postPicItemListener: PostPicItemListener) : R
                     val bitmap = LruCacheUtils.getLruCache(item.attachmentId)
                     Glide.with(context).load(bitmap).into(imgPic)
                 }
+
+                viewItem.attachmentId = item.attachmentId
             }
 
             close.setOnClickListener {
@@ -142,6 +147,10 @@ class ScrollPicAdapter(private val postPicItemListener: PostPicItemListener) : R
                 }
                 postPicItemListener.onUpdate()
                 notifyDataSetChanged()
+            }
+
+            itemView.setOnClickListener {
+                postPicItemListener.onViewer(viewItem)
             }
         }
     }

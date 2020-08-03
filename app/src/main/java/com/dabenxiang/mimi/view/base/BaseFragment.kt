@@ -1,10 +1,12 @@
 package com.dabenxiang.mimi.view.base
 
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -177,6 +179,20 @@ abstract class BaseFragment : Fragment() {
                 secondBtn = getString(R.string.btn_close)
             )
         ).show(requireActivity().supportFragmentManager)
+    }
+
+    fun getNotGrantedPermissions(permissions: Array<String>): ArrayList<String> {
+        val requestList = arrayListOf<String>()
+        permissions.indices.forEach {
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    permissions[it]
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestList += permissions[it]
+            }
+        }
+        return requestList
     }
 
     private fun logoutLocal() {

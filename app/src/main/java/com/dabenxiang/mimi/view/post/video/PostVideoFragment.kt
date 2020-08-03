@@ -12,7 +12,10 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.view.get
+import androidx.core.view.isEmpty
 import androidx.core.view.size
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -29,23 +32,23 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PostMemberRequest
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.PostVideoAttachment
+import com.dabenxiang.mimi.model.vo.ViewerItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.ScrollVideoAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_post_article.chipGroup
 import kotlinx.android.synthetic.main.fragment_post_article.clubLayout
-import kotlinx.android.synthetic.main.fragment_post_article.edt_content
 import kotlinx.android.synthetic.main.fragment_post_article.edt_hashtag
 import kotlinx.android.synthetic.main.fragment_post_article.edt_title
 import kotlinx.android.synthetic.main.fragment_post_article.iv_avatar
-import kotlinx.android.synthetic.main.fragment_post_article.txt_contentCount
 import kotlinx.android.synthetic.main.fragment_post_article.txt_hashtagCount
 import kotlinx.android.synthetic.main.fragment_post_article.txt_titleCount
 import kotlinx.android.synthetic.main.fragment_post_pic.*
@@ -58,6 +61,8 @@ import java.util.concurrent.TimeUnit
 
 class PostVideoFragment : BaseFragment() {
 
+    private var haveMainTag = false
+
     companion object {
         private const val REQUEST_VIDEO_CAPTURE = 10001
         const val BUNDLE_TRIMMER_URI = "bundle_trimmer_uri"
@@ -65,7 +70,7 @@ class PostVideoFragment : BaseFragment() {
 
         private const val TITLE_LIMIT = 60
         private const val CONTENT_LIMIT = 2000
-        private const val HASHTAG_LIMIT = 10
+        private const val HASHTAG_LIMIT = 20
         private const val INIT_VALUE = 0
         const val POST_ID = "post_id"
 
@@ -156,27 +161,6 @@ class PostVideoFragment : BaseFragment() {
             }
         })
 
-        edt_content.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                s?.let {
-                    if (it.length > CONTENT_LIMIT) {
-                        val content = it.toString().dropLast(1)
-                        edt_title.setText(content)
-
-                    }
-                }
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                txt_contentCount.text = String.format(getString(R.string.typing_count, s?.length,
-                    CONTENT_LIMIT
-                ))
-            }
-        })
-
         clubLayout.setOnClickListener {
             ChooseClubDialogFragment.newInstance(chooseClubDialogListener).also {
                 it.show(
@@ -188,8 +172,12 @@ class PostVideoFragment : BaseFragment() {
 
         edt_hashtag.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE){
-                addTag(edt_hashtag.text.toString())
-                edt_hashtag.text.clear()
+                if (chipGroup.size == HASHTAG_LIMIT) {
+                    Toast.makeText(requireContext(), R.string.post_warning_tag_limit, Toast.LENGTH_SHORT).show()
+                } else {
+                    addTag(edt_hashtag.text.toString())
+                    edt_hashtag.text.clear()
+                }
             }
             false
         }
@@ -200,21 +188,21 @@ class PostVideoFragment : BaseFragment() {
 
         tv_clean.setOnClickListener {
             val title = edt_title.text.toString()
-            val content = edt_content.text.toString()
 
             if (title.isBlank()) {
+                Toast.makeText(requireContext(), R.string.post_warning_title, Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            if (content.isBlank()) {
+            if (chipGroup.childCount == 0) {
+                Toast.makeText(requireContext(), R.string.post_warning_tag, Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            if (chipGroup.childCount == (0)) {
+            if (videoAttachmentList.isEmpty()) {
+                Toast.makeText(requireContext(), R.string.post_warning_video, Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-
-            //TODO 上面的判斷需要空白提示 UI
 
             val tags = arrayListOf<String>()
 
@@ -227,7 +215,6 @@ class PostVideoFragment : BaseFragment() {
             val request = PostMemberRequest(
                 title = title,
                 type = PostType.VIDEO.value,
-                content = content,
                 tags = tags
             )
 
@@ -253,8 +240,8 @@ class PostVideoFragment : BaseFragment() {
         }
     }
 
-    override fun initSettings() {
-        super.initSettings()
+    override fun setupFirstTime() {
+        super.setupFirstTime()
 
         val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
 
@@ -264,10 +251,6 @@ class PostVideoFragment : BaseFragment() {
         txt_titleCount.text = String.format(getString(R.string.typing_count,
             INIT_VALUE,
             TITLE_LIMIT
-        ))
-        txt_contentCount.text = String.format(getString(R.string.typing_count,
-            INIT_VALUE,
-            CONTENT_LIMIT
         ))
         txt_hashtagCount.text = String.format(getString(R.string.typing_count,
             INIT_VALUE,
@@ -293,19 +276,14 @@ class PostVideoFragment : BaseFragment() {
         postId = item.id
 
         edt_title.setText(item.title)
-        edt_content.setText(mediaItem.textContent)
 
         for (tag in item.tags!!) {
-            addTag(tag)
+            addEditTag(tag)
         }
 
         txt_titleCount.text = String.format(getString(R.string.typing_count,
             item.title.length,
             TITLE_LIMIT
-        ))
-        txt_contentCount.text = String.format(getString(R.string.typing_count,
-            mediaItem.textContent.length,
-            CONTENT_LIMIT
         ))
         txt_hashtagCount.text = String.format(getString(R.string.typing_count,
             item.tags.size,
@@ -340,7 +318,7 @@ class PostVideoFragment : BaseFragment() {
         }
     }
 
-    private fun addTag(tag: String) {
+    private fun addEditTag(tag: String) {
         val chip = LayoutInflater.from(requireContext()).inflate(R.layout.chip_item, chipGroup, false) as Chip
         chip.text = tag
         chip.setTextColor(chip.context.getColor(R.color.color_black_1_50))
@@ -355,12 +333,54 @@ class PostVideoFragment : BaseFragment() {
                 chipGroup.removeView(it)
             }
         } else {
-             viewModel.getClub(tag)
+            viewModel.getClub(tag)
         }
 
         chipGroup.addView(chip)
-
         setTagCount()
+    }
+
+    private fun addTag(tag: String, isMainTag: Boolean = false) {
+        val chip = LayoutInflater.from(requireContext()).inflate(R.layout.chip_item, chipGroup, false) as Chip
+        chip.text = tag
+        chip.setTextColor(chip.context.getColor(R.color.color_black_1_50))
+        chip.chipBackgroundColor =
+            ColorStateList.valueOf(chip.context.getColor(R.color.color_black_1_10))
+
+        if (isMainTag) {
+            if (haveMainTag) {
+                val mainTag = chipGroup[0] as Chip
+                mainTag.text = tag
+            } else {
+                haveMainTag = true
+
+                if (chipGroup.isEmpty()) {
+                    chipGroup.addView(chip)
+                    setTagCount()
+                } else {
+                    val chipList = arrayListOf<Chip>()
+                    for (i in 0 until chipGroup.size) {
+                        val chipItem = chipGroup[i] as Chip
+                        chipList.add(chipItem)
+                    }
+
+                    chipGroup.removeAllViews()
+                    chipGroup.addView(chip)
+                    for (tagItem in chipList) {
+                        chipGroup.addView(tagItem)
+                    }
+                }
+            }
+        } else {
+            chip.closeIcon = ContextCompat.getDrawable(requireContext(), R.drawable.btn_close_circle_small_black_n)
+            chip.isCloseIconVisible = true
+            chip.setCloseIconSizeResource(R.dimen.dp_24)
+            chip.setOnCloseIconClickListener {
+                chipGroup.removeView(it)
+            }
+            chipGroup.addView(chip)
+            setTagCount()
+        }
     }
 
     private fun setTagCount() {
@@ -410,7 +430,14 @@ class PostVideoFragment : BaseFragment() {
         PostVideoItemListener(
             { id, function -> getBitmap(id, function) },
             { openRecorder() },
-            { item -> deleteVideo(item) }
+            { item -> deleteVideo(item) },
+            { viewerItem -> openViewerPage(viewerItem) }
         )
+    }
+
+    private fun openViewerPage(viewerItem: ViewerItem) {
+        val bundle = Bundle()
+        bundle.putSerializable(PostViewerFragment.VIEWER_DATA, viewerItem)
+        findNavController().navigate(R.id.action_postVideoFragment_to_postViewerFragment, bundle)
     }
 }

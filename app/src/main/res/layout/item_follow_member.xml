@@ -4,47 +4,51 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/btnChatHistory"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
+    android:layout_height="wrap_content"
     android:background="@drawable/btn_chat_history_new">
 
     <ImageView
         android:id="@+id/iv_photo"
         android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="20dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:background="@drawable/default_profile_picture"
-        android:contentDescription="@null"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/tv_sub_title"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/tv_name" />
 
     <TextView
         android:id="@+id/tv_name"
         android:layout_width="0dp"
-        android:layout_height="20dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
+        android:layout_marginTop="15dp"
         android:layout_marginEnd="10dp"
         android:ellipsize="end"
         android:maxLines="1"
+        android:paddingTop="2dp"
+        android:paddingBottom="3dp"
         android:singleLine="true"
         android:textColor="@color/color_black_1"
         android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@id/tv_sub_title"
         app:layout_constraintEnd_toStartOf="@id/tv_follow"
         app:layout_constraintStart_toEndOf="@id/iv_photo"
-        app:layout_constraintTop_toTopOf="@id/iv_photo"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="名称名称名称名称名称名称名称名称名称名称名称名称" />
 
     <TextView
         android:id="@+id/tv_sub_title"
         android:layout_width="0dp"
-        android:layout_height="20dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
+        android:layout_marginBottom="15dp"
         android:ellipsize="end"
         android:maxLines="1"
         android:singleLine="true"
         android:textColor="@color/color_black_1_50"
-        android:textSize="14sp"
+        android:textSize="10sp"
         app:layout_constraintEnd_toStartOf="@id/tv_follow"
         app:layout_constraintStart_toEndOf="@id/iv_photo"
         app:layout_constraintTop_toBottomOf="@id/tv_name"
@@ -58,10 +62,9 @@
         android:background="@drawable/bg_gray_6_radius_16"
         android:gravity="center"
         android:paddingStart="9dp"
-        android:paddingTop="4dp"
+        android:paddingTop="3dp"
         android:paddingEnd="9dp"
         android:paddingBottom="3dp"
-        android:src="@drawable/btn_arrow_black_n"
         android:text="@string/followed"
         android:textColor="@color/color_black_1_60"
         android:textSize="12sp"
@@ -70,10 +73,13 @@
         app:layout_constraintTop_toTopOf="@id/iv_photo" />
 
     <View
+        android:id="@+id/v_line"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:background="@color/color_gray_3"
+        android:layout_marginTop="15dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_sub_title"
+        android:background="@color/color_black_1_05"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="@id/tv_follow"
+        app:layout_constraintStart_toStartOf="@id/tv_name" />
 </androidx.constraintlayout.widget.ConstraintLayout>

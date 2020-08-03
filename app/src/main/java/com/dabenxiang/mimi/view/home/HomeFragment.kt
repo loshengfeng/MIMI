@@ -30,12 +30,13 @@ import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_home.*
+import timber.log.Timber
 
 class HomeFragment : BaseFragment() {
 
     private val viewModel: HomeViewModel by viewModels()
 
-    private var lastPosition = 0
+    private var lastTabPosition = 0
 
     private val homeBannerViewHolderMap = hashMapOf<Int, HomeBannerViewHolder>()
     private val homeCarouselViewHolderMap = hashMapOf<Int, HomeCarouselViewHolder>()
@@ -79,7 +80,7 @@ class HomeFragment : BaseFragment() {
                             val detail = level2[i]
                             list.add(detail.name)
                         }
-                        tabAdapter.submitList(list, lastPosition)
+                        tabAdapter.submitList(list, lastTabPosition)
                         setupHomeData(mainViewModel?.normal)
                     }
                 }
@@ -98,7 +99,7 @@ class HomeFragment : BaseFragment() {
         })
 
         viewModel.videoList.observe(viewLifecycleOwner, Observer {
-            when (lastPosition) {
+            when (lastTabPosition) {
                 1 -> movieListAdapter.submitList(it)
                 2 -> dramaListAdapter.submitList(it)
                 3 -> varietyListAdapter.submitList(it)
@@ -140,7 +141,22 @@ class HomeFragment : BaseFragment() {
     override fun setupListeners() {
         refresh.setOnRefreshListener {
             refresh.isRefreshing = true
-            getData(lastPosition)
+            getData(lastTabPosition)
+        }
+
+        btn_filter.setOnClickListener {
+            takeIf { lastTabPosition > 0 }?.also {
+                val category = mainViewModel?.normal?.categories?.get(lastTabPosition - 1)
+                category?.also {
+                    val bundle = CategoriesFragment.createBundle(it.name, it.name, category)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_homeFragment_to_categoriesFragment,
+                            bundle
+                        )
+                    )
+                }
+            }
         }
 
         iv_bg_search.setOnClickListener {
@@ -164,8 +180,11 @@ class HomeFragment : BaseFragment() {
         rv_fifth.visibility = View.GONE
         rv_sixth.visibility = View.GONE
 
+        btn_filter.visibility = View.VISIBLE
+
         when (position) {
             0 -> {
+                btn_filter.visibility = View.GONE
                 rv_home.visibility = View.VISIBLE
                 takeIf { rv_home.adapter == null }?.also {
                     refresh.isRefreshing = true
@@ -248,8 +267,8 @@ class HomeFragment : BaseFragment() {
     }
 
     private fun setTab(index: Int) {
-        lastPosition = index
-        tabAdapter.setLastSelectedIndex(lastPosition)
+        lastTabPosition = index
+        tabAdapter.setLastSelectedIndex(lastTabPosition)
         recyclerview_tab.scrollToPosition(index)
         setupRecyclerByPosition(index)
     }
@@ -290,7 +309,7 @@ class HomeFragment : BaseFragment() {
 
     private val adapterListener = object : HomeAdapter.EventListener {
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
-            val bundle = CategoriesFragment.createBundle(item.title, item.categories)
+            val bundle = CategoriesFragment.createBundle(item.title, item.categories, mainViewModel?.getCategory(item.title, false))
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_homeFragment_to_categoriesFragment,

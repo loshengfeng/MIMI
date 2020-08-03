@@ -317,7 +317,13 @@ class PlayerViewModel : BaseViewModel() {
         viewModelScope.launch {
             flow {
                 val source = sourceList?.get(sourceListPosition.value!!)!!
-                val episode = source.videoEpisodes?.get(episodePosition.value!!)!!
+                var sortEpisode: MutableList<VideoEpisode> = mutableListOf()
+                for(i in 0..(source.videoEpisodes?.size!! - 1)) {
+                    sortEpisode.add(source.videoEpisodes?.get(i))
+                }
+                sortEpisode.sortBy { sort -> sort.episode }
+//                val episode = source.videoEpisodes?.get(episodePosition.value!!)!!
+                val episode = sortEpisode.get(episodePosition.value!!)
                 episodeId = episode.id ?: 0L
 
                 val apiRepository = domainManager.getApiRepository()
@@ -713,5 +719,11 @@ class PlayerViewModel : BaseViewModel() {
                     }
                 }
         }
+    }
+
+    fun clearStreamData() {
+        _episodePosition.postValue(-1)
+        _sourceListPosition.postValue(-1)
+        sourceList = ArrayList()
     }
 }

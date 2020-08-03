@@ -31,6 +31,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_text_detail.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
+import timber.log.Timber
 
 class TextDetailFragment : BaseFragment() {
 
@@ -351,6 +352,11 @@ class TextDetailFragment : BaseFragment() {
 
         override fun onOpenWebView(url: String) {
             GeneralUtils.openWebView(requireContext(), url)
+        }
+
+        override fun onAvatarClick() {
+            // TODO:
+            Timber.d("onAvatarClick nav to member post")
         }
     }
 

@@ -43,6 +43,7 @@ abstract class BaseDialogFragment : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupView()
         setupListeners()
         setupObservers()
     }
@@ -72,6 +73,8 @@ abstract class BaseDialogFragment : DialogFragment() {
 
     @LayoutRes
     abstract fun getLayoutId(): Int
+
+    open fun setupView(){}
 
     open fun setupObservers() {}
 
