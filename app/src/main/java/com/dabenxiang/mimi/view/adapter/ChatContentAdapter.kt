@@ -1,11 +1,9 @@
 package com.dabenxiang.mimi.view.adapter
 
-import android.annotation.SuppressLint
 import android.graphics.Bitmap
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.paging.PagedListAdapter
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ChatContentItem
@@ -15,31 +13,22 @@ import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.view.adapter.viewHolder.chat.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ChatContentAdapter(
         private val listener: EventListener
-) : PagedListAdapter<ChatContentItem, RecyclerView.ViewHolder>(diffCallback), KoinComponent {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), KoinComponent {
     private val pref: Pref by inject()
-
-    companion object {
-        private val diffCallback = object : DiffUtil.ItemCallback<ChatContentItem>() {
-            override fun areItemsTheSame(
-                    oldItem: ChatContentItem,
-                    newItem: ChatContentItem
-            ): Boolean = oldItem == newItem
-
-            @SuppressLint("DiffUtilEquals")
-            override fun areContentsTheSame(
-                    oldItem: ChatContentItem,
-                    newItem: ChatContentItem
-            ): Boolean = oldItem == newItem
-        }
-    }
+    private var data = ArrayList<ChatContentItem>()
 
     interface EventListener {
+        fun onGetAvatarAttachment(id: String, position: Int)
         fun onGetAttachment(id: String, position: Int)
         fun onImageClick(bitmap: Bitmap)
         fun onVideoClick(item: ChatContentItem?, position: Int)
+        fun getSenderAvatar(): String
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -125,7 +114,7 @@ class ChatContentAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val item = getItem(position)
+        val item = data[position]
         when (holder) {
             is ChatContentDateTitleViewHolder -> holder.bind(item)
             is ChatContentTextViewHolder -> holder.bind(item, position)
@@ -135,12 +124,12 @@ class ChatContentAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        val item = getItem(position)
+        val item = data[position]
         return when {
-            item?.dateTitle?.isNotEmpty() == true -> {
+            item.dateTitle?.isNotEmpty() == true -> {
                 ChatAdapterViewType.DATE_TITLE.ordinal
             }
-            item?.username == pref.profileItem.userId.toString() -> {
+            item.username == pref.profileItem.userId.toString() -> {
                 when (item.payload?.type) {
                     ChatMessageType.TEXT.ordinal -> {
                         ChatAdapterViewType.RECEIVER_TEXT.ordinal
@@ -177,5 +166,31 @@ class ChatContentAdapter(
 
     fun update(position: Int) {
         notifyItemChanged(position)
+    }
+
+    fun setData(data: ArrayList<ChatContentItem>) {
+        if (this.data.size > 0) {
+            this.data.removeAt(this.data.size - 1)
+        }
+        this.data.addAll(data)
+        notifyDataSetChanged()
+    }
+
+    fun insertItem(item: ChatContentItem, index: Int = 0) {
+        // 判斷需不需要先加上時間 Title
+        if (this.data.size > 0) {
+            val lastItemDate = this.data[0].payload?.sendTime?.let { time -> SimpleDateFormat("YYYY-MM-dd", Locale.getDefault()).format(time) }
+            val currentItemDate = item.payload?.sendTime?.let { time -> SimpleDateFormat("YYYY-MM-dd", Locale.getDefault()).format(time) }
+            if (!TextUtils.equals(lastItemDate, currentItemDate)) {
+                this.data.add(index, ChatContentItem(dateTitle = currentItemDate))
+            }
+        }
+
+        this.data.add(index, item)
+        notifyDataSetChanged()
+    }
+
+    override fun getItemCount(): Int {
+        return data.size
     }
 }

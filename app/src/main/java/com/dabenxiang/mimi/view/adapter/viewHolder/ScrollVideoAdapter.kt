@@ -11,6 +11,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.EditVideoAdapterListener
 import com.dabenxiang.mimi.callback.PostVideoItemListener
 import com.dabenxiang.mimi.model.vo.PostVideoAttachment
+import com.dabenxiang.mimi.model.vo.ViewerItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_pic.view.*
@@ -35,7 +36,7 @@ class ScrollVideoAdapter(private val listener: PostVideoItemListener) : Recycler
                 return AddViewHolder(view)
             }
             TYPE_VIDEO -> {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_pic, parent, false)
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_video, parent, false)
                 return PicViewHolder(view)
             }
         }
@@ -87,9 +88,12 @@ class ScrollVideoAdapter(private val listener: PostVideoItemListener) : Recycler
         private val close = itemView.iv_close
 
         fun bind(postVideoAttachment: PostVideoAttachment, position: Int) {
+            val viewItem = ViewerItem()
+
             if (postVideoAttachment.picAttachmentId.isEmpty()) {
                 val uriP = Uri.parse(postVideoAttachment.picUrl)
                 imgPic.setImageURI(uriP)
+                viewItem.url = postVideoAttachment.picUrl
             } else {
                 if (LruCacheUtils.getLruCache(postVideoAttachment.picAttachmentId) == null) {
                     listener.getBitmap(postVideoAttachment.picAttachmentId) { id ->
@@ -100,12 +104,18 @@ class ScrollVideoAdapter(private val listener: PostVideoItemListener) : Recycler
                     val bitmap = LruCacheUtils.getLruCache(postVideoAttachment.picAttachmentId)
                     Glide.with(context).load(bitmap).into(imgPic)
                 }
+
+                viewItem.attachmentId = postVideoAttachment.picAttachmentId
             }
 
             close.setOnClickListener {
                 listener.onDelete(postVideoAttachment)
                 uriList.removeAt(position)
                 notifyDataSetChanged()
+            }
+
+            itemView.setOnClickListener {
+                listener.onViewer(viewItem)
             }
         }
     }

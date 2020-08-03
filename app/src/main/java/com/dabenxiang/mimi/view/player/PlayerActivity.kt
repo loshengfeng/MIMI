@@ -10,10 +10,7 @@ import android.hardware.SensorManager
 import android.os.Bundle
 import android.text.Html
 import android.text.TextUtils
-import android.view.MotionEvent
-import android.view.Surface
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
@@ -66,7 +63,6 @@ import java.net.UnknownHostException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs
-import kotlin.math.min
 import kotlin.math.round
 
 class PlayerActivity : BaseActivity() {
@@ -100,6 +96,7 @@ class PlayerActivity : BaseActivity() {
     private var currentreplyName: String? = null
     private var moreDialog: MoreDialogFragment? = null
     private var reportDialog: ReportDialogFragment? = null
+    private var isFirstInit = true
 
     private val sourceListAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
@@ -123,11 +120,14 @@ class PlayerActivity : BaseActivity() {
         GuessLikeAdapter(object :
             GuessLikeAdapter.GuessLikeAdapterListener {
             override fun onVideoClick(view: View, item: PlayerData) {
-                val intent = Intent(this@PlayerActivity, PlayerActivity::class.java)
-                intent.putExtras(createBundle(item))
-                startActivity(intent)
-
-                finish()
+//                val intent = Intent(this@PlayerActivity, PlayerActivity::class.java)
+//                intent.putExtras(createBundle(item))
+//                startActivity(intent)
+//
+//                finish()
+                isFirstInit = true
+                viewModel.clearStreamData()
+                loadVideo(item)
             }
         }, obtainIsAdult())
     }
@@ -457,7 +457,7 @@ class PlayerActivity : BaseActivity() {
             }
         })
 
-        var isFirstInit = true
+//        var isFirstInit = true
         viewModel.apiVideoInfo.observe(this, Observer {
             when (it) {
                 is Loading -> progressHUD.show()
@@ -995,8 +995,11 @@ class PlayerActivity : BaseActivity() {
         }
     }
 
-    private fun loadVideo() {
-        if (viewModel.nextVideoUrl == null) {
+    private fun loadVideo(playerData: PlayerData = PlayerData(-1, false)) {
+        if(playerData.videoId != -1L) {
+            viewModel.videoId = playerData.videoId
+            viewModel.getVideoInfo()
+        } else if (viewModel.nextVideoUrl == null) {
             if (viewModel.apiVideoInfo.value == null) {
                 (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerData?)?.also {
                     viewModel.videoId = it.videoId
@@ -1475,15 +1478,20 @@ class PlayerActivity : BaseActivity() {
             params.width = ViewGroup.LayoutParams.MATCH_PARENT
             params.height = 0
             player_view.layoutParams = params
-
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
         } else {
             val params = player_view.layoutParams
             params.width = ViewGroup.LayoutParams.MATCH_PARENT
-            params.height =
-                min(screenSize.first, screenSize.second) - GeneralUtils.getStatusBarHeight(
-                    baseContext
-                )
+//            params.height =
+//                min(screenSize.first, screenSize.second) - GeneralUtils.getStatusBarHeight(
+//                    baseContext
+//                )
+            params.height = ViewGroup.LayoutParams.MATCH_PARENT
             player_view.layoutParams = params
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+            var windowParams = window.attributes
+            windowParams.flags = windowParams.flags or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+            window.attributes = windowParams
         }
     }
 

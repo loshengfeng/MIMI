@@ -83,6 +83,9 @@ class MyFollowFragment : BaseFragment() {
 
     private var interactionListener: InteractionListener? = null
 
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback {

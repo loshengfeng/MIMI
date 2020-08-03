@@ -714,4 +714,8 @@ class PlayerViewModel : BaseViewModel() {
                 }
         }
     }
+
+    fun clearStreamData() {
+        _episodePosition.postValue(-1)
+    }
 }

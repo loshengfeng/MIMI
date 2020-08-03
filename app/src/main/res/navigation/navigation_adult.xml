@@ -71,6 +71,28 @@
     </fragment>
 
     <fragment
+        android:id="@+id/searchPostFragment"
+        android:name="com.dabenxiang.mimi.view.search.post.SearchPostFragment"
+        tools:layout="@layout/fragment_search_post">
+
+        <action
+            android:id="@+id/action_searchPostFragment_to_pictureDetailFragment"
+            app:destination="@id/pictureDetailFragment" />
+
+        <action
+            android:id="@+id/action_searchPostFragment_to_textDetailFragment"
+            app:destination="@id/textDetailFragment" />
+
+        <action
+            android:id="@+id/action_searchPostFragment_to_clipFragment"
+            app:destination="@id/clipFragment" />
+
+        <action
+            android:id="@+id/action_searchPostFragment_to_clubDetailFragment"
+            app:destination="@id/navigation_detail_club" />
+    </fragment>
+
+    <fragment
         android:id="@+id/searchVideoFragment"
         android:name="com.dabenxiang.mimi.view.search.video.SearchVideoFragment"
         tools:layout="@layout/fragment_search_video" />
@@ -86,15 +108,40 @@
         tools:layout="@layout/fragment_post_article" />
 
     <fragment
+        android:id="@+id/pictureDetailFragment"
+        android:name="com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment"
+        tools:layout="@layout/fragment_picture_detail">
+        <action
+            android:id="@+id/action_pictureDetailFragment_to_pictureFragment"
+            app:destination="@id/pictureFragment" />
+        <action
+            android:id="@+id/action_pictureDetailFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+    </fragment>
+
+    <fragment
         android:id="@+id/pictureFragment"
         android:name="com.dabenxiang.mimi.view.fullpicture.FullPictureFragment"
         tools:layout="@layout/fragment_full_picture" />
 
     <fragment
+        android:id="@+id/textDetailFragment"
+        android:name="com.dabenxiang.mimi.view.textdetail.TextDetailFragment"
+        tools:layout="@layout/fragment_text_detail">
+        <action
+            android:id="@+id/action_textDetailFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+    </fragment>
+
+    <fragment
         android:id="@+id/postPicFragment"
         android:name="com.dabenxiang.mimi.view.post.pic.PostPicFragment"
         android:label="PostPicFragment"
-        tools:layout="@layout/fragment_post_pic" />
+        tools:layout="@layout/fragment_post_pic" >
+        <action
+            android:id="@+id/action_postPicFragment_to_postViewerFragment"
+            app:destination="@id/postViewerFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/postVideoFragment"
@@ -104,6 +151,9 @@
         <action
             android:id="@+id/action_postVideoFragment_self"
             app:destination="@id/postVideoFragment" />
+        <action
+            android:id="@+id/action_postVideoFragment_to_postViewerFragment"
+            app:destination="@id/postViewerFragment" />
     </fragment>
     <fragment
         android:id="@+id/editVideoFragment"
@@ -155,48 +205,8 @@
             android:id="@+id/action_rankingFragment_to_pictureDetailFragment"
             app:destination="@id/pictureDetailFragment" />
    </fragment>
-
     <fragment
-        android:id="@+id/searchPostFragment"
-        android:name="com.dabenxiang.mimi.view.search.post.SearchPostFragment"
-        tools:layout="@layout/fragment_search_post">
-
-        <action
-            android:id="@+id/action_searchPostFragment_to_pictureDetailFragment"
-            app:destination="@id/pictureDetailFragment" />
-
-        <action
-            android:id="@+id/action_searchPostFragment_to_textDetailFragment"
-            app:destination="@id/textDetailFragment" />
-
-        <action
-            android:id="@+id/action_searchPostFragment_to_clipFragment"
-            app:destination="@id/clipFragment" />
-
-        <action
-            android:id="@+id/action_searchPostFragment_to_clubDetailFragment"
-            app:destination="@id/navigation_detail_club" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/pictureDetailFragment"
-        android:name="com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment"
-        tools:layout="@layout/fragment_picture_detail">
-        <action
-            android:id="@+id/action_pictureDetailFragment_to_pictureFragment"
-            app:destination="@id/pictureFragment" />
-        <action
-            android:id="@+id/action_pictureDetailFragment_to_searchPostFragment"
-            app:destination="@id/searchPostFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/textDetailFragment"
-        android:name="com.dabenxiang.mimi.view.textdetail.TextDetailFragment"
-        tools:layout="@layout/fragment_text_detail">
-        <action
-            android:id="@+id/action_textDetailFragment_to_searchPostFragment"
-            app:destination="@id/searchPostFragment" />
-    </fragment>
-
+        android:id="@+id/postViewerFragment"
+        android:name="com.dabenxiang.mimi.view.post.viewer.PostViewerFragment"
+        android:label="PostViewerFragment" />
 </navigation>

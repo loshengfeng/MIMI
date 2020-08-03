@@ -21,6 +21,9 @@ class ChatHistoryViewModel : BaseViewModel() {
     private val _chatHistory = MutableLiveData<PagedList<ChatListItem>>()
     val chatHistory: LiveData<PagedList<ChatListItem>> = _chatHistory
 
+    private val _pagingResult = MutableLiveData<ApiResult<Void>>()
+    val pagingResult: LiveData<ApiResult<Void>> = _pagingResult
+
     private var _attachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
     val attachmentResult: LiveData<ApiResult<AttachmentItem>> = _attachmentResult
 
@@ -30,11 +33,11 @@ class ChatHistoryViewModel : BaseViewModel() {
         }
 
         override fun onLoaded() {
-
+            _pagingResult.value = ApiResult.loaded()
         }
 
         override fun onThrowable(throwable: Throwable) {
-
+            _pagingResult.value = ApiResult.error(throwable)
         }
 
         override fun onSucceed() {

@@ -24,6 +24,8 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
         const val VALIDATION_URL = "/v1/Members/ValidateEmail"
         const val FLAVOR_DEV = "dev"
         const val FLAVOR_SIT = "sit"
+        const val BUILDTYPE_DEV = "dev"
+        const val BUILDTYPE_SIT = "sit"
     }
 
     private var _goLibVersion = ""
@@ -65,29 +67,27 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
     }
 
     fun getApiDomain(): String {
-        return when (BuildConfig.FLAVOR) {
-            FLAVOR_DEV -> BuildConfig.API_HOST
-            else -> {
-                val domains = getDomain()
-                if (domains.isEmpty()) {
-                    BuildConfig.API_HOST
-                } else {
-                    StringBuilder("https://api.").append(getDomain()).toString()
-                }
+        if (BuildConfig.BUILD_TYPE.contains(BUILDTYPE_DEV)) {
+            return BuildConfig.API_HOST
+        } else {
+            val domains = getDomain()
+            if (domains.isEmpty()) {
+                return BuildConfig.API_HOST
+            } else {
+                return StringBuilder("https://api.").append(getDomain()).toString()
             }
         }
     }
 
     fun getAdDomain(): String {
-        return when (BuildConfig.FLAVOR) {
-            FLAVOR_DEV -> BuildConfig.AD_API_HOST
-            else -> {
-                val domains = getDomain()
-                if (domains.isEmpty()) {
-                    BuildConfig.AD_API_HOST
-                } else {
-                    StringBuilder("https://ad-api.").append(getDomain()).toString()
-                }
+        if (BuildConfig.BUILD_TYPE.contains(BUILDTYPE_DEV)) {
+            return BuildConfig.AD_API_HOST
+        } else {
+            val domains = getDomain()
+            if (domains.isEmpty()) {
+                return BuildConfig.AD_API_HOST
+            } else {
+                return StringBuilder("https://ad-api.").append(getDomain()).toString()
             }
         }
     }
