@@ -44,6 +44,7 @@ import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.fragment_post_article.*
 import kotlinx.android.synthetic.main.fragment_post_article.chipGroup
 import kotlinx.android.synthetic.main.fragment_post_article.clubLayout
 import kotlinx.android.synthetic.main.fragment_post_article.edt_hashtag
@@ -54,6 +55,7 @@ import kotlinx.android.synthetic.main.fragment_post_article.txt_titleCount
 import kotlinx.android.synthetic.main.fragment_post_pic.*
 import kotlinx.android.synthetic.main.fragment_post_pic.txt_clubName
 import kotlinx.android.synthetic.main.fragment_post_pic.txt_hashtagName
+import kotlinx.android.synthetic.main.fragment_post_pic.txt_placeholder
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -69,7 +71,6 @@ class PostVideoFragment : BaseFragment() {
         const val BUNDLE_COVER_URI = "bundle_cover_uri"
 
         private const val TITLE_LIMIT = 60
-        private const val CONTENT_LIMIT = 2000
         private const val HASHTAG_LIMIT = 20
         private const val INIT_VALUE = 0
         const val POST_ID = "post_id"
@@ -311,11 +312,14 @@ class PostVideoFragment : BaseFragment() {
                 .circleCrop()
                 .into(iv_avatar)
 
-            addTag(item.tag)
-
-            txt_placeholder.visibility = View.GONE
-            txt_clubName.visibility = View.VISIBLE
-            txt_hashtagName.visibility = View.VISIBLE
+            if (chipGroup.size == HASHTAG_LIMIT) {
+                Toast.makeText(requireContext(), R.string.post_warning_tag_limit, Toast.LENGTH_SHORT).show()
+            } else {
+                addTag(item.tag, true)
+                txt_placeholder.visibility = View.GONE
+                txt_clubName.visibility = View.VISIBLE
+                txt_hashtagName.visibility = View.VISIBLE
+            }
         }
     }
 
