@@ -220,6 +220,7 @@ class PostArticleFragment : BaseFragment() {
 
         tv_clean.visibility = View.VISIBLE
         tv_clean.text = getString(R.string.btn_send)
+        tv_clean.isEnabled = true
 
         txt_titleCount.text = String.format(getString(R.string.typing_count,
             INIT_VALUE,

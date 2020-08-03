@@ -106,6 +106,8 @@ class PostVideoFragment : BaseFragment() {
         adapter.submitList(videoAttachmentList)
         recyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         recyclerView.adapter = adapter
+
+        tv_clean.isEnabled = true
     }
 
     override fun setupObservers() {

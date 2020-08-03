@@ -81,7 +81,12 @@ class VideoOptions(private var ctx: Context) {
 
             override fun onSuccess() {
                 Log.e("FFmpegLoad", "onSuccess")
-                val command = arrayOf("-i", inputPath, "-vf", "fps=1,crop=$width:$height:$x:$y", "-ss", cropTime, "-t", cropTime, "-q:v", "2", outputPath)
+
+                var picCropTime = cropTime
+                if (cropTime == "00:00:00") {
+                    picCropTime = "00:00:01"
+                }
+                val command = arrayOf("-i", inputPath, "-vf", "fps=1,crop=$width:$height:$x:$y", "-ss", picCropTime, "-t", picCropTime, "-q:v", "2", outputPath)
                 try {
                     ff.execute(command, object : ExecuteBinaryResponseHandler() {
                         override fun onFailure(message: String?) {
@@ -117,6 +122,7 @@ class VideoOptions(private var ctx: Context) {
 
             }
         })
+        listener?.onCropStarted()
     }
 
     fun cropVideo(width: Int, height: Int, x: Int, y: Int, inputPath: String, outputPath: String, outputFileUri: Uri, listener: OnCropVideoListener?, frameCount: Int) {
