@@ -6,6 +6,7 @@
     app:startDestination="@id/adultHomeFragment">
 
     <include app:graph="@navigation/navigation_detail_club" />
+    <include app:graph="@navigation/navigation_my_post" />
 
     <fragment
         android:id="@+id/adultHomeFragment"
@@ -54,7 +55,8 @@
             app:destination="@id/navigation_detail_club" />
         <action
             android:id="@+id/action_adultHomeFragment_to_myPostFragment"
-            app:destination="@id/myPostFragment" />
+            app:destination="@id/navigation_my_post" />
+
         <action
             android:id="@+id/action_adultHomeFragment_to_rankingFragment"
             app:destination="@id/rankingFragment" />
@@ -180,33 +182,6 @@
         tools:layout="@layout/fragment_edit_video">
         <action
             android:id="@+id/action_editVideoFragment_to_postVideoFragment"
-            app:destination="@id/postVideoFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/myPostFragment"
-        android:name="com.dabenxiang.mimi.view.mypost.MyPostFragment"
-        android:label="MyPostFragment"
-        tools:layout="@layout/fragment_my_post" >
-        <action
-            android:id="@+id/action_myPostFragment_to_clipFragment"
-            app:destination="@id/clipFragment" />
-        <action
-            android:id="@+id/action_myPostFragment_to_searchPostFragment"
-            app:destination="@id/searchPostFragment" />
-        <action
-            android:id="@+id/action_myPostFragment_to_textDetailFragment"
-            app:destination="@id/textDetailFragment" />
-        <action
-            android:id="@+id/action_myPostFragment_to_pictureDetailFragment"
-            app:destination="@id/pictureDetailFragment" />
-        <action
-            android:id="@+id/action_myPostFragment_to_postArticleFragment"
-            app:destination="@id/postArticleFragment" />
-        <action
-            android:id="@+id/action_myPostFragment_to_postPicFragment"
-            app:destination="@id/postPicFragment" />
-        <action
-            android:id="@+id/action_myPostFragment_to_postVideoFragment"
             app:destination="@id/postVideoFragment" />
     </fragment>
 

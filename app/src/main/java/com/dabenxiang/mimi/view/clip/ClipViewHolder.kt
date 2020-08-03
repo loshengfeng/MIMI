@@ -30,7 +30,7 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     var ibBack: ImageButton = view.ib_back
     var tvTitle: TextView = view.tv_title
     var tvName: TextView = view.tv_name
-    var tvFavorite: TextView = view.tv_favorite
+    var tvFavorite: TextView = view.iv_favorite
     var tvLike: TextView = view.tv_like
     var tvComment: TextView = view.tv_comment
     var progress: ProgressBar = view.progress_video
