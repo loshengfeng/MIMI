@@ -79,15 +79,7 @@ class MyPostTextPostHolder(
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         tvTitle.text = item.title
-
-        if (isMe) {
-            tvFollow.visibility = View.GONE
-        } else {
-            tvFollow.visibility = View.VISIBLE
-            tvFollow.setOnClickListener {
-                myPostListener.onFollowClick(item, position, !item.isFollow)
-            }
-        }
+        tvCommentCount.text = item.commentCount.toString()
 
         // FIXME: item.content json 資料格式有問題
         try {
@@ -96,8 +88,6 @@ class MyPostTextPostHolder(
         } catch (e: Exception) {
             Timber.e(e)
         }
-
-        updateLikeAndFollowItem(item, position, myPostListener)
 
         if (LruCacheUtils.getLruCache(item.avatarAttachmentId.toString()) == null) {
             attachmentListener.onGetAttachment(
@@ -136,12 +126,30 @@ class MyPostTextPostHolder(
         }
 
         if (isMe) {
+            tvFollow.visibility = View.GONE
+
             ivMore.visibility = View.VISIBLE
             ivMore.setOnClickListener {
                 myPostListener.onMoreClick(item)
             }
         } else {
+            tvFollow.visibility = View.VISIBLE
+            tvFollow.setOnClickListener {
+                myPostListener.onFollowClick(item, position, !item.isFollow)
+                item.isFollow = !item.isFollow
+            }
+            updateFollow(item)
+
             ivMore.visibility = View.GONE
+        }
+
+        updateLike(item)
+
+        ivLike.setOnClickListener {
+            item.likeType = if (item.likeType == LikeType.LIKE) LikeType.DISLIKE else LikeType.LIKE
+            item.likeCount =
+                if (item.likeType == LikeType.LIKE) item.likeCount + 1 else item.likeCount - 1
+            myPostListener.onLikeClick(item, position, item.likeType == LikeType.LIKE)
         }
 
         textPostItemLayout.setOnClickListener {
@@ -149,35 +157,20 @@ class MyPostTextPostHolder(
         }
     }
 
-    private fun updateLikeAndFollowItem(
-        item: MemberPostItem,
-        position: Int,
-        myPostListener: MyPostFragment.MyPostListener
-    ) {
+    fun updateLike(item: MemberPostItem) {
         tvLikeCount.text = item.likeCount.toString()
-        tvCommentCount.text = item.commentCount.toString()
 
-        val likeType = item.likeType
-        val isLike: Boolean
-        if (likeType == LikeType.LIKE) {
-            isLike = true
+        if (item.likeType == LikeType.LIKE) {
             ivLike.setImageResource(R.drawable.ico_nice_s)
         } else {
-            isLike = false
             ivLike.setImageResource(if (isAdultTheme) R.drawable.ico_nice else R.drawable.ico_nice_gray)
         }
-
-        ivLike.setOnClickListener {
-            myPostListener.onLikeClick(item, position, !isLike)
-        }
-
-        updateFollow(item.isFollow)
     }
 
-    private fun updateFollow(isFollow: Boolean) {
-        tvFollow.setText(if (isFollow) R.string.followed else R.string.follow)
-        tvFollow.setBackgroundResource(if (isFollow) R.drawable.bg_white_1_stroke_radius_16 else R.drawable.bg_red_1_stroke_radius_16)
-        tvFollow.setTextColor(App.self.getColor(if (isFollow) R.color.color_white_1 else R.color.color_red_1))
+    fun updateFollow(item: MemberPostItem) {
+        tvFollow.setText(if (item.isFollow) R.string.followed else R.string.follow)
+        tvFollow.setBackgroundResource(if (item.isFollow) R.drawable.bg_white_1_stroke_radius_16 else R.drawable.bg_red_1_stroke_radius_16)
+        tvFollow.setTextColor(App.self.getColor(if (item.isFollow) R.color.color_white_1 else R.color.color_red_1))
     }
 
 }

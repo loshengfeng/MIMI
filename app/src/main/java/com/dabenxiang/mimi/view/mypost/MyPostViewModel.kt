@@ -49,11 +49,11 @@ class MyPostViewModel : BaseViewModel() {
     private var _likePostResult = MutableLiveData<ApiResult<Int>>()
     val likePostResult: LiveData<ApiResult<Int>> = _likePostResult
 
-    private var _favoriteResult = MutableLiveData<ApiResult<FavoriteItem>>()
-    val favoriteResult: LiveData<ApiResult<FavoriteItem>> = _favoriteResult
+    private var _favoriteResult = MutableLiveData<ApiResult<Int>>()
+    val favoriteResult: LiveData<ApiResult<Int>> = _favoriteResult
 
-    private var _followResult = MutableLiveData<ApiResult<FavoriteItem>>()
-    val followResult: LiveData<ApiResult<FavoriteItem>> = _followResult
+    private var _followResult = MutableLiveData<ApiResult<Int>>()
+    val followResult: LiveData<ApiResult<Int>> = _followResult
 
     private var _deletePostResult = MutableLiveData<ApiResult<Nothing>>()
     val deletePostResult: LiveData<ApiResult<Nothing>> = _deletePostResult
@@ -194,13 +194,6 @@ class MyPostViewModel : BaseViewModel() {
                 val request = LikeRequest(likeType)
                 val result = apiRepository.like(item.id, request)
                 if (!result.isSuccessful) throw HttpException(result)
-
-                item.likeType = likeType
-                item.likeCount = when (item.likeType) {
-                    LikeType.LIKE -> item.likeCount + 1
-                    else -> item.likeCount - 1
-                }
-
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
@@ -225,15 +218,7 @@ class MyPostViewModel : BaseViewModel() {
                     else -> apiRepository.deleteFavorite(item.id)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
-                item.isFavorite = isFavorite
-                if (isFavorite) item.favoriteCount++ else item.favoriteCount--
-                val favoriteItem = FavoriteItem(
-                    id = item.id.toString(),
-                    position = position,
-                    memberPostItem = item,
-                    type = type
-                )
-                emit(ApiResult.success(favoriteItem))
+                emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
@@ -250,13 +235,7 @@ class MyPostViewModel : BaseViewModel() {
                     else -> apiRepository.cancelFollowPost(item.creatorId)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
-                item.isFollow = isFollow
-                val followItem = FavoriteItem(
-                    id = item.id.toString(),
-                    position = position,
-                    memberPostItem = item
-                )
-                emit(ApiResult.success(followItem))
+                emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
