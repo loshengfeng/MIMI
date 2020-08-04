@@ -1,7 +1,5 @@
 package com.dabenxiang.mimi.model.vo
 
-import com.dabenxiang.mimi.model.holder.BaseVideoItem
-import com.dabenxiang.mimi.model.holder.CarouselHolderItem
 import java.io.Serializable
 
 class PlayerItem(val videoId: Long, val isAdult: Boolean) : Serializable {

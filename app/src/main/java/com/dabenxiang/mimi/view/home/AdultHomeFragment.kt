@@ -28,8 +28,8 @@ import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
-import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
+import com.dabenxiang.mimi.model.vo.statisticsItemToCarouselHolderItem
+import com.dabenxiang.mimi.model.vo.statisticsItemToVideoItem
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.model.vo.PostAttachmentItem

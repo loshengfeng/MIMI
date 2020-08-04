@@ -17,7 +17,7 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
-import com.dabenxiang.mimi.model.holder.BaseVideoItem
+import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.exoplayer2.C

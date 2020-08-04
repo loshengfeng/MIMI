@@ -2,7 +2,7 @@ package com.dabenxiang.mimi.view.home.viewholder
 
 import android.view.View
 import com.bumptech.glide.Glide
-import com.dabenxiang.mimi.model.holder.CarouselHolderItem
+import com.dabenxiang.mimi.model.vo.CarouselHolderItem
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
