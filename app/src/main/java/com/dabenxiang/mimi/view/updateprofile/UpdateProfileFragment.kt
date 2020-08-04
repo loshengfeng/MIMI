@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.updateprofile
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -82,23 +83,40 @@ class UpdateProfileFragment : BaseFragment() {
         arguments?.also { it ->
             viewModel.profileItem = it.getSerializable(KEY_PROFILE) as ProfileItem
             viewModel.type = it.getInt(KEY_TYPE, TYPE_NAME)
-            when (viewModel.type) {
-                TYPE_NAME -> {
-                    tv_title.text = getString(R.string.setting_change_name)
-                    tv_text.text = getString(R.string.setting_name)
-                    edit_content.hint = getString(R.string.login_name)
+            if (viewModel.profileItem.username.isNullOrEmpty()){
+                when (viewModel.type) {
+                    TYPE_NAME -> {
+                        tv_title.text = getString(R.string.setting_change_name)
+                        tv_text.text = getString(R.string.setting_name)
+                        edit_content.hint = getString(R.string.login_name)
+                    }
+                    TYPE_EMAIL -> {
+                        tv_title.text = getString(R.string.setting_mail_title)
+                        tv_text.text = getString(R.string.setting_email)
+                        edit_content.hint = getString(R.string.login_email)
+                    }
+                    TYPE_BIRTHDAY -> {
+                        tv_title.text = getString(R.string.setting_birthday_title)
+                        tv_text.text = getString(R.string.setting_birthday)
+                        edit_content.visibility = View.INVISIBLE
+                        edit_birthday.visibility = View.VISIBLE
+                        edit_birthday.listen()
+                    }
                 }
-                TYPE_EMAIL -> {
-                    tv_title.text = getString(R.string.setting_mail_title)
-                    tv_text.text = getString(R.string.setting_email)
-                    edit_content.hint = getString(R.string.login_email)
-                }
-                TYPE_BIRTHDAY -> {
-                    tv_title.text = getString(R.string.setting_birthday_title)
-                    tv_text.text = getString(R.string.setting_birthday)
-                    edit_content.visibility = View.INVISIBLE
-                    edit_birthday.visibility = View.VISIBLE
-                    edit_birthday.listen()
+            }else{
+                when (viewModel.type) {
+                    TYPE_NAME -> {
+                        edit_content.hint=viewModel.profileItem.username
+                    }
+                    TYPE_EMAIL -> {
+                        edit_content.hint = viewModel.profileItem.email
+                    }
+                    TYPE_BIRTHDAY -> {
+                        edit_content.visibility = View.INVISIBLE
+                        edit_birthday.visibility = View.VISIBLE
+                        edit_birthday.setText(viewModel.profileItem.birthday)
+                        edit_birthday.listen()
+                    }
                 }
             }
         }
