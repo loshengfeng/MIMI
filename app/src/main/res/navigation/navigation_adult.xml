@@ -7,6 +7,7 @@
 
     <include app:graph="@navigation/navigation_detail_club" />
     <include app:graph="@navigation/navigation_my_post" />
+    <include app:graph="@navigation/navigation_login" />
 
     <fragment
         android:id="@+id/adultHomeFragment"
@@ -66,6 +67,9 @@
         <action
             android:id="@+id/action_adultHomeFragment_to_navigation_my_post"
             app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_adultHomeFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
     </fragment>
 
     <fragment
@@ -213,5 +217,11 @@
     <fragment
         android:id="@+id/postViewerFragment"
         android:name="com.dabenxiang.mimi.view.post.viewer.PostViewerFragment"
-        android:label="PostViewerFragment" />
+        android:label="PostViewerFragment"
+        tools:layout="@layout/fragment_post_viewer"/>
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.dabenxiang.mimi.view.login.LoginFragment"
+        android:label="LoginFragment"
+        tools:layout="@layout/fragment_login"/>
 </navigation>

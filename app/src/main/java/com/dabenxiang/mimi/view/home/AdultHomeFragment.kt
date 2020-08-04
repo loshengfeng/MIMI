@@ -26,15 +26,11 @@ import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.model.vo.statisticsItemToCarouselHolderItem
-import com.dabenxiang.mimi.model.vo.statisticsItemToVideoItem
-import com.dabenxiang.mimi.model.vo.PlayerItem
-import com.dabenxiang.mimi.model.vo.SearchPostItem
-import com.dabenxiang.mimi.model.vo.PostAttachmentItem
-import com.dabenxiang.mimi.model.vo.PostVideoAttachment
-import com.dabenxiang.mimi.model.vo.UploadPicItem
+import com.dabenxiang.mimi.model.manager.AccountManager
+import com.dabenxiang.mimi.model.vo.*
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter
@@ -56,6 +52,9 @@ import com.dabenxiang.mimi.view.home.HomeViewModel.Companion.TYPE_VIDEO
 import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.login.LoginFragment
+import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_LOGIN
+import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
@@ -73,6 +72,7 @@ import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_home.*
+import org.koin.android.ext.android.inject
 import timber.log.Timber
 import java.io.File
 
@@ -107,6 +107,8 @@ class AdultHomeFragment : BaseFragment() {
 
     private var snackBar: Snackbar? = null
     private var picParameter = PicParameter()
+
+    val accountManager: AccountManager by inject()
 
     companion object {
         private const val REQUEST_PHOTO = 10001
@@ -590,11 +592,33 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         iv_post.setOnClickListener {
-            ChooseUploadMethodDialogFragment.newInstance(onChooseUploadMethodDialogListener).also {
-                it.show(
-                    requireActivity().supportFragmentManager,
-                    ChooseUploadMethodDialogFragment::class.java.simpleName
-                )
+            if (accountManager.isLogin()) {
+                ChooseUploadMethodDialogFragment.newInstance(onChooseUploadMethodDialogListener).also {
+                    it.show(
+                        requireActivity().supportFragmentManager,
+                        ChooseUploadMethodDialogFragment::class.java.simpleName
+                    )
+                }
+            } else {
+                GeneralDialog.newInstance(
+                    GeneralDialogData(
+                        titleRes = R.string.login_yet,
+                        message = getString(R.string.login_message),
+                        messageIcon = R.drawable.ico_default_photo,
+                        firstBtn = getString(R.string.btn_register),
+                        secondBtn = getString(R.string.btn_login),
+                        firstBlock = {
+                            val bundle = Bundle()
+                            bundle.putInt(LoginFragment.KEY_TYPE, TYPE_REGISTER)
+                            findNavController().navigate(R.id.action_adultHomeFragment_to_loginFragment, bundle)
+                        },
+                        secondBlock = {
+                            val bundle = Bundle()
+                            bundle.putInt(LoginFragment.KEY_TYPE, TYPE_LOGIN)
+                            findNavController().navigate(R.id.action_adultHomeFragment_to_loginFragment, bundle)
+                        }
+                    )
+                ).show(requireActivity().supportFragmentManager)
             }
         }
     }
