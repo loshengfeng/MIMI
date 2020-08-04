@@ -179,7 +179,7 @@ class TextDetailFragment : BaseFragment() {
                                 commentAdapter!!
                             )
                         }
-                        textDetailAdapter?.notifyItemChanged(2)
+                        textDetailAdapter?.notifyItemChanged(3)
                     }
                     is Error -> onApiError(it.throwable)
                 }
