@@ -14,9 +14,9 @@ import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
-import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
-import com.dabenxiang.mimi.model.serializable.PlayerData
+import com.dabenxiang.mimi.model.vo.statisticsItemToCarouselHolderItem
+import com.dabenxiang.mimi.model.vo.statisticsItemToVideoItem
+import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
@@ -322,7 +322,7 @@ class HomeFragment : BaseFragment() {
             )
         }
 
-        override fun onVideoClick(view: View, item: PlayerData) {
+        override fun onVideoClick(view: View, item: PlayerItem) {
             val intent = Intent(requireContext(), PlayerActivity::class.java)
             intent.putExtras(PlayerActivity.createBundle(item))
             startActivityForResult(intent, PlayerActivity.REQUEST_CODE)

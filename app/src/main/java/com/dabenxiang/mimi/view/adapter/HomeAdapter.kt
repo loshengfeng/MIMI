@@ -11,7 +11,7 @@ import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.HomeItemType
-import com.dabenxiang.mimi.model.serializable.PlayerData
+import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.club.ClubFuncItem
 import com.dabenxiang.mimi.view.home.HomeTemplate
@@ -149,7 +149,7 @@ class HomeAdapter(
 
     interface EventListener {
         fun onHeaderItemClick(view: View, item: HomeTemplate.Header)
-        fun onVideoClick(view: View, item: PlayerData)
+        fun onVideoClick(view: View, item: PlayerItem)
         fun onClipClick(view: View, item: List<MemberPostItem>, position: Int)
         fun onPictureClick(view: View, item: MemberPostItem)
         fun onClubClick(view: View, item: MemberClubItem)

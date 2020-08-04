@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.holder.BaseVideoItem
-import com.dabenxiang.mimi.model.serializable.PlayerData
+import com.dabenxiang.mimi.model.vo.BaseVideoItem
+import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.viewholder.VideoViewHolder
@@ -19,7 +19,7 @@ class GuessLikeAdapter(
     PagedListAdapter<BaseVideoItem, BaseViewHolder>(diffCallback) {
 
     interface GuessLikeAdapterListener {
-        fun onVideoClick(view: View, item: PlayerData)
+        fun onVideoClick(view: View, item: PlayerItem)
     }
 
     companion object {
@@ -42,7 +42,7 @@ class GuessLikeAdapter(
             override fun onClickItemIndex(view: View, index: Int) {
                 if (index > -1) {
                     getItem(index)?.also {
-                        val playerData = PlayerData.parser(it, isAdult)
+                        val playerData = PlayerItem.parser(it, isAdult)
                         listener.onVideoClick(view, playerData)
                     }
                 }

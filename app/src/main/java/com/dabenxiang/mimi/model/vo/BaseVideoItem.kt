@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.model.holder
+package com.dabenxiang.mimi.model.vo
 
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.SimpleVideoItem

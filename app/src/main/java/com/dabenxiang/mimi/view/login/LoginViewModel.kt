@@ -6,8 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.manager.DomainManager.Companion.PROMO_CODE
-import com.dabenxiang.mimi.manager.DomainManager.Companion.VALIDATION_URL
+import com.dabenxiang.mimi.model.manager.DomainManager.Companion.PROMO_CODE
+import com.dabenxiang.mimi.model.manager.DomainManager.Companion.VALIDATION_URL
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.SingUpRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel

@@ -13,8 +13,8 @@ import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.holder.BaseVideoItem
-import com.dabenxiang.mimi.model.holder.CarouselHolderItem
+import com.dabenxiang.mimi.model.vo.BaseVideoItem
+import com.dabenxiang.mimi.model.vo.CarouselHolderItem
 import com.dabenxiang.mimi.view.adapter.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.club.ClubFuncItem

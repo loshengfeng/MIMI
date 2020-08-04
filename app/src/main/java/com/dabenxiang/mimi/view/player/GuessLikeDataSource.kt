@@ -3,8 +3,8 @@ package com.dabenxiang.mimi.view.player
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.GuessLikePagingCallBack
 import com.dabenxiang.mimi.model.api.ApiRepository
-import com.dabenxiang.mimi.model.holder.BaseVideoItem
-import com.dabenxiang.mimi.model.holder.simpleVideoItemToVideoItem
+import com.dabenxiang.mimi.model.vo.BaseVideoItem
+import com.dabenxiang.mimi.model.vo.simpleVideoItemToVideoItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*

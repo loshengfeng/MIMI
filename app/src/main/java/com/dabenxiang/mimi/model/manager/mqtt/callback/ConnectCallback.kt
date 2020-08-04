@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.model.manager.mqtt
+package com.dabenxiang.mimi.model.manager.mqtt.callback
 
 import org.eclipse.paho.client.mqttv3.IMqttToken
 

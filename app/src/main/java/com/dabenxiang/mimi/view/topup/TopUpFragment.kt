@@ -18,8 +18,8 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.AgentItem
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
-import com.dabenxiang.mimi.model.holder.TopUpOnlinePayItem
-import com.dabenxiang.mimi.model.holder.TopUpProxyPayItem
+import com.dabenxiang.mimi.model.vo.TopUpOnlinePayItem
+import com.dabenxiang.mimi.model.vo.TopUpProxyPayItem
 import com.dabenxiang.mimi.view.adapter.TopUpAgentAdapter
 import com.dabenxiang.mimi.view.adapter.TopUpOnlinePayAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -158,10 +158,30 @@ class TopUpFragment : BaseFragment() {
         }
 
         val onlinePayList = mutableListOf<TopUpOnlinePayItem>(
-            TopUpOnlinePayItem(1, "300", "¥ 50.00", "¥ 55.00"),
-            TopUpOnlinePayItem(0, "900+90", "¥ 150.00", "¥ 165.00"),
-            TopUpOnlinePayItem(0, "1500+150", "¥ 250.00", "¥ 275.00"),
-            TopUpOnlinePayItem(0, "3000+300", "¥ 500.00", "¥ 500.00")
+            TopUpOnlinePayItem(
+                1,
+                "300",
+                "¥ 50.00",
+                "¥ 55.00"
+            ),
+            TopUpOnlinePayItem(
+                0,
+                "900+90",
+                "¥ 150.00",
+                "¥ 165.00"
+            ),
+            TopUpOnlinePayItem(
+                0,
+                "1500+150",
+                "¥ 250.00",
+                "¥ 275.00"
+            ),
+            TopUpOnlinePayItem(
+                0,
+                "3000+300",
+                "¥ 500.00",
+                "¥ 500.00"
+            )
         )
 
         rv_online_pay.adapter = TopUpOnlinePayAdapter(onlinePayListener)

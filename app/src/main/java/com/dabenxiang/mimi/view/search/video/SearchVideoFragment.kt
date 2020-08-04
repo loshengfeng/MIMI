@@ -24,8 +24,8 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.model.serializable.PlayerData
-import com.dabenxiang.mimi.model.serializable.SearchingVideoData
+import com.dabenxiang.mimi.model.vo.PlayerItem
+import com.dabenxiang.mimi.model.vo.SearchingVideoItem
 import com.dabenxiang.mimi.view.adapter.SearchVideoAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
@@ -55,7 +55,7 @@ class SearchVideoFragment : BaseFragment() {
         const val KEY_DATA = "data"
 
         fun createBundle(title: String = "", tag: String = ""): Bundle {
-            val data = SearchingVideoData()
+            val data = SearchingVideoItem()
             data.title = title
             data.tag = tag
 
@@ -90,7 +90,7 @@ class SearchVideoFragment : BaseFragment() {
 
         viewModel.isAdult = mainViewModel?.adultMode?.value ?: false
 
-        (arguments?.getSerializable(KEY_DATA) as SearchingVideoData?)?.also { data ->
+        (arguments?.getSerializable(KEY_DATA) as SearchingVideoItem?)?.also { data ->
             if (data.tag.isNotBlank()) {
                 viewModel.searchingTag = data.tag
                 tv_search_text.text = genResultText()
@@ -313,7 +313,10 @@ class SearchVideoFragment : BaseFragment() {
 
     private val adapterListener = object : SearchVideoAdapter.EventListener {
         override fun onVideoClick(item: VideoItem) {
-            val playerData = PlayerData(item.id ?: 0, item.isAdult)
+            val playerData = PlayerItem(
+                item.id ?: 0,
+                item.isAdult
+            )
             val intent = Intent(requireContext(), PlayerActivity::class.java)
             intent.putExtras(PlayerActivity.createBundle(playerData))
             startActivity(intent)
@@ -353,7 +356,10 @@ class SearchVideoFragment : BaseFragment() {
 
                 FunctionType.MSG -> {
                     // 點擊評論，進入播放頁面滾動到最下面
-                    val playerData = PlayerData(item.id ?: 0, item.isAdult)
+                    val playerData = PlayerItem(
+                        item.id ?: 0,
+                        item.isAdult
+                    )
                     val intent = Intent(requireContext(), PlayerActivity::class.java)
                     intent.putExtras(PlayerActivity.createBundle(playerData, true))
                     startActivity(intent)

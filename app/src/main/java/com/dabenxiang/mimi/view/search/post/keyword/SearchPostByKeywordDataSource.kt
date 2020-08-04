@@ -2,7 +2,7 @@ package com.dabenxiang.mimi.view.search.post.keyword
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.SearchPagingCallback
-import com.dabenxiang.mimi.manager.DomainManager
+import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
