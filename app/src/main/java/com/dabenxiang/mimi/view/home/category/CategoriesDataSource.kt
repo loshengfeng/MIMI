@@ -12,7 +12,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import timber.log.Timber
 
 class CategoriesDataSource(
     private val isAdult: Boolean,
@@ -83,7 +82,6 @@ class CategoriesDataSource(
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect {
                     pagingCallback.onGetCategory(it.category)
-                    Timber.d("@@loadInitial result: ${it.list}")
                     callback.onResult(it.list, null, it.nextKey) }
         }
     }

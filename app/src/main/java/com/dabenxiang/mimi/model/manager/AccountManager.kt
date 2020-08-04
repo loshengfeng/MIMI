@@ -164,6 +164,7 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
             .catch { e -> emit(ApiResult.error(e)) }
             .onCompletion { emit(ApiResult.loaded()) }
 
+
     fun changePwd(oldPassword: String, newPassword: String) =
         flow {
             val request = ChangePasswordRequest(oldPassword, newPassword)

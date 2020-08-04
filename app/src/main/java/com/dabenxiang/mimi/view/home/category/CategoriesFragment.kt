@@ -5,6 +5,8 @@ import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
@@ -32,6 +34,7 @@ class CategoriesFragment : BaseFragment() {
     companion object {
         const val KEY_DATA = "data"
         const val KEY_CATEGORY = "category"
+        const val TEXT_ALL = "全部"
 
         fun createBundle(title: String, categories: String?, item: CategoriesData?): Bundle {
             val data = CategoriesItem()
@@ -219,12 +222,16 @@ class CategoriesFragment : BaseFragment() {
         }
     }
 
-    private var filterViewList: List<RecyclerView> = listOf()
+    private var filterLLList: List<LinearLayout> = listOf()
+    private var filterRVList: List<RecyclerView> = listOf()
+    private var filterTVList: List<TextView> = listOf()
     private var filterAdapterList = mutableMapOf<Int, FilterTabAdapter>()
     private var filterDataList: ArrayList<List<String>> = arrayListOf()
 
     override fun setupObservers() {
-        filterViewList = listOf(filter_0, filter_1, filter_2)
+        filterLLList = listOf(ll_filter_0, ll_filter_1, ll_filter_2)
+        filterRVList = listOf(rl_filter_0, rl_filter_1, rl_filter_2)
+        filterTVList = listOf(tv_all_0, tv_all_1, tv_all_2)
 
         viewModel.getCategoryDetailResult.observe(viewLifecycleOwner, Observer {
             when (it) {
@@ -289,6 +296,31 @@ class CategoriesFragment : BaseFragment() {
             bar_filter.translationY = 0f
             setCollapsingFilterBar(View.GONE)
         }
+
+        tv_all_0.setOnClickListener {
+            updateFirstTab(0, true)
+            viewModel.updatedFilterPosition(0, null)
+            viewModel.updatedFilterPosition(1, null)
+            viewModel.updatedFilterPosition(2, null)
+            filterAdapterList.forEach {
+                it.value.updateLastSelected(null)
+            }
+            doOnTabSelected()
+        }
+
+        tv_all_1.setOnClickListener {
+            updateFirstTab(1, true)
+            viewModel.updatedFilterPosition(1, null)
+            filterAdapterList[1]?.updateLastSelected(null)
+            doOnTabSelected()
+        }
+
+        tv_all_2.setOnClickListener {
+            updateFirstTab(2, true)
+            viewModel.updatedFilterPosition(2, null)
+            filterAdapterList[2]?.updateLastSelected(null)
+            doOnTabSelected()
+        }
     }
 
     override fun onResume() {
@@ -308,15 +340,30 @@ class CategoriesFragment : BaseFragment() {
         val adapter = FilterTabAdapter(object : FilterTabAdapter.FilterTabAdapterListener {
             override fun onSelectedFilterTab(recyclerView: RecyclerView, position: Int, keyword: String) {
                 viewModel.updatedFilterPosition(index, position)
+                takeIf { index == 0 }?.also {
+                    updateFirstTab(index, false)
+                    updateFirstTab(1, true)
+                    updateFirstTab(2, true)
+                    viewModel.updatedFilterPosition(index, position)
+                    viewModel.updatedFilterPosition(1, null)
+                    viewModel.updatedFilterPosition(2, null)
+                    filterAdapterList[1]?.updateLastSelected(null)
+                    filterAdapterList[2]?.updateLastSelected(null)
+
+                } ?: run {
+                    updateFirstTab(index, false)
+                    viewModel.updatedFilterPosition(index, position)
+                    filterAdapterList[index]?.notifyDataSetChanged()
+                }
                 doOnTabSelected()
             }
         }, isAdult)
-        adapter.submitList(list, 0)
+        adapter.submitList(list, null)
 
-        filterViewList[index].adapter = adapter
+        filterRVList[index].adapter = adapter
         filterAdapterList[index] = adapter
         if (list.isEmpty()) {
-            filterViewList[index].visibility = View.GONE
+            filterLLList[index].visibility = View.GONE
         }
 
         viewModel.filterPositionData(index)?.observe(viewLifecycleOwner, Observer { position ->
@@ -344,7 +391,7 @@ class CategoriesFragment : BaseFragment() {
             lastPosition?.takeIf { it < list.size }?.let { list[it] }.also {
                 when(index) {
                     0 -> {
-                        val key = it.takeUnless { it == "全部" }?.let { key ->
+                        val key = it.takeUnless { it == TEXT_ALL }?.let { key ->
                             if (isAdult) key else "${data.title},$key"
                         } ?: let {
                             if (isAdult) null else data.title
@@ -352,7 +399,7 @@ class CategoriesFragment : BaseFragment() {
                         filterKeyList.add(key)
                     }
                     else -> {
-                        it.takeUnless { it == "全部" }?.also { key ->
+                        it.takeUnless { it == TEXT_ALL }?.also { key ->
                             filterKeyList.add(key)
                         } ?: run { filterKeyList.add(null) }
                     }
@@ -431,5 +478,21 @@ class CategoriesFragment : BaseFragment() {
             }
         })
         collapsingFilterAnimator.start()
+    }
+
+    private fun updateFirstTab(index: Int, isSelect: Boolean) {
+        val tv = when(index) {
+            0 -> tv_all_0
+            1 -> tv_all_1
+            else -> tv_all_2
+        }
+        takeIf { isSelect }?.also  {
+            tv.setTextColor(requireContext().getColor(R.color.color_white_1))
+            tv.background = requireContext().getDrawable(R.drawable.bg_red_1_radius_6)
+        } ?: run {
+            tv.setTextColor(takeIf { isAdult }?.let { requireContext().getColor(R.color.color_white_1) }
+                ?: let { requireContext().getColor(R.color.normal_color_text) })
+            tv.background = null
+        }
     }
 }

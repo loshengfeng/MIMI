@@ -2,8 +2,10 @@ package com.dabenxiang.mimi.view.home.viewholder
 
 import android.view.View
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
+import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import kotlinx.android.synthetic.main.item_filter.view.*
 import timber.log.Timber
 
@@ -26,6 +28,9 @@ class FilterTabHolder(itemView: View, listener: FilterTabHolderListener, var isA
     }
 
     override fun updated(model: String?) {
+        if (model == CategoriesFragment.TEXT_ALL) {
+            tvTitle.width = 0
+        }
         tvTitle.text = model
     }
 
