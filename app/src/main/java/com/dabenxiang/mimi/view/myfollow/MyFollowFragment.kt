@@ -52,7 +52,7 @@ class MyFollowFragment : BaseFragment() {
     private val clubFollowAdapter by lazy { ClubFollowAdapter(clubFollowListener) }
     private val clubFollowListener = object : ClubFollowAdapter.EventListener {
         override fun onDetail(item: ClubFollowItem) {
-            viewModel.getClub(item.tag)
+            viewModel.getClub(item.clubId)
         }
 
         override fun onGetAttachment(id: String, position: Int) {
@@ -148,7 +148,7 @@ class MyFollowFragment : BaseFragment() {
         viewModel.clubDetail.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Success -> {
-                    val bundle = ClubDetailFragment.createBundle(it.result[0])
+                    val bundle = ClubDetailFragment.createBundle(it.result)
                     navigateTo(
                         NavigateItem.Destination(
                             R.id.action_myFollowFragment_to_clubDetailFragment,

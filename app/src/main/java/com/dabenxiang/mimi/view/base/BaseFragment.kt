@@ -24,7 +24,6 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils.showToast
 import com.kaopiz.kprogresshud.KProgressHUD
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
-import timber.log.Timber
 import java.net.UnknownHostException
 
 abstract class BaseFragment : Fragment() {
