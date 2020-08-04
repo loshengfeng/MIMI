@@ -19,6 +19,7 @@ import com.dabenxiang.mimi.model.api.vo.PicParameter
 import com.dabenxiang.mimi.model.api.vo.PostMemberRequest
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.model.vo.UploadPicItem
 import com.dabenxiang.mimi.model.vo.mqtt.FavoriteItem
@@ -83,6 +84,9 @@ class MyPostViewModel : BaseViewModel() {
 
     private val _postVideoResult = MutableLiveData<ApiResult<Long>>()
     val postVideoResult: LiveData<ApiResult<Long>> = _postVideoResult
+
+    private val _postArticleResult = MutableLiveData<ApiResult<Long>>()
+    val postArticleResult: LiveData<ApiResult<Long>> = _postArticleResult
 
     private var job = Job()
 
@@ -325,11 +329,9 @@ class MyPostViewModel : BaseViewModel() {
                 Timber.d("Post member request : $request")
                 val resp = domainManager.getApiRepository().updatePost(id, request)
                 if (!resp.isSuccessful) throw HttpException(resp)
-                emit(ApiResult.success(resp.body()?.content))
+                emit(ApiResult.success(id))
             }
                 .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _postVideoMemberResult.value = it }
         }
@@ -365,6 +367,31 @@ class MyPostViewModel : BaseViewModel() {
                     }
                 }
         }
+    }
+
+    fun updateArticle(title: String, content: String, tags: ArrayList<String>, item: MemberPostItem) {
+        viewModelScope.launch {
+            flow {
+                val request = PostMemberRequest(
+                    title = title,
+                    content = content,
+                    type = PostType.TEXT.value,
+                    tags = tags
+                )
+
+                val resp = domainManager.getApiRepository().updatePost(item.id, request)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(item.id))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _postArticleResult.value = it }
+        }
+    }
+
+    fun clearLiveData() {
+        _postArticleResult.value = null
+        _postVideoMemberResult.value = null
     }
 
     fun cancelJob() {
