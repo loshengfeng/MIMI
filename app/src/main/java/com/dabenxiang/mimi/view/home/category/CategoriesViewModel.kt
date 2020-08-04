@@ -9,7 +9,7 @@ import androidx.paging.PagedList
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.VideoSearchItem
-import com.dabenxiang.mimi.model.holder.BaseVideoItem
+import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.home.video.VideoDataSource
 import com.dabenxiang.mimi.view.home.video.VideoFactory
@@ -25,6 +25,9 @@ class CategoriesViewModel : BaseViewModel() {
 
     private val _videoList = MutableLiveData<PagedList<BaseVideoItem>>()
     val videoList: LiveData<PagedList<BaseVideoItem>> = _videoList
+
+    private val _filterList = MutableLiveData<PagedList<BaseVideoItem>>()
+    val filterList: LiveData<PagedList<BaseVideoItem>> = _filterList
 
     private val _getCategoryDetailResult = MutableLiveData<ApiResult<VideoSearchItem>>()
     val getCategoryDetailResult: LiveData<ApiResult<VideoSearchItem>> = _getCategoryDetailResult
@@ -63,6 +66,32 @@ class CategoriesViewModel : BaseViewModel() {
 
             LivePagedListBuilder(factory, config).build().asFlow().collect {
                 _videoList.postValue(it)
+            }
+        }
+    }
+
+    fun getVideoFilterList(category: String?, country: String?, years: String?, isAdult: Boolean) {
+        viewModelScope.launch {
+            val dataSrc =
+                CategoriesDataSource(
+                    isAdult = isAdult,
+                    category = category,
+                    country = country,
+                    years = years,
+                    viewModelScope = viewModelScope,
+                    domainManager = domainManager,
+                    pagingCallback = pagingCallback,
+                    adWidth = adWidth,
+                    adHeight = adHeight
+                )
+            val factory =
+                CategoriesFactory(dataSrc)
+            val config = PagedList.Config.Builder()
+                .setPageSize(VideoDataSource.PER_LIMIT.toInt())
+                .build()
+
+            LivePagedListBuilder(factory, config).build().asFlow().collect {
+                _filterList.postValue(it)
             }
         }
     }

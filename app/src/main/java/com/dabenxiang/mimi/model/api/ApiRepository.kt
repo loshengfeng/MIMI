@@ -171,6 +171,11 @@ class ApiRepository(private val apiService: ApiService) {
         return apiService.setLastReadMessageTime(body)
     }
 
+    /**
+     * 取的未否有未讀訊息
+     */
+    suspend fun getUnread() = apiService.getUnread()
+
     /**********************************************************
      *
      *                  Functions
@@ -235,6 +240,15 @@ class ApiRepository(private val apiService: ApiService) {
         return apiService.getMembersPost(type.value, offset, limit)
     }
 
+    suspend fun getMembersPost(
+        offset: Int,
+        limit: Int,
+        creatorId:Long,
+        isAdult: Boolean
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
+        return apiService.getMembersPost(offset, limit,creatorId,isAdult)
+    }
+
     suspend fun getMemberPostDetail(postId: Long): Response<ApiBaseItem<MemberPostItem>> {
         return apiService.getMemberPostDetail(postId)
     }
@@ -283,6 +297,12 @@ class ApiRepository(private val apiService: ApiService) {
         tag: String
     ): Response<ApiBasePagingItem<ArrayList<MemberClubItem>>> {
         return apiService.getMembersClub(tag)
+    }
+
+    suspend fun getMembersClub(
+        clubId: Long
+    ): Response<ApiBasePagingItem<MemberClubItem>> {
+        return apiService.getMembersClub(clubId)
     }
 
     suspend fun getMembersClubPost(
@@ -341,7 +361,7 @@ class ApiRepository(private val apiService: ApiService) {
         category: String? = null,
         q: String? = null,
         country: String? = null,
-        years: Int? = null,
+        years: String? = null,
         isAdult: Boolean,
         offset: String,
         limit: String,

@@ -60,7 +60,6 @@ class CropVideoFragment : BaseFragment(), OnCropVideoListener {
     }
 
     override fun setupListeners() {
-
     }
 
     override fun cancelAction() {

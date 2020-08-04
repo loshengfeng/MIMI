@@ -20,6 +20,8 @@ class EditVideoFragment : BaseFragment() {
 
     private lateinit var editVideoFragmentPagerAdapter: EditVideoFragmentPagerAdapter
     private var videoUri = Uri.EMPTY
+    private var isVideoRangeFinish = false
+    private var isCropPicFinish = false
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -56,6 +58,8 @@ class EditVideoFragment : BaseFragment() {
             )
         viewPager.adapter = editVideoFragmentPagerAdapter
         viewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabLayout))
+
+        tv_clean.isEnabled = true
     }
 
     override fun setupObservers() {
@@ -100,11 +104,14 @@ class EditVideoFragment : BaseFragment() {
         }
 
         override fun onFinish(resourceUri: Uri) {
+            isVideoRangeFinish = true
+
+            dismissDialog()
+
             videoUri = resourceUri
             val cropVideoFragment = editVideoFragmentPagerAdapter.getFragment(1) as CropVideoFragment
             cropVideoFragment.setEditVideoListener(editCropVideoListener)
             cropVideoFragment.save()
-            progressHUD?.dismiss()
         }
     }
 
@@ -114,11 +121,22 @@ class EditVideoFragment : BaseFragment() {
         }
 
         override fun onFinish(resourceUri: Uri) {
-            progressHUD?.dismiss()
+            isCropPicFinish = true
+
+            dismissDialog()
+
             val bundle = Bundle()
             bundle.putString(BUNDLE_TRIMMER_URI, videoUri.toString())
             bundle.putString(BUNDLE_COVER_URI, resourceUri.toString())
             findNavController().navigate(R.id.action_editVideoFragment_to_postVideoFragment, bundle)
+        }
+    }
+
+    private fun dismissDialog() {
+        if (isCropPicFinish && isVideoRangeFinish) {
+            progressHUD?.dismiss()
+            isCropPicFinish = false
+            isVideoRangeFinish = false
         }
     }
 }

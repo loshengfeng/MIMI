@@ -39,6 +39,8 @@ class ChatHistoryFragment : BaseFragment() {
         }
 
     }
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
 
     companion object {
         const val NO_DATA = 0
@@ -60,7 +62,8 @@ class ChatHistoryFragment : BaseFragment() {
             when (it) {
                 is ApiResult.Success -> {
                     val attachmentItem = it.result
-                    LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
+                    LruCacheUtils.putLruArrayCache(attachmentItem.id ?: "", attachmentItem.fileArray
+                            ?: ByteArray(0))
                     adapter.update(attachmentItem.position ?: 0)
                 }
                 is ApiResult.Error -> Timber.e(it.throwable)

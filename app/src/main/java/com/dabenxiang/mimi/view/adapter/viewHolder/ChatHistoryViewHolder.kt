@@ -46,14 +46,16 @@ class ChatHistoryViewHolder(
         }
 
         data?.avatarAttachmentId?.let {
-            LruCacheUtils.getLruCache(it.toString())?.also { bitmap ->
+            LruCacheUtils.getLruArrayCache(it.toString())?.also { array ->
                 val options: RequestOptions = RequestOptions()
                         .transform(MultiTransformation(CenterCrop(), CircleCrop()))
                         .placeholder(R.drawable.default_profile_picture)
                         .error(R.drawable.default_profile_picture)
                         .priority(Priority.NORMAL)
 
-                Glide.with(App.self).load(bitmap)
+                Glide.with(App.self)
+                        .asBitmap()
+                        .load(array)
                         .apply(options)
                         .into(imgChatPhoto)
             } ?: run {

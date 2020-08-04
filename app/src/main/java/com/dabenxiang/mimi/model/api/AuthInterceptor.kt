@@ -1,8 +1,8 @@
 package com.dabenxiang.mimi.model.api
 
 import android.text.TextUtils
-import com.dabenxiang.mimi.manager.AccountManager
-import com.dabenxiang.mimi.manager.DomainManager
+import com.dabenxiang.mimi.model.manager.AccountManager
+import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.enums.TokenResult
 import com.dabenxiang.mimi.model.pref.Pref
 import kotlinx.coroutines.Dispatchers

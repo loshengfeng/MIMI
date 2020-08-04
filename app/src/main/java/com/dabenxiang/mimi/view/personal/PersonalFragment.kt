@@ -50,6 +50,11 @@ class PersonalFragment : BaseFragment() {
         return R.layout.fragment_personal
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.getUnread()
+    }
+
     override fun setupObservers() {
         viewModel.meItem.observe(viewLifecycleOwner, Observer {
             when (it) {
@@ -61,12 +66,6 @@ class PersonalFragment : BaseFragment() {
                     val meItem = it.result
                     tv_name.text = meItem.friendlyName.toString()
                     tv_Point.text = meItem.availablePoint.toString()
-
-                    // todo: confirm by Jeff...
-                    tv_new.visibility = when (meItem.hasNewMessage) {
-                        true -> View.VISIBLE
-                        else -> View.GONE
-                    }
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -117,6 +116,15 @@ class PersonalFragment : BaseFragment() {
                 }
             }
         })
+
+        viewModel.unreadResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    tv_new.visibility = if (it.result == 0) View.INVISIBLE else View.VISIBLE
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -161,6 +169,8 @@ class PersonalFragment : BaseFragment() {
 
     override fun initSettings() {
         super.initSettings()
+        interactionListener?.setAdult(false)
+
         tv_version_is_login.text = BuildConfig.VERSION_NAME
         tv_version_is_not_login.text = BuildConfig.VERSION_NAME
 

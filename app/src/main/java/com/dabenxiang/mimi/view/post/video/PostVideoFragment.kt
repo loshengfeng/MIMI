@@ -44,6 +44,7 @@ import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.fragment_post_article.*
 import kotlinx.android.synthetic.main.fragment_post_article.chipGroup
 import kotlinx.android.synthetic.main.fragment_post_article.clubLayout
 import kotlinx.android.synthetic.main.fragment_post_article.edt_hashtag
@@ -54,6 +55,7 @@ import kotlinx.android.synthetic.main.fragment_post_article.txt_titleCount
 import kotlinx.android.synthetic.main.fragment_post_pic.*
 import kotlinx.android.synthetic.main.fragment_post_pic.txt_clubName
 import kotlinx.android.synthetic.main.fragment_post_pic.txt_hashtagName
+import kotlinx.android.synthetic.main.fragment_post_pic.txt_placeholder
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -69,7 +71,6 @@ class PostVideoFragment : BaseFragment() {
         const val BUNDLE_COVER_URI = "bundle_cover_uri"
 
         private const val TITLE_LIMIT = 60
-        private const val CONTENT_LIMIT = 2000
         private const val HASHTAG_LIMIT = 20
         private const val INIT_VALUE = 0
         const val POST_ID = "post_id"
@@ -105,6 +106,8 @@ class PostVideoFragment : BaseFragment() {
         adapter.submitList(videoAttachmentList)
         recyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         recyclerView.adapter = adapter
+
+        tv_clean.isEnabled = true
     }
 
     override fun setupObservers() {
@@ -183,7 +186,7 @@ class PostVideoFragment : BaseFragment() {
         }
 
         tv_back.setOnClickListener {
-            findNavController().popBackStack()
+            findNavController().navigate(R.id.action_postVideoFragment_to_adultHomeFragment)
         }
 
         tv_clean.setOnClickListener {
@@ -231,12 +234,13 @@ class PostVideoFragment : BaseFragment() {
                 videoAttachmentList[0].length = length
             }
 
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(UPLOAD_VIDEO, true)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(MEMBER_REQUEST, request)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(VIDEO_DATA, videoAttachmentList)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(DELETE_ATTACHMENT, deleteVideoList)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(POST_ID, postId)
-            findNavController().navigateUp()
+            val bundle = Bundle()
+            bundle.putBoolean(UPLOAD_VIDEO, true)
+            bundle.putParcelable(MEMBER_REQUEST, request)
+            bundle.putParcelableArrayList(VIDEO_DATA, videoAttachmentList)
+            bundle.putParcelableArrayList(DELETE_ATTACHMENT, deleteVideoList)
+            bundle.putLong(POST_ID, postId)
+            findNavController().navigate(R.id.action_postVideoFragment_to_adultHomeFragment, bundle)
         }
     }
 
@@ -286,7 +290,7 @@ class PostVideoFragment : BaseFragment() {
             TITLE_LIMIT
         ))
         txt_hashtagCount.text = String.format(getString(R.string.typing_count,
-            item.tags.size,
+            item.tags?.size,
             HASHTAG_LIMIT
         ))
 
@@ -310,11 +314,14 @@ class PostVideoFragment : BaseFragment() {
                 .circleCrop()
                 .into(iv_avatar)
 
-            addTag(item.tag)
-
-            txt_placeholder.visibility = View.GONE
-            txt_clubName.visibility = View.VISIBLE
-            txt_hashtagName.visibility = View.VISIBLE
+            if (chipGroup.size == HASHTAG_LIMIT) {
+                Toast.makeText(requireContext(), R.string.post_warning_tag_limit, Toast.LENGTH_SHORT).show()
+            } else {
+                addTag(item.tag, true)
+                txt_placeholder.visibility = View.GONE
+                txt_clubName.visibility = View.VISIBLE
+                txt_hashtagName.visibility = View.VISIBLE
+            }
         }
     }
 
@@ -399,7 +406,7 @@ class PostVideoFragment : BaseFragment() {
                     val myUri = Uri.fromFile(File(UriUtils.getPath(requireContext(), videoUri!!)))
                     val bundle = Bundle()
                     bundle.putString(EditVideoFragment.BUNDLE_VIDEO_URI, myUri.toString())
-                    findNavController().navigate(R.id.action_postVideoFragment_self, bundle)
+                    findNavController().navigate(R.id.action_postVideoFragment_to_editVideoFragment, bundle)
                 }
             }
         }

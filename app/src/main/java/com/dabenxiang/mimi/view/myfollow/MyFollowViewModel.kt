@@ -40,8 +40,8 @@ class MyFollowViewModel : BaseViewModel() {
     private var _attachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
     val attachmentResult: LiveData<ApiResult<AttachmentItem>> = _attachmentResult
 
-    private val _clubDetail = MutableLiveData<ApiResult<ArrayList<MemberClubItem>>>()
-    val clubDetail: LiveData<ApiResult<ArrayList<MemberClubItem>>> = _clubDetail
+    private val _clubDetail = MutableLiveData<ApiResult<MemberClubItem>>()
+    val clubDetail: LiveData<ApiResult<MemberClubItem>> = _clubDetail
 
     private val _cleanResult = MutableLiveData<ApiResult<Nothing>>()
     val cleanResult: LiveData<ApiResult<Nothing>> = _cleanResult
@@ -242,10 +242,10 @@ class MyFollowViewModel : BaseViewModel() {
         }
     }
 
-    fun getClub(tag: String) {
+    fun getClub(clubId: Long) {
         viewModelScope.launch {
             flow {
-                val resp = domainManager.getApiRepository().getMembersClub(tag)
+                val resp = domainManager.getApiRepository().getMembersClub(clubId)
                 if (!resp.isSuccessful) throw HttpException(resp)
                 emit(ApiResult.success(resp.body()?.content))
             }

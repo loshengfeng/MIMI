@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.model.holder
+package com.dabenxiang.mimi.model.vo
 
 data class TopUpProxyPayItem(
     val photo: String?,

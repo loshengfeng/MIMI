@@ -131,7 +131,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         avatarImg.setOnClickListener {
-            adultListener.onAvatarClick()
+            adultListener.onAvatarClick(item.creatorId, item.postFriendlyName)
         }
     }
 

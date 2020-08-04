@@ -18,7 +18,7 @@ import androidx.fragment.app.FragmentActivity
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.PACKAGE_INSTALLED_ACTION
-import com.dabenxiang.mimi.manager.DomainManager
+import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.vo.error.ErrorItem
 import com.dabenxiang.mimi.model.api.vo.error.HttpExceptionItem

@@ -45,6 +45,10 @@ class PostArticleFragment : BaseFragment() {
         private const val CONTENT_LIMIT = 2000
         private const val HASHTAG_LIMIT = 20
         private const val INIT_VALUE = 0
+        const val UPLOAD_ARTICLE = "upload_article"
+        const val TITLE = "title"
+        const val REQUEST = "request"
+        const val TAG = "tag"
     }
 
     override val bottomNavigationVisibility: Int
@@ -60,17 +64,6 @@ class PostArticleFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.postArticleResult.observe(viewLifecycleOwner, Observer {
-            when(it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Loaded -> progressHUD?.dismiss()
-                is ApiResult.Success -> {
-                    findNavController().navigateUp()
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
-        })
-
         viewModel.clubItemResult.observe(viewLifecycleOwner, Observer {
             when(it) {
                 is ApiResult.Success -> {
@@ -204,12 +197,19 @@ class PostArticleFragment : BaseFragment() {
 
             val jsonString = Gson().toJson(requestContent)
 
-            if (isEdit != null) {
-                val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
-                viewModel.updateArticle(title, jsonString, tags, item)
-            } else {
-                viewModel.postArticle(title, jsonString, tags)
-            }
+//            if (isEdit != null) {
+//                val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
+//                viewModel.updateArticle(title, jsonString, tags, item)
+//            } else {
+//                viewModel.postArticle(title, jsonString, tags)
+//            }
+
+            val bundle = Bundle()
+            bundle.putBoolean(UPLOAD_ARTICLE, true)
+            bundle.putString(TITLE, title)
+            bundle.putString(REQUEST, jsonString)
+            bundle.putStringArrayList(TAG, tags)
+            findNavController().navigate(R.id.action_postArticleFragment_to_adultHomeFragment, bundle)
         }
     }
 
@@ -220,6 +220,7 @@ class PostArticleFragment : BaseFragment() {
 
         tv_clean.visibility = View.VISIBLE
         tv_clean.text = getString(R.string.btn_send)
+        tv_clean.isEnabled = true
 
         txt_titleCount.text = String.format(getString(R.string.typing_count,
             INIT_VALUE,
@@ -262,7 +263,7 @@ class PostArticleFragment : BaseFragment() {
             CONTENT_LIMIT
         ))
         txt_hashtagCount.text = String.format(getString(R.string.typing_count,
-            item.tags.size,
+            item.tags?.size,
             HASHTAG_LIMIT
         ))
     }

@@ -3,7 +3,7 @@ package com.dabenxiang.mimi.view.home.viewholder
 import android.view.View
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.holder.BaseVideoItem
+import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import kotlinx.android.synthetic.main.nested_item_home_statistics.view.*
 

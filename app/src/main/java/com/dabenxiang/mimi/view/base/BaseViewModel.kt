@@ -6,17 +6,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.dabenxiang.mimi.PROJECT_NAME
-import com.dabenxiang.mimi.manager.AccountManager
-import com.dabenxiang.mimi.manager.DomainManager
+import com.dabenxiang.mimi.model.manager.AccountManager
+import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.ExceptionResult
-import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getExceptionDetail
 import com.google.gson.Gson
-import kotlinx.coroutines.CoroutineExceptionHandler
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import timber.log.Timber
 import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
 
 abstract class BaseViewModel : ViewModel(), KoinComponent {

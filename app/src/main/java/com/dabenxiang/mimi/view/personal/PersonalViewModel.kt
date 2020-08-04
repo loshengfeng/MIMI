@@ -25,6 +25,9 @@ class PersonalViewModel : BaseViewModel() {
     private val _imageBitmap = MutableLiveData<ApiResult<Bitmap>>()
     val imageBitmap: LiveData<ApiResult<Bitmap>> = _imageBitmap
 
+    private val _unreadResult = MutableLiveData<ApiResult<Int>>()
+    val unreadResult: LiveData<ApiResult<Int>> = _unreadResult
+
     fun getMe() {
         viewModelScope.launch {
             flow {
@@ -66,6 +69,21 @@ class PersonalViewModel : BaseViewModel() {
             accountManager.signOut().collect {
                 _apiSignOut.value = it
             }
+        }
+    }
+
+    fun getUnread(){
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.getUnread()
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(result.body()?.content as Int))
+            }
+                    .onStart { emit(ApiResult.loading()) }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .collect { _unreadResult.value = it }
         }
     }
 }

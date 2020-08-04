@@ -8,14 +8,13 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
-import com.blankj.utilcode.util.AppUtils
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.serializable.CategoriesData
-import com.dabenxiang.mimi.model.serializable.PlayerData
+import com.dabenxiang.mimi.model.vo.CategoriesItem
+import com.dabenxiang.mimi.model.api.vo.CategoriesItem as CategoriesData
+import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.adapter.FilterTabAdapter
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
@@ -34,8 +33,8 @@ class CategoriesFragment : BaseFragment() {
         const val KEY_DATA = "data"
         const val KEY_CATEGORY = "category"
 
-        fun createBundle(title: String, categories: String?, item: CategoriesItem?): Bundle {
-            val data = CategoriesData()
+        fun createBundle(title: String, categories: String?, item: CategoriesData?): Bundle {
+            val data = CategoriesItem()
             data.title = title
             data.categories = categories
 
@@ -57,7 +56,7 @@ class CategoriesFragment : BaseFragment() {
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
         }
 
-        override fun onVideoClick(view: View, item: PlayerData) {
+        override fun onVideoClick(view: View, item: PlayerItem) {
             val intent = Intent(requireContext(), PlayerActivity::class.java)
             intent.putExtras(PlayerActivity.createBundle(item))
             startActivity(intent)
@@ -113,6 +112,7 @@ class CategoriesFragment : BaseFragment() {
         get() = View.GONE
 
     private val isAdult by lazy { mainViewModel?.adultMode?.value ?: false }
+    private val data by lazy {  arguments?.getSerializable(KEY_DATA) as CategoriesItem }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -120,7 +120,7 @@ class CategoriesFragment : BaseFragment() {
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
 
-        (arguments?.getSerializable(KEY_DATA) as CategoriesData?)?.also { data ->
+        (arguments?.getSerializable(KEY_DATA) as CategoriesItem?)?.also { data ->
             tv_title.text = data.title
 
             recyclerview_content.background =
@@ -199,90 +199,48 @@ class CategoriesFragment : BaseFragment() {
 
             recyclerview_content.adapter = videoListAdapter
 
-            viewModel.videoList.observe(viewLifecycleOwner, Observer {
-                videoListAdapter.submitList(it)
-            })
-
             if (isAdult) {
                 recyclerview_content.setPadding(0, GeneralUtils.dpToPx(requireContext(), 50), 0, 0)
             }
 
-            viewModel.setupVideoList(data.categories, isAdult)
-
             viewModel.getCategoryDetail(data.title, isAdult)
+            if (isAdult) {
+                viewModel.getVideoFilterList(null, null, null, isAdult)
+            } else {
+                viewModel.setupVideoList(data.categories, isAdult)
+            }
             progressHUD?.show()
         }
-
     }
-
 
     private var filterViewList: List<RecyclerView> = listOf()
     private var filterAdapterList = mutableMapOf<Int, FilterTabAdapter>()
+    private var filterDataList: ArrayList<List<String>> = arrayListOf()
 
     override fun setupObservers() {
-        val isAdult = mainViewModel?.adultMode?.value ?: false
-
         filterViewList = listOf(filter_0, filter_1, filter_2)
-//        filterAdapterList = mutableMapOf<Int, FilterTabAdapter>()
-        filterAdapterList
-
-//        mainViewModel?.categoriesData?.observe(viewLifecycleOwner, Observer { categories ->
-//
-//            // TODO: Fake data
-//            repeat(3) { i ->
-//                val years = mutableListOf<String>()
-//                repeat(8) { y ->
-//                    years.add("${2020 - y}")
-//                }
-//
-//                val adapter = FilterTabAdapter(object : FilterTabAdapter.FilterTabAdapterListener {
-//                    override fun onSelectedFilterTab(recyclerView: RecyclerView, position: Int) {
-//                        viewModel.updatedFilterPosition(i, position)
-//                    }
-//                }, isAdult)
-//                adapter.submitList(years, 0)
-//
-//                filterViewList[i].adapter = adapter
-//                filterAdapterList[i] = adapter
-//
-//                // TODO: Observer last position
-//                viewModel.filterPositionData(i)?.observe(viewLifecycleOwner, Observer { position ->
-//                    adapter.setLastSelectedIndex(position)
-//
-//                    val sb = StringBuilder()
-//                    var isFirst = true
-//                    for (j in 0..3) {
-//                        val lastPosition = viewModel.filterPositionData(j)?.value
-//                        if (lastPosition != null) {
-//                            if (isFirst) {
-//                                isFirst = false
-//                            } else {
-//                                sb.append(", ")
-//                            }
-//
-//                            sb.append(years[lastPosition])
-//                        }
-//                    }
-//
-//                    tv_collapsing_filter.text = sb.toString()
-//                })
-//            }
-//        })
 
         viewModel.getCategoryDetailResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Success -> {
                     progressHUD?.dismiss()
                     Timber.d("getCategoryDetailResult: ${it.result}")
-
-                    (arguments?.getSerializable(KEY_CATEGORY) as CategoriesItem?)?.also { data ->
+                    (arguments?.getSerializable(KEY_CATEGORY) as CategoriesData?)?.also { data ->
+                        var notEmptyCount = 0
                         val typeList = arrayListOf<String>()
                         data.categories?.forEach { item ->
                             typeList.add(item.name)
                         }
+                        takeIf { typeList.isNotEmpty() }?.also { notEmptyCount++ }
+                        val areasCategory = it.result.category?.areas ?: arrayListOf()
+                        takeIf { areasCategory.isNotEmpty() }?.also { notEmptyCount++ }
+                        val yearsCategory = it.result.category?.years ?: arrayListOf()
+                        takeIf { yearsCategory.isNotEmpty() }?.also { notEmptyCount++ }
                         setupFilter(0, typeList)
-                        setupFilter(1, it.result.category?.areas ?: arrayListOf())
-                        setupFilter(2, it.result.category?.years ?: arrayListOf())
+                        setupFilter(1, areasCategory)
+                        setupFilter(2, yearsCategory)
+
+                        recyclerview_content.setPadding(0, GeneralUtils.dpToPx(requireContext(), 50) * notEmptyCount, 0, 0)
                     }
 
                 }
@@ -290,6 +248,15 @@ class CategoriesFragment : BaseFragment() {
                     progressHUD?.dismiss()
                 }
             }
+        })
+
+        viewModel.videoList.observe(viewLifecycleOwner, Observer {
+            videoListAdapter.submitList(it)
+        })
+
+        viewModel.filterList.observe(viewLifecycleOwner, Observer {
+            progressHUD?.dismiss()
+            videoListAdapter.submitList(it)
         })
     }
 
@@ -322,9 +289,36 @@ class CategoriesFragment : BaseFragment() {
     }
 
     private fun setupFilter(index: Int, list: List<String>) {
+        filterDataList.add(index, list)
         val adapter = FilterTabAdapter(object : FilterTabAdapter.FilterTabAdapterListener {
-            override fun onSelectedFilterTab(recyclerView: RecyclerView, position: Int) {
+            override fun onSelectedFilterTab(recyclerView: RecyclerView, position: Int, keyword: String) {
                 viewModel.updatedFilterPosition(index, position)
+
+                val filterKeyList: ArrayList<String?> = arrayListOf()
+                filterDataList.forEachIndexed { index, list ->
+                    val lastPosition = viewModel.filterPositionData(index)?.value
+
+                    lastPosition?.takeIf { it < list.size }?.let { list[it] }.also {
+                        when(index) {
+                            0 -> {
+                                val key = it.takeUnless { it == "全部" }?.let { key ->
+                                    if (isAdult) key else "${data.title},$key"
+                                } ?: let {
+                                    if (isAdult) null else data.title
+                                }
+                                filterKeyList.add(key)
+                            }
+                            else -> {
+                                it.takeUnless { it == "全部" }?.also { key ->
+                                    filterKeyList.add(key)
+                                } ?: run { filterKeyList.add(null) }
+                            }
+                        }
+                    }
+                }
+
+                progressHUD?.show()
+                viewModel.getVideoFilterList(filterKeyList[0], filterKeyList[1], filterKeyList[2], isAdult)
             }
         }, isAdult)
         adapter.submitList(list, 0)
@@ -335,25 +329,20 @@ class CategoriesFragment : BaseFragment() {
             filterViewList[index].visibility = View.GONE
         }
 
-        // TODO: Observer last position
         viewModel.filterPositionData(index)?.observe(viewLifecycleOwner, Observer { position ->
             adapter.setLastSelectedIndex(position)
 
             val sb = StringBuilder()
-            var isFirst = true
-            for (j in 0..3) {
-                val lastPosition = viewModel.filterPositionData(j)?.value
-                if (lastPosition != null) {
-                    if (isFirst) {
-                        isFirst = false
+            filterDataList.forEachIndexed { index, list ->
+                val lastPosition = viewModel.filterPositionData(index)?.value
+                lastPosition?.takeIf { it < list.size }?.let { list[it] }?.also {
+                    if (index == 0) {
+                        sb.append(it)
                     } else {
-                        sb.append(", ")
+                        sb.append(", ").append(it)
                     }
-                    takeIf { list.isNotEmpty() }?.also { sb.append(list[lastPosition]) }
                 }
-            }
-
-            tv_collapsing_filter.text = sb.toString()
+            }.takeIf { sb.isNotEmpty() }?.run { tv_collapsing_filter.text = sb.toString() }
         })
     }
 
