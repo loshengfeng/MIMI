@@ -89,49 +89,32 @@ class MyFollowFragment : BaseFragment() {
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback {
-            navigateTo(NavigateItem.Up)
-        }
-        initSettings()
-    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-    override fun onResume() {
-        super.onResume()
-        setTabPosition(TYPE_MEMBER)
-        rv_content.adapter = memberFollowAdapter
-        viewModel.initData(lastTab)
-    }
-
-    override fun getLayoutId(): Int {
-        return R.layout.fragment_my_follow
-    }
-
-    override fun setupObservers() {
-        viewModel.showProgress.observe(viewLifecycleOwner, Observer {
+        viewModel.showProgress.observe(this, Observer {
             layout_refresh.isRefreshing = it
         })
 
-        viewModel.clubCount.observe(viewLifecycleOwner, Observer {
+        viewModel.clubCount.observe(this, Observer {
             refreshUi(TYPE_CLUB, it)
         })
 
-        viewModel.memberCount.observe(viewLifecycleOwner, Observer {
+        viewModel.memberCount.observe(this, Observer {
             refreshUi(TYPE_MEMBER, it)
         })
 
-        viewModel.clubList.observe(viewLifecycleOwner, Observer {
+        viewModel.clubList.observe(this, Observer {
             rv_content.adapter = clubFollowAdapter
             clubFollowAdapter.submitList(it)
         })
 
-        viewModel.memberList.observe(viewLifecycleOwner, Observer {
+        viewModel.memberList.observe(this, Observer {
             rv_content.adapter = memberFollowAdapter
             memberFollowAdapter.submitList(it)
         })
 
-        viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
+        viewModel.attachmentResult.observe(this, Observer {
             when (it) {
                 is ApiResult.Success -> {
                     val attachmentItem = it.result
@@ -145,7 +128,7 @@ class MyFollowFragment : BaseFragment() {
             }
         })
 
-        viewModel.clubDetail.observe(viewLifecycleOwner, Observer {
+        viewModel.clubDetail.observe(this, Observer {
             when (it) {
                 is ApiResult.Success -> {
                     val bundle = ClubDetailFragment.createBundle(it.result)
@@ -160,7 +143,7 @@ class MyFollowFragment : BaseFragment() {
             }
         })
 
-        viewModel.cleanResult.observe(viewLifecycleOwner, Observer {
+        viewModel.cleanResult.observe(this, Observer {
             when (it) {
                 is ApiResult.Loading -> layout_refresh.isRefreshing = true
                 is ApiResult.Loaded -> layout_refresh.isRefreshing = false
@@ -168,6 +151,24 @@ class MyFollowFragment : BaseFragment() {
             }
         })
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback {
+            navigateTo(NavigateItem.Up)
+        }
+        viewModel.initData(lastTab)
+    }
+
+    override fun setupFirstTime() {
+        initSettings()
+    }
+
+    override fun getLayoutId(): Int {
+        return R.layout.fragment_my_follow
+    }
+
+    override fun setupObservers() {}
 
     private val onCleanDialogListener = object : OnCleanDialogListener {
         override fun onClean() {
@@ -222,6 +223,9 @@ class MyFollowFragment : BaseFragment() {
         tv_clean.visibility = View.VISIBLE
         tv_title.setText(R.string.follow_title)
         tv_all.text = getString(R.string.follow_clubs_total_num, "0")
+
+        setTabPosition(TYPE_MEMBER)
+        rv_content.adapter = memberFollowAdapter
     }
 
     private fun refreshUi(witch: Int, size: Int) {
