@@ -14,10 +14,10 @@ import com.dabenxiang.mimi.model.api.vo.ChatContentPayloadItem
 import com.dabenxiang.mimi.model.api.vo.MQTTChatItem
 import com.dabenxiang.mimi.model.enums.ChatMessageType
 import com.dabenxiang.mimi.model.enums.VideoDownloadStatusType
-import com.dabenxiang.mimi.model.manager.mqtt.ConnectCallback
-import com.dabenxiang.mimi.model.manager.mqtt.ExtendedCallback
+import com.dabenxiang.mimi.model.manager.mqtt.callback.ConnectCallback
+import com.dabenxiang.mimi.model.manager.mqtt.callback.ExtendedCallback
 import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager
-import com.dabenxiang.mimi.model.manager.mqtt.SubscribeCallback
+import com.dabenxiang.mimi.model.manager.mqtt.callback.SubscribeCallback
 import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.model.vo.UploadPicItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
@@ -312,7 +312,8 @@ class ChatContentViewModel : BaseViewModel() {
 
     fun initMQTT() {
         topic = PREFIX_CHAT + chatId
-        mqttManager.init(serverUrl, clientId, object : ExtendedCallback {
+        mqttManager.init(serverUrl, clientId, object :
+            ExtendedCallback {
             override fun onConnectComplete(reconnect: Boolean, serverURI: String) {
                 Timber.d("Connect: $serverURI")
                 connect()
@@ -343,7 +344,8 @@ class ChatContentViewModel : BaseViewModel() {
     }
 
     fun connect() {
-        mqttManager.connect(object : ConnectCallback {
+        mqttManager.connect(object :
+            ConnectCallback {
             override fun onSuccess(asyncActionToken: IMqttToken) {
                 Timber.d("Connection onSuccess")
                 //TODO: test code
@@ -357,7 +359,8 @@ class ChatContentViewModel : BaseViewModel() {
     }
 
     fun subscribe(topic: String) {
-        mqttManager.subscribeToTopic(topic, object : SubscribeCallback {
+        mqttManager.subscribeToTopic(topic, object :
+            SubscribeCallback {
             override fun onSuccess(asyncActionToken: IMqttToken) {
                 Timber.d("onSuccess: $asyncActionToken")
             }

@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
-import com.dabenxiang.mimi.model.serializable.PlayerData
+import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.viewholder.GridBannerHolder
@@ -91,7 +91,7 @@ class HomeVideoListAdapter(
             override fun onClickItemIndex(view: View, index: Int) {
                 if (index > -1) {
                     getItem(index)?.also {
-                        val playerData = PlayerData.parser(it, isAdult)
+                        val playerData = PlayerItem.parser(it, isAdult)
                         nestedListener.onVideoClick(view, playerData)
                     }
                 }

@@ -1,8 +1,8 @@
-package com.dabenxiang.mimi.model.serializable
+package com.dabenxiang.mimi.model.vo
 
 import java.io.Serializable
 
-class CategoriesData : Serializable {
+class CategoriesItem : Serializable {
     var title: String = ""
     var categories: String? = ""
 }
