@@ -156,9 +156,9 @@ class TextDetailAdapter(
                     onTextDetailListener.onFollowClick(memberPostItem, position, !isFollow)
                 }
 
-//                holder.avatarImg.setOnClickListener {
-//                    onTextDetailListener.onAvatarClick(memberPostItem.creatorId, memberPostItem.postFriendlyName)
-//                }
+                holder.avatarImg.setOnClickListener {
+                    onTextDetailListener.onAvatarClick(memberPostItem.creatorId, memberPostItem.postFriendlyName)
+                }
             }
             is CommentTitleViewHolder -> {
                 holder.newestComment.setOnClickListener {
