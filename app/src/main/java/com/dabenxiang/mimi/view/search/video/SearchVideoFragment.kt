@@ -91,6 +91,7 @@ class SearchVideoFragment : BaseFragment() {
         viewModel.isAdult = mainViewModel?.adultMode?.value ?: false
 
         (arguments?.getSerializable(KEY_DATA) as SearchingVideoData?)?.also { data ->
+            Timber.d("key data from args is title: ${data.title} and tag: ${data.tag}")
             if (data.tag.isNotBlank()) {
                 viewModel.searchingTag = data.tag
                 tv_search_text.text = genResultText()

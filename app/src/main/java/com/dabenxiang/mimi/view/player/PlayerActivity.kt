@@ -16,6 +16,7 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavDeepLinkBuilder
 import androidx.recyclerview.widget.LinearSnapHelper
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
@@ -38,6 +39,8 @@ import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.dialog.*
 import com.dabenxiang.mimi.view.login.LoginActivity
 import com.dabenxiang.mimi.view.login.LoginFragment
+import com.dabenxiang.mimi.view.main.MainActivity
+import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.OrientationDetector
 import com.google.android.exoplayer2.*
@@ -1398,6 +1401,20 @@ class PlayerActivity : BaseActivity() {
                         R.color.color_black_1_10
                     }
                 )
+            )
+
+            chip.setOnClickListener(
+                    View.OnClickListener {
+                        val bundle = SearchVideoFragment.createBundle(tag = chip.text.toString())
+                        val pendingIntent = NavDeepLinkBuilder(this)
+                                .setComponentName(MainActivity::class.java)
+                                .setGraph(R.navigation.navigation_home)
+                                .setDestination(R.id.searchVideoFragment)
+                                .setArguments(bundle)
+                                .createPendingIntent()
+
+                        pendingIntent.send()
+                    }
             )
 
             headVideoInfo.reflow_group.addView(chip)

@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.home
 
 import android.content.Intent
+import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
