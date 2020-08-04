@@ -6,7 +6,6 @@ import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ChatContentItem
@@ -39,6 +38,7 @@ import java.net.URLEncoder
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 class ChatContentViewModel : BaseViewModel() {
@@ -142,11 +142,11 @@ class ChatContentViewModel : BaseViewModel() {
                 )
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()
-                val size = item?.content?.size ?: 0
-                val messages = adjustData(item?.content as ArrayList<ChatContentItem>)
-                val totalCount = item.paging.count
+                val size = item?.content?.messages?.size ?: 0
+                val messages = adjustData(item?.content?.messages ?: ArrayList<ChatContentItem>())
+                val totalCount = item?.paging?.count ?: 0
                 val nextPageKey = when {
-                    hasNextPage(totalCount, item.paging.offset, size) -> {
+                    hasNextPage(totalCount, item?.paging?.offset ?: 0, size) -> {
                         if (offset == 0) size else (offset + size)
                     }
                     else -> null
@@ -194,10 +194,9 @@ class ChatContentViewModel : BaseViewModel() {
                 if (!result.isSuccessful) throw HttpException(result)
                 val byteArray = result.body()?.bytes()
                 if (type == TAG_IMAGE) {
-                    val bitmap = ImageUtils.bytes2Bitmap(byteArray)
                     val item = AttachmentItem(
                             id = id,
-                            bitmap = bitmap,
+                            fileArray = byteArray,
                             position = position
                     )
                     emit(ApiResult.success(item))
@@ -393,13 +392,5 @@ class ChatContentViewModel : BaseViewModel() {
         val payload = ChatContentPayloadItem(messageType, message, if (TextUtils.isEmpty(sendTime)) null else convertStringToDate(sendTime), ext)
         val chatContentItem = ChatContentItem(pref.profileItem.userId.toString(), payload = payload, mediaHashCode = mediaHashcode, downloadStatus = downloadStatusType)
         _cachePushData.value = chatContentItem
-    }
-
-    fun genTextCacheData() {
-
-    }
-
-    fun genMediaCacheData() {
-
     }
 }

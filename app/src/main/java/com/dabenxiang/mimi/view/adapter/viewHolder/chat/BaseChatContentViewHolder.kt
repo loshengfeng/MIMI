@@ -19,6 +19,7 @@ import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -38,21 +39,23 @@ open class BaseChatContentViewHolder(
 
     override fun updated(position: Int) {
         super.updated(position)
-        val avatarId = if (!TextUtils.equals(pref.profileItem.userId.toString(), data?.username)) {
+        val avatarId = if (TextUtils.equals(pref.profileItem.userId.toString(), data?.username)) {
             pref.profileItem.avatarAttachmentId.toString()
         } else {
             listener.getSenderAvatar()
         }
 
         avatarId.let {
-            LruCacheUtils.getLruCache(avatarId)?.also { bitmap ->
+            LruCacheUtils.getLruArrayCache(avatarId)?.also { array ->
                 val options: RequestOptions = RequestOptions()
                         .transform(MultiTransformation(CenterCrop(), CircleCrop()))
                         .placeholder(R.drawable.default_profile_picture)
                         .error(R.drawable.default_profile_picture)
                         .priority(Priority.NORMAL)
 
-                Glide.with(App.self).load(bitmap)
+                Glide.with(App.self).
+                        asBitmap()
+                        .load(array)
                         .apply(options)
                         .into(ivHead)
             } ?: run {

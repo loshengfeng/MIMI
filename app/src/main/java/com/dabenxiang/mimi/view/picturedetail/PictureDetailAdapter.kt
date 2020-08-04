@@ -170,9 +170,9 @@ class PictureDetailAdapter(
                     onPictureDetailListener.onFollowClick(memberPostItem, position, !isFollow)
                 }
 
-                holder.avatarImg.setOnClickListener {
-                    onPictureDetailListener.onAvatarClick(memberPostItem.creatorId, memberPostItem.postFriendlyName)
-                }
+//                holder.avatarImg.setOnClickListener {
+//                    onPictureDetailListener.onAvatarClick(memberPostItem.creatorId, memberPostItem.postFriendlyName)
+//                }
 
             }
             is CommentTitleViewHolder -> {

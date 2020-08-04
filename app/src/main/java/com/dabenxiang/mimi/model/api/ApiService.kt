@@ -104,7 +104,7 @@ interface ApiService {
         @Path("chatId") chatId: Long,
         @Query("offset") offset: String,
         @Query("limit") limit: String
-    ): Response<ApiBasePagingItem<List<ChatContentItem>>>
+    ): Response<ApiBasePagingItem<ChatContent>>
 
     @PUT("/v1/Members/Me/Chats/LastRead")
     suspend fun setLastReadMessageTime(

@@ -620,6 +620,7 @@ class AdultHomeFragment : BaseFragment() {
             resources.getDimension(R.dimen.dp_6)
         )
 
+        iv_post.visibility = View.VISIBLE
         btn_filter.visibility = View.GONE
         btn_ranking.visibility = View.VISIBLE
 
