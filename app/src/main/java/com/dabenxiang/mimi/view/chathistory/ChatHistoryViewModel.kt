@@ -72,10 +72,9 @@ class ChatHistoryViewModel : BaseViewModel() {
                 val result = domainManager.getApiRepository().getAttachment(id)
                 if (!result.isSuccessful) throw HttpException(result)
                 val byteArray = result.body()?.bytes()
-                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
                 val item = AttachmentItem(
                         id = id,
-                        bitmap = bitmap,
+                        fileArray = byteArray,
                         position = position
                 )
                 emit(ApiResult.success(item))

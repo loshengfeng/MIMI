@@ -16,8 +16,8 @@ import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.model.serializable.PlayerData
-import com.dabenxiang.mimi.model.serializable.SearchPostItem
+import com.dabenxiang.mimi.model.vo.PlayerItem
+import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.adapter.FavoriteTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -280,7 +280,9 @@ class FavoriteFragment : BaseFragment() {
         override fun onVideoClick(item: Any) {
             when (item) {
                 is PlayItem -> {
-                    val playerData = PlayerData(item.videoId ?: 0, item.isAdult ?: false)
+                    val playerData = PlayerItem(
+                        item.videoId ?: 0, item.isAdult ?: false
+                    )
                     val intent = Intent(requireContext(), PlayerActivity::class.java)
                     intent.putExtras(PlayerActivity.createBundle(playerData))
                     startActivity(intent)
@@ -361,7 +363,7 @@ class FavoriteFragment : BaseFragment() {
                                 )
                             } else {
                                 val playerData =
-                                    PlayerData(
+                                    PlayerItem(
                                         item.videoId ?: 0, item.isAdult
                                             ?: false
                                     )
@@ -418,7 +420,12 @@ class FavoriteFragment : BaseFragment() {
                         )
                 )
             } else {
-                val bundle = SearchPostFragment.createBundle(SearchPostItem(PostType.getTypeByValue(type), text))
+                val bundle = SearchPostFragment.createBundle(
+                    SearchPostItem(
+                        PostType.getTypeByValue(type),
+                        text
+                    )
+                )
                 navigateTo(
                         NavigateItem.Destination(
                                 R.id.action_postFavoriteFragment_to_searchPostFragment,

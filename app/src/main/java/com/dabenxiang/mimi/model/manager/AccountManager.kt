@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.manager
+package com.dabenxiang.mimi.model.manager
 
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ChangePasswordRequest
@@ -163,6 +163,7 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
             .onStart { emit(ApiResult.loading()) }
             .catch { e -> emit(ApiResult.error(e)) }
             .onCompletion { emit(ApiResult.loaded()) }
+
 
     fun changePwd(oldPassword: String, newPassword: String) =
         flow {

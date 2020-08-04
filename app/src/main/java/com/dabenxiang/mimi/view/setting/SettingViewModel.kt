@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.BuildConfig
-import com.dabenxiang.mimi.manager.DomainManager
+import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.AvatarRequest
 import com.dabenxiang.mimi.model.api.vo.EmailRequest

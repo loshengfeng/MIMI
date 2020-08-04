@@ -8,5 +8,6 @@ data class AttachmentItem(
     var bitmap: Bitmap? = null,
     var parentPosition: Int? = null,
     var position: Int? = null,
-    val type: AttachmentType? = null
+    val type: AttachmentType? = null,
+    val fileArray: ByteArray? = null
 )

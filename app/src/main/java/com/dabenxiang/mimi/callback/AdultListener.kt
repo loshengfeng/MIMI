@@ -13,5 +13,5 @@ interface AdultListener {
     fun onClipItemClick(item: List<MemberPostItem>, position: Int)
     fun onClipCommentClick(item: List<MemberPostItem>, position: Int)
     fun onChipClick(type: PostType, tag: String)
-    fun onAvatarClick()
+    fun onAvatarClick(userId: Long, name: String)
 }

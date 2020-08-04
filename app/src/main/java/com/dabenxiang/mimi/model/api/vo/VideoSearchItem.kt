@@ -9,16 +9,6 @@ data class VideoSearchItem(
     @SerializedName("videos")
     val videos: List<VideoItem>?
 ) {
-    data class Category(
-//        @SerializedName("categories")
-//        val categories: List<Category>?,
-//        @SerializedName("name")
-//        val name: String?,
-        @SerializedName("areas")
-        val areas: List<String>?,
-        @SerializedName("years")
-        val years: List<String>?
-    )
 
     data class VideoSearchDetail(
         @SerializedName("cover")
@@ -39,3 +29,14 @@ data class VideoSearchItem(
         val years: Int?
     )
 }
+
+data class Category(
+//        @SerializedName("categories")
+//        val categories: List<Category>?,
+//        @SerializedName("name")
+//        val name: String?,
+    @SerializedName("areas")
+    val areas: List<String>?,
+    @SerializedName("years")
+    val years: List<String>?
+)

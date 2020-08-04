@@ -171,7 +171,7 @@ class PictureDetailAdapter(
                 }
 
                 holder.avatarImg.setOnClickListener {
-                    onPictureDetailListener.onAvatarClick()
+                    onPictureDetailListener.onAvatarClick(memberPostItem.creatorId, memberPostItem.postFriendlyName)
                 }
 
             }
@@ -260,8 +260,8 @@ class PictureDetailAdapter(
             onPictureDetailListener.onMoreClick(item)
         }
 
-        override fun onAvatarClick() {
-            onPictureDetailListener.onAvatarClick()
+        override fun onAvatarClick(userId: Long, name: String) {
+            onPictureDetailListener.onAvatarClick(userId, name)
         }
     }
 
@@ -277,6 +277,6 @@ class PictureDetailAdapter(
         fun onMoreClick(item: MembersPostCommentItem)
         fun onChipClick(type: PostType, tag: String)
         fun onOpenWebView(url: String)
-        fun onAvatarClick()
+        fun onAvatarClick(userId: Long, name: String)
     }
 }

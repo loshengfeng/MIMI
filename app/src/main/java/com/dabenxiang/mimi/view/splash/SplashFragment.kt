@@ -45,8 +45,7 @@ class SplashFragment : BaseFragment() {
 
     private val cameraPermissions = arrayOf(Manifest.permission.CAMERA)
 
-    private val permissions = locationPermissions+externalPermissions+cameraPermissions
-
+    private val permissions = locationPermissions + externalPermissions + cameraPermissions
 
     private val viewModel: SplashViewModel by viewModels()
 
@@ -88,8 +87,6 @@ class SplashFragment : BaseFragment() {
     }
 
     override fun setupListeners() {}
-
-
 
     private fun requestPermissions() {
         val requestList = getNotGrantedPermissions(permissions)
@@ -141,13 +138,17 @@ class SplashFragment : BaseFragment() {
                 is Empty -> {
                     goToHomePage()
                 }
-                is Error -> onApiError(it.throwable)
+                is Error -> {
+                    onApiError(it.throwable)
+                    viewModel.logoutLocal()
+                    goToHomePage()
+                }
             }
         })
         viewModel.autoLogin()
     }
 
-    private fun goToHomePage(){
+    private fun goToHomePage() {
         lifecycleScope.launch(Dispatchers.IO) {
             delay(1000)
             withContext(Dispatchers.Main) {

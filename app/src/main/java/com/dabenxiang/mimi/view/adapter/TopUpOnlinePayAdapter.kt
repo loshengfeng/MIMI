@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.holder.TopUpOnlinePayItem
+import com.dabenxiang.mimi.model.vo.TopUpOnlinePayItem
 import com.dabenxiang.mimi.view.listener.AdapterEventListener
 import com.dabenxiang.mimi.view.topup.TopUpOnlinePayViewHolder
 

@@ -1,8 +1,8 @@
 package com.dabenxiang.mimi.view.dialog.preview
 
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
+import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
@@ -13,17 +13,17 @@ import kotlinx.android.synthetic.main.fragment_dialog_image_preview.*
 class ImagePreviewDialogFragment : BaseDialogFragment() {
 
     private var onCleanDialogListener: OnCleanDialogListener? = null
-    private var bitmap: Bitmap? = null
+    private var imageArray: ByteArray? = null
 
     companion object {
 
         fun newInstance(
-                bitmap: Bitmap?,
+                imageArray: ByteArray?,
                 listener: OnCleanDialogListener? = null
         ): ImagePreviewDialogFragment {
             val fragment = ImagePreviewDialogFragment()
             fragment.onCleanDialogListener = listener
-            fragment.bitmap = bitmap
+            fragment.imageArray = imageArray
             return fragment
         }
     }
@@ -45,15 +45,17 @@ class ImagePreviewDialogFragment : BaseDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (bitmap != null) {
+        if (imageArray != null) {
             txt_file_invalid.visibility = View.INVISIBLE
             img_logo.visibility = View.INVISIBLE
             Glide.with(App.self)
-                    .load(bitmap)
+                    .asBitmap()
+                    .load(imageArray)
                     .into(ima_bg)
         } else {
             txt_file_invalid.visibility = View.VISIBLE
             img_logo.visibility = View.VISIBLE
+            ima_bg.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.black))
         }
     }
 }

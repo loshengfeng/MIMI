@@ -2,7 +2,7 @@ package com.dabenxiang.mimi.view.mypost
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.manager.DomainManager
+import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.USER_ID_ME
 import kotlinx.coroutines.CoroutineScope
@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
 class MyPostDataSource(
     private val userId: Long,

@@ -2,7 +2,7 @@ package com.dabenxiang.mimi.view.search.video
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.SearchPagingCallback
-import com.dabenxiang.mimi.manager.DomainManager
+import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.PostType

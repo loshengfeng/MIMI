@@ -1,6 +1,6 @@
 package com.dabenxiang.mimi.view.player
 
-import com.dabenxiang.mimi.manager.DomainManager
+import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.view.base.JFPageDataSource
 import retrofit2.HttpException

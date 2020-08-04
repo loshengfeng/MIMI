@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.manager
+package com.dabenxiang.mimi.model.manager
 
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.BuildConfig
