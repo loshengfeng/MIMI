@@ -38,6 +38,11 @@ class FilterTabAdapter(
         notifyDataSetChanged()
     }
 
+    fun updateLastSelected(selectedIndex: Int?) {
+        lastSelected = selectedIndex
+        notifyDataSetChanged()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilterTabHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_filter, parent, false)
         return FilterTabHolder(
