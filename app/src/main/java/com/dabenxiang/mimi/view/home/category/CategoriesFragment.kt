@@ -123,7 +123,7 @@ class CategoriesFragment : BaseFragment() {
         (arguments?.getSerializable(KEY_DATA) as CategoriesItem?)?.also { data ->
             tv_title.text = data.title
 
-            recyclerview_content.background =
+            cl_root.background =
                 if (isAdult) {
                     R.color.adult_color_background
                 } else {
@@ -131,6 +131,12 @@ class CategoriesFragment : BaseFragment() {
                 }.let { res ->
                     requireActivity().getDrawable(res)
                 }
+
+            tv_no_data.setTextColor(takeIf { isAdult }?.let {
+                requireActivity().getColorStateList(R.color.color_white_1)
+            } ?: run {
+                requireActivity().getColorStateList(R.color.color_black_2_50)
+            })
 
             layout_top.background =
                 if (isAdult) {
@@ -254,9 +260,18 @@ class CategoriesFragment : BaseFragment() {
             videoListAdapter.submitList(it)
         })
 
-        viewModel.filterList.observe(viewLifecycleOwner, Observer {
+        viewModel.filterList.observe(viewLifecycleOwner, Observer { data ->
             progressHUD?.dismiss()
-            videoListAdapter.submitList(it)
+            videoListAdapter.submitList(data)
+        })
+
+        viewModel.filterCategoryResult.observe(viewLifecycleOwner, Observer {
+            filterAdapterList[1]?.updateList(it.areas, null)
+            filterAdapterList[2]?.updateList(it.years, null)
+        })
+
+        viewModel.onTotalCountResult.observe(viewLifecycleOwner, Observer {
+            cl_no_data.visibility = it.takeIf { it == 0L }?.let {  View.VISIBLE } ?: let { View.GONE }
         })
     }
 
@@ -293,32 +308,7 @@ class CategoriesFragment : BaseFragment() {
         val adapter = FilterTabAdapter(object : FilterTabAdapter.FilterTabAdapterListener {
             override fun onSelectedFilterTab(recyclerView: RecyclerView, position: Int, keyword: String) {
                 viewModel.updatedFilterPosition(index, position)
-
-                val filterKeyList: ArrayList<String?> = arrayListOf()
-                filterDataList.forEachIndexed { index, list ->
-                    val lastPosition = viewModel.filterPositionData(index)?.value
-
-                    lastPosition?.takeIf { it < list.size }?.let { list[it] }.also {
-                        when(index) {
-                            0 -> {
-                                val key = it.takeUnless { it == "全部" }?.let { key ->
-                                    if (isAdult) key else "${data.title},$key"
-                                } ?: let {
-                                    if (isAdult) null else data.title
-                                }
-                                filterKeyList.add(key)
-                            }
-                            else -> {
-                                it.takeUnless { it == "全部" }?.also { key ->
-                                    filterKeyList.add(key)
-                                } ?: run { filterKeyList.add(null) }
-                            }
-                        }
-                    }
-                }
-
-                progressHUD?.show()
-                viewModel.getVideoFilterList(filterKeyList[0], filterKeyList[1], filterKeyList[2], isAdult)
+                doOnTabSelected()
             }
         }, isAdult)
         adapter.submitList(list, 0)
@@ -344,6 +334,34 @@ class CategoriesFragment : BaseFragment() {
                 }
             }.takeIf { sb.isNotEmpty() }?.run { tv_collapsing_filter.text = sb.toString() }
         })
+    }
+
+    private fun doOnTabSelected() {
+        val filterKeyList: ArrayList<String?> = arrayListOf()
+        filterDataList.forEachIndexed { index, list ->
+            val lastPosition = viewModel.filterPositionData(index)?.value
+
+            lastPosition?.takeIf { it < list.size }?.let { list[it] }.also {
+                when(index) {
+                    0 -> {
+                        val key = it.takeUnless { it == "全部" }?.let { key ->
+                            if (isAdult) key else "${data.title},$key"
+                        } ?: let {
+                            if (isAdult) null else data.title
+                        }
+                        filterKeyList.add(key)
+                    }
+                    else -> {
+                        it.takeUnless { it == "全部" }?.also { key ->
+                            filterKeyList.add(key)
+                        } ?: run { filterKeyList.add(null) }
+                    }
+                }
+            }
+        }
+
+        progressHUD?.show()
+        viewModel.getVideoFilterList(filterKeyList[0], filterKeyList[1], filterKeyList[2], isAdult)
     }
 
     private val onScrollListener = object : RecyclerView.OnScrollListener() {

@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.home.viewholder.FilterTabHolder
 
 class FilterTabAdapter(
@@ -20,12 +19,23 @@ class FilterTabAdapter(
 
     private var attachedRecyclerView: RecyclerView? = null
 
-    private val holderListener = object : BaseIndexViewHolder.IndexViewHolderListener {
-        override fun onClickItemIndex(view: View, index: Int) {
-            attachedRecyclerView?.also {
+    private var newTabList: List<String>? = null
+
+    private val holderListener = object : FilterTabHolder.FilterTabHolderListener {
+        override fun onClickItemIndex(view: View, index: Int, isDisable: Boolean) {
+            attachedRecyclerView?.takeUnless { isDisable }?.also {
                 listener.onSelectedFilterTab(it, index, tabList?.get(index) ?: "")
             }
         }
+    }
+
+    fun updateList(src: List<String>?, initSelectedIndex: Int?) {
+        initSelectedIndex?.also {
+            lastSelected = it
+        }
+        newTabList = src
+
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilterTabHolder {
@@ -39,7 +49,11 @@ class FilterTabAdapter(
 
     override fun onBindViewHolder(holder: FilterTabHolder, position: Int) {
         holder.bind(tabList?.get(position) ?: "", position)
-        holder.setSelected(lastSelected == position)
+        tabList?.get(position).let {
+            newTabList == null || newTabList?.contains(it) == true
+        }.also {
+            holder.setTitleStyle(lastSelected == position, !it)
+        }
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
