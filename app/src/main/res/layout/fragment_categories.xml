@@ -95,7 +95,6 @@
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
                 android:orientation="horizontal"
-                android:paddingStart="20dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
         </LinearLayout>
 
@@ -129,7 +128,6 @@
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
                 android:orientation="horizontal"
-                android:paddingStart="20dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
         </LinearLayout>
 
@@ -162,7 +160,6 @@
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
                 android:orientation="horizontal"
-                android:paddingStart="20dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
         </LinearLayout>
 

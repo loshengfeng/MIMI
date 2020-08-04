@@ -490,7 +490,8 @@ class CategoriesFragment : BaseFragment() {
             tv.setTextColor(requireContext().getColor(R.color.color_white_1))
             tv.background = requireContext().getDrawable(R.drawable.bg_red_1_radius_6)
         } ?: run {
-            tv.setTextColor(requireContext().getColor(R.color.normal_color_text))
+            tv.setTextColor(takeIf { isAdult }?.let { requireContext().getColor(R.color.color_white_1) }
+                ?: let { requireContext().getColor(R.color.normal_color_text) })
             tv.background = null
         }
     }
