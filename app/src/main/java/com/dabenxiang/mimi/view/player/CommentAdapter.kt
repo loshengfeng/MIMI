@@ -36,7 +36,7 @@ class CommentAdapter(isAdult: Boolean, listener: PlayerInfoListener, type: Comme
         fun removeCommentLikeType(replyId: Long?, succeededBlock: () -> Unit)
         fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit)
         fun onMoreClick(item: MembersPostCommentItem)
-        fun onAvatarClick()
+        fun onAvatarClick(userId: Long, name: String)
     }
 
     init {
@@ -140,8 +140,7 @@ class RootCommentProvider(
         val actualData = data as RootCommentNode
         when (view.id) {
             R.id.iv_avatar -> {
-                // TODO:
-                listener.onAvatarClick()
+                listener.onAvatarClick(actualData.data.creatorId, actualData.data.postName)
             }
             R.id.btn_show_comment_reply -> {
                 if (actualData.isExpanded) {
@@ -232,8 +231,7 @@ class NestedCommentProvider(
         val actualData = data as NestedCommentNode
         when (view.id) {
             R.id.iv_avatar -> {
-                // TODO:
-                listener.onAvatarClick()
+                listener.onAvatarClick(actualData.data.creatorId, actualData.data.postName)
             }
             R.id.tv_like -> {
                 val isLike = true

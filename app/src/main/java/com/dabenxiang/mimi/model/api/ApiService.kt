@@ -104,7 +104,7 @@ interface ApiService {
         @Path("chatId") chatId: Long,
         @Query("offset") offset: String,
         @Query("limit") limit: String
-    ): Response<ApiBasePagingItem<List<ChatContentItem>>>
+    ): Response<ApiBasePagingItem<ChatContent>>
 
     @PUT("/v1/Members/Me/Chats/LastRead")
     suspend fun setLastReadMessageTime(
@@ -230,6 +230,11 @@ interface ApiService {
     suspend fun getMembersClub(
         @Query("tag") tag: String
     ): Response<ApiBasePagingItem<ArrayList<MemberClubItem>>>
+
+    @GET("/v1/Members/Club/{id}")
+    suspend fun getMembersClub(
+        @Path("id") clubId: Long
+    ): Response<ApiBasePagingItem<MemberClubItem>>
 
     @GET("/v1/Members/Club/Post")
     suspend fun getMembersClubPost(

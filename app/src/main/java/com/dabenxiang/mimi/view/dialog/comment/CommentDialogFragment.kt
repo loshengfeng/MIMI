@@ -13,8 +13,10 @@ import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
+import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.CommentLoadMoreView
 import com.dabenxiang.mimi.view.player.RootCommentNode
@@ -166,9 +168,7 @@ class CommentDialogFragment : BaseDialogFragment() {
                 }
             }
 
-            override fun onAvatarClick() {
-
-            }
+            override fun onAvatarClick(userId: Long, name: String) {}
 
         }, CommentViewType.CLIP).apply {
             loadMoreModule.apply {

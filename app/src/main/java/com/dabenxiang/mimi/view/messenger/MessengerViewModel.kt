@@ -1,10 +1,10 @@
 package com.dabenxiang.mimi.view.messenger
 
 import com.dabenxiang.mimi.BuildConfig
-import com.dabenxiang.mimi.model.manager.mqtt.ConnectCallback
-import com.dabenxiang.mimi.model.manager.mqtt.ExtendedCallback
+import com.dabenxiang.mimi.model.manager.mqtt.callback.ConnectCallback
+import com.dabenxiang.mimi.model.manager.mqtt.callback.ExtendedCallback
 import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager
-import com.dabenxiang.mimi.model.manager.mqtt.SubscribeCallback
+import com.dabenxiang.mimi.model.manager.mqtt.callback.SubscribeCallback
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
 import org.eclipse.paho.client.mqttv3.IMqttToken
@@ -24,7 +24,8 @@ class MessengerViewModel : BaseViewModel() {
     private val clientId = UUID.randomUUID().toString()
 
     fun init() {
-        mqttManager.init(serverUrl, clientId, object : ExtendedCallback {
+        mqttManager.init(serverUrl, clientId, object :
+            ExtendedCallback {
             override fun onConnectComplete(reconnect: Boolean, serverURI: String) {
                 Timber.d("Connect: $serverURI")
                 connect()
@@ -49,7 +50,8 @@ class MessengerViewModel : BaseViewModel() {
     }
 
     fun connect() {
-        mqttManager.connect(object : ConnectCallback {
+        mqttManager.connect(object :
+            ConnectCallback {
             override fun onSuccess(asyncActionToken: IMqttToken) {
                 Timber.d("Connection onSuccess")
                 //TODO: test code
@@ -63,7 +65,8 @@ class MessengerViewModel : BaseViewModel() {
     }
 
     fun subscribe(topic: String) {
-        mqttManager.subscribeToTopic(topic, object : SubscribeCallback{
+        mqttManager.subscribeToTopic(topic, object :
+            SubscribeCallback {
             override fun onSuccess(asyncActionToken: IMqttToken) {
                 Timber.d("onSuccess: $asyncActionToken")
             }

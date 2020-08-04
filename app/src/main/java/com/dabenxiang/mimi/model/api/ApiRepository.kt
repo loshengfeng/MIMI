@@ -299,6 +299,12 @@ class ApiRepository(private val apiService: ApiService) {
         return apiService.getMembersClub(tag)
     }
 
+    suspend fun getMembersClub(
+        clubId: Long
+    ): Response<ApiBasePagingItem<MemberClubItem>> {
+        return apiService.getMembersClub(clubId)
+    }
+
     suspend fun getMembersClubPost(
         offset: Int,
         limit: Int

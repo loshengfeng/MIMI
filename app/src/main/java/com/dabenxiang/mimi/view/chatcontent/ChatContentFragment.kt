@@ -52,8 +52,8 @@ class ChatContentFragment : BaseFragment() {
             viewModel.getAttachment(requireContext(), id, position)
         }
 
-        override fun onImageClick(bitmap: Bitmap) {
-            imagePreviewDialog = ImagePreviewDialogFragment.newInstance(bitmap, null).also {
+        override fun onImageClick(imageArray: ByteArray?) {
+            imagePreviewDialog = ImagePreviewDialogFragment.newInstance(imageArray, null).also {
                 it.show(
                         requireActivity().supportFragmentManager,
                         MoreDialogFragment::class.java.simpleName
@@ -164,7 +164,8 @@ class ChatContentFragment : BaseFragment() {
                     when (it.result) {
                         is AttachmentItem -> {
                             val attachmentItem = it.result
-                            LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
+                            LruCacheUtils.putLruArrayCache(attachmentItem.id
+                                    ?: "", attachmentItem.fileArray ?: ByteArray(0))
                             adapter.update(attachmentItem.position ?: -1)
                         }
                         is String -> {

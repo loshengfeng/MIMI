@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.model.serializable
+package com.dabenxiang.mimi.model.vo
 
 import com.dabenxiang.mimi.model.enums.PostType
 import java.io.Serializable

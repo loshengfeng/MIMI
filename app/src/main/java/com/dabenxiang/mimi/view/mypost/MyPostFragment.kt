@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.mypost
 
-import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
@@ -20,9 +19,9 @@ import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.model.serializable.SearchPostItem
 import com.dabenxiang.mimi.model.vo.PostAttachmentItem
 import com.dabenxiang.mimi.model.vo.PostVideoAttachment
+import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.adapter.MyPostPagedAdapter
 import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -120,15 +119,7 @@ class MyPostFragment : BaseFragment() {
         requireActivity().onBackPressedDispatcher.addCallback {
             navigateTo(NavigateItem.Up)
         }
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        try {
-            interactionListener = context as InteractionListener
-        } catch (e: ClassCastException) {
-            Timber.e("MyPostFragment interaction listener can't cast")
-        }
+        viewModel.getMyPost(userId, isAdult)
     }
 
     override fun initSettings() {
@@ -138,6 +129,8 @@ class MyPostFragment : BaseFragment() {
             isAdult = it.getBoolean(KEY_IS_ADULT)
             isAdultTheme = it.getBoolean(KEY_IS_ADULT_THEME)
         }
+
+        useAdultTheme(isAdultTheme)
 
         adapter = MyPostPagedAdapter(
             requireContext(),
@@ -149,7 +142,6 @@ class MyPostFragment : BaseFragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
 
-        interactionListener?.setAdult(isAdultTheme)
         cl_bg.isSelected = isAdultTheme
         tv_title.text = if (userId == USER_ID_ME) getString(R.string.personal_my_post) else userName
         tv_title.isSelected = isAdultTheme
@@ -272,11 +264,6 @@ class MyPostFragment : BaseFragment() {
 
             viewModel.postPic(postId, postMemberRequest, content)
         }
-    }
-
-    override fun setupFirstTime() {
-        super.setupFirstTime()
-        viewModel.getMyPost()
     }
 
     override fun setupObservers() {
@@ -665,7 +652,7 @@ class MyPostFragment : BaseFragment() {
             val bundle = ClipFragment.createBundle(ArrayList(item), position)
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_myPostFragment_to_searchPostFragment,
+                    R.id.action_myPostFragment_to_clipFragment,
                     bundle
                 )
             )

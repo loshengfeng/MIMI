@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.adapter
 
-import android.graphics.Bitmap
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -27,7 +26,7 @@ class ChatContentAdapter(
     interface EventListener {
         fun onGetAvatarAttachment(id: String, position: Int)
         fun onGetAttachment(id: String, position: Int)
-        fun onImageClick(bitmap: Bitmap)
+        fun onImageClick(imageArray: ByteArray?)
         fun onVideoClick(item: ChatContentItem?, position: Int)
         fun getSenderAvatar(): String
     }

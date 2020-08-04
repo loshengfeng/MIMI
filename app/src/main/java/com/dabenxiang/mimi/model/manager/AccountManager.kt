@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.manager
+package com.dabenxiang.mimi.model.manager
 
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ChangePasswordRequest

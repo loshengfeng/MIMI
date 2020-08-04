@@ -8,14 +8,13 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
-import com.blankj.utilcode.util.AppUtils
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.serializable.CategoriesData
-import com.dabenxiang.mimi.model.serializable.PlayerData
+import com.dabenxiang.mimi.model.vo.CategoriesItem
+import com.dabenxiang.mimi.model.api.vo.CategoriesItem as CategoriesData
+import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.adapter.FilterTabAdapter
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
@@ -34,8 +33,8 @@ class CategoriesFragment : BaseFragment() {
         const val KEY_DATA = "data"
         const val KEY_CATEGORY = "category"
 
-        fun createBundle(title: String, categories: String?, item: CategoriesItem?): Bundle {
-            val data = CategoriesData()
+        fun createBundle(title: String, categories: String?, item: CategoriesData?): Bundle {
+            val data = CategoriesItem()
             data.title = title
             data.categories = categories
 
@@ -57,7 +56,7 @@ class CategoriesFragment : BaseFragment() {
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
         }
 
-        override fun onVideoClick(view: View, item: PlayerData) {
+        override fun onVideoClick(view: View, item: PlayerItem) {
             val intent = Intent(requireContext(), PlayerActivity::class.java)
             intent.putExtras(PlayerActivity.createBundle(item))
             startActivity(intent)
@@ -113,7 +112,7 @@ class CategoriesFragment : BaseFragment() {
         get() = View.GONE
 
     private val isAdult by lazy { mainViewModel?.adultMode?.value ?: false }
-    private val data by lazy {  arguments?.getSerializable(KEY_DATA) as CategoriesData }
+    private val data by lazy {  arguments?.getSerializable(KEY_DATA) as CategoriesItem }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -121,7 +120,7 @@ class CategoriesFragment : BaseFragment() {
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
 
-        (arguments?.getSerializable(KEY_DATA) as CategoriesData?)?.also { data ->
+        (arguments?.getSerializable(KEY_DATA) as CategoriesItem?)?.also { data ->
             tv_title.text = data.title
 
             recyclerview_content.background =
@@ -226,7 +225,7 @@ class CategoriesFragment : BaseFragment() {
                 is ApiResult.Success -> {
                     progressHUD?.dismiss()
                     Timber.d("getCategoryDetailResult: ${it.result}")
-                    (arguments?.getSerializable(KEY_CATEGORY) as CategoriesItem?)?.also { data ->
+                    (arguments?.getSerializable(KEY_CATEGORY) as CategoriesData?)?.also { data ->
                         var notEmptyCount = 0
                         val typeList = arrayListOf<String>()
                         data.categories?.forEach { item ->

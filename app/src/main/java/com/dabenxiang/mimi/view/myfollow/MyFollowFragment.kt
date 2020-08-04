@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.myfollow
 
-import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
@@ -19,8 +18,6 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
-import com.dabenxiang.mimi.view.favroite.FavoriteFragment
-import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_my_follow.*
@@ -55,7 +52,7 @@ class MyFollowFragment : BaseFragment() {
     private val clubFollowAdapter by lazy { ClubFollowAdapter(clubFollowListener) }
     private val clubFollowListener = object : ClubFollowAdapter.EventListener {
         override fun onDetail(item: ClubFollowItem) {
-            viewModel.getClub(item.tag)
+            viewModel.getClub(item.clubId)
         }
 
         override fun onGetAttachment(id: String, position: Int) {
@@ -73,7 +70,7 @@ class MyFollowFragment : BaseFragment() {
             val bundle = MyPostFragment.createBundle(
                 item.userId, item.friendlyName,
                 isAdult = true,
-                isAdultTheme = false
+                isAdultTheme = true
             )
             navigateTo(
                 NavigateItem.Destination(R.id.action_myFollowFragment_to_navigation_my_post, bundle)
@@ -89,8 +86,6 @@ class MyFollowFragment : BaseFragment() {
         }
     }
 
-    private var interactionListener: InteractionListener? = null
-
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
@@ -99,20 +94,14 @@ class MyFollowFragment : BaseFragment() {
         requireActivity().onBackPressedDispatcher.addCallback {
             navigateTo(NavigateItem.Up)
         }
+        initSettings()
     }
 
     override fun onResume() {
         super.onResume()
-        initSettings()
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        try {
-            interactionListener = context as InteractionListener
-        } catch (e: ClassCastException) {
-            Timber.e("MyFollowFragment interaction listener can't cast")
-        }
+        setTabPosition(TYPE_MEMBER)
+        rv_content.adapter = memberFollowAdapter
+        viewModel.initData(lastTab)
     }
 
     override fun getLayoutId(): Int {
@@ -159,7 +148,7 @@ class MyFollowFragment : BaseFragment() {
         viewModel.clubDetail.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Success -> {
-                    val bundle = ClubDetailFragment.createBundle(it.result[0])
+                    val bundle = ClubDetailFragment.createBundle(it.result)
                     navigateTo(
                         NavigateItem.Destination(
                             R.id.action_myFollowFragment_to_clubDetailFragment,
@@ -219,7 +208,7 @@ class MyFollowFragment : BaseFragment() {
     }
 
     override fun initSettings() {
-        super.initSettings()
+        useAdultTheme(false)
 
         rv_primary.adapter = primaryAdapter
 
@@ -228,15 +217,11 @@ class MyFollowFragment : BaseFragment() {
             getString(R.string.follow_circle)
         )
 
-        primaryAdapter.submitList(primaryList, FavoriteFragment.lastPrimaryIndex)
+        primaryAdapter.submitList(primaryList, lastTab)
 
         tv_clean.visibility = View.VISIBLE
         tv_title.setText(R.string.follow_title)
         tv_all.text = getString(R.string.follow_clubs_total_num, "0")
-
-        rv_content.adapter = memberFollowAdapter
-
-        viewModel.initData(lastTab)
     }
 
     private fun refreshUi(witch: Int, size: Int) {

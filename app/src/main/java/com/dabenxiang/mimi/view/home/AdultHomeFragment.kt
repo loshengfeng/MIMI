@@ -28,10 +28,10 @@ import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
-import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
-import com.dabenxiang.mimi.model.serializable.PlayerData
-import com.dabenxiang.mimi.model.serializable.SearchPostItem
+import com.dabenxiang.mimi.model.vo.statisticsItemToCarouselHolderItem
+import com.dabenxiang.mimi.model.vo.statisticsItemToVideoItem
+import com.dabenxiang.mimi.model.vo.PlayerItem
+import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.model.vo.PostAttachmentItem
 import com.dabenxiang.mimi.model.vo.PostVideoAttachment
 import com.dabenxiang.mimi.model.vo.UploadPicItem
@@ -56,6 +56,7 @@ import com.dabenxiang.mimi.view.home.HomeViewModel.Companion.TYPE_VIDEO
 import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.post.article.PostArticleFragment
@@ -623,6 +624,7 @@ class AdultHomeFragment : BaseFragment() {
             resources.getDimension(R.dimen.dp_6)
         )
 
+        iv_post.visibility = View.VISIBLE
         btn_filter.visibility = View.GONE
         btn_ranking.visibility = View.VISIBLE
 
@@ -999,9 +1001,13 @@ class AdultHomeFragment : BaseFragment() {
             )
         }
 
-        override fun onAvatarClick() {
-            // TODO:
-            Timber.d("onAvatarClick nav to member post")
+        override fun onAvatarClick(userId: Long, name: String) {
+            val bundle = MyPostFragment.createBundle(
+                userId, name,
+                isAdult = true,
+                isAdultTheme = true
+            )
+            navigateTo(NavigateItem.Destination(R.id.action_adultHomeFragment_to_navigation_my_post, bundle))
         }
     }
 
@@ -1050,7 +1056,7 @@ class AdultHomeFragment : BaseFragment() {
             setTab(position)
         }
 
-        override fun onVideoClick(view: View, item: PlayerData) {
+        override fun onVideoClick(view: View, item: PlayerItem) {
             val intent = Intent(requireContext(), PlayerActivity::class.java)
             intent.putExtras(PlayerActivity.createBundle(item))
             startActivity(intent)

@@ -6,7 +6,6 @@ import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ChatContentItem
@@ -14,10 +13,10 @@ import com.dabenxiang.mimi.model.api.vo.ChatContentPayloadItem
 import com.dabenxiang.mimi.model.api.vo.MQTTChatItem
 import com.dabenxiang.mimi.model.enums.ChatMessageType
 import com.dabenxiang.mimi.model.enums.VideoDownloadStatusType
-import com.dabenxiang.mimi.model.manager.mqtt.ConnectCallback
-import com.dabenxiang.mimi.model.manager.mqtt.ExtendedCallback
+import com.dabenxiang.mimi.model.manager.mqtt.callback.ConnectCallback
+import com.dabenxiang.mimi.model.manager.mqtt.callback.ExtendedCallback
 import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager
-import com.dabenxiang.mimi.model.manager.mqtt.SubscribeCallback
+import com.dabenxiang.mimi.model.manager.mqtt.callback.SubscribeCallback
 import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.model.vo.UploadPicItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
@@ -39,6 +38,7 @@ import java.net.URLEncoder
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 class ChatContentViewModel : BaseViewModel() {
@@ -142,11 +142,11 @@ class ChatContentViewModel : BaseViewModel() {
                 )
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()
-                val size = item?.content?.size ?: 0
-                val messages = adjustData(item?.content as ArrayList<ChatContentItem>)
-                val totalCount = item.paging.count
+                val size = item?.content?.messages?.size ?: 0
+                val messages = adjustData(item?.content?.messages ?: ArrayList<ChatContentItem>())
+                val totalCount = item?.paging?.count ?: 0
                 val nextPageKey = when {
-                    hasNextPage(totalCount, item.paging.offset, size) -> {
+                    hasNextPage(totalCount, item?.paging?.offset ?: 0, size) -> {
                         if (offset == 0) size else (offset + size)
                     }
                     else -> null
@@ -194,10 +194,9 @@ class ChatContentViewModel : BaseViewModel() {
                 if (!result.isSuccessful) throw HttpException(result)
                 val byteArray = result.body()?.bytes()
                 if (type == TAG_IMAGE) {
-                    val bitmap = ImageUtils.bytes2Bitmap(byteArray)
                     val item = AttachmentItem(
                             id = id,
-                            bitmap = bitmap,
+                            fileArray = byteArray,
                             position = position
                     )
                     emit(ApiResult.success(item))
@@ -311,7 +310,8 @@ class ChatContentViewModel : BaseViewModel() {
 
     fun initMQTT() {
         topic = PREFIX_CHAT + chatId
-        mqttManager.init(serverUrl, clientId, object : ExtendedCallback {
+        mqttManager.init(serverUrl, clientId, object :
+            ExtendedCallback {
             override fun onConnectComplete(reconnect: Boolean, serverURI: String) {
                 Timber.d("Connect: $serverURI")
                 connect()
@@ -342,7 +342,8 @@ class ChatContentViewModel : BaseViewModel() {
     }
 
     fun connect() {
-        mqttManager.connect(object : ConnectCallback {
+        mqttManager.connect(object :
+            ConnectCallback {
             override fun onSuccess(asyncActionToken: IMqttToken) {
                 Timber.d("Connection onSuccess")
                 //TODO: test code
@@ -356,7 +357,8 @@ class ChatContentViewModel : BaseViewModel() {
     }
 
     fun subscribe(topic: String) {
-        mqttManager.subscribeToTopic(topic, object : SubscribeCallback {
+        mqttManager.subscribeToTopic(topic, object :
+            SubscribeCallback {
             override fun onSuccess(asyncActionToken: IMqttToken) {
                 Timber.d("onSuccess: $asyncActionToken")
             }
@@ -393,13 +395,5 @@ class ChatContentViewModel : BaseViewModel() {
         val payload = ChatContentPayloadItem(messageType, message, if (TextUtils.isEmpty(sendTime)) null else convertStringToDate(sendTime), ext)
         val chatContentItem = ChatContentItem(pref.profileItem.userId.toString(), payload = payload, mediaHashCode = mediaHashcode, downloadStatus = downloadStatusType)
         _cachePushData.value = chatContentItem
-    }
-
-    fun genTextCacheData() {
-
-    }
-
-    fun genMediaCacheData() {
-
     }
 }

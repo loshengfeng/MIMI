@@ -170,9 +170,9 @@ class PictureDetailAdapter(
                     onPictureDetailListener.onFollowClick(memberPostItem, position, !isFollow)
                 }
 
-                holder.avatarImg.setOnClickListener {
-                    onPictureDetailListener.onAvatarClick()
-                }
+//                holder.avatarImg.setOnClickListener {
+//                    onPictureDetailListener.onAvatarClick(memberPostItem.creatorId, memberPostItem.postFriendlyName)
+//                }
 
             }
             is CommentTitleViewHolder -> {
@@ -260,8 +260,8 @@ class PictureDetailAdapter(
             onPictureDetailListener.onMoreClick(item)
         }
 
-        override fun onAvatarClick() {
-            onPictureDetailListener.onAvatarClick()
+        override fun onAvatarClick(userId: Long, name: String) {
+            onPictureDetailListener.onAvatarClick(userId, name)
         }
     }
 
@@ -277,6 +277,6 @@ class PictureDetailAdapter(
         fun onMoreClick(item: MembersPostCommentItem)
         fun onChipClick(type: PostType, tag: String)
         fun onOpenWebView(url: String)
-        fun onAvatarClick()
+        fun onAvatarClick(userId: Long, name: String)
     }
 }
