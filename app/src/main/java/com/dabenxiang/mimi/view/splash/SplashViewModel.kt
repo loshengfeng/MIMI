@@ -32,6 +32,8 @@ class SplashViewModel : BaseViewModel(), KoinComponent {
 
     private val versionManager: VersionManager by inject()
 
+    var isChecked =false
+
     private val handler = CoroutineExceptionHandler { _, throwable ->
         Timber.e("$throwable")
 
