@@ -5,24 +5,25 @@ import androidx.recyclerview.widget.RecyclerView
 abstract class BaseTabAdapter<M : Any, VH : RecyclerView.ViewHolder> : RecyclerView.Adapter<VH>() {
 
     protected var tabList: List<M>? = null
-    protected var lastSelected = 0
+    protected var lastSelected: Int? = null
 
-    fun submitList(src: List<M>, initSelectedIndex: Int) {
-        lastSelected = initSelectedIndex
+    fun submitList(src: List<M>, initSelectedIndex: Int?) {
+        initSelectedIndex?.also {
+            lastSelected = it
+        }
         tabList = src
 
         notifyDataSetChanged()
     }
 
-    fun setLastSelectedIndex(index: Int) {
-        val oldSelected = lastSelected
-        lastSelected = index
+    fun setLastSelectedIndex(index: Int?) {
+        index?.also { i ->
+            val oldSelected = lastSelected
+            lastSelected = i
 
-        if (oldSelected >= 0)
-            notifyItemChanged(oldSelected)
-
-        if (lastSelected >= 0)
-            notifyItemChanged(lastSelected)
+            oldSelected?.takeIf { it >= 0 }?.also { notifyItemChanged(it) }
+            lastSelected?.takeIf { it >= 0 }?.also { notifyItemChanged(it) }
+        }
     }
 
     override fun getItemCount(): Int {

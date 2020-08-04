@@ -514,32 +514,36 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         txtPost.setOnClickListener {
-            if (postType == PostType.TEXT) {
-                memberPostItem.id = postId
-                val bundle = TextDetailFragment.createBundle(memberPostItem, -1)
-                navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_adultHomeFragment_to_textDetailFragment,
-                        bundle
+            when(postType) {
+                PostType.TEXT -> {
+                    memberPostItem.id = postId
+                    val bundle = TextDetailFragment.createBundle(memberPostItem, -1)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_adultHomeFragment_to_textDetailFragment,
+                            bundle
+                        )
                     )
-                )
-            } else if (postType == PostType.IMAGE) {
-                memberPostItem.id = postId
-                val bundle = PictureDetailFragment.createBundle(memberPostItem, -1)
-                navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_adultHomeFragment_to_pictureDetailFragment,
-                        bundle
+                }
+                PostType.IMAGE -> {
+                    memberPostItem.id = postId
+                    val bundle = PictureDetailFragment.createBundle(memberPostItem, -1)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_adultHomeFragment_to_pictureDetailFragment,
+                            bundle
+                        )
                     )
-                )
-            } else if (postType == PostType.VIDEO) {
-                val bundle = ClipFragment.createBundle(arrayListOf(memberPostItem), -1, false)
-                navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_adultHomeFragment_to_clipFragment,
-                        bundle
+                }
+                PostType.VIDEO -> {
+                    val bundle = ClipFragment.createBundle(arrayListOf(memberPostItem), -1, false)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_adultHomeFragment_to_clipFragment,
+                            bundle
+                        )
                     )
-                )
+                }
             }
         }
 

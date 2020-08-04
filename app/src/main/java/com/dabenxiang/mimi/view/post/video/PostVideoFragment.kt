@@ -190,6 +190,8 @@ class PostVideoFragment : BaseFragment() {
         }
 
         tv_clean.setOnClickListener {
+            val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
+
             val title = edt_title.text.toString()
 
             if (title.isBlank()) {
@@ -240,7 +242,14 @@ class PostVideoFragment : BaseFragment() {
             bundle.putParcelableArrayList(VIDEO_DATA, videoAttachmentList)
             bundle.putParcelableArrayList(DELETE_ATTACHMENT, deleteVideoList)
             bundle.putLong(POST_ID, postId)
-            findNavController().navigate(R.id.action_postVideoFragment_to_adultHomeFragment, bundle)
+
+            if (isEdit != null && isEdit) {
+                val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+                findNavController().navigate(R.id.action_postVideoFragment_to_myPostFragment, bundle)
+            } else {
+                findNavController().navigate(R.id.action_postVideoFragment_to_adultHomeFragment, bundle)
+            }
         }
     }
 
