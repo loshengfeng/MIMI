@@ -14,6 +14,7 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.serializable.CategoriesData
 import com.dabenxiang.mimi.model.serializable.PlayerData
 import com.dabenxiang.mimi.view.adapter.FilterTabAdapter
@@ -128,7 +129,7 @@ class CategoriesFragment : BaseFragment() {
         (arguments?.getSerializable(KEY_DATA) as CategoriesData?)?.also { data ->
             tv_title.text = data.title
 
-            recyclerview_content.background =
+            cl_root.background =
                 if (isAdult) {
                     R.color.adult_color_background
                 } else {
@@ -136,6 +137,12 @@ class CategoriesFragment : BaseFragment() {
                 }.let { res ->
                     requireActivity().getDrawable(res)
                 }
+
+            tv_no_data.setTextColor(takeIf { isAdult }?.let {
+                requireActivity().getColorStateList(R.color.color_white_1)
+            } ?: run {
+                requireActivity().getColorStateList(R.color.color_black_2_50)
+            })
 
             layout_top.background =
                 if (isAdult) {
@@ -259,14 +266,18 @@ class CategoriesFragment : BaseFragment() {
             videoListAdapter.submitList(it)
         })
 
-        viewModel.filterList.observe(viewLifecycleOwner, Observer {
+        viewModel.filterList.observe(viewLifecycleOwner, Observer { data ->
             progressHUD?.dismiss()
-            videoListAdapter.submitList(it)
+            videoListAdapter.submitList(data)
         })
 
         viewModel.filterCategoryResult.observe(viewLifecycleOwner, Observer {
             filterAdapterList[1]?.updateList(it.areas, null)
             filterAdapterList[2]?.updateList(it.years, null)
+        })
+
+        viewModel.onTotalCountResult.observe(viewLifecycleOwner, Observer {
+            cl_no_data.visibility = it.takeIf { it == 0L }?.let {  View.VISIBLE } ?: let { View.GONE }
         })
     }
 

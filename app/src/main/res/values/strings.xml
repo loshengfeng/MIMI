@@ -321,4 +321,6 @@
     <string name="setting_version">版本：%s</string>
     <string name="confirm">确定</string>
     <string name="cancel">取消</string>
+
+    <string name="filter_empty">无搜寻结果</string>
 </resources>

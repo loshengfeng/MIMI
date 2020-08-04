@@ -55,7 +55,10 @@ class CategoriesDataSource(
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()
                 val videos = item?.content?.videos
-                if (videos != null) {
+                if (videos.isNullOrEmpty()) {
+                    pagingCallback.onTotalCount(0)
+                } else {
+                    pagingCallback.onTotalCount(videos.size.toLong())
                     returnList.addAll(videos.searchItemToVideoItem(isAdult))
                 }
                 val nextPageKey = when {
@@ -80,6 +83,7 @@ class CategoriesDataSource(
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect {
                     pagingCallback.onGetCategory(it.category)
+                    Timber.d("@@loadInitial result: ${it.list}")
                     callback.onResult(it.list, null, it.nextKey) }
         }
     }

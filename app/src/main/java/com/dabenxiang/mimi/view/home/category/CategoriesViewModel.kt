@@ -37,6 +37,9 @@ class CategoriesViewModel : BaseViewModel() {
     private val _getCategoryDetailResult = MutableLiveData<ApiResult<VideoSearchItem>>()
     val getCategoryDetailResult: LiveData<ApiResult<VideoSearchItem>> = _getCategoryDetailResult
 
+    private val _onTotalCountResult = MutableLiveData<Long>()
+    val onTotalCountResult: LiveData<Long> = _onTotalCountResult
+
     private val filterPositionDataList by lazy {
         val map = mutableMapOf<Int, MutableLiveData<Int>>()
         repeat(3) {
@@ -132,6 +135,11 @@ class CategoriesViewModel : BaseViewModel() {
         }
 
         override fun onThrowable(throwable: Throwable) {
+        }
+
+        override fun onTotalCount(count: Long) {
+            Timber.d("@@onTotalCount: $count")
+            _onTotalCountResult.postValue(count)
         }
 
         override fun onGetCategory(category: Category?) {
