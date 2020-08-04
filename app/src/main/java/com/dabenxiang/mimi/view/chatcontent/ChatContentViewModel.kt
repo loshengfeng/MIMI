@@ -6,7 +6,6 @@ import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ChatContentItem
@@ -195,10 +194,9 @@ class ChatContentViewModel : BaseViewModel() {
                 if (!result.isSuccessful) throw HttpException(result)
                 val byteArray = result.body()?.bytes()
                 if (type == TAG_IMAGE) {
-                    val bitmap = ImageUtils.bytes2Bitmap(byteArray)
                     val item = AttachmentItem(
                             id = id,
-                            bitmap = bitmap,
+                            fileArray = byteArray,
                             position = position
                     )
                     emit(ApiResult.success(item))
