@@ -75,8 +75,6 @@ class MyPostFragment : BaseFragment() {
     private var isAdult: Boolean = true
     private var isAdultTheme: Boolean = false
 
-    private var interactionListener: InteractionListener? = null
-
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
@@ -117,15 +115,6 @@ class MyPostFragment : BaseFragment() {
         }
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        try {
-            interactionListener = context as InteractionListener
-        } catch (e: ClassCastException) {
-            Timber.e("MyPostFragment interaction listener can't cast")
-        }
-    }
-
     override fun initSettings() {
         arguments?.let {
             userId = it.getLong(KEY_USER_ID)
@@ -133,6 +122,8 @@ class MyPostFragment : BaseFragment() {
             isAdult = it.getBoolean(KEY_IS_ADULT)
             isAdultTheme = it.getBoolean(KEY_IS_ADULT_THEME)
         }
+
+        useAdultTheme(isAdultTheme)
 
         adapter = MyPostPagedAdapter(
             requireContext(),
@@ -144,7 +135,6 @@ class MyPostFragment : BaseFragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
 
-        interactionListener?.setAdult(isAdultTheme)
         cl_bg.isSelected = isAdultTheme
         tv_title.text = if (userId == USER_ID_ME) getString(R.string.personal_my_post) else userName
         tv_title.isSelected = isAdultTheme

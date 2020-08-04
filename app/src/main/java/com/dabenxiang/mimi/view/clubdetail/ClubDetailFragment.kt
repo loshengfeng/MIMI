@@ -25,6 +25,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
+import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
@@ -83,6 +84,7 @@ class ClubDetailFragment : BaseFragment() {
     }
 
     private fun setUpUI() {
+        useAdultTheme(true)
         tv_title.text = memberClubItem.title
         tv_desc.text = memberClubItem.description
         tv_follow_count.text = memberClubItem.followerCount.toString()

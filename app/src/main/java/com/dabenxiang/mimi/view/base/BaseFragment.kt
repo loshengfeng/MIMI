@@ -18,6 +18,7 @@ import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
+import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.showToast
 import com.kaopiz.kprogresshud.KProgressHUD
@@ -133,6 +134,12 @@ abstract class BaseFragment : Fragment() {
 
     fun backToDesktop() {
         activity?.moveTaskToBack(true)
+    }
+
+    fun useAdultTheme(value: Boolean) {
+        activity?.also {
+            (it as MainActivity).setAdult(value)
+        }
     }
 
     open fun onApiError(
