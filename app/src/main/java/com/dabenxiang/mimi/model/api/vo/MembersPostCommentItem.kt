@@ -15,7 +15,7 @@ data class MembersPostCommentItem(
     var creationDate: Date?,
 
     @SerializedName("creatorId")
-    val creatorId: Long?,
+    val creatorId: Long,
 
     @SerializedName("dislikeCount")
     var dislikeCount: Long?,
@@ -33,7 +33,7 @@ data class MembersPostCommentItem(
     val postAvatarAttachmentId: Long?,
 
     @SerializedName("postName")
-    val postName: String?,
+    val postName: String,
 
     @SerializedName("reported")
     var reported: Boolean?

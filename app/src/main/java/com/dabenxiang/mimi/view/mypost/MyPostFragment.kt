@@ -113,6 +113,7 @@ class MyPostFragment : BaseFragment() {
         requireActivity().onBackPressedDispatcher.addCallback {
             navigateTo(NavigateItem.Up)
         }
+        viewModel.getMyPost(userId, isAdult)
     }
 
     override fun initSettings() {
@@ -251,11 +252,6 @@ class MyPostFragment : BaseFragment() {
                 viewModel.postPic(postId?.value!!, postMemberRequest, content)
             }
         }
-    }
-
-    override fun setupFirstTime() {
-        super.setupFirstTime()
-        viewModel.getMyPost()
     }
 
     override fun setupObservers() {
@@ -560,7 +556,7 @@ class MyPostFragment : BaseFragment() {
             val bundle = ClipFragment.createBundle(ArrayList(item), position)
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_myPostFragment_to_searchPostFragment,
+                    R.id.action_myPostFragment_to_clipFragment,
                     bundle
                 )
             )

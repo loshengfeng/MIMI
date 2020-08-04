@@ -93,7 +93,7 @@ class MyPostViewModel : BaseViewModel() {
         const val USER_ID_ME: Long = -1
     }
 
-    fun getMyPost(userId: Long = USER_ID_ME, isAdult: Boolean = false) {
+    fun getMyPost(userId: Long, isAdult: Boolean) {
         viewModelScope.launch {
             getMyPostPagingItems(userId, isAdult).asFlow()
                 .collect { _myPostItemListResult.value = it }

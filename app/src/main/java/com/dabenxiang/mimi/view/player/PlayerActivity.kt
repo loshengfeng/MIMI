@@ -222,7 +222,7 @@ class PlayerActivity : BaseActivity() {
                 Timber.i("playerInfoAdapter onMoreClick")
             }
 
-            override fun onAvatarClick() {
+            override fun onAvatarClick(userId: Long, name: String) {
                 // TODO:
                 Timber.d("onAvatarClick nav to member post")
             }

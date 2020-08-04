@@ -157,7 +157,7 @@ class TextDetailAdapter(
                 }
 
                 holder.avatarImg.setOnClickListener {
-                    onTextDetailListener.onAvatarClick()
+                    onTextDetailListener.onAvatarClick(memberPostItem.creatorId, memberPostItem.postFriendlyName)
                 }
             }
             is CommentTitleViewHolder -> {
@@ -245,8 +245,8 @@ class TextDetailAdapter(
             onTextDetailListener.onMoreClick(item)
         }
 
-        override fun onAvatarClick() {
-            onTextDetailListener.onAvatarClick()
+        override fun onAvatarClick(userId: Long, name: String) {
+            onTextDetailListener.onAvatarClick(userId, name)
         }
     }
 
@@ -261,6 +261,6 @@ class TextDetailAdapter(
         fun onMoreClick(item: MembersPostCommentItem)
         fun onChipClick(type: PostType, tag: String)
         fun onOpenWebView(url: String)
-        fun onAvatarClick()
+        fun onAvatarClick(userId: Long, name: String)
     }
 }
