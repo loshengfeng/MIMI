@@ -111,6 +111,9 @@ interface ApiService {
         @Body body: HashMap<String, Long>
     ): Response<Void>
 
+    @GET("/v1/Members/Me/Chats/UnRead")
+    suspend fun getUnread(): Response<ApiBaseItem<Int>>
+
     /**********************************************************
      *
      *                  Functions
@@ -168,6 +171,13 @@ interface ApiService {
         @Query("orderBy") orderBy: Int = 1
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
+    @GET("/v1/Members/Post")
+    suspend fun getMembersPost(
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int,
+        @Query("creatorId") creatorId: Long,
+        @Query("isAdult") isAdult: Boolean = true
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     @GET("/v1/Members/Post/{id}")
     suspend fun getMemberPostDetail(@Path("id") postId: Long): Response<ApiBaseItem<MemberPostItem>>
@@ -268,7 +278,7 @@ interface ApiService {
         @Query("category") category: String?,
         @Query("q") q: String?,
         @Query("country") country: String?,
-        @Query("years") years: Int?,
+        @Query("years") years: String?,
         @Query("isAdult") isAdult: Boolean?,
         @Query("offset") offset: String?,
         @Query("limit") limit: String?,
@@ -299,7 +309,6 @@ interface ApiService {
         @Query("offset") offset: String?,
         @Query("limit") limit: String?
     ): Response<ApiBasePagingItem<List<PostStatisticsItem>>>
-
 
 
     /**********************************************************

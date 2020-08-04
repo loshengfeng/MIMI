@@ -15,5 +15,6 @@ data class ChatContentItem(
 
         val dateTitle: String? = "",
         var downloadStatus: VideoDownloadStatusType = VideoDownloadStatusType.NORMAL,
-        var position: Int = -1
+        var position: Int = -1,
+        var mediaHashCode: Int = 0
 )

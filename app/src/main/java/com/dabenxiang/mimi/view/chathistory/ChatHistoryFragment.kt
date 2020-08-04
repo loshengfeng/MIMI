@@ -39,6 +39,8 @@ class ChatHistoryFragment : BaseFragment() {
         }
 
     }
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
 
     companion object {
         const val NO_DATA = 0

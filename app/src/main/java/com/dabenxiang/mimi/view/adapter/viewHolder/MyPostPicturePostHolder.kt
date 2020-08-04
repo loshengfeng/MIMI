@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.OnItemClickListener
@@ -29,38 +30,28 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_my_post_picture_post.view.*
-import kotlinx.android.synthetic.main.item_picture_post.view.chip_group_tag
-import kotlinx.android.synthetic.main.item_picture_post.view.img_avatar
-import kotlinx.android.synthetic.main.item_picture_post.view.iv_comment
-import kotlinx.android.synthetic.main.item_picture_post.view.iv_like
-import kotlinx.android.synthetic.main.item_picture_post.view.iv_more
-import kotlinx.android.synthetic.main.item_picture_post.view.layout_picture_post_item
-import kotlinx.android.synthetic.main.item_picture_post.view.recycler_picture
-import kotlinx.android.synthetic.main.item_picture_post.view.tv_comment_count
-import kotlinx.android.synthetic.main.item_picture_post.view.tv_like_count
-import kotlinx.android.synthetic.main.item_picture_post.view.tv_name
-import kotlinx.android.synthetic.main.item_picture_post.view.tv_picture_count
-import kotlinx.android.synthetic.main.item_picture_post.view.tv_time
-import kotlinx.android.synthetic.main.item_picture_post.view.tv_title
 import java.util.*
 
-class MyPostPicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
+class MyPostPicturePostHolder(
+    itemView: View,
+    private val isMe: Boolean,
+    private val isAdultTheme: Boolean
+) : BaseViewHolder(itemView) {
 
-    val picturePostItemLayout: ConstraintLayout = itemView.layout_picture_post_item
-    val avatarImg: ImageView = itemView.img_avatar
-    val name: TextView = itemView.tv_name
-    val time: TextView = itemView.tv_time
-    val title: TextView = itemView.tv_title
+    private val picturePostItemLayout: ConstraintLayout = itemView.layout_picture_post_item
+    private val imgAvatar: ImageView = itemView.img_avatar
+    private val tvName: TextView = itemView.tv_name
+    private val tvTime: TextView = itemView.tv_time
+    private val tvTitle: TextView = itemView.tv_title
     val pictureRecycler: RecyclerView = itemView.recycler_picture
-    val pictureCount: TextView = itemView.tv_picture_count
-    val tagChipGroup: ChipGroup = itemView.chip_group_tag
-    val likeImage: ImageView = itemView.iv_like
-    val likeCount: TextView = itemView.tv_like_count
-    val commentImage: ImageView = itemView.iv_comment
-    val commentCount: TextView = itemView.tv_comment_count
-    val moreImage: ImageView = itemView.iv_more
-    val tvFavorite: TextView = itemView.tv_favorite_count
-    val imgFavorite: ImageView = itemView.tv_favorite
+    private val tvPictureCount: TextView = itemView.tv_picture_count
+    private val tagChipGroup: ChipGroup = itemView.chip_group_tag
+    private val ivLike: ImageView = itemView.iv_like
+    private val tvLikeCount: TextView = itemView.tv_like_count
+    private val ivComment: ImageView = itemView.iv_comment
+    private val tvCommentCount: TextView = itemView.tv_comment_count
+    private val ivMore: ImageView = itemView.iv_more
+    private val tvFollow: TextView = itemView.tv_follow
 
     fun onBind(
         item: MemberPostItem,
@@ -68,9 +59,29 @@ class MyPostPicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         myPostListener: MyPostFragment.MyPostListener,
         attachmentListener: AttachmentListener
     ) {
-        name.text = item.postFriendlyName
-        time.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
-        title.text = item.title
+
+        picturePostItemLayout.setBackgroundColor(App.self.getColor(if (isAdultTheme) R.color.color_black_4 else R.color.color_white_1))
+        tvName.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1 else R.color.color_black_1))
+        tvTime.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1_50 else R.color.color_black_1_50))
+        tvTitle.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1 else R.color.color_black_1))
+        tvLikeCount.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1 else R.color.color_black_1))
+        tvCommentCount.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1 else R.color.color_black_1))
+        ivComment.setImageResource(if (isAdultTheme) R.drawable.ico_messege_adult else R.drawable.ico_messege_adult_gray)
+        ivMore.setImageResource(if (isAdultTheme) R.drawable.btn_more_white_n else R.drawable.btn_more_gray_n)
+
+        tvName.text = item.postFriendlyName
+        tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
+        tvTitle.text = item.title
+
+        if (isMe) {
+            tvFollow.visibility = View.GONE
+        } else {
+            tvFollow.visibility = View.VISIBLE
+            tvFollow.setOnClickListener {
+                myPostListener.onFollowClick(item, position, !item.isFollow)
+            }
+        }
+
         updateLikeAndFollowItem(item, position, myPostListener)
 
         if (LruCacheUtils.getLruCache(item.avatarAttachmentId.toString()) == null) {
@@ -81,10 +92,10 @@ class MyPostPicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
             )
         } else {
             val bitmap = LruCacheUtils.getLruCache(item.avatarAttachmentId.toString())
-            Glide.with(avatarImg.context)
+            Glide.with(imgAvatar.context)
                 .load(bitmap)
                 .circleCrop()
-                .into(avatarImg)
+                .into(imgAvatar)
         }
 
         tagChipGroup.removeAllViews()
@@ -92,19 +103,22 @@ class MyPostPicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
             val chip = LayoutInflater.from(tagChipGroup.context)
                 .inflate(R.layout.chip_item, tagChipGroup, false) as Chip
             chip.text = it
-            chip.setTextColor(tagChipGroup.context.getColor(R.color.color_black_1_50))
+            chip.setTextColor(tagChipGroup.context.getColor(if (isAdultTheme) R.color.color_white_1_50 else R.color.color_black_1_50))
             chip.chipBackgroundColor = ColorStateList.valueOf(
-                ContextCompat.getColor(tagChipGroup.context, R.color.color_black_1_05)
+                ContextCompat.getColor(
+                    tagChipGroup.context,
+                    if (isAdultTheme) R.color.color_black_6 else R.color.color_black_1_05
+                )
             )
             chip.setOnClickListener { view ->
-                myPostListener.onChipClick(PostType.IMAGE, (view as Chip).text.toString())
+                myPostListener.onChipClick(PostType.VIDEO, (view as Chip).text.toString())
             }
             tagChipGroup.addView(chip)
         }
 
         val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
-        if (pictureRecycler.adapter == null || pictureCount.tag != position) {
-            pictureCount.tag = position
+        if (pictureRecycler.adapter == null || tvPictureCount.tag != position) {
+            tvPictureCount.tag = position
             pictureRecycler.layoutManager = LinearLayoutManager(
                 pictureRecycler.context, LinearLayoutManager.HORIZONTAL, false
             )
@@ -124,19 +138,24 @@ class MyPostPicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
             pictureRecycler.setOnScrollChangeListener { _, _, _, _, _ ->
                 val currentPosition =
                     (pictureRecycler.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-                pictureCount.text =
+                tvPictureCount.text =
                     "${currentPosition + 1}/${contentItem.images?.size}"
             }
 
-            pictureCount.text = "1/${contentItem.images?.size}"
+            tvPictureCount.text = "1/${contentItem.images?.size}"
         }
 
-        commentImage.setOnClickListener {
+        ivComment.setOnClickListener {
             item.also { myPostListener.onCommentClick(it, AdultTabType.PICTURE) }
         }
 
-        moreImage.setOnClickListener {
-            myPostListener.onMoreClick(item)
+        if (isMe) {
+            ivMore.visibility = View.VISIBLE
+            ivMore.setOnClickListener {
+                myPostListener.onMoreClick(item)
+            }
+        } else {
+            ivMore.visibility = View.GONE
         }
 
         picturePostItemLayout.setOnClickListener {
@@ -144,29 +163,35 @@ class MyPostPicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
     }
 
-    fun updateLikeAndFollowItem(item: MemberPostItem, position: Int, myPostListener: MyPostFragment.MyPostListener) {
-        likeCount.text = item.likeCount.toString()
-        commentCount.text = item.commentCount.toString()
+    fun updateLikeAndFollowItem(
+        item: MemberPostItem,
+        position: Int,
+        myPostListener: MyPostFragment.MyPostListener
+    ) {
+        tvLikeCount.text = item.likeCount.toString()
+        tvCommentCount.text = item.commentCount.toString()
 
         val likeType = item.likeType
         val isLike: Boolean
         if (likeType == LikeType.LIKE) {
             isLike = true
-            likeImage.setImageResource(R.drawable.ico_nice_s)
+            ivLike.setImageResource(R.drawable.ico_nice_s)
         } else {
             isLike = false
-            likeImage.setImageResource(R.drawable.ico_nice_gray)
+            ivLike.setImageResource(if (isAdultTheme) R.drawable.ico_nice else R.drawable.ico_nice_gray)
         }
 
-        likeImage.setOnClickListener {
+        ivLike.setOnClickListener {
             myPostListener.onLikeClick(item, position, !isLike)
         }
 
-        tvFavorite.text = item.favoriteCount.toString()
-        if (item.isFavorite) {
-            imgFavorite.setImageResource(R.drawable.btn_favorite_white_s)
-        } else {
-            imgFavorite.setImageResource(R.drawable.btn_favorite_n)
-        }
+        updateFollow(item.isFollow)
     }
+
+    private fun updateFollow(isFollow: Boolean) {
+        tvFollow.setText(if (isFollow) R.string.followed else R.string.follow)
+        tvFollow.setBackgroundResource(if (isFollow) R.drawable.bg_white_1_stroke_radius_16 else R.drawable.bg_red_1_stroke_radius_16)
+        tvFollow.setTextColor(App.self.getColor(if (isFollow) R.color.color_white_1 else R.color.color_red_1))
+    }
+
 }

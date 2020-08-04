@@ -166,6 +166,10 @@ class CommentDialogFragment : BaseDialogFragment() {
                 }
             }
 
+            override fun onAvatarClick() {
+
+            }
+
         }, CommentViewType.CLIP).apply {
             loadMoreModule.apply {
                 isEnableLoadMore = true

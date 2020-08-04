@@ -12,7 +12,7 @@ data class MemberPostItem(
     var id: Long = 0,
 
     @SerializedName("title")
-    val title: String = "",
+    var title: String = "",
 
     @SerializedName("content")
     var content: String = "",
@@ -42,7 +42,7 @@ data class MemberPostItem(
     var commentCount: Int = 0,
 
     @SerializedName("tags")
-    val tags: ArrayList<String>? = arrayListOf(),
+    var tags: ArrayList<String>? = arrayListOf(),
 
     @SerializedName("clickThroughCount")
     val clickThroughCount: Int = 0,
@@ -68,6 +68,9 @@ data class MemberPostItem(
     @SerializedName("category")
     val category: String? = "",
 
-    val adItem: AdItem?= null
+    val adItem: AdItem? = null,
+
+    @SerializedName("isFullContent")
+    val isFullContent: Boolean = false
 
 ) : BaseMemberPostItem()

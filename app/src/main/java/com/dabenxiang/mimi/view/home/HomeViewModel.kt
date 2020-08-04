@@ -118,6 +118,9 @@ class HomeViewModel : BaseViewModel() {
     private val _totalCountResult = MutableLiveData<Int>()
     val totalCountResult: LiveData<Int> = _totalCountResult
 
+    private val _postArticleResult = MutableLiveData<ApiResult<Long>>()
+    val postArticleResult: LiveData<ApiResult<Long>> = _postArticleResult
+
     private var job = Job()
 
     fun loadNestedStatisticsListForCarousel(position: Int, src: HomeTemplate.Carousel) {
@@ -321,6 +324,33 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
+    fun favoritePost(item: MemberPostItem, isFavorite: Boolean, update: (Boolean, Int) -> Unit) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = when {
+                    isFavorite -> apiRepository.addFavorite(item.id)
+                    else -> apiRepository.deleteFavorite(item.id)
+                }
+                if (!result.isSuccessful) throw HttpException(result)
+                item.isFavorite = isFavorite
+                if (isFavorite) item.favoriteCount++ else item.favoriteCount--
+                emit(ApiResult.success(item.favoriteCount))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    when (it) {
+                        is ApiResult.Success -> {
+                            update(isFavorite, it.result)
+                        }
+                    }
+                }
+        }
+    }
+
     fun getVideos(category: String?, isAdult: Boolean) {
         viewModelScope.launch {
             getVideoPagingItems(category, isAdult).asFlow()
@@ -505,7 +535,35 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
+    fun postArticle(title: String, content: String, tags: ArrayList<String>) {
+        viewModelScope.launch {
+            flow {
+                val request = PostMemberRequest(
+                    title = title,
+                    content = content,
+                    type = PostType.TEXT.value,
+                    tags = tags
+                )
+
+                val resp = domainManager.getApiRepository().postMembersPost(request)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(resp.body()?.content))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _postArticleResult.value = it }
+        }
+    }
+
     fun cancelJob() {
         job.cancel()
+    }
+
+    fun clearLiveDataValue() {
+        _postPicResult.value = null
+        _postCoverResult.value = null
+        _postVideoResult.value = null
     }
 }

@@ -36,10 +36,12 @@ import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.post.article.PostArticleFragment
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment.Companion.VIEWER_DATA
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.fragment_post_article.*
 import kotlinx.android.synthetic.main.fragment_post_article.chipGroup
 import kotlinx.android.synthetic.main.fragment_post_article.clubLayout
 import kotlinx.android.synthetic.main.fragment_post_article.edt_hashtag
@@ -67,7 +69,7 @@ class PostPicFragment : BaseFragment() {
         const val POST_ID = "post_id"
 
         private const val TITLE_LIMIT = 60
-        private const val HASHTAG_LIMIT = 10
+        private const val HASHTAG_LIMIT = 20
         private const val INIT_VALUE = 0
         private const val PHOTO_LIMIT = 20
 
@@ -99,6 +101,8 @@ class PostPicFragment : BaseFragment() {
         adapter.submitList(attachmentList)
         recyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         recyclerView.adapter = adapter
+
+        tv_clean.isEnabled = true
     }
 
     override fun setupObservers() {
@@ -212,12 +216,13 @@ class PostPicFragment : BaseFragment() {
                 tags = tags
             )
 
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(UPLOAD_PIC, true)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(MEMBER_REQUEST, request)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(PIC_URI, adapter.getData())
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(DELETE_ATTACHMENT, deletePicList)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(POST_ID, postId)
-            findNavController().navigateUp()
+            val bundle = Bundle()
+            bundle.putBoolean(UPLOAD_PIC, true)
+            bundle.putParcelable(MEMBER_REQUEST, request)
+            bundle.putParcelableArrayList(PIC_URI, adapter.getData())
+            bundle.putStringArrayList(DELETE_ATTACHMENT, deletePicList)
+            bundle.putLong(POST_ID, postId)
+            findNavController().navigate(R.id.action_postPicFragment_to_adultHomeFragment, bundle)
         }
     }
 
@@ -271,7 +276,7 @@ class PostPicFragment : BaseFragment() {
             TITLE_LIMIT
         ))
         txt_hashtagCount.text = String.format(getString(R.string.typing_count,
-            item.tags.size,
+            item.tags?.size,
             HASHTAG_LIMIT
         ))
 
@@ -298,11 +303,14 @@ class PostPicFragment : BaseFragment() {
                 .circleCrop()
                 .into(iv_avatar)
 
-            addTag(item.tag)
-
-            txt_placeholder.visibility = View.GONE
-            txt_clubName.visibility = View.VISIBLE
-            txt_hashtagName.visibility = View.VISIBLE
+            if (chipGroup.size == HASHTAG_LIMIT) {
+                Toast.makeText(requireContext(), R.string.post_warning_tag_limit, Toast.LENGTH_SHORT).show()
+            } else {
+                addTag(item.tag, true)
+                txt_placeholder.visibility = View.GONE
+                txt_clubName.visibility = View.VISIBLE
+                txt_hashtagName.visibility = View.VISIBLE
+            }
         }
     }
 

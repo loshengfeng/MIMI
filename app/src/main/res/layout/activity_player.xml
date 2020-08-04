@@ -137,7 +137,7 @@
                 tools:text="999" />
 
             <TextView
-                android:id="@+id/tv_favorite"
+                android:id="@+id/iv_favorite"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
@@ -157,7 +157,7 @@
                 android:drawablePadding="3dp"
                 android:gravity="center"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/tv_favorite"
+                app:layout_constraintStart_toEndOf="@id/iv_favorite"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:drawableStart="@drawable/ico_messege_adult_gray"
                 tools:text="999" />

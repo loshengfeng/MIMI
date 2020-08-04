@@ -6,20 +6,20 @@ import java.util.*
 
 data class ChatListItem(
         @SerializedName("id")
-        val id: Long?,
+        val id: Long? = 0,
 
         @SerializedName("name")
-        val name: String?,
+        val name: String? = "",
 
         @SerializedName("message")
-        val message: String?,
+        val message: String? = "",
 
         @SerializedName("avatarAttachmentId")
-        val avatarAttachmentId: Long?,
+        val avatarAttachmentId: Long? = 0,
 
         @SerializedName("lastMessageTime")
-        val lastMessageTime: Date?,
+        val lastMessageTime: Date? = null,
 
         @SerializedName("lastReadTime")
-        val lastReadTime: Date?
+        val lastReadTime: Date? = null
 ) : Serializable

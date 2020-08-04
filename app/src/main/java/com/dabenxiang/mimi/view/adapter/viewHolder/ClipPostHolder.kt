@@ -23,8 +23,6 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_clip_post.view.*
-import timber.log.Timber
-import java.lang.Exception
 import java.util.*
 
 class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
@@ -39,6 +37,12 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
     private val tagChipGroup: ChipGroup = itemView.chip_group_tag
     private val likeImage: ImageView = itemView.iv_like
     private val likeCount: TextView = itemView.tv_like_count
+
+
+    private val favoriteImage: ImageView = itemView.iv_favorite
+    private val favoriteCount: TextView = itemView.tv_favorite_count
+
+
     private val commentImage: ImageView = itemView.iv_comment
     private val commentCount: TextView = itemView.tv_comment_count
     private val moreImage: ImageView = itemView.iv_more
@@ -59,7 +63,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
 
         val avatarId = item.avatarAttachmentId.toString()
         if (LruCacheUtils.getLruCache(avatarId) == null) {
-            memberPostFuncItem.getBitmap(avatarId) { id -> updateAvatar(id)}
+            memberPostFuncItem.getBitmap(avatarId) { id -> updateAvatar(id) }
         } else {
             updateAvatar(item.avatarAttachmentId.toString())
         }
@@ -104,7 +108,9 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
                         LruCacheUtils.getLruCache(id)?.also { bitmap ->
                             Glide.with(ivPhoto.context).load(bitmap).into(ivPhoto)
                         } ?: run { memberPostFuncItem.getBitmap(id) { id -> updatePicture(id) } }
-                    } ?: run { Glide.with(ivPhoto.context).load(R.drawable.img_nopic_03).into(ivPhoto) }
+                    } ?: run {
+                        Glide.with(ivPhoto.context).load(R.drawable.img_nopic_03).into(ivPhoto)
+                    }
                 } else {
                     Glide.with(ivPhoto.context)
                         .load(image.url).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
@@ -129,6 +135,10 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
                 false -> adultListener.onItemClick(item, AdultTabType.CLIP)
             }
         }
+
+        ivAvatar.setOnClickListener {
+            adultListener.onAvatarClick()
+        }
     }
 
     private fun updatePicture(id: String) {
@@ -146,6 +156,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
         memberPostFuncItem: MemberPostFuncItem
     ) {
         likeCount.text = item.likeCount.toString()
+        favoriteCount.text = item.favoriteCount.toString()
         commentCount.text = item.commentCount.toString()
 
         if (item.isFollow) {
@@ -165,13 +176,30 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
             likeImage.setImageResource(R.drawable.ico_nice)
         }
 
+        if (item.isFavorite) {
+            favoriteImage.setImageResource(R.drawable.btn_favorite_white_s)
+        } else {
+            favoriteImage.setImageResource(R.drawable.btn_favorite_white_n)
+        }
+
         follow.setOnClickListener {
-            memberPostFuncItem.onFollowClick(item, !(item.isFollow)) { isFollow -> updateFollow(isFollow) }
+            memberPostFuncItem.onFollowClick(item, !(item.isFollow)) { isFollow ->
+                updateFollow(
+                    isFollow
+                )
+            }
         }
 
         likeImage.setOnClickListener {
             val isLike = item.likeType == LikeType.LIKE
-            memberPostFuncItem.onLikeClick(item, !isLike) { like, count -> updateLike(like, count)}
+            memberPostFuncItem.onLikeClick(item, !isLike) { like, count -> updateLike(like, count) }
+        }
+
+        favoriteImage.setOnClickListener {
+            val isFavorite = item.isFavorite
+            memberPostFuncItem.onFavoriteClick(item, !isFavorite) { favorite, count ->
+                updateFavorite(favorite, count)
+            }
         }
     }
 
@@ -194,5 +222,14 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
             likeImage.setImageResource(R.drawable.ico_nice)
         }
         likeCount.text = count.toString()
+    }
+
+    private fun updateFavorite(isFavorite: Boolean, count: Int) {
+        if (isFavorite) {
+            favoriteImage.setImageResource(R.drawable.btn_favorite_white_s)
+        } else {
+            favoriteImage.setImageResource(R.drawable.btn_favorite_white_n)
+        }
+        favoriteCount.text = count.toString()
     }
 }

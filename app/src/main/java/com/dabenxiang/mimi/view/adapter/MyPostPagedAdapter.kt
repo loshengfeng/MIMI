@@ -15,6 +15,8 @@ import com.dabenxiang.mimi.view.mypost.MyPostFragment
 
 class MyPostPagedAdapter(
     val context: Context,
+    private val isMe: Boolean,
+    private val isAdultTheme: Boolean,
     private val myPostListener: MyPostFragment.MyPostListener,
     private val attachmentListener: AttachmentListener
 ) : PagedListAdapter<MemberPostItem, BaseViewHolder>(diffCallback) {
@@ -58,19 +60,22 @@ class MyPostPagedAdapter(
             VIEW_TYPE_CLIP -> {
                 MyPostClipPostHolder(
                     LayoutInflater.from(parent.context)
-                        .inflate(R.layout.item_my_post_clip_post, parent, false)
+                        .inflate(R.layout.item_my_post_clip_post, parent, false),
+                    isMe, isAdultTheme
                 )
             }
             VIEW_TYPE_PICTURE -> {
                 MyPostPicturePostHolder(
                     LayoutInflater.from(parent.context)
-                        .inflate(R.layout.item_my_post_picture_post, parent, false)
+                        .inflate(R.layout.item_my_post_picture_post, parent, false),
+                    isMe, isAdultTheme
                 )
             }
             else -> {
                 MyPostTextPostHolder(
                     LayoutInflater.from(parent.context)
-                        .inflate(R.layout.item_my_post_text_post, parent, false)
+                        .inflate(R.layout.item_my_post_text_post, parent, false),
+                    isMe, isAdultTheme
                 )
             }
         }
@@ -133,6 +138,12 @@ class MyPostPagedAdapter(
         val item = getItem(position)
         item?.isFavorite = memberPostItem.isFavorite
         item?.favoriteCount = memberPostItem.favoriteCount
+        notifyItemChanged(position)
+    }
+
+    fun updateFollowItem(memberPostItem: MemberPostItem, position: Int) {
+        val item = getItem(position)
+        item?.isFollow = memberPostItem.isFollow
         notifyItemChanged(position)
     }
 }

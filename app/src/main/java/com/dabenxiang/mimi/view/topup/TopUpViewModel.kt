@@ -10,10 +10,11 @@ import androidx.paging.PagedList
 import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.AgentItem
+import com.dabenxiang.mimi.model.api.vo.ChatRequest
 import com.dabenxiang.mimi.model.api.vo.MeItem
 import com.dabenxiang.mimi.model.vo.ProfileItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.favroite.FavoritePlayListDataSource
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -29,21 +30,30 @@ class TopUpViewModel : BaseViewModel() {
     private val _avatar = MutableLiveData<ApiResult<Bitmap>>()
     val avatar: LiveData<ApiResult<Bitmap>> = _avatar
 
+    private val _createChatRoomResult = MutableLiveData<ApiResult<Nothing>>()
+    val createChatRoomResult: LiveData<ApiResult<Nothing>> = _createChatRoomResult
+
+    var currentItem: AgentItem? = null
+
     fun initData() {
+        getProxyPayList()
+    }
+
+    fun getProxyPayList(){
         viewModelScope.launch {
             val dataSrc = TopUpProxyPayListDataSource(
-                viewModelScope,
-                domainManager,
-                topUpPagingCallback
+                    viewModelScope,
+                    domainManager,
+                    topUpPagingCallback
             )
             dataSrc.isInvalid
             val factory = TopUpProxyPayListFactory(dataSrc)
             val config = PagedList.Config.Builder()
-                .setPageSize(FavoritePlayListDataSource.PER_LIMIT.toInt())
-                .build()
+                    .setPageSize(TopUpProxyPayListDataSource.PER_LIMIT)
+                    .build()
 
             LivePagedListBuilder(factory, config).build().asFlow()
-                .collect { _agentList.postValue(it) }
+                    .collect { _agentList.postValue(it) }
         }
     }
 
@@ -84,6 +94,23 @@ class TopUpViewModel : BaseViewModel() {
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _avatar.value = it }
+        }
+    }
+
+    fun createChatRoom(item: AgentItem) {
+        currentItem = item
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val request = ChatRequest(userId = currentItem?.agentId?.toLong())
+                val result = apiRepository.postChats(request)
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(null))
+            }
+                    .onStart { emit(ApiResult.loading()) }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .collect { _createChatRoomResult.value = it }
         }
     }
 
