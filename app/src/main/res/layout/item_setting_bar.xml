@@ -10,7 +10,7 @@
         android:id="@+id/cl_bg"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="@color/item_setting_bar_bg_selector"
+        android:backgroundTint="@color/item_setting_bar_bg_selector"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
