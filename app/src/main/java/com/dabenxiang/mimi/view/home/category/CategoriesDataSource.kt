@@ -4,6 +4,7 @@ import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.AdItem
+import com.dabenxiang.mimi.model.api.vo.Category
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.model.holder.searchItemToVideoItem
 import kotlinx.coroutines.CoroutineScope
@@ -11,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
 class CategoriesDataSource(
     private val isAdult: Boolean,
@@ -29,7 +31,7 @@ class CategoriesDataSource(
         val PER_LIMIT_LONG = PER_LIMIT.toLong()
     }
 
-    private data class LoadResult(val list: List<BaseVideoItem>, val nextKey: Long?)
+    private data class LoadResult(val list: List<BaseVideoItem>, val category: Category?, val nextKey: Long?)
 
     override fun loadInitial(
         params: LoadInitialParams<Long>,
@@ -67,6 +69,7 @@ class CategoriesDataSource(
                 emit(
                     LoadResult(
                         returnList,
+                        item?.content?.category,
                         nextPageKey
                     )
                 )
@@ -75,7 +78,9 @@ class CategoriesDataSource(
                 .flowOn(Dispatchers.IO)
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
-                .collect { callback.onResult(it.list, null, it.nextKey) }
+                .collect {
+                    pagingCallback.onGetCategory(it.category)
+                    callback.onResult(it.list, null, it.nextKey) }
         }
     }
 
@@ -113,6 +118,7 @@ class CategoriesDataSource(
                 emit(
                     LoadResult(
                         returnList,
+                        null,
                         nextPageKey
                     )
                 )

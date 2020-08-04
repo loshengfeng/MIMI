@@ -8,6 +8,7 @@ import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.Category
 import com.dabenxiang.mimi.model.api.vo.VideoSearchItem
 import com.dabenxiang.mimi.model.holder.BaseVideoItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
@@ -17,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
 class CategoriesViewModel : BaseViewModel() {
 
@@ -28,6 +30,9 @@ class CategoriesViewModel : BaseViewModel() {
 
     private val _filterList = MutableLiveData<PagedList<BaseVideoItem>>()
     val filterList: LiveData<PagedList<BaseVideoItem>> = _filterList
+
+    private val _filterCategoryResult = MutableLiveData<Category>()
+    val filterCategoryResult: LiveData<Category> = _filterCategoryResult
 
     private val _getCategoryDetailResult = MutableLiveData<ApiResult<VideoSearchItem>>()
     val getCategoryDetailResult: LiveData<ApiResult<VideoSearchItem>> = _getCategoryDetailResult
@@ -91,6 +96,7 @@ class CategoriesViewModel : BaseViewModel() {
                 .build()
 
             LivePagedListBuilder(factory, config).build().asFlow().collect {
+                Timber.d("@@getVideoFilterList: $it")
                 _filterList.postValue(it)
             }
         }
@@ -126,6 +132,10 @@ class CategoriesViewModel : BaseViewModel() {
         }
 
         override fun onThrowable(throwable: Throwable) {
+        }
+
+        override fun onGetCategory(category: Category?) {
+            category?.also { _filterCategoryResult.value = it }
         }
     }
 }
