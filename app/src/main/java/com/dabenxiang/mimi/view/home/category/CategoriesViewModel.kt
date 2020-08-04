@@ -41,16 +41,16 @@ class CategoriesViewModel : BaseViewModel() {
     val onTotalCountResult: LiveData<Long> = _onTotalCountResult
 
     private val filterPositionDataList by lazy {
-        val map = mutableMapOf<Int, MutableLiveData<Int>>()
+        val map = mutableMapOf<Int, MutableLiveData<Int?>>()
         repeat(3) {
-            map[it] = MutableLiveData(0)
+            map[it] = MutableLiveData()
         }
         return@lazy map
     }
 
-    fun filterPositionData(index: Int): LiveData<Int>? = filterPositionDataList[index]
+    fun filterPositionData(index: Int): LiveData<Int?>? = filterPositionDataList[index]
 
-    fun updatedFilterPosition(index: Int, position: Int) {
+    fun updatedFilterPosition(index: Int, position: Int?) {
         filterPositionDataList[index]?.value = position
     }
 
