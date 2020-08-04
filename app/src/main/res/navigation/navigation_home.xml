@@ -15,9 +15,6 @@
             app:destination="@id/homeFragment"
             app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_splashFragment_to_searchVideoFragment"
-            app:destination="@id/searchVideoFragment" />
 
     </fragment>
 

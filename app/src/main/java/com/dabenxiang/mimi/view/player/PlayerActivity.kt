@@ -1405,15 +1405,8 @@ class PlayerActivity : BaseActivity() {
 
             chip.setOnClickListener(
                     View.OnClickListener {
-                        val bundle = SearchVideoFragment.createBundle(tag = chip.text.toString())
-                        val pendingIntent = NavDeepLinkBuilder(this)
-                                .setComponentName(MainActivity::class.java)
-                                .setGraph(R.navigation.navigation_home)
-                                .setDestination(R.id.searchVideoFragment)
-                                .setArguments(bundle)
-                                .createPendingIntent()
-
-                        pendingIntent.send()
+                        val bundle = SearchVideoFragment.createBundle(tag = chip.text.toString(), isAdult = obtainIsAdult())
+                        deepLinkToMainActivity(R.navigation.navigation_home, R.id.searchVideoFragment, bundle)
                     }
             )
 
@@ -1545,6 +1538,17 @@ class PlayerActivity : BaseActivity() {
         if (intent.extras?.getBoolean(KEY_IS_COMMENT) == true) {
             scrollView.fullScroll(View.FOCUS_DOWN)
         }
+    }
+
+    private fun deepLinkToMainActivity(navGraphId: Int, destId: Int, bundle: Bundle){
+        val pendingIntent = NavDeepLinkBuilder(this)
+                .setComponentName(MainActivity::class.java)
+                .setGraph(navGraphId)
+                .setDestination(destId)
+                .setArguments(bundle)
+                .createPendingIntent()
+
+        pendingIntent.send()
     }
 
 }

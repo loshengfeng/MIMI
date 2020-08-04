@@ -54,10 +54,11 @@ class SearchVideoFragment : BaseFragment() {
     companion object {
         const val KEY_DATA = "data"
 
-        fun createBundle(title: String = "", tag: String = ""): Bundle {
+        fun createBundle(title: String = "", tag: String = "", isAdult: Boolean = false): Bundle {
             val data = SearchingVideoData()
             data.title = title
             data.tag = tag
+            data.isAdult = isAdult
 
             return Bundle().also {
                 it.putSerializable(KEY_DATA, data)
@@ -91,12 +92,14 @@ class SearchVideoFragment : BaseFragment() {
         viewModel.isAdult = mainViewModel?.adultMode?.value ?: false
 
         (arguments?.getSerializable(KEY_DATA) as SearchingVideoData?)?.also { data ->
-            Timber.d("key data from args is title: ${data.title} and tag: ${data.tag}")
+            Timber.d("key data from args is title: ${data.title}, tag: ${data.tag} and isAdult: ${data.isAdult}")
             if (data.tag.isNotBlank()) {
                 viewModel.searchingTag = data.tag
                 tv_search_text.text = genResultText()
                 viewModel.getSearchList()
             }
+
+            viewModel.isAdult = data.isAdult
 
             if (TextUtils.isEmpty(viewModel.searchingTag) && TextUtils.isEmpty(viewModel.searchingStr)) {
                 layout_search_history.visibility = View.VISIBLE
