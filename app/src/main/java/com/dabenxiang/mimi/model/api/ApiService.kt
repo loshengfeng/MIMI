@@ -231,6 +231,11 @@ interface ApiService {
         @Query("tag") tag: String
     ): Response<ApiBasePagingItem<ArrayList<MemberClubItem>>>
 
+    @GET("/v1/Members/Club/{id}")
+    suspend fun getMembersClub(
+        @Path("id") clubId: Long
+    ): Response<ApiBasePagingItem<MemberClubItem>>
+
     @GET("/v1/Members/Club/Post")
     suspend fun getMembersClubPost(
         @Query("offset") offset: Int,

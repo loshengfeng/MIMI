@@ -25,6 +25,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.fullpicture.FullPictureFragment
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
@@ -365,9 +366,13 @@ class PictureDetailFragment : BaseFragment() {
             GeneralUtils.openWebView(requireContext(), url)
         }
 
-        override fun onAvatarClick() {
-            // TODO:
-            Timber.d("onAvatarClick nav to member post")
+        override fun onAvatarClick(userId: Long, name: String) {
+            val bundle = MyPostFragment.createBundle(
+                userId, name,
+                isAdult = true,
+                isAdultTheme = true
+            )
+            navigateTo(NavigateItem.Destination(R.id.action_pictureDetailFragment_to_myPostFragment, bundle))
         }
     }
 

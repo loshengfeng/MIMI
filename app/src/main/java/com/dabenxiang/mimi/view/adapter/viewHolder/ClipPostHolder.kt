@@ -137,7 +137,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         ivAvatar.setOnClickListener {
-            adultListener.onAvatarClick()
+            adultListener.onAvatarClick(item.creatorId, item.postFriendlyName)
         }
     }
 

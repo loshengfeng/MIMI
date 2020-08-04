@@ -56,6 +56,7 @@ import com.dabenxiang.mimi.view.home.HomeViewModel.Companion.TYPE_VIDEO
 import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.post.article.PostArticleFragment
@@ -996,9 +997,13 @@ class AdultHomeFragment : BaseFragment() {
             )
         }
 
-        override fun onAvatarClick() {
-            // TODO:
-            Timber.d("onAvatarClick nav to member post")
+        override fun onAvatarClick(userId: Long, name: String) {
+            val bundle = MyPostFragment.createBundle(
+                userId, name,
+                isAdult = true,
+                isAdultTheme = true
+            )
+            navigateTo(NavigateItem.Destination(R.id.action_adultHomeFragment_to_navigation_my_post, bundle))
         }
     }
 
