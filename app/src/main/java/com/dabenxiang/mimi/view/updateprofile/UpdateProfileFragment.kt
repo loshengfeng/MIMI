@@ -22,7 +22,8 @@ class UpdateProfileFragment : BaseFragment() {
         private const val KEY_PROFILE = "PROFILE"
         const val TYPE_NAME = 0
         const val TYPE_EMAIL = 1
-        const val TYPE_BIRTHDAY = 2
+        const val TYPE_GEN = 2
+        const val TYPE_BIRTHDAY = 3
 
         fun createBundle(type: Int, profileItem: ProfileItem) = Bundle().also {
             it.putInt(KEY_TYPE, type)
@@ -95,6 +96,11 @@ class UpdateProfileFragment : BaseFragment() {
                         tv_text.text = getString(R.string.setting_email)
                         edit_content.hint = getString(R.string.login_email)
                     }
+                    TYPE_GEN -> {
+                        tv_title.text = getString(R.string.setting_mail_title)
+                        tv_text.text = getString(R.string.setting_email)
+                        edit_content.hint = getString(R.string.login_email)
+                    }
                     TYPE_BIRTHDAY -> {
                         tv_title.text = getString(R.string.setting_birthday_title)
                         tv_text.text = getString(R.string.setting_birthday)
@@ -110,6 +116,9 @@ class UpdateProfileFragment : BaseFragment() {
                     }
                     TYPE_EMAIL -> {
                         edit_content.hint = viewModel.profileItem.email
+                    }
+                    TYPE_GEN -> {
+                        edit_content.hint =  getString(viewModel.profileItem.getGenderRes())
                     }
                     TYPE_BIRTHDAY -> {
                         edit_content.visibility = View.INVISIBLE

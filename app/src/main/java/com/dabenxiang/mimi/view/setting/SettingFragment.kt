@@ -163,12 +163,14 @@ class SettingFragment : BaseFragment() {
                 R.id.btn_resend -> viewModel.resendEmail()
                 R.id.btn_chang_pw -> navigateTo(NavigateItem.Destination(R.id.action_settingFragment_to_changePasswordFragment))
                 R.id.btn_gender -> {
-                    showFilterDialog(
-                        R.string.setting_choose,
-                        R.array.filter_gender,
-                        R.array.filter_gender_value,
-                        viewModel.profileData?.gender ?: 0,
-                        onDialogListener
+                    navigateTo(
+                        NavigateItem.Destination(R.id.updateProfileFragment,
+                            viewModel.profileData?.let {
+                                UpdateProfileFragment.createBundle(
+                                    UpdateProfileFragment.TYPE_GEN,
+                                    it
+                                )
+                            })
                     )
                 }
                 R.id.btn_birthday -> {
