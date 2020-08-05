@@ -10,6 +10,8 @@ import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.ProfileItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.dialog.FilterDialogFragment
+import com.dabenxiang.mimi.view.listener.OnDialogListener
 import kotlinx.android.synthetic.main.fragment_update_profile.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 
@@ -22,7 +24,8 @@ class UpdateProfileFragment : BaseFragment() {
         private const val KEY_PROFILE = "PROFILE"
         const val TYPE_NAME = 0
         const val TYPE_EMAIL = 1
-        const val TYPE_BIRTHDAY = 2
+        const val TYPE_GEN = 2
+        const val TYPE_BIRTHDAY = 3
 
         fun createBundle(type: Int, profileItem: ProfileItem) = Bundle().also {
             it.putInt(KEY_TYPE, type)
@@ -34,8 +37,8 @@ class UpdateProfileFragment : BaseFragment() {
         get() = View.GONE
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         initSettings()
+        super.onViewCreated(view, savedInstanceState)
     }
 
     override fun getLayoutId(): Int {
@@ -72,10 +75,25 @@ class UpdateProfileFragment : BaseFragment() {
             when (buttonView.id) {
                 R.id.tv_back -> navigateTo(NavigateItem.Up)
                 R.id.btn_confirm -> viewModel.doRegisterValidateAndSubmit()
+                R.id.edit_content -> {
+                    if (viewModel.type == TYPE_GEN) {
+                        showFilterDialog(
+                            R.string.setting_choose,
+                            R.array.filter_gender,
+                            R.array.filter_gender_value,
+                            viewModel.profileItem.gender ?: 0,
+                            onDialogListener
+                        )
+                    }
+                }
             }
         }.also {
             tv_back.setOnClickListener(it)
             btn_confirm.setOnClickListener(it)
+            if (viewModel.type == TYPE_GEN) {
+                //FIXME EditText force change !!
+                edit_content.setOnClickListener(it)
+            }
         }
     }
 
@@ -83,7 +101,7 @@ class UpdateProfileFragment : BaseFragment() {
         arguments?.also { it ->
             viewModel.profileItem = it.getSerializable(KEY_PROFILE) as ProfileItem
             viewModel.type = it.getInt(KEY_TYPE, TYPE_NAME)
-            if (viewModel.profileItem.username.isNullOrEmpty()){
+            if (viewModel.profileItem.username.isNullOrEmpty()) {
                 when (viewModel.type) {
                     TYPE_NAME -> {
                         tv_title.text = getString(R.string.setting_change_name)
@@ -91,6 +109,11 @@ class UpdateProfileFragment : BaseFragment() {
                         edit_content.hint = getString(R.string.login_name)
                     }
                     TYPE_EMAIL -> {
+                        tv_title.text = getString(R.string.setting_mail_title)
+                        tv_text.text = getString(R.string.setting_email)
+                        edit_content.hint = getString(R.string.login_email)
+                    }
+                    TYPE_GEN -> {
                         tv_title.text = getString(R.string.setting_mail_title)
                         tv_text.text = getString(R.string.setting_email)
                         edit_content.hint = getString(R.string.login_email)
@@ -103,13 +126,16 @@ class UpdateProfileFragment : BaseFragment() {
                         edit_birthday.listen()
                     }
                 }
-            }else{
+            } else {
                 when (viewModel.type) {
                     TYPE_NAME -> {
-                        edit_content.hint=viewModel.profileItem.username
+                        edit_content.hint = viewModel.profileItem.username
                     }
                     TYPE_EMAIL -> {
                         edit_content.hint = viewModel.profileItem.email
+                    }
+                    TYPE_GEN -> {
+                        edit_content.hint = getString(viewModel.profileItem.getGenderRes())
                     }
                     TYPE_BIRTHDAY -> {
                         edit_content.visibility = View.INVISIBLE
@@ -122,5 +148,34 @@ class UpdateProfileFragment : BaseFragment() {
         }
         viewModel.content.bindingEditText = edit_content
         viewModel.birthday.bindingEditText = edit_birthday
+    }
+
+    private fun showFilterDialog(
+        titleId: Int,
+        textArrayId: Int,
+        valueArrayId: Int,
+        selectedValue: Int,
+        dialogListener: OnDialogListener
+    ) {
+        val dialog = FilterDialogFragment.newInstance(
+            FilterDialogFragment.Content(
+                titleId,
+                textArrayId,
+                valueArrayId,
+                dialogListener,
+                selectedValue
+            )
+        )
+        dialog.show(
+            requireActivity().supportFragmentManager,
+            FilterDialogFragment::class.java.simpleName
+        )
+    }
+
+    private val onDialogListener = object : OnDialogListener {
+        override fun onItemSelected(value: Int, text: String) {
+            viewModel.profileItem.gender = value
+//            viewModel.updateProfile()
+        }
     }
 }
