@@ -17,6 +17,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/color_gray_4"
         android:layout_marginTop="15dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -24,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="15dp"
-            android:background="@color/color_white_1"
+            android:background="@color/transparent"
             android:paddingStart="20dp"
             android:paddingEnd="20dp">
 
@@ -109,7 +110,7 @@
                 android:text="@string/setting_email"
                 android:textColor="@color/color_black_1_50"
                 android:textSize="14sp"
-                app:layout_constraintBottom_toBottomOf="@+id/btn_resend"
+                app:layout_constraintBottom_toBottomOf="@+id/guideline"
                 app:layout_constraintEnd_toEndOf="@+id/btn_name"
                 app:layout_constraintHeight_min="60dp"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -121,7 +122,7 @@
                 android:id="@+id/btn_resend"
                 android:layout_width="92dp"
                 android:layout_height="32dp"
-                android:layout_marginTop="65dp"
+                android:layout_marginTop="75dp"
                 android:background="@drawable/bg_red_1_radius_6"
                 android:gravity="center"
                 android:text="@string/setting_resend_mail"
@@ -130,6 +131,16 @@
                 app:layout_constraintEnd_toEndOf="@+id/btn_email"
                 app:layout_constraintTop_toBottomOf="@+id/btn_name"
                 tools:visibility="visible" />
+
+            <View
+                android:id="@+id/guideline"
+                android:layout_width="wrap_content"
+                android:layout_height="1dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintEnd_toEndOf="@+id/btn_resend"
+                app:layout_constraintStart_toStartOf="@+id/btn_resend"
+                app:layout_constraintTop_toBottomOf="@+id/btn_resend"
+                app:layout_goneMarginTop="10dp" />
 
             <TextView
                 android:id="@+id/tv_email"
@@ -169,13 +180,13 @@
             <TextView
                 android:id="@+id/btn_chang_pw"
                 style="@style/settingStyle_1"
-                android:layout_marginTop="15dp"
                 android:drawableEnd="@drawable/btn_arrow_black_n"
                 android:gravity="center_vertical"
                 android:text="@string/setting_change_pw"
-                app:layout_constraintEnd_toEndOf="@id/btn_account"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_account" />
+                app:layout_constraintEnd_toEndOf="@+id/btn_account"
+                android:layout_marginTop="15dp"
+                app:layout_constraintStart_toStartOf="@+id/btn_account"
+                app:layout_constraintTop_toBottomOf="@+id/btn_account" />
 
             <TextView
                 android:id="@+id/btn_gender"
