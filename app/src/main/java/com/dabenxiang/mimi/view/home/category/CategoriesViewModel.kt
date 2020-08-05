@@ -99,7 +99,6 @@ class CategoriesViewModel : BaseViewModel() {
                 .build()
 
             LivePagedListBuilder(factory, config).build().asFlow().collect {
-                Timber.d("@@getVideoFilterList: $it")
                 _filterList.postValue(it)
             }
         }
@@ -138,7 +137,6 @@ class CategoriesViewModel : BaseViewModel() {
         }
 
         override fun onTotalCount(count: Long) {
-            Timber.d("@@onTotalCount: $count")
             _onTotalCountResult.postValue(count)
         }
 

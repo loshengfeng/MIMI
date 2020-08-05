@@ -126,9 +126,9 @@ class TopUpFragment : BaseFragment() {
         tl_type.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 when (tab.position) {
-                    0 -> GeneralUtils.showToast(context!!, "Wechat")
-                    1 -> GeneralUtils.showToast(context!!, "Alipay")
-                    2 -> GeneralUtils.showToast(context!!, "ChinaPay")
+                    0 -> GeneralUtils.showToast(requireContext(), "Wechat")
+                    1 -> GeneralUtils.showToast(requireContext(), "Alipay")
+                    2 -> GeneralUtils.showToast(requireContext(), "ChinaPay")
                 }
             }
 
