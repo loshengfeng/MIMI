@@ -33,6 +33,8 @@ class SplashViewModel : BaseViewModel() {
 
     private val versionManager: VersionManager by inject()
 
+    var isChecked =false
+
     private val handler = CoroutineExceptionHandler { _, throwable ->
         Timber.e("$throwable")
         _apiError.postValue(true)

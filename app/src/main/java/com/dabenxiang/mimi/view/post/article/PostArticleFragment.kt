@@ -22,9 +22,12 @@ import com.dabenxiang.mimi.model.api.vo.ArticleItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.dialog.GeneralDialog
+import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
+import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.EDIT
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.MEMBER_DATA
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
@@ -44,6 +47,7 @@ class PostArticleFragment : BaseFragment() {
         private const val TITLE_LIMIT = 60
         private const val CONTENT_LIMIT = 2000
         private const val HASHTAG_LIMIT = 20
+        private const val HASHTAG_TEXT_LIMIT = 10
         private const val INIT_VALUE = 0
         const val UPLOAD_ARTICLE = "upload_article"
         const val TITLE = "title"
@@ -97,6 +101,23 @@ class PostArticleFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+        edt_hashtag.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                s?.let {
+                    if (it.length > HASHTAG_TEXT_LIMIT) {
+                        val content = it.toString().dropLast(1)
+                        edt_hashtag.setText(content)
+                    }
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+        })
+
         edt_title.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 s?.let {
@@ -153,15 +174,31 @@ class PostArticleFragment : BaseFragment() {
                 if (chipGroup.size == HASHTAG_LIMIT) {
                     Toast.makeText(requireContext(), R.string.post_warning_tag_limit, Toast.LENGTH_SHORT).show()
                 } else {
-                    addTag(edt_hashtag.text.toString())
-                    edt_hashtag.text.clear()
+                    val tag = edt_hashtag.text.toString()
+                    if (isTagExist(tag)) {
+                        Toast.makeText(requireContext(), R.string.post_tag_already_have, Toast.LENGTH_SHORT).show()
+                    } else {
+                        addTag(tag)
+                        edt_hashtag.text.clear()
+                    }
                 }
             }
             false
         }
 
         tv_back.setOnClickListener {
-            findNavController().popBackStack()
+            GeneralDialog.newInstance(
+                GeneralDialogData(
+                    titleRes = R.string.whether_to_discard_content,
+                    messageIcon = R.drawable.ico_default_photo,
+                    firstBtn = getString(R.string.btn_cancel),
+                    secondBtn = getString(R.string.btn_confirm),
+                    isMessageIcon = false,
+                    secondBlock = {
+                        findNavController().navigateUp()
+                    }
+                )
+            ).show(requireActivity().supportFragmentManager)
         }
 
         tv_clean.setOnClickListener {
@@ -220,6 +257,9 @@ class PostArticleFragment : BaseFragment() {
         tv_clean.visibility = View.VISIBLE
         tv_clean.text = getString(R.string.btn_send)
         tv_clean.isEnabled = true
+
+        val img = requireContext().getDrawable(R.drawable.btn_close_n)
+        tv_back.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null)
 
         txt_titleCount.text = String.format(getString(R.string.typing_count,
             INIT_VALUE,
@@ -360,5 +400,15 @@ class PostArticleFragment : BaseFragment() {
         txt_hashtagCount.text = String.format(getString(R.string.typing_count, chipGroup.size,
             HASHTAG_LIMIT
         ))
+    }
+
+    private fun isTagExist(tag: String): Boolean  {
+        for (i in 0 until chipGroup.childCount) {
+            val chip = chipGroup.getChildAt(i) as Chip
+            if (chip.text == tag) {
+                return true
+            }
+        }
+        return false
     }
 }
