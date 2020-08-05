@@ -56,7 +56,6 @@ class ChooseUploadMethodDialogFragment : BaseDialogFragment() {
 
             dismiss()
         }.also {
-            layout_root.setOnClickListener(it)
             btn_camera.setOnClickListener(it)
             btn_article.setOnClickListener(it)
             btn_video.setOnClickListener(it)

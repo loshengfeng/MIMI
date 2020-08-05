@@ -35,9 +35,12 @@ import com.dabenxiang.mimi.model.vo.PostVideoAttachment
 import com.dabenxiang.mimi.model.vo.ViewerItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.ScrollVideoAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.dialog.GeneralDialog
+import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
+import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
@@ -110,6 +113,8 @@ class PostVideoFragment : BaseFragment() {
         recyclerView.adapter = adapter
 
         tv_clean.isEnabled = true
+        val img = requireContext().getDrawable(R.drawable.btn_close_n)
+        tv_back.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null)
         
         useAdultTheme(false)
     }
@@ -190,7 +195,23 @@ class PostVideoFragment : BaseFragment() {
         }
 
         tv_back.setOnClickListener {
-            findNavController().navigate(R.id.action_postVideoFragment_to_adultHomeFragment)
+            GeneralDialog.newInstance(
+                GeneralDialogData(
+                    titleRes = R.string.whether_to_discard_content,
+                    messageIcon = R.drawable.ico_default_photo,
+                    firstBtn = getString(R.string.btn_cancel),
+                    secondBtn = getString(R.string.btn_confirm),
+                    isMessageIcon = false,
+                    secondBlock = {
+                        val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
+                        if (isEdit != null && isEdit) {
+                            findNavController().navigate(R.id.action_postVideoFragment_to_myPostFragment)
+                        } else {
+                            findNavController().navigate(R.id.action_postVideoFragment_to_adultHomeFragment)
+                        }
+                    }
+                )
+            ).show(requireActivity().supportFragmentManager)
         }
 
         tv_clean.setOnClickListener {

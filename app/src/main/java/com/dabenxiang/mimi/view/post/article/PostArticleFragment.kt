@@ -22,9 +22,12 @@ import com.dabenxiang.mimi.model.api.vo.ArticleItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.dialog.GeneralDialog
+import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
+import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.EDIT
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.MEMBER_DATA
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
@@ -161,7 +164,18 @@ class PostArticleFragment : BaseFragment() {
         }
 
         tv_back.setOnClickListener {
-            findNavController().popBackStack()
+            GeneralDialog.newInstance(
+                GeneralDialogData(
+                    titleRes = R.string.whether_to_discard_content,
+                    messageIcon = R.drawable.ico_default_photo,
+                    firstBtn = getString(R.string.btn_cancel),
+                    secondBtn = getString(R.string.btn_confirm),
+                    isMessageIcon = false,
+                    secondBlock = {
+                        findNavController().navigateUp()
+                    }
+                )
+            ).show(requireActivity().supportFragmentManager)
         }
 
         tv_clean.setOnClickListener {
@@ -220,6 +234,9 @@ class PostArticleFragment : BaseFragment() {
         tv_clean.visibility = View.VISIBLE
         tv_clean.text = getString(R.string.btn_send)
         tv_clean.isEnabled = true
+
+        val img = requireContext().getDrawable(R.drawable.btn_close_n)
+        tv_back.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null)
 
         txt_titleCount.text = String.format(getString(R.string.typing_count,
             INIT_VALUE,
