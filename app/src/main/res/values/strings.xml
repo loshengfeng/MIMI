@@ -157,9 +157,11 @@
     <string name="text_follow">关注</string>
     <string name="text_post">帖子</string>
     <string name="text_ranking">排行榜</string>
+    <string name="text_gender_female">女</string>
+    <string name="text_gender_male">男</string>
     <string-array name="filter_gender">
-        <item>女</item>
-        <item>男</item>
+        <item>@string/text_gender_female</item>
+        <item>@string/text_gender_male</item>
     </string-array>
 
     <integer-array name="filter_gender_value">
