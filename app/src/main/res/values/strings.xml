@@ -1,4 +1,5 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+
     <string name="app_name">MiMi</string>
 
     <string name="splash_text">欢  迎  来  到  蜜  蜜</string>
@@ -54,6 +55,10 @@
     <string name="error_account_duplicate">此賬號已存在，請重新填寫</string>
     <string name="error_first_login">第一次登入需重设密码</string>
     <string name="reset_pw_success">重设密码成功</string>
+    <string name="verify_immediately">立即验证</string>
+    <string name="verify_later">稍后验证</string>
+    <string name="error_email_not_confirmed_title">尚未验证</string>
+    <string name="error_email_not_confirmed_msg">Email 尚未验证，请先完成验证后登录</string>
 
     <!-- Top Up -->
     <string name="topup_desc">蜜币购买</string>
@@ -296,7 +301,7 @@
     <string name="search_video_result">搜索\"%s\", 共找到 %,d 个视频</string>
     <string name="search_video_btn">搜索</string>
     <string name="search_video_input_empty_toast">请输入搜寻文字</string>
-    
+
     <!--  Chat Content  -->
     <string name="chat_content_media_chooser">请选择档案</string>
     <string name="chat_content_file_too_large">档案不得超过 5MB</string>

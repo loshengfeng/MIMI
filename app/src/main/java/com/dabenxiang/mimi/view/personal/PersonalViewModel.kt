@@ -11,6 +11,7 @@ import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
 class PersonalViewModel : BaseViewModel() {
 
@@ -36,7 +37,7 @@ class PersonalViewModel : BaseViewModel() {
                 val meItem = result.body()?.content
                 meItem?.let {
                     accountManager.setupProfile(it)
-                    getAttachment(it.avatarAttachmentId!!)
+                    it.avatarAttachmentId?.also { id -> getAttachment(id) }
                 }
                 emit(ApiResult.success(meItem))
             }
