@@ -15,9 +15,9 @@ import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.holder.statisticsItemToCarouselHolderItem
-import com.dabenxiang.mimi.model.holder.statisticsItemToVideoItem
-import com.dabenxiang.mimi.model.serializable.PlayerData
+import com.dabenxiang.mimi.model.vo.statisticsItemToCarouselHolderItem
+import com.dabenxiang.mimi.model.vo.statisticsItemToVideoItem
+import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
@@ -31,7 +31,6 @@ import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_home.*
-import timber.log.Timber
 
 class HomeFragment : BaseFragment() {
 
@@ -54,6 +53,7 @@ class HomeFragment : BaseFragment() {
         setupRecyclerByPosition(0)
         refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
         btn_ranking.visibility = View.GONE
+        iv_post.visibility = View.GONE
 
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
@@ -310,7 +310,11 @@ class HomeFragment : BaseFragment() {
 
     private val adapterListener = object : HomeAdapter.EventListener {
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
-            val bundle = CategoriesFragment.createBundle(item.title, item.categories, mainViewModel?.getCategory(item.title, false))
+            val bundle = CategoriesFragment.createBundle(
+                item.title,
+                item.categories,
+                mainViewModel?.getCategory(item.title, false)
+            )
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_homeFragment_to_categoriesFragment,
@@ -319,7 +323,7 @@ class HomeFragment : BaseFragment() {
             )
         }
 
-        override fun onVideoClick(view: View, item: PlayerData) {
+        override fun onVideoClick(view: View, item: PlayerItem) {
             val intent = Intent(requireContext(), PlayerActivity::class.java)
             intent.putExtras(PlayerActivity.createBundle(item))
             startActivityForResult(intent, PlayerActivity.REQUEST_CODE)

@@ -17,12 +17,14 @@ import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.AgentItem
-import com.dabenxiang.mimi.model.holder.TopUpOnlinePayItem
-import com.dabenxiang.mimi.model.holder.TopUpProxyPayItem
+import com.dabenxiang.mimi.model.api.vo.ChatListItem
+import com.dabenxiang.mimi.model.vo.TopUpOnlinePayItem
+import com.dabenxiang.mimi.model.vo.TopUpProxyPayItem
 import com.dabenxiang.mimi.view.adapter.TopUpAgentAdapter
 import com.dabenxiang.mimi.view.adapter.TopUpOnlinePayAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
 import com.dabenxiang.mimi.view.listener.AdapterEventListener
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -83,6 +85,25 @@ class TopUpFragment : BaseFragment() {
                 is Error -> onApiError(it.throwable)
             }
         })
+
+        viewModel.createChatRoomResult.observe(viewLifecycleOwner, Observer {
+            when(it){
+                is Success -> {
+                    viewModel.currentItem?.let { item ->
+                        ChatListItem(item.agentId?.toLong(), item.merchantName, avatarAttachmentId = item.avatarAttachmentId?.toLong())
+                    }?.also {
+                        val bundle = ChatContentFragment.createBundle(it)
+                        navigateTo(
+                                NavigateItem.Destination(
+                                        R.id.action_topupFragment_to_chatContentFragment,
+                                        bundle
+                                )
+                        )
+                    }
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -105,9 +126,9 @@ class TopUpFragment : BaseFragment() {
         tl_type.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 when (tab.position) {
-                    0 -> GeneralUtils.showToast(context!!, "Wechat")
-                    1 -> GeneralUtils.showToast(context!!, "Alipay")
-                    2 -> GeneralUtils.showToast(context!!, "ChinaPay")
+                    0 -> GeneralUtils.showToast(requireContext(), "Wechat")
+                    1 -> GeneralUtils.showToast(requireContext(), "Alipay")
+                    2 -> GeneralUtils.showToast(requireContext(), "ChinaPay")
                 }
             }
 
@@ -137,10 +158,30 @@ class TopUpFragment : BaseFragment() {
         }
 
         val onlinePayList = mutableListOf<TopUpOnlinePayItem>(
-            TopUpOnlinePayItem(1, "300", "¥ 50.00", "¥ 55.00"),
-            TopUpOnlinePayItem(0, "900+90", "¥ 150.00", "¥ 165.00"),
-            TopUpOnlinePayItem(0, "1500+150", "¥ 250.00", "¥ 275.00"),
-            TopUpOnlinePayItem(0, "3000+300", "¥ 500.00", "¥ 500.00")
+            TopUpOnlinePayItem(
+                1,
+                "300",
+                "¥ 50.00",
+                "¥ 55.00"
+            ),
+            TopUpOnlinePayItem(
+                0,
+                "900+90",
+                "¥ 150.00",
+                "¥ 165.00"
+            ),
+            TopUpOnlinePayItem(
+                0,
+                "1500+150",
+                "¥ 250.00",
+                "¥ 275.00"
+            ),
+            TopUpOnlinePayItem(
+                0,
+                "3000+300",
+                "¥ 500.00",
+                "¥ 500.00"
+            )
         )
 
         rv_online_pay.adapter = TopUpOnlinePayAdapter(onlinePayListener)
@@ -184,7 +225,7 @@ class TopUpFragment : BaseFragment() {
 
     private val agentListener = object : AdapterEventListener<AgentItem> {
         override fun onItemClick(view: View, item: AgentItem) {
-
+            viewModel.createChatRoom(item)
         }
     }
 

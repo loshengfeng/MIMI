@@ -2,7 +2,7 @@ package com.dabenxiang.mimi.view.chathistory
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.manager.DomainManager
+import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -12,9 +12,9 @@ import retrofit2.HttpException
 import timber.log.Timber
 
 class ChatHistoryListDataSource(
-        private val viewModelScope: CoroutineScope,
-        private val domainManager: DomainManager,
-        private val pagingCallback: PagingCallback
+    private val viewModelScope: CoroutineScope,
+    private val domainManager: DomainManager,
+    private val pagingCallback: PagingCallback
 ) : PageKeyedDataSource<Long, ChatListItem>() {
 
     companion object {

@@ -45,10 +45,14 @@ class SplashFragment : BaseFragment() {
 
     private val cameraPermissions = arrayOf(Manifest.permission.CAMERA)
 
-    private val permissions = locationPermissions+externalPermissions+cameraPermissions
-
+    private val permissions = locationPermissions + externalPermissions + cameraPermissions
 
     private val viewModel: SplashViewModel by viewModels()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Timber.i("onCreate")
+        setVersionObserve()
+    }
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_splash
@@ -56,6 +60,7 @@ class SplashFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Timber.i("onViewCreated")
         requestPermissions()
     }
 
@@ -63,7 +68,20 @@ class SplashFragment : BaseFragment() {
         get() = View.GONE
 
     override fun setupObservers() {
-        viewModel.versionStatus.observe(viewLifecycleOwner, Observer {
+
+        viewModel.apiError.observe(viewLifecycleOwner, Observer { isError ->
+            if (isError) {
+                initSettings()
+            }
+        })
+    }
+
+
+    private fun setVersionObserve() =
+        viewModel.versionStatus.observe(this, Observer {
+
+            Timber.i("versionStatus=$it   isVersionChecked=${mainViewModel?.isVersionChecked}")
+            if(mainViewModel?.isVersionChecked == true) return@Observer
             when (it) {
                 VersionStatus.UPDATE -> {
                     if (viewModel.isUpgradeApp()) {
@@ -80,16 +98,8 @@ class SplashFragment : BaseFragment() {
             }
         })
 
-        viewModel.apiError.observe(viewLifecycleOwner, Observer { isError ->
-            if (isError) {
-                initSettings()
-            }
-        })
-    }
 
     override fun setupListeners() {}
-
-
 
     private fun requestPermissions() {
         val requestList = getNotGrantedPermissions(permissions)
@@ -116,6 +126,7 @@ class SplashFragment : BaseFragment() {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
+        Timber.i("onRequestPermissionsResult")
         if (requestCode == PERMISSION_REQUEST_CODE) {
             var isPermissionAllGranted = true
             for (i in permissions.indices) {
@@ -141,13 +152,17 @@ class SplashFragment : BaseFragment() {
                 is Empty -> {
                     goToHomePage()
                 }
-                is Error -> onApiError(it.throwable)
+                is Error -> {
+                    onApiError(it.throwable)
+                    viewModel.logoutLocal()
+                    goToHomePage()
+                }
             }
         })
         viewModel.autoLogin()
     }
 
-    private fun goToHomePage(){
+    private fun goToHomePage() {
         lifecycleScope.launch(Dispatchers.IO) {
             delay(1000)
             withContext(Dispatchers.Main) {
@@ -179,13 +194,13 @@ class SplashFragment : BaseFragment() {
                     } else {
                         viewModel.updateApp(progressCallback)
                     }
-
+                    mainViewModel?.isVersionChecked =true
                 }
 
-                override fun onCancle() {
+                override fun onCancel() {
                     viewModel.setupRecordTimestamp()
                     initSettings()
-
+                    mainViewModel?.isVersionChecked =true
                 }
 
             }

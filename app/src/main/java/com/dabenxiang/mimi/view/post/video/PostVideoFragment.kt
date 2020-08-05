@@ -35,15 +35,20 @@ import com.dabenxiang.mimi.model.vo.PostVideoAttachment
 import com.dabenxiang.mimi.model.vo.ViewerItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.ScrollVideoAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.dialog.GeneralDialog
+import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
+import com.dabenxiang.mimi.view.dialog.show
+import com.dabenxiang.mimi.view.home.AdultHomeFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.fragment_post_article.*
 import kotlinx.android.synthetic.main.fragment_post_article.chipGroup
 import kotlinx.android.synthetic.main.fragment_post_article.clubLayout
 import kotlinx.android.synthetic.main.fragment_post_article.edt_hashtag
@@ -54,7 +59,9 @@ import kotlinx.android.synthetic.main.fragment_post_article.txt_titleCount
 import kotlinx.android.synthetic.main.fragment_post_pic.*
 import kotlinx.android.synthetic.main.fragment_post_pic.txt_clubName
 import kotlinx.android.synthetic.main.fragment_post_pic.txt_hashtagName
+import kotlinx.android.synthetic.main.fragment_post_pic.txt_placeholder
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import org.w3c.dom.Text
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -69,9 +76,10 @@ class PostVideoFragment : BaseFragment() {
         const val BUNDLE_COVER_URI = "bundle_cover_uri"
 
         private const val TITLE_LIMIT = 60
-        private const val CONTENT_LIMIT = 2000
         private const val HASHTAG_LIMIT = 20
+        private const val HASHTAG_TEXT_LIMIT = 10
         private const val INIT_VALUE = 0
+        private const val RECORD_LIMIT_TIME = 15
         const val POST_ID = "post_id"
 
         const val UPLOAD_VIDEO = "upload_video"
@@ -100,11 +108,19 @@ class PostVideoFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initSettings()
+    }
 
+    override fun initSettings() {
         adapter = ScrollVideoAdapter(postPicItemListener)
         adapter.submitList(videoAttachmentList)
         recyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         recyclerView.adapter = adapter
+
+        tv_clean.isEnabled = true
+        val img = requireContext().getDrawable(R.drawable.btn_close_n)
+        tv_back.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null)
+        
+        useAdultTheme(false)
     }
 
     override fun setupObservers() {
@@ -161,6 +177,23 @@ class PostVideoFragment : BaseFragment() {
             }
         })
 
+        edt_hashtag.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                s?.let {
+                    if (it.length > HASHTAG_TEXT_LIMIT) {
+                        val content = it.toString().dropLast(1)
+                        edt_hashtag.setText(content)
+                    }
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+        })
+
         clubLayout.setOnClickListener {
             ChooseClubDialogFragment.newInstance(chooseClubDialogListener).also {
                 it.show(
@@ -175,18 +208,41 @@ class PostVideoFragment : BaseFragment() {
                 if (chipGroup.size == HASHTAG_LIMIT) {
                     Toast.makeText(requireContext(), R.string.post_warning_tag_limit, Toast.LENGTH_SHORT).show()
                 } else {
-                    addTag(edt_hashtag.text.toString())
-                    edt_hashtag.text.clear()
+                    val tag = edt_hashtag.text.toString()
+                    if (isTagExist(tag)) {
+                        Toast.makeText(requireContext(), R.string.post_tag_already_have, Toast.LENGTH_SHORT).show()
+                    } else {
+                        addTag(tag)
+                        edt_hashtag.text.clear()
+                    }
                 }
             }
             false
         }
 
         tv_back.setOnClickListener {
-            findNavController().popBackStack()
+            GeneralDialog.newInstance(
+                GeneralDialogData(
+                    titleRes = R.string.whether_to_discard_content,
+                    messageIcon = R.drawable.ico_default_photo,
+                    firstBtn = getString(R.string.btn_cancel),
+                    secondBtn = getString(R.string.btn_confirm),
+                    isMessageIcon = false,
+                    secondBlock = {
+                        val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
+                        if (isEdit != null && isEdit) {
+                            findNavController().navigate(R.id.action_postVideoFragment_to_myPostFragment)
+                        } else {
+                            findNavController().navigate(R.id.action_postVideoFragment_to_adultHomeFragment)
+                        }
+                    }
+                )
+            ).show(requireActivity().supportFragmentManager)
         }
 
         tv_clean.setOnClickListener {
+            val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
+
             val title = edt_title.text.toString()
 
             if (title.isBlank()) {
@@ -231,12 +287,20 @@ class PostVideoFragment : BaseFragment() {
                 videoAttachmentList[0].length = length
             }
 
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(UPLOAD_VIDEO, true)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(MEMBER_REQUEST, request)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(VIDEO_DATA, videoAttachmentList)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(DELETE_ATTACHMENT, deleteVideoList)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(POST_ID, postId)
-            findNavController().navigateUp()
+            val bundle = Bundle()
+            bundle.putBoolean(UPLOAD_VIDEO, true)
+            bundle.putParcelable(MEMBER_REQUEST, request)
+            bundle.putParcelableArrayList(VIDEO_DATA, videoAttachmentList)
+            bundle.putParcelableArrayList(DELETE_ATTACHMENT, deleteVideoList)
+            bundle.putLong(POST_ID, postId)
+
+            if (isEdit != null && isEdit) {
+                val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+                findNavController().navigate(R.id.action_postVideoFragment_to_myPostFragment, bundle)
+            } else {
+                findNavController().navigate(R.id.action_postVideoFragment_to_adultHomeFragment, bundle)
+            }
         }
     }
 
@@ -286,7 +350,7 @@ class PostVideoFragment : BaseFragment() {
             TITLE_LIMIT
         ))
         txt_hashtagCount.text = String.format(getString(R.string.typing_count,
-            item.tags.size,
+            item.tags?.size,
             HASHTAG_LIMIT
         ))
 
@@ -310,11 +374,14 @@ class PostVideoFragment : BaseFragment() {
                 .circleCrop()
                 .into(iv_avatar)
 
-            addTag(item.tag)
-
-            txt_placeholder.visibility = View.GONE
-            txt_clubName.visibility = View.VISIBLE
-            txt_hashtagName.visibility = View.VISIBLE
+            if (chipGroup.size == HASHTAG_LIMIT) {
+                Toast.makeText(requireContext(), R.string.post_warning_tag_limit, Toast.LENGTH_SHORT).show()
+            } else {
+                addTag(item.tag, true)
+                txt_placeholder.visibility = View.GONE
+                txt_clubName.visibility = View.VISIBLE
+                txt_hashtagName.visibility = View.VISIBLE
+            }
         }
     }
 
@@ -399,7 +466,7 @@ class PostVideoFragment : BaseFragment() {
                     val myUri = Uri.fromFile(File(UriUtils.getPath(requireContext(), videoUri!!)))
                     val bundle = Bundle()
                     bundle.putString(EditVideoFragment.BUNDLE_VIDEO_URI, myUri.toString())
-                    findNavController().navigate(R.id.action_postVideoFragment_self, bundle)
+                    findNavController().navigate(R.id.action_postVideoFragment_to_editVideoFragment, bundle)
                 }
             }
         }
@@ -410,11 +477,11 @@ class PostVideoFragment : BaseFragment() {
     }
 
     private fun openRecorder() {
-        Intent(MediaStore.ACTION_VIDEO_CAPTURE).also { takeVideoIntent ->
-            takeVideoIntent.resolveActivity(requireContext().packageManager)?.also {
-                startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE)
-            }
-        }
+        val intent = Intent()
+        intent.action = MediaStore.ACTION_VIDEO_CAPTURE
+        intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, RECORD_LIMIT_TIME)
+        intent.resolveActivity(requireContext().packageManager)
+        startActivityForResult(intent, REQUEST_VIDEO_CAPTURE)
     }
 
     private fun deleteVideo(item: PostVideoAttachment) {
@@ -439,5 +506,15 @@ class PostVideoFragment : BaseFragment() {
         val bundle = Bundle()
         bundle.putSerializable(PostViewerFragment.VIEWER_DATA, viewerItem)
         findNavController().navigate(R.id.action_postVideoFragment_to_postViewerFragment, bundle)
+    }
+
+    private fun isTagExist(tag: String): Boolean  {
+        for (i in 0 until chipGroup.childCount) {
+            val chip = chipGroup.getChildAt(i) as Chip
+            if (chip.text == tag) {
+                return true
+            }
+        }
+        return false
     }
 }

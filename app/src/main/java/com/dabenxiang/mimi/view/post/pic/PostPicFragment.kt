@@ -3,7 +3,10 @@ package com.dabenxiang.mimi.view.post.pic
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -32,14 +35,19 @@ import com.dabenxiang.mimi.model.vo.PostAttachmentItem
 import com.dabenxiang.mimi.model.vo.ViewerItem
 import com.dabenxiang.mimi.view.adapter.ScrollPicAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.dialog.GeneralDialog
+import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
+import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.post.video.PostVideoFragment
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment.Companion.VIEWER_DATA
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.fragment_post_article.*
 import kotlinx.android.synthetic.main.fragment_post_article.chipGroup
 import kotlinx.android.synthetic.main.fragment_post_article.clubLayout
 import kotlinx.android.synthetic.main.fragment_post_article.edt_hashtag
@@ -64,14 +72,17 @@ class PostPicFragment : BaseFragment() {
         const val MEMBER_REQUEST = "member_request"
         const val PIC_URI = "pic_uri"
         const val DELETE_ATTACHMENT = "delete_attachment"
+
         const val POST_ID = "post_id"
 
         private const val TITLE_LIMIT = 60
-        private const val HASHTAG_LIMIT = 10
+        private const val HASHTAG_LIMIT = 20
+        private const val HASHTAG_TEXT_LIMIT = 10
         private const val INIT_VALUE = 0
         private const val PHOTO_LIMIT = 20
 
         private const val REQUEST_MUTLI_PHOTO = 1001
+        private const val INTENT_SELECT_IMG = 10001
     }
 
     override val bottomNavigationVisibility: Int
@@ -94,11 +105,19 @@ class PostPicFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initSettings()
+    }
 
+    override fun initSettings() {
         adapter = ScrollPicAdapter(postPicItemListener)
         adapter.submitList(attachmentList)
         recyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         recyclerView.adapter = adapter
+
+        tv_clean.isEnabled = true
+        val img = requireContext().getDrawable(R.drawable.btn_close_n)
+        tv_back.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null)
+
+        useAdultTheme(false)
     }
 
     override fun setupObservers() {
@@ -155,6 +174,23 @@ class PostPicFragment : BaseFragment() {
             }
         })
 
+        edt_hashtag.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                s?.let {
+                    if (it.length > HASHTAG_TEXT_LIMIT) {
+                        val content = it.toString().dropLast(1)
+                        edt_hashtag.setText(content)
+                    }
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+        })
+
         clubLayout.setOnClickListener {
             ChooseClubDialogFragment.newInstance(chooseClubDialogListener).also {
                 it.show(
@@ -169,18 +205,36 @@ class PostPicFragment : BaseFragment() {
                 if (chipGroup.size == HASHTAG_LIMIT) {
                     Toast.makeText(requireContext(), R.string.post_warning_tag_limit, Toast.LENGTH_SHORT).show()
                 } else {
-                    addTag(edt_hashtag.text.toString())
-                    edt_hashtag.text.clear()
+                    val tag = edt_hashtag.text.toString()
+                    if (isTagExist(tag)) {
+                        Toast.makeText(requireContext(), R.string.post_tag_already_have, Toast.LENGTH_SHORT).show()
+                    } else {
+                        addTag(tag)
+                        edt_hashtag.text.clear()
+                    }
                 }
             }
             false
         }
 
         tv_back.setOnClickListener {
-            findNavController().popBackStack()
+            GeneralDialog.newInstance(
+                GeneralDialogData(
+                    titleRes = R.string.whether_to_discard_content,
+                    messageIcon = R.drawable.ico_default_photo,
+                    firstBtn = getString(R.string.btn_cancel),
+                    secondBtn = getString(R.string.btn_confirm),
+                    isMessageIcon = false,
+                    secondBlock = {
+                        findNavController().navigateUp()
+                    }
+                )
+            ).show(requireActivity().supportFragmentManager)
         }
 
         tv_clean.setOnClickListener {
+            val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
+
             val title = edt_title.text.toString()
 
             if (title.isBlank()) {
@@ -212,12 +266,20 @@ class PostPicFragment : BaseFragment() {
                 tags = tags
             )
 
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(UPLOAD_PIC, true)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(MEMBER_REQUEST, request)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(PIC_URI, adapter.getData())
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(DELETE_ATTACHMENT, deletePicList)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(POST_ID, postId)
-            findNavController().navigateUp()
+            val bundle = Bundle()
+            bundle.putBoolean(UPLOAD_PIC, true)
+            bundle.putParcelable(MEMBER_REQUEST, request)
+            bundle.putParcelableArrayList(PIC_URI, adapter.getData())
+            bundle.putStringArrayList(DELETE_ATTACHMENT, deletePicList)
+            bundle.putLong(POST_ID, postId)
+
+            if (isEdit != null && isEdit) {
+                val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+                findNavController().navigate(R.id.action_postPicFragment_to_myPostFragment, bundle)
+            } else {
+                findNavController().navigate(R.id.action_postPicFragment_to_adultHomeFragment, bundle)
+            }
         }
     }
 
@@ -271,7 +333,7 @@ class PostPicFragment : BaseFragment() {
             TITLE_LIMIT
         ))
         txt_hashtagCount.text = String.format(getString(R.string.typing_count,
-            item.tags.size,
+            item.tags?.size,
             HASHTAG_LIMIT
         ))
 
@@ -298,11 +360,14 @@ class PostPicFragment : BaseFragment() {
                 .circleCrop()
                 .into(iv_avatar)
 
-            addTag(item.tag)
-
-            txt_placeholder.visibility = View.GONE
-            txt_clubName.visibility = View.VISIBLE
-            txt_hashtagName.visibility = View.VISIBLE
+            if (chipGroup.size == HASHTAG_LIMIT) {
+                Toast.makeText(requireContext(), R.string.post_warning_tag_limit, Toast.LENGTH_SHORT).show()
+            } else {
+                addTag(item.tag, true)
+                txt_placeholder.visibility = View.GONE
+                txt_clubName.visibility = View.VISIBLE
+                txt_hashtagName.visibility = View.VISIBLE
+            }
         }
     }
 
@@ -399,10 +464,16 @@ class PostPicFragment : BaseFragment() {
                     val postAttachmentItem = PostAttachmentItem(uri = uri.toString())
                     uriDataList.add(postAttachmentItem)
                 }
-
                 updateCountPicView()
             } else {
-                val uri = data?.data
+                val uri = if (data?.data == null) {
+                    val extras = data?.extras
+                    val imageBitmap = extras!!["data"] as Bitmap?
+                    Uri.parse(MediaStore.Images.Media.insertImage(requireContext().contentResolver, imageBitmap, null,null))
+                } else {
+                    data.data!!
+                }
+
                 val uriDataList = adapter.getData()
                 val postAttachmentItem = PostAttachmentItem(uri = uri.toString())
                 uriDataList.add(postAttachmentItem)
@@ -434,19 +505,35 @@ class PostPicFragment : BaseFragment() {
     }
 
     private fun addPic() {
-        val intent = Intent()
-        intent.type = "image/*"
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-        intent.action = Intent.ACTION_GET_CONTENT
+        val galleryIntent = Intent()
+        galleryIntent.type = "image/*"
+        galleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        galleryIntent.action = Intent.ACTION_GET_CONTENT
 
-        startActivityForResult(Intent.createChooser(intent, getString(R.string.select_pics)),
-            REQUEST_MUTLI_PHOTO
-        )
+        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+
+        val chooser = Intent(Intent.ACTION_CHOOSER)
+        chooser.putExtra(Intent.EXTRA_INTENT, galleryIntent)
+        chooser.putExtra(Intent.EXTRA_TITLE, requireContext().getString(R.string.post_select_pic))
+
+        val intentArray = arrayOf(cameraIntent)
+        chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
+        startActivityForResult(chooser, INTENT_SELECT_IMG)
     }
 
     private fun openViewerPage(viewerItem: ViewerItem) {
         val bundle = Bundle()
         bundle.putSerializable(VIEWER_DATA, viewerItem)
         findNavController().navigate(R.id.action_postPicFragment_to_postViewerFragment, bundle)
+    }
+
+    private fun isTagExist(tag: String): Boolean  {
+        for (i in 0 until chipGroup.childCount) {
+            val chip = chipGroup.getChildAt(i) as Chip
+            if (chip.text == tag) {
+                return true
+            }
+        }
+        return false
     }
 }

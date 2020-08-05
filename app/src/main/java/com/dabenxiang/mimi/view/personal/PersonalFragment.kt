@@ -66,6 +66,18 @@ class PersonalFragment : BaseFragment() {
                     val meItem = it.result
                     tv_name.text = meItem.friendlyName.toString()
                     tv_Point.text = meItem.availablePoint.toString()
+
+                    takeUnless { meItem.isEmailConfirmed == true }?.run {
+                        showEmailConfirmDialog {
+                            navigateTo(
+                                NavigateItem.Destination(
+                                    R.id.action_personalFragment_to_settingFragment,
+                                    viewModel.byteArray?.let { byteArray ->
+                                        SettingFragment.createBundle(byteArray)
+                                    })
+                            )
+                        }
+                    }
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -169,6 +181,8 @@ class PersonalFragment : BaseFragment() {
 
     override fun initSettings() {
         super.initSettings()
+        interactionListener?.setAdult(false)
+
         tv_version_is_login.text = BuildConfig.VERSION_NAME
         tv_version_is_not_login.text = BuildConfig.VERSION_NAME
 

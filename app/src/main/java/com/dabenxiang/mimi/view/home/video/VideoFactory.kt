@@ -1,7 +1,7 @@
 package com.dabenxiang.mimi.view.home.video
 
 import androidx.paging.DataSource
-import com.dabenxiang.mimi.model.holder.BaseVideoItem
+import com.dabenxiang.mimi.model.vo.BaseVideoItem
 
 class VideoFactory constructor(private val dataSource: VideoDataSource) :
     DataSource.Factory<Long, BaseVideoItem>() {

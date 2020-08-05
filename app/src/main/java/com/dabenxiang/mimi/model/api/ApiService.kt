@@ -104,7 +104,7 @@ interface ApiService {
         @Path("chatId") chatId: Long,
         @Query("offset") offset: String,
         @Query("limit") limit: String
-    ): Response<ApiBasePagingItem<List<ChatContentItem>>>
+    ): Response<ApiBasePagingItem<ChatContent>>
 
     @PUT("/v1/Members/Me/Chats/LastRead")
     suspend fun setLastReadMessageTime(
@@ -171,6 +171,14 @@ interface ApiService {
         @Query("orderBy") orderBy: Int = 1
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
+    @GET("/v1/Members/Post")
+    suspend fun getMembersPost(
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int,
+        @Query("creatorId") creatorId: Long,
+        @Query("isAdult") isAdult: Boolean = true,
+        @Query("orderBy") orderBy: Int = 1
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     @GET("/v1/Members/Post/{id}")
     suspend fun getMemberPostDetail(@Path("id") postId: Long): Response<ApiBaseItem<MemberPostItem>>
@@ -223,6 +231,11 @@ interface ApiService {
     suspend fun getMembersClub(
         @Query("tag") tag: String
     ): Response<ApiBasePagingItem<ArrayList<MemberClubItem>>>
+
+    @GET("/v1/Members/Club/{id}")
+    suspend fun getMembersClub(
+        @Path("id") clubId: Long
+    ): Response<ApiBasePagingItem<MemberClubItem>>
 
     @GET("/v1/Members/Club/Post")
     suspend fun getMembersClubPost(
@@ -302,7 +315,6 @@ interface ApiService {
         @Query("offset") offset: String?,
         @Query("limit") limit: String?
     ): Response<ApiBasePagingItem<List<PostStatisticsItem>>>
-
 
 
     /**********************************************************

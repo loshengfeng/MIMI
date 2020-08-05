@@ -18,12 +18,12 @@ import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
+import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.showToast
 import com.kaopiz.kprogresshud.KProgressHUD
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
-import timber.log.Timber
 import java.net.UnknownHostException
 
 abstract class BaseFragment : Fragment() {
@@ -135,6 +135,12 @@ abstract class BaseFragment : Fragment() {
         activity?.moveTaskToBack(true)
     }
 
+    fun useAdultTheme(value: Boolean) {
+        activity?.also {
+            (it as MainActivity).setAdult(value)
+        }
+    }
+
     open fun onApiError(
         throwable: Throwable,
         onHttpErrorBlock: ((ExceptionResult.HttpError) -> Unit)? = null
@@ -199,5 +205,18 @@ abstract class BaseFragment : Fragment() {
         view?.let {
             mainViewModel?.logoutLocal()
         }
+    }
+
+    fun showEmailConfirmDialog(block: () -> Unit) {
+        GeneralDialog.newInstance(
+            GeneralDialogData(
+                titleRes = R.string.error_email_not_confirmed_title,
+                message = getString(R.string.error_email_not_confirmed_msg),
+                messageIcon = R.drawable.ico_email,
+                firstBtn = getString(R.string.verify_later),
+                secondBtn = getString(R.string.verify_immediately),
+                secondBlock = block
+            )
+        ).show(requireActivity().supportFragmentManager)
     }
 }

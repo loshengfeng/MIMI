@@ -8,7 +8,7 @@
                     android:left="2dp"
                     android:right="2dp"
                     android:top="2dp" />
-            <solid android:color="@color/color_black_1_50" />
+            <solid android:color="@color/color_black_1_10" />
 
         </shape>
     </item>
@@ -17,7 +17,7 @@
         <clip>
             <shape>
                 <corners android:radius="7.5dp" />
-                <solid android:color="@color/color_blue_1" />
+                <solid android:color="@color/color_red_1" />
                 <padding
                         android:bottom="2dp"
                         android:left="2dp"

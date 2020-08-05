@@ -33,7 +33,7 @@ import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
-import com.dabenxiang.mimi.model.serializable.PlayerData
+import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseActivity
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
@@ -79,9 +79,9 @@ class PlayerActivity : BaseActivity() {
         private const val SWIPE_DISTANCE_UNIT = 25
         private const val SWIPE_SOUND_LEAST = 100
 
-        fun createBundle(data: PlayerData, isComment: Boolean = false): Bundle {
+        fun createBundle(item: PlayerItem, isComment: Boolean = false): Bundle {
             return Bundle().also {
-                it.putSerializable(KEY_PLAYER_SRC, data)
+                it.putSerializable(KEY_PLAYER_SRC, item)
                 it.putBoolean(KEY_IS_COMMENT, isComment)
             }
         }
@@ -123,7 +123,7 @@ class PlayerActivity : BaseActivity() {
     private val guessLikeAdapter by lazy {
         GuessLikeAdapter(object :
             GuessLikeAdapter.GuessLikeAdapterListener {
-            override fun onVideoClick(view: View, item: PlayerData) {
+            override fun onVideoClick(view: View, item: PlayerItem) {
 //                val intent = Intent(this@PlayerActivity, PlayerActivity::class.java)
 //                intent.putExtras(createBundle(item))
 //                startActivity(intent)
@@ -226,7 +226,7 @@ class PlayerActivity : BaseActivity() {
                 Timber.i("playerInfoAdapter onMoreClick")
             }
 
-            override fun onAvatarClick() {
+            override fun onAvatarClick(userId: Long, name: String) {
                 // TODO:
                 Timber.d("onAvatarClick nav to member post")
             }
@@ -562,7 +562,7 @@ class PlayerActivity : BaseActivity() {
         )
 
         tv_like.setTextColor(titleColor)
-        tv_favorite.setTextColor(titleColor)
+        iv_favorite.setTextColor(titleColor)
         tv_comment.setTextColor(titleColor)
 
         iv_share.setImageResource(if (isAdult) R.drawable.btn_share_white_n else R.drawable.btn_share_gray_n)
@@ -618,11 +618,11 @@ class PlayerActivity : BaseActivity() {
                     }
             }
 
-            tv_favorite.setCompoundDrawablesRelativeWithIntrinsicBounds(res, 0, 0, 0)
+            iv_favorite.setCompoundDrawablesRelativeWithIntrinsicBounds(res, 0, 0, 0)
         })
 
         viewModel.favoriteVideoCount.observe(this, Observer {
-            tv_favorite.text = it.toString()
+            iv_favorite.text = it.toString()
         })
 
         viewModel.commentCount.observe(this, Observer {
@@ -728,7 +728,7 @@ class PlayerActivity : BaseActivity() {
             }
         }
 
-        tv_favorite.setOnClickListener {
+        iv_favorite.setOnClickListener {
             viewModel.modifyFavorite()
         }
 
@@ -1004,13 +1004,17 @@ class PlayerActivity : BaseActivity() {
         }
     }
 
-    private fun loadVideo(playerData: PlayerData = PlayerData(-1, false)) {
-        if(playerData.videoId != -1L) {
-            viewModel.videoId = playerData.videoId
+    private fun loadVideo(playerItem: PlayerItem = PlayerItem(
+        -1,
+        false
+    )
+    ) {
+        if(playerItem.videoId != -1L) {
+            viewModel.videoId = playerItem.videoId
             viewModel.getVideoInfo()
         } else if (viewModel.nextVideoUrl == null) {
             if (viewModel.apiVideoInfo.value == null) {
-                (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerData?)?.also {
+                (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerItem?)?.also {
                     viewModel.videoId = it.videoId
                     viewModel.getVideoInfo()
                 }
@@ -1264,11 +1268,11 @@ class PlayerActivity : BaseActivity() {
     }
 
     private fun obtainVideoId(): Long {
-        return (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerData?)?.videoId ?: 0
+        return (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerItem?)?.videoId ?: 0
     }
 
     private fun obtainIsAdult(): Boolean {
-        return (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerData?)?.isAdult ?: false
+        return (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerItem?)?.isAdult ?: false
     }
 
     private fun openLoginDialog() {

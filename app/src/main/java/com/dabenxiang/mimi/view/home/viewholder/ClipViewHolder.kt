@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.home.viewholder
 
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R

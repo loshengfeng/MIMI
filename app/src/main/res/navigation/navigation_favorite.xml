@@ -6,6 +6,7 @@
     app:startDestination="@id/postFavoriteFragment">
 
     <include app:graph="@navigation/navigation_detail_club" />
+    <include app:graph="@navigation/navigation_my_post" />
 
     <fragment
         android:id="@+id/postFavoriteFragment"
@@ -20,6 +21,9 @@
         <action
             android:id="@+id/action_postFavoriteFragment_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_postFavoriteFragment_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
     </fragment>
     <fragment
         android:id="@+id/searchVideoFragment"
@@ -50,6 +54,9 @@
         <action
             android:id="@+id/action_searchPostFragment_to_clubDetailFragment"
             app:destination="@id/navigation_detail_club" />
+        <action
+            android:id="@+id/action_searchPostFragment_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
     </fragment>
 
     <fragment
@@ -62,6 +69,9 @@
         <action
             android:id="@+id/action_pictureDetailFragment_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_pictureDetailFragment_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
     </fragment>
 
     <fragment
@@ -71,6 +81,9 @@
         <action
             android:id="@+id/action_textDetailFragment_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_textDetailFragment_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
     </fragment>
 
     <fragment

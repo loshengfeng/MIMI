@@ -34,7 +34,7 @@ class MainActivity : BaseActivity(), InteractionListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        Timber.i("MainActivity onCreate")
         setupBottomNavigationBar()
     }
 
@@ -117,6 +117,7 @@ class MainActivity : BaseActivity(), InteractionListener {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
+        Timber.d("onNewIntent intent$intent")
         // this is for Package Installer activity callback method
         val extras = intent?.extras
         if (PACKAGE_INSTALLED_ACTION.equals(intent?.action)) {

@@ -52,6 +52,19 @@
         app:layout_constraintTop_toBottomOf="@+id/img_avatar"
         tools:text="Title" />
 
+    <TextView
+        android:id="@+id/tv_follow"
+        android:layout_width="54dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/bg_red_1_stroke_radius_16"
+        android:gravity="center"
+        android:textColor="@color/color_red_1"
+        android:textSize="12sp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="+关注" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_picture"
         android:layout_width="match_parent"
@@ -118,8 +131,10 @@
     <TextView
         android:id="@+id/tv_like_count"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="3dp"
+        android:layout_height="0dp"
+        android:gravity="center_vertical"
+        android:paddingStart="3dp"
+        android:paddingEnd="20dp"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@+id/iv_like"
         app:layout_constraintLeft_toRightOf="@+id/iv_like"
@@ -127,39 +142,21 @@
         tools:text="99" />
 
     <ImageView
-        android:id="@+id/tv_favorite"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="33dp"
-        android:src="@drawable/btn_favorite_n"
-        app:layout_constraintLeft_toRightOf="@+id/tv_like_count"
-        app:layout_constraintTop_toBottomOf="@+id/reflow_group_scroll" />
-
-    <TextView
-        android:id="@+id/tv_favorite_count"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="3dp"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="@+id/tv_favorite"
-        app:layout_constraintLeft_toRightOf="@+id/tv_favorite"
-        app:layout_constraintTop_toTopOf="@+id/tv_favorite"
-        tools:text="99" />
-
-    <ImageView
         android:id="@+id/iv_comment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="33dp"
+        android:layout_marginStart="13dp"
         android:src="@drawable/ico_messege_adult_gray"
-        app:layout_constraintLeft_toRightOf="@+id/tv_favorite_count"
+        app:layout_constraintLeft_toRightOf="@+id/tv_like_count"
         app:layout_constraintTop_toBottomOf="@+id/reflow_group_scroll" />
 
     <TextView
         android:id="@+id/tv_comment_count"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="3dp"
+        android:layout_height="0dp"
+        android:gravity="center_vertical"
+        android:paddingEnd="20dp"
+        android:paddingStart="3dp"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@+id/iv_comment"
         app:layout_constraintLeft_toRightOf="@+id/iv_comment"

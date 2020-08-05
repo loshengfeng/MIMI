@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.manager
+package com.dabenxiang.mimi.model.manager
 
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ChangePasswordRequest
@@ -35,6 +35,7 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
         pref.profileItem.avatarAttachmentId = meItem.avatarAttachmentId ?: 0
         pref.profileItem.friendlyName = meItem.friendlyName ?: ""
         pref.profileItem.point = meItem.availablePoint ?: 0
+        pref.profileItem.isEmailConfirmed = meItem.isEmailConfirmed ?: false
     }
 
     fun hasMemberToken(): Boolean {
@@ -138,7 +139,8 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
                         account = userName,
                         password = password,
                         friendlyName = meItem?.friendlyName ?: "",
-                        avatarAttachmentId = meItem?.avatarAttachmentId ?: 0
+                        avatarAttachmentId = meItem?.avatarAttachmentId ?: 0,
+                        isEmailConfirmed = meItem?.isEmailConfirmed ?: false
                     )
                 )
             }
@@ -163,6 +165,7 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
             .onStart { emit(ApiResult.loading()) }
             .catch { e -> emit(ApiResult.error(e)) }
             .onCompletion { emit(ApiResult.loaded()) }
+
 
     fun changePwd(oldPassword: String, newPassword: String) =
         flow {

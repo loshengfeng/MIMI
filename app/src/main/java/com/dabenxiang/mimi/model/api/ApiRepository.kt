@@ -240,6 +240,15 @@ class ApiRepository(private val apiService: ApiService) {
         return apiService.getMembersPost(type.value, offset, limit)
     }
 
+    suspend fun getMembersPost(
+        offset: Int,
+        limit: Int,
+        creatorId:Long,
+        isAdult: Boolean
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
+        return apiService.getMembersPost(offset, limit,creatorId,isAdult)
+    }
+
     suspend fun getMemberPostDetail(postId: Long): Response<ApiBaseItem<MemberPostItem>> {
         return apiService.getMemberPostDetail(postId)
     }
@@ -288,6 +297,12 @@ class ApiRepository(private val apiService: ApiService) {
         tag: String
     ): Response<ApiBasePagingItem<ArrayList<MemberClubItem>>> {
         return apiService.getMembersClub(tag)
+    }
+
+    suspend fun getMembersClub(
+        clubId: Long
+    ): Response<ApiBasePagingItem<MemberClubItem>> {
+        return apiService.getMembersClub(clubId)
     }
 
     suspend fun getMembersClubPost(

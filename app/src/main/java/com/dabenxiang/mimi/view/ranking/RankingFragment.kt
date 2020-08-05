@@ -12,7 +12,7 @@ import com.dabenxiang.mimi.callback.RankingFuncItem
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.model.serializable.PlayerData
+import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.adapter.RankingAdapter
 import com.dabenxiang.mimi.view.adapter.RankingVideosAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -42,7 +42,8 @@ class RankingFragment : BaseFragment() {
         RankingVideosAdapter(requireActivity(),
             RankingFuncItem(
                 onVideoItemClick = {
-                    val playerData = PlayerData(it.id!!, true)
+                    val playerData =
+                        PlayerItem(it.id!!, true)
                     val intent = Intent(requireContext(), PlayerActivity::class.java)
                     intent.putExtras(PlayerActivity.createBundle(playerData))
                     startActivity(intent)

@@ -8,7 +8,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.*
+import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.api.vo.error.*
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
@@ -25,7 +26,7 @@ class LoginFragment : BaseFragment() {
     private val viewModel: LoginViewModel by viewModels()
 
     companion object {
-        private const val KEY_TYPE = "TYPE"
+        const val KEY_TYPE = "TYPE"
         const val TYPE_REGISTER = 0
         const val TYPE_LOGIN = 1
 

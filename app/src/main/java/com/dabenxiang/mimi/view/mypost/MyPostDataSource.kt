@@ -2,15 +2,19 @@ package com.dabenxiang.mimi.view.mypost
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.manager.DomainManager
+import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.USER_ID_ME
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
 class MyPostDataSource(
+    private val userId: Long,
+    private val isAdult: Boolean,
     private val pagingCallback: PagingCallback,
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager
@@ -27,7 +31,9 @@ class MyPostDataSource(
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
-                val result = apiRepository.getMyPost(offset = 0, limit = PER_LIMIT)
+                val result =
+                    if (userId == USER_ID_ME) apiRepository.getMyPost(offset = 0, limit = PER_LIMIT)
+                    else apiRepository.getMembersPost(offset = 0, limit = PER_LIMIT, creatorId = userId, isAdult = isAdult)
                 if (!result.isSuccessful) throw HttpException(result)
                 val body = result.body()
                 val myPostItem = body?.content
@@ -43,6 +49,7 @@ class MyPostDataSource(
                 emit(InitResult(myPostItem ?: arrayListOf(), nextPageKey))
             }
                 .flowOn(Dispatchers.IO)
+                .onStart { pagingCallback.onLoading() }
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect {
@@ -61,11 +68,14 @@ class MyPostDataSource(
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
-                val result = apiRepository.getMyPost(offset = next, limit = PER_LIMIT)
+                val result =
+                    if (userId == USER_ID_ME) apiRepository.getMyPost(offset = next, limit = PER_LIMIT)
+                    else apiRepository.getMembersPost(offset = next, limit = PER_LIMIT, creatorId = userId, isAdult = isAdult)
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(result)
             }
                 .flowOn(Dispatchers.IO)
+                .onStart { pagingCallback.onLoading() }
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect {

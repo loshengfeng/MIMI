@@ -26,16 +26,13 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.head_video_info.view.*
-import org.koin.core.KoinComponent
-import org.koin.core.inject
 import java.text.SimpleDateFormat
 import java.util.*
 
 class FavoritePostViewHolder(
     itemView: View,
     private val listener: FavoriteAdapter.EventListener
-) : BaseAnyViewHolder<PostFavoriteItem>(itemView), KoinComponent {
-    private val gson: Gson by inject()
+) : BaseAnyViewHolder<PostFavoriteItem>(itemView) {
     private val ivHead = itemView.findViewById(R.id.iv_head) as ImageView
     private val tvName = itemView.findViewById(R.id.tv_name) as TextView
     private val tvTime = itemView.findViewById(R.id.tv_time) as TextView
@@ -51,6 +48,7 @@ class FavoritePostViewHolder(
     private val tvMore = itemView.findViewById(R.id.tv_more) as TextView
 
     init {
+        ivHead.setOnClickListener { listener.onAvatarClick(data!!.posterId, data!!.posterName) }
         ivPhoto.setOnClickListener { listener.onVideoClick(data!!) }
         tvLike.setOnClickListener {
             listener.onFunctionClick(
@@ -89,9 +87,9 @@ class FavoritePostViewHolder(
         }
         tvFollow.setOnClickListener {
             listener.onFunctionClick(
-                    FunctionType.FOLLOW,
-                    it,
-                    data!!
+                FunctionType.FOLLOW,
+                it,
+                data!!
             )
         }
         tvShare.visibility = View.GONE
@@ -104,19 +102,19 @@ class FavoritePostViewHolder(
         data?.posterAvatarAttachmentId?.let {
             LruCacheUtils.getLruCache(it.toString())?.also { bitmap ->
                 val options: RequestOptions = RequestOptions()
-                        .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                        .placeholder(R.drawable.default_profile_picture)
-                        .error(R.drawable.default_profile_picture)
-                        .priority(Priority.NORMAL)
+                    .transform(MultiTransformation(CenterCrop(), CircleCrop()))
+                    .placeholder(R.drawable.default_profile_picture)
+                    .error(R.drawable.default_profile_picture)
+                    .priority(Priority.NORMAL)
 
                 Glide.with(App.self).load(bitmap)
-                        .apply(options)
-                        .into(ivHead)
+                    .apply(options)
+                    .into(ivHead)
             } ?: run {
                 listener.onGetAttachment(
-                        it.toString(),
-                        position,
-                        AttachmentType.ADULT_AVATAR
+                    it.toString(),
+                    position,
+                    AttachmentType.ADULT_AVATAR
                 )
             }
         }
@@ -125,11 +123,11 @@ class FavoritePostViewHolder(
 //        tvTitle.text = data?.title
         tvTime.text = data?.postDate.let { date ->
             SimpleDateFormat(
-                    "yyyy-MM-dd HH:mm",
-                    Locale.getDefault()
+                "yyyy-MM-dd HH:mm",
+                Locale.getDefault()
             ).format(date)
         }
-        val contentItem = gson.fromJson(data?.content.toString(), MediaContentItem::class.java)
+        val contentItem = Gson().fromJson(data?.content.toString(), MediaContentItem::class.java)
         tvLength.text = contentItem?.shortVideo?.length
 
         contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
@@ -140,9 +138,9 @@ class FavoritePostViewHolder(
                             Glide.with(ivPhoto.context).load(bitmap).into(ivPhoto)
                         } ?: run {
                             listener.onGetAttachment(
-                                    image.id,
-                                    position,
-                                    AttachmentType.ADULT_HOME_CLIP
+                                image.id,
+                                position,
+                                AttachmentType.ADULT_HOME_CLIP
                             )
                         }
                     }

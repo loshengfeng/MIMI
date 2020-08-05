@@ -39,7 +39,7 @@ class ChatContentFragment : BaseFragment() {
 
     private lateinit var imagePreviewDialog: ImagePreviewDialogFragment
     private val viewModel: ChatContentViewModel by viewModels()
-    private val adapter by lazy { ChatContentAdapter(listener) }
+    private val adapter by lazy { ChatContentAdapter(viewModel.pref, listener) }
     private var senderAvatarId = ""
 
 
@@ -52,11 +52,11 @@ class ChatContentFragment : BaseFragment() {
             viewModel.getAttachment(requireContext(), id, position)
         }
 
-        override fun onImageClick(bitmap: Bitmap) {
-            imagePreviewDialog = ImagePreviewDialogFragment.newInstance(bitmap, null).also {
+        override fun onImageClick(imageArray: ByteArray?) {
+            imagePreviewDialog = ImagePreviewDialogFragment.newInstance(imageArray, null).also {
                 it.show(
-                        requireActivity().supportFragmentManager,
-                        MoreDialogFragment::class.java.simpleName
+                    requireActivity().supportFragmentManager,
+                    MoreDialogFragment::class.java.simpleName
                 )
             }
         }
@@ -64,23 +64,48 @@ class ChatContentFragment : BaseFragment() {
         override fun onVideoClick(item: ChatContentItem?, position: Int) {
             item?.run {
                 if (payload?.content == null || payload.ext == null) {
-                    GeneralUtils.showToast(requireContext(), getString(R.string.image_preview_file_invlid))
+                    GeneralUtils.showToast(
+                        requireContext(),
+                        getString(R.string.image_preview_file_invlid)
+                    )
                 } else {
                     // init videoCache
                     viewModel.videoCache[payload.content] = item
-                    if (!File(viewModel.getVideoPath(requireContext(), payload.content, payload.ext)).exists()) {
+                    if (!File(
+                            viewModel.getVideoPath(
+                                requireContext(),
+                                payload.content,
+                                payload.ext
+                            )
+                        ).exists()
+                    ) {
                         item.downloadStatus = VideoDownloadStatusType.DOWNLOADING
                         item.position = position
                         // update videoCache
                         viewModel.videoCache[payload.content] = item
-                        viewModel.getAttachment(requireContext(), payload.content, position, viewModel.TAG_VIDEO)
+                        viewModel.getAttachment(
+                            requireContext(),
+                            payload.content,
+                            position,
+                            viewModel.TAG_VIDEO
+                        )
                     } else {
                         viewModel.videoCache[payload.content]?.let { cacheItem ->
                             if (cacheItem.payload?.content == null || cacheItem.payload.ext == null) {
-                                GeneralUtils.showToast(requireContext(), getString(R.string.image_preview_file_invlid))
+                                GeneralUtils.showToast(
+                                    requireContext(),
+                                    getString(R.string.image_preview_file_invlid)
+                                )
                             } else {
                                 if (cacheItem.downloadStatus == VideoDownloadStatusType.FINISH) {
-                                    GeneralUtils.openPlayerIntent(requireContext(), viewModel.getVideoPath(requireContext(), cacheItem.payload.content, cacheItem.payload.ext))
+                                    GeneralUtils.openPlayerIntent(
+                                        requireContext(),
+                                        viewModel.getVideoPath(
+                                            requireContext(),
+                                            cacheItem.payload.content,
+                                            cacheItem.payload.ext
+                                        )
+                                    )
                                 }
                             }
                         }
@@ -103,6 +128,8 @@ class ChatContentFragment : BaseFragment() {
         }
     }
 
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -131,7 +158,8 @@ class ChatContentFragment : BaseFragment() {
 
     override fun initSettings() {
         super.initSettings()
-        recyclerContent.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
+        recyclerContent.layoutManager =
+            LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
         recyclerContent.adapter = adapter
     }
 
@@ -153,7 +181,8 @@ class ChatContentFragment : BaseFragment() {
                 is ApiResult.Loading -> {
                     // 更新為下載中
                     val fileName = it.arg as String
-                    viewModel.videoCache[fileName]?.downloadStatus = VideoDownloadStatusType.DOWNLOADING
+                    viewModel.videoCache[fileName]?.downloadStatus =
+                        VideoDownloadStatusType.DOWNLOADING
                     viewModel.videoCache[fileName]?.position?.let { position ->
                         adapter.update(position)
                     }
@@ -162,14 +191,20 @@ class ChatContentFragment : BaseFragment() {
                     when (it.result) {
                         is AttachmentItem -> {
                             val attachmentItem = it.result
-                            LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
+                            LruCacheUtils.putLruArrayCache(
+                                attachmentItem.id
+                                    ?: "", attachmentItem.fileArray ?: ByteArray(0)
+                            )
                             adapter.update(attachmentItem.position ?: -1)
                         }
                         is String -> {
                             val fileName = it.result.substringBefore(".").substringAfterLast("/")
-                            viewModel.videoCache[fileName]?.downloadStatus = VideoDownloadStatusType.FINISH
-                            adapter.update(viewModel.videoCache[fileName]?.position
-                                    ?: -1)
+                            viewModel.videoCache[fileName]?.downloadStatus =
+                                VideoDownloadStatusType.FINISH
+                            adapter.update(
+                                viewModel.videoCache[fileName]?.position
+                                    ?: -1
+                            )
                         }
                     }
                 }
@@ -185,7 +220,10 @@ class ChatContentFragment : BaseFragment() {
 
         viewModel.fileAttachmentTooLarge.observe(viewLifecycleOwner, Observer { result ->
             if (result) {
-                GeneralUtils.showToast(requireContext(), getString(R.string.chat_content_file_too_large))
+                GeneralUtils.showToast(
+                    requireContext(),
+                    getString(R.string.chat_content_file_too_large)
+                )
             }
         })
 
@@ -221,7 +259,8 @@ class ChatContentFragment : BaseFragment() {
         recyclerContent.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                val linearLayoutManager: LinearLayoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val linearLayoutManager: LinearLayoutManager =
+                    recyclerView.layoutManager as LinearLayoutManager
 
                 if (!viewModel.isLoading && !viewModel.noMore) {
                     if (linearLayoutManager != null && linearLayoutManager.findLastCompletelyVisibleItemPosition() == adapter.itemCount - PRELOAD_ITEM) {
@@ -248,7 +287,14 @@ class ChatContentFragment : BaseFragment() {
                 } else {
                     val extras = it.extras
                     val imageBitmap = extras!!["data"] as Bitmap?
-                    Uri.parse(MediaStore.Images.Media.insertImage(requireContext().contentResolver, imageBitmap, null, null));
+                    Uri.parse(
+                        MediaStore.Images.Media.insertImage(
+                            requireContext().contentResolver,
+                            imageBitmap,
+                            null,
+                            null
+                        )
+                    );
                 }
 
                 if (uriImage == null) {
@@ -272,7 +318,10 @@ class ChatContentFragment : BaseFragment() {
 
         val chooser = Intent(Intent.ACTION_CHOOSER)
         chooser.putExtra(Intent.EXTRA_INTENT, galleryIntent)
-        chooser.putExtra(Intent.EXTRA_TITLE, requireContext().getString(R.string.chat_content_media_chooser))
+        chooser.putExtra(
+            Intent.EXTRA_TITLE,
+            requireContext().getString(R.string.chat_content_media_chooser)
+        )
 
         val intentArray = arrayOf(cameraIntent, videoIntent)
         chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)

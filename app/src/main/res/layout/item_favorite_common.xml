@@ -21,7 +21,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
-        android:drawableStart="@drawable/btn_favorite_forvideo_s"
+        android:drawableStart="@drawable/btn_favorite_white_s"
         android:drawablePadding="3dp"
         android:gravity="center"
         app:layout_constraintStart_toEndOf="@id/tv_like"

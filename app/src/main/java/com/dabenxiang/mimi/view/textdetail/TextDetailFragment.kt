@@ -18,11 +18,12 @@ import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.model.serializable.SearchPostItem
+import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.RootCommentNode
@@ -68,6 +69,8 @@ class TextDetailFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        useAdultTheme(true)
 
         memberPostItem =
             arguments?.getSerializable(PictureDetailFragment.KEY_DATA) as MemberPostItem
@@ -179,7 +182,7 @@ class TextDetailFragment : BaseFragment() {
                                 commentAdapter!!
                             )
                         }
-                        textDetailAdapter?.notifyItemChanged(2)
+                        textDetailAdapter?.notifyItemChanged(3)
                     }
                     is Error -> onApiError(it.throwable)
                 }
@@ -354,9 +357,13 @@ class TextDetailFragment : BaseFragment() {
             GeneralUtils.openWebView(requireContext(), url)
         }
 
-        override fun onAvatarClick() {
-            // TODO:
-            Timber.d("onAvatarClick nav to member post")
+        override fun onAvatarClick(userId: Long, name: String) {
+            val bundle = MyPostFragment.createBundle(
+                userId, name,
+                isAdult = true,
+                isAdultTheme = true
+            )
+            navigateTo(NavigateItem.Destination(R.id.action_textDetailFragment_to_myPostFragment, bundle))
         }
     }
 

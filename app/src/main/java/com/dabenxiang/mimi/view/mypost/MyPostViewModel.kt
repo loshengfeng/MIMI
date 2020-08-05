@@ -2,7 +2,6 @@ package com.dabenxiang.mimi.view.mypost
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
@@ -19,22 +18,24 @@ import com.dabenxiang.mimi.model.api.vo.PicParameter
 import com.dabenxiang.mimi.model.api.vo.PostMemberRequest
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.AttachmentItem
-import com.dabenxiang.mimi.model.vo.UploadPicItem
-import com.dabenxiang.mimi.model.vo.mqtt.FavoriteItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.home.HomeViewModel
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.File
 import java.net.URLEncoder
 
-class MyPostViewModel: BaseViewModel() {
+class MyPostViewModel : BaseViewModel() {
 
     private val _myPostItemListResult = MutableLiveData<PagedList<MemberPostItem>>()
     val myPostItemListResult: LiveData<PagedList<MemberPostItem>> = _myPostItemListResult
@@ -48,8 +49,11 @@ class MyPostViewModel: BaseViewModel() {
     private var _likePostResult = MutableLiveData<ApiResult<Int>>()
     val likePostResult: LiveData<ApiResult<Int>> = _likePostResult
 
-    private var _favoriteResult = MutableLiveData<ApiResult<FavoriteItem>>()
-    val favoriteResult: LiveData<ApiResult<FavoriteItem>> = _favoriteResult
+    private var _favoriteResult = MutableLiveData<ApiResult<Int>>()
+    val favoriteResult: LiveData<ApiResult<Int>> = _favoriteResult
+
+    private var _followResult = MutableLiveData<ApiResult<Int>>()
+    val followResult: LiveData<ApiResult<Int>> = _followResult
 
     private var _deletePostResult = MutableLiveData<ApiResult<Nothing>>()
     val deletePostResult: LiveData<ApiResult<Nothing>> = _deletePostResult
@@ -81,25 +85,29 @@ class MyPostViewModel: BaseViewModel() {
     private val _postVideoResult = MutableLiveData<ApiResult<Long>>()
     val postVideoResult: LiveData<ApiResult<Long>> = _postVideoResult
 
+    private val _postArticleResult = MutableLiveData<ApiResult<Long>>()
+    val postArticleResult: LiveData<ApiResult<Long>> = _postArticleResult
+
     private var job = Job()
 
     companion object {
         const val TYPE_PIC = "type_pic"
         const val TYPE_COVER = "type_cover"
         const val TYPE_VIDEO = "type_video"
+        const val USER_ID_ME: Long = -1
     }
 
-    fun getMyPost() {
+    fun getMyPost(userId: Long, isAdult: Boolean) {
         viewModelScope.launch {
-            getMyPostPagingItems().asFlow()
+            getMyPostPagingItems(userId, isAdult).asFlow()
                 .collect { _myPostItemListResult.value = it }
         }
     }
 
-    private fun getMyPostPagingItems(): LiveData<PagedList<MemberPostItem>> {
+    private fun getMyPostPagingItems(userId: Long, isAdult: Boolean): LiveData<PagedList<MemberPostItem>> {
         val dataSourceFactory = object : DataSource.Factory<Int, MemberPostItem>() {
             override fun create(): DataSource<Int, MemberPostItem> {
-                return MyPostDataSource(pagingCallback, viewModelScope, domainManager)
+                return MyPostDataSource(userId, isAdult, pagingCallback, viewModelScope, domainManager)
             }
         }
 
@@ -109,11 +117,11 @@ class MyPostViewModel: BaseViewModel() {
         return LivePagedListBuilder(dataSourceFactory, config).build()
     }
 
-    fun invalidateDataSource() = _myPostItemListResult.value?.dataSource?.invalidate()
+    fun invalidateDataSource() = _myPostItemListResult.value!!.dataSource!!.invalidate()
 
     private val pagingCallback = object : PagingCallback {
         override fun onLoading() {
-//            setShowProgress(true)
+            setShowProgress(true)
         }
 
         override fun onLoaded() {
@@ -121,6 +129,7 @@ class MyPostViewModel: BaseViewModel() {
         }
 
         override fun onThrowable(throwable: Throwable) {
+            Timber.e(throwable)
         }
 
         override fun onSucceed() {
@@ -144,8 +153,6 @@ class MyPostViewModel: BaseViewModel() {
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _attachmentByTypeResult.value = it }
         }
@@ -167,8 +174,6 @@ class MyPostViewModel: BaseViewModel() {
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _attachmentResult.value = it }
         }
@@ -185,24 +190,19 @@ class MyPostViewModel: BaseViewModel() {
                 val request = LikeRequest(likeType)
                 val result = apiRepository.like(item.id, request)
                 if (!result.isSuccessful) throw HttpException(result)
-
-                item.likeType = likeType
-                item.likeCount = when (item.likeType) {
-                    LikeType.LIKE -> item.likeCount + 1
-                    else -> item.likeCount - 1
-                }
-
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _likePostResult.value = it }
         }
     }
 
-    fun favoritePost(item: MemberPostItem, position: Int, isFavorite: Boolean, type: AttachmentType) {
+    fun favoritePost(
+        item: MemberPostItem,
+        position: Int,
+        isFavorite: Boolean
+    ) {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
@@ -211,19 +211,28 @@ class MyPostViewModel: BaseViewModel() {
                     else -> apiRepository.deleteFavorite(item.id)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
-                item.isFavorite = isFavorite
-                if (isFavorite) item.favoriteCount++ else item.favoriteCount--
-                val favoriteItem = FavoriteItem(
-                    id = item.id.toString(),
-                    position = position,
-                    memberPostItem = item,
-                    type = type
-                )
-                emit(ApiResult.success(favoriteItem))
+                emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _favoriteResult.value = it }
+        }
+    }
+
+    fun followPost(item: MemberPostItem, position: Int, isFollow: Boolean) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = when {
+                    isFollow -> apiRepository.followPost(item.creatorId)
+                    else -> apiRepository.cancelFollowPost(item.creatorId)
+                }
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(position))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _followResult.value = it }
         }
     }
 
@@ -290,11 +299,9 @@ class MyPostViewModel: BaseViewModel() {
                 Timber.d("Post member request : $request")
                 val resp = domainManager.getApiRepository().updatePost(id, request)
                 if (!resp.isSuccessful) throw HttpException(resp)
-                emit(ApiResult.success(resp.body()?.content))
+                emit(ApiResult.success(id))
             }
                 .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _postVideoMemberResult.value = it }
         }
@@ -330,6 +337,31 @@ class MyPostViewModel: BaseViewModel() {
                     }
                 }
         }
+    }
+
+    fun updateArticle(title: String, content: String, tags: ArrayList<String>, item: MemberPostItem) {
+        viewModelScope.launch {
+            flow {
+                val request = PostMemberRequest(
+                    title = title,
+                    content = content,
+                    type = PostType.TEXT.value,
+                    tags = tags
+                )
+
+                val resp = domainManager.getApiRepository().updatePost(item.id, request)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(item.id))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _postArticleResult.value = it }
+        }
+    }
+
+    fun clearLiveData() {
+        _postArticleResult.value = null
+        _postVideoMemberResult.value = null
     }
 
     fun cancelJob() {

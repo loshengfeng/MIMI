@@ -2,8 +2,7 @@ package com.dabenxiang.mimi.view.myfollow
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.MyFollowPagingCallback
-import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.manager.DomainManager
+import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

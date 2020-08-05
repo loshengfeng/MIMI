@@ -5,8 +5,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.holder.BaseVideoItem
-import com.dabenxiang.mimi.model.serializable.PlayerData
+import com.dabenxiang.mimi.model.vo.BaseVideoItem
+import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.viewholder.VideoViewHolder
@@ -71,7 +71,7 @@ class HomeStatisticsAdapter(
             override fun onClickItemIndex(view: View, index: Int) {
                 if (index > -1) {
                     list?.get(index)?.also {
-                        nestedListener.onVideoClick(view, PlayerData.parser(it, isAdult))
+                        nestedListener.onVideoClick(view, PlayerItem.parser(it, isAdult))
                     }
                 }
             }

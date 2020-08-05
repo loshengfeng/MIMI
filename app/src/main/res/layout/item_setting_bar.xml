@@ -7,9 +7,10 @@
     android:background="@color/color_gray_2">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_bg"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="@color/color_gray_2"
+        android:background="@drawable/item_setting_bar_bg_selector"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -19,6 +20,7 @@
             android:layout_height="40dp"
             android:layout_marginStart="20dp"
             android:drawableStart="@drawable/btn_back_black_n"
+            android:drawableTint="@color/item_setting_bar_text_selector"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -28,7 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/title_setting"
-            android:textColor="@color/color_black_1"
+            android:textColor="@color/item_setting_bar_text_selector"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

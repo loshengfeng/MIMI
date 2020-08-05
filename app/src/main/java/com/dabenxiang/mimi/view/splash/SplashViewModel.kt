@@ -14,27 +14,29 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import org.koin.core.KoinComponent
 import org.koin.core.inject
 import timber.log.Timber
 import tw.gov.president.manager.submanager.update.VersionManager
 import tw.gov.president.manager.submanager.update.callback.DownloadProgressCallback
 import tw.gov.president.manager.submanager.update.data.VersionStatus
 
-class SplashViewModel : BaseViewModel(), KoinComponent {
+class SplashViewModel : BaseViewModel() {
 
     private val _autoLoginResult = MutableLiveData<ApiResult<Nothing>>()
     val autoLoginResult: LiveData<ApiResult<Nothing>> = _autoLoginResult
+
     private val _versionStatus = MutableLiveData<VersionStatus>()
     val versionStatus: LiveData<VersionStatus> = _versionStatus
+
     private val _apiError: MutableLiveData<Boolean> = MutableLiveData()
     val apiError: LiveData<Boolean> = _apiError
 
     private val versionManager: VersionManager by inject()
 
+    var isChecked =false
+
     private val handler = CoroutineExceptionHandler { _, throwable ->
         Timber.e("$throwable")
-
         _apiError.postValue(true)
     }
 

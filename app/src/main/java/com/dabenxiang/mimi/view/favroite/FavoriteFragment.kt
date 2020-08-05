@@ -16,8 +16,8 @@ import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.model.serializable.PlayerData
-import com.dabenxiang.mimi.model.serializable.SearchPostItem
+import com.dabenxiang.mimi.model.vo.PlayerItem
+import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.adapter.FavoriteTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -27,6 +27,7 @@ import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
@@ -83,12 +84,11 @@ class FavoriteFragment : BaseFragment() {
                 R.id.navigation_home
             )
         }
+        useAdultTheme(false)
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun setupFirstTime() {
         initSettings()
-        interactionListener?.setAdult(false)
     }
 
     override fun getLayoutId(): Int {
@@ -252,6 +252,8 @@ class FavoriteFragment : BaseFragment() {
             else -> View.GONE
         }
 
+        tv_clean.isEnabled = size > 0
+
         when (lastPrimaryIndex) {
             TYPE_NORMAL -> layout_adult.visibility = View.GONE
             TYPE_ADULT -> layout_adult.visibility = View.VISIBLE
@@ -280,7 +282,9 @@ class FavoriteFragment : BaseFragment() {
         override fun onVideoClick(item: Any) {
             when (item) {
                 is PlayItem -> {
-                    val playerData = PlayerData(item.videoId ?: 0, item.isAdult ?: false)
+                    val playerData = PlayerItem(
+                        item.videoId ?: 0, item.isAdult ?: false
+                    )
                     val intent = Intent(requireContext(), PlayerActivity::class.java)
                     intent.putExtras(PlayerActivity.createBundle(playerData))
                     startActivity(intent)
@@ -361,7 +365,7 @@ class FavoriteFragment : BaseFragment() {
                                 )
                             } else {
                                 val playerData =
-                                    PlayerData(
+                                    PlayerItem(
                                         item.videoId ?: 0, item.isAdult
                                             ?: false
                                     )
@@ -408,7 +412,7 @@ class FavoriteFragment : BaseFragment() {
 
         override fun onChipClick(text: String, type: Int?) {
             // 點擊標籤後進入 Search page
-            interactionListener?.setAdult(lastPrimaryIndex == TYPE_ADULT)
+            useAdultTheme(lastPrimaryIndex == TYPE_ADULT)
             if (lastSecondaryIndex == TYPE_MIMI) {
                 val bundle = SearchVideoFragment.createBundle(tag = text)
                 navigateTo(
@@ -418,7 +422,12 @@ class FavoriteFragment : BaseFragment() {
                         )
                 )
             } else {
-                val bundle = SearchPostFragment.createBundle(SearchPostItem(PostType.getTypeByValue(type), text))
+                val bundle = SearchPostFragment.createBundle(
+                    SearchPostItem(
+                        PostType.getTypeByValue(type),
+                        text
+                    )
+                )
                 navigateTo(
                         NavigateItem.Destination(
                                 R.id.action_postFavoriteFragment_to_searchPostFragment,
@@ -426,6 +435,15 @@ class FavoriteFragment : BaseFragment() {
                         )
                 )
             }
+        }
+
+        override fun onAvatarClick(userId: Long, name: String) {
+            val bundle = MyPostFragment.createBundle(
+                userId, name,
+                isAdult = true,
+                isAdultTheme = true
+            )
+            navigateTo(NavigateItem.Destination(R.id.action_postFavoriteFragment_to_myPostFragment, bundle))
         }
     }
 
@@ -466,6 +484,7 @@ class FavoriteFragment : BaseFragment() {
                     }
                 }
             }
+            useAdultTheme(true)
             val bundle = ClipFragment.createBundle(memberPost, item.position)
             navigateTo(
                     NavigateItem.Destination(

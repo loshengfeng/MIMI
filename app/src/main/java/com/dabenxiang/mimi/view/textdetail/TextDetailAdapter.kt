@@ -30,6 +30,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
+import timber.log.Timber
 import java.util.*
 
 class TextDetailAdapter(
@@ -106,8 +107,13 @@ class TextDetailAdapter(
                 }
             }
             is TextDetailViewHolder -> {
-                val contentItem =
+                val contentItem = try {
                     Gson().fromJson(memberPostItem.content, TextContentItem::class.java)
+                } catch (e: Exception) {
+                    Timber.e(e)
+                    TextContentItem()
+                }
+
                 holder.posterName.text = memberPostItem.postFriendlyName
                 holder.posterTime.text = GeneralUtils.getTimeDiff(
                     memberPostItem.creationDate, Date()
@@ -157,7 +163,10 @@ class TextDetailAdapter(
                 }
 
                 holder.avatarImg.setOnClickListener {
-                    onTextDetailListener.onAvatarClick()
+                    onTextDetailListener.onAvatarClick(
+                        memberPostItem.creatorId,
+                        memberPostItem.postFriendlyName
+                    )
                 }
             }
             is CommentTitleViewHolder -> {
@@ -245,8 +254,8 @@ class TextDetailAdapter(
             onTextDetailListener.onMoreClick(item)
         }
 
-        override fun onAvatarClick() {
-            onTextDetailListener.onAvatarClick()
+        override fun onAvatarClick(userId: Long, name: String) {
+            onTextDetailListener.onAvatarClick(userId, name)
         }
     }
 
@@ -261,6 +270,6 @@ class TextDetailAdapter(
         fun onMoreClick(item: MembersPostCommentItem)
         fun onChipClick(type: PostType, tag: String)
         fun onOpenWebView(url: String)
-        fun onAvatarClick()
+        fun onAvatarClick(userId: Long, name: String)
     }
 }
