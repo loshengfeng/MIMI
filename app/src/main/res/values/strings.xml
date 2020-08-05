@@ -88,7 +88,7 @@
     <string name="title_setting">个人设置</string>
     <string name="setting_photo">头像</string>
     <string name="setting_name">名称</string>
-    <string name="setting_email">email</string>
+    <string name="setting_email">Email</string>
     <string name="setting_account">帐号</string>
     <string name="setting_gender">性别</string>
     <string name="setting_choose">请选择(预设)</string>
