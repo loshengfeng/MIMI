@@ -121,7 +121,7 @@ class MyPostViewModel : BaseViewModel() {
 
     private val pagingCallback = object : PagingCallback {
         override fun onLoading() {
-//            setShowProgress(true)
+            setShowProgress(true)
         }
 
         override fun onLoaded() {
@@ -153,8 +153,6 @@ class MyPostViewModel : BaseViewModel() {
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _attachmentByTypeResult.value = it }
         }
@@ -176,8 +174,6 @@ class MyPostViewModel : BaseViewModel() {
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _attachmentResult.value = it }
         }
@@ -197,8 +193,6 @@ class MyPostViewModel : BaseViewModel() {
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _likePostResult.value = it }
         }
@@ -207,8 +201,7 @@ class MyPostViewModel : BaseViewModel() {
     fun favoritePost(
         item: MemberPostItem,
         position: Int,
-        isFavorite: Boolean,
-        type: AttachmentType
+        isFavorite: Boolean
     ) {
         viewModelScope.launch {
             flow {
@@ -238,8 +231,6 @@ class MyPostViewModel : BaseViewModel() {
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _followResult.value = it }
         }

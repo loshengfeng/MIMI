@@ -33,6 +33,7 @@ import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.comment.MyPostMoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.myfollow.MyFollowFragment
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.TYPE_VIDEO
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.USER_ID_ME
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
@@ -44,7 +45,9 @@ import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.fragment_my_follow.*
 import kotlinx.android.synthetic.main.fragment_my_post.*
+import kotlinx.android.synthetic.main.fragment_my_post.layout_refresh
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import timber.log.Timber
 
@@ -149,6 +152,7 @@ class MyPostFragment : BaseFragment() {
         tv_title.text = if (userId == USER_ID_ME) getString(R.string.personal_my_post) else userName
         tv_title.isSelected = isAdultTheme
         tv_back.isSelected = isAdultTheme
+        if(isAdultTheme) layout_refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
 
         handleUpdatePost()
     }
@@ -272,6 +276,10 @@ class MyPostFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
+        viewModel.showProgress.observe(this, Observer {
+            layout_refresh.isRefreshing = it
+        })
+
         viewModel.myPostItemListResult.observe(viewLifecycleOwner, Observer {
             adapter.submitList(it)
         })
@@ -353,8 +361,6 @@ class MyPostFragment : BaseFragment() {
 
         viewModel.deletePostResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Loaded -> progressHUD?.dismiss()
                 is ApiResult.Success -> viewModel.invalidateDataSource()
                 is ApiResult.Error -> onApiError(it.throwable)
             }
@@ -580,6 +586,11 @@ class MyPostFragment : BaseFragment() {
         }.also {
             tv_back.setOnClickListener(it)
         }
+
+        layout_refresh.setOnRefreshListener {
+            layout_refresh.isRefreshing = false
+            viewModel.getMyPost(userId, isAdult)
+        }
     }
 
     private val attachmentListener = object : AttachmentListener {
@@ -732,7 +743,7 @@ class MyPostFragment : BaseFragment() {
             isFavorite: Boolean,
             type: AttachmentType
         ) {
-            viewModel.favoritePost(item, position, isFavorite, type)
+            viewModel.favoritePost(item, position, isFavorite)
         }
 
         override fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
