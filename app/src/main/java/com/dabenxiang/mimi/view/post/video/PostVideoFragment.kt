@@ -41,6 +41,7 @@ import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
+import com.dabenxiang.mimi.view.home.AdultHomeFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
@@ -78,6 +79,7 @@ class PostVideoFragment : BaseFragment() {
         private const val HASHTAG_LIMIT = 20
         private const val HASHTAG_TEXT_LIMIT = 10
         private const val INIT_VALUE = 0
+        private const val RECORD_LIMIT_TIME = 15
         const val POST_ID = "post_id"
 
         const val UPLOAD_VIDEO = "upload_video"
@@ -475,11 +477,11 @@ class PostVideoFragment : BaseFragment() {
     }
 
     private fun openRecorder() {
-        Intent(MediaStore.ACTION_VIDEO_CAPTURE).also { takeVideoIntent ->
-            takeVideoIntent.resolveActivity(requireContext().packageManager)?.also {
-                startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE)
-            }
-        }
+        val intent = Intent()
+        intent.action = MediaStore.ACTION_VIDEO_CAPTURE
+        intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, RECORD_LIMIT_TIME)
+        intent.resolveActivity(requireContext().packageManager)
+        startActivityForResult(intent, REQUEST_VIDEO_CAPTURE)
     }
 
     private fun deleteVideo(item: PostVideoAttachment) {
