@@ -181,7 +181,8 @@ class MyPostFragment : BaseFragment() {
         memberPostItem = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
         postId = arguments?.getLong(PostPicFragment.POST_ID)!!
 
-        val memberRequest = arguments?.getParcelable<PostMemberRequest>(PostPicFragment.MEMBER_REQUEST)
+        val memberRequest =
+            arguments?.getParcelable<PostMemberRequest>(PostPicFragment.MEMBER_REQUEST)
         val picList = arguments?.getParcelableArrayList<PostAttachmentItem>(PostPicFragment.PIC_URI)
 
         postMemberRequest = memberRequest!!
@@ -231,7 +232,8 @@ class MyPostFragment : BaseFragment() {
         memberPostItem = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
         postId = arguments?.getLong(PostVideoFragment.POST_ID)!!
 
-        val memberRequest = arguments?.getParcelable<PostMemberRequest>(PostVideoFragment.MEMBER_REQUEST)
+        val memberRequest =
+            arguments?.getParcelable<PostMemberRequest>(PostVideoFragment.MEMBER_REQUEST)
 
         postMemberRequest = memberRequest!!
 
@@ -315,7 +317,7 @@ class MyPostFragment : BaseFragment() {
                 is ApiResult.Success -> {
                     adapter.notifyItemChanged(
                         it.result,
-                        MyPostPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI
+                        MyPostPagedAdapter.PAYLOAD_UPDATE_LIKE
                     )
                 }
                 is ApiResult.Error -> Timber.e(it.throwable)
@@ -324,10 +326,11 @@ class MyPostFragment : BaseFragment() {
 
         viewModel.favoriteResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Loaded -> progressHUD?.dismiss()
                 is ApiResult.Success -> {
-                    adapter.updateFavoriteItem(it.result.memberPostItem!!, it.result.position!!)
+                    adapter.notifyItemChanged(
+                        it.result,
+                        MyPostPagedAdapter.PAYLOAD_UPDATE_FAVORITE
+                    )
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
@@ -335,10 +338,11 @@ class MyPostFragment : BaseFragment() {
 
         viewModel.followResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Loaded -> progressHUD?.dismiss()
                 is ApiResult.Success -> {
-                    adapter.updateFollowItem(it.result.memberPostItem!!, it.result.position!!)
+                    adapter.notifyItemChanged(
+                        it.result,
+                        MyPostPagedAdapter.PAYLOAD_UPDATE_FOLLOW
+                    )
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
@@ -525,7 +529,7 @@ class MyPostFragment : BaseFragment() {
         }
 
         txtPost.setOnClickListener {
-            when(postType) {
+            when (postType) {
                 PostType.TEXT -> {
                     memberPostItem.id = postId
                     val bundle = TextDetailFragment.createBundle(memberPostItem, -1)

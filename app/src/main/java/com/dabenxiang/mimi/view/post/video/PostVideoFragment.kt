@@ -101,13 +101,17 @@ class PostVideoFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initSettings()
+    }
 
+    override fun initSettings() {
         adapter = ScrollVideoAdapter(postPicItemListener)
         adapter.submitList(videoAttachmentList)
         recyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         recyclerView.adapter = adapter
 
         tv_clean.isEnabled = true
+        
+        useAdultTheme(false)
     }
 
     override fun setupObservers() {

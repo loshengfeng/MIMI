@@ -96,13 +96,17 @@ class PostPicFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initSettings()
+    }
 
+    override fun initSettings() {
         adapter = ScrollPicAdapter(postPicItemListener)
         adapter.submitList(attachmentList)
         recyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         recyclerView.adapter = adapter
 
         tv_clean.isEnabled = true
+
+        useAdultTheme(false)
     }
 
     override fun setupObservers() {

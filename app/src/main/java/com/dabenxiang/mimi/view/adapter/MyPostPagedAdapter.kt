@@ -22,7 +22,9 @@ class MyPostPagedAdapter(
 ) : PagedListAdapter<MemberPostItem, BaseViewHolder>(diffCallback) {
 
     companion object {
-        const val PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI = 0
+        const val PAYLOAD_UPDATE_LIKE = 0
+        const val PAYLOAD_UPDATE_FAVORITE = 1
+        const val PAYLOAD_UPDATE_FOLLOW = 2
         const val VIEW_TYPE_CLIP = 0
         const val VIEW_TYPE_PICTURE = 1
         const val VIEW_TYPE_TEXT = 2
@@ -89,36 +91,46 @@ class MyPostPagedAdapter(
         viewHolderMap[position] = holder
         val item = getItem(position)
 
-        when (holder) {
-            is MyPostClipPostHolder -> {
-                item?.also {
-                    holder.onBind(
-                        it,
-                        currentList,
-                        position,
-                        myPostListener,
-                        attachmentListener
-                    )
-                }
-            }
-            is MyPostPicturePostHolder -> {
-                payloads.takeIf { it.isNotEmpty() }?.also {
-                    when (it[0] as Int) {
-                        PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI -> {
-                            item?.also { item ->
-                                holder.updateLikeAndFollowItem(item, position, myPostListener)
-                            }
+        item?.also {
+            when (holder) {
+                is MyPostClipPostHolder -> {
+                    payloads.takeIf { it.isNotEmpty() }?.also {
+                        when (it[0] as Int) {
+                            PAYLOAD_UPDATE_LIKE -> holder.updateLike(item)
+                            PAYLOAD_UPDATE_FAVORITE -> holder.updateFavorite(item)
+                            PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item)
                         }
+                    } ?: run {
+                        holder.onBind(
+                            it,
+                            currentList,
+                            position,
+                            myPostListener,
+                            attachmentListener
+                        )
                     }
-                } ?: run {
-                    item?.also {
+                }
+                is MyPostPicturePostHolder -> {
+                    payloads.takeIf { it.isNotEmpty() }?.also {
+                        when (it[0] as Int) {
+                            PAYLOAD_UPDATE_LIKE -> holder.updateLike(item)
+                            PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item)
+                        }
+                    } ?: run {
                         holder.pictureRecycler.tag = position
                         holder.onBind(it, position, myPostListener, attachmentListener)
                     }
                 }
-            }
-            is MyPostTextPostHolder -> {
-                item?.also { holder.onBind(it, position, myPostListener, attachmentListener) }
+                is MyPostTextPostHolder -> {
+                    payloads.takeIf { it.isNotEmpty() }?.also {
+                        when (it[0] as Int) {
+                            PAYLOAD_UPDATE_LIKE -> holder.updateLike(item)
+                            PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item)
+                        }
+                    } ?: run {
+                        holder.onBind(it, position, myPostListener, attachmentListener)
+                    }
+                }
             }
         }
     }
@@ -132,18 +144,5 @@ class MyPostPagedAdapter(
                 holder.pictureRecycler.adapter?.notifyDataSetChanged()
             }
         }
-    }
-
-    fun updateFavoriteItem(memberPostItem: MemberPostItem, position: Int) {
-        val item = getItem(position)
-        item?.isFavorite = memberPostItem.isFavorite
-        item?.favoriteCount = memberPostItem.favoriteCount
-        notifyItemChanged(position)
-    }
-
-    fun updateFollowItem(memberPostItem: MemberPostItem, position: Int) {
-        val item = getItem(position)
-        item?.isFollow = memberPostItem.isFollow
-        notifyItemChanged(position)
     }
 }

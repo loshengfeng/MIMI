@@ -240,6 +240,8 @@ class PostArticleFragment : BaseFragment() {
         } else {
             tv_title.text = getString(R.string.post_title)
         }
+
+        useAdultTheme(false)
     }
 
     private fun setUI() {
