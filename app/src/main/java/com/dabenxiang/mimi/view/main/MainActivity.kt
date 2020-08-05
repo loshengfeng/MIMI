@@ -1,12 +1,14 @@
 package com.dabenxiang.mimi.view.main
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageInstaller
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.NavDeepLinkBuilder
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.PACKAGE_INSTALLED_ACTION
@@ -15,6 +17,7 @@ import com.dabenxiang.mimi.extension.setupWithNavController
 import com.dabenxiang.mimi.view.base.BaseActivity
 import com.dabenxiang.mimi.view.home.HomeFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.FileUtil.deleteExternalFile
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.activity_main.*
@@ -102,6 +105,11 @@ class MainActivity : BaseActivity(), InteractionListener {
             } else {
                 finish()
             }
+        } else if(supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter("/").toString().toLowerCase(Locale.getDefault()) == SearchVideoFragment::class.java.simpleName.toLowerCase(Locale.getDefault())) {
+            if(viewModel.isFromPlayer)
+                deepLinkTo(MainActivity::class.java, R.navigation.navigation_home, R.id.homeFragment, null)
+            else
+                super.onBackPressed()
         } else {
             super.onBackPressed()
         }
@@ -151,6 +159,17 @@ class MainActivity : BaseActivity(), InteractionListener {
                 }
             }
         }
+    }
+
+    private fun deepLinkTo(activity: Class<out Activity>, navGraphId: Int, destId: Int, bundle: Bundle?){
+        val pendingIntent = NavDeepLinkBuilder(this)
+                .setComponentName(activity)
+                .setGraph(navGraphId)
+                .setDestination(destId)
+                .setArguments(bundle)
+                .createPendingIntent()
+
+        pendingIntent.send()
     }
 
 }

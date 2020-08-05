@@ -31,6 +31,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
+import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
@@ -54,7 +55,7 @@ class SearchVideoFragment : BaseFragment() {
     companion object {
         const val KEY_DATA = "data"
 
-        fun createBundle(title: String = "", tag: String = "", isAdult: Boolean = false): Bundle {
+        fun createBundle(title: String = "", tag: String = "", isAdult: Boolean? = null): Bundle {
             val data = SearchingVideoData()
             data.title = title
             data.tag = tag
@@ -93,13 +94,17 @@ class SearchVideoFragment : BaseFragment() {
 
         (arguments?.getSerializable(KEY_DATA) as SearchingVideoData?)?.also { data ->
             Timber.d("key data from args is title: ${data.title}, tag: ${data.tag} and isAdult: ${data.isAdult}")
+            if(data.isAdult != null){
+                viewModel.isAdult = data.isAdult!!
+                mainViewModel?.isFromPlayer = true
+            } else
+                mainViewModel?.isFromPlayer = false
+
             if (data.tag.isNotBlank()) {
                 viewModel.searchingTag = data.tag
                 tv_search_text.text = genResultText()
                 viewModel.getSearchList()
             }
-
-            viewModel.isAdult = data.isAdult
 
             if (TextUtils.isEmpty(viewModel.searchingTag) && TextUtils.isEmpty(viewModel.searchingStr)) {
                 layout_search_history.visibility = View.VISIBLE
@@ -259,7 +264,9 @@ class SearchVideoFragment : BaseFragment() {
 
     override fun setupListeners() {
         ib_back.setOnClickListener {
-            navigateTo(NavigateItem.Up)
+            if(mainViewModel?.isFromPlayer == true)
+                activity?.onBackPressed()
+            else navigateTo(NavigateItem.Up)
         }
 
         iv_clean.setOnClickListener {

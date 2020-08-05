@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.player
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -1406,7 +1407,7 @@ class PlayerActivity : BaseActivity() {
             chip.setOnClickListener(
                     View.OnClickListener {
                         val bundle = SearchVideoFragment.createBundle(tag = chip.text.toString(), isAdult = obtainIsAdult())
-                        deepLinkToMainActivity(R.navigation.navigation_home, R.id.searchVideoFragment, bundle)
+                        deepLinkTo(MainActivity::class.java, R.navigation.navigation_home, R.id.searchVideoFragment, bundle)
                     }
             )
 
@@ -1540,9 +1541,9 @@ class PlayerActivity : BaseActivity() {
         }
     }
 
-    private fun deepLinkToMainActivity(navGraphId: Int, destId: Int, bundle: Bundle){
+    private fun deepLinkTo(activity: Class<out Activity>, navGraphId: Int, destId: Int, bundle: Bundle?){
         val pendingIntent = NavDeepLinkBuilder(this)
-                .setComponentName(MainActivity::class.java)
+                .setComponentName(activity)
                 .setGraph(navGraphId)
                 .setDestination(destId)
                 .setArguments(bundle)
