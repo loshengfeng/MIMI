@@ -31,7 +31,7 @@ class UpdateMessageAlertDialog(
 
         btn_cancel.setOnClickListener {
             dismiss()
-            dialogListener.onCancle()
+            dialogListener.onCancel()
         }
     }
 }
