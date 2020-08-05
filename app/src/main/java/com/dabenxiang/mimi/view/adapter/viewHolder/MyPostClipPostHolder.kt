@@ -25,6 +25,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_my_post_clip_post.view.*
+import timber.log.Timber
 import java.util.*
 
 class MyPostClipPostHolder(
@@ -70,18 +71,7 @@ class MyPostClipPostHolder(
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         tvTitle.text = item.title
-
-        if (isMe) {
-            tvFollow.visibility = View.GONE
-        } else {
-            tvFollow.visibility = View.VISIBLE
-            updateFollow(item.isFollow)
-            tvFollow.setOnClickListener {
-                itemList?.also {
-                    myPostListener.onFollowClick(item, position, !item.isFollow)
-                }
-            }
-        }
+        tvCommentCount.text = item.commentCount.toString()
 
         if (LruCacheUtils.getLruCache(item.avatarAttachmentId.toString()) == null) {
             attachmentListener.onGetAttachment(
@@ -142,23 +132,33 @@ class MyPostClipPostHolder(
             itemList?.also { myPostListener.onClipCommentClick(it, position) }
         }
 
-        updateLikeAndFollowItem(item, position, myPostListener)
-
         if (isMe) {
+            tvFollow.visibility = View.GONE
+
             ivMore.visibility = View.VISIBLE
             ivMore.setOnClickListener {
                 myPostListener.onMoreClick(item)
             }
         } else {
+            tvFollow.visibility = View.VISIBLE
+            updateFollow(item)
+            tvFollow.setOnClickListener {
+                itemList?.also {
+                    myPostListener.onFollowClick(item, position, !item.isFollow)
+                    item.isFollow = !item.isFollow
+                }
+            }
+
             ivMore.visibility = View.GONE
         }
 
-        clClipPost.setOnClickListener {
-            itemList?.also { myPostListener.onClipItemClick(it, position) }
-        }
+        updateFavorite(item)
+        updateLike(item)
 
         ivFavorite.setOnClickListener {
             item.isFavorite = !item.isFavorite
+            item.favoriteCount =
+                if (item.isFavorite) item.favoriteCount + 1 else item.favoriteCount - 1
             myPostListener.onFavoriteClick(
                 item,
                 position,
@@ -166,44 +166,44 @@ class MyPostClipPostHolder(
                 AttachmentType.ADULT_HOME_CLIP
             )
         }
-    }
-
-    private fun updateLikeAndFollowItem(
-        item: MemberPostItem,
-        position: Int,
-        myPostListener: MyPostFragment.MyPostListener
-    ) {
-        tvLikeCount.text = item.likeCount.toString()
-        tvCommentCount.text = item.commentCount.toString()
-
-        val likeType = item.likeType
-        val isLike: Boolean
-        if (likeType == LikeType.LIKE) {
-            isLike = true
-            ivLike.setImageResource(R.drawable.ico_nice_s)
-        } else {
-            isLike = false
-            ivLike.setImageResource(if (isAdultTheme) R.drawable.ico_nice else R.drawable.ico_nice_gray)
-        }
 
         ivLike.setOnClickListener {
-            myPostListener.onLikeClick(item, position, !isLike)
+            item.likeType = if (item.likeType == LikeType.LIKE) LikeType.DISLIKE else LikeType.LIKE
+            item.likeCount =
+                if (item.likeType == LikeType.LIKE) item.likeCount + 1 else item.likeCount - 1
+            myPostListener.onLikeClick(item, position, item.likeType == LikeType.LIKE)
         }
 
+        clClipPost.setOnClickListener {
+            itemList?.also { myPostListener.onClipItemClick(it, position) }
+        }
+
+    }
+
+    fun updateLike(item: MemberPostItem) {
+        tvLikeCount.text = item.likeCount.toString()
+
+        if (item.likeType == LikeType.LIKE) {
+            ivLike.setImageResource(R.drawable.ico_nice_s)
+        } else {
+            ivLike.setImageResource(if (isAdultTheme) R.drawable.ico_nice else R.drawable.ico_nice_gray)
+        }
+    }
+
+    fun updateFollow(item: MemberPostItem) {
+        tvFollow.setText(if (item.isFollow) R.string.followed else R.string.follow)
+        tvFollow.setBackgroundResource(if (item.isFollow) R.drawable.bg_white_1_stroke_radius_16 else R.drawable.bg_red_1_stroke_radius_16)
+        tvFollow.setTextColor(App.self.getColor(if (item.isFollow) R.color.color_white_1 else R.color.color_red_1))
+    }
+
+    fun updateFavorite(item: MemberPostItem) {
         tvFavoriteCount.text = item.favoriteCount.toString()
+
         if (item.isFavorite) {
             ivFavorite.setImageResource(R.drawable.btn_favorite_white_s)
         } else {
             ivFavorite.setImageResource(if (isAdultTheme) R.drawable.btn_favorite_white_n else R.drawable.btn_favorite_n)
         }
-
-        updateFollow(item.isFollow)
-    }
-
-    private fun updateFollow(isFollow: Boolean) {
-        tvFollow.setText(if (isFollow) R.string.followed else R.string.follow)
-        tvFollow.setBackgroundResource(if (isFollow) R.drawable.bg_white_1_stroke_radius_16 else R.drawable.bg_red_1_stroke_radius_16)
-        tvFollow.setTextColor(App.self.getColor(if (isFollow) R.color.color_white_1 else R.color.color_red_1))
     }
 
 }

@@ -197,19 +197,18 @@ class PostArticleFragment : BaseFragment() {
 
             val jsonString = Gson().toJson(requestContent)
 
-//            if (isEdit != null) {
-//                val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
-//                viewModel.updateArticle(title, jsonString, tags, item)
-//            } else {
-//                viewModel.postArticle(title, jsonString, tags)
-//            }
-
             val bundle = Bundle()
             bundle.putBoolean(UPLOAD_ARTICLE, true)
             bundle.putString(TITLE, title)
             bundle.putString(REQUEST, jsonString)
             bundle.putStringArrayList(TAG, tags)
-            findNavController().navigate(R.id.action_postArticleFragment_to_adultHomeFragment, bundle)
+            if (isEdit != null) {
+                val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
+                bundle.putSerializable(MEMBER_DATA, item)
+                findNavController().navigate(R.id.action_postArticleFragment_to_myPostFragment, bundle)
+            } else {
+                findNavController().navigate(R.id.action_postArticleFragment_to_adultHomeFragment, bundle)
+            }
         }
     }
 
@@ -241,6 +240,8 @@ class PostArticleFragment : BaseFragment() {
         } else {
             tv_title.text = getString(R.string.post_title)
         }
+
+        useAdultTheme(false)
     }
 
     private fun setUI() {

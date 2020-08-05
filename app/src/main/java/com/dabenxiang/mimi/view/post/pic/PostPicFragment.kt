@@ -96,13 +96,17 @@ class PostPicFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initSettings()
+    }
 
+    override fun initSettings() {
         adapter = ScrollPicAdapter(postPicItemListener)
         adapter.submitList(attachmentList)
         recyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         recyclerView.adapter = adapter
 
         tv_clean.isEnabled = true
+
+        useAdultTheme(false)
     }
 
     override fun setupObservers() {
@@ -185,6 +189,8 @@ class PostPicFragment : BaseFragment() {
         }
 
         tv_clean.setOnClickListener {
+            val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
+
             val title = edt_title.text.toString()
 
             if (title.isBlank()) {
@@ -222,7 +228,14 @@ class PostPicFragment : BaseFragment() {
             bundle.putParcelableArrayList(PIC_URI, adapter.getData())
             bundle.putStringArrayList(DELETE_ATTACHMENT, deletePicList)
             bundle.putLong(POST_ID, postId)
-            findNavController().navigate(R.id.action_postPicFragment_to_adultHomeFragment, bundle)
+
+            if (isEdit != null && isEdit) {
+                val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+                findNavController().navigate(R.id.action_postPicFragment_to_myPostFragment, bundle)
+            } else {
+                findNavController().navigate(R.id.action_postPicFragment_to_adultHomeFragment, bundle)
+            }
         }
     }
 

@@ -2,19 +2,53 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cl_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_no_data"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/recyclerview_content">
+
+        <ImageView
+            android:id="@+id/iv_no_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/img_page_empty"
+            android:contentDescription="@null"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_no_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/filter_empty"
+            android:textColor="@color/color_black_2_50"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_no_data" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview_content"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@color/normal_color_background"
+        android:layout_height="wrap_content"
+        android:background="@color/transparent"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:paddingTop="150dp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layout_top"
@@ -32,32 +66,102 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layout_top">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/filter_0"
+        <LinearLayout
+            android:id="@+id/ll_filter_0"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:clipToPadding="false"
             android:orientation="horizontal"
-            android:paddingStart="20dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            android:gravity="center"
+            android:paddingStart="20dp">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/filter_1"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:clipToPadding="false"
-            android:orientation="horizontal"
-            android:paddingStart="20dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            <TextView
+                android:id="@+id/tv_all_0"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:background="@drawable/bg_red_1_radius_6"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/topup_all"
+                android:textColor="@color/color_white_1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/filter_2"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rl_filter_0"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/ll_filter_1"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:clipToPadding="false"
             android:orientation="horizontal"
-            android:paddingStart="20dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            android:gravity="center"
+            android:paddingStart="20dp">
+
+            <TextView
+                android:id="@+id/tv_all_1"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:background="@drawable/bg_red_1_radius_6"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/topup_all"
+                android:textColor="@color/color_white_1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rl_filter_1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_filter_2"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:clipToPadding="false"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:paddingStart="20dp">
+
+            <TextView
+                android:id="@+id/tv_all_2"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:background="@drawable/bg_red_1_radius_6"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/topup_all"
+                android:textColor="@color/color_white_1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rl_filter_2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        </LinearLayout>
 
     </LinearLayout>
 

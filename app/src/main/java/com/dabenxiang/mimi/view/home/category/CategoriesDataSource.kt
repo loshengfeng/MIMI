@@ -4,6 +4,7 @@ import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.AdItem
+import com.dabenxiang.mimi.model.api.vo.Category
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.model.vo.searchItemToVideoItem
 import kotlinx.coroutines.CoroutineScope
@@ -29,7 +30,7 @@ class CategoriesDataSource(
         val PER_LIMIT_LONG = PER_LIMIT.toLong()
     }
 
-    private data class LoadResult(val list: List<BaseVideoItem>, val nextKey: Long?)
+    private data class LoadResult(val list: List<BaseVideoItem>, val category: Category?, val nextKey: Long?)
 
     override fun loadInitial(
         params: LoadInitialParams<Long>,
@@ -53,7 +54,10 @@ class CategoriesDataSource(
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()
                 val videos = item?.content?.videos
-                if (videos != null) {
+                if (videos.isNullOrEmpty()) {
+                    pagingCallback.onTotalCount(0)
+                } else {
+                    pagingCallback.onTotalCount(videos.size.toLong())
                     returnList.addAll(videos.searchItemToVideoItem(isAdult))
                 }
                 val nextPageKey = when {
@@ -67,6 +71,7 @@ class CategoriesDataSource(
                 emit(
                     LoadResult(
                         returnList,
+                        item?.content?.category,
                         nextPageKey
                     )
                 )
@@ -75,7 +80,9 @@ class CategoriesDataSource(
                 .flowOn(Dispatchers.IO)
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
-                .collect { callback.onResult(it.list, null, it.nextKey) }
+                .collect {
+                    pagingCallback.onGetCategory(it.category)
+                    callback.onResult(it.list, null, it.nextKey) }
         }
     }
 
@@ -113,6 +120,7 @@ class CategoriesDataSource(
                 emit(
                     LoadResult(
                         returnList,
+                        null,
                         nextPageKey
                     )
                 )
