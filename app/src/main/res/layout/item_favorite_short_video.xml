@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingStart="20dp"
-    android:paddingEnd="20dp">
+    android:paddingEnd="20dp"
+    android:paddingBottom="20dp">
 
     <ImageView
         android:id="@+id/iv_head"
@@ -54,7 +55,6 @@
         android:id="@+id/tv_follow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
         android:background="@drawable/bg_gray_6_radius_16"
         android:gravity="center"
         android:paddingStart="9dp"

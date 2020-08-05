@@ -113,13 +113,17 @@ class MyPostFragment : BaseFragment() {
         return R.layout.fragment_my_post
     }
 
+    override fun setupFirstTime() {
+        initSettings()
+        viewModel.getMyPost(userId, isAdult)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initSettings()
+        useAdultTheme(isAdultTheme)
         requireActivity().onBackPressedDispatcher.addCallback {
             navigateTo(NavigateItem.Up)
         }
-        viewModel.getMyPost(userId, isAdult)
     }
 
     override fun initSettings() {
@@ -129,8 +133,6 @@ class MyPostFragment : BaseFragment() {
             isAdult = it.getBoolean(KEY_IS_ADULT)
             isAdultTheme = it.getBoolean(KEY_IS_ADULT_THEME)
         }
-
-        useAdultTheme(isAdultTheme)
 
         adapter = MyPostPagedAdapter(
             requireContext(),
@@ -142,6 +144,7 @@ class MyPostFragment : BaseFragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
 
+        cl_layout_bg.isSelected = isAdultTheme
         cl_bg.isSelected = isAdultTheme
         tv_title.text = if (userId == USER_ID_ME) getString(R.string.personal_my_post) else userName
         tv_title.isSelected = isAdultTheme
