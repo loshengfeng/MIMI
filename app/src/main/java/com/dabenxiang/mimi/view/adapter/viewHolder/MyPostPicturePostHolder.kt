@@ -72,7 +72,6 @@ class MyPostPicturePostHolder(
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         tvTitle.text = item.title
-        tvCommentCount.text = item.commentCount.toString()
 
         if (LruCacheUtils.getLruCache(item.avatarAttachmentId.toString()) == null) {
             attachmentListener.onGetAttachment(
@@ -135,10 +134,6 @@ class MyPostPicturePostHolder(
             tvPictureCount.text = "1/${contentItem.images?.size}"
         }
 
-        ivComment.setOnClickListener {
-            item.also { myPostListener.onCommentClick(it, AdultTabType.PICTURE) }
-        }
-
         if (isMe) {
             tvFollow.visibility = View.GONE
 
@@ -158,13 +153,21 @@ class MyPostPicturePostHolder(
         }
 
         updateLike(item)
-
-        ivLike.setOnClickListener {
+        val onLikeClickListener = View.OnClickListener {
             item.likeType = if (item.likeType == LikeType.LIKE) LikeType.DISLIKE else LikeType.LIKE
             item.likeCount =
                 if (item.likeType == LikeType.LIKE) item.likeCount + 1 else item.likeCount - 1
             myPostListener.onLikeClick(item, position, item.likeType == LikeType.LIKE)
         }
+        ivLike.setOnClickListener(onLikeClickListener)
+        tvLikeCount.setOnClickListener(onLikeClickListener)
+
+        tvCommentCount.text = item.commentCount.toString()
+        val onCommentClickListener = View.OnClickListener {
+            item.also { myPostListener.onCommentClick(it, AdultTabType.PICTURE) }
+        }
+        ivComment.setOnClickListener(onCommentClickListener)
+        tvCommentCount.setOnClickListener(onCommentClickListener)
 
         picturePostItemLayout.setOnClickListener {
             item.also { myPostListener.onItemClick(item, AdultTabType.PICTURE) }

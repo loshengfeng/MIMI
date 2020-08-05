@@ -252,6 +252,8 @@ class FavoriteFragment : BaseFragment() {
             else -> View.GONE
         }
 
+        tv_clean.isEnabled = size > 0
+
         when (lastPrimaryIndex) {
             TYPE_NORMAL -> layout_adult.visibility = View.GONE
             TYPE_ADULT -> layout_adult.visibility = View.VISIBLE

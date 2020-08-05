@@ -157,6 +157,7 @@ class MyFollowFragment : BaseFragment() {
         requireActivity().onBackPressedDispatcher.addCallback {
             navigateTo(NavigateItem.Up)
         }
+        useAdultTheme(false)
         viewModel.initData(lastTab)
     }
 
@@ -209,8 +210,6 @@ class MyFollowFragment : BaseFragment() {
     }
 
     override fun initSettings() {
-        useAdultTheme(false)
-
         rv_primary.adapter = primaryAdapter
 
         val primaryList = listOf(

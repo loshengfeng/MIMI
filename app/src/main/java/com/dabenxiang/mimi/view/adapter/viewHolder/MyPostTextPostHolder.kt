@@ -79,7 +79,6 @@ class MyPostTextPostHolder(
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         tvTitle.text = item.title
-        tvCommentCount.text = item.commentCount.toString()
 
         // FIXME: item.content json 資料格式有問題
         try {
@@ -121,10 +120,6 @@ class MyPostTextPostHolder(
             tagChipGroup.addView(chip)
         }
 
-        ivComment.setOnClickListener {
-            myPostListener.onCommentClick(item, AdultTabType.TEXT)
-        }
-
         if (isMe) {
             tvFollow.visibility = View.GONE
 
@@ -144,13 +139,21 @@ class MyPostTextPostHolder(
         }
 
         updateLike(item)
-
-        ivLike.setOnClickListener {
+        val onLikeClickListener = View.OnClickListener {
             item.likeType = if (item.likeType == LikeType.LIKE) LikeType.DISLIKE else LikeType.LIKE
             item.likeCount =
                 if (item.likeType == LikeType.LIKE) item.likeCount + 1 else item.likeCount - 1
             myPostListener.onLikeClick(item, position, item.likeType == LikeType.LIKE)
         }
+        ivLike.setOnClickListener(onLikeClickListener)
+        tvLikeCount.setOnClickListener(onLikeClickListener)
+
+        tvCommentCount.text = item.commentCount.toString()
+        val onCommentClickListener = View.OnClickListener {
+            myPostListener.onCommentClick(item, AdultTabType.TEXT)
+        }
+        ivComment.setOnClickListener(onCommentClickListener)
+        tvCommentCount.setOnClickListener(onCommentClickListener)
 
         textPostItemLayout.setOnClickListener {
             myPostListener.onItemClick(item, AdultTabType.TEXT)
