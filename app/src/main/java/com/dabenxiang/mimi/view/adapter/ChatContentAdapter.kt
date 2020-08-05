@@ -9,18 +9,18 @@ import com.dabenxiang.mimi.model.api.vo.ChatContentItem
 import com.dabenxiang.mimi.model.enums.ChatAdapterViewType
 import com.dabenxiang.mimi.model.enums.ChatMessageType
 import com.dabenxiang.mimi.model.pref.Pref
-import com.dabenxiang.mimi.view.adapter.viewHolder.chat.*
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import com.dabenxiang.mimi.view.adapter.viewHolder.chat.ChatContentDateTitleViewHolder
+import com.dabenxiang.mimi.view.adapter.viewHolder.chat.ChatContentFileViewHolder
+import com.dabenxiang.mimi.view.adapter.viewHolder.chat.ChatContentImageViewHolder
+import com.dabenxiang.mimi.view.adapter.viewHolder.chat.ChatContentTextViewHolder
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 class ChatContentAdapter(
-        private val listener: EventListener
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), KoinComponent {
-    private val pref: Pref by inject()
+    private val pref: Pref,
+    private val listener: EventListener
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var data = ArrayList<ChatContentItem>()
 
     interface EventListener {
@@ -36,78 +36,78 @@ class ChatContentAdapter(
         return when (viewType) {
             ChatAdapterViewType.DATE_TITLE.ordinal -> {
                 ChatContentDateTitleViewHolder(
-                        layoutInflater.inflate(
-                                R.layout.item_chat_content_date,
-                                parent,
-                                false
-                        ), listener
+                    layoutInflater.inflate(
+                        R.layout.item_chat_content_date,
+                        parent,
+                        false
+                    ), listener
                 )
             }
 
             // Receiver
             ChatAdapterViewType.RECEIVER_TEXT.ordinal -> {
                 ChatContentTextViewHolder(
-                        layoutInflater.inflate(
-                                R.layout.item_chat_content_receiver_text,
-                                parent,
-                                false
-                        ), listener
+                    layoutInflater.inflate(
+                        R.layout.item_chat_content_receiver_text,
+                        parent,
+                        false
+                    ), listener, pref
                 )
             }
             ChatAdapterViewType.RECEIVER_IMAGE.ordinal -> {
                 ChatContentImageViewHolder(
-                        layoutInflater.inflate(
-                                R.layout.item_chat_content_receiver_image,
-                                parent,
-                                false
-                        ), listener
+                    layoutInflater.inflate(
+                        R.layout.item_chat_content_receiver_image,
+                        parent,
+                        false
+                    ), listener, pref
                 )
             }
             ChatAdapterViewType.RECEIVER_BINARY.ordinal -> {
                 ChatContentFileViewHolder(
-                        layoutInflater.inflate(
-                                R.layout.item_chat_content_receiver_file,
-                                parent,
-                                false
-                        ), listener
+                    layoutInflater.inflate(
+                        R.layout.item_chat_content_receiver_file,
+                        parent,
+                        false
+                    ), listener, pref
                 )
             }
 
             // Sender
             ChatAdapterViewType.SENDER_TEXT.ordinal -> {
                 ChatContentTextViewHolder(
-                        layoutInflater.inflate(
-                                R.layout.item_chat_content_sender_text,
-                                parent,
-                                false
-                        ), listener
+                    layoutInflater.inflate(
+                        R.layout.item_chat_content_sender_text,
+                        parent,
+                        false
+                    ), listener, pref
                 )
             }
             ChatAdapterViewType.SENDER_IMAGE.ordinal -> {
                 ChatContentImageViewHolder(
-                        layoutInflater.inflate(
-                                R.layout.item_chat_content_sender_image,
-                                parent,
-                                false
-                        ), listener
+                    layoutInflater.inflate(
+                        R.layout.item_chat_content_sender_image,
+                        parent,
+                        false
+                    ), listener, pref
                 )
             }
             ChatAdapterViewType.SENDER_BINARY.ordinal -> {
                 ChatContentFileViewHolder(
-                        layoutInflater.inflate(
-                                R.layout.item_chat_content_sender_file,
-                                parent,
-                                false
-                        ), listener
+                    layoutInflater.inflate(
+                        R.layout.item_chat_content_sender_file,
+                        parent,
+                        false
+                    ), listener, pref
                 )
             }
             else -> {
                 ChatContentDateTitleViewHolder(
-                        layoutInflater.inflate(
-                                R.layout.item_chat_content_receiver_text,
-                                parent,
-                                false
-                        ), listener
+                    layoutInflater.inflate(
+                        R.layout.item_chat_content_receiver_text,
+                        parent,
+                        false
+                    ), listener
                 )
             }
         }
@@ -179,8 +179,18 @@ class ChatContentAdapter(
     fun insertItem(item: ChatContentItem, index: Int = 0) {
         // 判斷需不需要先加上時間 Title
         if (this.data.size > 0) {
-            val lastItemDate = this.data[0].payload?.sendTime?.let { time -> SimpleDateFormat("YYYY-MM-dd", Locale.getDefault()).format(time) }
-            val currentItemDate = item.payload?.sendTime?.let { time -> SimpleDateFormat("YYYY-MM-dd", Locale.getDefault()).format(time) }
+            val lastItemDate = this.data[0].payload?.sendTime?.let { time ->
+                SimpleDateFormat(
+                    "YYYY-MM-dd",
+                    Locale.getDefault()
+                ).format(time)
+            }
+            val currentItemDate = item.payload?.sendTime?.let { time ->
+                SimpleDateFormat(
+                    "YYYY-MM-dd",
+                    Locale.getDefault()
+                ).format(time)
+            }
             if (currentItemDate != null && !TextUtils.equals(lastItemDate, currentItemDate)) {
                 this.data.add(index, ChatContentItem(dateTitle = currentItemDate))
             }

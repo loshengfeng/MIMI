@@ -88,7 +88,7 @@
     <string name="title_setting">个人设置</string>
     <string name="setting_photo">头像</string>
     <string name="setting_name">名称</string>
-    <string name="setting_email">email</string>
+    <string name="setting_email">Email</string>
     <string name="setting_account">帐号</string>
     <string name="setting_gender">性别</string>
     <string name="setting_choose">请选择(预设)</string>
@@ -237,6 +237,7 @@
     <string name="post_warning_pic">请选择照片</string>
     <string name="post_warning_video">请选择影片</string>
     <string name="post_warning_tag_limit">标签已满</string>
+    <string name="post_select_pic">选择照片</string>
 
     <!-- Problem report -->
     <string-array name="video_problem_report_item">

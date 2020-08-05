@@ -6,15 +6,16 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.enums.VideoDownloadStatusType
+import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.view.adapter.ChatContentAdapter
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import java.io.File
-import java.lang.StringBuilder
 
 class ChatContentFileViewHolder(
-        itemView: View,
-        listener: ChatContentAdapter.EventListener
-) : BaseChatContentViewHolder(itemView, listener) {
+    itemView: View,
+    listener: ChatContentAdapter.EventListener,
+    pref: Pref
+) : BaseChatContentViewHolder(itemView, listener, pref) {
     private val txtMessage = itemView.findViewById(R.id.txt_message) as TextView
     private val imgFileIcon = itemView.findViewById(R.id.img_file_icon) as ImageView
     private val txtDownloadState = itemView.findViewById(R.id.txt_download_state) as TextView
@@ -52,7 +53,8 @@ class ChatContentFileViewHolder(
             }
             VideoDownloadStatusType.FINISH -> {
                 txtDownloadState.visibility = View.VISIBLE
-                txtDownloadState.text = context.getString(R.string.chat_content_file_download_finish)
+                txtDownloadState.text =
+                    context.getString(R.string.chat_content_file_download_finish)
             }
             VideoDownloadStatusType.UPLOADING -> {
                 txtDownloadState.visibility = View.VISIBLE
