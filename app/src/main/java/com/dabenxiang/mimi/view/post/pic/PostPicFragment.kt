@@ -42,6 +42,7 @@ import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.post.video.PostVideoFragment
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment.Companion.VIEWER_DATA
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
@@ -71,10 +72,12 @@ class PostPicFragment : BaseFragment() {
         const val MEMBER_REQUEST = "member_request"
         const val PIC_URI = "pic_uri"
         const val DELETE_ATTACHMENT = "delete_attachment"
+
         const val POST_ID = "post_id"
 
         private const val TITLE_LIMIT = 60
         private const val HASHTAG_LIMIT = 20
+        private const val HASHTAG_TEXT_LIMIT = 10
         private const val INIT_VALUE = 0
         private const val PHOTO_LIMIT = 20
 
@@ -171,6 +174,23 @@ class PostPicFragment : BaseFragment() {
             }
         })
 
+        edt_hashtag.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                s?.let {
+                    if (it.length > HASHTAG_TEXT_LIMIT) {
+                        val content = it.toString().dropLast(1)
+                        edt_hashtag.setText(content)
+                    }
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+        })
+
         clubLayout.setOnClickListener {
             ChooseClubDialogFragment.newInstance(chooseClubDialogListener).also {
                 it.show(
@@ -185,8 +205,13 @@ class PostPicFragment : BaseFragment() {
                 if (chipGroup.size == HASHTAG_LIMIT) {
                     Toast.makeText(requireContext(), R.string.post_warning_tag_limit, Toast.LENGTH_SHORT).show()
                 } else {
-                    addTag(edt_hashtag.text.toString())
-                    edt_hashtag.text.clear()
+                    val tag = edt_hashtag.text.toString()
+                    if (isTagExist(tag)) {
+                        Toast.makeText(requireContext(), R.string.post_tag_already_have, Toast.LENGTH_SHORT).show()
+                    } else {
+                        addTag(tag)
+                        edt_hashtag.text.clear()
+                    }
                 }
             }
             false
@@ -500,5 +525,15 @@ class PostPicFragment : BaseFragment() {
         val bundle = Bundle()
         bundle.putSerializable(VIEWER_DATA, viewerItem)
         findNavController().navigate(R.id.action_postPicFragment_to_postViewerFragment, bundle)
+    }
+
+    private fun isTagExist(tag: String): Boolean  {
+        for (i in 0 until chipGroup.childCount) {
+            val chip = chipGroup.getChildAt(i) as Chip
+            if (chip.text == tag) {
+                return true
+            }
+        }
+        return false
     }
 }
