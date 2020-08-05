@@ -228,35 +228,6 @@ class SettingFragment : BaseFragment() {
         }
     }
 
-    private fun showFilterDialog(
-        titleId: Int,
-        textArrayId: Int,
-        valueArrayId: Int,
-        selectedValue: Int,
-        dialogListener: OnDialogListener
-    ) {
-        val dialog = FilterDialogFragment.newInstance(
-            FilterDialogFragment.Content(
-                titleId,
-                textArrayId,
-                valueArrayId,
-                dialogListener,
-                selectedValue
-            )
-        )
-        dialog.show(
-            requireActivity().supportFragmentManager,
-            FilterDialogFragment::class.java.simpleName
-        )
-    }
-
-    private val onDialogListener = object : OnDialogListener {
-        override fun onItemSelected(value: Int, text: String) {
-            viewModel.profileData?.gender = value
-            viewModel.updateProfile()
-        }
-    }
-
     private val onChoosePickerDialogListener = object : OnChoosePickerDialogListener {
         override fun onPickFromCamera() {
             openCamera()

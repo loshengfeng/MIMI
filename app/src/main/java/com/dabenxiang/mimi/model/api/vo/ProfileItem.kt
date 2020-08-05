@@ -22,14 +22,12 @@ class ProfileItem : Serializable{
     @SerializedName("email")
     var email: String? = null
 
+    // 0:Female|1:Male default is Female
     @SerializedName("gender")
     var gender = 0
 
     @SerializedName("birthday")
     var birthday: String? = null
-
-    @SerializedName("id")
-    var id: Long = 0
 
     @SerializedName("avatarAttachmentId")
     var avatarAttachmentId: Long = 0
