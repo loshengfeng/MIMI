@@ -60,6 +60,8 @@ class EditVideoFragment : BaseFragment() {
         viewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabLayout))
 
         tv_clean.isEnabled = true
+
+        useAdultTheme(false)
     }
 
     override fun setupObservers() {

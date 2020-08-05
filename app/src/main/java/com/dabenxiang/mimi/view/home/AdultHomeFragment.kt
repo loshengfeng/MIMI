@@ -128,6 +128,8 @@ class AdultHomeFragment : BaseFragment() {
                 R.id.navigation_home
             )
         }
+
+        useAdultTheme(true)
     }
 
     override fun setupFirstTime() {
