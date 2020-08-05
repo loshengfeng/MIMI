@@ -17,17 +17,14 @@ import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.view.adapter.ChatContentAdapter
 import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
-import org.koin.core.KoinComponent
-import org.koin.core.inject
-import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
 open class BaseChatContentViewHolder(
-        itemView: View,
-        val listener: ChatContentAdapter.EventListener
-) : BaseAnyViewHolder<ChatContentItem>(itemView), KoinComponent {
-    private val pref: Pref by inject()
+    itemView: View,
+    val listener: ChatContentAdapter.EventListener,
+    val pref: Pref
+) : BaseAnyViewHolder<ChatContentItem>(itemView) {
     private val txtTime = itemView.findViewById(R.id.txt_time) as TextView
     private val ivHead = itemView.findViewById(R.id.iv_head) as ImageView
 
@@ -48,20 +45,24 @@ open class BaseChatContentViewHolder(
         avatarId.let {
             LruCacheUtils.getLruArrayCache(avatarId)?.also { array ->
                 val options: RequestOptions = RequestOptions()
-                        .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                        .placeholder(R.drawable.default_profile_picture)
-                        .error(R.drawable.default_profile_picture)
-                        .priority(Priority.NORMAL)
+                    .transform(MultiTransformation(CenterCrop(), CircleCrop()))
+                    .placeholder(R.drawable.default_profile_picture)
+                    .error(R.drawable.default_profile_picture)
+                    .priority(Priority.NORMAL)
 
-                Glide.with(App.self).
-                        asBitmap()
-                        .load(array)
-                        .apply(options)
-                        .into(ivHead)
+                Glide.with(App.self).asBitmap()
+                    .load(array)
+                    .apply(options)
+                    .into(ivHead)
             } ?: run {
                 listener.onGetAvatarAttachment(avatarId, position)
             }
         }
-        txtTime.text = data?.payload?.sendTime?.let { date -> SimpleDateFormat("YYYY-MM-dd HH:mm", Locale.getDefault()).format(date) }
+        txtTime.text = data?.payload?.sendTime?.let { date ->
+            SimpleDateFormat(
+                "YYYY-MM-dd HH:mm",
+                Locale.getDefault()
+            ).format(date)
+        }
     }
 }
