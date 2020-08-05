@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.setting
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
@@ -21,13 +22,20 @@ import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.FilterDialogFragment
+import com.dabenxiang.mimi.view.dialog.UpdateMessageAlertDialog
 import com.dabenxiang.mimi.view.dialog.choosepicker.ChoosePickerDialogFragment
 import com.dabenxiang.mimi.view.dialog.choosepicker.OnChoosePickerDialogListener
+import com.dabenxiang.mimi.view.dialog.editor.InvitationEditorDialog
 import com.dabenxiang.mimi.view.listener.OnDialogListener
+import com.dabenxiang.mimi.view.listener.OnSimpleDialogListener
+import com.dabenxiang.mimi.view.listener.OnSimpleEditorDialogListener
+import com.dabenxiang.mimi.view.splash.SplashFragment
 import com.dabenxiang.mimi.view.updateprofile.UpdateProfileFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_setting.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import timber.log.Timber
 
 class SettingFragment : BaseFragment() {
 
@@ -124,6 +132,12 @@ class SettingFragment : BaseFragment() {
                 is Error -> onApiError(it.throwable)
             }
         })
+
+        viewModel.isBinding.observe(this.viewLifecycleOwner, Observer { success ->
+            GeneralUtils.showToast(requireContext(), if(success)
+                getString(R.string.setting_binding_success) else
+                getString(R.string.setting_binding_failed))
+        })
     }
 
     override fun setupListeners() {
@@ -182,6 +196,9 @@ class SettingFragment : BaseFragment() {
                             })
                     )
                 }
+                R.id.btn_binding_invitation -> {
+                    showInvitationEditorDialog(requireContext())
+                }
             }
         }.also {
             tv_back.setOnClickListener(it)
@@ -192,6 +209,7 @@ class SettingFragment : BaseFragment() {
             btn_chang_pw.setOnClickListener(it)
             btn_gender.setOnClickListener(it)
             btn_birthday.setOnClickListener(it)
+            btn_binding_invitation.setOnClickListener(it)
         }
     }
 
@@ -295,5 +313,22 @@ class SettingFragment : BaseFragment() {
         Glide.with(this).load(bitmap)
             .apply(options)
             .into(iv_photo)
+    }
+
+    private fun showInvitationEditorDialog(context: Context) {
+        InvitationEditorDialog(
+            context,
+            R.string.setting_enter_invitation,
+            R.string.btn_confirm,
+            R.string.btn_cancel,
+            object : OnSimpleEditorDialogListener {
+                override fun onConfirm(text: String) {
+                    viewModel.bindingInvitationCodes(context, text)
+                }
+
+                override fun onCancel() {}
+
+            }
+        ).show()
     }
 }

@@ -1,11 +1,16 @@
 package com.dabenxiang.mimi.view.setting
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.os.Environment
+import android.view.contentcapture.ContentCaptureContext
+import android.widget.Toast
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.BuildConfig
+import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.AvatarRequest
@@ -14,14 +19,21 @@ import com.dabenxiang.mimi.model.api.vo.ProfileItem
 import com.dabenxiang.mimi.model.api.vo.ProfileRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.FileUtil
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import kotlinx.android.synthetic.main.fragment_setting.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.koin.core.inject
 import retrofit2.HttpException
+import timber.log.Timber
+import tw.gov.president.manager.submanager.update.VersionManager
 import java.io.File
 import java.net.URLEncoder
 
 class SettingViewModel : BaseViewModel() {
+
+    private val versionManager: VersionManager by inject()
 
     var bitmap: Bitmap? = null
 
@@ -39,6 +51,9 @@ class SettingViewModel : BaseViewModel() {
 
     private val _putResult = MutableLiveData<ApiResult<Nothing>>()
     val putResult: LiveData<ApiResult<Nothing>> = _putResult
+
+    private val _isBinding: MutableLiveData<Boolean> = MutableLiveData()
+    val isBinding: MutableLiveData<Boolean> = _isBinding
 
     var profileData: ProfileItem? = null
 
@@ -137,5 +152,21 @@ class SettingViewModel : BaseViewModel() {
 
     fun isEmailConfirmed(): Boolean {
         return profileData?.emailConfirmed ?: false
+    }
+
+    fun bindingInvitationCodes(context: Context, code: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            flow {
+                val isCodeBinding = versionManager.bindingInvitationCodes(code)
+                emit(isCodeBinding)
+            }.flowOn(Dispatchers.IO)
+                .catch { e ->
+                    Timber.e(e)
+                }
+                .collect {
+                    Timber.i("bindingInvitationCodes = $it")
+                    _isBinding.postValue(it)
+                }
+        }
     }
 }

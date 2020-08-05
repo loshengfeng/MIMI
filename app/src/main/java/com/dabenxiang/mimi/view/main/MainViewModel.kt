@@ -39,6 +39,8 @@ class MainViewModel : BaseViewModel() {
     val adult
         get() = _adult
 
+    var isVersionChecked =false
+
     fun setupNormalCategoriesItem(item: CategoriesItem?) {
         _normal = item
     }
