@@ -114,6 +114,7 @@ class AdultHomeFragment : BaseFragment() {
         private const val REQUEST_PHOTO = 10001
         private const val REQUEST_VIDEO_CAPTURE = 10002
 
+        private const val RECORD_LIMIT_TIME = 15
     }
 
     override fun getLayoutId() = R.layout.fragment_home
@@ -1157,11 +1158,11 @@ class AdultHomeFragment : BaseFragment() {
 
     private val onChooseUploadMethodDialogListener = object : OnChooseUploadMethodDialogListener {
         override fun onUploadVideo() {
-            Intent(MediaStore.ACTION_VIDEO_CAPTURE).also { takeVideoIntent ->
-                takeVideoIntent.resolveActivity(requireContext().packageManager)?.also {
-                    startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE)
-                }
-            }
+            val intent = Intent()
+            intent.action = MediaStore.ACTION_VIDEO_CAPTURE
+            intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, RECORD_LIMIT_TIME)
+            intent.resolveActivity(requireContext().packageManager)
+            startActivityForResult(intent, REQUEST_VIDEO_CAPTURE)
         }
 
         override fun onUploadPic() {
