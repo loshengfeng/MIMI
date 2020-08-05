@@ -27,9 +27,9 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.home.HomeTemplate
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.player.PlayerActivity
+import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_categories.*
-import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 
 class CategoriesFragment : BaseFragment() {
@@ -59,51 +59,30 @@ class CategoriesFragment : BaseFragment() {
     }
 
     private val adapterListener = object : HomeAdapter.EventListener {
-        override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
-        }
-
         override fun onVideoClick(view: View, item: PlayerItem) {
             val intent = Intent(requireContext(), PlayerActivity::class.java)
             intent.putExtras(PlayerActivity.createBundle(item))
             startActivity(intent)
         }
 
-        override fun onClipClick(view: View, item: List<MemberPostItem>, position: Int) {
-        }
-
-        override fun onPictureClick(view: View, item: MemberPostItem) {
-
-        }
-
-        override fun onClubClick(view: View, item: MemberClubItem) {
-
-        }
-
-        override fun onLoadBannerViewHolder(vh: HomeBannerViewHolder) {
-
-        }
-
+        override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {}
+        override fun onClipClick(view: View, item: List<MemberPostItem>, position: Int) {}
+        override fun onPictureClick(view: View, item: MemberPostItem) {}
+        override fun onClubClick(view: View, item: MemberClubItem) {}
+        override fun onLoadBannerViewHolder(vh: HomeBannerViewHolder) {}
+        override fun onLoadClipViewHolder(vh: HomeClipViewHolder) {}
+        override fun onLoadPictureViewHolder(vh: HomePictureViewHolder) {}
+        override fun onLoadClubViewHolder(vh: HomeClubViewHolder) {}
         override fun onLoadStatisticsViewHolder(
             vh: HomeStatisticsViewHolder,
             src: HomeTemplate.Statistics
         ) {
-
         }
 
         override fun onLoadCarouselViewHolder(
             vh: HomeCarouselViewHolder,
             src: HomeTemplate.Carousel
         ) {
-
-        }
-
-        override fun onLoadClipViewHolder(vh: HomeClipViewHolder) {
-        }
-
-        override fun onLoadPictureViewHolder(vh: HomePictureViewHolder) {
-        }
-
-        override fun onLoadClubViewHolder(vh: HomeClubViewHolder) {
         }
     }
 
@@ -115,7 +94,7 @@ class CategoriesFragment : BaseFragment() {
         get() = View.GONE
 
     private val isAdult by lazy { mainViewModel?.adultMode?.value ?: false }
-    private val data by lazy {  arguments?.getSerializable(KEY_DATA) as CategoriesItem }
+    private val data by lazy { arguments?.getSerializable(KEY_DATA) as CategoriesItem }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -241,7 +220,6 @@ class CategoriesFragment : BaseFragment() {
             when (it) {
                 is ApiResult.Success -> {
                     progressHUD?.dismiss()
-                    Timber.d("getCategoryDetailResult: ${it.result}")
                     setupFilterArea(it.result)
                 }
                 is ApiResult.Error -> {
@@ -265,7 +243,8 @@ class CategoriesFragment : BaseFragment() {
         })
 
         viewModel.onTotalCountResult.observe(viewLifecycleOwner, Observer {
-            cl_no_data.visibility = it.takeIf { it == 0L }?.let {  View.VISIBLE } ?: let { View.GONE }
+            cl_no_data.visibility =
+                it.takeIf { it == 0L }?.let { View.VISIBLE } ?: let { View.GONE }
         })
     }
 
@@ -275,8 +254,13 @@ class CategoriesFragment : BaseFragment() {
         }
 
         iv_search.setOnClickListener {
-            //val bundle = SearchVideoFragment.createBundle("", f)
-            //navigateTo(NavigateItem.Destination(R.id.action_categoriesFragment_to_searchVideoFragment, bundle))
+            val bundle = SearchVideoFragment.createBundle()
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_categoriesFragment_to_searchVideoFragment,
+                    bundle
+                )
+            )
         }
 
         bar_collapsing_filter.setOnClickListener {
@@ -310,13 +294,11 @@ class CategoriesFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-
         recyclerview_content.addOnScrollListener(onScrollListener)
     }
 
     override fun onPause() {
         super.onPause()
-
         recyclerview_content.removeOnScrollListener(onScrollListener)
     }
 
@@ -348,7 +330,11 @@ class CategoriesFragment : BaseFragment() {
     private fun setupFilter(index: Int, list: List<String>) {
         filterDataList.add(index, list)
         val adapter = FilterTabAdapter(object : FilterTabAdapter.FilterTabAdapterListener {
-            override fun onSelectedFilterTab(recyclerView: RecyclerView, position: Int, keyword: String) {
+            override fun onSelectedFilterTab(
+                recyclerView: RecyclerView,
+                position: Int,
+                keyword: String
+            ) {
                 viewModel.updatedFilterPosition(index, position)
                 takeIf { index == 0 }?.also { //選擇第一欄
                     updateFirstTab(index, false)
@@ -386,8 +372,8 @@ class CategoriesFragment : BaseFragment() {
             val lastPosition = viewModel.filterPositionData(index)?.value
 
             lastPosition?.takeIf { it < list.size }?.let { list[it] }.also {
-                when(index) {
-                    0 -> {
+                when (index) {
+                    0 -> { //第1欄category格式: ex. 电影,剧情片
                         val key = it.takeUnless { it == TEXT_ALL }?.let { key ->
                             if (isAdult) key else "${data.title},$key"
                         } ?: let {
@@ -454,7 +440,6 @@ class CategoriesFragment : BaseFragment() {
         } else if (bar_collapsing_filter.visibility == visibility) {
             return
         }
-        Timber.e("setCollapsingFilterBar : $visibility")
         val start = if (visibility == View.VISIBLE) {
             0f
         } else {
@@ -491,12 +476,12 @@ class CategoriesFragment : BaseFragment() {
     }
 
     private fun updateFirstTab(index: Int, isSelect: Boolean) {
-        val tv = when(index) {
+        val tv = when (index) {
             0 -> tv_all_0
             1 -> tv_all_1
             else -> tv_all_2
         }
-        takeIf { isSelect }?.also  {
+        takeIf { isSelect }?.also {
             tv.setTextColor(requireContext().getColor(R.color.color_white_1))
             tv.background = requireContext().getDrawable(R.drawable.bg_red_1_radius_6)
         } ?: run {
