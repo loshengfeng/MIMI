@@ -158,11 +158,11 @@ class MyFollowFragment : BaseFragment() {
             navigateTo(NavigateItem.Up)
         }
         useAdultTheme(false)
-        viewModel.initData(lastTab)
     }
 
     override fun setupFirstTime() {
         initSettings()
+        viewModel.initData(lastTab)
     }
 
     override fun getLayoutId(): Int {
