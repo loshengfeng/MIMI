@@ -40,6 +40,7 @@ class FavoriteAdapter(
         fun onFunctionClick(type: FunctionType, view: View, item: Any)
         fun onChipClick(text: String, type: Int? = -1)
         fun onGetAttachment(id: String, position: Int, type: AttachmentType)
+        fun onAvatarClick(userId: Long, name: String)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {

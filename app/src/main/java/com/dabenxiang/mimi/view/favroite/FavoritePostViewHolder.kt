@@ -48,6 +48,7 @@ class FavoritePostViewHolder(
     private val tvMore = itemView.findViewById(R.id.tv_more) as TextView
 
     init {
+        ivHead.setOnClickListener { listener.onAvatarClick(data!!.posterId, data!!.posterName) }
         ivPhoto.setOnClickListener { listener.onVideoClick(data!!) }
         tvLike.setOnClickListener {
             listener.onFunctionClick(
