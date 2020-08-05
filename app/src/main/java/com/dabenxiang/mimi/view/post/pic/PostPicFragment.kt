@@ -3,7 +3,10 @@ package com.dabenxiang.mimi.view.post.pic
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -36,7 +39,6 @@ import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.view.post.article.PostArticleFragment
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment.Companion.VIEWER_DATA
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
@@ -74,6 +76,7 @@ class PostPicFragment : BaseFragment() {
         private const val PHOTO_LIMIT = 20
 
         private const val REQUEST_MUTLI_PHOTO = 1001
+        private const val INTENT_SELECT_IMG = 10001
     }
 
     override val bottomNavigationVisibility: Int
@@ -420,10 +423,16 @@ class PostPicFragment : BaseFragment() {
                     val postAttachmentItem = PostAttachmentItem(uri = uri.toString())
                     uriDataList.add(postAttachmentItem)
                 }
-
                 updateCountPicView()
             } else {
-                val uri = data?.data
+                val uri = if (data?.data == null) {
+                    val extras = data?.extras
+                    val imageBitmap = extras!!["data"] as Bitmap?
+                    Uri.parse(MediaStore.Images.Media.insertImage(requireContext().contentResolver, imageBitmap, null,null))
+                } else {
+                    data.data!!
+                }
+
                 val uriDataList = adapter.getData()
                 val postAttachmentItem = PostAttachmentItem(uri = uri.toString())
                 uriDataList.add(postAttachmentItem)
@@ -455,14 +464,20 @@ class PostPicFragment : BaseFragment() {
     }
 
     private fun addPic() {
-        val intent = Intent()
-        intent.type = "image/*"
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-        intent.action = Intent.ACTION_GET_CONTENT
+        val galleryIntent = Intent()
+        galleryIntent.type = "image/*"
+        galleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        galleryIntent.action = Intent.ACTION_GET_CONTENT
 
-        startActivityForResult(Intent.createChooser(intent, getString(R.string.select_pics)),
-            REQUEST_MUTLI_PHOTO
-        )
+        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+
+        val chooser = Intent(Intent.ACTION_CHOOSER)
+        chooser.putExtra(Intent.EXTRA_INTENT, galleryIntent)
+        chooser.putExtra(Intent.EXTRA_TITLE, requireContext().getString(R.string.post_select_pic))
+
+        val intentArray = arrayOf(cameraIntent)
+        chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
+        startActivityForResult(chooser, INTENT_SELECT_IMG)
     }
 
     private fun openViewerPage(viewerItem: ViewerItem) {
