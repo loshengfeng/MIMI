@@ -28,7 +28,7 @@ class FilterTabHolder(itemView: View, listener: FilterTabHolderListener, var isA
     }
 
     override fun updated(model: String?) {
-        if (model == CategoriesFragment.TEXT_ALL) {
+        if (model == CategoriesFragment.TEXT_ALL && index == 0) {
             tvTitle.width = 0
         }
         tvTitle.text = model
