@@ -153,6 +153,7 @@ class AdultHomeFragment : BaseFragment() {
 
         if (isNeedPicUpload != null && isNeedPicUpload) {
             arguments?.remove(PostPicFragment.UPLOAD_PIC)
+            showSnackBar()
 
             val memberRequest =
                 arguments?.getParcelable<PostMemberRequest>(PostPicFragment.MEMBER_REQUEST)
