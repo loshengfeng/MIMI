@@ -170,7 +170,13 @@ class ClipAdapter(
     private fun processClip(playerView: PlayerView, id: String, url: String, position: Int) {
         Timber.d("processClip position:$position")
         val item = memberPostItems[position]
-        val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
+
+        var contentItem: MediaContentItem? = null
+        try {
+            contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
 
         if (TextUtils.isEmpty(url)) {
             if (clipMap.containsKey(id)) {
