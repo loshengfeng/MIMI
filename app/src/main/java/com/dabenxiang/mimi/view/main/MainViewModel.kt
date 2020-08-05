@@ -19,6 +19,8 @@ class MainViewModel : BaseViewModel() {
 
     var needCloseApp = false // 判斷是否需要離開 app
 
+    var isFromPlayer = false
+
     private val _adultMode = MutableLiveData(false)
     val adultMode: LiveData<Boolean> = _adultMode
 

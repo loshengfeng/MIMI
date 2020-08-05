@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.player
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -16,6 +17,7 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavDeepLinkBuilder
 import androidx.recyclerview.widget.LinearSnapHelper
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
@@ -38,6 +40,8 @@ import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.dialog.*
 import com.dabenxiang.mimi.view.login.LoginActivity
 import com.dabenxiang.mimi.view.login.LoginFragment
+import com.dabenxiang.mimi.view.main.MainActivity
+import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.OrientationDetector
 import com.google.android.exoplayer2.*
@@ -1404,6 +1408,13 @@ class PlayerActivity : BaseActivity() {
                 )
             )
 
+            chip.setOnClickListener(
+                    View.OnClickListener {
+                        val bundle = SearchVideoFragment.createBundle(tag = chip.text.toString(), isAdult = obtainIsAdult())
+                        deepLinkTo(MainActivity::class.java, R.navigation.navigation_home, R.id.searchVideoFragment, bundle)
+                    }
+            )
+
             headVideoInfo.reflow_group.addView(chip)
         }
     }
@@ -1532,6 +1543,17 @@ class PlayerActivity : BaseActivity() {
         if (intent.extras?.getBoolean(KEY_IS_COMMENT) == true) {
             scrollView.fullScroll(View.FOCUS_DOWN)
         }
+    }
+
+    private fun deepLinkTo(activity: Class<out Activity>, navGraphId: Int, destId: Int, bundle: Bundle?){
+        val pendingIntent = NavDeepLinkBuilder(this)
+                .setComponentName(activity)
+                .setGraph(navGraphId)
+                .setDestination(destId)
+                .setArguments(bundle)
+                .createPendingIntent()
+
+        pendingIntent.send()
     }
 
 }
