@@ -13,10 +13,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginTop="15dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -24,7 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="15dp"
-            android:background="@color/color_white_1"
+            android:background="@color/color_gray_4"
             android:paddingStart="20dp"
             android:paddingEnd="20dp">
 
@@ -204,6 +203,16 @@
                 android:text="@string/setting_birthday"
                 app:layout_constraintEnd_toEndOf="@id/btn_account"
                 app:layout_constraintTop_toBottomOf="@id/btn_gender" />
+
+            <TextView
+                android:id="@+id/btn_binding_invitation"
+                style="@style/settingStyle_1"
+                android:drawableEnd="@drawable/btn_arrow_black_n"
+                android:gravity="center_vertical"
+                android:text="@string/setting_binding_invitation"
+                android:layout_marginTop="15dp"
+                app:layout_constraintEnd_toEndOf="@id/btn_account"
+                app:layout_constraintTop_toBottomOf="@id/btn_birthday" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

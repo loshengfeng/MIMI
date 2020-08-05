@@ -1,7 +1,11 @@
 package com.dabenxiang.mimi.view.setting
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.os.Environment
+import android.view.contentcapture.ContentCaptureContext
+import android.widget.Toast
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -14,6 +18,7 @@ import com.dabenxiang.mimi.model.api.vo.ProfileItem
 import com.dabenxiang.mimi.model.api.vo.ProfileRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.FileUtil
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -147,7 +152,7 @@ class SettingViewModel : BaseViewModel() {
         return profileData?.emailConfirmed ?: false
     }
 
-    fun bindingInvitationCodes(code: String) {
+    fun bindingInvitationCodes(context: Context, code: String) {
         viewModelScope.launch(Dispatchers.IO) {
             flow {
                 val isCodeBinding = versionManager.bindingInvitationCodes(code)
@@ -155,6 +160,7 @@ class SettingViewModel : BaseViewModel() {
             }.flowOn(Dispatchers.IO)
                 .catch { e ->
                     Timber.e(e)
+                    GeneralUtils.showToast(context, e.toString())
                 }
                 .collect {
                     Timber.i("bindingInvitationCodes = $it")

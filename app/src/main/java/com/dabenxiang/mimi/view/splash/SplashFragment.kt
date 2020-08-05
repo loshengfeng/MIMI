@@ -197,7 +197,7 @@ class SplashFragment : BaseFragment() {
                     mainViewModel?.isVersionChecked =true
                 }
 
-                override fun onCancle() {
+                override fun onCancel() {
                     viewModel.setupRecordTimestamp()
                     initSettings()
                     mainViewModel?.isVersionChecked =true
