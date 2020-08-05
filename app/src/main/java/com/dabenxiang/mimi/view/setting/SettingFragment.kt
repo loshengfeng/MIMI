@@ -64,6 +64,7 @@ class SettingFragment : BaseFragment() {
                     tv_name.text = viewModel.profileData?.friendlyName
                     tv_email.text = viewModel.profileData?.email
                     tv_account.text = viewModel.profileData?.username
+                    gender_info.text = getString(viewModel.profileData!!.getGenderRes())
                     var img: Drawable? = null
 
                     if (viewModel.isEmailConfirmed()) {
