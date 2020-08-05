@@ -528,6 +528,7 @@ class SearchPostFragment : BaseFragment() {
                 isAdult = true,
                 isAdultTheme = true
             )
+
             navigateTo(NavigateItem.Destination(R.id.action_searchPostFragment_to_myPostFragment, bundle))
         }
     }

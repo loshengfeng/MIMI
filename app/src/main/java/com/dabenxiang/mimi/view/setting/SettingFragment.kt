@@ -26,6 +26,7 @@ import com.dabenxiang.mimi.view.dialog.choosepicker.OnChoosePickerDialogListener
 import com.dabenxiang.mimi.view.listener.OnDialogListener
 import com.dabenxiang.mimi.view.updateprofile.UpdateProfileFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_setting.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 
@@ -123,6 +124,13 @@ class SettingFragment : BaseFragment() {
                 is Empty -> viewModel.bitmap?.also { bitmap -> setupPhoto(bitmap) }
                 is Error -> onApiError(it.throwable)
             }
+        })
+
+        viewModel.isBinding.observe(this.viewLifecycleOwner, Observer { succeed ->
+
+
+
+
         })
     }
 

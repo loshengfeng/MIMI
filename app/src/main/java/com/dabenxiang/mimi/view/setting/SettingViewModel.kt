@@ -17,11 +17,16 @@ import com.dabenxiang.mimi.widget.utility.FileUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.koin.core.inject
 import retrofit2.HttpException
+import timber.log.Timber
+import tw.gov.president.manager.submanager.update.VersionManager
 import java.io.File
 import java.net.URLEncoder
 
 class SettingViewModel : BaseViewModel() {
+
+    private val versionManager: VersionManager by inject()
 
     var bitmap: Bitmap? = null
 
@@ -39,6 +44,9 @@ class SettingViewModel : BaseViewModel() {
 
     private val _putResult = MutableLiveData<ApiResult<Nothing>>()
     val putResult: LiveData<ApiResult<Nothing>> = _putResult
+
+    private val _isBinding: MutableLiveData<Boolean> = MutableLiveData()
+    val isBinding: MutableLiveData<Boolean> = _isBinding
 
     var profileData: ProfileItem? = null
 
@@ -137,5 +145,21 @@ class SettingViewModel : BaseViewModel() {
 
     fun isEmailConfirmed(): Boolean {
         return profileData?.emailConfirmed ?: false
+    }
+
+    fun bindingInvitationCodes(code: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            flow {
+                val isCodeBinding = versionManager.bindingInvitationCodes(code)
+                emit(isCodeBinding)
+            }.flowOn(Dispatchers.IO)
+                .catch { e ->
+                    Timber.e(e)
+                }
+                .collect {
+                    Timber.i("bindingInvitationCodes = $it")
+                    _isBinding.postValue(it)
+                }
+        }
     }
 }
