@@ -16,6 +16,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/color_gray_4"
         android:layout_marginTop="15dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -23,9 +24,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="15dp"
-            android:background="@color/color_gray_4"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp">
+            android:background="@color/transparent" >
+
 
             <TextView
                 android:id="@+id/btn_photo"
@@ -33,6 +33,7 @@
                 android:drawableEnd="@drawable/btn_arrow_black_n"
                 android:gravity="center_vertical"
                 android:text="@string/setting_photo"
+                android:paddingStart="16dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -40,7 +41,7 @@
                 android:id="@+id/iv_photo"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:layout_marginEnd="16dp"
+                android:layout_marginEnd="36dp"
                 android:contentDescription="@null"
                 android:gravity="center"
                 android:src="@drawable/ico_default_photo"
@@ -63,6 +64,8 @@
                 android:drawableEnd="@drawable/btn_arrow_black_n"
                 android:gravity="center_vertical"
                 android:text="@string/setting_name"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 app:layout_constraintEnd_toEndOf="@+id/btn_photo"
                 app:layout_constraintStart_toStartOf="@+id/btn_photo"
                 app:layout_constraintTop_toBottomOf="@+id/line_split_photo" />
@@ -72,7 +75,7 @@
                 style="@style/settingStyle_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="23dp"
+                android:layout_marginEnd="44dp"
                 android:drawablePadding="7dp"
                 android:gravity="center"
                 app:layout_constraintBottom_toBottomOf="@id/btn_name"
@@ -108,7 +111,9 @@
                 android:text="@string/setting_email"
                 android:textColor="@color/color_black_1_50"
                 android:textSize="14sp"
-                app:layout_constraintBottom_toBottomOf="@+id/btn_resend"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                app:layout_constraintBottom_toBottomOf="@+id/guideline"
                 app:layout_constraintEnd_toEndOf="@+id/btn_name"
                 app:layout_constraintHeight_min="60dp"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -120,7 +125,8 @@
                 android:id="@+id/btn_resend"
                 android:layout_width="92dp"
                 android:layout_height="32dp"
-                android:layout_marginTop="65dp"
+                android:layout_marginTop="75dp"
+                 android:layout_marginEnd="40dp"
                 android:background="@drawable/bg_red_1_radius_6"
                 android:gravity="center"
                 android:text="@string/setting_resend_mail"
@@ -130,12 +136,22 @@
                 app:layout_constraintTop_toBottomOf="@+id/btn_name"
                 tools:visibility="visible" />
 
+            <View
+                android:id="@+id/guideline"
+                android:layout_width="wrap_content"
+                android:layout_height="1dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintEnd_toEndOf="@+id/btn_resend"
+                app:layout_constraintStart_toStartOf="@+id/btn_resend"
+                app:layout_constraintTop_toBottomOf="@+id/btn_resend"
+                app:layout_goneMarginTop="10dp" />
+
             <TextView
                 android:id="@+id/tv_email"
                 style="@style/settingStyle_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="20dp"
+                android:layout_marginEnd="40dp"
                 android:drawableEnd="@drawable/ico_checked"
                 android:drawablePadding="7dp"
                 android:gravity="center|right"
@@ -149,6 +165,7 @@
                 style="@style/settingStyle_1"
                 android:gravity="center_vertical"
                 android:text="@string/setting_account"
+                android:paddingStart="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/line_split_email" />
@@ -160,6 +177,7 @@
                 android:layout_height="wrap_content"
                 android:drawablePadding="7dp"
                 android:gravity="center"
+                android:paddingEnd="20dp"
                 app:layout_constraintBottom_toTopOf="@+id/btn_account"
                 app:layout_constraintEnd_toEndOf="@+id/btn_account"
                 app:layout_constraintTop_toBottomOf="@+id/btn_account"
@@ -168,13 +186,15 @@
             <TextView
                 android:id="@+id/btn_chang_pw"
                 style="@style/settingStyle_1"
-                android:layout_marginTop="15dp"
                 android:drawableEnd="@drawable/btn_arrow_black_n"
                 android:gravity="center_vertical"
                 android:text="@string/setting_change_pw"
-                app:layout_constraintEnd_toEndOf="@id/btn_account"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_account" />
+                app:layout_constraintEnd_toEndOf="@+id/btn_account"
+                android:layout_marginTop="15dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                app:layout_constraintStart_toStartOf="@+id/btn_account"
+                app:layout_constraintTop_toBottomOf="@+id/btn_account" />
 
             <TextView
                 android:id="@+id/btn_gender"
@@ -183,6 +203,8 @@
                 android:drawableEnd="@drawable/btn_arrow_black_n"
                 android:gravity="center_vertical"
                 android:text="@string/setting_gender"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 app:layout_constraintEnd_toEndOf="@id/btn_account"
                 app:layout_constraintTop_toBottomOf="@id/btn_chang_pw" />
 
@@ -201,6 +223,8 @@
                 android:drawableEnd="@drawable/btn_arrow_black_n"
                 android:gravity="center_vertical"
                 android:text="@string/setting_birthday"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 app:layout_constraintEnd_toEndOf="@id/btn_account"
                 app:layout_constraintTop_toBottomOf="@id/btn_gender" />
 
@@ -211,6 +235,8 @@
                 android:gravity="center_vertical"
                 android:text="@string/setting_binding_invitation"
                 android:layout_marginTop="15dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 app:layout_constraintEnd_toEndOf="@id/btn_account"
                 app:layout_constraintTop_toBottomOf="@id/btn_birthday" />
 
