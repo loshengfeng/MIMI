@@ -162,11 +162,9 @@ class SettingViewModel : BaseViewModel() {
             }.flowOn(Dispatchers.IO)
                 .catch { e ->
                     Timber.e(e)
-                    GeneralUtils.showToast(context, e.toString())
                 }
                 .collect {
                     Timber.i("bindingInvitationCodes = $it")
-                    GeneralUtils.showToast(context, context.getString(R.string.setting_binding_success))
                     _isBinding.postValue(it)
                 }
         }

@@ -113,6 +113,8 @@
     <string name="setting_binding_invitation">绑定邀请码</string>
     <string name="setting_enter_invitation">请填写邀请码</string>
     <string name="setting_binding_success">绑定邀请码成功</string>
+    <string name="setting_binding_failed">绑定邀请码失敗</string>
+    <string name="setting_binding_enter_5_digits">请填写5位數邀请码</string>
     <string name="pls_choose_photo">选择图片</string>
     <string name="upload_tool">上传图片工具</string>
     <string name="choose_camera">使用相机</string>

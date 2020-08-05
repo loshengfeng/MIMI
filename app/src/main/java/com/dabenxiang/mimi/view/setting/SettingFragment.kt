@@ -133,11 +133,10 @@ class SettingFragment : BaseFragment() {
             }
         })
 
-        viewModel.isBinding.observe(this.viewLifecycleOwner, Observer { succeed ->
-
-
-
-
+        viewModel.isBinding.observe(this.viewLifecycleOwner, Observer { success ->
+            GeneralUtils.showToast(requireContext(), if(success)
+                getString(R.string.setting_binding_success) else
+                getString(R.string.setting_binding_failed))
         })
     }
 
