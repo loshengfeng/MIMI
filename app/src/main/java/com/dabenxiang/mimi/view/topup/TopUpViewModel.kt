@@ -69,7 +69,7 @@ class TopUpViewModel : BaseViewModel() {
                 val meItem = result.body()?.content
                 meItem?.let {
                     accountManager.setupProfile(it)
-                    getAttachment(it.avatarAttachmentId!!)
+                    it.avatarAttachmentId?.also { id -> getAttachment(id) }
                 }
                 emit(ApiResult.success(meItem))
             }

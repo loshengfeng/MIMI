@@ -27,6 +27,7 @@ import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
@@ -83,12 +84,11 @@ class FavoriteFragment : BaseFragment() {
                 R.id.navigation_home
             )
         }
+        useAdultTheme(false)
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun setupFirstTime() {
         initSettings()
-        interactionListener?.setAdult(false)
     }
 
     override fun getLayoutId(): Int {
@@ -412,7 +412,7 @@ class FavoriteFragment : BaseFragment() {
 
         override fun onChipClick(text: String, type: Int?) {
             // 點擊標籤後進入 Search page
-            interactionListener?.setAdult(lastPrimaryIndex == TYPE_ADULT)
+            useAdultTheme(lastPrimaryIndex == TYPE_ADULT)
             if (lastSecondaryIndex == TYPE_MIMI) {
                 val bundle = SearchVideoFragment.createBundle(tag = text)
                 navigateTo(
@@ -435,6 +435,15 @@ class FavoriteFragment : BaseFragment() {
                         )
                 )
             }
+        }
+
+        override fun onAvatarClick(userId: Long, name: String) {
+            val bundle = MyPostFragment.createBundle(
+                userId, name,
+                isAdult = true,
+                isAdultTheme = true
+            )
+            navigateTo(NavigateItem.Destination(R.id.action_postFavoriteFragment_to_myPostFragment, bundle))
         }
     }
 
@@ -475,6 +484,7 @@ class FavoriteFragment : BaseFragment() {
                     }
                 }
             }
+            useAdultTheme(true)
             val bundle = ClipFragment.createBundle(memberPost, item.position)
             navigateTo(
                     NavigateItem.Destination(

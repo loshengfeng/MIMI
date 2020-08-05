@@ -11,10 +11,10 @@ data class PostFavoriteItem(
     val postId: Long?,
 
     @SerializedName("posterId")
-    val posterId: Long?,
+    val posterId: Long,
 
     @SerializedName("posterName")
-    val posterName: String?,
+    val posterName: String,
 
     @SerializedName("posterAvatarAttachmentId")
     val posterAvatarAttachmentId: Long?,

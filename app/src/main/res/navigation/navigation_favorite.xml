@@ -21,6 +21,9 @@
         <action
             android:id="@+id/action_postFavoriteFragment_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_postFavoriteFragment_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
     </fragment>
     <fragment
         android:id="@+id/searchVideoFragment"
