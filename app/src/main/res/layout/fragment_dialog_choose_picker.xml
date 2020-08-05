@@ -46,9 +46,7 @@
         <TextView
             android:id="@+id/tv_title"
             android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:background="@drawable/bg_top_radius_35"
-            android:backgroundTint="@color/color_white_1"
+            android:layout_height="20dp"
             android:gravity="center"
             android:text="@string/upload_tool"
             android:textColor="@color/color_white_1"
