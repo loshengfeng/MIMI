@@ -33,7 +33,6 @@ import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.comment.MyPostMoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.listener.InteractionListener
-import com.dabenxiang.mimi.view.myfollow.MyFollowFragment
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.TYPE_VIDEO
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.USER_ID_ME
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
@@ -45,9 +44,7 @@ import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.fragment_my_follow.*
 import kotlinx.android.synthetic.main.fragment_my_post.*
-import kotlinx.android.synthetic.main.fragment_my_post.layout_refresh
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import timber.log.Timber
 
@@ -131,10 +128,10 @@ class MyPostFragment : BaseFragment() {
 
     override fun initSettings() {
         arguments?.let {
-            userId = it.getLong(KEY_USER_ID)
+            userId = it.getLong(KEY_USER_ID, USER_ID_ME)
             userName = it.getString(KEY_USER_NAME, "")
-            isAdult = it.getBoolean(KEY_IS_ADULT)
-            isAdultTheme = it.getBoolean(KEY_IS_ADULT_THEME)
+            isAdult = it.getBoolean(KEY_IS_ADULT, true)
+            isAdultTheme = it.getBoolean(KEY_IS_ADULT_THEME, false)
         }
 
         adapter = MyPostPagedAdapter(
