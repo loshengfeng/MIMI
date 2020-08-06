@@ -3,9 +3,29 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
-
+def android_builder_version = "3.5.3"
+def android_builder_main_version = 3
 android {
-    Version version = readVersion()
+    this.rootProject.buildscript.configurations.classpath
+            .resolvedConfiguration
+            .firstLevelModuleDependencies.
+            each {
+                def name = it.name
+                if (name.contains('com.android.tools.build:gradle')) {
+                    def moduleVersion = it.moduleVersion
+                    if (moduleVersion.contains("-")) {
+                        def versionArray = moduleVersion.split("-")
+                        version = versionArray[0]
+                        alpha = versionArray[1]
+                    } else {
+                        version = moduleVersion
+                        android_builder_version = moduleVersion
+                        println "Android Builder Version : " + android_builder_version
+                    }
+                }
+            }
+    android_builder_main_version = Integer.parseInt(android_builder_version.split("\\.")[0])
+    println "Android Builder Main Version : " + android_builder_main_version
 
     signingConfigs {
         release {
@@ -29,6 +49,18 @@ android {
         }
     }
 
+    //WARNING: DSL element 'android.dataBinding.enabled' is obsolete and has been replaced with 'android.buildFeatures.dataBinding'.
+    if (android_builder_main_version < 4) {
+        dataBinding {
+            enabled = false
+        }
+    } else {
+        buildFeatures {
+            dataBinding false
+            // for view binding:
+            // viewBinding true
+        }
+    }
     androidExtensions {
         experimental = true
     }
@@ -52,6 +84,7 @@ android {
         return ip.substring(ip.indexOf('/') + 1, ip.length())
     }
 
+    Version version = readVersion()
     defaultConfig {
         applicationId "com.dabenxiang.mimi"
         minSdkVersion 24
@@ -156,6 +189,21 @@ android {
 //        println "Show  flavorName !!  " + flavorName//
         def buildTypename = variant.buildType.name.toString()
 //        println "Show  buildTypename !!  " + buildTypename
+        Version flavor_version = readVersionWithPath(getVersionPropertiesPath(flavorName))
+        println "Show current flavor_version versionName " + flavor_version.versionName
+        println "Show current flavor_version versionCode :   " + flavor_version.versionCode
+        def current_branch = gitBranch()
+//        println "Show current_branch :   " + current_branch
+        if (buildTypename.equals("prod_release")&& (current_branch.equals("release")||current_branch.equals("master"))) {
+            increaseVersionWithPath(getVersionPropertiesPath(flavorName))
+            flavor_version = readVersionWithPath(getVersionPropertiesPath(flavorName))
+            println "prod_release get new flavor_version versionName " + flavor_version.versionName
+            println "prod_release get new flavor_version versionCode :   " + flavor_version.versionCode
+        }
+        variant.outputs.each { output ->
+            output.versionNameOverride = flavor_version.versionName
+            output.versionCodeOverride = flavor_version.versionCode.toInteger()
+        }
     }
 
 //    sourceSets {
@@ -403,11 +451,21 @@ class Version {
     def versionName
 }
 
-Version readVersion() {
-    readVersion('version.properties')
+def getVersionPropertiesPath(String flavor) {
+    def path = "version.properties"
+    switch (flavor) {
+        case "mimi":
+            path = "./src/mimi/version.properties"
+            break
+    }
+    return path
 }
 
-Version readVersion(String version_properties_path) {
+Version readVersion() {
+    readVersionWithPath('version.properties')
+}
+
+Version readVersionWithPath(String version_properties_path) {
     Properties defaultVersionProps = new Properties()
     def pfile = file(version_properties_path)
     if (!pfile.exists()) {
@@ -420,18 +478,21 @@ Version readVersion(String version_properties_path) {
 }
 
 def increaseVersion() {
-    increaseVersion('version.properties')
+    increaseVersionWithPath('version.properties')
 }
 
-def increaseVersion(String version_properties_path) {
+def increaseVersionWithPath(String version_properties_path) {
     Properties versionProps = new Properties()
-    def file = file(version_properties_path)
-    versionProps.load(new FileInputStream(file))
+    def pfile = file(version_properties_path)
+    if (!pfile.exists()) {
+        pfile = file('version.properties')
+    }
+    versionProps.load(new FileInputStream( pfile))
     def nextCode = versionProps['VERSION_CODE'].toInteger() + 1
     versionProps['VERSION_CODE'] = nextCode.toString()
     def nextBuild = versionProps['VERSION_NAME_BUILD'].toInteger() + 1
     versionProps['VERSION_NAME_BUILD'] = nextBuild.toString()
-    versionProps.store(file.newWriter(), null)
+    versionProps.store(pfile.newWriter(), null)
     def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD']
     println "Increase $buildVersionName"
 }

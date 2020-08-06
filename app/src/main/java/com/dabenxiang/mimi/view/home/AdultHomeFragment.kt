@@ -13,6 +13,7 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.viewModels
@@ -55,6 +56,7 @@ import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_LOGIN
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
+import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
@@ -96,7 +98,6 @@ class AdultHomeFragment : BaseFragment() {
     private val homeClubViewHolderMap = hashMapOf<Int, HomeClubViewHolder>()
 
     private var moreDialog: MoreDialogFragment? = null
-    private var reportDialog: ReportDialogFragment? = null
 
     private var interactionListener: InteractionListener? = null
     private var uploadPicItem = arrayListOf<UploadPicItem>()
@@ -122,7 +123,6 @@ class AdultHomeFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         handleBackStackData()
-//        showSnackBar()
 
         requireActivity().onBackPressedDispatcher.addCallback {
             interactionListener?.changeNavigationPosition(
@@ -229,7 +229,7 @@ class AdultHomeFragment : BaseFragment() {
                 secondBtn = getString(R.string.btn_confirm),
                 isMessageIcon = false,
                 secondBlock = {
-                    findNavController().navigate(R.id.action_adultHomeFragment_to_myPostFragment)
+                    resetAndCancelJob()
                 }
             )
         ).show(requireActivity().supportFragmentManager)
@@ -370,15 +370,6 @@ class AdultHomeFragment : BaseFragment() {
             clubMemberAdapter.submitList(it)
         })
 
-        viewModel.postReportResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Empty -> {
-                    GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
-                }
-                is Error -> onApiError(it.throwable)
-            }
-        })
-
         viewModel.postPicResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
@@ -410,7 +401,7 @@ class AdultHomeFragment : BaseFragment() {
                     }
                 }
                 is Error -> {
-                    resetAndCancelJob(it.throwable)
+                    resetAndCancelJob(it.throwable, getString(R.string.post_error))
                 }
             }
         })
@@ -427,7 +418,7 @@ class AdultHomeFragment : BaseFragment() {
                     )
                 }
                 is Error -> {
-                    resetAndCancelJob(it.throwable)
+                    resetAndCancelJob(it.throwable, getString(R.string.post_error))
                 }
             }
         })
@@ -452,7 +443,7 @@ class AdultHomeFragment : BaseFragment() {
                     postType = PostType.VIDEO
                 }
                 is Error -> {
-                    resetAndCancelJob(it.throwable)
+                    resetAndCancelJob(it.throwable, getString(R.string.post_error))
                 }
             }
         })
@@ -1039,32 +1030,10 @@ class AdultHomeFragment : BaseFragment() {
         }
     }
 
-    private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
-        override fun onSend(item: BaseMemberPostItem, content: String) {
-            if (TextUtils.isEmpty(content)) {
-                GeneralUtils.showToast(requireContext(), getString(R.string.report_error))
-            } else {
-                reportDialog?.dismiss()
-                when (item) {
-                    is MemberPostItem -> viewModel.sendPostReport(item, content)
-                }
-            }
-        }
-
-        override fun onCancel() {
-            reportDialog?.dismiss()
-        }
-    }
-
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem) {
             moreDialog?.dismiss()
-            reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
-                it.show(
-                    requireActivity().supportFragmentManager,
-                    ReportDialogFragment::class.java.simpleName
-                )
-            }
+            (requireActivity() as MainActivity).showReportDialog(item)
         }
 
         override fun onCancel() {
@@ -1267,12 +1236,16 @@ class AdultHomeFragment : BaseFragment() {
         viewModel.clubFollow(memberClubItem, isFollow, update)
     }
 
-    private fun resetAndCancelJob(t: Throwable) {
+    private fun resetAndCancelJob(t: Throwable = Throwable(), msg: String = "") {
         onApiError(t)
         viewModel.cancelJob()
         snackBar?.dismiss()
         uploadCurrentPicPosition = 0
         uploadPicUri.clear()
-        //TODO show error toast
+        Timber.e(t)
+
+        if (msg.isNotBlank()) {
+            Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
+        }
     }
 }

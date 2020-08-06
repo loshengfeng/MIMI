@@ -1,29 +1,48 @@
 package com.dabenxiang.mimi.model.api.vo
 
+import com.dabenxiang.mimi.R
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
-data class ProfileItem(
+class ProfileItem : Serializable{
+    /**
+     * username : kevinlove
+     * friendlyName : 1234567890
+     * email : jeff.yu@silkrode.com
+     * gender : 0
+     * avatarAttachmentId : 3811453500018130944
+     * emailConfirmed : false
+     */
     @SerializedName("username")
-    var username: String?,
+    var username: String? = null
 
     @SerializedName("friendlyName")
-    var friendlyName: String?,
+    var friendlyName: String? = null
 
     @SerializedName("email")
-    var email: String?,
+    var email: String? = null
 
-    // 0:Female|1:Male
+    // 0:Female|1:Male default is Female
     @SerializedName("gender")
-    var gender: Int?,
+    var gender = 0
 
     @SerializedName("birthday")
-    var birthday: String?,
+    var birthday: String? = null
 
-    @SerializedName("id")
-    var id: Long?,
+    @SerializedName("avatarAttachmentId")
+    var avatarAttachmentId: Long = 0
 
     @SerializedName("emailConfirmed")
-    var emailConfirmed: Boolean?
+    var emailConfirmed = false
 
-) : Serializable
+    fun getGenderRes(): Int {
+        return if (gender == 0) {
+            R.string.text_gender_female
+        } else {
+            R.string.text_gender_male
+        }
+    }
+}
+
+
+

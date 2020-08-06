@@ -13,17 +13,14 @@ import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
-import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
-import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
-import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.CommentLoadMoreView
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import jp.wasabeef.glide.transformations.BlurTransformation
 import kotlinx.android.synthetic.main.fragment_dialog_comment.*
-import timber.log.Timber
 
 
 class CommentDialogFragment : BaseDialogFragment() {
@@ -33,11 +30,14 @@ class CommentDialogFragment : BaseDialogFragment() {
 
     companion object {
         private const val KEY_DATA = "KEY_DATA"
+        private var commentListener: CommentListener? = null
 
         fun newInstance(
-            item: MemberPostItem
+            item: MemberPostItem,
+            listener: CommentListener
         ): CommentDialogFragment {
             val fragment = CommentDialogFragment()
+            commentListener = listener
             val args = Bundle()
             args.putSerializable(KEY_DATA, item)
             fragment.arguments = args
@@ -45,51 +45,23 @@ class CommentDialogFragment : BaseDialogFragment() {
         }
     }
 
+    interface CommentListener {
+        fun onAvatarClick(userId: Long, name: String)
+    }
+
     private var loadReplyCommentBlock: (() -> Unit)? = null
     private var loadCommentLikeBlock: (() -> Unit)? = null
 
     var moreDialog: MoreDialogFragment? = null
-    var reportDialog: ReportDialogFragment? = null
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem) {
             moreDialog?.dismiss()
-            reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
-                it.show(
-                    requireActivity().supportFragmentManager,
-                    ReportDialogFragment::class.java.simpleName
-                )
-            }
+            (requireActivity() as MainActivity).showReportDialog(item, data)
         }
 
         override fun onCancel() {
             moreDialog?.dismiss()
-        }
-    }
-
-    private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
-        override fun onSend(item: BaseMemberPostItem, content: String) {
-            if (TextUtils.isEmpty(content)) {
-                GeneralUtils.showToast(requireContext(), getString(R.string.report_error))
-            } else {
-                reportDialog?.dismiss()
-                when (item) {
-                    is MemberPostItem -> viewModel.sendPostReport(item, content)
-                    else -> {
-                        data?.also {
-                            viewModel.sendCommentPostReport(
-                                it,
-                                (item as MembersPostCommentItem),
-                                content
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        override fun onCancel() {
-            reportDialog?.dismiss()
         }
     }
 
@@ -168,7 +140,10 @@ class CommentDialogFragment : BaseDialogFragment() {
                 }
             }
 
-            override fun onAvatarClick(userId: Long, name: String) {}
+            override fun onAvatarClick(userId: Long, name: String) {
+                dismiss()
+                commentListener?.onAvatarClick(userId, name)
+            }
 
         }, CommentViewType.CLIP).apply {
             loadMoreModule.apply {
@@ -305,22 +280,5 @@ class CommentDialogFragment : BaseDialogFragment() {
             }
         })
 
-        viewModel.postReportResult.observe(this, Observer {
-            when (it) {
-                is Empty -> {
-                    GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
-                }
-                is Error -> onApiError(it.throwable)
-            }
-        })
-
-        viewModel.postCommentReportResult.observe(this, Observer {
-            when (it) {
-                is Empty -> {
-                    GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
-                }
-                is Error -> onApiError(it.throwable)
-            }
-        })
     }
 }

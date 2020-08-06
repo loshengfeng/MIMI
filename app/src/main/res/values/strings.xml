@@ -167,9 +167,11 @@
     <string name="text_follow">关注</string>
     <string name="text_post">帖子</string>
     <string name="text_ranking">排行榜</string>
+    <string name="text_gender_female">女</string>
+    <string name="text_gender_male">男</string>
     <string-array name="filter_gender">
-        <item>女</item>
-        <item>男</item>
+        <item>@string/text_gender_female</item>
+        <item>@string/text_gender_male</item>
     </string-array>
 
     <integer-array name="filter_gender_value">
@@ -249,6 +251,7 @@
     <string name="post_warning_tag_limit">已超过标签上限20个，请确认</string>
     <string name="post_select_pic">选择照片</string>
     <string name="post_tag_already_have">已存在相同标签，请确认</string>
+    <string name="post_error">发布失败</string>
 
     <!-- Problem report -->
     <string-array name="video_problem_report_item">
@@ -335,4 +338,7 @@
     <string name="cancel">取消</string>
 
     <string name="filter_empty">无搜寻结果</string>
+
+    <string name="copy_url">已将连结保存到剪贴簿</string>
+
 </resources>
