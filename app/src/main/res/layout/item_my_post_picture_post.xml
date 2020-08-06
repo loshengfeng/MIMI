@@ -105,6 +105,7 @@
         android:id="@+id/reflow_group_scroll"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:scrollbars="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/tv_title"
         app:layout_constraintTop_toBottomOf="@id/layout_picture">
@@ -131,8 +132,10 @@
     <TextView
         android:id="@+id/tv_like_count"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="3dp"
+        android:layout_height="0dp"
+        android:gravity="center_vertical"
+        android:paddingStart="3dp"
+        android:paddingEnd="20dp"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@+id/iv_like"
         app:layout_constraintLeft_toRightOf="@+id/iv_like"
@@ -143,7 +146,7 @@
         android:id="@+id/iv_comment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="33dp"
+        android:layout_marginStart="13dp"
         android:src="@drawable/ico_messege_adult_gray"
         app:layout_constraintLeft_toRightOf="@+id/tv_like_count"
         app:layout_constraintTop_toBottomOf="@+id/reflow_group_scroll" />
@@ -151,8 +154,10 @@
     <TextView
         android:id="@+id/tv_comment_count"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="3dp"
+        android:layout_height="0dp"
+        android:gravity="center_vertical"
+        android:paddingStart="3dp"
+        android:paddingEnd="20dp"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@+id/iv_comment"
         app:layout_constraintLeft_toRightOf="@+id/iv_comment"

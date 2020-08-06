@@ -54,10 +54,11 @@ class SearchVideoFragment : BaseFragment() {
     companion object {
         const val KEY_DATA = "data"
 
-        fun createBundle(title: String = "", tag: String = ""): Bundle {
+        fun createBundle(title: String = "", tag: String = "", isAdult: Boolean? = null): Bundle {
             val data = SearchingVideoItem()
             data.title = title
             data.tag = tag
+            data.isAdult = isAdult
 
             return Bundle().also {
                 it.putSerializable(KEY_DATA, data)
@@ -91,6 +92,13 @@ class SearchVideoFragment : BaseFragment() {
         viewModel.isAdult = mainViewModel?.adultMode?.value ?: false
 
         (arguments?.getSerializable(KEY_DATA) as SearchingVideoItem?)?.also { data ->
+            Timber.d("key data from args is title: ${data.title}, tag: ${data.tag} and isAdult: ${data.isAdult}")
+            if(data.isAdult != null){
+                viewModel.isAdult = data.isAdult!!
+                mainViewModel?.isFromPlayer = true
+            } else
+                mainViewModel?.isFromPlayer = false
+
             if (data.tag.isNotBlank()) {
                 viewModel.searchingTag = data.tag
                 tv_search_text.text = genResultText()
@@ -255,7 +263,9 @@ class SearchVideoFragment : BaseFragment() {
 
     override fun setupListeners() {
         ib_back.setOnClickListener {
-            navigateTo(NavigateItem.Up)
+            if(mainViewModel?.isFromPlayer == true)
+                activity?.onBackPressed()
+            else navigateTo(NavigateItem.Up)
         }
 
         iv_clean.setOnClickListener {

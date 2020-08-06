@@ -52,6 +52,7 @@ class ChooseClubAdapter(
         holder as ChooseClubViewHolder
         val item = getItem(position)
         item as MemberClubItem
+
         holder.clubName.text = item.title
         holder.hashTag.text = item.tag
 

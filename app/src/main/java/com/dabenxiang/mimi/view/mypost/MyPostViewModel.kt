@@ -2,7 +2,6 @@ package com.dabenxiang.mimi.view.mypost
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
@@ -21,14 +20,15 @@ import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.AttachmentItem
-import com.dabenxiang.mimi.model.vo.UploadPicItem
-import com.dabenxiang.mimi.model.vo.mqtt.FavoriteItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.home.HomeViewModel
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
@@ -117,11 +117,11 @@ class MyPostViewModel : BaseViewModel() {
         return LivePagedListBuilder(dataSourceFactory, config).build()
     }
 
-    fun invalidateDataSource() = _myPostItemListResult.value?.dataSource?.invalidate()
+    fun invalidateDataSource() = _myPostItemListResult.value!!.dataSource!!.invalidate()
 
     private val pagingCallback = object : PagingCallback {
         override fun onLoading() {
-//            setShowProgress(true)
+            setShowProgress(true)
         }
 
         override fun onLoaded() {
@@ -153,8 +153,6 @@ class MyPostViewModel : BaseViewModel() {
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _attachmentByTypeResult.value = it }
         }
@@ -176,8 +174,6 @@ class MyPostViewModel : BaseViewModel() {
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _attachmentResult.value = it }
         }
@@ -197,8 +193,6 @@ class MyPostViewModel : BaseViewModel() {
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _likePostResult.value = it }
         }
@@ -207,8 +201,7 @@ class MyPostViewModel : BaseViewModel() {
     fun favoritePost(
         item: MemberPostItem,
         position: Int,
-        isFavorite: Boolean,
-        type: AttachmentType
+        isFavorite: Boolean
     ) {
         viewModelScope.launch {
             flow {
@@ -238,8 +231,6 @@ class MyPostViewModel : BaseViewModel() {
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _followResult.value = it }
         }

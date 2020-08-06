@@ -29,7 +29,7 @@ class SearchVideoViewHolder(
     private val ivPhoto = itemView.findViewById(R.id.iv_photo) as ImageView
     private val tvLength = itemView.findViewById(R.id.tv_length) as TextView
     private val reflowGroup = itemView.findViewById(R.id.reflow_group) as ChipGroup
-    private val tvFavorite = itemView.findViewById(R.id.iv_favorite) as TextView
+    private val tvFavorite = itemView.findViewById(R.id.tv_favorite) as TextView
     private val tvLike = itemView.findViewById(R.id.tv_like) as TextView
     private val tvMsg = itemView.findViewById(R.id.tv_msg) as TextView
     private val tvShare = itemView.findViewById(R.id.tv_share) as TextView
@@ -110,7 +110,7 @@ class SearchVideoViewHolder(
                 .into(ivPhoto)
 
         // todo: no length data...
-        tvLength.text = "09:00:00"
+        tvLength.visibility = View.INVISIBLE
 
         if (data?.tags is String && (data?.tags as String).isNotEmpty()) {
             setupChipGroup((data?.tags as String).split(","))

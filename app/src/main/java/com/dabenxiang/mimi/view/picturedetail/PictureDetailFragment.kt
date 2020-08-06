@@ -72,6 +72,8 @@ class PictureDetailFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        useAdultTheme(true)
+
         memberPostItem = arguments?.getSerializable(KEY_DATA) as MemberPostItem
         val position = arguments?.getInt(KEY_POSITION) ?: 0
 

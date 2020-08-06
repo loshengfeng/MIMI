@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="20dp"
     android:paddingStart="20dp"
-    android:paddingEnd="20dp">
+    android:paddingEnd="20dp"
+    android:paddingBottom="20dp">
 
     <ImageView
         android:id="@+id/iv_head"
@@ -55,7 +55,6 @@
         android:id="@+id/tv_follow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
         android:background="@drawable/bg_gray_6_radius_16"
         android:gravity="center"
         android:paddingStart="9dp"
@@ -165,6 +164,7 @@
         android:id="@+id/reflow_group_scroll"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:scrollbars="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/tv_title"
         app:layout_constraintTop_toBottomOf="@id/layout_card">
@@ -183,6 +183,7 @@
             app:singleSelection="true" />
 
     </HorizontalScrollView>
+
     <include
         android:id="@+id/item_function"
         layout="@layout/item_favorite_common"

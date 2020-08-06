@@ -50,6 +50,7 @@ class MyPostClipPostHolder(
     private val ivMore: ImageView = itemView.iv_more
     private val ivFavorite: ImageView = itemView.iv_favorite
     private val tvFavoriteCount: TextView = itemView.tv_favorite_count
+    private val layoutClip: ConstraintLayout = itemView.layout_clip
 
     fun onBind(
         item: MemberPostItem,
@@ -71,7 +72,6 @@ class MyPostClipPostHolder(
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         tvTitle.text = item.title
-        tvCommentCount.text = item.commentCount.toString()
 
         if (LruCacheUtils.getLruCache(item.avatarAttachmentId.toString()) == null) {
             attachmentListener.onGetAttachment(
@@ -128,10 +128,6 @@ class MyPostClipPostHolder(
             }
         }
 
-        ivComment.setOnClickListener {
-            itemList?.also { myPostListener.onClipCommentClick(it, position) }
-        }
-
         if (isMe) {
             tvFollow.visibility = View.GONE
 
@@ -153,9 +149,7 @@ class MyPostClipPostHolder(
         }
 
         updateFavorite(item)
-        updateLike(item)
-
-        ivFavorite.setOnClickListener {
+        val onFavoriteClickListener = View.OnClickListener {
             item.isFavorite = !item.isFavorite
             item.favoriteCount =
                 if (item.isFavorite) item.favoriteCount + 1 else item.favoriteCount - 1
@@ -166,15 +160,27 @@ class MyPostClipPostHolder(
                 AttachmentType.ADULT_HOME_CLIP
             )
         }
+        ivFavorite.setOnClickListener(onFavoriteClickListener)
+        tvFavoriteCount.setOnClickListener(onFavoriteClickListener)
 
-        ivLike.setOnClickListener {
+        updateLike(item)
+        val onLikeClickListener = View.OnClickListener {
             item.likeType = if (item.likeType == LikeType.LIKE) LikeType.DISLIKE else LikeType.LIKE
             item.likeCount =
                 if (item.likeType == LikeType.LIKE) item.likeCount + 1 else item.likeCount - 1
             myPostListener.onLikeClick(item, position, item.likeType == LikeType.LIKE)
         }
+        ivLike.setOnClickListener(onLikeClickListener)
+        tvLikeCount.setOnClickListener(onLikeClickListener)
 
-        clClipPost.setOnClickListener {
+        tvCommentCount.text = item.commentCount.toString()
+        val onCommentClickListener = View.OnClickListener {
+            itemList?.also { myPostListener.onClipCommentClick(it, position) }
+        }
+        ivComment.setOnClickListener(onCommentClickListener)
+        tvCommentCount.setOnClickListener(onCommentClickListener)
+
+        layoutClip.setOnClickListener {
             itemList?.also { myPostListener.onClipItemClick(it, position) }
         }
 

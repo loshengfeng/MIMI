@@ -4,8 +4,8 @@ import androidx.paging.DataSource
 
 class ChooseClubFactory constructor(
     private val chooseClubFactory: ChooseClubDataSource
-) : DataSource.Factory<Int, Any>() {
-    override fun create(): DataSource<Int, Any> {
+) : DataSource.Factory<Long, Any>() {
+    override fun create(): DataSource<Long, Any> {
         return chooseClubFactory
     }
 }

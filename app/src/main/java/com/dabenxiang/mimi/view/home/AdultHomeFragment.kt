@@ -13,6 +13,7 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.viewModels
@@ -114,6 +115,7 @@ class AdultHomeFragment : BaseFragment() {
         private const val REQUEST_PHOTO = 10001
         private const val REQUEST_VIDEO_CAPTURE = 10002
 
+        private const val RECORD_LIMIT_TIME = 15
     }
 
     override fun getLayoutId() = R.layout.fragment_home
@@ -121,7 +123,6 @@ class AdultHomeFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         handleBackStackData()
-//        showSnackBar()
 
         requireActivity().onBackPressedDispatcher.addCallback {
             interactionListener?.changeNavigationPosition(
@@ -152,6 +153,7 @@ class AdultHomeFragment : BaseFragment() {
 
         if (isNeedPicUpload != null && isNeedPicUpload) {
             arguments?.remove(PostPicFragment.UPLOAD_PIC)
+            showSnackBar()
 
             val memberRequest =
                 arguments?.getParcelable<PostMemberRequest>(PostPicFragment.MEMBER_REQUEST)
@@ -227,7 +229,7 @@ class AdultHomeFragment : BaseFragment() {
                 secondBtn = getString(R.string.btn_confirm),
                 isMessageIcon = false,
                 secondBlock = {
-                    findNavController().navigate(R.id.action_adultHomeFragment_to_myPostFragment)
+                    resetAndCancelJob()
                 }
             )
         ).show(requireActivity().supportFragmentManager)
@@ -408,7 +410,7 @@ class AdultHomeFragment : BaseFragment() {
                     }
                 }
                 is Error -> {
-                    resetAndCancelJob(it.throwable)
+                    resetAndCancelJob(it.throwable, getString(R.string.post_error))
                 }
             }
         })
@@ -425,7 +427,7 @@ class AdultHomeFragment : BaseFragment() {
                     )
                 }
                 is Error -> {
-                    resetAndCancelJob(it.throwable)
+                    resetAndCancelJob(it.throwable, getString(R.string.post_error))
                 }
             }
         })
@@ -450,7 +452,7 @@ class AdultHomeFragment : BaseFragment() {
                     postType = PostType.VIDEO
                 }
                 is Error -> {
-                    resetAndCancelJob(it.throwable)
+                    resetAndCancelJob(it.throwable, getString(R.string.post_error))
                 }
             }
         })
@@ -1157,11 +1159,11 @@ class AdultHomeFragment : BaseFragment() {
 
     private val onChooseUploadMethodDialogListener = object : OnChooseUploadMethodDialogListener {
         override fun onUploadVideo() {
-            Intent(MediaStore.ACTION_VIDEO_CAPTURE).also { takeVideoIntent ->
-                takeVideoIntent.resolveActivity(requireContext().packageManager)?.also {
-                    startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE)
-                }
-            }
+            val intent = Intent()
+            intent.action = MediaStore.ACTION_VIDEO_CAPTURE
+            intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, RECORD_LIMIT_TIME)
+            intent.resolveActivity(requireContext().packageManager)
+            startActivityForResult(intent, REQUEST_VIDEO_CAPTURE)
         }
 
         override fun onUploadPic() {
@@ -1265,12 +1267,16 @@ class AdultHomeFragment : BaseFragment() {
         viewModel.clubFollow(memberClubItem, isFollow, update)
     }
 
-    private fun resetAndCancelJob(t: Throwable) {
+    private fun resetAndCancelJob(t: Throwable = Throwable(), msg: String = "") {
         onApiError(t)
         viewModel.cancelJob()
         snackBar?.dismiss()
         uploadCurrentPicPosition = 0
         uploadPicUri.clear()
-        //TODO show error toast
+        Timber.e(t)
+
+        if (msg.isNotBlank()) {
+            Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
+        }
     }
 }
