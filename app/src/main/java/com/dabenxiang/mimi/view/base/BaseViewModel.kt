@@ -42,6 +42,10 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
         }
     }
 
+    fun isLogin(): Boolean {
+        return accountManager.isLogin()
+    }
+
     fun logoutLocal() {
         accountManager.logoutLocal()
     }

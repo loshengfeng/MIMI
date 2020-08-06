@@ -87,17 +87,21 @@ class TopUpFragment : BaseFragment() {
         })
 
         viewModel.createChatRoomResult.observe(viewLifecycleOwner, Observer {
-            when(it){
+            when (it) {
                 is Success -> {
                     viewModel.currentItem?.let { item ->
-                        ChatListItem(item.agentId?.toLong(), item.merchantName, avatarAttachmentId = item.avatarAttachmentId?.toLong())
+                        ChatListItem(
+                            item.agentId?.toLong(),
+                            item.merchantName,
+                            avatarAttachmentId = item.avatarAttachmentId?.toLong()
+                        )
                     }?.also {
                         val bundle = ChatContentFragment.createBundle(it)
                         navigateTo(
-                                NavigateItem.Destination(
-                                        R.id.action_topupFragment_to_chatContentFragment,
-                                        bundle
-                                )
+                            NavigateItem.Destination(
+                                R.id.action_topupFragment_to_chatContentFragment,
+                                bundle
+                            )
                         )
                     }
                 }
@@ -207,7 +211,10 @@ class TopUpFragment : BaseFragment() {
             navigateTo(NavigateItem.Destination(R.id.action_topupFragment_to_orderFragment))
         }
 
-        viewModel.getMe()
+        val isLogin = mainViewModel?.isLogin() ?: false
+        if (isLogin) {
+            viewModel.getMe()
+        }
 
         viewModel.agentList.observe(viewLifecycleOwner, Observer {
             agentAdapter.submitList(it)
