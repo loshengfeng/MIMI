@@ -2,9 +2,13 @@ package com.dabenxiang.mimi.view.main
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInstaller
 import android.os.Bundle
+import android.text.TextUtils
+import android.util.AttributeSet
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
@@ -14,7 +18,12 @@ import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.PACKAGE_INSTALLED_ACTION
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setupWithNavController
+import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.view.base.BaseActivity
+import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.home.HomeFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
@@ -36,6 +45,15 @@ class MainActivity : BaseActivity(), InteractionListener {
         super.onCreate(savedInstanceState)
         Timber.i("MainActivity onCreate")
         setupBottomNavigationBar()
+
+        viewModel.postReportResult.observe(this, Observer {
+            when (it) {
+                is ApiResult.Empty -> {
+                    GeneralUtils.showToast(this, getString(R.string.report_success))
+                }
+                is ApiResult.Error -> Timber.e(it.throwable)
+            }
+        })
     }
 
     /**
@@ -98,16 +116,33 @@ class MainActivity : BaseActivity(), InteractionListener {
     @SuppressLint("RestrictedApi")
     override fun onBackPressed() {
         // 判斷當前的頁面是停留在 homeFragment，顯示退出 app 訊息
-        if (supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter("/").toString().toLowerCase(Locale.getDefault()) == HomeFragment::class.java.simpleName.toLowerCase(Locale.getDefault())) {
+        if (supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter(
+                "/"
+            ).toString()
+                .toLowerCase(Locale.getDefault()) == HomeFragment::class.java.simpleName.toLowerCase(
+                Locale.getDefault()
+            )
+        ) {
             if (!viewModel.needCloseApp) {
                 viewModel.startBackExitAppTimer()
                 GeneralUtils.showToast(this, getString(R.string.press_again_exit))
             } else {
                 finish()
             }
-        } else if(supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter("/").toString().toLowerCase(Locale.getDefault()) == SearchVideoFragment::class.java.simpleName.toLowerCase(Locale.getDefault())) {
-            if(viewModel.isFromPlayer)
-                deepLinkTo(MainActivity::class.java, R.navigation.navigation_home, R.id.homeFragment, null)
+        } else if (supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter(
+                "/"
+            ).toString()
+                .toLowerCase(Locale.getDefault()) == SearchVideoFragment::class.java.simpleName.toLowerCase(
+                Locale.getDefault()
+            )
+        ) {
+            if (viewModel.isFromPlayer)
+                deepLinkTo(
+                    MainActivity::class.java,
+                    R.navigation.navigation_home,
+                    R.id.homeFragment,
+                    null
+                )
             else
                 super.onBackPressed()
         } else {
@@ -162,15 +197,54 @@ class MainActivity : BaseActivity(), InteractionListener {
         }
     }
 
-    private fun deepLinkTo(activity: Class<out Activity>, navGraphId: Int, destId: Int, bundle: Bundle?){
+    private fun deepLinkTo(
+        activity: Class<out Activity>,
+        navGraphId: Int,
+        destId: Int,
+        bundle: Bundle?
+    ) {
         val pendingIntent = NavDeepLinkBuilder(this)
-                .setComponentName(activity)
-                .setGraph(navGraphId)
-                .setDestination(destId)
-                .setArguments(bundle)
-                .createPendingIntent()
+            .setComponentName(activity)
+            .setGraph(navGraphId)
+            .setDestination(destId)
+            .setArguments(bundle)
+            .createPendingIntent()
 
         pendingIntent.send()
     }
+
+    private var reportDialog: ReportDialogFragment? = null
+    fun showReportDialog(item: BaseMemberPostItem, postItem: MemberPostItem? = null) {
+        reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener, postItem).also {
+            it.show(supportFragmentManager, ReportDialogFragment::class.java.simpleName)
+        }
+    }
+
+    private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
+        override fun onSend(item: BaseMemberPostItem, content: String, postItem: MemberPostItem?) {
+            if (TextUtils.isEmpty(content)) {
+                GeneralUtils.showToast(App.applicationContext(), getString(R.string.report_error))
+            } else {
+                reportDialog?.dismiss()
+                when (item) {
+                    is MemberPostItem -> viewModel.sendPostReport(item, content)
+                    else -> {
+                        postItem?.also {
+                            viewModel.sendCommentPostReport(
+                                it,
+                                (item as MembersPostCommentItem),
+                                content
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        override fun onCancel() {
+            reportDialog?.dismiss()
+        }
+    }
+
 
 }

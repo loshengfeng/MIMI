@@ -71,6 +71,20 @@ class ChooseClubDialogFragment : BaseDialogFragment() {
                 is ApiResult.Error -> Timber.e(it.throwable)
             }
         })
+
+        viewModel.loadingStatus.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                progress_bar.visibility = View.VISIBLE
+                recyclerView.visibility = View.GONE
+            } else {
+                progress_bar.visibility = View.GONE
+                recyclerView.visibility = View.VISIBLE
+            }
+        })
+
+        viewModel.totalCount.observe(viewLifecycleOwner, Observer {
+            adapter.totalCount = it.toInt()
+        })
     }
 
     private val attachmentListener = object : PostAttachmentListener {

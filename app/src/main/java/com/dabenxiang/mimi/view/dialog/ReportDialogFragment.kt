@@ -21,17 +21,20 @@ class ReportDialogFragment : BaseDialogFragment() {
     companion object {
         fun newInstance(
             item: BaseMemberPostItem,
-            listener: OnReportDialogListener
+            listener: OnReportDialogListener,
+            postItem: MemberPostItem? = null
         ): ReportDialogFragment {
             val fragment = ReportDialogFragment()
             fragment.item = item
             fragment.listener = listener
+            fragment.postItem = postItem
             return fragment
         }
     }
 
     var item: BaseMemberPostItem? = null
     var listener: OnReportDialogListener? = null
+    var postItem: MemberPostItem? = null
 
     override fun isFullLayout(): Boolean {
         return true
@@ -94,7 +97,7 @@ class ReportDialogFragment : BaseDialogFragment() {
         }
 
         tv_send.setOnClickListener {
-            listener?.onSend(item!!, reportContent)
+            listener?.onSend(item!!, reportContent, postItem)
         }
 
         tv_close.setOnClickListener {
@@ -107,7 +110,7 @@ class ReportDialogFragment : BaseDialogFragment() {
     }
 
     interface OnReportDialogListener {
-        fun onSend(item: BaseMemberPostItem, content: String)
+        fun onSend(item: BaseMemberPostItem, content: String, postItem: MemberPostItem? = null)
         fun onCancel()
     }
 

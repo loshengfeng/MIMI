@@ -164,6 +164,7 @@
         android:id="@+id/reflow_group_scroll"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:scrollbars="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/tv_title"
         app:layout_constraintTop_toBottomOf="@id/layout_card">
@@ -182,6 +183,7 @@
             app:singleSelection="true" />
 
     </HorizontalScrollView>
+
     <include
         android:id="@+id/item_function"
         layout="@layout/item_favorite_common"

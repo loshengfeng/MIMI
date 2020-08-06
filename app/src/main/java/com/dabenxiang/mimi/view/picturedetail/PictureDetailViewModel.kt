@@ -50,12 +50,6 @@ class PictureDetailViewModel : BaseViewModel() {
     private var _likePostResult = MutableLiveData<ApiResult<MemberPostItem>>()
     val likePostResult: LiveData<ApiResult<MemberPostItem>> = _likePostResult
 
-    private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
-    val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
-
-    private val _postCommentReportResult = MutableLiveData<ApiResult<Nothing>>()
-    val postCommentReportResult: LiveData<ApiResult<Nothing>> = _postCommentReportResult
-
     private var _currentCommentType = CommentType.NEWEST
     val currentCommentType: CommentType
         get() = _currentCommentType
@@ -268,47 +262,6 @@ class PictureDetailViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _postCommentResult.value = SingleLiveEvent(it) }
-        }
-    }
-
-    fun sendPostReport(item: MemberPostItem, content: String) {
-        viewModelScope.launch {
-            flow {
-                val request = ReportRequest(content)
-                val result = domainManager.getApiRepository().sendPostReport(item.id, request)
-                if (!result.isSuccessful) throw HttpException(result)
-                item.reported = true
-                emit(ApiResult.success(null))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _postReportResult.value = it }
-        }
-    }
-
-    fun sendCommentPostReport(
-        postItem: MemberPostItem,
-        postCommentItem: MembersPostCommentItem,
-        content: String
-    ) {
-        viewModelScope.launch {
-            flow {
-                val request = ReportRequest(content)
-                val apiRepository = domainManager.getApiRepository()
-                val result = apiRepository.sendPostCommentReport(
-                    postItem.id, postCommentItem.id!!, request
-                )
-                if (!result.isSuccessful) throw HttpException(result)
-                postCommentItem.reported = true
-                emit(ApiResult.success(null))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _postCommentReportResult.value = it }
         }
     }
 

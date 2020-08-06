@@ -4,9 +4,6 @@ import android.os.Bundle
 import android.view.View
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
-import kotlinx.android.synthetic.main.fragment_dialog_choose_picker.btn_article
-import kotlinx.android.synthetic.main.fragment_dialog_choose_picker.btn_camera
-import kotlinx.android.synthetic.main.fragment_dialog_choose_picker.layout_root
 import kotlinx.android.synthetic.main.fragment_dialog_choose_upload_method.*
 
 class ChooseUploadMethodDialogFragment : BaseDialogFragment() {
@@ -14,8 +11,6 @@ class ChooseUploadMethodDialogFragment : BaseDialogFragment() {
     var onChooseUploadMethodDialogListener: OnChooseUploadMethodDialogListener? = null
 
     companion object {
-        private const val PERMISSION_REQUEST_CODE_EXTERNAL = 2002
-
         fun newInstance(listener: OnChooseUploadMethodDialogListener? = null): ChooseUploadMethodDialogFragment {
             val fragment = ChooseUploadMethodDialogFragment()
             fragment.onChooseUploadMethodDialogListener = listener
@@ -33,9 +28,8 @@ class ChooseUploadMethodDialogFragment : BaseDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        txt_cancel.setOnClickListener {
-            dismiss()
-        }
+        txt_cancel.setOnClickListener { dismiss() }
+        background.setOnClickListener { dismiss() }
     }
 
     override fun setupListeners() {
@@ -43,22 +37,21 @@ class ChooseUploadMethodDialogFragment : BaseDialogFragment() {
 
         View.OnClickListener { btnView ->
             when (btnView.id) {
-                R.id.btn_video -> {
+                R.id.tv_video -> {
                     onChooseUploadMethodDialogListener?.onUploadVideo()
                 }
-                R.id.btn_camera -> {
+                R.id.tv_camera -> {
                     onChooseUploadMethodDialogListener?.onUploadPic()
                 }
-                R.id.btn_article -> {
+                R.id.tv_article -> {
                     onChooseUploadMethodDialogListener?.onUploadArticle()
                 }
             }
-
             dismiss()
         }.also {
-            btn_camera.setOnClickListener(it)
-            btn_article.setOnClickListener(it)
-            btn_video.setOnClickListener(it)
+            tv_video.setOnClickListener(it)
+            tv_camera.setOnClickListener(it)
+            tv_article.setOnClickListener(it)
         }
     }
 }

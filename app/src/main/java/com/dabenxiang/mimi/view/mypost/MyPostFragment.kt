@@ -3,9 +3,11 @@ package com.dabenxiang.mimi.view.mypost
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
+import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.viewModels
@@ -14,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.AdultTabType
@@ -27,12 +30,10 @@ import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
-import com.dabenxiang.mimi.view.dialog.GeneralDialog
-import com.dabenxiang.mimi.view.dialog.GeneralDialogData
-import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
+import com.dabenxiang.mimi.view.dialog.*
 import com.dabenxiang.mimi.view.dialog.comment.MyPostMoreDialogFragment
-import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.TYPE_VIDEO
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.USER_ID_ME
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
@@ -41,6 +42,7 @@ import com.dabenxiang.mimi.view.post.pic.PostPicFragment
 import com.dabenxiang.mimi.view.post.video.PostVideoFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
@@ -53,7 +55,8 @@ class MyPostFragment : BaseFragment() {
 
     private lateinit var adapter: MyPostPagedAdapter
 
-    private var moreDialog: MyPostMoreDialogFragment? = null
+    private var meMoreDialog: MyPostMoreDialogFragment? = null
+    private var moreDialog: MoreDialogFragment? = null
 
     private val viewModel: MyPostViewModel by viewModels()
 
@@ -74,8 +77,6 @@ class MyPostFragment : BaseFragment() {
     private var userName: String = ""
     private var isAdult: Boolean = true
     private var isAdultTheme: Boolean = false
-
-    private var interactionListener: InteractionListener? = null
 
     private var memberPostItem = MemberPostItem()
     private var postType = PostType.TEXT
@@ -139,7 +140,8 @@ class MyPostFragment : BaseFragment() {
             userId == USER_ID_ME,
             isAdultTheme,
             myPostListener,
-            attachmentListener
+            attachmentListener,
+            memberPostFuncItem
         )
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
@@ -149,7 +151,7 @@ class MyPostFragment : BaseFragment() {
         tv_title.text = if (userId == USER_ID_ME) getString(R.string.personal_my_post) else userName
         tv_title.isSelected = isAdultTheme
         tv_back.isSelected = isAdultTheme
-        if(isAdultTheme) layout_refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
+        if (isAdultTheme) layout_refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
 
         handleUpdatePost()
     }
@@ -394,7 +396,7 @@ class MyPostFragment : BaseFragment() {
                         viewModel.postAttachment(pic.url, requireContext(), TYPE_PIC)
                     }
                 }
-                is ApiResult.Error -> resetAndCancelJob(it.throwable)
+                is ApiResult.Error -> resetAndCancelJob(it.throwable, getString(R.string.post_error))
             }
         })
 
@@ -413,7 +415,7 @@ class MyPostFragment : BaseFragment() {
                         viewModel.clearLiveData()
                     }
                 }
-                is ApiResult.Error -> resetAndCancelJob(it.throwable)
+                is ApiResult.Error -> resetAndCancelJob(it.throwable, getString(R.string.post_error))
             }
         })
 
@@ -440,7 +442,7 @@ class MyPostFragment : BaseFragment() {
                         TYPE_VIDEO
                     )
                 }
-                is ApiResult.Error -> resetAndCancelJob(it.throwable)
+                is ApiResult.Error -> resetAndCancelJob(it.throwable, getString(R.string.post_error))
             }
         })
 
@@ -473,7 +475,7 @@ class MyPostFragment : BaseFragment() {
                     Timber.d("Post video content item : $content")
                     viewModel.postPic(postId?.value!!, postMemberRequest, content)
                 }
-                is ApiResult.Error -> resetAndCancelJob(it.throwable)
+                is ApiResult.Error -> resetAndCancelJob(it.throwable, getString(R.string.post_error))
             }
         })
 
@@ -602,9 +604,9 @@ class MyPostFragment : BaseFragment() {
         }
     }
 
-    private val onMoreDialogListener = object : MyPostMoreDialogFragment.OnMoreDialogListener {
+    private val onMeMoreDialogListener = object : MyPostMoreDialogFragment.OnMoreDialogListener {
         override fun onCancel() {
-            moreDialog?.dismiss()
+            meMoreDialog?.dismiss()
         }
 
         override fun onDelete(item: BaseMemberPostItem) {
@@ -637,17 +639,38 @@ class MyPostFragment : BaseFragment() {
                 )
             }
 
+            meMoreDialog?.dismiss()
+        }
+    }
+
+    private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
+        override fun onProblemReport(item: BaseMemberPostItem) {
+            moreDialog?.dismiss()
+            (requireActivity() as MainActivity).showReportDialog(item)
+        }
+
+        override fun onCancel() {
             moreDialog?.dismiss()
         }
     }
 
     private val myPostListener = object : MyPostListener {
         override fun onMoreClick(item: MemberPostItem) {
-            moreDialog = MyPostMoreDialogFragment.newInstance(item, onMoreDialogListener).also {
-                it.show(
-                    requireActivity().supportFragmentManager,
-                    MoreDialogFragment::class.java.simpleName
-                )
+            if (userId == USER_ID_ME) {
+                meMoreDialog =
+                    MyPostMoreDialogFragment.newInstance(item, onMeMoreDialogListener).also {
+                        it.show(
+                            requireActivity().supportFragmentManager,
+                            MoreDialogFragment::class.java.simpleName
+                        )
+                    }
+            } else {
+                moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
+                    it.show(
+                        requireActivity().supportFragmentManager,
+                        MoreDialogFragment::class.java.simpleName
+                    )
+                }
             }
         }
 
@@ -801,18 +824,33 @@ class MyPostFragment : BaseFragment() {
                 secondBtn = getString(R.string.btn_confirm),
                 isMessageIcon = false,
                 secondBlock = {
-                    viewModel.cancelJob()
+                    resetAndCancelJob()
                 }
             )
         ).show(requireActivity().supportFragmentManager)
     }
 
-    private fun resetAndCancelJob(t: Throwable) {
+    private fun resetAndCancelJob(t: Throwable = Throwable(), msg: String = "") {
         onApiError(t)
         viewModel.cancelJob()
         snackBar?.dismiss()
         uploadCurrentPicPosition = 0
         deleteCurrentPicPosition = 0
-        //TODO show error toast
+
+        if (msg.isNotBlank()) {
+            Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private val memberPostFuncItem by lazy {
+        MemberPostFuncItem(
+            {},
+            { id, function -> getBitmap(id, function) },
+            { _, _, _ -> }
+        )
+    }
+
+    private fun getBitmap(id: String, update: ((String) -> Unit)) {
+        viewModel.getBitmap(id, update)
     }
 }

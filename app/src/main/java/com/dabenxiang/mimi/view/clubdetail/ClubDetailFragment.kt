@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.view.clubdetail
 
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
@@ -24,8 +23,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
-import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
-import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
@@ -61,7 +59,6 @@ class ClubDetailFragment : BaseFragment() {
     private val memberClubItem by lazy { arguments?.getSerializable(KEY_DATA) as MemberClubItem }
 
     private var moreDialog: MoreDialogFragment? = null
-    private var reportDialog: ReportDialogFragment? = null
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -116,15 +113,6 @@ class ClubDetailFragment : BaseFragment() {
             when (it) {
                 is ApiResult.Success -> {
                     updateFollow()
-                }
-                is ApiResult.Error -> Timber.e(it.throwable)
-            }
-        })
-
-        viewModel.postReportResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is ApiResult.Empty -> {
-                    GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
                 }
                 is ApiResult.Error -> Timber.e(it.throwable)
             }
@@ -280,32 +268,10 @@ class ClubDetailFragment : BaseFragment() {
         }
     }
 
-    private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
-        override fun onSend(item: BaseMemberPostItem, content: String) {
-            if (TextUtils.isEmpty(content)) {
-                GeneralUtils.showToast(requireContext(), getString(R.string.report_error))
-            } else {
-                reportDialog?.dismiss()
-                when (item) {
-                    is MemberPostItem -> viewModel.sendPostReport(item, content)
-                }
-            }
-        }
-
-        override fun onCancel() {
-            reportDialog?.dismiss()
-        }
-    }
-
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem) {
             moreDialog?.dismiss()
-            reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
-                it.show(
-                    requireActivity().supportFragmentManager,
-                    ReportDialogFragment::class.java.simpleName
-                )
-            }
+            (requireActivity() as MainActivity).showReportDialog(item)
         }
 
         override fun onCancel() {

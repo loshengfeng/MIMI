@@ -35,9 +35,6 @@ import retrofit2.HttpException
 
 class SearchPostViewModel : BaseViewModel() {
 
-    private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
-    val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
-
     private val _clubItemListResult = MutableLiveData<PagedList<MemberClubItem>>()
     val clubItemListResult: LiveData<PagedList<MemberClubItem>> = _clubItemListResult
 
@@ -66,23 +63,6 @@ class SearchPostViewModel : BaseViewModel() {
 
     var adWidth = 0
     var adHeight = 0
-
-    fun sendPostReport(item: MemberPostItem, content: String) {
-        viewModelScope.launch {
-            flow {
-                val request = ReportRequest(content)
-                val result = domainManager.getApiRepository().sendPostReport(item.id, request)
-                if (!result.isSuccessful) throw HttpException(result)
-                item.reported = true
-                emit(ApiResult.success(null))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _postReportResult.value = it }
-        }
-    }
 
     fun getAttachment(id: String, position: Int, type: AttachmentType) {
         viewModelScope.launch {

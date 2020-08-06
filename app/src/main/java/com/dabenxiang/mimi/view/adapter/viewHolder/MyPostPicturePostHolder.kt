@@ -14,7 +14,9 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.OnItemClickListener
+import com.dabenxiang.mimi.callback.PostPicItemListener
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
@@ -57,7 +59,8 @@ class MyPostPicturePostHolder(
         item: MemberPostItem,
         position: Int,
         myPostListener: MyPostFragment.MyPostListener,
-        attachmentListener: AttachmentListener
+        attachmentListener: AttachmentListener,
+        memberPostFuncItem: MemberPostFuncItem
     ) {
 
         picturePostItemLayout.setBackgroundColor(App.self.getColor(if (isAdultTheme) R.color.color_black_4 else R.color.color_white_1))
@@ -119,7 +122,8 @@ class MyPostPicturePostHolder(
                     override fun onItemClick() {
                         item.also { myPostListener.onItemClick(item, AdultTabType.PICTURE) }
                     }
-                }
+                },
+                memberPostFuncItem
             )
             pictureRecycler.onFlingListener = null
             PagerSnapHelper().attachToRecyclerView(pictureRecycler)
@@ -136,11 +140,6 @@ class MyPostPicturePostHolder(
 
         if (isMe) {
             tvFollow.visibility = View.GONE
-
-            ivMore.visibility = View.VISIBLE
-            ivMore.setOnClickListener {
-                myPostListener.onMoreClick(item)
-            }
         } else {
             tvFollow.visibility = View.VISIBLE
             tvFollow.setOnClickListener {
@@ -148,8 +147,10 @@ class MyPostPicturePostHolder(
                 item.isFollow = !item.isFollow
             }
             updateFollow(item)
+        }
 
-            ivMore.visibility = View.GONE
+        ivMore.setOnClickListener {
+            myPostListener.onMoreClick(item)
         }
 
         updateLike(item)

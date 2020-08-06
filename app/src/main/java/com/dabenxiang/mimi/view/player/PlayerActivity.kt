@@ -779,7 +779,7 @@ class PlayerActivity : BaseActivity() {
                     viewModel.episodeId.toString()
                 )
             )
-            GeneralUtils.showToast(baseContext, "already copy url")
+            GeneralUtils.showToast(baseContext, getString(R.string.copy_url))
         }
 
         iv_more.setOnClickListener {
@@ -788,7 +788,7 @@ class PlayerActivity : BaseActivity() {
                 MemberPostItem(
                     id = obtainVideoId(),
                     type = PostType.VIDEO,
-                    reported= viewModel.isReported
+                    reported = viewModel.isReported
 
                 ), onMoreDialogListener
             ).also {
@@ -840,7 +840,7 @@ class PlayerActivity : BaseActivity() {
     }
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
-        override fun onSend(item: BaseMemberPostItem, content: String) {
+        override fun onSend(item: BaseMemberPostItem, content: String, postItem: MemberPostItem?) {
             if (TextUtils.isEmpty(content)) {
                 GeneralUtils.showToast(App.applicationContext(), getString(R.string.report_error))
             } else {
@@ -1004,12 +1004,13 @@ class PlayerActivity : BaseActivity() {
         }
     }
 
-    private fun loadVideo(playerItem: PlayerItem = PlayerItem(
-        -1,
-        false
-    )
+    private fun loadVideo(
+        playerItem: PlayerItem = PlayerItem(
+            -1,
+            false
+        )
     ) {
-        if(playerItem.videoId != -1L) {
+        if (playerItem.videoId != -1L) {
             viewModel.videoId = playerItem.videoId
             viewModel.getVideoInfo()
         } else if (viewModel.nextVideoUrl == null) {
@@ -1193,7 +1194,7 @@ class PlayerActivity : BaseActivity() {
                 else -> "UNKNOWN_STATE"
             }
             Timber.d("Changed state to $stateString playWhenReady: $playWhenReady")
-            if(playbackState == ExoPlayer.STATE_ENDED && (viewModel.episodePosition.value!! < episodeAdapter.itemCount - 1)) {
+            if (playbackState == ExoPlayer.STATE_ENDED && (viewModel.episodePosition.value!! < episodeAdapter.itemCount - 1)) {
                 viewModel.setStreamPosition(viewModel.episodePosition.value!! + 1)
             }
         }
@@ -1358,7 +1359,7 @@ class PlayerActivity : BaseActivity() {
                 }
             }
             result.sort()
-            for(i in 0..(result.size - 1)) {
+            for (i in 0..(result.size - 1)) {
                 Timber.d("${result.get(i)}")
             }
         }
@@ -1409,10 +1410,18 @@ class PlayerActivity : BaseActivity() {
             )
 
             chip.setOnClickListener(
-                    View.OnClickListener {
-                        val bundle = SearchVideoFragment.createBundle(tag = chip.text.toString(), isAdult = obtainIsAdult())
-                        deepLinkTo(MainActivity::class.java, R.navigation.navigation_home, R.id.searchVideoFragment, bundle)
-                    }
+                View.OnClickListener {
+                    val bundle = SearchVideoFragment.createBundle(
+                        tag = chip.text.toString(),
+                        isAdult = obtainIsAdult()
+                    )
+                    deepLinkTo(
+                        MainActivity::class.java,
+                        R.navigation.navigation_home,
+                        R.id.searchVideoFragment,
+                        bundle
+                    )
+                }
             )
 
             headVideoInfo.reflow_group.addView(chip)
@@ -1515,9 +1524,11 @@ class PlayerActivity : BaseActivity() {
 //                )
             params.height = ViewGroup.LayoutParams.MATCH_PARENT
             player_view.layoutParams = params
-            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+            window.decorView.systemUiVisibility =
+                View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
             var windowParams = window.attributes
-            windowParams.flags = windowParams.flags or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+            windowParams.flags =
+                windowParams.flags or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
             window.attributes = windowParams
         }
     }
@@ -1545,13 +1556,18 @@ class PlayerActivity : BaseActivity() {
         }
     }
 
-    private fun deepLinkTo(activity: Class<out Activity>, navGraphId: Int, destId: Int, bundle: Bundle?){
+    private fun deepLinkTo(
+        activity: Class<out Activity>,
+        navGraphId: Int,
+        destId: Int,
+        bundle: Bundle?
+    ) {
         val pendingIntent = NavDeepLinkBuilder(this)
-                .setComponentName(activity)
-                .setGraph(navGraphId)
-                .setDestination(destId)
-                .setArguments(bundle)
-                .createPendingIntent()
+            .setComponentName(activity)
+            .setGraph(navGraphId)
+            .setDestination(destId)
+            .setArguments(bundle)
+            .createPendingIntent()
 
         pendingIntent.send()
     }
