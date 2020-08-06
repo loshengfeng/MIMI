@@ -105,6 +105,7 @@
         android:id="@+id/reflow_group_scroll"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:scrollbars="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/tv_title"
         app:layout_constraintTop_toBottomOf="@id/layout_picture">
@@ -155,8 +156,8 @@
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:gravity="center_vertical"
-        android:paddingEnd="20dp"
         android:paddingStart="3dp"
+        android:paddingEnd="20dp"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@+id/iv_comment"
         app:layout_constraintLeft_toRightOf="@+id/iv_comment"

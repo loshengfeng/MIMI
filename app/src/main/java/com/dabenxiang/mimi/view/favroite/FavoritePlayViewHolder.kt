@@ -80,7 +80,7 @@ class FavoritePlayViewHolder(
             .into(ivPhoto)
 
         // todo: no length data...
-        tvLength.text = "09:00:00"
+        tvLength.visibility = View.INVISIBLE
 
         if (!data?.tags.isNullOrEmpty()) {
             setupChipGroup(data?.tags)
