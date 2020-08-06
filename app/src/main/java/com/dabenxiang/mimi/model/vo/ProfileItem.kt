@@ -7,5 +7,6 @@ data class ProfileItem(
     var password: String = "",
     var avatarAttachmentId: Long = 0,
     var friendlyName: String = "",
-    var point: Int = 0
+    var point: Int = 0,
+    var isEmailConfirmed: Boolean = false
 )

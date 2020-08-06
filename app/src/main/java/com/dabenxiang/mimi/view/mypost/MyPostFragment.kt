@@ -128,10 +128,10 @@ class MyPostFragment : BaseFragment() {
 
     override fun initSettings() {
         arguments?.let {
-            userId = it.getLong(KEY_USER_ID)
+            userId = it.getLong(KEY_USER_ID, USER_ID_ME)
             userName = it.getString(KEY_USER_NAME, "")
-            isAdult = it.getBoolean(KEY_IS_ADULT)
-            isAdultTheme = it.getBoolean(KEY_IS_ADULT_THEME)
+            isAdult = it.getBoolean(KEY_IS_ADULT, true)
+            isAdultTheme = it.getBoolean(KEY_IS_ADULT_THEME, false)
         }
 
         adapter = MyPostPagedAdapter(
@@ -149,6 +149,7 @@ class MyPostFragment : BaseFragment() {
         tv_title.text = if (userId == USER_ID_ME) getString(R.string.personal_my_post) else userName
         tv_title.isSelected = isAdultTheme
         tv_back.isSelected = isAdultTheme
+        if(isAdultTheme) layout_refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
 
         handleUpdatePost()
     }
@@ -272,6 +273,10 @@ class MyPostFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
+        viewModel.showProgress.observe(this, Observer {
+            layout_refresh.isRefreshing = it
+        })
+
         viewModel.myPostItemListResult.observe(viewLifecycleOwner, Observer {
             adapter.submitList(it)
         })
@@ -353,9 +358,9 @@ class MyPostFragment : BaseFragment() {
 
         viewModel.deletePostResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Loaded -> progressHUD?.dismiss()
-                is ApiResult.Success -> viewModel.invalidateDataSource()
+                is ApiResult.Empty -> {
+                    viewModel.invalidateDataSource()
+                }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
@@ -580,6 +585,11 @@ class MyPostFragment : BaseFragment() {
         }.also {
             tv_back.setOnClickListener(it)
         }
+
+        layout_refresh.setOnRefreshListener {
+            layout_refresh.isRefreshing = false
+            viewModel.getMyPost(userId, isAdult)
+        }
     }
 
     private val attachmentListener = object : AttachmentListener {
@@ -732,7 +742,7 @@ class MyPostFragment : BaseFragment() {
             isFavorite: Boolean,
             type: AttachmentType
         ) {
-            viewModel.favoritePost(item, position, isFavorite, type)
+            viewModel.favoritePost(item, position, isFavorite)
         }
 
         override fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean) {

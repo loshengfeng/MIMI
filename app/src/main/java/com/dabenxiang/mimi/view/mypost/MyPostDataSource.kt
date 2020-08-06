@@ -49,6 +49,7 @@ class MyPostDataSource(
                 emit(InitResult(myPostItem ?: arrayListOf(), nextPageKey))
             }
                 .flowOn(Dispatchers.IO)
+                .onStart { pagingCallback.onLoading() }
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect {
@@ -74,6 +75,7 @@ class MyPostDataSource(
                 emit(result)
             }
                 .flowOn(Dispatchers.IO)
+                .onStart { pagingCallback.onLoading() }
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect {

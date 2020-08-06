@@ -66,6 +66,18 @@ class PersonalFragment : BaseFragment() {
                     val meItem = it.result
                     tv_name.text = meItem.friendlyName.toString()
                     tv_Point.text = meItem.availablePoint.toString()
+
+                    takeUnless { meItem.isEmailConfirmed == true }?.run {
+                        showEmailConfirmDialog {
+                            navigateTo(
+                                NavigateItem.Destination(
+                                    R.id.action_personalFragment_to_settingFragment,
+                                    viewModel.byteArray?.let { byteArray ->
+                                        SettingFragment.createBundle(byteArray)
+                                    })
+                            )
+                        }
+                    }
                 }
                 is Error -> onApiError(it.throwable)
             }
