@@ -83,9 +83,11 @@
     <HorizontalScrollView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:scrollbars="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_text_desc">
+
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/chip_group_tag"
             android:layout_width="0dp"
