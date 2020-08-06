@@ -132,6 +132,7 @@ class MainViewModel : BaseViewModel() {
                 val request = ReportRequest(content)
                 val result = domainManager.getApiRepository().sendPostReport(item.id, request)
                 if (!result.isSuccessful) throw HttpException(result)
+                item.reported = true
                 emit(ApiResult.success(null))
             }
                 .flowOn(Dispatchers.IO)
