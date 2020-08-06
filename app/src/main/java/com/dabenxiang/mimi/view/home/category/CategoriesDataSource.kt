@@ -76,7 +76,6 @@ class CategoriesDataSource(
                     )
                 )
             }
-
                 .flowOn(Dispatchers.IO)
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }

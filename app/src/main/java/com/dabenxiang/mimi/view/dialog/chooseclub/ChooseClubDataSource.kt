@@ -14,18 +14,18 @@ class ChooseClubDataSource constructor(
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
     private val pagingCallback: PagingCallback
-) : PageKeyedDataSource<Int, Any>() {
+) : PageKeyedDataSource<Long, Any>() {
 
     companion object {
         const val PER_LIMIT = "20"
         val PER_LIMIT_LONG = PER_LIMIT.toLong()
     }
 
-    private data class InitResult(val list: List<Any>, val nextKey: Int?)
+    private data class InitResult(val list: List<Any>, val nextKey: Long?)
 
     override fun loadInitial(
-        params: LoadInitialParams<Int>,
-        callback: LoadInitialCallback<Int, Any>
+        params: LoadInitialParams<Long>,
+        callback: LoadInitialCallback<Long, Any>
     ) {
         viewModelScope.launch {
             flow {
@@ -42,7 +42,7 @@ class ChooseClubDataSource constructor(
                         item?.paging?.count ?: 0,
                         item?.paging?.offset ?: 0,
                         clubItems?.size ?: 0
-                    ) -> 1
+                    ) -> PER_LIMIT_LONG
                     else -> null
                 }
 
@@ -61,15 +61,15 @@ class ChooseClubDataSource constructor(
     }
 
     override fun loadBefore(
-        params: LoadParams<Int>,
-        callback: LoadCallback<Int, Any>
+        params: LoadParams<Long>,
+        callback: LoadCallback<Long, Any>
     ) {
         Timber.d("loadBefore")
     }
 
     override fun loadAfter(
-        params: LoadParams<Int>,
-        callback: LoadCallback<Int, Any>
+        params: LoadParams<Long>,
+        callback: LoadCallback<Long, Any>
     ) {
         Timber.d("loadAfter")
         val next = params.key
@@ -84,9 +84,7 @@ class ChooseClubDataSource constructor(
                 emit(resp)
             }
                 .flowOn(Dispatchers.IO)
-                .onStart { pagingCallback.onLoading() }
                 .catch { e -> Timber.d("e: $e") }
-                .onCompletion { pagingCallback.onLoaded() }
                 .collect { response ->
                     response.body()?.also { item ->
                         item.content?.also { list ->
@@ -95,10 +93,10 @@ class ChooseClubDataSource constructor(
                                     item.paging.count,
                                     item.paging.offset,
                                     list.size
-                                ) -> next + 1
+                                ) -> next + PER_LIMIT_LONG
                                 else -> null
                             }
-                            callback.onResult(list as List<Any>, nextPageKey?.toInt())
+                            callback.onResult(list as List<Any>, nextPageKey)
                         }
                     }
                 }

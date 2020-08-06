@@ -110,7 +110,7 @@ class SearchVideoViewHolder(
                 .into(ivPhoto)
 
         // todo: no length data...
-        tvLength.text = "09:00:00"
+        tvLength.visibility = View.INVISIBLE
 
         if (data?.tags is String && (data?.tags as String).isNotEmpty()) {
             setupChipGroup((data?.tags as String).split(","))
