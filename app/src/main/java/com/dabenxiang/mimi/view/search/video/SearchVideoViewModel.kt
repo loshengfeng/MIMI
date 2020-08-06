@@ -45,9 +45,6 @@ class SearchVideoViewModel : BaseViewModel() {
     private val _favoriteResult = MutableLiveData<ApiResult<Long>>()
     val favoriteResult: LiveData<ApiResult<Long>> = _favoriteResult
 
-    private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
-    val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
-
     private fun getVideoPagingItems(isAdult: Boolean): LiveData<PagedList<VideoItem>> {
         val searchVideoDataSource =
             SearchVideoListDataSource(
@@ -145,23 +142,6 @@ class SearchVideoViewModel : BaseViewModel() {
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _favoriteResult.value = it }
-        }
-    }
-
-    fun sendPostReport(item: MemberPostItem, content: String) {
-        viewModelScope.launch {
-            flow {
-                val request = ReportRequest(content)
-                val result = domainManager.getApiRepository().sendPostReport(item.id, request)
-                if (!result.isSuccessful) throw HttpException(result)
-                item.reported = true
-                emit(ApiResult.success(null))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _postReportResult.value = it }
         }
     }
 

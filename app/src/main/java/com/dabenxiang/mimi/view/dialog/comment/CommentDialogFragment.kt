@@ -13,17 +13,14 @@ import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
-import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
-import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
-import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.CommentLoadMoreView
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import jp.wasabeef.glide.transformations.BlurTransformation
 import kotlinx.android.synthetic.main.fragment_dialog_comment.*
-import timber.log.Timber
 
 
 class CommentDialogFragment : BaseDialogFragment() {
@@ -56,47 +53,15 @@ class CommentDialogFragment : BaseDialogFragment() {
     private var loadCommentLikeBlock: (() -> Unit)? = null
 
     var moreDialog: MoreDialogFragment? = null
-    var reportDialog: ReportDialogFragment? = null
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem) {
             moreDialog?.dismiss()
-            reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
-                it.show(
-                    requireActivity().supportFragmentManager,
-                    ReportDialogFragment::class.java.simpleName
-                )
-            }
+            (requireActivity() as MainActivity).showReportDialog(item, data)
         }
 
         override fun onCancel() {
             moreDialog?.dismiss()
-        }
-    }
-
-    private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
-        override fun onSend(item: BaseMemberPostItem, content: String) {
-            if (TextUtils.isEmpty(content)) {
-                GeneralUtils.showToast(requireContext(), getString(R.string.report_error))
-            } else {
-                reportDialog?.dismiss()
-                when (item) {
-                    is MemberPostItem -> viewModel.sendPostReport(item, content)
-                    else -> {
-                        data?.also {
-                            viewModel.sendCommentPostReport(
-                                it,
-                                (item as MembersPostCommentItem),
-                                content
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        override fun onCancel() {
-            reportDialog?.dismiss()
         }
     }
 
@@ -315,22 +280,5 @@ class CommentDialogFragment : BaseDialogFragment() {
             }
         })
 
-        viewModel.postReportResult.observe(this, Observer {
-            when (it) {
-                is Empty -> {
-                    GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
-                }
-                is Error -> onApiError(it.throwable)
-            }
-        })
-
-        viewModel.postCommentReportResult.observe(this, Observer {
-            when (it) {
-                is Empty -> {
-                    GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
-                }
-                is Error -> onApiError(it.throwable)
-            }
-        })
     }
 }

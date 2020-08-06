@@ -840,7 +840,7 @@ class PlayerActivity : BaseActivity() {
     }
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
-        override fun onSend(item: BaseMemberPostItem, content: String) {
+        override fun onSend(item: BaseMemberPostItem, content: String, postItem: MemberPostItem?) {
             if (TextUtils.isEmpty(content)) {
                 GeneralUtils.showToast(App.applicationContext(), getString(R.string.report_error))
             } else {
