@@ -11,8 +11,6 @@ class ChooseUploadMethodDialogFragment : BaseDialogFragment() {
     var onChooseUploadMethodDialogListener: OnChooseUploadMethodDialogListener? = null
 
     companion object {
-        private const val PERMISSION_REQUEST_CODE_EXTERNAL = 2002
-
         fun newInstance(listener: OnChooseUploadMethodDialogListener? = null): ChooseUploadMethodDialogFragment {
             val fragment = ChooseUploadMethodDialogFragment()
             fragment.onChooseUploadMethodDialogListener = listener
