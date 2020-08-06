@@ -130,6 +130,8 @@ class PlayerActivity : BaseActivity() {
 //
 //                finish()
                 isFirstInit = true
+                player?.clearVideoDecoderOutputBufferRenderer()
+                player?.stop()
                 viewModel.clearStreamData()
                 loadVideo(item)
                 viewModel.setupCommentDataSource(playerInfoAdapter)
