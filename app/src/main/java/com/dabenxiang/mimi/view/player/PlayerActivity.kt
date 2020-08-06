@@ -339,7 +339,7 @@ class PlayerActivity : BaseActivity() {
             }
         )
 
-        bottom_func_bar.setBackgroundResource(
+        bottom_func_input.setBackgroundResource(
             if (isAdult) {
                 R.drawable.bg_adult_top_line
             } else {
@@ -347,11 +347,58 @@ class PlayerActivity : BaseActivity() {
             }
         )
 
-        if (isAdult) {
-            btn_write_comment.setTextColor(getColor(R.color.color_white_1_30))
-            et_message.setTextColor(getColor(R.color.color_white_1_30))
-//            btn_write_comment.setBtnSolidColor(getColor(R.color.color_black_1_20))
+
+        btn_write_comment.let {
+            it.setTextColor(
+                getColor(
+                    if (isAdult) {
+                        R.color.color_white_1_30
+                    } else {
+                        R.color.color_gray_9
+                    }
+                )
+            )
+            it.background = getDrawable(if (isAdult) R.drawable.bg_black_1_30_radius_18
+            else R.drawable.bg_gray_1_30_radius_18)
         }
+
+        tv_comment.setCompoundDrawablesRelativeWithIntrinsicBounds(
+            if (isAdult) R.drawable.ico_messege_adult else R.drawable.ico_messege_adult_gray,
+            0,
+            0,
+            0
+        )
+        et_message.let{
+            it.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                if (isAdult) R.drawable.ico_messege_adult else R.drawable.ico_messege_adult_gray,
+                0,
+                0,
+                0
+            )
+            it.compoundDrawablePadding = 5
+            it.setBackgroundColor(getColor(if(isAdult) R.color.color_black_1 else  R.color.color_gray_1))
+            it.setTextColor(getColor(if(isAdult) R.color.color_white_1 else R.color.color_black_1))
+            it.setHintTextColor(getColor(if(isAdult) R.color.color_gray_1 else R.color.color_gray_9))
+        }
+
+        iv_bar.setImageResource(if (isAdult) R.drawable.bg_black_1_30_radius_18
+        else R.drawable.bg_gray_1_30_radius_18)
+
+        tv_like.setTextColor(titleColor)
+        iv_favorite.setTextColor(titleColor)
+        tv_comment.setTextColor(titleColor)
+
+        iv_share.setImageResource(if (isAdult) R.drawable.btn_share_white_n else R.drawable.btn_share_gray_n)
+        iv_more.setImageResource(if (isAdult) R.drawable.btn_more_white_n else R.drawable.btn_more_gray_n)
+
+        tv_replay_name.setTextColor(if (obtainIsAdult()) {
+            R.color.color_white_1
+        } else {
+            R.color.color_black_1
+        }.let {
+            getColor(it)
+        })
+
 
         viewModel.fastForwardTime.observe(this, Observer {
             tv_forward_backward.text = "${if (it > 0) "+" else ""}${it / 1000}秒"
@@ -550,29 +597,6 @@ class PlayerActivity : BaseActivity() {
             }
         })
 
-        tv_comment.setCompoundDrawablesRelativeWithIntrinsicBounds(
-            if (isAdult) R.drawable.ico_messege_adult else R.drawable.ico_messege_adult_gray,
-            0,
-            0,
-            0
-        )
-
-        tv_like.setTextColor(titleColor)
-        iv_favorite.setTextColor(titleColor)
-        tv_comment.setTextColor(titleColor)
-
-        iv_share.setImageResource(if (isAdult) R.drawable.btn_share_white_n else R.drawable.btn_share_gray_n)
-        iv_more.setImageResource(if (isAdult) R.drawable.btn_more_white_n else R.drawable.btn_more_gray_n)
-
-        tv_replay_name.setTextColor(if (obtainIsAdult()) {
-            R.color.color_white_1
-        } else {
-            R.color.color_black_1
-        }.let {
-            getColor(it)
-        })
-
-
         headComment.tv_newest.setOnClickListener {
             viewModel.updatedSelectedNewestComment(true)
             lifecycleScope.launch {
@@ -710,6 +734,13 @@ class PlayerActivity : BaseActivity() {
             commentEditorToggle(true)
         }
 
+        tv_comment.setOnClickListener {
+            currentReplyId = null
+            currentreplyName = null
+            commentEditorOpen()
+            commentEditorToggle(true)
+        }
+
         btn_send.setOnClickListener {
             if (et_message.text.isNotEmpty()) {
                 viewModel.postComment(
@@ -779,21 +810,7 @@ class PlayerActivity : BaseActivity() {
         }
 
         iv_more.setOnClickListener {
-
-            moreDialog = MoreDialogFragment.newInstance(
-                MemberPostItem(
-                    id = obtainVideoId(),
-                    type = PostType.VIDEO,
-                    reported= viewModel.isReported
-
-                ), onMoreDialogListener
-            ).also {
-
-                it.show(
-                    supportFragmentManager,
-                    MoreDialogFragment::class.java.simpleName
-                )
-            }
+            showMoreDialog()
         }
 
         viewModel.apiReportResult.observe(this, Observer { event ->
@@ -833,6 +850,22 @@ class PlayerActivity : BaseActivity() {
         val adWidth = ((GeneralUtils.getScreenSize(this).first) * 0.333).toInt()
         val adHeight = (GeneralUtils.getScreenSize(this).second * 0.0245).toInt()
         viewModel.getAd(adWidth, adHeight)
+    }
+
+    private fun showMoreDialog(){
+        moreDialog = MoreDialogFragment.newInstance(
+            MemberPostItem(
+                id = obtainVideoId(),
+                type = PostType.VIDEO,
+                reported= viewModel.isReported
+
+            ), onMoreDialogListener
+        ).also {
+            it.show(
+                supportFragmentManager,
+                MoreDialogFragment::class.java.simpleName
+            )
+        }
     }
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
@@ -897,9 +930,8 @@ class PlayerActivity : BaseActivity() {
                     tv_replay_name.visibility = View.GONE
                 } else {
                     tv_replay_name.text = "@$currentreplyName"
+                    tv_replay_name.visibility = View.VISIBLE
                 }
-
-                tv_replay_name.visibility = View.VISIBLE
             }
             et_message.let {
                 it.requestFocusFromTouch()
@@ -909,6 +941,21 @@ class PlayerActivity : BaseActivity() {
             }
         }
         commentEditorToggle(true)
+    }
+
+    private fun commentEditorHide() {
+        CoroutineScope(Dispatchers.Main).launch {
+            tv_replay_name.visibility = View.GONE
+            val imm =
+                getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+        }
+        commentEditorToggle(false)
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if(et_message.isFocused) commentEditorHide()
+        return true
     }
 
     override fun onStart() {
