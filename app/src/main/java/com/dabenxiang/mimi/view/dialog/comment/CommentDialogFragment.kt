@@ -33,16 +33,23 @@ class CommentDialogFragment : BaseDialogFragment() {
 
     companion object {
         private const val KEY_DATA = "KEY_DATA"
+        private var commentListener: CommentListener? = null
 
         fun newInstance(
-            item: MemberPostItem
+            item: MemberPostItem,
+            listener: CommentListener
         ): CommentDialogFragment {
             val fragment = CommentDialogFragment()
+            commentListener = listener
             val args = Bundle()
             args.putSerializable(KEY_DATA, item)
             fragment.arguments = args
             return fragment
         }
+    }
+
+    interface CommentListener {
+        fun onAvatarClick(userId: Long, name: String)
     }
 
     private var loadReplyCommentBlock: (() -> Unit)? = null
@@ -168,7 +175,10 @@ class CommentDialogFragment : BaseDialogFragment() {
                 }
             }
 
-            override fun onAvatarClick(userId: Long, name: String) {}
+            override fun onAvatarClick(userId: Long, name: String) {
+                dismiss()
+                commentListener?.onAvatarClick(userId, name)
+            }
 
         }, CommentViewType.CLIP).apply {
             loadMoreModule.apply {
