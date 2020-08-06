@@ -130,11 +130,6 @@ class MyPostClipPostHolder(
 
         if (isMe) {
             tvFollow.visibility = View.GONE
-
-            ivMore.visibility = View.VISIBLE
-            ivMore.setOnClickListener {
-                myPostListener.onMoreClick(item)
-            }
         } else {
             tvFollow.visibility = View.VISIBLE
             updateFollow(item)
@@ -144,8 +139,9 @@ class MyPostClipPostHolder(
                     item.isFollow = !item.isFollow
                 }
             }
-
-            ivMore.visibility = View.GONE
+        }
+        ivMore.setOnClickListener {
+            myPostListener.onMoreClick(item)
         }
 
         updateFavorite(item)
