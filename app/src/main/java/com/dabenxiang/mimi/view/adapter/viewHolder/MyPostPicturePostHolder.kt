@@ -140,11 +140,6 @@ class MyPostPicturePostHolder(
 
         if (isMe) {
             tvFollow.visibility = View.GONE
-
-            ivMore.visibility = View.VISIBLE
-            ivMore.setOnClickListener {
-                myPostListener.onMoreClick(item)
-            }
         } else {
             tvFollow.visibility = View.VISIBLE
             tvFollow.setOnClickListener {
@@ -152,8 +147,10 @@ class MyPostPicturePostHolder(
                 item.isFollow = !item.isFollow
             }
             updateFollow(item)
+        }
 
-            ivMore.visibility = View.GONE
+        ivMore.setOnClickListener {
+            myPostListener.onMoreClick(item)
         }
 
         updateLike(item)

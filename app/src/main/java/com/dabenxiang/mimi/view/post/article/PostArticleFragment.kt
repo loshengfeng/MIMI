@@ -307,6 +307,8 @@ class PostArticleFragment : BaseFragment() {
             item.tags?.size,
             HASHTAG_LIMIT
         ))
+
+        haveMainTag = true
     }
 
     private val chooseClubDialogListener = object : ChooseClubDialogListener {

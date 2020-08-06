@@ -30,9 +30,6 @@ class ClubDetailViewModel : BaseViewModel() {
     private var _followClubResult = MutableLiveData<ApiResult<Boolean>>()
     val followClubResult: LiveData<ApiResult<Boolean>> = _followClubResult
 
-    private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
-    val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
-
     fun getMemberPosts(
         tag: String,
         orderBy: OrderBy,
@@ -139,23 +136,6 @@ class ClubDetailViewModel : BaseViewModel() {
                         }
                     }
                 }
-        }
-    }
-
-    fun sendPostReport(item: MemberPostItem, content: String) {
-        viewModelScope.launch {
-            flow {
-                val request = ReportRequest(content)
-                val result = domainManager.getApiRepository().sendPostReport(item.id, request)
-                if (!result.isSuccessful) throw HttpException(result)
-                item.reported = true
-                emit(ApiResult.success(null))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _postReportResult.value = it }
         }
     }
 

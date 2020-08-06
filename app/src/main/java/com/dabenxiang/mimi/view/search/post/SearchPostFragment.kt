@@ -40,6 +40,7 @@ import com.dabenxiang.mimi.view.club.MiMiLinearLayoutManager
 import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
+import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
@@ -62,7 +63,6 @@ class SearchPostFragment : BaseFragment() {
     private val viewModel: SearchPostViewModel by viewModels()
 
     private var moreDialog: MoreDialogFragment? = null
-    private var reportDialog: ReportDialogFragment? = null
 
     private var currentPostType: PostType = PostType.TEXT
     private var mTag: String = ""
@@ -133,14 +133,6 @@ class SearchPostFragment : BaseFragment() {
     override fun setupObservers() {
         viewModel.showProgress.observe(viewLifecycleOwner, Observer { showProgress ->
             showProgress?.takeUnless { it }?.also { progressHUD?.dismiss() }
-        })
-        viewModel.postReportResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Empty -> {
-                    GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
-                }
-                is Error -> onApiError(it.throwable)
-            }
         })
 
         viewModel.attachmentByTypeResult.observe(viewLifecycleOwner, Observer {
@@ -378,32 +370,10 @@ class SearchPostFragment : BaseFragment() {
         )
     }
 
-    private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
-        override fun onSend(item: BaseMemberPostItem, content: String) {
-            if (TextUtils.isEmpty(content)) {
-                GeneralUtils.showToast(requireContext(), getString(R.string.report_error))
-            } else {
-                reportDialog?.dismiss()
-                when (item) {
-                    is MemberPostItem -> viewModel.sendPostReport(item, content)
-                }
-            }
-        }
-
-        override fun onCancel() {
-            reportDialog?.dismiss()
-        }
-    }
-
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem) {
             moreDialog?.dismiss()
-            reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
-                it.show(
-                    requireActivity().supportFragmentManager,
-                    ReportDialogFragment::class.java.simpleName
-                )
-            }
+            (requireActivity() as MainActivity).showReportDialog(item)
         }
 
         override fun onCancel() {
