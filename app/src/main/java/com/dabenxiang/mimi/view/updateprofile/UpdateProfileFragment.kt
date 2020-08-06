@@ -76,15 +76,16 @@ class UpdateProfileFragment : BaseFragment() {
                 R.id.tv_back -> navigateTo(NavigateItem.Up)
                 R.id.btn_confirm -> viewModel.doRegisterValidateAndSubmit()
                 R.id.edit_content -> {
-                    if (viewModel.type == TYPE_GEN) {
-                        showFilterDialog(
-                            R.string.setting_choose,
-                            R.array.filter_gender,
-                            R.array.filter_gender_value,
-                            viewModel.profileItem.gender ?: 0,
-                            onDialogListener
-                        )
-                    }
+
+                }
+                R.id.content_gender -> {
+                    showFilterDialog(
+                        R.string.setting_choose,
+                        R.array.filter_gender,
+                        R.array.filter_gender_value,
+                        viewModel.profileItem.gender ?: 0,
+                        onDialogListener
+                    )
                 }
             }
         }.also {
@@ -92,7 +93,7 @@ class UpdateProfileFragment : BaseFragment() {
             btn_confirm.setOnClickListener(it)
             if (viewModel.type == TYPE_GEN) {
                 //FIXME EditText force change !!
-                edit_content.setOnClickListener(it)
+                content_gender.setOnClickListener(it)
             }
         }
     }
@@ -101,6 +102,9 @@ class UpdateProfileFragment : BaseFragment() {
         arguments?.also { it ->
             viewModel.profileItem = it.getSerializable(KEY_PROFILE) as ProfileItem
             viewModel.type = it.getInt(KEY_TYPE, TYPE_NAME)
+            edit_content.visibility = View.VISIBLE
+            content_gender.visibility = View.INVISIBLE
+            edit_birthday.visibility = View.INVISIBLE
             if (viewModel.profileItem.username.isNullOrEmpty()) {
                 when (viewModel.type) {
                     TYPE_NAME -> {
@@ -137,8 +141,9 @@ class UpdateProfileFragment : BaseFragment() {
                         edit_content.setText(viewModel.profileItem.email)
                     }
                     TYPE_GEN -> {
-                        edit_content.setText(getString(viewModel.profileItem.getGenderRes()))
-
+                        content_gender.visibility = View.VISIBLE
+                        edit_content.visibility = View.INVISIBLE
+                        content_gender.setText(getString(viewModel.profileItem.getGenderRes()))
                     }
                     TYPE_BIRTHDAY -> {
                         edit_content.visibility = View.INVISIBLE
