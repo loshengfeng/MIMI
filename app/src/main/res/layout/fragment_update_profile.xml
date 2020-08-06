@@ -34,12 +34,29 @@
         android:layout_marginEnd="20dp"
         android:width="0dp"
         android:visibility="visible"
+       tools:visibility="gone"
         android:importantForAutofill="no"
         android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_text"
         tools:ignore="LabelFor" />
+
+    <TextView
+        android:id="@+id/content_gender"
+        android:layout_width="0dp"
+        style="@style/login_edit_text"
+        android:layout_height="42dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="20dp"
+        android:gravity="left|center"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_text"
+        tools:text="标题内容" />
 
     <com.dabenxiang.mimi.widget.view.BirthdayEditText
         android:id="@+id/edit_birthday"

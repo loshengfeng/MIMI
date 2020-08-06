@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.updateprofile
 
 import android.text.TextUtils
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -38,6 +39,7 @@ class UpdateProfileViewModel : BaseViewModel() {
             UpdateProfileFragment.TYPE_NAME -> _error.value = isValidateFriendlyName()
             UpdateProfileFragment.TYPE_EMAIL -> _error.value = isValidateEmail()
             UpdateProfileFragment.TYPE_BIRTHDAY -> _error.value = isValidateBirthday()
+            UpdateProfileFragment.TYPE_GEN -> _error.value = ""
         }
         if (_error.value == "") {
             updateProfile()
@@ -45,6 +47,7 @@ class UpdateProfileViewModel : BaseViewModel() {
     }
 
     private fun isValidateFriendlyName(): String {
+
         val name = content.value ?: ""
         return when {
             TextUtils.isEmpty(name) -> app.getString(R.string.login_name)
