@@ -126,28 +126,30 @@ class UpdateProfileFragment : BaseFragment() {
                         edit_birthday.listen()
                     }
                 }
+                viewModel.content.bindingEditText = edit_content
+                viewModel.birthday.bindingEditText = edit_birthday
             } else {
                 when (viewModel.type) {
                     TYPE_NAME -> {
-                        edit_content.hint = viewModel.profileItem.username
+                        edit_content.setText(viewModel.profileItem.username)
                     }
                     TYPE_EMAIL -> {
-                        edit_content.hint = viewModel.profileItem.email
+                        edit_content.setText(viewModel.profileItem.email)
                     }
                     TYPE_GEN -> {
-                        edit_content.hint = getString(viewModel.profileItem.getGenderRes())
+                        edit_content.setText(getString(viewModel.profileItem.getGenderRes()))
+
                     }
                     TYPE_BIRTHDAY -> {
                         edit_content.visibility = View.INVISIBLE
                         edit_birthday.visibility = View.VISIBLE
-                        edit_birthday.setText(viewModel.profileItem.birthday)
+                        //FIXME
+                        edit_birthday.setText(viewModel.profileItem.birthday!!.split("T")[0])
                         edit_birthday.listen()
                     }
                 }
             }
         }
-        viewModel.content.bindingEditText = edit_content
-        viewModel.birthday.bindingEditText = edit_birthday
     }
 
     private fun showFilterDialog(
