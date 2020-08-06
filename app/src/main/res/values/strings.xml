@@ -336,4 +336,7 @@
     <string name="cancel">取消</string>
 
     <string name="filter_empty">无搜寻结果</string>
+
+    <string name="copy_url">已将连结保存到剪贴簿</string>
+
 </resources>

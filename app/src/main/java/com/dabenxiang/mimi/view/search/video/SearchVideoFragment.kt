@@ -35,17 +35,6 @@ import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_video.*
-import kotlinx.android.synthetic.main.fragment_search_video.chip_group_search_text
-import kotlinx.android.synthetic.main.fragment_search_video.edit_search
-import kotlinx.android.synthetic.main.fragment_search_video.ib_back
-import kotlinx.android.synthetic.main.fragment_search_video.iv_clean
-import kotlinx.android.synthetic.main.fragment_search_video.iv_clear_search_text
-import kotlinx.android.synthetic.main.fragment_search_video.iv_search
-import kotlinx.android.synthetic.main.fragment_search_video.iv_search_bar
-import kotlinx.android.synthetic.main.fragment_search_video.layout_search_history
-import kotlinx.android.synthetic.main.fragment_search_video.layout_search_text
-import kotlinx.android.synthetic.main.fragment_search_video.tv_search
-import kotlinx.android.synthetic.main.fragment_search_video.tv_search_text
 import timber.log.Timber
 import java.util.*
 
@@ -93,7 +82,7 @@ class SearchVideoFragment : BaseFragment() {
 
         (arguments?.getSerializable(KEY_DATA) as SearchingVideoItem?)?.also { data ->
             Timber.d("key data from args is title: ${data.title}, tag: ${data.tag} and isAdult: ${data.isAdult}")
-            if(data.isAdult != null){
+            if (data.isAdult != null) {
                 viewModel.isAdult = data.isAdult!!
                 mainViewModel?.isFromPlayer = true
             } else
@@ -115,18 +104,18 @@ class SearchVideoFragment : BaseFragment() {
             }
 
             iv_clear_search_text.background =
-                    if (viewModel.isAdult) {
-                        ContextCompat.getDrawable(requireContext(), R.drawable.btn_trash_white_n)
-                    } else {
-                        ContextCompat.getDrawable(requireContext(), R.drawable.btn_trash_n)
-                    }
+                if (viewModel.isAdult) {
+                    ContextCompat.getDrawable(requireContext(), R.drawable.btn_trash_white_n)
+                } else {
+                    ContextCompat.getDrawable(requireContext(), R.drawable.btn_trash_n)
+                }
 
             txt_history_title.setTextColor(
-                    if (viewModel.isAdult) {
-                        ContextCompat.getColor(requireContext(), android.R.color.white)
-                    } else {
-                        ContextCompat.getColor(requireContext(), android.R.color.black)
-                    }
+                if (viewModel.isAdult) {
+                    ContextCompat.getColor(requireContext(), android.R.color.white)
+                } else {
+                    ContextCompat.getColor(requireContext(), android.R.color.black)
+                }
             )
 
             tv_search_text.setTextColor(
@@ -263,7 +252,7 @@ class SearchVideoFragment : BaseFragment() {
 
     override fun setupListeners() {
         ib_back.setOnClickListener {
-            if(mainViewModel?.isFromPlayer == true)
+            if (mainViewModel?.isFromPlayer == true)
                 activity?.onBackPressed()
             else navigateTo(NavigateItem.Up)
         }
@@ -315,8 +304,8 @@ class SearchVideoFragment : BaseFragment() {
             GeneralUtils.hideKeyboard(requireActivity())
         } else {
             GeneralUtils.showToast(
-                    requireContext(),
-                    getString(R.string.search_video_input_empty_toast)
+                requireContext(),
+                getString(R.string.search_video_input_empty_toast)
             )
         }
     }
@@ -360,7 +349,10 @@ class SearchVideoFragment : BaseFragment() {
                             requireContext(),
                             viewModel.getShareUrl(item.tags, item.id)
                         )
-                        GeneralUtils.showToast(requireContext(), "already copy url")
+                        GeneralUtils.showToast(
+                            requireContext(),
+                            requireContext().getString(R.string.copy_url)
+                        )
                     }
                 }
 
@@ -478,17 +470,17 @@ class SearchVideoFragment : BaseFragment() {
         val searchHistories = viewModel.getSearchHistory().asReversed()
         searchHistories.forEach { text ->
             val chip = LayoutInflater.from(chip_group_search_text.context)
-                    .inflate(R.layout.chip_item, chip_group_search_text, false) as Chip
+                .inflate(R.layout.chip_item, chip_group_search_text, false) as Chip
             chip.text = text
 
             if (viewModel.isAdult) {
                 chip.chipBackgroundColor = ColorStateList.valueOf(
-                        ContextCompat.getColor(requireContext(), R.color.color_black_6)
+                    ContextCompat.getColor(requireContext(), R.color.color_black_6)
                 )
                 chip.setTextColor(requireContext().getColor(R.color.color_white_1_50))
             } else {
                 chip.chipBackgroundColor = ColorStateList.valueOf(
-                        ContextCompat.getColor(requireContext(), R.color.color_black_1_10)
+                    ContextCompat.getColor(requireContext(), R.color.color_black_1_10)
                 )
                 chip.setTextColor(requireContext().getColor(R.color.color_black_1_50))
             }
