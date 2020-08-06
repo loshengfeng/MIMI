@@ -358,7 +358,9 @@ class MyPostFragment : BaseFragment() {
 
         viewModel.deletePostResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Success -> viewModel.invalidateDataSource()
+                is ApiResult.Empty -> {
+                    viewModel.invalidateDataSource()
+                }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
