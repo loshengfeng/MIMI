@@ -19,15 +19,14 @@ class InvitationEditorDialog(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.dialog_editor)
+        setCanceledOnTouchOutside(true)
 
-        setCancelable(false)
         tv_editor.setHint(hintRes)
         btn_confirm.setText(confirmRes)
         btn_cancel.setText(cancelRes)
 
         btn_confirm.setOnClickListener {
             tv_editor.text.toString().let {
-
                 when (it.length) {
                     5 -> {
                         dismiss()
