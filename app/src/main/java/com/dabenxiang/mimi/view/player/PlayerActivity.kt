@@ -132,6 +132,7 @@ class PlayerActivity : BaseActivity() {
                 isFirstInit = true
                 viewModel.clearStreamData()
                 loadVideo(item)
+                viewModel.setupCommentDataSource(playerInfoAdapter)
             }
         }, obtainIsAdult())
     }
@@ -837,6 +838,27 @@ class PlayerActivity : BaseActivity() {
         val adWidth = ((GeneralUtils.getScreenSize(this).first) * 0.333).toInt()
         val adHeight = (GeneralUtils.getScreenSize(this).second * 0.0245).toInt()
         viewModel.getAd(adWidth, adHeight)
+
+        exo_play_pause.setOnClickListener{
+            player?.also {
+                it.playWhenReady.also { playing ->
+                    it.playWhenReady = !playing
+                    viewModel.setPlaying(!playing)
+                    if(!playing)
+                        exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
+                    else
+                        exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_play))
+                }
+            }
+        }
+
+        iv_player.setOnClickListener {
+            if(it.visibility == View.VISIBLE) {
+                player?.playWhenReady = true
+                viewModel.setPlaying(true)
+                exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
+            }
+        }
     }
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
@@ -1047,6 +1069,8 @@ class PlayerActivity : BaseActivity() {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     //Timber.d("ACTION_DOWN")
+                    if(!player_view.controllerAutoShow)
+                        player_view.showController()
                     originX = event.x
                     originY = event.y
                     isMove = false
@@ -1108,12 +1132,12 @@ class PlayerActivity : BaseActivity() {
                         }
                         true
                     } else {
-                        player?.also {
-                            it.playWhenReady.also { playing ->
-                                it.playWhenReady = !playing
-                                viewModel.setPlaying(!playing)
-                            }
-                        }
+//                        player?.also {
+//                            it.playWhenReady.also { playing ->
+//                                it.playWhenReady = !playing
+//                                viewModel.setPlaying(!playing)
+//                            }
+//                        }
                         false
                     }
 
