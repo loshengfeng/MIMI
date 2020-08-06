@@ -185,6 +185,7 @@ class PersonalFragment : BaseFragment() {
 
         tv_version_is_login.text = BuildConfig.VERSION_NAME
         tv_version_is_not_login.text = BuildConfig.VERSION_NAME
+        tv_topup.visibility = View.INVISIBLE
 
         when (viewModel.accountManager.isLogin()) {
             true -> {
