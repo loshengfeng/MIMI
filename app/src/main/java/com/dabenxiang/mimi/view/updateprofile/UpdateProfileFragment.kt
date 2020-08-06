@@ -74,7 +74,18 @@ class UpdateProfileFragment : BaseFragment() {
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.tv_back -> navigateTo(NavigateItem.Up)
-                R.id.btn_confirm -> viewModel.doRegisterValidateAndSubmit()
+                R.id.btn_confirm -> {
+                    if (viewModel.type == TYPE_BIRTHDAY) {
+                        //FIXME user TIMEFORMAT !!!!
+                        viewModel.content.value = edit_birthday.text.toString()
+                        viewModel.birthday.value = edit_birthday.text.toString()
+                    }else if (viewModel.type == TYPE_GEN) {
+
+                    }else{
+                        viewModel.content.value = edit_content.text.toString()
+                    }
+                    viewModel.doRegisterValidateAndSubmit()
+                }
                 R.id.edit_content -> {
 
                 }
@@ -135,7 +146,7 @@ class UpdateProfileFragment : BaseFragment() {
             } else {
                 when (viewModel.type) {
                     TYPE_NAME -> {
-                        edit_content.setText(viewModel.profileItem.username)
+                        edit_content.setText(viewModel.profileItem.friendlyName)
                     }
                     TYPE_EMAIL -> {
                         edit_content.setText(viewModel.profileItem.email)
@@ -182,7 +193,7 @@ class UpdateProfileFragment : BaseFragment() {
     private val onDialogListener = object : OnDialogListener {
         override fun onItemSelected(value: Int, text: String) {
             viewModel.profileItem.gender = value
-            viewModel.doRegisterValidateAndSubmit()
+            content_gender.setText(getString(viewModel.profileItem.getGenderRes()))
         }
     }
 }
