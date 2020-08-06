@@ -224,6 +224,9 @@ class PlayerActivity : BaseActivity() {
 
             override fun onMoreClick(item: MembersPostCommentItem) {
                 Timber.i("playerInfoAdapter onMoreClick")
+                if(item.id != null){
+                    showMoreDialog(item.id, PostType.VIDEO, item.reported ?: false)
+                }
             }
 
             override fun onAvatarClick(userId: Long, name: String) {
@@ -814,7 +817,8 @@ class PlayerActivity : BaseActivity() {
         }
 
         iv_more.setOnClickListener {
-            showMoreDialog()
+            Timber.i("viewModel.isReported ${viewModel.isReported}")
+            showMoreDialog(obtainVideoId(), PostType.VIDEO, viewModel.isReported)
         }
 
         viewModel.apiReportResult.observe(this, Observer { event ->
@@ -856,12 +860,14 @@ class PlayerActivity : BaseActivity() {
         viewModel.getAd(adWidth, adHeight)
     }
 
-    private fun showMoreDialog(){
+    private fun showMoreDialog(id:Long, type:PostType, isReported:Boolean){
+        Timber.i("id=$id")
+        Timber.i("isReported=$isReported")
         moreDialog = MoreDialogFragment.newInstance(
             MemberPostItem(
-                id = obtainVideoId(),
-                type = PostType.VIDEO,
-                reported= viewModel.isReported
+                id = id,
+                type = type,
+                reported= isReported
 
             ), onMoreDialogListener
         ).also {
@@ -891,7 +897,7 @@ class PlayerActivity : BaseActivity() {
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem) {
-            if (viewModel.isReported) {
+            if ((item as MemberPostItem).reported) {
                 GeneralUtils.showToast(
                     App.applicationContext(),
                     getString(R.string.already_reported)
