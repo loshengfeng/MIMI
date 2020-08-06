@@ -46,6 +46,8 @@ class ChooseClubDataSource constructor(
                     else -> null
                 }
 
+                pagingCallback.onTotalCount(item?.paging?.count ?: 0)
+
                 Timber.d("loadInitial_nextPageKey: ${nextPageKey.toString()}")
 
                 emit(InitResult(clubItems ?: arrayListOf(), nextPageKey))
