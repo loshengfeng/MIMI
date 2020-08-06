@@ -5,7 +5,9 @@ import android.view.View
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
+import kotlinx.android.synthetic.main.fragment_dialog_choose_upload_method.*
 import kotlinx.android.synthetic.main.fragment_dialog_my_post_more.*
+import kotlinx.android.synthetic.main.fragment_dialog_my_post_more.background
 
 class MyPostMoreDialogFragment : BaseDialogFragment() {
 
@@ -47,6 +49,8 @@ class MyPostMoreDialogFragment : BaseDialogFragment() {
         tv_edit.setOnClickListener {
             listener?.onEdit(item!!)
         }
+
+        background.setOnClickListener { dismiss() }
     }
 
     interface OnMoreDialogListener {

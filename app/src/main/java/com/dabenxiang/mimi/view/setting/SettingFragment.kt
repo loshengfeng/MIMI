@@ -67,6 +67,7 @@ class SettingFragment : BaseFragment() {
                     tv_name.text = viewModel.profileData?.friendlyName
                     tv_email.text = viewModel.profileData?.email
                     tv_account.text = viewModel.profileData?.username
+                    gender_info.text = getString(viewModel.profileData!!.getGenderRes())
                     var img: Drawable? = null
 
                     if (viewModel.isEmailConfirmed()) {
@@ -174,12 +175,14 @@ class SettingFragment : BaseFragment() {
                 R.id.btn_resend -> viewModel.resendEmail()
                 R.id.btn_chang_pw -> navigateTo(NavigateItem.Destination(R.id.action_settingFragment_to_changePasswordFragment))
                 R.id.btn_gender -> {
-                    showFilterDialog(
-                        R.string.setting_choose,
-                        R.array.filter_gender,
-                        R.array.filter_gender_value,
-                        viewModel.profileData?.gender ?: 0,
-                        onDialogListener
+                    navigateTo(
+                        NavigateItem.Destination(R.id.updateProfileFragment,
+                            viewModel.profileData?.let {
+                                UpdateProfileFragment.createBundle(
+                                    UpdateProfileFragment.TYPE_GEN,
+                                    it
+                                )
+                            })
                     )
                 }
                 R.id.btn_birthday -> {
@@ -238,35 +241,6 @@ class SettingFragment : BaseFragment() {
                 else -> null
             }
             viewModel.bitmap?.also { viewModel.postAttachment() }
-        }
-    }
-
-    private fun showFilterDialog(
-        titleId: Int,
-        textArrayId: Int,
-        valueArrayId: Int,
-        selectedValue: Int,
-        dialogListener: OnDialogListener
-    ) {
-        val dialog = FilterDialogFragment.newInstance(
-            FilterDialogFragment.Content(
-                titleId,
-                textArrayId,
-                valueArrayId,
-                dialogListener,
-                selectedValue
-            )
-        )
-        dialog.show(
-            requireActivity().supportFragmentManager,
-            FilterDialogFragment::class.java.simpleName
-        )
-    }
-
-    private val onDialogListener = object : OnDialogListener {
-        override fun onItemSelected(value: Int, text: String) {
-            viewModel.profileData?.gender = value
-            viewModel.updateProfile()
         }
     }
 
