@@ -27,6 +27,9 @@ class ChooseClubDialogViewModel : BaseViewModel() {
     private val _loadingStatus = MutableLiveData<Boolean>()
     val loadingStatus: LiveData<Boolean> = _loadingStatus
 
+    private val _totalCount = MutableLiveData<Long>()
+    val totalCount: MutableLiveData<Long> = _totalCount
+
     fun getClubList() {
         viewModelScope.launch {
             val dataSrc = ChooseClubDataSource(
@@ -82,6 +85,10 @@ class ChooseClubDialogViewModel : BaseViewModel() {
         }
 
         override fun onThrowable(throwable: Throwable) {
+        }
+
+        override fun onTotalCount(count: Long) {
+            _totalCount.postValue(count)
         }
     }
 }

@@ -81,6 +81,10 @@ class ChooseClubDialogFragment : BaseDialogFragment() {
                 recyclerView.visibility = View.VISIBLE
             }
         })
+
+        viewModel.totalCount.observe(viewLifecycleOwner, Observer {
+            adapter.totalCount = it.toInt()
+        })
     }
 
     private val attachmentListener = object : PostAttachmentListener {
