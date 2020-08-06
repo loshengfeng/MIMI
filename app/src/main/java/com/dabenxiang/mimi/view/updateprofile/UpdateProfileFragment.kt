@@ -177,7 +177,7 @@ class UpdateProfileFragment : BaseFragment() {
     private val onDialogListener = object : OnDialogListener {
         override fun onItemSelected(value: Int, text: String) {
             viewModel.profileItem.gender = value
-//            viewModel.updateProfile()
+            viewModel.doRegisterValidateAndSubmit()
         }
     }
 }
