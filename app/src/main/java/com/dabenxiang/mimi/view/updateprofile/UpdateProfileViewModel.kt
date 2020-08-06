@@ -23,6 +23,7 @@ class UpdateProfileViewModel : BaseViewModel() {
     lateinit var profileItem: ProfileItem
 
     var type = UpdateProfileFragment.TYPE_NAME
+    //FIXME !!!  use the same content !!!!
     val content = EditTextMutableLiveData()
     val birthday = EditTextMutableLiveData()
 

@@ -7,6 +7,7 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.viewModels
@@ -76,8 +77,6 @@ class MyPostFragment : BaseFragment() {
     private var userName: String = ""
     private var isAdult: Boolean = true
     private var isAdultTheme: Boolean = false
-
-    private var interactionListener: InteractionListener? = null
 
     private var memberPostItem = MemberPostItem()
     private var postType = PostType.TEXT
@@ -397,7 +396,7 @@ class MyPostFragment : BaseFragment() {
                         viewModel.postAttachment(pic.url, requireContext(), TYPE_PIC)
                     }
                 }
-                is ApiResult.Error -> resetAndCancelJob(it.throwable)
+                is ApiResult.Error -> resetAndCancelJob(it.throwable, getString(R.string.post_error))
             }
         })
 
@@ -416,7 +415,7 @@ class MyPostFragment : BaseFragment() {
                         viewModel.clearLiveData()
                     }
                 }
-                is ApiResult.Error -> resetAndCancelJob(it.throwable)
+                is ApiResult.Error -> resetAndCancelJob(it.throwable, getString(R.string.post_error))
             }
         })
 
@@ -443,7 +442,7 @@ class MyPostFragment : BaseFragment() {
                         TYPE_VIDEO
                     )
                 }
-                is ApiResult.Error -> resetAndCancelJob(it.throwable)
+                is ApiResult.Error -> resetAndCancelJob(it.throwable, getString(R.string.post_error))
             }
         })
 
@@ -476,7 +475,7 @@ class MyPostFragment : BaseFragment() {
                     Timber.d("Post video content item : $content")
                     viewModel.postPic(postId?.value!!, postMemberRequest, content)
                 }
-                is ApiResult.Error -> resetAndCancelJob(it.throwable)
+                is ApiResult.Error -> resetAndCancelJob(it.throwable, getString(R.string.post_error))
             }
         })
 
@@ -825,19 +824,22 @@ class MyPostFragment : BaseFragment() {
                 secondBtn = getString(R.string.btn_confirm),
                 isMessageIcon = false,
                 secondBlock = {
-                    viewModel.cancelJob()
+                    resetAndCancelJob()
                 }
             )
         ).show(requireActivity().supportFragmentManager)
     }
 
-    private fun resetAndCancelJob(t: Throwable) {
+    private fun resetAndCancelJob(t: Throwable = Throwable(), msg: String = "") {
         onApiError(t)
         viewModel.cancelJob()
         snackBar?.dismiss()
         uploadCurrentPicPosition = 0
         deleteCurrentPicPosition = 0
-        //TODO show error toast
+
+        if (msg.isNotBlank()) {
+            Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
+        }
     }
 
     private val memberPostFuncItem by lazy {
