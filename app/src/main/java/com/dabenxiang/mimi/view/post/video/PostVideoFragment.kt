@@ -119,7 +119,9 @@ class PostVideoFragment : BaseFragment() {
         tv_clean.isEnabled = true
         val img = requireContext().getDrawable(R.drawable.btn_close_n)
         tv_back.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null)
-        
+
+        edt_hashtag.imeOptions = EditorInfo.IME_ACTION_DONE
+
         useAdultTheme(false)
     }
 
