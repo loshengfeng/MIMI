@@ -349,6 +349,8 @@ class PostPicFragment : BaseFragment() {
         txt_picCount.text = String.format(getString(R.string.select_pic_count, attachmentList.size,
             PHOTO_LIMIT
         ))
+
+        haveMainTag = true
     }
 
     private val chooseClubDialogListener = object : ChooseClubDialogListener {

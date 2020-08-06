@@ -363,6 +363,8 @@ class PostVideoFragment : BaseFragment() {
             ext = mediaItem.picParameter[0].ext
         )
         videoAttachmentList.add(postVideoAttachment)
+
+        haveMainTag = true
     }
 
     private val chooseClubDialogListener = object : ChooseClubDialogListener {
