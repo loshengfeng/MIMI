@@ -24,6 +24,9 @@ class ChooseClubDialogViewModel : BaseViewModel() {
     private val _postList = MutableLiveData<PagedList<Any>>()
     val postList: LiveData<PagedList<Any>> = _postList
 
+    private val _loadingStatus = MutableLiveData<Boolean>()
+    val loadingStatus: LiveData<Boolean> = _loadingStatus
+
     fun getClubList() {
         viewModelScope.launch {
             val dataSrc = ChooseClubDataSource(
@@ -67,9 +70,11 @@ class ChooseClubDialogViewModel : BaseViewModel() {
 
     private val pagingCallback = object : PagingCallback {
         override fun onLoading() {
+            _loadingStatus.value = true
         }
 
         override fun onLoaded() {
+            _loadingStatus.value = false
         }
 
         override fun onSucceed() {
