@@ -18,6 +18,8 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.comment.CommentDialogFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.main.MainActivity
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import kotlinx.android.synthetic.main.fragment_clip.*
 import timber.log.Timber
 import java.io.File
@@ -53,8 +55,6 @@ class ClipFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
-
-        initSettings()
     }
 
     override fun onDestroyView() {
@@ -69,6 +69,10 @@ class ClipFragment : BaseFragment() {
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_clip
+    }
+
+    override fun setupFirstTime() {
+        initSettings()
     }
 
     override fun setupObservers() {
@@ -233,7 +237,22 @@ class ClipFragment : BaseFragment() {
     }
 
     private fun showCommentDialog(item: MemberPostItem) {
-        CommentDialogFragment.newInstance(item).also {
+        val listener = object : CommentDialogFragment.CommentListener {
+            override fun onAvatarClick(userId: Long, name: String) {
+                val bundle = MyPostFragment.createBundle(
+                    userId, name,
+                    isAdult = true,
+                    isAdultTheme = true
+                )
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_clipFragment_to_myPostFragment,
+                        bundle
+                    )
+                )
+            }
+        }
+        CommentDialogFragment.newInstance(item, listener).also {
             it.isCancelable = true
             it.show(
                 requireActivity().supportFragmentManager,

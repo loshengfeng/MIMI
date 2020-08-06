@@ -38,7 +38,11 @@
     <fragment
         android:id="@+id/clipFragment"
         android:name="com.dabenxiang.mimi.view.clip.ClipFragment"
-        tools:layout="@layout/fragment_clip" />
+        tools:layout="@layout/fragment_clip" >
+        <action
+            android:id="@+id/action_clipFragment_to_myPostFragment"
+            app:destination="@id/myPostFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/searchPostFragment"
