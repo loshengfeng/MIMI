@@ -225,6 +225,7 @@ class PlayerActivity : BaseActivity() {
             override fun onMoreClick(item: MembersPostCommentItem) {
                 Timber.i("playerInfoAdapter onMoreClick")
                 if(item.id != null){
+                    viewModel.isCommentReport = true
                     showMoreDialog(item.id, PostType.VIDEO, item.reported ?: false)
                 }
             }
@@ -818,7 +819,7 @@ class PlayerActivity : BaseActivity() {
 
         iv_more.setOnClickListener {
             Timber.i("viewModel.isReported ${viewModel.isReported}")
-            showMoreDialog(obtainVideoId(), PostType.VIDEO, viewModel.isReported)
+            showMoreDialog(viewModel.episodeId, PostType.VIDEO, viewModel.isReported)
         }
 
         viewModel.apiReportResult.observe(this, Observer { event ->
@@ -827,7 +828,12 @@ class PlayerActivity : BaseActivity() {
                     is Loading -> progressHUD.show()
                     is Loaded -> progressHUD.dismiss()
                     is Empty -> {
-                        viewModel.isReported = true
+                        if(!viewModel.isCommentReport) {
+                            viewModel.isReported = true
+                        }else {
+                            viewModel.isCommentReport = false
+                            viewModel.setupCommentDataSource(playerInfoAdapter)
+                        }
                         GeneralUtils.showToast(this, getString(R.string.report_success))
                     }
                     is Error -> onApiError(apiResult.throwable)
@@ -884,7 +890,7 @@ class PlayerActivity : BaseActivity() {
                 GeneralUtils.showToast(App.applicationContext(), getString(R.string.report_error))
             } else {
                 when (item) {
-                    is MemberPostItem -> viewModel.sentReport(content)
+                    is MemberPostItem -> viewModel.sentReport(item.id, content)
                 }
             }
             reportDialog?.dismiss()
@@ -898,6 +904,8 @@ class PlayerActivity : BaseActivity() {
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem) {
             if ((item as MemberPostItem).reported) {
+
+                viewModel.isCommentReport = false
                 GeneralUtils.showToast(
                     App.applicationContext(),
                     getString(R.string.already_reported)
