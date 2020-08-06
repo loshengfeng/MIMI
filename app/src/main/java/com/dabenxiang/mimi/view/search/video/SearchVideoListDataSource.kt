@@ -108,6 +108,7 @@ class SearchVideoListDataSource(
 
                 val body = result.body()
                 val videos = body?.content?.videos
+                videos?.let { adjustData(it) }
                 val nextPageKey = when {
                     hasNextPage(
                         body?.paging?.count ?: 0,
