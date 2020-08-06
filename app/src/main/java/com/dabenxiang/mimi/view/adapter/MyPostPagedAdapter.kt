@@ -7,6 +7,8 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.MemberPostFuncItem
+import com.dabenxiang.mimi.callback.PostPicItemListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
@@ -18,7 +20,8 @@ class MyPostPagedAdapter(
     private val isMe: Boolean,
     private val isAdultTheme: Boolean,
     private val myPostListener: MyPostFragment.MyPostListener,
-    private val attachmentListener: AttachmentListener
+    private val attachmentListener: AttachmentListener,
+    private val memberPostFuncItem: MemberPostFuncItem
 ) : PagedListAdapter<MemberPostItem, BaseViewHolder>(diffCallback) {
 
     companion object {
@@ -118,7 +121,7 @@ class MyPostPagedAdapter(
                         }
                     } ?: run {
                         holder.pictureRecycler.tag = position
-                        holder.onBind(it, position, myPostListener, attachmentListener)
+                        holder.onBind(it, position, myPostListener, attachmentListener, memberPostFuncItem)
                     }
                 }
                 is MyPostTextPostHolder -> {

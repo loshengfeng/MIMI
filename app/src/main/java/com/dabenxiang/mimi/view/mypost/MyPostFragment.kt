@@ -14,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.AdultTabType
@@ -139,7 +140,8 @@ class MyPostFragment : BaseFragment() {
             userId == USER_ID_ME,
             isAdultTheme,
             myPostListener,
-            attachmentListener
+            attachmentListener,
+            memberPostFuncItem
         )
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
@@ -358,7 +360,9 @@ class MyPostFragment : BaseFragment() {
 
         viewModel.deletePostResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Success -> viewModel.invalidateDataSource()
+                is ApiResult.Empty -> {
+                    viewModel.invalidateDataSource()
+                }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
@@ -812,5 +816,17 @@ class MyPostFragment : BaseFragment() {
         uploadCurrentPicPosition = 0
         deleteCurrentPicPosition = 0
         //TODO show error toast
+    }
+
+    private val memberPostFuncItem by lazy {
+        MemberPostFuncItem(
+            {},
+            { id, function -> getBitmap(id, function) },
+            { _, _, _ -> }
+        )
+    }
+
+    private fun getBitmap(id: String, update: ((String) -> Unit)) {
+        viewModel.getBitmap(id, update)
     }
 }

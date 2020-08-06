@@ -27,6 +27,7 @@ import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
@@ -83,12 +84,11 @@ class FavoriteFragment : BaseFragment() {
                 R.id.navigation_home
             )
         }
+        useAdultTheme(false)
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun setupFirstTime() {
         initSettings()
-        interactionListener?.setAdult(false)
     }
 
     override fun getLayoutId(): Int {
@@ -170,7 +170,7 @@ class FavoriteFragment : BaseFragment() {
                         AttachmentType.ADULT_HOME_CLIP -> {
                             favoriteAdapter.update(attachmentItem.position ?: 0)
                         }
-                        AttachmentType.ADULT_AVATAR->{
+                        AttachmentType.ADULT_AVATAR -> {
                             favoriteAdapter.update(attachmentItem.position ?: 0)
                         }
                         else -> {
@@ -346,7 +346,10 @@ class FavoriteFragment : BaseFragment() {
                                     requireContext(),
                                     viewModel.getShareUrl(item.tags[0], item.videoId, item.episode)
                                 )
-                                GeneralUtils.showToast(requireContext(), "already copy url")
+                                GeneralUtils.showToast(
+                                    requireContext(),
+                                    requireContext().getString(R.string.copy_url)
+                                )
                             }
                         }
                     }
@@ -374,7 +377,7 @@ class FavoriteFragment : BaseFragment() {
                                 startActivity(intent)
                             }
                         }
-                        is PostFavoriteItem->{
+                        is PostFavoriteItem -> {
                             goShortVideoDetailPage(item)
                         }
                     }
@@ -389,14 +392,14 @@ class FavoriteFragment : BaseFragment() {
 //                        )
 //                    }
                 }
-                FunctionType.FOLLOW->{
+                FunctionType.FOLLOW -> {
                     // 追蹤與取消追蹤
                     when (item) {
-                        is PostFavoriteItem->{
+                        is PostFavoriteItem -> {
                             if (item.posterId == null || item.posterId == 0L) {
                                 GeneralUtils.showToast(
-                                        requireContext(),
-                                        getString(R.string.unexpected_error)
+                                    requireContext(),
+                                    getString(R.string.unexpected_error)
                                 )
                             } else {
                                 viewModel.currentPostItem = item
@@ -412,14 +415,14 @@ class FavoriteFragment : BaseFragment() {
 
         override fun onChipClick(text: String, type: Int?) {
             // 點擊標籤後進入 Search page
-            interactionListener?.setAdult(lastPrimaryIndex == TYPE_ADULT)
+            useAdultTheme(lastPrimaryIndex == TYPE_ADULT)
             if (lastSecondaryIndex == TYPE_MIMI) {
                 val bundle = SearchVideoFragment.createBundle(tag = text)
                 navigateTo(
-                        NavigateItem.Destination(
-                                R.id.action_postFavoriteFragment_to_searchVideoFragment,
-                                bundle
-                        )
+                    NavigateItem.Destination(
+                        R.id.action_postFavoriteFragment_to_searchVideoFragment,
+                        bundle
+                    )
                 )
             } else {
                 val bundle = SearchPostFragment.createBundle(
@@ -429,18 +432,32 @@ class FavoriteFragment : BaseFragment() {
                     )
                 )
                 navigateTo(
-                        NavigateItem.Destination(
-                                R.id.action_postFavoriteFragment_to_searchPostFragment,
-                                bundle
-                        )
+                    NavigateItem.Destination(
+                        R.id.action_postFavoriteFragment_to_searchPostFragment,
+                        bundle
+                    )
                 )
             }
+        }
+
+        override fun onAvatarClick(userId: Long, name: String) {
+            val bundle = MyPostFragment.createBundle(
+                userId, name,
+                isAdult = true,
+                isAdultTheme = true
+            )
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_postFavoriteFragment_to_myPostFragment,
+                    bundle
+                )
+            )
         }
     }
 
     private val onCleanDialogListener = object : OnCleanDialogListener {
         override fun onClean() {
-            if(lastPrimaryIndex == TYPE_ADULT && lastSecondaryIndex == TYPE_SHORT_VIDEO) {
+            if (lastPrimaryIndex == TYPE_ADULT && lastSecondaryIndex == TYPE_SHORT_VIDEO) {
                 viewModel.deleteAllPostFavorite()
             } else {
                 viewModel.deleteFavorite()
@@ -454,33 +471,38 @@ class FavoriteFragment : BaseFragment() {
     private fun goShortVideoDetailPage(item: PostFavoriteItem) {
 
         if (item.tags == null || item.tags.first()
-                        .isEmpty() || item.postId == null
+                .isEmpty() || item.postId == null
         ) {
             GeneralUtils.showToast(
-                    requireContext(),
-                    getString(R.string.unexpected_error)
+                requireContext(),
+                getString(R.string.unexpected_error)
             )
         } else {
-            val memberPost: ArrayList<MemberPostItem> = Gson().fromJson(Gson().toJson(viewModel.currentPostList), object : TypeToken<ArrayList<MemberPostItem>>() {}.type)
+            val memberPost: ArrayList<MemberPostItem> = Gson().fromJson(
+                Gson().toJson(viewModel.currentPostList),
+                object : TypeToken<ArrayList<MemberPostItem>>() {}.type
+            )
             memberPost.forEach memberItem@{ memberItem ->
                 viewModel.currentPostList.forEach { postItem ->
                     if (postItem.id == memberItem.id) {
                         memberItem.avatarAttachmentId = postItem.posterAvatarAttachmentId
-                                ?: 0
+                            ?: 0
                         memberItem.id = postItem.postId ?: 0
                         memberItem.isFavorite = true
                         memberItem.creatorId = postItem.posterId ?: 0
-                        memberItem.likeType = if (postItem.likeType == 0) LikeType.LIKE else LikeType.DISLIKE
+                        memberItem.likeType =
+                            if (postItem.likeType == 0) LikeType.LIKE else LikeType.DISLIKE
                         return@memberItem
                     }
                 }
             }
+            useAdultTheme(true)
             val bundle = ClipFragment.createBundle(memberPost, item.position)
             navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_postFavoriteFragment_to_clipFragment,
-                            bundle
-                    )
+                NavigateItem.Destination(
+                    R.id.action_postFavoriteFragment_to_clipFragment,
+                    bundle
+                )
             )
         }
 

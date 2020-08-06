@@ -16,15 +16,15 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/color_gray_4"
-        android:layout_marginTop="15dp">
+        android:layout_marginTop="15dp"
+        android:background="@color/color_gray_4">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layout_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="15dp"
-            android:background="@color/transparent" >
+            android:background="@color/transparent">
 
 
             <TextView
@@ -32,9 +32,9 @@
                 style="@style/settingStyle_1"
                 android:drawableEnd="@drawable/btn_arrow_black_n"
                 android:gravity="center_vertical"
-                android:text="@string/setting_photo"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
+                android:text="@string/setting_photo"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -54,9 +54,7 @@
                 android:id="@+id/line_split_photo"
                 android:layout_width="0dp"
                 android:layout_height="1dp"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp"
-                android:background="@color/color_gray_12"
+                android:background="@color/color_black_1_50"
                 app:layout_constraintEnd_toEndOf="@+id/btn_photo"
                 app:layout_constraintStart_toStartOf="@+id/btn_photo"
                 app:layout_constraintTop_toBottomOf="@+id/btn_photo" />
@@ -66,9 +64,9 @@
                 style="@style/settingStyle_1"
                 android:drawableEnd="@drawable/btn_arrow_black_n"
                 android:gravity="center_vertical"
-                android:text="@string/setting_name"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
+                android:text="@string/setting_name"
                 app:layout_constraintEnd_toEndOf="@+id/btn_photo"
                 app:layout_constraintStart_toStartOf="@+id/btn_photo"
                 app:layout_constraintTop_toBottomOf="@+id/line_split_photo" />
@@ -90,9 +88,7 @@
                 android:id="@+id/line_split_name"
                 android:layout_width="0dp"
                 android:layout_height="1dp"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp"
-                android:background="@color/color_gray_12"
+                android:background="@color/color_black_1_50"
                 app:layout_constraintEnd_toEndOf="@+id/btn_name"
                 app:layout_constraintStart_toStartOf="@+id/btn_name"
                 app:layout_constraintTop_toBottomOf="@+id/btn_name" />
@@ -101,9 +97,7 @@
                 android:id="@+id/line_split_email"
                 android:layout_width="0dp"
                 android:layout_height="1dp"
-                android:background="@color/color_gray_12"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:background="@color/color_black_1_50"
                 app:layout_constraintEnd_toEndOf="@+id/line_split_name"
                 app:layout_constraintStart_toStartOf="@+id/line_split_name"
                 app:layout_constraintTop_toBottomOf="@+id/btn_email" />
@@ -113,13 +107,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:background="@color/color_white_1"
-                android:drawableEnd="@drawable/btn_arrow_black_n"
-                android:gravity="center_vertical"
+                android:gravity="top"
+                android:paddingStart="16dp"
+                android:paddingTop="20dp"
+                android:paddingEnd="16dp"
                 android:text="@string/setting_email"
                 android:textColor="@color/color_black_1_50"
                 android:textSize="14sp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
                 app:layout_constraintBottom_toBottomOf="@+id/guideline"
                 app:layout_constraintEnd_toEndOf="@+id/btn_name"
                 app:layout_constraintHeight_min="60dp"
@@ -128,19 +122,30 @@
                 app:layout_constraintTop_toBottomOf="@+id/line_split_name"
                 app:layout_constraintVertical_bias="0.0" />
 
+            <ImageView
+                android:id="@+id/iv_email_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/btn_arrow_black_n"
+                app:layout_constraintBottom_toBottomOf="@id/tv_email"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_email" />
+
             <Button
                 android:id="@+id/btn_resend"
                 android:layout_width="92dp"
                 android:layout_height="32dp"
-                android:layout_marginTop="75dp"
-                 android:layout_marginEnd="40dp"
+                android:layout_marginTop="15dp"
                 android:background="@drawable/bg_red_1_radius_6"
                 android:gravity="center"
                 android:text="@string/setting_resend_mail"
                 android:textColor="@color/color_white_1"
                 android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="@+id/btn_email"
-                app:layout_constraintTop_toBottomOf="@+id/btn_name"
+                app:layout_constraintBottom_toTopOf="@id/line_split_email"
+                app:layout_constraintEnd_toEndOf="@+id/iv_email_arrow"
+                app:layout_constraintTop_toBottomOf="@id/tv_email"
+                app:layout_constraintVertical_bias="0"
                 tools:visibility="visible" />
 
             <View
@@ -158,11 +163,11 @@
                 style="@style/settingStyle_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="17dp"
                 android:layout_marginEnd="40dp"
                 android:drawableEnd="@drawable/ico_checked"
                 android:drawablePadding="7dp"
                 android:gravity="center|right"
-                app:layout_constraintBottom_toBottomOf="@+id/btn_email"
                 app:layout_constraintEnd_toEndOf="@+id/btn_email"
                 app:layout_constraintTop_toTopOf="@+id/btn_email"
                 tools:text="jeff.yu@silkrode.com.tw" />
@@ -171,8 +176,8 @@
                 android:id="@+id/btn_account"
                 style="@style/settingStyle_1"
                 android:gravity="center_vertical"
-                android:text="@string/setting_account"
                 android:paddingStart="16dp"
+                android:text="@string/setting_account"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/line_split_email" />
@@ -180,8 +185,11 @@
             <TextView
                 android:id="@+id/tv_account"
                 style="@style/settingStyle_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawablePadding="7dp"
                 android:gravity="center"
-                android:layout_marginEnd="44dp"
+                android:paddingEnd="20dp"
                 app:layout_constraintBottom_toTopOf="@+id/btn_account"
                 app:layout_constraintEnd_toEndOf="@+id/btn_account"
                 app:layout_constraintTop_toBottomOf="@+id/btn_account"
@@ -190,13 +198,13 @@
             <TextView
                 android:id="@+id/btn_chang_pw"
                 style="@style/settingStyle_1"
+                android:layout_marginTop="15dp"
                 android:drawableEnd="@drawable/btn_arrow_black_n"
                 android:gravity="center_vertical"
-                android:text="@string/setting_change_pw"
-                app:layout_constraintEnd_toEndOf="@+id/btn_account"
-                android:layout_marginTop="15dp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
+                android:text="@string/setting_change_pw"
+                app:layout_constraintEnd_toEndOf="@+id/btn_account"
                 app:layout_constraintStart_toStartOf="@+id/btn_account"
                 app:layout_constraintTop_toBottomOf="@+id/btn_account" />
 
@@ -206,30 +214,16 @@
                 android:layout_marginTop="15dp"
                 android:drawableEnd="@drawable/btn_arrow_black_n"
                 android:gravity="center_vertical"
-                android:text="@string/setting_gender"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
+                android:text="@string/setting_gender"
                 app:layout_constraintEnd_toEndOf="@id/btn_account"
                 app:layout_constraintTop_toBottomOf="@id/btn_chang_pw" />
 
-            <TextView
-                android:id="@+id/gender_info"
-                style="@style/settingStyle_2"
-                android:drawablePadding="7dp"
-                android:gravity="center"
-                android:layout_marginEnd="44dp"
-                android:text="@string/setting_gender"
-                app:layout_constraintBottom_toBottomOf="@+id/btn_gender"
-                app:layout_constraintEnd_toEndOf="@+id/btn_gender"
-                app:layout_constraintTop_toTopOf="@+id/btn_gender" />
-
             <View
-                android:id="@+id/view"
                 android:layout_width="0dp"
                 android:layout_height="1dp"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp"
-                android:background="@color/color_gray_12"
+                android:background="@color/color_black_1_50"
                 app:layout_constraintBottom_toTopOf="@+id/btn_birthday"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -240,21 +234,21 @@
                 style="@style/settingStyle_1"
                 android:drawableEnd="@drawable/btn_arrow_black_n"
                 android:gravity="center_vertical"
-                android:text="@string/setting_birthday"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
+                android:text="@string/setting_birthday"
                 app:layout_constraintEnd_toEndOf="@id/btn_account"
                 app:layout_constraintTop_toBottomOf="@id/btn_gender" />
 
             <TextView
                 android:id="@+id/btn_binding_invitation"
                 style="@style/settingStyle_1"
+                android:layout_marginTop="15dp"
                 android:drawableEnd="@drawable/btn_arrow_black_n"
                 android:gravity="center_vertical"
-                android:text="@string/setting_binding_invitation"
-                android:layout_marginTop="15dp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
+                android:text="@string/setting_binding_invitation"
                 app:layout_constraintEnd_toEndOf="@id/btn_account"
                 app:layout_constraintTop_toBottomOf="@id/btn_birthday" />
 

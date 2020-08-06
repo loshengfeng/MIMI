@@ -22,20 +22,15 @@ import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.FilterDialogFragment
-import com.dabenxiang.mimi.view.dialog.UpdateMessageAlertDialog
 import com.dabenxiang.mimi.view.dialog.choosepicker.ChoosePickerDialogFragment
 import com.dabenxiang.mimi.view.dialog.choosepicker.OnChoosePickerDialogListener
 import com.dabenxiang.mimi.view.dialog.editor.InvitationEditorDialog
 import com.dabenxiang.mimi.view.listener.OnDialogListener
-import com.dabenxiang.mimi.view.listener.OnSimpleDialogListener
 import com.dabenxiang.mimi.view.listener.OnSimpleEditorDialogListener
-import com.dabenxiang.mimi.view.splash.SplashFragment
 import com.dabenxiang.mimi.view.updateprofile.UpdateProfileFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_setting.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import timber.log.Timber
 
 class SettingFragment : BaseFragment() {
 
@@ -135,9 +130,11 @@ class SettingFragment : BaseFragment() {
         })
 
         viewModel.isBinding.observe(this.viewLifecycleOwner, Observer { success ->
-            GeneralUtils.showToast(requireContext(), if(success)
-                getString(R.string.setting_binding_success) else
-                getString(R.string.setting_binding_failed))
+            GeneralUtils.showToast(
+                requireContext(), if (success)
+                    getString(R.string.setting_binding_success) else
+                    getString(R.string.setting_binding_failed)
+            )
         })
     }
 
