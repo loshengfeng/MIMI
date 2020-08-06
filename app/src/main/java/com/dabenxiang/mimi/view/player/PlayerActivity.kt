@@ -224,6 +224,10 @@ class PlayerActivity : BaseActivity() {
 
             override fun onMoreClick(item: MembersPostCommentItem) {
                 Timber.i("playerInfoAdapter onMoreClick")
+                if(item.id != null){
+                    viewModel.isCommentReport = true
+                    showMoreDialog(item.id, PostType.VIDEO, item.reported ?: false)
+                }
             }
 
             override fun onAvatarClick(userId: Long, name: String) {
@@ -343,7 +347,7 @@ class PlayerActivity : BaseActivity() {
             }
         )
 
-        bottom_func_bar.setBackgroundResource(
+        bottom_func_input.setBackgroundResource(
             if (isAdult) {
                 R.drawable.bg_adult_top_line
             } else {
@@ -351,11 +355,58 @@ class PlayerActivity : BaseActivity() {
             }
         )
 
-        if (isAdult) {
-            btn_write_comment.setTextColor(getColor(R.color.color_white_1_30))
-            et_message.setTextColor(getColor(R.color.color_white_1_30))
-//            btn_write_comment.setBtnSolidColor(getColor(R.color.color_black_1_20))
+
+        btn_write_comment.let {
+            it.setTextColor(
+                getColor(
+                    if (isAdult) {
+                        R.color.color_white_1_30
+                    } else {
+                        R.color.color_gray_9
+                    }
+                )
+            )
+            it.background = getDrawable(if (isAdult) R.drawable.bg_black_1_30_radius_18
+            else R.drawable.bg_gray_1_30_radius_18)
         }
+
+        tv_comment.setCompoundDrawablesRelativeWithIntrinsicBounds(
+            if (isAdult) R.drawable.ico_messege_adult else R.drawable.ico_messege_adult_gray,
+            0,
+            0,
+            0
+        )
+        et_message.let{
+            it.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                if (isAdult) R.drawable.ico_messege_adult else R.drawable.ico_messege_adult_gray,
+                0,
+                0,
+                0
+            )
+            it.compoundDrawablePadding = 5
+            it.setBackgroundColor(getColor(if(isAdult) R.color.color_black_1 else  R.color.color_gray_1))
+            it.setTextColor(getColor(if(isAdult) R.color.color_white_1 else R.color.color_black_1))
+            it.setHintTextColor(getColor(if(isAdult) R.color.color_gray_1 else R.color.color_gray_9))
+        }
+
+        iv_bar.setImageResource(if (isAdult) R.drawable.bg_black_1_30_radius_18
+        else R.drawable.bg_gray_1_30_radius_18)
+
+        tv_like.setTextColor(titleColor)
+        iv_favorite.setTextColor(titleColor)
+        tv_comment.setTextColor(titleColor)
+
+        iv_share.setImageResource(if (isAdult) R.drawable.btn_share_white_n else R.drawable.btn_share_gray_n)
+        iv_more.setImageResource(if (isAdult) R.drawable.btn_more_white_n else R.drawable.btn_more_gray_n)
+
+        tv_replay_name.setTextColor(if (obtainIsAdult()) {
+            R.color.color_white_1
+        } else {
+            R.color.color_black_1
+        }.let {
+            getColor(it)
+        })
+
 
         viewModel.fastForwardTime.observe(this, Observer {
             tv_forward_backward.text = "${if (it > 0) "+" else ""}${it / 1000}秒"
@@ -554,29 +605,6 @@ class PlayerActivity : BaseActivity() {
             }
         })
 
-        tv_comment.setCompoundDrawablesRelativeWithIntrinsicBounds(
-            if (isAdult) R.drawable.ico_messege_adult else R.drawable.ico_messege_adult_gray,
-            0,
-            0,
-            0
-        )
-
-        tv_like.setTextColor(titleColor)
-        iv_favorite.setTextColor(titleColor)
-        tv_comment.setTextColor(titleColor)
-
-        iv_share.setImageResource(if (isAdult) R.drawable.btn_share_white_n else R.drawable.btn_share_gray_n)
-        iv_more.setImageResource(if (isAdult) R.drawable.btn_more_white_n else R.drawable.btn_more_gray_n)
-
-        tv_replay_name.setTextColor(if (obtainIsAdult()) {
-            R.color.color_white_1
-        } else {
-            R.color.color_black_1
-        }.let {
-            getColor(it)
-        })
-
-
         headComment.tv_newest.setOnClickListener {
             viewModel.updatedSelectedNewestComment(true)
             lifecycleScope.launch {
@@ -714,6 +742,13 @@ class PlayerActivity : BaseActivity() {
             commentEditorToggle(true)
         }
 
+        tv_comment.setOnClickListener {
+            currentReplyId = null
+            currentreplyName = null
+            commentEditorOpen()
+            commentEditorToggle(true)
+        }
+
         btn_send.setOnClickListener {
             if (et_message.text.isNotEmpty()) {
                 viewModel.postComment(
@@ -783,21 +818,8 @@ class PlayerActivity : BaseActivity() {
         }
 
         iv_more.setOnClickListener {
-
-            moreDialog = MoreDialogFragment.newInstance(
-                MemberPostItem(
-                    id = obtainVideoId(),
-                    type = PostType.VIDEO,
-                    reported = viewModel.isReported
-
-                ), onMoreDialogListener
-            ).also {
-
-                it.show(
-                    supportFragmentManager,
-                    MoreDialogFragment::class.java.simpleName
-                )
-            }
+            Timber.i("viewModel.isReported ${viewModel.isReported}")
+            showMoreDialog(viewModel.episodeId, PostType.VIDEO, viewModel.isReported)
         }
 
         viewModel.apiReportResult.observe(this, Observer { event ->
@@ -806,7 +828,12 @@ class PlayerActivity : BaseActivity() {
                     is Loading -> progressHUD.show()
                     is Loaded -> progressHUD.dismiss()
                     is Empty -> {
-                        viewModel.isReported = true
+                        if(!viewModel.isCommentReport) {
+                            viewModel.isReported = true
+                        }else {
+                            viewModel.isCommentReport = false
+                            viewModel.setupCommentDataSource(playerInfoAdapter)
+                        }
                         GeneralUtils.showToast(this, getString(R.string.report_success))
                     }
                     is Error -> onApiError(apiResult.throwable)
@@ -839,13 +866,31 @@ class PlayerActivity : BaseActivity() {
         viewModel.getAd(adWidth, adHeight)
     }
 
+    private fun showMoreDialog(id:Long, type:PostType, isReported:Boolean){
+        Timber.i("id=$id")
+        Timber.i("isReported=$isReported")
+        moreDialog = MoreDialogFragment.newInstance(
+            MemberPostItem(
+                id = id,
+                type = type,
+                reported= isReported
+
+            ), onMoreDialogListener
+        ).also {
+            it.show(
+                supportFragmentManager,
+                MoreDialogFragment::class.java.simpleName
+            )
+        }
+    }
+
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
         override fun onSend(item: BaseMemberPostItem, content: String, postItem: MemberPostItem?) {
             if (TextUtils.isEmpty(content)) {
                 GeneralUtils.showToast(App.applicationContext(), getString(R.string.report_error))
             } else {
                 when (item) {
-                    is MemberPostItem -> viewModel.sentReport(content)
+                    is MemberPostItem -> viewModel.sentReport(item.id, content)
                 }
             }
             reportDialog?.dismiss()
@@ -858,7 +903,9 @@ class PlayerActivity : BaseActivity() {
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem) {
-            if (viewModel.isReported) {
+            if ((item as MemberPostItem).reported) {
+
+                viewModel.isCommentReport = false
                 GeneralUtils.showToast(
                     App.applicationContext(),
                     getString(R.string.already_reported)
@@ -901,9 +948,8 @@ class PlayerActivity : BaseActivity() {
                     tv_replay_name.visibility = View.GONE
                 } else {
                     tv_replay_name.text = "@$currentreplyName"
+                    tv_replay_name.visibility = View.VISIBLE
                 }
-
-                tv_replay_name.visibility = View.VISIBLE
             }
             et_message.let {
                 it.requestFocusFromTouch()
@@ -913,6 +959,21 @@ class PlayerActivity : BaseActivity() {
             }
         }
         commentEditorToggle(true)
+    }
+
+    private fun commentEditorHide() {
+        CoroutineScope(Dispatchers.Main).launch {
+            tv_replay_name.visibility = View.GONE
+            val imm =
+                getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+        }
+        commentEditorToggle(false)
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if(et_message.isFocused) commentEditorHide()
+        return true
     }
 
     override fun onStart() {

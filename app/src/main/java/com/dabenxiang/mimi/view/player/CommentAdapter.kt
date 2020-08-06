@@ -196,6 +196,8 @@ class RootCommentProvider(
                 listener.sendComment(actualData.data.id, actualData.data.postName)
             }
             R.id.btn_more -> {
+                val item = (actualData.data) as MembersPostCommentItem
+                Timber.i("btn_more item=$item")
                 listener.onMoreClick(actualData.data)
             }
         }
@@ -273,6 +275,8 @@ class NestedCommentProvider(
                 }
             }
             R.id.btn_more -> {
+                val item = (actualData.data) as MembersPostCommentItem
+                Timber.i("btn_more item=$item")
                 listener.onMoreClick(actualData.data)
             }
         }
