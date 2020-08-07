@@ -71,7 +71,7 @@ class RankingDataSource constructor(
             flow {
                 val result =
                     domainManager.getApiRepository().getRankingList(statisticsType= statisticsType,
-                        postType =postType, offset = next.toString(), limit = PER_LIMIT)
+                        postType = postType, offset = next.toString(), limit = PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(result)
             }

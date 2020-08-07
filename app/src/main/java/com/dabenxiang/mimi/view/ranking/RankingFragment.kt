@@ -6,6 +6,7 @@ import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.RankingFuncItem
@@ -21,11 +22,16 @@ import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.google.android.material.tabs.TabLayout
+import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_picture_detail.toolbarContainer
 import kotlinx.android.synthetic.main.fragment_ranking.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import kotlin.coroutines.coroutineContext
 
 class RankingFragment : BaseFragment() {
 
@@ -56,17 +62,22 @@ class RankingFragment : BaseFragment() {
     private val adapter by lazy {
         RankingAdapter(requireActivity(),
             RankingFuncItem(
-                onItemClick = {
+                onItemClick = {items, position ->
+                    val memberPostItems= items.map {
+                        MemberPostItem(
+                            id = it.id!!,
+                            content = it.content
+                        )
+                    }.let {
+                       arrayListOf<MemberPostItem>().also {arrayList->
+                           arrayList.addAll(it)
+                       }
+                    }
 
                     when (viewModel.postTypeSelected) {
                         PostType.VIDEO -> {
                             val bundle = ClipFragment.createBundle(
-                                arrayListOf(
-                                    MemberPostItem(
-                                        id = it.id!!,
-                                        content = it.content
-                                    )
-                                ), 0, false
+                                memberPostItems, position, false
                             )
                             navigateTo(
                                 NavigateItem.Destination(
@@ -77,19 +88,13 @@ class RankingFragment : BaseFragment() {
                         }
                         PostType.IMAGE -> {
                             val bundle = PictureDetailFragment.createBundle(
-                                MemberPostItem(
-                                    id = it.id!!,
-                                    content = it.content
-                                ), 0)
+                                memberPostItems[position], 0)
                             navigateTo(
                                 NavigateItem.Destination(
                                     R.id.action_rankingFragment_to_pictureDetailFragment,
                                     bundle
                                 )
                             )
-
-
-
                         }
                     }
 
@@ -110,6 +115,7 @@ class RankingFragment : BaseFragment() {
         toolbarContainer.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
+        layout_refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
         setupAdapter()
     }
 
@@ -121,10 +127,18 @@ class RankingFragment : BaseFragment() {
 
         viewModel.rankingVideosList.observe(viewLifecycleOwner, Observer {
             videosAdapter.submitList(it)
+            lifecycleScope.launch {
+                delay(1000)
+                layout_refresh.isRefreshing = false
+            }
         })
 
         viewModel.rankingList.observe(viewLifecycleOwner, Observer {
             adapter.submitList(it)
+            lifecycleScope.launch {
+                delay(1000)
+                layout_refresh.isRefreshing = false
+            }
         })
 
         viewModel.bitmapResult.observe(viewLifecycleOwner, Observer {
@@ -142,6 +156,7 @@ class RankingFragment : BaseFragment() {
 
     private fun setupAdapter() {
        Timber.i("post type=${tab_type_filter.selectedTabPosition} ")
+        layout_refresh.isRefreshing = true
         rv_ranking_content.adapter = if (tab_type_filter.selectedTabPosition == 0) videosAdapter else adapter
         viewModel.setStatisticsTypeFunction(tab_temporal_filter.selectedTabPosition)
         viewModel.setPostType(tab_type_filter.selectedTabPosition)
@@ -152,6 +167,7 @@ class RankingFragment : BaseFragment() {
 
         tab_temporal_filter.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
+                layout_refresh.isRefreshing = true
                 viewModel.setStatisticsTypeFunction(tab.position)
                 viewModel.getRankingList()
             }
@@ -162,6 +178,7 @@ class RankingFragment : BaseFragment() {
 
         tab_type_filter.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
+                layout_refresh.isRefreshing = true
                 rv_ranking_content.adapter = if (tab.position == 0) videosAdapter else adapter
                 viewModel.setPostType(tab.position)
                 viewModel.getRankingList()

@@ -47,7 +47,7 @@ class RankingAdapter(private val context: Context,
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         holder as RankingViewHolder
-        holder.bind(context, position, getItem(position)!!, rankingFuncItem)
+        holder.bind(context, position, currentList?.toMutableList()!!, getItem(position)!!, rankingFuncItem)
     }
 
     class RankingViewHolder(itemView: View) : BaseViewHolder(itemView) {
@@ -57,14 +57,10 @@ class RankingAdapter(private val context: Context,
         val hot:TextView = itemView.tv_hot
         val ranking:TextView = itemView.tv_no
 
-        private fun updatePicture(id: String) {
-            val bitmap = LruCacheUtils.getLruCache(id)
-            Glide.with(picture.context).load(bitmap).into(picture)
-        }
-
         fun bind(
             context: Context,
             position: Int,
+            items:MutableList<PostStatisticsItem>,
             item: PostStatisticsItem,
             rankingFuncItem: RankingFuncItem
         ) {
@@ -89,12 +85,12 @@ class RankingAdapter(private val context: Context,
                     if (TextUtils.isEmpty(image.url)) {
                         image.id.takeIf { !TextUtils.isEmpty(it) && it != LruCacheUtils.ZERO_ID }?.also { id ->
                             LruCacheUtils.getLruCache(id)?.also { bitmap ->
-                                Glide.with(picture.context).load(bitmap).into(picture)
+                                Glide.with(picture.context).load(bitmap).centerCrop().into(picture)
                             } ?: run {   rankingFuncItem.getBitmap(id, position) }
-                        } ?: run { Glide.with(picture.context).load(R.drawable.img_nopic_03).into(picture) }
+                        } ?: run { Glide.with(picture.context).load(R.drawable.img_nopic_03).centerCrop().into(picture) }
                     } else {
                         Glide.with(picture.context)
-                            .load(image.url).placeholder(R.drawable.img_nopic_03).into(picture)
+                            .load(image.url).placeholder(R.drawable.img_nopic_03).centerCrop().into(picture)
                     }
                 }
             }
@@ -102,7 +98,7 @@ class RankingAdapter(private val context: Context,
             title.text = item.title
             hot.text = item.count.toString()
             layout.setOnClickListener {
-                rankingFuncItem.onItemClick(item)
+                rankingFuncItem.onItemClick(items, position)
             }
         }
     }
