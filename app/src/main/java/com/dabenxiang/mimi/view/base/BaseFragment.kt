@@ -206,17 +206,4 @@ abstract class BaseFragment : Fragment() {
             mainViewModel?.logoutLocal()
         }
     }
-
-    fun showEmailConfirmDialog(block: () -> Unit) {
-        GeneralDialog.newInstance(
-            GeneralDialogData(
-                titleRes = R.string.error_email_not_confirmed_title,
-                message = getString(R.string.error_email_not_confirmed_msg),
-                messageIcon = R.drawable.ico_email,
-                firstBtn = getString(R.string.verify_later),
-                secondBtn = getString(R.string.verify_immediately),
-                secondBlock = block
-            )
-        ).show(requireActivity().supportFragmentManager)
-    }
 }

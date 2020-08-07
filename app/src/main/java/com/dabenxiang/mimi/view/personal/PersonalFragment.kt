@@ -25,6 +25,7 @@ import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_LOGIN
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
+import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.setting.SettingFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_personal.*
@@ -68,7 +69,7 @@ class PersonalFragment : BaseFragment() {
                     tv_Point.text = meItem.availablePoint.toString()
 
                     takeUnless { meItem.isEmailConfirmed == true }?.run {
-                        showEmailConfirmDialog {
+                        (requireActivity() as MainActivity).showEmailConfirmDialog {
                             navigateTo(
                                 NavigateItem.Destination(
                                     R.id.action_personalFragment_to_settingFragment,

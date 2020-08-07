@@ -55,6 +55,7 @@ class PersonalViewModel : BaseViewModel() {
                 val result = apiRepository.getAttachment(id.toString())
                 if (!result.isSuccessful) throw HttpException(result)
                 byteArray = result.body()?.bytes()
+                accountManager.setupMeAvatarCache(byteArray)
                 val bitmap = ImageUtils.bytes2Bitmap(byteArray)
                 emit(ApiResult.success(bitmap))
             }
