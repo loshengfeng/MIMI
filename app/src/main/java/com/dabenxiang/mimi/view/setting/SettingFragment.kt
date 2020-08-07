@@ -214,6 +214,7 @@ class SettingFragment : BaseFragment() {
     }
 
     override fun initSettings() {
+        useAdultTheme(false)
         viewModel.getProfile()
         arguments?.also { it ->
             val byteArray = it.getSerializable(KEY_PHOTO) as ByteArray
