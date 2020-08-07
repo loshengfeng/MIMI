@@ -40,16 +40,16 @@ class RankingViewModel : BaseViewModel() {
 
     fun setPostType(position: Int) {
         postTypeSelected = when (position) {
+            0->PostType.VIDEO_ON_DEMAND
             1 -> PostType.VIDEO
-            2 -> PostType.IMAGE
-            else -> PostType.VIDEO_ON_DEMAND
+            else -> PostType.IMAGE
         }
     }
 
     fun setStatisticsTypeFunction(position: Int) {
         statisticsTypeSelected = when (position) {
-            1 -> StatisticsType.TODAY
-            2 -> StatisticsType.WEEK
+            0 -> StatisticsType.TODAY
+            1 -> StatisticsType.WEEK
             else -> StatisticsType.MONTH
         }
     }
