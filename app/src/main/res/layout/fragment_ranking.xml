@@ -69,7 +69,7 @@
         app:tabMode="fixed"
         app:tabBackground="@drawable/bg_ranking_type_selector"
         app:tabSelectedTextColor="@color/color_white_1"
-        app:tabTextAppearance="@style/ranking_tab_item_text"
+        app:tabTextAppearance="@style/ranking_tab_item_type_text"
         app:tabTextColor="@color/color_white_1_50"
         app:tabInlineLabel="true">
 
