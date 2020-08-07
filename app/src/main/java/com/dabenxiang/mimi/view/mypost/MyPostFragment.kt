@@ -37,6 +37,7 @@ import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.TYPE_VIDEO
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.USER_ID_ME
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
+import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.post.article.PostArticleFragment
 import com.dabenxiang.mimi.view.post.pic.PostPicFragment
 import com.dabenxiang.mimi.view.post.video.PostVideoFragment
@@ -122,6 +123,8 @@ class MyPostFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (arguments?.getBoolean(PlayerActivity.KEY_IS_FROM_PLAYER) == true)
+            mainViewModel?.isFromPlayer = true
         useAdultTheme(isAdultTheme)
         requireActivity().onBackPressedDispatcher.addCallback {
             navigateTo(NavigateItem.Up)
@@ -595,7 +598,11 @@ class MyPostFragment : BaseFragment() {
     override fun setupListeners() {
         View.OnClickListener { btnView ->
             when (btnView.id) {
-                R.id.tv_back -> navigateTo(NavigateItem.Up)
+                R.id.tv_back -> {
+                    if (mainViewModel?.isFromPlayer == true)
+                        activity?.onBackPressed()
+                    else navigateTo(NavigateItem.Up)
+                }
             }
         }.also {
             tv_back.setOnClickListener(it)
