@@ -88,10 +88,10 @@ class FavoriteFragment : BaseFragment() {
             )
         }
         useAdultTheme(false)
+        initSettings()
     }
 
     override fun setupFirstTime() {
-        initSettings()
     }
 
     override fun getLayoutId(): Int {
