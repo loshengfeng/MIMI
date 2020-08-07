@@ -129,9 +129,7 @@ class UpdateProfileFragment : BaseFragment() {
                         edit_content.hint = getString(R.string.login_email)
                     }
                     TYPE_GEN -> {
-                        tv_title.text = getString(R.string.setting_mail_title)
-                        tv_text.text = getString(R.string.setting_email)
-                        edit_content.hint = getString(R.string.login_email)
+
                     }
                     TYPE_BIRTHDAY -> {
                         tv_title.text = getString(R.string.setting_birthday_title)
