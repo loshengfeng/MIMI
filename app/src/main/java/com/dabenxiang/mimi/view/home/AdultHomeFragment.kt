@@ -70,7 +70,6 @@ import com.dabenxiang.mimi.view.post.video.PostVideoFragment
 import com.dabenxiang.mimi.view.ranking.RankingFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
-import com.dabenxiang.mimi.view.setting.SettingFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
@@ -512,7 +511,7 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         txtPost.setOnClickListener {
-            when(postType) {
+            when (postType) {
                 PostType.TEXT -> {
                     memberPostItem.id = postId
                     val bundle = TextDetailFragment.createBundle(memberPostItem, -1)
@@ -588,42 +587,14 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         iv_post.setOnClickListener {
-            checkIsEmailConfirmed {
-                if (accountManager.isLogin()) {
-                    ChooseUploadMethodDialogFragment.newInstance(onChooseUploadMethodDialogListener)
-                        .also {
-                            it.show(
-                                requireActivity().supportFragmentManager,
-                                ChooseUploadMethodDialogFragment::class.java.simpleName
-                            )
-                        }
-                } else {
-                    GeneralDialog.newInstance(
-                        GeneralDialogData(
-                            titleRes = R.string.login_yet,
-                            message = getString(R.string.login_message),
-                            messageIcon = R.drawable.ico_default_photo,
-                            firstBtn = getString(R.string.btn_register),
-                            secondBtn = getString(R.string.btn_login),
-                            firstBlock = {
-                                val bundle = Bundle()
-                                bundle.putInt(LoginFragment.KEY_TYPE, TYPE_REGISTER)
-                                findNavController().navigate(
-                                    R.id.action_adultHomeFragment_to_loginFragment,
-                                    bundle
-                                )
-                            },
-                            secondBlock = {
-                                val bundle = Bundle()
-                                bundle.putInt(LoginFragment.KEY_TYPE, TYPE_LOGIN)
-                                findNavController().navigate(
-                                    R.id.action_adultHomeFragment_to_loginFragment,
-                                    bundle
-                                )
-                            }
+            checkStatus {
+                ChooseUploadMethodDialogFragment.newInstance(onChooseUploadMethodDialogListener)
+                    .also {
+                        it.show(
+                            requireActivity().supportFragmentManager,
+                            ChooseUploadMethodDialogFragment::class.java.simpleName
                         )
-                    ).show(requireActivity().supportFragmentManager)
-                }
+                    }
             }
         }
     }
@@ -919,7 +890,7 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            checkIsEmailConfirmed {
+            checkStatus {
                 when (adultTabType) {
                     AdultTabType.PICTURE -> {
                         val bundle = PictureDetailFragment.createBundle(item, 2)
@@ -955,13 +926,11 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onMoreClick(item: MemberPostItem) {
-            checkIsEmailConfirmed {
-                moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
-                    it.show(
-                        requireActivity().supportFragmentManager,
-                        MoreDialogFragment::class.java.simpleName
-                    )
-                }
+            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
+                it.show(
+                    requireActivity().supportFragmentManager,
+                    MoreDialogFragment::class.java.simpleName
+                )
             }
         }
 
@@ -1000,8 +969,8 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
-
-            val bundle = ClipFragment.createBundle(ArrayList(item.subList(1, item.lastIndex)), position-1)
+            val bundle =
+                ClipFragment.createBundle(ArrayList(item.subList(1, item.lastIndex)), position - 1)
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_adultHomeFragment_to_clipFragment,
@@ -1011,7 +980,7 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {
-            checkIsEmailConfirmed {
+            checkStatus {
                 val bundle = ClipFragment.createBundle(ArrayList(item), position, true)
                 navigateTo(
                     NavigateItem.Destination(
@@ -1043,14 +1012,19 @@ class AdultHomeFragment : BaseFragment() {
                 isAdult = true,
                 isAdultTheme = true
             )
-            navigateTo(NavigateItem.Destination(R.id.action_adultHomeFragment_to_navigation_my_post, bundle))
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_adultHomeFragment_to_navigation_my_post,
+                    bundle
+                )
+            )
         }
     }
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem) {
             moreDialog?.dismiss()
-            (requireActivity() as MainActivity).showReportDialog(item)
+            checkStatus { (requireActivity() as MainActivity).showReportDialog(item) }
         }
 
         override fun onCancel() {
@@ -1156,7 +1130,10 @@ class AdultHomeFragment : BaseFragment() {
 
             val chooser = Intent(Intent.ACTION_CHOOSER)
             chooser.putExtra(Intent.EXTRA_INTENT, galleryIntent)
-            chooser.putExtra(Intent.EXTRA_TITLE, requireContext().getString(R.string.post_select_pic))
+            chooser.putExtra(
+                Intent.EXTRA_TITLE,
+                requireContext().getString(R.string.post_select_pic)
+            )
 
             val intentArray = arrayOf(cameraIntent)
             chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
@@ -1173,7 +1150,10 @@ class AdultHomeFragment : BaseFragment() {
 
             val chooser = Intent(Intent.ACTION_CHOOSER)
             chooser.putExtra(Intent.EXTRA_INTENT, galleryIntent)
-            chooser.putExtra(Intent.EXTRA_TITLE, requireContext().getString(R.string.post_select_pic))
+            chooser.putExtra(
+                Intent.EXTRA_TITLE,
+                requireContext().getString(R.string.post_select_pic)
+            )
 
             val intentArray = arrayOf(cameraIntent)
             chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
@@ -1204,20 +1184,27 @@ class AdultHomeFragment : BaseFragment() {
                         val uri = if (data?.data == null) {
                             val extras = data?.extras
                             val imageBitmap = extras!!["data"] as Bitmap?
-                            Uri.parse(MediaStore.Images.Media.insertImage(requireContext().contentResolver, imageBitmap, null,null))
+                            Uri.parse(
+                                MediaStore.Images.Media.insertImage(
+                                    requireContext().contentResolver,
+                                    imageBitmap,
+                                    null,
+                                    null
+                                )
+                            )
                         } else {
                             data.data!!
                         }
 
                         pciUri.add(uri.toString())
                     }
-                        val bundle = Bundle()
-                        bundle.putStringArrayList(BUNDLE_PIC_URI, pciUri)
+                    val bundle = Bundle()
+                    bundle.putStringArrayList(BUNDLE_PIC_URI, pciUri)
 
-                        findNavController().navigate(
-                            R.id.action_adultHomeFragment_to_postPicFragment,
-                            bundle
-                        )
+                    findNavController().navigate(
+                        R.id.action_adultHomeFragment_to_postPicFragment,
+                        bundle
+                    )
                 }
 
                 REQUEST_VIDEO_CAPTURE -> {
@@ -1250,9 +1237,7 @@ class AdultHomeFragment : BaseFragment() {
         isFollow: Boolean,
         update: (Boolean) -> Unit
     ) {
-        checkIsEmailConfirmed {
-            viewModel.followMember(memberPostItem, isFollow, update)
-        }
+        checkStatus { viewModel.followMember(memberPostItem, isFollow, update) }
     }
 
     private fun likePost(
@@ -1260,9 +1245,7 @@ class AdultHomeFragment : BaseFragment() {
         isLike: Boolean,
         update: (Boolean, Int) -> Unit
     ) {
-        checkIsEmailConfirmed {
-            viewModel.likePost(memberPostItem, isLike, update)
-        }
+        checkStatus { viewModel.likePost(memberPostItem, isLike, update) }
     }
 
     private fun favoritePost(
@@ -1270,9 +1253,7 @@ class AdultHomeFragment : BaseFragment() {
         isFavorite: Boolean,
         update: (Boolean, Int) -> Unit
     ) {
-        checkIsEmailConfirmed {
-            viewModel.favoritePost(memberPostItem, isFavorite, update)
-        }
+        checkStatus { viewModel.favoritePost(memberPostItem, isFavorite, update) }
     }
 
     private fun clubFollow(
@@ -1280,9 +1261,7 @@ class AdultHomeFragment : BaseFragment() {
         isFollow: Boolean,
         update: (Boolean) -> Unit
     ) {
-        checkIsEmailConfirmed {
-            viewModel.clubFollow(memberClubItem, isFollow, update)
-        }
+        checkStatus { viewModel.clubFollow(memberClubItem, isFollow, update) }
     }
 
     private fun resetAndCancelJob(t: Throwable = Throwable(), msg: String = "") {
@@ -1296,21 +1275,6 @@ class AdultHomeFragment : BaseFragment() {
         if (msg.isNotBlank()) {
             Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
         }
-    }
-
-    private fun checkIsEmailConfirmed(onConfirmed: () -> Unit) {
-        mainViewModel?.checkIsEmailConfirmed(
-            onConfirmed,
-            {
-                navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_main_to_settingFragment,
-                        viewModel.getMeAvatar()?.let { byteArray ->
-                            SettingFragment.createBundle(byteArray)
-                        })
-                )
-            }
-        )
     }
 
 }

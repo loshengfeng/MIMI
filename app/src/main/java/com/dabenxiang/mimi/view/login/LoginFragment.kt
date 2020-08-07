@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
+import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -40,6 +41,7 @@ class LoginFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
         initSettings()
     }
 
@@ -256,6 +258,7 @@ class LoginFragment : BaseFragment() {
     }
 
     override fun initSettings() {
+        useAdultTheme(false)
         viewModel.registerAccount.bindingEditText = edit_register_account
         viewModel.email.bindingEditText = edit_email
         viewModel.friendlyName.bindingEditText = edit_friendly_name

@@ -206,4 +206,9 @@ abstract class BaseFragment : Fragment() {
             mainViewModel?.logoutLocal()
         }
     }
+
+    fun checkStatus(onConfirmed: () -> Unit) {
+        mainViewModel?.checkStatus(onConfirmed)
+    }
+
 }

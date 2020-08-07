@@ -3,7 +3,6 @@ package com.dabenxiang.mimi.view.mypost
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
-import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -32,7 +31,6 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.dialog.*
 import com.dabenxiang.mimi.view.dialog.comment.MyPostMoreDialogFragment
-import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.TYPE_VIDEO
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.USER_ID_ME
@@ -41,9 +39,7 @@ import com.dabenxiang.mimi.view.post.article.PostArticleFragment
 import com.dabenxiang.mimi.view.post.pic.PostPicFragment
 import com.dabenxiang.mimi.view.post.video.PostVideoFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
-import com.dabenxiang.mimi.view.setting.SettingFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
@@ -659,7 +655,7 @@ class MyPostFragment : BaseFragment() {
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem) {
             moreDialog?.dismiss()
-            (requireActivity() as MainActivity).showReportDialog(item)
+            checkStatus { (requireActivity() as MainActivity).showReportDialog(item) }
         }
 
         override fun onCancel() {
@@ -667,51 +663,34 @@ class MyPostFragment : BaseFragment() {
         }
     }
 
-    private fun checkIsEmailConfirmed(onConfirmed: () -> Unit) {
-        mainViewModel?.checkIsEmailConfirmed(
-            onConfirmed,
-            {
-                navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_myPostFragment_to_settingFragment,
-                        viewModel.getMeAvatar()?.let { byteArray ->
-                            SettingFragment.createBundle(byteArray)
-                        })
-                )
-            }
-        )
-    }
-
     private val myPostListener = object : MyPostListener {
         override fun onMoreClick(item: MemberPostItem) {
-            checkIsEmailConfirmed {
-                if (userId == USER_ID_ME) {
-                    meMoreDialog =
-                        MyPostMoreDialogFragment.newInstance(item, onMeMoreDialogListener)
-                            .also {
-                                it.show(
-                                    requireActivity().supportFragmentManager,
-                                    MoreDialogFragment::class.java.simpleName
-                                )
-                            }
-                } else {
-                    moreDialog =
-                        MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
+            if (userId == USER_ID_ME) {
+                meMoreDialog =
+                    MyPostMoreDialogFragment.newInstance(item, onMeMoreDialogListener)
+                        .also {
                             it.show(
                                 requireActivity().supportFragmentManager,
                                 MoreDialogFragment::class.java.simpleName
                             )
                         }
-                }
+            } else {
+                moreDialog =
+                    MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
+                        it.show(
+                            requireActivity().supportFragmentManager,
+                            MoreDialogFragment::class.java.simpleName
+                        )
+                    }
             }
         }
 
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
-            checkIsEmailConfirmed { viewModel.likePost(item, position, isLike) }
+            checkStatus { viewModel.likePost(item, position, isLike) }
         }
 
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {
-            checkIsEmailConfirmed {
+            checkStatus {
                 val bundle = ClipFragment.createBundle(ArrayList(item), position)
                 navigateTo(
                     NavigateItem.Destination(
@@ -769,7 +748,7 @@ class MyPostFragment : BaseFragment() {
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            checkIsEmailConfirmed {
+            checkStatus {
                 when (adultTabType) {
                     AdultTabType.PICTURE -> {
                         val bundle = PictureDetailFragment.createBundle(item, 1)
@@ -801,15 +780,11 @@ class MyPostFragment : BaseFragment() {
             isFavorite: Boolean,
             type: AttachmentType
         ) {
-            checkIsEmailConfirmed {
-                viewModel.favoritePost(item, position, isFavorite)
-            }
+            checkStatus { viewModel.favoritePost(item, position, isFavorite) }
         }
 
         override fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
-            checkIsEmailConfirmed {
-                viewModel.followPost(item, position, isFollow)
-            }
+            checkStatus { viewModel.followPost(item, position, isFollow) }
         }
     }
 
