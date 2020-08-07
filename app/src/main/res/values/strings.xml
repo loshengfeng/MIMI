@@ -250,6 +250,7 @@
     <string name="post_warning_video">请选择影片</string>
     <string name="post_warning_tag_limit">已超过标签上限20个，请确认</string>
     <string name="post_select_pic">选择照片</string>
+    <string name="post_select_video">选择影片</string>
     <string name="post_tag_already_have">已存在相同标签，请确认</string>
     <string name="post_error">发布失败</string>
 

@@ -1156,7 +1156,7 @@ class AdultHomeFragment : BaseFragment() {
 
             val chooser = Intent(Intent.ACTION_CHOOSER)
             chooser.putExtra(Intent.EXTRA_INTENT, galleryIntent)
-            chooser.putExtra(Intent.EXTRA_TITLE, requireContext().getString(R.string.post_select_pic))
+            chooser.putExtra(Intent.EXTRA_TITLE, requireContext().getString(R.string.post_select_video))
 
             val intentArray = arrayOf(cameraIntent)
             chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
@@ -1312,5 +1312,4 @@ class AdultHomeFragment : BaseFragment() {
             }
         )
     }
-
 }

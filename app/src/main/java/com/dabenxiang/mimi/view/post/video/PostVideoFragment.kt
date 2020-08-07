@@ -13,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.core.view.get
 import androidx.core.view.isEmpty
@@ -221,23 +222,7 @@ class PostVideoFragment : BaseFragment() {
         }
 
         tv_back.setOnClickListener {
-            GeneralDialog.newInstance(
-                GeneralDialogData(
-                    titleRes = R.string.whether_to_discard_content,
-                    messageIcon = R.drawable.ico_default_photo,
-                    firstBtn = getString(R.string.btn_cancel),
-                    secondBtn = getString(R.string.btn_confirm),
-                    isMessageIcon = false,
-                    secondBlock = {
-                        val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
-                        if (isEdit != null && isEdit) {
-                            findNavController().navigate(R.id.action_postVideoFragment_to_myPostFragment)
-                        } else {
-                            findNavController().navigate(R.id.action_postVideoFragment_to_adultHomeFragment)
-                        }
-                    }
-                )
-            ).show(requireActivity().supportFragmentManager)
+           handleBackEvent()
         }
 
         tv_clean.setOnClickListener {
@@ -302,6 +287,30 @@ class PostVideoFragment : BaseFragment() {
                 findNavController().navigate(R.id.action_postVideoFragment_to_adultHomeFragment, bundle)
             }
         }
+
+        requireActivity().onBackPressedDispatcher.addCallback {
+            handleBackEvent()
+        }
+    }
+
+    private fun handleBackEvent() {
+        GeneralDialog.newInstance(
+            GeneralDialogData(
+                titleRes = R.string.whether_to_discard_content,
+                messageIcon = R.drawable.ico_default_photo,
+                firstBtn = getString(R.string.btn_cancel),
+                secondBtn = getString(R.string.btn_confirm),
+                isMessageIcon = false,
+                secondBlock = {
+                    val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
+                    if (isEdit != null && isEdit) {
+                        findNavController().navigate(R.id.action_postVideoFragment_to_myPostFragment)
+                    } else {
+                        findNavController().navigate(R.id.action_postVideoFragment_to_adultHomeFragment)
+                    }
+                }
+            )
+        ).show(requireActivity().supportFragmentManager)
     }
 
     override fun setupFirstTime() {
