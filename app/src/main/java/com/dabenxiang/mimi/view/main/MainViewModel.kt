@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.vo.CheckEmailResult
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -38,7 +39,7 @@ class MainViewModel : BaseViewModel() {
     val adult
         get() = _adult
 
-    var isVersionChecked =false
+    var isVersionChecked = false
 
     fun setupNormalCategoriesItem(item: CategoriesItem?) {
         _normal = item
@@ -116,8 +117,8 @@ class MainViewModel : BaseViewModel() {
     fun getCategory(title: String, isAdult: Boolean): CategoriesItem? {
         val item = if (isAdult) _adult else _normal
         var result: CategoriesItem? = null
-            item?.categories?.forEach {
-            if(it.name == title) {
+        item?.categories?.forEach {
+            if (it.name == title) {
                 result = it
             }
         }
@@ -164,6 +165,27 @@ class MainViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _postReportResult.value = it }
+        }
+    }
+
+    private val _isEmailConfirmed by lazy { MutableLiveData<ApiResult<CheckEmailResult>>() }
+    val isEmailConfirmed: LiveData<ApiResult<CheckEmailResult>> get() = _isEmailConfirmed
+    fun checkIsEmailConfirmed(onConfirmed: () -> Unit, onUnconfirmed: () -> Unit) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getMe()
+                if (!result.isSuccessful) throw HttpException(result)
+                val meItem = result.body()?.content
+                emit(ApiResult.success(CheckEmailResult(
+                    meItem?.isEmailConfirmed ?: false,
+                    onConfirmed,
+                    onUnconfirmed
+                )))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _isEmailConfirmed.value = it }
         }
     }
 

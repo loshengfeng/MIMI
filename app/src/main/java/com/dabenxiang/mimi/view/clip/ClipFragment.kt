@@ -20,6 +20,7 @@ import com.dabenxiang.mimi.view.dialog.comment.CommentDialogFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.setting.SettingFragment
 import kotlinx.android.synthetic.main.fragment_clip.*
 import timber.log.Timber
 import java.io.File
@@ -217,23 +218,46 @@ class ClipFragment : BaseFragment() {
     }
 
     private fun onFollowClick(item: MemberPostItem, pos: Int, isFollow: Boolean) {
-        Timber.d("onFollowClick, item:$item, pos:$pos, isFollow:$isFollow")
-        viewModel.followPost(item, pos, isFollow)
+        checkIsEmailConfirmed {
+            Timber.d("onFollowClick, item:$item, pos:$pos, isFollow:$isFollow")
+            viewModel.followPost(item, pos, isFollow)
+        }
     }
 
     private fun onFavoriteClick(item: MemberPostItem, pos: Int, isFavorite: Boolean) {
-        Timber.d("onFavoriteClick,  item:$item, pos:$pos, isFavorite:$isFavorite")
-        viewModel.favoritePost(item, pos, isFavorite)
+        checkIsEmailConfirmed {
+            Timber.d("onFavoriteClick,  item:$item, pos:$pos, isFavorite:$isFavorite")
+            viewModel.favoritePost(item, pos, isFavorite)
+        }
     }
 
     private fun onLikeClick(item: MemberPostItem, pos: Int, isLike: Boolean) {
-        Timber.d("onLikeClick, item:$item, pos:$pos, isLike:$isLike")
-        viewModel.likePost(item, pos, isLike)
+        checkIsEmailConfirmed {
+            Timber.d("onLikeClick, item:$item, pos:$pos, isLike:$isLike")
+            viewModel.likePost(item, pos, isLike)
+        }
     }
 
     private fun onCommentClick(item: MemberPostItem) {
-        Timber.d("onCommentClick, item:$item")
-        showCommentDialog(item)
+        checkIsEmailConfirmed {
+            Timber.d("onCommentClick, item:$item")
+            showCommentDialog(item)
+        }
+    }
+
+    private fun checkIsEmailConfirmed(onConfirmed: () -> Unit) {
+        mainViewModel?.checkIsEmailConfirmed(
+            onConfirmed,
+            {
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_clipFragment_to_settingFragment,
+                        viewModel.getMeAvatar()?.let { byteArray ->
+                            SettingFragment.createBundle(byteArray)
+                        })
+                )
+            }
+        )
     }
 
     private fun showCommentDialog(item: MemberPostItem) {

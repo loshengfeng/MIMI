@@ -26,7 +26,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.manager.DomainManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import retrofit2.HttpException
 import timber.log.Timber
 
 /**
@@ -41,7 +46,9 @@ fun BottomNavigationView.setupWithNavController(
     navGraphIds: List<Int>,
     fragmentManager: FragmentManager,
     containerId: Int,
-    intent: Intent
+    intent: Intent,
+    domainManager: DomainManager,
+    onEmailUnconfirmed: () -> Unit
 ): LiveData<NavController> {
 
     // Map of tags
@@ -96,46 +103,63 @@ fun BottomNavigationView.setupWithNavController(
         if (fragmentManager.isStateSaved) {
             false
         } else {
-            val newlySelectedItemTag = graphIdToTagMap[item.itemId]
-            if (selectedItemTag != newlySelectedItemTag) {
-                // Pop everything above the first fragment (the "fixed start destination")
-                fragmentManager.popBackStack(
-                    firstFragmentTag,
-                    FragmentManager.POP_BACK_STACK_INCLUSIVE
-                )
-                val selectedFragment = fragmentManager.findFragmentByTag(newlySelectedItemTag)
-                        as NavHostFragment
+            var isConfirmed = false
+            if (item.title.toString() == context.getString(R.string.nav_topup)
+                || item.title.toString() == context.getString(R.string.nav_favorite)
+            ) {
+                runBlocking {
+                    isConfirmed = withContext(Dispatchers.Default) {
+                        isEmailConfirmed(domainManager)
+                    }
+                }
+            } else {
+                isConfirmed = true
+            }
+            if (isConfirmed) {
+                val newlySelectedItemTag = graphIdToTagMap[item.itemId]
+                if (selectedItemTag != newlySelectedItemTag) {
+                    // Pop everything above the first fragment (the "fixed start destination")
+                    fragmentManager.popBackStack(
+                        firstFragmentTag,
+                        FragmentManager.POP_BACK_STACK_INCLUSIVE
+                    )
+                    val selectedFragment = fragmentManager.findFragmentByTag(newlySelectedItemTag)
+                            as NavHostFragment
 
-                // Exclude the first fragment tag because it's always in the back stack.
-                if (firstFragmentTag != newlySelectedItemTag) {
-                    // Commit a transaction that cleans the back stack and adds the first fragment
-                    // to it, creating the fixed started destination.
-                    fragmentManager.beginTransaction()
-                        .setCustomAnimations(
-                            R.anim.nav_default_enter_anim,
-                            R.anim.nav_default_exit_anim,
-                            R.anim.nav_default_pop_enter_anim,
-                            R.anim.nav_default_pop_exit_anim
-                        )
-                        .attach(selectedFragment)
-                        .setPrimaryNavigationFragment(selectedFragment)
-                        .apply {
-                            // Detach all other Fragments
-                            graphIdToTagMap.forEach { _, fragmentTagIter ->
-                                if (fragmentTagIter != newlySelectedItemTag) {
-                                    detach(fragmentManager.findFragmentByTag(firstFragmentTag)!!)
+                    // Exclude the first fragment tag because it's always in the back stack.
+                    if (firstFragmentTag != newlySelectedItemTag) {
+                        // Commit a transaction that cleans the back stack and adds the first fragment
+                        // to it, creating the fixed started destination.
+                        fragmentManager.beginTransaction()
+                            .setCustomAnimations(
+                                R.anim.nav_default_enter_anim,
+                                R.anim.nav_default_exit_anim,
+                                R.anim.nav_default_pop_enter_anim,
+                                R.anim.nav_default_pop_exit_anim
+                            )
+                            .attach(selectedFragment)
+                            .setPrimaryNavigationFragment(selectedFragment)
+                            .apply {
+                                // Detach all other Fragments
+                                graphIdToTagMap.forEach { _, fragmentTagIter ->
+                                    if (fragmentTagIter != newlySelectedItemTag) {
+                                        detach(fragmentManager.findFragmentByTag(firstFragmentTag)!!)
+                                    }
                                 }
                             }
-                        }
-                        .addToBackStack(firstFragmentTag)
-                        .setReorderingAllowed(true)
-                        .commit()
+                            .addToBackStack(firstFragmentTag)
+                            .setReorderingAllowed(true)
+                            .commit()
+                    }
+                    selectedItemTag = newlySelectedItemTag
+                    isOnFirstFragment = selectedItemTag == firstFragmentTag
+                    selectedNavController.value = selectedFragment.navController
+                    true
+                } else {
+                    false
                 }
-                selectedItemTag = newlySelectedItemTag
-                isOnFirstFragment = selectedItemTag == firstFragmentTag
-                selectedNavController.value = selectedFragment.navController
-                true
             } else {
+                onEmailUnconfirmed()
                 false
             }
         }
@@ -162,6 +186,13 @@ fun BottomNavigationView.setupWithNavController(
         }
     }
     return selectedNavController
+}
+
+private suspend fun isEmailConfirmed(domainManager: DomainManager): Boolean {
+    val result = domainManager.getApiRepository().getMe()
+    if (!result.isSuccessful) throw HttpException(result)
+    val meItem = result.body()?.content
+    return meItem?.isEmailConfirmed ?: false
 }
 
 private fun BottomNavigationView.setupDeepLinks(
@@ -264,4 +295,5 @@ private fun FragmentManager.isOnBackStack(backStackName: String): Boolean {
 
 
 private fun getFragmentTag(index: Int) = "bottomNavigation#$index"
-private fun getIndex(fragmentTag: String) = fragmentTag.substringAfter("bottomNavigation#").toInt()
+private fun getIndex(fragmentTag: String) =
+    fragmentTag.substringAfter("bottomNavigation#").toInt()

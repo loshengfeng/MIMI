@@ -5,6 +5,8 @@
     android:id="@+id/navigation_detail_club"
     app:startDestination="@id/clubDetailFragment">
 
+    <include app:graph="@navigation/navigation_setting"/>
+
     <fragment
         android:id="@+id/clubDetailFragment"
         android:name="com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment"
@@ -91,6 +93,9 @@
         <action
             android:id="@+id/action_clipFragment_to_myPostFragment"
             app:destination="@id/myPostFragment" />
+        <action
+            android:id="@+id/action_clipFragment_to_settingFragment"
+            app:destination="@id/navigation_setting" />
     </fragment>
 
     <fragment
