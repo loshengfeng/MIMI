@@ -8,6 +8,7 @@
     <include app:graph="@navigation/navigation_detail_club" />
     <include app:graph="@navigation/navigation_my_post" />
     <include app:graph="@navigation/navigation_setting" />
+    <include app:graph="@navigation/navigation_login" />
 
     <fragment
         android:id="@+id/postFavoriteFragment"
@@ -25,6 +26,10 @@
         <action
             android:id="@+id/action_postFavoriteFragment_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
+
+        <action
+            android:id="@+id/action_postFavoriteFragment_to_loginFragment"
+            app:destination="@id/navigation_login" />
     </fragment>
     <fragment
         android:id="@+id/searchVideoFragment"
