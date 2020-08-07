@@ -1000,7 +1000,8 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
-            val bundle = ClipFragment.createBundle(ArrayList(item), position)
+
+            val bundle = ClipFragment.createBundle(ArrayList(item.subList(1, item.lastIndex)), position-1)
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_adultHomeFragment_to_clipFragment,
@@ -1144,11 +1145,22 @@ class AdultHomeFragment : BaseFragment() {
 
     private val onChooseUploadMethodDialogListener = object : OnChooseUploadMethodDialogListener {
         override fun onUploadVideo() {
-            val intent = Intent()
-            intent.action = MediaStore.ACTION_VIDEO_CAPTURE
-            intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, RECORD_LIMIT_TIME)
-            intent.resolveActivity(requireContext().packageManager)
-            startActivityForResult(intent, REQUEST_VIDEO_CAPTURE)
+            val galleryIntent = Intent()
+            galleryIntent.type = "video/*"
+            galleryIntent.action = Intent.ACTION_GET_CONTENT
+
+            val cameraIntent = Intent()
+            cameraIntent.action = MediaStore.ACTION_VIDEO_CAPTURE
+            cameraIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, RECORD_LIMIT_TIME)
+            cameraIntent.resolveActivity(requireContext().packageManager)
+
+            val chooser = Intent(Intent.ACTION_CHOOSER)
+            chooser.putExtra(Intent.EXTRA_INTENT, galleryIntent)
+            chooser.putExtra(Intent.EXTRA_TITLE, requireContext().getString(R.string.post_select_pic))
+
+            val intentArray = arrayOf(cameraIntent)
+            chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
+            startActivityForResult(chooser, REQUEST_VIDEO_CAPTURE)
         }
 
         override fun onUploadPic() {

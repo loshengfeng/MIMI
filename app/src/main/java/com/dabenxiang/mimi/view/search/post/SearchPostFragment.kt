@@ -114,8 +114,7 @@ class SearchPostFragment : BaseFragment() {
 
         takeIf { isClub }?.also {
             recycler_search_result.layoutManager = MiMiLinearLayoutManager(requireContext())
-            recycler_search_result.adapter = clubMemberAdapter
-        }
+            recycler_search_result.adapter = clubMemberAdapter }
             ?: run { recycler_search_result.adapter = adapter }
 
         if (!TextUtils.isEmpty(mTag)) {
@@ -417,7 +416,7 @@ class SearchPostFragment : BaseFragment() {
                         val bundle = ClipFragment.createBundle(arrayListOf(item), 0, true)
                         navigateTo(
                             NavigateItem.Destination(
-                                R.id.action_clubDetailFragment_to_clipFragment,
+                                R.id.action_searchPostFragment_to_clipFragment,
                                 bundle
                             )
                         )
@@ -463,7 +462,7 @@ class SearchPostFragment : BaseFragment() {
                     val bundle = ClipFragment.createBundle(arrayListOf(item), 0)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_clubDetailFragment_to_clipFragment,
+                            R.id.action_searchPostFragment_to_clipFragment,
                             bundle
                         )
                     )
@@ -507,12 +506,7 @@ class SearchPostFragment : BaseFragment() {
                 isAdultTheme = true
             )
 
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_searchPostFragment_to_myPostFragment,
-                    bundle
-                )
-            )
+            navigateTo(NavigateItem.Destination(R.id.action_searchPostFragment_to_myPostFragment, bundle))
         }
     }
 
