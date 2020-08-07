@@ -8,6 +8,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import kotlinx.android.synthetic.main.fragment_dialog_more.*
+import timber.log.Timber
 
 class MoreDialogFragment : BaseDialogFragment() {
 
@@ -47,6 +48,7 @@ class MoreDialogFragment : BaseDialogFragment() {
         } else {
             tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1))
             tv_problem_report.setOnClickListener {
+                Timber.i(" isReport=$isReport")
                 listener?.onProblemReport(item!!)
             }
         }

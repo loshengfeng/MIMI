@@ -9,7 +9,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.provider.MediaStore
-import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -44,9 +43,12 @@ import com.dabenxiang.mimi.view.club.ClubFuncItem
 import com.dabenxiang.mimi.view.club.ClubMemberAdapter
 import com.dabenxiang.mimi.view.club.MiMiLinearLayoutManager
 import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
-import com.dabenxiang.mimi.view.dialog.*
+import com.dabenxiang.mimi.view.dialog.GeneralDialog
+import com.dabenxiang.mimi.view.dialog.GeneralDialogData
+import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.OnChooseUploadMethodDialogListener
+import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.home.HomeViewModel.Companion.TYPE_COVER
 import com.dabenxiang.mimi.view.home.HomeViewModel.Companion.TYPE_PIC
 import com.dabenxiang.mimi.view.home.HomeViewModel.Companion.TYPE_VIDEO
@@ -1136,8 +1138,20 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onUploadPic() {
-            val takePicture = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            startActivityForResult(takePicture, REQUEST_PHOTO)
+            val galleryIntent = Intent()
+            galleryIntent.type = "image/*"
+            galleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+            galleryIntent.action = Intent.ACTION_GET_CONTENT
+
+            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+
+            val chooser = Intent(Intent.ACTION_CHOOSER)
+            chooser.putExtra(Intent.EXTRA_INTENT, galleryIntent)
+            chooser.putExtra(Intent.EXTRA_TITLE, requireContext().getString(R.string.post_select_pic))
+
+            val intentArray = arrayOf(cameraIntent)
+            chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
+            startActivityForResult(chooser, REQUEST_PHOTO)
         }
 
         override fun onUploadArticle() {
@@ -1151,32 +1165,33 @@ class AdultHomeFragment : BaseFragment() {
         if (resultCode == RESULT_OK) {
             when (requestCode) {
                 REQUEST_PHOTO -> {
-                    data?.let {
-                        val uriImage: Uri?
+                    val pciUri = arrayListOf<String>()
 
-                        uriImage = if (it.data != null) {
-                            it.data
+                    val clipData = data?.clipData
+                    if (clipData != null) {
+                        for (i in 0 until clipData.itemCount) {
+                            val item = clipData.getItemAt(i)
+                            val uri = item.uri
+                            pciUri.add(uri.toString())
+                        }
+                    } else {
+                        val uri = if (data?.data == null) {
+                            val extras = data?.extras
+                            val imageBitmap = extras!!["data"] as Bitmap?
+                            Uri.parse(MediaStore.Images.Media.insertImage(requireContext().contentResolver, imageBitmap, null,null))
                         } else {
-                            val extras = it.extras
-                            val imageBitmap = extras?.let { ex -> ex["data"] as Bitmap }
-                            Uri.parse(
-                                MediaStore.Images.Media.insertImage(
-                                    requireContext().contentResolver,
-                                    imageBitmap,
-                                    null,
-                                    null
-                                )
-                            )
+                            data.data!!
                         }
 
+                        pciUri.add(uri.toString())
+                    }
                         val bundle = Bundle()
-                        bundle.putString(BUNDLE_PIC_URI, uriImage.toString())
+                        bundle.putStringArrayList(BUNDLE_PIC_URI, pciUri)
 
                         findNavController().navigate(
                             R.id.action_adultHomeFragment_to_postPicFragment,
                             bundle
                         )
-                    }
                 }
 
                 REQUEST_VIDEO_CAPTURE -> {

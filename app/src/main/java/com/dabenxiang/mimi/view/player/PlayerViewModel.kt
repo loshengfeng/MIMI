@@ -48,6 +48,7 @@ class PlayerViewModel : BaseViewModel() {
     var category: String = ""
     var episodeId: Long = -1L
     var isReported: Boolean = false
+    var isCommentReport: Boolean = false
 
     var currentWindow: Int = 0
     var playbackPosition: Long = 0
@@ -258,8 +259,8 @@ class PlayerViewModel : BaseViewModel() {
             flow {
                 val source = sourceList?.get(sourceListPosition.value!!)!!
                 val episode = source.videoEpisodes?.get(0)!!
-                val episodeId = episode.id!!
-
+                episodeId = episode.id!!
+                Timber.i("episodeId =$episodeId")
                 val apiRepository = domainManager.getApiRepository()
 
                 val episodeResp = apiRepository.getVideoEpisode(videoId, episodeId)
@@ -325,7 +326,7 @@ class PlayerViewModel : BaseViewModel() {
 //                val episode = source.videoEpisodes?.get(episodePosition.value!!)!!
                 val episode = sortEpisode.get(episodePosition.value!!)
                 episodeId = episode.id ?: 0L
-
+                Timber.i("getStreamUrl episodeId =$episodeId")
                 val apiRepository = domainManager.getApiRepository()
 
                 val episodeResp = apiRepository.getVideoEpisode(videoId, episodeId)
@@ -677,11 +678,12 @@ class PlayerViewModel : BaseViewModel() {
     /**
      * 問題回報
      */
-    fun sentReport(content: String) {
+    fun sentReport(id: Long, content: String) {
         viewModelScope.launch {
             flow {
                 val resp = domainManager.getApiRepository().sendPostReport(
-                    videoId, ReportRequest(content)
+//                    videoId, ReportRequest(content)
+                    id, ReportRequest(content)
                 )
                 if (!resp.isSuccessful) throw HttpException(resp)
 

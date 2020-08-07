@@ -2,70 +2,71 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:id="@+id/layout_root"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="@drawable/bg_top_radius_35"
-        android:backgroundTint="@color/color_white_1" >
-
-        <TextView
-            android:id="@+id/btn_cancel"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:gravity="center"
-            android:layout_marginBottom="16dp"
-            android:stateListAnimator="@null"
-            android:text="@string/cancel"
-            android:textColor="@color/color_black_1"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/btn_article"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:gravity="center"
-            android:stateListAnimator="@null"
-            android:text="@string/choose_album"
-            android:textColor="@color/color_black_1"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toTopOf="@+id/btn_cancel"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/btn_camera"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:stateListAnimator="@null"
-            android:gravity="center"
-            android:text="@string/choose_camera"
-            android:textColor="@color/color_black_1"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toTopOf="@+id/btn_article"
-            app:layout_constraintEnd_toEndOf="@+id/btn_article"
-            app:layout_constraintStart_toStartOf="@+id/btn_article" />
+        android:backgroundTint="@color/color_white_1"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/tv_title"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="20dp"
             android:gravity="center"
-            tools:text="@string/upload_tool"
             android:textColor="@color/color_white_1"
             android:textSize="16sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@+id/btn_camera"
-            app:layout_constraintEnd_toEndOf="@+id/btn_camera"
-            app:layout_constraintStart_toStartOf="@+id/btn_camera" />
+            tools:text="@string/upload_tool" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/btn_camera"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="left|center_vertical"
+            android:paddingStart="30dp"
+            android:stateListAnimator="@null"
+            android:text="@string/choose_camera"
+            android:textColor="@color/color_black_1"
+            android:textSize="16sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/color_black_1_10" />
+
+        <TextView
+            android:id="@+id/btn_article"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="left|center_vertical"
+            android:stateListAnimator="@null"
+            android:text="@string/choose_album"
+            android:paddingStart="30dp"
+            android:textColor="@color/color_black_1"
+            android:textSize="16sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/color_black_1_10" />
+
+        <TextView
+            android:id="@+id/btn_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:stateListAnimator="@null"
+            android:text="@string/cancel"
+            android:textColor="@color/color_black_1"
+            android:textSize="16sp" />
+
+    </LinearLayout>
 </RelativeLayout>
