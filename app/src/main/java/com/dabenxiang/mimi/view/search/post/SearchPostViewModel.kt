@@ -158,6 +158,40 @@ class SearchPostViewModel : BaseViewModel() {
         }
     }
 
+    fun likePost(item: MemberPostItem, isLike: Boolean, update: (Boolean, Int) -> Unit) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val likeType = when {
+                    isLike -> LikeType.LIKE
+                    else -> LikeType.DISLIKE
+                }
+                val request = LikeRequest(likeType)
+                val result = apiRepository.like(item.id, request)
+                if (!result.isSuccessful) throw HttpException(result)
+
+                item.likeType = likeType
+                item.likeCount = when (item.likeType) {
+                    LikeType.LIKE -> item.likeCount + 1
+                    else -> item.likeCount - 1
+                }
+
+                emit(ApiResult.success(item.likeCount))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    when (it) {
+                        is ApiResult.Success -> {
+                            update(isLike, it.result)
+                        }
+                    }
+                }
+        }
+    }
+
     fun getSearchPostsByTag(type: PostType, tag: String, isPostFollow: Boolean) {
         viewModelScope.launch {
             getSearchPostByTagPagingItems(type, tag, isPostFollow).asFlow()
@@ -335,6 +369,59 @@ class SearchPostViewModel : BaseViewModel() {
 
         override fun onThrowable(throwable: Throwable) {
             setShowProgress(false)
+        }
+    }
+
+    fun followMember(item: MemberPostItem, isFollow: Boolean, update: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = when {
+                    isFollow -> apiRepository.followPost(item.creatorId)
+                    else -> apiRepository.cancelFollowPost(item.creatorId)
+                }
+                if (!result.isSuccessful) throw HttpException(result)
+                item.isFollow = isFollow
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    when (it) {
+                        is ApiResult.Empty -> {
+                            update(isFollow)
+                        }
+                    }
+                }
+        }
+    }
+
+    fun favoritePost(item: MemberPostItem, isFavorite: Boolean, update: (Boolean, Int) -> Unit) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = when {
+                    isFavorite -> apiRepository.addFavorite(item.id)
+                    else -> apiRepository.deleteFavorite(item.id)
+                }
+                if (!result.isSuccessful) throw HttpException(result)
+                item.isFavorite = isFavorite
+                if (isFavorite) item.favoriteCount++ else item.favoriteCount--
+                emit(ApiResult.success(item.favoriteCount))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    when (it) {
+                        is ApiResult.Success -> {
+                            update(isFavorite, it.result)
+                        }
+                    }
+                }
         }
     }
 }

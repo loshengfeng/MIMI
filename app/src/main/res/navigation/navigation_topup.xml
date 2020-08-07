@@ -5,6 +5,8 @@
     android:id="@+id/navigation_topup"
     app:startDestination="@id/topupFragment">
 
+    <include app:graph="@navigation/navigation_login" />
+
     <fragment
         android:id="@+id/topupFragment"
         android:name="com.dabenxiang.mimi.view.topup.TopUpFragment"
@@ -15,6 +17,9 @@
         <action
             android:id="@+id/action_topupFragment_to_chatContentFragment"
             app:destination="@id/chatContentFragment" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
     </fragment>
     <fragment
         android:id="@+id/orderFragment"

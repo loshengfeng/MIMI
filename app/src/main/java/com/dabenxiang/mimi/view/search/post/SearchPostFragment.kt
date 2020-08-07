@@ -366,8 +366,10 @@ class SearchPostFragment : BaseFragment() {
     private val memberPostFuncItem by lazy {
         MemberPostFuncItem(
             {},
-            { id, function -> getBitmap(id, function) },
-            { _, _, _ -> }
+            { id, func -> getBitmap(id, func) },
+            { item, isFollow, func -> followMember(item, isFollow, func) },
+            { item, isLike, func -> likePost(item, isLike, func) },
+            { item, isFavorite, func -> favoritePost(item, isFavorite, func) }
         )
     }
 
@@ -575,5 +577,29 @@ class SearchPostFragment : BaseFragment() {
             }
             chip_group_search_text.addView(chip)
         }
+    }
+
+    private fun followMember(
+        memberPostItem: MemberPostItem,
+        isFollow: Boolean,
+        update: (Boolean) -> Unit
+    ) {
+        checkStatus { viewModel.followMember(memberPostItem, isFollow, update) }
+    }
+
+    private fun likePost(
+        memberPostItem: MemberPostItem,
+        isLike: Boolean,
+        update: (Boolean, Int) -> Unit
+    ) {
+        checkStatus { viewModel.likePost(memberPostItem, isLike, update) }
+    }
+
+    private fun favoritePost(
+        memberPostItem: MemberPostItem,
+        isFavorite: Boolean,
+        update: (Boolean, Int) -> Unit
+    ) {
+        checkStatus { viewModel.favoritePost(memberPostItem, isFavorite, update) }
     }
 }
