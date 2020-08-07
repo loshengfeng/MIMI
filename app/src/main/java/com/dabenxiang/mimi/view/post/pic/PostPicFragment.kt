@@ -309,9 +309,11 @@ class PostPicFragment : BaseFragment() {
             setUI()
         } else {
             tv_title.text = getString(R.string.post_title)
-            val uri = arguments?.getString(BUNDLE_PIC_URI)
-            val postAttachmentItem = PostAttachmentItem(uri = uri!!)
-            attachmentList.add(postAttachmentItem)
+            val uriList = arguments?.getStringArrayList(BUNDLE_PIC_URI)!!
+            for (uri in uriList) {
+                val postAttachmentItem = PostAttachmentItem(uri = uri!!)
+                attachmentList.add(postAttachmentItem)
+            }
             txt_picCount.text = String.format(getString(R.string.select_pic_count, attachmentList.size,
                 PHOTO_LIMIT
             ))
