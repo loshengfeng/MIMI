@@ -49,11 +49,6 @@ class FilterDialogFragment : BaseDialogFragment() {
 
     private fun initSettings() {
         val content = arguments?.getSerializable(KEY_CONTENT) as Content
-
-        tv_title.text = getString(content.title)
-
-        recyclerFilter.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-
         val textArray = resources.getStringArray(content.textArray)
         val valueArray = resources.getIntArray(content.valueArray)
 
@@ -67,11 +62,17 @@ class FilterDialogFragment : BaseDialogFragment() {
                     dismiss()
                 }
             })
+
     }
 
     override fun setupListeners() {
         super.setupListeners()
-        View.OnClickListener { dismiss() }
-            .also { layout_root.setOnClickListener(it) }
+        View.OnClickListener {
+            dismiss()
+        }
+            .also {
+                layout_root.setOnClickListener(it)
+                btn_cancel.setOnClickListener(it)
+            }
     }
 }

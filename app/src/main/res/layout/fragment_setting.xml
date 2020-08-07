@@ -26,7 +26,6 @@
             android:layout_marginTop="15dp"
             android:background="@color/transparent">
 
-
             <TextView
                 android:id="@+id/btn_photo"
                 style="@style/settingStyle_1"
