@@ -43,7 +43,6 @@ import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.view.post.video.PostVideoFragment
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment.Companion.VIEWER_DATA
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
@@ -183,6 +182,7 @@ class PostPicFragment : BaseFragment() {
                     if (it.length > HASHTAG_TEXT_LIMIT) {
                         val content = it.toString().dropLast(1)
                         edt_hashtag.setText(content)
+                        edt_hashtag.setSelection(content.length)
                     }
                 }
             }

@@ -108,6 +108,7 @@ class PostArticleFragment : BaseFragment() {
                     if (it.length > HASHTAG_TEXT_LIMIT) {
                         val content = it.toString().dropLast(1)
                         edt_hashtag.setText(content)
+                        edt_hashtag.setSelection(content.length)
                     }
                 }
             }
