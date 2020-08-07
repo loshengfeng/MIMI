@@ -69,13 +69,11 @@
             android:id="@+id/action_adultHomeFragment_to_navigation_my_post"
             app:destination="@id/navigation_my_post" />
         <action
-            android:id="@+id/action_adultHomeFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
         <action
-            android:id="@+id/action_main_to_settingFragment"
-            app:destination="@id/navigation_setting"
-            app:popUpTo="@id/adultHomeFragment"
-            app:popUpToInclusive="false"/>
+            android:id="@+id/action_to_settingFragment"
+            app:destination="@id/navigation_setting"/>
     </fragment>
 
     <fragment
@@ -111,14 +109,24 @@
             android:id="@+id/action_searchPostFragment_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
         <action
-            android:id="@+id/action_searchPostFragment_to_settingFragment"
+            android:id="@+id/action_to_settingFragment"
             app:destination="@id/navigation_setting" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
     </fragment>
 
     <fragment
         android:id="@+id/searchVideoFragment"
         android:name="com.dabenxiang.mimi.view.search.video.SearchVideoFragment"
-        tools:layout="@layout/fragment_search_video" />
+        tools:layout="@layout/fragment_search_video" >
+        <action
+            android:id="@+id/action_to_settingFragment"
+            app:destination="@id/navigation_setting" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+    </fragment>
 
     <fragment
         android:id="@+id/clipFragment"
@@ -128,7 +136,10 @@
             android:id="@+id/action_clipFragment_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
         <action
-            android:id="@+id/action_clipFragment_to_settingFragment"
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_settingFragment"
             app:destination="@id/navigation_setting" />
     </fragment>
 
@@ -156,6 +167,12 @@
         <action
             android:id="@+id/action_pictureDetailFragment_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_settingFragment"
+            app:destination="@id/navigation_setting"/>
     </fragment>
 
     <fragment
@@ -173,6 +190,12 @@
         <action
             android:id="@+id/action_textDetailFragment_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_settingFragment"
+            app:destination="@id/navigation_setting"/>
     </fragment>
 
     <fragment
@@ -235,9 +258,4 @@
         android:name="com.dabenxiang.mimi.view.post.viewer.PostViewerFragment"
         android:label="PostViewerFragment"
         tools:layout="@layout/fragment_post_viewer"/>
-    <fragment
-        android:id="@+id/loginFragment"
-        android:name="com.dabenxiang.mimi.view.login.LoginFragment"
-        android:label="LoginFragment"
-        tools:layout="@layout/fragment_login"/>
 </navigation>

@@ -14,6 +14,7 @@ import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.request.RequestOptions
+import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.AgentItem
@@ -27,9 +28,17 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
 import com.dabenxiang.mimi.view.listener.AdapterEventListener
 import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
+import kotlinx.android.synthetic.main.fragment_personal.*
 import kotlinx.android.synthetic.main.fragment_top_up.*
+import kotlinx.android.synthetic.main.fragment_top_up.item_is_Login
+import kotlinx.android.synthetic.main.fragment_top_up.item_is_not_Login
+import kotlinx.android.synthetic.main.fragment_top_up.iv_photo
+import kotlinx.android.synthetic.main.fragment_top_up.tv_name
+import kotlinx.android.synthetic.main.item_personal_is_login.*
+import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import timber.log.Timber
 
 class TopUpFragment : BaseFragment() {
@@ -45,7 +54,6 @@ class TopUpFragment : BaseFragment() {
         requireActivity().onBackPressedDispatcher.addCallback {
             interactionListener?.changeNavigationPosition(R.id.navigation_home)
         }
-
         initSettings()
     }
 
@@ -144,81 +152,105 @@ class TopUpFragment : BaseFragment() {
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.btn_pay -> GeneralUtils.showToast(requireContext(), "btnPay")
+                R.id.tv_login -> navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_to_loginFragment,
+                        LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                    )
+                )
+                R.id.tv_register -> navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_to_loginFragment,
+                        LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                    )
+                )
             }
         }.also {
             btn_pay.setOnClickListener(it)
+            tv_login.setOnClickListener(it)
+            tv_register.setOnClickListener(it)
         }
     }
 
     override fun initSettings() {
-        val userItem = viewModel.getUserData()
-        tv_name.text = userItem.friendlyName
-        tv_coco.text = userItem.point.toString()
-        tv_subtitle.text = getString(R.string.topup_subtitle)
-        tv_total.text = "¥ 50.00"
+        when (viewModel.accountManager.isLogin()) {
+            true -> {
+                tv_record_top_up.visibility = View.VISIBLE
+                item_is_Login.visibility = View.VISIBLE
+                item_is_not_Login.visibility = View.GONE
+                val userItem = viewModel.getUserData()
+                tv_name.text = userItem.friendlyName
+                tv_coco.text = userItem.point.toString()
+                tv_subtitle.text = getString(R.string.topup_subtitle)
+                tv_total.text = "¥ 50.00"
 
-        GridLayoutManager(context, 2).also { layoutManager ->
-            rv_online_pay.layoutManager = layoutManager
-        }
+                GridLayoutManager(context, 2).also { layoutManager ->
+                    rv_online_pay.layoutManager = layoutManager
+                }
 
-        val onlinePayList = mutableListOf<TopUpOnlinePayItem>(
-            TopUpOnlinePayItem(
-                1,
-                "300",
-                "¥ 50.00",
-                "¥ 55.00"
-            ),
-            TopUpOnlinePayItem(
-                0,
-                "900+90",
-                "¥ 150.00",
-                "¥ 165.00"
-            ),
-            TopUpOnlinePayItem(
-                0,
-                "1500+150",
-                "¥ 250.00",
-                "¥ 275.00"
-            ),
-            TopUpOnlinePayItem(
-                0,
-                "3000+300",
-                "¥ 500.00",
-                "¥ 500.00"
-            )
-        )
+                val onlinePayList = mutableListOf<TopUpOnlinePayItem>(
+                    TopUpOnlinePayItem(
+                        1,
+                        "300",
+                        "¥ 50.00",
+                        "¥ 55.00"
+                    ),
+                    TopUpOnlinePayItem(
+                        0,
+                        "900+90",
+                        "¥ 150.00",
+                        "¥ 165.00"
+                    ),
+                    TopUpOnlinePayItem(
+                        0,
+                        "1500+150",
+                        "¥ 250.00",
+                        "¥ 275.00"
+                    ),
+                    TopUpOnlinePayItem(
+                        0,
+                        "3000+300",
+                        "¥ 500.00",
+                        "¥ 500.00"
+                    )
+                )
 
-        rv_online_pay.adapter = TopUpOnlinePayAdapter(onlinePayListener)
-        val onlinePayAdapter = rv_online_pay.adapter as TopUpOnlinePayAdapter
-        onlinePayAdapter.setDataSrc(onlinePayList)
+                rv_online_pay.adapter = TopUpOnlinePayAdapter(onlinePayListener)
+                val onlinePayAdapter = rv_online_pay.adapter as TopUpOnlinePayAdapter
+                onlinePayAdapter.setDataSrc(onlinePayList)
 
-        activity?.also { activity ->
-            LinearLayoutManager(activity).also { layoutManager ->
-                layoutManager.orientation = LinearLayoutManager.VERTICAL
-                rv_proxy_pay.layoutManager = layoutManager
+                activity?.also { activity ->
+                    LinearLayoutManager(activity).also { layoutManager ->
+                        layoutManager.orientation = LinearLayoutManager.VERTICAL
+                        rv_proxy_pay.layoutManager = layoutManager
+                    }
+                }
+
+                // TODO: 尚未測試，因為目前沒有資料可以做測試
+                rv_proxy_pay.adapter = agentAdapter
+
+                viewModel.initData()
+
+                // TODO: 目前這階段無需開發訂單管理功能, 因此暫時隱藏起來
+                tv_record_top_up.visibility = View.GONE
+
+                tv_record_top_up.setOnClickListener {
+                    navigateTo(NavigateItem.Destination(R.id.action_topupFragment_to_orderFragment))
+                }
+
+                viewModel.getMe()
+
+                viewModel.agentList.observe(viewLifecycleOwner, Observer {
+                    agentAdapter.submitList(it)
+                })
+            }
+            false -> {
+                tv_record_top_up.visibility = View.GONE
+                tv_version_is_not_login.text = BuildConfig.VERSION_NAME
+                item_is_Login.visibility = View.GONE
+                item_is_not_Login.visibility = View.VISIBLE
             }
         }
-
-        // TODO: 尚未測試，因為目前沒有資料可以做測試
-        rv_proxy_pay.adapter = agentAdapter
-
-        viewModel.initData()
-
-        // TODO: 目前這階段無需開發訂單管理功能, 因此暫時隱藏起來
-        tv_record_top_up.visibility = View.GONE
-
-        tv_record_top_up.setOnClickListener {
-            navigateTo(NavigateItem.Destination(R.id.action_topupFragment_to_orderFragment))
-        }
-
-        val isLogin = mainViewModel?.isLogin() ?: false
-        if (isLogin) {
-            viewModel.getMe()
-        }
-
-        viewModel.agentList.observe(viewLifecycleOwner, Observer {
-            agentAdapter.submitList(it)
-        })
     }
 
     override fun onAttach(context: Context) {

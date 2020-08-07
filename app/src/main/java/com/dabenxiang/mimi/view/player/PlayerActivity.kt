@@ -41,6 +41,7 @@ import com.dabenxiang.mimi.view.dialog.*
 import com.dabenxiang.mimi.view.login.LoginActivity
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.main.MainActivity
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.OrientationDetector
@@ -73,6 +74,7 @@ class PlayerActivity : BaseActivity() {
 
     companion object {
         const val REQUEST_CODE = 111
+        const val KEY_IS_FROM_PLAYER = "KEY_IS_FROM_PLAYER"
         private const val KEY_PLAYER_SRC = "KEY_PLAYER_SRC"
         private const val KEY_IS_COMMENT = "KEY_IS_COMMENT"
         private const val JUMP_TIME = 1000
@@ -234,8 +236,19 @@ class PlayerActivity : BaseActivity() {
             }
 
             override fun onAvatarClick(userId: Long, name: String) {
-                // TODO:
-                Timber.d("onAvatarClick nav to member post")
+                Timber.d("onAvatarClick nav to member post with userId: $userId and name: $name")
+                val bundle = MyPostFragment.createBundle(
+                        userId, name,
+                        isAdult = true,
+                        isAdultTheme = obtainIsAdult()
+                )
+                bundle.putBoolean(KEY_IS_FROM_PLAYER, true)
+                deepLinkTo(
+                        MainActivity::class.java,
+                        R.navigation.navigation_adult,
+                        R.id.myPostFragment,
+                        bundle
+                )
             }
         }, CommentViewType.VIDEO).apply {
             loadMoreModule.apply {
@@ -979,7 +992,7 @@ class PlayerActivity : BaseActivity() {
                 it.requestFocusFromTouch()
                 val lManager: InputMethodManager =
                     getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                lManager.showSoftInput(it, 0)
+                lManager?.showSoftInput(it, 0)
             }
         }
         commentEditorToggle(true)
@@ -1502,6 +1515,7 @@ class PlayerActivity : BaseActivity() {
                         tag = chip.text.toString(),
                         isAdult = obtainIsAdult()
                     )
+                    bundle.putBoolean(KEY_IS_FROM_PLAYER, true)
                     deepLinkTo(
                         MainActivity::class.java,
                         R.navigation.navigation_home,

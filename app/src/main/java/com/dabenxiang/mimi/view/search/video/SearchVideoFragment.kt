@@ -30,10 +30,10 @@ import com.dabenxiang.mimi.view.adapter.SearchVideoAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
-import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.setting.SettingFragment
+import com.dabenxiang.mimi.view.player.PlayerActivity.Companion.KEY_IS_FROM_PLAYER
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_video.*
@@ -45,7 +45,7 @@ class SearchVideoFragment : BaseFragment() {
     companion object {
         const val KEY_DATA = "data"
 
-        fun createBundle(title: String = "", tag: String = "", isAdult: Boolean? = null): Bundle {
+        fun createBundle(title: String = "", tag: String = "", isAdult: Boolean = false): Bundle {
             val data = SearchingVideoItem()
             data.title = title
             data.tag = tag
@@ -83,11 +83,10 @@ class SearchVideoFragment : BaseFragment() {
 
         (arguments?.getSerializable(KEY_DATA) as SearchingVideoItem?)?.also { data ->
             Timber.d("key data from args is title: ${data.title}, tag: ${data.tag} and isAdult: ${data.isAdult}")
-            if (data.isAdult != null) {
-                viewModel.isAdult = data.isAdult!!
+            if (arguments?.getBoolean(KEY_IS_FROM_PLAYER) == true){
+                viewModel.isAdult = data.isAdult
                 mainViewModel?.isFromPlayer = true
-            } else
-                mainViewModel?.isFromPlayer = false
+            }
 
             if (data.tag.isNotBlank()) {
                 viewModel.searchingTag = data.tag
@@ -313,37 +312,42 @@ class SearchVideoFragment : BaseFragment() {
         }
 
         override fun onFunctionClick(type: FunctionType, view: View, item: VideoItem) {
-
             when (type) {
                 FunctionType.LIKE -> {
                     // 點擊更改喜歡,
-                    viewModel.currentItem = item
-                    item.id?.let {
-                        viewModel.modifyLike(it)
+                    checkStatus {
+                        viewModel.currentItem = item
+                        item.id?.let {
+                            viewModel.modifyLike(it)
+                        }
                     }
                 }
 
                 FunctionType.FAVORITE -> {
                     // 點擊後加入收藏,
-                    viewModel.currentItem = item
-                    item.id?.let {
-                        viewModel.modifyFavorite(it)
+                    checkStatus {
+                        viewModel.currentItem = item
+                        item.id?.let {
+                            viewModel.modifyFavorite(it)
+                        }
                     }
                 }
 
                 FunctionType.SHARE -> {
                     /* 點擊後複製網址 */
-                    if (item.tags == null || (item.tags as String).isEmpty() || item.id == null) {
-                        GeneralUtils.showToast(requireContext(), "copy url error")
-                    } else {
-                        GeneralUtils.copyToClipboard(
-                            requireContext(),
-                            viewModel.getShareUrl(item.tags, item.id)
-                        )
-                        GeneralUtils.showToast(
-                            requireContext(),
-                            requireContext().getString(R.string.copy_url)
-                        )
+                    checkStatus {
+                        if (item.tags == null || (item.tags as String).isEmpty() || item.id == null) {
+                            GeneralUtils.showToast(requireContext(), "copy url error")
+                        } else {
+                            GeneralUtils.copyToClipboard(
+                                requireContext(),
+                                viewModel.getShareUrl(item.tags, item.id)
+                            )
+                            GeneralUtils.showToast(
+                                requireContext(),
+                                requireContext().getString(R.string.copy_url)
+                            )
+                        }
                     }
                 }
 
@@ -428,7 +432,7 @@ class SearchVideoFragment : BaseFragment() {
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem) {
             moreDialog?.dismiss()
-            (requireActivity() as MainActivity).showReportDialog(item)
+            checkStatus { (requireActivity() as MainActivity).showReportDialog(item) }
         }
 
         override fun onCancel() {
@@ -467,20 +471,5 @@ class SearchVideoFragment : BaseFragment() {
             }
             chip_group_search_text.addView(chip)
         }
-    }
-
-    private fun checkIsEmailConfirmed(onConfirmed: () -> Unit) {
-        mainViewModel?.checkIsEmailConfirmed(
-            onConfirmed,
-            {
-                navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_searchPostFragment_to_settingFragment,
-                        viewModel.getMeAvatar()?.let { byteArray ->
-                            SettingFragment.createBundle(byteArray)
-                        })
-                )
-            }
-        )
     }
 }

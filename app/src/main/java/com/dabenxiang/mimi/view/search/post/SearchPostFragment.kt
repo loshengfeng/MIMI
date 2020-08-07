@@ -39,16 +39,15 @@ import com.dabenxiang.mimi.view.club.ClubMemberAdapter
 import com.dabenxiang.mimi.view.club.MiMiLinearLayoutManager
 import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
-import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
-import com.dabenxiang.mimi.view.setting.SettingFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_post.*
+import timber.log.Timber
 
 class SearchPostFragment : BaseFragment() {
 
@@ -114,7 +113,8 @@ class SearchPostFragment : BaseFragment() {
 
         takeIf { isClub }?.also {
             recycler_search_result.layoutManager = MiMiLinearLayoutManager(requireContext())
-            recycler_search_result.adapter = clubMemberAdapter }
+            recycler_search_result.adapter = clubMemberAdapter
+        }
             ?: run { recycler_search_result.adapter = adapter }
 
         if (!TextUtils.isEmpty(mTag)) {
@@ -366,15 +366,17 @@ class SearchPostFragment : BaseFragment() {
     private val memberPostFuncItem by lazy {
         MemberPostFuncItem(
             {},
-            { id, function -> getBitmap(id, function) },
-            { _, _, _ -> }
+            { id, func -> getBitmap(id, func) },
+            { item, isFollow, func -> followMember(item, isFollow, func) },
+            { item, isLike, func -> likePost(item, isLike, func) },
+            { item, isFavorite, func -> favoritePost(item, isFavorite, func) }
         )
     }
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem) {
             moreDialog?.dismiss()
-            (requireActivity() as MainActivity).showReportDialog(item)
+            checkStatus { (requireActivity() as MainActivity).showReportDialog(item) }
         }
 
         override fun onCancel() {
@@ -384,15 +386,15 @@ class SearchPostFragment : BaseFragment() {
 
     private val adultListener = object : AdultListener {
         override fun onFollowPostClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
-            checkIsEmailConfirmed { viewModel.followPost(item, position, isFollow)}
+            checkStatus { viewModel.followPost(item, position, isFollow) }
         }
 
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
-            checkIsEmailConfirmed { viewModel.likePost(item, position, isLike)}
+            checkStatus { viewModel.likePost(item, position, isLike) }
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            checkIsEmailConfirmed {
+            checkStatus {
                 when (adultTabType) {
                     AdultTabType.PICTURE -> {
                         val bundle = PictureDetailFragment.createBundle(item, 1)
@@ -428,13 +430,11 @@ class SearchPostFragment : BaseFragment() {
         }
 
         override fun onMoreClick(item: MemberPostItem) {
-            checkIsEmailConfirmed {
-                moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
-                    it.show(
-                        requireActivity().supportFragmentManager,
-                        MoreDialogFragment::class.java.simpleName
-                    )
-                }
+            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
+                it.show(
+                    requireActivity().supportFragmentManager,
+                    MoreDialogFragment::class.java.simpleName
+                )
             }
         }
 
@@ -483,7 +483,7 @@ class SearchPostFragment : BaseFragment() {
         }
 
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {
-            checkIsEmailConfirmed {
+            checkStatus {
                 val bundle = ClipFragment.createBundle(ArrayList(item), position)
                 navigateTo(
                     NavigateItem.Destination(
@@ -506,7 +506,12 @@ class SearchPostFragment : BaseFragment() {
                 isAdultTheme = true
             )
 
-            navigateTo(NavigateItem.Destination(R.id.action_searchPostFragment_to_myPostFragment, bundle))
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_searchPostFragment_to_myPostFragment,
+                    bundle
+                )
+            )
         }
     }
 
@@ -534,7 +539,7 @@ class SearchPostFragment : BaseFragment() {
         isFollow: Boolean,
         update: (Boolean) -> Unit
     ) {
-        checkIsEmailConfirmed { viewModel.clubFollow(memberClubItem, isFollow, update) }
+        checkStatus { viewModel.clubFollow(memberClubItem, isFollow, update) }
     }
 
     private fun onItemClick(item: MemberClubItem) {
@@ -574,18 +579,27 @@ class SearchPostFragment : BaseFragment() {
         }
     }
 
-    private fun checkIsEmailConfirmed(onConfirmed: () -> Unit) {
-        mainViewModel?.checkIsEmailConfirmed(
-            onConfirmed,
-            {
-                navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_searchPostFragment_to_settingFragment,
-                        viewModel.getMeAvatar()?.let { byteArray ->
-                            SettingFragment.createBundle(byteArray)
-                        })
-                )
-            }
-        )
+    private fun followMember(
+        memberPostItem: MemberPostItem,
+        isFollow: Boolean,
+        update: (Boolean) -> Unit
+    ) {
+        checkStatus { viewModel.followMember(memberPostItem, isFollow, update) }
+    }
+
+    private fun likePost(
+        memberPostItem: MemberPostItem,
+        isLike: Boolean,
+        update: (Boolean, Int) -> Unit
+    ) {
+        checkStatus { viewModel.likePost(memberPostItem, isLike, update) }
+    }
+
+    private fun favoritePost(
+        memberPostItem: MemberPostItem,
+        isFavorite: Boolean,
+        update: (Boolean, Int) -> Unit
+    ) {
+        checkStatus { viewModel.favoritePost(memberPostItem, isFavorite, update) }
     }
 }

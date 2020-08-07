@@ -27,7 +27,6 @@ import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
-import com.dabenxiang.mimi.view.setting.SettingFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
@@ -123,7 +122,7 @@ class ClubDetailFragment : BaseFragment() {
     override fun setupListeners() {
         ib_back.setOnClickListener { findNavController().navigateUp() }
         tv_follow.setOnClickListener {
-            checkIsEmailConfirmed {
+            checkStatus {
                 viewModel.followClub(
                     memberClubItem,
                     !memberClubItem.isFollow
@@ -153,7 +152,7 @@ class ClubDetailFragment : BaseFragment() {
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {}
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            checkIsEmailConfirmed {
+            checkStatus {
                 when (adultTabType) {
                     AdultTabType.PICTURE -> {
                         val bundle = PictureDetailFragment.createBundle(item, 1)
@@ -189,13 +188,11 @@ class ClubDetailFragment : BaseFragment() {
         }
 
         override fun onMoreClick(item: MemberPostItem) {
-            checkIsEmailConfirmed {
-                moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
-                    it.show(
-                        requireActivity().supportFragmentManager,
-                        MoreDialogFragment::class.java.simpleName
-                    )
-                }
+            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
+                it.show(
+                    requireActivity().supportFragmentManager,
+                    MoreDialogFragment::class.java.simpleName
+                )
             }
         }
 
@@ -245,7 +242,7 @@ class ClubDetailFragment : BaseFragment() {
         }
 
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {
-            checkIsEmailConfirmed {
+            checkStatus {
                 val bundle = ClipFragment.createBundle(ArrayList(item), position)
                 navigateTo(
                     NavigateItem.Destination(
@@ -273,14 +270,19 @@ class ClubDetailFragment : BaseFragment() {
                 isAdult = true,
                 isAdultTheme = true
             )
-            navigateTo(NavigateItem.Destination(R.id.action_clubDetailFragment_to_myPostFragment, bundle))
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_clubDetailFragment_to_myPostFragment,
+                    bundle
+                )
+            )
         }
     }
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem) {
             moreDialog?.dismiss()
-            (requireActivity() as MainActivity).showReportDialog(item)
+            checkStatus { (requireActivity() as MainActivity).showReportDialog(item) }
         }
 
         override fun onCancel() {
@@ -301,9 +303,7 @@ class ClubDetailFragment : BaseFragment() {
         isFollow: Boolean,
         update: (Boolean) -> Unit
     ) {
-        checkIsEmailConfirmed {
-            viewModel.followMember(memberPostItem, isFollow, update)
-        }
+        checkStatus { viewModel.followMember(memberPostItem, isFollow, update) }
     }
 
     private fun likePost(
@@ -311,24 +311,7 @@ class ClubDetailFragment : BaseFragment() {
         isLike: Boolean,
         update: (Boolean, Int) -> Unit
     ) {
-        checkIsEmailConfirmed {
-            viewModel.likePost(memberPostItem, isLike, update)
-        }
-    }
-
-    private fun checkIsEmailConfirmed(onConfirmed: () -> Unit) {
-        mainViewModel?.checkIsEmailConfirmed(
-            onConfirmed,
-            {
-                navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_clubDetailFragment_to_settingFragment,
-                        viewModel.getMeAvatar()?.let { byteArray ->
-                            SettingFragment.createBundle(byteArray)
-                        })
-                )
-            }
-        )
+        checkStatus { viewModel.likePost(memberPostItem, isLike, update) }
     }
 
 }

@@ -69,15 +69,7 @@ class PersonalFragment : BaseFragment() {
                     tv_Point.text = meItem.availablePoint.toString()
 
                     takeUnless { meItem.isEmailConfirmed == true }?.run {
-                        (requireActivity() as MainActivity).showEmailConfirmDialog {
-                            navigateTo(
-                                NavigateItem.Destination(
-                                    R.id.action_personalFragment_to_settingFragment,
-                                    viewModel.byteArray?.let { byteArray ->
-                                        SettingFragment.createBundle(byteArray)
-                                    })
-                            )
-                        }
+                        (requireActivity() as MainActivity).showEmailConfirmDialog()
                     }
                 }
                 is Error -> onApiError(it.throwable)
@@ -150,7 +142,7 @@ class PersonalFragment : BaseFragment() {
                 R.id.tv_my_post -> findNavController().navigate(R.id.action_personalFragment_to_myPostFragment)
                 R.id.tv_setting -> navigateTo(
                     NavigateItem.Destination(
-                        R.id.action_personalFragment_to_settingFragment,
+                        R.id.action_to_settingFragment,
                         viewModel.byteArray?.let { SettingFragment.createBundle(it) })
                 )
                 R.id.tv_logout -> viewModel.signOut()
