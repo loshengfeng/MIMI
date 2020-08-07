@@ -5,15 +5,20 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.PROJECT_NAME
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getExceptionDetail
 import com.google.gson.Gson
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import retrofit2.HttpException
 import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
 
 abstract class BaseViewModel : ViewModel(), KoinComponent {
@@ -40,6 +45,10 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
                 sendCrashReport(getExceptionDetail(exceptionResult.httpExceptionItem.httpExceptionClone))
             }
         }
+    }
+
+    fun isLogin(): Boolean {
+        return accountManager.isLogin()
     }
 
     fun logoutLocal() {
@@ -69,4 +78,9 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     private fun sendCrashReport(data: String) {
         SendLogManager.e(PROJECT_NAME, data)
     }
+
+    fun getMeAvatar(): ByteArray? {
+        return accountManager.getMeAvatarCache()
+    }
+
 }

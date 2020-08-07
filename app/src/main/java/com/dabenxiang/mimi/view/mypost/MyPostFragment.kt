@@ -41,6 +41,7 @@ import com.dabenxiang.mimi.view.post.article.PostArticleFragment
 import com.dabenxiang.mimi.view.post.pic.PostPicFragment
 import com.dabenxiang.mimi.view.post.video.PostVideoFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
+import com.dabenxiang.mimi.view.setting.SettingFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
@@ -396,7 +397,10 @@ class MyPostFragment : BaseFragment() {
                         viewModel.postAttachment(pic.url, requireContext(), TYPE_PIC)
                     }
                 }
-                is ApiResult.Error -> resetAndCancelJob(it.throwable, getString(R.string.post_error))
+                is ApiResult.Error -> resetAndCancelJob(
+                    it.throwable,
+                    getString(R.string.post_error)
+                )
             }
         })
 
@@ -415,7 +419,10 @@ class MyPostFragment : BaseFragment() {
                         viewModel.clearLiveData()
                     }
                 }
-                is ApiResult.Error -> resetAndCancelJob(it.throwable, getString(R.string.post_error))
+                is ApiResult.Error -> resetAndCancelJob(
+                    it.throwable,
+                    getString(R.string.post_error)
+                )
             }
         })
 
@@ -442,7 +449,10 @@ class MyPostFragment : BaseFragment() {
                         TYPE_VIDEO
                     )
                 }
-                is ApiResult.Error -> resetAndCancelJob(it.throwable, getString(R.string.post_error))
+                is ApiResult.Error -> resetAndCancelJob(
+                    it.throwable,
+                    getString(R.string.post_error)
+                )
             }
         })
 
@@ -475,7 +485,10 @@ class MyPostFragment : BaseFragment() {
                     Timber.d("Post video content item : $content")
                     viewModel.postPic(postId?.value!!, postMemberRequest, content)
                 }
-                is ApiResult.Error -> resetAndCancelJob(it.throwable, getString(R.string.post_error))
+                is ApiResult.Error -> resetAndCancelJob(
+                    it.throwable,
+                    getString(R.string.post_error)
+                )
             }
         })
 
@@ -654,38 +667,59 @@ class MyPostFragment : BaseFragment() {
         }
     }
 
+    private fun checkIsEmailConfirmed(onConfirmed: () -> Unit) {
+        mainViewModel?.checkIsEmailConfirmed(
+            onConfirmed,
+            {
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_myPostFragment_to_settingFragment,
+                        viewModel.getMeAvatar()?.let { byteArray ->
+                            SettingFragment.createBundle(byteArray)
+                        })
+                )
+            }
+        )
+    }
+
     private val myPostListener = object : MyPostListener {
         override fun onMoreClick(item: MemberPostItem) {
-            if (userId == USER_ID_ME) {
-                meMoreDialog =
-                    MyPostMoreDialogFragment.newInstance(item, onMeMoreDialogListener).also {
-                        it.show(
-                            requireActivity().supportFragmentManager,
-                            MoreDialogFragment::class.java.simpleName
-                        )
-                    }
-            } else {
-                moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
-                    it.show(
-                        requireActivity().supportFragmentManager,
-                        MoreDialogFragment::class.java.simpleName
-                    )
+            checkIsEmailConfirmed {
+                if (userId == USER_ID_ME) {
+                    meMoreDialog =
+                        MyPostMoreDialogFragment.newInstance(item, onMeMoreDialogListener)
+                            .also {
+                                it.show(
+                                    requireActivity().supportFragmentManager,
+                                    MoreDialogFragment::class.java.simpleName
+                                )
+                            }
+                } else {
+                    moreDialog =
+                        MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
+                            it.show(
+                                requireActivity().supportFragmentManager,
+                                MoreDialogFragment::class.java.simpleName
+                            )
+                        }
                 }
             }
         }
 
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
-            viewModel.likePost(item, position, isLike)
+            checkIsEmailConfirmed { viewModel.likePost(item, position, isLike) }
         }
 
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {
-            val bundle = ClipFragment.createBundle(ArrayList(item), position)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_myPostFragment_to_clipFragment,
-                    bundle
+            checkIsEmailConfirmed {
+                val bundle = ClipFragment.createBundle(ArrayList(item), position)
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_myPostFragment_to_clipFragment,
+                        bundle
+                    )
                 )
-            )
+            }
         }
 
         override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
@@ -735,26 +769,28 @@ class MyPostFragment : BaseFragment() {
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            when (adultTabType) {
-                AdultTabType.PICTURE -> {
-                    val bundle = PictureDetailFragment.createBundle(item, 1)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_myPostFragment_to_pictureDetailFragment,
-                            bundle
+            checkIsEmailConfirmed {
+                when (adultTabType) {
+                    AdultTabType.PICTURE -> {
+                        val bundle = PictureDetailFragment.createBundle(item, 1)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_myPostFragment_to_pictureDetailFragment,
+                                bundle
+                            )
                         )
-                    )
-                }
-                AdultTabType.TEXT -> {
-                    val bundle = TextDetailFragment.createBundle(item, 1)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_myPostFragment_to_textDetailFragment,
-                            bundle
+                    }
+                    AdultTabType.TEXT -> {
+                        val bundle = TextDetailFragment.createBundle(item, 1)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_myPostFragment_to_textDetailFragment,
+                                bundle
+                            )
                         )
-                    )
-                }
-                else -> {
+                    }
+                    else -> {
+                    }
                 }
             }
         }
@@ -765,11 +801,15 @@ class MyPostFragment : BaseFragment() {
             isFavorite: Boolean,
             type: AttachmentType
         ) {
-            viewModel.favoritePost(item, position, isFavorite)
+            checkIsEmailConfirmed {
+                viewModel.favoritePost(item, position, isFavorite)
+            }
         }
 
         override fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
-            viewModel.followPost(item, position, isFollow)
+            checkIsEmailConfirmed {
+                viewModel.followPost(item, position, isFollow)
+            }
         }
     }
 

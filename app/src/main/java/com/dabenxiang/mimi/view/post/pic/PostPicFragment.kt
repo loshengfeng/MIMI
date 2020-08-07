@@ -117,6 +117,8 @@ class PostPicFragment : BaseFragment() {
         val img = requireContext().getDrawable(R.drawable.btn_close_n)
         tv_back.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null)
 
+        edt_hashtag.imeOptions = EditorInfo.IME_ACTION_DONE
+
         useAdultTheme(false)
     }
 
@@ -307,9 +309,11 @@ class PostPicFragment : BaseFragment() {
             setUI()
         } else {
             tv_title.text = getString(R.string.post_title)
-            val uri = arguments?.getString(BUNDLE_PIC_URI)
-            val postAttachmentItem = PostAttachmentItem(uri = uri!!)
-            attachmentList.add(postAttachmentItem)
+            val uriList = arguments?.getStringArrayList(BUNDLE_PIC_URI)!!
+            for (uri in uriList) {
+                val postAttachmentItem = PostAttachmentItem(uri = uri!!)
+                attachmentList.add(postAttachmentItem)
+            }
             txt_picCount.text = String.format(getString(R.string.select_pic_count, attachmentList.size,
                 PHOTO_LIMIT
             ))
@@ -347,6 +351,8 @@ class PostPicFragment : BaseFragment() {
         txt_picCount.text = String.format(getString(R.string.select_pic_count, attachmentList.size,
             PHOTO_LIMIT
         ))
+
+        haveMainTag = true
     }
 
     private val chooseClubDialogListener = object : ChooseClubDialogListener {

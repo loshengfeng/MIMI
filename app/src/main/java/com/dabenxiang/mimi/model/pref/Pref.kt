@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.model.pref
 
+import com.blankj.utilcode.util.ConvertUtils
 import com.dabenxiang.mimi.model.vo.ProfileItem
 import com.dabenxiang.mimi.model.vo.SearchHistoryItem
 import com.dabenxiang.mimi.model.vo.TokenItem
@@ -13,6 +14,7 @@ class Pref(private val gson: Gson, preferenceFileName: String, isDebug: Boolean)
     private val profilePref = StringPref("PROFILE")
     private val keepAccountPref = BooleanPref("KEEP_ACCOUNT")
     private var searchHistoryPref = StringPref("SEARCH_HISTORY")
+    private var meAvatarPref = StringPref("ME_AVATAR")
 
     private var cachedPublicToken: TokenItem? = null
     private var cachedMemberToken: TokenItem? = null
@@ -74,6 +76,13 @@ class Pref(private val gson: Gson, preferenceFileName: String, isDebug: Boolean)
     var keepAccount: Boolean
         get() = keepAccountPref.get()
         set(value) = keepAccountPref.set(value)
+
+    var meAvatar: ByteArray?
+        get() = if (meAvatarPref.get() != null) ConvertUtils.hexString2Bytes(meAvatarPref.get()!!) else null
+        set(value) = meAvatarPref.set(
+            if (value == null) ""
+            else ConvertUtils.bytes2HexString(value)
+        )
 
     fun clearMemberToken() {
         cachedMemberToken = null

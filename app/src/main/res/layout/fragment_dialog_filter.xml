@@ -15,13 +15,35 @@
         android:backgroundTint="@color/color_white_1">
 
         <TextView
+            android:id="@+id/btn_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="center"
+            android:text="@string/cancel"
+            android:textColor="@color/color_black_1"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <View
+            android:id="@+id/line"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/color_black_1_40"
+            app:layout_constraintBottom_toTopOf="@+id/btn_cancel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
             android:id="@+id/tv_title"
             android:layout_width="0dp"
-            android:layout_height="66dp"
+            android:layout_height="10dp"
             android:background="@drawable/bg_top_radius_35"
             android:backgroundTint="@color/color_white_1"
             android:gravity="center"
-            android:text="@string/setting_choose"
             android:textColor="@color/color_black_1"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -33,12 +55,14 @@
             android:id="@+id/recyclerFilter"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@+id/line"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_title"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:itemCount="3"
+            tools:itemCount="2"
             tools:listitem="@layout/item_gender"
             tools:scrollbars="vertical" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </RelativeLayout>

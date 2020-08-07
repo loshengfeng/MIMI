@@ -2,17 +2,16 @@ package com.dabenxiang.mimi.view.main
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInstaller
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.AttributeSet
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.NavDeepLinkBuilder
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.PACKAGE_INSTALLED_ACTION
@@ -23,10 +22,15 @@ import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.view.base.BaseActivity
+import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.dialog.GeneralDialog
+import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
+import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.home.HomeFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
+import com.dabenxiang.mimi.view.setting.SettingFragment
 import com.dabenxiang.mimi.widget.utility.FileUtil.deleteExternalFile
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.activity_main.*
@@ -54,6 +58,19 @@ class MainActivity : BaseActivity(), InteractionListener {
                 is ApiResult.Error -> Timber.e(it.throwable)
             }
         })
+
+        viewModel.isEmailConfirmed.observe(this, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    if (it.result.isConfirmed) {
+                        it.result.onConfirmed()
+                    } else {
+                        showEmailConfirmDialog(it.result.onUnconfirmed)
+                    }
+                }
+                is ApiResult.Error -> Timber.e(it.throwable)
+            }
+        })
     }
 
     /**
@@ -75,7 +92,18 @@ class MainActivity : BaseActivity(), InteractionListener {
             navGraphIds = navGraphIds,
             fragmentManager = supportFragmentManager,
             containerId = R.id.nav_host_fragment,
-            intent = intent
+            intent = intent,
+            domainManager = viewModel.domainManager,
+            onEmailUnconfirmed = {
+                showEmailConfirmDialog {
+                    Navigation.findNavController(this, R.id.nav_host_fragment)
+                        .navigate(
+                            R.id.action_main_to_settingFragment,
+                            viewModel.getMeAvatar()?.let { byteArray ->
+                                SettingFragment.createBundle(byteArray)
+                            })
+                }
+            }
         )
 
         controller.observe(this, Observer {
@@ -215,9 +243,10 @@ class MainActivity : BaseActivity(), InteractionListener {
 
     private var reportDialog: ReportDialogFragment? = null
     fun showReportDialog(item: BaseMemberPostItem, postItem: MemberPostItem? = null) {
-        reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener, postItem).also {
-            it.show(supportFragmentManager, ReportDialogFragment::class.java.simpleName)
-        }
+        reportDialog =
+            ReportDialogFragment.newInstance(item, onReportDialogListener, postItem).also {
+                it.show(supportFragmentManager, ReportDialogFragment::class.java.simpleName)
+            }
     }
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
@@ -246,5 +275,17 @@ class MainActivity : BaseActivity(), InteractionListener {
         }
     }
 
+    fun showEmailConfirmDialog(block: () -> Unit) {
+        GeneralDialog.newInstance(
+            GeneralDialogData(
+                titleRes = R.string.error_email_not_confirmed_title,
+                message = getString(R.string.error_email_not_confirmed_msg),
+                messageIcon = R.drawable.ico_email,
+                firstBtn = getString(R.string.verify_later),
+                secondBtn = getString(R.string.verify_immediately),
+                secondBlock = block
+            )
+        ).show(supportFragmentManager)
+    }
 
 }

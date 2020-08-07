@@ -26,7 +26,6 @@
             android:layout_marginTop="15dp"
             android:background="@color/transparent">
 
-
             <TextView
                 android:id="@+id/btn_photo"
                 style="@style/settingStyle_1"
@@ -54,7 +53,7 @@
                 android:id="@+id/line_split_photo"
                 android:layout_width="0dp"
                 android:layout_height="1dp"
-                android:background="@color/color_black_1_50"
+                android:background="@color/color_black_1_02"
                 app:layout_constraintEnd_toEndOf="@+id/btn_photo"
                 app:layout_constraintStart_toStartOf="@+id/btn_photo"
                 app:layout_constraintTop_toBottomOf="@+id/btn_photo" />
@@ -88,7 +87,7 @@
                 android:id="@+id/line_split_name"
                 android:layout_width="0dp"
                 android:layout_height="1dp"
-                android:background="@color/color_black_1_50"
+                android:background="@color/color_black_1_02"
                 app:layout_constraintEnd_toEndOf="@+id/btn_name"
                 app:layout_constraintStart_toStartOf="@+id/btn_name"
                 app:layout_constraintTop_toBottomOf="@+id/btn_name" />
@@ -97,7 +96,7 @@
                 android:id="@+id/line_split_email"
                 android:layout_width="0dp"
                 android:layout_height="1dp"
-                android:background="@color/color_black_1_50"
+                android:background="@color/color_black_1_02"
                 app:layout_constraintEnd_toEndOf="@+id/line_split_name"
                 app:layout_constraintStart_toStartOf="@+id/line_split_name"
                 app:layout_constraintTop_toBottomOf="@+id/btn_email" />
@@ -223,19 +222,19 @@
             <TextView
                 android:id="@+id/gender_info"
                 style="@style/settingStyle_2"
+                android:layout_marginEnd="44dp"
                 android:drawablePadding="7dp"
                 android:gravity="center"
-                android:layout_marginEnd="44dp"
                 android:text="@string/setting_gender"
                 app:layout_constraintBottom_toBottomOf="@+id/btn_gender"
                 app:layout_constraintEnd_toEndOf="@+id/btn_gender"
                 app:layout_constraintTop_toTopOf="@+id/btn_gender" />
 
             <View
-                android:layout_width="0dp"
+                android:id="@+id/line_gender"
+                android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/color_black_1_50"
-                app:layout_constraintBottom_toTopOf="@+id/btn_birthday"
+                android:background="@color/color_black_1_02"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/btn_gender" />
@@ -249,7 +248,7 @@
                 android:paddingEnd="16dp"
                 android:text="@string/setting_birthday"
                 app:layout_constraintEnd_toEndOf="@id/btn_account"
-                app:layout_constraintTop_toBottomOf="@id/btn_gender" />
+                app:layout_constraintTop_toBottomOf="@id/line_gender" />
 
             <TextView
                 android:id="@+id/btn_binding_invitation"

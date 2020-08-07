@@ -8,6 +8,7 @@
     <include app:graph="@navigation/navigation_login" />
     <include app:graph="@navigation/navigation_detail_club" />
     <include app:graph="@navigation/navigation_my_post" />
+    <include app:graph="@navigation/navigation_setting" />
 
     <fragment
         android:id="@+id/personalFragment"
@@ -32,33 +33,15 @@
 
         <action
             android:id="@+id/action_personalFragment_to_settingFragment"
-            app:destination="@id/settingFragment" />
+            app:destination="@id/navigation_setting" />
         <action
             android:id="@+id/action_personalFragment_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
-
-    </fragment>
-
-    <fragment
-        android:id="@+id/settingFragment"
-        android:name="com.dabenxiang.mimi.view.setting.SettingFragment"
-        tools:layout="@layout/fragment_setting">
-
         <action
-            android:id="@+id/action_settingFragment_to_updateProfileFragment"
-            app:destination="@id/updateProfileFragment" />
-
-        <action
-            android:id="@+id/action_settingFragment_to_changePasswordFragment"
-            app:destination="@id/changePasswordFragment" />
-
-    </fragment>
-
-    <fragment
-        android:id="@+id/updateProfileFragment"
-        android:name="com.dabenxiang.mimi.view.updateprofile.UpdateProfileFragment"
-        tools:layout="@layout/fragment_update_profile">
-
+            android:id="@+id/action_main_to_settingFragment"
+            app:destination="@id/navigation_setting"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="false"/>
     </fragment>
 
     <fragment
@@ -92,13 +75,6 @@
         android:id="@+id/messengerFragment"
         android:name="com.dabenxiang.mimi.view.messenger.MessengerFragment"
         tools:layout="@layout/fragment_messenger" />
-
-    <fragment
-        android:id="@+id/changePasswordFragment"
-        android:name="com.dabenxiang.mimi.view.changepassword.ChangePasswordFragment"
-        tools:layout="@layout/fragment_change_password">
-
-    </fragment>
 
     <fragment
         android:id="@+id/chatContentFragment"

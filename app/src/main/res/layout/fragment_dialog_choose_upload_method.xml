@@ -31,7 +31,7 @@
             android:gravity="center_vertical"
             android:paddingHorizontal="16dp"
             android:paddingVertical="16dp"
-            android:text="@string/upload_photo"
+            android:text="@string/upload_video"
             android:textColor="@color/color_black_1"
             android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@+id/tv_camera"

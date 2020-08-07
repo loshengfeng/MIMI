@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import retrofit2.HttpException
+import timber.log.Timber
 import java.util.*
 
 class AccountManager(private val pref: Pref, private val domainManager: DomainManager) {
@@ -36,6 +37,14 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
         pref.profileItem.friendlyName = meItem.friendlyName ?: ""
         pref.profileItem.point = meItem.availablePoint ?: 0
         pref.profileItem.isEmailConfirmed = meItem.isEmailConfirmed ?: false
+    }
+
+    fun setupMeAvatarCache(avatar: ByteArray?) {
+        avatar?.let { pref.meAvatar = it }
+    }
+
+    fun getMeAvatarCache(): ByteArray? {
+        return pref.meAvatar
     }
 
     fun hasMemberToken(): Boolean {
