@@ -33,6 +33,7 @@ import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.setting.SettingFragment
+import com.dabenxiang.mimi.view.player.PlayerActivity.Companion.KEY_IS_FROM_PLAYER
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_video.*
@@ -44,7 +45,7 @@ class SearchVideoFragment : BaseFragment() {
     companion object {
         const val KEY_DATA = "data"
 
-        fun createBundle(title: String = "", tag: String = "", isAdult: Boolean? = null): Bundle {
+        fun createBundle(title: String = "", tag: String = "", isAdult: Boolean = false): Bundle {
             val data = SearchingVideoItem()
             data.title = title
             data.tag = tag
@@ -82,11 +83,10 @@ class SearchVideoFragment : BaseFragment() {
 
         (arguments?.getSerializable(KEY_DATA) as SearchingVideoItem?)?.also { data ->
             Timber.d("key data from args is title: ${data.title}, tag: ${data.tag} and isAdult: ${data.isAdult}")
-            if (data.isAdult != null) {
-                viewModel.isAdult = data.isAdult!!
+            if (arguments?.getBoolean(KEY_IS_FROM_PLAYER) == true){
+                viewModel.isAdult = data.isAdult
                 mainViewModel?.isFromPlayer = true
-            } else
-                mainViewModel?.isFromPlayer = false
+            }
 
             if (data.tag.isNotBlank()) {
                 viewModel.searchingTag = data.tag

@@ -5,5 +5,5 @@ import java.io.Serializable
 class SearchingVideoItem : Serializable {
     var title: String = ""
     var tag: String = ""
-    var isAdult: Boolean? = null
+    var isAdult: Boolean = false
 }

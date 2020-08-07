@@ -969,8 +969,8 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
-            val bundle =
-                ClipFragment.createBundle(ArrayList(item.subList(1, item.lastIndex)), position - 1)
+
+            val bundle = ClipFragment.createBundle(ArrayList(item.subList(1, item.lastIndex)), position-1)
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_adultHomeFragment_to_clipFragment,
@@ -1012,12 +1012,7 @@ class AdultHomeFragment : BaseFragment() {
                 isAdult = true,
                 isAdultTheme = true
             )
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_adultHomeFragment_to_navigation_my_post,
-                    bundle
-                )
-            )
+            navigateTo(NavigateItem.Destination(R.id.action_adultHomeFragment_to_navigation_my_post, bundle))
         }
     }
 
@@ -1130,10 +1125,7 @@ class AdultHomeFragment : BaseFragment() {
 
             val chooser = Intent(Intent.ACTION_CHOOSER)
             chooser.putExtra(Intent.EXTRA_INTENT, galleryIntent)
-            chooser.putExtra(
-                Intent.EXTRA_TITLE,
-                requireContext().getString(R.string.post_select_pic)
-            )
+            chooser.putExtra(Intent.EXTRA_TITLE, requireContext().getString(R.string.post_select_video))
 
             val intentArray = arrayOf(cameraIntent)
             chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
@@ -1150,10 +1142,7 @@ class AdultHomeFragment : BaseFragment() {
 
             val chooser = Intent(Intent.ACTION_CHOOSER)
             chooser.putExtra(Intent.EXTRA_INTENT, galleryIntent)
-            chooser.putExtra(
-                Intent.EXTRA_TITLE,
-                requireContext().getString(R.string.post_select_pic)
-            )
+            chooser.putExtra(Intent.EXTRA_TITLE, requireContext().getString(R.string.post_select_pic))
 
             val intentArray = arrayOf(cameraIntent)
             chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
@@ -1184,27 +1173,20 @@ class AdultHomeFragment : BaseFragment() {
                         val uri = if (data?.data == null) {
                             val extras = data?.extras
                             val imageBitmap = extras!!["data"] as Bitmap?
-                            Uri.parse(
-                                MediaStore.Images.Media.insertImage(
-                                    requireContext().contentResolver,
-                                    imageBitmap,
-                                    null,
-                                    null
-                                )
-                            )
+                            Uri.parse(MediaStore.Images.Media.insertImage(requireContext().contentResolver, imageBitmap, null,null))
                         } else {
                             data.data!!
                         }
 
                         pciUri.add(uri.toString())
                     }
-                    val bundle = Bundle()
-                    bundle.putStringArrayList(BUNDLE_PIC_URI, pciUri)
+                        val bundle = Bundle()
+                        bundle.putStringArrayList(BUNDLE_PIC_URI, pciUri)
 
-                    findNavController().navigate(
-                        R.id.action_adultHomeFragment_to_postPicFragment,
-                        bundle
-                    )
+                        findNavController().navigate(
+                            R.id.action_adultHomeFragment_to_postPicFragment,
+                            bundle
+                        )
                 }
 
                 REQUEST_VIDEO_CAPTURE -> {

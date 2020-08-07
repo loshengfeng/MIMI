@@ -29,6 +29,7 @@ import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.home.HomeFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.view.setting.SettingFragment
 import com.dabenxiang.mimi.widget.utility.FileUtil.deleteExternalFile
@@ -149,21 +150,28 @@ class MainActivity : BaseActivity(), InteractionListener {
             } else {
                 finish()
             }
-        } else if (supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter(
-                "/"
-            ).toString()
-                .toLowerCase(Locale.getDefault()) == SearchVideoFragment::class.java.simpleName.toLowerCase(
-                Locale.getDefault()
-            )
+        } else if ((supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter(
+                        "/"
+                ).toString()
+                        .toLowerCase(Locale.getDefault()) == SearchVideoFragment::class.java.simpleName.toLowerCase(
+                        Locale.getDefault()
+                ))
+                || (supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter(
+                        "/"
+                ).toString()
+                        .toLowerCase(Locale.getDefault()) == MyPostFragment::class.java.simpleName.toLowerCase(
+                        Locale.getDefault()
+                ))
         ) {
-            if (viewModel.isFromPlayer)
+            if (viewModel.isFromPlayer){
+                viewModel.isFromPlayer = false
                 deepLinkTo(
-                    MainActivity::class.java,
-                    R.navigation.navigation_home,
-                    R.id.homeFragment,
-                    null
+                        MainActivity::class.java,
+                        R.navigation.navigation_home,
+                        R.id.homeFragment,
+                        null
                 )
-            else
+            } else
                 super.onBackPressed()
         } else {
             super.onBackPressed()

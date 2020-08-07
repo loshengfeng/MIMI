@@ -27,6 +27,7 @@ import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
@@ -36,7 +37,9 @@ import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.fragment_post_favorite.*
+import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import org.koin.android.viewmodel.dsl.ATTRIBUTE_VIEW_MODEL
 import timber.log.Timber
 
 class FavoriteFragment : BaseFragment() {
@@ -193,9 +196,23 @@ class FavoriteFragment : BaseFragment() {
                         )
                     }
                 }
+                R.id.tv_login -> navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_postFavoriteFragment_to_loginFragment,
+                        LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                    )
+                )
+                R.id.tv_register -> navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_postFavoriteFragment_to_loginFragment,
+                        LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                    )
+                )
             }
         }.also {
             tv_clean.setOnClickListener(it)
+            tv_login.setOnClickListener(it)
+            tv_register.setOnClickListener(it)
         }
 
         layout_refresh.setOnRefreshListener {
@@ -207,29 +224,40 @@ class FavoriteFragment : BaseFragment() {
     override fun initSettings() {
         tv_back.visibility = View.GONE
         tv_title.text = getString(R.string.favorite_title)
-        tv_clean.visibility = View.VISIBLE
 
-        rv_primary.adapter = primaryAdapter
+        when(viewModel.accountManager.isLogin()) {
+            true -> {
+                item_is_not_Login.visibility = View.GONE
+                item_is_Login.visibility = View.VISIBLE
+                tv_clean.visibility = View.VISIBLE
 
-        val primaryList = listOf(
-            getString(R.string.favorite_normal),
-            getString(R.string.favorite_adult)
-        )
+                rv_primary.adapter = primaryAdapter
 
-        primaryAdapter.submitList(primaryList, lastPrimaryIndex)
+                val primaryList = listOf(
+                    getString(R.string.favorite_normal),
+                    getString(R.string.favorite_adult)
+                )
 
-        rv_secondary.adapter = secondaryAdapter
+                primaryAdapter.submitList(primaryList, lastPrimaryIndex)
 
-        val secondaryList = listOf(
-            getString(R.string.favorite_tab_mimi),
-            getString(R.string.favorite_tab_short)
-        )
+                rv_secondary.adapter = secondaryAdapter
 
-        secondaryAdapter.submitList(secondaryList, lastSecondaryIndex)
+                val secondaryList = listOf(
+                    getString(R.string.favorite_tab_mimi),
+                    getString(R.string.favorite_tab_short)
+                )
 
-        rv_content.adapter = favoriteAdapter
+                secondaryAdapter.submitList(secondaryList, lastSecondaryIndex)
 
-        viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
+                rv_content.adapter = favoriteAdapter
+
+                viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
+            }
+            false -> {
+                item_is_not_Login.visibility = View.VISIBLE
+                item_is_Login.visibility = View.GONE
+            }
+        }
     }
 
     override fun onAttach(context: Context) {
