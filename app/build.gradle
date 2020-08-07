@@ -205,6 +205,10 @@ android {
             output.versionCodeOverride = flavor_version.versionCode.toInteger()
         }
     }
+////Ref : https://blog.csdn.net/lbcab/article/details/72771729
+////Android Studio在对变体目录和main目录进行资源合并时，会遵守这样的规则 某资源在free下有，在main中没有，那么在打包时，会将该资源直接合并到main资源中 某资源在free下有，在main中也有，那么在打包时，会以free为主，将free中资源替换掉main中资源。
+////代码文件，顾名思义就是指java目录下的.java文件了，为什么代码叫整合，而资源却是合并呢？因为代码文件是没办法合并的，只能是整合，整合是什么意思？假设当前选中的变体是freeDebug，有一个java文件是Test.java，这个Test.java要么只存在free/java下，要么只存在于main/java下，如
+////assets虽然是资源，但它不是合并，而是整合，也就是说，assets文件的处理方式跟java文件的处理方式是一样的 解决方案是使用sourceSets
 
 //    sourceSets {
 //        main {
@@ -221,6 +225,19 @@ android {
 //        mimi {
 //
 //        }
+//    sourceSets.all { sourceSet ->
+//        // println("sourceSet.name = ${sourceSet.name}")
+//        if (sourceSet.name.contains('Debug') || sourceSet.name.contains('Release')) {
+//            if (sourceSet.name.contains("china")
+//                    || sourceSet.name.contains("a")
+//                    || sourceSet.name.contains("b")
+//                    || ...) {
+//                sourceSet.assets.srcDirs = ['src/free/assets']
+//            }
+//        }
+//    }
+
+
 //    }
 
     compileOptions {
