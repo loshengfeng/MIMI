@@ -26,6 +26,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.Dispatchers
@@ -48,6 +49,7 @@ fun BottomNavigationView.setupWithNavController(
     containerId: Int,
     intent: Intent,
     domainManager: DomainManager,
+    accountManager: AccountManager,
     onEmailUnconfirmed: () -> Unit
 ): LiveData<NavController> {
 
@@ -104,8 +106,10 @@ fun BottomNavigationView.setupWithNavController(
             false
         } else {
             var isConfirmed = false
-            if (item.title.toString() == context.getString(R.string.nav_topup)
-                || item.title.toString() == context.getString(R.string.nav_favorite)
+            if (accountManager.isLogin() &&
+                (item.title.toString() == context.getString(R.string.nav_topup) || item.title.toString() == context.getString(
+                    R.string.nav_favorite
+                ))
             ) {
                 runBlocking {
                     isConfirmed = withContext(Dispatchers.Default) {

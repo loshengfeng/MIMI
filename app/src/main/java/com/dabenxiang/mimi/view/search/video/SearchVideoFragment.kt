@@ -33,6 +33,7 @@ import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.player.PlayerActivity
+import com.dabenxiang.mimi.view.setting.SettingFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_video.*
@@ -466,5 +467,20 @@ class SearchVideoFragment : BaseFragment() {
             }
             chip_group_search_text.addView(chip)
         }
+    }
+
+    private fun checkIsEmailConfirmed(onConfirmed: () -> Unit) {
+        mainViewModel?.checkIsEmailConfirmed(
+            onConfirmed,
+            {
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_searchPostFragment_to_settingFragment,
+                        viewModel.getMeAvatar()?.let { byteArray ->
+                            SettingFragment.createBundle(byteArray)
+                        })
+                )
+            }
+        )
     }
 }

@@ -173,14 +173,22 @@ class MainViewModel : BaseViewModel() {
     fun checkIsEmailConfirmed(onConfirmed: () -> Unit, onUnconfirmed: () -> Unit) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().getMe()
-                if (!result.isSuccessful) throw HttpException(result)
-                val meItem = result.body()?.content
-                emit(ApiResult.success(CheckEmailResult(
-                    meItem?.isEmailConfirmed ?: false,
-                    onConfirmed,
-                    onUnconfirmed
-                )))
+                if (accountManager.isLogin()) {
+                    val result = domainManager.getApiRepository().getMe()
+                    if (!result.isSuccessful) throw HttpException(result)
+                    val meItem = result.body()?.content
+                    emit(
+                        ApiResult.success(
+                            CheckEmailResult(
+                                meItem?.isEmailConfirmed ?: false,
+                                onConfirmed,
+                                onUnconfirmed
+                            )
+                        )
+                    )
+                } else {
+                    emit(ApiResult.success(CheckEmailResult(true, onConfirmed, onUnconfirmed)))
+                }
             }
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
