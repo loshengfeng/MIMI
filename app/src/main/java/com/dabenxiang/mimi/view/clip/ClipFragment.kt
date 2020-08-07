@@ -146,6 +146,7 @@ class ClipFragment : BaseFragment() {
 
     override fun initSettings() {
         val position = arguments?.getInt(KEY_POSITION) ?: 0
+        
         (arguments?.getSerializable(KEY_DATA) as ArrayList<MemberPostItem>).also { data ->
             memberPostItems.addAll(data)
             rv_third.adapter = ClipAdapter(
@@ -172,14 +173,16 @@ class ClipFragment : BaseFragment() {
                             val currentPos =
                                 (rv_third.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
                             Timber.d("SCROLL_STATE_IDLE position: $currentPos")
+
                             val clipAdapter = rv_third.adapter as ClipAdapter
                             val lastPosition = clipAdapter.getCurrentPos()
-                            takeIf { currentPos != lastPosition }?.also {
+                            Timber.d("SCROLL_STATE_IDLE lastPosition: $lastPosition")
+                            takeIf { currentPos>0 && currentPos != lastPosition }?.also {
                                 clipAdapter.releasePlayer()
                                 clipAdapter.updateCurrentPosition(currentPos)
                                 clipAdapter.notifyItemChanged(lastPosition)
                                 clipAdapter.notifyItemChanged(currentPos)
-                            }
+                            } ?: clipAdapter.updateCurrentPosition(lastPosition)
                         }
                     }
                 }

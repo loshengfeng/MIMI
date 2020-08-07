@@ -41,7 +41,6 @@ import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
-import com.dabenxiang.mimi.view.home.AdultHomeFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
@@ -61,7 +60,6 @@ import kotlinx.android.synthetic.main.fragment_post_pic.txt_clubName
 import kotlinx.android.synthetic.main.fragment_post_pic.txt_hashtagName
 import kotlinx.android.synthetic.main.fragment_post_pic.txt_placeholder
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import org.w3c.dom.Text
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -470,7 +468,19 @@ class PostVideoFragment : BaseFragment() {
                     val myUri = Uri.fromFile(File(UriUtils.getPath(requireContext(), videoUri!!)))
                     val bundle = Bundle()
                     bundle.putString(EditVideoFragment.BUNDLE_VIDEO_URI, myUri.toString())
-                    findNavController().navigate(R.id.action_postVideoFragment_to_editVideoFragment, bundle)
+
+                    val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
+
+                    if (isEdit != null && isEdit) {
+                        val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+
+                        bundle.putBoolean(MyPostFragment.EDIT, true)
+                        bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+                        findNavController().navigate(R.id.action_postVideoFragment_to_editVideoFragment2, bundle)
+
+                    } else {
+                        findNavController().navigate(R.id.action_postVideoFragment_to_editVideoFragment, bundle)
+                    }
                 }
             }
         }
@@ -481,11 +491,22 @@ class PostVideoFragment : BaseFragment() {
     }
 
     private fun openRecorder() {
-        val intent = Intent()
-        intent.action = MediaStore.ACTION_VIDEO_CAPTURE
-        intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, RECORD_LIMIT_TIME)
-        intent.resolveActivity(requireContext().packageManager)
-        startActivityForResult(intent, REQUEST_VIDEO_CAPTURE)
+        val galleryIntent = Intent()
+        galleryIntent.type = "video/*"
+        galleryIntent.action = Intent.ACTION_GET_CONTENT
+
+        val cameraIntent = Intent()
+        cameraIntent.action = MediaStore.ACTION_VIDEO_CAPTURE
+        cameraIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, RECORD_LIMIT_TIME)
+        cameraIntent.resolveActivity(requireContext().packageManager)
+
+        val chooser = Intent(Intent.ACTION_CHOOSER)
+        chooser.putExtra(Intent.EXTRA_INTENT, galleryIntent)
+        chooser.putExtra(Intent.EXTRA_TITLE, requireContext().getString(R.string.post_select_pic))
+
+        val intentArray = arrayOf(cameraIntent)
+        chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
+        startActivityForResult(chooser, REQUEST_VIDEO_CAPTURE)
     }
 
     private fun deleteVideo(item: PostVideoAttachment) {

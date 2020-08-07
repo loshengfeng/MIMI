@@ -94,6 +94,7 @@ class MainActivity : BaseActivity(), InteractionListener {
             containerId = R.id.nav_host_fragment,
             intent = intent,
             domainManager = viewModel.domainManager,
+            accountManager = viewModel.accountManager,
             onEmailUnconfirmed = {
                 showEmailConfirmDialog {
                     Navigation.findNavController(this, R.id.nav_host_fragment)

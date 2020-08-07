@@ -43,6 +43,7 @@ import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
+import com.dabenxiang.mimi.view.setting.SettingFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
@@ -383,53 +384,57 @@ class SearchPostFragment : BaseFragment() {
 
     private val adultListener = object : AdultListener {
         override fun onFollowPostClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
-            viewModel.followPost(item, position, isFollow)
+            checkIsEmailConfirmed { viewModel.followPost(item, position, isFollow)}
         }
 
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
-            viewModel.likePost(item, position, isLike)
+            checkIsEmailConfirmed { viewModel.likePost(item, position, isLike)}
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            when (adultTabType) {
-                AdultTabType.PICTURE -> {
-                    val bundle = PictureDetailFragment.createBundle(item, 1)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_searchPostFragment_to_pictureDetailFragment,
-                            bundle
+            checkIsEmailConfirmed {
+                when (adultTabType) {
+                    AdultTabType.PICTURE -> {
+                        val bundle = PictureDetailFragment.createBundle(item, 1)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_searchPostFragment_to_pictureDetailFragment,
+                                bundle
+                            )
                         )
-                    )
-                }
-                AdultTabType.TEXT -> {
-                    val bundle = TextDetailFragment.createBundle(item, 1)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_searchPostFragment_to_textDetailFragment,
-                            bundle
+                    }
+                    AdultTabType.TEXT -> {
+                        val bundle = TextDetailFragment.createBundle(item, 1)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_searchPostFragment_to_textDetailFragment,
+                                bundle
+                            )
                         )
-                    )
-                }
-                AdultTabType.CLIP -> {
-                    val bundle = ClipFragment.createBundle(arrayListOf(item), 0, true)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_clubDetailFragment_to_clipFragment,
-                            bundle
+                    }
+                    AdultTabType.CLIP -> {
+                        val bundle = ClipFragment.createBundle(arrayListOf(item), 0, true)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_searchPostFragment_to_clipFragment,
+                                bundle
+                            )
                         )
-                    )
-                }
-                else -> {
+                    }
+                    else -> {
+                    }
                 }
             }
         }
 
         override fun onMoreClick(item: MemberPostItem) {
-            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
-                it.show(
-                    requireActivity().supportFragmentManager,
-                    MoreDialogFragment::class.java.simpleName
-                )
+            checkIsEmailConfirmed {
+                moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
+                    it.show(
+                        requireActivity().supportFragmentManager,
+                        MoreDialogFragment::class.java.simpleName
+                    )
+                }
             }
         }
 
@@ -457,7 +462,7 @@ class SearchPostFragment : BaseFragment() {
                     val bundle = ClipFragment.createBundle(arrayListOf(item), 0)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_clubDetailFragment_to_clipFragment,
+                            R.id.action_searchPostFragment_to_clipFragment,
                             bundle
                         )
                     )
@@ -478,13 +483,15 @@ class SearchPostFragment : BaseFragment() {
         }
 
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {
-            val bundle = ClipFragment.createBundle(ArrayList(item), position)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_searchPostFragment_to_clipFragment,
-                    bundle
+            checkIsEmailConfirmed {
+                val bundle = ClipFragment.createBundle(ArrayList(item), position)
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_searchPostFragment_to_clipFragment,
+                        bundle
+                    )
                 )
-            )
+            }
         }
 
         override fun onChipClick(type: PostType, tag: String) {
@@ -527,7 +534,7 @@ class SearchPostFragment : BaseFragment() {
         isFollow: Boolean,
         update: (Boolean) -> Unit
     ) {
-        viewModel.clubFollow(memberClubItem, isFollow, update)
+        checkIsEmailConfirmed { viewModel.clubFollow(memberClubItem, isFollow, update) }
     }
 
     private fun onItemClick(item: MemberClubItem) {
@@ -565,5 +572,20 @@ class SearchPostFragment : BaseFragment() {
             }
             chip_group_search_text.addView(chip)
         }
+    }
+
+    private fun checkIsEmailConfirmed(onConfirmed: () -> Unit) {
+        mainViewModel?.checkIsEmailConfirmed(
+            onConfirmed,
+            {
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_searchPostFragment_to_settingFragment,
+                        viewModel.getMeAvatar()?.let { byteArray ->
+                            SettingFragment.createBundle(byteArray)
+                        })
+                )
+            }
+        )
     }
 }

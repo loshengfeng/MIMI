@@ -6,9 +6,11 @@ import android.view.View
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.EditVideoListener
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PostMemberRequest
 import com.dabenxiang.mimi.model.vo.PostVideoAttachment
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.post.video.PostVideoFragment.Companion.BUNDLE_COVER_URI
 import com.dabenxiang.mimi.view.post.video.PostVideoFragment.Companion.BUNDLE_TRIMMER_URI
 import com.google.android.material.tabs.TabLayout
@@ -130,7 +132,18 @@ class EditVideoFragment : BaseFragment() {
             val bundle = Bundle()
             bundle.putString(BUNDLE_TRIMMER_URI, videoUri.toString())
             bundle.putString(BUNDLE_COVER_URI, resourceUri.toString())
-            findNavController().navigate(R.id.action_editVideoFragment_to_postVideoFragment, bundle)
+
+            val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
+
+            if (isEdit != null && isEdit) {
+                val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+
+                bundle.putBoolean(MyPostFragment.EDIT, true)
+                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+                findNavController().navigate(R.id.action_editVideoFragment2_to_postVideoFragment, bundle)
+            } else {
+                findNavController().navigate(R.id.action_editVideoFragment_to_postVideoFragment, bundle)
+            }
         }
     }
 
