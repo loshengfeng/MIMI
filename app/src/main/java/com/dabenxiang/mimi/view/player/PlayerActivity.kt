@@ -72,7 +72,6 @@ import kotlin.math.round
 class PlayerActivity : BaseActivity() {
 
     companion object {
-        const val REQUEST_CODE = 111
         const val KEY_IS_FROM_PLAYER = "KEY_IS_FROM_PLAYER"
         private const val KEY_PLAYER_SRC = "KEY_PLAYER_SRC"
         private const val KEY_IS_COMMENT = "KEY_IS_COMMENT"

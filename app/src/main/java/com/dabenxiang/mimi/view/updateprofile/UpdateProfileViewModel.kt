@@ -93,7 +93,7 @@ class UpdateProfileViewModel : BaseViewModel() {
                     profileItem.gender,
                     profileItem.birthday,
                     profileItem.email,
-                    BuildConfig.API_HOST + DomainManager.VALIDATION_URL
+                    domainManager.getWebDomain() + DomainManager.PARAM_SIGN_UP_CODE
                 )
                 val result = domainManager.getApiRepository().updateProfile(request)
                 if (!result.isSuccessful) throw HttpException(result)
