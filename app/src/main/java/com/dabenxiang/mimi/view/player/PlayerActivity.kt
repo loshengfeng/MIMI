@@ -901,13 +901,14 @@ class PlayerActivity : BaseActivity() {
                 exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
             }
         }
-        scrollView.setOnScrollChangeListener { _, _, _, _, _ ->
-            Timber.i("scrollView setOnScrollChangeListener")
-        }
+//        scrollView.setOnScrollChangeListener { _, _, _, _, _ ->
+//            Timber.i("scrollView setOnScrollChangeListener")
+//        }
+//
+//        scrollView.setOnClickListener {
+//            Timber.i("scrollView setOnClickListener")
+//        }
 
-        scrollView.setOnClickListener {
-            Timber.i("scrollView setOnClickListener")
-        }
     }
 
     private fun showMoreDialog(id:Long, type:PostType, isReported:Boolean){
@@ -1664,7 +1665,7 @@ class PlayerActivity : BaseActivity() {
 
     private fun scrollToBottom() {
         if (intent.extras?.getBoolean(KEY_IS_COMMENT) == true) {
-            scrollView.fullScroll(View.FOCUS_DOWN)
+//            scrollView.fullScroll(View.FOCUS_DOWN)
         }
     }
 
