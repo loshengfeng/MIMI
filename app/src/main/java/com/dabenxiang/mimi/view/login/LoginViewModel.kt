@@ -4,12 +4,11 @@ import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.manager.DomainManager.Companion.PROMO_CODE
-import com.dabenxiang.mimi.model.manager.DomainManager.Companion.VALIDATION_URL
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.SingUpRequest
+import com.dabenxiang.mimi.model.manager.DomainManager.Companion.PARAM_SIGN_UP_CODE
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
 import com.dabenxiang.mimi.widget.utility.EditTextMutableLiveData
@@ -86,7 +85,7 @@ class LoginViewModel : BaseViewModel() {
                         friendlyName = friendlyName.value,
                         password = registerPw.value,
                         promoCode = PROMO_CODE,
-                        validationUrl = BuildConfig.API_HOST + VALIDATION_URL
+                        validationUrl = domainManager.getWebDomain() + PARAM_SIGN_UP_CODE
                     )
                 ).collect {
                     _registerResult.value = it

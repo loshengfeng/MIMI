@@ -23,6 +23,7 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
         const val DOWNLOAD_SERVER_PROJECT_ID = "WaumJF6y"
         const val PROMO_CODE = "xxx"
         const val VALIDATION_URL = "/v1/Members/ValidateEmail"
+        const val PARAM_SIGN_UP_CODE = "/?signupCode="
         const val FLAVOR_DEV = "dev"
         const val FLAVOR_SIT = "sit"
         const val BUILDTYPE_DEV = "dev"
@@ -68,32 +69,46 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
     }
 
     fun getApiDomain(): String {
-        if (BuildConfig.BUILD_TYPE.contains(BUILDTYPE_DEV)) {
-            return BuildConfig.API_HOST
+        return if (BuildConfig.BUILD_TYPE.contains(BUILDTYPE_DEV)) {
+            BuildConfig.API_HOST
         } else {
             val domains = getDomain()
             if (domains.isEmpty()) {
-                return BuildConfig.API_HOST
+                BuildConfig.API_HOST
             } else {
-                return StringBuilder("https://api.").append(getDomain()).toString()
+                StringBuilder("https://api.").append(getDomain()).toString()
             }
         }
     }
 
     fun getAdDomain(): String {
-        if (BuildConfig.BUILD_TYPE.contains(BUILDTYPE_DEV)) {
-            return BuildConfig.AD_API_HOST
+        return if (BuildConfig.BUILD_TYPE.contains(BUILDTYPE_DEV)) {
+            BuildConfig.AD_API_HOST
         } else {
             val domains = getDomain()
             if (domains.isEmpty()) {
-                return BuildConfig.AD_API_HOST
+                BuildConfig.AD_API_HOST
             } else {
-                return StringBuilder("https://ad-api.").append(getDomain()).toString()
+                StringBuilder("https://ad-api.").append(getDomain()).toString()
             }
         }
     }
 
-    fun getDomain(): String {
+    fun getWebDomain(): String {
+        return when {
+            BuildConfig.BUILD_TYPE.contains(BUILDTYPE_DEV) -> {
+                BuildConfig.WEB_HOST
+            }
+            BuildConfig.BUILD_TYPE.contains(BUILDTYPE_SIT) -> {
+                BuildConfig.WEB_HOST
+            }
+            else -> {
+                StringBuilder("https://www.").append(getDomain()).toString()
+            }
+        }
+    }
+
+    private fun getDomain(): String {
         return when {
             currentDomainIndex < domainList.size -> domainList[currentDomainIndex]
             else -> {
