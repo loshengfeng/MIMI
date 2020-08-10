@@ -39,21 +39,21 @@ class TopUpViewModel : BaseViewModel() {
         getProxyPayList()
     }
 
-    fun getProxyPayList(){
+    fun getProxyPayList() {
         viewModelScope.launch {
             val dataSrc = TopUpProxyPayListDataSource(
-                    viewModelScope,
-                    domainManager,
-                    topUpPagingCallback
+                viewModelScope,
+                domainManager,
+                topUpPagingCallback
             )
             dataSrc.isInvalid
             val factory = TopUpProxyPayListFactory(dataSrc)
             val config = PagedList.Config.Builder()
-                    .setPageSize(TopUpProxyPayListDataSource.PER_LIMIT)
-                    .build()
+                .setPageSize(TopUpProxyPayListDataSource.PER_LIMIT)
+                .build()
 
             LivePagedListBuilder(factory, config).build().asFlow()
-                    .collect { _agentList.postValue(it) }
+                .collect { _agentList.postValue(it) }
         }
     }
 
@@ -107,10 +107,10 @@ class TopUpViewModel : BaseViewModel() {
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }
-                    .onStart { emit(ApiResult.loading()) }
-                    .catch { e -> emit(ApiResult.error(e)) }
-                    .onCompletion { emit(ApiResult.loaded()) }
-                    .collect { _createChatRoomResult.value = it }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _createChatRoomResult.value = it }
         }
     }
 
@@ -124,5 +124,22 @@ class TopUpViewModel : BaseViewModel() {
         }
 
         override fun onThrowable(throwable: Throwable) {}
+    }
+
+    private val _isEmailConfirmed by lazy { MutableLiveData<ApiResult<Boolean>>() }
+    val isEmailConfirmed: LiveData<ApiResult<Boolean>> get() = _isEmailConfirmed
+    fun checkEmailConfirmed() {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getMe()
+                val isEmailConfirmed = result.body()?.content?.isEmailConfirmed ?: false
+                val status = result.isSuccessful && isEmailConfirmed
+                emit(ApiResult.success(status))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _isEmailConfirmed.value = it }
+        }
     }
 }
