@@ -6,6 +6,7 @@
     app:startDestination="@id/clubDetailFragment">
 
     <include app:graph="@navigation/navigation_setting"/>
+    <include app:graph="@navigation/navigation_login"/>
 
     <fragment
         android:id="@+id/clubDetailFragment"
@@ -27,6 +28,12 @@
         <action
             android:id="@+id/action_clubDetailFragment_to_myPostFragment"
             app:destination="@id/myPostFragment" />
+        <action
+            android:id="@+id/action_to_settingFragment"
+            app:destination="@id/navigation_setting" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
     </fragment>
 
     <fragment
@@ -42,6 +49,12 @@
         <action
             android:id="@+id/action_pictureDetailFragment_to_myPostFragment"
             app:destination="@id/myPostFragment" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_settingFragment"
+            app:destination="@id/navigation_setting"/>
     </fragment>
 
     <fragment
@@ -67,6 +80,12 @@
         <action
             android:id="@+id/action_searchPostFragment_to_myPostFragment"
             app:destination="@id/myPostFragment" />
+        <action
+            android:id="@+id/action_to_settingFragment"
+            app:destination="@id/navigation_setting" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
     </fragment>
 
     <fragment
@@ -79,6 +98,12 @@
         <action
             android:id="@+id/action_textDetailFragment_to_myPostFragment"
             app:destination="@id/myPostFragment" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_settingFragment"
+            app:destination="@id/navigation_setting"/>
     </fragment>
 
     <fragment
@@ -94,7 +119,10 @@
             android:id="@+id/action_clipFragment_to_myPostFragment"
             app:destination="@id/myPostFragment" />
         <action
-            android:id="@+id/action_clipFragment_to_settingFragment"
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_settingFragment"
             app:destination="@id/navigation_setting" />
     </fragment>
 
@@ -115,6 +143,12 @@
         <action
             android:id="@+id/action_myPostFragment_to_pictureDetailFragment"
             app:destination="@id/pictureDetailFragment" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_settingFragment"
+            app:destination="@id/navigation_setting" />
     </fragment>
 
 </navigation>

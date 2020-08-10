@@ -14,6 +14,7 @@ import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.request.RequestOptions
+import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.AgentItem
@@ -27,9 +28,11 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
 import com.dabenxiang.mimi.view.listener.AdapterEventListener
 import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_top_up.*
+import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import timber.log.Timber
 
 class TopUpFragment : BaseFragment() {
@@ -45,7 +48,6 @@ class TopUpFragment : BaseFragment() {
         requireActivity().onBackPressedDispatcher.addCallback {
             interactionListener?.changeNavigationPosition(R.id.navigation_home)
         }
-
         initSettings()
     }
 
@@ -108,6 +110,19 @@ class TopUpFragment : BaseFragment() {
                 is Error -> onApiError(it.throwable)
             }
         })
+
+        viewModel.isEmailConfirmed.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    if (!it.result) {
+                        interactionListener?.changeNavigationPosition(R.id.navigation_personal)
+                    } else {
+                        initTopUp()
+                    }
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -144,13 +159,44 @@ class TopUpFragment : BaseFragment() {
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.btn_pay -> GeneralUtils.showToast(requireContext(), "btnPay")
+                R.id.tv_login -> navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_to_loginFragment,
+                        LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                    )
+                )
+                R.id.tv_register -> navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_to_loginFragment,
+                        LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                    )
+                )
             }
         }.also {
             btn_pay.setOnClickListener(it)
+            tv_login.setOnClickListener(it)
+            tv_register.setOnClickListener(it)
         }
     }
 
     override fun initSettings() {
+        when (viewModel.accountManager.isLogin()) {
+            true -> {
+                viewModel.checkEmailConfirmed()
+            }
+            false -> {
+                tv_record_top_up.visibility = View.GONE
+                tv_version_is_not_login.text = BuildConfig.VERSION_NAME
+                item_is_Login.visibility = View.GONE
+                item_is_not_Login.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private fun initTopUp() {
+        tv_record_top_up.visibility = View.VISIBLE
+        item_is_Login.visibility = View.VISIBLE
+        item_is_not_Login.visibility = View.GONE
         val userItem = viewModel.getUserData()
         tv_name.text = userItem.friendlyName
         tv_coco.text = userItem.point.toString()
@@ -211,10 +257,7 @@ class TopUpFragment : BaseFragment() {
             navigateTo(NavigateItem.Destination(R.id.action_topupFragment_to_orderFragment))
         }
 
-        val isLogin = mainViewModel?.isLogin() ?: false
-        if (isLogin) {
-            viewModel.getMe()
-        }
+        viewModel.getMe()
 
         viewModel.agentList.observe(viewLifecycleOwner, Observer {
             agentAdapter.submitList(it)

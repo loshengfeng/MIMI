@@ -26,7 +26,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.manager.DomainManager
+import com.dabenxiang.mimi.model.vo.StatusItem
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -48,6 +50,7 @@ fun BottomNavigationView.setupWithNavController(
     containerId: Int,
     intent: Intent,
     domainManager: DomainManager,
+    accountManager: AccountManager,
     onEmailUnconfirmed: () -> Unit
 ): LiveData<NavController> {
 
@@ -103,64 +106,76 @@ fun BottomNavigationView.setupWithNavController(
         if (fragmentManager.isStateSaved) {
             false
         } else {
-            var isConfirmed = false
-            if (item.title.toString() == context.getString(R.string.nav_topup)
-                || item.title.toString() == context.getString(R.string.nav_favorite)
+            var status = StatusItem.LOGIN_AND_EMAIL_CONFIRMED
+            if (accountManager.isLogin() && (item.title.toString() == context.getString(R.string.nav_topup) || item.title.toString() == context.getString(
+                    R.string.nav_favorite
+                ))
             ) {
                 runBlocking {
-                    isConfirmed = withContext(Dispatchers.Default) {
+                    val isConfirmed = withContext(Dispatchers.Default) {
                         isEmailConfirmed(domainManager)
                     }
+                    status =
+                        if (isConfirmed) StatusItem.LOGIN_AND_EMAIL_CONFIRMED else StatusItem.LOGIN_BUT_EMAIL_NOT_CONFIRMED
                 }
-            } else {
-                isConfirmed = true
             }
-            if (isConfirmed) {
-                val newlySelectedItemTag = graphIdToTagMap[item.itemId]
-                if (selectedItemTag != newlySelectedItemTag) {
-                    // Pop everything above the first fragment (the "fixed start destination")
-                    fragmentManager.popBackStack(
-                        firstFragmentTag,
-                        FragmentManager.POP_BACK_STACK_INCLUSIVE
-                    )
-                    val selectedFragment = fragmentManager.findFragmentByTag(newlySelectedItemTag)
-                            as NavHostFragment
-
-                    // Exclude the first fragment tag because it's always in the back stack.
-                    if (firstFragmentTag != newlySelectedItemTag) {
-                        // Commit a transaction that cleans the back stack and adds the first fragment
-                        // to it, creating the fixed started destination.
-                        fragmentManager.beginTransaction()
-                            .setCustomAnimations(
-                                R.anim.nav_default_enter_anim,
-                                R.anim.nav_default_exit_anim,
-                                R.anim.nav_default_pop_enter_anim,
-                                R.anim.nav_default_pop_exit_anim
-                            )
-                            .attach(selectedFragment)
-                            .setPrimaryNavigationFragment(selectedFragment)
-                            .apply {
-                                // Detach all other Fragments
-                                graphIdToTagMap.forEach { _, fragmentTagIter ->
-                                    if (fragmentTagIter != newlySelectedItemTag) {
-                                        detach(fragmentManager.findFragmentByTag(firstFragmentTag)!!)
-                                    }
-                                }
-                            }
-                            .addToBackStack(firstFragmentTag)
-                            .setReorderingAllowed(true)
-                            .commit()
-                    }
-                    selectedItemTag = newlySelectedItemTag
-                    isOnFirstFragment = selectedItemTag == firstFragmentTag
-                    selectedNavController.value = selectedFragment.navController
-                    true
-                } else {
+            when (status) {
+                StatusItem.NOT_LOGIN -> {
                     false
                 }
-            } else {
-                onEmailUnconfirmed()
-                false
+                StatusItem.LOGIN_BUT_EMAIL_NOT_CONFIRMED -> {
+                    onEmailUnconfirmed()
+                    false
+                }
+                StatusItem.LOGIN_AND_EMAIL_CONFIRMED -> {
+                    val newlySelectedItemTag = graphIdToTagMap[item.itemId]
+                    if (selectedItemTag != newlySelectedItemTag) {
+                        // Pop everything above the first fragment (the "fixed start destination")
+                        fragmentManager.popBackStack(
+                            firstFragmentTag,
+                            FragmentManager.POP_BACK_STACK_INCLUSIVE
+                        )
+                        val selectedFragment =
+                            fragmentManager.findFragmentByTag(newlySelectedItemTag)
+                                    as NavHostFragment
+
+                        // Exclude the first fragment tag because it's always in the back stack.
+                        if (firstFragmentTag != newlySelectedItemTag) {
+                            // Commit a transaction that cleans the back stack and adds the first fragment
+                            // to it, creating the fixed started destination.
+                            fragmentManager.beginTransaction()
+                                .setCustomAnimations(
+                                    R.anim.nav_default_enter_anim,
+                                    R.anim.nav_default_exit_anim,
+                                    R.anim.nav_default_pop_enter_anim,
+                                    R.anim.nav_default_pop_exit_anim
+                                )
+                                .attach(selectedFragment)
+                                .setPrimaryNavigationFragment(selectedFragment)
+                                .apply {
+                                    // Detach all other Fragments
+                                    graphIdToTagMap.forEach { _, fragmentTagIter ->
+                                        if (fragmentTagIter != newlySelectedItemTag) {
+                                            detach(
+                                                fragmentManager.findFragmentByTag(
+                                                    firstFragmentTag
+                                                )!!
+                                            )
+                                        }
+                                    }
+                                }
+                                .addToBackStack(firstFragmentTag)
+                                .setReorderingAllowed(true)
+                                .commit()
+                        }
+                        selectedItemTag = newlySelectedItemTag
+                        isOnFirstFragment = selectedItemTag == firstFragmentTag
+                        selectedNavController.value = selectedFragment.navController
+                        true
+                    } else {
+                        false
+                    }
+                }
             }
         }
     }
@@ -190,7 +205,7 @@ fun BottomNavigationView.setupWithNavController(
 
 private suspend fun isEmailConfirmed(domainManager: DomainManager): Boolean {
     val result = domainManager.getApiRepository().getMe()
-    if (!result.isSuccessful) throw HttpException(result)
+    if (!result.isSuccessful) return false
     val meItem = result.body()?.content
     return meItem?.isEmailConfirmed ?: false
 }

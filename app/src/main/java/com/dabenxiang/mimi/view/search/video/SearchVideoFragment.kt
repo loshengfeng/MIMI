@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.search.video
 
+import android.app.Activity
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
@@ -16,6 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -30,7 +32,6 @@ import com.dabenxiang.mimi.view.adapter.SearchVideoAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
-import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.player.PlayerActivity.Companion.KEY_IS_FROM_PLAYER
@@ -43,6 +44,7 @@ import java.util.*
 class SearchVideoFragment : BaseFragment() {
 
     companion object {
+        private const val REQUEST_LOGIN = 1000
         const val KEY_DATA = "data"
 
         fun createBundle(title: String = "", tag: String = "", isAdult: Boolean = false): Bundle {
@@ -72,8 +74,9 @@ class SearchVideoFragment : BaseFragment() {
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun setupFirstTime() {
+        super.setupFirstTime()
+
         requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
 
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
@@ -308,41 +311,46 @@ class SearchVideoFragment : BaseFragment() {
             )
             val intent = Intent(requireContext(), PlayerActivity::class.java)
             intent.putExtras(PlayerActivity.createBundle(playerData))
-            startActivity(intent)
+            startActivityForResult(intent, REQUEST_LOGIN)
         }
 
         override fun onFunctionClick(type: FunctionType, view: View, item: VideoItem) {
-
             when (type) {
                 FunctionType.LIKE -> {
                     // 點擊更改喜歡,
-                    viewModel.currentItem = item
-                    item.id?.let {
-                        viewModel.modifyLike(it)
+                    checkStatus {
+                        viewModel.currentItem = item
+                        item.id?.let {
+                            viewModel.modifyLike(it)
+                        }
                     }
                 }
 
                 FunctionType.FAVORITE -> {
                     // 點擊後加入收藏,
-                    viewModel.currentItem = item
-                    item.id?.let {
-                        viewModel.modifyFavorite(it)
+                    checkStatus {
+                        viewModel.currentItem = item
+                        item.id?.let {
+                            viewModel.modifyFavorite(it)
+                        }
                     }
                 }
 
                 FunctionType.SHARE -> {
                     /* 點擊後複製網址 */
-                    if (item.tags == null || (item.tags as String).isEmpty() || item.id == null) {
-                        GeneralUtils.showToast(requireContext(), "copy url error")
-                    } else {
-                        GeneralUtils.copyToClipboard(
-                            requireContext(),
-                            viewModel.getShareUrl(item.tags, item.id)
-                        )
-                        GeneralUtils.showToast(
-                            requireContext(),
-                            requireContext().getString(R.string.copy_url)
-                        )
+                    checkStatus {
+                        if (item.tags == null || (item.tags as String).isEmpty() || item.id == null) {
+                            GeneralUtils.showToast(requireContext(), "copy url error")
+                        } else {
+                            GeneralUtils.copyToClipboard(
+                                requireContext(),
+                                viewModel.getShareUrl(item.tags, item.id)
+                            )
+                            GeneralUtils.showToast(
+                                requireContext(),
+                                requireContext().getString(R.string.copy_url)
+                            )
+                        }
                     }
                 }
 
@@ -354,7 +362,7 @@ class SearchVideoFragment : BaseFragment() {
                     )
                     val intent = Intent(requireContext(), PlayerActivity::class.java)
                     intent.putExtras(PlayerActivity.createBundle(playerData, true))
-                    startActivity(intent)
+                    startActivityForResult(intent, REQUEST_LOGIN)
                 }
 
                 FunctionType.MORE -> {
@@ -427,7 +435,7 @@ class SearchVideoFragment : BaseFragment() {
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem) {
             moreDialog?.dismiss()
-            (requireActivity() as MainActivity).showReportDialog(item)
+            checkStatus { (requireActivity() as MainActivity).showReportDialog(item) }
         }
 
         override fun onCancel() {
@@ -465,6 +473,18 @@ class SearchVideoFragment : BaseFragment() {
                 GeneralUtils.hideKeyboard(requireActivity())
             }
             chip_group_search_text.addView(chip)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                REQUEST_LOGIN -> {
+                    findNavController().navigate(R.id.action_to_loginFragment, data?.extras)
+                }
+            }
         }
     }
 }

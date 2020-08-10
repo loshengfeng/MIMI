@@ -6,6 +6,7 @@
     app:startDestination="@id/splashFragment">
 
     <include app:graph="@navigation/navigation_setting" />
+    <include app:graph="@navigation/navigation_login" />
 
     <fragment
         android:id="@+id/splashFragment"
@@ -36,10 +37,11 @@
             android:id="@+id/action_homeFragment_to_settingFragment"
             app:destination="@id/settingFragment" />
         <action
-            android:id="@+id/action_main_to_settingFragment"
-            app:destination="@id/navigation_setting"
-            app:popUpTo="@id/homeFragment"
-            app:popUpToInclusive="false"/>
+            android:id="@+id/action_to_settingFragment"
+            app:destination="@id/navigation_setting"/>
+        <action
+            android:id="@+id/action_homeFragment_to_loginFragment"
+            app:destination="@id/navigation_login"/>
 
     </fragment>
 
@@ -52,41 +54,27 @@
             android:id="@+id/action_categoriesFragment_to_searchVideoFragment"
             app:destination="@id/searchVideoFragment" />
 
+        <action
+            android:id="@+id/action_categoriesFragment_to_loginFragment"
+            app:destination="@id/navigation_login" />
+
     </fragment>
 
     <fragment
         android:id="@+id/searchVideoFragment"
         android:name="com.dabenxiang.mimi.view.search.video.SearchVideoFragment"
-        tools:layout="@layout/fragment_search_video" />
+        tools:layout="@layout/fragment_search_video">
+        <action
+            android:id="@+id/action_to_settingFragment"
+            app:destination="@id/navigation_setting" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+    </fragment>
 
     <fragment
         android:id="@+id/rankingFragment"
         android:name="com.dabenxiang.mimi.view.ranking.RankingFragment"
         tools:layout="@layout/fragment_ranking" />
-
-    <fragment
-        android:id="@+id/settingFragment"
-        android:name="com.dabenxiang.mimi.view.setting.SettingFragment"
-        tools:layout="@layout/fragment_setting">
-
-        <action
-            android:id="@+id/action_settingFragment_to_updateProfileFragment"
-            app:destination="@id/updateProfileFragment" />
-
-        <action
-            android:id="@+id/action_settingFragment_to_changePasswordFragment"
-            app:destination="@id/changePasswordFragment" />
-
-    </fragment>
-
-    <fragment
-        android:id="@+id/updateProfileFragment"
-        android:name="com.dabenxiang.mimi.view.updateprofile.UpdateProfileFragment"
-        tools:layout="@layout/fragment_update_profile"/>
-
-    <fragment
-        android:id="@+id/changePasswordFragment"
-        android:name="com.dabenxiang.mimi.view.changepassword.ChangePasswordFragment"
-        tools:layout="@layout/fragment_change_password"/>
 
 </navigation>

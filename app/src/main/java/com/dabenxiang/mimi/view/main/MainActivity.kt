@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageInstaller
 import android.os.Bundle
 import android.text.TextUtils
-import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
@@ -21,14 +20,15 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
+import com.dabenxiang.mimi.model.vo.StatusItem
 import com.dabenxiang.mimi.view.base.BaseActivity
-import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.home.HomeFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.view.setting.SettingFragment
@@ -60,13 +60,13 @@ class MainActivity : BaseActivity(), InteractionListener {
             }
         })
 
-        viewModel.isEmailConfirmed.observe(this, Observer {
+        viewModel.checkStatusResult.observe(this, Observer {
             when (it) {
                 is ApiResult.Success -> {
-                    if (it.result.isConfirmed) {
-                        it.result.onConfirmed()
-                    } else {
-                        showEmailConfirmDialog(it.result.onUnconfirmed)
+                    when (it.result.status) {
+                        StatusItem.NOT_LOGIN -> showNotLoginDialog()
+                        StatusItem.LOGIN_BUT_EMAIL_NOT_CONFIRMED -> showEmailConfirmDialog()
+                        StatusItem.LOGIN_AND_EMAIL_CONFIRMED -> it.result.onLoginAndEmailConfirmed()
                     }
                 }
                 is ApiResult.Error -> Timber.e(it.throwable)
@@ -95,16 +95,8 @@ class MainActivity : BaseActivity(), InteractionListener {
             containerId = R.id.nav_host_fragment,
             intent = intent,
             domainManager = viewModel.domainManager,
-            onEmailUnconfirmed = {
-                showEmailConfirmDialog {
-                    Navigation.findNavController(this, R.id.nav_host_fragment)
-                        .navigate(
-                            R.id.action_main_to_settingFragment,
-                            viewModel.getMeAvatar()?.let { byteArray ->
-                                SettingFragment.createBundle(byteArray)
-                            })
-                }
-            }
+            accountManager = viewModel.accountManager,
+            onEmailUnconfirmed = { showEmailConfirmDialog() }
         )
 
         controller.observe(this, Observer {
@@ -283,7 +275,7 @@ class MainActivity : BaseActivity(), InteractionListener {
         }
     }
 
-    fun showEmailConfirmDialog(block: () -> Unit) {
+    fun showEmailConfirmDialog() {
         GeneralDialog.newInstance(
             GeneralDialogData(
                 titleRes = R.string.error_email_not_confirmed_title,
@@ -291,7 +283,45 @@ class MainActivity : BaseActivity(), InteractionListener {
                 messageIcon = R.drawable.ico_email,
                 firstBtn = getString(R.string.verify_later),
                 secondBtn = getString(R.string.verify_immediately),
-                secondBlock = block
+                secondBlock = {
+                    Navigation.findNavController(this, R.id.nav_host_fragment)
+                        .navigate(
+                            R.id.action_to_settingFragment,
+                            viewModel.getMeAvatar()?.let { byteArray ->
+                                SettingFragment.createBundle(byteArray)
+                            })
+                }
+            )
+        ).show(supportFragmentManager)
+    }
+
+    fun showNotLoginDialog() {
+        GeneralDialog.newInstance(
+            GeneralDialogData(
+                titleRes = R.string.login_yet,
+                message = getString(R.string.login_message),
+                messageIcon = R.drawable.ico_default_photo,
+                firstBtn = getString(R.string.btn_register),
+                secondBtn = getString(R.string.btn_login),
+                firstBlock = {
+                    val bundle = Bundle()
+                    bundle.putInt(LoginFragment.KEY_TYPE, LoginFragment.TYPE_REGISTER)
+                    Navigation.findNavController(this, R.id.nav_host_fragment).navigate(
+                        R.id.action_to_loginFragment,
+                        bundle
+                    )
+                },
+                secondBlock = {
+                    val bundle = Bundle()
+                    bundle.putInt(LoginFragment.KEY_TYPE, LoginFragment.TYPE_LOGIN)
+                    Navigation.findNavController(this, R.id.nav_host_fragment).navigate(
+                        R.id.action_to_loginFragment,
+                        bundle
+                    )
+                },
+                closeBlock = {
+                    Timber.d("close!")
+                }
             )
         ).show(supportFragmentManager)
     }

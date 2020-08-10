@@ -32,16 +32,11 @@
             app:destination="@id/chatHistoryFragment" />
 
         <action
-            android:id="@+id/action_personalFragment_to_settingFragment"
-            app:destination="@id/navigation_setting" />
-        <action
             android:id="@+id/action_personalFragment_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
         <action
-            android:id="@+id/action_main_to_settingFragment"
-            app:destination="@id/navigation_setting"
-            app:popUpTo="@id/homeFragment"
-            app:popUpToInclusive="false"/>
+            android:id="@+id/action_to_settingFragment"
+            app:destination="@id/navigation_setting"/>
     </fragment>
 
     <fragment

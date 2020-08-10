@@ -18,9 +18,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.comment.CommentDialogFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
-import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.view.setting.SettingFragment
 import kotlinx.android.synthetic.main.fragment_clip.*
 import timber.log.Timber
 import java.io.File
@@ -146,6 +144,7 @@ class ClipFragment : BaseFragment() {
 
     override fun initSettings() {
         val position = arguments?.getInt(KEY_POSITION) ?: 0
+        
         (arguments?.getSerializable(KEY_DATA) as ArrayList<MemberPostItem>).also { data ->
             memberPostItems.addAll(data)
             rv_third.adapter = ClipAdapter(
@@ -172,14 +171,16 @@ class ClipFragment : BaseFragment() {
                             val currentPos =
                                 (rv_third.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
                             Timber.d("SCROLL_STATE_IDLE position: $currentPos")
+
                             val clipAdapter = rv_third.adapter as ClipAdapter
                             val lastPosition = clipAdapter.getCurrentPos()
-                            takeIf { currentPos != lastPosition }?.also {
+                            Timber.d("SCROLL_STATE_IDLE lastPosition: $lastPosition")
+                            takeIf { currentPos>=0 && currentPos != lastPosition }?.also {
                                 clipAdapter.releasePlayer()
                                 clipAdapter.updateCurrentPosition(currentPos)
                                 clipAdapter.notifyItemChanged(lastPosition)
                                 clipAdapter.notifyItemChanged(currentPos)
-                            }
+                            } ?: clipAdapter.updateCurrentPosition(lastPosition)
                         }
                     }
                 }
@@ -218,46 +219,31 @@ class ClipFragment : BaseFragment() {
     }
 
     private fun onFollowClick(item: MemberPostItem, pos: Int, isFollow: Boolean) {
-        checkIsEmailConfirmed {
+        checkStatus {
             Timber.d("onFollowClick, item:$item, pos:$pos, isFollow:$isFollow")
             viewModel.followPost(item, pos, isFollow)
         }
     }
 
     private fun onFavoriteClick(item: MemberPostItem, pos: Int, isFavorite: Boolean) {
-        checkIsEmailConfirmed {
+        checkStatus {
             Timber.d("onFavoriteClick,  item:$item, pos:$pos, isFavorite:$isFavorite")
             viewModel.favoritePost(item, pos, isFavorite)
         }
     }
 
     private fun onLikeClick(item: MemberPostItem, pos: Int, isLike: Boolean) {
-        checkIsEmailConfirmed {
+        checkStatus {
             Timber.d("onLikeClick, item:$item, pos:$pos, isLike:$isLike")
             viewModel.likePost(item, pos, isLike)
         }
     }
 
     private fun onCommentClick(item: MemberPostItem) {
-        checkIsEmailConfirmed {
+        checkStatus {
             Timber.d("onCommentClick, item:$item")
             showCommentDialog(item)
         }
-    }
-
-    private fun checkIsEmailConfirmed(onConfirmed: () -> Unit) {
-        mainViewModel?.checkIsEmailConfirmed(
-            onConfirmed,
-            {
-                navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_clipFragment_to_settingFragment,
-                        viewModel.getMeAvatar()?.let { byteArray ->
-                            SettingFragment.createBundle(byteArray)
-                        })
-                )
-            }
-        )
     }
 
     private fun showCommentDialog(item: MemberPostItem) {

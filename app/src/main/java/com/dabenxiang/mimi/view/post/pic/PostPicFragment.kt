@@ -13,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.core.view.get
 import androidx.core.view.isEmpty
@@ -42,7 +43,6 @@ import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.view.post.video.PostVideoFragment
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment.Companion.VIEWER_DATA
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
@@ -182,6 +182,7 @@ class PostPicFragment : BaseFragment() {
                     if (it.length > HASHTAG_TEXT_LIMIT) {
                         val content = it.toString().dropLast(1)
                         edt_hashtag.setText(content)
+                        edt_hashtag.setSelection(content.length)
                     }
                 }
             }
@@ -220,18 +221,7 @@ class PostPicFragment : BaseFragment() {
         }
 
         tv_back.setOnClickListener {
-            GeneralDialog.newInstance(
-                GeneralDialogData(
-                    titleRes = R.string.whether_to_discard_content,
-                    messageIcon = R.drawable.ico_default_photo,
-                    firstBtn = getString(R.string.btn_cancel),
-                    secondBtn = getString(R.string.btn_confirm),
-                    isMessageIcon = false,
-                    secondBlock = {
-                        findNavController().navigateUp()
-                    }
-                )
-            ).show(requireActivity().supportFragmentManager)
+            handleBackEvent()
         }
 
         tv_clean.setOnClickListener {
@@ -283,6 +273,25 @@ class PostPicFragment : BaseFragment() {
                 findNavController().navigate(R.id.action_postPicFragment_to_adultHomeFragment, bundle)
             }
         }
+
+        requireActivity().onBackPressedDispatcher.addCallback {
+            handleBackEvent()
+        }
+    }
+
+    private fun handleBackEvent() {
+        GeneralDialog.newInstance(
+            GeneralDialogData(
+                titleRes = R.string.whether_to_discard_content,
+                messageIcon = R.drawable.ico_default_photo,
+                firstBtn = getString(R.string.btn_cancel),
+                secondBtn = getString(R.string.btn_confirm),
+                isMessageIcon = false,
+                secondBlock = {
+                    findNavController().navigateUp()
+                }
+            )
+        ).show(requireActivity().supportFragmentManager)
     }
 
     override fun setupFirstTime() {

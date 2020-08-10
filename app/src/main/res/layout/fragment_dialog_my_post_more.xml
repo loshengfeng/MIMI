@@ -20,19 +20,19 @@
         android:background="@drawable/bg_white_1_top_radius_20"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        android:paddingTop="12dp">
 
         <TextView
             android:id="@+id/tv_edit"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="start"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="28dp"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="30dp"
             android:text="@string/edit_post"
             android:textColor="@color/color_black_1"
             android:textSize="16sp"
-            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintBottom_toTopOf="@id/tv_delete"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -40,10 +40,9 @@
         <TextView
             android:id="@+id/tv_delete"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="start"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="28dp"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="30dp"
             android:text="@string/delete_post"
             android:textColor="@color/color_red_1"
             android:textSize="16sp"
@@ -57,6 +56,7 @@
             android:id="@+id/line"
             android:layout_width="match_parent"
             android:layout_height="1dp"
+            android:layout_marginTop="20dp"
             android:background="@color/color_gray_13"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -64,10 +64,9 @@
 
         <TextView
             android:id="@+id/tv_cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="67dp"
+            android:gravity="center"
             android:text="@string/upload_cancel"
             android:textColor="@color/color_black_1"
             android:textSize="16sp"

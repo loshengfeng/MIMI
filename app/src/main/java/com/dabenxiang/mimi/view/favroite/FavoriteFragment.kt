@@ -7,6 +7,7 @@ import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -27,6 +28,7 @@ import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
@@ -36,6 +38,7 @@ import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.fragment_post_favorite.*
+import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import timber.log.Timber
 
@@ -85,10 +88,29 @@ class FavoriteFragment : BaseFragment() {
             )
         }
         useAdultTheme(false)
+        initSettings()
     }
 
     override fun setupFirstTime() {
-        initSettings()
+        val primaryList = listOf(
+            getString(R.string.favorite_normal),
+            getString(R.string.favorite_adult)
+        )
+
+        primaryAdapter.submitList(primaryList, lastPrimaryIndex)
+
+        rv_secondary.adapter = secondaryAdapter
+
+        val secondaryList = listOf(
+            getString(R.string.favorite_tab_mimi),
+            getString(R.string.favorite_tab_short)
+        )
+
+        secondaryAdapter.submitList(secondaryList, lastSecondaryIndex)
+
+        rv_content.adapter = favoriteAdapter
+
+        viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
     }
 
     override fun getLayoutId(): Int {
@@ -193,9 +215,23 @@ class FavoriteFragment : BaseFragment() {
                         )
                     }
                 }
+                R.id.tv_login -> navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_postFavoriteFragment_to_loginFragment,
+                        LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                    )
+                )
+                R.id.tv_register -> navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_postFavoriteFragment_to_loginFragment,
+                        LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                    )
+                )
             }
         }.also {
             tv_clean.setOnClickListener(it)
+            tv_login.setOnClickListener(it)
+            tv_register.setOnClickListener(it)
         }
 
         layout_refresh.setOnRefreshListener {
@@ -207,29 +243,20 @@ class FavoriteFragment : BaseFragment() {
     override fun initSettings() {
         tv_back.visibility = View.GONE
         tv_title.text = getString(R.string.favorite_title)
-        tv_clean.visibility = View.VISIBLE
 
-        rv_primary.adapter = primaryAdapter
-
-        val primaryList = listOf(
-            getString(R.string.favorite_normal),
-            getString(R.string.favorite_adult)
-        )
-
-        primaryAdapter.submitList(primaryList, lastPrimaryIndex)
-
-        rv_secondary.adapter = secondaryAdapter
-
-        val secondaryList = listOf(
-            getString(R.string.favorite_tab_mimi),
-            getString(R.string.favorite_tab_short)
-        )
-
-        secondaryAdapter.submitList(secondaryList, lastSecondaryIndex)
-
-        rv_content.adapter = favoriteAdapter
-
-        viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
+        when(viewModel.accountManager.isLogin()) {
+            true -> {
+                item_is_not_Login.visibility = View.GONE
+                item_is_Login.visibility = View.VISIBLE
+                tv_clean.visibility = View.VISIBLE
+                rv_primary.adapter = primaryAdapter
+            }
+            false -> {
+                item_is_not_Login.visibility = View.VISIBLE
+                item_is_Login.visibility = View.GONE
+                tv_version_is_not_login.text = BuildConfig.VERSION_NAME
+            }
+        }
     }
 
     override fun onAttach(context: Context) {
@@ -469,7 +496,6 @@ class FavoriteFragment : BaseFragment() {
      * 進到短影片的詳細頁面
      */
     private fun goShortVideoDetailPage(item: PostFavoriteItem) {
-
         if (item.tags == null || item.tags.first()
                 .isEmpty() || item.postId == null
         ) {
@@ -492,6 +518,7 @@ class FavoriteFragment : BaseFragment() {
                         memberItem.creatorId = postItem.posterId ?: 0
                         memberItem.likeType =
                             if (postItem.likeType == 0) LikeType.LIKE else LikeType.DISLIKE
+                        memberItem.postFriendlyName = postItem.posterName
                         return@memberItem
                     }
                 }

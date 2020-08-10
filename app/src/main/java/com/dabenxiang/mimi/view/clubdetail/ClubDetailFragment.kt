@@ -122,15 +122,17 @@ class ClubDetailFragment : BaseFragment() {
     override fun setupListeners() {
         ib_back.setOnClickListener { findNavController().navigateUp() }
         tv_follow.setOnClickListener {
-            viewModel.followClub(
-                memberClubItem,
-                !memberClubItem.isFollow
-            )
+            checkStatus {
+                viewModel.followClub(
+                    memberClubItem,
+                    !memberClubItem.isFollow
+                )
+            }
         }
     }
 
     private fun updateFollow() {
-        val isFollow = memberClubItem.isFollow ?: false
+        val isFollow = memberClubItem.isFollow
         if (isFollow) {
             tv_follow.text = requireContext().getString(R.string.followed)
             tv_follow.background =
@@ -150,35 +152,37 @@ class ClubDetailFragment : BaseFragment() {
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {}
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            when (adultTabType) {
-                AdultTabType.PICTURE -> {
-                    val bundle = PictureDetailFragment.createBundle(item, 1)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_clubDetailFragment_to_pictureDetailFragment,
-                            bundle
+            checkStatus {
+                when (adultTabType) {
+                    AdultTabType.PICTURE -> {
+                        val bundle = PictureDetailFragment.createBundle(item, 1)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_clubDetailFragment_to_pictureDetailFragment,
+                                bundle
+                            )
                         )
-                    )
-                }
-                AdultTabType.TEXT -> {
-                    val bundle = TextDetailFragment.createBundle(item, 1)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_clubDetailFragment_to_textDetailFragment,
-                            bundle
+                    }
+                    AdultTabType.TEXT -> {
+                        val bundle = TextDetailFragment.createBundle(item, 1)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_clubDetailFragment_to_textDetailFragment,
+                                bundle
+                            )
                         )
-                    )
-                }
-                AdultTabType.CLIP -> {
-                    val bundle = ClipFragment.createBundle(arrayListOf(item), 0, true)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_clubDetailFragment_to_clipFragment,
-                            bundle
+                    }
+                    AdultTabType.CLIP -> {
+                        val bundle = ClipFragment.createBundle(arrayListOf(item), 0, true)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_clubDetailFragment_to_clipFragment,
+                                bundle
+                            )
                         )
-                    )
-                }
-                else -> {
+                    }
+                    else -> {
+                    }
                 }
             }
         }
@@ -238,13 +242,15 @@ class ClubDetailFragment : BaseFragment() {
         }
 
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {
-            val bundle = ClipFragment.createBundle(ArrayList(item), position)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_clubDetailFragment_to_clipFragment,
-                    bundle
+            checkStatus {
+                val bundle = ClipFragment.createBundle(ArrayList(item), position)
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_clubDetailFragment_to_clipFragment,
+                        bundle
+                    )
                 )
-            )
+            }
         }
 
         override fun onChipClick(type: PostType, tag: String) {
@@ -264,14 +270,19 @@ class ClubDetailFragment : BaseFragment() {
                 isAdult = true,
                 isAdultTheme = true
             )
-            navigateTo(NavigateItem.Destination(R.id.action_clubDetailFragment_to_myPostFragment, bundle))
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_clubDetailFragment_to_myPostFragment,
+                    bundle
+                )
+            )
         }
     }
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem) {
             moreDialog?.dismiss()
-            (requireActivity() as MainActivity).showReportDialog(item)
+            checkStatus { (requireActivity() as MainActivity).showReportDialog(item) }
         }
 
         override fun onCancel() {
@@ -292,7 +303,7 @@ class ClubDetailFragment : BaseFragment() {
         isFollow: Boolean,
         update: (Boolean) -> Unit
     ) {
-        viewModel.followMember(memberPostItem, isFollow, update)
+        checkStatus { viewModel.followMember(memberPostItem, isFollow, update) }
     }
 
     private fun likePost(
@@ -300,6 +311,7 @@ class ClubDetailFragment : BaseFragment() {
         isLike: Boolean,
         update: (Boolean, Int) -> Unit
     ) {
-        viewModel.likePost(memberPostItem, isLike, update)
+        checkStatus { viewModel.likePost(memberPostItem, isLike, update) }
     }
+
 }

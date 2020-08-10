@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDeepLinkBuilder
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearSnapHelper
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
@@ -36,11 +37,11 @@ import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.vo.PlayerItem
+import com.dabenxiang.mimi.model.vo.StatusItem
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseActivity
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.dialog.*
-import com.dabenxiang.mimi.view.login.LoginActivity
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.main.MainViewModel
@@ -77,7 +78,6 @@ import kotlin.math.round
 class PlayerActivity : BaseActivity() {
 
     companion object {
-        const val REQUEST_CODE = 111
         const val KEY_IS_FROM_PLAYER = "KEY_IS_FROM_PLAYER"
         private const val KEY_PLAYER_SRC = "KEY_PLAYER_SRC"
         private const val KEY_IS_COMMENT = "KEY_IS_COMMENT"
@@ -107,6 +107,7 @@ class PlayerActivity : BaseActivity() {
     private var moreDialog: MoreDialogFragment? = null
     private var reportDialog: ReportDialogFragment? = null
     private var isFirstInit = true
+    private var isKeyboardShown =false
 
     private val sourceListAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
@@ -177,29 +178,16 @@ class PlayerActivity : BaseActivity() {
         Timber.i("playerInfoAdapter")
         CommentAdapter(obtainIsAdult(), object : CommentAdapter.PlayerInfoListener {
             override fun sendComment(replyId: Long?, replyName: String?) {
-                viewModel.checkIsEmailConfirmed (
-                        {
-                            Timber.i("playerInfoAdapter sendComment")
-                            currentReplyId = null
-                            currentreplyName = null
-                            if (replyId != null) {
-                                currentReplyId = replyId
-                                currentreplyName = replyName
-                                commentEditorOpen()
-                            }
-                        },
-                        {
-                            Timber.d("exo_play_pause unconfirmed")
-                            deepLinkTo(
-                                    MainActivity::class.java,
-                                    R.navigation.navigation_adult,
-                                    R.id.settingFragment,
-                                    viewModel.getMeAvatar()?.let { byteArray ->
-                                        SettingFragment.createBundle(byteArray)
-                                    }
-                            )
-                        }
-                )
+                viewModel.checkStatus {
+                    Timber.i("playerInfoAdapter sendComment")
+                    currentReplyId = null
+                    currentreplyName = null
+                    if (replyId != null) {
+                        currentReplyId = replyId
+                        currentreplyName = replyName
+                        commentEditorOpen()
+                    }
+                }
             }
 
             override fun expandReply(parentNode: RootCommentNode, succeededBlock: () -> Unit) {
@@ -226,49 +214,23 @@ class PlayerActivity : BaseActivity() {
                 isLike: Boolean,
                 succeededBlock: () -> Unit
             ) {
-                viewModel.checkIsEmailConfirmed (
-                        {
-                            Timber.i("playerInfoAdapter setCommentLikeType")
-                            loadCommentLikeBlock = succeededBlock
-                            replyId?.also {
-                                val type = if (isLike) 0 else 1
-                                viewModel.postCommentLike(replyId, PostLikeRequest(type))
-                            }
-                        },
-                        {
-                            Timber.d("exo_play_pause unconfirmed")
-                            deepLinkTo(
-                                    MainActivity::class.java,
-                                    R.navigation.navigation_adult,
-                                    R.id.settingFragment,
-                                    viewModel.getMeAvatar()?.let { byteArray ->
-                                        SettingFragment.createBundle(byteArray)
-                                    }
-                            )
-                        }
-                )
+                viewModel.checkStatus {
+                    Timber.i("playerInfoAdapter setCommentLikeType")
+                    loadCommentLikeBlock = succeededBlock
+                    replyId?.also {
+                        val type = if (isLike) 0 else 1
+                        viewModel.postCommentLike(replyId, PostLikeRequest(type))
+                    }
+                }
             }
 
             override fun removeCommentLikeType(replyId: Long?, succeededBlock: () -> Unit) {
-                viewModel.checkIsEmailConfirmed (
-                        {
-                            loadCommentLikeBlock = succeededBlock
-                            replyId?.also {
-                                viewModel.deleteCommentLike(replyId)
-                            }
-                        },
-                        {
-                            Timber.d("exo_play_pause unconfirmed")
-                            deepLinkTo(
-                                    MainActivity::class.java,
-                                    R.navigation.navigation_adult,
-                                    R.id.settingFragment,
-                                    viewModel.getMeAvatar()?.let { byteArray ->
-                                        SettingFragment.createBundle(byteArray)
-                                    }
-                            )
-                        }
-                )
+                viewModel.checkStatus {
+                    loadCommentLikeBlock = succeededBlock
+                    replyId?.also {
+                        viewModel.deleteCommentLike(replyId)
+                    }
+                }
             }
 
             override fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit) {
@@ -801,49 +763,23 @@ class PlayerActivity : BaseActivity() {
             }
 
         btn_write_comment.setOnClickListener {
-            viewModel.checkIsEmailConfirmed (
-                    {
-                        Timber.d("onWriteCommentClick confirmed")
-                        currentReplyId = null
-                        currentreplyName = null
-                        commentEditorOpen()
-                        commentEditorToggle(true)
-                    },
-                    {
-                        Timber.d("onWriteCommentClick unconfirmed")
-                        deepLinkTo(
-                                MainActivity::class.java,
-                                R.navigation.navigation_adult,
-                                R.id.settingFragment,
-                                viewModel.getMeAvatar()?.let { byteArray ->
-                                    SettingFragment.createBundle(byteArray)
-                                }
-                        )
-                    }
-            )
+            viewModel.checkStatus {
+                Timber.d("onWriteCommentClick confirmed")
+                currentReplyId = null
+                currentreplyName = null
+                commentEditorOpen()
+                commentEditorToggle(true)
+            }
         }
 
         tv_comment.setOnClickListener {
-            viewModel.checkIsEmailConfirmed (
-                    {
-                        Timber.d("onCommentClick confirmed")
-                        currentReplyId = null
-                        currentreplyName = null
-                        commentEditorOpen()
-                        commentEditorToggle(true)
-                    },
-                    {
-                        Timber.d("onCommentClick unconfirmed")
-                        deepLinkTo(
-                                MainActivity::class.java,
-                                R.navigation.navigation_adult,
-                                R.id.settingFragment,
-                                viewModel.getMeAvatar()?.let { byteArray ->
-                                    SettingFragment.createBundle(byteArray)
-                                }
-                        )
-                    }
-            )
+            viewModel.checkStatus {
+                Timber.d("onCommentClick confirmed")
+                currentReplyId = null
+                currentreplyName = null
+                commentEditorOpen()
+                commentEditorToggle(true)
+            }
         }
 
         btn_send.setOnClickListener {
@@ -861,23 +797,10 @@ class PlayerActivity : BaseActivity() {
         }
 
         iv_favorite.setOnClickListener {
-            viewModel.checkIsEmailConfirmed (
-                    {
-                        Timber.d("onFavoriteClick confirmed")
-                        viewModel.modifyFavorite()
-                    },
-                    {
-                        Timber.d("onFavoriteClick unconfirmed")
-                        deepLinkTo(
-                                MainActivity::class.java,
-                                R.navigation.navigation_setting,
-                                R.id.settingFragment,
-                                viewModel.getMeAvatar()?.let { byteArray ->
-                                    SettingFragment.createBundle(byteArray)
-                                }
-                        )
-                    }
-            )
+            viewModel.checkStatus {
+                Timber.d("onFavoriteClick confirmed")
+                viewModel.modifyFavorite()
+            }
         }
 
         viewModel.apiAddFavoriteResult.observe(this, Observer { event ->
@@ -898,23 +821,10 @@ class PlayerActivity : BaseActivity() {
         })
 
         tv_like.setOnClickListener {
-            viewModel.checkIsEmailConfirmed (
-                    {
-                        Timber.d("like confirmed")
-                        viewModel.modifyLike()
-                    },
-                    {
-                        Timber.d("like unconfirmed")
-                        deepLinkTo(
-                                MainActivity::class.java,
-                                R.navigation.navigation_setting,
-                                R.id.settingFragment,
-                                viewModel.getMeAvatar()?.let { byteArray ->
-                                    SettingFragment.createBundle(byteArray)
-                                }
-                        )
-                    }
-            )
+            viewModel.checkStatus {
+                Timber.d("like confirmed")
+                viewModel.modifyLike()
+            }
         }
 
         viewModel.apiAddLikeResult.observe(this, Observer { event ->
@@ -935,31 +845,18 @@ class PlayerActivity : BaseActivity() {
         })
 
         iv_share.setOnClickListener {
-            viewModel.checkIsEmailConfirmed (
-                    {
-                        Timber.d("share confirmed")
-                        GeneralUtils.copyToClipboard(
-                                baseContext,
-                                viewModel.getShareUrl(
-                                        viewModel.category,
-                                        viewModel.videoId,
-                                        viewModel.episodeId.toString()
-                                )
+            viewModel.checkStatus {
+                Timber.d("share confirmed")
+                GeneralUtils.copyToClipboard(
+                        baseContext,
+                        viewModel.getShareUrl(
+                                viewModel.category,
+                                viewModel.videoId,
+                                viewModel.episodeId.toString()
                         )
-                        GeneralUtils.showToast(baseContext, getString(R.string.copy_url))
-                    },
-                    {
-                        Timber.d("share unconfirmed")
-                        deepLinkTo(
-                                MainActivity::class.java,
-                                R.navigation.navigation_setting,
-                                R.id.settingFragment,
-                                viewModel.getMeAvatar()?.let { byteArray ->
-                                    SettingFragment.createBundle(byteArray)
-                                }
-                        )
-                    }
-            )
+                )
+                GeneralUtils.showToast(baseContext, getString(R.string.copy_url))
+            }
         }
 
         iv_more.setOnClickListener {
@@ -1001,15 +898,17 @@ class PlayerActivity : BaseActivity() {
             }
         })
 
-        viewModel.isEmailConfirmed.observe(this, Observer {
+        viewModel.checkStatusResult.observe(this, Observer {
             when (it) {
                 is ApiResult.Success -> {
-                    if (it.result.isConfirmed) {
-                        it.result.onConfirmed()
-                    } else {
-                        iv_player.visibility = VISIBLE
-                        exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_play))
-                        showEmailConfirmDialog(it.result.onUnconfirmed)
+                    when (it.result.status) {
+                        StatusItem.NOT_LOGIN -> showNotLoginDialog()
+                        StatusItem.LOGIN_BUT_EMAIL_NOT_CONFIRMED -> {
+                            iv_player.visibility = VISIBLE
+                            exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_play))
+                            showEmailConfirmDialog()
+                        }
+                        StatusItem.LOGIN_AND_EMAIL_CONFIRMED -> it.result.onLoginAndEmailConfirmed()
                     }
                 }
                 is ApiResult.Error -> Timber.e(it.throwable)
@@ -1018,6 +917,7 @@ class PlayerActivity : BaseActivity() {
 
         //Detect key keyboard shown/hide
         this.addKeyboardToggleListener { shown ->
+            isKeyboardShown = shown
             if (!shown) commentEditorToggle(false)
         }
 
@@ -1026,57 +926,35 @@ class PlayerActivity : BaseActivity() {
         viewModel.getAd(adWidth, adHeight)
 
         exo_play_pause.setOnClickListener{
-            viewModel.checkIsEmailConfirmed (
-                    {
-                        Timber.d("exo_play_pause confirmed")
-                        player?.also {
-                            it.playWhenReady.also { playing ->
-                                it.playWhenReady = !playing
-                                viewModel.setPlaying(!playing)
-                                if(!playing)
-                                    exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
-                                else
-                                    exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_play))
-                            }
-                        }
-                    },
-                    {
-                        Timber.d("exo_play_pause unconfirmed")
-                        deepLinkTo(
-                                MainActivity::class.java,
-                                R.navigation.navigation_adult,
-                                R.id.settingFragment,
-                                viewModel.getMeAvatar()?.let { byteArray ->
-                                    SettingFragment.createBundle(byteArray)
-                                }
-                        )
+            viewModel.checkStatus {
+                Timber.d("exo_play_pause confirmed")
+                player?.also {
+                    it.playWhenReady.also { playing ->
+                        it.playWhenReady = !playing
+                        viewModel.setPlaying(!playing)
+                        if(!playing)
+                            exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
+                        else
+                            exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_play))
                     }
-            )
+                }
+            }
         }
 
         iv_player.setOnClickListener {
-            viewModel.checkIsEmailConfirmed (
-                    {
-                        Timber.d("iv_player confirmed")
-                        if(it.visibility == View.VISIBLE) {
-                            player?.playWhenReady = true
-                            viewModel.setPlaying(true)
-                            exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
-                        }
-                    },
-                    {
-                        Timber.d("iv_player unconfirmed")
-                        deepLinkTo(
-                                MainActivity::class.java,
-                                R.navigation.navigation_adult,
-                                R.id.settingFragment,
-                                viewModel.getMeAvatar()?.let { byteArray ->
-                                    SettingFragment.createBundle(byteArray)
-                                }
-                        )
-                    }
-            )
+            viewModel.checkStatus {
+                Timber.d("iv_player confirmed")
+                if(it.visibility == View.VISIBLE) {
+                    player?.playWhenReady = true
+                    viewModel.setPlaying(true)
+                    exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
+                }
+            }
         }
+        recycler_info.setOnClickListener {
+            Timber.i("RecyclerView=setOnClickListener")
+        }
+
     }
 
     private fun showMoreDialog(id:Long, type:PostType, isReported:Boolean){
@@ -1164,29 +1042,26 @@ class PlayerActivity : BaseActivity() {
                     tv_replay_name.visibility = View.VISIBLE
                 }
             }
+
             et_message.let {
                 it.requestFocusFromTouch()
                 val lManager: InputMethodManager =
                     getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                lManager.showSoftInput(it, 0)
+                lManager?.showSoftInput(it, 0)
             }
         }
         commentEditorToggle(true)
     }
 
     private fun commentEditorHide() {
+        Timber.i("commentEditorHide")
         CoroutineScope(Dispatchers.Main).launch {
             tv_replay_name.visibility = View.GONE
-            val imm =
+            val lManager: InputMethodManager =
                 getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+            lManager?.hideSoftInputFromWindow(et_message.windowToken, 0)
         }
         commentEditorToggle(false)
-    }
-
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if(et_message.isFocused) commentEditorHide()
-        return true
     }
 
     override fun onStart() {
@@ -1310,23 +1185,10 @@ class PlayerActivity : BaseActivity() {
         val sourceFactory = DefaultDataSourceFactory(this, agent)
 
         viewModel.getMediaSource(url, sourceFactory)?.also {
-            viewModel.checkIsEmailConfirmed (
-                    {
-                        Timber.d("player ready confirmed")
-                        player?.prepare(it, isReset, isReset)
-                    },
-                    {
-                        Timber.d("player ready unconfirmed")
-                        deepLinkTo(
-                                MainActivity::class.java,
-                                R.navigation.navigation_adult,
-                                R.id.settingFragment,
-                                viewModel.getMeAvatar()?.let { byteArray ->
-                                    SettingFragment.createBundle(byteArray)
-                                }
-                        )
-                    }
-            )
+            viewModel.checkStatus {
+                Timber.d("player ready confirmed")
+                player?.prepare(it, isReset, isReset)
+            }
         }
     }
 
@@ -1338,7 +1200,7 @@ class PlayerActivity : BaseActivity() {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     //Timber.d("ACTION_DOWN")
-                    if(!player_view.controllerAutoShow)
+                    if (!player_view.controllerAutoShow)
                         player_view.showController()
                     originX = event.x
                     originY = event.y
@@ -1401,12 +1263,12 @@ class PlayerActivity : BaseActivity() {
                         }
                         true
                     } else {
-//                        player?.also {
-//                            it.playWhenReady.also { playing ->
-//                                it.playWhenReady = !playing
-//                                viewModel.setPlaying(!playing)
-//                            }
-//                        }
+    //                        player?.also {
+    //                            it.playWhenReady.also { playing ->
+    //                                it.playWhenReady = !playing
+    //                                viewModel.setPlaying(!playing)
+    //                            }
+    //                        }
                         false
                     }
 
@@ -1418,6 +1280,25 @@ class PlayerActivity : BaseActivity() {
                 }
             }
             isMove
+        }
+
+        var startClickTime:Long = 0
+        recycler_info.setOnTouchListener { v, event ->
+            Timber.i("RecyclerView=setOnTouchListener isKeyboardShown=$isKeyboardShown")
+            if(!isKeyboardShown) return@setOnTouchListener false
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    startClickTime = System.currentTimeMillis()
+                }
+
+                MotionEvent.ACTION_UP -> {
+                    var clickDuration:Long = System.currentTimeMillis()
+                    if(clickDuration - startClickTime <100){
+                      commentEditorHide()
+                    }
+                }
+            }
+            false
         }
     }
 
@@ -1570,15 +1451,17 @@ class PlayerActivity : BaseActivity() {
 
     private fun openLoginDialog() {
         val registerBlock = {
-            val intent = Intent(this, LoginActivity::class.java)
+            val intent = Intent()
             intent.putExtras(LoginFragment.createBundle(LoginFragment.TYPE_REGISTER))
-            startActivity(intent)
+            setResult(Activity.RESULT_OK, intent)
+            finish()
         }
 
         val loginBlock = {
-            val intent = Intent(this, LoginActivity::class.java)
+            val intent = Intent()
             intent.putExtras(LoginFragment.createBundle(LoginFragment.TYPE_LOGIN))
-            startActivity(intent)
+            setResult(Activity.RESULT_OK, intent)
+            finish()
         }
 
         val data = GeneralDialogData(
@@ -1845,7 +1728,7 @@ class PlayerActivity : BaseActivity() {
 
     private fun scrollToBottom() {
         if (intent.extras?.getBoolean(KEY_IS_COMMENT) == true) {
-            scrollView.fullScroll(View.FOCUS_DOWN)
+//            scrollView.fullScroll(View.FOCUS_DOWN)
         }
     }
 
@@ -1865,7 +1748,7 @@ class PlayerActivity : BaseActivity() {
         pendingIntent.send()
     }
 
-    fun showEmailConfirmDialog(block: () -> Unit) {
+    private fun showEmailConfirmDialog() {
         GeneralDialog.newInstance(
                 GeneralDialogData(
                         titleRes = R.string.error_email_not_confirmed_title,
@@ -1873,9 +1756,53 @@ class PlayerActivity : BaseActivity() {
                         messageIcon = R.drawable.ico_email,
                         firstBtn = getString(R.string.verify_later),
                         secondBtn = getString(R.string.verify_immediately),
-                        secondBlock = block
+                        secondBlock = {
+                            deepLinkTo(
+                                    MainActivity::class.java,
+                                    R.navigation.navigation_adult,
+                                    R.id.settingFragment,
+                                    viewModel.getMeAvatar()?.let { byteArray ->
+                                        SettingFragment.createBundle(byteArray)
+                                    }
+                            )
+                        }
                 )
         ).show(supportFragmentManager)
     }
 
+
+    fun showNotLoginDialog() {
+        GeneralDialog.newInstance(
+                GeneralDialogData(
+                        titleRes = R.string.login_yet,
+                        message = getString(R.string.login_message),
+                        messageIcon = R.drawable.ico_default_photo,
+                        firstBtn = getString(R.string.btn_register),
+                        secondBtn = getString(R.string.btn_login),
+                        firstBlock = {
+                            val bundle = Bundle()
+                            bundle.putInt(LoginFragment.KEY_TYPE, LoginFragment.TYPE_REGISTER)
+                            deepLinkTo(
+                                    MainActivity::class.java,
+                                    R.navigation.navigation_adult,
+                                    R.id.loginFragment,
+                                    bundle
+                            )
+                        },
+                        secondBlock = {
+                            val bundle = Bundle()
+                            bundle.putInt(LoginFragment.KEY_TYPE, LoginFragment.TYPE_LOGIN)
+                            deepLinkTo(
+                                    MainActivity::class.java,
+                                    R.navigation.navigation_adult,
+                                    R.id.loginFragment,
+                                    bundle
+                            )
+                        },
+                        closeBlock = {
+                            Timber.d("close!")
+                        }
+                )
+        ).show(supportFragmentManager)
+    }
 }

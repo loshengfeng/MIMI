@@ -3,12 +3,16 @@ package com.dabenxiang.mimi.view.post.video
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import androidx.activity.addCallback
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.EditVideoListener
-import com.dabenxiang.mimi.model.api.vo.PostMemberRequest
-import com.dabenxiang.mimi.model.vo.PostVideoAttachment
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.dialog.GeneralDialog
+import com.dabenxiang.mimi.view.dialog.GeneralDialogData
+import com.dabenxiang.mimi.view.dialog.show
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.post.video.PostVideoFragment.Companion.BUNDLE_COVER_URI
 import com.dabenxiang.mimi.view.post.video.PostVideoFragment.Companion.BUNDLE_TRIMMER_URI
 import com.google.android.material.tabs.TabLayout
@@ -37,17 +41,6 @@ class EditVideoFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initSettings()
-        val isNeedVideoUpload = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>(PostVideoFragment.UPLOAD_VIDEO)
-
-        if (isNeedVideoUpload?.value != null) {
-            val memberRequest = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<PostMemberRequest>(PostVideoFragment.MEMBER_REQUEST)
-            val videoAttachment = findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<ArrayList<PostVideoAttachment>>(PostVideoFragment.VIDEO_DATA)
-
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(PostVideoFragment.UPLOAD_VIDEO, true)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(PostVideoFragment.MEMBER_REQUEST, memberRequest?.value)
-            findNavController().previousBackStackEntry?.savedStateHandle?.set(PostVideoFragment.VIDEO_DATA, videoAttachment?.value)
-            findNavController().navigateUp()
-        }
 
         val uri = arguments?.getString(BUNDLE_VIDEO_URI)
         editVideoFragmentPagerAdapter =
@@ -69,7 +62,7 @@ class EditVideoFragment : BaseFragment() {
 
     override fun setupListeners() {
         tv_back.setOnClickListener {
-            findNavController().popBackStack()
+            handleBackEvent()
         }
 
         tv_clean.setOnClickListener {
@@ -90,6 +83,25 @@ class EditVideoFragment : BaseFragment() {
                 viewPager!!.currentItem = tab!!.position
             }
         })
+
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            handleBackEvent()
+        }
+    }
+
+    private fun handleBackEvent() {
+        GeneralDialog.newInstance(
+            GeneralDialogData(
+                titleRes = R.string.whether_to_discard_content,
+                messageIcon = R.drawable.ico_default_photo,
+                firstBtn = getString(R.string.btn_cancel),
+                secondBtn = getString(R.string.btn_confirm),
+                isMessageIcon = false,
+                secondBlock = {
+                    findNavController().navigateUp()
+                }
+            )
+        ).show(requireActivity().supportFragmentManager)
     }
 
     override fun initSettings() {
@@ -98,6 +110,9 @@ class EditVideoFragment : BaseFragment() {
         tv_title.text = getString(R.string.post_title)
         tv_clean.visibility = View.VISIBLE
         tv_clean.text = getString(R.string.btn_send)
+
+        val img = requireContext().getDrawable(R.drawable.btn_close_n)
+        tv_back.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null)
     }
 
     private val editTrimmerVideoListener = object : EditVideoListener {
@@ -130,7 +145,18 @@ class EditVideoFragment : BaseFragment() {
             val bundle = Bundle()
             bundle.putString(BUNDLE_TRIMMER_URI, videoUri.toString())
             bundle.putString(BUNDLE_COVER_URI, resourceUri.toString())
-            findNavController().navigate(R.id.action_editVideoFragment_to_postVideoFragment, bundle)
+
+            val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
+
+            if (isEdit != null && isEdit) {
+                val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+
+                bundle.putBoolean(MyPostFragment.EDIT, true)
+                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+                findNavController().navigate(R.id.action_editVideoFragment2_to_postVideoFragment, bundle)
+            } else {
+                findNavController().navigate(R.id.action_editVideoFragment_to_postVideoFragment, bundle)
+            }
         }
     }
 
