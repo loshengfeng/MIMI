@@ -76,7 +76,7 @@ class SettingViewModel : BaseViewModel() {
         viewModelScope.launch {
             flow {
                 val result =
-                    domainManager.getApiRepository().resendEmail(EmailRequest(profileData?.email))
+                    domainManager.getApiRepository().resendEmail(EmailRequest(BuildConfig.API_HOST + DomainManager.VALIDATION_URL))
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }

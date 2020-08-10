@@ -38,7 +38,6 @@ import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseActivity
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.dialog.*
-import com.dabenxiang.mimi.view.login.LoginActivity
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
@@ -1390,15 +1389,17 @@ class PlayerActivity : BaseActivity() {
 
     private fun openLoginDialog() {
         val registerBlock = {
-            val intent = Intent(this, LoginActivity::class.java)
+            val intent = Intent()
             intent.putExtras(LoginFragment.createBundle(LoginFragment.TYPE_REGISTER))
-            startActivity(intent)
+            setResult(Activity.RESULT_OK, intent)
+            finish()
         }
 
         val loginBlock = {
-            val intent = Intent(this, LoginActivity::class.java)
+            val intent = Intent()
             intent.putExtras(LoginFragment.createBundle(LoginFragment.TYPE_LOGIN))
-            startActivity(intent)
+            setResult(Activity.RESULT_OK, intent)
+            finish()
         }
 
         val data = GeneralDialogData(
