@@ -901,10 +901,12 @@ class PlayerActivity : BaseActivity() {
                 exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
             }
         }
+        scrollView.setOnScrollChangeListener { _, _, _, _, _ ->
+            Timber.i("scrollView setOnScrollChangeListener")
+        }
 
         scrollView.setOnClickListener {
-            if(et_message.isFocused)
-                commentEditorHide()
+            Timber.i("scrollView setOnClickListener")
         }
     }
 
@@ -1005,8 +1007,10 @@ class PlayerActivity : BaseActivity() {
     }
 
     private fun commentEditorHide() {
+        Timber.i("commentEditorHide")
         CoroutineScope(Dispatchers.Main).launch {
             et_message.clearFocus()
+            Timber.i("et_message clearFocus")
             tv_replay_name.visibility = View.GONE
             val lManager: InputMethodManager =
                 getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -1227,7 +1231,6 @@ class PlayerActivity : BaseActivity() {
 
                     tv_forward_backward.visibility = View.GONE
                     tv_sound_tune.visibility = View.GONE
-                    player_view?.performClick()  //For performClick warning
                 }
                 else -> {
 
