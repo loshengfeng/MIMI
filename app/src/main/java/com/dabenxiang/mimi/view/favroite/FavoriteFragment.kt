@@ -39,7 +39,6 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.fragment_post_favorite.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import org.koin.android.viewmodel.dsl.ATTRIBUTE_VIEW_MODEL
 import timber.log.Timber
 
 class FavoriteFragment : BaseFragment() {
@@ -497,7 +496,6 @@ class FavoriteFragment : BaseFragment() {
      * 進到短影片的詳細頁面
      */
     private fun goShortVideoDetailPage(item: PostFavoriteItem) {
-
         if (item.tags == null || item.tags.first()
                 .isEmpty() || item.postId == null
         ) {
@@ -520,6 +518,7 @@ class FavoriteFragment : BaseFragment() {
                         memberItem.creatorId = postItem.posterId ?: 0
                         memberItem.likeType =
                             if (postItem.likeType == 0) LikeType.LIKE else LikeType.DISLIKE
+                        memberItem.postFriendlyName = postItem.posterName
                         return@memberItem
                     }
                 }
