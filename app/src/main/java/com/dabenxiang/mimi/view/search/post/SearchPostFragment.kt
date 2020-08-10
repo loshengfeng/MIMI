@@ -107,7 +107,7 @@ class SearchPostFragment : BaseFragment() {
         }
 
         adapter = MemberPostPagedAdapter(
-            requireContext(), adultListener, mTag, memberPostFuncItem
+            requireContext(), adultListener, mTag, memberPostFuncItem, true
         )
         recycler_search_result.layoutManager = LinearLayoutManager(requireContext())
 
@@ -473,7 +473,15 @@ class SearchPostFragment : BaseFragment() {
         }
 
         override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
-            val bundle = ClipFragment.createBundle(ArrayList(item), position)
+            val iterator = item.iterator()
+            val memberPostItemList = arrayListOf<MemberPostItem>()
+            while (iterator.hasNext()) {
+                val data = iterator.next()
+                if(data.type != PostType.AD) {
+                    memberPostItemList.add(data)
+                }
+            }
+            val bundle = ClipFragment.createBundle(ArrayList(memberPostItemList), position)
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_searchPostFragment_to_clipFragment,

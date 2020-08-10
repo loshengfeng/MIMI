@@ -55,9 +55,6 @@ import com.dabenxiang.mimi.view.home.HomeViewModel.Companion.TYPE_VIDEO
 import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.listener.InteractionListener
-import com.dabenxiang.mimi.view.login.LoginFragment
-import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_LOGIN
-import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
@@ -116,6 +113,7 @@ class AdultHomeFragment : BaseFragment() {
     companion object {
         private const val REQUEST_PHOTO = 10001
         private const val REQUEST_VIDEO_CAPTURE = 10002
+        private const val REQUEST_LOGIN = 10003
 
         private const val RECORD_LIMIT_TIME = 15
     }
@@ -1042,7 +1040,7 @@ class AdultHomeFragment : BaseFragment() {
         override fun onVideoClick(view: View, item: PlayerItem) {
             val intent = Intent(requireContext(), PlayerActivity::class.java)
             intent.putExtras(PlayerActivity.createBundle(item))
-            startActivity(intent)
+            startActivityForResult(intent, REQUEST_LOGIN)
         }
 
         override fun onClipClick(view: View, item: List<MemberPostItem>, position: Int) {
@@ -1200,6 +1198,10 @@ class AdultHomeFragment : BaseFragment() {
                         R.id.action_adultHomeFragment_to_editVideoFragment,
                         bundle
                     )
+                }
+
+                REQUEST_LOGIN -> {
+                    findNavController().navigate(R.id.action_to_loginFragment, data?.extras)
                 }
             }
         }

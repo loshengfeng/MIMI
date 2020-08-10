@@ -20,15 +20,15 @@
         android:background="@drawable/bg_white_1_top_radius_20"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        android:paddingTop="16dp">
 
         <TextView
             android:id="@+id/tv_problem_report"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingVertical="28dp"
-            android:paddingHorizontal="16dp"
-            android:gravity="start"
+            android:layout_height="48dp"
+            android:paddingHorizontal="30dp"
+            android:gravity="center_vertical"
             android:text="@string/problem_report"
             android:textColor="@color/color_black_1"
             android:textSize="16sp"
@@ -39,6 +39,7 @@
 
         <View
             android:id="@+id/line"
+            android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/color_gray_13"
@@ -48,10 +49,9 @@
 
         <TextView
             android:id="@+id/tv_cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="67dp"
+            android:gravity="center"
             android:text="@string/upload_cancel"
             android:textColor="@color/color_black_1"
             android:textSize="16sp"

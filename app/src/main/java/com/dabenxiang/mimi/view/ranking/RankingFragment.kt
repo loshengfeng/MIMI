@@ -128,16 +128,16 @@ class RankingFragment : BaseFragment() {
         viewModel.rankingVideosList.observe(viewLifecycleOwner, Observer {
             videosAdapter.submitList(it)
             lifecycleScope.launch {
-                delay(1000)
-                layout_refresh.isRefreshing = false
+                delay(500)
+                layout_refresh?.isRefreshing = false
             }
         })
 
         viewModel.rankingList.observe(viewLifecycleOwner, Observer {
             adapter.submitList(it)
             lifecycleScope.launch {
-                delay(1000)
-                layout_refresh.isRefreshing = false
+                delay(500)
+                layout_refresh?.isRefreshing = false
             }
         })
 
