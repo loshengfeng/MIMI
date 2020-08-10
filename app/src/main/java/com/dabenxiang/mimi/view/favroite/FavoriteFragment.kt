@@ -39,7 +39,6 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.fragment_post_favorite.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import org.koin.android.viewmodel.dsl.ATTRIBUTE_VIEW_MODEL
 import timber.log.Timber
 
 class FavoriteFragment : BaseFragment() {
@@ -92,6 +91,25 @@ class FavoriteFragment : BaseFragment() {
     }
 
     override fun setupFirstTime() {
+        val primaryList = listOf(
+            getString(R.string.favorite_normal),
+            getString(R.string.favorite_adult)
+        )
+
+        primaryAdapter.submitList(primaryList, lastPrimaryIndex)
+
+        rv_secondary.adapter = secondaryAdapter
+
+        val secondaryList = listOf(
+            getString(R.string.favorite_tab_mimi),
+            getString(R.string.favorite_tab_short)
+        )
+
+        secondaryAdapter.submitList(secondaryList, lastSecondaryIndex)
+
+        rv_content.adapter = favoriteAdapter
+
+        viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
     }
 
     override fun getLayoutId(): Int {
@@ -230,28 +248,7 @@ class FavoriteFragment : BaseFragment() {
                 item_is_not_Login.visibility = View.GONE
                 item_is_Login.visibility = View.VISIBLE
                 tv_clean.visibility = View.VISIBLE
-
                 rv_primary.adapter = primaryAdapter
-
-                val primaryList = listOf(
-                    getString(R.string.favorite_normal),
-                    getString(R.string.favorite_adult)
-                )
-
-                primaryAdapter.submitList(primaryList, lastPrimaryIndex)
-
-                rv_secondary.adapter = secondaryAdapter
-
-                val secondaryList = listOf(
-                    getString(R.string.favorite_tab_mimi),
-                    getString(R.string.favorite_tab_short)
-                )
-
-                secondaryAdapter.submitList(secondaryList, lastSecondaryIndex)
-
-                rv_content.adapter = favoriteAdapter
-
-                viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
             }
             false -> {
                 item_is_not_Login.visibility = View.VISIBLE
@@ -497,7 +494,6 @@ class FavoriteFragment : BaseFragment() {
      * 進到短影片的詳細頁面
      */
     private fun goShortVideoDetailPage(item: PostFavoriteItem) {
-
         if (item.tags == null || item.tags.first()
                 .isEmpty() || item.postId == null
         ) {
@@ -520,6 +516,7 @@ class FavoriteFragment : BaseFragment() {
                         memberItem.creatorId = postItem.posterId ?: 0
                         memberItem.likeType =
                             if (postItem.likeType == 0) LikeType.LIKE else LikeType.DISLIKE
+                        memberItem.postFriendlyName = postItem.posterName
                         return@memberItem
                     }
                 }
