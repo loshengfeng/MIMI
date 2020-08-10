@@ -102,6 +102,7 @@ class PlayerActivity : BaseActivity() {
     private var moreDialog: MoreDialogFragment? = null
     private var reportDialog: ReportDialogFragment? = null
     private var isFirstInit = true
+    private var isKeyboardShown =false
 
     private val sourceListAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
@@ -873,6 +874,7 @@ class PlayerActivity : BaseActivity() {
 
         //Detect key keyboard shown/hide
         this.addKeyboardToggleListener { shown ->
+            isKeyboardShown = shown
             if (!shown) commentEditorToggle(false)
         }
 
@@ -900,13 +902,9 @@ class PlayerActivity : BaseActivity() {
                 exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
             }
         }
-//        scrollView.setOnScrollChangeListener { _, _, _, _, _ ->
-//            Timber.i("scrollView setOnScrollChangeListener")
-//        }
-//
-//        scrollView.setOnClickListener {
-//            Timber.i("scrollView setOnClickListener")
-//        }
+        recycler_info.setOnClickListener {
+            Timber.i("RecyclerView=setOnClickListener")
+        }
 
     }
 
@@ -1009,20 +1007,13 @@ class PlayerActivity : BaseActivity() {
     private fun commentEditorHide() {
         Timber.i("commentEditorHide")
         CoroutineScope(Dispatchers.Main).launch {
-            et_message.clearFocus()
-            Timber.i("et_message clearFocus")
             tv_replay_name.visibility = View.GONE
             val lManager: InputMethodManager =
                 getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            lManager?.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+            lManager?.hideSoftInputFromWindow(et_message.windowToken, 0)
         }
         commentEditorToggle(false)
     }
-
-//    override fun onTouchEvent(event: MotionEvent?): Boolean {
-//        if(et_message.isFocused) commentEditorHide()
-//        return true
-//    }
 
     override fun onStart() {
         super.onStart()
@@ -1237,6 +1228,25 @@ class PlayerActivity : BaseActivity() {
                 }
             }
             isMove
+        }
+
+        var startClickTime:Long = 0
+        recycler_info.setOnTouchListener { v, event ->
+            Timber.i("RecyclerView=setOnTouchListener isKeyboardShown=$isKeyboardShown")
+            if(!isKeyboardShown) return@setOnTouchListener false
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    startClickTime = System.currentTimeMillis()
+                }
+
+                MotionEvent.ACTION_UP -> {
+                    var clickDuration:Long = System.currentTimeMillis()
+                    if(clickDuration - startClickTime <100){
+                      commentEditorHide()
+                    }
+                }
+            }
+            false
         }
     }
 
