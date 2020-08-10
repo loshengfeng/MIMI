@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.text.Html
 import android.text.TextUtils
 import android.view.*
+import android.view.View.VISIBLE
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
@@ -176,14 +177,29 @@ class PlayerActivity : BaseActivity() {
         Timber.i("playerInfoAdapter")
         CommentAdapter(obtainIsAdult(), object : CommentAdapter.PlayerInfoListener {
             override fun sendComment(replyId: Long?, replyName: String?) {
-                Timber.i("playerInfoAdapter sendComment")
-                currentReplyId = null
-                currentreplyName = null
-                if (replyId != null) {
-                    currentReplyId = replyId
-                    currentreplyName = replyName
-                    commentEditorOpen()
-                }
+                viewModel.checkIsEmailConfirmed (
+                        {
+                            Timber.i("playerInfoAdapter sendComment")
+                            currentReplyId = null
+                            currentreplyName = null
+                            if (replyId != null) {
+                                currentReplyId = replyId
+                                currentreplyName = replyName
+                                commentEditorOpen()
+                            }
+                        },
+                        {
+                            Timber.d("exo_play_pause unconfirmed")
+                            deepLinkTo(
+                                    MainActivity::class.java,
+                                    R.navigation.navigation_adult,
+                                    R.id.settingFragment,
+                                    viewModel.getMeAvatar()?.let { byteArray ->
+                                        SettingFragment.createBundle(byteArray)
+                                    }
+                            )
+                        }
+                )
             }
 
             override fun expandReply(parentNode: RootCommentNode, succeededBlock: () -> Unit) {
@@ -210,19 +226,49 @@ class PlayerActivity : BaseActivity() {
                 isLike: Boolean,
                 succeededBlock: () -> Unit
             ) {
-                Timber.i("playerInfoAdapter setCommentLikeType")
-                loadCommentLikeBlock = succeededBlock
-                replyId?.also {
-                    val type = if (isLike) 0 else 1
-                    viewModel.postCommentLike(replyId, PostLikeRequest(type))
-                }
+                viewModel.checkIsEmailConfirmed (
+                        {
+                            Timber.i("playerInfoAdapter setCommentLikeType")
+                            loadCommentLikeBlock = succeededBlock
+                            replyId?.also {
+                                val type = if (isLike) 0 else 1
+                                viewModel.postCommentLike(replyId, PostLikeRequest(type))
+                            }
+                        },
+                        {
+                            Timber.d("exo_play_pause unconfirmed")
+                            deepLinkTo(
+                                    MainActivity::class.java,
+                                    R.navigation.navigation_adult,
+                                    R.id.settingFragment,
+                                    viewModel.getMeAvatar()?.let { byteArray ->
+                                        SettingFragment.createBundle(byteArray)
+                                    }
+                            )
+                        }
+                )
             }
 
             override fun removeCommentLikeType(replyId: Long?, succeededBlock: () -> Unit) {
-                loadCommentLikeBlock = succeededBlock
-                replyId?.also {
-                    viewModel.deleteCommentLike(replyId)
-                }
+                viewModel.checkIsEmailConfirmed (
+                        {
+                            loadCommentLikeBlock = succeededBlock
+                            replyId?.also {
+                                viewModel.deleteCommentLike(replyId)
+                            }
+                        },
+                        {
+                            Timber.d("exo_play_pause unconfirmed")
+                            deepLinkTo(
+                                    MainActivity::class.java,
+                                    R.navigation.navigation_adult,
+                                    R.id.settingFragment,
+                                    viewModel.getMeAvatar()?.let { byteArray ->
+                                        SettingFragment.createBundle(byteArray)
+                                    }
+                            )
+                        }
+                )
             }
 
             override fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit) {
@@ -889,15 +935,31 @@ class PlayerActivity : BaseActivity() {
         })
 
         iv_share.setOnClickListener {
-            GeneralUtils.copyToClipboard(
-                baseContext,
-                viewModel.getShareUrl(
-                    viewModel.category,
-                    viewModel.videoId,
-                    viewModel.episodeId.toString()
-                )
+            viewModel.checkIsEmailConfirmed (
+                    {
+                        Timber.d("share confirmed")
+                        GeneralUtils.copyToClipboard(
+                                baseContext,
+                                viewModel.getShareUrl(
+                                        viewModel.category,
+                                        viewModel.videoId,
+                                        viewModel.episodeId.toString()
+                                )
+                        )
+                        GeneralUtils.showToast(baseContext, getString(R.string.copy_url))
+                    },
+                    {
+                        Timber.d("share unconfirmed")
+                        deepLinkTo(
+                                MainActivity::class.java,
+                                R.navigation.navigation_setting,
+                                R.id.settingFragment,
+                                viewModel.getMeAvatar()?.let { byteArray ->
+                                    SettingFragment.createBundle(byteArray)
+                                }
+                        )
+                    }
             )
-            GeneralUtils.showToast(baseContext, getString(R.string.copy_url))
         }
 
         iv_more.setOnClickListener {
@@ -945,6 +1007,8 @@ class PlayerActivity : BaseActivity() {
                     if (it.result.isConfirmed) {
                         it.result.onConfirmed()
                     } else {
+                        iv_player.visibility = VISIBLE
+                        exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_play))
                         showEmailConfirmDialog(it.result.onUnconfirmed)
                     }
                 }
@@ -962,24 +1026,56 @@ class PlayerActivity : BaseActivity() {
         viewModel.getAd(adWidth, adHeight)
 
         exo_play_pause.setOnClickListener{
-            player?.also {
-                it.playWhenReady.also { playing ->
-                    it.playWhenReady = !playing
-                    viewModel.setPlaying(!playing)
-                    if(!playing)
-                        exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
-                    else
-                        exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_play))
-                }
-            }
+            viewModel.checkIsEmailConfirmed (
+                    {
+                        Timber.d("exo_play_pause confirmed")
+                        player?.also {
+                            it.playWhenReady.also { playing ->
+                                it.playWhenReady = !playing
+                                viewModel.setPlaying(!playing)
+                                if(!playing)
+                                    exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
+                                else
+                                    exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_play))
+                            }
+                        }
+                    },
+                    {
+                        Timber.d("exo_play_pause unconfirmed")
+                        deepLinkTo(
+                                MainActivity::class.java,
+                                R.navigation.navigation_adult,
+                                R.id.settingFragment,
+                                viewModel.getMeAvatar()?.let { byteArray ->
+                                    SettingFragment.createBundle(byteArray)
+                                }
+                        )
+                    }
+            )
         }
 
         iv_player.setOnClickListener {
-            if(it.visibility == View.VISIBLE) {
-                player?.playWhenReady = true
-                viewModel.setPlaying(true)
-                exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
-            }
+            viewModel.checkIsEmailConfirmed (
+                    {
+                        Timber.d("iv_player confirmed")
+                        if(it.visibility == View.VISIBLE) {
+                            player?.playWhenReady = true
+                            viewModel.setPlaying(true)
+                            exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
+                        }
+                    },
+                    {
+                        Timber.d("iv_player unconfirmed")
+                        deepLinkTo(
+                                MainActivity::class.java,
+                                R.navigation.navigation_adult,
+                                R.id.settingFragment,
+                                viewModel.getMeAvatar()?.let { byteArray ->
+                                    SettingFragment.createBundle(byteArray)
+                                }
+                        )
+                    }
+            )
         }
     }
 
@@ -1214,7 +1310,23 @@ class PlayerActivity : BaseActivity() {
         val sourceFactory = DefaultDataSourceFactory(this, agent)
 
         viewModel.getMediaSource(url, sourceFactory)?.also {
-            player?.prepare(it, isReset, isReset)
+            viewModel.checkIsEmailConfirmed (
+                    {
+                        Timber.d("player ready confirmed")
+                        player?.prepare(it, isReset, isReset)
+                    },
+                    {
+                        Timber.d("player ready unconfirmed")
+                        deepLinkTo(
+                                MainActivity::class.java,
+                                R.navigation.navigation_adult,
+                                R.id.settingFragment,
+                                viewModel.getMeAvatar()?.let { byteArray ->
+                                    SettingFragment.createBundle(byteArray)
+                                }
+                        )
+                    }
+            )
         }
     }
 
