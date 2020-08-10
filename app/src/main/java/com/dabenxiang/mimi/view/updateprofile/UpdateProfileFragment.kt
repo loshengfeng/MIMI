@@ -158,7 +158,9 @@ class UpdateProfileFragment : BaseFragment() {
                         edit_content.visibility = View.INVISIBLE
                         edit_birthday.visibility = View.VISIBLE
                         //FIXME
-                        edit_birthday.setText(viewModel.profileItem.birthday!!.split("T")[0])
+                        edit_birthday.setText(viewModel.profileItem.birthday?.let {
+                            it.split("T")[0]
+                        })
                         edit_birthday.listen()
                     }
                 }

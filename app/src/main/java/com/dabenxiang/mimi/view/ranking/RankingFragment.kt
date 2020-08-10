@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.ranking
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -22,20 +23,19 @@ import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.google.android.material.tabs.TabLayout
-import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_picture_detail.toolbarContainer
 import kotlinx.android.synthetic.main.fragment_ranking.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import kotlin.coroutines.coroutineContext
 
 class RankingFragment : BaseFragment() {
 
     companion object {
+        private const val REQUEST_LOGIN = 1000
+
         fun createBundle(): Bundle {
             return Bundle().also {
             }
@@ -52,7 +52,7 @@ class RankingFragment : BaseFragment() {
                         PlayerItem(it.id!!, true)
                     val intent = Intent(requireContext(), PlayerActivity::class.java)
                     intent.putExtras(PlayerActivity.createBundle(playerData))
-                    startActivity(intent)
+                    startActivityForResult(intent, REQUEST_LOGIN)
                 },
                 getBitmap = { id, position -> viewModel.getBitmap(id = id, position = position) }
             )
@@ -62,16 +62,16 @@ class RankingFragment : BaseFragment() {
     private val adapter by lazy {
         RankingAdapter(requireActivity(),
             RankingFuncItem(
-                onItemClick = {items, position ->
-                    val memberPostItems= items.map {
+                onItemClick = { items, position ->
+                    val memberPostItems = items.map {
                         MemberPostItem(
                             id = it.id!!,
                             content = it.content
                         )
                     }.let {
-                       arrayListOf<MemberPostItem>().also {arrayList->
-                           arrayList.addAll(it)
-                       }
+                        arrayListOf<MemberPostItem>().also { arrayList ->
+                            arrayList.addAll(it)
+                        }
                     }
 
                     when (viewModel.postTypeSelected) {
@@ -88,7 +88,8 @@ class RankingFragment : BaseFragment() {
                         }
                         PostType.IMAGE -> {
                             val bundle = PictureDetailFragment.createBundle(
-                                memberPostItems[position], 0)
+                                memberPostItems[position], 0
+                            )
                             navigateTo(
                                 NavigateItem.Destination(
                                     R.id.action_rankingFragment_to_pictureDetailFragment,
@@ -155,9 +156,10 @@ class RankingFragment : BaseFragment() {
     }
 
     private fun setupAdapter() {
-       Timber.i("post type=${tab_type_filter.selectedTabPosition} ")
+        Timber.i("post type=${tab_type_filter.selectedTabPosition} ")
         layout_refresh.isRefreshing = true
-        rv_ranking_content.adapter = if (tab_type_filter.selectedTabPosition == 0) videosAdapter else adapter
+        rv_ranking_content.adapter =
+            if (tab_type_filter.selectedTabPosition == 0) videosAdapter else adapter
         viewModel.setStatisticsTypeFunction(tab_temporal_filter.selectedTabPosition)
         viewModel.setPostType(tab_type_filter.selectedTabPosition)
         viewModel.getRankingList()
@@ -192,6 +194,17 @@ class RankingFragment : BaseFragment() {
             layout_refresh.isRefreshing = false
             viewModel.getRankingList()
         }
+    }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                REQUEST_LOGIN -> {
+                    findNavController().navigate(R.id.action_rankingFragment_to_loginFragment, data?.extras)
+                }
+            }
+        }
     }
 }

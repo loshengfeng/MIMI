@@ -72,7 +72,6 @@ import kotlin.math.round
 class PlayerActivity : BaseActivity() {
 
     companion object {
-        const val REQUEST_CODE = 111
         const val KEY_IS_FROM_PLAYER = "KEY_IS_FROM_PLAYER"
         private const val KEY_PLAYER_SRC = "KEY_PLAYER_SRC"
         private const val KEY_IS_COMMENT = "KEY_IS_COMMENT"
@@ -900,13 +899,14 @@ class PlayerActivity : BaseActivity() {
                 exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
             }
         }
-        scrollView.setOnScrollChangeListener { _, _, _, _, _ ->
-            Timber.i("scrollView setOnScrollChangeListener")
-        }
+//        scrollView.setOnScrollChangeListener { _, _, _, _, _ ->
+//            Timber.i("scrollView setOnScrollChangeListener")
+//        }
+//
+//        scrollView.setOnClickListener {
+//            Timber.i("scrollView setOnClickListener")
+//        }
 
-        scrollView.setOnClickListener {
-            Timber.i("scrollView setOnClickListener")
-        }
     }
 
     private fun showMoreDialog(id:Long, type:PostType, isReported:Boolean){
@@ -1665,7 +1665,7 @@ class PlayerActivity : BaseActivity() {
 
     private fun scrollToBottom() {
         if (intent.extras?.getBoolean(KEY_IS_COMMENT) == true) {
-            scrollView.fullScroll(View.FOCUS_DOWN)
+//            scrollView.fullScroll(View.FOCUS_DOWN)
         }
     }
 

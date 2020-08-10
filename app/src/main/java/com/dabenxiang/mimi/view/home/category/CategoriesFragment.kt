@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.home.category
 
 import android.animation.Animator
 import android.animation.ObjectAnimator
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -10,6 +11,7 @@ import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -24,6 +26,7 @@ import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.home.AdultHomeFragment
 import com.dabenxiang.mimi.view.home.HomeTemplate
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.player.PlayerActivity
@@ -35,6 +38,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 class CategoriesFragment : BaseFragment() {
 
     companion object {
+        private const val REQUEST_LOGIN = 1000
+
         const val KEY_DATA = "data"
         const val KEY_CATEGORY = "category"
         const val TEXT_ALL = "全部"
@@ -62,7 +67,7 @@ class CategoriesFragment : BaseFragment() {
         override fun onVideoClick(view: View, item: PlayerItem) {
             val intent = Intent(requireContext(), PlayerActivity::class.java)
             intent.putExtras(PlayerActivity.createBundle(item))
-            startActivity(intent)
+            startActivityForResult(intent, REQUEST_LOGIN)
         }
 
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {}
@@ -488,6 +493,18 @@ class CategoriesFragment : BaseFragment() {
             tv.setTextColor(takeIf { isAdult }?.let { requireContext().getColor(R.color.color_white_1) }
                 ?: let { requireContext().getColor(R.color.normal_color_text) })
             tv.background = null
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                REQUEST_LOGIN -> {
+                    findNavController().navigate(R.id.action_categoriesFragment_to_loginFragment, data?.extras)
+                }
+            }
         }
     }
 }
