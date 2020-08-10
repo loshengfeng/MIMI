@@ -28,6 +28,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginEnd="15dp"
+            android:padding="15dp"
             android:background="@drawable/btn_post_n"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
