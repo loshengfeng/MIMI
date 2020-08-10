@@ -281,6 +281,9 @@ class LoginFragment : BaseFragment() {
             }
             false -> ""
         }
+
+        cb_register_account.isEnabled = false
+        cb_email.isEnabled = false
     }
 
     override fun navigateTo(item: NavigateItem) {

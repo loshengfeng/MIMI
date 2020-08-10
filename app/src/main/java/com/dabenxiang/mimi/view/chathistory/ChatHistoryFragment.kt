@@ -52,6 +52,10 @@ class ChatHistoryFragment : BaseFragment() {
         initSettings()
     }
 
+    override fun setupFirstTime() {
+        viewModel.getChatList()
+    }
+
     override fun getLayoutId(): Int {
         return R.layout.fragment_chat_history
     }
@@ -99,7 +103,6 @@ class ChatHistoryFragment : BaseFragment() {
         tv_title.setText(R.string.title_chat_history)
         rv_content.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         rv_content.adapter = adapter
-        viewModel.getChatList()
         swipeRefreshLayout.setColorSchemeColors(swipeRefreshLayout.context.getColor(R.color.color_red_1))
     }
 

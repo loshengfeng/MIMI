@@ -175,7 +175,7 @@ class ClipFragment : BaseFragment() {
                             val clipAdapter = rv_third.adapter as ClipAdapter
                             val lastPosition = clipAdapter.getCurrentPos()
                             Timber.d("SCROLL_STATE_IDLE lastPosition: $lastPosition")
-                            takeIf { currentPos>0 && currentPos != lastPosition }?.also {
+                            takeIf { currentPos>=0 && currentPos != lastPosition }?.also {
                                 clipAdapter.releasePlayer()
                                 clipAdapter.updateCurrentPosition(currentPos)
                                 clipAdapter.notifyItemChanged(lastPosition)

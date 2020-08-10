@@ -901,6 +901,13 @@ class PlayerActivity : BaseActivity() {
                 exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
             }
         }
+        scrollView.setOnScrollChangeListener { _, _, _, _, _ ->
+            Timber.i("scrollView setOnScrollChangeListener")
+        }
+
+        scrollView.setOnClickListener {
+            Timber.i("scrollView setOnClickListener")
+        }
     }
 
     private fun showMoreDialog(id:Long, type:PostType, isReported:Boolean){
@@ -988,6 +995,7 @@ class PlayerActivity : BaseActivity() {
                     tv_replay_name.visibility = View.VISIBLE
                 }
             }
+
             et_message.let {
                 it.requestFocusFromTouch()
                 val lManager: InputMethodManager =
@@ -999,19 +1007,22 @@ class PlayerActivity : BaseActivity() {
     }
 
     private fun commentEditorHide() {
+        Timber.i("commentEditorHide")
         CoroutineScope(Dispatchers.Main).launch {
+            et_message.clearFocus()
+            Timber.i("et_message clearFocus")
             tv_replay_name.visibility = View.GONE
-            val imm =
+            val lManager: InputMethodManager =
                 getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+            lManager?.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
         }
         commentEditorToggle(false)
     }
 
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if(et_message.isFocused) commentEditorHide()
-        return true
-    }
+//    override fun onTouchEvent(event: MotionEvent?): Boolean {
+//        if(et_message.isFocused) commentEditorHide()
+//        return true
+//    }
 
     override fun onStart() {
         super.onStart()
@@ -1146,7 +1157,7 @@ class PlayerActivity : BaseActivity() {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     //Timber.d("ACTION_DOWN")
-                    if(!player_view.controllerAutoShow)
+                    if (!player_view.controllerAutoShow)
                         player_view.showController()
                     originX = event.x
                     originY = event.y
@@ -1209,12 +1220,12 @@ class PlayerActivity : BaseActivity() {
                         }
                         true
                     } else {
-//                        player?.also {
-//                            it.playWhenReady.also { playing ->
-//                                it.playWhenReady = !playing
-//                                viewModel.setPlaying(!playing)
-//                            }
-//                        }
+    //                        player?.also {
+    //                            it.playWhenReady.also { playing ->
+    //                                it.playWhenReady = !playing
+    //                                viewModel.setPlaying(!playing)
+    //                            }
+    //                        }
                         false
                     }
 
