@@ -38,7 +38,6 @@ import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseActivity
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.dialog.*
-import com.dabenxiang.mimi.view.login.LoginActivity
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
@@ -901,13 +900,14 @@ class PlayerActivity : BaseActivity() {
                 exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
             }
         }
-        scrollView.setOnScrollChangeListener { _, _, _, _, _ ->
-            Timber.i("scrollView setOnScrollChangeListener")
-        }
+//        scrollView.setOnScrollChangeListener { _, _, _, _, _ ->
+//            Timber.i("scrollView setOnScrollChangeListener")
+//        }
+//
+//        scrollView.setOnClickListener {
+//            Timber.i("scrollView setOnClickListener")
+//        }
 
-        scrollView.setOnClickListener {
-            Timber.i("scrollView setOnClickListener")
-        }
     }
 
     private fun showMoreDialog(id:Long, type:PostType, isReported:Boolean){
@@ -1389,15 +1389,17 @@ class PlayerActivity : BaseActivity() {
 
     private fun openLoginDialog() {
         val registerBlock = {
-            val intent = Intent(this, LoginActivity::class.java)
+            val intent = Intent()
             intent.putExtras(LoginFragment.createBundle(LoginFragment.TYPE_REGISTER))
-            startActivity(intent)
+            setResult(Activity.RESULT_OK, intent)
+            finish()
         }
 
         val loginBlock = {
-            val intent = Intent(this, LoginActivity::class.java)
+            val intent = Intent()
             intent.putExtras(LoginFragment.createBundle(LoginFragment.TYPE_LOGIN))
-            startActivity(intent)
+            setResult(Activity.RESULT_OK, intent)
+            finish()
         }
 
         val data = GeneralDialogData(
@@ -1664,7 +1666,7 @@ class PlayerActivity : BaseActivity() {
 
     private fun scrollToBottom() {
         if (intent.extras?.getBoolean(KEY_IS_COMMENT) == true) {
-            scrollView.fullScroll(View.FOCUS_DOWN)
+//            scrollView.fullScroll(View.FOCUS_DOWN)
         }
     }
 

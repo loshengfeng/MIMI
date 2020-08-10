@@ -1,11 +1,13 @@
 package com.dabenxiang.mimi.view.home
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
@@ -44,6 +46,10 @@ class HomeFragment : BaseFragment() {
 
     private val homeStatisticsViewHolderMap = hashMapOf<Int, HomeStatisticsViewHolder>()
     private val statisticsMap = hashMapOf<Int, HomeTemplate.Statistics>()
+
+    companion object {
+        private const val REQUEST_LOGIN = 1000
+    }
 
     override fun getLayoutId() = R.layout.fragment_home
 
@@ -326,7 +332,7 @@ class HomeFragment : BaseFragment() {
         override fun onVideoClick(view: View, item: PlayerItem) {
             val intent = Intent(requireContext(), PlayerActivity::class.java)
             intent.putExtras(PlayerActivity.createBundle(item))
-            startActivityForResult(intent, PlayerActivity.REQUEST_CODE)
+            startActivityForResult(intent, REQUEST_LOGIN)
         }
 
         override fun onClipClick(view: View, item: List<MemberPostItem>, position: Int) {
@@ -381,5 +387,17 @@ class HomeFragment : BaseFragment() {
 
     private fun getBitmap(id: String, update: ((String) -> Unit)) {
         viewModel.getBitmap(id, update)
+    }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                REQUEST_LOGIN -> {
+                    findNavController().navigate(R.id.action_homeFragment_to_loginFragment, data?.extras)
+                }
+            }
+        }
     }
 }
