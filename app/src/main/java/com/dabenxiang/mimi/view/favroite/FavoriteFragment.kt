@@ -7,6 +7,7 @@ import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -253,6 +254,7 @@ class FavoriteFragment : BaseFragment() {
             false -> {
                 item_is_not_Login.visibility = View.VISIBLE
                 item_is_Login.visibility = View.GONE
+                tv_version_is_not_login.text = BuildConfig.VERSION_NAME
             }
         }
     }
