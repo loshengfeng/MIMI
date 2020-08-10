@@ -18,6 +18,7 @@ import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
+import com.dabenxiang.mimi.model.vo.CheckEmailResult
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.exoplayer2.C
@@ -727,5 +728,26 @@ class PlayerViewModel : BaseViewModel() {
         _episodePosition.postValue(-1)
         _sourceListPosition.postValue(-1)
         sourceList = ArrayList()
+    }
+
+    private val _isEmailConfirmed by lazy { MutableLiveData<ApiResult<CheckEmailResult>>() }
+    val isEmailConfirmed: LiveData<ApiResult<CheckEmailResult>> get() = _isEmailConfirmed
+    fun checkIsEmailConfirmed(onConfirmed: () -> Unit, onUnconfirmed: () -> Unit) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getMe()
+                if (!result.isSuccessful) throw HttpException(result)
+                val meItem = result.body()?.content
+                emit(ApiResult.success(CheckEmailResult(
+                        meItem?.isEmailConfirmed ?: false,
+                        onConfirmed,
+                        onUnconfirmed
+                )))
+            }
+                    .onStart { emit(ApiResult.loading()) }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .collect { _isEmailConfirmed.value = it }
+        }
     }
 }

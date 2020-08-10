@@ -26,6 +26,7 @@ import com.dabenxiang.mimi.extension.addKeyboardToggleListener
 import com.dabenxiang.mimi.extension.handleException
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.extension.setNot
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.api.vo.*
@@ -41,8 +42,10 @@ import com.dabenxiang.mimi.view.dialog.*
 import com.dabenxiang.mimi.view.login.LoginActivity
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.main.MainActivity
+import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
+import com.dabenxiang.mimi.view.setting.SettingFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.OrientationDetector
 import com.google.android.exoplayer2.*
@@ -752,17 +755,49 @@ class PlayerActivity : BaseActivity() {
             }
 
         btn_write_comment.setOnClickListener {
-            currentReplyId = null
-            currentreplyName = null
-            commentEditorOpen()
-            commentEditorToggle(true)
+            viewModel.checkIsEmailConfirmed (
+                    {
+                        Timber.d("onWriteCommentClick confirmed")
+                        currentReplyId = null
+                        currentreplyName = null
+                        commentEditorOpen()
+                        commentEditorToggle(true)
+                    },
+                    {
+                        Timber.d("onWriteCommentClick unconfirmed")
+                        deepLinkTo(
+                                MainActivity::class.java,
+                                R.navigation.navigation_adult,
+                                R.id.settingFragment,
+                                viewModel.getMeAvatar()?.let { byteArray ->
+                                    SettingFragment.createBundle(byteArray)
+                                }
+                        )
+                    }
+            )
         }
 
         tv_comment.setOnClickListener {
-            currentReplyId = null
-            currentreplyName = null
-            commentEditorOpen()
-            commentEditorToggle(true)
+            viewModel.checkIsEmailConfirmed (
+                    {
+                        Timber.d("onCommentClick confirmed")
+                        currentReplyId = null
+                        currentreplyName = null
+                        commentEditorOpen()
+                        commentEditorToggle(true)
+                    },
+                    {
+                        Timber.d("onCommentClick unconfirmed")
+                        deepLinkTo(
+                                MainActivity::class.java,
+                                R.navigation.navigation_adult,
+                                R.id.settingFragment,
+                                viewModel.getMeAvatar()?.let { byteArray ->
+                                    SettingFragment.createBundle(byteArray)
+                                }
+                        )
+                    }
+            )
         }
 
         btn_send.setOnClickListener {
@@ -780,7 +815,23 @@ class PlayerActivity : BaseActivity() {
         }
 
         iv_favorite.setOnClickListener {
-            viewModel.modifyFavorite()
+            viewModel.checkIsEmailConfirmed (
+                    {
+                        Timber.d("onFavoriteClick confirmed")
+                        viewModel.modifyFavorite()
+                    },
+                    {
+                        Timber.d("onFavoriteClick unconfirmed")
+                        deepLinkTo(
+                                MainActivity::class.java,
+                                R.navigation.navigation_setting,
+                                R.id.settingFragment,
+                                viewModel.getMeAvatar()?.let { byteArray ->
+                                    SettingFragment.createBundle(byteArray)
+                                }
+                        )
+                    }
+            )
         }
 
         viewModel.apiAddFavoriteResult.observe(this, Observer { event ->
@@ -801,7 +852,23 @@ class PlayerActivity : BaseActivity() {
         })
 
         tv_like.setOnClickListener {
-            viewModel.modifyLike()
+            viewModel.checkIsEmailConfirmed (
+                    {
+                        Timber.d("like confirmed")
+                        viewModel.modifyLike()
+                    },
+                    {
+                        Timber.d("like unconfirmed")
+                        deepLinkTo(
+                                MainActivity::class.java,
+                                R.navigation.navigation_setting,
+                                R.id.settingFragment,
+                                viewModel.getMeAvatar()?.let { byteArray ->
+                                    SettingFragment.createBundle(byteArray)
+                                }
+                        )
+                    }
+            )
         }
 
         viewModel.apiAddLikeResult.observe(this, Observer { event ->
@@ -869,6 +936,19 @@ class PlayerActivity : BaseActivity() {
                     }
                 }
                 is Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.isEmailConfirmed.observe(this, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    if (it.result.isConfirmed) {
+                        it.result.onConfirmed()
+                    } else {
+                        showEmailConfirmDialog(it.result.onUnconfirmed)
+                    }
+                }
+                is ApiResult.Error -> Timber.e(it.throwable)
             }
         })
 
@@ -1671,6 +1751,19 @@ class PlayerActivity : BaseActivity() {
             .createPendingIntent()
 
         pendingIntent.send()
+    }
+
+    fun showEmailConfirmDialog(block: () -> Unit) {
+        GeneralDialog.newInstance(
+                GeneralDialogData(
+                        titleRes = R.string.error_email_not_confirmed_title,
+                        message = getString(R.string.error_email_not_confirmed_msg),
+                        messageIcon = R.drawable.ico_email,
+                        firstBtn = getString(R.string.verify_later),
+                        secondBtn = getString(R.string.verify_immediately),
+                        secondBlock = block
+                )
+        ).show(supportFragmentManager)
     }
 
 }
