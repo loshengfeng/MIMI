@@ -992,7 +992,7 @@ class PlayerActivity : BaseActivity() {
                 it.requestFocusFromTouch()
                 val lManager: InputMethodManager =
                     getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                lManager.showSoftInput(it, 0)
+                lManager?.showSoftInput(it, 0)
             }
         }
         commentEditorToggle(true)
