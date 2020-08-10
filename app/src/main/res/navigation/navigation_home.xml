@@ -54,6 +54,10 @@
             android:id="@+id/action_categoriesFragment_to_searchVideoFragment"
             app:destination="@id/searchVideoFragment" />
 
+        <action
+            android:id="@+id/action_categoriesFragment_to_loginFragment"
+            app:destination="@id/navigation_login" />
+
     </fragment>
 
     <fragment

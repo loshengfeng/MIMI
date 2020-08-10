@@ -83,6 +83,11 @@
         <action
             android:id="@+id/action_categoriesFragment_to_searchVideoFragment"
             app:destination="@id/searchVideoFragment" />
+
+        <action
+            android:id="@+id/action_categoriesFragment_to_loginFragment"
+            app:destination="@id/navigation_login" />
+
     </fragment>
 
     <fragment
@@ -252,6 +257,10 @@
         <action
             android:id="@+id/action_rankingFragment_to_pictureDetailFragment"
             app:destination="@id/pictureDetailFragment" />
+
+        <action
+            android:id="@+id/action_rankingFragment_to_loginFragment"
+            app:destination="@id/navigation_login" />
    </fragment>
     <fragment
         android:id="@+id/postViewerFragment"
