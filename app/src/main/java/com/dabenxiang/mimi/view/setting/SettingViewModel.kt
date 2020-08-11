@@ -69,7 +69,7 @@ class SettingViewModel : BaseViewModel() {
         viewModelScope.launch {
             flow {
                 val result =
-                    domainManager.getApiRepository().resendEmail(EmailRequest(domainManager.getWebDomain()+ DomainManager.PARAM_VALIDATE_CODE))
+                    domainManager.getApiRepository().resendEmail(EmailRequest(domainManager.getWebDomain()+ DomainManager.PARAM_RESET_CODE))
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }
@@ -88,7 +88,7 @@ class SettingViewModel : BaseViewModel() {
                     profileData?.gender,
                     profileData?.birthday,
                     profileData?.email,
-                    domainManager.getWebDomain() + DomainManager.PARAM_VALIDATE_CODE
+                    domainManager.getWebDomain() + DomainManager.PARAM_RESET_CODE
                 )
                 val result = domainManager.getApiRepository().updateProfile(request)
                 if (!result.isSuccessful) throw HttpException(result)
