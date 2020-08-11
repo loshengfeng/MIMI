@@ -93,6 +93,24 @@ class SettingFragment : BaseFragment() {
             }
         })
 
+        viewModel.imageBitmap.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> {
+                    val options: RequestOptions = RequestOptions()
+                        .transform(MultiTransformation(CenterCrop(), CircleCrop()))
+                        .placeholder(R.drawable.ico_default_photo)
+                        .error(R.drawable.ico_default_photo)
+                        .priority(Priority.NORMAL)
+                    Glide.with(this).load(it.result)
+                        .apply(options)
+                        .into(iv_photo)
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
         viewModel.resendResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Loading -> progressHUD?.show()
@@ -238,6 +256,8 @@ class SettingFragment : BaseFragment() {
     }
 
     override fun initSettings() {
+        Glide.with(this).load(R.drawable.ico_default_photo)
+            .into(iv_photo)
         useAdultTheme(false)
         viewModel.getProfile()
     }

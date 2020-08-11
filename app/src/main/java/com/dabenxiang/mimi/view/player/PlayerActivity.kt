@@ -19,7 +19,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDeepLinkBuilder
-import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearSnapHelper
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
@@ -28,7 +27,6 @@ import com.dabenxiang.mimi.extension.addKeyboardToggleListener
 import com.dabenxiang.mimi.extension.handleException
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.extension.setNot
-import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.api.vo.*
@@ -44,7 +42,6 @@ import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.dialog.*
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.main.MainActivity
-import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.view.setting.SettingFragment
@@ -901,7 +898,7 @@ class PlayerActivity : BaseActivity() {
 
         viewModel.checkStatusResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     when (it.result.status) {
                         StatusItem.NOT_LOGIN -> showNotLoginDialog()
                         StatusItem.LOGIN_BUT_EMAIL_NOT_CONFIRMED -> {
@@ -912,7 +909,7 @@ class PlayerActivity : BaseActivity() {
                         StatusItem.LOGIN_AND_EMAIL_CONFIRMED -> it.result.onLoginAndEmailConfirmed()
                     }
                 }
-                is ApiResult.Error -> Timber.e(it.throwable)
+                is Error -> Timber.e(it.throwable)
             }
         })
 
@@ -995,22 +992,24 @@ class PlayerActivity : BaseActivity() {
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem) {
-            if ((item as MemberPostItem).reported) {
+            viewModel.checkStatus {
+                if ((item as MemberPostItem).reported) {
 
-                viewModel.isCommentReport = false
-                GeneralUtils.showToast(
-                    App.applicationContext(),
-                    getString(R.string.already_reported)
-                )
-            } else {
-                reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
-                    it.show(
-                        supportFragmentManager,
-                        ReportDialogFragment::class.java.simpleName
+                    viewModel.isCommentReport = false
+                    GeneralUtils.showToast(
+                        App.applicationContext(),
+                        getString(R.string.already_reported)
                     )
+                } else {
+                    reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
+                        it.show(
+                            supportFragmentManager,
+                            ReportDialogFragment::class.java.simpleName
+                        )
+                    }
                 }
+                moreDialog?.dismiss()
             }
-            moreDialog?.dismiss()
         }
 
         override fun onCancel() {

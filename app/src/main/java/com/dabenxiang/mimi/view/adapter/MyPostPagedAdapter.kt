@@ -8,10 +8,12 @@ import androidx.recyclerview.widget.DiffUtil
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
-import com.dabenxiang.mimi.callback.PostPicItemListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.view.adapter.viewHolder.*
+import com.dabenxiang.mimi.view.adapter.viewHolder.MyPostClipPostHolder
+import com.dabenxiang.mimi.view.adapter.viewHolder.MyPostPicturePostHolder
+import com.dabenxiang.mimi.view.adapter.viewHolder.MyPostTextPostHolder
+import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 
@@ -65,21 +67,21 @@ class MyPostPagedAdapter(
             VIEW_TYPE_CLIP -> {
                 MyPostClipPostHolder(
                     LayoutInflater.from(parent.context)
-                        .inflate(R.layout.item_my_post_clip_post, parent, false),
+                        .inflate(R.layout.item_clip_post, parent, false),
                     isMe, isAdultTheme
                 )
             }
             VIEW_TYPE_PICTURE -> {
                 MyPostPicturePostHolder(
                     LayoutInflater.from(parent.context)
-                        .inflate(R.layout.item_my_post_picture_post, parent, false),
+                        .inflate(R.layout.item_picture_post, parent, false),
                     isMe, isAdultTheme
                 )
             }
             else -> {
                 MyPostTextPostHolder(
                     LayoutInflater.from(parent.context)
-                        .inflate(R.layout.item_my_post_text_post, parent, false),
+                        .inflate(R.layout.item_text_post, parent, false),
                     isMe, isAdultTheme
                 )
             }

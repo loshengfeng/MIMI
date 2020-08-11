@@ -80,6 +80,8 @@ class FavoriteFragment : BaseFragment() {
         }, false)
     }
 
+    private var needRefresh = false
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback {
@@ -235,18 +237,24 @@ class FavoriteFragment : BaseFragment() {
                         )
                     }
                 }
-                R.id.tv_login -> navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_postFavoriteFragment_to_loginFragment,
-                        LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                R.id.tv_login -> {
+                    needRefresh = true
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_postFavoriteFragment_to_loginFragment,
+                            LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                        )
                     )
-                )
-                R.id.tv_register -> navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_postFavoriteFragment_to_loginFragment,
-                        LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                }
+                R.id.tv_register -> {
+                    needRefresh = true
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_postFavoriteFragment_to_loginFragment,
+                            LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                        )
                     )
-                )
+                }
             }
         }.also {
             tv_clean.setOnClickListener(it)
@@ -264,9 +272,11 @@ class FavoriteFragment : BaseFragment() {
         tv_back.visibility = View.GONE
         tv_title.text = getString(R.string.favorite_title)
 
-        when(viewModel.accountManager.isLogin()) {
+        when (viewModel.accountManager.isLogin()) {
             true -> {
-                viewModel.checkEmailConfirmed()
+                //TODO: 目前先不判斷是否有驗證過
+//                viewModel.checkEmailConfirmed()
+                initView()
             }
             false -> {
                 item_is_not_Login.visibility = View.VISIBLE
@@ -274,6 +284,10 @@ class FavoriteFragment : BaseFragment() {
                 tv_version_is_not_login.text = BuildConfig.VERSION_NAME
                 tv_clean.visibility = View.GONE
             }
+        }
+        if (needRefresh) {
+            needRefresh = false
+            viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
         }
     }
 
