@@ -19,14 +19,12 @@ import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoSearchItem
 import com.dabenxiang.mimi.model.vo.CategoriesItem
-import com.dabenxiang.mimi.model.api.vo.CategoriesItem as CategoriesData
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.adapter.FilterTabAdapter
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.home.AdultHomeFragment
 import com.dabenxiang.mimi.view.home.HomeTemplate
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.player.PlayerActivity
@@ -34,6 +32,7 @@ import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_categories.*
 import java.util.concurrent.atomic.AtomicBoolean
+import com.dabenxiang.mimi.model.api.vo.CategoriesItem as CategoriesData
 
 class CategoriesFragment : BaseFragment() {
 
@@ -57,6 +56,12 @@ class CategoriesFragment : BaseFragment() {
     }
 
     private val viewModel: CategoriesViewModel by viewModels()
+
+    private var filterLLList: List<LinearLayout> = listOf()
+    private var filterRVList: List<RecyclerView> = listOf()
+    private var filterTVList: List<TextView> = listOf()
+    private var filterAdapterList = mutableMapOf<Int, FilterTabAdapter>()
+    private var filterDataList: ArrayList<List<String>> = arrayListOf()
 
     private val videoListAdapter by lazy {
         val isAdult = mainViewModel?.adultMode?.value ?: false
@@ -101,8 +106,8 @@ class CategoriesFragment : BaseFragment() {
     private val isAdult by lazy { mainViewModel?.adultMode?.value ?: false }
     private val data by lazy { arguments?.getSerializable(KEY_DATA) as CategoriesItem }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun setupFirstTime() {
+        super.setupFirstTime()
 
         requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
 
@@ -209,12 +214,6 @@ class CategoriesFragment : BaseFragment() {
             progressHUD?.show()
         }
     }
-
-    private var filterLLList: List<LinearLayout> = listOf()
-    private var filterRVList: List<RecyclerView> = listOf()
-    private var filterTVList: List<TextView> = listOf()
-    private var filterAdapterList = mutableMapOf<Int, FilterTabAdapter>()
-    private var filterDataList: ArrayList<List<String>> = arrayListOf()
 
     override fun setupObservers() {
         filterLLList = listOf(ll_filter_0, ll_filter_1, ll_filter_2)
@@ -404,11 +403,13 @@ class CategoriesFragment : BaseFragment() {
         val isFirst = AtomicBoolean(true)
         filterDataList.forEachIndexed { index, list ->
             val lastPosition = viewModel.filterPositionData(index)?.value
-            val key = lastPosition?.takeIf { it < list.size }?.let { list[it] }
-                ?: let { TEXT_ALL }
-            takeIf { isFirst.compareAndSet(true, false) }?.also {
-                sb.append(key)
-            } ?: run { sb.append(", ").append(key) }
+            if (list.isNotEmpty()) {
+                val key = lastPosition?.takeIf { it < list.size }?.let { list[it] }
+                    ?: let { TEXT_ALL }
+                takeIf { isFirst.compareAndSet(true, false) }?.also {
+                    sb.append(key)
+                } ?: run { sb.append(", ").append(key) }
+            }
         }.takeIf { sb.isNotEmpty() }?.run { tv_collapsing_filter.text = sb.toString() }
     }
 
