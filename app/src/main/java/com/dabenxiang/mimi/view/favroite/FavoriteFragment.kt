@@ -202,6 +202,26 @@ class FavoriteFragment : BaseFragment() {
                 is ApiResult.Error -> Timber.e(it.throwable)
             }
         })
+
+        viewModel.isEmailConfirmed.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    if (!it.result) {
+                        interactionListener?.changeNavigationPosition(R.id.navigation_personal)
+                    } else {
+                        initView()
+                    }
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+    }
+
+    private fun initView() {
+        item_is_not_Login.visibility = View.GONE
+        item_is_Login.visibility = View.VISIBLE
+        tv_clean.visibility = View.VISIBLE
+        rv_primary.adapter = primaryAdapter
     }
 
     override fun setupListeners() {
@@ -246,10 +266,7 @@ class FavoriteFragment : BaseFragment() {
 
         when(viewModel.accountManager.isLogin()) {
             true -> {
-                item_is_not_Login.visibility = View.GONE
-                item_is_Login.visibility = View.VISIBLE
-                tv_clean.visibility = View.VISIBLE
-                rv_primary.adapter = primaryAdapter
+                viewModel.checkEmailConfirmed()
             }
             false -> {
                 item_is_not_Login.visibility = View.VISIBLE
