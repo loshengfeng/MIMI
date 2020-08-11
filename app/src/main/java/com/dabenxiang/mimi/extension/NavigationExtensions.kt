@@ -116,8 +116,7 @@ fun BottomNavigationView.setupWithNavController(
 //                        if (isConfirmed) StatusItem.LOGIN_AND_EMAIL_CONFIRMED else StatusItem.LOGIN_BUT_EMAIL_NOT_CONFIRMED
 //                }
 //            }
-            val status =
-                if (accountManager.isLogin()) StatusItem.LOGIN_AND_EMAIL_CONFIRMED else StatusItem.NOT_LOGIN
+            val status = StatusItem.LOGIN_AND_EMAIL_CONFIRMED
             when (status) {
                 StatusItem.NOT_LOGIN -> {
                     false
