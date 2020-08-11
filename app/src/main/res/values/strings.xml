@@ -319,6 +319,7 @@
     <string name="chat_content_file_downloading">下载中</string>
     <string name="chat_content_file_download_finish">下载完成</string>
     <string name="chat_content_file_uploading">上傳中</string>
+    <string name="chat_content_text_too_much">文字超過五百字</string>
 
     <!--  Image Preview  -->
     <string name="image_preview_file_invlid">档案已失效</string>
