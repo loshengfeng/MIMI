@@ -31,7 +31,6 @@ import com.dabenxiang.mimi.view.dialog.choosepicker.ChoosePickerDialogFragment
 import com.dabenxiang.mimi.view.dialog.choosepicker.OnChoosePickerDialogListener
 import com.dabenxiang.mimi.view.dialog.editor.InvitationEditorDialog
 import com.dabenxiang.mimi.view.listener.OnSimpleEditorDialogListener
-import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.updateprofile.UpdateProfileFragment
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -227,9 +226,7 @@ class SettingFragment : BaseFragment() {
         }
     }
 
-    override fun initSettings() {
-        useAdultTheme(false)
-        viewModel.getProfile()
+    override fun setupFirstTime() {
         arguments?.also { it ->
             val byteArray = it.getSerializable(KEY_PHOTO) as ByteArray
             byteArray.also {
@@ -237,6 +234,11 @@ class SettingFragment : BaseFragment() {
                 setupPhoto(bitmap)
             }
         }
+    }
+
+    override fun initSettings() {
+        useAdultTheme(false)
+        viewModel.getProfile()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
