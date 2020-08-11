@@ -57,6 +57,9 @@ class FavoriteViewModel : BaseViewModel() {
     private var _attachmentByTypeResult = MutableLiveData<ApiResult<AttachmentItem>>()
     val attachmentByTypeResult: LiveData<ApiResult<AttachmentItem>> = _attachmentByTypeResult
 
+    private val _isEmailConfirmed = MutableLiveData<ApiResult<Boolean>>()
+    val isEmailConfirmed: LiveData<ApiResult<Boolean>> get() = _isEmailConfirmed
+
     fun initData(primaryType: Int, secondaryType: Int) {
         viewModelScope.launch {
             when {
@@ -315,4 +318,18 @@ class FavoriteViewModel : BaseViewModel() {
         }
     }
 
+    fun checkEmailConfirmed() {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getMe()
+                val isEmailConfirmed = result.body()?.content?.isEmailConfirmed ?: false
+                val status = result.isSuccessful && isEmailConfirmed
+                emit(ApiResult.success(status))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _isEmailConfirmed.value = it }
+        }
+    }
 }
