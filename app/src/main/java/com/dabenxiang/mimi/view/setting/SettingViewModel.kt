@@ -115,7 +115,9 @@ class SettingViewModel : BaseViewModel() {
         val tempImagePath =
             Environment.getExternalStorageDirectory().path.plus(StringBuffer("/").append(fileName))
 
-        FileUtil.saveBitmapToJpegFile(bitmap!!, destPath = tempImagePath)
+        bitmap?.also {
+            FileUtil.saveBitmapToJpegFile(it, it.width, it.height, destPath = tempImagePath)
+        }
 
         viewModelScope.launch {
             flow {
