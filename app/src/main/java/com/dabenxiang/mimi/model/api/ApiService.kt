@@ -559,4 +559,27 @@ interface ApiService {
         @Path("utcTime") utcTime: Long?,
         @Path("sign") sign: String?
     ): Response<Void>
+
+
+    /**********************************************************
+     *
+     *                  Ordering
+     *
+     ***********************************************************/
+    @GET("/v1/Ordering/Package")
+    suspend fun getOrderingPackage(): Response<ApiBaseItem<ArrayList<OrderingPackageItem>>>
+
+    @GET("/v1/Ordering/Package")
+    suspend fun getOrderingPackageByPaymentType(
+        @Query("paymentType") paymentType: Int
+    ): Response<ApiBaseItem<ArrayList<OrderingPackageItem>>>
+
+    /**********************************************************
+     *
+     *                  Create Order
+     *
+     ***********************************************************/
+    @POST("/v1/Members/Me/Order")
+    suspend fun createOrder(@Body request: CreateOrderRequest): Response<Void>
+
 }
