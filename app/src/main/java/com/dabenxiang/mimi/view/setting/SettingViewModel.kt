@@ -6,6 +6,9 @@ import android.os.Environment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.blankj.utilcode.util.ImageUtils
+import com.dabenxiang.mimi.BuildConfig
+import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.AvatarRequest
@@ -29,6 +32,7 @@ class SettingViewModel : BaseViewModel() {
     private val versionManager: VersionManager by inject()
 
     var bitmap: Bitmap? = null
+    var byteArray: ByteArray? = null
 
     private val _profileItem = MutableLiveData<ApiResult<ProfileItem>>()
     val profileItem: LiveData<ApiResult<ProfileItem>> = _profileItem
@@ -48,6 +52,9 @@ class SettingViewModel : BaseViewModel() {
     private val _isBinding: MutableLiveData<Boolean> = MutableLiveData()
     val isBinding: MutableLiveData<Boolean> = _isBinding
 
+    private val _imageBitmap = MutableLiveData<ApiResult<Bitmap>>()
+    val imageBitmap: LiveData<ApiResult<Bitmap>> = _imageBitmap
+
     var profileData: ProfileItem? = null
 
     fun getProfile() {
@@ -56,12 +63,33 @@ class SettingViewModel : BaseViewModel() {
                 val result = domainManager.getApiRepository().getProfile()
                 if (!result.isSuccessful) throw HttpException(result)
                 profileData = result.body()?.content
+                profileData?.let {
+                    it.avatarAttachmentId?.also { id -> getAttachment(id) }
+                }
                 emit(ApiResult.success(result.body()?.content))
             }
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _profileItem.value = it }
+        }
+    }
+
+    fun getAttachment(id: Long) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.getAttachment(id.toString())
+                if (!result.isSuccessful) throw HttpException(result)
+                byteArray = result.body()?.bytes()
+                accountManager.setupMeAvatarCache(byteArray)
+                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
+                emit(ApiResult.success(bitmap))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _imageBitmap.value = it }
         }
     }
 
