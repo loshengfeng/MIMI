@@ -162,6 +162,12 @@ class MainActivity : BaseActivity(), InteractionListener {
                         .toLowerCase(Locale.getDefault()) == MyPostFragment::class.java.simpleName.toLowerCase(
                         Locale.getDefault()
                 ))
+                || (supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter(
+                        "/"
+                ).toString()
+                        .toLowerCase(Locale.getDefault()) == SettingFragment::class.java.simpleName.toLowerCase(
+                        Locale.getDefault()
+                ))
         ) {
             if (viewModel.isFromPlayer){
                 viewModel.isFromPlayer = false
