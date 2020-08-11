@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
 import android.graphics.Matrix
 import android.graphics.drawable.Drawable
 import android.media.ExifInterface
@@ -250,12 +251,14 @@ class SettingFragment : BaseFragment() {
                 }
                 REQUEST_CODE_ALBUM -> {
                     val type = data?.data?.let { requireActivity().contentResolver.getType(it) }
-                    if (type != null && type.startsWith("image")) {
-                        MediaStore.Images.Media.getBitmap(
-                            requireActivity().contentResolver,
-                            data.data
-                        )
-                    } else null
+                    data?.data?.takeIf { type?.startsWith("image") == true }?.let {
+                        if (android.os.Build.VERSION.SDK_INT >= 29){
+                            val source = ImageDecoder.createSource(requireContext().contentResolver, it)
+                            ImageDecoder.decodeBitmap(source)
+                        } else{
+                            MediaStore.Images.Media.getBitmap(requireContext().contentResolver, it)
+                        }
+                    }
                 }
                 else -> null
             }
@@ -286,7 +289,7 @@ class SettingFragment : BaseFragment() {
     private fun openAlbum() {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.type = "image/*"
-        if (intent.resolveActivity(requireContext().packageManager) != null) {
+        intent.resolveActivity(requireContext().packageManager)?.also {
             startActivityForResult(
                 Intent.createChooser(
                     intent,

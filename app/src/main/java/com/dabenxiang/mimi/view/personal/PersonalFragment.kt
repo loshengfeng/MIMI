@@ -125,7 +125,7 @@ class PersonalFragment : BaseFragment() {
         viewModel.unreadResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    tv_new.visibility = if (it.result == 0) View.INVISIBLE else View.VISIBLE
+//                    tv_new.visibility = if (it.result == 0) View.INVISIBLE else View.VISIBLE
                 }
                 is Error -> onApiError(it.throwable)
             }
