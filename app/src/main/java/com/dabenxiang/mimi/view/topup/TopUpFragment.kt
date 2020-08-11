@@ -192,7 +192,9 @@ class TopUpFragment : BaseFragment() {
     override fun initSettings() {
         when (viewModel.accountManager.isLogin()) {
             true -> {
-                viewModel.checkEmailConfirmed()
+                //TODO: 目前先不判斷是否有驗證過
+//                viewModel.checkEmailConfirmed()
+                initTopUp()
             }
             false -> {
                 tv_record_top_up.visibility = View.GONE

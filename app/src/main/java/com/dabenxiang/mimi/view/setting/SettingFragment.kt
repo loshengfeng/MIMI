@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
 import android.graphics.Matrix
 import android.graphics.drawable.Drawable
 import android.media.ExifInterface
@@ -87,6 +88,24 @@ class SettingFragment : BaseFragment() {
                     }
 
                     tv_email.setCompoundDrawablesWithIntrinsicBounds(null, null, img, null)
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.imageBitmap.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> {
+                    val options: RequestOptions = RequestOptions()
+                        .transform(MultiTransformation(CenterCrop(), CircleCrop()))
+                        .placeholder(R.drawable.ico_default_photo)
+                        .error(R.drawable.ico_default_photo)
+                        .priority(Priority.NORMAL)
+                    Glide.with(this).load(it.result)
+                        .apply(options)
+                        .into(iv_photo)
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -237,6 +256,8 @@ class SettingFragment : BaseFragment() {
     }
 
     override fun initSettings() {
+        Glide.with(this).load(R.drawable.ico_default_photo)
+            .into(iv_photo)
         useAdultTheme(false)
         viewModel.getProfile()
     }
@@ -250,12 +271,14 @@ class SettingFragment : BaseFragment() {
                 }
                 REQUEST_CODE_ALBUM -> {
                     val type = data?.data?.let { requireActivity().contentResolver.getType(it) }
-                    if (type != null && type.startsWith("image")) {
-                        MediaStore.Images.Media.getBitmap(
-                            requireActivity().contentResolver,
-                            data.data
-                        )
-                    } else null
+                    data?.data?.takeIf { type?.startsWith("image") == true }?.let {
+                        if (android.os.Build.VERSION.SDK_INT >= 29){
+                            val source = ImageDecoder.createSource(requireContext().contentResolver, it)
+                            ImageDecoder.decodeBitmap(source)
+                        } else{
+                            MediaStore.Images.Media.getBitmap(requireContext().contentResolver, it)
+                        }
+                    }
                 }
                 else -> null
             }
@@ -286,7 +309,7 @@ class SettingFragment : BaseFragment() {
     private fun openAlbum() {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.type = "image/*"
-        if (intent.resolveActivity(requireContext().packageManager) != null) {
+        intent.resolveActivity(requireContext().packageManager)?.also {
             startActivityForResult(
                 Intent.createChooser(
                     intent,
