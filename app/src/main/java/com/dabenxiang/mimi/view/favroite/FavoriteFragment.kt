@@ -272,6 +272,7 @@ class FavoriteFragment : BaseFragment() {
                 item_is_not_Login.visibility = View.VISIBLE
                 item_is_Login.visibility = View.GONE
                 tv_version_is_not_login.text = BuildConfig.VERSION_NAME
+                tv_clean.visibility = View.GONE
             }
         }
     }
