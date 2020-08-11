@@ -31,8 +31,8 @@ class TopUpViewModel : BaseViewModel() {
     private val _avatar = MutableLiveData<ApiResult<AttachmentItem>>()
     val avatar: LiveData<ApiResult<AttachmentItem>> = _avatar
 
-    private val _createChatRoomResult = MutableLiveData<ApiResult<Nothing>>()
-    val createChatRoomResult: LiveData<ApiResult<Nothing>> = _createChatRoomResult
+    private val _createChatRoomResult = MutableLiveData<ApiResult<AgentItem>>()
+    val createChatRoomResult: LiveData<ApiResult<AgentItem>> = _createChatRoomResult
 
     var currentItem: AgentItem? = null
 
@@ -110,7 +110,7 @@ class TopUpViewModel : BaseViewModel() {
                 val request = ChatRequest(userId = currentItem?.agentId?.toLong())
                 val result = apiRepository.postChats(request)
                 if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(null))
+                emit(ApiResult.success(item))
             }
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }

@@ -101,13 +101,13 @@ class TopUpFragment : BaseFragment() {
         viewModel.createChatRoomResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    viewModel.currentItem?.let { item ->
+                    it.result.let { item ->
                         ChatListItem(
                             item.agentId?.toLong(),
                             item.merchantName,
                             avatarAttachmentId = item.avatarAttachmentId?.toLong()
                         )
-                    }?.also {
+                    }.also {
                         val bundle = ChatContentFragment.createBundle(it)
                         navigateTo(
                             NavigateItem.Destination(
