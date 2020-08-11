@@ -3,14 +3,9 @@ package com.dabenxiang.mimi.view.setting
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Environment
-import android.view.contentcapture.ContentCaptureContext
-import android.widget.Toast
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.dabenxiang.mimi.BuildConfig
-import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.AvatarRequest
@@ -19,8 +14,6 @@ import com.dabenxiang.mimi.model.api.vo.ProfileItem
 import com.dabenxiang.mimi.model.api.vo.ProfileRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.FileUtil
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import kotlinx.android.synthetic.main.fragment_setting.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -76,7 +69,7 @@ class SettingViewModel : BaseViewModel() {
         viewModelScope.launch {
             flow {
                 val result =
-                    domainManager.getApiRepository().resendEmail(EmailRequest(domainManager.getWebDomain()+ DomainManager.PARAM_SIGN_UP_CODE))
+                    domainManager.getApiRepository().resendEmail(EmailRequest(domainManager.getWebDomain()+ DomainManager.PARAM_VALIDATE_CODE))
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }
@@ -95,7 +88,7 @@ class SettingViewModel : BaseViewModel() {
                     profileData?.gender,
                     profileData?.birthday,
                     profileData?.email,
-                    domainManager.getWebDomain() + DomainManager.PARAM_SIGN_UP_CODE
+                    domainManager.getWebDomain() + DomainManager.PARAM_VALIDATE_CODE
                 )
                 val result = domainManager.getApiRepository().updateProfile(request)
                 if (!result.isSuccessful) throw HttpException(result)

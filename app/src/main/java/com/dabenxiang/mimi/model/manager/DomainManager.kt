@@ -23,7 +23,7 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
         const val DOWNLOAD_SERVER_PROJECT_ID = "WaumJF6y"
         const val PROMO_CODE = "xxx"
         const val VALIDATION_URL = "/v1/Members/ValidateEmail"
-        const val PARAM_SIGN_UP_CODE = "/?signupCode="
+        const val PARAM_VALIDATE_CODE = "/?resetCode="
         const val FLAVOR_DEV = "dev"
         const val FLAVOR_SIT = "sit"
         const val BUILDTYPE_DEV = "dev"
