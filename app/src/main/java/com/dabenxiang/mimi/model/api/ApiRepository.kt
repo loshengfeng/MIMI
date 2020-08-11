@@ -460,14 +460,6 @@ class ApiRepository(private val apiService: ApiService) {
     ) = apiService.cancelMyMemberFollow(userId)
 
     /**
-     * 取得使用者充值紀錄(需登入帳號)
-     */
-    suspend fun getOrder(
-        offset: String,
-        limit: String
-    ) = apiService.getOrder(offset, limit)
-
-    /**
      * 取得聊天室列表
      */
     suspend fun getMeChatItem(
@@ -718,6 +710,27 @@ class ApiRepository(private val apiService: ApiService) {
      */
     suspend fun createOrder(request: CreateOrderRequest): Response<Void> {
         return apiService.createOrder(request)
+    }
+
+    /**
+     * 取得充值管理
+     */
+    suspend fun getOrder(
+        offset: String,
+        limit: String
+    ): Response<ApiBasePagingItem<ArrayList<OrderItem>>> {
+        return apiService.getOrder(offset, limit)
+    }
+
+    /**
+     * 依據isOnline, 取得充值管理
+     */
+    suspend fun getOrderByOnline(
+        isOnline: Boolean,
+        offset: String,
+        limit: String
+    ): Response<ApiBasePagingItem<ArrayList<OrderItem>>> {
+        return apiService.getOrderByOnline(isOnline, offset, limit)
     }
 
 }

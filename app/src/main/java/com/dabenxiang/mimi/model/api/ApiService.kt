@@ -352,12 +352,6 @@ interface ApiService {
         @Path("userId") id: Long
     ): Response<Void>
 
-    @GET("/v1/Members/Me/Order")
-    suspend fun getOrder(
-        @Query("offset") offset: String,
-        @Query("limit") limit: String
-    ): Response<ApiBasePagingItem<List<OrderItem>>>
-
     @GET("/v1/Members/Me/Chat")
     suspend fun getMeChat(
         @Query("offset") offset: Int,
@@ -581,5 +575,23 @@ interface ApiService {
      ***********************************************************/
     @POST("/v1/Members/Me/Order")
     suspend fun createOrder(@Body request: CreateOrderRequest): Response<Void>
+
+    /**********************************************************
+     *
+     *                  Get Order
+     *
+     ***********************************************************/
+    @GET("/v1/Members/Me/Order")
+    suspend fun getOrder(
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ): Response<ApiBasePagingItem<ArrayList<OrderItem>>>
+
+    @GET("/v1/Members/Me/Order")
+    suspend fun getOrderByOnline(
+        @Query("isOnline") isOnline: Boolean,
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ): Response<ApiBasePagingItem<ArrayList<OrderItem>>>
 
 }
