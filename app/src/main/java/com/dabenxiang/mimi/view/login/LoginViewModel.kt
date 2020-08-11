@@ -84,7 +84,7 @@ class LoginViewModel : BaseViewModel() {
                         email = email.value,
                         friendlyName = friendlyName.value,
                         password = registerPw.value,
-                        promoCode = PROMO_CODE,
+//                        promoCode = PROMO_CODE,
                         validationUrl = domainManager.getWebDomain() + DomainManager.PARAM_SIGNUP_CODE
                     )
                 ).collect {

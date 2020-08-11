@@ -24,8 +24,7 @@ import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.item_my_post_clip_post.view.*
-import timber.log.Timber
+import kotlinx.android.synthetic.main.item_clip_post.view.*
 import java.util.*
 
 class MyPostClipPostHolder(
@@ -51,6 +50,7 @@ class MyPostClipPostHolder(
     private val ivFavorite: ImageView = itemView.iv_favorite
     private val tvFavoriteCount: TextView = itemView.tv_favorite_count
     private val layoutClip: ConstraintLayout = itemView.layout_clip
+    private val vSeparator:View = itemView.v_separator
 
     fun onBind(
         item: MemberPostItem,
@@ -68,6 +68,7 @@ class MyPostClipPostHolder(
         tvCommentCount.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1 else R.color.color_black_1))
         ivComment.setImageResource(if (isAdultTheme) R.drawable.ico_messege_adult else R.drawable.ico_messege_adult_gray)
         ivMore.setImageResource(if (isAdultTheme) R.drawable.btn_more_white_n else R.drawable.btn_more_gray_n)
+        vSeparator.setBackgroundColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1_30 else R.color.color_black_1_05))
 
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())

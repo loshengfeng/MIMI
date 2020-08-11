@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
 class RankingViewModel : BaseViewModel() {
 
@@ -115,6 +116,7 @@ class RankingViewModel : BaseViewModel() {
     }
 
     fun getBitmap(id: String, position: Int) {
+        Timber.i("getBitmap id=$id")
         if (id == "0") return
         viewModelScope.launch {
             flow {

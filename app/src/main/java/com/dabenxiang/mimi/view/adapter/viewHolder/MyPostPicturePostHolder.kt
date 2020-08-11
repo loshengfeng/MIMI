@@ -16,7 +16,6 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.OnItemClickListener
-import com.dabenxiang.mimi.callback.PostPicItemListener
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
@@ -31,7 +30,7 @@ import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.item_my_post_picture_post.view.*
+import kotlinx.android.synthetic.main.item_picture_post.view.*
 import java.util.*
 
 class MyPostPicturePostHolder(
@@ -54,6 +53,7 @@ class MyPostPicturePostHolder(
     private val tvCommentCount: TextView = itemView.tv_comment_count
     private val ivMore: ImageView = itemView.iv_more
     private val tvFollow: TextView = itemView.tv_follow
+    private val vSeparator:View = itemView.v_separator
 
     fun onBind(
         item: MemberPostItem,
@@ -71,6 +71,7 @@ class MyPostPicturePostHolder(
         tvCommentCount.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1 else R.color.color_black_1))
         ivComment.setImageResource(if (isAdultTheme) R.drawable.ico_messege_adult else R.drawable.ico_messege_adult_gray)
         ivMore.setImageResource(if (isAdultTheme) R.drawable.btn_more_white_n else R.drawable.btn_more_gray_n)
+        vSeparator.setBackgroundColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1_30 else R.color.color_black_1_05))
 
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())

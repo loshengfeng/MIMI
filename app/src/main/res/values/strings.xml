@@ -65,6 +65,7 @@
     <string name="topup_total">总计</string>
     <string name="topup_confirm_pay">确认支付</string>
     <string name="topup_subtitle">会员尊享 每天无限观看</string>
+    <string name="topup_proxy_title_name">火热代理</string>
 
     <!-- Favorite -->
     <string name="favorite_title">我的收藏</string>

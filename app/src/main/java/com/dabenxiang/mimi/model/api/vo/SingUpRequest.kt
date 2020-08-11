@@ -15,8 +15,8 @@ data class SingUpRequest(
     @SerializedName("friendlyName")
     val friendlyName: String?,
 
-    @SerializedName("promoCode")
-    val promoCode: String?,
+//    @SerializedName("promoCode")
+//    val promoCode: String?,
 
     @SerializedName("validationUrl")
     val validationUrl: String?

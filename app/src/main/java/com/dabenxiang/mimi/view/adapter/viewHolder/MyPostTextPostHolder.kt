@@ -24,18 +24,7 @@ import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.item_my_post_text_post.view.*
-import kotlinx.android.synthetic.main.item_my_post_text_post.view.chip_group_tag
-import kotlinx.android.synthetic.main.item_my_post_text_post.view.img_avatar
-import kotlinx.android.synthetic.main.item_my_post_text_post.view.iv_comment
-import kotlinx.android.synthetic.main.item_my_post_text_post.view.iv_like
-import kotlinx.android.synthetic.main.item_my_post_text_post.view.iv_more
-import kotlinx.android.synthetic.main.item_my_post_text_post.view.tv_comment_count
-import kotlinx.android.synthetic.main.item_my_post_text_post.view.tv_follow
-import kotlinx.android.synthetic.main.item_my_post_text_post.view.tv_like_count
-import kotlinx.android.synthetic.main.item_my_post_text_post.view.tv_name
-import kotlinx.android.synthetic.main.item_my_post_text_post.view.tv_time
-import kotlinx.android.synthetic.main.item_my_post_text_post.view.tv_title
+import kotlinx.android.synthetic.main.item_text_post.view.*
 import timber.log.Timber
 import java.util.*
 
@@ -58,6 +47,8 @@ class MyPostTextPostHolder(
     private val tvCommentCount: TextView = itemView.tv_comment_count
     private val ivMore: ImageView = itemView.iv_more
     private val tvFollow: TextView = itemView.tv_follow
+    private val vSeparator: View = itemView.v_separator
+    private val textLayout: ConstraintLayout = itemView.layout_text
 
     fun onBind(
         item: MemberPostItem,
@@ -75,6 +66,8 @@ class MyPostTextPostHolder(
         tvCommentCount.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1 else R.color.color_black_1))
         ivComment.setImageResource(if (isAdultTheme) R.drawable.ico_messege_adult else R.drawable.ico_messege_adult_gray)
         ivMore.setImageResource(if (isAdultTheme) R.drawable.btn_more_white_n else R.drawable.btn_more_gray_n)
+        vSeparator.setBackgroundColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1_30 else R.color.color_black_1_05))
+        textLayout.setBackgroundResource(if (isAdultTheme) R.drawable.bg_white_1_10_radius_6 else R.drawable.bg_white_stroke_2_radius_6)
 
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())

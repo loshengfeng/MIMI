@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.topup
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
+import com.dabenxiang.mimi.model.api.vo.AgentItem
 import com.dabenxiang.mimi.model.manager.DomainManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,17 +14,17 @@ class TopUpProxyPayListDataSource constructor(
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
     private val pagingCallback: PagingCallback
-) : PageKeyedDataSource<Long, Any>() {
+) : PageKeyedDataSource<Long, AgentItem>() {
 
     companion object {
         const val PER_LIMIT = 10
         val PER_LIMIT_LONG = PER_LIMIT.toLong()
     }
 
-    private data class InitResult(val list: List<Any>, val nextKey: Long?)
+    private data class InitResult(val list: List<AgentItem>, val nextKey: Long?)
     override fun loadInitial(
         params: LoadInitialParams<Long>,
-        callback: LoadInitialCallback<Long, Any>
+        callback: LoadInitialCallback<Long, AgentItem>
     ) {
         viewModelScope.launch {
             flow {
@@ -48,17 +49,15 @@ class TopUpProxyPayListDataSource constructor(
                 .onStart { pagingCallback.onLoading() }
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
-                .collect { response ->
-                    callback.onResult(response.list, null, response.nextKey)
-                }
+                .collect { response -> callback.onResult(response.list, null, response.nextKey) }
         }
     }
 
-    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Long, Any>) {}
+    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Long, AgentItem>) {}
 
     override fun loadAfter(
         params: LoadParams<Long>,
-        callback: LoadCallback<Long, Any>
+        callback: LoadCallback<Long, AgentItem>
     ) {
         val next = params.key
         viewModelScope.launch {

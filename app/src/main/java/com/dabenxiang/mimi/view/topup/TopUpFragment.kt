@@ -30,6 +30,7 @@ import com.dabenxiang.mimi.view.listener.AdapterEventListener
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_top_up.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
@@ -73,16 +74,25 @@ class TopUpFragment : BaseFragment() {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
                 is Success -> {
-                    val options: RequestOptions = RequestOptions()
-                        .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                        .placeholder(R.drawable.ico_default_photo)
-                        .error(R.drawable.ico_default_photo)
-                        .priority(Priority.NORMAL)
+                    val attachmentItem = it.result
+                    LruCacheUtils.putLruArrayCache(attachmentItem.id
+                            ?: "", attachmentItem.fileArray
+                            ?: ByteArray(0))
+                    if (attachmentItem.position==viewModel.TAG_MY_AVATAR){
+                        val options: RequestOptions = RequestOptions()
+                                .transform(MultiTransformation(CenterCrop(), CircleCrop()))
+                                .placeholder(R.drawable.ico_default_photo)
+                                .error(R.drawable.ico_default_photo)
+                                .priority(Priority.NORMAL)
 
 
-                    Glide.with(this).load(it.result)
-                        .apply(options)
-                        .into(iv_photo)
+                        Glide.with(this).asBitmap()
+                                .load(attachmentItem.fileArray)
+                                .apply(options)
+                                .into(iv_photo)
+                    }else {
+                        agentAdapter.update(attachmentItem.position ?: 0)
+                    }
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -91,13 +101,13 @@ class TopUpFragment : BaseFragment() {
         viewModel.createChatRoomResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    viewModel.currentItem?.let { item ->
+                    it.result.let { item ->
                         ChatListItem(
                             item.agentId?.toLong(),
                             item.merchantName,
                             avatarAttachmentId = item.avatarAttachmentId?.toLong()
                         )
-                    }?.also {
+                    }.also {
                         val bundle = ChatContentFragment.createBundle(it)
                         navigateTo(
                             NavigateItem.Destination(
@@ -247,7 +257,6 @@ class TopUpFragment : BaseFragment() {
             }
         }
 
-        // TODO: 尚未測試，因為目前沒有資料可以做測試
         rv_proxy_pay.adapter = agentAdapter
 
         viewModel.initData()
@@ -275,9 +284,13 @@ class TopUpFragment : BaseFragment() {
         }
     }
 
-    private val agentListener = object : AdapterEventListener<AgentItem> {
+    private val agentListener = object : TopUpAgentAdapter.EventListener {
         override fun onItemClick(view: View, item: AgentItem) {
             viewModel.createChatRoom(item)
+        }
+
+        override fun onGetAvatarAttachment(id: String, position: Int) {
+            viewModel.getAttachment(id, position)
         }
     }
 
