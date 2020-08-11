@@ -119,8 +119,6 @@ class MyPostFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (arguments?.getBoolean(PlayerActivity.KEY_IS_FROM_PLAYER) == true)
-            mainViewModel?.isFromPlayer = true
         useAdultTheme(isAdultTheme)
         requireActivity().onBackPressedDispatcher.addCallback {
             navigateTo(NavigateItem.Up)

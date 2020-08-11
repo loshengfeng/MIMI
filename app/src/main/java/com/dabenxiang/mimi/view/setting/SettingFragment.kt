@@ -4,11 +4,15 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.graphics.drawable.Drawable
+import android.media.ExifInterface
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
 import androidx.activity.addCallback
+import androidx.core.content.FileProvider
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.blankj.utilcode.util.ImageUtils
@@ -18,6 +22,7 @@ import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.request.RequestOptions
+import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -27,13 +32,17 @@ import com.dabenxiang.mimi.view.dialog.choosepicker.OnChoosePickerDialogListener
 import com.dabenxiang.mimi.view.dialog.editor.InvitationEditorDialog
 import com.dabenxiang.mimi.view.listener.OnSimpleEditorDialogListener
 import com.dabenxiang.mimi.view.updateprofile.UpdateProfileFragment
+import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_setting.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import java.io.File
 
 class SettingFragment : BaseFragment() {
 
     private val viewModel: SettingViewModel by viewModels()
+
+    val file: File = FileUtil.getAvatarFile()
 
     companion object {
         private const val REQUEST_CODE_CAMERA = 100
@@ -141,7 +150,11 @@ class SettingFragment : BaseFragment() {
     override fun setupListeners() {
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
-                R.id.tv_back -> navigateTo(NavigateItem.Up)
+                R.id.tv_back -> {
+                    if (mainViewModel?.isFromPlayer == true)
+                        activity?.onBackPressed()
+                    else navigateTo(NavigateItem.Up)
+                }
                 R.id.btn_photo -> {
                     ChoosePickerDialogFragment.newInstance(onChoosePickerDialogListener).also {
                         it.show(
@@ -213,9 +226,7 @@ class SettingFragment : BaseFragment() {
         }
     }
 
-    override fun initSettings() {
-        useAdultTheme(false)
-        viewModel.getProfile()
+    override fun setupFirstTime() {
         arguments?.also { it ->
             val byteArray = it.getSerializable(KEY_PHOTO) as ByteArray
             byteArray.also {
@@ -225,11 +236,18 @@ class SettingFragment : BaseFragment() {
         }
     }
 
+    override fun initSettings() {
+        useAdultTheme(false)
+        viewModel.getProfile()
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && (requestCode == REQUEST_CODE_CAMERA || requestCode == REQUEST_CODE_ALBUM)) {
             viewModel.bitmap = when (requestCode) {
-                REQUEST_CODE_CAMERA -> data?.extras?.get("data") as Bitmap
+                REQUEST_CODE_CAMERA -> {
+                    rotateImage(BitmapFactory.decodeFile(file.absolutePath))
+                }
                 REQUEST_CODE_ALBUM -> {
                     val type = data?.data?.let { requireActivity().contentResolver.getType(it) }
                     if (type != null && type.startsWith("image")) {
@@ -256,9 +274,12 @@ class SettingFragment : BaseFragment() {
     }
 
     private fun openCamera() {
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        if (intent.resolveActivity(requireContext().packageManager) != null) {
-            startActivityForResult(intent, REQUEST_CODE_CAMERA)
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+            takePictureIntent.resolveActivity(requireContext().packageManager)?.also {
+                val uri = FileProvider.getUriForFile(requireContext(), BuildConfig.APPLICATION_ID + ".fileProvider", file)
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
+                startActivityForResult(takePictureIntent, REQUEST_CODE_CAMERA)
+            }
         }
     }
 
@@ -278,8 +299,8 @@ class SettingFragment : BaseFragment() {
     private fun setupPhoto(bitmap: Bitmap) {
         val options: RequestOptions = RequestOptions()
             .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-            .placeholder(R.mipmap.ic_launcher)
-            .error(R.mipmap.ic_launcher)
+            .placeholder(R.drawable.ico_default_photo)
+            .error(R.drawable.ico_default_photo)
             .priority(Priority.NORMAL)
 
         Glide.with(this).load(bitmap)
@@ -302,5 +323,33 @@ class SettingFragment : BaseFragment() {
 
             }
         ).show()
+    }
+
+    private fun rotateImage(bitmap: Bitmap): Bitmap? {
+        val ei = ExifInterface(file)
+
+        val orientation: Int = ei.getAttributeInt(
+            ExifInterface.TAG_ORIENTATION,
+            ExifInterface.ORIENTATION_UNDEFINED
+        )
+
+        val rotatedBitmap: Bitmap?
+        rotatedBitmap = when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(bitmap, 90f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(bitmap, 180f)
+            ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(bitmap, 270f)
+            ExifInterface.ORIENTATION_NORMAL -> bitmap
+            else -> bitmap
+        }
+        return rotatedBitmap
+    }
+
+    private fun rotateImage(source: Bitmap, angle: Float): Bitmap? {
+        val matrix = Matrix()
+        matrix.postRotate(angle)
+        return Bitmap.createBitmap(
+            source, 0, 0, source.width, source.height,
+            matrix, true
+        )
     }
 }
