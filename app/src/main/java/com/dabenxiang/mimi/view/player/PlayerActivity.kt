@@ -995,22 +995,24 @@ class PlayerActivity : BaseActivity() {
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem) {
-            if ((item as MemberPostItem).reported) {
+            viewModel.checkStatus {
+                if ((item as MemberPostItem).reported) {
 
-                viewModel.isCommentReport = false
-                GeneralUtils.showToast(
-                    App.applicationContext(),
-                    getString(R.string.already_reported)
-                )
-            } else {
-                reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
-                    it.show(
-                        supportFragmentManager,
-                        ReportDialogFragment::class.java.simpleName
+                    viewModel.isCommentReport = false
+                    GeneralUtils.showToast(
+                        App.applicationContext(),
+                        getString(R.string.already_reported)
                     )
+                } else {
+                    reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
+                        it.show(
+                            supportFragmentManager,
+                            ReportDialogFragment::class.java.simpleName
+                        )
+                    }
                 }
+                moreDialog?.dismiss()
             }
-            moreDialog?.dismiss()
         }
 
         override fun onCancel() {
