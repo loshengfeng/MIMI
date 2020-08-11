@@ -143,9 +143,7 @@ class PersonalFragment : BaseFragment() {
                 R.id.tv_chat_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_chatHistoryFragment))
                 R.id.tv_my_post -> findNavController().navigate(R.id.action_personalFragment_to_myPostFragment)
                 R.id.tv_setting -> navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_to_settingFragment,
-                        viewModel.byteArray?.let { SettingFragment.createBundle(it) })
+                    NavigateItem.Destination(R.id.action_to_settingFragment)
                 )
                 R.id.tv_logout -> {
                     Glide.with(this).clear(iv_photo)
