@@ -1,13 +1,12 @@
 package com.dabenxiang.mimi.view.adapter.viewHolder
 
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.OrderItem
+import com.dabenxiang.mimi.model.enums.PaymentType
 import timber.log.Timber
 
 class OrderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -26,22 +25,13 @@ class OrderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         }
     }
 
-    companion object {
-        const val NONE = 0
-        const val ALIPAY = 1
-        const val WECHAT = 2
-        const val UNIONPAY = 4
-    }
-
     fun bind(orderItem: OrderItem?) {
         this.orderItem = orderItem
         ivType.setBackgroundResource(
             when (orderItem?.paymentType) {
-                NONE -> R.drawable.ico_alipay
-                ALIPAY -> R.drawable.ico_alipay
-                WECHAT -> R.drawable.ico_wechat_pay
-                UNIONPAY -> R.drawable.ico_china_pay
-                else -> R.drawable.ico_alipay
+                PaymentType.ALI -> R.drawable.ico_alipay
+                PaymentType.WX -> R.drawable.ico_wechat_pay
+                else -> R.drawable.ico_bank
             }
         )
 
