@@ -1,18 +1,17 @@
 package com.dabenxiang.mimi.view.topup
 
-import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.AgentItem
 import com.dabenxiang.mimi.model.api.vo.ChatRequest
 import com.dabenxiang.mimi.model.api.vo.MeItem
+import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.model.vo.ProfileItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.flow.*
@@ -21,14 +20,16 @@ import retrofit2.HttpException
 
 class TopUpViewModel : BaseViewModel() {
 
-    private val _agentList = MutableLiveData<PagedList<Any>>()
-    val agentList: LiveData<PagedList<Any>> = _agentList
+    val TAG_MY_AVATAR = -1
+
+    private val _agentList = MutableLiveData<PagedList<AgentItem>>()
+    val agentList: LiveData<PagedList<AgentItem>> = _agentList
 
     private val _meItem = MutableLiveData<ApiResult<MeItem>>()
     val meItem: LiveData<ApiResult<MeItem>> = _meItem
 
-    private val _avatar = MutableLiveData<ApiResult<Bitmap>>()
-    val avatar: LiveData<ApiResult<Bitmap>> = _avatar
+    private val _avatar = MutableLiveData<ApiResult<AttachmentItem>>()
+    val avatar: LiveData<ApiResult<AttachmentItem>> = _avatar
 
     private val _createChatRoomResult = MutableLiveData<ApiResult<Nothing>>()
     val createChatRoomResult: LiveData<ApiResult<Nothing>> = _createChatRoomResult
@@ -69,7 +70,7 @@ class TopUpViewModel : BaseViewModel() {
                 val meItem = result.body()?.content
                 meItem?.let {
                     accountManager.setupProfile(it)
-                    it.avatarAttachmentId?.also { id -> getAttachment(id) }
+                    it.avatarAttachmentId?.also { id -> getAttachment(id.toString()) }
                 }
                 emit(ApiResult.success(meItem))
             }
@@ -80,15 +81,19 @@ class TopUpViewModel : BaseViewModel() {
         }
     }
 
-    fun getAttachment(id: Long) {
+    fun getAttachment(id: String, position: Int = TAG_MY_AVATAR) {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
-                val result = apiRepository.getAttachment(id.toString())
+                val result = apiRepository.getAttachment(id)
                 if (!result.isSuccessful) throw HttpException(result)
                 val byteArray = result.body()?.bytes()
-                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
-                emit(ApiResult.success(bitmap))
+                val item = AttachmentItem(
+                        id = id,
+                        fileArray = byteArray,
+                        position = position
+                )
+                emit(ApiResult.success(item))
             }
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
