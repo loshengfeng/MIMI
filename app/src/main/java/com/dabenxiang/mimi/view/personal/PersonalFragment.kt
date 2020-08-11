@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.MultiTransformation
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.request.RequestOptions
@@ -28,6 +29,7 @@ import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.setting.SettingFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.google.android.exoplayer2.util.Log
 import kotlinx.android.synthetic.main.fragment_personal.*
 import kotlinx.android.synthetic.main.item_personal_is_login.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
@@ -145,7 +147,12 @@ class PersonalFragment : BaseFragment() {
                         R.id.action_to_settingFragment,
                         viewModel.byteArray?.let { SettingFragment.createBundle(it) })
                 )
-                R.id.tv_logout -> viewModel.signOut()
+                R.id.tv_logout -> {
+                    Glide.with(this).clear(iv_photo)
+                    viewModel.signOut()
+                    Glide.with(this).load(R.drawable.ico_default_photo)
+                        .into(iv_photo)
+                }
                 R.id.tv_login -> navigateTo(
                     NavigateItem.Destination(
                         R.id.action_personalFragment_to_loginFragment,
