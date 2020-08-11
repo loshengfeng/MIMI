@@ -297,8 +297,8 @@ class SettingFragment : BaseFragment() {
     private fun setupPhoto(bitmap: Bitmap) {
         val options: RequestOptions = RequestOptions()
             .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-            .placeholder(R.mipmap.ic_launcher)
-            .error(R.mipmap.ic_launcher)
+            .placeholder(R.drawable.ico_default_photo)
+            .error(R.drawable.ico_default_photo)
             .priority(Priority.NORMAL)
 
         Glide.with(this).load(bitmap)
