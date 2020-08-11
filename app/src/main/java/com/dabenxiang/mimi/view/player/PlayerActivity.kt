@@ -736,9 +736,10 @@ class PlayerActivity : BaseActivity() {
         })
 
         btn_full_screen.setOnClickListener {
-            viewModel.lockFullScreen = !viewModel.lockFullScreen
-
-            switchScreenOrientation()
+            viewModel.checkStatus {
+                viewModel.lockFullScreen = !viewModel.lockFullScreen
+                switchScreenOrientation()
+            }
         }
 
         orientationDetector =
@@ -1757,13 +1758,15 @@ class PlayerActivity : BaseActivity() {
                         firstBtn = getString(R.string.verify_later),
                         secondBtn = getString(R.string.verify_immediately),
                         secondBlock = {
+                            var bundle = viewModel.getMeAvatar()?.let { byteArray ->
+                                SettingFragment.createBundle(byteArray)
+                            }
+                            bundle?.putBoolean(KEY_IS_FROM_PLAYER, true)
                             deepLinkTo(
                                     MainActivity::class.java,
                                     R.navigation.navigation_adult,
                                     R.id.settingFragment,
-                                    viewModel.getMeAvatar()?.let { byteArray ->
-                                        SettingFragment.createBundle(byteArray)
-                                    }
+                                    bundle
                             )
                         }
                 )
