@@ -20,6 +20,7 @@ import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.main.MainViewModel
+import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.showToast
 import com.kaopiz.kprogresshud.KProgressHUD
 import kotlinx.android.synthetic.main.activity_main.*
@@ -68,6 +69,9 @@ abstract class BaseFragment : Fragment() {
             setupFirstTime()
             firstCreateView = false
         }
+
+        if (arguments?.getBoolean(PlayerActivity.KEY_IS_FROM_PLAYER) == true)
+            mainViewModel?.isFromPlayer = true
     }
 
     abstract fun getLayoutId(): Int
