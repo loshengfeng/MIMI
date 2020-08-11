@@ -594,4 +594,27 @@ interface ApiService {
         @Query("limit") limit: String
     ): Response<ApiBasePagingItem<ArrayList<OrderItem>>>
 
+    /**********************************************************
+     *
+     *                  Chats TraceLog
+     *
+     ***********************************************************/
+    @POST("/v1/Members/Me/Order/TraceLog")
+    suspend fun createOrderChat(@Body request: CreateChatRequest): Response<Void>
+
+    @GET("/v1/Members/Me/Order/TraceLog/UnRead")
+    suspend fun getUnReadOrderCount(): Response<ApiBaseItem<Int>>
+
+    @GET("/v1/Members/Me/Order/TraceLog/{id}")
+    suspend fun getOrderChatContent(
+        @Path("id") id: Long,
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ): Response<ApiBasePagingItem<OrderChatContentItem>>
+
+    @PUT("/v1/Members/Me/Order/TraceLog/{id}/LastRead")
+    suspend fun updateOrderChatLastReadTime(@Path("id") id: Long): Response<Void>
+
+    @PUT("/v1/Members/Me/Order/TraceLog/{id}/Status")
+    suspend fun updateOrderChatStatus(@Path("id") id: Long): Response<Void>
 }

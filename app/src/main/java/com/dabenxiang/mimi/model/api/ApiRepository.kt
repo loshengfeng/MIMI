@@ -733,5 +733,44 @@ class ApiRepository(private val apiService: ApiService) {
         return apiService.getOrderByOnline(isOnline, offset, limit)
     }
 
+    /**
+     * 建立工單聊天室
+     */
+    suspend fun createOrderChat(request: CreateChatRequest): Response<Void> {
+        return apiService.createOrderChat(request)
+    }
+
+    /**
+     * 取得未讀工單數量
+     */
+    suspend fun getUnReadOrderCount(): Response<ApiBaseItem<Int>> {
+        return apiService.getUnReadOrderCount()
+    }
+
+    /**
+     * 取得工單聊天室內容
+     */
+    suspend fun getOrderChatContent(
+        id: Long,
+        offset: String,
+        limit: String
+    ): Response<ApiBasePagingItem<OrderChatContentItem>> {
+        return apiService.getOrderChatContent(id, offset, limit)
+    }
+
+    /**
+     * 更新工單聊天室最後讀取時間
+     */
+    suspend fun updateOrderChatLastReadTime(id: Long): Response<Void> {
+        return apiService.updateOrderChatLastReadTime(id)
+    }
+
+    /**
+     * 更新工單狀態
+     */
+    suspend fun updateOrderChatStatus(id: Long): Response<Void> {
+        return apiService.updateOrderChatStatus(id)
+    }
+
 }
 
