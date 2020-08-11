@@ -174,7 +174,16 @@ class SettingViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
-                .collect { _putResult.value = it }
+                .collect {
+                    _putResult.value = it
+                    when (it) {
+                        is ApiResult.Empty -> {
+                            LruCacheUtils.getLruCache(id.toString())?.also { bitmap ->
+                                _imageBitmap.value = ApiResult.success(bitmap)
+                            } ?: getAttachment(id)
+                        }
+                    }
+                }
         }
     }
 

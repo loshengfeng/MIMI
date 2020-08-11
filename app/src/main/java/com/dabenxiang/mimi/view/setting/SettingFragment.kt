@@ -16,7 +16,6 @@ import androidx.activity.addCallback
 import androidx.core.content.FileProvider
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import com.blankj.utilcode.util.ImageUtils
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.MultiTransformation
@@ -37,7 +36,6 @@ import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_setting.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import timber.log.Timber
 import java.io.File
 
 class SettingFragment : BaseFragment() {
@@ -140,10 +138,7 @@ class SettingFragment : BaseFragment() {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Success -> {
-                    Timber.d("@@postResult: ${it.result}")
-                    viewModel.putAvatar(it.result)
-                }
+                is Success -> viewModel.putAvatar(it.result)
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -152,7 +147,7 @@ class SettingFragment : BaseFragment() {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Empty -> viewModel.bitmap?.also { bitmap -> setupPhoto(bitmap) }
+                is Empty -> {}
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -310,15 +305,12 @@ class SettingFragment : BaseFragment() {
     }
 
     private fun setupPhoto(bitmap: Bitmap) {
-        Timber.d("@@setupPhoto $bitmap")
-        val options: RequestOptions = RequestOptions()
-            .transform(MultiTransformation(CenterCrop(), CircleCrop()))
+        Glide.with(this)
+            .load(bitmap)
+            .circleCrop()
             .placeholder(R.drawable.ico_default_photo)
             .error(R.drawable.ico_default_photo)
             .priority(Priority.NORMAL)
-
-        Glide.with(this).load(bitmap)
-            .apply(options)
             .into(iv_photo)
     }
 
