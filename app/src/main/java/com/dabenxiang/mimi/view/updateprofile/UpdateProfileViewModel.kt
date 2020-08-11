@@ -4,6 +4,7 @@ import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -91,7 +92,7 @@ class UpdateProfileViewModel : BaseViewModel() {
                     profileItem.gender,
                     profileItem.birthday,
                     profileItem.email,
-                    domainManager.getWebDomain() + DomainManager.PARAM_VALIDATE_CODE
+                    domainManager.getWebDomain() + DomainManager.PARAM_RESET_CODE
                 )
                 val result = domainManager.getApiRepository().updateProfile(request)
                 if (!result.isSuccessful) throw HttpException(result)
