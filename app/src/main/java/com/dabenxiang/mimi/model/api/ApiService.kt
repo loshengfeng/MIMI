@@ -352,12 +352,6 @@ interface ApiService {
         @Path("userId") id: Long
     ): Response<Void>
 
-    @GET("/v1/Members/Me/Order")
-    suspend fun getOrder(
-        @Query("offset") offset: String,
-        @Query("limit") limit: String
-    ): Response<ApiBasePagingItem<List<OrderItem>>>
-
     @GET("/v1/Members/Me/Chat")
     suspend fun getMeChat(
         @Query("offset") offset: Int,
@@ -559,4 +553,68 @@ interface ApiService {
         @Path("utcTime") utcTime: Long?,
         @Path("sign") sign: String?
     ): Response<Void>
+
+
+    /**********************************************************
+     *
+     *                  Ordering
+     *
+     ***********************************************************/
+    @GET("/v1/Ordering/Package")
+    suspend fun getOrderingPackage(): Response<ApiBaseItem<ArrayList<OrderingPackageItem>>>
+
+    @GET("/v1/Ordering/Package")
+    suspend fun getOrderingPackageByPaymentType(
+        @Query("paymentType") paymentType: Int
+    ): Response<ApiBaseItem<ArrayList<OrderingPackageItem>>>
+
+    /**********************************************************
+     *
+     *                  Create Order
+     *
+     ***********************************************************/
+    @POST("/v1/Members/Me/Order")
+    suspend fun createOrder(@Body request: CreateOrderRequest): Response<Void>
+
+    /**********************************************************
+     *
+     *                  Get Order
+     *
+     ***********************************************************/
+    @GET("/v1/Members/Me/Order")
+    suspend fun getOrder(
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ): Response<ApiBasePagingItem<ArrayList<OrderItem>>>
+
+    @GET("/v1/Members/Me/Order")
+    suspend fun getOrderByOnline(
+        @Query("isOnline") isOnline: Boolean,
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ): Response<ApiBasePagingItem<ArrayList<OrderItem>>>
+
+    /**********************************************************
+     *
+     *                  Chats TraceLog
+     *
+     ***********************************************************/
+    @POST("/v1/Members/Me/Order/TraceLog")
+    suspend fun createOrderChat(@Body request: CreateChatRequest): Response<Void>
+
+    @GET("/v1/Members/Me/Order/TraceLog/UnRead")
+    suspend fun getUnReadOrderCount(): Response<ApiBaseItem<Int>>
+
+    @GET("/v1/Members/Me/Order/TraceLog/{id}")
+    suspend fun getOrderChatContent(
+        @Path("id") id: Long,
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ): Response<ApiBasePagingItem<OrderChatContentItem>>
+
+    @PUT("/v1/Members/Me/Order/TraceLog/{id}/LastRead")
+    suspend fun updateOrderChatLastReadTime(@Path("id") id: Long): Response<Void>
+
+    @PUT("/v1/Members/Me/Order/TraceLog/{id}/Status")
+    suspend fun updateOrderChatStatus(@Path("id") id: Long): Response<Void>
 }

@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.model.api
 
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.api.vo.error.TOKEN_NOT_FOUND
+import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.StatisticsType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -164,7 +165,7 @@ class ApiRepository(private val apiService: ApiService) {
      * 調整訊息已讀時間
      */
     suspend fun setLastReadMessageTime(
-            chatId: Long
+        chatId: Long
     ): Response<Void> {
         val body = HashMap<String, Long>()
         body["chatId"] = chatId
@@ -243,10 +244,10 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun getMembersPost(
         offset: Int,
         limit: Int,
-        creatorId:Long,
+        creatorId: Long,
         isAdult: Boolean
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
-        return apiService.getMembersPost(offset, limit,creatorId,isAdult)
+        return apiService.getMembersPost(offset, limit, creatorId, isAdult)
     }
 
     suspend fun getMemberPostDetail(postId: Long): Response<ApiBaseItem<MemberPostItem>> {
@@ -457,14 +458,6 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun cancelMyMemberFollow(
         userId: Long
     ) = apiService.cancelMyMemberFollow(userId)
-
-    /**
-     * 取得使用者充值紀錄(需登入帳號)
-     */
-    suspend fun getOrder(
-        offset: String,
-        limit: String
-    ) = apiService.getOrder(offset, limit)
 
     /**
      * 取得聊天室列表
@@ -697,5 +690,87 @@ class ApiRepository(private val apiService: ApiService) {
         utcTime: Long? = null,
         sign: String? = null
     ) = apiService.getVideoStreamM3u8(streamId, userId, utcTime, sign)
+
+    /**
+     * 取得在線支付
+     */
+    suspend fun getOrderingPackage(): Response<ApiBaseItem<ArrayList<OrderingPackageItem>>> {
+        return apiService.getOrderingPackage()
+    }
+
+    /**
+     * 依據PaymentType, 取得在線支付
+     */
+    suspend fun getOrderingPackageByPaymentType(paymentType: PaymentType): Response<ApiBaseItem<ArrayList<OrderingPackageItem>>> {
+        return apiService.getOrderingPackageByPaymentType(paymentType.value)
+    }
+
+    /**
+     * 建立訂單
+     */
+    suspend fun createOrder(request: CreateOrderRequest): Response<Void> {
+        return apiService.createOrder(request)
+    }
+
+    /**
+     * 取得充值管理
+     */
+    suspend fun getOrder(
+        offset: String,
+        limit: String
+    ): Response<ApiBasePagingItem<ArrayList<OrderItem>>> {
+        return apiService.getOrder(offset, limit)
+    }
+
+    /**
+     * 依據isOnline, 取得充值管理
+     */
+    suspend fun getOrderByOnline(
+        isOnline: Boolean,
+        offset: String,
+        limit: String
+    ): Response<ApiBasePagingItem<ArrayList<OrderItem>>> {
+        return apiService.getOrderByOnline(isOnline, offset, limit)
+    }
+
+    /**
+     * 建立工單聊天室
+     */
+    suspend fun createOrderChat(request: CreateChatRequest): Response<Void> {
+        return apiService.createOrderChat(request)
+    }
+
+    /**
+     * 取得未讀工單數量
+     */
+    suspend fun getUnReadOrderCount(): Response<ApiBaseItem<Int>> {
+        return apiService.getUnReadOrderCount()
+    }
+
+    /**
+     * 取得工單聊天室內容
+     */
+    suspend fun getOrderChatContent(
+        id: Long,
+        offset: String,
+        limit: String
+    ): Response<ApiBasePagingItem<OrderChatContentItem>> {
+        return apiService.getOrderChatContent(id, offset, limit)
+    }
+
+    /**
+     * 更新工單聊天室最後讀取時間
+     */
+    suspend fun updateOrderChatLastReadTime(id: Long): Response<Void> {
+        return apiService.updateOrderChatLastReadTime(id)
+    }
+
+    /**
+     * 更新工單狀態
+     */
+    suspend fun updateOrderChatStatus(id: Long): Response<Void> {
+        return apiService.updateOrderChatStatus(id)
+    }
+
 }
 

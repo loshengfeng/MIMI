@@ -4,15 +4,15 @@ import com.google.gson.annotations.SerializedName
 import java.util.*
 
 data class ChatContentPayloadItem(
-        @SerializedName("type")
-        val type: Int?,
+    @SerializedName("type")
+    val type: Int?,
 
-        @SerializedName("content")
-        val content: String?,
+    @SerializedName("content")
+    val content: String?,
 
-        @SerializedName("sendTime")
-        val sendTime: Date?,
+    @SerializedName("sendTime")
+    val sendTime: Date?,
 
-        @SerializedName("ext")
-        val ext: String?
+    @SerializedName("ext")
+    val ext: String?
 )

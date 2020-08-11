@@ -25,7 +25,6 @@ import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_LOGIN
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
-import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.setting.SettingFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_personal.*
@@ -68,9 +67,10 @@ class PersonalFragment : BaseFragment() {
                     tv_name.text = meItem.friendlyName.toString()
                     tv_Point.text = meItem.availablePoint.toString()
 
-                    takeUnless { meItem.isEmailConfirmed == true }?.run {
-                        (requireActivity() as MainActivity).showEmailConfirmDialog()
-                    }
+                    //TODO: 目前先不判斷是否有驗證過
+//                    takeUnless { meItem.isEmailConfirmed == true }?.run {
+//                        (requireActivity() as MainActivity).showEmailConfirmDialog()
+//                    }
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -125,7 +125,7 @@ class PersonalFragment : BaseFragment() {
         viewModel.unreadResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    tv_new.visibility = if (it.result == 0) View.INVISIBLE else View.VISIBLE
+//                    tv_new.visibility = if (it.result == 0) View.INVISIBLE else View.VISIBLE
                 }
                 is Error -> onApiError(it.throwable)
             }

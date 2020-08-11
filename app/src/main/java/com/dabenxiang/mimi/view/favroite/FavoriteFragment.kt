@@ -266,7 +266,9 @@ class FavoriteFragment : BaseFragment() {
 
         when(viewModel.accountManager.isLogin()) {
             true -> {
-                viewModel.checkEmailConfirmed()
+                //TODO: 目前先不判斷是否有驗證過
+//                viewModel.checkEmailConfirmed()
+                initView()
             }
             false -> {
                 item_is_not_Login.visibility = View.VISIBLE
