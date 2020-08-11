@@ -31,6 +31,7 @@ import com.dabenxiang.mimi.view.dialog.choosepicker.ChoosePickerDialogFragment
 import com.dabenxiang.mimi.view.dialog.choosepicker.OnChoosePickerDialogListener
 import com.dabenxiang.mimi.view.dialog.editor.InvitationEditorDialog
 import com.dabenxiang.mimi.view.listener.OnSimpleEditorDialogListener
+import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.updateprofile.UpdateProfileFragment
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -150,7 +151,11 @@ class SettingFragment : BaseFragment() {
     override fun setupListeners() {
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
-                R.id.tv_back -> navigateTo(NavigateItem.Up)
+                R.id.tv_back -> {
+                    if (mainViewModel?.isFromPlayer == true)
+                        activity?.onBackPressed()
+                    else navigateTo(NavigateItem.Up)
+                }
                 R.id.btn_photo -> {
                     ChoosePickerDialogFragment.newInstance(onChoosePickerDialogListener).also {
                         it.show(
