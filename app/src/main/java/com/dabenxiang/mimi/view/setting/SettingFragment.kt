@@ -37,6 +37,7 @@ import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_setting.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import timber.log.Timber
 import java.io.File
 
 class SettingFragment : BaseFragment() {
@@ -49,10 +50,6 @@ class SettingFragment : BaseFragment() {
         private const val REQUEST_CODE_CAMERA = 100
         private const val REQUEST_CODE_ALBUM = 200
         private const val KEY_PHOTO = "PHOTO"
-
-        fun createBundle(byteArray: ByteArray) = Bundle().also {
-            it.putSerializable(KEY_PHOTO, byteArray)
-        }
     }
 
     override val bottomNavigationVisibility: Int
@@ -143,7 +140,10 @@ class SettingFragment : BaseFragment() {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Success -> viewModel.putAvatar(it.result)
+                is Success -> {
+                    Timber.d("@@postResult: ${it.result}")
+                    viewModel.putAvatar(it.result)
+                }
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -245,16 +245,6 @@ class SettingFragment : BaseFragment() {
         }
     }
 
-    override fun setupFirstTime() {
-        arguments?.also { it ->
-            val byteArray = it.getSerializable(KEY_PHOTO) as ByteArray
-            byteArray.also {
-                val bitmap = ImageUtils.bytes2Bitmap(it)
-                setupPhoto(bitmap)
-            }
-        }
-    }
-
     override fun initSettings() {
         Glide.with(this).load(R.drawable.ico_default_photo)
             .into(iv_photo)
@@ -320,6 +310,7 @@ class SettingFragment : BaseFragment() {
     }
 
     private fun setupPhoto(bitmap: Bitmap) {
+        Timber.d("@@setupPhoto $bitmap")
         val options: RequestOptions = RequestOptions()
             .transform(MultiTransformation(CenterCrop(), CircleCrop()))
             .placeholder(R.drawable.ico_default_photo)

@@ -17,6 +17,7 @@ import com.dabenxiang.mimi.model.api.vo.ProfileItem
 import com.dabenxiang.mimi.model.api.vo.ProfileRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.FileUtil
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -32,7 +33,7 @@ class SettingViewModel : BaseViewModel() {
     private val versionManager: VersionManager by inject()
 
     var bitmap: Bitmap? = null
-    var byteArray: ByteArray? = null
+//    var byteArray: ByteArray? = null
 
     private val _profileItem = MutableLiveData<ApiResult<ProfileItem>>()
     val profileItem: LiveData<ApiResult<ProfileItem>> = _profileItem
@@ -64,7 +65,11 @@ class SettingViewModel : BaseViewModel() {
                 if (!result.isSuccessful) throw HttpException(result)
                 profileData = result.body()?.content
                 profileData?.let {
-                    it.avatarAttachmentId?.also { id -> getAttachment(id) }
+                    it.avatarAttachmentId?.also { id ->
+                        LruCacheUtils.getLruCache(id.toString())?.also { bitmap ->
+                            _imageBitmap.value = ApiResult.success(bitmap)
+                        } ?: getAttachment(id)
+                    }
                 }
                 emit(ApiResult.success(result.body()?.content))
             }
@@ -81,7 +86,7 @@ class SettingViewModel : BaseViewModel() {
                 val apiRepository = domainManager.getApiRepository()
                 val result = apiRepository.getAttachment(id.toString())
                 if (!result.isSuccessful) throw HttpException(result)
-                byteArray = result.body()?.bytes()
+                val byteArray = result.body()?.bytes()
                 accountManager.setupMeAvatarCache(byteArray)
                 val bitmap = ImageUtils.bytes2Bitmap(byteArray)
                 emit(ApiResult.success(bitmap))
