@@ -53,10 +53,11 @@ class MyPostPicturePostHolder(
     private val tvCommentCount: TextView = itemView.tv_comment_count
     private val ivMore: ImageView = itemView.iv_more
     private val tvFollow: TextView = itemView.tv_follow
-    private val vSeparator:View = itemView.v_separator
+    private val vSeparator: View = itemView.v_separator
 
     fun onBind(
         item: MemberPostItem,
+        itemList: List<MemberPostItem>?,
         position: Int,
         myPostListener: MyPostFragment.MyPostListener,
         attachmentListener: AttachmentListener,
@@ -144,7 +145,7 @@ class MyPostPicturePostHolder(
         } else {
             tvFollow.visibility = View.VISIBLE
             tvFollow.setOnClickListener {
-                myPostListener.onFollowClick(item, position, !item.isFollow)
+                itemList?.also { myPostListener.onFollowClick(itemList, position, !item.isFollow) }
                 item.isFollow = !item.isFollow
             }
             updateFollow(item)

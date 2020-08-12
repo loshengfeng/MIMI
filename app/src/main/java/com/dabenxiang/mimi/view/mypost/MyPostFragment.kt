@@ -29,13 +29,15 @@ import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
-import com.dabenxiang.mimi.view.dialog.*
+import com.dabenxiang.mimi.view.dialog.GeneralDialog
+import com.dabenxiang.mimi.view.dialog.GeneralDialogData
+import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.comment.MyPostMoreDialogFragment
+import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.TYPE_VIDEO
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.USER_ID_ME
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
-import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.post.article.PostArticleFragment
 import com.dabenxiang.mimi.view.post.pic.PostPicFragment
 import com.dabenxiang.mimi.view.post.video.PostVideoFragment
@@ -347,10 +349,15 @@ class MyPostFragment : BaseFragment() {
         viewModel.followResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Success -> {
-                    adapter.notifyItemChanged(
-                        it.result,
+                    adapter.notifyItemRangeChanged(
+                        0,
+                        viewModel.totalCount,
                         MyPostPagedAdapter.PAYLOAD_UPDATE_FOLLOW
                     )
+//                    adapter.notifyItemChanged(
+//                        it.result,
+//                        MyPostPagedAdapter.PAYLOAD_UPDATE_FOLLOW
+//                    )
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
@@ -788,8 +795,12 @@ class MyPostFragment : BaseFragment() {
             checkStatus { viewModel.favoritePost(item, position, isFavorite) }
         }
 
-        override fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
-            checkStatus { viewModel.followPost(item, position, isFollow) }
+        override fun onFollowClick(
+            items: List<MemberPostItem>,
+            position: Int,
+            isFollow: Boolean
+        ) {
+            checkStatus { viewModel.followPost(ArrayList(items), position, isFollow) }
         }
     }
 
@@ -808,7 +819,7 @@ class MyPostFragment : BaseFragment() {
             type: AttachmentType
         )
 
-        fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean)
+        fun onFollowClick(items: List<MemberPostItem>, position: Int, isFollow: Boolean)
     }
 
     private fun showSnackBar() {
