@@ -254,6 +254,7 @@
     <string name="post_select_video">选择影片</string>
     <string name="post_tag_already_have">已存在相同标签，请确认</string>
     <string name="post_error">发布失败</string>
+    <string name="post_video_length_error">影片长度最短为3秒最长为15秒</string>
 
     <!-- Problem report -->
     <string-array name="video_problem_report_item">

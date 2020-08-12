@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -1192,12 +1193,18 @@ class AdultHomeFragment : BaseFragment() {
                     val myUri =
                         Uri.fromFile(File(UriUtils.getPath(requireContext(), videoUri!!) ?: ""))
 
-                    val bundle = Bundle()
-                    bundle.putString(BUNDLE_VIDEO_URI, myUri.toString())
-                    findNavController().navigate(
-                        R.id.action_adultHomeFragment_to_editVideoFragment,
-                        bundle
-                    )
+                    val retriever = MediaMetadataRetriever()
+                    retriever.setDataSource(requireContext(), myUri)
+                    val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                    val timeInMillisec = time.toLong()
+
+                    if (timeInMillisec in 3001..149999) {
+                        val bundle = Bundle()
+                        bundle.putString(BUNDLE_VIDEO_URI, myUri.toString())
+                        findNavController().navigate(R.id.action_adultHomeFragment_to_editVideoFragment, bundle)
+                    } else {
+                        Toast.makeText(requireContext(), R.string.post_video_length_error, Toast.LENGTH_SHORT).show()
+                    }
                 }
 
                 REQUEST_LOGIN -> {
