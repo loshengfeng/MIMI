@@ -18,6 +18,7 @@ import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.paging.PagedList
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
@@ -461,9 +462,13 @@ class AdultHomeFragment : BaseFragment() {
             picParameter = it
         })
 
-        viewModel.totalCountResult.observe(viewLifecycleOwner, Observer { totalCount ->
-            takeIf { rv_sixth.visibility == View.VISIBLE }?.also {
-                clubMemberAdapter.totalCount = totalCount
+        viewModel.totalCountResult.observe(viewLifecycleOwner, Observer {
+            it?.also { totalCount ->
+                cl_no_data.visibility = takeIf { totalCount > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
+                takeIf { rv_sixth.visibility == View.VISIBLE }?.also {
+                    clubMemberAdapter.totalCount = totalCount
+                }
+                viewModel.clearLiveDataValue()
             }
         })
 
@@ -656,6 +661,7 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private fun setupRecyclerByPosition(position: Int) {
+        cl_no_data.visibility = View.GONE
 
         rv_home.visibility = View.GONE
         rv_first.visibility = View.GONE
@@ -702,6 +708,9 @@ class AdultHomeFragment : BaseFragment() {
                     rv_second.layoutManager = LinearLayoutManager(requireContext())
                     rv_second.adapter = followPostPagedAdapter
                     viewModel.getPostFollows()
+                }?: run {
+                    Timber.d("@@followPostPagedAdapter.itemCount ${followPostPagedAdapter.itemCount}")
+                    cl_no_data.visibility = followPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }?.let { View.GONE } ?: let { View.VISIBLE }
                 }
             }
             3 -> {
@@ -713,7 +722,7 @@ class AdultHomeFragment : BaseFragment() {
                     rv_third.layoutManager = LinearLayoutManager(requireContext())
                     rv_third.adapter = clipPostPagedAdapter
                     viewModel.getClipPosts()
-                }
+                }?: run { cl_no_data.visibility = clipPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }?.let { View.GONE } ?: let { View.VISIBLE } }
             }
             4 -> {
                 rv_fourth.visibility = View.VISIBLE
@@ -724,7 +733,7 @@ class AdultHomeFragment : BaseFragment() {
                     rv_fourth.layoutManager = LinearLayoutManager(requireContext())
                     rv_fourth.adapter = picturePostPagedAdapter
                     viewModel.getPicturePosts()
-                }
+                }?: run { cl_no_data.visibility = picturePostPagedAdapter.currentList.takeUnless { isListEmpty(it) }?.let { View.GONE } ?: let { View.VISIBLE } }
             }
             5 -> {
                 rv_fifth.visibility = View.VISIBLE
@@ -735,7 +744,7 @@ class AdultHomeFragment : BaseFragment() {
                     rv_fifth.layoutManager = LinearLayoutManager(requireContext())
                     rv_fifth.adapter = textPostPagedAdapter
                     viewModel.getTextPosts()
-                }
+                }?: run { cl_no_data.visibility = textPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }?.let { View.GONE } ?: let { View.VISIBLE } }
             }
             else -> {
                 rv_sixth.visibility = View.VISIBLE
@@ -746,7 +755,7 @@ class AdultHomeFragment : BaseFragment() {
                     rv_sixth.layoutManager = MiMiLinearLayoutManager(requireContext())
                     rv_sixth.adapter = clubMemberAdapter
                     viewModel.getClubs()
-                }
+                }?: run { cl_no_data.visibility = clubMemberAdapter.currentList.takeUnless { isClubListEmpty(it) }?.let { View.GONE } ?: let { View.VISIBLE } }
             }
         }
     }
@@ -1261,4 +1270,11 @@ class AdultHomeFragment : BaseFragment() {
         }
     }
 
+    private fun isListEmpty(list: PagedList<MemberPostItem>?): Boolean {
+        return list == null || list.size == 0 || (list.size == 1 && list[0]?.adItem != null)
+    }
+
+    private fun isClubListEmpty(list: PagedList<MemberClubItem>?): Boolean {
+        return list == null || list.size == 0 || (list.size == 1 && list[0]?.adItem != null)
+    }
 }
