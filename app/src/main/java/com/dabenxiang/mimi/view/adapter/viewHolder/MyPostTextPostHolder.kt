@@ -52,6 +52,7 @@ class MyPostTextPostHolder(
 
     fun onBind(
         item: MemberPostItem,
+        itemList: List<MemberPostItem>?,
         position: Int,
         myPostListener: MyPostFragment.MyPostListener,
         attachmentListener: AttachmentListener
@@ -118,7 +119,7 @@ class MyPostTextPostHolder(
         } else {
             tvFollow.visibility = View.VISIBLE
             tvFollow.setOnClickListener {
-                myPostListener.onFollowClick(item, position, !item.isFollow)
+                itemList?.also { myPostListener.onFollowClick(itemList, position, !item.isFollow) }
                 item.isFollow = !item.isFollow
             }
             updateFollow(item)

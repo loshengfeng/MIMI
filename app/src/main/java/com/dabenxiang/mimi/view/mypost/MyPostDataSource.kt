@@ -1,21 +1,20 @@
 package com.dabenxiang.mimi.view.mypost
 
 import androidx.paging.PageKeyedDataSource
-import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.model.manager.DomainManager
+import com.dabenxiang.mimi.callback.MyPostPagingCallback
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.USER_ID_ME
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import timber.log.Timber
 
 class MyPostDataSource(
     private val userId: Long,
     private val isAdult: Boolean,
-    private val pagingCallback: PagingCallback,
+    private val pagingCallback: MyPostPagingCallback,
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager
 ) : PageKeyedDataSource<Int, MemberPostItem>() {
@@ -53,7 +52,7 @@ class MyPostDataSource(
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect {
-                    pagingCallback.onSucceed()
+                    pagingCallback.onTotalCount(it.list.size.toLong(), true)
                     callback.onResult(it.list, null, it.nextKey)
                 }
         }
@@ -81,6 +80,7 @@ class MyPostDataSource(
                 .collect {
                     it.body()?.also { item ->
                         item.content?.also { list ->
+                            pagingCallback.onTotalCount(list.size.toLong(), false)
                             val nextPageKey = when {
                                 hasNextPage(
                                     item.paging.count,
