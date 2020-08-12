@@ -94,7 +94,7 @@ class TopUpFragment : BaseFragment() {
                         agentAdapter.update(attachmentItem.position ?: 0)
                     }
                 }
-                is Error -> onApiError(it.throwable)
+                is Error -> {}
             }
         })
 
@@ -103,9 +103,9 @@ class TopUpFragment : BaseFragment() {
                 is Success -> {
                     it.result.let { item ->
                         ChatListItem(
-                            item.agentId?.toLong(),
-                            item.merchantName,
-                            avatarAttachmentId = item.avatarAttachmentId?.toLong()
+                            item.toLong(),
+                            viewModel.currentItem?.merchantName,
+                            avatarAttachmentId = viewModel.currentItem?.avatarAttachmentId?.toLong()
                         )
                     }.also {
                         val bundle = ChatContentFragment.createBundle(it)

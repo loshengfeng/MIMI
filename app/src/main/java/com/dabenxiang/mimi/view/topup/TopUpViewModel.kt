@@ -9,6 +9,7 @@ import androidx.paging.PagedList
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.AgentItem
+import com.dabenxiang.mimi.model.api.vo.ApiBaseItem
 import com.dabenxiang.mimi.model.api.vo.ChatRequest
 import com.dabenxiang.mimi.model.api.vo.MeItem
 import com.dabenxiang.mimi.model.vo.AttachmentItem
@@ -31,8 +32,8 @@ class TopUpViewModel : BaseViewModel() {
     private val _avatar = MutableLiveData<ApiResult<AttachmentItem>>()
     val avatar: LiveData<ApiResult<AttachmentItem>> = _avatar
 
-    private val _createChatRoomResult = MutableLiveData<ApiResult<AgentItem>>()
-    val createChatRoomResult: LiveData<ApiResult<AgentItem>> = _createChatRoomResult
+    private val _createChatRoomResult = MutableLiveData<ApiResult<String>>()
+    val createChatRoomResult: LiveData<ApiResult<String>> = _createChatRoomResult
 
     var currentItem: AgentItem? = null
 
@@ -107,10 +108,10 @@ class TopUpViewModel : BaseViewModel() {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
-                val request = ChatRequest(userId = currentItem?.agentId?.toLong())
+                val request = ChatRequest(userId = item.agentId?.toLong())
                 val result = apiRepository.postChats(request)
                 if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(item))
+                emit(ApiResult.success((result.body() as ApiBaseItem<*>).content as String))
             }
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }

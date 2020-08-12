@@ -86,7 +86,7 @@ interface ApiService {
     @POST("/v1/Members/Me/Chats")
     suspend fun postChat(
         @Body request: ChatRequest
-    ): Response<Void>
+    ): Response<ApiBaseItem<String>>
 
     @GET("/v1/Members/Me/Chats")
     suspend fun getChat(
