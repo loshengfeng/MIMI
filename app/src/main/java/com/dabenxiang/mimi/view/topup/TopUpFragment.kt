@@ -29,7 +29,6 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_top_up.*
@@ -41,12 +40,7 @@ class TopUpFragment : BaseFragment() {
     private val viewModel: TopUpViewModel by viewModels()
 
     private val agentAdapter by lazy { TopUpAgentAdapter(agentListener) }
-    private val onlinePayAdapter by lazy {
-        TopUpOnlinePayAdapter(
-            requireContext(),
-            onlinePayListener
-        )
-    }
+    private val onlinePayAdapter by lazy { TopUpOnlinePayAdapter(requireContext()) }
 
     private var interactionListener: InteractionListener? = null
 
@@ -195,7 +189,8 @@ class TopUpFragment : BaseFragment() {
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.btn_next -> {
-
+                    // TODO: Select Ordering Package Item 傳到下一頁
+//                    onlinePayAdapter.selectItem
                 }
                 R.id.tv_login -> navigateTo(
                     NavigateItem.Destination(
@@ -268,12 +263,6 @@ class TopUpFragment : BaseFragment() {
 
         override fun onGetAvatarAttachment(id: String, position: Int) {
             viewModel.getAttachment(id, position)
-        }
-    }
-
-    private val onlinePayListener = object : TopUpOnlinePayAdapter.TopUpOnlinePayListener {
-        override fun onSelectPackageItem(selectItem: OrderingPackageItem?) {
-            // TODO: Select Ordering Package Item 傳到下一頁
         }
     }
 

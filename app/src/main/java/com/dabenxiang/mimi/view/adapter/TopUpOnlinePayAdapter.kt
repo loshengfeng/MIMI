@@ -10,12 +10,10 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.OrderingPackageItem
 import com.dabenxiang.mimi.view.topup.TopUpOnlinePayViewHolder
 
-class TopUpOnlinePayAdapter(
-    val context: Context,
-    val listener: TopUpOnlinePayListener
-) : RecyclerView.Adapter<TopUpOnlinePayViewHolder>() {
+class TopUpOnlinePayAdapter(val context: Context) :
+    RecyclerView.Adapter<TopUpOnlinePayViewHolder>() {
 
-    private var selectItem: OrderingPackageItem? = null
+    var selectItem: OrderingPackageItem? = null
 
     private var orderingPackageItems: ArrayList<OrderingPackageItem>? = null
 
@@ -38,13 +36,18 @@ class TopUpOnlinePayAdapter(
 
         if (selectItem != null && selectItem?.id == item?.id) {
             holder.ivCheck.visibility = View.VISIBLE
+            holder.orderPackageLayout.background = context.getDrawable(
+                R.drawable.bg_red_1_stroke_1_radius_8
+            )
         } else {
             holder.ivCheck.visibility = View.INVISIBLE
+            holder.orderPackageLayout.background = context.getDrawable(
+                R.drawable.bg_gray_7_stroke_1_radius_8
+            )
         }
 
         holder.orderPackageLayout.setOnClickListener {
             selectItem = item
-            listener.onSelectPackageItem(selectItem)
             notifyDataSetChanged()
         }
     }
@@ -55,9 +58,5 @@ class TopUpOnlinePayAdapter(
 
     fun clearSelectItem() {
         selectItem = null
-    }
-
-    interface TopUpOnlinePayListener {
-        fun onSelectPackageItem(selectItem: OrderingPackageItem?)
     }
 }
