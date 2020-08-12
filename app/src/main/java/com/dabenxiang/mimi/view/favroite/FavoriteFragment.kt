@@ -272,7 +272,7 @@ class FavoriteFragment : BaseFragment() {
         tv_back.visibility = View.GONE
         tv_title.text = getString(R.string.favorite_title)
 
-        when (viewModel.accountManager.isLogin()) {
+        when (viewModel.isLogin()) {
             true -> {
                 //TODO: 目前先不判斷是否有驗證過
 //                viewModel.checkEmailConfirmed()

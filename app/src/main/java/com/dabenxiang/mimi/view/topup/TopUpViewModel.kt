@@ -8,10 +8,8 @@ import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.AgentItem
-import com.dabenxiang.mimi.model.api.vo.ApiBaseItem
-import com.dabenxiang.mimi.model.api.vo.ChatRequest
-import com.dabenxiang.mimi.model.api.vo.MeItem
+import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.model.vo.ProfileItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
@@ -22,6 +20,7 @@ import retrofit2.HttpException
 class TopUpViewModel : BaseViewModel() {
 
     val TAG_MY_AVATAR = -1
+    var currentItem: AgentItem? = null
 
     private val _agentList = MutableLiveData<PagedList<AgentItem>>()
     val agentList: LiveData<PagedList<AgentItem>> = _agentList
@@ -35,11 +34,13 @@ class TopUpViewModel : BaseViewModel() {
     private val _createChatRoomResult = MutableLiveData<ApiResult<String>>()
     val createChatRoomResult: LiveData<ApiResult<String>> = _createChatRoomResult
 
-    var currentItem: AgentItem? = null
+    private val _orderPackageResult =
+        MutableLiveData<ApiResult<HashMap<PaymentType, ArrayList<OrderingPackageItem>>>>()
+    val orderPackageResult: LiveData<ApiResult<HashMap<PaymentType, ArrayList<OrderingPackageItem>>>> =
+        _orderPackageResult
 
-    fun initData() {
-        getProxyPayList()
-    }
+    private val _isEmailConfirmed by lazy { MutableLiveData<ApiResult<Boolean>>() }
+    val isEmailConfirmed: LiveData<ApiResult<Boolean>> get() = _isEmailConfirmed
 
     fun getProxyPayList() {
         viewModelScope.launch {
@@ -59,8 +60,26 @@ class TopUpViewModel : BaseViewModel() {
         }
     }
 
-    fun getUserData(): ProfileItem {
-        return accountManager.getProfile()
+    fun getOrderingPackage() {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getOrderingPackage()
+                if (!result.isSuccessful) throw HttpException(result)
+                val orderPackageMap = hashMapOf<PaymentType, ArrayList<OrderingPackageItem>>()
+                val orderingPackageItems = result.body()?.content ?: arrayListOf()
+                orderingPackageItems.forEach {
+                    if (orderPackageMap[it.paymentType] == null) {
+                        orderPackageMap[it.paymentType] = arrayListOf()
+                    }
+                    orderPackageMap[it.paymentType]?.add(it)
+                }
+                emit(ApiResult.success(orderPackageMap))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _orderPackageResult.value = it }
+        }
     }
 
     fun getMe() {
@@ -90,9 +109,9 @@ class TopUpViewModel : BaseViewModel() {
                 if (!result.isSuccessful) throw HttpException(result)
                 val byteArray = result.body()?.bytes()
                 val item = AttachmentItem(
-                        id = id,
-                        fileArray = byteArray,
-                        position = position
+                    id = id,
+                    fileArray = byteArray,
+                    position = position
                 )
                 emit(ApiResult.success(item))
             }
@@ -120,6 +139,10 @@ class TopUpViewModel : BaseViewModel() {
         }
     }
 
+    fun getUserData(): ProfileItem {
+        return accountManager.getProfile()
+    }
+
     private val topUpPagingCallback = object : PagingCallback {
         override fun onLoading() {
             setShowProgress(true)
@@ -132,8 +155,6 @@ class TopUpViewModel : BaseViewModel() {
         override fun onThrowable(throwable: Throwable) {}
     }
 
-    private val _isEmailConfirmed by lazy { MutableLiveData<ApiResult<Boolean>>() }
-    val isEmailConfirmed: LiveData<ApiResult<Boolean>> get() = _isEmailConfirmed
     fun checkEmailConfirmed() {
         viewModelScope.launch {
             flow {

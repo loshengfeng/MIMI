@@ -16,7 +16,8 @@ import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult.*
+import com.dabenxiang.mimi.model.api.ApiResult.Error
+import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.AgentItem
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.vo.TopUpOnlinePayItem
@@ -59,8 +60,6 @@ class TopUpFragment : BaseFragment() {
     override fun setupObservers() {
         viewModel.meItem.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Loading -> progressHUD?.show()
-                is Loaded -> progressHUD?.dismiss()
                 is Success -> {
                     tv_name.text = it.result.friendlyName
                     tv_coco.text = it.result.availablePoint.toString()
@@ -71,43 +70,42 @@ class TopUpFragment : BaseFragment() {
 
         viewModel.avatar.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Loading -> progressHUD?.show()
-                is Loaded -> progressHUD?.dismiss()
                 is Success -> {
                     val attachmentItem = it.result
-                    LruCacheUtils.putLruArrayCache(attachmentItem.id
+                    LruCacheUtils.putLruArrayCache(
+                        attachmentItem.id
                             ?: "", attachmentItem.fileArray
-                            ?: ByteArray(0))
-                    if (attachmentItem.position==viewModel.TAG_MY_AVATAR){
+                            ?: ByteArray(0)
+                    )
+                    if (attachmentItem.position == viewModel.TAG_MY_AVATAR) {
                         val options: RequestOptions = RequestOptions()
-                                .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                                .placeholder(R.drawable.ico_default_photo)
-                                .error(R.drawable.ico_default_photo)
-                                .priority(Priority.NORMAL)
+                            .transform(MultiTransformation(CenterCrop(), CircleCrop()))
+                            .placeholder(R.drawable.ico_default_photo)
+                            .error(R.drawable.ico_default_photo)
+                            .priority(Priority.NORMAL)
 
 
                         Glide.with(this).asBitmap()
-                                .load(attachmentItem.fileArray)
-                                .apply(options)
-                                .into(iv_photo)
-                    }else {
+                            .load(attachmentItem.fileArray)
+                            .apply(options)
+                            .into(iv_photo)
+                    } else {
                         agentAdapter.update(attachmentItem.position ?: 0)
                     }
                 }
-                is Error -> {}
+                is Error -> {
+                }
             }
         })
 
         viewModel.createChatRoomResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    it.result.let { item ->
-                        ChatListItem(
-                            item.toLong(),
-                            viewModel.currentItem?.merchantName,
-                            avatarAttachmentId = viewModel.currentItem?.avatarAttachmentId?.toLong()
-                        )
-                    }.also {
+                    ChatListItem(
+                        it.result.toLong(),
+                        viewModel.currentItem?.merchantName,
+                        avatarAttachmentId = viewModel.currentItem?.avatarAttachmentId?.toLong()
+                    ).also {
                         val bundle = ChatContentFragment.createBundle(it)
                         navigateTo(
                             NavigateItem.Destination(
@@ -133,21 +131,36 @@ class TopUpFragment : BaseFragment() {
                 is Error -> onApiError(it.throwable)
             }
         })
+
+        viewModel.orderPackageResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    val orderPackageMap = it.result
+                    orderPackageMap.keys.forEach { type ->
+                        Timber.d("@@:${type.value}")
+                    }
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.agentList.observe(viewLifecycleOwner, Observer {
+            agentAdapter.submitList(it)
+        })
     }
 
     override fun setupListeners() {
-        Timber.d("${TopUpFragment::class.java.simpleName}_setupListeners")
-
         rg_Type.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.rb_online_pay -> {
-                    // 暫時不做
-//                    layout_online_pay.visibility = View.VISIBLE
-//                    rv_proxy_pay.visibility = View.GONE
+                    layout_online_pay.visibility = View.VISIBLE
+                    rv_proxy_pay.visibility = View.GONE
+                    viewModel.getOrderingPackage()
                 }
                 R.id.rb_proxy_pay -> {
                     layout_online_pay.visibility = View.GONE
                     rv_proxy_pay.visibility = View.VISIBLE
+                    viewModel.getProxyPayList()
                 }
             }
         }
@@ -190,7 +203,7 @@ class TopUpFragment : BaseFragment() {
     }
 
     override fun initSettings() {
-        when (viewModel.accountManager.isLogin()) {
+        when (viewModel.isLogin()) {
             true -> {
                 //TODO: 目前先不判斷是否有驗證過
 //                viewModel.checkEmailConfirmed()
@@ -209,15 +222,17 @@ class TopUpFragment : BaseFragment() {
         tv_record_top_up.visibility = View.VISIBLE
         item_is_Login.visibility = View.VISIBLE
         item_is_not_Login.visibility = View.GONE
-        val userItem = viewModel.getUserData()
-        tv_name.text = userItem.friendlyName
-        tv_coco.text = userItem.point.toString()
+
         tv_subtitle.text = getString(R.string.topup_subtitle)
         tv_total.text = "¥ 50.00"
 
-        GridLayoutManager(context, 2).also { layoutManager ->
-            rv_online_pay.layoutManager = layoutManager
-        }
+        val userItem = viewModel.getUserData()
+        tv_name.text = userItem.friendlyName
+        tv_coco.text = userItem.point.toString()
+
+
+        val gridLayoutManager = GridLayoutManager(context, 2)
+        rv_online_pay.layoutManager = gridLayoutManager
 
         val onlinePayList = mutableListOf<TopUpOnlinePayItem>(
             TopUpOnlinePayItem(
@@ -249,30 +264,16 @@ class TopUpFragment : BaseFragment() {
         rv_online_pay.adapter = TopUpOnlinePayAdapter(onlinePayListener)
         val onlinePayAdapter = rv_online_pay.adapter as TopUpOnlinePayAdapter
         onlinePayAdapter.setDataSrc(onlinePayList)
-
-        activity?.also { activity ->
-            LinearLayoutManager(activity).also { layoutManager ->
-                layoutManager.orientation = LinearLayoutManager.VERTICAL
-                rv_proxy_pay.layoutManager = layoutManager
-            }
-        }
-
+        
+        rv_proxy_pay.layoutManager = LinearLayoutManager(context)
         rv_proxy_pay.adapter = agentAdapter
-
-        viewModel.initData()
-
-        // TODO: 目前這階段無需開發訂單管理功能, 因此暫時隱藏起來
-        tv_record_top_up.visibility = View.GONE
 
         tv_record_top_up.setOnClickListener {
             navigateTo(NavigateItem.Destination(R.id.action_topupFragment_to_orderFragment))
         }
 
         viewModel.getMe()
-
-        viewModel.agentList.observe(viewLifecycleOwner, Observer {
-            agentAdapter.submitList(it)
-        })
+        viewModel.getOrderingPackage()
     }
 
     override fun onAttach(context: Context) {

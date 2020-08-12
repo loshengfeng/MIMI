@@ -47,7 +47,7 @@ class LoginFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        if (viewModel.accountManager.isLogin()) {
+        if (viewModel.isLogin()) {
             navigateTo(NavigateItem.Up)
         }
     }
