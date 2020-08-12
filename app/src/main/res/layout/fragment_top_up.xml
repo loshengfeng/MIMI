@@ -291,10 +291,23 @@
                     android:id="@+id/rv_online_pay"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
+                    android:overScrollMode="never"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tl_type" />
+
+                <TextView
+                    android:id="@+id/tv_online_empty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/topup_online_empty"
+                    android:textColor="@color/color_black_1"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tl_type" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

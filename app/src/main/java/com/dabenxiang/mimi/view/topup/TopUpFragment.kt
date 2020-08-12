@@ -268,6 +268,11 @@ class TopUpFragment : BaseFragment() {
 
     private fun updateOrderPackages(paymentType: PaymentType) {
         val orderPackages = orderPackageMap?.get(paymentType) ?: arrayListOf()
+        if (orderPackages.isEmpty()) {
+            tv_online_empty.visibility = View.VISIBLE
+        } else {
+            tv_online_empty.visibility = View.GONE
+        }
         onlinePayAdapter.setupData(orderPackages)
         onlinePayAdapter.notifyDataSetChanged()
     }
