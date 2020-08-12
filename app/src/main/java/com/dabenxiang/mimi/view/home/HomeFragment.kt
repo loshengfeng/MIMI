@@ -178,6 +178,7 @@ class HomeFragment : BaseFragment() {
     }
 
     private fun setupRecyclerByPosition(position: Int) {
+        cl_no_data.visibility = View.GONE
 
         rv_home.visibility = View.GONE
         rv_first.visibility = View.GONE
