@@ -123,7 +123,7 @@ class MyPostPagedAdapter(
                         }
                     } ?: run {
                         holder.pictureRecycler.tag = position
-                        holder.onBind(it, position, myPostListener, attachmentListener, memberPostFuncItem)
+                        holder.onBind(it, currentList, position, myPostListener, attachmentListener, memberPostFuncItem)
                     }
                 }
                 is MyPostTextPostHolder -> {
@@ -133,7 +133,7 @@ class MyPostPagedAdapter(
                             PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item)
                         }
                     } ?: run {
-                        holder.onBind(it, position, myPostListener, attachmentListener)
+                        holder.onBind(it, currentList, position, myPostListener, attachmentListener)
                     }
                 }
             }

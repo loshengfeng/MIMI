@@ -135,10 +135,7 @@ class MyPostClipPostHolder(
             tvFollow.visibility = View.VISIBLE
             updateFollow(item)
             tvFollow.setOnClickListener {
-                itemList?.also {
-                    myPostListener.onFollowClick(item, position, !item.isFollow)
-                    item.isFollow = !item.isFollow
-                }
+                itemList?.also { myPostListener.onFollowClick(it, position, !item.isFollow) }
             }
         }
         ivMore.setOnClickListener {
