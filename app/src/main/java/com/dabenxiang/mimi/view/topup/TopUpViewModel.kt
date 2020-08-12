@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.dabenxiang.mimi.callback.PagingCallback
+import com.dabenxiang.mimi.callback.TopUpPagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.AgentItem
 import com.dabenxiang.mimi.model.api.vo.ApiBaseItem
@@ -25,6 +26,9 @@ class TopUpViewModel : BaseViewModel() {
 
     private val _agentList = MutableLiveData<PagedList<AgentItem>>()
     val agentList: LiveData<PagedList<AgentItem>> = _agentList
+
+    private val _agentListIsEmpty = MutableLiveData<Boolean>()
+    val agentListIsEmpty: LiveData<Boolean> = _agentListIsEmpty
 
     private val _meItem = MutableLiveData<ApiResult<MeItem>>()
     val meItem: LiveData<ApiResult<MeItem>> = _meItem
@@ -120,7 +124,7 @@ class TopUpViewModel : BaseViewModel() {
         }
     }
 
-    private val topUpPagingCallback = object : PagingCallback {
+    private val topUpPagingCallback = object : TopUpPagingCallback {
         override fun onLoading() {
             setShowProgress(true)
         }
@@ -129,7 +133,13 @@ class TopUpViewModel : BaseViewModel() {
             setShowProgress(false)
         }
 
-        override fun onThrowable(throwable: Throwable) {}
+        override fun onThrowable(throwable: Throwable) {
+            _agentListIsEmpty.postValue(true)
+        }
+
+        override fun listEmpty(isEmpty: Boolean) {
+            _agentListIsEmpty.postValue(isEmpty)
+        }
     }
 
     private val _isEmailConfirmed by lazy { MutableLiveData<ApiResult<Boolean>>() }
