@@ -48,6 +48,7 @@ class PostFollowDataSource(
                     ) -> PER_LIMIT
                     else -> null
                 }
+                pagingCallback.onTotalCount(body?.paging?.count ?: 0)
                 emit(InitResult(memberPostItems ?: arrayListOf(), nextPageKey))
             }
                 .flowOn(Dispatchers.IO)
