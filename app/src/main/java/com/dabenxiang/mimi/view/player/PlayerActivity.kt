@@ -743,8 +743,10 @@ class PlayerActivity : BaseActivity() {
             OrientationDetector(this, SensorManager.SENSOR_DELAY_NORMAL).also { detector ->
                 detector.setChangeListener(object : OrientationDetector.OnChangeListener {
                     override fun onChanged(orientation: Int) {
-                        viewModel.currentOrientation = orientation
 
+                        Timber.i("detector onChanged")
+                        viewModel.currentOrientation = orientation
+                        viewModel.lockFullScreen = !viewModel.lockFullScreen
                         if (viewModel.lockFullScreen) {
                             when (orientation) {
                                 ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE, ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE -> {
@@ -754,7 +756,7 @@ class PlayerActivity : BaseActivity() {
                         } else {
                             requestedOrientation = orientation
                         }
-
+                        fullScreenUISet()
                         adjustPlayerSize()
                     }
                 })
