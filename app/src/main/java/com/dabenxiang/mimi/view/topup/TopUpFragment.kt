@@ -41,7 +41,12 @@ class TopUpFragment : BaseFragment() {
     private val viewModel: TopUpViewModel by viewModels()
 
     private val agentAdapter by lazy { TopUpAgentAdapter(agentListener) }
-    private val onlinePayAdapter by lazy { TopUpOnlinePayAdapter(requireContext()) }
+    private val onlinePayAdapter by lazy {
+        TopUpOnlinePayAdapter(
+            requireContext(),
+            onlinePayListener
+        )
+    }
 
     private var interactionListener: InteractionListener? = null
 
@@ -189,7 +194,9 @@ class TopUpFragment : BaseFragment() {
 
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
-                R.id.btn_pay -> GeneralUtils.showToast(requireContext(), "btnPay")
+                R.id.btn_next -> {
+
+                }
                 R.id.tv_login -> navigateTo(
                     NavigateItem.Destination(
                         R.id.action_to_loginFragment,
@@ -204,7 +211,7 @@ class TopUpFragment : BaseFragment() {
                 )
             }
         }.also {
-            btn_pay.setOnClickListener(it)
+            btn_next.setOnClickListener(it)
             tv_login.setOnClickListener(it)
             tv_register.setOnClickListener(it)
         }
@@ -232,7 +239,6 @@ class TopUpFragment : BaseFragment() {
         item_is_not_Login.visibility = View.GONE
 
         tv_subtitle.text = getString(R.string.topup_subtitle)
-        tv_total.text = "¥ 0.00"
 
         val userItem = viewModel.getUserData()
         tv_name.text = userItem.friendlyName
@@ -248,6 +254,9 @@ class TopUpFragment : BaseFragment() {
             navigateTo(NavigateItem.Destination(R.id.action_topupFragment_to_orderFragment))
         }
 
+        tl_type.getTabAt(0)?.select()
+        onlinePayAdapter.clearSelectItem()
+
         viewModel.getMe()
         viewModel.getOrderingPackage()
     }
@@ -259,6 +268,12 @@ class TopUpFragment : BaseFragment() {
 
         override fun onGetAvatarAttachment(id: String, position: Int) {
             viewModel.getAttachment(id, position)
+        }
+    }
+
+    private val onlinePayListener = object : TopUpOnlinePayAdapter.TopUpOnlinePayListener {
+        override fun onSelectPackageItem(selectItem: OrderingPackageItem?) {
+            // TODO: Select Ordering Package Item 傳到下一頁
         }
     }
 

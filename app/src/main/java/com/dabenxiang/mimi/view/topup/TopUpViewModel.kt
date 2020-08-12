@@ -16,6 +16,7 @@ import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
 class TopUpViewModel : BaseViewModel() {
 

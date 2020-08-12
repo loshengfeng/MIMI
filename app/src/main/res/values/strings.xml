@@ -63,6 +63,7 @@
     <!-- Top Up -->
     <string name="topup_desc">蜜币购买</string>
     <string name="topup_total">总计</string>
+    <string name="topup_next">下一步</string>
     <string name="topup_confirm_pay">确认支付</string>
     <string name="topup_subtitle">会员尊享 每天无限观看</string>
     <string name="topup_proxy_title_name">火热代理</string>

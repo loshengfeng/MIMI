@@ -309,42 +309,15 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/layout_online_pay_1">
 
-                <TextView
-                    android:id="@+id/tv_total_title"
-                    android:layout_width="42dp"
-                    android:layout_height="20dp"
-                    android:text="@string/topup_total"
-                    android:textColor="@color/color_black_1"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/tv_total"
-                    app:layout_constraintHorizontal_chainStyle="packed"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/tv_total"
-                    android:layout_width="73dp"
-                    android:layout_height="28dp"
-                    android:textColor="@color/color_black_1"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/tv_total_title"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="¥ 50.00" />
-
                 <Button
-                    android:id="@+id/btn_pay"
+                    android:id="@+id/btn_next"
                     android:layout_width="92dp"
                     android:layout_height="33dp"
-                    android:layout_marginStart="15dp"
                     android:layout_marginEnd="9dp"
                     android:background="@drawable/bg_red_1_radius_6"
-                    android:text="@string/topup_confirm_pay"
+                    android:text="@string/topup_next"
                     android:textColor="@color/color_white_1"
+                    android:textSize="15sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
