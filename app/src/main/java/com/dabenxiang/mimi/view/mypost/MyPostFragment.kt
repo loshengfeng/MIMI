@@ -696,7 +696,7 @@ class MyPostFragment : BaseFragment() {
 
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {
             checkStatus {
-                val bundle = ClipFragment.createBundle(ArrayList(item), position)
+                val bundle = ClipFragment.createBundle(ArrayList(mutableListOf(item[position])), 0)
                 navigateTo(
                     NavigateItem.Destination(
                         R.id.action_myPostFragment_to_clipFragment,
@@ -707,7 +707,7 @@ class MyPostFragment : BaseFragment() {
         }
 
         override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
-            val bundle = ClipFragment.createBundle(ArrayList(item), position)
+            val bundle = ClipFragment.createBundle(ArrayList(mutableListOf(item[position])), 0)
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_myPostFragment_to_clipFragment,
