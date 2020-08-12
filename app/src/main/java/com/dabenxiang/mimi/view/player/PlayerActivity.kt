@@ -746,7 +746,6 @@ class PlayerActivity : BaseActivity() {
 
                         Timber.i("detector onChanged")
                         viewModel.currentOrientation = orientation
-                        viewModel.lockFullScreen = !viewModel.lockFullScreen
                         if (viewModel.lockFullScreen) {
                             when (orientation) {
                                 ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE, ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE -> {
