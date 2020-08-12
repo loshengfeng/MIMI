@@ -86,7 +86,7 @@ interface ApiService {
     @POST("/v1/Members/Me/Chats")
     suspend fun postChat(
         @Body request: ChatRequest
-    ): Response<Void>
+    ): Response<ApiBaseItem<String>>
 
     @GET("/v1/Members/Me/Chats")
     suspend fun getChat(
@@ -518,7 +518,7 @@ interface ApiService {
     suspend fun getAgent(
         @Query("offset") offset: Int,
         @Query("limit") limit: Int
-    ): Response<ApiBasePagingItem<List<AgentItem>>>
+    ): Response<ApiBasePagingItem<ArrayList<AgentItem>>>
 
     /**********************************************************
      *

@@ -65,6 +65,7 @@
     <string name="topup_total">总计</string>
     <string name="topup_confirm_pay">确认支付</string>
     <string name="topup_subtitle">会员尊享 每天无限观看</string>
+    <string name="topup_proxy_title_name">火热代理</string>
 
     <!-- Favorite -->
     <string name="favorite_title">我的收藏</string>
@@ -318,6 +319,7 @@
     <string name="chat_content_file_downloading">下载中</string>
     <string name="chat_content_file_download_finish">下载完成</string>
     <string name="chat_content_file_uploading">上傳中</string>
+    <string name="chat_content_text_too_much">文字超過五百字</string>
 
     <!--  Image Preview  -->
     <string name="image_preview_file_invlid">档案已失效</string>

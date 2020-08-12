@@ -291,11 +291,7 @@ class MainActivity : BaseActivity(), InteractionListener {
                 secondBtn = getString(R.string.verify_immediately),
                 secondBlock = {
                     Navigation.findNavController(this, R.id.nav_host_fragment)
-                        .navigate(
-                            R.id.action_to_settingFragment,
-                            viewModel.getMeAvatar()?.let { byteArray ->
-                                SettingFragment.createBundle(byteArray)
-                            })
+                        .navigate(R.id.action_to_settingFragment)
                 }
             )
         ).show(supportFragmentManager)

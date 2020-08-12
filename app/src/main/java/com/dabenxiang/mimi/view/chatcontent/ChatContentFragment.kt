@@ -247,9 +247,16 @@ class ChatContentFragment : BaseFragment() {
 
         btnSend.setOnClickListener {
             if (editChat.text.isNotEmpty()) {
-                viewModel.messageType = ChatMessageType.TEXT.ordinal
-                viewModel.pushMsgWithCacheData(editChat.text.toString())
-                editChat.text.clear()
+                if (editChat.text.length<500) {
+                    viewModel.messageType = ChatMessageType.TEXT.ordinal
+                    viewModel.pushMsgWithCacheData(editChat.text.toString())
+                    editChat.text.clear()
+                }else{
+                    GeneralUtils.showToast(
+                            requireContext(),
+                            getString(R.string.chat_content_text_too_much)
+                    )
+                }
             }
         }
         btnAdd.setOnClickListener {

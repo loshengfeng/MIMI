@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.adapter
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -12,20 +13,24 @@ import com.dabenxiang.mimi.view.listener.AdapterEventListener
 import com.dabenxiang.mimi.view.topup.TopUpProxyPayViewHolder
 
 class TopUpAgentAdapter(
-    private val listener: AdapterEventListener<AgentItem>
-) : PagedListAdapter<Any, RecyclerView.ViewHolder>(diffCallback) {
+    private val listener: EventListener
+) : PagedListAdapter<AgentItem, RecyclerView.ViewHolder>(diffCallback) {
+    interface EventListener {
+        fun onItemClick(view: View, item: AgentItem)
+        fun onGetAvatarAttachment(id: String, position: Int)
+    }
 
     companion object {
-        private val diffCallback = object : DiffUtil.ItemCallback<Any>() {
+        private val diffCallback = object : DiffUtil.ItemCallback<AgentItem>() {
             override fun areItemsTheSame(
-                oldItem: Any,
-                newItem: Any
+                oldItem: AgentItem,
+                newItem: AgentItem
             ): Boolean = oldItem == newItem
 
             @SuppressLint("DiffUtilEquals")
             override fun areContentsTheSame(
-                oldItem: Any,
-                newItem: Any
+                oldItem: AgentItem,
+                newItem: AgentItem
             ): Boolean = oldItem == newItem
         }
     }
@@ -34,7 +39,7 @@ class TopUpAgentAdapter(
         val layoutInflater = LayoutInflater.from(parent.context)
         return TopUpProxyPayViewHolder(
                 layoutInflater.inflate(
-                        R.layout.item_favorite_normal,
+                        R.layout.item_topup_proxy_pay,
                         parent,
                         false
                 ), listener
@@ -46,5 +51,9 @@ class TopUpAgentAdapter(
         when (holder) {
             is TopUpProxyPayViewHolder -> holder.bind(item as AgentItem)
         }
+    }
+
+    fun update(position: Int) {
+        notifyItemChanged(position)
     }
 }

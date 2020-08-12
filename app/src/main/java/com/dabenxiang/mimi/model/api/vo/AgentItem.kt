@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class AgentItem(
     @SerializedName("merchantOwnerId")
-    val merchantOwnerId: Int?,
+    val merchantOwnerId: Long?,
 
     @SerializedName("merchantName")
     val merchantName: String?,

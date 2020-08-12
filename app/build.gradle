@@ -146,12 +146,12 @@ android {
         sit_debug {
             buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
             buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
-            buildConfigField "String", "MQTT_HOST", '"ws://10.1.1.121:8083"'
+            buildConfigField "String", "MQTT_HOST", '"wss://mqtt.ymmsp.com:443"'
         }
         sit_release {
             buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
             buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
-            buildConfigField "String", "MQTT_HOST", '"ws://10.1.1.121:8083"'
+            buildConfigField "String", "MQTT_HOST", '"wss://mqtt.ymmsp.com:443"'
         }
 
         dev_debug {

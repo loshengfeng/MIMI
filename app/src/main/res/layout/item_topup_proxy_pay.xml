@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="74dp"
+    android:layout_height="wrap_content"
     android:layout_marginBottom="10dp"
     android:background="@drawable/bg_gray_7_stroke_1_radius_8"
     android:paddingStart="20dp"
@@ -27,11 +27,11 @@
         android:layout_marginStart="11dp"
         android:drawableStart="@drawable/ico_medal"
         android:drawablePadding="5dp"
+        android:text="@string/topup_proxy_title_name"
         android:textColor="@color/color_black_1_50"
         android:textSize="14sp"
         app:layout_constraintStart_toEndOf="@+id/iv_photo"
-        app:layout_constraintTop_toTopOf="@id/iv_photo"
-        tools:text="火热代理" />
+        app:layout_constraintTop_toTopOf="@id/iv_photo" />
 
     <TextView
         android:id="@+id/tv_subtitle"

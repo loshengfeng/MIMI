@@ -150,7 +150,7 @@ class RankingFragment : BaseFragment() {
                     it.result,
                     RankingAdapter
                 )
-                is ApiResult.Error -> onApiError(it.throwable)
+//                is ApiResult.Error -> onApiError(it.throwable)
             }
         })
     }
