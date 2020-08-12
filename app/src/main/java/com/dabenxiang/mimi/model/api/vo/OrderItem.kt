@@ -1,58 +1,82 @@
 package com.dabenxiang.mimi.model.api.vo
 
+import com.dabenxiang.mimi.model.enums.PaymentStatus
+import com.dabenxiang.mimi.model.enums.PaymentType
 import com.google.gson.annotations.SerializedName
 
 data class OrderItem(
     @SerializedName("id")
-    val id: Int?,
+    val id: Long = 0,
 
     @SerializedName("chatId")
-    val chatId: Int?,
+    val chatId: Long = 0,
 
     @SerializedName("userFriendlyName")
-    val userFriendlyName: String?,
+    val userFriendlyName: String = "",
 
-    // 禮包名稱
     @SerializedName("packageName")
-    val packageName: String?,
+    val packageName: String = "",
 
     @SerializedName("packageListPrice")
-    val packageListPrice: Int?,
+    val packageListPrice: Float = 0f,
 
     @SerializedName("packagePrice")
-    val packagePrice: Int?,
+    val packagePrice: Float = 0f,
 
     @SerializedName("packagePoint")
-    val packagePoint: Int?,
+    val packagePoint: Int = 0,
 
-    // 客服名稱
     @SerializedName("merchantUserFriendlyName")
-    val merchantUserFriendlyName: String?,
+    val merchantUserFriendlyName: String = "",
 
-    // 收款類別 0:None|1:Alipay|2:WeChat|4:UnionPay
+    @SerializedName("merchantUserAvatarAttachmentId")
+    val merchantUserAvatarAttachmentId: Long = 0,
+
     @SerializedName("paymentType")
-    val paymentType: Int?,
+    val paymentType: PaymentType = PaymentType.BANK,
 
-    // 付款狀態 0:Unpaid|1:Paid|99:Failed
     @SerializedName("paymentStatus")
-    val paymentStatus: Int?,
+    val paymentStatus: PaymentStatus = PaymentStatus.UNPAID,
 
-    // 付款金額
     @SerializedName("sellingPrice")
-    val sellingPrice: Int?,
+    val sellingPrice: Float = 0f,
 
     @SerializedName("status")
-    val status: Int?,
+    val status: Int = 0,
 
     @SerializedName("createTime")
-    val createTime: String?,
+    val createTime: String = "",
 
     @SerializedName("completionTime")
-    val completionTime: String?,
+    val completionTime: String = "",
 
     @SerializedName("accountName")
-    val accountName: String?,
+    val accountName: String = "",
 
     @SerializedName("accountNumber")
-    val accountNumber: String?
+    val accountNumber: String = "",
+
+    @SerializedName("isOnline")
+    val isOnline: Boolean = false,
+
+    @SerializedName("paymentInfos")
+    val paymentInfos: ArrayList<PaymentInfoItem> = arrayListOf(),
+
+    @SerializedName("traceLogId")
+    val traceLogId: Long = 0,
+
+    @SerializedName("lastReplyTime")
+    val lastReplyTime: String = "",
+
+    @SerializedName("lastReadTime")
+    val lastReadTime: String = "",
+
+    @SerializedName("actualAmount")
+    val actualAmount: Float = 0f,
+
+    @SerializedName("point")
+    val point: Int = 0,
+
+    @SerializedName("failureReason")
+    val failureReason: String = ""
 )

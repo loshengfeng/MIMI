@@ -736,16 +736,19 @@ class PlayerViewModel : BaseViewModel() {
     fun checkStatus(onConfirmed: () -> Unit) {
         viewModelScope.launch {
             flow {
-                var status = StatusItem.NOT_LOGIN
-                if (accountManager.isLogin()) {
-                    val result = domainManager.getApiRepository().getMe()
-                    val isEmailConfirmed = result.body()?.content?.isEmailConfirmed ?: false
-                    status = if (result.isSuccessful && isEmailConfirmed) {
-                        StatusItem.LOGIN_AND_EMAIL_CONFIRMED
-                    } else {
-                        StatusItem.LOGIN_BUT_EMAIL_NOT_CONFIRMED
-                    }
-                }
+                //TODO: 目前先不判斷是否有驗證過
+//                var status = StatusItem.NOT_LOGIN
+//                if (accountManager.isLogin()) {
+//                    val result = domainManager.getApiRepository().getMe()
+//                    val isEmailConfirmed = result.body()?.content?.isEmailConfirmed ?: false
+//                    status = if (result.isSuccessful && isEmailConfirmed) {
+//                        StatusItem.LOGIN_AND_EMAIL_CONFIRMED
+//                    } else {
+//                        StatusItem.LOGIN_BUT_EMAIL_NOT_CONFIRMED
+//                    }
+//                }
+                val status =
+                    if (accountManager.isLogin()) StatusItem.LOGIN_AND_EMAIL_CONFIRMED else StatusItem.NOT_LOGIN
                 emit(ApiResult.success(CheckStatusItem(status, onConfirmed)))
             }
                     .onStart { emit(ApiResult.loading()) }

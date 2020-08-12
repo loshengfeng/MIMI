@@ -40,6 +40,7 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
+        android:requestLegacyExternalStorage="true"
         android:theme="@style/AppTheme">
 
         <activity
@@ -55,7 +56,8 @@
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="mimi" />
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="mimi"/>
             </intent-filter>
         </activity>
 

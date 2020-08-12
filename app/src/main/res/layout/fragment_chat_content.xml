@@ -71,7 +71,6 @@
             android:paddingEnd="18dp"
             android:textColorHint="@color/color_black_1_30"
             android:textSize="14sp"
-            android:hint="@string/edit_hint_chat"
             android:background="@drawable/bg_white_1_65625_radius_18" />
 
         <ImageButton

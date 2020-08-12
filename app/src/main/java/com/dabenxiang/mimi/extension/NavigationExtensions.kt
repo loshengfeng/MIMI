@@ -30,10 +30,6 @@ import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.vo.StatusItem
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import retrofit2.HttpException
 import timber.log.Timber
 
 /**
@@ -106,19 +102,21 @@ fun BottomNavigationView.setupWithNavController(
         if (fragmentManager.isStateSaved) {
             false
         } else {
-            var status = StatusItem.LOGIN_AND_EMAIL_CONFIRMED
-            if (accountManager.isLogin() && (item.title.toString() == context.getString(R.string.nav_topup) || item.title.toString() == context.getString(
-                    R.string.nav_favorite
-                ))
-            ) {
-                runBlocking {
-                    val isConfirmed = withContext(Dispatchers.Default) {
-                        isEmailConfirmed(domainManager)
-                    }
-                    status =
-                        if (isConfirmed) StatusItem.LOGIN_AND_EMAIL_CONFIRMED else StatusItem.LOGIN_BUT_EMAIL_NOT_CONFIRMED
-                }
-            }
+            //TODO: 目前先不判斷是否有驗證過
+//            var status = StatusItem.LOGIN_AND_EMAIL_CONFIRMED
+//            if (accountManager.isLogin() && (item.title.toString() == context.getString(R.string.nav_topup) || item.title.toString() == context.getString(
+//                    R.string.nav_favorite
+//                ))
+//            ) {
+//                runBlocking {
+//                    val isConfirmed = withContext(Dispatchers.Default) {
+//                        isEmailConfirmed(domainManager)
+//                    }
+//                    status =
+//                        if (isConfirmed) StatusItem.LOGIN_AND_EMAIL_CONFIRMED else StatusItem.LOGIN_BUT_EMAIL_NOT_CONFIRMED
+//                }
+//            }
+            val status = StatusItem.LOGIN_AND_EMAIL_CONFIRMED
             when (status) {
                 StatusItem.NOT_LOGIN -> {
                     false

@@ -21,9 +21,10 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
     companion object {
         const val MIMI_PROJECT_ID = "815e22a6"
         const val DOWNLOAD_SERVER_PROJECT_ID = "WaumJF6y"
-        const val PROMO_CODE = "xxx"
+        const val PROMO_CODE = ""
         const val VALIDATION_URL = "/v1/Members/ValidateEmail"
-        const val PARAM_SIGN_UP_CODE = "/?signupCode="
+        const val PARAM_SIGNUP_CODE = "/?signupCode="
+        const val PARAM_RESET_CODE = "/?resetCode="
         const val FLAVOR_DEV = "dev"
         const val FLAVOR_SIT = "sit"
         const val BUILDTYPE_DEV = "dev"
