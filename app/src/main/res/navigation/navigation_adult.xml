@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_adult"
+    app:startDestination="@id/adultHomeFragment">
+
+    <include app:graph="@navigation/navigation_detail_club" />
+    <include app:graph="@navigation/navigation_my_post" />
+    <include app:graph="@navigation/navigation_login" />
+    <include app:graph="@navigation/navigation_setting" />
+
+    <fragment
+        android:id="@+id/adultHomeFragment"
+        android:name="com.dabenxiang.mimi.view.home.AdultHomeFragment"
+        tools:layout="@layout/fragment_home">
+
+        <action
+            android:id="@+id/action_homeFragment_to_categoriesFragment"
+            app:destination="@id/categoriesFragment" />
+
+        <action
+            android:id="@+id/action_homeFragment_to_searchVideoFragment"
+            app:destination="@id/searchVideoFragment" />
+
+        <action
+            android:id="@+id/action_homeFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+
+        <action
+            android:id="@+id/action_adultHomeFragment_to_clipFragment"
+            app:destination="@id/clipFragment" />
+
+        <action
+            android:id="@+id/action_adultHomeFragment_to_postArticleFragment"
+            app:destination="@id/postArticleFragment" />
+
+        <action
+            android:id="@+id/action_adultHomeFragment_to_pictureDetailFragment"
+            app:destination="@id/pictureDetailFragment" />
+
+        <action
+            android:id="@+id/action_adultHomeFragment_to_textDetailFragment"
+            app:destination="@id/textDetailFragment" />
+
+        <action
+            android:id="@+id/action_adultHomeFragment_to_postPicFragment"
+            app:destination="@id/postPicFragment" />
+        <action
+            android:id="@+id/action_adultHomeFragment_to_editVideoFragment"
+            app:destination="@id/editVideoFragment" />
+        <action
+            android:id="@+id/action_adultHomeFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_adultHomeFragment_to_clubDetailFragment"
+            app:destination="@id/navigation_detail_club" />
+        <action
+            android:id="@+id/action_adultHomeFragment_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+
+        <action
+            android:id="@+id/action_adultHomeFragment_to_rankingFragment"
+            app:destination="@id/rankingFragment" />
+        <action
+            android:id="@+id/action_adultHomeFragment_to_categoriesFragment"
+            app:destination="@id/categoriesFragment" />
+        <action
+            android:id="@+id/action_adultHomeFragment_to_navigation_my_post"
+            app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_settingFragment"
+            app:destination="@id/navigation_setting"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/categoriesFragment"
+        android:name="com.dabenxiang.mimi.view.home.category.CategoriesFragment"
+        tools:layout="@layout/fragment_categories">
+        <action
+            android:id="@+id/action_categoriesFragment_to_searchVideoFragment"
+            app:destination="@id/searchVideoFragment" />
+
+        <action
+            android:id="@+id/action_categoriesFragment_to_loginFragment"
+            app:destination="@id/navigation_login" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/searchPostFragment"
+        android:name="com.dabenxiang.mimi.view.search.post.SearchPostFragment"
+        tools:layout="@layout/fragment_search_post">
+
+        <action
+            android:id="@+id/action_searchPostFragment_to_pictureDetailFragment"
+            app:destination="@id/pictureDetailFragment" />
+
+        <action
+            android:id="@+id/action_searchPostFragment_to_textDetailFragment"
+            app:destination="@id/textDetailFragment" />
+
+        <action
+            android:id="@+id/action_searchPostFragment_to_clipFragment"
+            app:destination="@id/clipFragment" />
+
+        <action
+            android:id="@+id/action_searchPostFragment_to_clubDetailFragment"
+            app:destination="@id/navigation_detail_club" />
+        <action
+            android:id="@+id/action_searchPostFragment_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_to_settingFragment"
+            app:destination="@id/navigation_setting" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/searchVideoFragment"
+        android:name="com.dabenxiang.mimi.view.search.video.SearchVideoFragment"
+        tools:layout="@layout/fragment_search_video" >
+        <action
+            android:id="@+id/action_to_settingFragment"
+            app:destination="@id/navigation_setting" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/clipFragment"
+        android:name="com.dabenxiang.mimi.view.clip.ClipFragment"
+        tools:layout="@layout/fragment_clip" >
+        <action
+            android:id="@+id/action_clipFragment_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_settingFragment"
+            app:destination="@id/navigation_setting" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/postArticleFragment"
+        android:name="com.dabenxiang.mimi.view.post.article.PostArticleFragment"
+        tools:layout="@layout/fragment_post_article" >
+        <action
+            android:id="@+id/action_postArticleFragment_to_adultHomeFragment"
+            app:destination="@id/adultHomeFragment"
+            app:popUpTo="@+id/adultHomeFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/pictureDetailFragment"
+        android:name="com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment"
+        tools:layout="@layout/fragment_picture_detail">
+        <action
+            android:id="@+id/action_pictureDetailFragment_to_pictureFragment"
+            app:destination="@id/pictureFragment" />
+        <action
+            android:id="@+id/action_pictureDetailFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_pictureDetailFragment_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_settingFragment"
+            app:destination="@id/navigation_setting"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/pictureFragment"
+        android:name="com.dabenxiang.mimi.view.fullpicture.FullPictureFragment"
+        tools:layout="@layout/fragment_full_picture" />
+
+    <fragment
+        android:id="@+id/textDetailFragment"
+        android:name="com.dabenxiang.mimi.view.textdetail.TextDetailFragment"
+        tools:layout="@layout/fragment_text_detail">
+        <action
+            android:id="@+id/action_textDetailFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_textDetailFragment_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_settingFragment"
+            app:destination="@id/navigation_setting"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/postPicFragment"
+        android:name="com.dabenxiang.mimi.view.post.pic.PostPicFragment"
+        android:label="PostPicFragment"
+        tools:layout="@layout/fragment_post_pic" >
+        <action
+            android:id="@+id/action_postPicFragment_to_postViewerFragment"
+            app:destination="@id/postViewerFragment" />
+        <action
+            android:id="@+id/action_postPicFragment_to_adultHomeFragment"
+            app:destination="@id/adultHomeFragment"
+            app:popUpTo="@+id/adultHomeFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/postVideoFragment"
+        android:name="com.dabenxiang.mimi.view.post.video.PostVideoFragment"
+        android:label="PostVideoFragment"
+        tools:layout="@layout/fragment_post_video">
+        <action
+            android:id="@+id/action_postVideoFragment_to_postViewerFragment"
+            app:destination="@id/postViewerFragment" />
+        <action
+            android:id="@+id/action_postVideoFragment_to_editVideoFragment"
+            app:destination="@id/editVideoFragment" />
+        <action
+            android:id="@+id/action_postVideoFragment_to_adultHomeFragment"
+            app:destination="@+id/adultHomeFragment"
+            app:popUpTo="@+id/adultHomeFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/editVideoFragment"
+        android:name="com.dabenxiang.mimi.view.post.video.EditVideoFragment"
+        android:label="EditVideoFragment"
+        tools:layout="@layout/fragment_edit_video">
+        <action
+            android:id="@+id/action_editVideoFragment_to_postVideoFragment"
+            app:destination="@id/postVideoFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/rankingFragment"
+        android:name="com.dabenxiang.mimi.view.ranking.RankingFragment"
+        android:label="RankingFragment"
+        tools:layout="@layout/fragment_ranking" >
+        <action
+            android:id="@+id/action_rankingFragment_to_clipFragment"
+            app:destination="@id/clipFragment" />
+
+        <action
+            android:id="@+id/action_rankingFragment_to_pictureDetailFragment"
+            app:destination="@id/pictureDetailFragment" />
+
+        <action
+            android:id="@+id/action_rankingFragment_to_loginFragment"
+            app:destination="@id/navigation_login" />
+   </fragment>
+    <fragment
+        android:id="@+id/postViewerFragment"
+        android:name="com.dabenxiang.mimi.view.post.viewer.PostViewerFragment"
+        android:label="PostViewerFragment"
+        tools:layout="@layout/fragment_post_viewer"/>
+</navigation>

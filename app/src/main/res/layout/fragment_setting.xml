@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_gray_4"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/layout_title"
+        layout="@layout/item_setting_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="15dp"
+        android:background="@color/color_gray_4">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="15dp"
+            android:background="@color/transparent">
+
+            <TextView
+                android:id="@+id/btn_photo"
+                style="@style/settingStyle_1"
+                android:drawableEnd="@drawable/btn_arrow_black_n"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/setting_photo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/iv_photo"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginEnd="36dp"
+                android:contentDescription="@null"
+                android:gravity="center"
+                android:src="@drawable/ico_default_photo"
+                app:layout_constraintBottom_toBottomOf="@id/btn_photo"
+                app:layout_constraintEnd_toEndOf="@id/btn_photo"
+                app:layout_constraintTop_toTopOf="@id/btn_photo" />
+
+            <View
+                android:id="@+id/line_split_photo"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@color/color_black_1_02"
+                app:layout_constraintEnd_toEndOf="@+id/btn_photo"
+                app:layout_constraintStart_toStartOf="@+id/btn_photo"
+                app:layout_constraintTop_toBottomOf="@+id/btn_photo" />
+
+            <TextView
+                android:id="@+id/btn_name"
+                style="@style/settingStyle_1"
+                android:drawableEnd="@drawable/btn_arrow_black_n"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/setting_name"
+                app:layout_constraintEnd_toEndOf="@+id/btn_photo"
+                app:layout_constraintStart_toStartOf="@+id/btn_photo"
+                app:layout_constraintTop_toBottomOf="@+id/line_split_photo" />
+
+            <TextView
+                android:id="@+id/tv_name"
+                style="@style/settingStyle_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="44dp"
+                android:drawablePadding="7dp"
+                android:gravity="center"
+                app:layout_constraintBottom_toBottomOf="@id/btn_name"
+                app:layout_constraintEnd_toEndOf="@id/btn_name"
+                app:layout_constraintTop_toTopOf="@id/btn_name"
+                tools:text="Jeff" />
+
+            <View
+                android:id="@+id/line_split_name"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@color/color_black_1_02"
+                app:layout_constraintEnd_toEndOf="@+id/btn_name"
+                app:layout_constraintStart_toStartOf="@+id/btn_name"
+                app:layout_constraintTop_toBottomOf="@+id/btn_name" />
+
+            <View
+                android:id="@+id/line_split_email"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@color/color_black_1_02"
+                app:layout_constraintEnd_toEndOf="@+id/line_split_name"
+                app:layout_constraintStart_toStartOf="@+id/line_split_name"
+                app:layout_constraintTop_toBottomOf="@+id/btn_email" />
+
+            <TextView
+                android:id="@+id/btn_email"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:background="@color/color_white_1"
+                android:gravity="top"
+                android:paddingStart="16dp"
+                android:paddingTop="20dp"
+                android:paddingEnd="16dp"
+                android:text="@string/setting_email"
+                android:textColor="@color/color_black_1_50"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="@+id/guideline"
+                app:layout_constraintEnd_toEndOf="@+id/btn_name"
+                app:layout_constraintHeight_min="60dp"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/btn_name"
+                app:layout_constraintTop_toBottomOf="@+id/line_split_name"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <ImageView
+                android:id="@+id/iv_email_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/btn_arrow_black_n"
+                app:layout_constraintBottom_toBottomOf="@id/tv_email"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_email" />
+
+            <Button
+                android:id="@+id/btn_resend"
+                android:layout_width="92dp"
+                android:layout_height="32dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/bg_red_1_radius_6"
+                android:gravity="center"
+                android:text="@string/setting_resend_mail"
+                android:textColor="@color/color_white_1"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@id/line_split_email"
+                app:layout_constraintEnd_toEndOf="@+id/iv_email_arrow"
+                app:layout_constraintTop_toBottomOf="@id/tv_email"
+                app:layout_constraintVertical_bias="0"
+                tools:visibility="visible" />
+
+            <View
+                android:id="@+id/guideline"
+                android:layout_width="wrap_content"
+                android:layout_height="1dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintEnd_toEndOf="@+id/btn_resend"
+                app:layout_constraintStart_toStartOf="@+id/btn_resend"
+                app:layout_constraintTop_toBottomOf="@+id/btn_resend"
+                app:layout_goneMarginTop="10dp" />
+
+            <TextView
+                android:id="@+id/tv_email"
+                style="@style/settingStyle_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="17dp"
+                android:layout_marginEnd="40dp"
+                android:drawableEnd="@drawable/ico_checked"
+                android:drawablePadding="7dp"
+                android:gravity="center|right"
+                app:layout_constraintEnd_toEndOf="@+id/btn_email"
+                app:layout_constraintTop_toTopOf="@+id/btn_email"
+                tools:text="jeff.yu@silkrode.com.tw" />
+
+            <TextView
+                android:id="@+id/btn_account"
+                style="@style/settingStyle_1"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:text="@string/setting_account"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/line_split_email" />
+
+            <TextView
+                android:id="@+id/tv_account"
+                style="@style/settingStyle_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawablePadding="7dp"
+                android:gravity="center"
+                android:paddingEnd="20dp"
+                app:layout_constraintBottom_toTopOf="@+id/btn_account"
+                app:layout_constraintEnd_toEndOf="@+id/btn_account"
+                app:layout_constraintTop_toBottomOf="@+id/btn_account"
+                tools:text="Jeff" />
+
+            <TextView
+                android:id="@+id/btn_chang_pw"
+                style="@style/settingStyle_1"
+                android:layout_marginTop="15dp"
+                android:drawableEnd="@drawable/btn_arrow_black_n"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/setting_change_pw"
+                app:layout_constraintEnd_toEndOf="@+id/btn_account"
+                app:layout_constraintStart_toStartOf="@+id/btn_account"
+                app:layout_constraintTop_toBottomOf="@+id/btn_account" />
+
+            <TextView
+                android:id="@+id/btn_gender"
+                style="@style/settingStyle_1"
+                android:layout_marginTop="15dp"
+                android:drawableEnd="@drawable/btn_arrow_black_n"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/setting_gender"
+                app:layout_constraintEnd_toEndOf="@id/btn_account"
+                app:layout_constraintTop_toBottomOf="@id/btn_chang_pw" />
+
+            <TextView
+                android:id="@+id/gender_info"
+                style="@style/settingStyle_2"
+                android:layout_marginEnd="44dp"
+                android:drawablePadding="7dp"
+                android:gravity="center"
+                android:text="@string/setting_gender"
+                app:layout_constraintBottom_toBottomOf="@+id/btn_gender"
+                app:layout_constraintEnd_toEndOf="@+id/btn_gender"
+                app:layout_constraintTop_toTopOf="@+id/btn_gender" />
+
+            <View
+                android:id="@+id/line_gender"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/color_black_1_02"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btn_gender" />
+
+            <TextView
+                android:id="@+id/btn_birthday"
+                style="@style/settingStyle_1"
+                android:drawableEnd="@drawable/btn_arrow_black_n"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/setting_birthday"
+                app:layout_constraintEnd_toEndOf="@id/btn_account"
+                app:layout_constraintTop_toBottomOf="@id/line_gender" />
+
+            <TextView
+                android:id="@+id/btn_binding_invitation"
+                style="@style/settingStyle_1"
+                android:layout_marginTop="15dp"
+                android:drawableEnd="@drawable/btn_arrow_black_n"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/setting_binding_invitation"
+                app:layout_constraintEnd_toEndOf="@id/btn_account"
+                app:layout_constraintTop_toBottomOf="@id/btn_birthday" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</LinearLayout>

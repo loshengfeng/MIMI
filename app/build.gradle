@@ -3,9 +3,29 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
-
+def android_builder_version = "3.5.3"
+def android_builder_main_version = 3
 android {
-    Version version = readVersion()
+    this.rootProject.buildscript.configurations.classpath
+            .resolvedConfiguration
+            .firstLevelModuleDependencies.
+            each {
+                def name = it.name
+                if (name.contains('com.android.tools.build:gradle')) {
+                    def moduleVersion = it.moduleVersion
+                    if (moduleVersion.contains("-")) {
+                        def versionArray = moduleVersion.split("-")
+                        version = versionArray[0]
+                        alpha = versionArray[1]
+                    } else {
+                        version = moduleVersion
+                        android_builder_version = moduleVersion
+                        println "Android Builder Version : " + android_builder_version
+                    }
+                }
+            }
+    android_builder_main_version = Integer.parseInt(android_builder_version.split("\\.")[0])
+    println "Android Builder Main Version : " + android_builder_main_version
 
     signingConfigs {
         release {
@@ -19,12 +39,35 @@ android {
         }
     }
 
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+
+    kapt {
+        correctErrorTypes = true
+        arguments {
+            arg("room.schemaLocation", "$projectDir/schemas".toString())
+        }
+    }
+
+    //WARNING: DSL element 'android.dataBinding.enabled' is obsolete and has been replaced with 'android.buildFeatures.dataBinding'.
+    if (android_builder_main_version < 4) {
+        dataBinding {
+            enabled = false
+        }
+    } else {
+        buildFeatures {
+            dataBinding false
+            // for view binding:
+            // viewBinding true
+        }
+    }
     androidExtensions {
         experimental = true
     }
 
-    compileSdkVersion 29
-    buildToolsVersion "30.0.1"
+    lintOptions {
+        disable 'MissingDefaultResource'
+    }
 
     def getLocalIPv4 = { ->
         def ip4s = []
@@ -41,18 +84,23 @@ android {
         return ip.substring(ip.indexOf('/') + 1, ip.length())
     }
 
+    Version version = readVersion()
     defaultConfig {
         applicationId "com.dabenxiang.mimi"
-        minSdkVersion 26
+        minSdkVersion 24
         targetSdkVersion 29
         versionCode version.versionCode.toInteger()
         versionName version.versionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField "String", "API_HOST", '"http://dev-atw-api.silkrode.com.tw/"'
+        buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
+        buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
+        buildConfigField "String", "WEB_HOST", '"https://sit-video-web.ymmsp.com"'
         buildConfigField "String", "LOCAL_SOCKET_HOST", "\"${getLocalIPv4()}\""
         buildConfigField "int", "LOCAL_SOCKET_PORT", "8080"
-        buildConfigField "String", "WEB_SOCKET_HOST", '"ws://dev-wt-api.silkrode.com.tw/topics/atw-wx?token="'
         archivesBaseName = "$applicationName-v$versionName"
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a"
+        }
     }
 
     buildTypes {
@@ -84,25 +132,37 @@ android {
         dev_release.initWith(buildTypes.release)
 
         prod_debug {
-            buildConfigField "String", "API_HOST", '"http://10.1.1.121:12080/"'
+            buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
+            buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
+            buildConfigField "String", "MQTT_HOST", '"ws://10.1.1.121:8083"'
         }
 
         prod_release {
-            buildConfigField "String", "API_HOST", '"http://10.1.1.121:12080/"'
+            buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
+            buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
+            buildConfigField "String", "MQTT_HOST", '"ws://10.1.1.121:8083"'
         }
 
         sit_debug {
-            buildConfigField "String", "API_HOST", '"http://10.1.1.121:12080/"'
+            buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
+            buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
+            buildConfigField "String", "MQTT_HOST", '"wss://mqtt.ymmsp.com:443"'
         }
         sit_release {
-            buildConfigField "String", "API_HOST", '"http://10.1.1.121:12080/"'
+            buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
+            buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
+            buildConfigField "String", "MQTT_HOST", '"wss://mqtt.ymmsp.com:443"'
         }
 
         dev_debug {
-            buildConfigField "String", "API_HOST", '"http://10.1.1.121:12080/"'
+            buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
+            buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
+            buildConfigField "String", "MQTT_HOST", '"ws://10.1.1.121:8083"'
         }
         dev_release {
-            buildConfigField "String", "API_HOST", '"http://10.1.1.121:12080/"'
+            buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
+            buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
+            buildConfigField "String", "MQTT_HOST", '"ws://10.1.1.121:8083"'
         }
     }
 
@@ -130,31 +190,64 @@ android {
 //        println "Show  flavorName !!  " + flavorName//
         def buildTypename = variant.buildType.name.toString()
 //        println "Show  buildTypename !!  " + buildTypename
-    }
-
-    sourceSets {
-        main {
-            aidl.srcDirs = []
-            assets.srcDirs = ['src/main/assets']
-            java.srcDirs = []
-            jni.srcDirs = []
-            renderscript.srcDirs = []
-            res.srcDirs = []
-            resources.srcDirs = []
-            jniLibs.srcDirs = []
+        Version flavor_version = readVersionWithPath(getVersionPropertiesPath(flavorName))
+        println "Show current flavor_version versionName " + flavor_version.versionName
+        println "Show current flavor_version versionCode :   " + flavor_version.versionCode
+        def current_branch = gitBranch()
+//        println "Show current_branch :   " + current_branch
+        if (buildTypename.equals("prod_release")&& (current_branch.equals("release")||current_branch.equals("master"))) {
+            increaseVersionWithPath(getVersionPropertiesPath(flavorName))
+            flavor_version = readVersionWithPath(getVersionPropertiesPath(flavorName))
+            println "prod_release get new flavor_version versionName " + flavor_version.versionName
+            println "prod_release get new flavor_version versionCode :   " + flavor_version.versionCode
+        }
+        variant.outputs.each { output ->
+            output.versionNameOverride = flavor_version.versionName
+            output.versionCodeOverride = flavor_version.versionCode.toInteger()
         }
     }
+////Ref : https://blog.csdn.net/lbcab/article/details/72771729
+////Android Studio在对变体目录和main目录进行资源合并时，会遵守这样的规则 某资源在free下有，在main中没有，那么在打包时，会将该资源直接合并到main资源中 某资源在free下有，在main中也有，那么在打包时，会以free为主，将free中资源替换掉main中资源。
+////代码文件，顾名思义就是指java目录下的.java文件了，为什么代码叫整合，而资源却是合并呢？因为代码文件是没办法合并的，只能是整合，整合是什么意思？假设当前选中的变体是freeDebug，有一个java文件是Test.java，这个Test.java要么只存在free/java下，要么只存在于main/java下，如
+////assets虽然是资源，但它不是合并，而是整合，也就是说，assets文件的处理方式跟java文件的处理方式是一样的 解决方案是使用sourceSets
+
+//    sourceSets {
+//        main {
+//            manifest.srcFile 'AndroidManifest.xml'
+//            aidl.srcDirs = []
+//            assets.srcDirs = ['src/main/assets']
+//            java.srcDirs = []
+//            jni.srcDirs = []
+//            renderscript.srcDirs = []
+//            res.srcDirs = []
+//            resources.srcDirs = []
+//            jniLibs.srcDirs = []
+//        }
+//        mimi {
+//
+//        }
+//    sourceSets.all { sourceSet ->
+//        // println("sourceSet.name = ${sourceSet.name}")
+//        if (sourceSet.name.contains('Debug') || sourceSet.name.contains('Release')) {
+//            if (sourceSet.name.contains("china")
+//                    || sourceSet.name.contains("a")
+//                    || sourceSet.name.contains("b")
+//                    || ...) {
+//                sourceSet.assets.srcDirs = ['src/free/assets']
+//            }
+//        }
+//    }
+
+
+//    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    kapt {
-        correctErrorTypes = true
-        arguments {
-            arg("room.schemaLocation", "$projectDir/schemas".toString())
-        }
+    kotlinOptions {
+        jvmTarget = "1.8"
     }
 
     testOptions {
@@ -166,14 +259,42 @@ android {
     }
 }
 
+project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions {
+        freeCompilerArgs = [
+                "-Xjsr305=strict",
+                "-progressive"
+        ]
+        jvmTarget = "1.8"
+    }
+}
+
+def gitBranch() {
+    def branch = ""
+    def proc = "git rev-parse --abbrev-ref HEAD".execute()
+    proc.in.eachLine { line -> branch = line }
+    proc.err.eachLine { line -> println line }
+    proc.waitFor()
+    branch
+}
+
+def isWithSubmoduleBranch() {
+    if (gitBranch().contains("dev_sub")) {
+        return true
+    } else {
+        return false
+    }
+}
+
 dependencies {
-    implementation fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
 
     // AndroidX
     implementation "androidx.appcompat:appcompat:$appcompat_version"
     implementation "androidx.core:core-ktx:$ktx_version"
     implementation "com.google.android.material:material:$material_version"
+    implementation "androidx.activity:activity-ktx:$activity_ktx_version"
+    implementation "androidx.fragment:fragment-ktx:$fragment_ktx_version"
 
     // Kotlin Coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
@@ -252,6 +373,11 @@ dependencies {
     // WebSocket
     implementation "org.java-websocket:Java-WebSocket:$websocket_version"
 
+    // MQTT
+    implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:$mqtt_version"
+    implementation "org.eclipse.paho:org.eclipse.paho.android.service:$paho_service_version"
+    implementation "androidx.localbroadcastmanager:localbroadcastmanager:$local_broadcast_manager_version"
+
     // Security-Crypto
     implementation "androidx.security:security-crypto:$security_crypto_version"
 
@@ -268,6 +394,57 @@ dependencies {
 
     // AndroidUtilCode
     implementation "com.blankj:utilcodex:$utilcodex_version"
+
+    // Viewpager2
+    implementation "androidx.viewpager2:viewpager2:$viewpager2_version"
+    implementation 'com.to.aboomy:pager2banner:0.0.5'
+
+    // RoundedView
+    implementation "com.github.yulichswift:RoundedViews:$rounded_views_version"
+
+    // ExoPlayer
+    implementation "com.google.android.exoplayer:exoplayer:$exoplayer_version"
+    implementation "com.google.android.exoplayer:extension-rtmp:$exoplayer_version"
+
+    // BaseRecyclerViewAdapterHelper
+    implementation "com.github.CymChad:BaseRecyclerViewAdapterHelper:$base_recycler_view_adapter_helper_version"
+
+    // Domain GoLib
+    implementation project(path: ':domain_libs')
+
+    // Video Editor
+    implementation project(path: ':video-editor')
+
+    // Application Provider
+    implementation "com.github.florent37:applicationprovider:$application_provider_version"
+
+    // Work
+    implementation "androidx.work:work-runtime-ktx:$work_version"
+
+    implementation 'org.conscrypt:conscrypt-android:2.2.1'
+
+    // Log
+    if (isWithSubmoduleBranch()) {
+        println "sub_project dep !!  "
+        implementation project(path: ':BaseManager')
+        implementation project(path: ':DeviceInfoProvider')
+        implementation project(path: ':logmanager')
+        implementation project(path: ':utils_device')
+        implementation project(path: ':utils_api_result')
+        implementation project(path: ':utils_general')
+        implementation project(path: ':utils_loglevel')
+        implementation project(path: ':utils_gson_factory')
+    } else {
+        implementation "org.cks.utils:BaseManager:$cks_log_version"
+        implementation "org.cks.utils:DeviceInfoProvider:$cks_provider"
+        implementation "org.cks.utils:logmanager:$cks_log_version"
+        implementation "org.cks.utils:utils_device:$cks_utils"
+        implementation "org.cks.utils:utils_api_result:$cks_utils"
+        implementation "org.cks.utils:utils_general:$cks_utils"
+        implementation "org.cks.utils:utils_loglevel:$cks_utils"
+        implementation "org.cks.utils:utils_gson_factory:$cks_utils"
+        implementation "org.cks.utils:updatemanager:$cks_update_version"
+    }
 
     // Test
     testImplementation "io.mockk:mockk:$mokk_version"
@@ -292,11 +469,21 @@ class Version {
     def versionName
 }
 
-Version readVersion() {
-    readVersion('version.properties')
+def getVersionPropertiesPath(String flavor) {
+    def path = "version.properties"
+    switch (flavor) {
+        case "mimi":
+            path = "./src/mimi/version.properties"
+            break
+    }
+    return path
 }
 
-Version readVersion(String version_properties_path) {
+Version readVersion() {
+    readVersionWithPath('version.properties')
+}
+
+Version readVersionWithPath(String version_properties_path) {
     Properties defaultVersionProps = new Properties()
     def pfile = file(version_properties_path)
     if (!pfile.exists()) {
@@ -309,18 +496,21 @@ Version readVersion(String version_properties_path) {
 }
 
 def increaseVersion() {
-    increaseVersion('version.properties')
+    increaseVersionWithPath('version.properties')
 }
 
-def increaseVersion(String version_properties_path) {
+def increaseVersionWithPath(String version_properties_path) {
     Properties versionProps = new Properties()
-    def file = file(version_properties_path)
-    versionProps.load(new FileInputStream(file))
+    def pfile = file(version_properties_path)
+    if (!pfile.exists()) {
+        pfile = file('version.properties')
+    }
+    versionProps.load(new FileInputStream( pfile))
     def nextCode = versionProps['VERSION_CODE'].toInteger() + 1
     versionProps['VERSION_CODE'] = nextCode.toString()
     def nextBuild = versionProps['VERSION_NAME_BUILD'].toInteger() + 1
     versionProps['VERSION_NAME_BUILD'] = nextBuild.toString()
-    versionProps.store(file.newWriter(), null)
+    versionProps.store(pfile.newWriter(), null)
     def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD']
     println "Increase $buildVersionName"
 }
@@ -330,30 +520,3 @@ task increaseVersion {
         increaseVersion()
     }
 }
-
-def decreaseVersion() {
-    decreaseVersion('version.properties')
-}
-
-def decreaseVersion(String version_properties_path) {
-    Properties versionProps = new Properties()
-    def file = file(version_properties_path)
-    versionProps.load(new FileInputStream(file))
-    def preCode = versionProps['VERSION_CODE'].toInteger() - 1
-    versionProps['VERSION_CODE'] = preCode.toString()
-    def preBuild = versionProps['VERSION_NAME_BUILD'].toInteger() - 1
-    versionProps['VERSION_NAME_BUILD'] = preBuild.toString()
-    versionProps.store(file.newWriter(), null)
-    def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD']
-    println "Decrease $buildVersionName"
-}
-
-task decreaseVersion {
-    doLast {
-        decreaseVersion()
-    }
-}
-
-
-
-

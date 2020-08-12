@@ -1,2 +1,3 @@
+include ':video-editor'
 rootProject.name='MiMi'
-include ':app'
+include ':app', ':domain_libs'

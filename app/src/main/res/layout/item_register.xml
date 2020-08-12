@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="30dp"
+    android:paddingTop="50dp"
+    android:paddingEnd="30dp"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
+
+    <EditText
+        android:id="@+id/edit_friendly_name"
+        style="@style/login_edit_text"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:width="0dp"
+        android:hint="@string/login_name"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        android:maxLength="20"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_friendly_name_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color_red_2"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_friendly_name"
+        tools:text="错误讯息"
+        tools:visibility="visible" />
+
+    <EditText
+        android:id="@+id/edit_email"
+        style="@style/login_edit_text"
+        android:layout_height="wrap_content"
+        android:width="0dp"
+        android:hint="@string/login_email"
+        android:importantForAutofill="no"
+        android:inputType="textEmailAddress"
+        android:maxLength="100"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_friendly_name" />
+
+    <CheckBox
+        android:id="@+id/cb_email"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/ico_checked_selector"
+        android:button="@null"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/edit_email"
+        app:layout_constraintEnd_toEndOf="@id/edit_email"
+        app:layout_constraintTop_toTopOf="@id/edit_email"
+        tools:checked="false"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/tv_email_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color_red_2"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_email"
+        tools:text="错误讯息"
+        tools:visibility="visible" />
+
+    <EditText
+        android:id="@+id/edit_register_account"
+        style="@style/login_edit_text"
+        android:layout_height="wrap_content"
+        android:width="0dp"
+        android:autofillHints=""
+        android:hint="@string/login_account"
+        android:inputType="text"
+        android:maxLength="20"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/edit_email"
+        tools:ignore="LabelFor" />
+
+    <CheckBox
+        android:id="@+id/cb_register_account"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/ico_checked_selector"
+        android:button="@null"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/edit_register_account"
+        app:layout_constraintEnd_toEndOf="@id/edit_register_account"
+        app:layout_constraintTop_toTopOf="@id/edit_register_account"
+        tools:checked="true"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/tv_register_account_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color_red_2"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_register_account"
+        tools:text="错误讯息"
+        tools:visibility="visible" />
+
+    <EditText
+        android:id="@+id/edit_register_pw"
+        style="@style/login_edit_text"
+        android:layout_height="wrap_content"
+        android:width="0dp"
+        android:hint="@string/login_pw"
+        android:importantForAutofill="no"
+        android:inputType="textPassword"
+        android:maxLength="20"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_register_account"
+        tools:ignore="LabelFor" />
+
+    <CheckBox
+        android:id="@+id/cb_show_register_pw"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/ico_eye_selector"
+        android:button="@null"
+        android:checked="false"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@id/edit_register_pw"
+        app:layout_constraintEnd_toEndOf="@id/edit_register_pw"
+        app:layout_constraintTop_toTopOf="@id/edit_register_pw" />
+
+    <TextView
+        android:id="@+id/tv_register_pw_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color_red_2"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_register_pw"
+        tools:text="错误讯息"
+        tools:visibility="visible" />
+
+    <EditText
+        android:id="@+id/edit_register_confirm_pw"
+        style="@style/login_edit_text"
+        android:layout_height="wrap_content"
+        android:width="0dp"
+        android:hint="@string/login_confirm_pw"
+        android:importantForAutofill="no"
+        android:inputType="textPassword"
+        android:maxLength="20"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_register_pw"
+        tools:ignore="LabelFor" />
+
+    <CheckBox
+        android:id="@+id/cb_show_register_confirm_pw"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/ico_eye_selector"
+        android:button="@null"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/edit_register_confirm_pw"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/edit_register_confirm_pw" />
+
+    <TextView
+        android:id="@+id/tv_register_confirm_pw_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color_red_2"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_register_confirm_pw"
+        tools:text="错误讯息"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/tv_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/login_desc"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/edit_register_confirm_pw" />
+
+    <Button
+        android:id="@+id/btn_register_cancel"
+        android:layout_width="76dp"
+        android:layout_height="33dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/bg_white_stroke_1_radius_6"
+        android:text="@string/btn_cancel"
+        android:textColor="@color/color_black_1_50"
+        app:layout_constraintEnd_toStartOf="@id/btn_register"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_desc" />
+
+    <Button
+        android:id="@+id/btn_register"
+        android:layout_width="76dp"
+        android:layout_height="33dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/bg_red_1_radius_6"
+        android:text="@string/btn_register"
+        android:textColor="@color/color_white_1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/btn_register_cancel"
+        app:layout_constraintTop_toBottomOf="@id/tv_desc" />
+</androidx.constraintlayout.widget.ConstraintLayout>

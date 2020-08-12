@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_personal"
+    app:startDestination="@id/personalFragment">
+
+    <include app:graph="@navigation/navigation_login" />
+    <include app:graph="@navigation/navigation_detail_club" />
+    <include app:graph="@navigation/navigation_my_post" />
+    <include app:graph="@navigation/navigation_setting" />
+
+    <fragment
+        android:id="@+id/personalFragment"
+        android:name="com.dabenxiang.mimi.view.personal.PersonalFragment"
+        tools:layout="@layout/fragment_personal">
+
+        <action
+            android:id="@+id/action_personalFragment_to_loginFragment"
+            app:destination="@id/navigation_login" />
+
+        <action
+            android:id="@+id/action_personalFragment_to_myFollowFragment"
+            app:destination="@id/myFollowFragment" />
+
+        <action
+            android:id="@+id/action_personalFragment_to_orderFragment"
+            app:destination="@id/orderFragment" />
+
+        <action
+            android:id="@+id/action_personalFragment_to_chatHistoryFragment"
+            app:destination="@id/chatHistoryFragment" />
+
+        <action
+            android:id="@+id/action_personalFragment_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_to_settingFragment"
+            app:destination="@id/navigation_setting"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/myFollowFragment"
+        android:name="com.dabenxiang.mimi.view.myfollow.MyFollowFragment"
+        tools:layout="@layout/fragment_my_follow">
+
+        <action
+            android:id="@+id/action_myFollowFragment_to_clubDetailFragment"
+            app:destination="@id/navigation_detail_club"/>
+        <action
+            android:id="@+id/action_myFollowFragment_to_navigation_my_post"
+            app:destination="@id/navigation_my_post" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/orderFragment"
+        android:name="com.dabenxiang.mimi.view.order.OrderFragment"
+        tools:layout="@layout/fragment_order"/>
+
+    <fragment
+        android:id="@+id/chatHistoryFragment"
+        android:name="com.dabenxiang.mimi.view.chathistory.ChatHistoryFragment"
+        tools:layout="@layout/fragment_chat_history" >
+        <action
+            android:id="@+id/action_chatHistoryFragment_to_chatContentFragment"
+            app:destination="@id/chatContentFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/messengerFragment"
+        android:name="com.dabenxiang.mimi.view.messenger.MessengerFragment"
+        tools:layout="@layout/fragment_messenger" />
+
+    <fragment
+        android:id="@+id/chatContentFragment"
+        android:name="com.dabenxiang.mimi.view.chatcontent.ChatContentFragment"
+        android:label="ChatContentFragment" />
+
+</navigation>

@@ -6,7 +6,6 @@ import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.widget.utility.CryptUtils
 
 abstract class AbstractPref protected constructor(preferenceFileName: String, isDebug: Boolean) {
-
     var prefs: SharedPreferences = when {
         isDebug -> {
             App.applicationContext()

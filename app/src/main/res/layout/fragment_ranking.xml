@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/adult_color_background">
+
+    <include
+        android:id="@+id/toolbarContainer"
+        layout="@layout/toolbar" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_temporal_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
+        android:background="@color/adult_color_status_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbarContainer"
+        app:tabGravity="fill"
+        app:tabIndicatorColor="@color/color_red_1"
+        app:tabIndicatorFullWidth="false"
+        app:tabIndicatorHeight="5dp"
+        app:tabMode="fixed"
+        app:tabSelectedTextColor="@color/color_white_1"
+        app:tabTextAppearance="@style/ranking_tab_item_text"
+        app:tabTextColor="@color/color_white_1_50">
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/ti_ranking_day"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:text="@string/ranking_day" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/ti_ranking_week"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:text="@string/ranking_week" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/ti_ranking_moon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:text="@string/ranking_moon" />
+
+    </com.google.android.material.tabs.TabLayout>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_type_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
+        android:background="@color/adult_color_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tab_temporal_filter"
+        app:tabGravity="fill"
+        app:tabIndicatorColor="@color/color_red_1"
+        app:tabIndicatorFullWidth="false"
+        app:tabIndicatorHeight="0dp"
+        app:tabMode="fixed"
+        app:tabBackground="@drawable/bg_ranking_type_selector"
+        app:tabSelectedTextColor="@color/color_white_1"
+        app:tabTextAppearance="@style/ranking_tab_item_type_text"
+        app:tabTextColor="@color/color_white_1_50"
+        app:tabInlineLabel="true">
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/ti_video_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:icon="@drawable/ico_rank_video_1"
+            android:text="@string/video" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/ti_short_video_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:icon="@drawable/ico_rank_shortvideo_1"
+            android:text="@string/short_video" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/ti_picture_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:icon="@drawable/ico_rank_photo_1"
+            android:text="@string/picture" />
+    </com.google.android.material.tabs.TabLayout>
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/layout_refresh"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:background="@color/color_black_6"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tab_type_filter">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_ranking_content"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="20dp"
+            android:visibility="visible"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tl_type"
+            tools:visability="visible" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

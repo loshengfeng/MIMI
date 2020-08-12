@@ -1,7 +1,7 @@
 package com.dabenxiang.mimi.di
 
+import com.dabenxiang.mimi.API_HOST_URL
 import com.dabenxiang.mimi.BuildConfig
-import com.dabenxiang.mimi.Constant
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiService
 import com.dabenxiang.mimi.model.api.AuthInterceptor
@@ -21,6 +21,7 @@ val apiModule = module {
     single { provideOkHttpClient(get(), get()) }
     single { provideApiService(get()) }
     single { provideApiRepository(get()) }
+
 }
 
 fun provideAuthInterceptor(pref: Pref): AuthInterceptor {
@@ -36,7 +37,10 @@ fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
     return httpLoggingInterceptor
 }
 
-fun provideOkHttpClient(authInterceptor: AuthInterceptor, httpLoggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
+fun provideOkHttpClient(
+    authInterceptor: AuthInterceptor,
+    httpLoggingInterceptor: HttpLoggingInterceptor
+): OkHttpClient {
     val builder = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(60, TimeUnit.SECONDS)
@@ -44,7 +48,7 @@ fun provideOkHttpClient(authInterceptor: AuthInterceptor, httpLoggingInterceptor
         .addInterceptor(authInterceptor)
         .addInterceptor(httpLoggingInterceptor)
 
-    if(BuildConfig.DEBUG) {
+    if (BuildConfig.DEBUG) {
         builder.addNetworkInterceptor(StethoInterceptor())
     }
 
@@ -55,7 +59,7 @@ fun provideApiService(okHttpClient: OkHttpClient): ApiService {
     return Retrofit.Builder()
         .addConverterFactory(GsonConverterFactory.create(Gson()))
         .client(okHttpClient)
-        .baseUrl(Constant.API_HOST_URL)
+        .baseUrl(API_HOST_URL)
         .build()
         .create(ApiService::class.java)
 }
