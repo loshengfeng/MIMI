@@ -153,7 +153,18 @@ class TopUpFragment : BaseFragment() {
         })
 
         viewModel.agentList.observe(viewLifecycleOwner, Observer {
+            rv_proxy_pay.visibility = View.VISIBLE
             agentAdapter.submitList(it)
+        })
+
+        viewModel.agentListIsEmpty.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                tv_proxy_empty.visibility = View.VISIBLE
+                rv_proxy_pay.visibility = View.GONE
+            } else {
+                tv_proxy_empty.visibility = View.GONE
+                rv_proxy_pay.visibility = View.VISIBLE
+            }
         })
     }
 
@@ -163,10 +174,13 @@ class TopUpFragment : BaseFragment() {
                 R.id.rb_online_pay -> {
                     layout_online_pay.visibility = View.VISIBLE
                     rv_proxy_pay.visibility = View.GONE
+                    tv_proxy_empty.visibility = View.GONE
                 }
                 R.id.rb_proxy_pay -> {
                     layout_online_pay.visibility = View.GONE
                     rv_proxy_pay.visibility = View.VISIBLE
+                    tv_proxy_empty.visibility = View.VISIBLE
+
                     viewModel.getProxyPayList()
                 }
             }

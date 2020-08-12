@@ -977,7 +977,7 @@ class AdultHomeFragment : BaseFragment() {
 
         override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
 
-            val bundle = ClipFragment.createBundle(ArrayList(item.subList(1, item.lastIndex)), position-1)
+            val bundle = ClipFragment.createBundle(ArrayList(item.subList(1, item.size)), position-1)
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_adultHomeFragment_to_clipFragment,
