@@ -743,8 +743,10 @@ class PlayerActivity : BaseActivity() {
             OrientationDetector(this, SensorManager.SENSOR_DELAY_NORMAL).also { detector ->
                 detector.setChangeListener(object : OrientationDetector.OnChangeListener {
                     override fun onChanged(orientation: Int) {
-                        viewModel.currentOrientation = orientation
 
+                        Timber.i("detector onChanged")
+                        viewModel.currentOrientation = orientation
+                        viewModel.lockFullScreen = !viewModel.lockFullScreen
                         if (viewModel.lockFullScreen) {
                             when (orientation) {
                                 ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE, ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE -> {
@@ -754,7 +756,7 @@ class PlayerActivity : BaseActivity() {
                         } else {
                             requestedOrientation = orientation
                         }
-
+                        fullScreenUISet()
                         adjustPlayerSize()
                     }
                 })
@@ -1722,8 +1724,18 @@ class PlayerActivity : BaseActivity() {
             } else {
                 ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             }
-
+        fullScreenUISet()
         adjustPlayerSize()
+    }
+
+    private fun fullScreenUISet(){
+        if(viewModel.lockFullScreen){
+            recycler_info.visibility = View.GONE
+            bottom_func_bar.visibility = View.GONE
+        }else{
+            recycler_info?.visibility = View.VISIBLE
+            bottom_func_bar?.visibility = View.VISIBLE
+        }
     }
 
     private fun scrollToBottom() {
