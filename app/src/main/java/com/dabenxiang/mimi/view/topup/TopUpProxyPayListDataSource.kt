@@ -1,7 +1,7 @@
 package com.dabenxiang.mimi.view.topup
 
 import androidx.paging.PageKeyedDataSource
-import com.dabenxiang.mimi.callback.PagingCallback
+import com.dabenxiang.mimi.callback.TopUpPagingCallback
 import com.dabenxiang.mimi.model.api.vo.AgentItem
 import com.dabenxiang.mimi.model.manager.DomainManager
 import kotlinx.coroutines.CoroutineScope
@@ -13,7 +13,7 @@ import retrofit2.HttpException
 class TopUpProxyPayListDataSource constructor(
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
-    private val pagingCallback: PagingCallback
+    private val pagingCallback: TopUpPagingCallback
 ) : PageKeyedDataSource<Long, AgentItem>() {
 
     companion object {
@@ -33,7 +33,7 @@ class TopUpProxyPayListDataSource constructor(
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()
                 val items = item?.content
-
+                pagingCallback.listEmpty(items?.size?:0 == 0)
                 val nextPageKey = when {
                     hasNextPage(
                         item?.paging?.count ?: 0,
