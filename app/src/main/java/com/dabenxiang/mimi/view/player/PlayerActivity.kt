@@ -1722,8 +1722,18 @@ class PlayerActivity : BaseActivity() {
             } else {
                 ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             }
-
+        fullScreenUISet()
         adjustPlayerSize()
+    }
+
+    private fun fullScreenUISet(){
+        if(viewModel.lockFullScreen){
+            recycler_info.visibility = View.GONE
+            bottom_func_bar.visibility = View.GONE
+        }else{
+            recycler_info?.visibility = View.VISIBLE
+            bottom_func_bar?.visibility = View.VISIBLE
+        }
     }
 
     private fun scrollToBottom() {
