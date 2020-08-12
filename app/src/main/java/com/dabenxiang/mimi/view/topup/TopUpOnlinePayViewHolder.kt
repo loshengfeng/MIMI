@@ -1,30 +1,16 @@
 package com.dabenxiang.mimi.view.topup
 
 import android.view.View
-import com.dabenxiang.mimi.model.vo.TopUpOnlinePayItem
-import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
-import com.dabenxiang.mimi.view.listener.AdapterEventListener
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_topup_online_pay.view.*
-import timber.log.Timber
 
-class TopUpOnlinePayViewHolder(
-    view: View,
-    listener: AdapterEventListener<TopUpOnlinePayItem>
-) : BaseAnyViewHolder<TopUpOnlinePayItem>(view) {
-    private val ivCheck = itemView.iv_check!!
-    private val tvToken = itemView.tv_token!!
-    private val tvOriginalPrice = itemView.tv_original_price!!
-    private val tvPrice = itemView.tv_price!!
-
-    init {
-        view.setOnClickListener { data?.let { it -> listener.onItemClick(view, it) } }
-    }
-
-    override fun updated() {
-        Timber.d("${TopUpOnlinePayViewHolder::class.java.simpleName}_updated")
-        ivCheck.visibility = View.VISIBLE
-        tvToken.text = data?.token
-        tvPrice.text = data?.price
-        tvOriginalPrice.text = data?.originalPrice
-    }
+class TopUpOnlinePayViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    val orderPackageLayout: ConstraintLayout = itemView.layout_order_package
+    val ivCheck: ImageView = itemView.iv_check
+    val tvPackageName: TextView = itemView.tv_package_name
+    val listPrice: TextView = itemView.tv_list_price
+    val price: TextView = itemView.tv_price
 }

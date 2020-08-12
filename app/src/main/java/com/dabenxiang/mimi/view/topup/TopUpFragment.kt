@@ -20,14 +20,13 @@ import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.AgentItem
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
-import com.dabenxiang.mimi.model.vo.TopUpOnlinePayItem
-import com.dabenxiang.mimi.model.vo.TopUpProxyPayItem
+import com.dabenxiang.mimi.model.api.vo.OrderingPackageItem
+import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.view.adapter.TopUpAgentAdapter
 import com.dabenxiang.mimi.view.adapter.TopUpOnlinePayAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
-import com.dabenxiang.mimi.view.listener.AdapterEventListener
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -42,8 +41,20 @@ class TopUpFragment : BaseFragment() {
     private val viewModel: TopUpViewModel by viewModels()
 
     private val agentAdapter by lazy { TopUpAgentAdapter(agentListener) }
+    private val onlinePayAdapter by lazy { TopUpOnlinePayAdapter(requireContext()) }
 
     private var interactionListener: InteractionListener? = null
+
+    private var orderPackageMap: HashMap<PaymentType, ArrayList<OrderingPackageItem>>? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        try {
+            interactionListener = context as InteractionListener
+        } catch (e: ClassCastException) {
+            Timber.e("TopUpFragment interaction listener can't cast")
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -135,10 +146,8 @@ class TopUpFragment : BaseFragment() {
         viewModel.orderPackageResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    val orderPackageMap = it.result
-                    orderPackageMap.keys.forEach { type ->
-                        Timber.d("@@:${type.value}")
-                    }
+                    orderPackageMap = it.result
+                    updateOrderPackages(PaymentType.BANK)
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -155,7 +164,6 @@ class TopUpFragment : BaseFragment() {
                 R.id.rb_online_pay -> {
                     layout_online_pay.visibility = View.VISIBLE
                     rv_proxy_pay.visibility = View.GONE
-                    viewModel.getOrderingPackage()
                 }
                 R.id.rb_proxy_pay -> {
                     layout_online_pay.visibility = View.GONE
@@ -168,9 +176,9 @@ class TopUpFragment : BaseFragment() {
         tl_type.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 when (tab.position) {
-                    0 -> GeneralUtils.showToast(requireContext(), "Wechat")
-                    1 -> GeneralUtils.showToast(requireContext(), "Alipay")
-                    2 -> GeneralUtils.showToast(requireContext(), "ChinaPay")
+                    0 -> updateOrderPackages(PaymentType.BANK)
+                    1 -> updateOrderPackages(PaymentType.ALI)
+                    2 -> updateOrderPackages(PaymentType.WX)
                 }
             }
 
@@ -224,47 +232,15 @@ class TopUpFragment : BaseFragment() {
         item_is_not_Login.visibility = View.GONE
 
         tv_subtitle.text = getString(R.string.topup_subtitle)
-        tv_total.text = "¥ 50.00"
+        tv_total.text = "¥ 0.00"
 
         val userItem = viewModel.getUserData()
         tv_name.text = userItem.friendlyName
         tv_coco.text = userItem.point.toString()
 
+        rv_online_pay.layoutManager = GridLayoutManager(context, 2)
+        rv_online_pay.adapter = onlinePayAdapter
 
-        val gridLayoutManager = GridLayoutManager(context, 2)
-        rv_online_pay.layoutManager = gridLayoutManager
-
-        val onlinePayList = mutableListOf<TopUpOnlinePayItem>(
-            TopUpOnlinePayItem(
-                1,
-                "300",
-                "¥ 50.00",
-                "¥ 55.00"
-            ),
-            TopUpOnlinePayItem(
-                0,
-                "900+90",
-                "¥ 150.00",
-                "¥ 165.00"
-            ),
-            TopUpOnlinePayItem(
-                0,
-                "1500+150",
-                "¥ 250.00",
-                "¥ 275.00"
-            ),
-            TopUpOnlinePayItem(
-                0,
-                "3000+300",
-                "¥ 500.00",
-                "¥ 500.00"
-            )
-        )
-
-        rv_online_pay.adapter = TopUpOnlinePayAdapter(onlinePayListener)
-        val onlinePayAdapter = rv_online_pay.adapter as TopUpOnlinePayAdapter
-        onlinePayAdapter.setDataSrc(onlinePayList)
-        
         rv_proxy_pay.layoutManager = LinearLayoutManager(context)
         rv_proxy_pay.adapter = agentAdapter
 
@@ -274,15 +250,6 @@ class TopUpFragment : BaseFragment() {
 
         viewModel.getMe()
         viewModel.getOrderingPackage()
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        try {
-            interactionListener = context as InteractionListener
-        } catch (e: ClassCastException) {
-            Timber.e("TopUpFragment interaction listener can't cast")
-        }
     }
 
     private val agentListener = object : TopUpAgentAdapter.EventListener {
@@ -295,15 +262,9 @@ class TopUpFragment : BaseFragment() {
         }
     }
 
-    private val onlinePayListener = object : AdapterEventListener<TopUpOnlinePayItem> {
-        override fun onItemClick(view: View, item: TopUpOnlinePayItem) {
-            Timber.d("${TopUpFragment::class.java.simpleName}_onlinePayListener_onItemClick_item: $item")
-        }
-    }
-
-    private val proxyPayListener = object : AdapterEventListener<TopUpProxyPayItem> {
-        override fun onItemClick(view: View, item: TopUpProxyPayItem) {
-            Timber.d("${TopUpFragment::class.java.simpleName}_proxyPayListener_onItemClick_item: $item")
-        }
+    private fun updateOrderPackages(paymentType: PaymentType) {
+        val orderPackages = orderPackageMap?.get(paymentType) ?: arrayListOf()
+        onlinePayAdapter.setupData(orderPackages)
+        onlinePayAdapter.notifyDataSetChanged()
     }
 }
