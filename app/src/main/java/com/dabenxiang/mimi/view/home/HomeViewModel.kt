@@ -35,6 +35,7 @@ import retrofit2.HttpException
 import timber.log.Timber
 import java.io.File
 import java.net.URLEncoder
+import java.util.*
 
 class HomeViewModel : BaseViewModel() {
 
@@ -461,7 +462,10 @@ class HomeViewModel : BaseViewModel() {
     fun postAttachment(pic: String, context: Context, type: String) {
         viewModelScope.launch(context = job) {
             flow {
-                val realPath = UriUtils.getPath(context, Uri.parse(pic))
+                val realPath =  when (type) {
+                    TYPE_VIDEO -> pic
+                    else -> UriUtils.getPath(context, Uri.parse(pic))
+                }
                 val fileNameSplit = realPath?.split("/")
                 val fileName = fileNameSplit?.last()
                 val extSplit = fileName?.split(".")
