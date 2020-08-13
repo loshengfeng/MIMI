@@ -16,8 +16,7 @@ import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult.Error
-import com.dabenxiang.mimi.model.api.ApiResult.Success
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.AgentItem
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderingPackageItem
@@ -145,6 +144,7 @@ class TopUpFragment : BaseFragment() {
 
         viewModel.orderPackageResult.observe(viewLifecycleOwner, Observer {
             when (it) {
+                is Loaded -> tv_proxy_empty.visibility = View.GONE
                 is Success -> {
                     orderPackageMap = it.result
                     updateOrderPackages(PaymentType.BANK)
@@ -173,15 +173,16 @@ class TopUpFragment : BaseFragment() {
         rg_Type.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.rb_online_pay -> {
+                    tv_proxy_empty.visibility = View.GONE
                     layout_online_pay.visibility = View.VISIBLE
                     rv_proxy_pay.visibility = View.GONE
                     tv_proxy_empty.visibility = View.GONE
                 }
                 R.id.rb_proxy_pay -> {
+                    tv_online_empty.visibility = View.GONE
                     layout_online_pay.visibility = View.GONE
                     rv_proxy_pay.visibility = View.VISIBLE
                     tv_proxy_empty.visibility = View.VISIBLE
-
                     viewModel.getProxyPayList()
                 }
             }
@@ -260,7 +261,6 @@ class TopUpFragment : BaseFragment() {
         tv_record_top_up.visibility = View.VISIBLE
         item_is_Login.visibility = View.VISIBLE
         item_is_not_Login.visibility = View.GONE
-        tv_proxy_empty.visibility = View.GONE
 
         tv_subtitle.text = getString(R.string.topup_subtitle)
 
