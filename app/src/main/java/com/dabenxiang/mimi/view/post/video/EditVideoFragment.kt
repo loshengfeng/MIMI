@@ -7,7 +7,10 @@ import androidx.activity.addCallback
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.EditVideoListener
+import com.dabenxiang.mimi.model.api.vo.MediaItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.PicParameter
+import com.dabenxiang.mimi.model.api.vo.VideoParameter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
@@ -16,6 +19,7 @@ import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.post.video.PostVideoFragment.Companion.BUNDLE_COVER_URI
 import com.dabenxiang.mimi.view.post.video.PostVideoFragment.Companion.BUNDLE_TRIMMER_URI
 import com.google.android.material.tabs.TabLayout
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_edit_video.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 
@@ -150,6 +154,10 @@ class EditVideoFragment : BaseFragment() {
 
             if (isEdit != null && isEdit) {
                 val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+                val mediaItem = Gson().fromJson(item.content, MediaItem::class.java)
+                mediaItem.videoParameter = VideoParameter()
+                mediaItem.picParameter = ArrayList(mutableListOf(PicParameter()))
+                item.content = Gson().toJson(mediaItem)
 
                 bundle.putBoolean(MyPostFragment.EDIT, true)
                 bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)

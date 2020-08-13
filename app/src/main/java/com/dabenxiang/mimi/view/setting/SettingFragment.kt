@@ -8,12 +8,12 @@ import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.graphics.Matrix
 import android.graphics.drawable.Drawable
-import android.media.ExifInterface
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
 import androidx.activity.addCallback
 import androidx.core.content.FileProvider
+import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
@@ -332,7 +332,7 @@ class SettingFragment : BaseFragment() {
     }
 
     private fun rotateImage(bitmap: Bitmap): Bitmap? {
-        val ei = ExifInterface(file)
+        val ei = ExifInterface(file.absolutePath)
 
         val orientation: Int = ei.getAttributeInt(
             ExifInterface.TAG_ORIENTATION,
