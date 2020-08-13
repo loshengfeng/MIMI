@@ -270,7 +270,10 @@ class MyPostViewModel : BaseViewModel() {
     fun postAttachment(pic: String, context: Context, type: String) {
         viewModelScope.launch {
             flow {
-                val realPath = UriUtils.getPath(context, Uri.parse(pic))
+                val realPath =  when (type) {
+                    HomeViewModel.TYPE_VIDEO -> pic
+                    else -> UriUtils.getPath(context, Uri.parse(pic))
+                }
                 val fileNameSplit = realPath?.split("/")
                 val fileName = fileNameSplit?.last()
                 val extSplit = fileName?.split(".")
