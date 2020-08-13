@@ -619,6 +619,7 @@ class MyPostFragment : BaseFragment() {
                     )
                 }
                 PostType.VIDEO -> {
+                    memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
                     val bundle = ClipFragment.createBundle(arrayListOf(memberPostItem), -1, false)
                     navigateTo(
                         NavigateItem.Destination(

@@ -130,7 +130,6 @@ class AdultHomeFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         handleBackStackData()
-
         requireActivity().onBackPressedDispatcher.addCallback {
             interactionListener?.changeNavigationPosition(
                 R.id.navigation_home
@@ -573,6 +572,7 @@ class AdultHomeFragment : BaseFragment() {
                     )
                 }
                 PostType.VIDEO -> {
+                    memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
                     val bundle = ClipFragment.createBundle(arrayListOf(memberPostItem), -1, false)
                     navigateTo(
                         NavigateItem.Destination(
