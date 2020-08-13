@@ -43,6 +43,10 @@
             android:id="@+id/action_homeFragment_to_loginFragment"
             app:destination="@id/navigation_login"/>
 
+        <action
+            android:id="@+id/action_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+
     </fragment>
 
     <fragment
@@ -76,5 +80,6 @@
         android:id="@+id/rankingFragment"
         android:name="com.dabenxiang.mimi.view.ranking.RankingFragment"
         tools:layout="@layout/fragment_ranking" />
+    <include app:graph="@navigation/navigation_my_post" />
 
 </navigation>

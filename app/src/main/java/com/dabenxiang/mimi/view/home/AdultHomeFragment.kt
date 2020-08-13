@@ -1010,7 +1010,7 @@ class AdultHomeFragment : BaseFragment() {
                 isAdult = true,
                 isAdultTheme = true
             )
-            navigateTo(NavigateItem.Destination(R.id.action_adultHomeFragment_to_navigation_my_post, bundle))
+            navigateTo(NavigateItem.Destination(R.id.action_to_myPostFragment, bundle))
         }
     }
 
