@@ -27,7 +27,8 @@ class MemberPostPagedAdapter(
 ) : PagedListAdapter<MemberPostItem, BaseViewHolder>(diffCallback) {
 
     companion object {
-        const val PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI = 0
+        const val PAYLOAD_UPDATE_LIKE = 0
+        const val PAYLOAD_UPDATE_FOLLOW = 1
         const val VIEW_TYPE_CLIP = 0
         const val VIEW_TYPE_PICTURE = 1
         const val VIEW_TYPE_TEXT = 2
@@ -107,42 +108,63 @@ class MemberPostPagedAdapter(
             }
             is ClipPostHolder -> {
                 item?.also {
-                    holder.onBind(
-                        it,
-                        currentList,
-                        position,
-                        adultListener,
-                        mTag,
-                        memberPostFuncItem,
-                        isClipList
-                    )
+                    payloads.takeIf { it.isNotEmpty() }?.also {
+                        when (it[0] as Int) {
+                            PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item.isFollow)
+                        }
+                    } ?: run {
+                        holder.onBind(
+                            item,
+                            currentList,
+                            position,
+                            adultListener,
+                            mTag,
+                            memberPostFuncItem,
+                            isClipList
+                        )
+                    }
                 }
             }
             is PicturePostHolder -> {
-                payloads.takeIf { it.isNotEmpty() }?.also {
-                    when (it[0] as Int) {
-                        PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI -> {
-                            item?.also { item ->
-                                holder.updateLikeAndFollowItem(item, memberPostFuncItem)
-                            }
+                item?.also {
+                    payloads.takeIf { it.isNotEmpty() }?.also {
+                        when (it[0] as Int) {
+                            PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item.isFollow)
+                            PAYLOAD_UPDATE_LIKE -> holder.updateLikeAndFollowItem(
+                                item,
+                                currentList,
+                                memberPostFuncItem
+                            )
                         }
-                    }
-                } ?: run {
-                    item?.also {
+                    } ?: run {
                         holder.pictureRecycler.tag = position
-                        holder.onBind(it, position, adultListener, mTag, memberPostFuncItem)
+                        holder.onBind(
+                            item,
+                            currentList,
+                            position,
+                            adultListener,
+                            mTag,
+                            memberPostFuncItem
+                        )
                     }
                 }
             }
             is TextPostHolder -> {
                 item?.also {
-                    holder.onBind(
-                        it,
-                        position,
-                        adultListener,
-                        mTag,
-                        memberPostFuncItem
-                    )
+                    payloads.takeIf { it.isNotEmpty() }?.also {
+                        when (it[0] as Int) {
+                            PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item.isFollow)
+                        }
+                    } ?: run {
+                        holder.onBind(
+                            it,
+                            currentList,
+                            position,
+                            adultListener,
+                            mTag,
+                            memberPostFuncItem
+                        )
+                    }
                 }
             }
         }

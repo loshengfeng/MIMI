@@ -78,11 +78,11 @@ class TopUpFragment : BaseFragment() {
                     LruCacheUtils.putLruArrayCache(attachmentItem.id
                             ?: "", attachmentItem.fileArray
                             ?: ByteArray(0))
-                    if (attachmentItem.position==viewModel.TAG_MY_AVATAR){
+                    if (attachmentItem.position == viewModel.TAG_MY_AVATAR) {
                         val options: RequestOptions = RequestOptions()
                                 .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                                .placeholder(R.drawable.ico_default_photo)
-                                .error(R.drawable.ico_default_photo)
+                                .placeholder(R.drawable.default_profile_picture)
+                                .error(R.drawable.default_profile_picture)
                                 .priority(Priority.NORMAL)
 
 
@@ -131,6 +131,21 @@ class TopUpFragment : BaseFragment() {
                     }
                 }
                 is Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.agentList.observe(viewLifecycleOwner, Observer {
+            rv_proxy_pay.visibility = View.VISIBLE
+            agentAdapter.submitList(it)
+        })
+
+        viewModel.agentListIsEmpty.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                txt_empty_message.visibility = View.VISIBLE
+                rv_proxy_pay.visibility = View.GONE
+            } else {
+                txt_empty_message.visibility = View.GONE
+                rv_proxy_pay.visibility = View.VISIBLE
             }
         })
     }
@@ -269,10 +284,6 @@ class TopUpFragment : BaseFragment() {
         }
 
         viewModel.getMe()
-
-        viewModel.agentList.observe(viewLifecycleOwner, Observer {
-            agentAdapter.submitList(it)
-        })
     }
 
     override fun onAttach(context: Context) {

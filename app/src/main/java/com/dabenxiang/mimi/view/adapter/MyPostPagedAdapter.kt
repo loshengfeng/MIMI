@@ -67,22 +67,19 @@ class MyPostPagedAdapter(
             VIEW_TYPE_CLIP -> {
                 MyPostClipPostHolder(
                     LayoutInflater.from(parent.context)
-                        .inflate(R.layout.item_clip_post, parent, false),
-                    isMe, isAdultTheme
+                        .inflate(R.layout.item_clip_post, parent, false), isAdultTheme
                 )
             }
             VIEW_TYPE_PICTURE -> {
                 MyPostPicturePostHolder(
                     LayoutInflater.from(parent.context)
-                        .inflate(R.layout.item_picture_post, parent, false),
-                    isMe, isAdultTheme
+                        .inflate(R.layout.item_picture_post, parent, false), isAdultTheme
                 )
             }
             else -> {
                 MyPostTextPostHolder(
                     LayoutInflater.from(parent.context)
-                        .inflate(R.layout.item_text_post, parent, false),
-                    isMe, isAdultTheme
+                        .inflate(R.layout.item_text_post, parent, false), isAdultTheme
                 )
             }
         }
@@ -123,7 +120,7 @@ class MyPostPagedAdapter(
                         }
                     } ?: run {
                         holder.pictureRecycler.tag = position
-                        holder.onBind(it, position, myPostListener, attachmentListener, memberPostFuncItem)
+                        holder.onBind(it, currentList, position, myPostListener, attachmentListener, memberPostFuncItem)
                     }
                 }
                 is MyPostTextPostHolder -> {
@@ -133,7 +130,7 @@ class MyPostPagedAdapter(
                             PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item)
                         }
                     } ?: run {
-                        holder.onBind(it, position, myPostListener, attachmentListener)
+                        holder.onBind(it, currentList, position, myPostListener, attachmentListener)
                     }
                 }
             }

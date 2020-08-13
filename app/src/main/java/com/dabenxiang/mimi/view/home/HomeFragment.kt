@@ -16,9 +16,9 @@ import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.model.vo.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.vo.statisticsItemToVideoItem
-import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
@@ -177,6 +177,7 @@ class HomeFragment : BaseFragment() {
     }
 
     private fun setupRecyclerByPosition(position: Int) {
+        cl_no_data.visibility = View.GONE
 
         rv_home.visibility = View.GONE
         rv_first.visibility = View.GONE
@@ -293,7 +294,7 @@ class HomeFragment : BaseFragment() {
         MemberPostFuncItem(
             {},
             { id, function -> getBitmap(id, function) },
-            { _, _, _ -> }
+            { _,_, _, _ -> }
         )
     }
 

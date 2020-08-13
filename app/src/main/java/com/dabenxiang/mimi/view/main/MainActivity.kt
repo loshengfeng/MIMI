@@ -118,12 +118,13 @@ class MainActivity : BaseActivity(), InteractionListener {
             window?.statusBarColor = getColor(R.color.adult_color_status_bar)
             bottom_navigation.setBackgroundColor(getColor(R.color.adult_color_status_bar))
             bottom_navigation.itemTextColor =
-                resources.getColorStateList(R.color.color_white_1_30, null)
+                resources.getColorStateList(R.color.bottom_nav_adult_text_selector, null)
+
         } else {
             window?.statusBarColor = getColor(R.color.normal_color_status_bar)
             bottom_navigation.setBackgroundColor(getColor(R.color.normal_color_status_bar))
             bottom_navigation.itemTextColor =
-                resources.getColorStateList(R.color.normal_color_bottom_bar_item, null)
+                resources.getColorStateList(R.color.bottom_nav_normal_text_selector, null)
         }
     }
 

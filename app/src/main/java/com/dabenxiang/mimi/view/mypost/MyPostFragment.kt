@@ -1,7 +1,9 @@
 package com.dabenxiang.mimi.view.mypost
 
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.view.View
 import android.widget.ImageView
@@ -29,24 +31,33 @@ import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
-import com.dabenxiang.mimi.view.dialog.*
+import com.dabenxiang.mimi.view.dialog.GeneralDialog
+import com.dabenxiang.mimi.view.dialog.GeneralDialogData
+import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.comment.MyPostMoreDialogFragment
+import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.main.MainActivity
+import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.TYPE_COVER
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.TYPE_VIDEO
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.USER_ID_ME
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
-import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.post.article.PostArticleFragment
 import com.dabenxiang.mimi.view.post.pic.PostPicFragment
 import com.dabenxiang.mimi.view.post.video.PostVideoFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
+import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
+import com.video.trimmer.utils.RealPathUtil
+import com.vincent.videocompressor.VideoCompress
 import kotlinx.android.synthetic.main.fragment_my_post.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import timber.log.Timber
+import java.io.File
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class MyPostFragment : BaseFragment() {
@@ -244,7 +255,7 @@ class MyPostFragment : BaseFragment() {
         if (uploadVideoList[0].picAttachmentId.isBlank()) {
             viewModel.postAttachment(
                 uploadVideoList[0].picUrl, requireContext(),
-                TYPE_PIC
+                TYPE_COVER
             )
         } else {
             val mediaItem = MediaItem()
@@ -346,9 +357,11 @@ class MyPostFragment : BaseFragment() {
 
         viewModel.followResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Success -> {
-                    adapter.notifyItemChanged(
-                        it.result,
+                is ApiResult.Empty -> {
+
+                    adapter.notifyItemRangeChanged(
+                        0,
+                        viewModel.totalCount,
                         MyPostPagedAdapter.PAYLOAD_UPDATE_FOLLOW
                     )
                 }
@@ -384,11 +397,10 @@ class MyPostFragment : BaseFragment() {
                         val content = Gson().toJson(mediaItem)
                         Timber.d("Post pic content item : $content")
 
-                        val postId =
-                            findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Long>(
-                                PostPicFragment.POST_ID
-                            )
-                        viewModel.postPic(postId?.value!!, postMemberRequest, content)
+
+                        val postId = arguments?.getLong(PostPicFragment.POST_ID)
+
+                        viewModel.postPic(postId!!, postMemberRequest, content)
                     } else {
                         val pic = uploadPicList[uploadCurrentPicPosition]
                         viewModel.postAttachment(pic.url, requireContext(), TYPE_PIC)
@@ -440,11 +452,43 @@ class MyPostFragment : BaseFragment() {
             when (it) {
                 is ApiResult.Success -> {
                     uploadVideoList[0].picAttachmentId = it.result.toString()
-                    viewModel.postAttachment(
-                        uploadVideoList[0].videoUrl,
-                        requireContext(),
-                        TYPE_VIDEO
-                    )
+
+                    val realPath = UriUtils.getPath(requireContext(), Uri.parse(uploadVideoList[0].videoUrl))
+                    uploadVideoList[0].videoUrl = realPath!!
+
+                    val videoUri = Uri.parse(uploadVideoList[0].videoUrl)
+                    val file = File(videoUri.path ?: "")
+                    val destinationPath = Environment.getExternalStorageDirectory().toString() + File.separator + "temp" + File.separator + "Videos" + File.separator
+                    val root = File(destinationPath)
+                    val outputFileUri = Uri.fromFile(File(root, "t_${Calendar.getInstance().timeInMillis}_" + file.nameWithoutExtension + ".mp4"))
+                    val outPutPath = RealPathUtil.realPathFromUriApi19(requireContext(), outputFileUri)
+                        ?: File(root, "t_${Calendar.getInstance().timeInMillis}_" + videoUri.path?.substring(videoUri.path!!.lastIndexOf("/") + 1)).absolutePath
+
+                    VideoCompress.compressVideoLow(realPath, outPutPath , object : VideoCompress.CompressListener {
+                        override fun onStart() {
+                            Timber.d("Start compress")
+                        }
+
+                        override fun onSuccess() {
+                            Timber.d("Compress success")
+                            uploadVideoList[0].videoUrl = outPutPath
+                            viewModel.postAttachment(
+                                uploadVideoList[0].videoUrl,
+                                requireContext(),
+                                TYPE_VIDEO
+                            )
+
+                        }
+
+                        override fun onFail() {
+                            Timber.d("Compress fail")
+                            resetAndCancelJob(Throwable(), getString(R.string.post_error))
+                        }
+
+                        override fun onProgress(percent: Float) {
+                            Timber.d("Compress progress : $percent")
+                        }
+                    })
                 }
                 is ApiResult.Error -> resetAndCancelJob(
                     it.throwable,
@@ -458,10 +502,7 @@ class MyPostFragment : BaseFragment() {
                 is ApiResult.Success -> {
                     uploadVideoList[0].videoAttachmentId = it.result.toString()
 
-                    val postId =
-                        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Long>(
-                            PostVideoFragment.POST_ID
-                        )
+                    val postId = arguments?.getLong(PostVideoFragment.POST_ID)
 
                     val mediaItem = MediaItem()
                     val videoParameter = VideoParameter(
@@ -479,13 +520,17 @@ class MyPostFragment : BaseFragment() {
                     mediaItem.textContent = postMemberRequest.content
                     val content = Gson().toJson(mediaItem)
                     memberPostItem.content = content
+                    Timber.d("Post id : $postId")
+                    Timber.d("Request : $postMemberRequest")
                     Timber.d("Post video content item : $content")
-                    viewModel.postPic(postId?.value!!, postMemberRequest, content)
+                    viewModel.postPic(postId!!, postMemberRequest, content)
                 }
-                is ApiResult.Error -> resetAndCancelJob(
-                    it.throwable,
-                    getString(R.string.post_error)
-                )
+                is ApiResult.Error -> {
+                    Timber.e(it.throwable)
+
+                    resetAndCancelJob(it.throwable, getString(R.string.post_error))
+
+                }
             }
         })
 
@@ -562,6 +607,8 @@ class MyPostFragment : BaseFragment() {
                 }
                 PostType.IMAGE -> {
                     memberPostItem.id = postId
+                    memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
+                    memberPostItem.avatarAttachmentId = viewModel.pref.profileItem.avatarAttachmentId
                     val bundle = PictureDetailFragment.createBundle(memberPostItem, -1)
                     navigateTo(
                         NavigateItem.Destination(
@@ -571,6 +618,7 @@ class MyPostFragment : BaseFragment() {
                     )
                 }
                 PostType.VIDEO -> {
+                    memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
                     val bundle = ClipFragment.createBundle(arrayListOf(memberPostItem), -1, false)
                     navigateTo(
                         NavigateItem.Destination(
@@ -670,7 +718,8 @@ class MyPostFragment : BaseFragment() {
 
     private val myPostListener = object : MyPostListener {
         override fun onMoreClick(item: MemberPostItem) {
-            if (userId == USER_ID_ME) {
+            val isMe = viewModel.accountManager.getProfile().userId == item.creatorId
+            if (isMe) {
                 meMoreDialog =
                     MyPostMoreDialogFragment.newInstance(item, onMeMoreDialogListener)
                         .also {
@@ -788,8 +837,12 @@ class MyPostFragment : BaseFragment() {
             checkStatus { viewModel.favoritePost(item, position, isFavorite) }
         }
 
-        override fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
-            checkStatus { viewModel.followPost(item, position, isFollow) }
+        override fun onFollowClick(
+            items: List<MemberPostItem>,
+            position: Int,
+            isFollow: Boolean
+        ) {
+            checkStatus { viewModel.followPost(ArrayList(items), position, isFollow) }
         }
     }
 
@@ -808,7 +861,7 @@ class MyPostFragment : BaseFragment() {
             type: AttachmentType
         )
 
-        fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean)
+        fun onFollowClick(items: List<MemberPostItem>, position: Int, isFollow: Boolean)
     }
 
     private fun showSnackBar() {
@@ -866,7 +919,7 @@ class MyPostFragment : BaseFragment() {
         MemberPostFuncItem(
             {},
             { id, function -> getBitmap(id, function) },
-            { _, _, _ -> }
+            { _, _, _, _ -> }
         )
     }
 

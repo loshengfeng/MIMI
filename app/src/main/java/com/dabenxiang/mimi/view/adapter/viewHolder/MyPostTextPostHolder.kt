@@ -17,6 +17,7 @@ import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -25,14 +26,17 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_text_post.view.*
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import timber.log.Timber
 import java.util.*
 
 class MyPostTextPostHolder(
     itemView: View,
-    private val isMe: Boolean,
     private val isAdultTheme: Boolean
-) : BaseViewHolder(itemView) {
+) : BaseViewHolder(itemView),KoinComponent {
+
+    private val accountManager: AccountManager by inject()
 
     private val textPostItemLayout: ConstraintLayout = itemView.layout_text_post_item
     private val imgAvatar: ImageView = itemView.img_avatar
@@ -52,10 +56,13 @@ class MyPostTextPostHolder(
 
     fun onBind(
         item: MemberPostItem,
+        itemList: List<MemberPostItem>?,
         position: Int,
         myPostListener: MyPostFragment.MyPostListener,
         attachmentListener: AttachmentListener
     ) {
+
+        val isMe = accountManager.getProfile().userId == item.creatorId
 
         textPostItemLayout.setBackgroundColor(App.self.getColor(if (isAdultTheme) R.color.color_black_4 else R.color.color_white_1))
         tvName.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1 else R.color.color_black_1))
@@ -118,7 +125,7 @@ class MyPostTextPostHolder(
         } else {
             tvFollow.visibility = View.VISIBLE
             tvFollow.setOnClickListener {
-                myPostListener.onFollowClick(item, position, !item.isFollow)
+                itemList?.also { myPostListener.onFollowClick(itemList, position, !item.isFollow) }
                 item.isFollow = !item.isFollow
             }
             updateFollow(item)

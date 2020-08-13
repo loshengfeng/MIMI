@@ -5,8 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.provider.MediaStore
 import android.view.View
@@ -18,6 +20,7 @@ import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.paging.PagedList
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
@@ -34,6 +37,7 @@ import com.dabenxiang.mimi.model.vo.*
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter
+import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter.Companion.PAYLOAD_UPDATE_FOLLOW
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
@@ -72,10 +76,14 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
+import com.video.trimmer.utils.RealPathUtil
+import com.vincent.videocompressor.VideoCompress
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 import java.io.File
+import java.util.*
+import kotlin.collections.ArrayList
 
 class AdultHomeFragment : BaseFragment() {
 
@@ -123,7 +131,6 @@ class AdultHomeFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         handleBackStackData()
-
         requireActivity().onBackPressedDispatcher.addCallback {
             interactionListener?.changeNavigationPosition(
                 R.id.navigation_home
@@ -409,11 +416,42 @@ class AdultHomeFragment : BaseFragment() {
                 is Success -> {
                     picParameter.id = it.result.toString()
                     viewModel.clearLiveDataValue()
-                    viewModel.postAttachment(
-                        uploadVideoUri[0].videoUrl,
-                        requireContext(),
-                        TYPE_VIDEO
-                    )
+                    val realPath = UriUtils.getPath(requireContext(), Uri.parse(uploadVideoUri[0].videoUrl))
+                    uploadVideoUri[0].videoUrl = realPath!!
+
+                    val videoUri = Uri.parse(uploadVideoUri[0].videoUrl)
+                    val file = File(videoUri.path ?: "")
+                    val destinationPath = Environment.getExternalStorageDirectory().toString() + File.separator + "temp" + File.separator + "Videos" + File.separator
+                    val root = File(destinationPath)
+                    val outputFileUri = Uri.fromFile(File(root, "t_${Calendar.getInstance().timeInMillis}_" + file.nameWithoutExtension + ".mp4"))
+                    val outPutPath = RealPathUtil.realPathFromUriApi19(requireContext(), outputFileUri)
+                        ?: File(root, "t_${Calendar.getInstance().timeInMillis}_" + videoUri.path?.substring(videoUri.path!!.lastIndexOf("/") + 1)).absolutePath
+
+                    VideoCompress.compressVideoLow(realPath, outPutPath , object : VideoCompress.CompressListener {
+                        override fun onStart() {
+                            Timber.d("Start compress")
+                        }
+
+                        override fun onSuccess() {
+                            Timber.d("Compress success")
+                            uploadVideoUri[0].videoUrl = outPutPath
+                            viewModel.postAttachment(
+                                uploadVideoUri[0].videoUrl,
+                                requireContext(),
+                                TYPE_VIDEO
+                            )
+
+                        }
+
+                        override fun onFail() {
+                            Timber.d("Compress fail")
+                            resetAndCancelJob(Throwable(), getString(R.string.post_error))
+                        }
+
+                        override fun onProgress(percent: Float) {
+                            Timber.d("Compress progress : $percent")
+                        }
+                    })
                 }
                 is Error -> {
                     resetAndCancelJob(it.throwable, getString(R.string.post_error))
@@ -461,9 +499,13 @@ class AdultHomeFragment : BaseFragment() {
             picParameter = it
         })
 
-        viewModel.totalCountResult.observe(viewLifecycleOwner, Observer { totalCount ->
-            takeIf { rv_sixth.visibility == View.VISIBLE }?.also {
-                clubMemberAdapter.totalCount = totalCount
+        viewModel.totalCountResult.observe(viewLifecycleOwner, Observer {
+            it?.also { totalCount ->
+                cl_no_data.visibility = takeIf { totalCount > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
+                takeIf { rv_sixth.visibility == View.VISIBLE }?.also {
+                    clubMemberAdapter.totalCount = totalCount
+                }
+                viewModel.clearLiveDataValue()
             }
         })
 
@@ -472,6 +514,27 @@ class AdultHomeFragment : BaseFragment() {
                 is Success -> {
                     postType = PostType.TEXT
                     setSnackBarPostStatus(it.result)
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.followResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Empty -> {
+                    val adapter = when (lastPosition) {
+                        1 -> rv_first.adapter
+                        2 -> rv_second.adapter
+                        3 -> rv_third.adapter
+                        4 -> rv_fourth.adapter
+                        5 -> rv_fifth.adapter
+                        else -> rv_sixth.adapter
+                    }
+                    adapter?.notifyItemRangeChanged(
+                        0,
+                        viewModel.totalCount,
+                        PAYLOAD_UPDATE_FOLLOW
+                    )
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -522,6 +585,8 @@ class AdultHomeFragment : BaseFragment() {
                 }
                 PostType.IMAGE -> {
                     memberPostItem.id = postId
+                    memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
+                    memberPostItem.avatarAttachmentId = viewModel.pref.profileItem.avatarAttachmentId
                     val bundle = PictureDetailFragment.createBundle(memberPostItem, -1)
                     navigateTo(
                         NavigateItem.Destination(
@@ -531,6 +596,7 @@ class AdultHomeFragment : BaseFragment() {
                     )
                 }
                 PostType.VIDEO -> {
+                    memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
                     val bundle = ClipFragment.createBundle(arrayListOf(memberPostItem), -1, false)
                     navigateTo(
                         NavigateItem.Destination(
@@ -656,6 +722,7 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private fun setupRecyclerByPosition(position: Int) {
+        cl_no_data.visibility = View.GONE
 
         rv_home.visibility = View.GONE
         rv_first.visibility = View.GONE
@@ -702,6 +769,9 @@ class AdultHomeFragment : BaseFragment() {
                     rv_second.layoutManager = LinearLayoutManager(requireContext())
                     rv_second.adapter = followPostPagedAdapter
                     viewModel.getPostFollows()
+                }?: run {
+                    Timber.d("@@followPostPagedAdapter.itemCount ${followPostPagedAdapter.itemCount}")
+                    cl_no_data.visibility = followPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }?.let { View.GONE } ?: let { View.VISIBLE }
                 }
             }
             3 -> {
@@ -713,7 +783,7 @@ class AdultHomeFragment : BaseFragment() {
                     rv_third.layoutManager = LinearLayoutManager(requireContext())
                     rv_third.adapter = clipPostPagedAdapter
                     viewModel.getClipPosts()
-                }
+                }?: run { cl_no_data.visibility = clipPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }?.let { View.GONE } ?: let { View.VISIBLE } }
             }
             4 -> {
                 rv_fourth.visibility = View.VISIBLE
@@ -724,7 +794,7 @@ class AdultHomeFragment : BaseFragment() {
                     rv_fourth.layoutManager = LinearLayoutManager(requireContext())
                     rv_fourth.adapter = picturePostPagedAdapter
                     viewModel.getPicturePosts()
-                }
+                }?: run { cl_no_data.visibility = picturePostPagedAdapter.currentList.takeUnless { isListEmpty(it) }?.let { View.GONE } ?: let { View.VISIBLE } }
             }
             5 -> {
                 rv_fifth.visibility = View.VISIBLE
@@ -735,7 +805,7 @@ class AdultHomeFragment : BaseFragment() {
                     rv_fifth.layoutManager = LinearLayoutManager(requireContext())
                     rv_fifth.adapter = textPostPagedAdapter
                     viewModel.getTextPosts()
-                }
+                }?: run { cl_no_data.visibility = textPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }?.let { View.GONE } ?: let { View.VISIBLE } }
             }
             else -> {
                 rv_sixth.visibility = View.VISIBLE
@@ -746,7 +816,7 @@ class AdultHomeFragment : BaseFragment() {
                     rv_sixth.layoutManager = MiMiLinearLayoutManager(requireContext())
                     rv_sixth.adapter = clubMemberAdapter
                     viewModel.getClubs()
-                }
+                }?: run { cl_no_data.visibility = clubMemberAdapter.currentList.takeUnless { isClubListEmpty(it) }?.let { View.GONE } ?: let { View.VISIBLE } }
             }
         }
     }
@@ -854,7 +924,7 @@ class AdultHomeFragment : BaseFragment() {
         MemberPostFuncItem(
             {},
             { id, func -> getBitmap(id, func) },
-            { item, isFollow, func -> followMember(item, isFollow, func) },
+            { item, items, isFollow, func -> followMember(item, items, isFollow, func) },
             { item, isLike, func -> likePost(item, isLike, func) },
             { item, isFavorite, func -> favoritePost(item, isFavorite, func) }
         )
@@ -968,7 +1038,7 @@ class AdultHomeFragment : BaseFragment() {
 
         override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
 
-            val bundle = ClipFragment.createBundle(ArrayList(item.subList(1, item.lastIndex)), position-1)
+            val bundle = ClipFragment.createBundle(ArrayList(item.subList(1, item.size)), position-1)
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_adultHomeFragment_to_clipFragment,
@@ -1188,16 +1258,23 @@ class AdultHomeFragment : BaseFragment() {
                 }
 
                 REQUEST_VIDEO_CAPTURE -> {
+
                     val videoUri: Uri? = data?.data
                     val myUri =
                         Uri.fromFile(File(UriUtils.getPath(requireContext(), videoUri!!) ?: ""))
 
-                    val bundle = Bundle()
-                    bundle.putString(BUNDLE_VIDEO_URI, myUri.toString())
-                    findNavController().navigate(
-                        R.id.action_adultHomeFragment_to_editVideoFragment,
-                        bundle
-                    )
+                    val retriever = MediaMetadataRetriever()
+                    retriever.setDataSource(requireContext(), myUri)
+                    val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                    val timeInMillisec = time.toLong()
+
+                    if (timeInMillisec > 3001) {
+                        val bundle = Bundle()
+                        bundle.putString(BUNDLE_VIDEO_URI, myUri.toString())
+                        findNavController().navigate(R.id.action_adultHomeFragment_to_editVideoFragment, bundle)
+                    } else {
+                        Toast.makeText(requireContext(), R.string.post_video_length_error, Toast.LENGTH_SHORT).show()
+                    }
                 }
 
                 REQUEST_LOGIN -> {
@@ -1218,10 +1295,11 @@ class AdultHomeFragment : BaseFragment() {
 
     private fun followMember(
         memberPostItem: MemberPostItem,
+        items: List<MemberPostItem>,
         isFollow: Boolean,
         update: (Boolean) -> Unit
     ) {
-        checkStatus { viewModel.followMember(memberPostItem, isFollow, update) }
+        checkStatus { viewModel.followMember(memberPostItem, ArrayList(items), isFollow, update) }
     }
 
     private fun likePost(
@@ -1261,4 +1339,11 @@ class AdultHomeFragment : BaseFragment() {
         }
     }
 
+    private fun isListEmpty(list: PagedList<MemberPostItem>?): Boolean {
+        return list == null || list.size == 0 || (list.size == 1 && list[0]?.adItem != null)
+    }
+
+    private fun isClubListEmpty(list: PagedList<MemberClubItem>?): Boolean {
+        return list == null || list.size == 0 || (list.size == 1 && list[0]?.adItem != null)
+    }
 }

@@ -12,7 +12,6 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.ReportRequest
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.view.base.BaseViewModel
@@ -29,6 +28,9 @@ class ClubDetailViewModel : BaseViewModel() {
 
     private var _followClubResult = MutableLiveData<ApiResult<Boolean>>()
     val followClubResult: LiveData<ApiResult<Boolean>> = _followClubResult
+
+    private var _followMemberResult = MutableLiveData<ApiResult<Nothing>>()
+    val followMemberResult: LiveData<ApiResult<Nothing>> = _followMemberResult
 
     fun getMemberPosts(
         tag: String,
@@ -84,7 +86,13 @@ class ClubDetailViewModel : BaseViewModel() {
         }
     }
 
-    fun followMember(item: MemberPostItem, isFollow: Boolean, update: (Boolean) -> Unit) {
+    var totalCount: Int = 0
+    fun followMember(
+        item: MemberPostItem,
+        items: List<MemberPostItem>,
+        isFollow: Boolean,
+        update: (Boolean) -> Unit
+    ) {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
@@ -93,7 +101,11 @@ class ClubDetailViewModel : BaseViewModel() {
                     else -> apiRepository.cancelFollowPost(item.creatorId)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
-                item.isFollow = isFollow
+                items.forEach {
+                    if (it.creatorId == item.creatorId) {
+                        it.isFollow = isFollow
+                    }
+                }
                 emit(ApiResult.success(null))
             }
                 .flowOn(Dispatchers.IO)
@@ -172,6 +184,11 @@ class ClubDetailViewModel : BaseViewModel() {
         }
 
         override fun onSucceed() {
+        }
+
+        override fun onTotalCount(count: Long, isInitial: Boolean) {
+            totalCount = if (isInitial) count.toInt()
+            else totalCount.plus(count.toInt())
         }
     }
 }

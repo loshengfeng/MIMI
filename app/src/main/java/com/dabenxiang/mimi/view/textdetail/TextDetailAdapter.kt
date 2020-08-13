@@ -18,6 +18,7 @@ import com.dabenxiang.mimi.model.api.vo.TextContentItem
 import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailAdapter
 import com.dabenxiang.mimi.view.picturedetail.viewholder.CommentContentViewHolder
@@ -30,6 +31,8 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import timber.log.Timber
 import java.util.*
 
@@ -39,7 +42,7 @@ class TextDetailAdapter(
     private val onTextDetailListener: OnTextDetailListener,
     private val onItemClickListener: OnItemClickListener,
     private var mAdItem: AdItem? = null
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), KoinComponent {
 
     companion object {
         const val VIEW_TYPE_TEXT_DETAIL = 0
@@ -47,6 +50,8 @@ class TextDetailAdapter(
         const val VIEW_TYPE_COMMENT_DATA = 2
         const val VIEW_TYPE_AD = 3
     }
+
+    private val accountManager: AccountManager by inject()
 
     private var commentAdapter: CommentAdapter? = null
 
@@ -127,17 +132,25 @@ class TextDetailAdapter(
                     .circleCrop()
                     .into(holder.avatarImg)
 
-                val isFollow = memberPostItem.isFollow
-                if (isFollow) {
-                    holder.follow.text = context.getString(R.string.followed)
-                    holder.follow.background =
-                        context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
-                    holder.follow.setTextColor(context.getColor(R.color.color_white_1))
+                if (accountManager.getProfile().userId != memberPostItem.creatorId) {
+                    holder.follow.visibility = View.VISIBLE
+                    val isFollow = memberPostItem.isFollow
+                    if (isFollow) {
+                        holder.follow.text = context.getString(R.string.followed)
+                        holder.follow.background =
+                            context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
+                        holder.follow.setTextColor(context.getColor(R.color.color_white_1))
+                    } else {
+                        holder.follow.text = context.getString(R.string.follow)
+                        holder.follow.background =
+                            context.getDrawable(R.drawable.bg_red_1_stroke_radius_16)
+                        holder.follow.setTextColor(context.getColor(R.color.color_red_1))
+                    }
+                    holder.follow.setOnClickListener {
+                        onTextDetailListener.onFollowClick(memberPostItem, position, !isFollow)
+                    }
                 } else {
-                    holder.follow.text = context.getString(R.string.follow)
-                    holder.follow.background =
-                        context.getDrawable(R.drawable.bg_red_1_stroke_radius_16)
-                    holder.follow.setTextColor(context.getColor(R.color.color_red_1))
+                    holder.follow.visibility = View.GONE
                 }
 
                 holder.tagChipGroup.removeAllViews()
@@ -156,10 +169,6 @@ class TextDetailAdapter(
                         )
                     }
                     holder.tagChipGroup.addView(chip)
-                }
-
-                holder.follow.setOnClickListener {
-                    onTextDetailListener.onFollowClick(memberPostItem, position, !isFollow)
                 }
 
                 holder.avatarImg.setOnClickListener {

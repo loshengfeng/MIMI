@@ -17,6 +17,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -25,13 +26,16 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_clip_post.view.*
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import java.util.*
 
 class MyPostClipPostHolder(
     itemView: View,
-    private val isMe: Boolean,
     private val isAdultTheme: Boolean
-) : BaseViewHolder(itemView) {
+) : BaseViewHolder(itemView),KoinComponent {
+
+    private val accountManager: AccountManager by inject()
 
     private val clClipPost: ConstraintLayout = itemView.cl_clip_post
     private val ivAvatar: ImageView = itemView.img_avatar
@@ -59,6 +63,8 @@ class MyPostClipPostHolder(
         myPostListener: MyPostFragment.MyPostListener,
         attachmentListener: AttachmentListener
     ) {
+        val isMe = accountManager.getProfile().userId == item.creatorId
+
         clClipPost.setBackgroundColor(App.self.getColor(if (isAdultTheme) R.color.color_black_4 else R.color.color_white_1))
         tvName.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1 else R.color.color_black_1))
         tvTime.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1_50 else R.color.color_black_1_50))
@@ -73,6 +79,7 @@ class MyPostClipPostHolder(
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         tvTitle.text = item.title
+        tvFollow.visibility = if(accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
 
         if (LruCacheUtils.getLruCache(item.avatarAttachmentId.toString()) == null) {
             attachmentListener.onGetAttachment(
@@ -135,10 +142,7 @@ class MyPostClipPostHolder(
             tvFollow.visibility = View.VISIBLE
             updateFollow(item)
             tvFollow.setOnClickListener {
-                itemList?.also {
-                    myPostListener.onFollowClick(item, position, !item.isFollow)
-                    item.isFollow = !item.isFollow
-                }
+                itemList?.also { myPostListener.onFollowClick(it, position, !item.isFollow) }
             }
         }
         ivMore.setOnClickListener {

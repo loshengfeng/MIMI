@@ -53,8 +53,8 @@ class MyPostViewModel : BaseViewModel() {
     private var _favoriteResult = MutableLiveData<ApiResult<Int>>()
     val favoriteResult: LiveData<ApiResult<Int>> = _favoriteResult
 
-    private var _followResult = MutableLiveData<ApiResult<Int>>()
-    val followResult: LiveData<ApiResult<Int>> = _followResult
+    private var _followResult = MutableLiveData<ApiResult<Nothing>>()
+    val followResult: LiveData<ApiResult<Nothing>> = _followResult
 
     private var _deletePostResult = MutableLiveData<ApiResult<Nothing>>()
     val deletePostResult: LiveData<ApiResult<Nothing>> = _deletePostResult
@@ -89,6 +89,8 @@ class MyPostViewModel : BaseViewModel() {
     private val _postArticleResult = MutableLiveData<ApiResult<Long>>()
     val postArticleResult: LiveData<ApiResult<Long>> = _postArticleResult
 
+    var totalCount: Int = 0
+
     private var job = Job()
 
     companion object {
@@ -105,10 +107,19 @@ class MyPostViewModel : BaseViewModel() {
         }
     }
 
-    private fun getMyPostPagingItems(userId: Long, isAdult: Boolean): LiveData<PagedList<MemberPostItem>> {
+    private fun getMyPostPagingItems(
+        userId: Long,
+        isAdult: Boolean
+    ): LiveData<PagedList<MemberPostItem>> {
         val dataSourceFactory = object : DataSource.Factory<Int, MemberPostItem>() {
             override fun create(): DataSource<Int, MemberPostItem> {
-                return MyPostDataSource(userId, isAdult, pagingCallback, viewModelScope, domainManager)
+                return MyPostDataSource(
+                    userId,
+                    isAdult,
+                    pagingCallback,
+                    viewModelScope,
+                    domainManager
+                )
             }
         }
 
@@ -133,8 +144,10 @@ class MyPostViewModel : BaseViewModel() {
             Timber.e(throwable)
         }
 
-        override fun onSucceed() {
-//            _scrollToLastPosition.postValue(true)
+        override fun onTotalCount(count: Long, isInitial: Boolean) {
+            totalCount = if (isInitial) count.toInt()
+            else totalCount.plus(count.toInt())
+            Timber.d("onTotalCount: $totalCount")
         }
     }
 
@@ -220,16 +233,19 @@ class MyPostViewModel : BaseViewModel() {
         }
     }
 
-    fun followPost(item: MemberPostItem, position: Int, isFollow: Boolean) {
+    fun followPost(items: ArrayList<MemberPostItem>, position: Int, isFollow: Boolean) {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val result = when {
-                    isFollow -> apiRepository.followPost(item.creatorId)
-                    else -> apiRepository.cancelFollowPost(item.creatorId)
+                    isFollow -> apiRepository.followPost(items[position].creatorId)
+                    else -> apiRepository.cancelFollowPost(items[position].creatorId)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(position))
+                items.forEach { item ->
+                    item.isFollow = isFollow
+                }
+                emit(ApiResult.success(null))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
@@ -254,7 +270,10 @@ class MyPostViewModel : BaseViewModel() {
     fun postAttachment(pic: String, context: Context, type: String) {
         viewModelScope.launch {
             flow {
-                val realPath = UriUtils.getPath(context, Uri.parse(pic))
+                val realPath =  when (type) {
+                    HomeViewModel.TYPE_VIDEO -> pic
+                    else -> UriUtils.getPath(context, Uri.parse(pic))
+                }
                 val fileNameSplit = realPath?.split("/")
                 val fileName = fileNameSplit?.last()
                 val extSplit = fileName?.split(".")
@@ -340,7 +359,12 @@ class MyPostViewModel : BaseViewModel() {
         }
     }
 
-    fun updateArticle(title: String, content: String, tags: ArrayList<String>, item: MemberPostItem) {
+    fun updateArticle(
+        title: String,
+        content: String,
+        tags: ArrayList<String>,
+        item: MemberPostItem
+    ) {
         viewModelScope.launch {
             flow {
                 val request = PostMemberRequest(
