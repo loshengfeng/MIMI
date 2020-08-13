@@ -1,7 +1,7 @@
 package com.dabenxiang.mimi.view.mypost
 
 import androidx.paging.PageKeyedDataSource
-import com.dabenxiang.mimi.callback.MyPostPagingCallback
+import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.USER_ID_ME
@@ -14,7 +14,7 @@ import retrofit2.HttpException
 class MyPostDataSource(
     private val userId: Long,
     private val isAdult: Boolean,
-    private val pagingCallback: MyPostPagingCallback,
+    private val pagingCallback: PagingCallback,
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager
 ) : PageKeyedDataSource<Int, MemberPostItem>() {

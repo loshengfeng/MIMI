@@ -16,6 +16,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
@@ -23,9 +24,13 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_clip_post.view.*
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import java.util.*
 
-class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
+class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
+
+    private val accountManager: AccountManager by inject()
 
     private val ivAvatar: ImageView = itemView.img_avatar
     private val name: TextView = itemView.tv_name
@@ -59,7 +64,8 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         title.text = item.title
-        updateLikeAndFollowItem(item, memberPostFuncItem)
+        follow.visibility = if(accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
+        updateLikeAndFollowItem(item, itemList, memberPostFuncItem)
 
         val avatarId = item.avatarAttachmentId.toString()
         if (LruCacheUtils.getLruCache(avatarId) == null) {
@@ -153,6 +159,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
 
     private fun updateLikeAndFollowItem(
         item: MemberPostItem,
+        itemList:List<MemberPostItem>?,
         memberPostFuncItem: MemberPostFuncItem
     ) {
         likeCount.text = item.likeCount.toString()
@@ -183,10 +190,12 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         follow.setOnClickListener {
-            memberPostFuncItem.onFollowClick(item, !(item.isFollow)) { isFollow ->
-                updateFollow(
-                    isFollow
-                )
+            itemList?.also{
+                memberPostFuncItem.onFollowClick(item, itemList, !(item.isFollow)) { isFollow ->
+                    updateFollow(
+                        isFollow
+                    )
+                }
             }
         }
 
@@ -203,7 +212,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
     }
 
-    private fun updateFollow(isFollow: Boolean) {
+    fun updateFollow(isFollow: Boolean) {
         if (isFollow) {
             follow.text = follow.context.getString(R.string.followed)
             follow.background = follow.context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)

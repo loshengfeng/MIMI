@@ -10,7 +10,7 @@ import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.blankj.utilcode.util.ImageUtils
-import com.dabenxiang.mimi.callback.MyPostPagingCallback
+import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -53,8 +53,8 @@ class MyPostViewModel : BaseViewModel() {
     private var _favoriteResult = MutableLiveData<ApiResult<Int>>()
     val favoriteResult: LiveData<ApiResult<Int>> = _favoriteResult
 
-    private var _followResult = MutableLiveData<ApiResult<ArrayList<MemberPostItem>>>()
-    val followResult: LiveData<ApiResult<ArrayList<MemberPostItem>>> = _followResult
+    private var _followResult = MutableLiveData<ApiResult<Nothing>>()
+    val followResult: LiveData<ApiResult<Nothing>> = _followResult
 
     private var _deletePostResult = MutableLiveData<ApiResult<Nothing>>()
     val deletePostResult: LiveData<ApiResult<Nothing>> = _deletePostResult
@@ -131,7 +131,7 @@ class MyPostViewModel : BaseViewModel() {
 
     fun invalidateDataSource() = _myPostItemListResult.value!!.dataSource!!.invalidate()
 
-    private val pagingCallback = object : MyPostPagingCallback {
+    private val pagingCallback = object : PagingCallback {
         override fun onLoading() {
             setShowProgress(true)
         }
@@ -245,7 +245,7 @@ class MyPostViewModel : BaseViewModel() {
                 items.forEach { item ->
                     item.isFollow = isFollow
                 }
-                emit(ApiResult.success(items))
+                emit(ApiResult.success(null))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
