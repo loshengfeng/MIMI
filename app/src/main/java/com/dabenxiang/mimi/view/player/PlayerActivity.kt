@@ -746,7 +746,6 @@ class PlayerActivity : BaseActivity() {
 
                         Timber.i("detector onChanged")
                         viewModel.currentOrientation = orientation
-                        viewModel.lockFullScreen = !viewModel.lockFullScreen
                         if (viewModel.lockFullScreen) {
                             when (orientation) {
                                 ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE, ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE -> {
@@ -756,7 +755,6 @@ class PlayerActivity : BaseActivity() {
                         } else {
                             requestedOrientation = orientation
                         }
-                        fullScreenUISet()
                         adjustPlayerSize()
                     }
                 })
@@ -918,7 +916,8 @@ class PlayerActivity : BaseActivity() {
         //Detect key keyboard shown/hide
         this.addKeyboardToggleListener { shown ->
             isKeyboardShown = shown
-            if (!shown) commentEditorToggle(false)
+            if (!shown && requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+                commentEditorToggle(false)
         }
 
         val adWidth = ((GeneralUtils.getScreenSize(this).first) * 0.333).toInt()
@@ -1020,6 +1019,7 @@ class PlayerActivity : BaseActivity() {
     }
 
     private fun commentEditorToggle(enable: Boolean) {
+        Timber.i("commentEditorToggle enable:$enable")
         when (enable) {
             true -> {
                 bottom_func_input.visibility = View.VISIBLE
@@ -1063,7 +1063,6 @@ class PlayerActivity : BaseActivity() {
                 getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             lManager?.hideSoftInputFromWindow(et_message.windowToken, 0)
         }
-        commentEditorToggle(false)
     }
 
     override fun onStart() {
@@ -1297,6 +1296,7 @@ class PlayerActivity : BaseActivity() {
                     var clickDuration:Long = System.currentTimeMillis()
                     if(clickDuration - startClickTime <100){
                       commentEditorHide()
+                      commentEditorToggle(false)
                     }
                 }
             }
@@ -1686,6 +1686,7 @@ class PlayerActivity : BaseActivity() {
      * 調整 player 的寬與高
      */
     private fun adjustPlayerSize() {
+
         val screenSize = GeneralUtils.getScreenSize(this)
         if (requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
             val params = player_view.layoutParams
@@ -1693,6 +1694,7 @@ class PlayerActivity : BaseActivity() {
             params.height = 0
             player_view.layoutParams = params
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+            fullScreenUISet(false)
         } else {
             val params = player_view.layoutParams
             params.width = ViewGroup.LayoutParams.MATCH_PARENT
@@ -1708,6 +1710,7 @@ class PlayerActivity : BaseActivity() {
             windowParams.flags =
                 windowParams.flags or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
             window.attributes = windowParams
+            fullScreenUISet(true)
         }
     }
 
@@ -1724,17 +1727,19 @@ class PlayerActivity : BaseActivity() {
             } else {
                 ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             }
-        fullScreenUISet()
         adjustPlayerSize()
     }
 
-    private fun fullScreenUISet(){
-        if(viewModel.lockFullScreen){
+    private fun fullScreenUISet(isFullScreen:Boolean){
+        if(isFullScreen){
+            commentEditorHide()
             recycler_info.visibility = View.GONE
             bottom_func_bar.visibility = View.GONE
+            bottom_func_input.visibility = View.GONE
         }else{
             recycler_info?.visibility = View.VISIBLE
             bottom_func_bar?.visibility = View.VISIBLE
+            bottom_func_input.visibility = View.GONE
         }
     }
 

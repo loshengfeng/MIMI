@@ -477,11 +477,10 @@ class SearchPostFragment : BaseFragment() {
             val memberPostItemList = arrayListOf<MemberPostItem>()
             while (iterator.hasNext()) {
                 val data = iterator.next()
-                if(data.type != PostType.AD) {
-                    memberPostItemList.add(data)
-                }
+                if(data.type != PostType.AD) memberPostItemList.add(data)
             }
-            val bundle = ClipFragment.createBundle(ArrayList(memberPostItemList), position)
+            val mappingPosition = position - (position / 3)
+            val bundle = ClipFragment.createBundle(ArrayList(memberPostItemList), mappingPosition)
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_searchPostFragment_to_clipFragment,

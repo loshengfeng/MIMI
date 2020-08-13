@@ -549,5 +549,6 @@ class HomeViewModel : BaseViewModel() {
         _postPicResult.value = null
         _postCoverResult.value = null
         _postVideoResult.value = null
+        _totalCountResult.value = null
     }
 }
