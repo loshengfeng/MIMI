@@ -29,6 +29,9 @@ class ClubDetailViewModel : BaseViewModel() {
     private var _followClubResult = MutableLiveData<ApiResult<Boolean>>()
     val followClubResult: LiveData<ApiResult<Boolean>> = _followClubResult
 
+    private var _followMemberResult = MutableLiveData<ApiResult<Nothing>>()
+    val followMemberResult: LiveData<ApiResult<Nothing>> = _followMemberResult
+
     fun getMemberPosts(
         tag: String,
         orderBy: OrderBy,
@@ -84,8 +87,12 @@ class ClubDetailViewModel : BaseViewModel() {
     }
 
     var totalCount: Int = 0
-
-    fun followMember(item: MemberPostItem, isFollow: Boolean, update: (Boolean) -> Unit) {
+    fun followMember(
+        item: MemberPostItem,
+        items: List<MemberPostItem>,
+        isFollow: Boolean,
+        update: (Boolean) -> Unit
+    ) {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
@@ -94,7 +101,11 @@ class ClubDetailViewModel : BaseViewModel() {
                     else -> apiRepository.cancelFollowPost(item.creatorId)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
-                item.isFollow = isFollow
+                items.forEach {
+                    if (it.creatorId == item.creatorId) {
+                        it.isFollow = isFollow
+                    }
+                }
                 emit(ApiResult.success(null))
             }
                 .flowOn(Dispatchers.IO)
