@@ -563,6 +563,8 @@ class AdultHomeFragment : BaseFragment() {
                 }
                 PostType.IMAGE -> {
                     memberPostItem.id = postId
+                    memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
+                    memberPostItem.avatarAttachmentId = viewModel.pref.profileItem.avatarAttachmentId
                     val bundle = PictureDetailFragment.createBundle(memberPostItem, -1)
                     navigateTo(
                         NavigateItem.Destination(
