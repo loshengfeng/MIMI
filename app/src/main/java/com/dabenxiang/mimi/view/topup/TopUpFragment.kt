@@ -29,6 +29,8 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
+import com.dabenxiang.mimi.view.orderinfo.OrderInfoFragment
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_top_up.*
@@ -103,8 +105,7 @@ class TopUpFragment : BaseFragment() {
                         agentAdapter.update(attachmentItem.position ?: 0)
                     }
                 }
-                is Error -> {
-                }
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -203,8 +204,21 @@ class TopUpFragment : BaseFragment() {
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.btn_next -> {
-                    // TODO: Select Ordering Package Item 傳到下一頁
-//                    onlinePayAdapter.selectItem
+                    val selectItem = onlinePayAdapter.getSelectItem()
+                    if (selectItem == null) {
+                        GeneralUtils.showToast(
+                            requireContext(),
+                            getString(R.string.topup_select_error)
+                        )
+                    } else {
+                        val bundle = OrderInfoFragment.createBundle(selectItem)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_to_orderInfoFragment,
+                                bundle
+                            )
+                        )
+                    }
                 }
                 R.id.tv_login -> navigateTo(
                     NavigateItem.Destination(

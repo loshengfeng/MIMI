@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.model.api.vo
 
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class OrderingPackageItem(
 
@@ -22,4 +23,4 @@ data class OrderingPackageItem(
 
     @SerializedName("point")
     val point: Int = 0
-)
+): Serializable
