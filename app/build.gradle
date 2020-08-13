@@ -415,6 +415,9 @@ dependencies {
     // Video Editor
     implementation project(path: ':video-editor')
 
+    //Video compressor
+    implementation project(path: ':videocompressor')
+
     // Application Provider
     implementation "com.github.florent37:applicationprovider:$application_provider_version"
 

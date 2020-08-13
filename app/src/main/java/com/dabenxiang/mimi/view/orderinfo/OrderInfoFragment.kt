@@ -1,0 +1,93 @@
+package com.dabenxiang.mimi.view.orderinfo
+
+import android.os.Bundle
+import android.view.View
+import androidx.activity.addCallback
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.OrderingPackageItem
+import com.dabenxiang.mimi.model.enums.PaymentType
+import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
+import kotlinx.android.synthetic.main.fragment_order_info.*
+import kotlinx.android.synthetic.main.fragment_text_detail.toolbarContainer
+import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.android.synthetic.main.toolbar.view.*
+
+class OrderInfoFragment : BaseFragment() {
+
+    companion object {
+        const val KEY_DATA = "data"
+        fun createBundle(item: OrderingPackageItem?): Bundle {
+            return Bundle().also {
+                it.putSerializable(KEY_DATA, item)
+            }
+        }
+    }
+
+    private val viewModel: OrderInfoViewModel by viewModels()
+
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        text_toolbar_title.text = getString(R.string.order_detail_title)
+
+        toolbar.setBackgroundColor(requireContext().getColor(R.color.color_gray_2))
+        text_toolbar_title.setTextColor(requireContext().getColor(R.color.color_black_1))
+        toolbarContainer.toolbar.navigationIcon =
+            requireContext().getDrawable(R.drawable.btn_back_black_n)
+        toolbarContainer.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
+
+        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
+
+        val orderingPackageItem =
+            arguments?.getSerializable(PictureDetailFragment.KEY_DATA) as OrderingPackageItem
+
+        val productName = StringBuilder(orderingPackageItem.point.toString())
+            .append(" ")
+            .append(getString(R.string.order_detail_point))
+            .append("(")
+        when (orderingPackageItem.paymentType) {
+            PaymentType.BANK -> productName.append(getString(R.string.order_detail_payment_bank))
+            PaymentType.ALI -> productName.append(getString(R.string.order_detail_payment_ali))
+            else -> productName.append(getString(R.string.order_detail_payment_wx))
+        }
+        productName.append(")")
+        tv_product_name.text = productName
+
+        tv_product_count.text = StringBuilder("¥ ")
+            .append(orderingPackageItem.listPrice)
+            .append(" x 1")
+            .toString()
+
+        tv_total.text = StringBuilder("¥ ")
+            .append(orderingPackageItem.listPrice)
+            .toString()
+
+        tv_total_amount.text = StringBuilder("¥ ")
+            .append(orderingPackageItem.listPrice)
+            .toString()
+    }
+
+    override fun getLayoutId(): Int {
+        return R.layout.fragment_order_info
+    }
+
+    override fun setupObservers() {
+
+    }
+
+    override fun setupListeners() {
+        btn_create_order.setOnClickListener {
+
+        }
+    }
+
+}

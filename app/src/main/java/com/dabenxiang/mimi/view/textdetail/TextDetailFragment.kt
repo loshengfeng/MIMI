@@ -22,7 +22,6 @@ import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
-import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
@@ -33,7 +32,6 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_text_detail.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
-import timber.log.Timber
 
 class TextDetailFragment : BaseFragment() {
 
@@ -273,7 +271,7 @@ class TextDetailFragment : BaseFragment() {
 
     private val onTextDetailListener = object : TextDetailAdapter.OnTextDetailListener {
         override fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
-            checkStatus {viewModel.followPost(item, position, isFollow)}
+            checkStatus { viewModel.followPost(item, position, isFollow) }
         }
 
         override fun onGetCommandInfo(adapter: CommentAdapter, type: CommentType) {
@@ -357,7 +355,12 @@ class TextDetailFragment : BaseFragment() {
                 isAdult = true,
                 isAdultTheme = true
             )
-            navigateTo(NavigateItem.Destination(R.id.action_textDetailFragment_to_myPostFragment, bundle))
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_textDetailFragment_to_myPostFragment,
+                    bundle
+                )
+            )
         }
     }
 
@@ -373,7 +376,12 @@ class TextDetailFragment : BaseFragment() {
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem) {
             moreDialog?.dismiss()
-            checkStatus { (requireActivity() as MainActivity).showReportDialog(item, memberPostItem) }
+            checkStatus {
+                (requireActivity() as MainActivity).showReportDialog(
+                    item,
+                    memberPostItem
+                )
+            }
         }
 
         override fun onCancel() {

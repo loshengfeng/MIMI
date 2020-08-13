@@ -5,8 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.provider.MediaStore
 import android.view.View
@@ -73,10 +75,14 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
+import com.video.trimmer.utils.RealPathUtil
+import com.vincent.videocompressor.VideoCompress
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 import java.io.File
+import java.util.*
+import kotlin.collections.ArrayList
 
 class AdultHomeFragment : BaseFragment() {
 
@@ -124,7 +130,6 @@ class AdultHomeFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         handleBackStackData()
-
         requireActivity().onBackPressedDispatcher.addCallback {
             interactionListener?.changeNavigationPosition(
                 R.id.navigation_home
@@ -410,11 +415,42 @@ class AdultHomeFragment : BaseFragment() {
                 is Success -> {
                     picParameter.id = it.result.toString()
                     viewModel.clearLiveDataValue()
-                    viewModel.postAttachment(
-                        uploadVideoUri[0].videoUrl,
-                        requireContext(),
-                        TYPE_VIDEO
-                    )
+                    val realPath = UriUtils.getPath(requireContext(), Uri.parse(uploadVideoUri[0].videoUrl))
+                    uploadVideoUri[0].videoUrl = realPath!!
+
+                    val videoUri = Uri.parse(uploadVideoUri[0].videoUrl)
+                    val file = File(videoUri.path ?: "")
+                    val destinationPath = Environment.getExternalStorageDirectory().toString() + File.separator + "temp" + File.separator + "Videos" + File.separator
+                    val root = File(destinationPath)
+                    val outputFileUri = Uri.fromFile(File(root, "t_${Calendar.getInstance().timeInMillis}_" + file.nameWithoutExtension + ".mp4"))
+                    val outPutPath = RealPathUtil.realPathFromUriApi19(requireContext(), outputFileUri)
+                        ?: File(root, "t_${Calendar.getInstance().timeInMillis}_" + videoUri.path?.substring(videoUri.path!!.lastIndexOf("/") + 1)).absolutePath
+
+                    VideoCompress.compressVideoLow(realPath, outPutPath , object : VideoCompress.CompressListener {
+                        override fun onStart() {
+                            Timber.d("Start compress")
+                        }
+
+                        override fun onSuccess() {
+                            Timber.d("Compress success")
+                            uploadVideoUri[0].videoUrl = outPutPath
+                            viewModel.postAttachment(
+                                uploadVideoUri[0].videoUrl,
+                                requireContext(),
+                                TYPE_VIDEO
+                            )
+
+                        }
+
+                        override fun onFail() {
+                            Timber.d("Compress fail")
+                            resetAndCancelJob(Throwable(), getString(R.string.post_error))
+                        }
+
+                        override fun onProgress(percent: Float) {
+                            Timber.d("Compress progress : $percent")
+                        }
+                    })
                 }
                 is Error -> {
                     resetAndCancelJob(it.throwable, getString(R.string.post_error))
@@ -527,6 +563,8 @@ class AdultHomeFragment : BaseFragment() {
                 }
                 PostType.IMAGE -> {
                     memberPostItem.id = postId
+                    memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
+                    memberPostItem.avatarAttachmentId = viewModel.pref.profileItem.avatarAttachmentId
                     val bundle = PictureDetailFragment.createBundle(memberPostItem, -1)
                     navigateTo(
                         NavigateItem.Destination(
@@ -536,6 +574,7 @@ class AdultHomeFragment : BaseFragment() {
                     )
                 }
                 PostType.VIDEO -> {
+                    memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
                     val bundle = ClipFragment.createBundle(arrayListOf(memberPostItem), -1, false)
                     navigateTo(
                         NavigateItem.Destination(
@@ -1197,16 +1236,23 @@ class AdultHomeFragment : BaseFragment() {
                 }
 
                 REQUEST_VIDEO_CAPTURE -> {
+
                     val videoUri: Uri? = data?.data
                     val myUri =
                         Uri.fromFile(File(UriUtils.getPath(requireContext(), videoUri!!) ?: ""))
 
-                    val bundle = Bundle()
-                    bundle.putString(BUNDLE_VIDEO_URI, myUri.toString())
-                    findNavController().navigate(
-                        R.id.action_adultHomeFragment_to_editVideoFragment,
-                        bundle
-                    )
+                    val retriever = MediaMetadataRetriever()
+                    retriever.setDataSource(requireContext(), myUri)
+                    val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                    val timeInMillisec = time.toLong()
+
+                    if (timeInMillisec in 3001..149999) {
+                        val bundle = Bundle()
+                        bundle.putString(BUNDLE_VIDEO_URI, myUri.toString())
+                        findNavController().navigate(R.id.action_adultHomeFragment_to_editVideoFragment, bundle)
+                    } else {
+                        Toast.makeText(requireContext(), R.string.post_video_length_error, Toast.LENGTH_SHORT).show()
+                    }
                 }
 
                 REQUEST_LOGIN -> {

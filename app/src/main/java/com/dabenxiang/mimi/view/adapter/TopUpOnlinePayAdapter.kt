@@ -13,7 +13,7 @@ import com.dabenxiang.mimi.view.topup.TopUpOnlinePayViewHolder
 class TopUpOnlinePayAdapter(val context: Context) :
     RecyclerView.Adapter<TopUpOnlinePayViewHolder>() {
 
-    var selectItem: OrderingPackageItem? = null
+    private var selectItem: OrderingPackageItem? = null
 
     private var orderingPackageItems: ArrayList<OrderingPackageItem>? = null
 
@@ -58,5 +58,9 @@ class TopUpOnlinePayAdapter(val context: Context) :
 
     fun clearSelectItem() {
         selectItem = null
+    }
+
+    fun getSelectItem(): OrderingPackageItem? {
+        return selectItem
     }
 }
