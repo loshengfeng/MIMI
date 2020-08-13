@@ -48,8 +48,8 @@ class EditVideoRangeFragment : BaseFragment(), OnTrimVideoListener, OnVideoListe
             .setOnVideoListener(this)
             .setVideoURI(Uri.parse(uri))
             .setVideoInformationVisibility(true)
-            .setMaxDuration(10)
-            .setMinDuration(2)
+            .setMaxDuration(15)
+            .setMinDuration(3)
             .setDestinationPath(Environment.getExternalStorageDirectory().toString() + File.separator + "temp" + File.separator + "Videos" + File.separator)
     }
 
