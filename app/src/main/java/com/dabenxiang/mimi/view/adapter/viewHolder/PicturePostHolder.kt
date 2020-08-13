@@ -21,6 +21,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.adapter.PictureAdapter
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -29,9 +30,13 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_picture_post.view.*
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import java.util.*
 
-class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
+class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
+
+    private val accountManager: AccountManager by inject()
 
     val picturePostItemLayout: ConstraintLayout = itemView.layout_picture_post_item
     val avatarImg: ImageView = itemView.img_avatar
@@ -58,6 +63,8 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate ?: Date(), Date())
         title.text = item.title
+        follow.visibility = if(accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
+
         updateLikeAndFollowItem(item, memberPostFuncItem)
 
         val avatarId = item.avatarAttachmentId.toString()

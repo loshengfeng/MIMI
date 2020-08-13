@@ -17,6 +17,7 @@ import com.dabenxiang.mimi.model.api.vo.TextContentItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
@@ -24,10 +25,13 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_text_post.view.*
-import timber.log.Timber
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import java.util.*
 
-class TextPostHolder(itemView: View) : BaseViewHolder(itemView) {
+class TextPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
+
+    private val accountManager: AccountManager by inject()
 
     val textPostItemLayout: ConstraintLayout = itemView.layout_text_post_item
     val avatarImg: ImageView = itemView.img_avatar
@@ -53,6 +57,7 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView) {
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         title.text = item.title
+        follow.visibility = if(accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
 
         // FIXME: item.content json 資料格式有問題
         try {

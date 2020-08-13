@@ -677,7 +677,8 @@ class MyPostFragment : BaseFragment() {
 
     private val myPostListener = object : MyPostListener {
         override fun onMoreClick(item: MemberPostItem) {
-            if (userId == USER_ID_ME) {
+            val isMe = viewModel.accountManager.getProfile().userId == item.creatorId
+            if (isMe) {
                 meMoreDialog =
                     MyPostMoreDialogFragment.newInstance(item, onMeMoreDialogListener)
                         .also {
