@@ -10,7 +10,6 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.MultiTransformation
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.request.RequestOptions
@@ -26,9 +25,7 @@ import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_LOGIN
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
-import com.dabenxiang.mimi.view.setting.SettingFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.google.android.exoplayer2.util.Log
 import kotlinx.android.synthetic.main.fragment_personal.*
 import kotlinx.android.synthetic.main.item_personal_is_login.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
@@ -85,8 +82,8 @@ class PersonalFragment : BaseFragment() {
                 is Success -> {
                     val options: RequestOptions = RequestOptions()
                         .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                        .placeholder(R.drawable.ico_default_photo)
-                        .error(R.drawable.ico_default_photo)
+                        .placeholder(R.drawable.default_profile_picture)
+                        .error(R.drawable.default_profile_picture)
                         .priority(Priority.NORMAL)
                     Glide.with(this).load(it.result)
                         .apply(options)
@@ -148,7 +145,7 @@ class PersonalFragment : BaseFragment() {
                 R.id.tv_logout -> {
                     Glide.with(this).clear(iv_photo)
                     viewModel.signOut()
-                    Glide.with(this).load(R.drawable.ico_default_photo)
+                    Glide.with(this).load(R.drawable.default_profile_picture)
                         .into(iv_photo)
                 }
                 R.id.tv_login -> navigateTo(

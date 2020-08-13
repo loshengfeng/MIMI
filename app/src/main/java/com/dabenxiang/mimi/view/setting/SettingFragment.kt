@@ -95,8 +95,8 @@ class SettingFragment : BaseFragment() {
                 is Success -> {
                     val options: RequestOptions = RequestOptions()
                         .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                        .placeholder(R.drawable.ico_default_photo)
-                        .error(R.drawable.ico_default_photo)
+                        .placeholder(R.drawable.default_profile_picture)
+                        .error(R.drawable.default_profile_picture)
                         .priority(Priority.NORMAL)
                     Glide.with(this).load(it.result)
                         .apply(options)
@@ -241,7 +241,7 @@ class SettingFragment : BaseFragment() {
     }
 
     override fun initSettings() {
-        Glide.with(this).load(R.drawable.ico_default_photo)
+        Glide.with(this).load(R.drawable.default_profile_picture)
             .into(iv_photo)
         useAdultTheme(false)
         viewModel.getProfile()
@@ -308,8 +308,8 @@ class SettingFragment : BaseFragment() {
         Glide.with(this)
             .load(bitmap)
             .circleCrop()
-            .placeholder(R.drawable.ico_default_photo)
-            .error(R.drawable.ico_default_photo)
+            .placeholder(R.drawable.default_profile_picture)
+            .error(R.drawable.default_profile_picture)
             .priority(Priority.NORMAL)
             .into(iv_photo)
     }

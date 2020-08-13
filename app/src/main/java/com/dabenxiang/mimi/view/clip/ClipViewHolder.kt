@@ -58,7 +58,7 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view), KoinComponent 
                 Glide.with(ivHead.context).load(bitmap).circleCrop().into(ivHead)
             } ?: run { clipFuncItem.getBitmap(id, pos) }
         } ?: run {
-            Glide.with(ivHead.context).load(R.drawable.icon_cs_photo).circleCrop().into(ivHead)
+            Glide.with(ivHead.context).load(R.drawable.default_profile_picture).circleCrop().into(ivHead)
         }
 
         var contentItem: MediaContentItem? = null

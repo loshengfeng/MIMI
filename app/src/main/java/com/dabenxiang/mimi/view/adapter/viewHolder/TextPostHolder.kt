@@ -78,7 +78,7 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
                 updateAvatar(avatarId)
             }
         } else {
-            Glide.with(avatarImg.context).load(R.drawable.icon_cs_photo).circleCrop()
+            Glide.with(avatarImg.context).load(R.drawable.default_profile_picture).circleCrop()
                 .into(avatarImg)
         }
 

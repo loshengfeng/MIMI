@@ -491,7 +491,7 @@ class PostVideoFragment : BaseFragment() {
                     val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
                     val timeInMillisec = time.toLong()
 
-                    if (timeInMillisec in 3001..149999) {
+                    if (timeInMillisec > 3001) {
                         val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
 
                         if (isEdit != null && isEdit) {

@@ -18,6 +18,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.SeekBar
+import android.widget.Toast
 import com.video.trimmer.R
 import com.video.trimmer.interfaces.OnProgressVideoListener
 import com.video.trimmer.interfaces.OnRangeSeekBarListener
@@ -49,6 +50,8 @@ class VideoTrimmer @JvmOverloads constructor(context: Context, attrs: AttributeS
     private var mEndPosition = 0f
     private var mResetSeekBar = true
     private val mMessageHandler = MessageHandler(this)
+
+    private var endDuration = 0
 
     private var destinationPath: String
         get() {
@@ -169,6 +172,11 @@ class VideoTrimmer @JvmOverloads constructor(context: Context, attrs: AttributeS
     }
 
     fun onSaveClicked() {
+        if (endDuration < 3001) {
+            Toast.makeText(context, R.string.post_video_length_error, Toast.LENGTH_LONG).show()
+            return
+        }
+
         mOnTrimVideoListener?.onTrimStarted()
         icon_video_play.visibility = View.VISIBLE
         video_loader.pause()
@@ -292,6 +300,7 @@ class VideoTrimmer @JvmOverloads constructor(context: Context, attrs: AttributeS
     private fun setTimeFrames() {
         val seconds = context.getString(R.string.short_seconds)
         textTimeSelection.text = String.format("%s %s - %s %s", TrimVideoUtils.stringForTime(mStartPosition), seconds, TrimVideoUtils.stringForTime(mEndPosition), seconds)
+        endDuration = (mEndPosition - mStartPosition).toInt()
     }
 
     private fun onSeekThumbs(index: Int, value: Float) {
