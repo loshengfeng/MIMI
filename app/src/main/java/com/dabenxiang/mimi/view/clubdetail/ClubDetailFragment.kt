@@ -19,6 +19,7 @@ import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
+import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
@@ -32,7 +33,6 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_club_detail.*
-import timber.log.Timber
 
 class ClubDetailFragment : BaseFragment() {
 
@@ -97,7 +97,7 @@ class ClubDetailFragment : BaseFragment() {
             ClubPagerAdapter(
                 ClubDetailFuncItem({ orderBy, function -> getPost(orderBy, function) },
                     { id, function -> getBitmap(id, function) },
-                    { item, isFollow, func -> followMember(item, isFollow, func) },
+                    { item, items, isFollow, func -> followMember(item, items, isFollow, func) },
                     { item, isLike, func -> likePost(item, isLike, func) }),
                 adultListener
             )
@@ -114,7 +114,7 @@ class ClubDetailFragment : BaseFragment() {
                 is ApiResult.Success -> {
                     updateFollow()
                 }
-                is ApiResult.Error -> Timber.e(it.throwable)
+                is ApiResult.Error -> onApiError(it.throwable)
             }
         })
     }
@@ -300,10 +300,11 @@ class ClubDetailFragment : BaseFragment() {
 
     private fun followMember(
         memberPostItem: MemberPostItem,
+        items: List<MemberPostItem>,
         isFollow: Boolean,
         update: (Boolean) -> Unit
     ) {
-        checkStatus { viewModel.followMember(memberPostItem, isFollow, update) }
+        checkStatus { viewModel.followMember(memberPostItem, items, isFollow, update) }
     }
 
     private fun likePost(
@@ -313,5 +314,4 @@ class ClubDetailFragment : BaseFragment() {
     ) {
         checkStatus { viewModel.likePost(memberPostItem, isLike, update) }
     }
-
 }
