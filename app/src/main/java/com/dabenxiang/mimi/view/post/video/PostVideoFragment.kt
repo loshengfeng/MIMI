@@ -269,7 +269,7 @@ class PostVideoFragment : BaseFragment() {
                 val length = String.format("%02d:%02d:%02d",
                     TimeUnit.MILLISECONDS.toHours(timeInMillisec),
                     TimeUnit.MILLISECONDS.toMinutes(timeInMillisec) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(timeInMillisec)),
-                    TimeUnit.MILLISECONDS.toSeconds(timeInMillisec) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(timeInMillisec)));
+                    TimeUnit.MILLISECONDS.toSeconds(timeInMillisec) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(timeInMillisec)))
                 videoAttachmentList[0].length = length
             }
 
@@ -345,16 +345,12 @@ class PostVideoFragment : BaseFragment() {
 
     private fun setUI() {
         val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
-        val mediaItem = Gson().fromJson(item.content, MediaItem::class.java)
+        val trimmerUri = arguments?.getString(BUNDLE_TRIMMER_URI, "")
+        val picUri = arguments?.getString(BUNDLE_COVER_URI, "")
 
         postId = item.id
 
         edt_title.setText(item.title)
-
-        for (tag in item.tags!!) {
-            addEditTag(tag)
-        }
-
         txt_titleCount.text = String.format(getString(R.string.typing_count,
             item.title.length,
             TITLE_LIMIT
@@ -364,15 +360,26 @@ class PostVideoFragment : BaseFragment() {
             HASHTAG_LIMIT
         ))
 
-        val postVideoAttachment = PostVideoAttachment(
-            videoAttachmentId = mediaItem.videoParameter.id,
-            length = mediaItem.videoParameter.length,
-            picAttachmentId = mediaItem.picParameter[0].id,
-            ext = mediaItem.picParameter[0].ext
-        )
-        videoAttachmentList.add(postVideoAttachment)
+        for (tag in item.tags!!) {
+            addEditTag(tag)
+        }
 
-        haveMainTag = true
+        if (trimmerUri!!.isBlank()) {
+            val mediaItem = Gson().fromJson(item.content, MediaItem::class.java)
+
+            val postVideoAttachment = PostVideoAttachment(
+                videoAttachmentId = mediaItem.videoParameter.id,
+                length = mediaItem.videoParameter.length,
+                picAttachmentId = mediaItem.picParameter[0].id,
+                ext = mediaItem.picParameter[0].ext
+            )
+            videoAttachmentList.add(postVideoAttachment)
+
+            haveMainTag = true
+        } else {
+            val postVideoAttachment = PostVideoAttachment(videoUrl = trimmerUri, picUrl = picUri!!)
+            videoAttachmentList.add(postVideoAttachment)
+        }
     }
 
     private val chooseClubDialogListener = object : ChooseClubDialogListener {
@@ -479,17 +486,26 @@ class PostVideoFragment : BaseFragment() {
                     val bundle = Bundle()
                     bundle.putString(EditVideoFragment.BUNDLE_VIDEO_URI, myUri.toString())
 
-                    val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
+                    val retriever = MediaMetadataRetriever()
+                    retriever.setDataSource(requireContext(), myUri)
+                    val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                    val timeInMillisec = time.toLong()
 
-                    if (isEdit != null && isEdit) {
-                        val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+                    if (timeInMillisec in 3001..149999) {
+                        val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
 
-                        bundle.putBoolean(MyPostFragment.EDIT, true)
-                        bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
-                        findNavController().navigate(R.id.action_postVideoFragment_to_editVideoFragment2, bundle)
+                        if (isEdit != null && isEdit) {
+                            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
 
+                            bundle.putBoolean(MyPostFragment.EDIT, true)
+                            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+                            findNavController().navigate(R.id.action_postVideoFragment_to_editVideoFragment2, bundle)
+
+                        } else {
+                            findNavController().navigate(R.id.action_postVideoFragment_to_editVideoFragment, bundle)
+                        }
                     } else {
-                        findNavController().navigate(R.id.action_postVideoFragment_to_editVideoFragment, bundle)
+                        Toast.makeText(requireContext(), R.string.post_video_length_error, Toast.LENGTH_SHORT).show()
                     }
                 }
             }
