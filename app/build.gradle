@@ -39,8 +39,8 @@ android {
         }
     }
 
-    compileSdkVersion 29
-    buildToolsVersion "29.0.3"
+    compileSdkVersion 30
+    buildToolsVersion "30.0.1"
 
     kapt {
         correctErrorTypes = true
@@ -88,7 +88,7 @@ android {
     defaultConfig {
         applicationId "com.dabenxiang.mimi"
         minSdkVersion 24
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode version.versionCode.toInteger()
         versionName version.versionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -131,39 +131,14 @@ android {
         sit_release.initWith(buildTypes.release)
         dev_release.initWith(buildTypes.release)
 
-        prod_debug {
-            buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
-            buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
-            buildConfigField "String", "MQTT_HOST", '"ws://10.1.1.121:8083"'
-        }
+        prod_debug {}
+        prod_release {}
 
-        prod_release {
-            buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
-            buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
-            buildConfigField "String", "MQTT_HOST", '"ws://10.1.1.121:8083"'
-        }
+        sit_debug {}
+        sit_release {}
 
-        sit_debug {
-            buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
-            buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
-            buildConfigField "String", "MQTT_HOST", '"wss://mqtt.ymmsp.com:443"'
-        }
-        sit_release {
-            buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
-            buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
-            buildConfigField "String", "MQTT_HOST", '"wss://mqtt.ymmsp.com:443"'
-        }
-
-        dev_debug {
-            buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
-            buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
-            buildConfigField "String", "MQTT_HOST", '"ws://10.1.1.121:8083"'
-        }
-        dev_release {
-            buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
-            buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
-            buildConfigField "String", "MQTT_HOST", '"ws://10.1.1.121:8083"'
-        }
+        dev_debug {}
+        dev_release {}
     }
 
     flavorDimensions "normal"
@@ -188,24 +163,33 @@ android {
     applicationVariants.all { variant ->
         def flavorName = variant.flavorName
 //        println "Show  flavorName !!  " + flavorName//
-        def buildTypename = variant.buildType.name.toString()
-//        println "Show  buildTypename !!  " + buildTypename
+        def full_buildTypename = variant.buildType.name.toString()
+//        println "Show  full_buildTypename !!  " + full_buildTypename
+        def buildtype = full_buildTypename
+        if (full_buildTypename.contains("_")) {
+            buildtype = full_buildTypename.split("_")[0]
+        }
+
         Version flavor_version = readVersionWithPath(getVersionPropertiesPath(flavorName))
         println "Show current flavor_version versionName " + flavor_version.versionName
         println "Show current flavor_version versionCode :   " + flavor_version.versionCode
         def current_branch = gitBranch()
 //        println "Show current_branch :   " + current_branch
-        if (buildTypename.equals("prod_release")&& (current_branch.equals("release")||current_branch.equals("master"))) {
+        if (full_buildTypename.equals("prod_release") && (current_branch.equals("release") || current_branch.equals("master"))) {
             increaseVersionWithPath(getVersionPropertiesPath(flavorName))
             flavor_version = readVersionWithPath(getVersionPropertiesPath(flavorName))
             println "prod_release get new flavor_version versionName " + flavor_version.versionName
             println "prod_release get new flavor_version versionCode :   " + flavor_version.versionCode
         }
+        variant.buildConfigField "String", "API_HOST", "\"${getAPI_Host(buildtype)}\""
+        variant.buildConfigField "String", "AD_API_HOST", "\"${getAD_API_Host(buildtype)}\""
+        variant.buildConfigField "String", "MQTT_HOST", "\"${getMQTT_Host(buildtype)}\""
         variant.outputs.each { output ->
             output.versionNameOverride = flavor_version.versionName
             output.versionCodeOverride = flavor_version.versionCode.toInteger()
         }
     }
+
 ////Ref : https://blog.csdn.net/lbcab/article/details/72771729
 ////Android Studio在对变体目录和main目录进行资源合并时，会遵守这样的规则 某资源在free下有，在main中没有，那么在打包时，会将该资源直接合并到main资源中 某资源在free下有，在main中也有，那么在打包时，会以free为主，将free中资源替换掉main中资源。
 ////代码文件，顾名思义就是指java目录下的.java文件了，为什么代码叫整合，而资源却是合并呢？因为代码文件是没办法合并的，只能是整合，整合是什么意思？假设当前选中的变体是freeDebug，有一个java文件是Test.java，这个Test.java要么只存在free/java下，要么只存在于main/java下，如
@@ -269,6 +253,50 @@ project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     }
 }
 
+def getAPI_Host(String buildtype) {
+    def path = "http://api.vsense.dev-121.silkrode.io"
+    switch (buildtype) {
+        case "sit":
+            path = "http://api.vsense.dev-121.silkrode.io"
+            break
+        case "dev":
+            path = "http://api.vsense.dev-121.silkrode.io"
+            break
+        case "prod":
+        default:
+            break
+    }
+    return path
+}
+
+def getAD_API_Host(String buildtype) {
+    def path = "http://api.promotion.dev-121.silkrode.io"
+    switch (buildtype) {
+        case "sit":
+        case "dev":
+        case "prod":
+        default:
+            break
+    }
+    return path
+}
+
+def getMQTT_Host(String buildtype) {
+    def path = "ws://10.1.1.121:8083"
+    switch (buildtype) {
+        case "sit":
+            path = "wss://mqtt.ymmsp.com:443"
+            break
+        case "dev":
+            path = "ws://10.1.1.121:8083"
+            break
+        case "prod":
+        default:
+            break
+    }
+    return path
+}
+
 def gitBranch() {
     def branch = ""
     def proc = "git rev-parse --abbrev-ref HEAD".execute()
@@ -291,6 +319,11 @@ dependencies {
 
     // AndroidX
     implementation "androidx.appcompat:appcompat:$appcompat_version"
+    //FIXME !!
+    implementation 'androidx.appcompat:appcompat:1.3.0-alpha01'
+    implementation "androidx.appcompat:appcompat-resources:1.3.0-alpha01"
+    implementation 'com.google.android.material:material:1.3.0-alpha02'
+
     implementation "androidx.core:core-ktx:$ktx_version"
     implementation "com.google.android.material:material:$material_version"
     implementation "androidx.activity:activity-ktx:$activity_ktx_version"
@@ -508,7 +541,7 @@ def increaseVersionWithPath(String version_properties_path) {
     if (!pfile.exists()) {
         pfile = file('version.properties')
     }
-    versionProps.load(new FileInputStream( pfile))
+    versionProps.load(new FileInputStream(pfile))
     def nextCode = versionProps['VERSION_CODE'].toInteger() + 1
     versionProps['VERSION_CODE'] = nextCode.toString()
     def nextBuild = versionProps['VERSION_NAME_BUILD'].toInteger() + 1
