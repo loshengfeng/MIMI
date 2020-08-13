@@ -13,6 +13,7 @@ import androidx.navigation.NavDeepLinkBuilder
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.App
+import com.dabenxiang.mimi.NAVIGATE_TO_ACTION
 import com.dabenxiang.mimi.PACKAGE_INSTALLED_ACTION
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setupWithNavController
@@ -30,6 +31,7 @@ import com.dabenxiang.mimi.view.home.HomeFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.view.setting.SettingFragment
 import com.dabenxiang.mimi.widget.utility.FileUtil.deleteExternalFile
@@ -228,6 +230,11 @@ class MainActivity : BaseActivity(), InteractionListener {
                     Timber.d("unrecognized status received from installer")
                 }
             }
+        }
+        else if(NAVIGATE_TO_ACTION == intent?.action){
+            val dest = intent.getIntExtra(PlayerActivity.KEY_DEST_ID, 0)
+            if (dest != 0)
+                Navigation.findNavController(this, R.id.nav_host_fragment).navigate(dest, extras)
         }
     }
 

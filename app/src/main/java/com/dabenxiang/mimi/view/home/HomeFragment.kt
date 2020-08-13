@@ -2,7 +2,6 @@ package com.dabenxiang.mimi.view.home
 
 import android.app.Activity
 import android.content.Intent
-import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
@@ -170,7 +169,7 @@ class HomeFragment : BaseFragment() {
             val bundle = SearchVideoFragment.createBundle("")
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_homeFragment_to_searchVideoFragment,
+                    R.id.action_to_searchVideoFragment,
                     bundle
                 )
             )
