@@ -1268,7 +1268,7 @@ class AdultHomeFragment : BaseFragment() {
                     val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
                     val timeInMillisec = time.toLong()
 
-                    if (timeInMillisec in 3001..149999) {
+                    if (timeInMillisec > 3001) {
                         val bundle = Bundle()
                         bundle.putString(BUNDLE_VIDEO_URI, myUri.toString())
                         findNavController().navigate(R.id.action_adultHomeFragment_to_editVideoFragment, bundle)

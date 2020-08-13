@@ -18,12 +18,16 @@ class ClubPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
     private val swipeRefreshLayout: SwipeRefreshLayout = itemView.swipeRefreshLayout
     private val rvPost: RecyclerView = itemView.rv_post
     private val clNoData: ConstraintLayout = itemView.cl_no_data
+    private var onParentFollowClick: ((MemberPostItem, List<MemberPostItem>, Boolean, ((Boolean) -> Unit)) -> Unit) =
+        { _, _, _, _ -> }
 
     fun onBind(
         position: Int,
         clubDetailFuncItem: ClubDetailFuncItem,
         adultListener: AdultListener
     ) {
+        onParentFollowClick = clubDetailFuncItem.onFollowClick
+
         swipeRefreshLayout.setColorSchemeColors(swipeRefreshLayout.context.getColor(R.color.color_red_1))
         swipeRefreshLayout.setOnRefreshListener {
             clubDetailFuncItem.getMemberPost(getOrderType(position)) { list -> updateList(list) }
@@ -39,13 +43,25 @@ class ClubPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
                     MemberPostFuncItem(
                         onItemClick = {},
                         getBitmap = clubDetailFuncItem.getBitmap,
-                        onFollowClick = clubDetailFuncItem.onFollowClick,
+                        onFollowClick = { item, _, isFollow, _ -> onFollowClick(item, isFollow) },
                         onLikeClick = clubDetailFuncItem.onLikeClick
                     )
                 )
             clubDetailFuncItem.getMemberPost(getOrderType(position)) { list -> updateList(list) }
             swipeRefreshLayout.isRefreshing = true
         }
+    }
+
+    private fun onFollowClick(memberPostItem: MemberPostItem, isFollow: Boolean) {
+        onParentFollowClick(
+            memberPostItem,
+            (rvPost.adapter as MemberPostPagedAdapter).currentList ?: arrayListOf(),
+            isFollow
+        ) { updateFollowStatus() }
+    }
+
+    private fun updateFollowStatus() {
+        rvPost.adapter?.notifyDataSetChanged()
     }
 
     private fun updateList(list: PagedList<MemberPostItem>) {
