@@ -14,7 +14,6 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.ReportRequest
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
@@ -60,6 +59,9 @@ class SearchPostViewModel : BaseViewModel() {
 
     private val _searchTotalCount = MutableLiveData<Long>()
     val searchTotalCount: LiveData<Long> = _searchTotalCount
+
+    private val _followResult = MutableLiveData<ApiResult<Nothing>>()
+    val followResult: LiveData<ApiResult<Nothing>> = _followResult
 
     var adWidth = 0
     var adHeight = 0
@@ -330,12 +332,20 @@ class SearchPostViewModel : BaseViewModel() {
 
     private fun getClubPagingItems(keyword: String): LiveData<PagedList<MemberClubItem>> {
         val clubDataSource =
-            ClubDataSource(postPagingCallback, viewModelScope, domainManager, adWidth, adHeight, keyword)
+            ClubDataSource(
+                postPagingCallback,
+                viewModelScope,
+                domainManager,
+                adWidth,
+                adHeight,
+                keyword
+            )
         val clubFactory = ClubFactory(clubDataSource)
         val config = PagedList.Config.Builder().setPrefetchDistance(4).build()
         return LivePagedListBuilder(clubFactory, config).build()
     }
 
+    var totalCount: Int = 0
     private val pagingCallback = object : SearchPagingCallback {
         override fun onTotalCount(count: Long) {
             _searchTotalCount.postValue(count)
@@ -351,6 +361,11 @@ class SearchPostViewModel : BaseViewModel() {
 
         override fun onThrowable(throwable: Throwable) {
             setShowProgress(false)
+        }
+
+        override fun onTotalCount(count: Long, isInitial: Boolean) {
+            totalCount = if (isInitial) count.toInt()
+            else totalCount.plus(count.toInt())
         }
     }
 
@@ -372,7 +387,12 @@ class SearchPostViewModel : BaseViewModel() {
         }
     }
 
-    fun followMember(item: MemberPostItem, isFollow: Boolean, update: (Boolean) -> Unit) {
+    fun followMember(
+        item: MemberPostItem,
+        items: ArrayList<MemberPostItem>,
+        isFollow: Boolean,
+        update: (Boolean) -> Unit
+    ) {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
@@ -381,20 +401,18 @@ class SearchPostViewModel : BaseViewModel() {
                     else -> apiRepository.cancelFollowPost(item.creatorId)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
-                item.isFollow = isFollow
+                items.forEach {
+                    if (it.creatorId == item.creatorId) {
+                        it.isFollow = isFollow
+                    }
+                }
                 emit(ApiResult.success(null))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect {
-                    when (it) {
-                        is ApiResult.Empty -> {
-                            update(isFollow)
-                        }
-                    }
-                }
+                .collect { _followResult.value = it }
         }
     }
 

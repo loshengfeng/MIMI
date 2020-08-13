@@ -22,6 +22,7 @@ import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.adapter.PictureAdapter
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
@@ -31,13 +32,16 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_picture_post.view.*
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import java.util.*
 
 class MyPostPicturePostHolder(
     itemView: View,
-    private val isMe: Boolean,
     private val isAdultTheme: Boolean
-) : BaseViewHolder(itemView) {
+) : BaseViewHolder(itemView),KoinComponent {
+
+    private val accountManager: AccountManager by inject()
 
     private val picturePostItemLayout: ConstraintLayout = itemView.layout_picture_post_item
     private val imgAvatar: ImageView = itemView.img_avatar
@@ -63,6 +67,7 @@ class MyPostPicturePostHolder(
         attachmentListener: AttachmentListener,
         memberPostFuncItem: MemberPostFuncItem
     ) {
+        val isMe = accountManager.getProfile().userId == item.creatorId
 
         picturePostItemLayout.setBackgroundColor(App.self.getColor(if (isAdultTheme) R.color.color_black_4 else R.color.color_white_1))
         tvName.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1 else R.color.color_black_1))
@@ -77,6 +82,7 @@ class MyPostPicturePostHolder(
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         tvTitle.text = item.title
+        tvFollow.visibility = if(accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
 
         if (LruCacheUtils.getLruCache(item.avatarAttachmentId.toString()) == null) {
             attachmentListener.onGetAttachment(

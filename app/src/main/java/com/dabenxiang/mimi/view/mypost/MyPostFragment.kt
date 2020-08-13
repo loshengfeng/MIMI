@@ -357,16 +357,13 @@ class MyPostFragment : BaseFragment() {
 
         viewModel.followResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is ApiResult.Empty -> {
+
                     adapter.notifyItemRangeChanged(
                         0,
                         viewModel.totalCount,
                         MyPostPagedAdapter.PAYLOAD_UPDATE_FOLLOW
                     )
-//                    adapter.notifyItemChanged(
-//                        it.result,
-//                        MyPostPagedAdapter.PAYLOAD_UPDATE_FOLLOW
-//                    )
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
@@ -721,7 +718,8 @@ class MyPostFragment : BaseFragment() {
 
     private val myPostListener = object : MyPostListener {
         override fun onMoreClick(item: MemberPostItem) {
-            if (userId == USER_ID_ME) {
+            val isMe = viewModel.accountManager.getProfile().userId == item.creatorId
+            if (isMe) {
                 meMoreDialog =
                     MyPostMoreDialogFragment.newInstance(item, onMeMoreDialogListener)
                         .also {
@@ -921,7 +919,7 @@ class MyPostFragment : BaseFragment() {
         MemberPostFuncItem(
             {},
             { id, function -> getBitmap(id, function) },
-            { _, _, _ -> }
+            { _, _, _, _ -> }
         )
     }
 

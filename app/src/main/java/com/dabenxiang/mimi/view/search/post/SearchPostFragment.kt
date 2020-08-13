@@ -181,7 +181,7 @@ class SearchPostFragment : BaseFragment() {
                         is TextPostHolder -> {
                             adapter?.notifyItemChanged(
                                 it.result,
-                                MemberPostPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI
+                                MemberPostPagedAdapter.PAYLOAD_UPDATE_LIKE
                             )
                         }
                     }
@@ -199,7 +199,7 @@ class SearchPostFragment : BaseFragment() {
                         is TextPostHolder -> {
                             adapter?.notifyItemChanged(
                                 it.result,
-                                MemberPostPagedAdapter.PAYLOAD_UPDATE_LIKE_AND_FOLLOW_UI
+                                MemberPostPagedAdapter.PAYLOAD_UPDATE_LIKE
                             )
                         }
                     }
@@ -222,6 +222,19 @@ class SearchPostFragment : BaseFragment() {
 
         viewModel.clubItemListResult.observe(viewLifecycleOwner, Observer {
             clubMemberAdapter.submitList(it)
+        })
+
+        viewModel.followResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Empty -> {
+                    recycler_search_result.adapter?.notifyItemRangeChanged(
+                        0,
+                        viewModel.totalCount,
+                        MemberPostPagedAdapter.PAYLOAD_UPDATE_FOLLOW
+                    )
+                }
+                is Error -> onApiError(it.throwable)
+            }
         })
     }
 
@@ -366,7 +379,7 @@ class SearchPostFragment : BaseFragment() {
         MemberPostFuncItem(
             {},
             { id, func -> getBitmap(id, func) },
-            { item, isFollow, func -> followMember(item, isFollow, func) },
+            { item, items, isFollow, func -> followMember(item, items, isFollow, func) },
             { item, isLike, func -> likePost(item, isLike, func) },
             { item, isFavorite, func -> favoritePost(item, isFavorite, func) }
         )
@@ -587,10 +600,11 @@ class SearchPostFragment : BaseFragment() {
 
     private fun followMember(
         memberPostItem: MemberPostItem,
+        items: List<MemberPostItem>,
         isFollow: Boolean,
         update: (Boolean) -> Unit
     ) {
-        checkStatus { viewModel.followMember(memberPostItem, isFollow, update) }
+        checkStatus { viewModel.followMember(memberPostItem, ArrayList(items), isFollow, update) }
     }
 
     private fun likePost(

@@ -37,6 +37,7 @@ import com.dabenxiang.mimi.model.vo.*
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter
+import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter.Companion.PAYLOAD_UPDATE_FOLLOW
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
@@ -517,6 +518,27 @@ class AdultHomeFragment : BaseFragment() {
                 is Error -> onApiError(it.throwable)
             }
         })
+
+        viewModel.followResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Empty -> {
+                    val adapter = when (lastPosition) {
+                        1 -> rv_first.adapter
+                        2 -> rv_second.adapter
+                        3 -> rv_third.adapter
+                        4 -> rv_fourth.adapter
+                        5 -> rv_fifth.adapter
+                        else -> rv_sixth.adapter
+                    }
+                    adapter?.notifyItemRangeChanged(
+                        0,
+                        viewModel.totalCount,
+                        PAYLOAD_UPDATE_FOLLOW
+                    )
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     private fun setSnackBarPostStatus(postId: Long = 0) {
@@ -902,7 +924,7 @@ class AdultHomeFragment : BaseFragment() {
         MemberPostFuncItem(
             {},
             { id, func -> getBitmap(id, func) },
-            { item, isFollow, func -> followMember(item, isFollow, func) },
+            { item, items, isFollow, func -> followMember(item, items, isFollow, func) },
             { item, isLike, func -> likePost(item, isLike, func) },
             { item, isFavorite, func -> favoritePost(item, isFavorite, func) }
         )
@@ -1273,10 +1295,11 @@ class AdultHomeFragment : BaseFragment() {
 
     private fun followMember(
         memberPostItem: MemberPostItem,
+        items: List<MemberPostItem>,
         isFollow: Boolean,
         update: (Boolean) -> Unit
     ) {
-        checkStatus { viewModel.followMember(memberPostItem, isFollow, update) }
+        checkStatus { viewModel.followMember(memberPostItem, ArrayList(items), isFollow, update) }
     }
 
     private fun likePost(

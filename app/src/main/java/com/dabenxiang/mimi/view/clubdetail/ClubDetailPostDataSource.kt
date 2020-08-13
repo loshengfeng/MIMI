@@ -2,11 +2,11 @@ package com.dabenxiang.mimi.view.clubdetail
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.manager.DomainManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -57,7 +57,10 @@ class ClubDetailPostDataSource(
                 .flowOn(Dispatchers.IO)
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
-                .collect { callback.onResult(it.list, null, it.nextKey) }
+                .collect {
+                    pagingCallback.onTotalCount(it.list.size.toLong(), true)
+                    callback.onResult(it.list, null, it.nextKey)
+                }
         }
     }
 
@@ -81,6 +84,7 @@ class ClubDetailPostDataSource(
                 .collect {
                     it.body()?.also { item ->
                         item.content?.also { list ->
+                            pagingCallback.onTotalCount(list.size.toLong(), false)
                             val nextPageKey = when {
                                 hasNextPage(
                                     item.paging.count,

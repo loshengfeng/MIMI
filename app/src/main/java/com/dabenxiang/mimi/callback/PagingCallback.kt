@@ -8,5 +8,6 @@ interface PagingCallback {
     fun onSucceed() {}
     fun onThrowable(throwable: Throwable)
     fun onTotalCount(count: Long) {}
+    fun onTotalCount(count: Long, isInitial: Boolean) {}
     fun onGetCategory(category: Category?) {}
 }
