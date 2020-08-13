@@ -22,5 +22,6 @@ data class OrderingPackageItem(
     val price: Float = 0f,
 
     @SerializedName("point")
-    val point: Int = 0
+    val point: Float = 0f
+
 ): Serializable

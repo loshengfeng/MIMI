@@ -260,6 +260,7 @@ class TopUpFragment : BaseFragment() {
         tv_record_top_up.visibility = View.VISIBLE
         item_is_Login.visibility = View.VISIBLE
         item_is_not_Login.visibility = View.GONE
+        tv_proxy_empty.visibility = View.GONE
 
         tv_subtitle.text = getString(R.string.topup_subtitle)
 

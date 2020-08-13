@@ -2,12 +2,17 @@ package com.dabenxiang.mimi.view.orderinfo
 
 import android.os.Bundle
 import android.view.View
+import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.OrderingPackageItem
+import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.view.base.BaseFragment
-import kotlinx.android.synthetic.main.fragment_text_detail.*
+import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
+import kotlinx.android.synthetic.main.fragment_order_info.*
+import kotlinx.android.synthetic.main.fragment_text_detail.toolbarContainer
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 
@@ -40,6 +45,35 @@ class OrderInfoFragment : BaseFragment() {
             findNavController().navigateUp()
         }
 
+        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
+
+        val orderingPackageItem =
+            arguments?.getSerializable(PictureDetailFragment.KEY_DATA) as OrderingPackageItem
+
+        val productName = StringBuilder(orderingPackageItem.point.toString())
+            .append(" ")
+            .append(getString(R.string.order_detail_point))
+            .append("(")
+        when (orderingPackageItem.paymentType) {
+            PaymentType.BANK -> productName.append(getString(R.string.order_detail_payment_bank))
+            PaymentType.ALI -> productName.append(getString(R.string.order_detail_payment_ali))
+            else -> productName.append(getString(R.string.order_detail_payment_wx))
+        }
+        productName.append(")")
+        tv_product_name.text = productName
+
+        tv_product_count.text = StringBuilder("¥ ")
+            .append(orderingPackageItem.listPrice)
+            .append(" x 1")
+            .toString()
+
+        tv_total.text = StringBuilder("¥ ")
+            .append(orderingPackageItem.listPrice)
+            .toString()
+
+        tv_total_amount.text = StringBuilder("¥ ")
+            .append(orderingPackageItem.listPrice)
+            .toString()
     }
 
     override fun getLayoutId(): Int {
@@ -51,7 +85,9 @@ class OrderInfoFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+        btn_create_order.setOnClickListener {
 
+        }
     }
 
 }

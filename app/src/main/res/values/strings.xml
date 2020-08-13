@@ -64,7 +64,6 @@
     <string name="topup_desc">蜜币购买</string>
     <string name="topup_total">总计</string>
     <string name="topup_next">下一步</string>
-    <string name="topup_confirm_pay">确认支付</string>
     <string name="topup_subtitle">会员尊享 每天无限观看</string>
     <string name="topup_proxy_title_name">火热代理</string>
     <string name="topup_online_empty">所有在现均在忙碌中，请稍後再试。</string>
@@ -346,6 +345,15 @@
 
     <!-- Order Detail -->
     <string name="order_detail_title">订单资讯</string>
+    <string name="order_detail_product_name">商品名称</string>
+    <string name="order_detail_total">小計</string>
+    <string name="order_detail_point">蜜币</string>
+    <string name="order_detail_payment_bank">银行卡付款</string>
+    <string name="order_detail_payment_ali">支付宝付款</string>
+    <string name="order_detail_payment_wx">微信付款</string>
+    <string name="order_detail_create_order">建立订单</string>
+    <string name="order_detail_total_amount">总计</string>
+
 
     <string name="filter_empty">无搜寻结果</string>
     <string name="copy_url">已将连结保存到剪贴簿</string>
