@@ -4,8 +4,11 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.ApiResult.Empty
+import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.model.api.vo.OrderingPackageItem
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -29,6 +32,8 @@ class OrderInfoFragment : BaseFragment() {
 
     private val viewModel: OrderInfoViewModel by viewModels()
 
+    private lateinit var orderingPackageItem: OrderingPackageItem
+
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
@@ -47,7 +52,7 @@ class OrderInfoFragment : BaseFragment() {
 
         requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
 
-        val orderingPackageItem =
+        orderingPackageItem =
             arguments?.getSerializable(PictureDetailFragment.KEY_DATA) as OrderingPackageItem
 
         val productName = StringBuilder(orderingPackageItem.point.toString())
@@ -72,7 +77,7 @@ class OrderInfoFragment : BaseFragment() {
             .toString()
 
         tv_total_amount.text = StringBuilder("¥ ")
-            .append(orderingPackageItem.listPrice)
+            .append(orderingPackageItem?.listPrice)
             .toString()
     }
 
@@ -81,12 +86,19 @@ class OrderInfoFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-
+        viewModel.createOrderResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Empty -> {
+                    // TODO: 跳轉頁面
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
         btn_create_order.setOnClickListener {
-
+            viewModel.createOrder(orderingPackageItem.paymentType, orderingPackageItem.id)
         }
     }
 
