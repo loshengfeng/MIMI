@@ -19,6 +19,7 @@ import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
@@ -26,13 +27,18 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.head_video_info.view.*
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import java.text.SimpleDateFormat
 import java.util.*
 
 class FavoritePostViewHolder(
     itemView: View,
     private val listener: FavoriteAdapter.EventListener
-) : BaseAnyViewHolder<PostFavoriteItem>(itemView) {
+) : BaseAnyViewHolder<PostFavoriteItem>(itemView), KoinComponent {
+
+    private val accountManager: AccountManager by inject()
+
     private val ivHead = itemView.findViewById(R.id.iv_head) as ImageView
     private val tvName = itemView.findViewById(R.id.tv_name) as TextView
     private val tvTime = itemView.findViewById(R.id.tv_time) as TextView
@@ -97,6 +103,7 @@ class FavoritePostViewHolder(
     }
 
     override fun updated(position: Int) {
+        val isMe = data?.posterId == accountManager.getProfile().userId
         data?.position = position
         data?.posterAvatarAttachmentId?.let {
             LruCacheUtils.getLruCache(it.toString())?.also { bitmap ->
@@ -149,18 +156,22 @@ class FavoritePostViewHolder(
             }
         }
 
-
-        when (data?.isFollow) {
-            true -> {
-                tvFollow.setTextColor(tvFollow.context.getColor(R.color.color_black_1_60))
-                tvFollow.setBackgroundResource(R.drawable.bg_gray_6_radius_16)
-                tvFollow.setText(R.string.followed)
+        if (!isMe) {
+            tvFollow.visibility = View.VISIBLE
+            when (data?.isFollow) {
+                true -> {
+                    tvFollow.setTextColor(tvFollow.context.getColor(R.color.color_black_1_60))
+                    tvFollow.setBackgroundResource(R.drawable.bg_gray_6_radius_16)
+                    tvFollow.setText(R.string.followed)
+                }
+                else -> {
+                    tvFollow.setTextColor(tvFollow.context.getColor(R.color.color_red_1))
+                    tvFollow.setBackgroundResource(R.drawable.bg_red_1_stroke_radius_16)
+                    tvFollow.setText(R.string.follow)
+                }
             }
-            else -> {
-                tvFollow.setTextColor(tvFollow.context.getColor(R.color.color_red_1))
-                tvFollow.setBackgroundResource(R.drawable.bg_red_1_stroke_radius_16)
-                tvFollow.setText(R.string.follow)
-            }
+        } else {
+            tvFollow.visibility = View.GONE
         }
 
         setupChipGroup(data?.tags, data?.type)
