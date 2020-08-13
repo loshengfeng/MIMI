@@ -368,7 +368,7 @@ class PictureDetailFragment : BaseFragment() {
                 isAdult = true,
                 isAdultTheme = true
             )
-            navigateTo(NavigateItem.Destination(R.id.action_pictureDetailFragment_to_myPostFragment, bundle))
+            navigateTo(NavigateItem.Destination(R.id.action_to_myPostFragment, bundle))
         }
     }
 

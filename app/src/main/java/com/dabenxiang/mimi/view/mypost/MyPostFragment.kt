@@ -590,7 +590,7 @@ class MyPostFragment : BaseFragment() {
         txtPost.visibility = View.VISIBLE
 
         imgPost.setOnClickListener {
-            findNavController().navigate(R.id.action_adultHomeFragment_to_myPostFragment)
+            findNavController().navigate(R.id.action_to_myPostFragment)
         }
 
         txtPost.setOnClickListener {
