@@ -120,8 +120,14 @@ class FavoriteFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.playList.observe(viewLifecycleOwner, Observer { favoriteAdapter.submitList(it) })
-        viewModel.postList.observe(viewLifecycleOwner, Observer { favoriteAdapter.submitList(it) })
+        viewModel.playList.observe(viewLifecycleOwner, Observer {
+            if (!(lastPrimaryIndex == TYPE_ADULT && lastSecondaryIndex == TYPE_SHORT_VIDEO))
+                favoriteAdapter.submitList(it)
+        })
+        viewModel.postList.observe(viewLifecycleOwner, Observer {
+            if (lastPrimaryIndex == TYPE_ADULT && lastSecondaryIndex == TYPE_SHORT_VIDEO)
+                favoriteAdapter.submitList(it)
+        })
         viewModel.dataCount.observe(viewLifecycleOwner, Observer { refreshUi(it) })
 
 
