@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
-import com.dabenxiang.mimi.callback.AttachmentListener
 
 class ClubPagerAdapter(
     private val clubDetailFuncItem: ClubDetailFuncItem,

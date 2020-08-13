@@ -49,6 +49,7 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
 
     fun onBind(
         item: MemberPostItem,
+        itemList: List<MemberPostItem>?,
         position: Int,
         adultListener: AdultListener,
         tag: String,
@@ -67,7 +68,7 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
 //            Timber.e(e)
         }
 
-        updateLikeAndFollowItem(item, memberPostFuncItem)
+        updateLikeAndFollowItem(item, itemList, memberPostFuncItem)
 
         val avatarId = item.avatarAttachmentId.toString()
         if (avatarId != LruCacheUtils.ZERO_ID) {
@@ -77,7 +78,8 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
                 updateAvatar(avatarId)
             }
         } else {
-            Glide.with(avatarImg.context).load(R.drawable.icon_cs_photo).circleCrop().into(avatarImg)
+            Glide.with(avatarImg.context).load(R.drawable.icon_cs_photo).circleCrop()
+                .into(avatarImg)
         }
 
         tagChipGroup.removeAllViews()
@@ -127,6 +129,7 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
 
     private fun updateLikeAndFollowItem(
         item: MemberPostItem,
+        itemList: List<MemberPostItem>?,
         memberPostFuncItem: MemberPostFuncItem
     ) {
         likeCount.text = item.likeCount.toString()
@@ -154,17 +157,23 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
 
         follow.setOnClickListener {
 //            adultListener.onFollowPostClick(item, position, !isFollow)
-            memberPostFuncItem.onFollowClick(item, !item.isFollow) { isFollow -> updateFollow(isFollow)}
+            itemList?.also {
+                memberPostFuncItem.onFollowClick(
+                    item,
+                    itemList,
+                    !item.isFollow
+                ) { isFollow -> updateFollow(isFollow) }
+            }
         }
 
         likeImage.setOnClickListener {
 //            adultListener.onLikeClick(item, position, !isLike)
             val isLike = item.likeType == LikeType.LIKE
-            memberPostFuncItem.onLikeClick(item, !isLike) { like, count-> updateLike(like, count) }
+            memberPostFuncItem.onLikeClick(item, !isLike) { like, count -> updateLike(like, count) }
         }
     }
 
-    private fun updateFollow(isFollow: Boolean) {
+    fun updateFollow(isFollow: Boolean) {
         if (isFollow) {
             follow.text = follow.context.getString(R.string.followed)
             follow.background = follow.context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)

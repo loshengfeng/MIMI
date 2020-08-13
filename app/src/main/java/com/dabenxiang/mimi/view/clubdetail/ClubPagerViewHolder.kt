@@ -36,10 +36,12 @@ class ClubPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
                     rvPost.context,
                     adultListener,
                     "",
-                    MemberPostFuncItem(onItemClick = {},
+                    MemberPostFuncItem(
+                        onItemClick = {},
                         getBitmap = clubDetailFuncItem.getBitmap,
                         onFollowClick = clubDetailFuncItem.onFollowClick,
-                        onLikeClick = clubDetailFuncItem.onLikeClick)
+                        onLikeClick = clubDetailFuncItem.onLikeClick
+                    )
                 )
             clubDetailFuncItem.getMemberPost(getOrderType(position)) { list -> updateList(list) }
             swipeRefreshLayout.isRefreshing = true

@@ -12,7 +12,6 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.ReportRequest
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.view.base.BaseViewModel
@@ -83,6 +82,8 @@ class ClubDetailViewModel : BaseViewModel() {
                 }
         }
     }
+
+    var totalCount: Int = 0
 
     fun followMember(item: MemberPostItem, isFollow: Boolean, update: (Boolean) -> Unit) {
         viewModelScope.launch {
@@ -172,6 +173,11 @@ class ClubDetailViewModel : BaseViewModel() {
         }
 
         override fun onSucceed() {
+        }
+
+        override fun onTotalCount(count: Long, isInitial: Boolean) {
+            totalCount = if (isInitial) count.toInt()
+            else totalCount.plus(count.toInt())
         }
     }
 }

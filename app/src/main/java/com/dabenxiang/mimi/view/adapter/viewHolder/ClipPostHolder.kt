@@ -65,7 +65,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
         time.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         title.text = item.title
         follow.visibility = if(accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
-        updateLikeAndFollowItem(item, memberPostFuncItem)
+        updateLikeAndFollowItem(item, itemList, memberPostFuncItem)
 
         val avatarId = item.avatarAttachmentId.toString()
         if (LruCacheUtils.getLruCache(avatarId) == null) {
@@ -159,6 +159,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
 
     private fun updateLikeAndFollowItem(
         item: MemberPostItem,
+        itemList:List<MemberPostItem>?,
         memberPostFuncItem: MemberPostFuncItem
     ) {
         likeCount.text = item.likeCount.toString()
@@ -189,10 +190,12 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
         }
 
         follow.setOnClickListener {
-            memberPostFuncItem.onFollowClick(item, !(item.isFollow)) { isFollow ->
-                updateFollow(
-                    isFollow
-                )
+            itemList?.also{
+                memberPostFuncItem.onFollowClick(item, itemList, !(item.isFollow)) { isFollow ->
+                    updateFollow(
+                        isFollow
+                    )
+                }
             }
         }
 
@@ -209,7 +212,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
         }
     }
 
-    private fun updateFollow(isFollow: Boolean) {
+    fun updateFollow(isFollow: Boolean) {
         if (isFollow) {
             follow.text = follow.context.getString(R.string.followed)
             follow.background = follow.context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)

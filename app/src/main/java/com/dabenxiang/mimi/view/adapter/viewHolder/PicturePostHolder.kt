@@ -55,6 +55,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
 
     fun onBind(
         item: MemberPostItem,
+        itemList: List<MemberPostItem>?,
         position: Int,
         adultListener: AdultListener,
         tag: String,
@@ -65,7 +66,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
         title.text = item.title
         follow.visibility = if(accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
 
-        updateLikeAndFollowItem(item, memberPostFuncItem)
+        updateLikeAndFollowItem(item, itemList, memberPostFuncItem)
 
         val avatarId = item.avatarAttachmentId.toString()
         if (LruCacheUtils.getLruCache(avatarId) == null) {
@@ -147,7 +148,11 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
         Glide.with(avatarImg.context).load(bitmap).circleCrop().into(avatarImg)
     }
 
-    fun updateLikeAndFollowItem(item: MemberPostItem, memberPostFuncItem: MemberPostFuncItem) {
+    fun updateLikeAndFollowItem(
+        item: MemberPostItem,
+        itemList: List<MemberPostItem>?,
+        memberPostFuncItem: MemberPostFuncItem
+    ) {
         likeCount.text = item.likeCount.toString()
         commentCount.text = item.commentCount.toString()
 
@@ -172,10 +177,12 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
         }
 
         follow.setOnClickListener {
-            memberPostFuncItem.onFollowClick(item, !item.isFollow) { isFollow ->
-                updateFollow(
-                    isFollow
-                )
+            itemList?.also {
+                memberPostFuncItem.onFollowClick(item, itemList, !item.isFollow) { isFollow ->
+                    updateFollow(
+                        isFollow
+                    )
+                }
             }
         }
 
@@ -185,7 +192,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
         }
     }
 
-    private fun updateFollow(isFollow: Boolean) {
+    fun updateFollow(isFollow: Boolean) {
         if (isFollow) {
             follow.text = follow.context.getString(R.string.followed)
             follow.background = follow.context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)

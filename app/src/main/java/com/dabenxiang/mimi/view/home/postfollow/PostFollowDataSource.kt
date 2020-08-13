@@ -2,10 +2,10 @@ package com.dabenxiang.mimi.view.home.postfollow
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.manager.DomainManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -55,6 +55,7 @@ class PostFollowDataSource(
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect {
+                    pagingCallback.onTotalCount(it.list.size.toLong(), true)
                     callback.onResult(it.list, null, it.nextKey)
                 }
         }
@@ -79,6 +80,7 @@ class PostFollowDataSource(
                 .collect {
                     it.body()?.also { item ->
                         item.content?.also { list ->
+                            pagingCallback.onTotalCount(list.size.toLong(), false)
                             val nextPageKey = when {
                                 hasNextPage(
                                     item.paging.count,
