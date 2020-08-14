@@ -22,7 +22,6 @@ import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
-import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
@@ -33,7 +32,6 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_text_detail.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
-import timber.log.Timber
 
 class TextDetailFragment : BaseFragment() {
 
@@ -357,7 +355,7 @@ class TextDetailFragment : BaseFragment() {
                 isAdult = true,
                 isAdultTheme = true
             )
-            navigateTo(NavigateItem.Destination(R.id.action_textDetailFragment_to_myPostFragment, bundle))
+            navigateTo(NavigateItem.Destination(R.id.action_to_myPostFragment, bundle))
         }
     }
 

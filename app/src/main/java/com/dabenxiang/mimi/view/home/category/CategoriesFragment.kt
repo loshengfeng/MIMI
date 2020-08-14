@@ -261,7 +261,7 @@ class CategoriesFragment : BaseFragment() {
             val bundle = SearchVideoFragment.createBundle()
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_categoriesFragment_to_searchVideoFragment,
+                    R.id.action_to_searchVideoFragment,
                     bundle
                 )
             )

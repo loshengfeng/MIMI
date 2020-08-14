@@ -256,7 +256,7 @@ class ClipFragment : BaseFragment() {
                 )
                 navigateTo(
                     NavigateItem.Destination(
-                        R.id.action_clipFragment_to_myPostFragment,
+                        R.id.action_to_myPostFragment,
                         bundle
                     )
                 )

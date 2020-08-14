@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.adapter.viewHolder
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
@@ -18,11 +19,10 @@ class MemberFollowViewHolder(
     private val ivPhoto: ImageView = itemView.iv_photo
     private val tvName: TextView = itemView.tv_name
     private val tvSubTitle: TextView = itemView.tv_sub_title
-    private val tvFollow: TextView = itemView.tv_follow
+    private val clFollow: ConstraintLayout = itemView.cl_follow
 
     init {
         itemView.setOnClickListener { data?.let { data -> listener.onDetail(data) } }
-        tvFollow.setOnClickListener { data?.userId?.let { userId -> listener.onCancelFollow(userId) } }
     }
 
     override fun updated(position: Int) {
@@ -35,11 +35,20 @@ class MemberFollowViewHolder(
                 Glide.with(ivPhoto.context).load(bitmap).circleCrop().into(ivPhoto)
             }
         } else {
-            Glide.with(ivPhoto.context).load(R.drawable.default_profile_picture).circleCrop().into(ivPhoto)
+            Glide.with(ivPhoto.context).load(R.drawable.default_profile_picture).circleCrop()
+                .into(ivPhoto)
         }
 
         tvName.text = data?.friendlyName
         tvSubTitle.text = data?.friendlyName
+        clFollow.setOnClickListener {
+            data?.userId?.let { userId ->
+                listener.onCancelFollow(
+                    userId,
+                    position
+                )
+            }
+        }
     }
 
     override fun updated() {

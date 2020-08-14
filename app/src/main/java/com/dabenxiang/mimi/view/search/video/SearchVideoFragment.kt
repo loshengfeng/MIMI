@@ -86,8 +86,10 @@ class SearchVideoFragment : BaseFragment() {
 
         (arguments?.getSerializable(KEY_DATA) as SearchingVideoItem?)?.also { data ->
             Timber.d("key data from args is title: ${data.title}, tag: ${data.tag} and isAdult: ${data.isAdult}")
-            if (arguments?.getBoolean(KEY_IS_FROM_PLAYER) == true)
+            if (arguments?.getBoolean(KEY_IS_FROM_PLAYER) == true){
                 viewModel.isAdult = data.isAdult
+                useAdultTheme(viewModel.isAdult)
+            }
 
             if (data.tag.isNotBlank()) {
                 viewModel.searchingTag = data.tag
