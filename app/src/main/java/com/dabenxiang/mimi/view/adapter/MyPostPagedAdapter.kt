@@ -86,7 +86,7 @@ class MyPostPagedAdapter(
                 )
             }
             else -> {
-                DeletedPostHolder(
+                DeletedItemViewHolder(
                     LayoutInflater.from(parent.context)
                         .inflate(R.layout.item_deleted, parent, false)
                 )
