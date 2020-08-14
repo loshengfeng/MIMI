@@ -88,7 +88,7 @@ android {
     defaultConfig {
         applicationId "com.dabenxiang.mimi"
         minSdkVersion 24
-        targetSdkVersion 29
+        targetSdkVersion 28
         versionCode version.versionCode.toInteger()
         versionName version.versionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
