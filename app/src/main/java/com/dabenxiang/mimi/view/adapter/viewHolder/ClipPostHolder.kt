@@ -64,14 +64,20 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         title.text = item.title
-        follow.visibility = if(accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
+        follow.visibility =
+            if (accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
         updateLikeAndFollowItem(item, itemList, memberPostFuncItem)
 
         val avatarId = item.avatarAttachmentId.toString()
-        if (LruCacheUtils.getLruCache(avatarId) == null) {
-            memberPostFuncItem.getBitmap(avatarId) { id -> updateAvatar(id) }
+        if (avatarId != LruCacheUtils.ZERO_ID) {
+            if (LruCacheUtils.getLruCache(avatarId) == null) {
+                memberPostFuncItem.getBitmap(avatarId) { id -> updateAvatar(id) }
+            } else {
+                updateAvatar(item.avatarAttachmentId.toString())
+            }
         } else {
-            updateAvatar(item.avatarAttachmentId.toString())
+            Glide.with(ivAvatar.context).load(R.drawable.default_profile_picture).circleCrop()
+                .into(ivAvatar)
         }
 
         tagChipGroup.removeAllViews()
@@ -159,7 +165,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
 
     private fun updateLikeAndFollowItem(
         item: MemberPostItem,
-        itemList:List<MemberPostItem>?,
+        itemList: List<MemberPostItem>?,
         memberPostFuncItem: MemberPostFuncItem
     ) {
         likeCount.text = item.likeCount.toString()
@@ -190,7 +196,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
         }
 
         follow.setOnClickListener {
-            itemList?.also{
+            itemList?.also {
                 memberPostFuncItem.onFollowClick(item, itemList, !(item.isFollow)) { isFollow ->
                     updateFollow(
                         isFollow
