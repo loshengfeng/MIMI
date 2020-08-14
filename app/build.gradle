@@ -145,6 +145,9 @@ android {
     productFlavors {
         mimi {
             dimension = "normal"
+            ext {
+                mqtt = [sit: "wss://mqtt.ymmsp.com:443", dev: "ws://10.1.1.121:8083", prod: "ws://10.1.1.121:8083"]
+            }
         }
     }
 
@@ -161,6 +164,7 @@ android {
     }
 
     applicationVariants.all { variant ->
+        def flavor = variant.productFlavors[0]
         def flavorName = variant.flavorName
 //        println "Show  flavorName !!  " + flavorName//
         def full_buildTypename = variant.buildType.name.toString()
@@ -183,7 +187,8 @@ android {
         }
         variant.buildConfigField "String", "API_HOST", "\"${getAPI_Host(buildtype)}\""
         variant.buildConfigField "String", "AD_API_HOST", "\"${getAD_API_Host(buildtype)}\""
-        variant.buildConfigField "String", "MQTT_HOST", "\"${getMQTT_Host(buildtype)}\""
+//        variant.buildConfigField "String", "MQTT_HOST", "\"${getMQTT_Host(buildtype)}\""
+        variant.buildConfigField "String", "MQTT_HOST", "\"${flavor.ext.mqtt[buildtype]}\""
         variant.outputs.each { output ->
             output.versionNameOverride = flavor_version.versionName
             output.versionCodeOverride = flavor_version.versionCode.toInteger()
