@@ -1266,7 +1266,7 @@ class AdultHomeFragment : BaseFragment() {
                     val retriever = MediaMetadataRetriever()
                     retriever.setDataSource(requireContext(), myUri)
                     val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-                    val timeInMillisec = time.toLong()
+                    val timeInMillisec = time!!.toLong()
 
                     if (timeInMillisec > 3001) {
                         val bundle = Bundle()
