@@ -119,6 +119,9 @@ class HomeViewModel : BaseViewModel() {
     private val _postArticleResult = MutableLiveData<ApiResult<Long>>()
     val postArticleResult: LiveData<ApiResult<Long>> = _postArticleResult
 
+    private val _followResult = MutableLiveData<ApiResult<Nothing>>()
+    val followResult: LiveData<ApiResult<Nothing>> = _followResult
+
     private var job = Job()
 
     fun loadNestedStatisticsListForCarousel(position: Int, src: HomeTemplate.Carousel) {
@@ -262,7 +265,13 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-    fun followMember(item: MemberPostItem, isFollow: Boolean, update: (Boolean) -> Unit) {
+    var totalCount: Int = 0
+    fun followMember(
+        item: MemberPostItem,
+        items: ArrayList<MemberPostItem>,
+        isFollow: Boolean,
+        update: (Boolean) -> Unit
+    ) {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
@@ -271,20 +280,18 @@ class HomeViewModel : BaseViewModel() {
                     else -> apiRepository.cancelFollowPost(item.creatorId)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
-                item.isFollow = isFollow
+                items.forEach {
+                    if (it.creatorId == item.creatorId) {
+                        it.isFollow = isFollow
+                    }
+                }
                 emit(ApiResult.success(null))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect {
-                    when (it) {
-                        is ApiResult.Empty -> {
-                            update(isFollow)
-                        }
-                    }
-                }
+                .collect { _followResult.value = it }
         }
     }
 
@@ -456,6 +463,11 @@ class HomeViewModel : BaseViewModel() {
 
         override fun onTotalCount(count: Long) {
             _totalCountResult.postValue(count.toInt())
+        }
+
+        override fun onTotalCount(count: Long, isInitial: Boolean) {
+            totalCount = if (isInitial) count.toInt()
+            else totalCount.plus(count.toInt())
         }
     }
 

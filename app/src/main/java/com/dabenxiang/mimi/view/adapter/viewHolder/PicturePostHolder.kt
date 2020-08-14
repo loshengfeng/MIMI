@@ -21,6 +21,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.adapter.PictureAdapter
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -29,9 +30,13 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_picture_post.view.*
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import java.util.*
 
-class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
+class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
+
+    private val accountManager: AccountManager by inject()
 
     val picturePostItemLayout: ConstraintLayout = itemView.layout_picture_post_item
     val avatarImg: ImageView = itemView.img_avatar
@@ -50,6 +55,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
 
     fun onBind(
         item: MemberPostItem,
+        itemList: List<MemberPostItem>?,
         position: Int,
         adultListener: AdultListener,
         tag: String,
@@ -58,13 +64,21 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate ?: Date(), Date())
         title.text = item.title
-        updateLikeAndFollowItem(item, memberPostFuncItem)
+        follow.visibility =
+            if (accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
+
+        updateLikeAndFollowItem(item, itemList, memberPostFuncItem)
 
         val avatarId = item.avatarAttachmentId.toString()
-        if (LruCacheUtils.getLruCache(avatarId) == null) {
-            memberPostFuncItem.getBitmap(avatarId) { id -> updateAvatar(id) }
+        if (avatarId != LruCacheUtils.ZERO_ID) {
+            if (LruCacheUtils.getLruCache(avatarId) == null) {
+                memberPostFuncItem.getBitmap(avatarId) { id -> updateAvatar(id) }
+            } else {
+                updateAvatar(avatarId)
+            }
         } else {
-            updateAvatar(avatarId)
+            Glide.with(avatarImg.context).load(R.drawable.default_profile_picture).circleCrop()
+                .into(avatarImg)
         }
 
         tagChipGroup.removeAllViews()
@@ -140,7 +154,11 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         Glide.with(avatarImg.context).load(bitmap).circleCrop().into(avatarImg)
     }
 
-    fun updateLikeAndFollowItem(item: MemberPostItem, memberPostFuncItem: MemberPostFuncItem) {
+    fun updateLikeAndFollowItem(
+        item: MemberPostItem,
+        itemList: List<MemberPostItem>?,
+        memberPostFuncItem: MemberPostFuncItem
+    ) {
         likeCount.text = item.likeCount.toString()
         commentCount.text = item.commentCount.toString()
 
@@ -165,10 +183,12 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         follow.setOnClickListener {
-            memberPostFuncItem.onFollowClick(item, !item.isFollow) { isFollow ->
-                updateFollow(
-                    isFollow
-                )
+            itemList?.also {
+                memberPostFuncItem.onFollowClick(item, itemList, !item.isFollow) { isFollow ->
+                    updateFollow(
+                        isFollow
+                    )
+                }
             }
         }
 
@@ -178,7 +198,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView) {
         }
     }
 
-    private fun updateFollow(isFollow: Boolean) {
+    fun updateFollow(isFollow: Boolean) {
         if (isFollow) {
             follow.text = follow.context.getString(R.string.followed)
             follow.background = follow.context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)

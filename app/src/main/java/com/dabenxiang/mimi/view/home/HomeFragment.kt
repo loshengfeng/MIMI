@@ -2,7 +2,6 @@ package com.dabenxiang.mimi.view.home
 
 import android.app.Activity
 import android.content.Intent
-import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
@@ -17,9 +16,9 @@ import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.model.vo.statisticsItemToCarouselHolderItem
 import com.dabenxiang.mimi.model.vo.statisticsItemToVideoItem
-import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
@@ -170,7 +169,7 @@ class HomeFragment : BaseFragment() {
             val bundle = SearchVideoFragment.createBundle("")
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_homeFragment_to_searchVideoFragment,
+                    R.id.action_to_searchVideoFragment,
                     bundle
                 )
             )
@@ -295,7 +294,7 @@ class HomeFragment : BaseFragment() {
         MemberPostFuncItem(
             {},
             { id, function -> getBitmap(id, function) },
-            { _, _, _ -> }
+            { _,_, _, _ -> }
         )
     }
 

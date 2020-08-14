@@ -81,8 +81,8 @@ class TopUpFragment : BaseFragment() {
                     if (attachmentItem.position == viewModel.TAG_MY_AVATAR) {
                         val options: RequestOptions = RequestOptions()
                                 .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                                .placeholder(R.drawable.ico_default_photo)
-                                .error(R.drawable.ico_default_photo)
+                                .placeholder(R.drawable.default_profile_picture)
+                                .error(R.drawable.default_profile_picture)
                                 .priority(Priority.NORMAL)
 
 

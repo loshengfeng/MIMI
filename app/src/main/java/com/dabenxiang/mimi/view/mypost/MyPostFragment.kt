@@ -357,16 +357,13 @@ class MyPostFragment : BaseFragment() {
 
         viewModel.followResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is ApiResult.Empty -> {
+
                     adapter.notifyItemRangeChanged(
                         0,
                         viewModel.totalCount,
                         MyPostPagedAdapter.PAYLOAD_UPDATE_FOLLOW
                     )
-//                    adapter.notifyItemChanged(
-//                        it.result,
-//                        MyPostPagedAdapter.PAYLOAD_UPDATE_FOLLOW
-//                    )
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
@@ -593,7 +590,7 @@ class MyPostFragment : BaseFragment() {
         txtPost.visibility = View.VISIBLE
 
         imgPost.setOnClickListener {
-            findNavController().navigate(R.id.action_adultHomeFragment_to_myPostFragment)
+            findNavController().navigate(R.id.action_to_myPostFragment)
         }
 
         txtPost.setOnClickListener {
@@ -610,6 +607,8 @@ class MyPostFragment : BaseFragment() {
                 }
                 PostType.IMAGE -> {
                     memberPostItem.id = postId
+                    memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
+                    memberPostItem.avatarAttachmentId = viewModel.pref.profileItem.avatarAttachmentId
                     val bundle = PictureDetailFragment.createBundle(memberPostItem, -1)
                     navigateTo(
                         NavigateItem.Destination(
@@ -619,6 +618,7 @@ class MyPostFragment : BaseFragment() {
                     )
                 }
                 PostType.VIDEO -> {
+                    memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
                     val bundle = ClipFragment.createBundle(arrayListOf(memberPostItem), -1, false)
                     navigateTo(
                         NavigateItem.Destination(
@@ -718,7 +718,8 @@ class MyPostFragment : BaseFragment() {
 
     private val myPostListener = object : MyPostListener {
         override fun onMoreClick(item: MemberPostItem) {
-            if (userId == USER_ID_ME) {
+            val isMe = viewModel.accountManager.getProfile().userId == item.creatorId
+            if (isMe) {
                 meMoreDialog =
                     MyPostMoreDialogFragment.newInstance(item, onMeMoreDialogListener)
                         .also {
@@ -918,7 +919,7 @@ class MyPostFragment : BaseFragment() {
         MemberPostFuncItem(
             {},
             { id, function -> getBitmap(id, function) },
-            { _, _, _ -> }
+            { _, _, _, _ -> }
         )
     }
 
