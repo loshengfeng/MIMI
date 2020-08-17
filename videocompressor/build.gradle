@@ -1,12 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.0"
+    compileSdkVersion 30
+    buildToolsVersion "30.0.1"
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 26
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
@@ -26,8 +26,7 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    implementation 'com.android.support:design:26.1.0'
     testImplementation 'junit:junit:4.12'
-    compile files('libs/isoparser-1.0.6.jar')
-    compile files('libs/aspectjrt-1.7.3.jar')
+    implementation group: 'com.googlecode.mp4parser', name: 'isoparser', version: '1.0.6'
+    implementation group: 'org.aspectj', name: 'aspectjrt', version: '1.7.3'
 }
