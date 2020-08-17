@@ -4,26 +4,32 @@ import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.view.get
 import androidx.core.view.isEmpty
 import androidx.core.view.size
+import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.PostPicItemListener
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -44,7 +50,9 @@ import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDial
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment.Companion.VIEWER_DATA
+import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
+import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_post_article.*
@@ -60,11 +68,15 @@ import kotlinx.android.synthetic.main.fragment_post_pic.txt_clubName
 import kotlinx.android.synthetic.main.fragment_post_pic.txt_hashtagName
 import kotlinx.android.synthetic.main.fragment_post_pic.txt_placeholder
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import java.io.File
+import java.util.*
 
 
 class PostPicFragment : BaseFragment() {
 
     private var haveMainTag = false
+
+    private var file = File("")
 
     companion object {
         const val BUNDLE_PIC_URI = "bundle_pic_uri"
@@ -81,7 +93,6 @@ class PostPicFragment : BaseFragment() {
         private const val INIT_VALUE = 0
         private const val PHOTO_LIMIT = 20
 
-        private const val REQUEST_MUTLI_PHOTO = 1001
         private const val INTENT_SELECT_IMG = 10001
     }
 
@@ -474,23 +485,36 @@ class PostPicFragment : BaseFragment() {
             if (clipData != null) {
                 for (i in 0 until clipData.itemCount) {
                     val item = clipData.getItemAt(i)
-                    val uri = item.uri
+                    val uri = UriUtils.getPath(requireContext(), item.uri)
                     val uriDataList = adapter.getData()
-                    val postAttachmentItem = PostAttachmentItem(uri = uri.toString())
+                    val postAttachmentItem = PostAttachmentItem(uri = uri!!)
                     uriDataList.add(postAttachmentItem)
                 }
                 updateCountPicView()
             } else {
-                val uri = if (data?.data == null) {
+                val postAttachmentItem = PostAttachmentItem()
+                var uri = Uri.parse("")
+
+                if (data?.data == null) {
                     val extras = data?.extras
-                    val imageBitmap = extras!!["data"] as Bitmap?
-                    Uri.parse(MediaStore.Images.Media.insertImage(requireContext().contentResolver, imageBitmap, null,null))
+
+                    if (extras == null) {
+                        rotateImage(BitmapFactory.decodeFile(file.absolutePath))
+                        postAttachmentItem.uri = file.absolutePath
+                    } else {
+                        val extrasData = extras["data"]
+                        val imageBitmap = extrasData as Bitmap?
+                        uri = Uri.parse(MediaStore.Images.Media.insertImage(requireContext().contentResolver, imageBitmap, null,null))
+                    }
                 } else {
-                    data.data!!
+                    uri = data.data!!
+                }
+
+                if (uri.path!!.isNotBlank()) {
+                    postAttachmentItem.uri = UriUtils.getPath(requireContext(), uri)!!
                 }
 
                 val uriDataList = adapter.getData()
-                val postAttachmentItem = PostAttachmentItem(uri = uri.toString())
                 uriDataList.add(postAttachmentItem)
                 updateCountPicView()
             }
@@ -520,12 +544,16 @@ class PostPicFragment : BaseFragment() {
     }
 
     private fun addPic() {
+        file = FileUtil.getTest(System.currentTimeMillis().toString() + ".jpg")
+
         val galleryIntent = Intent()
         galleryIntent.type = "image/*"
         galleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
         galleryIntent.action = Intent.ACTION_GET_CONTENT
 
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        val uri = FileProvider.getUriForFile(requireContext(), BuildConfig.APPLICATION_ID + ".fileProvider", file)
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
 
         val chooser = Intent(Intent.ACTION_CHOOSER)
         chooser.putExtra(Intent.EXTRA_INTENT, galleryIntent)
@@ -550,5 +578,34 @@ class PostPicFragment : BaseFragment() {
             }
         }
         return false
+    }
+
+    private fun rotateImage(bitmap: Bitmap): Bitmap? {
+        val ei = ExifInterface(file.absolutePath)
+
+        val orientation: Int = ei.getAttributeInt(
+            ExifInterface.TAG_ORIENTATION,
+            ExifInterface.ORIENTATION_UNDEFINED
+        )
+
+        val rotatedBitmap: Bitmap?
+        rotatedBitmap = when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(bitmap, 90f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(bitmap, 180f)
+            ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(bitmap, 270f)
+            ExifInterface.ORIENTATION_NORMAL -> bitmap
+            else -> bitmap
+        }
+
+        return rotatedBitmap
+    }
+
+    private fun rotateImage(source: Bitmap, angle: Float): Bitmap? {
+        val matrix = Matrix()
+        matrix.postRotate(angle)
+        return Bitmap.createBitmap(
+            source, 0, 0, source.width, source.height,
+            matrix, true
+        )
     }
 }
