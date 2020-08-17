@@ -1,9 +1,349 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+
     <string name="app_name">MiMi</string>
 
-    <string name="api_failed_msg">伺服器错误，请重試。</string>
+    <string name="splash_text">欢  迎  来  到  蜜  蜜</string>
+
+    <string name="error_device_binding_title">@string/oops</string>
+    <string name="error_device_binding_positive">@string/i_know</string>
+
+    <string name="oops">Oops!</string>
+    <string name="i_know">知道了</string>
+
+    <string name="upload_succeed">上传成功</string>
+    <string name="unexpected_error">未预期的错误</string>
+
+    <string name="press_again_exit">再按一次离开 APP</string>
+
+    <!-- Nav Button -->
+    <string name="nav_home">一般影视</string>
+    <string name="nav_adult">成人影视</string>
+    <string name="nav_topup">充值</string>
+    <string name="nav_favorite">收藏</string>
+    <string name="nav_personal">我的</string>
+
+    <!-- Categories -->
+    <string name="home">首页</string>
+
+    <!-- Login -->
+    <string name="friendly_name_format_error_1">请填写中文、英文或数字或特殊符号</string>
+    <string name="friendly_name_format_error_2">已超过字数上限20字</string>
+    <string name="email_format_error_1">请填写email</string>
+    <string name="email_format_error_2">请填写正确的Email格式</string>
+    <string name="email_format_error_3">已超过字数上限100字，请确认</string>
+    <string name="email_format_error_4">此Email已存在，请重新填写</string>
+    <string name="account_format_error_1">请填写账号</string>
+    <string name="account_format_error_2">請填寫5~20字的英文或數字</string>
+    <string name="account_format_error_3">此账号已存在，请重新填写</string>
+    <string name="password_format_error_1">请填写密码</string>
+    <string name="password_format_error_2">请填写8~20字的英文、数字或特殊符号，区分大小写</string>
+    <string name="password_format_error_3">请填写确认密码</string>
+    <string name="password_format_error_4">密码不相符</string>
+    <string name="receive_mail">请收验证信</string>
+    <string name="desc_register">请至信箱查看验证信以完成账号注册</string>
+    <string name="desc_email">已传送新密码至您的邮箱\n%s\n请至邮箱确认</string>
+    <string name="desc_email_account_not_match">Email与账号不符，请确认</string>
+    <string name="desc_success">登录成功</string>
+    <string name="forget_password">忘记密码</string>
+    <string name="login_yet">尚未登录</string>
+    <string name="login_message">请立即登录享受线上强档</string>
+    <string name="error_bad_request">参数错误</string>
+    <string name="error_username_or_password_incorrect">使用者名称或密码错误</string>
+    <string name="error_account_disable">此帐户已停用</string>
+    <string name="error_validation">驗證錯誤</string>
+    <string name="error_email_duplicate">此Email已存在，請重新填寫</string>
+    <string name="error_account_duplicate">此賬號已存在，請重新填寫</string>
+    <string name="error_first_login">第一次登入需重设密码</string>
+    <string name="reset_pw_success">重设密码成功</string>
+    <string name="verify_immediately">立即验证</string>
+    <string name="verify_later">稍后验证</string>
+    <string name="error_email_not_confirmed_title">尚未验证</string>
+    <string name="error_email_not_confirmed_msg">Email 尚未验证，请先完成验证后登录</string>
+
+    <!-- Top Up -->
+    <string name="topup_desc">蜜币购买</string>
+    <string name="topup_total">总计</string>
+    <string name="topup_confirm_pay">确认支付</string>
+    <string name="topup_subtitle">会员尊享 每天无限观看</string>
+    <string name="topup_proxy_title_name">火热代理</string>
+    <string name="topup_proxy_empty">所有代理均在忙碌中，请稍後再试。</string>
+
+    <!-- Favorite -->
+    <string name="favorite_title">我的收藏</string>
+    <string name="favorite_clean">清除所有收藏</string>
+    <string name="favorite_normal">一般视频</string>
+    <string name="favorite_adult">成人视频</string>
+    <string name="favorite_tab_mimi">蜜蜜影视</string>
+    <string name="favorite_tab_short">短视频</string>
+    <string name="favorite_follow">+关注</string>
+    <string name="favorite_btn_clean">是否要清除所有收藏</string>
+    <string name="favorite_delete_favorite">取消收藏</string>
+
+    <!-- Personal -->
+    <string name="personal_title">我的</string>
+    <string name="personal_not_login_tips_1">还没登录吗?</string>
+    <string name="personal_not_login_tips_2">赶紧登录观看更多内容</string>
+    <string name="personal_not_login_tips_3">若尚未成为会员，赶紧注册体验更多内容</string>
+    <string name="personal_topup">充值去 ></string>
+    <string name="personal_follow">我的关注</string>
+    <string name="personal_order">充值管理</string>
+    <string name="personal_topup_now">现在充值去</string>
+    <string name="personal_my_post">我的帖子</string>
+    <string name="personal_chat_history">对话记录</string>
+    <string name="personal_setting">设置</string>
+    <string name="btn_logout">登出</string>
+    <string name="title_setting">个人设置</string>
+    <string name="setting_photo">头像</string>
+    <string name="setting_name">名称</string>
+    <string name="setting_email">Email</string>
+    <string name="setting_account">帐号</string>
+    <string name="setting_gender">性别</string>
+    <string name="setting_choose">请选择(预设)</string>
+    <string name="setting_birthday">生日</string>
+    <string name="setting_birthday_title">修改生日</string>
+    <string name="setting_type_birthday">请填写生日</string>
+    <string name="setting_birthday_hint">YYYY-MM-DD</string>
+    <string name="setting_birthday_error">格式错误(YYYY-MM-DD)</string>
+    <string name="setting_change_name">修改名称</string>
+    <string name="setting_change_pw">修改密码</string>
+    <string name="setting_mail_title">信箱设置</string>
+    <string name="setting_resend_mail">重发认证信</string>
+    <string name="setting_change_password">修改密码</string>
+    <string name="setting_current_password">目前密码</string>
+    <string name="setting_current_password_error_1">请填写目前密码</string>
+    <string name="setting_current_password_error_2">密码错误</string>
+    <string name="setting_new_password">新密码</string>
+    <string name="setting_new_password_error_1">请填写新密码</string>
+    <string name="setting_confirm_password">确认新密码</string>
+    <string name="setting_confirm_password_error_1">请填写确认新密码</string>
+    <string name="setting_confirm_password_error_2">与新密码不相符</string>
+    <string name="setting_binding_invitation">绑定邀请码</string>
+    <string name="setting_enter_invitation">请填写邀请码</string>
+    <string name="setting_binding_success">绑定邀请码成功</string>
+    <string name="setting_binding_failed">绑定邀请码失敗</string>
+    <string name="setting_binding_enter_5_digits">请填写5位數邀请码</string>
+    <string name="pls_choose_photo">选择图片</string>
+    <string name="upload_tool">上传图片工具</string>
+    <string name="choose_camera">使用相机</string>
+    <string name="choose_album">使用相薄</string>
+    <string name="file_type_not_supported">不支援的档案格式，请重新上传</string>
+    <string name="topup_all">全部</string>
+    <string name="topup_online_pay">在线支付</string>
+    <string name="topup_proxy_pay">代理支付</string>
+    <string name="topup_pay">支付金额</string>
+    <string name="title_chat_history">对话记录</string>
+    <string name="edit_hint_chat">留下评论</string>
+    <string name="issue_report">问题回报</string>
+    <string name="resend_mail_success">重发认证信成功</string>
+    <string name="gender_success">修改性别成功</string>
+
+    <string name="api_failed_msg">伺服器错误，请重试。</string>
     <string name="server_error">无法连线．请检查您的网路环境</string>
+    <string name="btn_confirm">确定</string>
+    <string name="btn_close">关闭</string>
+    <string name="btn_cancel">取消</string>
+    <string name="btn_register">注册</string>
+    <string name="btn_send">送出</string>
+    <string name="btn_login">登录</string>
+    <string name="login_name">请填写名称</string>
+    <string name="login_email">请填写Email</string>
+    <string name="login_account">请填写帐号</string>
+    <string name="login_pw">请填写密码</string>
+    <string name="login_confirm_pw">请填写确认密码</string>
+    <string name="login_desc">点选「注册」即表示您同意接受<font fgcolor="#ff4d4d">服务条款</font>及<font fgcolor="#ff4d4d">服隐私权保护政策</font></string>
+    <string name="login_keep_account">记住帐号</string>
+    <string name="login_forget">忘记密码?</string>
+    <string name="username_or_password_incorrect">使用者名称或密码错误</string>
+
+    <!-- Home -->
+    <string name="follow_title">我的关注</string>
+    <string name="follow_people">关注的人</string>
+    <string name="follow_circle">关注的圈子</string>
+    <string name="follow_members_total_num">全部关注%s人</string>
+    <string name="follow_clubs_total_num">全部关注%s圈子</string>
+    <string name="follow_clean">清除</string>
+    <string name="follow_clean_member_dlg_msg">是否要清除所有关注的人</string>
+    <string name="follow_clean_club_dlg_msg">是否要清除所有关注的圈子</string>
+    <string name="text_more">更多</string>
+    <string name="text_search">搜寻</string>
+    <string name="text_follow">关注</string>
+    <string name="text_post">帖子</string>
+    <string name="text_ranking">排行榜</string>
+    <string name="text_gender_female">女</string>
+    <string name="text_gender_male">男</string>
+    <string-array name="filter_gender">
+        <item>@string/text_gender_female</item>
+        <item>@string/text_gender_male</item>
+    </string-array>
+
+    <integer-array name="filter_gender_value">
+        <item>0</item>
+        <item>1</item>
+    </integer-array>
+
+    <!-- Player -->
+    <string name="introduction">简介</string>
+    <string name="player_info_format">更新: %-20s地區: %s</string>
+    <string name="write_comment">留下评论</string>
+    <string name="point_not_enough">点数不足</string>
+    <string name="point_not_enough_message">&lt;font color=\"#000000\"&gt;请先至充值页面，&lt;/font&gt;&lt;font color=\"#ff4d4d\"&gt;充值&lt;/font&gt;&lt;font color=\"#000000\"&gt;去吧&lt;/font&gt;</string>
+    <string name="cost_point_message">&lt;font color=\"#000000\"&gt;目前蜜币余额%d，是否支付&lt;/font&gt;&lt;font color=\"#ff4d4d\"&gt;%d&lt;/font&gt;&lt;font color=\"#000000\"&gt;蜜币播放视频？&lt;/font&gt;</string>
+    <string name="recharge">前往充值</string>
+    <string name="player_source">播放列表</string>
+    <string name="guess_u_like">猜你喜欢</string>
+    <string name="comment">评论</string>
+    <string name="newest">最新</string>
+    <string name="hottest">最热</string>
+    <string name="no_comment">暂无评论</string>
+    <string name="load_more_comment">查看更多</string>
+    <string name="all_comment_display">已显示全部内容</string>
+    <string name="load_more_comment_fail">加载失败</string>
+    <string name="reply">回复</string>
+    <string name="n_reply">%d个回复</string>
+
+    <!-- Picture Detail -->
+    <string name="picture_detail_title">图片详情</string>
+    <string name="picture_detail_comment">评论</string>
+    <string name="picture_detail_comment_newest">最新</string>
+    <string name="picture_detail_comment_top">最热</string>
+
+    <!-- Text Detail -->
+    <string name="text">短文</string>
+    <string name="text_detail_title">短文详情</string>
+
+    <!-- Club -->
+    <string name="picture">图片</string>
+    <string name="video">视频</string>
+    <string name="empty_post">目前尚无贴文</string>
+
+    <!-- Follow -->
+    <string name="follow">+关注</string>
+    <string name="followed">已关注</string>
+
+    <!-- Post -->
+    <string name="upload_video">上传视频</string>
+    <string name="upload_photo">上传照片</string>
+    <string name="upload_article">上传短文</string>
+    <string name="upload_cancel">取消</string>
+    <string name="post_title">建立帖子</string>
+    <string name="edit_post_title">编辑帖子</string>
+    <string name="typing_count">%1$d/%2$d</string>
+    <string name="select_post_club_name">已选择的圈子名称</string>
+    <string name="post_tag_name"> #标签名称</string>
+    <string name="post_select_tag_more_see">选择圈子可让帖子让更多人看见</string>
+    <string name="select_pic_count">%1$d/%2$d 张图片</string>
+    <string name="add_pic">添加图片</string>
+    <string name="add_video">添加视频</string>
+    <string name="select_pics">选择照片：</string>
+    <string name="edit_video">编辑</string>
+    <string name="crop_photo">封面</string>
+    <string name="short_video">短视频</string>
+    <string name="post_success">发帖成功</string>
+    <string name="view_post">查看发帖</string>
+    <string name="post_uploading">上传中…</string>
+    <string name="whether_to_discard_content">是否舍弃内容</string>
+    <string name="post_hint_title">请输入标题(必填)</string>
+    <string name="post_hint_content">请输入内容(必填)</string>
+    <string name="post_hint_tag">请输入标签, 字数限 10 字</string>
+    <string name="post_warning_title">请输入标题</string>
+    <string name="post_warning_content">请输入内容</string>
+    <string name="post_warning_tag">请选择圈子</string>
+    <string name="post_warning_pic">请选择照片</string>
+    <string name="post_warning_video">请选择影片</string>
+    <string name="post_warning_tag_limit">已超过标签上限20个，请确认</string>
+    <string name="post_select_pic">选择照片</string>
+    <string name="post_select_video">选择影片</string>
+    <string name="post_tag_already_have">已存在相同标签，请确认</string>
+    <string name="post_error">发布失败</string>
+    <string name="post_video_length_error">影片长度最短为3秒最长为15秒</string>
+
+    <!-- Problem report -->
+    <string-array name="video_problem_report_item">
+        <item>视频无法播放</item>
+        <item>与其他视频相同</item>
+        <item>视频标题与内容不符</item>
+        <item>垃圾内容或误导性内容</item>
+        <item>仇恨与恶意内容</item>
+        <item>有害的危险行为</item>
+    </string-array>
+
+    <string-array name="picture_problem_report_item">
+        <item>图片与内容不符</item>
+        <item>垃圾内容或误导性内容</item>
+        <item>仇恨与恶意内容</item>
+        <item>有害的危险行为</item>
+    </string-array>
+
+    <string-array name="text_problem_report_item">
+        <item>标题与内容不符</item>
+        <item>垃圾内容或误导性内容</item>
+        <item>仇恨与恶意内容</item>
+        <item>有害的危险行为</item>
+    </string-array>
+
+    <!-- My post -->
+    <string name="delete_post">删除</string>
+    <string name="edit_post">编辑</string>
+
+    <string name="problem_report">问题回报</string>
+    <string name="already_reported">您已回报过问题</string>
+    <string name="clip_username">"@%s"</string>
+    <string name="clip_comment_count">"%d 评论"</string>
+
+    <string name="report_success">问题回报成功</string>
+    <string name="report_error">请选择回报问题</string>
+
+    <!--  Search Post -->
+    <string name="search_result">搜索\"%s\", 共找到 %,d 个视频</string>
+    <string name="search_text">搜寻</string>
+    <string name="search_btn">搜索</string>
+    <string name="search_input_empty_toast">请输入搜寻文字</string>
+    <string name="search_text_1">到</string>
+    <string name="search_text_2">个</string>
+    <string name="search_keyword_1">搜索\"</string>
+    <string name="search_keyword_2">\", 共找到</string>
+    <string name="search_keyword_3">个</string>
+    <string name="search_type_clip">视频</string>
+    <string name="search_type_picture">图片</string>
+    <string name="search_type_text">短文</string>
+    <string name="search_type_club">圈子</string>
+    <string name="search_history">历史搜索</string>
+
+
+    <!--  Search video  -->
+    <string name="search_video_result">搜索\"%s\", 共找到 %,d 个视频</string>
+    <string name="search_video_btn">搜索</string>
+    <string name="search_video_input_empty_toast">请输入搜寻文字</string>
+
+    <!--  Chat Content  -->
+    <string name="chat_content_media_chooser">请选择档案</string>
+    <string name="chat_content_file_too_large">档案不得超过 5MB</string>
+    <string name="chat_content_file_downloading">下载中</string>
+    <string name="chat_content_file_download_finish">下载完成</string>
+    <string name="chat_content_file_uploading">上傳中</string>
+    <string name="chat_content_text_too_much">文字超過五百字</string>
+
+    <!--  Image Preview  -->
+    <string name="image_preview_file_invlid">档案已失效</string>
+
+    <!-- Ranking  -->
+    <string name="ranking_day">日排行</string>
+    <string name="ranking_week">周排行</string>
+    <string name="ranking_moon">月排行</string>
+
+    <!-- Version check  -->
+    <string name="check_version">检查版本…</string>
+    <string name="update_version">%d%%  更新中…</string>
+    <string name="updated_version_title">已有更新版本，是否立即更新</string>
+    <string name="update_immediately">立即更新</string>
+    <string name="remind_later">稍后提醒</string>
+    <string name="install_apk_failed_alert">安装apk失败，请手动安装</string>
+    <string name="setting_version">版本：%s</string>
     <string name="confirm">确定</string>
-    <string name="close">关闭</string>
+    <string name="cancel">取消</string>
+
+    <string name="filter_empty">无搜寻结果</string>
+
+    <string name="copy_url">已将连结保存到剪贴簿</string>
 
 </resources>

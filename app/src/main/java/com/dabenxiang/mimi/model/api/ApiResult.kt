@@ -2,8 +2,8 @@ package com.dabenxiang.mimi.model.api
 
 sealed class ApiResult<T> {
     companion object {
-        fun <T> loading(): ApiResult<T> {
-            return Loading()
+        fun <T> loading(arg: T? = null): ApiResult<T> {
+            return Loading(arg)
         }
 
         fun <T> loaded(): ApiResult<T> {
@@ -28,7 +28,7 @@ sealed class ApiResult<T> {
 
     class Empty<T> : ApiResult<T>()
 
-    class Loading<T> : ApiResult<T>()
+    class Loading<T>(val arg: T?) : ApiResult<T>()
 
     class Loaded<T> : ApiResult<T>()
 }

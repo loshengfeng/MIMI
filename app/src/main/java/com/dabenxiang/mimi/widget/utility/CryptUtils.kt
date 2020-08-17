@@ -56,7 +56,11 @@ object CryptUtils {
         )
     }
 
-    private fun getEncryptedFile(context: Context, filesDir: String, fileName: String): EncryptedFile {
+    private fun getEncryptedFile(
+        context: Context,
+        filesDir: String,
+        fileName: String
+    ): EncryptedFile {
         return EncryptedFile.Builder(
             File(filesDir, fileName),
             context,

@@ -4,13 +4,28 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.Window
+import androidx.annotation.LayoutRes
 import androidx.fragment.app.DialogFragment
-import com.kaopiz.kprogresshud.KProgressHUD
+import androidx.lifecycle.ViewModelProvider
+import com.dabenxiang.mimi.extension.handleException
+import com.dabenxiang.mimi.model.api.ExceptionResult
+import com.dabenxiang.mimi.view.main.MainViewModel
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
 abstract class BaseDialogFragment : DialogFragment() {
 
-    var progressHUD: KProgressHUD? = null
+    open var mainViewModel: MainViewModel? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        activity?.let {
+            mainViewModel = ViewModelProvider(it).get(MainViewModel::class.java)
+        }
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
@@ -28,30 +43,64 @@ abstract class BaseDialogFragment : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        progressHUD = KProgressHUD.create(context)
-            .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+        setupView()
+        setupListeners()
+        setupObservers()
     }
 
     override fun onStart() {
         super.onStart()
-        if (dialog != null) {
-            if (isFullLayout()) {
-                dialog!!.window!!.setLayout(
-                    WindowManager.LayoutParams.MATCH_PARENT,
-                    WindowManager.LayoutParams.MATCH_PARENT
+        if (isFullLayout()) {
+            val window = dialog?.window
+            if (window != null) {
+                window.setLayout(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
                 )
-                dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            } else {
+                window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            }
+        } else {
+            val window = dialog?.window
+            if (window != null) {
                 val widthPixels = (resources.displayMetrics.widthPixels * 0.8).toInt()
-                dialog!!.window!!.setLayout(widthPixels, ViewGroup.LayoutParams.WRAP_CONTENT)
-                dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                window.setLayout(widthPixels, ViewGroup.LayoutParams.WRAP_CONTENT)
+                window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             }
         }
     }
 
     abstract fun isFullLayout(): Boolean
 
+    @LayoutRes
     abstract fun getLayoutId(): Int
+
+    open fun setupView(){}
+
+    open fun setupObservers() {}
+
+    open fun setupListeners() {}
+
+    open fun onApiError(
+        throwable: Throwable,
+        onHttpErrorBlock: ((ExceptionResult.HttpError) -> Unit)? = null
+    ) {
+        when (val errorHandler =
+            throwable.handleException { ex -> mainViewModel?.processException(ex) }) {
+            is ExceptionResult.HttpError -> {
+                if (onHttpErrorBlock == null) handleHttpError(errorHandler)
+                else onHttpErrorBlock(errorHandler)
+            }
+            is ExceptionResult.Crash -> {
+                GeneralUtils.showToast(requireContext(), errorHandler.throwable.toString())
+            }
+        }
+    }
+
+    open fun handleHttpError(errorHandler: ExceptionResult.HttpError) {
+        GeneralUtils.showToast(
+            requireContext(),
+            errorHandler.httpExceptionItem.errorItem.toString()
+        )
+    }
 
 }

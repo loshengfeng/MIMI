@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.di
 
-import com.dabenxiang.mimi.Constant
+import com.dabenxiang.mimi.BuildConfig
+import com.dabenxiang.mimi.PREFS_NAME
 import com.dabenxiang.mimi.model.pref.Pref
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -16,5 +17,5 @@ fun provideGson(): Gson {
 }
 
 fun providePref(gson: Gson): Pref {
-    return Pref(gson, Constant.PREFS_NAME)
+    return Pref(gson, PREFS_NAME, BuildConfig.DEBUG)
 }

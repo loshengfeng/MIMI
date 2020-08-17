@@ -1,0 +1,8 @@
+<resources>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="short_seconds">秒</string>
+    <string name="megabyte">MB</string>
+    <string name="kilobyte">KB</string>
+    <string name="post_video_length_error">影片长度最短为3秒最长为15秒</string>
+</resources>

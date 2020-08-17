@@ -1,48 +1,92 @@
 package com.dabenxiang.mimi.model.pref
 
-import com.dabenxiang.mimi.model.vo.ProfileData
-import com.dabenxiang.mimi.model.vo.TokenData
+import com.blankj.utilcode.util.ConvertUtils
+import com.dabenxiang.mimi.model.vo.ProfileItem
+import com.dabenxiang.mimi.model.vo.SearchHistoryItem
+import com.dabenxiang.mimi.model.vo.TokenItem
 import com.google.gson.Gson
 
-class Pref(private val gson: Gson, preferenceFileName: String) : AbstractPref(preferenceFileName) {
+class Pref(private val gson: Gson, preferenceFileName: String, isDebug: Boolean) :
+    AbstractPref(preferenceFileName, isDebug) {
 
     private val tokenPref = StringPref("TOKEN")
-    private val aesKeyPref = StringPref("AES_KEY")
-    private val ellipsizeKeyPref = BooleanPref("ELLIPSIZE_KEY")
+    private val memberTokenPref = StringPref("MEMBER_TOKEN")
     private val profilePref = StringPref("PROFILE")
+    private val keepAccountPref = BooleanPref("KEEP_ACCOUNT")
+    private var searchHistoryPref = StringPref("SEARCH_HISTORY")
+    private var meAvatarPref = StringPref("ME_AVATAR")
 
-    var token: TokenData
+    private var cachedPublicToken: TokenItem? = null
+    private var cachedMemberToken: TokenItem? = null
+
+    var publicToken: TokenItem
         get() =
             try {
-                gson.fromJson(tokenPref.get(), TokenData::class.java)
+                if (cachedPublicToken == null) {
+                    cachedPublicToken = gson.fromJson(tokenPref.get(), TokenItem::class.java)
+                }
+
+                cachedPublicToken ?: TokenItem()
             } catch (e: Exception) {
-                TokenData()
+                TokenItem()
             }
         set(value) {
+            cachedPublicToken = value
             tokenPref.set(gson.toJson(value))
         }
 
-    var profileData: ProfileData
+    var memberToken: TokenItem
         get() =
             try {
-                gson.fromJson(profilePref.get(), ProfileData::class.java)
+                if (cachedMemberToken == null) {
+                    cachedMemberToken = gson.fromJson(memberTokenPref.get(), TokenItem::class.java)
+                }
+
+                cachedMemberToken ?: TokenItem()
             } catch (e: Exception) {
-                ProfileData()
+                TokenItem()
+            }
+        set(value) {
+            cachedMemberToken = value
+            memberTokenPref.set(gson.toJson(value))
+        }
+
+    var profileItem: ProfileItem
+        get() =
+            try {
+                gson.fromJson(profilePref.get(), ProfileItem::class.java)
+            } catch (e: Exception) {
+                ProfileItem()
             }
         set(value) {
             profilePref.set(gson.toJson(value))
         }
 
-    var aesKey: String
-        get() = aesKeyPref.get().toString()
-        set(strAESKey) = aesKeyPref.set(strAESKey)
+    var searchHistoryItem: SearchHistoryItem
+        get() =
+            try {
+                gson.fromJson(searchHistoryPref.get(), SearchHistoryItem::class.java)
+            } catch (e: Exception) {
+                SearchHistoryItem()
+            }
+        set(value) {
+            searchHistoryPref.set(gson.toJson(value))
+        }
 
-    var disableEllipsize: Boolean
-        get() = ellipsizeKeyPref.get()
-        set(disable) = ellipsizeKeyPref.set(disable)
+    var keepAccount: Boolean
+        get() = keepAccountPref.get()
+        set(value) = keepAccountPref.set(value)
 
-    fun clearToken() {
-        tokenPref.remove()
+    var meAvatar: ByteArray?
+        get() = if (meAvatarPref.get() != null) ConvertUtils.hexString2Bytes(meAvatarPref.get()!!) else null
+        set(value) = meAvatarPref.set(
+            if (value == null) ""
+            else ConvertUtils.bytes2HexString(value)
+        )
+
+    fun clearMemberToken() {
+        cachedMemberToken = null
+        memberTokenPref.remove()
     }
 
     fun clearProfile() {

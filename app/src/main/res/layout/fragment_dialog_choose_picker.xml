@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="12dp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/bg_white_1_top_radius_20"
+        android:backgroundTint="@color/color_white_1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/btn_camera"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="left|center_vertical"
+            android:paddingStart="30dp"
+            android:stateListAnimator="@null"
+            android:text="@string/choose_camera"
+            android:textColor="@color/color_black_1"
+            android:textSize="16sp" />
+        <TextView
+            android:id="@+id/btn_article"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="left|center_vertical"
+            android:stateListAnimator="@null"
+            android:text="@string/choose_album"
+            android:paddingStart="30dp"
+            android:textColor="@color/color_black_1"
+            android:textSize="16sp" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_marginTop="20dp"
+            android:layout_height="1dp"
+            android:background="@color/color_black_1_10" />
+        <TextView
+            android:id="@+id/btn_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="67dp"
+            android:gravity="center"
+            android:stateListAnimator="@null"
+            android:text="@string/cancel"
+            android:textColor="@color/color_black_1"
+            android:textSize="16sp" />
+    </LinearLayout>
+</RelativeLayout>
