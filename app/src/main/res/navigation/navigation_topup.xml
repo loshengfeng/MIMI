@@ -33,7 +33,16 @@
     <fragment
         android:id="@+id/orderInfoFragment"
         android:name="com.dabenxiang.mimi.view.orderinfo.OrderInfoFragment"
-        android:label="OrderInfoFragment" />
+        android:label="OrderInfoFragment">
+        <action
+            android:id="@+id/action_orderInfoFragment_to_orderResultFragment"
+            app:destination="@id/orderResultFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/orderResultFragment"
+        android:name="com.dabenxiang.mimi.view.orderresult.OrderResultFragment"
+        android:label="OrderResultFragment" />
 
     <fragment
         android:id="@+id/chatContentFragment"

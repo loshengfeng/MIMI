@@ -16,14 +16,14 @@ import kotlinx.android.synthetic.main.item_setting_bar.*
 
 class OrderFragment : BaseFragment() {
 
-    private val viewModel: OrderViewModel by viewModels()
-
     companion object {
         const val NO_DATA = 0
         const val TYPE_ALL = 0
         const val TYPE_ONLINE_PAY = 1
         const val TYPE_PROXY_PAY = 2
     }
+
+    private val viewModel: OrderViewModel by viewModels()
 
     private val orderAdapter by lazy { OrderAdapter() }
 

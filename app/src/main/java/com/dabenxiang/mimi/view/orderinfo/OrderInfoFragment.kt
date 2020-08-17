@@ -18,7 +18,6 @@ import kotlinx.android.synthetic.main.fragment_order_info.*
 import kotlinx.android.synthetic.main.fragment_text_detail.toolbarContainer
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
-import timber.log.Timber
 
 class OrderInfoFragment : BaseFragment() {
 
@@ -90,8 +89,7 @@ class OrderInfoFragment : BaseFragment() {
         viewModel.createOrderResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Empty -> {
-                    // TODO: 跳轉頁面
-                    Timber.d("Create Order Successful")
+                    navigateTo(NavigateItem.Destination(R.id.action_orderInfoFragment_to_orderResultFragment))
                 }
                 is Error -> onApiError(it.throwable)
             }
