@@ -3,8 +3,10 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
+
 def android_builder_version = "3.5.3"
 def android_builder_main_version = 3
+
 android {
     this.rootProject.buildscript.configurations.classpath
             .resolvedConfiguration
@@ -40,7 +42,7 @@ android {
     }
 
     compileSdkVersion 30
-    buildToolsVersion "30.0.1"
+    buildToolsVersion "29.0.2"
 
     kapt {
         correctErrorTypes = true
@@ -88,7 +90,7 @@ android {
     defaultConfig {
         applicationId "com.dabenxiang.mimi"
         minSdkVersion 24
-        targetSdkVersion 28
+        targetSdkVersion 30
         versionCode version.versionCode.toInteger()
         versionName version.versionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -324,6 +326,7 @@ dependencies {
 
     // AndroidX
     implementation "androidx.appcompat:appcompat:$appcompat_version"
+
     implementation "androidx.core:core-ktx:$ktx_version"
     implementation "com.google.android.material:material:$material_version"
     implementation "androidx.activity:activity-ktx:$activity_ktx_version"
