@@ -279,6 +279,7 @@ class MyPostViewModel : BaseViewModel() {
             flow {
                 val realPath =  when (type) {
                     HomeViewModel.TYPE_VIDEO -> pic
+                    HomeViewModel.TYPE_PIC -> pic
                     else -> UriUtils.getPath(context, Uri.parse(pic))
                 }
                 val fileNameSplit = realPath?.split("/")

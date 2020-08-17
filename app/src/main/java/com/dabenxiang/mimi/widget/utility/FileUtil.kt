@@ -106,6 +106,14 @@ object FileUtil {
         return File(dir,"/avatar.jpg")
     }
 
+    fun getTest(fileName: String): File {
+        val dir = File("${getAppPath(App.applicationContext())}/pic")
+        if (!dir.exists()) {
+            dir.mkdirs()
+        }
+        return File(dir, "/$fileName")
+    }
+
     @Suppress(
         "NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS",
         "RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS"
