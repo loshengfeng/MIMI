@@ -64,15 +64,21 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate ?: Date(), Date())
         title.text = item.title
-        follow.visibility = if(accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
+        follow.visibility =
+            if (accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
 
         updateLikeAndFollowItem(item, itemList, memberPostFuncItem)
 
         val avatarId = item.avatarAttachmentId.toString()
-        if (LruCacheUtils.getLruCache(avatarId) == null) {
-            memberPostFuncItem.getBitmap(avatarId) { id -> updateAvatar(id) }
+        if (avatarId != LruCacheUtils.ZERO_ID) {
+            if (LruCacheUtils.getLruCache(avatarId) == null) {
+                memberPostFuncItem.getBitmap(avatarId) { id -> updateAvatar(id) }
+            } else {
+                updateAvatar(avatarId)
+            }
         } else {
-            updateAvatar(avatarId)
+            Glide.with(avatarImg.context).load(R.drawable.default_profile_picture).circleCrop()
+                .into(avatarImg)
         }
 
         tagChipGroup.removeAllViews()

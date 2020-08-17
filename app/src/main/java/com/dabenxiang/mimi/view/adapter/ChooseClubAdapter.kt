@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.paging.PagedListAdapter
@@ -102,7 +103,7 @@ class ChooseClubAdapter(
                         .into(holder.avatar)
                 }
 
-                holder.itemView.setOnClickListener {
+                holder.rootLayout.setOnClickListener {
                     clubListener.onClick(item)
                 }
             }
@@ -119,6 +120,7 @@ class ChooseClubAdapter(
     }
 
     class ChooseClubViewHolder(itemView: View) : BaseViewHolder(itemView) {
+        val rootLayout:RelativeLayout = itemView.rootLayout
         val avatar: ImageView = itemView.iv_avatar
         val clubName: TextView = itemView.txt_clubName
         val hashTag: TextView = itemView.txt_hashtagName

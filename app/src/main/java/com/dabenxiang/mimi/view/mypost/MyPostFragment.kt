@@ -146,7 +146,6 @@ class MyPostFragment : BaseFragment() {
 
         adapter = MyPostPagedAdapter(
             requireContext(),
-            userId == USER_ID_ME,
             isAdultTheme,
             myPostListener,
             attachmentListener,
@@ -358,7 +357,6 @@ class MyPostFragment : BaseFragment() {
         viewModel.followResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Empty -> {
-
                     adapter.notifyItemRangeChanged(
                         0,
                         viewModel.totalCount,
@@ -371,11 +369,16 @@ class MyPostFragment : BaseFragment() {
 
         viewModel.deletePostResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Empty -> {
-                    viewModel.invalidateDataSource()
+                is ApiResult.Success -> {
+                    adapter.removedPosList.add(it.result)
+                    adapter.notifyItemChanged(it.result)
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
+        })
+
+        viewModel.cleanRemovedPosList.observe(viewLifecycleOwner, Observer {
+            adapter.removedPosList.clear()
         })
 
         viewModel.uploadPicItem.observe(viewLifecycleOwner, Observer {
@@ -453,42 +456,58 @@ class MyPostFragment : BaseFragment() {
                 is ApiResult.Success -> {
                     uploadVideoList[0].picAttachmentId = it.result.toString()
 
-                    val realPath = UriUtils.getPath(requireContext(), Uri.parse(uploadVideoList[0].videoUrl))
+                    val realPath =
+                        UriUtils.getPath(requireContext(), Uri.parse(uploadVideoList[0].videoUrl))
                     uploadVideoList[0].videoUrl = realPath!!
 
                     val videoUri = Uri.parse(uploadVideoList[0].videoUrl)
                     val file = File(videoUri.path ?: "")
-                    val destinationPath = Environment.getExternalStorageDirectory().toString() + File.separator + "temp" + File.separator + "Videos" + File.separator
+                    val destinationPath = Environment.getExternalStorageDirectory()
+                        .toString() + File.separator + "temp" + File.separator + "Videos" + File.separator
                     val root = File(destinationPath)
-                    val outputFileUri = Uri.fromFile(File(root, "t_${Calendar.getInstance().timeInMillis}_" + file.nameWithoutExtension + ".mp4"))
-                    val outPutPath = RealPathUtil.realPathFromUriApi19(requireContext(), outputFileUri)
-                        ?: File(root, "t_${Calendar.getInstance().timeInMillis}_" + videoUri.path?.substring(videoUri.path!!.lastIndexOf("/") + 1)).absolutePath
+                    val outputFileUri = Uri.fromFile(
+                        File(
+                            root,
+                            "t_${Calendar.getInstance().timeInMillis}_" + file.nameWithoutExtension + ".mp4"
+                        )
+                    )
+                    val outPutPath =
+                        RealPathUtil.realPathFromUriApi19(requireContext(), outputFileUri)
+                            ?: File(
+                                root,
+                                "t_${Calendar.getInstance().timeInMillis}_" + videoUri.path?.substring(
+                                    videoUri.path!!.lastIndexOf("/") + 1
+                                )
+                            ).absolutePath
 
-                    VideoCompress.compressVideoLow(realPath, outPutPath , object : VideoCompress.CompressListener {
-                        override fun onStart() {
-                            Timber.d("Start compress")
-                        }
+                    VideoCompress.compressVideoLow(
+                        realPath,
+                        outPutPath,
+                        object : VideoCompress.CompressListener {
+                            override fun onStart() {
+                                Timber.d("Start compress")
+                            }
 
-                        override fun onSuccess() {
-                            Timber.d("Compress success")
-                            uploadVideoList[0].videoUrl = outPutPath
-                            viewModel.postAttachment(
-                                uploadVideoList[0].videoUrl,
-                                requireContext(),
-                                TYPE_VIDEO
-                            )
+                            override fun onSuccess() {
+                                Timber.d("Compress success")
+                                uploadVideoList[0].videoUrl = outPutPath
+                                viewModel.postAttachment(
+                                    uploadVideoList[0].videoUrl,
+                                    requireContext(),
+                                    TYPE_VIDEO
+                                )
 
-                        }
+                            }
 
-                        override fun onFail() {
-                            Timber.d("Compress fail")
-                            resetAndCancelJob(Throwable(), getString(R.string.post_error))
-                        }
+                            override fun onFail() {
+                                Timber.d("Compress fail")
+                                resetAndCancelJob(Throwable(), getString(R.string.post_error))
+                            }
 
-                        override fun onProgress(percent: Float) {
-                            Timber.d("Compress progress : $percent")
-                        }
-                    })
+                            override fun onProgress(percent: Float) {
+                                Timber.d("Compress progress : $percent")
+                            }
+                        })
                 }
                 is ApiResult.Error -> resetAndCancelJob(
                     it.throwable,
@@ -590,7 +609,7 @@ class MyPostFragment : BaseFragment() {
         txtPost.visibility = View.VISIBLE
 
         imgPost.setOnClickListener {
-            findNavController().navigate(R.id.action_adultHomeFragment_to_myPostFragment)
+            findNavController().navigate(R.id.action_to_myPostFragment)
         }
 
         txtPost.setOnClickListener {
@@ -608,7 +627,8 @@ class MyPostFragment : BaseFragment() {
                 PostType.IMAGE -> {
                     memberPostItem.id = postId
                     memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
-                    memberPostItem.avatarAttachmentId = viewModel.pref.profileItem.avatarAttachmentId
+                    memberPostItem.avatarAttachmentId =
+                        viewModel.pref.profileItem.avatarAttachmentId
                     val bundle = PictureDetailFragment.createBundle(memberPostItem, -1)
                     navigateTo(
                         NavigateItem.Destination(
@@ -672,7 +692,10 @@ class MyPostFragment : BaseFragment() {
         }
 
         override fun onDelete(item: BaseMemberPostItem) {
-            viewModel.deletePost(item as MemberPostItem)
+            viewModel.deletePost(
+                item as MemberPostItem,
+                ArrayList(adapter.currentList as List<MemberPostItem>)
+            )
         }
 
         override fun onEdit(item: BaseMemberPostItem) {

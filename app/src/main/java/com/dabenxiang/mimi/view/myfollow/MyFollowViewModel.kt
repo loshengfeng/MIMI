@@ -8,7 +8,6 @@ import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.MyFollowPagingCallback
-import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
@@ -18,7 +17,6 @@ import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.myfollow.MyFollowFragment.Companion.TYPE_CLUB
 import com.dabenxiang.mimi.view.myfollow.MyFollowFragment.Companion.TYPE_MEMBER
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -45,6 +43,18 @@ class MyFollowViewModel : BaseViewModel() {
 
     private val _cleanResult = MutableLiveData<ApiResult<Nothing>>()
     val cleanResult: LiveData<ApiResult<Nothing>> = _cleanResult
+
+    private val _cancelOneClub = MutableLiveData<ApiResult<Int>>()
+    val cancelOneClub: LiveData<ApiResult<Int>> = _cancelOneClub
+
+    private val _cleanClubRemovedPosList = MutableLiveData<Nothing>()
+    val cleanClubRemovedPosList: LiveData<Nothing> = _cleanClubRemovedPosList
+
+    private val _cancelOneMember = MutableLiveData<ApiResult<Int>>()
+    val cancelOneMember: LiveData<ApiResult<Int>> = _cancelOneMember
+
+    private val _cleanMemberRemovedPosList = MutableLiveData<Nothing>()
+    val cleanMemberRemovedPosList: LiveData<Nothing> = _cleanMemberRemovedPosList
 
     private val _clubIdList = ArrayList<Long>()
     private val _userIdList = ArrayList<Long>()
@@ -106,12 +116,12 @@ class MyFollowViewModel : BaseViewModel() {
             val total = if (isInitial) count.toInt()
             else _memberCount.value?.plus(count.toInt())
             _memberCount.postValue(total)
+            if(isInitial) _cleanMemberRemovedPosList.postValue(null)
         }
 
         override fun onIdList(list: ArrayList<Long>, isInitial: Boolean) {
             if (isInitial) _userIdList.removeAll(list)
             _userIdList.addAll(list)
-            Timber.d("current _userIdList: $_userIdList")
         }
     }
 
@@ -129,16 +139,15 @@ class MyFollowViewModel : BaseViewModel() {
         }
 
         override fun onTotalCount(count: Long, isInitial: Boolean) {
-            Timber.d("onTotalCount:$count($isInitial)")
             val total = if (isInitial) count.toInt()
             else _clubCount.value?.plus(count.toInt())
             _clubCount.postValue(total)
+            if(isInitial) _cleanClubRemovedPosList.postValue(null)
         }
 
         override fun onIdList(list: ArrayList<Long>, isInitial: Boolean) {
             if (isInitial) _clubIdList.clear()
             _clubIdList.addAll(list)
-            Timber.d("current _clubIdList: $_clubIdList")
         }
     }
 
@@ -164,37 +173,46 @@ class MyFollowViewModel : BaseViewModel() {
         }
     }
 
-    fun cancelFollowMember(userId: Long) {
+    fun cancelFollowMember(userId: Long, position: Int) {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().cancelMyMemberFollow(userId)
                 if (!result.isSuccessful) throw HttpException(result)
                 _userIdList.remove(userId)
-                emit(ApiResult.success(null))
-                initData(TYPE_MEMBER)
+                val count = _memberCount.value?.minus(1)
+                _memberCount.postValue(count)
+                emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect {}
+                .collect {
+                    _cancelOneMember.value = it
+                }
         }
     }
 
-    fun cancelFollowClub(clubId: Long) {
+    fun cancelFollowClub(
+        clubId: Long,
+        position: Int
+    ) {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().cancelMyClubFollow(clubId)
                 if (!result.isSuccessful) throw HttpException(result)
                 _clubIdList.remove(clubId)
-                emit(ApiResult.success(null))
-                initData(TYPE_CLUB)
+                val count = _clubCount.value?.minus(1)
+                _clubCount.postValue(count)
+                emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect {}
+                .collect {
+                    _cancelOneClub.value = it
+                }
         }
     }
 

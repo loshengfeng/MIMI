@@ -485,7 +485,7 @@ class FavoriteFragment : BaseFragment() {
                 val bundle = SearchVideoFragment.createBundle(tag = text)
                 navigateTo(
                     NavigateItem.Destination(
-                        R.id.action_postFavoriteFragment_to_searchVideoFragment,
+                        R.id.action_to_searchVideoFragment,
                         bundle
                     )
                 )
@@ -513,7 +513,7 @@ class FavoriteFragment : BaseFragment() {
             )
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_postFavoriteFragment_to_myPostFragment,
+                    R.id.action_to_myPostFragment,
                     bundle
                 )
             )
