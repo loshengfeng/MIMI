@@ -215,6 +215,7 @@ class MainViewModel : BaseViewModel() {
 
     fun startMQTT() {
         mqttManager.init(MQTT_HOST_URL, clientId, extendedCallback)
+        mqttManager.connect(connectCallback)
     }
 
     fun subscribeToTopic(topic: String) {
@@ -239,9 +240,8 @@ class MainViewModel : BaseViewModel() {
 
     private val extendedCallback = object : ExtendedCallback {
         override fun onConnectComplete(reconnect: Boolean, serverURI: String) {
-            Timber.d("reconnect: $reconnect")
+            Timber.d("Reconnect: $reconnect")
             Timber.d("Connect: $serverURI")
-            mqttManager.connect(connectCallback)
         }
 
         override fun onMessageArrived(topic: String, message: MqttMessage) {
@@ -255,7 +255,7 @@ class MainViewModel : BaseViewModel() {
         }
 
         override fun onDeliveryComplete(token: IMqttDeliveryToken) {
-            Timber.d("deliveryComplete message:: ${String(token.message.payload)}")
+            Timber.d("DeliveryComplete message:: ${String(token.message.payload)}")
         }
     }
 

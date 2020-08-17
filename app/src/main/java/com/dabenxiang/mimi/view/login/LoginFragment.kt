@@ -9,7 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.api.vo.error.*
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -142,8 +142,8 @@ class LoginFragment : BaseFragment() {
 
         viewModel.registerResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Empty -> {
+                is Loading -> progressHUD?.show()
+                is Empty -> {
                     progressHUD?.dismiss()
                     GeneralDialog.newInstance(
                         GeneralDialogData(
@@ -162,16 +162,17 @@ class LoginFragment : BaseFragment() {
                     ).setCancel(false)
                         .show(requireActivity().supportFragmentManager)
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.loginResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Empty -> {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Empty -> {
                     progressHUD?.dismiss()
+                    mainViewModel?.startMQTT()
                     GeneralDialog.newInstance(
                         GeneralDialogData(
                             titleRes = R.string.desc_success,
@@ -180,11 +181,9 @@ class LoginFragment : BaseFragment() {
                             secondBtn = getString(R.string.btn_confirm),
                             secondBlock = { navigateTo(NavigateItem.Up) }
                         )
-                    ).setCancel(false)
-                        .show(requireActivity().supportFragmentManager)
-//                    viewModel.getProfile()
+                    ).setCancel(false).show(requireActivity().supportFragmentManager)
                 }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is Error -> onApiError(it.throwable)
             }
         })
     }

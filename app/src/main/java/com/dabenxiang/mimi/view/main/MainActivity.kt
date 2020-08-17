@@ -332,5 +332,4 @@ class MainActivity : BaseActivity(), InteractionListener {
             )
         ).show(supportFragmentManager)
     }
-
 }

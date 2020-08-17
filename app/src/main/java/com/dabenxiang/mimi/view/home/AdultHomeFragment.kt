@@ -785,7 +785,7 @@ class AdultHomeFragment : BaseFragment() {
                     rv_second.adapter = followPostPagedAdapter
                     viewModel.getPostFollows()
                 }?: run {
-                    Timber.d("@@followPostPagedAdapter.itemCount ${followPostPagedAdapter.itemCount}")
+                    Timber.d("followPostPagedAdapter.itemCount ${followPostPagedAdapter.itemCount}")
                     cl_no_data.visibility = followPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }?.let { View.GONE } ?: let { View.VISIBLE }
                 }
             }
