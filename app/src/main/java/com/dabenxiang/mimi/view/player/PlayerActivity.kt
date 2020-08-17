@@ -22,6 +22,7 @@ import androidx.navigation.NavDeepLinkBuilder
 import androidx.recyclerview.widget.LinearSnapHelper
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
+import com.dabenxiang.mimi.NAVIGATE_TO_ACTION
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.addKeyboardToggleListener
 import com.dabenxiang.mimi.extension.handleException
@@ -76,6 +77,7 @@ class PlayerActivity : BaseActivity() {
 
     companion object {
         const val KEY_IS_FROM_PLAYER = "KEY_IS_FROM_PLAYER"
+        const val KEY_DEST_ID = "DEST_ID"
         private const val KEY_PLAYER_SRC = "KEY_PLAYER_SRC"
         private const val KEY_IS_COMMENT = "KEY_IS_COMMENT"
         private const val JUMP_TIME = 1000
@@ -251,10 +253,9 @@ class PlayerActivity : BaseActivity() {
                         isAdultTheme = obtainIsAdult()
                 )
                 bundle.putBoolean(KEY_IS_FROM_PLAYER, true)
-                deepLinkTo(
+                navigateTo(
                         MainActivity::class.java,
-                        R.navigation.navigation_adult,
-                        R.id.myPostFragment,
+                        R.id.action_to_myPostFragment,
                         bundle
                 )
             }
@@ -1593,9 +1594,8 @@ class PlayerActivity : BaseActivity() {
                         isAdult = obtainIsAdult()
                     )
                     bundle.putBoolean(KEY_IS_FROM_PLAYER, true)
-                    deepLinkTo(
+                    navigateTo(
                         MainActivity::class.java,
-                        R.navigation.navigation_home,
                         R.id.searchVideoFragment,
                         bundle
                     )
@@ -1749,20 +1749,16 @@ class PlayerActivity : BaseActivity() {
         }
     }
 
-    private fun deepLinkTo(
+    private fun navigateTo(
         activity: Class<out Activity>,
-        navGraphId: Int,
         destId: Int,
-        bundle: Bundle?
+        bundle: Bundle
     ) {
-        val pendingIntent = NavDeepLinkBuilder(this)
-            .setComponentName(activity)
-            .setGraph(navGraphId)
-            .setDestination(destId)
-            .setArguments(bundle)
-            .createPendingIntent()
-
-        pendingIntent.send()
+        var intent = Intent(this, activity)
+        intent.setAction(NAVIGATE_TO_ACTION)
+        intent.putExtras(bundle)
+        intent.putExtra(KEY_DEST_ID, destId)
+        startActivity(intent)
     }
 
     private fun showEmailConfirmDialog() {
@@ -1775,9 +1771,8 @@ class PlayerActivity : BaseActivity() {
                         secondBtn = getString(R.string.verify_immediately),
                         secondBlock = {
                             val bundle = Bundle().also { it.putBoolean(KEY_IS_FROM_PLAYER, true) }
-                            deepLinkTo(
+                            navigateTo(
                                     MainActivity::class.java,
-                                    R.navigation.navigation_adult,
                                     R.id.settingFragment,
                                     bundle
                             )
@@ -1798,9 +1793,8 @@ class PlayerActivity : BaseActivity() {
                         firstBlock = {
                             val bundle = Bundle()
                             bundle.putInt(LoginFragment.KEY_TYPE, LoginFragment.TYPE_REGISTER)
-                            deepLinkTo(
+                            navigateTo(
                                     MainActivity::class.java,
-                                    R.navigation.navigation_adult,
                                     R.id.loginFragment,
                                     bundle
                             )
@@ -1808,9 +1802,8 @@ class PlayerActivity : BaseActivity() {
                         secondBlock = {
                             val bundle = Bundle()
                             bundle.putInt(LoginFragment.KEY_TYPE, LoginFragment.TYPE_LOGIN)
-                            deepLinkTo(
+                            navigateTo(
                                     MainActivity::class.java,
-                                    R.navigation.navigation_adult,
                                     R.id.loginFragment,
                                     bundle
                             )

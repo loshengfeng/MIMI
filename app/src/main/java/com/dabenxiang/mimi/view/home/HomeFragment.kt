@@ -169,7 +169,7 @@ class HomeFragment : BaseFragment() {
             val bundle = SearchVideoFragment.createBundle("")
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_homeFragment_to_searchVideoFragment,
+                    R.id.action_to_searchVideoFragment,
                     bundle
                 )
             )

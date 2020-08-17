@@ -121,11 +121,18 @@ class PictureDetailAdapter(
                     GeneralUtils.getTimeDiff(memberPostItem.creationDate, Date())
                 holder.title.text = memberPostItem.title
 
-                val bitmap = LruCacheUtils.getLruCache(memberPostItem.avatarAttachmentId.toString())
-                Glide.with(context)
-                    .load(bitmap)
-                    .circleCrop()
-                    .into(holder.avatarImg)
+                val avatarId = memberPostItem.avatarAttachmentId.toString()
+                if (avatarId != LruCacheUtils.ZERO_ID) {
+                    val bitmap = LruCacheUtils.getLruCache(avatarId)
+                    Glide.with(context)
+                        .load(bitmap)
+                        .circleCrop()
+                        .into(holder.avatarImg)
+                } else {
+                    Glide.with(holder.avatarImg.context).load(R.drawable.default_profile_picture)
+                        .circleCrop()
+                        .into(holder.avatarImg)
+                }
 
                 if (accountManager.getProfile().userId != memberPostItem.creatorId) {
                     holder.follow.visibility = View.VISIBLE

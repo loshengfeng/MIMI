@@ -527,7 +527,7 @@ class SearchPostFragment : BaseFragment() {
 
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_searchPostFragment_to_myPostFragment,
+                    R.id.action_to_myPostFragment,
                     bundle
                 )
             )

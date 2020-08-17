@@ -31,7 +31,7 @@
             app:destination="@id/categoriesFragment" />
 
         <action
-            android:id="@+id/action_homeFragment_to_searchVideoFragment"
+            android:id="@+id/action_to_searchVideoFragment"
             app:destination="@id/searchVideoFragment" />
         <action
             android:id="@+id/action_homeFragment_to_settingFragment"
@@ -43,6 +43,10 @@
             android:id="@+id/action_homeFragment_to_loginFragment"
             app:destination="@id/navigation_login"/>
 
+        <action
+            android:id="@+id/action_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+
     </fragment>
 
     <fragment
@@ -51,7 +55,7 @@
         tools:layout="@layout/fragment_categories">
 
         <action
-            android:id="@+id/action_categoriesFragment_to_searchVideoFragment"
+            android:id="@+id/action_to_searchVideoFragment"
             app:destination="@id/searchVideoFragment" />
 
         <action
@@ -76,5 +80,6 @@
         android:id="@+id/rankingFragment"
         android:name="com.dabenxiang.mimi.view.ranking.RankingFragment"
         tools:layout="@layout/fragment_ranking" />
+    <include app:graph="@navigation/navigation_my_post" />
 
 </navigation>

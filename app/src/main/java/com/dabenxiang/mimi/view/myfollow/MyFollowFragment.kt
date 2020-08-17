@@ -59,8 +59,8 @@ class MyFollowFragment : BaseFragment() {
             viewModel.getAttachment(id, position)
         }
 
-        override fun onCancelFollow(clubId: Long) {
-            viewModel.cancelFollowClub(clubId)
+        override fun onCancelFollow(clubId: Long, position: Int) {
+            viewModel.cancelFollowClub(clubId, position)
         }
     }
 
@@ -81,8 +81,8 @@ class MyFollowFragment : BaseFragment() {
             viewModel.getAttachment(id, position)
         }
 
-        override fun onCancelFollow(userId: Long) {
-            viewModel.cancelFollowMember(userId)
+        override fun onCancelFollow(userId: Long, position: Int) {
+            viewModel.cancelFollowMember(userId, position)
         }
     }
 
@@ -118,10 +118,12 @@ class MyFollowFragment : BaseFragment() {
             when (it) {
                 is ApiResult.Success -> {
                     val attachmentItem = it.result
-                    LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
-                    when (lastTab) {
-                        TYPE_MEMBER -> memberFollowAdapter.update(attachmentItem.position ?: 0)
-                        TYPE_CLUB -> clubFollowAdapter.update(attachmentItem.position ?: 0)
+                    if (attachmentItem.id != null && attachmentItem.bitmap != null) {
+                        LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
+                        when (lastTab) {
+                            TYPE_MEMBER -> memberFollowAdapter.update(attachmentItem.position ?: 0)
+                            TYPE_CLUB -> clubFollowAdapter.update(attachmentItem.position ?: 0)
+                        }
                     }
                 }
                 is ApiResult.Error -> Timber.e(it.throwable)
@@ -149,6 +151,38 @@ class MyFollowFragment : BaseFragment() {
                 is ApiResult.Loaded -> layout_refresh.isRefreshing = false
                 is ApiResult.Error -> onApiError(it.throwable)
             }
+        })
+
+        viewModel.cancelOneClub.observe(this, Observer {
+            when (it) {
+                is ApiResult.Loading -> layout_refresh.isRefreshing = true
+                is ApiResult.Loaded -> layout_refresh.isRefreshing = false
+                is ApiResult.Success -> {
+                    clubFollowAdapter.removedPosList.add(it.result)
+                    clubFollowAdapter.notifyItemChanged(it.result)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.cleanClubRemovedPosList.observe(this, Observer {
+            clubFollowAdapter.removedPosList.clear()
+        })
+
+        viewModel.cancelOneMember.observe(this, Observer {
+            when (it) {
+                is ApiResult.Loading -> layout_refresh.isRefreshing = true
+                is ApiResult.Loaded -> layout_refresh.isRefreshing = false
+                is ApiResult.Success -> {
+                    memberFollowAdapter.removedPosList.add(it.result)
+                    memberFollowAdapter.notifyItemChanged(it.result)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.cleanMemberRemovedPosList.observe(this, Observer {
+            memberFollowAdapter.removedPosList.clear()
         })
     }
 

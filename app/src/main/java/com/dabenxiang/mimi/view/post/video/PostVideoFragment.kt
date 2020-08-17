@@ -264,7 +264,7 @@ class PostVideoFragment : BaseFragment() {
                 val retriever = MediaMetadataRetriever()
                 retriever.setDataSource(context, Uri.parse(videoAttachmentList[0].videoUrl))
                 val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-                val timeInMillisec: Long = time.toLong()
+                val timeInMillisec: Long = time!!.toLong()
                 retriever.release()
                 val length = String.format("%02d:%02d:%02d",
                     TimeUnit.MILLISECONDS.toHours(timeInMillisec),
@@ -489,7 +489,7 @@ class PostVideoFragment : BaseFragment() {
                     val retriever = MediaMetadataRetriever()
                     retriever.setDataSource(requireContext(), myUri)
                     val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-                    val timeInMillisec = time.toLong()
+                    val timeInMillisec = time!!.toLong()
 
                     if (timeInMillisec > 3001) {
                         val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
