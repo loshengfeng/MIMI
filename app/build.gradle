@@ -89,7 +89,6 @@ android {
         applicationId "com.dabenxiang.mimi"
         minSdkVersion 24
         targetSdkVersion 28
-        targetSdkVersion 30
         versionCode version.versionCode.toInteger()
         versionName version.versionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -325,11 +324,6 @@ dependencies {
 
     // AndroidX
     implementation "androidx.appcompat:appcompat:$appcompat_version"
-    //FIXME !!
-    implementation 'androidx.appcompat:appcompat:1.3.0-alpha01'
-    implementation "androidx.appcompat:appcompat-resources:1.3.0-alpha01"
-    implementation 'com.google.android.material:material:1.3.0-alpha02'
-
     implementation "androidx.core:core-ktx:$ktx_version"
     implementation "com.google.android.material:material:$material_version"
     implementation "androidx.activity:activity-ktx:$activity_ktx_version"
