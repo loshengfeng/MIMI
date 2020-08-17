@@ -62,7 +62,6 @@ class LoginViewModel : BaseViewModel() {
     private val _loginResult = MutableLiveData<ApiResult<Nothing>>()
     val loginResult: LiveData<ApiResult<Nothing>> = _loginResult
 
-    @ExperimentalCoroutinesApi
     fun doRegisterValidateAndSubmit() {
         _friendlyNameError.value = isValidateFriendlyName(friendlyName.value ?: "")
         _emailError.value = isValidateEmail(email.value ?: "")
@@ -78,7 +77,7 @@ class LoginViewModel : BaseViewModel() {
             "" == _confirmPasswordError.value
         ) {
             viewModelScope.launch {
-                accountManager.singUp(
+                accountManager.signUp(
                     SingUpRequest(
                         username = registerAccount.value,
                         email = email.value,

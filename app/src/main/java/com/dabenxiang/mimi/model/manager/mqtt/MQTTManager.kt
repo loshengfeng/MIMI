@@ -11,6 +11,10 @@ import timber.log.Timber
 
 class MQTTManager(val context: Context, private val pref: Pref) {
 
+    companion object {
+        const val PREFIX_CHAT = "/chat/"
+    }
+
     private var client: MqttAndroidClient? = null
     private var options: MqttConnectOptions? = null
 
