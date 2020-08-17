@@ -76,10 +76,6 @@ class MQTTManager(val context: Context, private val pref: Pref) {
                 subscribeCallback.onFailure(asyncActionToken, exception)
             }
         })
-
-//        client?.subscribe(subscriptionTopic, 1) { topic, message ->
-//            subscribeCallback.onSubscribe(topic, message)
-//        }
     }
 
     fun publishMessage(publishTopic: String, publishMessage: String) {
