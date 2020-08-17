@@ -583,6 +583,9 @@ class AdultHomeFragment : BaseFragment() {
             when (postType) {
                 PostType.TEXT -> {
                     memberPostItem.id = postId
+                    memberPostItem.creatorId = viewModel.pref.profileItem.userId
+                    memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
+                    memberPostItem.avatarAttachmentId = viewModel.pref.profileItem.avatarAttachmentId
                     val bundle = TextDetailFragment.createBundle(memberPostItem, -1)
                     navigateTo(
                         NavigateItem.Destination(
@@ -593,6 +596,7 @@ class AdultHomeFragment : BaseFragment() {
                 }
                 PostType.IMAGE -> {
                     memberPostItem.id = postId
+                    memberPostItem.creatorId = viewModel.pref.profileItem.userId
                     memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
                     memberPostItem.avatarAttachmentId = viewModel.pref.profileItem.avatarAttachmentId
                     val bundle = PictureDetailFragment.createBundle(memberPostItem, -1)
@@ -604,7 +608,10 @@ class AdultHomeFragment : BaseFragment() {
                     )
                 }
                 PostType.VIDEO -> {
+                    memberPostItem.id = postId
+                    memberPostItem.creatorId = viewModel.pref.profileItem.userId
                     memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
+                    memberPostItem.avatarAttachmentId = viewModel.pref.profileItem.avatarAttachmentId
                     val bundle = ClipFragment.createBundle(arrayListOf(memberPostItem), -1, false)
                     navigateTo(
                         NavigateItem.Destination(
