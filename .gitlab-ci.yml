@@ -5,6 +5,8 @@ stages:
 
 depoly:
   stage: depoly
+  tags:
+    - docker
   script:
     - fastlane init_env
     - fastlane build_release
