@@ -69,16 +69,16 @@ class OrderInfoFragment : BaseFragment() {
         tv_product_name.text = productName
 
         tv_product_count.text = StringBuilder("¥ ")
-            .append(orderingPackageItem.listPrice)
+            .append(orderingPackageItem.price)
             .append(" x 1")
             .toString()
 
         tv_total.text = StringBuilder("¥ ")
-            .append(orderingPackageItem.listPrice)
+            .append(orderingPackageItem.price)
             .toString()
 
         tv_total_amount.text = StringBuilder("¥ ")
-            .append(orderingPackageItem?.listPrice)
+            .append(orderingPackageItem.price)
             .toString()
     }
 

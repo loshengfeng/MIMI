@@ -11,6 +11,6 @@ class TopUpOnlinePayViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVie
     val orderPackageLayout: ConstraintLayout = itemView.layout_order_package
     val ivCheck: ImageView = itemView.iv_check
     val tvPackageName: TextView = itemView.tv_package_name
-    val listPrice: TextView = itemView.tv_list_price
     val price: TextView = itemView.tv_price
+    val listPrice: TextView = itemView.tv_list_price
 }

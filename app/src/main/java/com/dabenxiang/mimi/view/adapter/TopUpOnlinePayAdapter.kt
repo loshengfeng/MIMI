@@ -5,6 +5,7 @@ import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.OrderingPackageItem
@@ -30,18 +31,21 @@ class TopUpOnlinePayAdapter(val context: Context) :
     override fun onBindViewHolder(holder: TopUpOnlinePayViewHolder, position: Int) {
         val item = orderingPackageItems?.get(position)
         holder.tvPackageName.text = item?.name
-        holder.listPrice.text = item?.listPrice.toString()
-        holder.price.text = StringBuilder("¥ ").append(item?.price).toString()
-        holder.price.paint.flags = Paint.STRIKE_THRU_TEXT_FLAG
+
+        holder.price.text = item?.price.toString()
+        holder.listPrice.text = StringBuilder("¥ ").append(item?.listPrice).toString()
+        holder.listPrice.paint.flags = Paint.STRIKE_THRU_TEXT_FLAG
 
         if (selectItem != null && selectItem?.id == item?.id) {
             holder.ivCheck.visibility = View.VISIBLE
-            holder.orderPackageLayout.background = context.getDrawable(
+            holder.orderPackageLayout.background = ContextCompat.getDrawable(
+                context,
                 R.drawable.bg_red_1_stroke_1_radius_8
             )
         } else {
             holder.ivCheck.visibility = View.INVISIBLE
-            holder.orderPackageLayout.background = context.getDrawable(
+            holder.orderPackageLayout.background = ContextCompat.getDrawable(
+                context,
                 R.drawable.bg_gray_7_stroke_1_radius_8
             )
         }
