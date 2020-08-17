@@ -50,7 +50,7 @@ class MainActivity : BaseActivity(), InteractionListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Timber.i("MainActivity onCreate")
+
         setupBottomNavigationBar()
 
         viewModel.postReportResult.observe(this, Observer {
@@ -107,7 +107,6 @@ class MainActivity : BaseActivity(), InteractionListener {
                     R.id.navigation_adult -> true
                     else -> false
                 }
-
             viewModel.setAdultMode(isAdult)
             setUiMode(isAdult)
         })
@@ -119,7 +118,6 @@ class MainActivity : BaseActivity(), InteractionListener {
             bottom_navigation.setBackgroundColor(getColor(R.color.adult_color_status_bar))
             bottom_navigation.itemTextColor =
                 resources.getColorStateList(R.color.bottom_nav_adult_text_selector, null)
-
         } else {
             window?.statusBarColor = getColor(R.color.normal_color_status_bar)
             bottom_navigation.setBackgroundColor(getColor(R.color.normal_color_status_bar))
@@ -154,31 +152,31 @@ class MainActivity : BaseActivity(), InteractionListener {
                 finish()
             }
         } else if ((supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter(
-                        "/"
-                ).toString()
-                        .toLowerCase(Locale.getDefault()) == SearchVideoFragment::class.java.simpleName.toLowerCase(
-                        Locale.getDefault()
-                ))
-                || (supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter(
-                        "/"
-                ).toString()
-                        .toLowerCase(Locale.getDefault()) == MyPostFragment::class.java.simpleName.toLowerCase(
-                        Locale.getDefault()
-                ))
-                || (supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter(
-                        "/"
-                ).toString()
-                        .toLowerCase(Locale.getDefault()) == SettingFragment::class.java.simpleName.toLowerCase(
-                        Locale.getDefault()
-                ))
+                "/"
+            ).toString()
+                .toLowerCase(Locale.getDefault()) == SearchVideoFragment::class.java.simpleName.toLowerCase(
+                Locale.getDefault()
+            ))
+            || (supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter(
+                "/"
+            ).toString()
+                .toLowerCase(Locale.getDefault()) == MyPostFragment::class.java.simpleName.toLowerCase(
+                Locale.getDefault()
+            ))
+            || (supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter(
+                "/"
+            ).toString()
+                .toLowerCase(Locale.getDefault()) == SettingFragment::class.java.simpleName.toLowerCase(
+                Locale.getDefault()
+            ))
         ) {
-            if (viewModel.isFromPlayer){
+            if (viewModel.isFromPlayer) {
                 viewModel.isFromPlayer = false
                 deepLinkTo(
-                        MainActivity::class.java,
-                        R.navigation.navigation_home,
-                        R.id.homeFragment,
-                        null
+                    MainActivity::class.java,
+                    R.navigation.navigation_home,
+                    R.id.homeFragment,
+                    null
                 )
             } else
                 super.onBackPressed()
@@ -231,8 +229,7 @@ class MainActivity : BaseActivity(), InteractionListener {
                     Timber.d("unrecognized status received from installer")
                 }
             }
-        }
-        else if(NAVIGATE_TO_ACTION == intent?.action){
+        } else if (NAVIGATE_TO_ACTION == intent?.action) {
             val dest = intent.getIntExtra(PlayerActivity.KEY_DEST_ID, 0)
             if (dest != 0)
                 Navigation.findNavController(this, R.id.nav_host_fragment).navigate(dest, extras)

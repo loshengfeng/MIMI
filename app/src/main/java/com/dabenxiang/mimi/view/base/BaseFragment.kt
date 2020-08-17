@@ -70,8 +70,9 @@ abstract class BaseFragment : Fragment() {
             firstCreateView = false
         }
 
-        if (arguments?.getBoolean(PlayerActivity.KEY_IS_FROM_PLAYER) == true)
+        if (arguments?.getBoolean(PlayerActivity.KEY_IS_FROM_PLAYER) == true) {
             mainViewModel?.isFromPlayer = true
+        }
     }
 
     abstract fun getLayoutId(): Int

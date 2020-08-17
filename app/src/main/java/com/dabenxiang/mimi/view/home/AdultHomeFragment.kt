@@ -32,7 +32,6 @@ import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.*
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
@@ -79,7 +78,6 @@ import com.google.gson.Gson
 import com.video.trimmer.utils.RealPathUtil
 import com.vincent.videocompressor.VideoCompress
 import kotlinx.android.synthetic.main.fragment_home.*
-import org.koin.android.ext.android.inject
 import timber.log.Timber
 import java.io.File
 import java.util.*
@@ -87,11 +85,18 @@ import kotlin.collections.ArrayList
 
 class AdultHomeFragment : BaseFragment() {
 
+    companion object {
+        private const val REQUEST_PHOTO = 10001
+        private const val REQUEST_VIDEO_CAPTURE = 10002
+        private const val REQUEST_LOGIN = 10003
+        private const val RECORD_LIMIT_TIME = 15
+    }
+
+    private val viewModel: HomeViewModel by viewModels()
+
     private var lastPosition = 0
     private var uploadCurrentPicPosition = 0
     private var postType = PostType.TEXT
-
-    private val viewModel: HomeViewModel by viewModels()
 
     private val homeBannerViewHolderMap = hashMapOf<Int, HomeBannerViewHolder>()
     private val homeCarouselViewHolderMap = hashMapOf<Int, HomeCarouselViewHolder>()
@@ -115,16 +120,6 @@ class AdultHomeFragment : BaseFragment() {
 
     private var snackBar: Snackbar? = null
     private var picParameter = PicParameter()
-
-    val accountManager: AccountManager by inject()
-
-    companion object {
-        private const val REQUEST_PHOTO = 10001
-        private const val REQUEST_VIDEO_CAPTURE = 10002
-        private const val REQUEST_LOGIN = 10003
-
-        private const val RECORD_LIMIT_TIME = 15
-    }
 
     override fun getLayoutId() = R.layout.fragment_home
 
@@ -416,42 +411,58 @@ class AdultHomeFragment : BaseFragment() {
                 is Success -> {
                     picParameter.id = it.result.toString()
                     viewModel.clearLiveDataValue()
-                    val realPath = UriUtils.getPath(requireContext(), Uri.parse(uploadVideoUri[0].videoUrl))
+                    val realPath =
+                        UriUtils.getPath(requireContext(), Uri.parse(uploadVideoUri[0].videoUrl))
                     uploadVideoUri[0].videoUrl = realPath!!
 
                     val videoUri = Uri.parse(uploadVideoUri[0].videoUrl)
                     val file = File(videoUri.path ?: "")
-                    val destinationPath = Environment.getExternalStorageDirectory().toString() + File.separator + "temp" + File.separator + "Videos" + File.separator
+                    val destinationPath = Environment.getExternalStorageDirectory()
+                        .toString() + File.separator + "temp" + File.separator + "Videos" + File.separator
                     val root = File(destinationPath)
-                    val outputFileUri = Uri.fromFile(File(root, "t_${Calendar.getInstance().timeInMillis}_" + file.nameWithoutExtension + ".mp4"))
-                    val outPutPath = RealPathUtil.realPathFromUriApi19(requireContext(), outputFileUri)
-                        ?: File(root, "t_${Calendar.getInstance().timeInMillis}_" + videoUri.path?.substring(videoUri.path!!.lastIndexOf("/") + 1)).absolutePath
+                    val outputFileUri = Uri.fromFile(
+                        File(
+                            root,
+                            "t_${Calendar.getInstance().timeInMillis}_" + file.nameWithoutExtension + ".mp4"
+                        )
+                    )
+                    val outPutPath =
+                        RealPathUtil.realPathFromUriApi19(requireContext(), outputFileUri)
+                            ?: File(
+                                root,
+                                "t_${Calendar.getInstance().timeInMillis}_" + videoUri.path?.substring(
+                                    videoUri.path!!.lastIndexOf("/") + 1
+                                )
+                            ).absolutePath
 
-                    VideoCompress.compressVideoLow(realPath, outPutPath , object : VideoCompress.CompressListener {
-                        override fun onStart() {
-                            Timber.d("Start compress")
-                        }
+                    VideoCompress.compressVideoLow(
+                        realPath,
+                        outPutPath,
+                        object : VideoCompress.CompressListener {
+                            override fun onStart() {
+                                Timber.d("Start compress")
+                            }
 
-                        override fun onSuccess() {
-                            Timber.d("Compress success")
-                            uploadVideoUri[0].videoUrl = outPutPath
-                            viewModel.postAttachment(
-                                uploadVideoUri[0].videoUrl,
-                                requireContext(),
-                                TYPE_VIDEO
-                            )
+                            override fun onSuccess() {
+                                Timber.d("Compress success")
+                                uploadVideoUri[0].videoUrl = outPutPath
+                                viewModel.postAttachment(
+                                    uploadVideoUri[0].videoUrl,
+                                    requireContext(),
+                                    TYPE_VIDEO
+                                )
 
-                        }
+                            }
 
-                        override fun onFail() {
-                            Timber.d("Compress fail")
-                            resetAndCancelJob(Throwable(), getString(R.string.post_error))
-                        }
+                            override fun onFail() {
+                                Timber.d("Compress fail")
+                                resetAndCancelJob(Throwable(), getString(R.string.post_error))
+                            }
 
-                        override fun onProgress(percent: Float) {
-                            Timber.d("Compress progress : $percent")
-                        }
-                    })
+                            override fun onProgress(percent: Float) {
+                                Timber.d("Compress progress : $percent")
+                            }
+                        })
                 }
                 is Error -> {
                     resetAndCancelJob(it.throwable, getString(R.string.post_error))
@@ -501,7 +512,8 @@ class AdultHomeFragment : BaseFragment() {
 
         viewModel.totalCountResult.observe(viewLifecycleOwner, Observer {
             it?.also { totalCount ->
-                cl_no_data.visibility = takeIf { totalCount > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
+                cl_no_data.visibility =
+                    takeIf { totalCount > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
                 takeIf { rv_sixth.visibility == View.VISIBLE }?.also {
                     clubMemberAdapter.totalCount = totalCount
                 }
@@ -577,7 +589,8 @@ class AdultHomeFragment : BaseFragment() {
                     memberPostItem.id = postId
                     memberPostItem.creatorId = viewModel.pref.profileItem.userId
                     memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
-                    memberPostItem.avatarAttachmentId = viewModel.pref.profileItem.avatarAttachmentId
+                    memberPostItem.avatarAttachmentId =
+                        viewModel.pref.profileItem.avatarAttachmentId
                     val bundle = TextDetailFragment.createBundle(memberPostItem, -1)
                     navigateTo(
                         NavigateItem.Destination(
@@ -590,7 +603,8 @@ class AdultHomeFragment : BaseFragment() {
                     memberPostItem.id = postId
                     memberPostItem.creatorId = viewModel.pref.profileItem.userId
                     memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
-                    memberPostItem.avatarAttachmentId = viewModel.pref.profileItem.avatarAttachmentId
+                    memberPostItem.avatarAttachmentId =
+                        viewModel.pref.profileItem.avatarAttachmentId
                     val bundle = PictureDetailFragment.createBundle(memberPostItem, -1)
                     navigateTo(
                         NavigateItem.Destination(
@@ -603,7 +617,8 @@ class AdultHomeFragment : BaseFragment() {
                     memberPostItem.id = postId
                     memberPostItem.creatorId = viewModel.pref.profileItem.userId
                     memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
-                    memberPostItem.avatarAttachmentId = viewModel.pref.profileItem.avatarAttachmentId
+                    memberPostItem.avatarAttachmentId =
+                        viewModel.pref.profileItem.avatarAttachmentId
                     val bundle = ClipFragment.createBundle(arrayListOf(memberPostItem), -1, false)
                     navigateTo(
                         NavigateItem.Destination(
@@ -776,9 +791,11 @@ class AdultHomeFragment : BaseFragment() {
                     rv_second.layoutManager = LinearLayoutManager(requireContext())
                     rv_second.adapter = followPostPagedAdapter
                     viewModel.getPostFollows()
-                }?: run {
+                } ?: run {
                     Timber.d("@@followPostPagedAdapter.itemCount ${followPostPagedAdapter.itemCount}")
-                    cl_no_data.visibility = followPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }?.let { View.GONE } ?: let { View.VISIBLE }
+                    cl_no_data.visibility =
+                        followPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
+                            ?.let { View.GONE } ?: let { View.VISIBLE }
                 }
             }
             3 -> {
@@ -790,7 +807,11 @@ class AdultHomeFragment : BaseFragment() {
                     rv_third.layoutManager = LinearLayoutManager(requireContext())
                     rv_third.adapter = clipPostPagedAdapter
                     viewModel.getClipPosts()
-                }?: run { cl_no_data.visibility = clipPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }?.let { View.GONE } ?: let { View.VISIBLE } }
+                } ?: run {
+                    cl_no_data.visibility =
+                        clipPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
+                            ?.let { View.GONE } ?: let { View.VISIBLE }
+                }
             }
             4 -> {
                 rv_fourth.visibility = View.VISIBLE
@@ -801,7 +822,11 @@ class AdultHomeFragment : BaseFragment() {
                     rv_fourth.layoutManager = LinearLayoutManager(requireContext())
                     rv_fourth.adapter = picturePostPagedAdapter
                     viewModel.getPicturePosts()
-                }?: run { cl_no_data.visibility = picturePostPagedAdapter.currentList.takeUnless { isListEmpty(it) }?.let { View.GONE } ?: let { View.VISIBLE } }
+                } ?: run {
+                    cl_no_data.visibility =
+                        picturePostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
+                            ?.let { View.GONE } ?: let { View.VISIBLE }
+                }
             }
             5 -> {
                 rv_fifth.visibility = View.VISIBLE
@@ -812,7 +837,11 @@ class AdultHomeFragment : BaseFragment() {
                     rv_fifth.layoutManager = LinearLayoutManager(requireContext())
                     rv_fifth.adapter = textPostPagedAdapter
                     viewModel.getTextPosts()
-                }?: run { cl_no_data.visibility = textPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }?.let { View.GONE } ?: let { View.VISIBLE } }
+                } ?: run {
+                    cl_no_data.visibility =
+                        textPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
+                            ?.let { View.GONE } ?: let { View.VISIBLE }
+                }
             }
             else -> {
                 rv_sixth.visibility = View.VISIBLE
@@ -823,7 +852,11 @@ class AdultHomeFragment : BaseFragment() {
                     rv_sixth.layoutManager = MiMiLinearLayoutManager(requireContext())
                     rv_sixth.adapter = clubMemberAdapter
                     viewModel.getClubs()
-                }?: run { cl_no_data.visibility = clubMemberAdapter.currentList.takeUnless { isClubListEmpty(it) }?.let { View.GONE } ?: let { View.VISIBLE } }
+                } ?: run {
+                    cl_no_data.visibility =
+                        clubMemberAdapter.currentList.takeUnless { isClubListEmpty(it) }
+                            ?.let { View.GONE } ?: let { View.VISIBLE }
+                }
             }
         }
     }
@@ -1045,7 +1078,8 @@ class AdultHomeFragment : BaseFragment() {
 
         override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
 
-            val bundle = ClipFragment.createBundle(ArrayList(item.subList(1, item.size)), position-1)
+            val bundle =
+                ClipFragment.createBundle(ArrayList(item.subList(1, item.size)), position - 1)
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_adultHomeFragment_to_clipFragment,
@@ -1200,7 +1234,10 @@ class AdultHomeFragment : BaseFragment() {
 
             val chooser = Intent(Intent.ACTION_CHOOSER)
             chooser.putExtra(Intent.EXTRA_INTENT, galleryIntent)
-            chooser.putExtra(Intent.EXTRA_TITLE, requireContext().getString(R.string.post_select_video))
+            chooser.putExtra(
+                Intent.EXTRA_TITLE,
+                requireContext().getString(R.string.post_select_video)
+            )
 
             val intentArray = arrayOf(cameraIntent)
             chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
@@ -1217,7 +1254,10 @@ class AdultHomeFragment : BaseFragment() {
 
             val chooser = Intent(Intent.ACTION_CHOOSER)
             chooser.putExtra(Intent.EXTRA_INTENT, galleryIntent)
-            chooser.putExtra(Intent.EXTRA_TITLE, requireContext().getString(R.string.post_select_pic))
+            chooser.putExtra(
+                Intent.EXTRA_TITLE,
+                requireContext().getString(R.string.post_select_pic)
+            )
 
             val intentArray = arrayOf(cameraIntent)
             chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
@@ -1248,20 +1288,27 @@ class AdultHomeFragment : BaseFragment() {
                         val uri = if (data?.data == null) {
                             val extras = data?.extras
                             val imageBitmap = extras!!["data"] as Bitmap?
-                            Uri.parse(MediaStore.Images.Media.insertImage(requireContext().contentResolver, imageBitmap, null,null))
+                            Uri.parse(
+                                MediaStore.Images.Media.insertImage(
+                                    requireContext().contentResolver,
+                                    imageBitmap,
+                                    null,
+                                    null
+                                )
+                            )
                         } else {
                             data.data!!
                         }
 
                         pciUri.add(uri.toString())
                     }
-                        val bundle = Bundle()
-                        bundle.putStringArrayList(BUNDLE_PIC_URI, pciUri)
+                    val bundle = Bundle()
+                    bundle.putStringArrayList(BUNDLE_PIC_URI, pciUri)
 
-                        findNavController().navigate(
-                            R.id.action_adultHomeFragment_to_postPicFragment,
-                            bundle
-                        )
+                    findNavController().navigate(
+                        R.id.action_adultHomeFragment_to_postPicFragment,
+                        bundle
+                    )
                 }
 
                 REQUEST_VIDEO_CAPTURE -> {
@@ -1272,15 +1319,23 @@ class AdultHomeFragment : BaseFragment() {
 
                     val retriever = MediaMetadataRetriever()
                     retriever.setDataSource(requireContext(), myUri)
-                    val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                    val time =
+                        retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
                     val timeInMillisec = time!!.toLong()
 
                     if (timeInMillisec > 3001) {
                         val bundle = Bundle()
                         bundle.putString(BUNDLE_VIDEO_URI, myUri.toString())
-                        findNavController().navigate(R.id.action_adultHomeFragment_to_editVideoFragment, bundle)
+                        findNavController().navigate(
+                            R.id.action_adultHomeFragment_to_editVideoFragment,
+                            bundle
+                        )
                     } else {
-                        Toast.makeText(requireContext(), R.string.post_video_length_error, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            R.string.post_video_length_error,
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
 
