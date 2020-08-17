@@ -543,10 +543,13 @@ def increaseVersionWithPath(String version_properties_path) {
         pfile = file('version.properties')
     }
     versionProps.load(new FileInputStream(pfile))
-    def nextCode = versionProps['VERSION_CODE'].toInteger() + 1
+    def hotfix = versionProps['VERSION_NAME_HOTFIX'].toInteger()
+    def nextCode = versionProps['VERSION_CODE'].toInteger() -hotfix + 10
     versionProps['VERSION_CODE'] = nextCode.toString()
     def nextBuild = versionProps['VERSION_NAME_BUILD'].toInteger() + 1
     versionProps['VERSION_NAME_BUILD'] = nextBuild.toString()
+    hotfix = 0
+    versionProps['VERSION_NAME_HOTFIX'] = hotfix.toString()
     versionProps.store(pfile.newWriter(), null)
     def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD']
     println "Increase $buildVersionName"
