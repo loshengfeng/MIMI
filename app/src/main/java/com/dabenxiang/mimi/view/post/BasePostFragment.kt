@@ -19,7 +19,7 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.ArticleItem
+import com.dabenxiang.mimi.model.api.vo.MediaItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -39,9 +39,11 @@ import kotlinx.android.synthetic.main.item_setting_bar.*
 
 open class BasePostFragment : BaseFragment() {
 
-    private val viewModel: PostArticleViewModel by viewModels()
+    val viewModel: PostArticleViewModel by viewModels()
 
     private var haveMainTag = false
+
+    var postId: Long = 0
 
     companion object {
         const val CONTENT_LIMIT = 2000
@@ -172,9 +174,11 @@ open class BasePostFragment : BaseFragment() {
     }
 
     override fun initSettings() {
-        super.initSettings()
 
-        val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
+    }
+
+    override fun setupFirstTime() {
+        val isEdit = arguments?.getBoolean(MyPostFragment.EDIT, false)
 
         tv_clean.visibility = View.VISIBLE
         tv_clean.text = getString(R.string.btn_send)
@@ -184,35 +188,44 @@ open class BasePostFragment : BaseFragment() {
         tv_back.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null)
 
         txt_titleCount.text = String.format(getString(R.string.typing_count, INIT_VALUE, TITLE_LIMIT))
-        txt_contentCount.text = String.format(getString(R.string.typing_count, INIT_VALUE, CONTENT_LIMIT))
         txt_hashtagCount.text = String.format(getString(R.string.typing_count, INIT_VALUE, HASHTAG_LIMIT))
 
-        if (isEdit != null) {
+        if (isEdit != null && isEdit) {
             tv_title.text = getString(R.string.edit_post_title)
             setUI()
         } else {
             tv_title.text = getString(R.string.post_title)
+            handlePic()
         }
 
         useAdultTheme(false)
     }
 
+    open fun handlePic() {
+    }
+
     private fun setUI() {
         val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
-        val articleItem = Gson().fromJson(item.content, ArticleItem::class.java)
+        val contentItem = Gson().fromJson(item.content, MediaItem::class.java)
+
+        postId = item.id
 
         edt_title.setText(item.title)
-        edt_content.setText(articleItem.text)
 
         for (tag in item.tags!!) {
             addEditTag(tag)
         }
 
         txt_titleCount.text = String.format(getString(R.string.typing_count, item.title.length, TITLE_LIMIT))
-        txt_contentCount.text = String.format(getString(R.string.typing_count, articleItem.text.length, CONTENT_LIMIT))
         txt_hashtagCount.text = String.format(getString(R.string.typing_count, item.tags?.size, HASHTAG_LIMIT))
 
         haveMainTag = true
+
+        setUI(contentItem)
+    }
+
+    open fun setUI(item: MediaItem) {
+
     }
 
     private fun addEditTag(tag: String) {

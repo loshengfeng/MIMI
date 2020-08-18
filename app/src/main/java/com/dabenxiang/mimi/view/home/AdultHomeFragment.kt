@@ -1274,7 +1274,7 @@ class AdultHomeFragment : BaseFragment() {
                         }
 
                         if (uri.path!!.isNotBlank()) {
-                            pciUri.add(uri.toString())
+                            pciUri.add(UriUtils.getPath(requireContext(), uri)!!)
                         } else {
                             pciUri.add(file.absolutePath)
                         }

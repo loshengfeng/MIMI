@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ArticleItem
+import com.dabenxiang.mimi.model.api.vo.MediaItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.EDIT
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.MEMBER_DATA
@@ -28,6 +29,12 @@ class PostArticleFragment : BasePostFragment() {
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_post_article
+    }
+
+    override fun setUI(item: MediaItem) {
+        edt_content.setText(item.textContent)
+        txt_contentCount.text = String.format(getString(R.string.typing_count, item.textContent.length, CONTENT_LIMIT))
+
     }
 
     override fun setupListeners() {

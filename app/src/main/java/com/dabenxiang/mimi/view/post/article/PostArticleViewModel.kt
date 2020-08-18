@@ -77,4 +77,26 @@ class PostArticleViewModel: BaseViewModel() {
                 .collect { _bitmapResult.value = it }
         }
     }
+
+    fun getBitmap(id: String, update: ((String) -> Unit)) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getAttachment(id)
+                if (!result.isSuccessful) throw HttpException(result)
+                val byteArray = result.body()?.bytes()
+                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
+                LruCacheUtils.putLruCache(id, bitmap)
+                emit(ApiResult.success(id))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    when(it) {
+                        is ApiResult.Success -> {
+                            update(it.result)
+                        }
+                    }
+                }
+        }
+    }
 }
