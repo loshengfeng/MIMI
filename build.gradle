@@ -14,7 +14,7 @@ buildscript {
     ext.lifecycle_version = "2.2.0"
     ext.core_testing = '2.1.0'
     ext.room_version = '2.2.5'
-    ext.paging_version = '2.1.2'
+    ext.paging_version = '3.0.0-alpha04'
     ext.live_event_bus_version = '1.5.2'
     ext.nav_version = '2.3.0'
     ext.okhttp_version = '4.7.2'
