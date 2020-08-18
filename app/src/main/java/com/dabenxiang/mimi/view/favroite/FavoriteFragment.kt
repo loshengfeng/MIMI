@@ -463,14 +463,14 @@ class FavoriteFragment : BaseFragment() {
                     // 追蹤與取消追蹤
                     when (item) {
                         is MemberPostItem -> {
-                            if (item.id == 0L) {
+                            if (item.creatorId == 0L) {
                                 GeneralUtils.showToast(
                                     requireContext(),
                                     getString(R.string.unexpected_error)
                                 )
                             } else {
                                 viewModel.currentPostItem = item
-                                viewModel.modifyFollow(item.id, item.isFollow)
+                                viewModel.modifyFollow(item.creatorId, item.isFollow)
                             }
                         }
                     }
