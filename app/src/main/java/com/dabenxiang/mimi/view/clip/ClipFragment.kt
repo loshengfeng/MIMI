@@ -263,6 +263,14 @@ class ClipFragment : BaseFragment() {
                     )
                 )
             }
+
+            override fun onUpdateCommentCount(count: Int) {
+                val index = memberPostItems.indexOf(item)
+                if (index >= 0) {
+                    memberPostItems[index].commentCount = count
+                    rv_third.adapter?.notifyItemChanged(index, ClipAdapter.PAYLOAD_UPDATE_UI)
+                }
+            }
         }
         CommentDialogFragment.newInstance(item, listener).also {
             it.isCancelable = true
