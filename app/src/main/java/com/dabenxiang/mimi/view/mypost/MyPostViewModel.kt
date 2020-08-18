@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.mypost
 
 import android.content.Context
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -56,8 +57,8 @@ class MyPostViewModel : BaseViewModel() {
     private var _followResult = MutableLiveData<ApiResult<Nothing>>()
     val followResult: LiveData<ApiResult<Nothing>> = _followResult
 
-    private var _deletePostResult = MutableLiveData<ApiResult<Nothing>>()
-    val deletePostResult: LiveData<ApiResult<Nothing>> = _deletePostResult
+    private var _deletePostResult = MutableLiveData<ApiResult<Int>>()
+    val deletePostResult: LiveData<ApiResult<Int>> = _deletePostResult
 
     private val _uploadPicItem = MutableLiveData<PicParameter>()
     val uploadPicItem: LiveData<PicParameter> = _uploadPicItem
@@ -88,6 +89,9 @@ class MyPostViewModel : BaseViewModel() {
 
     private val _postArticleResult = MutableLiveData<ApiResult<Long>>()
     val postArticleResult: LiveData<ApiResult<Long>> = _postArticleResult
+
+    private val _cleanRemovedPosList = MutableLiveData<Nothing>()
+    val cleanRemovedPosList: LiveData<Nothing> = _cleanRemovedPosList
 
     var totalCount: Int = 0
 
@@ -129,8 +133,6 @@ class MyPostViewModel : BaseViewModel() {
         return LivePagedListBuilder(dataSourceFactory, config).build()
     }
 
-    fun invalidateDataSource() = _myPostItemListResult.value!!.dataSource!!.invalidate()
-
     private val pagingCallback = object : PagingCallback {
         override fun onLoading() {
             setShowProgress(true)
@@ -147,7 +149,7 @@ class MyPostViewModel : BaseViewModel() {
         override fun onTotalCount(count: Long, isInitial: Boolean) {
             totalCount = if (isInitial) count.toInt()
             else totalCount.plus(count.toInt())
-            Timber.d("onTotalCount: $totalCount")
+            if(isInitial) _cleanRemovedPosList.value = null
         }
     }
 
@@ -253,13 +255,19 @@ class MyPostViewModel : BaseViewModel() {
         }
     }
 
-    fun deletePost(item: MemberPostItem) {
+    fun deletePost(
+        item: MemberPostItem,
+        items: ArrayList<MemberPostItem>
+    ) {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val result = apiRepository.deleteMyPost(item.id)
                 if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(null))
+                val position = items.indexOf(item)
+                items.remove(item)
+                totalCount--
+                emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
@@ -272,12 +280,14 @@ class MyPostViewModel : BaseViewModel() {
             flow {
                 val realPath =  when (type) {
                     HomeViewModel.TYPE_VIDEO -> pic
+                    HomeViewModel.TYPE_PIC -> pic
                     else -> UriUtils.getPath(context, Uri.parse(pic))
                 }
                 val fileNameSplit = realPath?.split("/")
                 val fileName = fileNameSplit?.last()
                 val extSplit = fileName?.split(".")
                 val ext = "." + extSplit?.last()
+                var mime: String? = null
 
                 if (type == HomeViewModel.TYPE_PIC) {
                     val picParameter = PicParameter(ext = ext)
@@ -285,15 +295,27 @@ class MyPostViewModel : BaseViewModel() {
                 } else if (type == HomeViewModel.TYPE_COVER) {
                     val picParameter = PicParameter(ext = ext)
                     _uploadCoverItem.postValue(picParameter)
+                } else if (type == HomeViewModel.TYPE_VIDEO) {
+                    val mmr = MediaMetadataRetriever()
+                    mmr.setDataSource(realPath)
+                    mime = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE);
                 }
 
                 Timber.d("Upload photo path : $realPath")
                 Timber.d("Upload photo ext : $ext")
 
-                val result = domainManager.getApiRepository().postAttachment(
-                    File(realPath),
-                    fileName = URLEncoder.encode(fileName, "UTF-8")
-                )
+                val result = if (mime == null) {
+                    domainManager.getApiRepository().postAttachment(
+                        File(realPath!!),
+                        fileName = URLEncoder.encode(fileName, "UTF-8")
+                    )
+                } else {
+                    domainManager.getApiRepository().postAttachment(
+                        File(realPath!!),
+                        fileName = URLEncoder.encode(fileName, "UTF-8"),
+                        type = mime
+                    )
+                }
 
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(result.body()?.content))

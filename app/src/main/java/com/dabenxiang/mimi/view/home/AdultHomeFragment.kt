@@ -4,7 +4,9 @@ import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.Matrix
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
@@ -16,13 +18,16 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.core.content.FileProvider
 import androidx.core.widget.ContentLoadingProgressBar
+import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
@@ -72,6 +77,7 @@ import com.dabenxiang.mimi.view.ranking.RankingFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
+import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.snackbar.Snackbar
@@ -90,6 +96,8 @@ class AdultHomeFragment : BaseFragment() {
     private var lastPosition = 0
     private var uploadCurrentPicPosition = 0
     private var postType = PostType.TEXT
+
+    private var file = File("")
 
     private val viewModel: HomeViewModel by viewModels()
 
@@ -575,6 +583,9 @@ class AdultHomeFragment : BaseFragment() {
             when (postType) {
                 PostType.TEXT -> {
                     memberPostItem.id = postId
+                    memberPostItem.creatorId = viewModel.pref.profileItem.userId
+                    memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
+                    memberPostItem.avatarAttachmentId = viewModel.pref.profileItem.avatarAttachmentId
                     val bundle = TextDetailFragment.createBundle(memberPostItem, -1)
                     navigateTo(
                         NavigateItem.Destination(
@@ -585,6 +596,7 @@ class AdultHomeFragment : BaseFragment() {
                 }
                 PostType.IMAGE -> {
                     memberPostItem.id = postId
+                    memberPostItem.creatorId = viewModel.pref.profileItem.userId
                     memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
                     memberPostItem.avatarAttachmentId = viewModel.pref.profileItem.avatarAttachmentId
                     val bundle = PictureDetailFragment.createBundle(memberPostItem, -1)
@@ -596,7 +608,10 @@ class AdultHomeFragment : BaseFragment() {
                     )
                 }
                 PostType.VIDEO -> {
+                    memberPostItem.id = postId
+                    memberPostItem.creatorId = viewModel.pref.profileItem.userId
                     memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
+                    memberPostItem.avatarAttachmentId = viewModel.pref.profileItem.avatarAttachmentId
                     val bundle = ClipFragment.createBundle(arrayListOf(memberPostItem), -1, false)
                     navigateTo(
                         NavigateItem.Destination(
@@ -1201,12 +1216,16 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onUploadPic() {
+            file = FileUtil.getTest(System.currentTimeMillis().toString() + ".jpg")
+
             val galleryIntent = Intent()
             galleryIntent.type = "image/*"
             galleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
             galleryIntent.action = Intent.ACTION_GET_CONTENT
 
             val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            val uri = FileProvider.getUriForFile(requireContext(), BuildConfig.APPLICATION_ID + ".fileProvider", file)
+            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
 
             val chooser = Intent(Intent.ACTION_CHOOSER)
             chooser.putExtra(Intent.EXTRA_INTENT, galleryIntent)
@@ -1234,31 +1253,43 @@ class AdultHomeFragment : BaseFragment() {
                     if (clipData != null) {
                         for (i in 0 until clipData.itemCount) {
                             val item = clipData.getItemAt(i)
-                            val uri = item.uri
+                            val uri = UriUtils.getPath(requireContext(), item.uri)
                             pciUri.add(uri.toString())
                         }
                     } else {
-                        val uri = if (data?.data == null) {
+                        var uri = Uri.parse("")
+
+                        if (data?.data == null) {
                             val extras = data?.extras
-                            val imageBitmap = extras!!["data"] as Bitmap?
-                            Uri.parse(MediaStore.Images.Media.insertImage(requireContext().contentResolver, imageBitmap, null,null))
+
+                            if (extras == null) {
+                                rotateImage(BitmapFactory.decodeFile(file.absolutePath))
+                            } else {
+                                val extrasData = extras["data"]
+                                val imageBitmap = extrasData as Bitmap?
+                                uri = Uri.parse(MediaStore.Images.Media.insertImage(requireContext().contentResolver, imageBitmap, null,null))
+                            }
                         } else {
-                            data.data!!
+                            uri = data.data!!
                         }
 
-                        pciUri.add(uri.toString())
+                        if (uri.path!!.isNotBlank()) {
+                            pciUri.add(uri.toString())
+                        } else {
+                            pciUri.add(file.absolutePath)
+                        }
                     }
-                        val bundle = Bundle()
-                        bundle.putStringArrayList(BUNDLE_PIC_URI, pciUri)
 
-                        findNavController().navigate(
-                            R.id.action_adultHomeFragment_to_postPicFragment,
-                            bundle
-                        )
+                    val bundle = Bundle()
+                    bundle.putStringArrayList(BUNDLE_PIC_URI, pciUri)
+
+                    findNavController().navigate(
+                        R.id.action_adultHomeFragment_to_postPicFragment,
+                        bundle
+                    )
                 }
 
                 REQUEST_VIDEO_CAPTURE -> {
-
                     val videoUri: Uri? = data?.data
                     val myUri =
                         Uri.fromFile(File(UriUtils.getPath(requireContext(), videoUri!!) ?: ""))
@@ -1266,7 +1297,7 @@ class AdultHomeFragment : BaseFragment() {
                     val retriever = MediaMetadataRetriever()
                     retriever.setDataSource(requireContext(), myUri)
                     val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-                    val timeInMillisec = time.toLong()
+                    val timeInMillisec = time!!.toLong()
 
                     if (timeInMillisec > 3001) {
                         val bundle = Bundle()
@@ -1345,5 +1376,34 @@ class AdultHomeFragment : BaseFragment() {
 
     private fun isClubListEmpty(list: PagedList<MemberClubItem>?): Boolean {
         return list == null || list.size == 0 || (list.size == 1 && list[0]?.adItem != null)
+    }
+
+    private fun rotateImage(bitmap: Bitmap): Bitmap? {
+        val ei = ExifInterface(file.absolutePath)
+
+        val orientation: Int = ei.getAttributeInt(
+            ExifInterface.TAG_ORIENTATION,
+            ExifInterface.ORIENTATION_UNDEFINED
+        )
+
+        val rotatedBitmap: Bitmap?
+        rotatedBitmap = when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(bitmap, 90f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(bitmap, 180f)
+            ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(bitmap, 270f)
+            ExifInterface.ORIENTATION_NORMAL -> bitmap
+            else -> bitmap
+        }
+
+        return rotatedBitmap
+    }
+
+    private fun rotateImage(source: Bitmap, angle: Float): Bitmap? {
+        val matrix = Matrix()
+        matrix.postRotate(angle)
+        return Bitmap.createBitmap(
+            source, 0, 0, source.width, source.height,
+            matrix, true
+        )
     }
 }

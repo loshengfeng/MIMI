@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.paging.PagedListAdapter
@@ -24,7 +25,7 @@ import kotlinx.android.synthetic.main.item_list_loading.view.*
 class ChooseClubAdapter(
     private val attachmentListener: PostAttachmentListener,
     private val clubListener: ClubListener
-): PagedListAdapter<Any, BaseViewHolder>(diffCallback) {
+) : PagedListAdapter<Any, BaseViewHolder>(diffCallback) {
 
     private lateinit var context: Context
 
@@ -49,7 +50,7 @@ class ChooseClubAdapter(
     }
 
     override fun getItemCount(): Int {
-        return if(currentList?.size ?: 0 >= ChooseClubDataSource.PER_LIMIT_LONG) {
+        return if (currentList?.size ?: 0 >= ChooseClubDataSource.PER_LIMIT_LONG) {
             super.getItemCount() + 1
         } else {
             super.getItemCount()
@@ -67,9 +68,12 @@ class ChooseClubAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         context = parent.context
 
-        return when(viewType) {
+        return when (viewType) {
             VIEW_TYPE_CLUB -> {
-                ChooseClubViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_choose_club, parent, false))
+                ChooseClubViewHolder(
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_choose_club, parent, false)
+                )
             }
             VIEW_TYPE_LOAD -> {
                 ListLoadingViewHolder(
@@ -78,7 +82,10 @@ class ChooseClubAdapter(
                 )
             }
             else -> {
-                ChooseClubViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_choose_club, parent, false))
+                ChooseClubViewHolder(
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_choose_club, parent, false)
+                )
 
             }
         }
@@ -92,18 +99,29 @@ class ChooseClubAdapter(
                 holder.clubName.text = item.title
                 holder.hashTag.text = item.tag
 
-                if (LruCacheUtils.getLruCache(item.avatarAttachmentId.toString()) == null) {
-                    attachmentListener.getAttachment(item.avatarAttachmentId.toString(), position)
-                } else {
-                    val bitmap = LruCacheUtils.getLruCache(item.avatarAttachmentId.toString())
-                    Glide.with(context)
-                        .load(bitmap)
-                        .circleCrop()
-                        .into(holder.avatar)
+                holder.rootLayout.setOnClickListener {
+                    clubListener.onClick(item)
                 }
 
-                holder.itemView.setOnClickListener {
-                    clubListener.onClick(item)
+                val avatarId = item.avatarAttachmentId.toString()
+                if (avatarId != LruCacheUtils.ZERO_ID) {
+                    if (LruCacheUtils.getLruCache(avatarId) == null) {
+                        attachmentListener.getAttachment(
+                            item.avatarAttachmentId.toString(),
+                            position
+                        )
+                    } else {
+                        val bitmap = LruCacheUtils.getLruCache(item.avatarAttachmentId.toString())
+                        Glide.with(context)
+                            .load(bitmap)
+                            .circleCrop()
+                            .into(holder.avatar)
+                    }
+                } else {
+                    Glide.with(context)
+                        .load(R.drawable.img_avatar_a_01)
+                        .circleCrop()
+                        .into(holder.avatar)
                 }
             }
 
@@ -119,6 +137,7 @@ class ChooseClubAdapter(
     }
 
     class ChooseClubViewHolder(itemView: View) : BaseViewHolder(itemView) {
+        val rootLayout: RelativeLayout = itemView.rootLayout
         val avatar: ImageView = itemView.iv_avatar
         val clubName: TextView = itemView.txt_clubName
         val hashTag: TextView = itemView.txt_hashtagName

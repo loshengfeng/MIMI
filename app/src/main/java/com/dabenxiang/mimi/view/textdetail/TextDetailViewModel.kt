@@ -166,6 +166,7 @@ class TextDetailViewModel : BaseViewModel() {
     }
 
     fun getAvatar(id: String) {
+        if (id == LruCacheUtils.ZERO_ID) return
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getAttachment(id)
