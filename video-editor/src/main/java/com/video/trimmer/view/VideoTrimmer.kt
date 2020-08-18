@@ -204,12 +204,13 @@ class VideoTrimmer @JvmOverloads constructor(context: Context, attrs: AttributeS
         try {
             extractor.setDataSource(file.path)
             val numTracks = extractor.trackCount
-            for (i in 0..numTracks) {
+            for (i in 0..(numTracks-1)) {
                 val format = extractor.getTrackFormat(i)
                 val mime = format.getString(MediaFormat.KEY_MIME)
                 if (mime.startsWith("video/")) {
                     if (format.containsKey(MediaFormat.KEY_FRAME_RATE)) {
                         frameRate = format.getInteger(MediaFormat.KEY_FRAME_RATE)
+                        break
                     }
                 }
             }
