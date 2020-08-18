@@ -53,6 +53,7 @@ class ClipViewModel : BaseViewModel() {
 
                 emit(ApiResult.success(Triple(id, pos, file)))
             }
+                .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _clipResult.value = it }
         }

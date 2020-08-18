@@ -90,7 +90,7 @@ android {
     defaultConfig {
         applicationId "com.dabenxiang.mimi"
         minSdkVersion 24
-        targetSdkVersion 30
+        targetSdkVersion 28
         versionCode version.versionCode.toInteger()
         versionName version.versionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -460,7 +460,11 @@ dependencies {
     // Work
     implementation "androidx.work:work-runtime-ktx:$work_version"
 
-    implementation 'org.conscrypt:conscrypt-android:2.2.1'
+    // Epoxy
+    implementation "com.airbnb.android:epoxy:$epoxy_version"
+    kapt "com.airbnb.android:epoxy-processor:$epoxy_version"
+
+    implementation "org.conscrypt:conscrypt-android:$conscrypt_version"
 
     // Log
     if (isWithSubmoduleBranch()) {

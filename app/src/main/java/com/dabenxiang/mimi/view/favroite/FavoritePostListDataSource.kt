@@ -2,8 +2,8 @@ package com.dabenxiang.mimi.view.favroite
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.FavoritePagingCallback
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.manager.DomainManager
-import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -31,25 +31,27 @@ class FavoritePostListDataSource constructor(
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getPostFavorite("0", PER_LIMIT)
-                Timber.d("over")
                 if (!result.isSuccessful) throw HttpException(result)
-                val item = result.body()
-                val playListItems = item?.content
+                result.body()?.also { item ->
+                    val postListItems = ArrayList<MemberPostItem>()
+                    item.content?.forEach {
+                        val memberPostItem = it.toMemberPostItem()
+                        postListItems.add(memberPostItem)
+                    }
 
-                pagingCallback.onReceiveResponse(playListItems as ArrayList<PostFavoriteItem>)
+                    pagingCallback.onReceiveResponse(postListItems)
 
-                val nextPageKey = when {
-                    hasNextPage(
-                        item.paging.count,
-                        item.paging.offset,
-                        playListItems.size
-                    ) -> PER_LIMIT_LONG
-                    else -> null
+                    val nextPageKey = when {
+                        hasNextPage(
+                            item.paging.count,
+                            item.paging.offset,
+                            postListItems.size
+                        ) -> PER_LIMIT_LONG
+                        else -> null
+                    }
+                    Timber.d("loadInitial_nextPageKey: ${nextPageKey.toString()}")
+                    emit(InitResult(postListItems, nextPageKey))
                 }
-
-                Timber.d("loadInitial_nextPageKey: ${nextPageKey.toString()}")
-
-                emit(InitResult(playListItems ?: arrayListOf(), nextPageKey))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { pagingCallback.onLoading() }
@@ -59,7 +61,7 @@ class FavoritePostListDataSource constructor(
                     pagingCallback.onTotalCount(response.list.size)
                     val ids = ArrayList<Long>()
                     response.list.forEach {
-                        (it as PostFavoriteItem).id?.let { it1 -> ids.add(it1) }
+                        (it as MemberPostItem).id.let { it1 -> ids.add(it1) }
                     }
                     pagingCallback.onTotalVideoId(ids,true)
                     callback.onResult(response.list, null, response.nextKey)
@@ -93,13 +95,15 @@ class FavoritePostListDataSource constructor(
                 .collect { response ->
                     response.body()?.also { item ->
                         item.content?.also { list ->
-
+                            val postListItems = ArrayList<MemberPostItem>()
                             val ids = ArrayList<Long>()
                             list.forEach {
-                                it.id?.let { it1 -> ids.add(it1) }
+                                val memberPostItem = it.toMemberPostItem()
+                                postListItems.add(memberPostItem)
+                                it.id.let { it1 -> ids.add(it1) }
                             }
                             pagingCallback.onTotalVideoId(ids, false)
-                            pagingCallback.onReceiveResponse(list as ArrayList<PostFavoriteItem>)
+                            pagingCallback.onReceiveResponse(postListItems)
                             val nextPageKey = when {
                                 hasNextPage(
                                     item.paging.count,

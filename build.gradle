@@ -55,6 +55,8 @@ buildscript {
     ext.cks_provider = '0.0.1'
     ext.application_provider_version = '1.0.5'
     ext.work_version = '2.4.0'
+    ext.conscrypt_version = '2.2.1'
+    ext.epoxy_version = '3.11.0'
     repositories {
         google()
         jcenter()
