@@ -12,10 +12,8 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
-import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.FunctionType
-import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.model.vo.SearchPostItem
@@ -35,8 +33,6 @@ import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.fragment_post_favorite.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
@@ -82,6 +78,113 @@ class FavoriteFragment : BaseFragment() {
 
     private var needRefresh = false
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        viewModel.playList.observe(this, Observer {
+            if (!(lastPrimaryIndex == TYPE_ADULT && lastSecondaryIndex == TYPE_SHORT_VIDEO))
+                favoriteAdapter.submitList(it)
+        })
+        viewModel.postList.observe(this, Observer {
+            if (lastPrimaryIndex == TYPE_ADULT && lastSecondaryIndex == TYPE_SHORT_VIDEO)
+                favoriteAdapter.submitList(it)
+        })
+        viewModel.dataCount.observe(this, Observer { refreshUi(it) })
+
+        viewModel.cleanResult.observe(this, Observer {
+            when (it) {
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Error -> onApiError(it.throwable)
+                is ApiResult.Empty -> {
+                    viewModel.videoIDList.clear()
+                    viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
+                }
+                is ApiResult.Loaded -> progressHUD?.dismiss()
+            }
+        })
+
+        viewModel.likeResult.observe(this, Observer {
+            when (it) {
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Error -> onApiError(it.throwable)
+                is ApiResult.Success -> {
+                    favoriteAdapter.notifyDataSetChanged()
+                }
+                is ApiResult.Loaded -> progressHUD?.dismiss()
+            }
+        })
+
+        viewModel.followResult.observe(this, Observer {
+            when (it) {
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Error -> onApiError(it.throwable)
+                is ApiResult.Success -> {
+                    favoriteAdapter.notifyDataSetChanged()
+                }
+                is ApiResult.Loaded -> progressHUD?.dismiss()
+            }
+        })
+
+
+        viewModel.favoriteResult.observe(this, Observer {
+            when (it) {
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Error -> onApiError(it.throwable)
+                is ApiResult.Success -> {
+                    viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
+                    GeneralUtils.showToast(
+                        requireContext(),
+                        getString(R.string.favorite_delete_favorite)
+                    )
+                }
+                is ApiResult.Loaded -> progressHUD?.dismiss()
+            }
+        })
+
+        viewModel.reportResult.observe(this, Observer {
+            when (it) {
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Error -> onApiError(it.throwable)
+                is ApiResult.Success -> {
+                }
+                is ApiResult.Loaded -> progressHUD?.dismiss()
+            }
+        })
+
+        viewModel.attachmentByTypeResult.observe(this, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    val attachmentItem = it.result
+                    LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
+                    when (attachmentItem.type) {
+                        AttachmentType.ADULT_HOME_CLIP -> {
+                            favoriteAdapter.update(attachmentItem.position ?: 0)
+                        }
+                        AttachmentType.ADULT_AVATAR -> {
+                            favoriteAdapter.update(attachmentItem.position ?: 0)
+                        }
+                        else -> {
+                        }
+                    }
+                }
+                is ApiResult.Error -> Timber.e(it.throwable)
+            }
+        })
+
+        viewModel.isEmailConfirmed.observe(this, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    if (!it.result) {
+                        interactionListener?.changeNavigationPosition(R.id.navigation_personal)
+                    } else {
+                        initView()
+                    }
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback {
@@ -91,6 +194,7 @@ class FavoriteFragment : BaseFragment() {
         }
         useAdultTheme(false)
         initSettings()
+        favoriteAdapter.notifyDataSetChanged()
     }
 
     override fun setupFirstTime() {
@@ -120,109 +224,6 @@ class FavoriteFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.playList.observe(viewLifecycleOwner, Observer {
-            if (!(lastPrimaryIndex == TYPE_ADULT && lastSecondaryIndex == TYPE_SHORT_VIDEO))
-                favoriteAdapter.submitList(it)
-        })
-        viewModel.postList.observe(viewLifecycleOwner, Observer {
-            if (lastPrimaryIndex == TYPE_ADULT && lastSecondaryIndex == TYPE_SHORT_VIDEO)
-                favoriteAdapter.submitList(it)
-        })
-        viewModel.dataCount.observe(viewLifecycleOwner, Observer { refreshUi(it) })
-
-
-        viewModel.cleanResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Empty -> {
-                    viewModel.videoIDList.clear()
-                    viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
-                }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
-            }
-        })
-
-        viewModel.likeResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> {
-                    favoriteAdapter.notifyDataSetChanged()
-                }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
-            }
-        })
-
-        viewModel.followResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> {
-                    favoriteAdapter.notifyDataSetChanged()
-                }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
-            }
-        })
-
-
-        viewModel.favoriteResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> {
-                    viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
-                    GeneralUtils.showToast(
-                        requireContext(),
-                        getString(R.string.favorite_delete_favorite)
-                    )
-                }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
-            }
-        })
-
-        viewModel.reportResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> {
-                }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
-            }
-        })
-
-        viewModel.attachmentByTypeResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is ApiResult.Success -> {
-                    val attachmentItem = it.result
-                    LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
-                    when (attachmentItem.type) {
-                        AttachmentType.ADULT_HOME_CLIP -> {
-                            favoriteAdapter.update(attachmentItem.position ?: 0)
-                        }
-                        AttachmentType.ADULT_AVATAR -> {
-                            favoriteAdapter.update(attachmentItem.position ?: 0)
-                        }
-                        else -> {
-                        }
-                    }
-                }
-                is ApiResult.Error -> Timber.e(it.throwable)
-            }
-        })
-
-        viewModel.isEmailConfirmed.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is ApiResult.Success -> {
-                    if (!it.result) {
-                        interactionListener?.changeNavigationPosition(R.id.navigation_personal)
-                    } else {
-                        initView()
-                    }
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
-        })
     }
 
     private fun initView() {
@@ -344,7 +345,7 @@ class FavoriteFragment : BaseFragment() {
             viewModel.getAttachment(id, position, type)
         }
 
-        override fun onVideoClick(item: Any) {
+        override fun onVideoClick(item: Any, position: Int?) {
             when (item) {
                 is PlayItem -> {
                     val playerData = PlayerItem(
@@ -354,14 +355,19 @@ class FavoriteFragment : BaseFragment() {
                     intent.putExtras(PlayerActivity.createBundle(playerData))
                     startActivity(intent)
                 }
-                is PostFavoriteItem -> {
-                    goShortVideoDetailPage(item)
+                is MemberPostItem -> {
+                    position?.let { goShortVideoDetailPage(item, position) }
                 }
             }
         }
 
 
-        override fun onFunctionClick(type: FunctionType, view: View, item: Any) {
+        override fun onFunctionClick(
+            type: FunctionType,
+            view: View,
+            item: Any,
+            position: Int?
+        ) {
             when (type) {
                 FunctionType.LIKE -> {
                     when (item) {
@@ -371,11 +377,9 @@ class FavoriteFragment : BaseFragment() {
                                 viewModel.modifyLike(it)
                             }
                         }
-                        is PostFavoriteItem -> {
+                        is MemberPostItem -> {
                             viewModel.currentPostItem = item
-                            item.postId?.let {
-                                viewModel.modifyPostLike(it)
-                            }
+                            viewModel.modifyPostLike(item.id)
                         }
                     }
                 }
@@ -389,11 +393,9 @@ class FavoriteFragment : BaseFragment() {
                                 viewModel.modifyFavorite(it)
                             }
                         }
-                        is PostFavoriteItem -> {
+                        is MemberPostItem -> {
                             viewModel.currentPostItem = item
-                            item.postId?.let {
-                                viewModel.removePostFavorite(it)
-                            }
+                            viewModel.removePostFavorite(item.id)
                         }
                     }
                 }
@@ -442,8 +444,8 @@ class FavoriteFragment : BaseFragment() {
                                 startActivity(intent)
                             }
                         }
-                        is PostFavoriteItem -> {
-                            goShortVideoDetailPage(item)
+                        is MemberPostItem -> {
+                            position?.let { goShortVideoDetailPage(item, position) }
                         }
                     }
                 }
@@ -460,15 +462,15 @@ class FavoriteFragment : BaseFragment() {
                 FunctionType.FOLLOW -> {
                     // 追蹤與取消追蹤
                     when (item) {
-                        is PostFavoriteItem -> {
-                            if (item.posterId == null || item.posterId == 0L) {
+                        is MemberPostItem -> {
+                            if (item.id == 0L) {
                                 GeneralUtils.showToast(
                                     requireContext(),
                                     getString(R.string.unexpected_error)
                                 )
                             } else {
                                 viewModel.currentPostItem = item
-                                viewModel.modifyFollow(item.posterId, item.isFollow ?: false)
+                                viewModel.modifyFollow(item.id, item.isFollow)
                             }
                         }
                     }
@@ -533,36 +535,18 @@ class FavoriteFragment : BaseFragment() {
     /**
      * 進到短影片的詳細頁面
      */
-    private fun goShortVideoDetailPage(item: PostFavoriteItem) {
-        if (item.tags == null || item.tags.first()
-                .isEmpty() || item.postId == null
-        ) {
+    private fun goShortVideoDetailPage(
+        item: MemberPostItem,
+        position: Int
+    ) {
+        if (item.tags == null || item.tags!!.first().isEmpty()) {
             GeneralUtils.showToast(
                 requireContext(),
                 getString(R.string.unexpected_error)
             )
         } else {
-            val memberPost: ArrayList<MemberPostItem> = Gson().fromJson(
-                Gson().toJson(viewModel.currentPostList),
-                object : TypeToken<ArrayList<MemberPostItem>>() {}.type
-            )
-            memberPost.forEach memberItem@{ memberItem ->
-                viewModel.currentPostList.forEach { postItem ->
-                    if (postItem.id == memberItem.id) {
-                        memberItem.avatarAttachmentId = postItem.posterAvatarAttachmentId
-                            ?: 0
-                        memberItem.id = postItem.postId ?: 0
-                        memberItem.isFavorite = true
-                        memberItem.creatorId = postItem.posterId ?: 0
-                        memberItem.likeType =
-                            if (postItem.likeType == 0) LikeType.LIKE else LikeType.DISLIKE
-                        memberItem.postFriendlyName = postItem.posterName
-                        return@memberItem
-                    }
-                }
-            }
             useAdultTheme(true)
-            val bundle = ClipFragment.createBundle(memberPost, item.position)
+            val bundle = ClipFragment.createBundle(viewModel.currentPostList, position, false)
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_postFavoriteFragment_to_clipFragment,

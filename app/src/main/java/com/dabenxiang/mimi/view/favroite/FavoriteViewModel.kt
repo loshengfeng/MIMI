@@ -30,8 +30,8 @@ class FavoriteViewModel : BaseViewModel() {
     val videoIDList = ArrayList<Long>()
 
     var currentPlayItem: PlayItem? = null
-    var currentPostItem: PostFavoriteItem? = null
-    var currentPostList: ArrayList<PostFavoriteItem> = ArrayList()
+    var currentPostItem: MemberPostItem? = null
+    var currentPostList: ArrayList<MemberPostItem> = ArrayList()
 
     private val _cleanResult = MutableLiveData<ApiResult<Nothing>>()
     val cleanResult: LiveData<ApiResult<Nothing>> = _cleanResult
@@ -171,7 +171,7 @@ class FavoriteViewModel : BaseViewModel() {
     }
 
     fun modifyPostLike(videoID: Long) {
-        val likeType = if (currentPostItem?.likeType == 0) LikeType.DISLIKE else LikeType.LIKE
+        val likeType = if (currentPostItem?.likeType == LikeType.LIKE) LikeType.DISLIKE else LikeType.LIKE
         val likeRequest = LikeRequest(likeType)
         viewModelScope.launch {
             flow {
@@ -188,8 +188,8 @@ class FavoriteViewModel : BaseViewModel() {
                     .onCompletion { emit(ApiResult.loaded()) }
                     .collect {
                         currentPostItem?.let {item->
-                            item.likeType = if (item.likeType == 1) 0 else 1
-                            item.likeCount = if (item.likeType == 0) (item.likeCount ?: 0) + 1 else (item.likeCount ?: 0) - 1
+                            item.likeType = if (item.likeType == LikeType.LIKE) LikeType.DISLIKE else LikeType.LIKE
+                            item.likeCount = if (item.likeType == LikeType.LIKE) (item.likeCount ?: 0) + 1 else (item.likeCount ?: 0) - 1
                         }
                         _likeResult.value = it
                     }
@@ -313,7 +313,7 @@ class FavoriteViewModel : BaseViewModel() {
             videoIDList.addAll(ids)
         }
 
-        override fun onReceiveResponse(response: ArrayList<PostFavoriteItem>) {
+        override fun onReceiveResponse(response: ArrayList<MemberPostItem>) {
             currentPostList.addAll(response)
         }
     }
