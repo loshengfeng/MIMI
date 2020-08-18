@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.home
 
 import android.content.Context
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -483,6 +484,7 @@ class HomeViewModel : BaseViewModel() {
                 val fileName = fileNameSplit?.last()
                 val extSplit = fileName?.split(".")
                 val ext = "." + extSplit?.last()
+                var mime: String? = null
 
                 if (type == TYPE_PIC) {
                     val uploadPicItem = UploadPicItem(ext = ext)
@@ -490,15 +492,27 @@ class HomeViewModel : BaseViewModel() {
                 } else if (type == TYPE_COVER) {
                     val picParameter = PicParameter(ext = ext)
                     _uploadCoverItem.postValue(picParameter)
+                } else if (type == TYPE_VIDEO) {
+                    val mmr = MediaMetadataRetriever()
+                    mmr.setDataSource(realPath)
+                    mime = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE);
                 }
 
                 Timber.d("Upload photo path : $realPath")
                 Timber.d("Upload photo ext : $ext")
 
-                val result = domainManager.getApiRepository().postAttachment(
-                    File(realPath),
-                    fileName = URLEncoder.encode(fileName, "UTF-8")
-                )
+                val result = if (mime == null) {
+                    domainManager.getApiRepository().postAttachment(
+                        File(realPath!!),
+                        fileName = URLEncoder.encode(fileName, "UTF-8")
+                    )
+                } else {
+                    domainManager.getApiRepository().postAttachment(
+                        File(realPath!!),
+                        fileName = URLEncoder.encode(fileName, "UTF-8"),
+                        type = mime
+                    )
+                }
 
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(result.body()?.content))

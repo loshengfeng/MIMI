@@ -7,14 +7,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.blankj.utilcode.util.ImageUtils
-import com.dabenxiang.mimi.BuildConfig
-import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.AvatarRequest
 import com.dabenxiang.mimi.model.api.vo.EmailRequest
 import com.dabenxiang.mimi.model.api.vo.ProfileItem
 import com.dabenxiang.mimi.model.api.vo.ProfileRequest
+import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
@@ -81,6 +79,7 @@ class SettingViewModel : BaseViewModel() {
     }
 
     fun getAttachment(id: Long) {
+        if (id.toString() == LruCacheUtils.ZERO_ID) return
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
@@ -102,7 +101,8 @@ class SettingViewModel : BaseViewModel() {
         viewModelScope.launch {
             flow {
                 val result =
-                    domainManager.getApiRepository().resendEmail(EmailRequest(domainManager.getWebDomain()+ DomainManager.PARAM_RESET_CODE))
+                    domainManager.getApiRepository()
+                        .resendEmail(EmailRequest(domainManager.getWebDomain() + DomainManager.PARAM_RESET_CODE))
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }
