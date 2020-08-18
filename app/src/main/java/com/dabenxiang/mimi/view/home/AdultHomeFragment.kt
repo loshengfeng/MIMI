@@ -1295,7 +1295,6 @@ class AdultHomeFragment : BaseFragment() {
                 }
 
                 REQUEST_VIDEO_CAPTURE -> {
-
                     val videoUri: Uri? = data?.data
                     val myUri =
                         Uri.fromFile(File(UriUtils.getPath(requireContext(), videoUri!!) ?: ""))

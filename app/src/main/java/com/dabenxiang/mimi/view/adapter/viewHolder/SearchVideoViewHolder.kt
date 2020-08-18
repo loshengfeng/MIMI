@@ -92,8 +92,12 @@ class SearchVideoViewHolder(
         tvTitle.run {
             text = if (data?.searchingStr != null && data?.searchingStr?.isNotBlank()!!) {
                 val firstChar = data?.searchingStr ?: "".substring(0, 1)
-                title.setSpan(ForegroundColorSpan(ContextCompat.getColor(itemView.context, R.color.color_red_1)), title.indexOf(firstChar), title.indexOf(firstChar) + firstChar.length, Spanned.SPAN_INCLUSIVE_INCLUSIVE)
-                title
+                val firstIndex = title.toString().toLowerCase().indexOf(firstChar)
+                if (firstIndex != -1) {
+                    title.setSpan(ForegroundColorSpan(ContextCompat.getColor(itemView.context, R.color.color_red_1)), firstIndex, firstIndex + firstChar.length, Spanned.SPAN_INCLUSIVE_INCLUSIVE)
+                    title
+                } else
+                    title
             } else {
                 data?.title
             }
