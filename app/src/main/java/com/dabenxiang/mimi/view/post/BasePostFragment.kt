@@ -196,12 +196,17 @@ open class BasePostFragment : BaseFragment() {
         } else {
             tv_title.text = getString(R.string.post_title)
             handlePic()
+            handleVideo()
         }
 
         useAdultTheme(false)
     }
 
     open fun handlePic() {
+    }
+
+    open fun handleVideo() {
+
     }
 
     private fun setUI() {
