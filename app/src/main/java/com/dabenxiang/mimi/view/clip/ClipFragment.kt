@@ -129,10 +129,12 @@ class ClipFragment : BaseFragment() {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Success -> rv_third.adapter?.notifyItemChanged(
-                    it.result,
-                    ClipAdapter.PAYLOAD_UPDATE_UI
-                )
+                is Success -> {
+                    rv_third.adapter?.notifyItemChanged(
+                        it.result,
+                        ClipAdapter.PAYLOAD_UPDATE_UI
+                    )
+                }
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -144,7 +146,7 @@ class ClipFragment : BaseFragment() {
 
     override fun initSettings() {
         val position = arguments?.getInt(KEY_POSITION) ?: 0
-        
+
         (arguments?.getSerializable(KEY_DATA) as ArrayList<MemberPostItem>).also { data ->
             memberPostItems.addAll(data)
             rv_third.adapter = ClipAdapter(
@@ -175,7 +177,7 @@ class ClipFragment : BaseFragment() {
                             val clipAdapter = rv_third.adapter as ClipAdapter
                             val lastPosition = clipAdapter.getCurrentPos()
                             Timber.d("SCROLL_STATE_IDLE lastPosition: $lastPosition")
-                            takeIf { currentPos>=0 && currentPos != lastPosition }?.also {
+                            takeIf { currentPos >= 0 && currentPos != lastPosition }?.also {
                                 clipAdapter.releasePlayer()
                                 clipAdapter.updateCurrentPosition(currentPos)
                                 clipAdapter.notifyItemChanged(lastPosition)

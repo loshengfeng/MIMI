@@ -9,7 +9,7 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
-import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.LikeType
@@ -29,7 +29,7 @@ import java.util.*
 class FavoritePostViewHolder(
     itemView: View,
     private val listener: FavoriteAdapter.EventListener
-) : BaseAnyViewHolder<PostFavoriteItem>(itemView), KoinComponent {
+) : BaseAnyViewHolder<MemberPostItem>(itemView), KoinComponent {
 
     private val accountManager: AccountManager by inject()
 
@@ -48,64 +48,69 @@ class FavoritePostViewHolder(
     private val tvMore = itemView.findViewById(R.id.tv_more) as TextView
 
     init {
-        ivHead.setOnClickListener { listener.onAvatarClick(data!!.posterId, data!!.posterName) }
-        ivPhoto.setOnClickListener { listener.onVideoClick(data!!) }
+        ivHead.setOnClickListener { listener.onAvatarClick(data!!.creatorId, data!!.postFriendlyName) }
+        tvShare.visibility = View.GONE
+        tvMore.visibility = View.INVISIBLE
+    }
+
+    override fun updated(position: Int) {
+        val isMe = data?.creatorId == accountManager.getProfile().userId
+        ivPhoto.setOnClickListener { listener.onVideoClick(data!!, position) }
         tvLike.setOnClickListener {
             listener.onFunctionClick(
                 FunctionType.LIKE,
                 it,
-                data!!
+                data!!,
+                position
             )
         }
         tvFavorite.setOnClickListener {
             listener.onFunctionClick(
                 FunctionType.FAVORITE,
                 it,
-                data!!
+                data!!,
+                position
             )
         }
         tvMsg.setOnClickListener {
             listener.onFunctionClick(
                 FunctionType.MSG,
                 it,
-                data!!
+                data!!,
+                position
             )
         }
         tvShare.setOnClickListener {
             listener.onFunctionClick(
                 FunctionType.SHARE,
                 it,
-                data!!
+                data!!,
+                position
             )
         }
         tvMore.setOnClickListener {
             listener.onFunctionClick(
                 FunctionType.MORE,
                 it,
-                data!!
+                data!!,
+                position
             )
         }
         tvFollow.setOnClickListener {
             listener.onFunctionClick(
                 FunctionType.FOLLOW,
                 it,
-                data!!
+                data!!,
+                position
             )
         }
-        tvShare.visibility = View.GONE
-        tvMore.visibility = View.INVISIBLE
-    }
-
-    override fun updated(position: Int) {
-        val isMe = data?.posterId == accountManager.getProfile().userId
-        data?.position = position
-        data?.posterAvatarAttachmentId
+        data?.avatarAttachmentId
             .takeIf { it != null && it.toString() != LruCacheUtils.ZERO_ID }?.also { id ->
                 LruCacheUtils.getLruCache(id.toString())?.also { bitmap ->
                     Glide.with(ivHead.context).load(bitmap).circleCrop().into(ivHead)
                 } ?: run {
                     listener.onGetAttachment(
-                        data!!.posterAvatarAttachmentId!!.toString(),
+                        data!!.avatarAttachmentId!!.toString(),
                         position,
                         AttachmentType.ADULT_AVATAR
                     )
@@ -114,9 +119,9 @@ class FavoritePostViewHolder(
             Glide.with(ivHead.context).load(R.drawable.default_profile_picture).circleCrop().into(ivHead)
         }
 
-        tvName.text = data?.posterName
+        tvName.text = data?.postFriendlyName
         tvTitle.text = data?.title
-        tvTime.text = data?.postDate.let { date ->
+        tvTime.text = data?.creationDate.let { date ->
             SimpleDateFormat(
                 "yyyy-MM-dd HH:mm",
                 Locale.getDefault()
@@ -163,10 +168,10 @@ class FavoritePostViewHolder(
             tvFollow.visibility = View.GONE
         }
 
-        setupChipGroup(data?.tags, data?.type)
+        setupChipGroup(data?.tags, data?.type?.value)
 
         tvLike.text = data?.likeCount.toString()
-        val res = if (data?.likeType == LikeType.LIKE.value) {
+        val res = if (data?.likeType == LikeType.LIKE) {
             R.drawable.ico_nice_s
         } else {
             R.drawable.ico_nice_gray
