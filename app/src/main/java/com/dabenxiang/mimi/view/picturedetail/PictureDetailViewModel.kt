@@ -7,7 +7,10 @@ import androidx.lifecycle.viewModelScope
 import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.event.SingleLiveEvent
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.api.vo.LikeRequest
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.PostCommentRequest
+import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
 import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.vo.AttachmentItem
@@ -55,6 +58,7 @@ class PictureDetailViewModel : BaseViewModel() {
         get() = _currentCommentType
 
     fun getAttachment(id: String, position: Int) {
+        if (id == LruCacheUtils.ZERO_ID) return
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getAttachment(id)
@@ -77,6 +81,7 @@ class PictureDetailViewModel : BaseViewModel() {
     }
 
     fun getAvatar(id: String) {
+        if (id == LruCacheUtils.ZERO_ID) return
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getAttachment(id)
