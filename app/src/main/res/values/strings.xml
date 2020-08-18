@@ -355,6 +355,10 @@
     <string name="order_detail_create_order">建立订单</string>
     <string name="order_detail_total_amount">总计</string>
 
+    <!-- Order Result -->
+    <string name="order_result_create_order">建立订单</string>
+    <string name="order_result_create_order_complete">订单建立完成</string>
+
 
     <string name="filter_empty">无搜寻结果</string>
     <string name="copy_url">已将连结保存到剪贴簿</string>
