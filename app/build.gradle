@@ -460,18 +460,18 @@ dependencies {
 
     implementation 'org.conscrypt:conscrypt-android:2.2.1'
 
-    // Log
-    if (isWithSubmoduleBranch()) {
-        println "sub_project dep !!  "
-        implementation project(path: ':BaseManager')
-        implementation project(path: ':DeviceInfoProvider')
-        implementation project(path: ':logmanager')
-        implementation project(path: ':utils_device')
-        implementation project(path: ':utils_api_result')
-        implementation project(path: ':utils_general')
-        implementation project(path: ':utils_loglevel')
-        implementation project(path: ':utils_gson_factory')
-    } else {
+//    // Log
+//    if (isWithSubmoduleBranch()) {
+//        println "sub_project dep !!  "
+//        implementation project(path: ':BaseManager')
+//        implementation project(path: ':DeviceInfoProvider')
+//        implementation project(path: ':logmanager')
+//        implementation project(path: ':utils_device')
+//        implementation project(path: ':utils_api_result')
+//        implementation project(path: ':utils_general')
+//        implementation project(path: ':utils_loglevel')
+//        implementation project(path: ':utils_gson_factory')
+//    } else {
         implementation "org.cks.utils:BaseManager:$cks_log_version"
         implementation "org.cks.utils:DeviceInfoProvider:$cks_provider"
         implementation "org.cks.utils:logmanager:$cks_log_version"
@@ -481,7 +481,7 @@ dependencies {
         implementation "org.cks.utils:utils_loglevel:$cks_utils"
         implementation "org.cks.utils:utils_gson_factory:$cks_utils"
         implementation "org.cks.utils:updatemanager:$cks_update_version"
-    }
+//    }
 
     // Test
     testImplementation "io.mockk:mockk:$mokk_version"
