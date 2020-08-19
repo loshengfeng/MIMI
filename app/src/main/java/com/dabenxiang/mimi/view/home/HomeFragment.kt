@@ -210,7 +210,7 @@ class HomeFragment : BaseFragment() {
                 rv_first.visibility = View.VISIBLE
                 takeIf { rv_first.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_first.layoutManager = GridLayoutManager(requireContext(), 2)
+                    rv_first.layoutManager = GridLayoutManager(requireContext(), 3)
                     rv_first.adapter = movieListAdapter
                     getData(position)
                 }
@@ -219,7 +219,7 @@ class HomeFragment : BaseFragment() {
                 rv_second.visibility = View.VISIBLE
                 takeIf { rv_second.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_second.layoutManager = GridLayoutManager(requireContext(), 2)
+                    rv_second.layoutManager = GridLayoutManager(requireContext(), 3)
                     rv_second.adapter = dramaListAdapter
                     getData(position)
                 }
@@ -228,7 +228,7 @@ class HomeFragment : BaseFragment() {
                 rv_third.visibility = View.VISIBLE
                 takeIf { rv_third.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_third.layoutManager = GridLayoutManager(requireContext(), 2)
+                    rv_third.layoutManager = GridLayoutManager(requireContext(), 3)
                     rv_third.adapter = varietyListAdapter
                     getData(position)
                 }
@@ -237,7 +237,7 @@ class HomeFragment : BaseFragment() {
                 rv_fourth.visibility = View.VISIBLE
                 takeIf { rv_fourth.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_fourth.layoutManager = GridLayoutManager(requireContext(), 2)
+                    rv_fourth.layoutManager = GridLayoutManager(requireContext(), 3)
                     rv_fourth.adapter = animationListAdapter
                     getData(position)
                 }
