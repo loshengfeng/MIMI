@@ -24,6 +24,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
@@ -144,6 +145,7 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         useAdultTheme(true)
+        getCurrentAdapter()?.notifyDataSetChanged()
     }
 
     override fun setupFirstTime() {
@@ -528,15 +530,7 @@ class AdultHomeFragment : BaseFragment() {
         viewModel.followResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Empty -> {
-                    val adapter = when (lastPosition) {
-                        1 -> rv_first.adapter
-                        2 -> rv_second.adapter
-                        3 -> rv_third.adapter
-                        4 -> rv_fourth.adapter
-                        5 -> rv_fifth.adapter
-                        else -> rv_sixth.adapter
-                    }
-                    adapter?.notifyItemRangeChanged(
+                    getCurrentAdapter()?.notifyItemRangeChanged(
                         0,
                         viewModel.totalCount,
                         PAYLOAD_UPDATE_FOLLOW
@@ -545,6 +539,17 @@ class AdultHomeFragment : BaseFragment() {
                 is Error -> onApiError(it.throwable)
             }
         })
+    }
+
+    private fun getCurrentAdapter(): RecyclerView.Adapter<*>? {
+        return when (lastPosition) {
+            1 -> rv_first.adapter
+            2 -> rv_second.adapter
+            3 -> rv_third.adapter
+            4 -> rv_fourth.adapter
+            5 -> rv_fifth.adapter
+            else -> rv_sixth.adapter
+        }
     }
 
     private fun setSnackBarPostStatus(postId: Long = 0) {
