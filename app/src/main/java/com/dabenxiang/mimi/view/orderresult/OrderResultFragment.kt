@@ -5,6 +5,7 @@ import android.view.View
 import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -43,7 +44,7 @@ class OrderResultFragment : BaseFragment() {
         recycler_order_result.layoutManager = LinearLayoutManager(requireContext())
         recycler_order_result.adapter = epoxyController.adapter
 
-        epoxyController.setData("", "")
+        epoxyController.setData(null)
     }
 
     override fun getLayoutId(): Int {
@@ -51,7 +52,9 @@ class OrderResultFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-
+        mainViewModel?.orderItem?.observe(viewLifecycleOwner, Observer {
+            epoxyController.setData(it)
+        })
     }
 
     override fun setupListeners() {

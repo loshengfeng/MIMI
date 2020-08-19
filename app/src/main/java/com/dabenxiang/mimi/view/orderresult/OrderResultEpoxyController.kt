@@ -1,19 +1,24 @@
 package com.dabenxiang.mimi.view.orderresult
 
-import com.airbnb.epoxy.Typed2EpoxyController
+import com.airbnb.epoxy.TypedEpoxyController
+import com.dabenxiang.mimi.model.vo.mqtt.OrderItem
 import com.dabenxiang.mimi.view.orderresult.itemview.*
 
 class OrderResultEpoxyController(
     private val failedListener: OrderResultFailedItemView.OrderResultFailedListener,
     private val successListener: OrderResultSuccessItemView.OrderResultSuccessListener
-) : Typed2EpoxyController<String, String>() {
+) : TypedEpoxyController<OrderItem>() {
 
-    override fun buildModels(data: String?, epoxyState: String?) {
-
-//        addOrderResultWaitingItemView()
-//        addOrderResultFailedItemView()
-        addOrderResultSuccessfulItemView()
-
+    override fun buildModels(item: OrderItem?) {
+        if (item == null) {
+            addOrderResultWaitingItemView()
+        } else {
+            if (item.isSuccessful) {
+                addOrderResultSuccessfulItemView(item)
+            } else {
+                addOrderResultFailedItemView()
+            }
+        }
     }
 
     private fun addOrderResultWaitingItemView() {
@@ -29,15 +34,34 @@ class OrderResultEpoxyController(
         }
     }
 
-    private fun addOrderResultSuccessfulItemView() {
+    private fun addOrderResultSuccessfulItemView(item: OrderItem) {
+        val timeout = StringBuilder("请于 ")
+            .append(item.createTime)
+            .append(" 前完成打款动作，避免订单超时")
+            .toString()
+
+        val bank = StringBuilder(item.bankBranchName)
+            .append("(")
+            .append(item.bankCode)
+            .append(") ")
+            .append(item.bankBranchName)
+            .toString()
+
+        val city = StringBuilder(item.bankBranchProvince)
+            .append("/")
+            .append(item.bankBranchCity)
+            .append("/")
+            .append(item.bankBranchName)
+            .toString()
+
         orderResultSuccessItemView {
             id("order_result_success")
-            setupTimeout("请于 YYYY-MM-DD hh:mm 前完成打款动作，避免订单超时")
-            setupName("王大明")
-            setupBank("中国银行(111) 南京分行")
-            setupCity("开户省/开户市/开户行")
-            setupAccount("1234567890123456")
-            setupAmount("100.00")
+            setupTimeout(timeout)
+            setupName(item.accountName)
+            setupBank(bank)
+            setupCity(city)
+            setupAccount(item.accountNumber)
+            setupAmount(item.amount.toString())
             setupClickListener(successListener)
         }
     }
