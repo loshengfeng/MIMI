@@ -18,7 +18,7 @@ import kotlinx.android.synthetic.main.fragment_order_result.*
 class OrderResultFragment : BaseFragment() {
 
     companion object {
-        private const val KEY_ERROR = "ERROR"
+        private const val KEY_ERROR = "error"
 
         fun createBundle(isError: Boolean): Bundle {
             return Bundle().also { it.putBoolean(KEY_ERROR, isError) }
