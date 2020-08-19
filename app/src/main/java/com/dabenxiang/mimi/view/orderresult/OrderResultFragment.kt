@@ -8,6 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.vo.mqtt.OrderItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.orderresult.itemview.OrderResultFailedItemView
@@ -38,8 +39,12 @@ class OrderResultFragment : BaseFragment() {
             requireContext(), R.drawable.bg_black_1_oval
         )
 
-        line.setBackgroundColor(requireContext().getColor(R.color.color_black_1))
+        line.setBackgroundColor(requireContext().getColor(R.color.color_black_1_20))
         tv_create_order.setTextColor(requireContext().getColor(R.color.color_black_1))
+        tv_create_order_complete.setTextColor(requireContext().getColor(R.color.color_black_1_30))
+
+        tv_step1.text = "1"
+        tv_step2.text = "2"
 
         recycler_order_result.layoutManager = LinearLayoutManager(requireContext())
         recycler_order_result.adapter = epoxyController.adapter
@@ -53,6 +58,7 @@ class OrderResultFragment : BaseFragment() {
 
     override fun setupObservers() {
         mainViewModel?.orderItem?.observe(viewLifecycleOwner, Observer {
+            setupStepUi(it)
             epoxyController.setData(it)
         })
     }
@@ -74,6 +80,39 @@ class OrderResultFragment : BaseFragment() {
 
         override fun onClose() {
             navigateTo(NavigateItem.Destination(R.id.action_orderResultFragment_to_topupFragment))
+        }
+    }
+
+    private fun setupStepUi(item: OrderItem) {
+        if (item.isSuccessful) {
+            tv_step1.background = ContextCompat.getDrawable(
+                requireContext(), R.drawable.bg_blue_1_oval
+            )
+
+            tv_step2.background = ContextCompat.getDrawable(
+                requireContext(), R.drawable.bg_blue_1_oval
+            )
+
+            line.setBackgroundColor(requireContext().getColor(R.color.color_blue_2))
+            tv_create_order.setTextColor(requireContext().getColor(R.color.color_black_1_30))
+            tv_create_order_complete.setTextColor(requireContext().getColor(R.color.color_black_1))
+
+            val img = ContextCompat.getDrawable(requireContext(), R.drawable.ico_cheched)
+            tv_step1.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null)
+            tv_step1.text = ""
+
+        } else {
+            tv_step1.background = ContextCompat.getDrawable(
+                requireContext(), R.drawable.bg_black_1_oval
+            )
+
+            tv_step2.background = ContextCompat.getDrawable(
+                requireContext(), R.drawable.bg_black_1_oval
+            )
+
+            line.setBackgroundColor(requireContext().getColor(R.color.color_black_1_20))
+            tv_create_order.setTextColor(requireContext().getColor(R.color.color_black_1_30))
+            tv_create_order_complete.setTextColor(requireContext().getColor(R.color.color_black_1_30))
         }
     }
 }
