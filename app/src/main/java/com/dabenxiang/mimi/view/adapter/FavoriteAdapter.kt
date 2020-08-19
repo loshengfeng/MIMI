@@ -8,8 +8,8 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
-import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_ADULT
@@ -36,8 +36,14 @@ class FavoriteAdapter(
     }
 
     interface EventListener {
-        fun onVideoClick(item: Any)
-        fun onFunctionClick(type: FunctionType, view: View, item: Any)
+        fun onVideoClick(item: Any, position: Int? = 0)
+        fun onFunctionClick(
+            type: FunctionType,
+            view: View,
+            item: Any,
+            position: Int? = 0
+        )
+
         fun onChipClick(text: String, type: Int? = -1)
         fun onGetAttachment(id: String, position: Int, type: AttachmentType)
         fun onAvatarClick(userId: Long, name: String)
@@ -80,8 +86,7 @@ class FavoriteAdapter(
         when (holder) {
             is FavoritePlayViewHolder -> holder.bind(item as PlayItem)
             is FavoritePostViewHolder -> {
-                if(item is PostFavoriteItem)
-                    holder.bind(item, position)
+                holder.bind(item as MemberPostItem, position)
             }
         }
     }
@@ -95,7 +100,7 @@ class FavoriteAdapter(
         }
     }
 
-    fun update(position: Int){
+    fun update(position: Int) {
         notifyItemChanged(position)
     }
 
