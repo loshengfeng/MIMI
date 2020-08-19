@@ -20,7 +20,8 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
 class SearchVideoAdapter(
     val context: Context,
-    private val listener: EventListener
+    private val listener: EventListener,
+    private val isAdult: Boolean = true
 ) : PagedListAdapter<VideoItem, RecyclerView.ViewHolder>(diffCallback) {
 
     companion object {
@@ -59,9 +60,13 @@ class SearchVideoAdapter(
             }
             else -> {
                 val layoutInflater = LayoutInflater.from(parent.context)
+                val viewId = when(isAdult) {
+                    true -> R.layout.item_favorite_normal
+                    else -> R.layout.item_general_normal
+                }
                 SearchVideoViewHolder(
                     layoutInflater.inflate(
-                        R.layout.item_favorite_normal,
+                        viewId,
                         parent,
                         false
                     ), listener

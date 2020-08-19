@@ -4,9 +4,7 @@ import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.graphics.Matrix
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
@@ -20,13 +18,13 @@ import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.core.content.FileProvider
 import androidx.core.widget.ContentLoadingProgressBar
-import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
@@ -79,6 +77,7 @@ import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.widget.utility.RotateUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
@@ -146,6 +145,7 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         useAdultTheme(true)
+        getCurrentAdapter()?.notifyDataSetChanged()
     }
 
     override fun setupFirstTime() {
@@ -530,15 +530,7 @@ class AdultHomeFragment : BaseFragment() {
         viewModel.followResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Empty -> {
-                    val adapter = when (lastPosition) {
-                        1 -> rv_first.adapter
-                        2 -> rv_second.adapter
-                        3 -> rv_third.adapter
-                        4 -> rv_fourth.adapter
-                        5 -> rv_fifth.adapter
-                        else -> rv_sixth.adapter
-                    }
-                    adapter?.notifyItemRangeChanged(
+                    getCurrentAdapter()?.notifyItemRangeChanged(
                         0,
                         viewModel.totalCount,
                         PAYLOAD_UPDATE_FOLLOW
@@ -547,6 +539,17 @@ class AdultHomeFragment : BaseFragment() {
                 is Error -> onApiError(it.throwable)
             }
         })
+    }
+
+    private fun getCurrentAdapter(): RecyclerView.Adapter<*>? {
+        return when (lastPosition) {
+            1 -> rv_first.adapter
+            2 -> rv_second.adapter
+            3 -> rv_third.adapter
+            4 -> rv_fourth.adapter
+            5 -> rv_fifth.adapter
+            else -> rv_sixth.adapter
+        }
     }
 
     private fun setSnackBarPostStatus(postId: Long = 0) {
@@ -640,7 +643,7 @@ class AdultHomeFragment : BaseFragment() {
 
         iv_bg_search.setOnClickListener {
             if (lastPosition == 0 || lastPosition == 1) {
-                val bundle = SearchVideoFragment.createBundle()
+                val bundle = SearchVideoFragment.createBundle("", "", true)
                 navigateTo(
                     NavigateItem.Destination(
                         R.id.action_to_searchVideoFragment,
@@ -1263,7 +1266,7 @@ class AdultHomeFragment : BaseFragment() {
                             val extras = data?.extras
 
                             if (extras == null) {
-                                rotateImage(BitmapFactory.decodeFile(file.absolutePath))
+                                RotateUtils().rotateImage(file)
                             } else {
                                 val extrasData = extras["data"]
                                 val imageBitmap = extrasData as Bitmap?
@@ -1274,7 +1277,7 @@ class AdultHomeFragment : BaseFragment() {
                         }
 
                         if (uri.path!!.isNotBlank()) {
-                            pciUri.add(uri.toString())
+                            pciUri.add(UriUtils.getPath(requireContext(), uri)!!)
                         } else {
                             pciUri.add(file.absolutePath)
                         }
@@ -1376,34 +1379,5 @@ class AdultHomeFragment : BaseFragment() {
 
     private fun isClubListEmpty(list: PagedList<MemberClubItem>?): Boolean {
         return list == null || list.size == 0 || (list.size == 1 && list[0]?.adItem != null)
-    }
-
-    private fun rotateImage(bitmap: Bitmap): Bitmap? {
-        val ei = ExifInterface(file.absolutePath)
-
-        val orientation: Int = ei.getAttributeInt(
-            ExifInterface.TAG_ORIENTATION,
-            ExifInterface.ORIENTATION_UNDEFINED
-        )
-
-        val rotatedBitmap: Bitmap?
-        rotatedBitmap = when (orientation) {
-            ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(bitmap, 90f)
-            ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(bitmap, 180f)
-            ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(bitmap, 270f)
-            ExifInterface.ORIENTATION_NORMAL -> bitmap
-            else -> bitmap
-        }
-
-        return rotatedBitmap
-    }
-
-    private fun rotateImage(source: Bitmap, angle: Float): Bitmap? {
-        val matrix = Matrix()
-        matrix.postRotate(angle)
-        return Bitmap.createBitmap(
-            source, 0, 0, source.width, source.height,
-            matrix, true
-        )
     }
 }

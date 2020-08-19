@@ -12,6 +12,7 @@ import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -197,8 +198,8 @@ class CategoriesFragment : BaseFragment() {
                 }
             )
 
+            recyclerview_content.layoutManager = GridLayoutManager(requireContext(), when(isAdult) { true -> 2 else -> 3})
             recyclerview_content.adapter = videoListAdapter
-
             if (isAdult) {
                 recyclerview_content.setPadding(0, GeneralUtils.dpToPx(requireContext(), 50), 0, 0)
                 ll_filter_1.visibility = View.GONE

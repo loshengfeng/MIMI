@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
@@ -14,6 +15,7 @@ import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.viewholder.GridBannerHolder
 import com.dabenxiang.mimi.view.home.viewholder.VideoViewHolder
+import kotlinx.android.synthetic.main.layout_item_video.view.*
 
 class HomeVideoListAdapter(
     private val nestedListener: HomeAdapter.EventListener,
@@ -43,6 +45,13 @@ class HomeVideoListAdapter(
             VIDEO -> {
                 val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.nested_item_video, parent, false)
+                val layoutParams = view.layout_card.layoutParams as ConstraintLayout.LayoutParams
+                if(isAdult) {
+                    layoutParams.dimensionRatio = "155:87"
+                } else {
+                    layoutParams.dimensionRatio = "100:134"
+                }
+                view.layout_card.layoutParams = layoutParams
                 VideoViewHolder(view, videoViewHolderListener)
             }
             else -> {
@@ -79,7 +88,10 @@ class HomeVideoListAdapter(
             object : GridLayoutManager.SpanSizeLookup() {
                 override fun getSpanSize(position: Int): Int {
                     return when (getItemViewType(position)) {
-                        BANNER -> 2
+                        BANNER -> when(isAdult) {
+                            true -> 2
+                            else -> 3
+                        }
                         else -> 1
                     }
                 }
