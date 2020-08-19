@@ -42,7 +42,7 @@ android {
     }
 
     compileSdkVersion 30
-    buildToolsVersion "29.0.2"
+    buildToolsVersion "30.0.1"
 
     kapt {
         correctErrorTypes = true
@@ -90,6 +90,8 @@ android {
     defaultConfig {
         applicationId "com.dabenxiang.mimi"
         minSdkVersion 24
+        //FIXME Note :  if use video-editor  & com.writingminds:FFmpegAndroid:0.3.2 the targetSdkVersion must below 28 if want over 29/30 (Android Q) change to branch dev_sub_FFmpegAndroid
+        //FIXME : branch dev_sub_FFmpegAndroid submodule !!
         targetSdkVersion 28
         versionCode version.versionCode.toInteger()
         versionName version.versionName
