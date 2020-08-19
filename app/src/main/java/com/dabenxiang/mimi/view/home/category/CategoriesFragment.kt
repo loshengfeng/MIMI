@@ -198,8 +198,8 @@ class CategoriesFragment : BaseFragment() {
                 }
             )
 
-            recyclerview_content.adapter = videoListAdapter
             recyclerview_content.layoutManager = GridLayoutManager(requireContext(), when(isAdult) { true -> 2 else -> 3})
+            recyclerview_content.adapter = videoListAdapter
             if (isAdult) {
                 recyclerview_content.setPadding(0, GeneralUtils.dpToPx(requireContext(), 50), 0, 0)
                 ll_filter_1.visibility = View.GONE
