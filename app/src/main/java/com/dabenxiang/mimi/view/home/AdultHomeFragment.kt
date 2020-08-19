@@ -644,7 +644,7 @@ class AdultHomeFragment : BaseFragment() {
 
         iv_bg_search.setOnClickListener {
             if (lastPosition == 0 || lastPosition == 1) {
-                val bundle = SearchVideoFragment.createBundle()
+                val bundle = SearchVideoFragment.createBundle("", "", true)
                 navigateTo(
                     NavigateItem.Destination(
                         R.id.action_to_searchVideoFragment,
