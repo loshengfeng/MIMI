@@ -8,13 +8,18 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.orderresult.itemview.OrderResultFailedItemView
+import com.dabenxiang.mimi.view.orderresult.itemview.OrderResultSuccessItemView
 import kotlinx.android.synthetic.main.fragment_order_result.*
 
 class OrderResultFragment : BaseFragment() {
 
     private val viewModel: OrderResultViewModel by viewModels()
 
-    private val controller = OrderResultEpoxyController()
+    private val epoxyController by lazy {
+        OrderResultEpoxyController(failedListener, successListener)
+    }
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -36,7 +41,9 @@ class OrderResultFragment : BaseFragment() {
         tv_create_order.setTextColor(requireContext().getColor(R.color.color_black_1))
 
         recycler_order_result.layoutManager = LinearLayoutManager(requireContext())
-        recycler_order_result.adapter = controller.adapter
+        recycler_order_result.adapter = epoxyController.adapter
+
+        epoxyController.setData("", "")
     }
 
     override fun getLayoutId(): Int {
@@ -49,5 +56,21 @@ class OrderResultFragment : BaseFragment() {
 
     override fun setupListeners() {
 
+    }
+
+    private val failedListener = object : OrderResultFailedItemView.OrderResultFailedListener {
+        override fun onConfirm() {
+            navigateTo(NavigateItem.Destination(R.id.action_orderResultFragment_to_topupFragment))
+        }
+    }
+
+    private val successListener = object : OrderResultSuccessItemView.OrderResultSuccessListener {
+        override fun onConfirm() {
+            //TODO: navigate to 充值管理
+        }
+
+        override fun onClose() {
+            navigateTo(NavigateItem.Destination(R.id.action_orderResultFragment_to_topupFragment))
+        }
     }
 }

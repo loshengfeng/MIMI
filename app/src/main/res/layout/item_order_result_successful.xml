@@ -249,7 +249,7 @@
                 android:textSize="14sp"
                 app:layout_constraintLeft_toLeftOf="@+id/guideline_account_start"
                 app:layout_constraintTop_toBottomOf="@+id/guideline_amount_value_top"
-                tools:text="1234567890123456" />
+                tools:text="100.00" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

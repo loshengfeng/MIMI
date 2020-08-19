@@ -42,7 +42,13 @@
     <fragment
         android:id="@+id/orderResultFragment"
         android:name="com.dabenxiang.mimi.view.orderresult.OrderResultFragment"
-        android:label="OrderResultFragment" />
+        android:label="OrderResultFragment">
+        <action
+            android:id="@+id/action_orderResultFragment_to_topupFragment"
+            app:destination="@id/topupFragment"
+            app:popUpTo="@id/topupFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 
     <fragment
         android:id="@+id/chatContentFragment"
