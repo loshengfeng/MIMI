@@ -93,7 +93,7 @@ class FavoriteAdapter(
 
     override fun getItemViewType(position: Int): Int {
         val isPlayItem = getItem(position) is PlayItem
-        val item = if(isPlayItem) getItem(position) as PlayItem else getItem(position) as PostFavoriteItem
+        val item = if(isPlayItem) getItem(position) as PlayItem else getItem(position) as MemberPostItem
         return when (isPlayItem) {
             true -> if((item as PlayItem).isAdult!!) TYPE_ADULT else TYPE_NORMAL
             else -> TYPE_SHORT_VIDEO
