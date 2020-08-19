@@ -9,7 +9,7 @@ android {
         minSdkVersion 21
         //FIXME Note :  if use com.writingminds:FFmpegAndroid:0.3.2 the targetSdkVersion must below 28 if want over 29/30 (Android Q) change to branch dev_sub_FFmpegAndroid
         //FIXME : branch dev_sub_FFmpegAndroid submodule !!
-        targetSdkVersion 28
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
         ndk {
