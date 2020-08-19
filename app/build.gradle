@@ -40,7 +40,7 @@ android {
     }
 
     compileSdkVersion 30
-    buildToolsVersion "29.0.2"
+    buildToolsVersion "30.0.1"
 
     kapt {
         correctErrorTypes = true
