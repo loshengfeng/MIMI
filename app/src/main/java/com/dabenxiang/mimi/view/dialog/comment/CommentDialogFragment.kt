@@ -47,6 +47,7 @@ class CommentDialogFragment : BaseDialogFragment() {
 
     interface CommentListener {
         fun onAvatarClick(userId: Long, name: String)
+        fun onUpdateCommentCount(count: Int)
     }
 
     private var loadReplyCommentBlock: (() -> Unit)? = null
@@ -245,7 +246,7 @@ class CommentDialogFragment : BaseDialogFragment() {
                         data?.also { memberPostItem ->
                             viewModel.setupCommentDataSource(memberPostItem.id, playerInfoAdapter)
                         }
-
+                        commentListener?.onUpdateCommentCount(data?.commentCount ?: 0)
                     }
                     is Error -> onApiError(it.throwable)
                 }
