@@ -3,8 +3,6 @@ package com.dabenxiang.mimi.view.post.pic
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Matrix
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -12,8 +10,6 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.core.content.FileProvider
-import androidx.exifinterface.media.ExifInterface
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -31,6 +27,7 @@ import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment.Companion.VIEWER_DATA
 import com.dabenxiang.mimi.widget.utility.FileUtil
+import com.dabenxiang.mimi.widget.utility.RotateUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_post_article.chipGroup
@@ -198,7 +195,7 @@ class PostPicFragment : BasePostFragment() {
                     val extras = data?.extras
 
                     if (extras == null) {
-                        rotateImage(BitmapFactory.decodeFile(file.absolutePath))
+                        RotateUtils().rotateImage(file)
                         postAttachmentItem.uri = file.absolutePath
                     } else {
                         val extrasData = extras["data"]
@@ -267,34 +264,5 @@ class PostPicFragment : BasePostFragment() {
         val bundle = Bundle()
         bundle.putSerializable(VIEWER_DATA, viewerItem)
         findNavController().navigate(R.id.action_postPicFragment_to_postViewerFragment, bundle)
-    }
-
-    private fun rotateImage(bitmap: Bitmap): Bitmap? {
-        val ei = ExifInterface(file.absolutePath)
-
-        val orientation: Int = ei.getAttributeInt(
-            ExifInterface.TAG_ORIENTATION,
-            ExifInterface.ORIENTATION_UNDEFINED
-        )
-
-        val rotatedBitmap: Bitmap?
-        rotatedBitmap = when (orientation) {
-            ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(bitmap, 90f)
-            ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(bitmap, 180f)
-            ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(bitmap, 270f)
-            ExifInterface.ORIENTATION_NORMAL -> bitmap
-            else -> bitmap
-        }
-
-        return rotatedBitmap
-    }
-
-    private fun rotateImage(source: Bitmap, angle: Float): Bitmap? {
-        val matrix = Matrix()
-        matrix.postRotate(angle)
-        return Bitmap.createBitmap(
-            source, 0, 0, source.width, source.height,
-            matrix, true
-        )
     }
 }

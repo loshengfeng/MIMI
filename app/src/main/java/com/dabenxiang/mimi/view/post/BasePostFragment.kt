@@ -30,7 +30,6 @@ import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.view.post.article.PostArticleViewModel
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
@@ -39,7 +38,7 @@ import kotlinx.android.synthetic.main.item_setting_bar.*
 
 open class BasePostFragment : BaseFragment() {
 
-    val viewModel: PostArticleViewModel by viewModels()
+    val viewModel: PostViewModel by viewModels()
 
     private var haveMainTag = false
 
