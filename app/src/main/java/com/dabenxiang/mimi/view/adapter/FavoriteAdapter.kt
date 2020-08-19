@@ -12,8 +12,8 @@ import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.FunctionType
+import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_ADULT
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_NORMAL
-import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_SHORT_VIDEO
 import com.dabenxiang.mimi.view.favroite.FavoritePlayViewHolder
 import com.dabenxiang.mimi.view.favroite.FavoritePostViewHolder
 
@@ -43,30 +43,35 @@ class FavoriteAdapter(
         fun onAvatarClick(userId: Long, name: String)
     }
 
+    private var isAdult = false
+    private val TYPE_SHORT_VIDEO = 2
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            TYPE_NORMAL -> FavoritePlayViewHolder(
+            TYPE_NORMAL -> {
+                FavoritePlayViewHolder(
                 layoutInflater.inflate(
-                    R.layout.item_favorite_normal,
+                    R.layout.item_general_normal,
                     parent,
                     false
                 ), listener
-            )
-            TYPE_SHORT_VIDEO -> FavoritePostViewHolder(
-                layoutInflater.inflate(
-                    R.layout.item_favorite_short_video,
-                    parent,
-                    false
-                ), listener
-            )
-            else -> FavoritePlayViewHolder(
-                layoutInflater.inflate(
-                    R.layout.item_favorite_normal,
-                    parent,
-                    false
-                ), listener
-            )
+            )}
+            TYPE_ADULT ->
+                FavoritePlayViewHolder(
+                    layoutInflater.inflate(
+                        R.layout.item_favorite_normal,
+                        parent,
+                        false
+                    ), listener)
+            else ->
+                FavoritePostViewHolder(
+                    layoutInflater.inflate(
+                        R.layout.item_favorite_short_video,
+                        parent,
+                        false
+                    ), listener
+                )
         }
     }
 
@@ -75,19 +80,30 @@ class FavoriteAdapter(
         when (holder) {
             is FavoritePlayViewHolder -> holder.bind(item as PlayItem)
             is FavoritePostViewHolder -> {
-                holder.bind(item as PostFavoriteItem, position)
+                if(item is PostFavoriteItem)
+                    holder.bind(item, position)
             }
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (getItem(position)) {
-            is PlayItem -> TYPE_NORMAL
+        val isPlayItem = getItem(position) is PlayItem
+        val item = if(isPlayItem) getItem(position) as PlayItem else getItem(position) as PostFavoriteItem
+        return when (isPlayItem) {
+            true -> if((item as PlayItem).isAdult!!) TYPE_ADULT else TYPE_NORMAL
             else -> TYPE_SHORT_VIDEO
         }
     }
 
     fun update(position: Int){
         notifyItemChanged(position)
+    }
+
+    fun isAdult(): Boolean {
+        return isAdult
+    }
+
+    fun setAdult(adult: Boolean = false) {
+        this.isAdult = adult
     }
 }

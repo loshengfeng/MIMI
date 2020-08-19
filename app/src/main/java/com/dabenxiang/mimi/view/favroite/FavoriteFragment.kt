@@ -328,8 +328,11 @@ class FavoriteFragment : BaseFragment() {
     private fun setTabPosition(type: Int, index: Int) {
         when (type) {
             TAB_PRIMARY -> {
-                lastPrimaryIndex = index
-                primaryAdapter.setLastSelectedIndex(lastPrimaryIndex)
+                if(lastPrimaryIndex != index) {
+                    lastPrimaryIndex = index
+                    primaryAdapter.setLastSelectedIndex(lastPrimaryIndex)
+                    favoriteAdapter.setAdult(index != TYPE_NORMAL)
+                }
             }
             TAB_SECONDARY -> {
                 lastSecondaryIndex = index

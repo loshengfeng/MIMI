@@ -64,7 +64,7 @@ class SearchVideoFragment : BaseFragment() {
     var moreDialog: MoreDialogFragment? = null
 
     private val videoListAdapter by lazy {
-        SearchVideoAdapter(requireContext(), adapterListener)
+        SearchVideoAdapter(requireContext(), adapterListener, viewModel.isAdult)
     }
 
     override fun getLayoutId(): Int {
