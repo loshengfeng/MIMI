@@ -42,20 +42,6 @@ class PostPicFragment : BasePostFragment() {
 
     private var file = File("")
 
-    companion object {
-        const val BUNDLE_PIC_URI = "bundle_pic_uri"
-        const val UPLOAD_PIC = "upload_pic"
-        const val MEMBER_REQUEST = "member_request"
-        const val PIC_URI = "pic_uri"
-        const val DELETE_ATTACHMENT = "delete_attachment"
-
-        const val POST_ID = "post_id"
-
-        private const val PHOTO_LIMIT = 20
-
-        private const val INTENT_SELECT_IMG = 10001
-    }
-
     override fun getLayoutId(): Int {
         return R.layout.fragment_post_pic
     }

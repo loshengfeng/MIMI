@@ -39,20 +39,6 @@ class PostVideoFragment : BasePostFragment() {
 
     private var haveMainTag = false
 
-    companion object {
-        private const val REQUEST_VIDEO_CAPTURE = 10001
-        const val BUNDLE_TRIMMER_URI = "bundle_trimmer_uri"
-        const val BUNDLE_COVER_URI = "bundle_cover_uri"
-
-        private const val RECORD_LIMIT_TIME = 15
-        const val POST_ID = "post_id"
-
-        const val UPLOAD_VIDEO = "upload_video"
-        const val MEMBER_REQUEST = "member_request"
-        const val VIDEO_DATA = "video_data"
-        const val DELETE_ATTACHMENT = "delete_attachment"
-    }
-
     override fun getLayoutId(): Int {
         return R.layout.fragment_post_video
     }

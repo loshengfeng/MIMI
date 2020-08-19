@@ -20,13 +20,6 @@ import kotlinx.android.synthetic.main.item_setting_bar.*
 
 class PostArticleFragment : BasePostFragment() {
 
-    companion object {
-        const val UPLOAD_ARTICLE = "upload_article"
-        const val TITLE = "title"
-        const val REQUEST = "request"
-        const val TAG = "tag"
-    }
-
     override fun getLayoutId(): Int {
         return R.layout.fragment_post_article
     }
@@ -34,7 +27,6 @@ class PostArticleFragment : BasePostFragment() {
     override fun setUI(item: MediaItem) {
         edt_content.setText(item.textContent)
         txt_contentCount.text = String.format(getString(R.string.typing_count, item.textContent.length, CONTENT_LIMIT))
-
     }
 
     override fun setupListeners() {

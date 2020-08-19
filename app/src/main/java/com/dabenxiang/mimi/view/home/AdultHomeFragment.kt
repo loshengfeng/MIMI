@@ -66,11 +66,17 @@ import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
-import com.dabenxiang.mimi.view.post.article.PostArticleFragment
-import com.dabenxiang.mimi.view.post.pic.PostPicFragment
-import com.dabenxiang.mimi.view.post.pic.PostPicFragment.Companion.BUNDLE_PIC_URI
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.BUNDLE_PIC_URI
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.MEMBER_REQUEST
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.PIC_URI
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.REQUEST
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.TAG
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.TITLE
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.UPLOAD_ARTICLE
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.UPLOAD_PIC
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.UPLOAD_VIDEO
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.VIDEO_DATA
 import com.dabenxiang.mimi.view.post.video.EditVideoFragment.Companion.BUNDLE_VIDEO_URI
-import com.dabenxiang.mimi.view.post.video.PostVideoFragment
 import com.dabenxiang.mimi.view.ranking.RankingFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
@@ -160,18 +166,18 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private fun handleBackStackData() {
-        val isNeedPicUpload = arguments?.getBoolean(PostPicFragment.UPLOAD_PIC)
-        val isNeedVideoUpload = arguments?.getBoolean(PostVideoFragment.UPLOAD_VIDEO)
-        val isNeedArticleUpload = arguments?.getBoolean(PostArticleFragment.UPLOAD_ARTICLE)
+        val isNeedPicUpload = arguments?.getBoolean(UPLOAD_PIC)
+        val isNeedVideoUpload = arguments?.getBoolean(UPLOAD_VIDEO)
+        val isNeedArticleUpload = arguments?.getBoolean(UPLOAD_ARTICLE)
 
         if (isNeedPicUpload != null && isNeedPicUpload) {
-            arguments?.remove(PostPicFragment.UPLOAD_PIC)
+            arguments?.remove(UPLOAD_PIC)
             showSnackBar()
 
             val memberRequest =
-                arguments?.getParcelable<PostMemberRequest>(PostPicFragment.MEMBER_REQUEST)
+                arguments?.getParcelable<PostMemberRequest>(MEMBER_REQUEST)
             val picUriList =
-                arguments?.getParcelableArrayList<PostAttachmentItem>(PostPicFragment.PIC_URI)
+                arguments?.getParcelableArrayList<PostAttachmentItem>(PIC_URI)
 
             postMemberRequest = memberRequest!!
 
@@ -183,23 +189,23 @@ class AdultHomeFragment : BaseFragment() {
             memberPostItem.tags = memberRequest.tags
             postType = PostType.IMAGE
         } else if (isNeedVideoUpload != null && isNeedVideoUpload) {
-            arguments?.remove(PostVideoFragment.UPLOAD_VIDEO)
+            arguments?.remove(UPLOAD_VIDEO)
             showSnackBar()
 
             val memberRequest =
-                arguments?.getParcelable<PostMemberRequest>(PostVideoFragment.MEMBER_REQUEST)
-            uploadVideoUri = arguments?.getParcelableArrayList(PostVideoFragment.VIDEO_DATA)!!
+                arguments?.getParcelable<PostMemberRequest>(MEMBER_REQUEST)
+            uploadVideoUri = arguments?.getParcelableArrayList(VIDEO_DATA)!!
             postMemberRequest = memberRequest!!
             memberPostItem.title = memberRequest.title
             memberPostItem.tags = memberRequest.tags
             viewModel.postAttachment(uploadVideoUri[0].picUrl, requireContext(), TYPE_COVER)
         } else if (isNeedArticleUpload != null && isNeedArticleUpload) {
-            arguments?.remove(PostArticleFragment.UPLOAD_ARTICLE)
+            arguments?.remove(UPLOAD_ARTICLE)
             showSnackBar()
 
-            val title = arguments?.getString(PostArticleFragment.TITLE)
-            val request = arguments?.getString(PostArticleFragment.REQUEST)
-            val tags = arguments?.getStringArrayList(PostArticleFragment.TAG)
+            val title = arguments?.getString(TITLE)
+            val request = arguments?.getString(REQUEST)
+            val tags = arguments?.getStringArrayList(TAG)
 
             memberPostItem.title = title!!
             memberPostItem.content = request!!
