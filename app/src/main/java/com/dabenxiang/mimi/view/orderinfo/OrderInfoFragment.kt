@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.model.api.vo.OrderingPackageItem
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.orderresult.OrderResultFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import kotlinx.android.synthetic.main.fragment_order_info.*
 import kotlinx.android.synthetic.main.fragment_text_detail.toolbarContainer
@@ -91,7 +92,14 @@ class OrderInfoFragment : BaseFragment() {
                 is Empty -> {
                     navigateTo(NavigateItem.Destination(R.id.action_orderInfoFragment_to_orderResultFragment))
                 }
-                is Error -> onApiError(it.throwable)
+                is Error -> {
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_orderInfoFragment_to_orderResultFragment,
+                            OrderResultFragment.createBundle(true)
+                        )
+                    )
+                }
             }
         })
     }

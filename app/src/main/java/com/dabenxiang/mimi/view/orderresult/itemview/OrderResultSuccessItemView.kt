@@ -1,8 +1,12 @@
 package com.dabenxiang.mimi.view.orderresult.itemview
 
 import android.content.Context
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import com.airbnb.epoxy.CallbackProp
 import com.airbnb.epoxy.ModelProp
 import com.airbnb.epoxy.ModelView
@@ -18,7 +22,18 @@ class OrderResultSuccessItemView(context: Context) : ConstraintLayout(context) {
 
     @ModelProp
     fun setupTimeout(text: String) {
-        tv_timeout.text = text
+        val builder = SpannableStringBuilder(text)
+        builder.setSpan(
+            ForegroundColorSpan(
+                ContextCompat.getColor(
+                    context,
+                    R.color.color_red_1
+                )
+            ), builder.indexOf("于") + 1,
+            builder.lastIndexOf("前") - 1,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        tv_timeout.text = builder
     }
 
     @ModelProp

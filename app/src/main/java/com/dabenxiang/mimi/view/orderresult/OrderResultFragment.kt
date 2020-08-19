@@ -17,6 +17,14 @@ import kotlinx.android.synthetic.main.fragment_order_result.*
 
 class OrderResultFragment : BaseFragment() {
 
+    companion object {
+        private const val KEY_ERROR = "ERROR"
+
+        fun createBundle(isError: Boolean): Bundle {
+            return Bundle().also { it.putBoolean(KEY_ERROR, isError) }
+        }
+    }
+
     private val viewModel: OrderResultViewModel by viewModels()
 
     private val epoxyController by lazy {
@@ -49,7 +57,12 @@ class OrderResultFragment : BaseFragment() {
         recycler_order_result.layoutManager = LinearLayoutManager(requireContext())
         recycler_order_result.adapter = epoxyController.adapter
 
-        epoxyController.setData(null)
+        if (arguments?.getBoolean(KEY_ERROR) == true) {
+            setupStepUi(false)
+            epoxyController.setData(OrderItem(isSuccessful = false))
+        } else {
+            epoxyController.setData(null)
+        }
     }
 
     override fun getLayoutId(): Int {
@@ -58,7 +71,7 @@ class OrderResultFragment : BaseFragment() {
 
     override fun setupObservers() {
         mainViewModel?.orderItem?.observe(viewLifecycleOwner, Observer {
-            setupStepUi(it)
+            setupStepUi(it.isSuccessful)
             epoxyController.setData(it)
         })
     }
@@ -83,8 +96,8 @@ class OrderResultFragment : BaseFragment() {
         }
     }
 
-    private fun setupStepUi(item: OrderItem) {
-        if (item.isSuccessful) {
+    private fun setupStepUi(isSuccessful: Boolean) {
+        if (isSuccessful) {
             tv_step1.background = ContextCompat.getDrawable(
                 requireContext(), R.drawable.bg_blue_1_oval
             )
