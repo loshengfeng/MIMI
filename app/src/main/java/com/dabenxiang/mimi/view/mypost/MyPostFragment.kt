@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
+import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.AdultTabType
@@ -52,7 +53,6 @@ import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.UPLOAD_ARTICLE
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.UPLOAD_PIC
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.UPLOAD_VIDEO
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.VIDEO_DATA
-import com.dabenxiang.mimi.view.post.video.PostVideoFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
@@ -635,9 +635,6 @@ class MyPostFragment : BaseFragment() {
                 }
                 PostType.IMAGE -> {
                     memberPostItem.id = postId
-//                    memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
-//                    memberPostItem.avatarAttachmentId =
-//                        viewModel.pref.profileItem.avatarAttachmentId
                     val bundle = PictureDetailFragment.createBundle(memberPostItem, -1)
                     navigateTo(
                         NavigateItem.Destination(
@@ -876,24 +873,6 @@ class MyPostFragment : BaseFragment() {
         ) {
             checkStatus { viewModel.followPost(ArrayList(items), position, isFollow) }
         }
-    }
-
-    interface MyPostListener {
-        fun onMoreClick(item: MemberPostItem)
-        fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean)
-        fun onClipCommentClick(item: List<MemberPostItem>, position: Int)
-        fun onClipItemClick(item: List<MemberPostItem>, position: Int)
-        fun onChipClick(type: PostType, tag: String)
-        fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType)
-        fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType)
-        fun onFavoriteClick(
-            item: MemberPostItem,
-            position: Int,
-            isFavorite: Boolean,
-            type: AttachmentType
-        )
-
-        fun onFollowClick(items: List<MemberPostItem>, position: Int, isFollow: Boolean)
     }
 
     private fun showSnackBar() {

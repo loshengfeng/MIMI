@@ -3,20 +3,16 @@ package com.dabenxiang.mimi.view.home
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.Color
-import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
-import android.provider.MediaStore
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.core.content.FileProvider
 import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -25,7 +21,6 @@ import androidx.paging.PagedList
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
@@ -76,6 +71,7 @@ import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.UPLOAD_ARTICLE
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.UPLOAD_PIC
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.UPLOAD_VIDEO
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.VIDEO_DATA
+import com.dabenxiang.mimi.view.post.utility.PostUtils
 import com.dabenxiang.mimi.view.post.video.EditVideoFragment.Companion.BUNDLE_VIDEO_URI
 import com.dabenxiang.mimi.view.ranking.RankingFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
@@ -83,7 +79,6 @@ import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.dabenxiang.mimi.widget.utility.RotateUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
@@ -136,7 +131,7 @@ class AdultHomeFragment : BaseFragment() {
         private const val REQUEST_VIDEO_CAPTURE = 10002
         private const val REQUEST_LOGIN = 10003
 
-        private const val RECORD_LIMIT_TIME = 15
+        const val RECORD_LIMIT_TIME = 15
     }
 
     override fun getLayoutId() = R.layout.fragment_home
@@ -1206,43 +1201,12 @@ class AdultHomeFragment : BaseFragment() {
 
     private val onChooseUploadMethodDialogListener = object : OnChooseUploadMethodDialogListener {
         override fun onUploadVideo() {
-            val galleryIntent = Intent()
-            galleryIntent.type = "video/*"
-            galleryIntent.action = Intent.ACTION_GET_CONTENT
-
-            val cameraIntent = Intent()
-            cameraIntent.action = MediaStore.ACTION_VIDEO_CAPTURE
-            cameraIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, RECORD_LIMIT_TIME)
-            cameraIntent.resolveActivity(requireContext().packageManager)
-
-            val chooser = Intent(Intent.ACTION_CHOOSER)
-            chooser.putExtra(Intent.EXTRA_INTENT, galleryIntent)
-            chooser.putExtra(Intent.EXTRA_TITLE, requireContext().getString(R.string.post_select_video))
-
-            val intentArray = arrayOf(cameraIntent)
-            chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
-            startActivityForResult(chooser, REQUEST_VIDEO_CAPTURE)
+            PostUtils().selectVideo(this@AdultHomeFragment)
         }
 
         override fun onUploadPic() {
-            file = FileUtil.getTest(System.currentTimeMillis().toString() + ".jpg")
-
-            val galleryIntent = Intent()
-            galleryIntent.type = "image/*"
-            galleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-            galleryIntent.action = Intent.ACTION_GET_CONTENT
-
-            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            val uri = FileProvider.getUriForFile(requireContext(), BuildConfig.APPLICATION_ID + ".fileProvider", file)
-            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
-
-            val chooser = Intent(Intent.ACTION_CHOOSER)
-            chooser.putExtra(Intent.EXTRA_INTENT, galleryIntent)
-            chooser.putExtra(Intent.EXTRA_TITLE, requireContext().getString(R.string.post_select_pic))
-
-            val intentArray = arrayOf(cameraIntent)
-            chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
-            startActivityForResult(chooser, REQUEST_PHOTO)
+            file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
+            PostUtils().selectPics(this@AdultHomeFragment, file)
         }
 
         override fun onUploadArticle() {
@@ -1256,59 +1220,14 @@ class AdultHomeFragment : BaseFragment() {
         if (resultCode == RESULT_OK) {
             when (requestCode) {
                 REQUEST_PHOTO -> {
-                    val pciUri = arrayListOf<String>()
-
-                    val clipData = data?.clipData
-                    if (clipData != null) {
-                        for (i in 0 until clipData.itemCount) {
-                            val item = clipData.getItemAt(i)
-                            val uri = UriUtils.getPath(requireContext(), item.uri)
-                            pciUri.add(uri.toString())
-                        }
-                    } else {
-                        var uri = Uri.parse("")
-
-                        if (data?.data == null) {
-                            val extras = data?.extras
-
-                            if (extras == null) {
-                                RotateUtils().rotateImage(file)
-                            } else {
-                                val extrasData = extras["data"]
-                                val imageBitmap = extrasData as Bitmap?
-                                uri = Uri.parse(MediaStore.Images.Media.insertImage(requireContext().contentResolver, imageBitmap, null,null))
-                            }
-                        } else {
-                            uri = data.data!!
-                        }
-
-                        if (uri.path!!.isNotBlank()) {
-                            pciUri.add(UriUtils.getPath(requireContext(), uri)!!)
-                        } else {
-                            pciUri.add(file.absolutePath)
-                        }
-                    }
-
-                    val bundle = Bundle()
-                    bundle.putStringArrayList(BUNDLE_PIC_URI, pciUri)
-
-                    findNavController().navigate(
-                        R.id.action_adultHomeFragment_to_postPicFragment,
-                        bundle
-                    )
+                    handleTakePhoto(data)
                 }
 
                 REQUEST_VIDEO_CAPTURE -> {
                     val videoUri: Uri? = data?.data
-                    val myUri =
-                        Uri.fromFile(File(UriUtils.getPath(requireContext(), videoUri!!) ?: ""))
+                    val myUri = Uri.fromFile(File(UriUtils.getPath(requireContext(), videoUri!!) ?: ""))
 
-                    val retriever = MediaMetadataRetriever()
-                    retriever.setDataSource(requireContext(), myUri)
-                    val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-                    val timeInMillisec = time!!.toLong()
-
-                    if (timeInMillisec > 3001) {
+                    if (PostUtils().isVideoTimeValid(myUri, requireContext())) {
                         val bundle = Bundle()
                         bundle.putString(BUNDLE_VIDEO_URI, myUri.toString())
                         findNavController().navigate(R.id.action_adultHomeFragment_to_editVideoFragment, bundle)
@@ -1322,6 +1241,31 @@ class AdultHomeFragment : BaseFragment() {
                 }
             }
         }
+    }
+
+    private fun handleTakePhoto(data: Intent?) {
+        val pciUri = arrayListOf<String>()
+
+        val clipData = data?.clipData
+        if (clipData != null) {
+            pciUri.addAll(PostUtils().getPicsUri(clipData, requireContext()))
+        } else {
+            val uri = PostUtils().getPicUri(data, requireContext(), file)
+
+            if (uri.path!!.isNotBlank()) {
+                pciUri.add(UriUtils.getPath(requireContext(), uri)!!)
+            } else {
+                pciUri.add(file.absolutePath)
+            }
+        }
+
+        val bundle = Bundle()
+        bundle.putStringArrayList(BUNDLE_PIC_URI, pciUri)
+
+        findNavController().navigate(
+            R.id.action_adultHomeFragment_to_postPicFragment,
+            bundle
+        )
     }
 
     private fun onItemClick(item: MemberClubItem) {

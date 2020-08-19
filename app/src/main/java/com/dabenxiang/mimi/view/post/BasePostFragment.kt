@@ -22,6 +22,8 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MediaItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.PostMemberRequest
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
@@ -366,5 +368,41 @@ open class BasePostFragment : BaseFragment() {
             }
         }
         return false
+    }
+
+    fun getTags(): ArrayList<String> {
+        val tags = arrayListOf<String>()
+
+        for (i in 0 until chipGroup.childCount) {
+            val chip = chipGroup.getChildAt(i)
+            chip as Chip
+            tags.add(chip.text.toString())
+        }
+
+        return tags
+    }
+
+    fun checkFieldIsEmpty(): Boolean {
+        val title = edt_title.text.toString()
+
+        if (title.isBlank()) {
+            Toast.makeText(requireContext(), R.string.post_warning_title, Toast.LENGTH_SHORT).show()
+            return true
+        }
+
+        if (chipGroup.childCount == 0) {
+            Toast.makeText(requireContext(), R.string.post_warning_tag, Toast.LENGTH_SHORT).show()
+            return true
+        }
+
+        return false
+    }
+
+    fun getRequest(title: String, type: Int): PostMemberRequest {
+        return PostMemberRequest(
+            title = title,
+            type = type,
+            tags = getTags()
+        )
     }
 }

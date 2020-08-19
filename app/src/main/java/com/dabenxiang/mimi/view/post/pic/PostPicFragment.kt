@@ -1,36 +1,29 @@
 package com.dabenxiang.mimi.view.post.pic
 
 import android.app.Activity.RESULT_OK
+import android.content.ClipData
 import android.content.Intent
-import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
-import androidx.core.content.FileProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.PostPicItemListener
 import com.dabenxiang.mimi.model.api.vo.MediaItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.PostMemberRequest
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.PostAttachmentItem
 import com.dabenxiang.mimi.model.vo.ViewerItem
 import com.dabenxiang.mimi.view.adapter.ScrollPicAdapter
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
+import com.dabenxiang.mimi.view.post.utility.PostUtils
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment.Companion.VIEWER_DATA
 import com.dabenxiang.mimi.widget.utility.FileUtil
-import com.dabenxiang.mimi.widget.utility.RotateUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
-import com.google.android.material.chip.Chip
-import kotlinx.android.synthetic.main.fragment_post_article.chipGroup
 import kotlinx.android.synthetic.main.fragment_post_article.edt_hashtag
 import kotlinx.android.synthetic.main.fragment_post_article.edt_title
 import kotlinx.android.synthetic.main.fragment_post_pic.*
@@ -76,17 +69,8 @@ class PostPicFragment : BasePostFragment() {
         super.setupListeners()
 
         tv_clean.setOnClickListener {
-            val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
 
-            val title = edt_title.text.toString()
-
-            if (title.isBlank()) {
-                Toast.makeText(requireContext(), R.string.post_warning_title, Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (chipGroup.childCount == 0) {
-                Toast.makeText(requireContext(), R.string.post_warning_tag, Toast.LENGTH_SHORT).show()
+            if (checkFieldIsEmpty()) {
                 return@setOnClickListener
             }
 
@@ -95,36 +79,32 @@ class PostPicFragment : BasePostFragment() {
                 return@setOnClickListener
             }
 
-            val tags = arrayListOf<String>()
-
-            for (i in 0 until chipGroup.childCount) {
-                val chip = chipGroup.getChildAt(i)
-                chip as Chip
-                tags.add(chip.text.toString())
-            }
-
-            val request = PostMemberRequest(
-                title = title,
-                type = PostType.IMAGE.value,
-                tags = tags
-            )
-
-            val bundle = Bundle()
-            bundle.putBoolean(UPLOAD_PIC, true)
-            bundle.putParcelable(MEMBER_REQUEST, request)
-            bundle.putParcelableArrayList(PIC_URI, adapter.getData())
-            bundle.putStringArrayList(DELETE_ATTACHMENT, deletePicList)
-            bundle.putLong(POST_ID, postId)
-
-            if (isEdit != null && isEdit) {
-                val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
-                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
-                findNavController().navigate(R.id.action_postPicFragment_to_myPostFragment, bundle)
-            } else {
-                findNavController().navigate(R.id.action_postPicFragment_to_adultHomeFragment, bundle)
-            }
+            navigation()
         }
     }
+
+    private fun navigation() {
+        val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
+        val title = edt_title.text.toString()
+
+        val request = getRequest(title, PostType.IMAGE.value)
+
+        val bundle = Bundle()
+        bundle.putBoolean(UPLOAD_PIC, true)
+        bundle.putParcelable(MEMBER_REQUEST, request)
+        bundle.putParcelableArrayList(PIC_URI, adapter.getData())
+        bundle.putStringArrayList(DELETE_ATTACHMENT, deletePicList)
+        bundle.putLong(POST_ID, postId)
+
+        if (isEdit != null && isEdit) {
+            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+            findNavController().navigate(R.id.action_postPicFragment_to_myPostFragment, bundle)
+        } else {
+            findNavController().navigate(R.id.action_postPicFragment_to_adultHomeFragment, bundle)
+        }
+    }
+
 
     override fun handlePic() {
         val uriList = arguments?.getStringArrayList(BUNDLE_PIC_URI)!!
@@ -165,42 +145,35 @@ class PostPicFragment : BasePostFragment() {
         if (resultCode == RESULT_OK) {
             val clipData = data?.clipData
             if (clipData != null) {
-                for (i in 0 until clipData.itemCount) {
-                    val item = clipData.getItemAt(i)
-                    val uri = UriUtils.getPath(requireContext(), item.uri)
-                    val uriDataList = adapter.getData()
-                    val postAttachmentItem = PostAttachmentItem(uri = uri!!)
-                    uriDataList.add(postAttachmentItem)
-                }
-                updateCountPicView()
+                handleMultiPics(clipData)
             } else {
-                val postAttachmentItem = PostAttachmentItem()
-                var uri = Uri.parse("")
-
-                if (data?.data == null) {
-                    val extras = data?.extras
-
-                    if (extras == null) {
-                        RotateUtils().rotateImage(file)
-                        postAttachmentItem.uri = file.absolutePath
-                    } else {
-                        val extrasData = extras["data"]
-                        val imageBitmap = extrasData as Bitmap?
-                        uri = Uri.parse(MediaStore.Images.Media.insertImage(requireContext().contentResolver, imageBitmap, null,null))
-                    }
-                } else {
-                    uri = data.data!!
-                }
-
-                if (uri.path!!.isNotBlank()) {
-                    postAttachmentItem.uri = UriUtils.getPath(requireContext(), uri)!!
-                }
-
-                val uriDataList = adapter.getData()
-                uriDataList.add(postAttachmentItem)
-                updateCountPicView()
+                handleSinglePic(data)
             }
+            updateCountPicView()
         }
+    }
+
+    private fun handleMultiPics(clipData: ClipData) {
+        val uriList = PostUtils().getPicsUri(clipData, requireContext())
+        for (uri in uriList) {
+            val uriDataList = adapter.getData()
+            val postAttachmentItem = PostAttachmentItem(uri = uri)
+            uriDataList.add(postAttachmentItem)
+        }
+    }
+
+    private fun handleSinglePic(data: Intent?) {
+        val postAttachmentItem = PostAttachmentItem()
+        postAttachmentItem.uri = file.absolutePath
+
+        val uri = PostUtils().getPicUri(data, requireContext(), file)
+
+        if (uri.path!!.isNotBlank()) {
+            postAttachmentItem.uri = UriUtils.getPath(requireContext(), uri)!!
+        }
+
+        val uriDataList = adapter.getData()
+        uriDataList.add(postAttachmentItem)
     }
 
     private val postPicItemListener by lazy {
@@ -226,24 +199,8 @@ class PostPicFragment : BasePostFragment() {
     }
 
     private fun addPic() {
-        file = FileUtil.getTest(System.currentTimeMillis().toString() + ".jpg")
-
-        val galleryIntent = Intent()
-        galleryIntent.type = "image/*"
-        galleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-        galleryIntent.action = Intent.ACTION_GET_CONTENT
-
-        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        val uri = FileProvider.getUriForFile(requireContext(), BuildConfig.APPLICATION_ID + ".fileProvider", file)
-        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
-
-        val chooser = Intent(Intent.ACTION_CHOOSER)
-        chooser.putExtra(Intent.EXTRA_INTENT, galleryIntent)
-        chooser.putExtra(Intent.EXTRA_TITLE, requireContext().getString(R.string.post_select_pic))
-
-        val intentArray = arrayOf(cameraIntent)
-        chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
-        startActivityForResult(chooser, INTENT_SELECT_IMG)
+        file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
+        PostUtils().selectPics(this@PostPicFragment, file)
     }
 
     private fun openViewerPage(viewerItem: ViewerItem) {
