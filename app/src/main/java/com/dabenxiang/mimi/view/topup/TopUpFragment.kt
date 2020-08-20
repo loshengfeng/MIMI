@@ -152,15 +152,16 @@ class TopUpFragment : BaseFragment() {
             }
         })
 
-        viewModel.pendingOrderCountResult.observe(viewLifecycleOwner, Observer {
+        viewModel.pendingOrderResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    if (it.result > 0) {
+                    val item = it.result
+                    if (item.pendingOrders >= item.pendingOrderLimit) {
                         layout_error.visibility = View.VISIBLE
                         layout_next.visibility = View.GONE
                         tv_pending_order.text = StringBuilder()
                             .append(getString(R.string.topup_pending_order_1))
-                            .append(it.result)
+                            .append(item.pendingOrders)
                             .append(getString(R.string.topup_pending_order_2))
                             .toString()
                     } else {

@@ -595,7 +595,7 @@ interface ApiService {
     ): Response<ApiBasePagingItem<ArrayList<OrderItem>>>
 
     @GET("/v1/Member/Me/Order/GetPendingOrder")
-    suspend fun getPendingOrderCount(): Response<ApiBaseItem<Int>>
+    suspend fun getPendingOrderCount(): Response<ApiBaseItem<PendingOrderItem>>
 
     /**********************************************************
      *

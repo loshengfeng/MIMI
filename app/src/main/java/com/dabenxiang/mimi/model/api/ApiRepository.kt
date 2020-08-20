@@ -736,7 +736,7 @@ class ApiRepository(private val apiService: ApiService) {
     /**
      * 取得未完成訂單
      */
-    suspend fun getPendingOrderCount(): Response<ApiBaseItem<Int>> {
+    suspend fun getPendingOrderCount(): Response<ApiBaseItem<PendingOrderItem>> {
         return apiService.getPendingOrderCount()
     }
 

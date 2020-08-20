@@ -37,8 +37,8 @@ class TopUpViewModel : BaseViewModel() {
     private val _createChatRoomResult = MutableLiveData<ApiResult<String>>()
     val createChatRoomResult: LiveData<ApiResult<String>> = _createChatRoomResult
 
-    private val _pendingOrderCountResult = MutableLiveData<ApiResult<Int>>()
-    val pendingOrderCountResult: LiveData<ApiResult<Int>> = _pendingOrderCountResult
+    private val _pendingOrderResult = MutableLiveData<ApiResult<PendingOrderItem>>()
+    val pendingOrderResult: LiveData<ApiResult<PendingOrderItem>> = _pendingOrderResult
 
     private val _orderPackageResult =
         MutableLiveData<ApiResult<HashMap<PaymentType, ArrayList<OrderingPackageItem>>>>()
@@ -69,13 +69,13 @@ class TopUpViewModel : BaseViewModel() {
             flow {
                 val result = domainManager.getApiRepository().getPendingOrderCount()
                 if (!result.isSuccessful) throw HttpException(result)
-                val count = result.body()?.content
-                emit(ApiResult.success(count))
+                val pendingOrderItem = result.body()?.content
+                emit(ApiResult.success(pendingOrderItem))
             }
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
-                .collect { _pendingOrderCountResult.value = it }
+                .collect { _pendingOrderResult.value = it }
         }
     }
 
