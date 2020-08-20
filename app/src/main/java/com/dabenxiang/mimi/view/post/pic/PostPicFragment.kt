@@ -20,7 +20,7 @@ import com.dabenxiang.mimi.model.vo.ViewerItem
 import com.dabenxiang.mimi.view.adapter.ScrollPicAdapter
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
-import com.dabenxiang.mimi.view.post.utility.PostUtils
+import com.dabenxiang.mimi.view.post.utility.PostManager
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment.Companion.VIEWER_DATA
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.UriUtils
@@ -154,7 +154,7 @@ class PostPicFragment : BasePostFragment() {
     }
 
     private fun handleMultiPics(clipData: ClipData) {
-        val uriList = PostUtils().getPicsUri(clipData, requireContext())
+        val uriList = PostManager().getPicsUri(clipData, requireContext())
         for (uri in uriList) {
             val uriDataList = adapter.getData()
             val postAttachmentItem = PostAttachmentItem(uri = uri)
@@ -166,7 +166,7 @@ class PostPicFragment : BasePostFragment() {
         val postAttachmentItem = PostAttachmentItem()
         postAttachmentItem.uri = file.absolutePath
 
-        val uri = PostUtils().getPicUri(data, requireContext(), file)
+        val uri = PostManager().getPicUri(data, requireContext(), file)
 
         if (uri.path!!.isNotBlank()) {
             postAttachmentItem.uri = UriUtils.getPath(requireContext(), uri)!!
@@ -200,7 +200,7 @@ class PostPicFragment : BasePostFragment() {
 
     private fun addPic() {
         file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
-        PostUtils().selectPics(this@PostPicFragment, file)
+        PostManager().selectPics(this@PostPicFragment, file)
     }
 
     private fun openViewerPage(viewerItem: ViewerItem) {

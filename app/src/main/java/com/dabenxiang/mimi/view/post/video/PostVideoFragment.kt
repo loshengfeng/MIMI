@@ -20,7 +20,7 @@ import com.dabenxiang.mimi.model.vo.ViewerItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.ScrollVideoAdapter
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
-import com.dabenxiang.mimi.view.post.utility.PostUtils
+import com.dabenxiang.mimi.view.post.utility.PostManager
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.android.synthetic.main.fragment_post_article.edt_hashtag
@@ -149,7 +149,7 @@ class PostVideoFragment : BasePostFragment() {
         val videoUri: Uri? = data?.data
         val myUri = Uri.fromFile(File(UriUtils.getPath(requireContext(), videoUri!!) ?: ""))
 
-        if (PostUtils().isVideoTimeValid(myUri, requireContext())) {
+        if (PostManager().isVideoTimeValid(myUri, requireContext())) {
             val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
 
             val bundle = Bundle()
@@ -176,7 +176,7 @@ class PostVideoFragment : BasePostFragment() {
     }
 
     private fun openRecorder() {
-        PostUtils().selectVideo(this@PostVideoFragment)
+        PostManager().selectVideo(this@PostVideoFragment)
     }
 
     private fun deleteVideo(item: PostVideoAttachment) {
@@ -205,7 +205,7 @@ class PostVideoFragment : BasePostFragment() {
 
     private fun setVideoTime() {
         if (videoAttachmentList[0].videoAttachmentId.isBlank()) {
-            val timeInMillisec = PostUtils().getVideoTime(Uri.parse(videoAttachmentList[0].videoUrl), requireContext())
+            val timeInMillisec = PostManager().getVideoTime(Uri.parse(videoAttachmentList[0].videoUrl), requireContext())
 
             val length = String.format("%02d:%02d:%02d",
                 TimeUnit.MILLISECONDS.toHours(timeInMillisec),

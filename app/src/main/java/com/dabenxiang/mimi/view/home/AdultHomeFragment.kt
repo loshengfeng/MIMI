@@ -3,17 +3,11 @@ package com.dabenxiang.mimi.view.home
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -71,7 +65,7 @@ import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.UPLOAD_ARTICLE
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.UPLOAD_PIC
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.UPLOAD_VIDEO
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.VIDEO_DATA
-import com.dabenxiang.mimi.view.post.utility.PostUtils
+import com.dabenxiang.mimi.view.post.utility.PostManager
 import com.dabenxiang.mimi.view.post.video.EditVideoFragment.Companion.BUNDLE_VIDEO_URI
 import com.dabenxiang.mimi.view.ranking.RankingFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
@@ -82,14 +76,10 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
-import com.video.trimmer.utils.RealPathUtil
-import com.vincent.videocompressor.VideoCompress
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 import java.io.File
-import java.util.*
-import kotlin.collections.ArrayList
 
 class AdultHomeFragment : BaseFragment() {
 
@@ -211,27 +201,11 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private fun showSnackBar() {
-        snackBar = Snackbar.make(snackBarLayout, "", Snackbar.LENGTH_INDEFINITE)
-        val snackBarLayout: Snackbar.SnackbarLayout = snackBar?.view as Snackbar.SnackbarLayout
-        val textView = snackBarLayout.findViewById(R.id.snackbar_text) as TextView
-        textView.visibility = View.INVISIBLE
-
-        val snackView: View = layoutInflater.inflate(R.layout.snackbar_upload, null)
-        snackBarLayout.addView(snackView, 0)
-        snackBarLayout.setPadding(15, 0, 15, 0)
-        snackBarLayout.setBackgroundColor(Color.TRANSPARENT)
-        snackBar?.show()
-
-        val imgCancel = snackBarLayout.findViewById(R.id.iv_cancel) as ImageView
-        val txtCancel = snackBarLayout.findViewById(R.id.txt_cancel) as TextView
-
-        txtCancel.setOnClickListener {
-            cancelDialog()
-        }
-
-        imgCancel.setOnClickListener {
-            cancelDialog()
-        }
+        snackBar = PostManager().showSnackBar(snackBarLayout, this, object : PostManager.CancelDialogListener {
+            override fun onCancel() {
+                cancelDialog()
+            }
+        })
     }
 
     private fun cancelDialog() {
@@ -391,24 +365,7 @@ class AdultHomeFragment : BaseFragment() {
                     uploadCurrentPicPosition += 1
 
                     if (uploadCurrentPicPosition > uploadPicUri.size - 1) {
-
-                        val mediaItem = MediaItem()
-                        mediaItem.textContent = postMemberRequest.content
-
-                        for (item in uploadPicItem) {
-                            mediaItem.picParameter.add(
-                                PicParameter(
-                                    id = item.id.toString(),
-                                    ext = item.ext
-                                )
-                            )
-                        }
-
-                        val content = Gson().toJson(mediaItem)
-                        Timber.d("Post pic content item : $content")
-                        memberPostItem.content = content
-                        viewModel.clearLiveDataValue()
-                        viewModel.postPic(postMemberRequest, content)
+                        uploadPhoto()
                     } else {
                         val pic = uploadPicUri[uploadCurrentPicPosition]
                         viewModel.postAttachment(pic.uri, requireContext(), TYPE_PIC)
@@ -428,39 +385,8 @@ class AdultHomeFragment : BaseFragment() {
                     val realPath = UriUtils.getPath(requireContext(), Uri.parse(uploadVideoUri[0].videoUrl))
                     uploadVideoUri[0].videoUrl = realPath!!
 
-                    val videoUri = Uri.parse(uploadVideoUri[0].videoUrl)
-                    val file = File(videoUri.path ?: "")
-                    val destinationPath = Environment.getExternalStorageDirectory().toString() + File.separator + "temp" + File.separator + "Videos" + File.separator
-                    val root = File(destinationPath)
-                    val outputFileUri = Uri.fromFile(File(root, "t_${Calendar.getInstance().timeInMillis}_" + file.nameWithoutExtension + ".mp4"))
-                    val outPutPath = RealPathUtil.realPathFromUriApi19(requireContext(), outputFileUri)
-                        ?: File(root, "t_${Calendar.getInstance().timeInMillis}_" + videoUri.path?.substring(videoUri.path!!.lastIndexOf("/") + 1)).absolutePath
-
-                    VideoCompress.compressVideoLow(realPath, outPutPath , object : VideoCompress.CompressListener {
-                        override fun onStart() {
-                            Timber.d("Start compress")
-                        }
-
-                        override fun onSuccess() {
-                            Timber.d("Compress success")
-                            uploadVideoUri[0].videoUrl = outPutPath
-                            viewModel.postAttachment(
-                                uploadVideoUri[0].videoUrl,
-                                requireContext(),
-                                TYPE_VIDEO
-                            )
-
-                        }
-
-                        override fun onFail() {
-                            Timber.d("Compress fail")
-                            resetAndCancelJob(Throwable(), getString(R.string.post_error))
-                        }
-
-                        override fun onProgress(percent: Float) {
-                            Timber.d("Compress progress : $percent")
-                        }
-                    })
+                    val outPutPath = PostManager().getCompressPath(realPath, requireContext())
+                    compressVideoAndUpload(realPath, outPutPath)
                 }
                 is Error -> {
                     resetAndCancelJob(it.throwable, getString(R.string.post_error))
@@ -542,6 +468,43 @@ class AdultHomeFragment : BaseFragment() {
         })
     }
 
+    private fun uploadPhoto() {
+        val mediaItem = MediaItem()
+        mediaItem.textContent = postMemberRequest.content
+
+        for (item in uploadPicItem) {
+            mediaItem.picParameter.add(
+                PicParameter(
+                    id = item.id.toString(),
+                    ext = item.ext
+                )
+            )
+        }
+
+        val content = Gson().toJson(mediaItem)
+        Timber.d("Post pic content item : $content")
+        memberPostItem.content = content
+        viewModel.clearLiveDataValue()
+        viewModel.postPic(postMemberRequest, content)
+    }
+
+    private fun compressVideoAndUpload(realPath: String, outPutPath: String) {
+        PostManager().videoCompress(realPath, outPutPath, object : PostManager.VideoCompressListener {
+            override fun onSuccess() {
+                uploadVideoUri[0].videoUrl = outPutPath
+                viewModel.postAttachment(
+                    uploadVideoUri[0].videoUrl,
+                    requireContext(),
+                    TYPE_VIDEO
+                )
+            }
+
+            override fun onFail() {
+                resetAndCancelJob(Throwable(), getString(R.string.post_error))
+            }
+        })
+    }
+
     private fun getCurrentAdapter(): RecyclerView.Adapter<*>? {
         return when (lastPosition) {
             1 -> rv_first.adapter
@@ -554,85 +517,60 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private fun setSnackBarPostStatus(postId: Long = 0) {
-        val snackBarLayout: Snackbar.SnackbarLayout = snackBar?.view as Snackbar.SnackbarLayout
-        val progressBar =
-            snackBarLayout.findViewById(R.id.contentLoadingProgressBar) as ContentLoadingProgressBar
-        val imgSuccess = snackBarLayout.findViewById(R.id.iv_success) as ImageView
-
-        val txtSuccess = snackBarLayout.findViewById(R.id.txt_postSuccess) as TextView
-        val txtUploading = snackBarLayout.findViewById(R.id.txt_uploading) as TextView
-
-        val imgCancel = snackBarLayout.findViewById(R.id.iv_cancel) as ImageView
-        val txtCancel = snackBarLayout.findViewById(R.id.txt_cancel) as TextView
-        val imgPost = snackBarLayout.findViewById(R.id.iv_viewPost) as ImageView
-        val txtPost = snackBarLayout.findViewById(R.id.txt_viewPost) as TextView
-
-        progressBar.visibility = View.GONE
-        imgSuccess.visibility = View.VISIBLE
-
-        txtSuccess.visibility = View.VISIBLE
-        txtUploading.visibility = View.GONE
-
-        imgCancel.visibility = View.GONE
-        txtCancel.visibility = View.GONE
-
-        imgPost.visibility = View.VISIBLE
-        txtPost.visibility = View.VISIBLE
-
-        imgPost.setOnClickListener {
-            findNavController().navigate(R.id.action_adultHomeFragment_to_myPostFragment)
-        }
-
-        txtPost.setOnClickListener {
-            when (postType) {
-                PostType.TEXT -> {
-                    memberPostItem.id = postId
-                    memberPostItem.creatorId = viewModel.pref.profileItem.userId
-                    memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
-                    memberPostItem.avatarAttachmentId = viewModel.pref.profileItem.avatarAttachmentId
-                    val bundle = TextDetailFragment.createBundle(memberPostItem, -1)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_adultHomeFragment_to_textDetailFragment,
-                            bundle
-                        )
-                    )
-                }
-                PostType.IMAGE -> {
-                    memberPostItem.id = postId
-                    memberPostItem.creatorId = viewModel.pref.profileItem.userId
-                    memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
-                    memberPostItem.avatarAttachmentId = viewModel.pref.profileItem.avatarAttachmentId
-                    val bundle = PictureDetailFragment.createBundle(memberPostItem, -1)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_adultHomeFragment_to_pictureDetailFragment,
-                            bundle
-                        )
-                    )
-                }
-                PostType.VIDEO -> {
-                    memberPostItem.id = postId
-                    memberPostItem.creatorId = viewModel.pref.profileItem.userId
-                    memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
-                    memberPostItem.avatarAttachmentId = viewModel.pref.profileItem.avatarAttachmentId
-                    val bundle = ClipFragment.createBundle(arrayListOf(memberPostItem), -1, false)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_adultHomeFragment_to_clipFragment,
-                            bundle
-                        )
-                    )
-                }
+        PostManager().dismissSnackBar(snackBar!!, postId, memberPostItem, viewModel, object : PostManager.SnackBarListener {
+            override fun onClick(memberPostItem: MemberPostItem) {
+                postNavigation(memberPostItem)
             }
-        }
+        })
 
         uploadCurrentPicPosition = 0
         uploadPicUri.clear()
+    }
 
-        Handler().postDelayed({
-            snackBar?.dismiss()
-        }, 3000)
+    private fun postNavigation(memberPostItem: MemberPostItem) {
+        when (postType) {
+            PostType.TEXT -> {
+                val bundle = TextDetailFragment.createBundle(memberPostItem, -1)
+                navigationToText(bundle)
+            }
+
+            PostType.IMAGE -> {
+                val bundle = PictureDetailFragment.createBundle(memberPostItem, -1)
+                navigationToPicture(bundle)
+            }
+
+            PostType.VIDEO -> {
+                val bundle = ClipFragment.createBundle(arrayListOf(memberPostItem), -1, false)
+                navigationToClip(bundle)
+            }
+        }
+    }
+
+    private fun navigationToText(bundle: Bundle) {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_adultHomeFragment_to_textDetailFragment,
+                bundle
+            )
+        )
+    }
+
+    private fun navigationToPicture(bundle: Bundle) {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_adultHomeFragment_to_pictureDetailFragment,
+                bundle
+            )
+        )
+    }
+
+    private fun navigationToClip(bundle: Bundle) {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_adultHomeFragment_to_clipFragment,
+                bundle
+            )
+        )
     }
 
     override fun setupListeners() {
@@ -981,32 +919,15 @@ class AdultHomeFragment : BaseFragment() {
                 when (adultTabType) {
                     AdultTabType.PICTURE -> {
                         val bundle = PictureDetailFragment.createBundle(item, 2)
-                        navigateTo(
-                            NavigateItem.Destination(
-                                R.id.action_adultHomeFragment_to_pictureDetailFragment,
-                                bundle
-                            )
-                        )
+                        navigationToPicture(bundle)
                     }
                     AdultTabType.TEXT -> {
                         val bundle = TextDetailFragment.createBundle(item, 2)
-                        navigateTo(
-                            NavigateItem.Destination(
-                                R.id.action_adultHomeFragment_to_textDetailFragment,
-                                bundle
-                            )
-                        )
+                        navigationToText(bundle)
                     }
                     AdultTabType.CLIP -> {
                         val bundle = ClipFragment.createBundle(arrayListOf(item), 0, true)
-                        navigateTo(
-                            NavigateItem.Destination(
-                                R.id.action_adultHomeFragment_to_clipFragment,
-                                bundle
-                            )
-                        )
-                    }
-                    else -> {
+                        navigationToClip(bundle)
                     }
                 }
             }
@@ -1025,38 +946,20 @@ class AdultHomeFragment : BaseFragment() {
             when (adultTabType) {
                 AdultTabType.PICTURE -> {
                     val bundle = PictureDetailFragment.createBundle(item, 0)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_adultHomeFragment_to_pictureDetailFragment,
-                            bundle
-                        )
-                    )
+                    navigationToPicture(bundle)
                 }
                 AdultTabType.TEXT -> {
                     val bundle = TextDetailFragment.createBundle(item, 0)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_adultHomeFragment_to_textDetailFragment,
-                            bundle
-                        )
-                    )
+                    navigationToText(bundle)
                 }
                 AdultTabType.CLIP -> {
                     val bundle = ClipFragment.createBundle(arrayListOf(item), 0)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_adultHomeFragment_to_clipFragment,
-                            bundle
-                        )
-                    )
-                }
-                else -> {
+                    navigationToClip(bundle)
                 }
             }
         }
 
         override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
-
             val bundle = ClipFragment.createBundle(ArrayList(item.subList(1, item.size)), position-1)
             navigateTo(
                 NavigateItem.Destination(
@@ -1201,12 +1104,12 @@ class AdultHomeFragment : BaseFragment() {
 
     private val onChooseUploadMethodDialogListener = object : OnChooseUploadMethodDialogListener {
         override fun onUploadVideo() {
-            PostUtils().selectVideo(this@AdultHomeFragment)
+            PostManager().selectVideo(this@AdultHomeFragment)
         }
 
         override fun onUploadPic() {
             file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
-            PostUtils().selectPics(this@AdultHomeFragment, file)
+            PostManager().selectPics(this@AdultHomeFragment, file)
         }
 
         override fun onUploadArticle() {
@@ -1227,7 +1130,7 @@ class AdultHomeFragment : BaseFragment() {
                     val videoUri: Uri? = data?.data
                     val myUri = Uri.fromFile(File(UriUtils.getPath(requireContext(), videoUri!!) ?: ""))
 
-                    if (PostUtils().isVideoTimeValid(myUri, requireContext())) {
+                    if (PostManager().isVideoTimeValid(myUri, requireContext())) {
                         val bundle = Bundle()
                         bundle.putString(BUNDLE_VIDEO_URI, myUri.toString())
                         findNavController().navigate(R.id.action_adultHomeFragment_to_editVideoFragment, bundle)
@@ -1248,9 +1151,9 @@ class AdultHomeFragment : BaseFragment() {
 
         val clipData = data?.clipData
         if (clipData != null) {
-            pciUri.addAll(PostUtils().getPicsUri(clipData, requireContext()))
+            pciUri.addAll(PostManager().getPicsUri(clipData, requireContext()))
         } else {
-            val uri = PostUtils().getPicUri(data, requireContext(), file)
+            val uri = PostManager().getPicUri(data, requireContext(), file)
 
             if (uri.path!!.isNotBlank()) {
                 pciUri.add(UriUtils.getPath(requireContext(), uri)!!)
