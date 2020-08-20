@@ -279,7 +279,7 @@ class FavoriteFragment : BaseFragment() {
         tv_back.visibility = View.GONE
         tv_title.text = getString(R.string.favorite_title)
 
-        when (viewModel.accountManager.isLogin()) {
+        when (viewModel.isLogin()) {
             true -> {
                 //TODO: 目前先不判斷是否有驗證過
 //                viewModel.checkEmailConfirmed()
@@ -329,8 +329,11 @@ class FavoriteFragment : BaseFragment() {
     private fun setTabPosition(type: Int, index: Int) {
         when (type) {
             TAB_PRIMARY -> {
-                lastPrimaryIndex = index
-                primaryAdapter.setLastSelectedIndex(lastPrimaryIndex)
+                if(lastPrimaryIndex != index) {
+                    lastPrimaryIndex = index
+                    primaryAdapter.setLastSelectedIndex(lastPrimaryIndex)
+                    favoriteAdapter.setAdult(index != TYPE_NORMAL)
+                }
             }
             TAB_SECONDARY -> {
                 lastSecondaryIndex = index
@@ -463,14 +466,14 @@ class FavoriteFragment : BaseFragment() {
                     // 追蹤與取消追蹤
                     when (item) {
                         is MemberPostItem -> {
-                            if (item.id == 0L) {
+                            if (item.creatorId == 0L) {
                                 GeneralUtils.showToast(
                                     requireContext(),
                                     getString(R.string.unexpected_error)
                                 )
                             } else {
                                 viewModel.currentPostItem = item
-                                viewModel.modifyFollow(item.id, item.isFollow)
+                                viewModel.modifyFollow(item.creatorId, item.isFollow)
                             }
                         }
                     }

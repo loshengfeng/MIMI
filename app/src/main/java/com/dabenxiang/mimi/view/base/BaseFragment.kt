@@ -62,16 +62,17 @@ abstract class BaseFragment : Fragment() {
 
         activity?.bottom_navigation?.visibility = bottomNavigationVisibility
 
-        setupListeners()
-        setupObservers()
-
         takeIf { firstCreateView }?.run {
             setupFirstTime()
             firstCreateView = false
         }
 
-        if (arguments?.getBoolean(PlayerActivity.KEY_IS_FROM_PLAYER) == true)
+        setupListeners()
+        setupObservers()
+
+        if (arguments?.getBoolean(PlayerActivity.KEY_IS_FROM_PLAYER) == true) {
             mainViewModel?.isFromPlayer = true
+        }
     }
 
     abstract fun getLayoutId(): Int

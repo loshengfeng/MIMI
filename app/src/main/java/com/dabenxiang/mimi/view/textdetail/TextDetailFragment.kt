@@ -271,7 +271,7 @@ class TextDetailFragment : BaseFragment() {
 
     private val onTextDetailListener = object : TextDetailAdapter.OnTextDetailListener {
         override fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
-            checkStatus {viewModel.followPost(item, position, isFollow)}
+            checkStatus { viewModel.followPost(item, position, isFollow) }
         }
 
         override fun onGetCommandInfo(adapter: CommentAdapter, type: CommentType) {
@@ -371,7 +371,12 @@ class TextDetailFragment : BaseFragment() {
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem) {
             moreDialog?.dismiss()
-            checkStatus { (requireActivity() as MainActivity).showReportDialog(item, memberPostItem) }
+            checkStatus {
+                (requireActivity() as MainActivity).showReportDialog(
+                    item,
+                    memberPostItem
+                )
+            }
         }
 
         override fun onCancel() {

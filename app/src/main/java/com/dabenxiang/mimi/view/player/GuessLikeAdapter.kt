@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.player
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.dabenxiang.mimi.R
@@ -11,6 +12,8 @@ import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.viewholder.VideoViewHolder
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import kotlinx.android.synthetic.main.nested_item_home_statistics.view.*
 
 class GuessLikeAdapter(
     private val listener: GuessLikeAdapterListener,
@@ -53,6 +56,14 @@ class GuessLikeAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.nested_item_home_statistics, parent, false)
+        val layoutParams = view.layout_card.layoutParams as ConstraintLayout.LayoutParams
+        if(isAdult) {
+            layoutParams.width = (((200.0 / 360.0)) * GeneralUtils.getWindowsWidth()).toInt()
+            layoutParams.height = (((113.0 / 640.0)) * GeneralUtils.getWindowsHeight()).toInt()
+        } else {
+            layoutParams.width = (((100.0 / 360.0)) * GeneralUtils.getWindowsWidth()).toInt()
+            layoutParams.height = (((144.0 / 640.0)) * GeneralUtils.getWindowsHeight()).toInt()
+        }
         return VideoViewHolder(
             view,
             videoViewHolderListener
