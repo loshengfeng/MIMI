@@ -37,6 +37,9 @@ class TopUpViewModel : BaseViewModel() {
     private val _createChatRoomResult = MutableLiveData<ApiResult<String>>()
     val createChatRoomResult: LiveData<ApiResult<String>> = _createChatRoomResult
 
+    private val _pendingOrderCountResult = MutableLiveData<ApiResult<Int>>()
+    val pendingOrderCountResult: LiveData<ApiResult<Int>> = _pendingOrderCountResult
+
     private val _orderPackageResult =
         MutableLiveData<ApiResult<HashMap<PaymentType, ArrayList<OrderingPackageItem>>>>()
     val orderPackageResult: LiveData<ApiResult<HashMap<PaymentType, ArrayList<OrderingPackageItem>>>> =
@@ -56,9 +59,23 @@ class TopUpViewModel : BaseViewModel() {
             val config = PagedList.Config.Builder()
                 .setPageSize(TopUpProxyPayListDataSource.PER_LIMIT)
                 .build()
-
             LivePagedListBuilder(factory, config).build().asFlow()
                 .collect { _agentList.postValue(it) }
+        }
+    }
+
+    fun getPendingOrderCount() {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getPendingOrderCount()
+                if (!result.isSuccessful) throw HttpException(result)
+                val count = result.body()?.content
+                emit(ApiResult.success(count))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _pendingOrderCountResult.value = it }
         }
     }
 

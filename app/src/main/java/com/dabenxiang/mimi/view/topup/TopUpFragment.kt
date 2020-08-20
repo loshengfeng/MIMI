@@ -152,6 +152,34 @@ class TopUpFragment : BaseFragment() {
             }
         })
 
+        viewModel.pendingOrderCountResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    if (it.result > 0) {
+                        layout_error.visibility = View.VISIBLE
+                        layout_next.visibility = View.GONE
+                        tv_pending_order.text = StringBuilder()
+                            .append(getString(R.string.topup_pending_order_1))
+                            .append(it.result)
+                            .append(getString(R.string.topup_pending_order_2))
+                            .toString()
+                    } else {
+                        layout_error.visibility = View.GONE
+                        layout_next.visibility = View.VISIBLE
+                        val selectItem = onlinePayAdapter.getSelectItem()
+                        val bundle = OrderInfoFragment.createBundle(selectItem)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_to_orderInfoFragment,
+                                bundle
+                            )
+                        )
+                    }
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
         viewModel.agentList.observe(viewLifecycleOwner, Observer {
             agentAdapter.submitList(it)
         })
@@ -166,6 +194,15 @@ class TopUpFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+
+        tv_record_top_up.setOnClickListener {
+            navigateTo(NavigateItem.Destination(R.id.action_topupFragment_to_orderFragment))
+        }
+
+        tv_goto_top_up_manage.setOnClickListener {
+            navigateTo(NavigateItem.Destination(R.id.action_topupFragment_to_orderFragment))
+        }
+
         rg_type.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.rb_online_pay -> {
@@ -210,13 +247,7 @@ class TopUpFragment : BaseFragment() {
                             getString(R.string.topup_select_error)
                         )
                     } else {
-                        val bundle = OrderInfoFragment.createBundle(selectItem)
-                        navigateTo(
-                            NavigateItem.Destination(
-                                R.id.action_to_orderInfoFragment,
-                                bundle
-                            )
-                        )
+                        viewModel.getPendingOrderCount()
                     }
                 }
                 R.id.tv_login -> navigateTo(
@@ -276,6 +307,9 @@ class TopUpFragment : BaseFragment() {
         item_is_Login.visibility = View.VISIBLE
         item_is_not_Login.visibility = View.GONE
 
+        layout_error.visibility = View.GONE
+        layout_next.visibility = View.VISIBLE
+
         tv_subtitle.text = getString(R.string.topup_subtitle)
 
         val userItem = viewModel.getUserData()
@@ -287,10 +321,6 @@ class TopUpFragment : BaseFragment() {
 
         rv_proxy_pay.layoutManager = LinearLayoutManager(context)
         rv_proxy_pay.adapter = agentAdapter
-
-        tv_record_top_up.setOnClickListener {
-            navigateTo(NavigateItem.Destination(R.id.action_topupFragment_to_orderFragment))
-        }
 
         onlinePayAdapter.clearSelectItem()
 

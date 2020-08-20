@@ -69,6 +69,9 @@
     <string name="topup_online_empty">所有在现均在忙碌中，请稍後再试。</string>
     <string name="topup_proxy_empty">所有代理均在忙碌中，请稍後再试。</string>
     <string name="topup_select_error">请选择在线支付方案</string>
+    <string name="topup_pending_order_1">尚有</string>
+    <string name="topup_pending_order_2">笔充值作业未完成，请稍后再试</string>
+    <string name="topup_goto_top_up_manage">前往充值管理</string>
 
     <!-- Favorite -->
     <string name="favorite_title">我的收藏</string>
@@ -311,7 +314,6 @@
     <string name="search_type_club">圈子</string>
     <string name="search_history">历史搜索</string>
 
-
     <!--  Search video  -->
     <string name="search_video_result">搜索\"%s\", 共找到 %,d 个视频</string>
     <string name="search_video_btn">搜索</string>
@@ -365,7 +367,6 @@
     <string name="order_result_create_order_amount">应付金额(¥)</string>
     <string name="order_result_create_order_close">关闭</string>
     <string name="order_result_create_order_submit">前往充值管理</string>
-
 
     <string name="filter_empty">无搜寻结果</string>
     <string name="copy_url">已将连结保存到剪贴簿</string>
