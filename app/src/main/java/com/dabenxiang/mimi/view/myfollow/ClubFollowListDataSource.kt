@@ -2,8 +2,8 @@ package com.dabenxiang.mimi.view.myfollow
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.MyFollowPagingCallback
-import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
+import com.dabenxiang.mimi.model.manager.DomainManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -21,8 +21,6 @@ class ClubFollowListDataSource constructor(
         val PER_LIMIT_LONG = PER_LIMIT.toLong()
     }
 
-    private data class InitResult(val list: List<ClubFollowItem>, val nextKey: Long?)
-
     override fun loadInitial(
         params: LoadInitialParams<Long>,
         callback: LoadInitialCallback<Long, ClubFollowItem>
@@ -31,31 +29,30 @@ class ClubFollowListDataSource constructor(
             flow {
                 val result = domainManager.getApiRepository().getMyClubFollow("0", PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
-                val item = result.body()
-                val clubs = item?.content
-
-                val nextPageKey = when {
-                    hasNextPage(
-                        item?.paging?.count ?: 0,
-                        item?.paging?.offset ?: 0,
-                        clubs?.size ?: 0
-                    ) -> PER_LIMIT_LONG
-                    else -> null
-                }
-                emit(InitResult(clubs ?: arrayListOf(), nextPageKey))
+                emit(result.body())
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { pagingCallback.onLoading() }
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
-                .collect { response ->
-                    pagingCallback.onTotalCount(response.list.size.toLong(), true)
+                .filterNotNull()
+                .collect { item ->
+                    val clubs = item.content
+                    val nextPageKey = when {
+                        hasNextPage(
+                            item.paging.count,
+                            item.paging.offset,
+                            clubs?.size ?: 0
+                        ) -> PER_LIMIT_LONG
+                        else -> null
+                    }
+                    pagingCallback.onTotalCount(item.paging.count, true)
                     val idList = ArrayList<Long>()
-                    response.list.forEach {
+                    clubs?.forEach {
                         idList.add(it.clubId)
                     }
                     pagingCallback.onIdList(idList, true)
-                    callback.onResult(response.list, null, response.nextKey)
+                    callback.onResult(clubs ?: listOf(), null, nextPageKey)
                 }
         }
     }
@@ -63,7 +60,8 @@ class ClubFollowListDataSource constructor(
     override fun loadBefore(
         params: LoadParams<Long>,
         callback: LoadCallback<Long, ClubFollowItem>
-    ) {}
+    ) {
+    }
 
     override fun loadAfter(params: LoadParams<Long>, callback: LoadCallback<Long, ClubFollowItem>) {
         val next = params.key
@@ -72,32 +70,30 @@ class ClubFollowListDataSource constructor(
                 val result =
                     domainManager.getApiRepository().getMyClubFollow(next.toString(), PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
-                emit(result)
+                emit(result.body())
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { pagingCallback.onLoading() }
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
-                .collect { response ->
-                    response.body()?.also { item ->
-                        item.content?.also { list ->
-                            val nextPageKey = when {
-                                hasNextPage(
-                                    item.paging.count,
-                                    item.paging.offset,
-                                    list.size
-                                ) -> next + PER_LIMIT_LONG
-                                else -> null
-                            }
-                            pagingCallback.onTotalCount(list.size.toLong(), false)
-                            val idList = ArrayList<Long>()
-                            list.forEach {
-                                idList.add(it.clubId)
-                            }
-                            pagingCallback.onIdList(idList, false)
-                            callback.onResult(list, nextPageKey)
-                        }
+                .filterNotNull()
+                .collect { item ->
+                    val clubs = item.content
+                    val nextPageKey = when {
+                        hasNextPage(
+                            item.paging.count,
+                            item.paging.offset,
+                            clubs?.size ?: 0
+                        ) -> next + PER_LIMIT_LONG
+                        else -> null
                     }
+                    pagingCallback.onTotalCount(item.paging.count, false)
+                    val idList = ArrayList<Long>()
+                    clubs?.forEach {
+                        idList.add(it.clubId)
+                    }
+                    pagingCallback.onIdList(idList, false)
+                    callback.onResult(clubs ?: listOf(), nextPageKey)
                 }
         }
     }

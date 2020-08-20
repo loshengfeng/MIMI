@@ -70,6 +70,8 @@ class MyFollowFragment : BaseFragment() {
         }
     }
 
+    private var vpAdapter: MyFollowViewPagerAdapter? = null
+
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
@@ -77,24 +79,22 @@ class MyFollowFragment : BaseFragment() {
         super.onCreate(savedInstanceState)
 
         viewModel.showProgress.observe(this, Observer {
-            layout_refresh.isRefreshing = it
+            vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, it)
         })
 
         viewModel.clubCount.observe(this, Observer {
-            if(layout_tab.selectedTabPosition == TYPE_CLUB) refreshUi(TYPE_CLUB, it)
+            if (layout_tab.selectedTabPosition == TYPE_CLUB) refreshUi(TYPE_CLUB, it)
         })
 
         viewModel.memberCount.observe(this, Observer {
-            if(layout_tab.selectedTabPosition == TYPE_MEMBER) refreshUi(TYPE_MEMBER, it)
+            if (layout_tab.selectedTabPosition == TYPE_MEMBER) refreshUi(TYPE_MEMBER, it)
         })
 
         viewModel.clubList.observe(this, Observer {
-            rv_content.adapter = clubFollowAdapter
             clubFollowAdapter.submitList(it)
         })
 
         viewModel.memberList.observe(this, Observer {
-            rv_content.adapter = memberFollowAdapter
             memberFollowAdapter.submitList(it)
         })
 
@@ -131,16 +131,16 @@ class MyFollowFragment : BaseFragment() {
 
         viewModel.cleanResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Loading -> layout_refresh.isRefreshing = true
-                is ApiResult.Loaded -> layout_refresh.isRefreshing = false
+                is ApiResult.Loading -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, true)
+                is ApiResult.Loaded -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, false)
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.cancelOneClub.observe(this, Observer {
             when (it) {
-                is ApiResult.Loading -> layout_refresh.isRefreshing = true
-                is ApiResult.Loaded -> layout_refresh.isRefreshing = false
+                is ApiResult.Loading -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, true)
+                is ApiResult.Loaded -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, false)
                 is ApiResult.Success -> {
                     clubFollowAdapter.removedPosList.add(it.result)
                     clubFollowAdapter.notifyItemChanged(it.result)
@@ -155,8 +155,8 @@ class MyFollowFragment : BaseFragment() {
 
         viewModel.cancelOneMember.observe(this, Observer {
             when (it) {
-                is ApiResult.Loading -> layout_refresh.isRefreshing = true
-                is ApiResult.Loaded -> layout_refresh.isRefreshing = false
+                is ApiResult.Loading -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, true)
+                is ApiResult.Loaded -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, false)
                 is ApiResult.Success -> {
                     memberFollowAdapter.removedPosList.add(it.result)
                     memberFollowAdapter.notifyItemChanged(it.result)
@@ -176,7 +176,6 @@ class MyFollowFragment : BaseFragment() {
             navigateTo(NavigateItem.Up)
         }
         useAdultTheme(false)
-        viewModel.initData(layout_tab.selectedTabPosition)
     }
 
     override fun setupFirstTime() {
@@ -220,11 +219,6 @@ class MyFollowFragment : BaseFragment() {
             tv_back.setOnClickListener(it)
             tv_clean.setOnClickListener(it)
         }
-
-        layout_refresh.setOnRefreshListener {
-            layout_refresh.isRefreshing = false
-            viewModel.initData(layout_tab.selectedTabPosition)
-        }
     }
 
     override fun initSettings() {
@@ -242,31 +236,22 @@ class MyFollowFragment : BaseFragment() {
             }
 
         })
+        vpAdapter = MyFollowViewPagerAdapter(
+            requireContext(),
+            memberFollowAdapter,
+            clubFollowAdapter
+        ) {
+            viewModel.initData(layout_tab.selectedTabPosition)
+        }
+        vp.adapter = vpAdapter
+        layout_tab.setupWithViewPager(vp)
 
         tv_clean.visibility = View.VISIBLE
         tv_title.setText(R.string.follow_title)
-        tv_all.text = getString(R.string.follow_members_total_num, "0")
-
-        rv_content.adapter = memberFollowAdapter
     }
 
-    private fun refreshUi(witch: Int, size: Int) {
-        rv_content.visibility = when (size) {
-            NO_DATA -> View.GONE
-            else -> View.VISIBLE
-        }
-
-        item_no_data.visibility = when (size) {
-            NO_DATA -> View.VISIBLE
-            else -> View.GONE
-        }
-
+    private fun refreshUi(type: Int, size: Int) {
         tv_clean.isEnabled = size != NO_DATA
-
-        tv_all.text =
-            if (witch == TYPE_MEMBER)
-                getString(R.string.follow_members_total_num, size.toString())
-            else
-                getString(R.string.follow_clubs_total_num, size.toString())
+        vpAdapter?.refreshUi(type, size)
     }
 }
