@@ -152,7 +152,7 @@
     <string name="login_account">请填写帐号</string>
     <string name="login_pw">请填写密码</string>
     <string name="login_confirm_pw">请填写确认密码</string>
-    <string name="login_desc">点选「注册」即表示您同意接受<font fgcolor="#ff4d4d">服务条款</font>及<font fgcolor="#ff4d4d">服隐私权保护政策</font></string>
+    <string name="login_desc">点选「注册」即表示您同意接受<font fgcolor="#ff4d4d">服务条款</font>及<font fgcolor="#ff4d4d">隐私权保护政策</font></string>
     <string name="login_keep_account">记住帐号</string>
     <string name="login_forget">忘记密码?</string>
     <string name="username_or_password_incorrect">使用者名称或密码错误</string>

@@ -12,20 +12,12 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.EDIT
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.MEMBER_DATA
 import com.dabenxiang.mimi.view.post.BasePostFragment
-import com.google.android.material.chip.Chip
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_post_article.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 
 
 class PostArticleFragment : BasePostFragment() {
-
-    companion object {
-        const val UPLOAD_ARTICLE = "upload_article"
-        const val TITLE = "title"
-        const val REQUEST = "request"
-        const val TAG = "tag"
-    }
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_post_article
@@ -34,7 +26,6 @@ class PostArticleFragment : BasePostFragment() {
     override fun setUI(item: MediaItem) {
         edt_content.setText(item.textContent)
         txt_contentCount.text = String.format(getString(R.string.typing_count, item.textContent.length, CONTENT_LIMIT))
-
     }
 
     override fun setupListeners() {
@@ -59,13 +50,10 @@ class PostArticleFragment : BasePostFragment() {
         })
 
         tv_clean.setOnClickListener {
-            val isEdit = arguments?.getBoolean(EDIT)
-
             val title = edt_title.text.toString()
             val content = edt_content.text.toString()
 
-            if (title.isBlank()) {
-                Toast.makeText(requireContext(), R.string.post_warning_title, Toast.LENGTH_SHORT).show()
+            if (checkFieldIsEmpty()) {
                 return@setOnClickListener
             }
 
@@ -74,35 +62,27 @@ class PostArticleFragment : BasePostFragment() {
                 return@setOnClickListener
             }
 
-            if (chipGroup.childCount == 0) {
-                Toast.makeText(requireContext(), R.string.post_warning_tag, Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
             val requestContent = ArticleItem(content)
-
-            val tags = arrayListOf<String>()
-
-            for (i in 0 until chipGroup.childCount) {
-                val chip = chipGroup.getChildAt(i)
-                chip as Chip
-                tags.add(chip.text.toString())
-            }
-
             val jsonString = Gson().toJson(requestContent)
 
-            val bundle = Bundle()
-            bundle.putBoolean(UPLOAD_ARTICLE, true)
-            bundle.putString(TITLE, title)
-            bundle.putString(REQUEST, jsonString)
-            bundle.putStringArrayList(TAG, tags)
-            if (isEdit != null) {
-                val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
-                bundle.putSerializable(MEMBER_DATA, item)
-                findNavController().navigate(R.id.action_postArticleFragment_to_myPostFragment, bundle)
-            } else {
-                findNavController().navigate(R.id.action_postArticleFragment_to_adultHomeFragment, bundle)
-            }
+            navigation(title, jsonString)
+        }
+    }
+
+    private fun navigation(title: String, request: String) {
+        val isEdit = arguments?.getBoolean(EDIT)
+
+        val bundle = Bundle()
+        bundle.putBoolean(UPLOAD_ARTICLE, true)
+        bundle.putString(TITLE, title)
+        bundle.putString(REQUEST, request)
+        bundle.putStringArrayList(TAG, getTags())
+        if (isEdit != null) {
+            val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
+            bundle.putSerializable(MEMBER_DATA, item)
+            findNavController().navigate(R.id.action_postArticleFragment_to_myPostFragment, bundle)
+        } else {
+            findNavController().navigate(R.id.action_postArticleFragment_to_adultHomeFragment, bundle)
         }
     }
 }
