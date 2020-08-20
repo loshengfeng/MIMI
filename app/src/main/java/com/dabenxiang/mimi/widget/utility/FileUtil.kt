@@ -106,7 +106,7 @@ object FileUtil {
         return File(dir,"/avatar.jpg")
     }
 
-    fun getTest(fileName: String): File {
+    fun getTakePhoto(fileName: String): File {
         val dir = File("${getAppPath(App.applicationContext())}/pic")
         if (!dir.exists()) {
             dir.mkdirs()

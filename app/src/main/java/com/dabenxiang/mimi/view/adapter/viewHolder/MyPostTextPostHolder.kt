@@ -11,6 +11,7 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.TextContentItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
@@ -58,7 +59,7 @@ class MyPostTextPostHolder(
         item: MemberPostItem,
         itemList: List<MemberPostItem>?,
         position: Int,
-        myPostListener: MyPostFragment.MyPostListener,
+        myPostListener: MyPostListener,
         attachmentListener: AttachmentListener
     ) {
 
