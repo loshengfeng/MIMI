@@ -11,6 +11,11 @@ import timber.log.Timber
 
 class MQTTManager(val context: Context, private val pref: Pref) {
 
+    companion object {
+        const val PREFIX_CHAT = "/chat/"
+        const val PREFIX_NOTIFICATION = "/notification/"
+    }
+
     private var client: MqttAndroidClient? = null
     private var options: MqttConnectOptions? = null
 
@@ -76,10 +81,6 @@ class MQTTManager(val context: Context, private val pref: Pref) {
                 subscribeCallback.onFailure(asyncActionToken, exception)
             }
         })
-
-//        client?.subscribe(subscriptionTopic, 1) { topic, message ->
-//            subscribeCallback.onSubscribe(topic, message)
-//        }
     }
 
     fun publishMessage(publishTopic: String, publishMessage: String) {

@@ -150,6 +150,7 @@ class SplashFragment : BaseFragment() {
         viewModel.autoLoginResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Empty -> {
+                    mainViewModel?.startMQTT()
                     goToHomePage()
                 }
                 is Error -> {

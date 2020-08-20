@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_upper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/color_gray_2"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_step_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.308" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_end_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.672" />
+
+        <TextView
+            android:id="@+id/tv_step1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_blue_1_oval"
+            android:gravity="center"
+            android:textColor="@color/color_white_1"
+            android:textSize="14sp"
+            android:layout_gravity="center"
+            app:layout_constraintLeft_toLeftOf="@id/guideline_step_start"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="1"/>
+
+        <View
+            android:id="@+id/line"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@color/color_black_1"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_step1"
+            app:layout_constraintLeft_toRightOf="@+id/tv_step1"
+            app:layout_constraintRight_toLeftOf="@+id/tv_step2"
+            app:layout_constraintTop_toTopOf="@+id/tv_step1" />
+
+        <TextView
+            android:id="@+id/tv_step2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_black_1_oval"
+            android:gravity="center"
+            android:textColor="@color/color_white_1"
+            android:textSize="14sp"
+            app:layout_constraintRight_toRightOf="@+id/guideline_end_start"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="2"/>
+
+        <TextView
+            android:id="@+id/tv_create_order"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="20dp"
+            android:text="@string/order_result_create_order"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="@+id/tv_step1"
+            app:layout_constraintRight_toRightOf="@+id/tv_step1"
+            app:layout_constraintTop_toBottomOf="@+id/tv_step1" />
+
+        <TextView
+            android:id="@+id/tv_create_order_complete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/order_result_create_order_complete"
+            app:layout_constraintLeft_toLeftOf="@+id/tv_step2"
+            app:layout_constraintRight_toRightOf="@+id/tv_step2"
+            app:layout_constraintTop_toBottomOf="@+id/tv_step2" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_order_result"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:nestedScrollingEnabled="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layout_upper" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

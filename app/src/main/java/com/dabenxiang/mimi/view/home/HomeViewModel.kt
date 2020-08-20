@@ -28,6 +28,7 @@ import com.dabenxiang.mimi.view.home.video.VideoDataSource
 import com.dabenxiang.mimi.view.home.video.VideoFactory
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
+import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
@@ -52,6 +53,7 @@ class HomeViewModel : BaseViewModel() {
     var adHeight = 0
 
     var lastListIndex = 0 // 垂直recycler view 跳出後的最後一筆資料
+    var lastPosition = 0
 
     private var _videoList = MutableLiveData<PagedList<BaseVideoItem>>()
     val videoList: LiveData<PagedList<BaseVideoItem>> = _videoList
@@ -324,6 +326,7 @@ class HomeViewModel : BaseViewModel() {
                     when (it) {
                         is ApiResult.Success -> {
                             update(isLike, it.result)
+                            getAllOtherPosts(lastPosition)
                         }
                     }
                 }
@@ -355,6 +358,15 @@ class HomeViewModel : BaseViewModel() {
                     }
                 }
         }
+    }
+
+    fun getAllOtherPosts(lastPosition: Int){
+        if(lastPosition != 1) getVideos(null, true)
+        if(lastPosition != 2) getPostFollows()
+        if(lastPosition != 3) getClipPosts()
+        if(lastPosition != 4) getPicturePosts()
+        if(lastPosition != 5) getTextPosts()
+        if(lastPosition != 6) getClubs()
     }
 
     fun getVideos(category: String?, isAdult: Boolean) {

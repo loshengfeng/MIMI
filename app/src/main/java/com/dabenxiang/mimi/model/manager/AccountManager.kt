@@ -13,13 +13,9 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import retrofit2.HttpException
-import timber.log.Timber
 import java.util.*
 
 class AccountManager(private val pref: Pref, private val domainManager: DomainManager) {
-    fun getProfile(): ProfileItem {
-        return pref.profileItem
-    }
 
     var keepAccount: Boolean
         get() = pref.keepAccount
@@ -37,6 +33,10 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
         pref.profileItem.friendlyName = meItem.friendlyName ?: ""
         pref.profileItem.point = meItem.availablePoint ?: 0
         pref.profileItem.isEmailConfirmed = meItem.isEmailConfirmed ?: false
+    }
+
+    fun getProfile(): ProfileItem {
+        return pref.profileItem
     }
 
     fun setupMeAvatarCache(avatar: ByteArray?) {
@@ -110,7 +110,7 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
             .flowOn(Dispatchers.IO)
             .catch { e -> emit(ApiResult.error(e)) }
 
-    fun singUp(request: SingUpRequest) =
+    fun signUp(request: SingUpRequest) =
         flow {
             val result = domainManager.getApiRepository().signUp(request)
             if (!result.isSuccessful) throw HttpException(result)
