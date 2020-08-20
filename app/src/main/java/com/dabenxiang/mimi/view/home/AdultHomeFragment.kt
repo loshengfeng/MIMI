@@ -287,6 +287,7 @@ class AdultHomeFragment : BaseFragment() {
 
         viewModel.videoList.observe(viewLifecycleOwner, Observer {
             videoListAdapter.submitList(it)
+            videoListAdapter.notifyDataSetChanged()
         })
 
         viewModel.carouselResult.observe(viewLifecycleOwner, Observer {
@@ -366,22 +367,27 @@ class AdultHomeFragment : BaseFragment() {
 
         viewModel.postFollowItemListResult.observe(viewLifecycleOwner, Observer {
             followPostPagedAdapter.submitList(it)
+            followPostPagedAdapter.notifyDataSetChanged()
         })
 
         viewModel.clipPostItemListResult.observe(viewLifecycleOwner, Observer {
             clipPostPagedAdapter.submitList(it)
+            clipPostPagedAdapter.notifyDataSetChanged()
         })
 
         viewModel.picturePostItemListResult.observe(viewLifecycleOwner, Observer {
             picturePostPagedAdapter.submitList(it)
+            picturePostPagedAdapter.notifyDataSetChanged()
         })
 
         viewModel.textPostItemListResult.observe(viewLifecycleOwner, Observer {
             textPostPagedAdapter.submitList(it)
+            textPostPagedAdapter.notifyDataSetChanged()
         })
 
         viewModel.clubItemListResult.observe(viewLifecycleOwner, Observer {
             clubMemberAdapter.submitList(it)
+            clubMemberAdapter.notifyDataSetChanged()
         })
 
         viewModel.postPicResult.observe(viewLifecycleOwner, Observer {
@@ -536,6 +542,7 @@ class AdultHomeFragment : BaseFragment() {
                         viewModel.totalCount,
                         PAYLOAD_UPDATE_FOLLOW
                     )
+                    viewModel.getAllOtherPosts(lastPosition)
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -875,6 +882,7 @@ class AdultHomeFragment : BaseFragment() {
 
     private fun setTab(index: Int) {
         lastPosition = index
+        viewModel.lastPosition = index
         tabAdapter.setLastSelectedIndex(lastPosition)
         recyclerview_tab.scrollToPosition(index)
         setupRecyclerByPosition(index)
