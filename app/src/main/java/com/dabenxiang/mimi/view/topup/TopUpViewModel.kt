@@ -52,7 +52,6 @@ class TopUpViewModel : BaseViewModel() {
                 domainManager,
                 topUpPagingCallback
             )
-            dataSrc.isInvalid
             val factory = TopUpProxyPayListFactory(dataSrc)
             val config = PagedList.Config.Builder()
                 .setPageSize(TopUpProxyPayListDataSource.PER_LIMIT)

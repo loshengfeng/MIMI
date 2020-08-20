@@ -153,35 +153,34 @@ class TopUpFragment : BaseFragment() {
         })
 
         viewModel.agentList.observe(viewLifecycleOwner, Observer {
-            rv_proxy_pay.visibility = View.VISIBLE
             agentAdapter.submitList(it)
         })
 
         viewModel.agentListIsEmpty.observe(viewLifecycleOwner, Observer {
             if (it) {
                 tv_proxy_empty.visibility = View.VISIBLE
-                rv_proxy_pay.visibility = View.GONE
             } else {
                 tv_proxy_empty.visibility = View.GONE
-                rv_proxy_pay.visibility = View.VISIBLE
             }
         })
     }
 
     override fun setupListeners() {
-        rg_Type.setOnCheckedChangeListener { _, checkedId ->
+        rg_type.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.rb_online_pay -> {
-                    tv_proxy_empty.visibility = View.GONE
-                    layout_online_pay.visibility = View.VISIBLE
-                    rv_proxy_pay.visibility = View.GONE
-                    tv_proxy_empty.visibility = View.GONE
+                    // FIXME: 下階段的訂單, Release先隱藏
+                    if (BuildConfig.DEBUG) {
+                        layout_online_pay.visibility = View.VISIBLE
+                        rv_proxy_pay.visibility = View.GONE
+                        tv_proxy_empty.visibility = View.GONE
+                    }
                 }
                 R.id.rb_proxy_pay -> {
-                    tv_online_empty.visibility = View.GONE
                     layout_online_pay.visibility = View.GONE
                     rv_proxy_pay.visibility = View.VISIBLE
                     tv_proxy_empty.visibility = View.VISIBLE
+                    tv_online_empty.visibility = View.GONE
                     viewModel.getProxyPayList()
                 }
             }
@@ -241,6 +240,15 @@ class TopUpFragment : BaseFragment() {
     }
 
     override fun initSettings() {
+
+        // FIXME: 下階段的訂單, Release先隱藏
+        if (BuildConfig.DEBUG) {
+            rg_type.check(R.id.rb_online_pay)
+        } else {
+            rg_type.check(R.id.rb_proxy_pay)
+            rb_online_pay.isClickable = false
+        }
+
         when (viewModel.isLogin()) {
             true -> {
                 //TODO: 目前先不判斷是否有驗證過
@@ -257,7 +265,14 @@ class TopUpFragment : BaseFragment() {
     }
 
     private fun initTopUp() {
-        tv_record_top_up.visibility = View.VISIBLE
+
+        // FIXME: 下階段的訂單, Release先隱藏
+        if (BuildConfig.DEBUG) {
+            tv_record_top_up.visibility = View.VISIBLE
+        } else {
+            tv_record_top_up.visibility = View.GONE
+        }
+
         item_is_Login.visibility = View.VISIBLE
         item_is_not_Login.visibility = View.GONE
 
@@ -277,11 +292,15 @@ class TopUpFragment : BaseFragment() {
             navigateTo(NavigateItem.Destination(R.id.action_topupFragment_to_orderFragment))
         }
 
-        tl_type.getTabAt(0)?.select()
         onlinePayAdapter.clearSelectItem()
 
         viewModel.getMe()
-        viewModel.getOrderingPackage()
+
+        // FIXME: 下階段的訂單, Release先隱藏
+        if (BuildConfig.DEBUG) {
+            tl_type.getTabAt(0)?.select()
+            viewModel.getOrderingPackage()
+        }
     }
 
     private val agentListener = object : TopUpAgentAdapter.EventListener {
