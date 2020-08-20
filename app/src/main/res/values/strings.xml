@@ -63,10 +63,15 @@
     <!-- Top Up -->
     <string name="topup_desc">蜜币购买</string>
     <string name="topup_total">总计</string>
-    <string name="topup_confirm_pay">确认支付</string>
+    <string name="topup_next">下一步</string>
     <string name="topup_subtitle">会员尊享 每天无限观看</string>
     <string name="topup_proxy_title_name">火热代理</string>
+    <string name="topup_online_empty">所有在现均在忙碌中，请稍後再试。</string>
     <string name="topup_proxy_empty">所有代理均在忙碌中，请稍後再试。</string>
+    <string name="topup_select_error">请选择在线支付方案</string>
+    <string name="topup_pending_order_1">尚有</string>
+    <string name="topup_pending_order_2">笔充值作业未完成，请稍后再试</string>
+    <string name="topup_goto_top_up_manage">前往充值管理</string>
 
     <!-- Favorite -->
     <string name="favorite_title">我的收藏</string>
@@ -309,7 +314,6 @@
     <string name="search_type_club">圈子</string>
     <string name="search_history">历史搜索</string>
 
-
     <!--  Search video  -->
     <string name="search_video_result">搜索\"%s\", 共找到 %,d 个视频</string>
     <string name="search_video_btn">搜索</string>
@@ -342,8 +346,29 @@
     <string name="confirm">确定</string>
     <string name="cancel">取消</string>
 
-    <string name="filter_empty">无搜寻结果</string>
+    <!-- Order Detail -->
+    <string name="order_detail_title">订单资讯</string>
+    <string name="order_detail_product_name">商品名称</string>
+    <string name="order_detail_total">小計</string>
+    <string name="order_detail_point">蜜币</string>
+    <string name="order_detail_payment_bank">银行卡付款</string>
+    <string name="order_detail_payment_ali">支付宝付款</string>
+    <string name="order_detail_payment_wx">微信付款</string>
+    <string name="order_detail_create_order">建立订单</string>
+    <string name="order_detail_total_amount">总计</string>
 
+    <!-- Order Result -->
+    <string name="order_result_create_order">建立订单</string>
+    <string name="order_result_create_order_complete">订单建立完成</string>
+    <string name="order_result_create_order_waiting">订单建立中，请稍后…</string>
+    <string name="order_result_create_order_busy">系统忙碌中，请稍后再试</string>
+    <string name="order_result_create_order_confirm">确定</string>
+    <string name="order_result_create_order_account">收款帐户资讯</string>
+    <string name="order_result_create_order_amount">应付金额(¥)</string>
+    <string name="order_result_create_order_close">关闭</string>
+    <string name="order_result_create_order_submit">前往充值管理</string>
+
+    <string name="filter_empty">无搜寻结果</string>
     <string name="copy_url">已将连结保存到剪贴簿</string>
 
 </resources>

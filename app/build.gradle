@@ -3,8 +3,10 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
+
 def android_builder_version = "3.5.3"
 def android_builder_main_version = 3
+
 android {
     this.rootProject.buildscript.configurations.classpath
             .resolvedConfiguration
@@ -460,7 +462,11 @@ dependencies {
     // Work
     implementation "androidx.work:work-runtime-ktx:$work_version"
 
-    implementation 'org.conscrypt:conscrypt-android:2.2.1'
+    // Epoxy
+    implementation "com.airbnb.android:epoxy:$epoxy_version"
+    kapt "com.airbnb.android:epoxy-processor:$epoxy_version"
+
+    implementation "org.conscrypt:conscrypt-android:$conscrypt_version"
 
     // Log
     if (isWithSubmoduleBranch()) {
@@ -562,4 +568,3 @@ task increaseVersion {
         increaseVersion()
     }
 }
-

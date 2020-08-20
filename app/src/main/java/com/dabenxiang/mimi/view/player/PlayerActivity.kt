@@ -1078,7 +1078,7 @@ class PlayerActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
 
-        if (!viewModel.accountManager.isLogin() && (dialog == null || dialog?.isVisible == false)) {
+        if (!viewModel.isLogin() && (dialog == null || dialog?.isVisible == false)) {
             openLoginDialog()
         } else {
             loadVideo()

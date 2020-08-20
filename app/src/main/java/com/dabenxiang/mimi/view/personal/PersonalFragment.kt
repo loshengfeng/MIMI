@@ -182,7 +182,7 @@ class PersonalFragment : BaseFragment() {
         tv_version_is_not_login.text = BuildConfig.VERSION_NAME
         tv_topup.visibility = View.INVISIBLE
 
-        when (viewModel.accountManager.isLogin()) {
+        when (viewModel.isLogin()) {
             true -> {
                 item_is_Login.visibility = View.VISIBLE
                 item_is_not_Login.visibility = View.GONE

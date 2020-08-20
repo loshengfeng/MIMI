@@ -11,6 +11,7 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.ExceptionResult
+import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager
 import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getExceptionDetail
 import com.google.gson.Gson
@@ -28,6 +29,7 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     val pref: Pref by inject()
     val accountManager: AccountManager by inject()
     val domainManager: DomainManager by inject()
+    val mqttManager: MQTTManager by inject()
 
     private val _showProgress by lazy { MutableLiveData<Boolean>() }
     val showProgress: LiveData<Boolean> get() = _showProgress

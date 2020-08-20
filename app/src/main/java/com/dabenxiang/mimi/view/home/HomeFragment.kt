@@ -36,6 +36,10 @@ import kotlinx.android.synthetic.main.fragment_home.*
 
 class HomeFragment : BaseFragment() {
 
+    companion object {
+        private const val REQUEST_LOGIN = 1000
+    }
+
     private val viewModel: HomeViewModel by viewModels()
 
     private var lastTabPosition = 0
@@ -46,10 +50,6 @@ class HomeFragment : BaseFragment() {
 
     private val homeStatisticsViewHolderMap = hashMapOf<Int, HomeStatisticsViewHolder>()
     private val statisticsMap = hashMapOf<Int, HomeTemplate.Statistics>()
-
-    companion object {
-        private const val REQUEST_LOGIN = 1000
-    }
 
     override fun getLayoutId() = R.layout.fragment_home
 
@@ -300,7 +300,7 @@ class HomeFragment : BaseFragment() {
         MemberPostFuncItem(
             {},
             { id, function -> getBitmap(id, function) },
-            { _,_, _, _ -> }
+            { _, _, _, _ -> }
         )
     }
 
@@ -401,7 +401,10 @@ class HomeFragment : BaseFragment() {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 REQUEST_LOGIN -> {
-                    findNavController().navigate(R.id.action_homeFragment_to_loginFragment, data?.extras)
+                    findNavController().navigate(
+                        R.id.action_homeFragment_to_loginFragment,
+                        data?.extras
+                    )
                 }
             }
         }
