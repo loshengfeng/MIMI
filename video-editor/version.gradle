@@ -1,0 +1,26 @@
+
+ext {
+    default_version = this.&readVersionWithPath
+}
+
+class Version {
+    def versionCode
+    def versionName
+}
+
+Version  readVersionWithPath(String version_properties_path) {
+    if (version_properties_path == null || version_properties_path.equals("")){
+        version_properties_path='version.properties'
+    }
+    Properties defaultVersionProps = new Properties()
+    def pfile = file(version_properties_path)
+    if (!pfile.exists()) {
+        pfile = file('version.properties')
+    }
+    defaultVersionProps.load(new FileInputStream(pfile))
+    def defaultBuildVersionCode = defaultVersionProps['VERSION_CODE']
+    def defaultBuildVersionName = defaultVersionProps['VERSION_NAME_PREFIX'] + "." + defaultVersionProps['VERSION_NAME_BUILD']
+    return new Version(versionCode: defaultBuildVersionCode, versionName: defaultBuildVersionName)
+}
+
+

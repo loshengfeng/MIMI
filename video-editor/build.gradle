@@ -9,7 +9,8 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-Version version = readVersion()
+apply from: 'version.gradle'
+def version =  this.ext.default_version()
 ext {
     //FIXME the below three  modify with project type by yourself
     maven_repo_name = 'VideoTools'
@@ -47,8 +48,8 @@ android {
         //FIXME Note :  if use com.writingminds:FFmpegAndroid:0.3.2 the targetSdkVersion must below 28 if want over 29/30 (Android Q) change to branch dev_sub_FFmpegAndroid
         //FIXME : branch dev_sub_FFmpegAndroid submodule !!
         targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        versionCode version.versionCode.toInteger()
+        versionName version.versionName
         ndk {
             abiFilters "arm64-v8a" ,"armeabi-v7a"
         }
@@ -114,33 +115,6 @@ if (f.exists() && !f.isDirectory()) {
 ////apply from: 'https://raw.githubusercontent.com/sky-uk/gradle-maven-plugin/master/gradle-mavenizer.gradle'
 
 //FIXME the below how to export into version.gradle ??  let other gradle use apply from: import  !!
-class Version {
-    def versionCode
-    def versionName
-}
-
-Version readVersion() {
-    readVersionWithPath('version.properties')
-}
-
-Version readVersionWithPath(String version_properties_path) {
-    Properties defaultVersionProps = new Properties()
-    def pfile = file(version_properties_path)
-    if (!pfile.exists()) {
-        pfile = file('version.properties')
-    }
-    defaultVersionProps.load(new FileInputStream(pfile))
-    def defaultBuildVersionCode = defaultVersionProps['VERSION_CODE']
-    def hotfix = defaultVersionProps['VERSION_NAME_HOTFIX']
-    def defaultBuildVersionName
-    if (hotfix != "0") {
-        defaultBuildVersionName = defaultVersionProps['VERSION_NAME_PREFIX'] + "." + defaultVersionProps['VERSION_NAME_BUILD'] + "." + hotfix
-    } else {
-        defaultBuildVersionName = defaultVersionProps['VERSION_NAME_PREFIX'] + "." + defaultVersionProps['VERSION_NAME_BUILD']
-    }
-    return new Version(versionCode: defaultBuildVersionCode, versionName: defaultBuildVersionName)
-}
-
 def increaseVersion() {
     increaseVersionWithPath('version.properties')
 }
@@ -199,12 +173,13 @@ def decreaseVersionWithPath(String version_properties_path) {
     versionProps['VERSION_CODE'] = preCode.toString()
     def preBuild = versionProps['VERSION_NAME_BUILD'].toInteger() - 1
     versionProps['VERSION_NAME_BUILD'] = preBuild.toString()
-    versionProps.store(file.newWriter(), null)
+    versionProps.store(pfile.newWriter(), null)
     def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD']
     println "Decrease $buildVersionName"
 }
 
 task showCurrentVersion {
+    group "version Tasks"
     Properties versionProps = new Properties()
     def pfile = file('version.properties')
     versionProps.load(new FileInputStream(pfile))
@@ -213,12 +188,14 @@ task showCurrentVersion {
 }
 
 task increaseVersion {
+    group "version Tasks"
     doLast {
         increaseVersion()
     }
 }
 
 task decreaseVersion {
+    group "version Tasks"
     doLast {
         decreaseVersion()
     }
