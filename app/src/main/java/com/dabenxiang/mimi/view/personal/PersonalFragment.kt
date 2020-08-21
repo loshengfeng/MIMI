@@ -186,6 +186,13 @@ class PersonalFragment : BaseFragment() {
                 item_is_Login.visibility = View.VISIBLE
                 item_is_not_Login.visibility = View.GONE
                 viewModel.getMe()
+
+                // FIXME: 下階段的訂單, Release先隱藏
+                tv_topup_history.visibility = if (BuildConfig.DEBUG) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
             }
             false -> {
                 item_is_Login.visibility = View.GONE

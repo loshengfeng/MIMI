@@ -5,10 +5,8 @@ import androidx.paging.PagedList
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.item_order_pager.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -20,8 +18,6 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
     private val clNoData: View = itemView.item_no_data
 
     fun onBind(position: Int, orderFuncItem: OrderFuncItem) {
-        GeneralUtils.showToast(App.self, "$position")
-
         if (rvOrder.adapter == null || rvOrder.tag != position) {
             rvOrder.tag = position
             rvOrder.adapter = OrderAdapter()
