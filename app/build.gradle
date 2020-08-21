@@ -460,7 +460,8 @@ dependencies {
     implementation 'org.cks.ffmpeg:FFmpegAndroid:0.3.3'
 
     //Video compressor
-    implementation project(path: ':videocompressor')
+//    implementation project(path: ':videocompressor')
+    implementation 'org.cks.utils.video:videocompressor:0.0.0'
 
     // Application Provider
     implementation "com.github.florent37:applicationprovider:$application_provider_version"
