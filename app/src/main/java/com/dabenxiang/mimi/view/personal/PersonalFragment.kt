@@ -108,7 +108,6 @@ class PersonalFragment : BaseFragment() {
                             data.errorItem.message?.also { message ->
                                 GeneralDialog.newInstance(
                                     GeneralDialogData(
-                                        titleRes = 0,
                                         message = message,
                                         messageIcon = R.drawable.ico_default_photo,
                                         secondBtn = getString(R.string.btn_confirm)

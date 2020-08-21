@@ -22,6 +22,7 @@ class ApiRepository(private val apiService: ApiService) {
         fun isRefreshTokenFailed(code: String?): Boolean {
             return code == TOKEN_NOT_FOUND
         }
+        const val NETWORK_PAGE_SIZE = 20
     }
 
     /**********************************************************
@@ -718,7 +719,7 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun getOrder(
         offset: String,
         limit: String
-    ): Response<ApiBasePagingItem<ArrayList<OrderItem>>> {
+    ): Response<ApiBasePagingItem<OrderContentItem>> {
         return apiService.getOrder(offset, limit)
     }
 

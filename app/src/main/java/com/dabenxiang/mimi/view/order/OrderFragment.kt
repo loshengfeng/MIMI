@@ -3,10 +3,11 @@ package com.dabenxiang.mimi.view.order
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.PagingData
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.view.adapter.OrderAdapter
+import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.google.android.material.tabs.TabLayout
@@ -15,6 +16,12 @@ import kotlinx.android.synthetic.main.fragment_order.*
 import kotlinx.android.synthetic.main.fragment_order.viewPager
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import kotlinx.android.synthetic.main.item_setting_bar.tv_title
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class OrderFragment : BaseFragment() {
 
@@ -48,16 +55,12 @@ class OrderFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.orderList.observe(viewLifecycleOwner, Observer {
-            refreshUi(it.size)
-            orderAdapter.submitList(it)
-        })
     }
 
     override fun setupListeners() {
         tl_type.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
-                viewModel.getOrder(tab.position)
+//                viewModel.getOrder(tab.position)
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab) {}
@@ -78,7 +81,10 @@ class OrderFragment : BaseFragment() {
 
         tv_title.text = getString(R.string.personal_order)
 
-        viewPager.adapter = OrderPagerAdapter()
+        viewPager.adapter = OrderPagerAdapter(
+            OrderFuncItem(getOrder = { update -> getOrder(update) },
+                getOrder2 = { update -> viewModel.getOrder2(update)})
+        )
 
         TabLayoutMediator(tl_type, viewPager) { tab, position ->
             tab.text = tabTitle[position]
@@ -95,5 +101,17 @@ class OrderFragment : BaseFragment() {
 
         tl_type.getTabAt(tl_type.selectedTabPosition)?.text =
             StringBuilder(title).append("(").append(size).append(")").toString()
+    }
+
+    private var getOrderJob: Job? = null
+    private fun getOrder(update: ((PagingData<OrderItem>, CoroutineScope) -> Unit)) {
+        Timber.d("@@getOrder")
+        getOrderJob?.cancel()
+        getOrderJob = lifecycleScope.launch {
+            viewModel.getOrder().collectLatest {
+                Timber.d("@@getOrder collect: $it")
+                update(it, this)
+            }
+        }
     }
 }

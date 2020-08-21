@@ -7,9 +7,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.model.enums.PaymentType
+import com.dabenxiang.mimi.view.base.BaseViewHolder
 import timber.log.Timber
 
-class OrderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+class OrderViewHolder(view: View) : BaseViewHolder(view) {
     private val ivType = itemView.findViewById(R.id.iv_type) as ImageView
     private val tvAccount = itemView.findViewById(R.id.tv_account) as TextView
     private val tvTime = itemView.findViewById(R.id.tv_time) as TextView
@@ -20,7 +21,6 @@ class OrderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
     init {
         view.setOnClickListener {
-            // todo : not sure...
             Timber.d("onClick")
         }
     }

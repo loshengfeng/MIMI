@@ -585,7 +585,7 @@ interface ApiService {
     suspend fun getOrder(
         @Query("offset") offset: String,
         @Query("limit") limit: String
-    ): Response<ApiBasePagingItem<ArrayList<OrderItem>>>
+    ): Response<ApiBasePagingItem<OrderContentItem>>
 
     @GET("/v1/Members/Me/Order")
     suspend fun getOrderByOnline(
