@@ -594,6 +594,9 @@ interface ApiService {
         @Query("limit") limit: String
     ): Response<ApiBasePagingItem<ArrayList<OrderItem>>>
 
+    @GET("/v1/Member/Me/Order/GetPendingOrder")
+    suspend fun getPendingOrderCount(): Response<ApiBaseItem<PendingOrderItem>>
+
     /**********************************************************
      *
      *                  Chats TraceLog

@@ -33,7 +33,7 @@ data class OrderItem(
     val bankBranchCity: String = "",
 
     @SerializedName("BankBranchProvince")
-    val BankBranchProvince: String = "",
+    val bankBranchProvince: String = "",
 
     @SerializedName("amount")
     val amount: Float = 0f,
