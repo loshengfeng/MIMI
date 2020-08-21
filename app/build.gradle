@@ -66,7 +66,7 @@ android {
     androidExtensions {
         experimental = true
     }
-
+//Ref : https://juejin.im/post/6844904004955144205
     lintOptions {
         disable 'MissingDefaultResource'
     }
@@ -179,8 +179,8 @@ android {
         }
 
         Version flavor_version = readVersionWithPath(getVersionPropertiesPath(flavorName))
-        println "Show current flavor_version versionName " + flavor_version.versionName
-        println "Show current flavor_version versionCode :   " + flavor_version.versionCode
+//        println "Show current flavor_version versionName " + flavor_version.versionName
+//        println "Show current flavor_version versionCode :   " + flavor_version.versionCode
         def current_branch = gitBranch()
 //        println "Show current_branch :   " + current_branch
         if (full_buildTypename.equals("prod_release") && (current_branch.equals("release") || current_branch.equals("master"))) {
@@ -455,7 +455,9 @@ dependencies {
     implementation project(path: ':domain_libs')
 
     // Video Editor
-    implementation project(path: ':video-editor')
+//    implementation project(path: ':video-editor')
+    implementation 'org.cks.utils.video:video-editor:0.0.0'
+    implementation 'org.cks.ffmpeg:FFmpegAndroid:0.3.3'
 
     //Video compressor
     implementation project(path: ':videocompressor')

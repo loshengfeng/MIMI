@@ -67,6 +67,9 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "com.google.gms:google-services:$google_service_version"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"
+        //For dev & deploy  library
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4"
     }
 }
 
@@ -79,6 +82,22 @@ allprojects {
         maven { url 'https://dl.bintray.com/cks/Utils' }
         maven { url 'https://dl.bintray.com/cks/Manager' }
         maven { url 'https://dl.bintray.com/cks/Provider' }
+    }
+}
+
+subprojects {
+   if (it.name =="video-editor"){
+       //FIXME add  project only itself library repo
+       repositories {
+           maven { url 'https://dl.bintray.com/cks/FFMPEG' }
+       }
+   }
+    if (it.name =="app"){
+        //FIXME add  project only itself library repo
+        repositories {
+            maven { url 'https://dl.bintray.com/cks/VideoTools' }
+            maven { url 'https://dl.bintray.com/cks/FFMPEG' }
+        }
     }
 }
 
