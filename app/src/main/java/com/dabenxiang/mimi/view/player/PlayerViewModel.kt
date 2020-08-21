@@ -13,6 +13,7 @@ import androidx.paging.PagedList
 import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.GuessLikePagingCallBack
 import com.dabenxiang.mimi.event.SingleLiveEvent
+import com.dabenxiang.mimi.extension.downloadFile
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
@@ -31,6 +32,8 @@ import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.android.Android
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -38,6 +41,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import timber.log.Timber
+import java.io.File
 
 class PlayerViewModel : BaseViewModel() {
 
@@ -176,6 +180,58 @@ class PlayerViewModel : BaseViewModel() {
         }
     }
 
+    fun getM3u8Source(streamId: Long,
+                      userId: Long? = null,
+                      utcTime: Long? = null,
+                      sign: String? = null) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository().getVideoM3u8Source(streamId, userId, utcTime, sign)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(resp.body()?.content))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e ->
+                    Timber.e(e)
+                    emit(ApiResult.error(e))
+                }
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect {
+                    when(it) {
+                        is ApiResult.Success -> {
+                            Timber.d("this video name is ${it.result.streamName}, m3u8 play list source url is ${it.result.streamUrl}")
+                        }
+                    }
+                }
+        }
+    }
+
+    private suspend fun downloadM3U8(uriString: String) {
+        HttpClient(Android).downloadFile(uriString)
+            .collect {
+                withContext(Dispatchers.IO) {
+                    when(it) {
+                        is DownloadResult.Success -> {
+                            if(Uri.parse((it.url)).isHierarchical) {
+                                Timber.d("download success file path ${it.url}")
+                                nextVideoUrl = it.url
+                            }
+                        }
+                        is DownloadResult.Error -> {
+                            Timber.d("error ${it.cause}")
+                        }
+                        is DownloadResult.Progress -> {
+                            Timber.d("progress ${it.progress}")
+                        }
+                        is DownloadResult.Redirect -> {
+                            downloadM3U8(it.url)
+                        }
+                    }
+                }
+            }
+    }
+
     fun getMediaSource(uriString: String, sourceFactory: DefaultDataSourceFactory): MediaSource? {
         val uri = Uri.parse(uriString)
 
@@ -291,15 +347,21 @@ class PlayerViewModel : BaseViewModel() {
                         0
                 )!!
 
-                val streamResp = apiRepository.getVideoVideoStreamM3u8(
+                val streamResp = apiRepository.getVideoM3u8Source(
                     stream.id!!,
                     accountManager.getProfile().userId,
                     stream.utcTime,
                     stream.sign
                 )
                 if (!streamResp.isSuccessful) throw HttpException(streamResp)
+                deletaCachrFile()
                 // 取得轉址Url
-                nextVideoUrl = streamResp.raw().request.url.toString()
+                when(streamResp.body()?.content?.isContent) {
+                    false -> nextVideoUrl = streamResp.body()?.content?.streamUrl
+                    true -> {
+                        downloadM3U8(streamResp.body()?.content?.streamUrl!!)
+                    }
+                }
 
                 emit(ApiResult.success(null))
             }
@@ -338,6 +400,7 @@ class PlayerViewModel : BaseViewModel() {
                     val videoInfoResp = domainManager.getApiRepository().getVideoInfo(videoId)
                     if (!videoInfoResp.isSuccessful) throw HttpException(videoInfoResp)
                     isDeducted = videoInfoResp.body()?.content?.deducted ?: false
+                    videoInfoResp.body()?.content?.source
                 }
 
                 if (!isDeducted) throw Exception("點數不足")
@@ -351,17 +414,32 @@ class PlayerViewModel : BaseViewModel() {
 //                videoId = episodeInfo?.id ?: 0
 
                 val stream = episodeInfo?.videoStreams?.get(0)!!
-                val streamResp = apiRepository.getVideoStreamOfEpisode(
-                    videoId,
-                    episodeId,
+
+//                val streamResp = apiRepository.getVideoStreamOfEpisode(
+//                    videoId,
+//                    episodeId,
+//                    stream.id!!,
+//                    accountManager.getProfile().userId,
+//                    stream.utcTime,
+//                    stream.sign
+//                )
+                val streamResp = apiRepository.getVideoM3u8Source(
                     stream.id!!,
                     accountManager.getProfile().userId,
                     stream.utcTime,
                     stream.sign
                 )
                 if (!streamResp.isSuccessful) throw HttpException(streamResp)
+                deletaCachrFile()
                 // 取得轉址Url
-                nextVideoUrl = streamResp.raw().request.url.toString()
+                when(streamResp.body()?.content?.isContent) {
+                    false -> {
+                        nextVideoUrl = streamResp.body()?.content?.streamUrl
+                    }
+                    true -> {
+                        downloadM3U8(streamResp.body()?.content?.streamUrl!!)
+                    }
+                }
 
                 emit(ApiResult.success(null))
             }
@@ -756,5 +834,10 @@ class PlayerViewModel : BaseViewModel() {
                     .onCompletion { emit(ApiResult.loaded()) }
                     .collect { _checkStatusResult.value = it }
         }
+    }
+
+    fun deletaCachrFile() {
+        // remove cache file
+        if(!nextVideoUrl.isNullOrEmpty() && File(nextVideoUrl).isFile) File(nextVideoUrl).delete()
     }
 }

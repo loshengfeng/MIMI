@@ -554,6 +554,14 @@ interface ApiService {
         @Path("sign") sign: String?
     ): Response<Void>
 
+    @GET("/v1/Player/VideoStreamUrl/{streamId}")
+    suspend fun getVideoM3u8Source(
+        @Path("streamId") streamId: Long,
+        @Query("userId") userId: Long?,
+        @Query("utcTime") utcTime: Long?,
+        @Query("sign") sign: String?
+    ): Response<ApiBaseItem<VideoM3u8Source>>
+
 
     /**********************************************************
      *

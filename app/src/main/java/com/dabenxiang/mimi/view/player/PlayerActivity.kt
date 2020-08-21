@@ -1126,6 +1126,7 @@ class PlayerActivity : BaseActivity() {
         consumeDialog = null
         loadReplyCommentBlock = null
         loadCommentLikeBlock = null
+        viewModel.deletaCachrFile()
     }
 
     override fun onBackPressed() {
@@ -1178,6 +1179,7 @@ class PlayerActivity : BaseActivity() {
                 isReset = true
                 viewModel.currentVideoUrl = viewModel.nextVideoUrl!!
             }
+            Timber.d("Niel url ${viewModel.currentVideoUrl}")
             setupPlayUrl(viewModel.currentVideoUrl!!, isReset)
         }
     }
@@ -1185,6 +1187,8 @@ class PlayerActivity : BaseActivity() {
     private fun setupPlayUrl(url: String, isReset: Boolean) {
         val agent = Util.getUserAgent(this, getString(R.string.app_name))
         val sourceFactory = DefaultDataSourceFactory(this, agent)
+
+//        viewModel.downloadM3U8(url)
 
         viewModel.getMediaSource(url, sourceFactory)?.also {
             viewModel.checkStatus {
