@@ -6,12 +6,14 @@ import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.MQTT_HOST_URL
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager
 import com.dabenxiang.mimi.model.manager.mqtt.callback.ConnectCallback
 import com.dabenxiang.mimi.model.manager.mqtt.callback.ExtendedCallback
 import com.dabenxiang.mimi.model.manager.mqtt.callback.MessageListener
 import com.dabenxiang.mimi.model.manager.mqtt.callback.SubscribeCallback
 import com.dabenxiang.mimi.model.vo.CheckStatusItem
 import com.dabenxiang.mimi.model.vo.StatusItem
+import com.dabenxiang.mimi.model.vo.mqtt.OrderItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -51,6 +53,9 @@ class MainViewModel : BaseViewModel() {
 
     private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
     val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
+
+    private val _orderItem = MutableLiveData<OrderItem>()
+    val orderItem: LiveData<OrderItem> = _orderItem
 
     private var _normal: CategoriesItem? = null
     val normal
@@ -221,7 +226,7 @@ class MainViewModel : BaseViewModel() {
     fun subscribeToTopic(topic: String) {
         mqttManager.subscribeToTopic(topic, object : SubscribeCallback {
             override fun onSuccess(asyncActionToken: IMqttToken) {
-                Timber.d("onSuccess: $asyncActionToken")
+                Timber.d("onSuccess: $topic, $asyncActionToken")
             }
 
             override fun onFailure(asyncActionToken: IMqttToken, exception: Throwable) {
@@ -238,10 +243,14 @@ class MainViewModel : BaseViewModel() {
         mqttManager.publishMessage(topic, msg)
     }
 
+    fun getNotificationTopic(): String {
+        val userId = accountManager.getProfile().userId
+        return StringBuilder(MQTTManager.PREFIX_NOTIFICATION).append(userId).toString()
+    }
+
     private val extendedCallback = object : ExtendedCallback {
         override fun onConnectComplete(reconnect: Boolean, serverURI: String) {
-            Timber.d("Reconnect: $reconnect")
-            Timber.d("Connect: $serverURI")
+            Timber.d("Reconnect: $reconnect, ServerURI: $serverURI")
         }
 
         override fun onMessageArrived(topic: String, message: MqttMessage) {
@@ -263,11 +272,21 @@ class MainViewModel : BaseViewModel() {
         override fun onSuccess(asyncActionToken: IMqttToken) {
             Timber.d("Connection onSuccess")
             isMqttConnect = true
+            val topic = getNotificationTopic()
+            messageListenerMap[topic] = messageListener
+            subscribeToTopic(topic)
         }
 
         override fun onFailure(asyncActionToken: IMqttToken, exception: Throwable) {
             Timber.e("Connection onFailure: $exception")
             isMqttConnect = false
+        }
+    }
+
+    private val messageListener = object : MessageListener {
+        override fun onMsgReceive(message: MqttMessage) {
+            val data = gson.fromJson(String(message.payload), OrderItem::class.java)
+            _orderItem.postValue(data)
         }
     }
 

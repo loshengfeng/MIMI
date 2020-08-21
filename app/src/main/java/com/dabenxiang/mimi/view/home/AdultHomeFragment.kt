@@ -3,24 +3,17 @@ package com.dabenxiang.mimi.view.home
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.graphics.Matrix
-import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
-import android.provider.MediaStore
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.core.content.FileProvider
 import androidx.core.widget.ContentLoadingProgressBar
-import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -28,7 +21,6 @@ import androidx.paging.PagedList
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
@@ -69,11 +61,18 @@ import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
-import com.dabenxiang.mimi.view.post.article.PostArticleFragment
-import com.dabenxiang.mimi.view.post.pic.PostPicFragment
-import com.dabenxiang.mimi.view.post.pic.PostPicFragment.Companion.BUNDLE_PIC_URI
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.BUNDLE_PIC_URI
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.MEMBER_REQUEST
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.PIC_URI
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.REQUEST
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.TAG
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.TITLE
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.UPLOAD_ARTICLE
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.UPLOAD_PIC
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.UPLOAD_VIDEO
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.VIDEO_DATA
+import com.dabenxiang.mimi.view.post.utility.PostUtils
 import com.dabenxiang.mimi.view.post.video.EditVideoFragment.Companion.BUNDLE_VIDEO_URI
-import com.dabenxiang.mimi.view.post.video.PostVideoFragment
 import com.dabenxiang.mimi.view.ranking.RankingFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
@@ -132,7 +131,7 @@ class AdultHomeFragment : BaseFragment() {
         private const val REQUEST_VIDEO_CAPTURE = 10002
         private const val REQUEST_LOGIN = 10003
 
-        private const val RECORD_LIMIT_TIME = 15
+        const val RECORD_LIMIT_TIME = 15
     }
 
     override fun getLayoutId() = R.layout.fragment_home
@@ -162,18 +161,18 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private fun handleBackStackData() {
-        val isNeedPicUpload = arguments?.getBoolean(PostPicFragment.UPLOAD_PIC)
-        val isNeedVideoUpload = arguments?.getBoolean(PostVideoFragment.UPLOAD_VIDEO)
-        val isNeedArticleUpload = arguments?.getBoolean(PostArticleFragment.UPLOAD_ARTICLE)
+        val isNeedPicUpload = arguments?.getBoolean(UPLOAD_PIC)
+        val isNeedVideoUpload = arguments?.getBoolean(UPLOAD_VIDEO)
+        val isNeedArticleUpload = arguments?.getBoolean(UPLOAD_ARTICLE)
 
         if (isNeedPicUpload != null && isNeedPicUpload) {
-            arguments?.remove(PostPicFragment.UPLOAD_PIC)
+            arguments?.remove(UPLOAD_PIC)
             showSnackBar()
 
             val memberRequest =
-                arguments?.getParcelable<PostMemberRequest>(PostPicFragment.MEMBER_REQUEST)
+                arguments?.getParcelable<PostMemberRequest>(MEMBER_REQUEST)
             val picUriList =
-                arguments?.getParcelableArrayList<PostAttachmentItem>(PostPicFragment.PIC_URI)
+                arguments?.getParcelableArrayList<PostAttachmentItem>(PIC_URI)
 
             postMemberRequest = memberRequest!!
 
@@ -185,23 +184,23 @@ class AdultHomeFragment : BaseFragment() {
             memberPostItem.tags = memberRequest.tags
             postType = PostType.IMAGE
         } else if (isNeedVideoUpload != null && isNeedVideoUpload) {
-            arguments?.remove(PostVideoFragment.UPLOAD_VIDEO)
+            arguments?.remove(UPLOAD_VIDEO)
             showSnackBar()
 
             val memberRequest =
-                arguments?.getParcelable<PostMemberRequest>(PostVideoFragment.MEMBER_REQUEST)
-            uploadVideoUri = arguments?.getParcelableArrayList(PostVideoFragment.VIDEO_DATA)!!
+                arguments?.getParcelable<PostMemberRequest>(MEMBER_REQUEST)
+            uploadVideoUri = arguments?.getParcelableArrayList(VIDEO_DATA)!!
             postMemberRequest = memberRequest!!
             memberPostItem.title = memberRequest.title
             memberPostItem.tags = memberRequest.tags
             viewModel.postAttachment(uploadVideoUri[0].picUrl, requireContext(), TYPE_COVER)
         } else if (isNeedArticleUpload != null && isNeedArticleUpload) {
-            arguments?.remove(PostArticleFragment.UPLOAD_ARTICLE)
+            arguments?.remove(UPLOAD_ARTICLE)
             showSnackBar()
 
-            val title = arguments?.getString(PostArticleFragment.TITLE)
-            val request = arguments?.getString(PostArticleFragment.REQUEST)
-            val tags = arguments?.getStringArrayList(PostArticleFragment.TAG)
+            val title = arguments?.getString(TITLE)
+            val request = arguments?.getString(REQUEST)
+            val tags = arguments?.getStringArrayList(TAG)
 
             memberPostItem.title = title!!
             memberPostItem.content = request!!
@@ -288,6 +287,7 @@ class AdultHomeFragment : BaseFragment() {
 
         viewModel.videoList.observe(viewLifecycleOwner, Observer {
             videoListAdapter.submitList(it)
+            videoListAdapter.notifyDataSetChanged()
         })
 
         viewModel.carouselResult.observe(viewLifecycleOwner, Observer {
@@ -367,22 +367,27 @@ class AdultHomeFragment : BaseFragment() {
 
         viewModel.postFollowItemListResult.observe(viewLifecycleOwner, Observer {
             followPostPagedAdapter.submitList(it)
+            followPostPagedAdapter.notifyDataSetChanged()
         })
 
         viewModel.clipPostItemListResult.observe(viewLifecycleOwner, Observer {
             clipPostPagedAdapter.submitList(it)
+            clipPostPagedAdapter.notifyDataSetChanged()
         })
 
         viewModel.picturePostItemListResult.observe(viewLifecycleOwner, Observer {
             picturePostPagedAdapter.submitList(it)
+            picturePostPagedAdapter.notifyDataSetChanged()
         })
 
         viewModel.textPostItemListResult.observe(viewLifecycleOwner, Observer {
             textPostPagedAdapter.submitList(it)
+            textPostPagedAdapter.notifyDataSetChanged()
         })
 
         viewModel.clubItemListResult.observe(viewLifecycleOwner, Observer {
             clubMemberAdapter.submitList(it)
+            clubMemberAdapter.notifyDataSetChanged()
         })
 
         viewModel.postPicResult.observe(viewLifecycleOwner, Observer {
@@ -537,6 +542,7 @@ class AdultHomeFragment : BaseFragment() {
                         viewModel.totalCount,
                         PAYLOAD_UPDATE_FOLLOW
                     )
+                    viewModel.getAllOtherPosts(lastPosition)
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -645,7 +651,7 @@ class AdultHomeFragment : BaseFragment() {
 
         iv_bg_search.setOnClickListener {
             if (lastPosition == 0 || lastPosition == 1) {
-                val bundle = SearchVideoFragment.createBundle()
+                val bundle = SearchVideoFragment.createBundle("", "", true)
                 navigateTo(
                     NavigateItem.Destination(
                         R.id.action_to_searchVideoFragment,
@@ -790,7 +796,7 @@ class AdultHomeFragment : BaseFragment() {
                     rv_second.adapter = followPostPagedAdapter
                     viewModel.getPostFollows()
                 }?: run {
-                    Timber.d("followPostPagedAdapter.itemCount ${followPostPagedAdapter.itemCount}")
+                    Timber.d("@@followPostPagedAdapter.itemCount ${followPostPagedAdapter.itemCount}")
                     cl_no_data.visibility = followPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }?.let { View.GONE } ?: let { View.VISIBLE }
                 }
             }
@@ -876,6 +882,7 @@ class AdultHomeFragment : BaseFragment() {
 
     private fun setTab(index: Int) {
         lastPosition = index
+        viewModel.lastPosition = index
         tabAdapter.setLastSelectedIndex(lastPosition)
         recyclerview_tab.scrollToPosition(index)
         setupRecyclerByPosition(index)
@@ -1202,43 +1209,12 @@ class AdultHomeFragment : BaseFragment() {
 
     private val onChooseUploadMethodDialogListener = object : OnChooseUploadMethodDialogListener {
         override fun onUploadVideo() {
-            val galleryIntent = Intent()
-            galleryIntent.type = "video/*"
-            galleryIntent.action = Intent.ACTION_GET_CONTENT
-
-            val cameraIntent = Intent()
-            cameraIntent.action = MediaStore.ACTION_VIDEO_CAPTURE
-            cameraIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, RECORD_LIMIT_TIME)
-            cameraIntent.resolveActivity(requireContext().packageManager)
-
-            val chooser = Intent(Intent.ACTION_CHOOSER)
-            chooser.putExtra(Intent.EXTRA_INTENT, galleryIntent)
-            chooser.putExtra(Intent.EXTRA_TITLE, requireContext().getString(R.string.post_select_video))
-
-            val intentArray = arrayOf(cameraIntent)
-            chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
-            startActivityForResult(chooser, REQUEST_VIDEO_CAPTURE)
+            PostUtils().selectVideo(this@AdultHomeFragment)
         }
 
         override fun onUploadPic() {
-            file = FileUtil.getTest(System.currentTimeMillis().toString() + ".jpg")
-
-            val galleryIntent = Intent()
-            galleryIntent.type = "image/*"
-            galleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-            galleryIntent.action = Intent.ACTION_GET_CONTENT
-
-            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            val uri = FileProvider.getUriForFile(requireContext(), BuildConfig.APPLICATION_ID + ".fileProvider", file)
-            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
-
-            val chooser = Intent(Intent.ACTION_CHOOSER)
-            chooser.putExtra(Intent.EXTRA_INTENT, galleryIntent)
-            chooser.putExtra(Intent.EXTRA_TITLE, requireContext().getString(R.string.post_select_pic))
-
-            val intentArray = arrayOf(cameraIntent)
-            chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
-            startActivityForResult(chooser, REQUEST_PHOTO)
+            file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
+            PostUtils().selectPics(this@AdultHomeFragment, file)
         }
 
         override fun onUploadArticle() {
@@ -1252,59 +1228,14 @@ class AdultHomeFragment : BaseFragment() {
         if (resultCode == RESULT_OK) {
             when (requestCode) {
                 REQUEST_PHOTO -> {
-                    val pciUri = arrayListOf<String>()
-
-                    val clipData = data?.clipData
-                    if (clipData != null) {
-                        for (i in 0 until clipData.itemCount) {
-                            val item = clipData.getItemAt(i)
-                            val uri = UriUtils.getPath(requireContext(), item.uri)
-                            pciUri.add(uri.toString())
-                        }
-                    } else {
-                        var uri = Uri.parse("")
-
-                        if (data?.data == null) {
-                            val extras = data?.extras
-
-                            if (extras == null) {
-                                rotateImage(BitmapFactory.decodeFile(file.absolutePath))
-                            } else {
-                                val extrasData = extras["data"]
-                                val imageBitmap = extrasData as Bitmap?
-                                uri = Uri.parse(MediaStore.Images.Media.insertImage(requireContext().contentResolver, imageBitmap, null,null))
-                            }
-                        } else {
-                            uri = data.data!!
-                        }
-
-                        if (uri.path!!.isNotBlank()) {
-                            pciUri.add(uri.toString())
-                        } else {
-                            pciUri.add(file.absolutePath)
-                        }
-                    }
-
-                    val bundle = Bundle()
-                    bundle.putStringArrayList(BUNDLE_PIC_URI, pciUri)
-
-                    findNavController().navigate(
-                        R.id.action_adultHomeFragment_to_postPicFragment,
-                        bundle
-                    )
+                    handleTakePhoto(data)
                 }
 
                 REQUEST_VIDEO_CAPTURE -> {
                     val videoUri: Uri? = data?.data
-                    val myUri =
-                        Uri.fromFile(File(UriUtils.getPath(requireContext(), videoUri!!) ?: ""))
+                    val myUri = Uri.fromFile(File(UriUtils.getPath(requireContext(), videoUri!!) ?: ""))
 
-                    val retriever = MediaMetadataRetriever()
-                    retriever.setDataSource(requireContext(), myUri)
-                    val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-                    val timeInMillisec = time!!.toLong()
-
-                    if (timeInMillisec > 3001) {
+                    if (PostUtils().isVideoTimeValid(myUri, requireContext())) {
                         val bundle = Bundle()
                         bundle.putString(BUNDLE_VIDEO_URI, myUri.toString())
                         findNavController().navigate(R.id.action_adultHomeFragment_to_editVideoFragment, bundle)
@@ -1318,6 +1249,31 @@ class AdultHomeFragment : BaseFragment() {
                 }
             }
         }
+    }
+
+    private fun handleTakePhoto(data: Intent?) {
+        val pciUri = arrayListOf<String>()
+
+        val clipData = data?.clipData
+        if (clipData != null) {
+            pciUri.addAll(PostUtils().getPicsUri(clipData, requireContext()))
+        } else {
+            val uri = PostUtils().getPicUri(data, requireContext(), file)
+
+            if (uri.path!!.isNotBlank()) {
+                pciUri.add(UriUtils.getPath(requireContext(), uri)!!)
+            } else {
+                pciUri.add(file.absolutePath)
+            }
+        }
+
+        val bundle = Bundle()
+        bundle.putStringArrayList(BUNDLE_PIC_URI, pciUri)
+
+        findNavController().navigate(
+            R.id.action_adultHomeFragment_to_postPicFragment,
+            bundle
+        )
     }
 
     private fun onItemClick(item: MemberClubItem) {
@@ -1381,34 +1337,5 @@ class AdultHomeFragment : BaseFragment() {
 
     private fun isClubListEmpty(list: PagedList<MemberClubItem>?): Boolean {
         return list == null || list.size == 0 || (list.size == 1 && list[0]?.adItem != null)
-    }
-
-    private fun rotateImage(bitmap: Bitmap): Bitmap? {
-        val ei = ExifInterface(file.absolutePath)
-
-        val orientation: Int = ei.getAttributeInt(
-            ExifInterface.TAG_ORIENTATION,
-            ExifInterface.ORIENTATION_UNDEFINED
-        )
-
-        val rotatedBitmap: Bitmap?
-        rotatedBitmap = when (orientation) {
-            ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(bitmap, 90f)
-            ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(bitmap, 180f)
-            ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(bitmap, 270f)
-            ExifInterface.ORIENTATION_NORMAL -> bitmap
-            else -> bitmap
-        }
-
-        return rotatedBitmap
-    }
-
-    private fun rotateImage(source: Bitmap, angle: Float): Bitmap? {
-        val matrix = Matrix()
-        matrix.postRotate(angle)
-        return Bitmap.createBitmap(
-            source, 0, 0, source.width, source.height,
-            matrix, true
-        )
     }
 }

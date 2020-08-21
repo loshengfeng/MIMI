@@ -13,6 +13,7 @@ class MQTTManager(val context: Context, private val pref: Pref) {
 
     companion object {
         const val PREFIX_CHAT = "/chat/"
+        const val PREFIX_NOTIFICATION = "/notification/"
     }
 
     private var client: MqttAndroidClient? = null

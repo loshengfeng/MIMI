@@ -735,6 +735,13 @@ class ApiRepository(private val apiService: ApiService) {
     }
 
     /**
+     * 取得未完成訂單
+     */
+    suspend fun getPendingOrderCount(): Response<ApiBaseItem<PendingOrderItem>> {
+        return apiService.getPendingOrderCount()
+    }
+
+    /**
      * 建立工單聊天室
      */
     suspend fun createOrderChat(request: CreateChatRequest): Response<Void> {

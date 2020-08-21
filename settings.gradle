@@ -1,4 +1,25 @@
+rootProject.name = 'MiMi'
+include ':app'
+include ':domain_libs'
 include ':videocompressor'
 include ':video-editor'
-rootProject.name='MiMi'
-include ':app', ':domain_libs'
+def gitBranch() {
+    def branch = ""
+    def proc = "git rev-parse --abbrev-ref HEAD".execute()
+    proc.in.eachLine { line -> branch = line }
+    proc.err.eachLine { line -> println line }
+    proc.waitFor()
+    branch
+}
+
+def isWithSubmoduleBranch() {
+    if (gitBranch().contains("dev_sub")) {
+        return true
+    } else {
+        return false
+    }
+}
+if (isWithSubmoduleBranch()) {
+    include ':FFmpegAndroid'
+    project(":FFmpegAndroid").projectDir = file("./FFMpegLibrary/FFmpegAndroid")
+}

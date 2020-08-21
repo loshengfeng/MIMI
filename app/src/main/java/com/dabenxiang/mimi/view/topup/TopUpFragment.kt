@@ -152,36 +152,73 @@ class TopUpFragment : BaseFragment() {
             }
         })
 
+        viewModel.pendingOrderResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    val item = it.result
+                    if (item.pendingOrders >= item.pendingOrderLimit) {
+                        layout_error.visibility = View.VISIBLE
+                        layout_next.visibility = View.GONE
+                        tv_pending_order.text = StringBuilder()
+                            .append(getString(R.string.topup_pending_order_1))
+                            .append(item.pendingOrders)
+                            .append(getString(R.string.topup_pending_order_2))
+                            .toString()
+                    } else {
+                        layout_error.visibility = View.GONE
+                        layout_next.visibility = View.VISIBLE
+                        val selectItem = onlinePayAdapter.getSelectItem()
+                        val bundle = OrderInfoFragment.createBundle(selectItem)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_to_orderInfoFragment,
+                                bundle
+                            )
+                        )
+                    }
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
         viewModel.agentList.observe(viewLifecycleOwner, Observer {
-            rv_proxy_pay.visibility = View.VISIBLE
             agentAdapter.submitList(it)
         })
 
         viewModel.agentListIsEmpty.observe(viewLifecycleOwner, Observer {
             if (it) {
                 tv_proxy_empty.visibility = View.VISIBLE
-                rv_proxy_pay.visibility = View.GONE
             } else {
                 tv_proxy_empty.visibility = View.GONE
-                rv_proxy_pay.visibility = View.VISIBLE
             }
         })
     }
 
     override fun setupListeners() {
-        rg_Type.setOnCheckedChangeListener { _, checkedId ->
+
+        tv_record_top_up.setOnClickListener {
+            navigateTo(NavigateItem.Destination(R.id.action_topupFragment_to_orderFragment))
+        }
+
+        tv_goto_top_up_manage.setOnClickListener {
+            navigateTo(NavigateItem.Destination(R.id.action_topupFragment_to_orderFragment))
+        }
+
+        rg_type.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.rb_online_pay -> {
-                    tv_proxy_empty.visibility = View.GONE
-                    layout_online_pay.visibility = View.VISIBLE
-                    rv_proxy_pay.visibility = View.GONE
-                    tv_proxy_empty.visibility = View.GONE
+                    // FIXME: 下階段的訂單, Release先隱藏
+                    if (BuildConfig.DEBUG) {
+                        layout_online_pay.visibility = View.VISIBLE
+                        rv_proxy_pay.visibility = View.GONE
+                        tv_proxy_empty.visibility = View.GONE
+                    }
                 }
                 R.id.rb_proxy_pay -> {
-                    tv_online_empty.visibility = View.GONE
                     layout_online_pay.visibility = View.GONE
                     rv_proxy_pay.visibility = View.VISIBLE
                     tv_proxy_empty.visibility = View.VISIBLE
+                    tv_online_empty.visibility = View.GONE
                     viewModel.getProxyPayList()
                 }
             }
@@ -211,13 +248,7 @@ class TopUpFragment : BaseFragment() {
                             getString(R.string.topup_select_error)
                         )
                     } else {
-                        val bundle = OrderInfoFragment.createBundle(selectItem)
-                        navigateTo(
-                            NavigateItem.Destination(
-                                R.id.action_to_orderInfoFragment,
-                                bundle
-                            )
-                        )
+                        viewModel.getPendingOrderCount()
                     }
                 }
                 R.id.tv_login -> navigateTo(
@@ -241,6 +272,15 @@ class TopUpFragment : BaseFragment() {
     }
 
     override fun initSettings() {
+
+        // FIXME: 下階段的訂單, Release先隱藏
+        if (BuildConfig.DEBUG) {
+            rg_type.check(R.id.rb_online_pay)
+        } else {
+            rg_type.check(R.id.rb_proxy_pay)
+            rb_online_pay.isClickable = false
+        }
+
         when (viewModel.isLogin()) {
             true -> {
                 //TODO: 目前先不判斷是否有驗證過
@@ -257,9 +297,19 @@ class TopUpFragment : BaseFragment() {
     }
 
     private fun initTopUp() {
-        tv_record_top_up.visibility = View.VISIBLE
+
+        // FIXME: 下階段的訂單, Release先隱藏
+        if (BuildConfig.DEBUG) {
+            tv_record_top_up.visibility = View.VISIBLE
+        } else {
+            tv_record_top_up.visibility = View.GONE
+        }
+
         item_is_Login.visibility = View.VISIBLE
         item_is_not_Login.visibility = View.GONE
+
+        layout_error.visibility = View.GONE
+        layout_next.visibility = View.VISIBLE
 
         tv_subtitle.text = getString(R.string.topup_subtitle)
 
@@ -273,15 +323,15 @@ class TopUpFragment : BaseFragment() {
         rv_proxy_pay.layoutManager = LinearLayoutManager(context)
         rv_proxy_pay.adapter = agentAdapter
 
-        tv_record_top_up.setOnClickListener {
-            navigateTo(NavigateItem.Destination(R.id.action_topupFragment_to_orderFragment))
-        }
-
-        tl_type.getTabAt(0)?.select()
         onlinePayAdapter.clearSelectItem()
 
         viewModel.getMe()
-        viewModel.getOrderingPackage()
+
+        // FIXME: 下階段的訂單, Release先隱藏
+        if (BuildConfig.DEBUG) {
+            tl_type.getTabAt(0)?.select()
+            viewModel.getOrderingPackage()
+        }
     }
 
     private val agentListener = object : TopUpAgentAdapter.EventListener {

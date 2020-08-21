@@ -104,6 +104,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="12sp"
+        android:textColor="@color/color_blue_2"
         app:layout_constraintBottom_toBottomOf="@+id/line"
         app:layout_constraintLeft_toRightOf="@+id/guideline_timeout_start"
         app:layout_constraintRight_toLeftOf="@+id/guideline_timeout_end"
@@ -249,7 +250,7 @@
                 android:textSize="14sp"
                 app:layout_constraintLeft_toLeftOf="@+id/guideline_account_start"
                 app:layout_constraintTop_toBottomOf="@+id/guideline_amount_value_top"
-                tools:text="1234567890123456" />
+                tools:text="100.00" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
