@@ -186,6 +186,7 @@ android {
         if (full_buildTypename.equals("prod_release") && (current_branch.equals("release") || current_branch.equals("master"))) {
             increaseVersionWithPath(getVersionPropertiesPath(flavorName))
             flavor_version = readVersionWithPath(getVersionPropertiesPath(flavorName))
+            setAndpushTag(flavor_version.versionName)
             println "prod_release get new flavor_version versionName " + flavor_version.versionName
             println "prod_release get new flavor_version versionCode :   " + flavor_version.versionCode
         }
@@ -317,6 +318,18 @@ def gitBranch() {
     proc.err.eachLine { line -> println line }
     proc.waitFor()
     branch
+}
+
+def setAndpushTag(String tagName) {
+    println("Show tagname  = $tagName")
+    def proc = "git tag $tagName".execute()
+    proc.in.eachLine { line -> branch = line }
+    proc.err.eachLine { line -> println line }
+    proc.waitFor()
+    proc = "git push --tags".execute()
+    proc.in.eachLine { line -> branch = line }
+    proc.err.eachLine { line -> println line }
+    proc.waitFor()
 }
 
 def isWithSubmoduleBranch() {
