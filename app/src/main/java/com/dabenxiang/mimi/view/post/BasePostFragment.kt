@@ -22,6 +22,8 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MediaItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.PostMemberRequest
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
@@ -46,12 +48,32 @@ open class BasePostFragment : BaseFragment() {
 
     companion object {
         const val CONTENT_LIMIT = 2000
+        const val PHOTO_LIMIT = 20
+        const val RECORD_LIMIT_TIME = 15
+
+        const val INTENT_SELECT_IMG = 10001
+        const val REQUEST_VIDEO_CAPTURE = 10002
+
         private const val TITLE_LIMIT = 60
         private const val HASHTAG_LIMIT = 20
         private const val HASHTAG_TEXT_LIMIT = 10
         private const val INIT_VALUE = 0
-    }
 
+        const val TAG = "tag"
+        const val REQUEST = "request"
+        const val TITLE = "title"
+        const val UPLOAD_ARTICLE = "upload_article"
+        const val POST_ID = "post_id"
+        const val BUNDLE_PIC_URI = "bundle_pic_uri"
+        const val UPLOAD_PIC = "upload_pic"
+        const val MEMBER_REQUEST = "member_request"
+        const val PIC_URI = "pic_uri"
+        const val DELETE_ATTACHMENT = "delete_attachment"
+        const val UPLOAD_VIDEO = "upload_video"
+        const val VIDEO_DATA = "video_data"
+        const val BUNDLE_TRIMMER_URI = "bundle_trimmer_uri"
+        const val BUNDLE_COVER_URI = "bundle_cover_uri"
+    }
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -346,5 +368,41 @@ open class BasePostFragment : BaseFragment() {
             }
         }
         return false
+    }
+
+    fun getTags(): ArrayList<String> {
+        val tags = arrayListOf<String>()
+
+        for (i in 0 until chipGroup.childCount) {
+            val chip = chipGroup.getChildAt(i)
+            chip as Chip
+            tags.add(chip.text.toString())
+        }
+
+        return tags
+    }
+
+    fun checkFieldIsEmpty(): Boolean {
+        val title = edt_title.text.toString()
+
+        if (title.isBlank()) {
+            Toast.makeText(requireContext(), R.string.post_warning_title, Toast.LENGTH_SHORT).show()
+            return true
+        }
+
+        if (chipGroup.childCount == 0) {
+            Toast.makeText(requireContext(), R.string.post_warning_tag, Toast.LENGTH_SHORT).show()
+            return true
+        }
+
+        return false
+    }
+
+    fun getRequest(title: String, type: Int): PostMemberRequest {
+        return PostMemberRequest(
+            title = title,
+            type = type,
+            tags = getTags()
+        )
     }
 }

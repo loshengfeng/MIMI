@@ -3,27 +3,42 @@ package com.dabenxiang.mimi.view.order
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.PagingData
+import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.view.adapter.OrderAdapter
+import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_order.*
-import kotlinx.android.synthetic.main.item_order_no_data.*
+import kotlinx.android.synthetic.main.fragment_order.viewPager
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import kotlinx.android.synthetic.main.item_setting_bar.tv_title
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class OrderFragment : BaseFragment() {
-
-    private val viewModel: OrderViewModel by viewModels()
 
     companion object {
         const val NO_DATA = 0
         const val TYPE_ALL = 0
         const val TYPE_ONLINE_PAY = 1
         const val TYPE_PROXY_PAY = 2
+
+        val tabTitle = arrayListOf(
+            App.self.getString(R.string.topup_all),
+            App.self.getString(R.string.topup_online_pay),
+            App.self.getString(R.string.topup_proxy_pay)
+        )
     }
+
+    private val viewModel: OrderViewModel by viewModels()
 
     private val orderAdapter by lazy { OrderAdapter() }
 
@@ -40,16 +55,12 @@ class OrderFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.orderList.observe(viewLifecycleOwner, Observer {
-            refreshUi(it.size)
-            orderAdapter.submitList(it)
-        })
     }
 
     override fun setupListeners() {
         tl_type.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
-                viewModel.getOrder(tab.position)
+//                viewModel.getOrder(tab.position)
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab) {}
@@ -59,37 +70,29 @@ class OrderFragment : BaseFragment() {
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.tv_back -> navigateTo(NavigateItem.Up)
-                R.id.tv_topup -> GeneralUtils.showToast(requireContext(), "btn_topup")
             }
         }.also {
             tv_back.setOnClickListener(it)
-            tv_topup.setOnClickListener(it)
-        }
-
-        layout_refresh.setOnRefreshListener {
-            layout_refresh.isRefreshing = false
-            viewModel.getOrder(tl_type.selectedTabPosition)
         }
     }
 
-    override fun initSettings() {
+    override fun setupFirstTime() {
+        super.setupFirstTime()
+
         tv_title.text = getString(R.string.personal_order)
-        tv_text.text = "文字文字"
-        viewModel.getOrder(TYPE_ALL)
-        rv_content.adapter = orderAdapter
+
+        viewPager.adapter = OrderPagerAdapter(
+            OrderFuncItem(getOrder = { update -> getOrder(update) },
+                getOrder2 = { update -> viewModel.getOrder2(update)})
+        )
+
+        TabLayoutMediator(tl_type, viewPager) { tab, position ->
+            tab.text = tabTitle[position]
+            viewPager.setCurrentItem(tab.position, true)
+        }.attach()
     }
 
     private fun refreshUi(size: Int) {
-        layout_refresh.visibility = when (size) {
-            NO_DATA -> View.GONE
-            else -> View.VISIBLE
-        }
-
-        item_no_data.visibility = when (size) {
-            NO_DATA -> View.VISIBLE
-            else -> View.GONE
-        }
-
         val title = when (tl_type.selectedTabPosition) {
             TYPE_ALL -> getString(R.string.topup_all)
             TYPE_ONLINE_PAY -> getString(R.string.topup_online_pay)
@@ -98,5 +101,17 @@ class OrderFragment : BaseFragment() {
 
         tl_type.getTabAt(tl_type.selectedTabPosition)?.text =
             StringBuilder(title).append("(").append(size).append(")").toString()
+    }
+
+    private var getOrderJob: Job? = null
+    private fun getOrder(update: ((PagingData<OrderItem>, CoroutineScope) -> Unit)) {
+        Timber.d("@@getOrder")
+        getOrderJob?.cancel()
+        getOrderJob = lifecycleScope.launch {
+            viewModel.getOrder().collectLatest {
+                Timber.d("@@getOrder collect: $it")
+                update(it, this)
+            }
+        }
     }
 }

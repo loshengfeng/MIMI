@@ -3,8 +3,10 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
+apply from: 'version.gradle'
 def android_builder_version = "3.5.3"
 def android_builder_main_version = 3
+
 android {
     this.rootProject.buildscript.configurations.classpath
             .resolvedConfiguration
@@ -64,7 +66,7 @@ android {
     androidExtensions {
         experimental = true
     }
-
+//Ref : https://juejin.im/post/6844904004955144205
     lintOptions {
         disable 'MissingDefaultResource'
     }
@@ -84,13 +86,13 @@ android {
         return ip.substring(ip.indexOf('/') + 1, ip.length())
     }
 
-    Version version = readVersion()
+    def version =  this.ext.default_version()
     defaultConfig {
         applicationId "com.dabenxiang.mimi"
         minSdkVersion 24
         //FIXME Note :  if use video-editor  & com.writingminds:FFmpegAndroid:0.3.2 the targetSdkVersion must below 28 if want over 29/30 (Android Q) change to branch dev_sub_FFmpegAndroid
         //FIXME : branch dev_sub_FFmpegAndroid submodule !!
-        targetSdkVersion 28
+        targetSdkVersion 30
         versionCode version.versionCode.toInteger()
         versionName version.versionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -176,7 +178,7 @@ android {
             buildtype = full_buildTypename.split("_")[0]
         }
 
-        Version flavor_version = readVersionWithPath(getVersionPropertiesPath(flavorName))
+        def flavor_version =  this.ext.default_version(getVersionPropertiesPath(flavorName))
         println "Show current flavor_version versionName " + flavor_version.versionName
         println "Show current flavor_version versionCode :   " + flavor_version.versionCode
         def current_branch = gitBranch()
@@ -184,6 +186,7 @@ android {
         if (full_buildTypename.equals("prod_release") && (current_branch.equals("release") || current_branch.equals("master"))) {
             increaseVersionWithPath(getVersionPropertiesPath(flavorName))
             flavor_version = readVersionWithPath(getVersionPropertiesPath(flavorName))
+            setAndpushTag(flavor_version.versionName)
             println "prod_release get new flavor_version versionName " + flavor_version.versionName
             println "prod_release get new flavor_version versionCode :   " + flavor_version.versionCode
         }
@@ -251,6 +254,10 @@ android {
         exclude 'META-INF/kotlinx-io.kotlin_module'
         exclude 'META-INF/kotlinx-coroutines-io.kotlin_module'
         exclude 'META-INF/kotlinx-coroutines-core.kotlin_module'
+//        pickFirst 'lib/x86/libc++_shared.so'
+//        pickFirst 'lib/x86_64/libc++_shared.so'
+//        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+//        pickFirst 'lib/arm64-v8a/libc++_shared.so'
     }
 }
 
@@ -315,6 +322,18 @@ def gitBranch() {
     proc.err.eachLine { line -> println line }
     proc.waitFor()
     branch
+}
+
+def setAndpushTag(String tagName) {
+    println("Show tagname  = $tagName")
+    def proc = "git tag $tagName".execute()
+    proc.in.eachLine { line -> branch = line }
+    proc.err.eachLine { line -> println line }
+    proc.waitFor()
+    proc = "git push --tags".execute()
+    proc.in.eachLine { line -> branch = line }
+    proc.err.eachLine { line -> println line }
+    proc.waitFor()
 }
 
 def isWithSubmoduleBranch() {
@@ -453,10 +472,13 @@ dependencies {
     implementation project(path: ':domain_libs')
 
     // Video Editor
-    implementation project(path: ':video-editor')
+//    implementation project(path: ':video-editor')
+    implementation 'org.cks.utils.video:video-editor:0.0.0'
+    implementation 'org.cks.ffmpeg:FFmpegAndroid:0.3.3'
 
     //Video compressor
-    implementation project(path: ':videocompressor')
+//    implementation project(path: ':videocompressor')
+    implementation 'org.cks.utils.video:videocompressor:0.0.0'
 
     // Application Provider
     implementation "com.github.florent37:applicationprovider:$application_provider_version"
@@ -464,23 +486,26 @@ dependencies {
     // Work
     implementation "androidx.work:work-runtime-ktx:$work_version"
 
-    implementation 'org.conscrypt:conscrypt-android:2.2.1'
-
-    //ktor
     implementation "io.ktor:ktor-client-android:1.2.5"
+    // Epoxy
+    implementation "com.airbnb.android:epoxy:$epoxy_version"
+    kapt "com.airbnb.android:epoxy-processor:$epoxy_version"
 
-    // Log
-    if (isWithSubmoduleBranch()) {
-        println "sub_project dep !!  "
-        implementation project(path: ':BaseManager')
-        implementation project(path: ':DeviceInfoProvider')
-        implementation project(path: ':logmanager')
-        implementation project(path: ':utils_device')
-        implementation project(path: ':utils_api_result')
-        implementation project(path: ':utils_general')
-        implementation project(path: ':utils_loglevel')
-        implementation project(path: ':utils_gson_factory')
-    } else {
+    implementation "org.conscrypt:conscrypt-android:$conscrypt_version"
+
+//    // Log
+//    if (isWithSubmoduleBranch()) {
+//        println "sub_project dep !!  "
+//        implementation project(path: ':BaseManager')
+//        implementation project(path: ':DeviceInfoProvider')
+//        implementation project(path: ':logmanager')
+//        implementation project(path: ':utils_device')
+//        implementation project(path: ':utils_api_result')
+//        implementation project(path: ':utils_general')
+//        implementation project(path: ':utils_loglevel')
+//        implementation project(path: ':utils_gson_factory')
+//    } else {
+
         implementation "org.cks.utils:BaseManager:$cks_log_version"
         implementation "org.cks.utils:DeviceInfoProvider:$cks_provider"
         implementation "org.cks.utils:logmanager:$cks_log_version"
@@ -490,7 +515,7 @@ dependencies {
         implementation "org.cks.utils:utils_loglevel:$cks_utils"
         implementation "org.cks.utils:utils_gson_factory:$cks_utils"
         implementation "org.cks.utils:updatemanager:$cks_update_version"
-    }
+//    }
 
     // Test
     testImplementation "io.mockk:mockk:$mokk_version"
@@ -510,11 +535,6 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:$android_test_ext_version"
 }
 
-class Version {
-    def versionCode
-    def versionName
-}
-
 def getVersionPropertiesPath(String flavor) {
     def path = "version.properties"
     switch (flavor) {
@@ -523,22 +543,6 @@ def getVersionPropertiesPath(String flavor) {
             break
     }
     return path
-}
-
-Version readVersion() {
-    readVersionWithPath('version.properties')
-}
-
-Version readVersionWithPath(String version_properties_path) {
-    Properties defaultVersionProps = new Properties()
-    def pfile = file(version_properties_path)
-    if (!pfile.exists()) {
-        pfile = file('version.properties')
-    }
-    defaultVersionProps.load(new FileInputStream(pfile))
-    def defaultBuildVersionCode = defaultVersionProps['VERSION_CODE']
-    def defaultBuildVersionName = defaultVersionProps['VERSION_NAME_PREFIX'] + "." + defaultVersionProps['VERSION_NAME_BUILD']
-    return new Version(versionCode: defaultBuildVersionCode, versionName: defaultBuildVersionName)
 }
 
 def increaseVersion() {
@@ -553,7 +557,7 @@ def increaseVersionWithPath(String version_properties_path) {
     }
     versionProps.load(new FileInputStream(pfile))
     def hotfix = versionProps['VERSION_NAME_HOTFIX'].toInteger()
-    def nextCode = versionProps['VERSION_CODE'].toInteger() -hotfix + 10
+    def nextCode = versionProps['VERSION_CODE'].toInteger() - hotfix + 10
     versionProps['VERSION_CODE'] = nextCode.toString()
     def nextBuild = versionProps['VERSION_NAME_BUILD'].toInteger() + 1
     versionProps['VERSION_NAME_BUILD'] = nextBuild.toString()
@@ -564,9 +568,65 @@ def increaseVersionWithPath(String version_properties_path) {
     println "Increase $buildVersionName"
 }
 
+def increaseHotfixVersion() {
+    increaseHotfixVersionWithPath('version.properties')
+}
+
+def increaseHotfixVersionWithPath(String version_properties_path) {
+    Properties versionProps = new Properties()
+    def pfile = file(version_properties_path)
+    if (!pfile.exists()) {
+        pfile = file('version.properties')
+    }
+    versionProps.load(new FileInputStream(pfile))
+    def nextCode = versionProps['VERSION_CODE'].toInteger() + 1
+    versionProps['VERSION_CODE'] = nextCode.toString()
+    def hotfix = versionProps['VERSION_NAME_HOTFIX'].toInteger() + 1
+    versionProps['VERSION_NAME_HOTFIX'] = hotfix.toString()
+    versionProps.store(pfile.newWriter(), null)
+    def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD'] + "." + versionProps['VERSION_NAME_HOTFIX']
+    println "Increase $buildVersionName"
+}
+
+def decreaseVersion() {
+    decreaseVersionWithPath('version.properties')
+}
+
+def decreaseVersionWithPath(String version_properties_path) {
+    Properties versionProps = new Properties()
+    def pfile = file(version_properties_path)
+    if (!pfile.exists()) {
+        pfile = file('version.properties')
+    }
+    versionProps.load(new FileInputStream(pfile))
+    def preCode = versionProps['VERSION_CODE'].toInteger() - 1
+    versionProps['VERSION_CODE'] = preCode.toString()
+    def preBuild = versionProps['VERSION_NAME_BUILD'].toInteger() - 1
+    versionProps['VERSION_NAME_BUILD'] = preBuild.toString()
+    versionProps.store(pfile.newWriter(), null)
+    def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD']
+    println "Decrease $buildVersionName"
+}
+
+task showCurrentVersion {
+    group "version Tasks"
+    Properties versionProps = new Properties()
+    def pfile = file('version.properties')
+    versionProps.load(new FileInputStream(pfile))
+    def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD']
+    println this.project.name +" current : $buildVersionName"
+}
+
 task increaseVersion {
+    group "version Tasks"
     doLast {
         increaseVersion()
     }
 }
 
+task decreaseVersion {
+    group "version Tasks"
+    doLast {
+        decreaseVersion()
+    }
+}

@@ -22,6 +22,7 @@ class ApiRepository(private val apiService: ApiService) {
         fun isRefreshTokenFailed(code: String?): Boolean {
             return code == TOKEN_NOT_FOUND
         }
+        const val NETWORK_PAGE_SIZE = 20
     }
 
     /**********************************************************
@@ -728,7 +729,7 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun getOrder(
         offset: String,
         limit: String
-    ): Response<ApiBasePagingItem<ArrayList<OrderItem>>> {
+    ): Response<ApiBasePagingItem<OrderContentItem>> {
         return apiService.getOrder(offset, limit)
     }
 
@@ -741,6 +742,13 @@ class ApiRepository(private val apiService: ApiService) {
         limit: String
     ): Response<ApiBasePagingItem<ArrayList<OrderItem>>> {
         return apiService.getOrderByOnline(isOnline, offset, limit)
+    }
+
+    /**
+     * 取得未完成訂單
+     */
+    suspend fun getPendingOrderCount(): Response<ApiBaseItem<PendingOrderItem>> {
+        return apiService.getPendingOrderCount()
     }
 
     /**

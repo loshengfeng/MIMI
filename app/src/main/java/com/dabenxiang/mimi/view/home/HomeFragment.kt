@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.home
 
 import android.app.Activity
 import android.content.Intent
+import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
@@ -35,6 +36,10 @@ import kotlinx.android.synthetic.main.fragment_home.*
 
 class HomeFragment : BaseFragment() {
 
+    companion object {
+        private const val REQUEST_LOGIN = 1000
+    }
+
     private val viewModel: HomeViewModel by viewModels()
 
     private var lastTabPosition = 0
@@ -46,34 +51,16 @@ class HomeFragment : BaseFragment() {
     private val homeStatisticsViewHolderMap = hashMapOf<Int, HomeStatisticsViewHolder>()
     private val statisticsMap = hashMapOf<Int, HomeTemplate.Statistics>()
 
-    companion object {
-        private const val REQUEST_LOGIN = 1000
-    }
-
     override fun getLayoutId() = R.layout.fragment_home
 
-    override fun setupFirstTime() {
-        requireActivity().onBackPressedDispatcher.addCallback { backToDesktop() }
-        recyclerview_tab.adapter = tabAdapter
-        setupRecyclerByPosition(0)
-        refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
-        btn_ranking.visibility = View.GONE
-        iv_post.visibility = View.GONE
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        viewModel.adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
-
-        if (mainViewModel?.normal == null) {
-            mainViewModel?.getHomeCategories()
-        }
-    }
-
-    override fun setupObservers() {
-        viewModel.showProgress.observe(viewLifecycleOwner, Observer { showProgress ->
+        viewModel.showProgress.observe(this, Observer { showProgress ->
             showProgress?.takeUnless { it }?.also { refresh.isRefreshing = it }
         })
 
-        mainViewModel?.categoriesData?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.categoriesData?.observe(this, Observer {
             when (it) {
                 is Loading -> refresh.isRefreshing = true
                 is Loaded -> refresh.isRefreshing = false
@@ -94,7 +81,7 @@ class HomeFragment : BaseFragment() {
             }
         })
 
-        mainViewModel?.getAdHomeResult?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.getAdHomeResult?.observe(this, Observer {
             when (val response = it.second) {
                 is Success -> {
                     val viewHolder = homeBannerViewHolderMap[it.first]
@@ -104,7 +91,7 @@ class HomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.videoList.observe(viewLifecycleOwner, Observer {
+        viewModel.videoList.observe(this, Observer {
             when (lastTabPosition) {
                 1 -> movieListAdapter.submitList(it)
                 2 -> dramaListAdapter.submitList(it)
@@ -113,7 +100,7 @@ class HomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.carouselResult.observe(viewLifecycleOwner, Observer {
+        viewModel.carouselResult.observe(this, Observer {
             when (val response = it.second) {
                 is Success -> {
                     val viewHolder = homeCarouselViewHolderMap[it.first]
@@ -126,7 +113,7 @@ class HomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.videosResult.observe(viewLifecycleOwner, Observer {
+        viewModel.videosResult.observe(this, Observer {
             when (val response = it.second) {
                 is Loaded -> {
                     val viewHolder = homeStatisticsViewHolderMap[it.first]
@@ -142,6 +129,25 @@ class HomeFragment : BaseFragment() {
                 is Error -> onApiError(response.throwable)
             }
         })
+    }
+
+    override fun setupFirstTime() {
+        requireActivity().onBackPressedDispatcher.addCallback { backToDesktop() }
+        recyclerview_tab.adapter = tabAdapter
+        setupRecyclerByPosition(0)
+        refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
+        btn_ranking.visibility = View.GONE
+        iv_post.visibility = View.GONE
+
+        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
+        viewModel.adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
+
+        if (mainViewModel?.normal == null) {
+            mainViewModel?.getHomeCategories()
+        }
+    }
+
+    override fun setupObservers() {
     }
 
     override fun setupListeners() {
@@ -294,7 +300,7 @@ class HomeFragment : BaseFragment() {
         MemberPostFuncItem(
             {},
             { id, function -> getBitmap(id, function) },
-            { _,_, _, _ -> }
+            { _, _, _, _ -> }
         )
     }
 
@@ -395,7 +401,10 @@ class HomeFragment : BaseFragment() {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 REQUEST_LOGIN -> {
-                    findNavController().navigate(R.id.action_homeFragment_to_loginFragment, data?.extras)
+                    findNavController().navigate(
+                        R.id.action_homeFragment_to_loginFragment,
+                        data?.extras
+                    )
                 }
             }
         }

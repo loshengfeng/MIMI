@@ -16,8 +16,8 @@ import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.view.post.video.PostVideoFragment.Companion.BUNDLE_COVER_URI
-import com.dabenxiang.mimi.view.post.video.PostVideoFragment.Companion.BUNDLE_TRIMMER_URI
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.BUNDLE_COVER_URI
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.BUNDLE_TRIMMER_URI
 import com.google.android.material.tabs.TabLayout
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_edit_video.*
