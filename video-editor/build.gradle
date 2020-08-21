@@ -96,12 +96,12 @@ dependencies {
     implementation 'org.jetbrains.anko:anko-sqlite:0.10.2'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-//    if (isWithSubmoduleBranch()) {
-//        println "sub_project dep !!  "
-//        implementation project(path: ':FFmpegAndroid')
-//    } else {
+    if (isWithSubmoduleBranch()) {
+        println "sub_project dep !!  "
+        implementation project(path: ':FFmpegAndroid')
+    } else {
         implementation 'org.cks.ffmpeg:FFmpegAndroid:0.3.3'
-//    }
+    }
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
 }
 
