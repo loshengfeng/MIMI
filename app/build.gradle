@@ -66,7 +66,7 @@ android {
     androidExtensions {
         experimental = true
     }
-
+//Ref : https://juejin.im/post/6844904004955144205
     lintOptions {
         disable 'MissingDefaultResource'
     }
@@ -92,7 +92,7 @@ android {
         minSdkVersion 24
         //FIXME Note :  if use video-editor  & com.writingminds:FFmpegAndroid:0.3.2 the targetSdkVersion must below 28 if want over 29/30 (Android Q) change to branch dev_sub_FFmpegAndroid
         //FIXME : branch dev_sub_FFmpegAndroid submodule !!
-        targetSdkVersion 28
+        targetSdkVersion 30
         versionCode version.versionCode.toInteger()
         versionName version.versionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -179,8 +179,8 @@ android {
         }
 
         Version flavor_version = readVersionWithPath(getVersionPropertiesPath(flavorName))
-        println "Show current flavor_version versionName " + flavor_version.versionName
-        println "Show current flavor_version versionCode :   " + flavor_version.versionCode
+//        println "Show current flavor_version versionName " + flavor_version.versionName
+//        println "Show current flavor_version versionCode :   " + flavor_version.versionCode
         def current_branch = gitBranch()
 //        println "Show current_branch :   " + current_branch
         if (full_buildTypename.equals("prod_release") && (current_branch.equals("release") || current_branch.equals("master"))) {
@@ -249,6 +249,10 @@ android {
 
     packagingOptions {
         exclude 'LICENSE'
+//        pickFirst 'lib/x86/libc++_shared.so'
+//        pickFirst 'lib/x86_64/libc++_shared.so'
+//        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+//        pickFirst 'lib/arm64-v8a/libc++_shared.so'
     }
 }
 
@@ -451,10 +455,13 @@ dependencies {
     implementation project(path: ':domain_libs')
 
     // Video Editor
-    implementation project(path: ':video-editor')
+//    implementation project(path: ':video-editor')
+    implementation 'org.cks.utils.video:video-editor:0.0.0'
+    implementation 'org.cks.ffmpeg:FFmpegAndroid:0.3.3'
 
     //Video compressor
-    implementation project(path: ':videocompressor')
+//    implementation project(path: ':videocompressor')
+    implementation 'org.cks.utils.video:videocompressor:0.0.0'
 
     // Application Provider
     implementation "com.github.florent37:applicationprovider:$application_provider_version"
@@ -468,18 +475,18 @@ dependencies {
 
     implementation "org.conscrypt:conscrypt-android:$conscrypt_version"
 
-    // Log
-    if (isWithSubmoduleBranch()) {
-        println "sub_project dep !!  "
-        implementation project(path: ':BaseManager')
-        implementation project(path: ':DeviceInfoProvider')
-        implementation project(path: ':logmanager')
-        implementation project(path: ':utils_device')
-        implementation project(path: ':utils_api_result')
-        implementation project(path: ':utils_general')
-        implementation project(path: ':utils_loglevel')
-        implementation project(path: ':utils_gson_factory')
-    } else {
+//    // Log
+//    if (isWithSubmoduleBranch()) {
+//        println "sub_project dep !!  "
+//        implementation project(path: ':BaseManager')
+//        implementation project(path: ':DeviceInfoProvider')
+//        implementation project(path: ':logmanager')
+//        implementation project(path: ':utils_device')
+//        implementation project(path: ':utils_api_result')
+//        implementation project(path: ':utils_general')
+//        implementation project(path: ':utils_loglevel')
+//        implementation project(path: ':utils_gson_factory')
+//    } else {
         implementation "org.cks.utils:BaseManager:$cks_log_version"
         implementation "org.cks.utils:DeviceInfoProvider:$cks_provider"
         implementation "org.cks.utils:logmanager:$cks_log_version"
@@ -489,7 +496,7 @@ dependencies {
         implementation "org.cks.utils:utils_loglevel:$cks_utils"
         implementation "org.cks.utils:utils_gson_factory:$cks_utils"
         implementation "org.cks.utils:updatemanager:$cks_update_version"
-    }
+//    }
 
     // Test
     testImplementation "io.mockk:mockk:$mokk_version"
