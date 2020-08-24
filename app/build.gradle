@@ -472,9 +472,9 @@ dependencies {
     implementation project(path: ':domain_libs')
 
     // Video Editor
-//    implementation project(path: ':video-editor')
-    implementation 'org.cks.utils.video:video-editor:0.0.0'
-    implementation 'org.cks.ffmpeg:FFmpegAndroid:0.3.3'
+    implementation project(path: ':video-editor')
+//    implementation 'org.cks.utils.video:video-editor:0.0.0'
+//    implementation 'org.cks.ffmpeg:FFmpegAndroid:0.3.3'
 
     //Video compressor
 //    implementation project(path: ':videocompressor')
@@ -492,6 +492,7 @@ dependencies {
     kapt "com.airbnb.android:epoxy-processor:$epoxy_version"
 
     implementation "org.conscrypt:conscrypt-android:$conscrypt_version"
+//    implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.+'
 
 //    // Log
 //    if (isWithSubmoduleBranch()) {
