@@ -4,6 +4,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 apply from: 'version.gradle'
+
 def android_builder_version = "3.5.3"
 def android_builder_main_version = 3
 
@@ -86,7 +87,7 @@ android {
         return ip.substring(ip.indexOf('/') + 1, ip.length())
     }
 
-    def version =  this.ext.default_version()
+    def version = this.ext.default_version()
     defaultConfig {
         applicationId "com.dabenxiang.mimi"
         minSdkVersion 24
@@ -178,7 +179,7 @@ android {
             buildtype = full_buildTypename.split("_")[0]
         }
 
-        def flavor_version =  this.ext.default_version(getVersionPropertiesPath(flavorName))
+        def flavor_version = this.ext.default_version(getVersionPropertiesPath(flavorName))
         println "Show current flavor_version versionName " + flavor_version.versionName
         println "Show current flavor_version versionCode :   " + flavor_version.versionCode
         def current_branch = gitBranch()
@@ -199,41 +200,6 @@ android {
             output.versionCodeOverride = flavor_version.versionCode.toInteger()
         }
     }
-
-////Ref : https://blog.csdn.net/lbcab/article/details/72771729
-////Android Studio在对变体目录和main目录进行资源合并时，会遵守这样的规则 某资源在free下有，在main中没有，那么在打包时，会将该资源直接合并到main资源中 某资源在free下有，在main中也有，那么在打包时，会以free为主，将free中资源替换掉main中资源。
-////代码文件，顾名思义就是指java目录下的.java文件了，为什么代码叫整合，而资源却是合并呢？因为代码文件是没办法合并的，只能是整合，整合是什么意思？假设当前选中的变体是freeDebug，有一个java文件是Test.java，这个Test.java要么只存在free/java下，要么只存在于main/java下，如
-////assets虽然是资源，但它不是合并，而是整合，也就是说，assets文件的处理方式跟java文件的处理方式是一样的 解决方案是使用sourceSets
-
-//    sourceSets {
-//        main {
-//            manifest.srcFile 'AndroidManifest.xml'
-//            aidl.srcDirs = []
-//            assets.srcDirs = ['src/main/assets']
-//            java.srcDirs = []
-//            jni.srcDirs = []
-//            renderscript.srcDirs = []
-//            res.srcDirs = []
-//            resources.srcDirs = []
-//            jniLibs.srcDirs = []
-//        }
-//        mimi {
-//
-//        }
-//    sourceSets.all { sourceSet ->
-//        // println("sourceSet.name = ${sourceSet.name}")
-//        if (sourceSet.name.contains('Debug') || sourceSet.name.contains('Release')) {
-//            if (sourceSet.name.contains("china")
-//                    || sourceSet.name.contains("a")
-//                    || sourceSet.name.contains("b")
-//                    || ...) {
-//                sourceSet.assets.srcDirs = ['src/free/assets']
-//            }
-//        }
-//    }
-
-
-//    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -349,7 +315,6 @@ dependencies {
 
     // AndroidX
     implementation "androidx.appcompat:appcompat:$appcompat_version"
-
     implementation "androidx.core:core-ktx:$ktx_version"
     implementation "com.google.android.material:material:$material_version"
     implementation "androidx.activity:activity-ktx:$activity_ktx_version"
@@ -440,6 +405,33 @@ dependencies {
     // Security-Crypto
     implementation "androidx.security:security-crypto:$security_crypto_version"
 
+    // Work
+    implementation "androidx.work:work-runtime-ktx:$work_version"
+
+    // Ktor
+    implementation "io.ktor:ktor-client-android:1.2.5"
+
+    // Epoxy
+    implementation "com.airbnb.android:epoxy:$epoxy_version"
+    kapt "com.airbnb.android:epoxy-processor:$epoxy_version"
+
+    // Viewpager2
+    implementation "androidx.viewpager2:viewpager2:$viewpager2_version"
+    implementation "com.to.aboomy:pager2banner:$pager2banner_version"
+
+    // RoundedView
+    implementation "com.github.yulichswift:RoundedViews:$rounded_views_version"
+
+    // ExoPlayer
+    implementation "com.google.android.exoplayer:exoplayer:$exoplayer_version"
+    implementation "com.google.android.exoplayer:extension-rtmp:$exoplayer_version"
+
+    // BaseRecyclerViewAdapterHelper
+    implementation "com.github.CymChad:BaseRecyclerViewAdapterHelper:$base_recycler_view_adapter_helper_version"
+
+    // Application Provider
+    implementation "com.github.florent37:applicationprovider:$application_provider_version"
+
     // Stetho
     implementation "com.facebook.stetho:stetho:$stetho_version"
     implementation "com.facebook.stetho:stetho-okhttp3:$stetho_version"
@@ -454,69 +446,28 @@ dependencies {
     // AndroidUtilCode
     implementation "com.blankj:utilcodex:$utilcodex_version"
 
-    // Viewpager2
-    implementation "androidx.viewpager2:viewpager2:$viewpager2_version"
-    implementation 'com.to.aboomy:pager2banner:0.0.5'
+    // Conscrypt
+    implementation "org.conscrypt:conscrypt-android:$conscrypt_version"
 
-    // RoundedView
-    implementation "com.github.yulichswift:RoundedViews:$rounded_views_version"
-
-    // ExoPlayer
-    implementation "com.google.android.exoplayer:exoplayer:$exoplayer_version"
-    implementation "com.google.android.exoplayer:extension-rtmp:$exoplayer_version"
-
-    // BaseRecyclerViewAdapterHelper
-    implementation "com.github.CymChad:BaseRecyclerViewAdapterHelper:$base_recycler_view_adapter_helper_version"
+    // CKS
+    implementation "org.cks.utils:BaseManager:$cks_log_version"
+    implementation "org.cks.utils:DeviceInfoProvider:$cks_provider"
+    implementation "org.cks.utils:logmanager:$cks_log_version"
+    implementation "org.cks.utils:utils_device:$cks_utils"
+    implementation "org.cks.utils:utils_api_result:$cks_utils"
+    implementation "org.cks.utils:utils_general:$cks_utils"
+    implementation "org.cks.utils:utils_loglevel:$cks_utils"
+    implementation "org.cks.utils:utils_gson_factory:$cks_utils"
+    implementation "org.cks.utils:updatemanager:$cks_update_version"
 
     // Domain GoLib
     implementation project(path: ':domain_libs')
 
     // Video Editor
     implementation project(path: ':video-editor')
-//    implementation 'org.cks.utils.video:video-editor:0.0.0'
-//    implementation 'org.cks.ffmpeg:FFmpegAndroid:0.3.3'
 
     //Video compressor
     implementation project(path: ':videocompressor')
-//    implementation 'org.cks.utils.video:videocompressor:0.0.0'
-
-    // Application Provider
-    implementation "com.github.florent37:applicationprovider:$application_provider_version"
-
-    // Work
-    implementation "androidx.work:work-runtime-ktx:$work_version"
-
-    implementation "io.ktor:ktor-client-android:1.2.5"
-    // Epoxy
-    implementation "com.airbnb.android:epoxy:$epoxy_version"
-    kapt "com.airbnb.android:epoxy-processor:$epoxy_version"
-
-    implementation "org.conscrypt:conscrypt-android:$conscrypt_version"
-//    implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.+'
-
-//    // Log
-//    if (isWithSubmoduleBranch()) {
-//        println "sub_project dep !!  "
-//        implementation project(path: ':BaseManager')
-//        implementation project(path: ':DeviceInfoProvider')
-//        implementation project(path: ':logmanager')
-//        implementation project(path: ':utils_device')
-//        implementation project(path: ':utils_api_result')
-//        implementation project(path: ':utils_general')
-//        implementation project(path: ':utils_loglevel')
-//        implementation project(path: ':utils_gson_factory')
-//    } else {
-
-        implementation "org.cks.utils:BaseManager:$cks_log_version"
-        implementation "org.cks.utils:DeviceInfoProvider:$cks_provider"
-        implementation "org.cks.utils:logmanager:$cks_log_version"
-        implementation "org.cks.utils:utils_device:$cks_utils"
-        implementation "org.cks.utils:utils_api_result:$cks_utils"
-        implementation "org.cks.utils:utils_general:$cks_utils"
-        implementation "org.cks.utils:utils_loglevel:$cks_utils"
-        implementation "org.cks.utils:utils_gson_factory:$cks_utils"
-        implementation "org.cks.utils:updatemanager:$cks_update_version"
-//    }
 
     // Test
     testImplementation "io.mockk:mockk:$mokk_version"
@@ -615,7 +566,7 @@ task showCurrentVersion {
     def pfile = file('version.properties')
     versionProps.load(new FileInputStream(pfile))
     def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD']
-    println this.project.name +" current : $buildVersionName"
+    println this.project.name + " current : $buildVersionName"
 }
 
 task increaseVersion {

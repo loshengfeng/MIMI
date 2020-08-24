@@ -22,6 +22,7 @@ class ApiRepository(private val apiService: ApiService) {
         fun isRefreshTokenFailed(code: String?): Boolean {
             return code == TOKEN_NOT_FOUND
         }
+
         const val NETWORK_PAGE_SIZE = 20
     }
 
