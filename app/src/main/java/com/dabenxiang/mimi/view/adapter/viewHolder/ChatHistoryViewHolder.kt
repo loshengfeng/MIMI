@@ -17,6 +17,7 @@ import com.dabenxiang.mimi.view.adapter.ChatHistoryAdapter
 import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -33,10 +34,11 @@ class ChatHistoryViewHolder(
     private val btnChatHistory: ConstraintLayout = itemView.findViewById(R.id.btnChatHistory) as ConstraintLayout
 
     init {
-        btnChatHistory.setOnClickListener { data?.let { data -> listener.onClickListener(data) } }
+        Timber.d("@@init")
     }
 
     override fun updated(position: Int) {
+        Timber.d("@@updated: $position")
         if (data?.lastReadTime == null || data?.lastMessageTime == null || data?.lastReadTime!!.after(data?.lastMessageTime!!)) {
             btnChatHistory.setBackgroundResource(R.drawable.btn_chat_history)
             imgIsNew.visibility = View.INVISIBLE
@@ -44,6 +46,12 @@ class ChatHistoryViewHolder(
             btnChatHistory.setBackgroundResource(R.drawable.btn_chat_history_new)
             imgIsNew.visibility = View.VISIBLE
         }
+
+        btnChatHistory.setOnClickListener {
+            Timber.d("@@setOnClickListener")
+            data?.let { data ->
+                Timber.d("@@setOnClickListener $data")
+                listener.onClickListener(data) } }
 
         data?.avatarAttachmentId?.let {
             LruCacheUtils.getLruArrayCache(it.toString())?.also { array ->

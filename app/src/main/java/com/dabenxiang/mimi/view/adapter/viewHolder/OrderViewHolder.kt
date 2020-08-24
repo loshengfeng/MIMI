@@ -3,25 +3,28 @@ package com.dabenxiang.mimi.view.adapter.viewHolder
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import kotlinx.android.synthetic.main.item_order.view.*
 import timber.log.Timber
 
 class OrderViewHolder(view: View) : BaseViewHolder(view) {
-    private val ivType = itemView.findViewById(R.id.iv_type) as ImageView
-    private val tvAccount = itemView.findViewById(R.id.tv_account) as TextView
-    private val tvTime = itemView.findViewById(R.id.tv_time) as TextView
-    private val tvToken = itemView.findViewById(R.id.tv_token) as TextView
-    private val tvPrice = itemView.findViewById(R.id.tv_price) as TextView
+    private val ivType: ImageView = view.iv_type
+    private val tvAccount: TextView = view.tv_account
+    private val tvTime: TextView = view.tv_time
+    private val tvToken: TextView = view.tv_token
+    private val tvPrice: TextView = view.tv_price
+    private val clRoot: ConstraintLayout = view.cl_root
 
     private var orderItem: OrderItem? = null
 
     init {
+        Timber.d("@@init")
         view.setOnClickListener {
-            Timber.d("onClick")
+            Timber.d("@@nClick")
         }
     }
 
@@ -34,6 +37,13 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
                 else -> R.drawable.ico_bank
             }
         )
+        ivType.setOnClickListener {
+            Timber.d("@@ivType setOnClickListener")
+        }
+
+        clRoot.setOnClickListener {
+            Timber.d("@@setOnClickListener")
+        }
 
         tvAccount.text = orderItem?.accountName
 
