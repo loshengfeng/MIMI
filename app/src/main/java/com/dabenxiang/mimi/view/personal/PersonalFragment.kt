@@ -108,7 +108,6 @@ class PersonalFragment : BaseFragment() {
                             data.errorItem.message?.also { message ->
                                 GeneralDialog.newInstance(
                                     GeneralDialogData(
-                                        titleRes = 0,
                                         message = message,
                                         messageIcon = R.drawable.ico_default_photo,
                                         secondBtn = getString(R.string.btn_confirm)
@@ -187,6 +186,13 @@ class PersonalFragment : BaseFragment() {
                 item_is_Login.visibility = View.VISIBLE
                 item_is_not_Login.visibility = View.GONE
                 viewModel.getMe()
+
+                // FIXME: 下階段的訂單, Release先隱藏
+                tv_topup_history.visibility = if (BuildConfig.DEBUG) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
             }
             false -> {
                 item_is_Login.visibility = View.GONE

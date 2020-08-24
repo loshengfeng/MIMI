@@ -1,17 +1,59 @@
+//FIXME how add  project only itself library repo
+//repositories {
+//    maven { url 'https://dl.bintray.com/cks/FFMPEG' }
+//}
+
+//FIXME
+// Note if run bintryUpload  to upload library aar/jar files into Bintry/Jcenter
+// must temp disable  org.gradle.parallel=true  & org.gradle.configureondemand=true @ gradle.properties
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply from: 'version.gradle'
+def version =  this.ext.default_version()
+ext {
+    //FIXME the below three  modify with project type by yourself
+    maven_repo_name = 'VideoTools'
+    library_versionName = version.versionName
+    library_pom_bintray_GroupId = 'org.cks.utils.video'
+    //FIXME the below  if deploy to Bintray & public (jcneter) must real git repo & information (when pass jcenter you can del git repo )
+    // if private can fake git repo
+    // project homepage
+    scmUrl = 'https://github.com/xiangdingquan/Aes'
+// project git
+    developerid = 'xiangdingquan'
+    developername = 'xdq(xiangdingquan)'
+    developeremail = 'xdq19910120@gmail.com'
+    scmConnectionUrl = 'https://github.com/xiangdingquan/Aes'
+    scmDeveloperConnectionUrl = 'https://github.com/xiangdingquan/Aes.git'
 
+    mavDevelopers = ["Fe": "Federico"]
+    mavSiteUrl = "https://github.com/xiangdingquan/Aes"
+    mavGitUrl = mavSiteUrl + '.git'
+    mavProjectName = this.project.name
+    mavPublishToInternalRepo = true
+    mavRepoInternalUrl = "path/to/internal/repo"
+    mavLibraryLicenses = ["Apache-2.0": 'http://www.apache.org/licenses/LICENSE-2.0.txt']
+    mavLibraryDescription = "an AES decrypt and encrypt for jni !!"
+}
 android {
     compileSdkVersion 28
-
+    buildToolsVersion "29.0.2"
+    lintOptions {
+        disable 'MissingDefaultResource'
+        abortOnError false
+        ignoreWarnings true
+    }
     defaultConfig {
         minSdkVersion 21
         //FIXME Note :  if use com.writingminds:FFmpegAndroid:0.3.2 the targetSdkVersion must below 28 if want over 29/30 (Android Q) change to branch dev_sub_FFmpegAndroid
         //FIXME : branch dev_sub_FFmpegAndroid submodule !!
         targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        versionCode version.versionCode.toInteger()
+        versionName version.versionName
+        ndk {
+            abiFilters "arm64-v8a" ,"armeabi-v7a"
+        }
     }
     buildTypes {
         release {
@@ -19,13 +61,143 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+//    sourceSets.main {
+////        assets.srcDirs = ['assets']
+////        jni.srcDirs = [] //disable automatic ndk-build
+////        jniLibs.srcDirs = ['libs']
+//    }
+
+    packagingOptions {
+        pickFirst 'lib/x86/libc++_shared.so'
+        pickFirst 'lib/x86_64/libc++_shared.so'
+        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+        pickFirst 'lib/arm64-v8a/libc++_shared.so'
+    }
+}
+
+def gitBranch() {
+    def branch = ""
+    def proc = "git rev-parse --abbrev-ref HEAD".execute()
+    proc.in.eachLine { line -> branch = line }
+    proc.err.eachLine { line -> println line }
+    proc.waitFor()
+    branch
+}
+
+def isWithSubmoduleBranch() {
+    if (gitBranch().contains("dev_sub")) {
+        return true
+    } else {
+        return false
+    }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar','*.aar'])
     implementation 'org.jetbrains.anko:anko-sqlite:0.10.2'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.writingminds:FFmpegAndroid:0.3.2'
-    implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
+    if (isWithSubmoduleBranch()) {
+        println "sub_project dep !!  "
+        implementation project(path: ':FFmpegAndroid')
+    } else {
+        implementation 'org.cks.ffmpeg:FFmpegAndroid:0.3.3'
+    }
+    api 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
+}
+
+////apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'install.gradle'
+File f = this.file('bintray.properties')
+if (f.exists() && !f.isDirectory()) {
+    apply from: 'bintray.gradle'
+}
+////apply from: 'https://raw.githubusercontent.com/sky-uk/gradle-maven-plugin/master/gradle-mavenizer.gradle'
+
+//FIXME the below how to export into version.gradle ??  let other gradle use apply from: import  !!
+def increaseVersion() {
+    increaseVersionWithPath('version.properties')
+}
+
+def increaseVersionWithPath(String version_properties_path) {
+    Properties versionProps = new Properties()
+    def pfile = file(version_properties_path)
+    if (!pfile.exists()) {
+        pfile = file('version.properties')
+    }
+    versionProps.load(new FileInputStream(pfile))
+    def hotfix = versionProps['VERSION_NAME_HOTFIX'].toInteger()
+    def nextCode = versionProps['VERSION_CODE'].toInteger() - hotfix + 10
+    versionProps['VERSION_CODE'] = nextCode.toString()
+    def nextBuild = versionProps['VERSION_NAME_BUILD'].toInteger() + 1
+    versionProps['VERSION_NAME_BUILD'] = nextBuild.toString()
+    hotfix = 0
+    versionProps['VERSION_NAME_HOTFIX'] = hotfix.toString()
+    versionProps.store(pfile.newWriter(), null)
+    def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD']
+    println "Increase $buildVersionName"
+}
+
+def increaseHotfixVersion() {
+    increaseHotfixVersionWithPath('version.properties')
+}
+
+def increaseHotfixVersionWithPath(String version_properties_path) {
+    Properties versionProps = new Properties()
+    def pfile = file(version_properties_path)
+    if (!pfile.exists()) {
+        pfile = file('version.properties')
+    }
+    versionProps.load(new FileInputStream(pfile))
+    def nextCode = versionProps['VERSION_CODE'].toInteger() + 1
+    versionProps['VERSION_CODE'] = nextCode.toString()
+    def hotfix = versionProps['VERSION_NAME_HOTFIX'].toInteger() + 1
+    versionProps['VERSION_NAME_HOTFIX'] = hotfix.toString()
+    versionProps.store(pfile.newWriter(), null)
+    def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD'] + "." + versionProps['VERSION_NAME_HOTFIX']
+    println "Increase $buildVersionName"
+}
+
+def decreaseVersion() {
+    decreaseVersionWithPath('version.properties')
+}
+
+def decreaseVersionWithPath(String version_properties_path) {
+    Properties versionProps = new Properties()
+    def pfile = file(version_properties_path)
+    if (!pfile.exists()) {
+        pfile = file('version.properties')
+    }
+    versionProps.load(new FileInputStream(pfile))
+    def preCode = versionProps['VERSION_CODE'].toInteger() - 1
+    versionProps['VERSION_CODE'] = preCode.toString()
+    def preBuild = versionProps['VERSION_NAME_BUILD'].toInteger() - 1
+    versionProps['VERSION_NAME_BUILD'] = preBuild.toString()
+    versionProps.store(pfile.newWriter(), null)
+    def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD']
+    println "Decrease $buildVersionName"
+}
+
+task showCurrentVersion {
+    group "version Tasks"
+    Properties versionProps = new Properties()
+    def pfile = file('version.properties')
+    versionProps.load(new FileInputStream(pfile))
+    def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD']
+    println this.project.name +" current : $buildVersionName"
+}
+
+task increaseVersion {
+    group "version Tasks"
+    doLast {
+        increaseVersion()
+    }
+}
+
+task decreaseVersion {
+    group "version Tasks"
+    doLast {
+        decreaseVersion()
+    }
 }

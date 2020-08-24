@@ -15,7 +15,7 @@
         android:layout_height="24dp"
         android:layout_marginTop="15dp"
         android:layout_marginStart="15dp"
-        android:src="@drawable/ico_alipay"
+        android:background="@drawable/ico_alipay"
         android:contentDescription="@null"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

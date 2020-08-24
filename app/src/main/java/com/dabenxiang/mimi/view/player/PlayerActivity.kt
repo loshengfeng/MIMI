@@ -18,7 +18,6 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavDeepLinkBuilder
 import androidx.recyclerview.widget.LinearSnapHelper
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
@@ -45,7 +44,6 @@ import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
-import com.dabenxiang.mimi.view.setting.SettingFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.OrientationDetector
 import com.google.android.exoplayer2.*
@@ -106,7 +104,7 @@ class PlayerActivity : BaseActivity() {
     private var moreDialog: MoreDialogFragment? = null
     private var reportDialog: ReportDialogFragment? = null
     private var isFirstInit = true
-    private var isKeyboardShown =false
+    private var isKeyboardShown = false
 
     private val sourceListAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
@@ -239,7 +237,7 @@ class PlayerActivity : BaseActivity() {
 
             override fun onMoreClick(item: MembersPostCommentItem) {
                 Timber.i("playerInfoAdapter onMoreClick")
-                if(item.id != null){
+                if (item.id != null) {
                     viewModel.isCommentReport = true
                     showMoreDialog(item.id, PostType.VIDEO, item.reported ?: false)
                 }
@@ -248,15 +246,15 @@ class PlayerActivity : BaseActivity() {
             override fun onAvatarClick(userId: Long, name: String) {
                 Timber.d("onAvatarClick nav to member post with userId: $userId and name: $name")
                 val bundle = MyPostFragment.createBundle(
-                        userId, name,
-                        isAdult = true,
-                        isAdultTheme = obtainIsAdult()
+                    userId, name,
+                    isAdult = true,
+                    isAdultTheme = obtainIsAdult()
                 )
                 bundle.putBoolean(KEY_IS_FROM_PLAYER, true)
                 navigateTo(
-                        MainActivity::class.java,
-                        R.id.action_to_myPostFragment,
-                        bundle
+                    MainActivity::class.java,
+                    R.id.action_to_myPostFragment,
+                    bundle
                 )
             }
         }, CommentViewType.VIDEO).apply {
@@ -391,8 +389,10 @@ class PlayerActivity : BaseActivity() {
                     }
                 )
             )
-            it.background = getDrawable(if (isAdult) R.drawable.bg_black_1_30_radius_18
-            else R.drawable.bg_gray_1_30_radius_18)
+            it.background = getDrawable(
+                if (isAdult) R.drawable.bg_black_1_30_radius_18
+                else R.drawable.bg_gray_1_30_radius_18
+            )
         }
 
         tv_comment.setCompoundDrawablesRelativeWithIntrinsicBounds(
@@ -401,7 +401,7 @@ class PlayerActivity : BaseActivity() {
             0,
             0
         )
-        et_message.let{
+        et_message.let {
             it.setCompoundDrawablesRelativeWithIntrinsicBounds(
                 if (isAdult) R.drawable.ico_messege_adult else R.drawable.ico_messege_adult_gray,
                 0,
@@ -409,13 +409,15 @@ class PlayerActivity : BaseActivity() {
                 0
             )
             it.compoundDrawablePadding = 5
-            it.setBackgroundColor(getColor(if(isAdult) R.color.color_black_1 else  R.color.color_gray_1))
-            it.setTextColor(getColor(if(isAdult) R.color.color_white_1 else R.color.color_black_1))
-            it.setHintTextColor(getColor(if(isAdult) R.color.color_gray_1 else R.color.color_gray_9))
+            it.setBackgroundColor(getColor(if (isAdult) R.color.color_black_1 else R.color.color_gray_1))
+            it.setTextColor(getColor(if (isAdult) R.color.color_white_1 else R.color.color_black_1))
+            it.setHintTextColor(getColor(if (isAdult) R.color.color_gray_1 else R.color.color_gray_9))
         }
 
-        iv_bar.setImageResource(if (isAdult) R.drawable.bg_black_1_30_radius_18
-        else R.drawable.bg_gray_1_30_radius_18)
+        iv_bar.setImageResource(
+            if (isAdult) R.drawable.bg_black_1_30_radius_18
+            else R.drawable.bg_gray_1_30_radius_18
+        )
 
         tv_like.setTextColor(titleColor)
         iv_favorite.setTextColor(titleColor)
@@ -847,12 +849,12 @@ class PlayerActivity : BaseActivity() {
             viewModel.checkStatus {
                 Timber.d("share confirmed")
                 GeneralUtils.copyToClipboard(
-                        baseContext,
-                        viewModel.getShareUrl(
-                                viewModel.category,
-                                viewModel.videoId,
-                                viewModel.episodeId.toString()
-                        )
+                    baseContext,
+                    viewModel.getShareUrl(
+                        viewModel.category,
+                        viewModel.videoId,
+                        viewModel.episodeId.toString()
+                    )
                 )
                 GeneralUtils.showToast(baseContext, getString(R.string.copy_url))
             }
@@ -869,9 +871,9 @@ class PlayerActivity : BaseActivity() {
                     is Loading -> progressHUD.show()
                     is Loaded -> progressHUD.dismiss()
                     is Empty -> {
-                        if(!viewModel.isCommentReport) {
+                        if (!viewModel.isCommentReport) {
                             viewModel.isReported = true
-                        }else {
+                        } else {
                             viewModel.isCommentReport = false
                             viewModel.setupCommentDataSource(playerInfoAdapter)
                         }
@@ -925,14 +927,14 @@ class PlayerActivity : BaseActivity() {
         val adHeight = (GeneralUtils.getScreenSize(this).second * 0.0245).toInt()
         viewModel.getAd(adWidth, adHeight)
 
-        exo_play_pause.setOnClickListener{
+        exo_play_pause.setOnClickListener {
             viewModel.checkStatus {
                 Timber.d("exo_play_pause confirmed")
                 player?.also {
                     it.playWhenReady.also { playing ->
                         it.playWhenReady = !playing
                         viewModel.setPlaying(!playing)
-                        if(!playing)
+                        if (!playing)
                             exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
                         else
                             exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_play))
@@ -944,7 +946,7 @@ class PlayerActivity : BaseActivity() {
         iv_player.setOnClickListener {
             viewModel.checkStatus {
                 Timber.d("iv_player confirmed")
-                if(it.visibility == View.VISIBLE) {
+                if (it.visibility == View.VISIBLE) {
                     player?.playWhenReady = true
                     viewModel.setPlaying(true)
                     exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
@@ -957,14 +959,14 @@ class PlayerActivity : BaseActivity() {
 
     }
 
-    private fun showMoreDialog(id:Long, type:PostType, isReported:Boolean){
+    private fun showMoreDialog(id: Long, type: PostType, isReported: Boolean) {
         Timber.i("id=$id")
         Timber.i("isReported=$isReported")
         moreDialog = MoreDialogFragment.newInstance(
             MemberPostItem(
                 id = id,
                 type = type,
-                reported= isReported
+                reported = isReported
 
             ), onMoreDialogListener
         ).also {
@@ -1003,12 +1005,13 @@ class PlayerActivity : BaseActivity() {
                         getString(R.string.already_reported)
                     )
                 } else {
-                    reportDialog = ReportDialogFragment.newInstance(item, onReportDialogListener).also {
-                        it.show(
-                            supportFragmentManager,
-                            ReportDialogFragment::class.java.simpleName
-                        )
-                    }
+                    reportDialog =
+                        ReportDialogFragment.newInstance(item, onReportDialogListener).also {
+                            it.show(
+                                supportFragmentManager,
+                                ReportDialogFragment::class.java.simpleName
+                            )
+                        }
                 }
                 moreDialog?.dismiss()
             }
@@ -1126,6 +1129,7 @@ class PlayerActivity : BaseActivity() {
         consumeDialog = null
         loadReplyCommentBlock = null
         loadCommentLikeBlock = null
+        viewModel.deleteCacheFile()
     }
 
     override fun onBackPressed() {
@@ -1178,6 +1182,7 @@ class PlayerActivity : BaseActivity() {
                 isReset = true
                 viewModel.currentVideoUrl = viewModel.nextVideoUrl!!
             }
+            Timber.d("Niel url ${viewModel.currentVideoUrl}")
             setupPlayUrl(viewModel.currentVideoUrl!!, isReset)
         }
     }
@@ -1185,6 +1190,8 @@ class PlayerActivity : BaseActivity() {
     private fun setupPlayUrl(url: String, isReset: Boolean) {
         val agent = Util.getUserAgent(this, getString(R.string.app_name))
         val sourceFactory = DefaultDataSourceFactory(this, agent)
+
+//        viewModel.downloadM3U8(url)
 
         viewModel.getMediaSource(url, sourceFactory)?.also {
             viewModel.checkStatus {
@@ -1265,12 +1272,12 @@ class PlayerActivity : BaseActivity() {
                         }
                         true
                     } else {
-    //                        player?.also {
-    //                            it.playWhenReady.also { playing ->
-    //                                it.playWhenReady = !playing
-    //                                viewModel.setPlaying(!playing)
-    //                            }
-    //                        }
+                        //                        player?.also {
+                        //                            it.playWhenReady.also { playing ->
+                        //                                it.playWhenReady = !playing
+                        //                                viewModel.setPlaying(!playing)
+                        //                            }
+                        //                        }
                         false
                     }
 
@@ -1284,20 +1291,20 @@ class PlayerActivity : BaseActivity() {
             isMove
         }
 
-        var startClickTime:Long = 0
+        var startClickTime: Long = 0
         recycler_info.setOnTouchListener { v, event ->
             Timber.i("RecyclerView=setOnTouchListener isKeyboardShown=$isKeyboardShown")
-            if(!isKeyboardShown) return@setOnTouchListener false
+            if (!isKeyboardShown) return@setOnTouchListener false
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     startClickTime = System.currentTimeMillis()
                 }
 
                 MotionEvent.ACTION_UP -> {
-                    var clickDuration:Long = System.currentTimeMillis()
-                    if(clickDuration - startClickTime <100){
-                      commentEditorHide()
-                      commentEditorToggle(false)
+                    var clickDuration: Long = System.currentTimeMillis()
+                    if (clickDuration - startClickTime < 100) {
+                        commentEditorHide()
+                        commentEditorToggle(false)
                     }
                 }
             }
@@ -1730,13 +1737,13 @@ class PlayerActivity : BaseActivity() {
         adjustPlayerSize()
     }
 
-    private fun fullScreenUISet(isFullScreen:Boolean){
-        if(isFullScreen){
+    private fun fullScreenUISet(isFullScreen: Boolean) {
+        if (isFullScreen) {
             commentEditorHide()
             recycler_info.visibility = View.GONE
             bottom_func_bar.visibility = View.GONE
             bottom_func_input.visibility = View.GONE
-        }else{
+        } else {
             recycler_info?.visibility = View.VISIBLE
             bottom_func_bar?.visibility = View.VISIBLE
             bottom_func_input.visibility = View.GONE
@@ -1763,55 +1770,55 @@ class PlayerActivity : BaseActivity() {
 
     private fun showEmailConfirmDialog() {
         GeneralDialog.newInstance(
-                GeneralDialogData(
-                        titleRes = R.string.error_email_not_confirmed_title,
-                        message = getString(R.string.error_email_not_confirmed_msg),
-                        messageIcon = R.drawable.ico_email,
-                        firstBtn = getString(R.string.verify_later),
-                        secondBtn = getString(R.string.verify_immediately),
-                        secondBlock = {
-                            val bundle = Bundle().also { it.putBoolean(KEY_IS_FROM_PLAYER, true) }
-                            navigateTo(
-                                    MainActivity::class.java,
-                                    R.id.settingFragment,
-                                    bundle
-                            )
-                        }
-                )
+            GeneralDialogData(
+                titleRes = R.string.error_email_not_confirmed_title,
+                message = getString(R.string.error_email_not_confirmed_msg),
+                messageIcon = R.drawable.ico_email,
+                firstBtn = getString(R.string.verify_later),
+                secondBtn = getString(R.string.verify_immediately),
+                secondBlock = {
+                    val bundle = Bundle().also { it.putBoolean(KEY_IS_FROM_PLAYER, true) }
+                    navigateTo(
+                        MainActivity::class.java,
+                        R.id.settingFragment,
+                        bundle
+                    )
+                }
+            )
         ).show(supportFragmentManager)
     }
 
 
     fun showNotLoginDialog() {
         GeneralDialog.newInstance(
-                GeneralDialogData(
-                        titleRes = R.string.login_yet,
-                        message = getString(R.string.login_message),
-                        messageIcon = R.drawable.ico_default_photo,
-                        firstBtn = getString(R.string.btn_register),
-                        secondBtn = getString(R.string.btn_login),
-                        firstBlock = {
-                            val bundle = Bundle()
-                            bundle.putInt(LoginFragment.KEY_TYPE, LoginFragment.TYPE_REGISTER)
-                            navigateTo(
-                                    MainActivity::class.java,
-                                    R.id.loginFragment,
-                                    bundle
-                            )
-                        },
-                        secondBlock = {
-                            val bundle = Bundle()
-                            bundle.putInt(LoginFragment.KEY_TYPE, LoginFragment.TYPE_LOGIN)
-                            navigateTo(
-                                    MainActivity::class.java,
-                                    R.id.loginFragment,
-                                    bundle
-                            )
-                        },
-                        closeBlock = {
-                            Timber.d("close!")
-                        }
-                )
+            GeneralDialogData(
+                titleRes = R.string.login_yet,
+                message = getString(R.string.login_message),
+                messageIcon = R.drawable.ico_default_photo,
+                firstBtn = getString(R.string.btn_register),
+                secondBtn = getString(R.string.btn_login),
+                firstBlock = {
+                    val bundle = Bundle()
+                    bundle.putInt(LoginFragment.KEY_TYPE, LoginFragment.TYPE_REGISTER)
+                    navigateTo(
+                        MainActivity::class.java,
+                        R.id.loginFragment,
+                        bundle
+                    )
+                },
+                secondBlock = {
+                    val bundle = Bundle()
+                    bundle.putInt(LoginFragment.KEY_TYPE, LoginFragment.TYPE_LOGIN)
+                    navigateTo(
+                        MainActivity::class.java,
+                        R.id.loginFragment,
+                        bundle
+                    )
+                },
+                closeBlock = {
+                    Timber.d("close!")
+                }
+            )
         ).show(supportFragmentManager)
     }
 }

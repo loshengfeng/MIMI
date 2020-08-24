@@ -22,6 +22,8 @@ class ApiRepository(private val apiService: ApiService) {
         fun isRefreshTokenFailed(code: String?): Boolean {
             return code == TOKEN_NOT_FOUND
         }
+
+        const val NETWORK_PAGE_SIZE = 20
     }
 
     /**********************************************************
@@ -692,6 +694,16 @@ class ApiRepository(private val apiService: ApiService) {
     ) = apiService.getVideoStreamM3u8(streamId, userId, utcTime, sign)
 
     /**
+     * 取得m3u8播放列表檔案
+     */
+    suspend fun getVideoM3u8Source(
+        streamId: Long,
+        userId: Long? = null,
+        utcTime: Long? = null,
+        sign: String? = null
+    ) = apiService.getVideoM3u8Source(streamId, userId, utcTime, sign)
+
+    /**
      * 取得在線支付
      */
     suspend fun getOrderingPackage(): Response<ApiBaseItem<ArrayList<OrderingPackageItem>>> {
@@ -718,7 +730,7 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun getOrder(
         offset: String,
         limit: String
-    ): Response<ApiBasePagingItem<ArrayList<OrderItem>>> {
+    ): Response<ApiBasePagingItem<OrderContentItem>> {
         return apiService.getOrder(offset, limit)
     }
 
