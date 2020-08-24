@@ -12,7 +12,7 @@ data class OrderingPackageItem(
     @SerializedName("name")
     val name: String = "",
 
-    @SerializedName("type")
+    @SerializedName("paymentType")
     val paymentType: PaymentType = PaymentType.BANK,
 
     @SerializedName("listPrice")
