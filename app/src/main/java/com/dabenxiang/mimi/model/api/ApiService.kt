@@ -599,7 +599,7 @@ interface ApiService {
         @Query("isOnline") isOnline: Boolean,
         @Query("offset") offset: String,
         @Query("limit") limit: String
-    ): Response<ApiBasePagingItem<ArrayList<OrderItem>>>
+    ): Response<ApiBasePagingItem<OrderContentItem>>
 
     @GET("/v1/Member/Me/Order/GetPendingOrder")
     suspend fun getPendingOrderCount(): Response<ApiBaseItem<PendingOrderItem>>

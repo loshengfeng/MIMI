@@ -135,6 +135,8 @@
     <string name="topup_all">全部</string>
     <string name="topup_online_pay">在线支付</string>
     <string name="topup_proxy_pay">代理支付</string>
+    <string name="topup_proxy_order">代理订单</string>
+    <string name="topup_proxy_chat">对话记录</string>
     <string name="topup_pay">支付金额</string>
     <string name="title_chat_history">对话记录</string>
     <string name="edit_hint_chat">留下评论</string>

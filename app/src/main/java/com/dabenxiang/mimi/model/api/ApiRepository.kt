@@ -741,7 +741,7 @@ class ApiRepository(private val apiService: ApiService) {
         isOnline: Boolean,
         offset: String,
         limit: String
-    ): Response<ApiBasePagingItem<ArrayList<OrderItem>>> {
+    ): Response<ApiBasePagingItem<OrderContentItem>> {
         return apiService.getOrderByOnline(isOnline, offset, limit)
     }
 

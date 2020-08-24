@@ -7,11 +7,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingData
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.android.synthetic.main.fragment_club_detail.*
 import kotlinx.android.synthetic.main.fragment_order.*
 import kotlinx.android.synthetic.main.fragment_order.viewPager
 import kotlinx.android.synthetic.main.item_setting_bar.*
@@ -40,7 +43,16 @@ class OrderFragment : BaseFragment() {
 
     private val viewModel: OrderViewModel by viewModels()
 
-    private val orderAdapter by lazy { OrderAdapter() }
+    private val orderPagerAdapter by lazy {
+        OrderPagerAdapter(
+            OrderFuncItem(
+                getOrderByPaging3 = { update -> getOrderByPaging3(update) },
+                getOrderByPaging2 = { isOnline, update -> viewModel.getOrderByPaging2(isOnline, update) },
+                getChatList = { update -> viewModel.getChatList(update) },
+                getChatAttachment = { id, pos, update -> viewModel.getAttachment(id, pos, update) },
+                onChatItemClick = { item -> onChatItemClick(item) }
+            ))
+    }
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -81,10 +93,7 @@ class OrderFragment : BaseFragment() {
 
         tv_title.text = getString(R.string.personal_order)
 
-        viewPager.adapter = OrderPagerAdapter(
-            OrderFuncItem(getOrder = { update -> getOrder(update) },
-                getOrder2 = { update -> viewModel.getOrder2(update)})
-        )
+        viewPager.adapter = orderPagerAdapter
 
         TabLayoutMediator(tl_type, viewPager) { tab, position ->
             tab.text = tabTitle[position]
@@ -104,14 +113,23 @@ class OrderFragment : BaseFragment() {
     }
 
     private var getOrderJob: Job? = null
-    private fun getOrder(update: ((PagingData<OrderItem>, CoroutineScope) -> Unit)) {
+    private fun getOrderByPaging3(update: ((PagingData<OrderItem>, CoroutineScope) -> Unit)) {
         Timber.d("@@getOrder")
         getOrderJob?.cancel()
         getOrderJob = lifecycleScope.launch {
-            viewModel.getOrder().collectLatest {
+            viewModel.getOrderByPaging3().collectLatest {
                 Timber.d("@@getOrder collect: $it")
                 update(it, this)
             }
         }
+    }
+
+    private fun onChatItemClick(item: ChatListItem) {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_orderFragment_to_chatContentFragment,
+                ChatContentFragment.createBundle(item)
+            )
+        )
     }
 }
