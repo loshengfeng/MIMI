@@ -16,6 +16,9 @@ import timber.log.Timber
 class OrderViewHolder(view: View) : BaseViewHolder(view) {
     private val tvStatus: TextView = view.tv_status
     private val ivType: ImageView = view.iv_type
+    private val clProxy: ConstraintLayout = view.cl_proxy
+    private val ivAvatar: ImageView = view.img_avatar
+    private val tvName: TextView = view.tv_name
     private val tvOrderId: TextView = view.tv_order_id
     private val tvTime: TextView = view.tv_time
     private val tvPoint: TextView = view.tv_point
@@ -58,13 +61,24 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
             }
         }
 
-        ivType.setBackgroundResource(
-            when (orderItem?.paymentType) {
-                PaymentType.ALI -> R.drawable.ico_alipay
-                PaymentType.WX -> R.drawable.ico_wechat_pay
-                else -> R.drawable.ico_bank
+        when(orderItem?.isOnline) {
+            false -> {
+                ivType.visibility = View.INVISIBLE
+                clProxy.visibility = View.VISIBLE
+                tvName.text = orderItem.merchantUserFriendlyName
             }
-        )
+            true -> {
+                clProxy.visibility = View.GONE
+                ivType.visibility = View.VISIBLE
+                ivType.setBackgroundResource(
+                    when (orderItem.paymentType) {
+                        PaymentType.ALI -> R.drawable.ico_alipay
+                        PaymentType.WX -> R.drawable.ico_wechat_pay
+                        else -> R.drawable.ico_bank
+                    }
+                )
+            }
+        }
 
         ivType.setOnClickListener {
             Timber.d("@@ivType setOnClickListener")
