@@ -2,70 +2,73 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_order_package"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
-    android:layout_marginStart="5dp"
-    android:layout_marginTop="12dp"
-    android:layout_marginEnd="6dp"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="4dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginEnd="4dp"
+    android:layout_marginBottom="8dp"
     android:background="@drawable/bg_gray_7_stroke_1_radius_8">
 
     <ImageView
         android:id="@+id/iv_check"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="@null"
-        android:src="@drawable/btn_checkbox_s"
+        android:src="@drawable/ico_preice_checked"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/iv_token"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:contentDescription="@null"
-        android:src="@drawable/ico_micoin_small"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/tv_token"
-        app:layout_constraintTop_toBottomOf="@id/iv_check" />
-
     <TextView
-        android:id="@+id/tv_token"
+        android:id="@+id/tv_package_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="3dp"
+        android:drawableStart="@drawable/ico_micoin_medium"
+        android:drawablePadding="3dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
         android:textColor="@color/color_black_1"
-        android:textSize="20sp"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/iv_token"
-        app:layout_constraintTop_toTopOf="@id/iv_token"
-        tools:text="300" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iv_check"
+        tools:text="在線新方案在線新方案在線新方案在線新方案在線新方案在線新方案在線新方案" />
 
     <TextView
         android:id="@+id/tv_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:lineSpacingExtra="2sp"
         android:textColor="@color/color_red_1"
-        android:textSize="22sp"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/iv_token"
-        tools:text="¥ 50.00" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_package_name"
+        tools:text="50.00" />
 
     <TextView
-        android:id="@+id/tv_original_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:lineSpacingExtra="2sp"
+        android:layout_marginEnd="4dp"
+        android:text="¥"
+        android:textColor="@color/color_red_1"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_price"
+        app:layout_constraintRight_toLeftOf="@+id/tv_price" />
+
+    <TextView
+        android:id="@+id/tv_list_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp"
         android:textColor="@color/color_gray_9"
         android:textSize="14sp"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_price"
-        tools:text="¥ 55.00" />
-
+        tools:text="55.00" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

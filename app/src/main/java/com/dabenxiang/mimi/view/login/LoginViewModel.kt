@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.manager.DomainManager.Companion.PROMO_CODE
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.SingUpRequest
 import com.dabenxiang.mimi.model.manager.DomainManager
@@ -62,7 +61,6 @@ class LoginViewModel : BaseViewModel() {
     private val _loginResult = MutableLiveData<ApiResult<Nothing>>()
     val loginResult: LiveData<ApiResult<Nothing>> = _loginResult
 
-    @ExperimentalCoroutinesApi
     fun doRegisterValidateAndSubmit() {
         _friendlyNameError.value = isValidateFriendlyName(friendlyName.value ?: "")
         _emailError.value = isValidateEmail(email.value ?: "")
@@ -78,7 +76,7 @@ class LoginViewModel : BaseViewModel() {
             "" == _confirmPasswordError.value
         ) {
             viewModelScope.launch {
-                accountManager.singUp(
+                accountManager.signUp(
                     SingUpRequest(
                         username = registerAccount.value,
                         email = email.value,
@@ -107,9 +105,8 @@ class LoginViewModel : BaseViewModel() {
 
     fun doLogin(userName: String, password: String) {
         viewModelScope.launch {
-            accountManager.signIn(userName, password).collect {
-                _loginResult.value = it
-            }
+            accountManager.signIn(userName, password)
+                .collect { _loginResult.value = it }
         }
     }
 

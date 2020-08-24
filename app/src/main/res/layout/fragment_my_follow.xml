@@ -15,27 +15,42 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/layout_tab"
+    <View
+        android:id="@+id/v_tab_bg"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/app_bar_height"
+        android:layout_height="0dp"
         android:background="@color/normal_color_status_bar"
+        app:layout_constraintBottom_toBottomOf="@id/layout_tab"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layout_title">
+        app:layout_constraintTop_toTopOf="@id/layout_tab" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_primary"
+    <com.google.android.material.tabs.TabLayout
+        app:tabRippleColor="@color/transparent"
+        android:id="@+id/layout_tab"
+        android:layout_width="260dp"
+        android:layout_height="@dimen/app_bar_height"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layout_title"
+        app:tabIndicator="@drawable/bg_tab_my_follow"
+        app:tabIndicatorColor="@color/color_red_1"
+        app:tabTextColor="@color/color_black_1_50"
+        app:tabSelectedTextColor="@color/color_black_1"
+        app:tabTextAppearance="@style/favorite_tab_item_text">
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/ti_people"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:orientation="horizontal"
-            android:paddingStart="20dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:ignore="RtlSymmetry" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_height="wrap_content"
+            android:text="@string/follow_people" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/ti_circle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/follow_circle" />
+    </com.google.android.material.tabs.TabLayout>
 
     <TextView
         android:id="@+id/tv_all"
