@@ -34,6 +34,7 @@ import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_post_favorite.*
+import kotlinx.android.synthetic.main.item_follow_no_data.view.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import timber.log.Timber
@@ -314,7 +315,10 @@ class FavoriteFragment : BaseFragment() {
         }
 
         item_no_data.visibility = when (size) {
-            NO_DATA -> View.VISIBLE
+            NO_DATA -> {
+                item_no_data.tv_text.text = getString(R.string.favorite_no_data)
+                View.VISIBLE
+            }
             else -> View.GONE
         }
 

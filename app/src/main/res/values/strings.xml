@@ -83,6 +83,7 @@
     <string name="favorite_follow">+关注</string>
     <string name="favorite_btn_clean">是否要清除所有收藏</string>
     <string name="favorite_delete_favorite">取消收藏</string>
+    <string name="favorite_no_data">尚未收藏影片，快去看片吧！</string>
 
     <!-- Personal -->
     <string name="personal_title">我的</string>
@@ -169,6 +170,7 @@
     <string name="follow_clean">清除</string>
     <string name="follow_clean_member_dlg_msg">是否要清除所有关注的人</string>
     <string name="follow_clean_club_dlg_msg">是否要清除所有关注的圈子</string>
+    <string name="follow_no_data">尚未有任何关注，快去关注一下吧！</string>
     <string name="text_more">更多</string>
     <string name="text_search">搜寻</string>
     <string name="text_follow">关注</string>

@@ -20,6 +20,7 @@ import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_my_follow.*
+import kotlinx.android.synthetic.main.item_follow_no_data.view.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import timber.log.Timber
 
@@ -257,7 +258,10 @@ class MyFollowFragment : BaseFragment() {
         }
 
         item_no_data.visibility = when (size) {
-            NO_DATA -> View.VISIBLE
+            NO_DATA -> {
+                item_no_data.tv_text.text = getString(R.string.follow_no_data)
+                View.VISIBLE
+            }
             else -> View.GONE
         }
 
