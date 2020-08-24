@@ -4,19 +4,17 @@ import com.dabenxiang.mimi.model.api.vo.DownloadResult
 import io.ktor.client.HttpClient
 import io.ktor.client.call.call
 import io.ktor.client.request.url
+import io.ktor.client.response.readBytes
 import io.ktor.http.HttpMethod
-import io.ktor.http.contentLength
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.io.readUTF8Line
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import java.net.URI
-import kotlin.math.roundToInt
 
 suspend fun HttpClient.downloadFile(url: String): Flow<DownloadResult> {
     return flow {
@@ -27,39 +25,12 @@ suspend fun HttpClient.downloadFile(url: String): Flow<DownloadResult> {
                 method = HttpMethod.Get
             }.response
 
-            val data = ByteArray(
-                when(response.contentLength() != null) {
-                    true -> response.contentLength()!!.toInt()
-                    else -> {
-                        256 * 256
-                    }
-            })
-
-            var offset = 0
             var count = 0
             val tsPattern = ".ts"
             val indexPattern = "index.m3u8"
             val ENCRYPTION_KEY = "encryption.key"
 
-//            val d = arrayListOf<String>()
-//
-//            while (true) {
-//                val info = response.content.readUTF8Line()
-//                Timber.d("1111 ${info.toString()}")
-//                if(!info.isNullOrEmpty()) {
-//                    d.add(info.toString())
-//                } else break
-//            }
-//
-//            Timber.d("$d")
-
-            do {
-                val currentRead = response.content.readAvailable(data, offset, data.size)
-                offset += currentRead
-                val progress = (offset * 100f / data.size).roundToInt()
-                emit(DownloadResult.Progress(progress))
-                if(offset == data.size) break
-            } while (currentRead > 0)
+            val data = response.readBytes()
 
             response.close()
 
