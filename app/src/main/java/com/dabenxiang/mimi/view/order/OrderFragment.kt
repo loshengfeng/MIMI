@@ -14,26 +14,18 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.fragment_club_detail.*
 import kotlinx.android.synthetic.main.fragment_order.*
 import kotlinx.android.synthetic.main.fragment_order.viewPager
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import kotlinx.android.synthetic.main.item_setting_bar.tv_title
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class OrderFragment : BaseFragment() {
 
     companion object {
-        const val NO_DATA = 0
-        const val TYPE_ALL = 0
-        const val TYPE_ONLINE_PAY = 1
-        const val TYPE_PROXY_PAY = 2
-
         val tabTitle = arrayListOf(
             App.self.getString(R.string.topup_all),
             App.self.getString(R.string.topup_online_pay),
@@ -47,7 +39,12 @@ class OrderFragment : BaseFragment() {
         OrderPagerAdapter(
             OrderFuncItem(
                 getOrderByPaging3 = { update -> getOrderByPaging3(update) },
-                getOrderByPaging2 = { isOnline, update -> viewModel.getOrderByPaging2(isOnline, update) },
+                getOrderByPaging2 = { isOnline, update ->
+                    viewModel.getOrderByPaging2(
+                        isOnline,
+                        update
+                    )
+                },
                 getChatList = { update -> viewModel.getChatList(update) },
                 getChatAttachment = { id, pos, update -> viewModel.getAttachment(id, pos, update) },
                 onChatItemClick = { item -> onChatItemClick(item) }
@@ -101,24 +98,12 @@ class OrderFragment : BaseFragment() {
         }.attach()
     }
 
-    private fun refreshUi(size: Int) {
-        val title = when (tl_type.selectedTabPosition) {
-            TYPE_ALL -> getString(R.string.topup_all)
-            TYPE_ONLINE_PAY -> getString(R.string.topup_online_pay)
-            else -> getString(R.string.topup_proxy_pay)
-        }
-
-        tl_type.getTabAt(tl_type.selectedTabPosition)?.text =
-            StringBuilder(title).append("(").append(size).append(")").toString()
-    }
 
     private var getOrderJob: Job? = null
     private fun getOrderByPaging3(update: ((PagingData<OrderItem>, CoroutineScope) -> Unit)) {
-        Timber.d("@@getOrder")
         getOrderJob?.cancel()
         getOrderJob = lifecycleScope.launch {
             viewModel.getOrderByPaging3().collectLatest {
-                Timber.d("@@getOrder collect: $it")
                 update(it, this)
             }
         }
