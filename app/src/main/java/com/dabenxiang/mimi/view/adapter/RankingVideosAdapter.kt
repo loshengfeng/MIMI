@@ -13,11 +13,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.RankingFuncItem
-import com.dabenxiang.mimi.model.api.vo.PostStatisticsItem
-import com.dabenxiang.mimi.model.api.vo.RankingItem
 import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_ranking.view.*
 
 class RankingVideosAdapter(private val context: Context,
