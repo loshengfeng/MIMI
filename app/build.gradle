@@ -179,17 +179,17 @@ android {
             buildtype = full_buildTypename.split("_")[0]
         }
 
-        def flavor_version = this.ext.default_version(getVersionPropertiesPath(flavorName))
-        println "Show current flavor_version versionName " + flavor_version.versionName
-        println "Show current flavor_version versionCode :   " + flavor_version.versionCode
+        def flavor_version = this.ext.default_version(flavorName)
+        println "Show " + flavorName + " current flavor_version versionName " + flavor_version.versionName
+        println "Show " + flavorName + " current _version versionCode :   " + flavor_version.versionCode
         def current_branch = gitBranch()
 //        println "Show current_branch :   " + current_branch
         if (full_buildTypename.equals("prod_release") && (current_branch.equals("release") || current_branch.equals("master"))) {
-            increaseVersionWithPath(getVersionPropertiesPath(flavorName))
-            flavor_version = readVersionWithPath(getVersionPropertiesPath(flavorName))
+            this.project.ext.increaseVersion(flavorName)
+            flavor_version = this.ext.default_version(flavorName)
             setAndpushTag(flavor_version.versionName)
-            println "prod_release get new flavor_version versionName " + flavor_version.versionName
-            println "prod_release get new flavor_version versionCode :   " + flavor_version.versionCode
+            println "prod_release get " + flavorName + " new flavor_version versionName " + flavor_version.versionName
+            println "prod_release get " + flavorName + " new flavor_version versionCode :   " + flavor_version.versionCode
         }
         variant.buildConfigField "String", "API_HOST", "\"${getAPI_Host(buildtype)}\""
         variant.buildConfigField "String", "AD_API_HOST", "\"${getAD_API_Host(buildtype)}\""
@@ -488,98 +488,21 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:$android_test_ext_version"
 }
 
-def getVersionPropertiesPath(String flavor) {
-    def path = "version.properties"
-    switch (flavor) {
-        case "mimi":
-            path = "./src/mimi/version.properties"
-            break
-    }
-    return path
-}
-
-def increaseVersion() {
-    increaseVersionWithPath('version.properties')
-}
-
-def increaseVersionWithPath(String version_properties_path) {
-    Properties versionProps = new Properties()
-    def pfile = file(version_properties_path)
-    if (!pfile.exists()) {
-        pfile = file('version.properties')
-    }
-    versionProps.load(new FileInputStream(pfile))
-    def hotfix = versionProps['VERSION_NAME_HOTFIX'].toInteger()
-    def nextCode = versionProps['VERSION_CODE'].toInteger() - hotfix + 10
-    versionProps['VERSION_CODE'] = nextCode.toString()
-    def nextBuild = versionProps['VERSION_NAME_BUILD'].toInteger() + 1
-    versionProps['VERSION_NAME_BUILD'] = nextBuild.toString()
-    hotfix = 0
-    versionProps['VERSION_NAME_HOTFIX'] = hotfix.toString()
-    versionProps.store(pfile.newWriter(), null)
-    def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD']
-    println "Increase $buildVersionName"
-}
-
-def increaseHotfixVersion() {
-    increaseHotfixVersionWithPath('version.properties')
-}
-
-def increaseHotfixVersionWithPath(String version_properties_path) {
-    Properties versionProps = new Properties()
-    def pfile = file(version_properties_path)
-    if (!pfile.exists()) {
-        pfile = file('version.properties')
-    }
-    versionProps.load(new FileInputStream(pfile))
-    def nextCode = versionProps['VERSION_CODE'].toInteger() + 1
-    versionProps['VERSION_CODE'] = nextCode.toString()
-    def hotfix = versionProps['VERSION_NAME_HOTFIX'].toInteger() + 1
-    versionProps['VERSION_NAME_HOTFIX'] = hotfix.toString()
-    versionProps.store(pfile.newWriter(), null)
-    def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD'] + "." + versionProps['VERSION_NAME_HOTFIX']
-    println "Increase $buildVersionName"
-}
-
-def decreaseVersion() {
-    decreaseVersionWithPath('version.properties')
-}
-
-def decreaseVersionWithPath(String version_properties_path) {
-    Properties versionProps = new Properties()
-    def pfile = file(version_properties_path)
-    if (!pfile.exists()) {
-        pfile = file('version.properties')
-    }
-    versionProps.load(new FileInputStream(pfile))
-    def preCode = versionProps['VERSION_CODE'].toInteger() - 1
-    versionProps['VERSION_CODE'] = preCode.toString()
-    def preBuild = versionProps['VERSION_NAME_BUILD'].toInteger() - 1
-    versionProps['VERSION_NAME_BUILD'] = preBuild.toString()
-    versionProps.store(pfile.newWriter(), null)
-    def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD']
-    println "Decrease $buildVersionName"
-}
-
 task showCurrentVersion {
     group "version Tasks"
-    Properties versionProps = new Properties()
-    def pfile = file('version.properties')
-    versionProps.load(new FileInputStream(pfile))
-    def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD']
-    println this.project.name + " current : $buildVersionName"
+    this.project.ext.currentVersion("")
 }
 
 task increaseVersion {
     group "version Tasks"
     doLast {
-        increaseVersion()
+        this.project.ext.increaseVersion("")
     }
 }
 
 task decreaseVersion {
     group "version Tasks"
     doLast {
-        decreaseVersion()
+        this.project.ext.decreaseVersion("")
     }
 }
