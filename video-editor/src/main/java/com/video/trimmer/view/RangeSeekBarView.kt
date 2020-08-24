@@ -5,10 +5,10 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
-import androidx.core.content.ContextCompat
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import androidx.core.content.ContextCompat
 import com.video.trimmer.R
 import com.video.trimmer.interfaces.OnRangeSeekBarListener
 
@@ -19,6 +19,7 @@ class RangeSeekBarView @JvmOverloads constructor(context: Context, attrs: Attrib
     lateinit var thumbs: List<Thumb>
     private var mListeners: MutableList<OnRangeSeekBarListener>? = null
     private var mMaxWidth = 0f
+    private var mMinWidth = 0f
     private var mThumbWidth = 0f
     private var mThumbHeight = 0f
     private var mViewWidth = 0
@@ -26,6 +27,8 @@ class RangeSeekBarView @JvmOverloads constructor(context: Context, attrs: Attrib
     private var mPixelRangeMax = 0f
     private var mScaleRangeMax = 0f
     private var mFirstRun = false
+    var minBarLeftPos = 0f
+    var minBarRightPost = 0f
 
     private val mShadow = Paint()
     private val mLine = Paint()
@@ -66,6 +69,10 @@ class RangeSeekBarView @JvmOverloads constructor(context: Context, attrs: Attrib
         onSeekStop(this, 1, thumbs[1].value)
     }
 
+    fun initMinWidth() {
+        mMinWidth = minBarRightPost - minBarLeftPos
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
@@ -86,6 +93,7 @@ class RangeSeekBarView @JvmOverloads constructor(context: Context, attrs: Attrib
                 th.value = mScaleRangeMax * i
                 th.pos = mPixelRangeMax * i
             }
+
             onCreate(this, currentThumb, getThumbValue(currentThumb))
             mFirstRun = false
         }
@@ -124,7 +132,12 @@ class RangeSeekBarView @JvmOverloads constructor(context: Context, attrs: Attrib
                 // Calculate the distance moved
                 val dx = coordinate - mThumb.lastTouchX
                 val newX = mThumb.pos + dx
+
                 if (currentThumb == 0) {
+                    if (mThumb2.pos - newX < mMinWidth) {
+                        return true
+                    }
+
                     when {
                         newX + mThumb.widthBitmap >= mThumb2.pos -> mThumb.pos = mThumb2.pos - mThumb.widthBitmap
                         newX <= mPixelRangeMin -> mThumb.pos = mPixelRangeMin
@@ -136,9 +149,17 @@ class RangeSeekBarView @JvmOverloads constructor(context: Context, attrs: Attrib
                     }
 
                 } else {
+                    if (newX - mThumb2.pos < mMinWidth) {
+                        return true
+                    }
+
                     when {
-                        newX <= mThumb2.pos + mThumb2.widthBitmap -> mThumb.pos = mThumb2.pos + mThumb.widthBitmap
-                        newX >= mPixelRangeMax -> mThumb.pos = mPixelRangeMax
+                        newX <= mThumb2.pos + mThumb2.widthBitmap ->{
+                            mThumb.pos = mThumb2.pos + mThumb.widthBitmap
+                        }
+                        newX >= mPixelRangeMax -> {
+                            mThumb.pos = mPixelRangeMax
+                        }
                         else -> {
                             checkPositionThumb(mThumb2, mThumb, dx, false)
                             mThumb.pos = mThumb.pos + dx
@@ -148,6 +169,7 @@ class RangeSeekBarView @JvmOverloads constructor(context: Context, attrs: Attrib
                 }
 
                 setThumbPos(currentThumb, mThumb.pos)
+
                 invalidate()
                 return true
             }
@@ -191,7 +213,7 @@ class RangeSeekBarView @JvmOverloads constructor(context: Context, attrs: Attrib
         }
     }
 
-    private fun scaleToPixel(index: Int, scaleValue: Float): Float {
+    fun scaleToPixel(index: Int, scaleValue: Float): Float {
         val px = scaleValue * mPixelRangeMax / 100
         return if (index == 0) {
             val pxThumb = scaleValue * mThumbWidth / 100

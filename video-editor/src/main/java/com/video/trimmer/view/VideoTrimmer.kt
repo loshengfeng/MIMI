@@ -279,8 +279,15 @@ class VideoTrimmer @JvmOverloads constructor(context: Context, attrs: AttributeS
             mDuration >= mMaxDuration && mMaxDuration != -1 -> {
                 mStartPosition = mDuration / 2 - mMaxDuration / 2
                 mEndPosition = mDuration / 2 + mMaxDuration / 2
+
                 timeLineBar.setThumbValue(0, (mStartPosition * 100 / mDuration))
                 timeLineBar.setThumbValue(1, (mEndPosition * 100 / mDuration))
+
+                val minStartPosition = mDuration / 2 - mMinDuration / 2
+                val minEndPosition = mDuration / 2 + mMinDuration / 2
+
+                timeLineBar.minBarLeftPos =  timeLineBar.scaleToPixel(0, (minStartPosition * 100 / mDuration))
+                timeLineBar.minBarRightPost = timeLineBar.scaleToPixel(1, (minEndPosition * 100 / mDuration))
             }
             mDuration <= mMinDuration && mMinDuration != -1 -> {
                 mStartPosition = mDuration / 2 - mMinDuration / 2
@@ -293,9 +300,11 @@ class VideoTrimmer @JvmOverloads constructor(context: Context, attrs: AttributeS
                 mEndPosition = mDuration
             }
         }
+
         video_loader.seekTo(mStartPosition.toInt())
         mTimeVideo = mDuration
         timeLineBar.initMaxWidth()
+        timeLineBar.initMinWidth()
     }
 
     private fun setTimeFrames() {

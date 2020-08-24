@@ -21,7 +21,6 @@ ext {
     developeremail = 'xdq19910120@gmail.com'
     scmConnectionUrl = 'https://github.com/xiangdingquan/Aes'
     scmDeveloperConnectionUrl = 'https://github.com/xiangdingquan/Aes.git'
-
     mavDevelopers = ["Fe": "Federico"]
     mavSiteUrl = "https://github.com/xiangdingquan/Aes"
     mavGitUrl = mavSiteUrl + '.git'
@@ -31,6 +30,7 @@ ext {
     mavLibraryLicenses = ["Apache-2.0": 'http://www.apache.org/licenses/LICENSE-2.0.txt']
     mavLibraryDescription = "an AES decrypt and encrypt for jni !!"
 }
+
 apply plugin: 'com.android.library'
 
 android {
@@ -83,6 +83,7 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+
     testImplementation 'junit:junit:4.12'
 }
 
