@@ -554,6 +554,14 @@ interface ApiService {
         @Path("sign") sign: String?
     ): Response<Void>
 
+    @GET("/v1/Player/VideoStreamUrl/{streamId}")
+    suspend fun getVideoM3u8Source(
+        @Path("streamId") streamId: Long,
+        @Query("userId") userId: Long?,
+        @Query("utcTime") utcTime: Long?,
+        @Query("sign") sign: String?
+    ): Response<ApiBaseItem<VideoM3u8Source>>
+
 
     /**********************************************************
      *
@@ -585,7 +593,7 @@ interface ApiService {
     suspend fun getOrder(
         @Query("offset") offset: String,
         @Query("limit") limit: String
-    ): Response<ApiBasePagingItem<ArrayList<OrderItem>>>
+    ): Response<ApiBasePagingItem<OrderContentItem>>
 
     @GET("/v1/Members/Me/Order")
     suspend fun getOrderByOnline(

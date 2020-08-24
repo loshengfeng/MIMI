@@ -1,18 +1,55 @@
+//FIXME
+// Note if run bintryUpload  to upload library aar/jar files into Bintry/Jcenter
+// must temp disable  org.gradle.parallel=true  & org.gradle.configureondemand=true @ gradle.properties
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply from: 'version.gradle'
+def version =  this.ext.default_version()
+ext {
+    //FIXME the below three  modify with project type by yourself
+    maven_repo_name = 'VideoTools'
+    library_versionName = version.versionName
+    library_pom_bintray_GroupId = 'org.cks.utils.video'
+    //FIXME the below  if deploy to Bintray & public (jcneter) must real git repo & information (when pass jcenter you can del git repo )
+    // if private can fake git repo
+    // project homepage
+    scmUrl = 'https://github.com/xiangdingquan/Aes'
+// project git
+    developerid = 'xiangdingquan'
+    developername = 'xdq(xiangdingquan)'
+    developeremail = 'xdq19910120@gmail.com'
+    scmConnectionUrl = 'https://github.com/xiangdingquan/Aes'
+    scmDeveloperConnectionUrl = 'https://github.com/xiangdingquan/Aes.git'
+    mavDevelopers = ["Fe": "Federico"]
+    mavSiteUrl = "https://github.com/xiangdingquan/Aes"
+    mavGitUrl = mavSiteUrl + '.git'
+    mavProjectName = this.project.name
+    mavPublishToInternalRepo = true
+    mavRepoInternalUrl = "path/to/internal/repo"
+    mavLibraryLicenses = ["Apache-2.0": 'http://www.apache.org/licenses/LICENSE-2.0.txt']
+    mavLibraryDescription = "an AES decrypt and encrypt for jni !!"
+}
+
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion "26.0.3"
-
+    compileSdkVersion 30
+    buildToolsVersion "30.0.1"
+    //Ref : https://juejin.im/post/6844904004955144205
+    lintOptions {
+        disable 'MissingDefaultResource'
+        abortOnError false
+        ignoreWarnings true
+    }
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
-
+        targetSdkVersion 30
+        versionCode version.versionCode.toInteger()
+        versionName version.versionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -21,13 +58,126 @@ android {
     }
 }
 
+def gitBranch() {
+    def branch = ""
+    def proc = "git rev-parse --abbrev-ref HEAD".execute()
+    proc.in.eachLine { line -> branch = line }
+    proc.err.eachLine { line -> println line }
+    proc.waitFor()
+    branch
+}
+
+def isWithSubmoduleBranch() {
+    if (gitBranch().contains("dev_sub")) {
+        return true
+    } else {
+        return false
+    }
+}
+
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation group: 'com.googlecode.mp4parser', name: 'isoparser', version: '1.0.6'
+    implementation group: 'org.aspectj', name: 'aspectjrt', version: '1.7.3'
+
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    implementation 'com.android.support:design:28.0.0'
+
     testImplementation 'junit:junit:4.12'
-    compile files('libs/isoparser-1.0.6.jar')
-    compile files('libs/aspectjrt-1.7.3.jar')
+}
+
+////apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'install.gradle'
+File f = this.file('bintray.properties')
+if (f.exists() && !f.isDirectory()) {
+    apply from: 'bintray.gradle'
+}
+////apply from: 'https://raw.githubusercontent.com/sky-uk/gradle-maven-plugin/master/gradle-mavenizer.gradle'
+
+//FIXME the below how to export into version.gradle ??  let other gradle use apply from: import  !!
+def increaseVersion() {
+    increaseVersionWithPath('version.properties')
+}
+
+def increaseVersionWithPath(String version_properties_path) {
+    Properties versionProps = new Properties()
+    def pfile = file(version_properties_path)
+    if (!pfile.exists()) {
+        pfile = file('version.properties')
+    }
+    versionProps.load(new FileInputStream(pfile))
+    def hotfix = versionProps['VERSION_NAME_HOTFIX'].toInteger()
+    def nextCode = versionProps['VERSION_CODE'].toInteger() - hotfix + 10
+    versionProps['VERSION_CODE'] = nextCode.toString()
+    def nextBuild = versionProps['VERSION_NAME_BUILD'].toInteger() + 1
+    versionProps['VERSION_NAME_BUILD'] = nextBuild.toString()
+    hotfix = 0
+    versionProps['VERSION_NAME_HOTFIX'] = hotfix.toString()
+    versionProps.store(pfile.newWriter(), null)
+    def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD']
+    println "Increase $buildVersionName"
+}
+
+def increaseHotfixVersion() {
+    increaseHotfixVersionWithPath('version.properties')
+}
+
+def increaseHotfixVersionWithPath(String version_properties_path) {
+    Properties versionProps = new Properties()
+    def pfile = file(version_properties_path)
+    if (!pfile.exists()) {
+        pfile = file('version.properties')
+    }
+    versionProps.load(new FileInputStream(pfile))
+    def nextCode = versionProps['VERSION_CODE'].toInteger() + 1
+    versionProps['VERSION_CODE'] = nextCode.toString()
+    def hotfix = versionProps['VERSION_NAME_HOTFIX'].toInteger() + 1
+    versionProps['VERSION_NAME_HOTFIX'] = hotfix.toString()
+    versionProps.store(pfile.newWriter(), null)
+    def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD'] + "." + versionProps['VERSION_NAME_HOTFIX']
+    println "Increase $buildVersionName"
+}
+
+def decreaseVersion() {
+    decreaseVersionWithPath('version.properties')
+}
+
+def decreaseVersionWithPath(String version_properties_path) {
+    Properties versionProps = new Properties()
+    def pfile = file(version_properties_path)
+    if (!pfile.exists()) {
+        pfile = file('version.properties')
+    }
+    versionProps.load(new FileInputStream(pfile))
+    def preCode = versionProps['VERSION_CODE'].toInteger() - 1
+    versionProps['VERSION_CODE'] = preCode.toString()
+    def preBuild = versionProps['VERSION_NAME_BUILD'].toInteger() - 1
+    versionProps['VERSION_NAME_BUILD'] = preBuild.toString()
+    versionProps.store(pfile.newWriter(), null)
+    def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD']
+    println "Decrease $buildVersionName"
+}
+
+task showCurrentVersion {
+    group "version Tasks"
+    Properties versionProps = new Properties()
+    def pfile = file('version.properties')
+    versionProps.load(new FileInputStream(pfile))
+    def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD']
+    println this.project.name +" current : $buildVersionName"
+}
+
+task increaseVersion {
+    group "version Tasks"
+    doLast {
+        increaseVersion()
+    }
+}
+
+task decreaseVersion {
+    group "version Tasks"
+    doLast {
+        decreaseVersion()
+    }
 }

@@ -33,7 +33,7 @@ class OrderListDataSource constructor(
                 val result = domainManager.getApiRepository().getOrder("0", PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()
-                val clubs = item?.content
+                val clubs = item?.content?.orders
 
                 val nextPageKey = when {
                     hasNextPage(
@@ -79,12 +79,12 @@ class OrderListDataSource constructor(
                                 hasNextPage(
                                     item.paging.count,
                                     item.paging.offset,
-                                    list.size
+                                    0
                                 ) -> next + PER_LIMIT_LONG
                                 else -> null
                             }
 
-                            callback.onResult(list, nextPageKey)
+                            callback.onResult(arrayListOf(), nextPageKey)
                         }
                     }
                 }
