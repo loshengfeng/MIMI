@@ -33,12 +33,7 @@ class ChatHistoryViewHolder(
     private val textDate: TextView = itemView.findViewById(R.id.textDate) as TextView
     private val btnChatHistory: ConstraintLayout = itemView.findViewById(R.id.btnChatHistory) as ConstraintLayout
 
-    init {
-        Timber.d("@@init")
-    }
-
     override fun updated(position: Int) {
-        Timber.d("@@updated: $position")
         if (data?.lastReadTime == null || data?.lastMessageTime == null || data?.lastReadTime!!.after(data?.lastMessageTime!!)) {
             btnChatHistory.setBackgroundResource(R.drawable.btn_chat_history)
             imgIsNew.visibility = View.INVISIBLE
@@ -48,10 +43,8 @@ class ChatHistoryViewHolder(
         }
 
         btnChatHistory.setOnClickListener {
-            Timber.d("@@setOnClickListener")
-            data?.let { data ->
-                Timber.d("@@setOnClickListener $data")
-                listener.onClickListener(data) } }
+            data?.let { data -> listener.onClickListener(data) }
+        }
 
         data?.avatarAttachmentId?.let {
             LruCacheUtils.getLruArrayCache(it.toString())?.also { array ->

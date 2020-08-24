@@ -54,7 +54,7 @@ open class BaseChatContentViewHolder(
                     .load(array)
                     .apply(options)
                     .into(ivHead)
-            } ?: run {
+            } ?: takeIf { avatarId != "0" }?.run {
                 listener.onGetAvatarAttachment(avatarId, position)
             }
         }

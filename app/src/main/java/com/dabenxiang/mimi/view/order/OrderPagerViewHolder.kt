@@ -41,7 +41,6 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
     private val chatAdapter by lazy { ChatHistoryAdapter(listener) }
     private val listener = object : ChatHistoryAdapter.EventListener {
         override fun onClickListener(item: ChatListItem) {
-            Timber.d("@@onClickListener $item")
             orderFuncItem?.onChatItemClick?.invoke(item)
         }
 
@@ -65,6 +64,7 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
     }
 
     fun onBind(position: Int, orderFuncItem: OrderFuncItem) {
+        this.orderFuncItem = orderFuncItem
         when(position) {
             2 -> {
                 if (rvChat.adapter == null) {
@@ -115,7 +115,6 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
     }
 
     private fun updateChatAvatar(position: Int) {
-        Timber.d("@@updateChatAvatar: $position")
         chatAdapter.update(position)
     }
 
