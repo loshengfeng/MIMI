@@ -10,7 +10,8 @@ import com.dabenxiang.mimi.view.adapter.viewHolder.OrderViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 
 //class OrderAdapter: PagingDataAdapter<OrderItem, BaseViewHolder>(COMPARATOR) {
-class OrderAdapter: PagedListAdapter<OrderItem, BaseViewHolder>(COMPARATOR) {
+class OrderAdapter(private val orderFuncItem: OrderFuncItem?) :
+    PagedListAdapter<OrderItem, BaseViewHolder>(COMPARATOR) {
     companion object {
         private val COMPARATOR = object : DiffUtil.ItemCallback<OrderItem>() {
             override fun areItemsTheSame(oldItem: OrderItem, newItem: OrderItem): Boolean =
@@ -29,7 +30,7 @@ class OrderAdapter: PagedListAdapter<OrderItem, BaseViewHolder>(COMPARATOR) {
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         when (holder) {
-            is OrderViewHolder -> holder.bind(getItem(position))
+            is OrderViewHolder -> holder.bind(getItem(position), orderFuncItem)
         }
     }
 }

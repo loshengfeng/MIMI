@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.OrderViewHolder
+import com.dabenxiang.mimi.view.order.OrderFuncItem
 
 class OrderAdapter : PagedListAdapter<OrderItem, RecyclerView.ViewHolder>(diffCallback) {
     companion object {
@@ -32,7 +33,7 @@ class OrderAdapter : PagedListAdapter<OrderItem, RecyclerView.ViewHolder>(diffCa
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
-            is OrderViewHolder -> holder.bind(getItem(position)!!)
+            is OrderViewHolder -> holder.bind(getItem(position)!!, OrderFuncItem())
         }
     }
 }

@@ -150,4 +150,27 @@ class OrderViewModel : BaseViewModel() {
                 }
         }
     }
+
+    fun getProxyAttachment(id: String, update: (String) -> Unit) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getAttachment(id)
+                if (!result.isSuccessful) throw HttpException(result)
+                val byteArray = result.body()?.bytes()
+                LruCacheUtils.putLruArrayCache(id, byteArray ?: ByteArray(0))
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    when (it) {
+                        is ApiResult.Empty -> {
+                            update(id)
+                        }
+                    }
+                }
+        }
+    }
 }
