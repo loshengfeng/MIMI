@@ -37,7 +37,7 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
             }
         }, false)
     }
-    private val orderAdapter by lazy { OrderAdapter() }
+    private val orderAdapter by lazy { OrderAdapter(orderFuncItem) }
     private val chatAdapter by lazy { ChatHistoryAdapter(listener) }
     private val listener = object : ChatHistoryAdapter.EventListener {
         override fun onClickListener(item: ChatListItem) {

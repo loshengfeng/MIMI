@@ -5,11 +5,14 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.model.enums.OrderStatus
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.view.order.OrderFuncItem
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_order.view.*
 import timber.log.Timber
 
@@ -27,7 +30,7 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
 
     private var orderItem: OrderItem? = null
 
-    fun bind(orderItem: OrderItem?) {
+    fun bind(orderItem: OrderItem?, orderFuncItem: OrderFuncItem?) {
         this.orderItem = orderItem
 
         when(orderItem?.status) {
@@ -66,6 +69,17 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
                 ivType.visibility = View.INVISIBLE
                 clProxy.visibility = View.VISIBLE
                 tvName.text = orderItem.merchantUserFriendlyName
+                orderItem.merchantUserAvatarAttachmentId?.toString()
+                    .takeIf { !TextUtils.isEmpty(it) && it != LruCacheUtils.ZERO_ID }?.also { id ->
+                    LruCacheUtils.getLruCache(id)?.also { bitmap ->
+                        Glide.with(ivAvatar.context).load(bitmap).into(ivAvatar)
+                    } ?: run {
+                        orderFuncItem?.getOrderProxyAttachment?.invoke(id) { id -> updateAvatar(id) }
+                    }
+                } ?: run {
+                    Glide.with(ivAvatar.context).load(R.drawable.default_profile_picture)
+                        .into(ivAvatar)
+                }
             }
             true -> {
                 clProxy.visibility = View.GONE
@@ -80,10 +94,6 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
             }
         }
 
-        ivType.setOnClickListener {
-            Timber.d("@@ivType setOnClickListener")
-        }
-
         clRoot.setOnClickListener {
             Timber.d("@@setOnClickListener")
         }
@@ -91,7 +101,6 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
         tvOrderId.text = orderItem?.id.toString()
 
         // 格式為YYYY-MM-DD hh:mm
-        Timber.d("@@completionTime: ${orderItem?.completionTime}")
         tvTime.text = orderItem?.completionTime
             ?: let { tvTime.context.getString(R.string.topup_default_time) }
 
@@ -100,6 +109,11 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
 
         // 若未登入顯示「-」
         tvSellingPrice.text = orderItem?.sellingPrice.toString()
+    }
+
+    private fun updateAvatar(id: String) {
+        val bitmap = LruCacheUtils.getLruCache(id)
+        Glide.with(ivAvatar.context).load(bitmap).into(ivAvatar)
     }
 
 }

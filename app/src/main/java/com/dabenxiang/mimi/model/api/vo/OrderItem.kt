@@ -31,7 +31,7 @@ data class OrderItem(
     val merchantUserFriendlyName: String = "",
 
     @SerializedName("merchantUserAvatarAttachmentId")
-    val merchantUserAvatarAttachmentId: Long = 0,
+    val merchantUserAvatarAttachmentId: Long? = 0,
 
     @SerializedName("paymentType")
     val paymentType: PaymentType = PaymentType.BANK,

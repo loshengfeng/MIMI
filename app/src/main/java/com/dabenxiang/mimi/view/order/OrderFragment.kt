@@ -47,7 +47,8 @@ class OrderFragment : BaseFragment() {
                 },
                 getChatList = { update -> viewModel.getChatList(update) },
                 getChatAttachment = { id, pos, update -> viewModel.getAttachment(id, pos, update) },
-                onChatItemClick = { item -> onChatItemClick(item) }
+                onChatItemClick = { item -> onChatItemClick(item) },
+                getOrderProxyAttachment = { id, update -> viewModel.getProxyAttachment(id, update) }
             ))
     }
 
