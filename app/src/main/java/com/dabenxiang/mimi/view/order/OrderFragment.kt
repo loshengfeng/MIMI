@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -63,6 +64,9 @@ class OrderFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback {
+            navigateTo(NavigateItem.Up)
+        }
         initSettings()
     }
 
@@ -72,7 +76,7 @@ class OrderFragment : BaseFragment() {
 
     override fun setupObservers() {
         viewModel.balanceResult.observe(viewLifecycleOwner, Observer {
-            for (i in 0..tl_type.tabCount) {
+            for (i in 0 until tl_type.tabCount) {
                 val title = tabTitle[i]
                 tl_type.getTabAt(i)?.also { tab ->
                     tab.customView?.findViewById<TextView>(R.id.tv_title)?.text = when (i) {
