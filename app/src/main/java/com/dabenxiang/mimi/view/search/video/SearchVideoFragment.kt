@@ -20,7 +20,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
@@ -221,23 +221,19 @@ class SearchVideoFragment : BaseFragment() {
 
         viewModel.likeResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> {
-                    videoListAdapter.notifyDataSetChanged()
-                }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> videoListAdapter.notifyDataSetChanged()
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.favoriteResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> {
-                    videoListAdapter.notifyDataSetChanged()
-                }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> videoListAdapter.notifyDataSetChanged()
+                is Error -> onApiError(it.throwable)
             }
         })
 

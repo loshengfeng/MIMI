@@ -146,6 +146,5 @@ class OrderResultFragment : BaseFragment() {
 
     private fun stopTimer() {
         timer.cancel()
-        timer.purge()
     }
 }

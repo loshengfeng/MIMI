@@ -17,7 +17,7 @@ import com.dabenxiang.mimi.NAVIGATE_TO_ACTION
 import com.dabenxiang.mimi.PACKAGE_INSTALLED_ACTION
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setupWithNavController
-import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
@@ -55,23 +55,23 @@ class MainActivity : BaseActivity(), InteractionListener {
 
         viewModel.postReportResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Empty -> {
+                is Empty -> {
                     GeneralUtils.showToast(this, getString(R.string.report_success))
                 }
-                is ApiResult.Error -> Timber.e(it.throwable)
+                is Error -> Timber.e(it.throwable)
             }
         })
 
         viewModel.checkStatusResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     when (it.result.status) {
                         StatusItem.NOT_LOGIN -> showNotLoginDialog()
                         StatusItem.LOGIN_BUT_EMAIL_NOT_CONFIRMED -> showEmailConfirmDialog()
                         StatusItem.LOGIN_AND_EMAIL_CONFIRMED -> it.result.onLoginAndEmailConfirmed()
                     }
                 }
-                is ApiResult.Error -> Timber.e(it.throwable)
+                is Error -> Timber.e(it.throwable)
             }
         })
     }

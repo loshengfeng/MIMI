@@ -81,7 +81,7 @@ class SplashFragment : BaseFragment() {
         viewModel.versionStatus.observe(this, Observer {
 
             Timber.i("versionStatus=$it   isVersionChecked=${mainViewModel?.isVersionChecked}")
-            if(mainViewModel?.isVersionChecked == true) return@Observer
+            if (mainViewModel?.isVersionChecked == true) return@Observer
             when (it) {
                 VersionStatus.UPDATE -> {
                     if (viewModel.isUpgradeApp()) {
@@ -195,13 +195,13 @@ class SplashFragment : BaseFragment() {
                     } else {
                         viewModel.updateApp(progressCallback)
                     }
-                    mainViewModel?.isVersionChecked =true
+                    mainViewModel?.isVersionChecked = true
                 }
 
                 override fun onCancel() {
                     viewModel.setupRecordTimestamp()
                     initSettings()
-                    mainViewModel?.isVersionChecked =true
+                    mainViewModel?.isVersionChecked = true
                 }
 
             }

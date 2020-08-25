@@ -15,7 +15,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoSearchItem
@@ -223,11 +223,11 @@ class CategoriesFragment : BaseFragment() {
 
         viewModel.getCategoryDetailResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     progressHUD?.dismiss()
                     setupFilterArea(it.result)
                 }
-                is ApiResult.Error -> {
+                is Error -> {
                     progressHUD?.dismiss()
                 }
             }

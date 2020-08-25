@@ -6,7 +6,7 @@ import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
 import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
 import com.dabenxiang.mimi.view.adapter.ClubFollowAdapter
@@ -100,7 +100,7 @@ class MyFollowFragment : BaseFragment() {
 
         viewModel.attachmentResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     val attachmentItem = it.result
                     if (attachmentItem.id != null && attachmentItem.bitmap != null) {
                         LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
@@ -110,13 +110,13 @@ class MyFollowFragment : BaseFragment() {
                         }
                     }
                 }
-                is ApiResult.Error -> Timber.e(it.throwable)
+                is Error -> Timber.e(it.throwable)
             }
         })
 
         viewModel.clubDetail.observe(this, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     val bundle = ClubDetailFragment.createBundle(it.result)
                     navigateTo(
                         NavigateItem.Destination(
@@ -125,27 +125,27 @@ class MyFollowFragment : BaseFragment() {
                         )
                     )
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.cleanResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Loading -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, true)
-                is ApiResult.Loaded -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, false)
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Loading -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, true)
+                is Loaded -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, false)
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.cancelOneClub.observe(this, Observer {
             when (it) {
-                is ApiResult.Loading -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, true)
-                is ApiResult.Loaded -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, false)
-                is ApiResult.Success -> {
+                is Loading -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, true)
+                is Loaded -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, false)
+                is Success -> {
                     clubFollowAdapter.removedPosList.add(it.result)
                     clubFollowAdapter.notifyItemChanged(it.result)
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -155,13 +155,13 @@ class MyFollowFragment : BaseFragment() {
 
         viewModel.cancelOneMember.observe(this, Observer {
             when (it) {
-                is ApiResult.Loading -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, true)
-                is ApiResult.Loaded -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, false)
-                is ApiResult.Success -> {
+                is Loading -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, true)
+                is Loaded -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, false)
+                is Success -> {
                     memberFollowAdapter.removedPosList.add(it.result)
                     memberFollowAdapter.notifyItemChanged(it.result)
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 

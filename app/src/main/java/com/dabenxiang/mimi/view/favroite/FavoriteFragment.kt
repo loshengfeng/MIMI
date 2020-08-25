@@ -9,7 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
@@ -96,67 +96,61 @@ class FavoriteFragment : BaseFragment() {
 
         viewModel.cleanResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Empty -> {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Empty -> {
                     viewModel.videoIDList.clear()
                     viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
                 }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.likeResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> {
-                    favoriteAdapter.notifyDataSetChanged()
-                }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> favoriteAdapter.notifyDataSetChanged()
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.followResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> {
-                    favoriteAdapter.notifyDataSetChanged()
-                }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> favoriteAdapter.notifyDataSetChanged()
+                is Error -> onApiError(it.throwable)
             }
         })
 
 
         viewModel.favoriteResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> {
                     viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
                     GeneralUtils.showToast(
                         requireContext(),
                         getString(R.string.favorite_delete_favorite)
                     )
                 }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.reportResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> {
-                }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.attachmentByTypeResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     val attachmentItem = it.result
                     LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
                     when (attachmentItem.type) {
@@ -170,20 +164,20 @@ class FavoriteFragment : BaseFragment() {
                         }
                     }
                 }
-                is ApiResult.Error -> Timber.e(it.throwable)
+                is Error -> Timber.e(it.throwable)
             }
         })
 
         viewModel.isEmailConfirmed.observe(this, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     if (!it.result) {
                         interactionListener?.changeNavigationPosition(R.id.navigation_personal)
                     } else {
                         initView()
                     }
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
     }
@@ -332,7 +326,7 @@ class FavoriteFragment : BaseFragment() {
     private fun setTabPosition(type: Int, index: Int) {
         when (type) {
             TAB_PRIMARY -> {
-                if(lastPrimaryIndex != index) {
+                if (lastPrimaryIndex != index) {
                     lastPrimaryIndex = index
                     primaryAdapter.setLastSelectedIndex(lastPrimaryIndex)
                     favoriteAdapter.setAdult(index != TYPE_NORMAL)

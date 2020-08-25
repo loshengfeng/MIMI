@@ -1,9 +1,11 @@
 package com.dabenxiang.mimi.model.api
 
 import android.text.TextUtils
+import com.dabenxiang.mimi.model.api.ApiResult.Empty
+import com.dabenxiang.mimi.model.api.ApiResult.Error
+import com.dabenxiang.mimi.model.enums.TokenResult
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.manager.DomainManager
-import com.dabenxiang.mimi.model.enums.TokenResult
 import com.dabenxiang.mimi.model.pref.Pref
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
@@ -136,8 +138,8 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
             accountManager.refreshToken()
                 .collect {
                     when (it) {
-                        is ApiResult.Empty -> Timber.d("Refresh token successful!")
-                        is ApiResult.Error -> Timber.e("Refresh token error: $it")
+                        is Empty -> Timber.d("Refresh token successful!")
+                        is Error -> Timber.e("Refresh token error: $it")
                     }
                 }
         }
@@ -148,8 +150,8 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
             accountManager.getPublicToken()
                 .collect {
                     when (it) {
-                        is ApiResult.Empty -> Timber.d("Get token successful!")
-                        is ApiResult.Error -> Timber.e("Get token error: $it")
+                        is Empty -> Timber.d("Get token successful!")
+                        is Error -> Timber.e("Get token error: $it")
                     }
                 }
         }

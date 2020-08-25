@@ -11,7 +11,8 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
-import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ApiResult.Error
+import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -19,7 +20,6 @@ import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
-import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
@@ -111,10 +111,10 @@ class ClubDetailFragment : BaseFragment() {
     override fun setupObservers() {
         viewModel.followClubResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     updateFollow()
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
     }
