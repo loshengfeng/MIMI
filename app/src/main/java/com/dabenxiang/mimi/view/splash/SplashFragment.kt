@@ -103,15 +103,6 @@ class SplashFragment : BaseFragment() {
 
     private fun requestPermissions() {
         val requestList = getNotGrantedPermissions(permissions)
-        for (i in requestList.indices) {
-            if (ActivityCompat.checkSelfPermission(
-                    requireContext(),
-                    requestList[i]
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                requestList.add(requestList[i])
-            }
-        }
 
         if (requestList.size > 0) {
             requestPermissions(requestList.toTypedArray(), PERMISSION_REQUEST_CODE)
