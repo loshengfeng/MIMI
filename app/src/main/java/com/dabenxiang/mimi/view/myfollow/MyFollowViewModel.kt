@@ -23,14 +23,9 @@ import retrofit2.HttpException
 import timber.log.Timber
 
 class MyFollowViewModel : BaseViewModel() {
-    private val _clubList = MutableLiveData<PagingData<ClubFollowItem>>()
-    val clubList: LiveData<PagingData<ClubFollowItem>> = _clubList
 
     private val _clubCount = MutableLiveData<Int>()
     val clubCount: LiveData<Int> = _clubCount
-
-    private val _memberList = MutableLiveData<PagingData<MemberFollowItem>>()
-    val memberList: LiveData<PagingData<MemberFollowItem>> = _memberList
 
     private val _memberCount = MutableLiveData<Int>()
     val memberCount: LiveData<Int> = _memberCount
