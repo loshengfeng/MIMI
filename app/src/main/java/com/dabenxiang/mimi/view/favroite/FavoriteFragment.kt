@@ -23,8 +23,11 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.dialog.GeneralDialog
+import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
+import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
@@ -389,18 +392,29 @@ class FavoriteFragment : BaseFragment() {
 
                 FunctionType.FAVORITE -> {
                     // 點擊後加入收藏,
-                    when (item) {
-                        is PlayItem -> {
-                            viewModel.currentPlayItem = item
-                            item.videoId?.let {
-                                viewModel.modifyFavorite(it)
-                            }
-                        }
-                        is MemberPostItem -> {
-                            viewModel.currentPostItem = item
-                            viewModel.removePostFavorite(item.id)
-                        }
-                    }
+                    GeneralDialog.newInstance(
+                        GeneralDialogData(
+                            titleRes = R.string.favorite_delete_this_favorite,
+                            messageIcon = R.drawable.ico_default_photo,
+                            secondBtn = getString(R.string.btn_confirm),
+                            secondBlock = {
+                                when (item) {
+                                    is PlayItem -> {
+                                        viewModel.currentPlayItem = item
+                                        item.videoId?.let {
+                                            viewModel.modifyFavorite(it)
+                                        }
+                                    }
+                                    is MemberPostItem -> {
+                                        viewModel.currentPostItem = item
+                                        viewModel.removePostFavorite(item.id)
+                                    }
+                                }
+                            },
+                            firstBtn = getString(R.string.cancel),
+                            isMessageIcon = false
+                        )
+                    ).show(requireActivity().supportFragmentManager)
                 }
 
                 FunctionType.SHARE -> {

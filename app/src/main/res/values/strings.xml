@@ -83,6 +83,7 @@
     <string name="favorite_follow">+关注</string>
     <string name="favorite_btn_clean">是否要清除所有收藏</string>
     <string name="favorite_delete_favorite">取消收藏</string>
+    <string name="favorite_delete_this_favorite">是否要清除此收藏</string>
 
     <!-- Personal -->
     <string name="personal_title">我的</string>
