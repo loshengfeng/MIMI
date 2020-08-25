@@ -3,15 +3,11 @@ package com.dabenxiang.mimi.view.orderresult
 import com.airbnb.epoxy.TypedEpoxyController
 import com.dabenxiang.mimi.model.vo.mqtt.OrderPayloadItem
 import com.dabenxiang.mimi.view.orderresult.itemview.*
-import java.text.SimpleDateFormat
-import java.util.*
 
 class OrderResultEpoxyController(
     private val failedListener: OrderResultFailedItemView.OrderResultFailedListener,
     private val successListener: OrderResultSuccessItemView.OrderResultSuccessListener
 ) : TypedEpoxyController<OrderPayloadItem>() {
-
-    private val sdf = SimpleDateFormat("yyyy-MM-dd hh:mm")
 
     override fun buildModels(item: OrderPayloadItem?) {
         if (item == null) {
@@ -40,14 +36,8 @@ class OrderResultEpoxyController(
 
     private fun addOrderResultSuccessfulItemView(item: OrderPayloadItem) {
 
-        val createTime = if (item.createTime == 0L) {
-            sdf.format(Date())
-        } else {
-            sdf.format(Date(item.createTime * 1000))
-        }
-
         val timeout = StringBuilder("请于 ")
-            .append(createTime)
+            .append(item.createTime)
             .append(" 前完成打款动作，避免订单超时")
             .toString()
 
