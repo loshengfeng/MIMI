@@ -36,7 +36,7 @@ data class OrderPayloadItem(
     val amount: Float = 0f,
 
     @SerializedName("createTime")
-    val createTime: Long = 0,
+    val createTime: String = "",
 
     @SerializedName("isSuccessful")
     val isSuccessful: Boolean = false

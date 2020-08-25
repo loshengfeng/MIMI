@@ -10,4 +10,5 @@ interface PagingCallback {
     fun onTotalCount(count: Long) {}
     fun onTotalCount(count: Long, isInitial: Boolean) {}
     fun onGetCategory(category: Category?) {}
+    fun onGetAny(obj: Any?) {}
 }

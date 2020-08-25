@@ -6,9 +6,9 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiRepository.Companion.NETWORK_PAGE_SIZE
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.BalanceItem
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.model.vo.AttachmentItem
@@ -20,12 +20,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import timber.log.Timber
 
 class OrderViewModel : BaseViewModel() {
 
-    private val _orderList = MutableLiveData<PagedList<OrderItem>>()
-    val orderList: LiveData<PagedList<OrderItem>> = _orderList
+    private val _balanceResult = MutableLiveData<BalanceItem>()
+    val balanceResult: LiveData<BalanceItem> = _balanceResult
 
     fun getOrderByPaging2(isOnline: Boolean?, update: ((PagedList<OrderItem>) -> Unit)) {
         viewModelScope.launch {
@@ -50,13 +49,6 @@ class OrderViewModel : BaseViewModel() {
         ).flow.cachedIn(viewModelScope)
     }
 
-    fun getOrderLiveData(): LiveData<PagingData<OrderItem>> {
-        return Pager(
-            config = PagingConfig(pageSize = NETWORK_PAGE_SIZE, enablePlaceholders = false),
-            pagingSourceFactory = { OrderPagingSource(domainManager) }
-        ).liveData
-    }
-
     private val pagingCallback = object : PagingCallback {
         override fun onLoading() {
             setShowProgress(true)
@@ -67,32 +59,22 @@ class OrderViewModel : BaseViewModel() {
         }
 
         override fun onThrowable(throwable: Throwable) {}
+
+        override fun onGetAny(obj: Any?) {
+            if (obj is BalanceItem) {
+                _balanceResult.postValue(obj)
+            }
+        }
     }
-
-    private val _chatHistory = MutableLiveData<PagedList<ChatListItem>>()
-    val chatHistory: LiveData<PagedList<ChatListItem>> = _chatHistory
-
-    private val _pagingResult = MutableLiveData<ApiResult<Void>>()
-    val pagingResult: LiveData<ApiResult<Void>> = _pagingResult
-
-    private var _attachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
-    val attachmentResult: LiveData<ApiResult<AttachmentItem>> = _attachmentResult
 
     private val chatPagingCallback = object : PagingCallback {
         override fun onLoading() {
-
         }
 
         override fun onLoaded() {
-            _pagingResult.value = ApiResult.loaded()
         }
 
         override fun onThrowable(throwable: Throwable) {
-            _pagingResult.value = ApiResult.error(throwable)
-        }
-
-        override fun onSucceed() {
-            super.onSucceed()
         }
     }
 
