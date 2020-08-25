@@ -8,7 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.vo.mqtt.OrderItem
+import com.dabenxiang.mimi.model.vo.mqtt.OrderPayloadItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.orderresult.itemview.OrderResultFailedItemView
@@ -64,7 +64,7 @@ class OrderResultFragment : BaseFragment() {
 
         if (arguments?.getBoolean(KEY_ERROR) == true) {
             setupStepUi(false)
-            epoxyController.setData(OrderItem(isSuccessful = false))
+            epoxyController.setData(OrderPayloadItem(isSuccessful = false))
         } else {
             startTimer()
             epoxyController.setData(null)
@@ -77,9 +77,10 @@ class OrderResultFragment : BaseFragment() {
 
     override fun setupObservers() {
         mainViewModel?.orderItem?.observe(viewLifecycleOwner, Observer {
-            setupStepUi(it.isSuccessful)
+            val item = it.orderPayloadItem
+            setupStepUi(item?.isSuccessful)
             stopTimer()
-            epoxyController.setData(it)
+            epoxyController.setData(item)
         })
     }
 
@@ -103,8 +104,8 @@ class OrderResultFragment : BaseFragment() {
         }
     }
 
-    private fun setupStepUi(isSuccessful: Boolean) {
-        if (isSuccessful) {
+    private fun setupStepUi(isSuccessful: Boolean?) {
+        if (isSuccessful == true) {
             tv_step1.background = ContextCompat.getDrawable(
                 requireContext(), R.drawable.bg_blue_1_oval
             )
@@ -138,7 +139,7 @@ class OrderResultFragment : BaseFragment() {
 
     private fun startTimer() {
         val task = timerTask {
-            epoxyController.setData(OrderItem(isSuccessful = false))
+            epoxyController.setData(OrderPayloadItem(isSuccessful = false))
         }
         timer.schedule(task, DELAY_TIME)
     }
