@@ -113,13 +113,14 @@ class HomeBannerViewHolder(itemView: View, listener: HomeAdapter.EventListener, 
 class HomeCarouselViewHolder(
     itemView: View,
     listener: HomeAdapter.EventListener,
-    isAdult: Boolean
+    isAdult: Boolean,
+    memberPostFuncItem: MemberPostFuncItem
 ) : HomeViewHolder<HomeTemplate.Carousel>(itemView, listener, isAdult) {
 
     private val banner: Banner = itemView.banner
     private val pagerIndicator: ViewPagerIndicator = itemView.pager_indicator
     private val nestedAdapter by lazy {
-        CarouselAdapter(nestedListener, isAdult)
+        CarouselAdapter(nestedListener, isAdult, memberPostFuncItem)
     }
 
     private val dp8 by lazy { itemView.resources.getDimensionPixelSize(R.dimen.dp_8) }

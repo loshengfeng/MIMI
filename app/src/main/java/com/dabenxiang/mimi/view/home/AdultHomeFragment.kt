@@ -270,7 +270,8 @@ class AdultHomeFragment : BaseFragment() {
                     val viewHolder = homeCarouselViewHolderMap[it.first]
                     val carousel = carouselMap[it.first]
                     val carouselHolderItems =
-                        response.result.content?.statisticsItemToCarouselHolderItem(carousel!!.isAdult)
+                        response.result.content?.categoryBannerItemCarouselHolderItem()
+//                        response.result.content?.statisticsItemToCarouselHolderItem(carousel!!.isAdult)
                     viewHolder?.submitList(carouselHolderItems)
                 }
                 is Error -> onApiError(response.throwable)
@@ -1091,7 +1092,7 @@ class AdultHomeFragment : BaseFragment() {
         ) {
             homeCarouselViewHolderMap[vh.adapterPosition] = vh
             carouselMap[vh.adapterPosition] = src
-            viewModel.loadNestedStatisticsListForCarousel(vh.adapterPosition, src)
+            viewModel.loadNestedStatisticsListForCarousel(vh.adapterPosition, src, true)
         }
 
         override fun onLoadClipViewHolder(vh: HomeClipViewHolder) {
@@ -1107,6 +1108,10 @@ class AdultHomeFragment : BaseFragment() {
         override fun onLoadClubViewHolder(vh: HomeClubViewHolder) {
             homeClubViewHolderMap[vh.adapterPosition] = vh
             viewModel.loadNestedClubList(vh.adapterPosition)
+        }
+
+        override fun onClickBanner(item: CarouselHolderItem) {
+            GeneralUtils.openWebView(requireContext(), item.url)
         }
     }
 

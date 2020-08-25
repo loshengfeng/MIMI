@@ -343,6 +343,16 @@ class ApiRepository(private val apiService: ApiService) {
 
     /**********************************************************
      *
+     *                   Members/Home/Banner
+     *
+     ***********************************************************/
+    /**
+     * get the banner list
+     */
+    suspend fun fetchHomeBanner(bannerCategory: Int) = apiService.fetchHomeBanner(bannerCategory)
+
+    /**********************************************************
+     *
      *                   Members/Home/Categories
      *
      ***********************************************************/
