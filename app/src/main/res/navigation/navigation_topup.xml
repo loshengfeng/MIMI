@@ -47,6 +47,11 @@
         android:id="@+id/orderResultFragment"
         android:name="com.dabenxiang.mimi.view.orderresult.OrderResultFragment"
         android:label="OrderResultFragment">
+
+        <action
+            android:id="@+id/action_orderResultFragment_to_orderFragment"
+            app:destination="@id/orderFragment" />
+
         <action
             android:id="@+id/action_orderResultFragment_to_topupFragment"
             app:destination="@id/topupFragment"

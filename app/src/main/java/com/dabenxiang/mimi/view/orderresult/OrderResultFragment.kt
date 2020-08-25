@@ -14,11 +14,14 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.orderresult.itemview.OrderResultFailedItemView
 import com.dabenxiang.mimi.view.orderresult.itemview.OrderResultSuccessItemView
 import kotlinx.android.synthetic.main.fragment_order_result.*
+import java.util.*
+import kotlin.concurrent.timerTask
 
 class OrderResultFragment : BaseFragment() {
 
     companion object {
         private const val KEY_ERROR = "error"
+        private const val DELAY_TIME = 60000L
 
         fun createBundle(isError: Boolean): Bundle {
             return Bundle().also { it.putBoolean(KEY_ERROR, isError) }
@@ -26,6 +29,8 @@ class OrderResultFragment : BaseFragment() {
     }
 
     private val viewModel: OrderResultViewModel by viewModels()
+
+    private val timer = Timer()
 
     private val epoxyController by lazy {
         OrderResultEpoxyController(failedListener, successListener)
@@ -37,7 +42,7 @@ class OrderResultFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireActivity().onBackPressedDispatcher.addCallback { }
+        requireActivity().onBackPressedDispatcher.addCallback(this) { }
 
         tv_step1.background = ContextCompat.getDrawable(
             requireContext(), R.drawable.bg_blue_1_oval
@@ -61,6 +66,7 @@ class OrderResultFragment : BaseFragment() {
             setupStepUi(false)
             epoxyController.setData(OrderItem(isSuccessful = false))
         } else {
+            startTimer()
             epoxyController.setData(null)
         }
     }
@@ -72,6 +78,7 @@ class OrderResultFragment : BaseFragment() {
     override fun setupObservers() {
         mainViewModel?.orderItem?.observe(viewLifecycleOwner, Observer {
             setupStepUi(it.isSuccessful)
+            stopTimer()
             epoxyController.setData(it)
         })
     }
@@ -88,7 +95,7 @@ class OrderResultFragment : BaseFragment() {
 
     private val successListener = object : OrderResultSuccessItemView.OrderResultSuccessListener {
         override fun onConfirm() {
-            //TODO: navigate to 充值管理
+            navigateTo(NavigateItem.Destination(R.id.action_orderResultFragment_to_orderFragment))
         }
 
         override fun onClose() {
@@ -127,5 +134,16 @@ class OrderResultFragment : BaseFragment() {
             tv_create_order.setTextColor(requireContext().getColor(R.color.color_black_1_30))
             tv_create_order_complete.setTextColor(requireContext().getColor(R.color.color_black_1_30))
         }
+    }
+
+    private fun startTimer() {
+        val task = timerTask {
+            epoxyController.setData(OrderItem(isSuccessful = false))
+        }
+        timer.schedule(task, DELAY_TIME)
+    }
+
+    private fun stopTimer() {
+        timer.cancel()
     }
 }
