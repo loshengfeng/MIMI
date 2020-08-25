@@ -121,7 +121,9 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
         tvSellingPrice.text = orderItem?.sellingPrice.toString()
 
         btnContact.setOnClickListener {
-            Timber.d("btnContact setOnClickListener")
+            orderItem?.also {
+                orderFuncItem?.onContactClick?.invoke(it.id, it.chatId)
+            }
         }
 
         ivNew.visibility = orderItem?.takeIf { it.lastReadTime < it.lastReplyTime }?.let {

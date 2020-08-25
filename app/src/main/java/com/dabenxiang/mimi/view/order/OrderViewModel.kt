@@ -67,9 +67,6 @@ class OrderViewModel : BaseViewModel() {
         }
     }
 
-    private var _attachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
-    val attachmentResult: LiveData<ApiResult<AttachmentItem>> = _attachmentResult
-
     private val chatPagingCallback = object : PagingCallback {
         override fun onLoading() {
         }

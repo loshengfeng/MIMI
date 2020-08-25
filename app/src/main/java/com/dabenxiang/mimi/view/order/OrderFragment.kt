@@ -2,6 +2,8 @@ package com.dabenxiang.mimi.view.order
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -13,7 +15,6 @@ import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
-import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_order.*
 import kotlinx.android.synthetic.main.fragment_order.viewPager
@@ -50,9 +51,12 @@ class OrderFragment : BaseFragment() {
                 getChatList = { update -> viewModel.getChatList(update) },
                 getChatAttachment = { id, pos, update -> viewModel.getAttachment(id, pos, update) },
                 onChatItemClick = { item -> onChatItemClick(item) },
-                getOrderProxyAttachment = { id, update -> viewModel.getProxyAttachment(id, update) }
+                getOrderProxyAttachment = { id, update -> viewModel.getProxyAttachment(id, update) },
+                onContactClick = { id, chatId -> Timber.d("onContactClick $id, $chatId") }
             ))
     }
+
+
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -68,14 +72,17 @@ class OrderFragment : BaseFragment() {
 
     override fun setupObservers() {
         viewModel.balanceResult.observe(viewLifecycleOwner, Observer {
-            TabLayoutMediator(tl_type, viewPager) { tab, position ->
-                tab.text = when (position) {
-                    0 -> "${tabTitle[position]}(${it.allCount})"
-                    1 -> "${tabTitle[position]}(${it.isOnlineCount})"
-                    else -> "${tabTitle[position]}(${(it.allCount ?: 0) - (it.isOnlineCount ?: 0)})"
+            for (i in 0..tl_type.tabCount) {
+                val title = tabTitle[i]
+                tl_type.getTabAt(i)?.also { tab ->
+                    tab.customView?.findViewById<TextView>(R.id.tv_title)?.text = when (i) {
+                        0 -> "$title(${it.allCount})"
+                        1 -> "$title(${it.isOnlineCount})"
+                        else -> "$title(${(it.allCount ?: 0) - (it.isOnlineCount ?: 0)})"
+                    }
+                    tab.customView?.findViewById<ImageView>(R.id.iv_new)?.visibility = View.VISIBLE
                 }
-                viewPager.setCurrentItem(tab.position, true)
-            }.attach()
+            }
         })
     }
 
@@ -97,7 +104,8 @@ class OrderFragment : BaseFragment() {
         viewPager.adapter = orderPagerAdapter
 
         TabLayoutMediator(tl_type, viewPager) { tab, position ->
-            tab.text = tabTitle[position]
+            tab.setCustomView(R.layout.badged_tab)
+            tab.customView?.findViewById<TextView>(R.id.tv_title)?.text = tabTitle[position]
             viewPager.setCurrentItem(tab.position, true)
         }.attach()
     }
