@@ -26,6 +26,15 @@ class OrderViewModel : BaseViewModel() {
     private val _balanceResult = MutableLiveData<BalanceItem>()
     val balanceResult: LiveData<BalanceItem> = _balanceResult
 
+    private val _unreadResult = MutableLiveData<ApiResult<Int>>()
+    val unreadResult: LiveData<ApiResult<Int>> = _unreadResult
+
+    private val _unreadOrderResult = MutableLiveData<ApiResult<Int>>()
+    val unreadOrderResult: LiveData<ApiResult<Int>> = _unreadOrderResult
+
+    var unreadCount = 0
+    var unreadOrderCount = 0
+
     fun getOrderByPaging2(isOnline: Boolean?, update: ((PagedList<OrderItem>) -> Unit)) {
         viewModelScope.launch {
             val dataSrc =
@@ -153,6 +162,36 @@ class OrderViewModel : BaseViewModel() {
                         }
                     }
                 }
+        }
+    }
+
+    fun getUnread(){
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.getUnread()
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(result.body()?.content as Int))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _unreadResult.value = it }
+        }
+    }
+
+    fun getUnReadOrderCount() {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.getUnReadOrderCount()
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(result.body()?.content as Int))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _unreadOrderResult.value = it }
         }
     }
 }

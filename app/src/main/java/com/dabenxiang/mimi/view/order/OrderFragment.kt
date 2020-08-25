@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingData
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -84,7 +85,33 @@ class OrderFragment : BaseFragment() {
                         1 -> "$title(${it.isOnlineCount})"
                         else -> "$title(${(it.allCount ?: 0) - (it.isOnlineCount ?: 0)})"
                     }
-                    tab.customView?.findViewById<ImageView>(R.id.iv_new)?.visibility = View.VISIBLE
+                }
+            }
+        })
+
+        viewModel.unreadResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Success -> {
+                    viewModel.unreadCount = it.result
+                    tl_type.getTabAt(2)?.takeIf { viewModel.unreadCount > 0 }?.also { tab ->
+                        tab.customView?.findViewById<ImageView>(R.id.iv_new)?.visibility = View.VISIBLE
+                    }
+                }
+            }
+            viewModel.getUnReadOrderCount()
+        })
+
+        viewModel.unreadOrderResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Success -> {
+                    viewModel.unreadOrderCount = it.result
+                    tl_type.getTabAt(1)?.takeIf { viewModel.unreadOrderCount > 0 }?.also { tab ->
+                        tab.customView?.findViewById<ImageView>(R.id.iv_new)?.visibility = View.VISIBLE
+                    }
+
+                    tl_type.getTabAt(0)?.takeIf { viewModel.unreadCount + viewModel.unreadOrderCount > 0 }?.also { tab ->
+                        tab.customView?.findViewById<ImageView>(R.id.iv_new)?.visibility = View.VISIBLE
+                    }
                 }
             }
         })
@@ -114,6 +141,10 @@ class OrderFragment : BaseFragment() {
         }.attach()
     }
 
+    override fun initSettings() {
+        super.initSettings()
+        viewModel.getUnread()
+    }
 
     private var getOrderJob: Job? = null
     private fun getOrderByPaging3(update: ((PagingData<OrderItem>, CoroutineScope) -> Unit)) {
