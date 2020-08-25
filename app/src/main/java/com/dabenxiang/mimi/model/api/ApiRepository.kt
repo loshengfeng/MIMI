@@ -755,7 +755,7 @@ class ApiRepository(private val apiService: ApiService) {
     /**
      * 建立工單聊天室
      */
-    suspend fun createOrderChat(request: CreateChatRequest): Response<Void> {
+    suspend fun createOrderChat(request: CreateChatRequest): Response<ApiBaseItem<CreateOrderChatItem>> {
         return apiService.createOrderChat(request)
     }
 
