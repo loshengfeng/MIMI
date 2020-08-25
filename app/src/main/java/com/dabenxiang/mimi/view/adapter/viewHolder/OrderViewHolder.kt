@@ -1,60 +1,119 @@
 package com.dabenxiang.mimi.view.adapter.viewHolder
 
+import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.OrderItem
+import com.dabenxiang.mimi.model.enums.OrderStatus
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.view.order.OrderFuncItem
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_order.view.*
 import timber.log.Timber
 
 class OrderViewHolder(view: View) : BaseViewHolder(view) {
+    private val tvStatus: TextView = view.tv_status
     private val ivType: ImageView = view.iv_type
-    private val tvAccount: TextView = view.tv_account
+    private val clProxy: ConstraintLayout = view.cl_proxy
+    private val ivAvatar: ImageView = view.img_avatar
+    private val tvName: TextView = view.tv_name
+    private val tvOrderId: TextView = view.tv_order_id
     private val tvTime: TextView = view.tv_time
-    private val tvToken: TextView = view.tv_token
-    private val tvPrice: TextView = view.tv_price
+    private val tvPoint: TextView = view.tv_point
+    private val tvSellingPrice: TextView = view.tv_selling_price
     private val clRoot: ConstraintLayout = view.cl_root
 
     private var orderItem: OrderItem? = null
 
-    init {
-        Timber.d("@@init")
-        view.setOnClickListener {
-            Timber.d("@@nClick")
-        }
-    }
-
-    fun bind(orderItem: OrderItem?) {
+    fun bind(orderItem: OrderItem?, orderFuncItem: OrderFuncItem?) {
         this.orderItem = orderItem
-        ivType.setBackgroundResource(
-            when (orderItem?.paymentType) {
-                PaymentType.ALI -> R.drawable.ico_alipay
-                PaymentType.WX -> R.drawable.ico_wechat_pay
-                else -> R.drawable.ico_bank
+
+        when(orderItem?.status) {
+            OrderStatus.PENDING -> {
+                tvStatus.setTextColor(tvStatus.context.getColor(R.color.color_black_1))
+                tvStatus.text = tvStatus.context.getString(R.string.topup_pending)
             }
-        )
-        ivType.setOnClickListener {
-            Timber.d("@@ivType setOnClickListener")
+            OrderStatus.TRANSACTION -> {
+                tvStatus.setTextColor(tvStatus.context.getColor(R.color.color_black_1))
+                tvStatus.text = tvStatus.context.getString(R.string.topup_transaction)
+            }
+            OrderStatus.COMPLETED -> {
+                tvStatus.setTextColor(tvStatus.context.getColor(R.color.color_green_1))
+                tvStatus.text = tvStatus.context.getString(R.string.topup_completed)
+            }
+            OrderStatus.ORDER_CREATING -> {
+                tvStatus.setTextColor(tvStatus.context.getColor(R.color.color_black_1))
+                tvStatus.text = tvStatus.context.getString(R.string.topup_order_creating)
+            }
+            OrderStatus.ORDER_CREATE_FAIL -> {
+                tvStatus.setTextColor(tvStatus.context.getColor(R.color.color_black_1))
+                tvStatus.text = tvStatus.context.getString(R.string.topup_order_create_fail)
+            }
+            OrderStatus.CANCELED -> {
+                tvStatus.setTextColor(tvStatus.context.getColor(R.color.color_black_1))
+                tvStatus.text = tvStatus.context.getString(R.string.topup_canceled)
+            }
+            OrderStatus.FAILED -> {
+                tvStatus.setTextColor(tvStatus.context.getColor(R.color.color_red_1))
+                tvStatus.text = tvStatus.context.getString(R.string.topup_failed)
+            }
+        }
+
+        when(orderItem?.isOnline) {
+            false -> {
+                ivType.visibility = View.INVISIBLE
+                clProxy.visibility = View.VISIBLE
+                tvName.text = orderItem.merchantUserFriendlyName
+                orderItem.merchantUserAvatarAttachmentId?.toString()
+                    .takeIf { !TextUtils.isEmpty(it) && it != LruCacheUtils.ZERO_ID }?.also { id ->
+                    LruCacheUtils.getLruCache(id)?.also { bitmap ->
+                        Glide.with(ivAvatar.context).load(bitmap).into(ivAvatar)
+                    } ?: run {
+                        orderFuncItem?.getOrderProxyAttachment?.invoke(id) { id -> updateAvatar(id) }
+                    }
+                } ?: run {
+                    Glide.with(ivAvatar.context).load(R.drawable.default_profile_picture)
+                        .into(ivAvatar)
+                }
+            }
+            true -> {
+                clProxy.visibility = View.GONE
+                ivType.visibility = View.VISIBLE
+                ivType.setBackgroundResource(
+                    when (orderItem.paymentType) {
+                        PaymentType.ALI -> R.drawable.ico_alipay
+                        PaymentType.WX -> R.drawable.ico_wechat_pay
+                        else -> R.drawable.ico_bank
+                    }
+                )
+            }
         }
 
         clRoot.setOnClickListener {
             Timber.d("@@setOnClickListener")
         }
 
-        tvAccount.text = orderItem?.accountName
+        tvOrderId.text = orderItem?.id.toString()
 
         // 格式為YYYY-MM-DD hh:mm
         tvTime.text = orderItem?.completionTime
+            ?: let { tvTime.context.getString(R.string.topup_default_time) }
 
         // 僅顯示會員充值的蜜幣數量
-        tvToken.text = orderItem?.packagePoint.toString()
+        tvPoint.text = orderItem?.packagePoint.toString()
 
         // 若未登入顯示「-」
-        tvPrice.text = orderItem?.sellingPrice.toString()
+        tvSellingPrice.text = orderItem?.sellingPrice.toString()
+    }
+
+    private fun updateAvatar(id: String) {
+        val bitmap = LruCacheUtils.getLruCache(id)
+        Glide.with(ivAvatar.context).load(bitmap).into(ivAvatar)
     }
 
 }

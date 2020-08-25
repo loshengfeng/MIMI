@@ -11,5 +11,6 @@ class OrderFuncItem(
     val getOrderByPaging2: (Boolean?, ((PagedList<OrderItem>) -> Unit)) -> Unit = { _, _ -> },
     val getChatList: (((PagedList<ChatListItem>) -> Unit)) -> Unit = { _ -> },
     val getChatAttachment: ((String, Int, ((Int) -> Unit)) -> Unit) = { _, _, _ -> },
-    val onChatItemClick: ((ChatListItem) -> Unit) = { _ -> }
+    val onChatItemClick: ((ChatListItem) -> Unit) = { _ -> },
+    val getOrderProxyAttachment: ((String, ((String) -> Unit)) -> Unit) = { _, _ -> }
 )

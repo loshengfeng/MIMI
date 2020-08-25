@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.model.api.vo
 
+import com.dabenxiang.mimi.model.enums.OrderStatus
 import com.dabenxiang.mimi.model.enums.PaymentStatus
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.google.gson.annotations.SerializedName
@@ -30,7 +31,7 @@ data class OrderItem(
     val merchantUserFriendlyName: String = "",
 
     @SerializedName("merchantUserAvatarAttachmentId")
-    val merchantUserAvatarAttachmentId: Long = 0,
+    val merchantUserAvatarAttachmentId: Long? = 0,
 
     @SerializedName("paymentType")
     val paymentType: PaymentType = PaymentType.BANK,
@@ -42,13 +43,13 @@ data class OrderItem(
     val sellingPrice: Float = 0f,
 
     @SerializedName("status")
-    val status: Int = 0,
+    val status: OrderStatus = OrderStatus.PENDING,
 
     @SerializedName("createTime")
     val createTime: String = "",
 
     @SerializedName("completionTime")
-    val completionTime: String = "",
+    val completionTime: String? = null,
 
     @SerializedName("accountName")
     val accountName: String = "",
