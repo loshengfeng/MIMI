@@ -50,8 +50,8 @@ class ChatHistoryViewHolder(
             LruCacheUtils.getLruArrayCache(it.toString())?.also { array ->
                 val options: RequestOptions = RequestOptions()
                         .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                        .placeholder(R.drawable.default_profile_picture)
-                        .error(R.drawable.default_profile_picture)
+                        .placeholder(R.drawable.icon_cs_photo)
+                        .error(R.drawable.icon_cs_photo)
                         .priority(Priority.NORMAL)
 
                 Glide.with(App.self)

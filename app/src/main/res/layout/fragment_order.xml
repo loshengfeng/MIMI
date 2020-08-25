@@ -26,7 +26,7 @@
         app:layout_constraintTop_toBottomOf="@id/layout_title"
         app:tabGravity="fill"
         app:tabIndicatorColor="@color/color_red_1"
-        app:tabIndicatorFullWidth="true"
+        app:tabIndicatorFullWidth="false"
         app:tabIndicatorHeight="4dp"
         app:tabMode="fixed"
         app:tabSelectedTextColor="@color/color_black_1"

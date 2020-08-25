@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.adapter.viewHolder
 
 import android.text.TextUtils
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -17,22 +18,28 @@ import kotlinx.android.synthetic.main.item_order.view.*
 import timber.log.Timber
 
 class OrderViewHolder(view: View) : BaseViewHolder(view) {
+    private val clRoot: ConstraintLayout = view.cl_root
     private val tvStatus: TextView = view.tv_status
     private val ivType: ImageView = view.iv_type
     private val clProxy: ConstraintLayout = view.cl_proxy
+    private val tvFailureReason: TextView = view.tv_failure_reason
     private val ivAvatar: ImageView = view.img_avatar
     private val tvName: TextView = view.tv_name
     private val tvOrderId: TextView = view.tv_order_id
     private val tvTime: TextView = view.tv_time
     private val tvPoint: TextView = view.tv_point
     private val tvSellingPrice: TextView = view.tv_selling_price
-    private val clRoot: ConstraintLayout = view.cl_root
+    private val btnContact: Button = view.btn_contact
+    private val ivNew: ImageView = view.iv_new
 
     private var orderItem: OrderItem? = null
 
     fun bind(orderItem: OrderItem?, orderFuncItem: OrderFuncItem?) {
         this.orderItem = orderItem
 
+
+        tvStatus.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0)
+        tvStatus.compoundDrawablePadding = 0
         when(orderItem?.status) {
             OrderStatus.PENDING -> {
                 tvStatus.setTextColor(tvStatus.context.getColor(R.color.color_black_1))
@@ -61,6 +68,8 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
             OrderStatus.FAILED -> {
                 tvStatus.setTextColor(tvStatus.context.getColor(R.color.color_red_1))
                 tvStatus.text = tvStatus.context.getString(R.string.topup_failed)
+                tvStatus.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ico_attention, 0)
+                tvStatus.compoundDrawablePadding = 4
             }
         }
 
@@ -77,7 +86,7 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
                         orderFuncItem?.getOrderProxyAttachment?.invoke(id) { id -> updateAvatar(id) }
                     }
                 } ?: run {
-                    Glide.with(ivAvatar.context).load(R.drawable.default_profile_picture)
+                    Glide.with(ivAvatar.context).load(R.drawable.icon_cs_photo)
                         .into(ivAvatar)
                 }
             }
@@ -94,9 +103,10 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
             }
         }
 
-        clRoot.setOnClickListener {
-            Timber.d("@@setOnClickListener")
-        }
+        orderItem?.failureReason?.takeIf { !TextUtils.isEmpty(it) }?.also {
+            tvFailureReason.text = it
+            tvFailureReason.visibility = View.VISIBLE
+        } ?: run { tvFailureReason.visibility = View.GONE }
 
         tvOrderId.text = orderItem?.id.toString()
 
@@ -109,6 +119,14 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
 
         // 若未登入顯示「-」
         tvSellingPrice.text = orderItem?.sellingPrice.toString()
+
+        btnContact.setOnClickListener {
+            Timber.d("btnContact setOnClickListener")
+        }
+
+        ivNew.visibility = orderItem?.takeIf { it.lastReadTime < it.lastReplyTime }?.let {
+            View.VISIBLE
+        } ?: let { View.GONE }
     }
 
     private fun updateAvatar(id: String) {
