@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.orderresult
 
+import android.text.TextUtils
 import com.airbnb.epoxy.TypedEpoxyController
 import com.dabenxiang.mimi.model.vo.mqtt.OrderPayloadItem
 import com.dabenxiang.mimi.view.orderresult.itemview.*
@@ -37,7 +38,11 @@ class OrderResultEpoxyController(
     }
 
     private fun addOrderResultSuccessfulItemView(item: OrderPayloadItem) {
-        val dateTime = GeneralUtils.getDateTime(item.createTime)
+
+        val dateTime = when {
+            TextUtils.isEmpty(item.createTime) -> ""
+            else -> GeneralUtils.getDateTime(item.createTime)
+        }
 
         val timeout = StringBuilder("请于 ")
             .append(dateTime)
