@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.order
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingData
 import com.dabenxiang.mimi.App
@@ -22,6 +23,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class OrderFragment : BaseFragment() {
 
@@ -65,18 +67,19 @@ class OrderFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
+        viewModel.balanceResult.observe(viewLifecycleOwner, Observer {
+            TabLayoutMediator(tl_type, viewPager) { tab, position ->
+                tab.text = when (position) {
+                    0 -> "${tabTitle[position]}(${it.allCount})"
+                    1 -> "${tabTitle[position]}(${it.isOnlineCount})"
+                    else -> "${tabTitle[position]}(${(it.allCount ?: 0) - (it.isOnlineCount ?: 0)})"
+                }
+                viewPager.setCurrentItem(tab.position, true)
+            }.attach()
+        })
     }
 
     override fun setupListeners() {
-        tl_type.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab) {
-//                viewModel.getOrder(tab.position)
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab) {}
-            override fun onTabReselected(tab: TabLayout.Tab) {}
-        })
-
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.tv_back -> navigateTo(NavigateItem.Up)
