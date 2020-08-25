@@ -648,10 +648,21 @@ class MyPostFragment : BaseFragment() {
         }
 
         override fun onDelete(item: BaseMemberPostItem) {
-            viewModel.deletePost(
-                item as MemberPostItem,
-                ArrayList(adapter.currentList as List<MemberPostItem>)
-            )
+            GeneralDialog.newInstance(
+                GeneralDialogData(
+                    titleRes = R.string.is_post_delete,
+                    messageIcon = R.drawable.ico_default_photo,
+                    secondBtn = getString(R.string.btn_confirm),
+                    secondBlock = {
+                        viewModel.deletePost(
+                            item as MemberPostItem,
+                            ArrayList(adapter.currentList as List<MemberPostItem>)
+                        )
+                    },
+                    firstBtn = getString(R.string.cancel),
+                    isMessageIcon = false
+                )
+            ).show(requireActivity().supportFragmentManager)
         }
 
         override fun onEdit(item: BaseMemberPostItem) {
