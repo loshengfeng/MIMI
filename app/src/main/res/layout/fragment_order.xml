@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/color_gray_2">
 
     <include
@@ -18,15 +19,15 @@
         android:id="@+id/tl_type"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
         android:background="@color/color_gray_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layout_title"
         app:tabGravity="fill"
         app:tabIndicatorColor="@color/color_red_1"
-        app:tabIndicatorFullWidth="true"
+        app:tabIndicatorFullWidth="false"
         app:tabIndicatorHeight="4dp"
         app:tabMode="fixed"
         app:tabSelectedTextColor="@color/color_black_1"
@@ -38,21 +39,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="false"
-            android:text="@string/topup_all" />
+            android:text="@string/topup_all"
+            tools:text="全部(36)"/>
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/ti_online_pay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="false"
-            android:text="@string/topup_online_pay" />
+            android:text="@string/topup_online_pay"
+            tools:text="在线支付(35)" />
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/ti_proxy_pay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="false"
-            android:text="@string/topup_proxy_pay" />
+            android:text="@string/topup_proxy_pay"
+            tools:text="代理支付(1)" />
     </com.google.android.material.tabs.TabLayout>
 
     <androidx.viewpager2.widget.ViewPager2

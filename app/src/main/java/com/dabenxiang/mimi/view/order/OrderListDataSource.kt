@@ -48,6 +48,9 @@ class OrderListDataSource constructor(
                 }
                 emit(InitResult(clubs ?: arrayListOf(), nextPageKey))
 
+                if (isOnline == null) {
+                    pagingCallback.onGetAny(item?.content?.balance)
+                }
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> pagingCallback.onThrowable(e) }
