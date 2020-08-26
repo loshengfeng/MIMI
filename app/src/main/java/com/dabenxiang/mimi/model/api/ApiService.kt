@@ -273,9 +273,8 @@ interface ApiService {
      ***********************************************************/
     @GET("/v1/Members/Home/Banner")
     suspend fun fetchHomeBanner(
-            @Query("position") position: Int?,
-            @Query("bannerCategory") bannerCategory: String?
-    ): Response<ApiBaseItem<BannerItem>>
+        @Query("bannerCategory") bannerCategory: Int
+    ): Response<ApiBaseItem<List<CategoryBanner>>>
 
     /**********************************************************
      *

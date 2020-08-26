@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.model.enums.OrderStatus
 import com.dabenxiang.mimi.model.enums.PaymentType
@@ -122,11 +123,21 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
 
         btnContact.setOnClickListener {
             orderItem?.also {
-                orderFuncItem?.onContactClick?.invoke(it.id, it.chatId)
+                orderFuncItem?.onContactClick?.invoke(
+                    it.id,
+                    ChatListItem(
+                        id = it.chatId,
+                        name = if (TextUtils.isEmpty(it.merchantUserFriendlyName)) btnContact.context.getString(
+                            R.string.order_contact_mimi_service
+                        ) else it.merchantUserFriendlyName,
+                        avatarAttachmentId = it.merchantUserAvatarAttachmentId,
+                        lastReadTime = it.lastReadTime
+                    )
+                )
             }
         }
 
-        ivNew.visibility = orderItem?.takeIf { it.lastReadTime < it.lastReplyTime }?.let {
+        ivNew.visibility = orderItem?.takeIf { it.lastReadTime?.time?:0 < it.lastReplyTime?.time?:0 }?.let {
             View.VISIBLE
         } ?: let { View.GONE }
     }

@@ -28,7 +28,6 @@ import com.dabenxiang.mimi.view.home.video.VideoDataSource
 import com.dabenxiang.mimi.view.home.video.VideoFactory
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
-import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
@@ -59,8 +58,8 @@ class HomeViewModel : BaseViewModel() {
     val videoList: LiveData<PagedList<BaseVideoItem>> = _videoList
 
     private var _carouselResult =
-        MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<StatisticsItem>>>>>()
-    val carouselResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<StatisticsItem>>>>> =
+        MutableLiveData<Pair<Int, ApiResult<ApiBaseItem<List<CategoryBanner>>>>>()
+    val carouselResult: LiveData<Pair<Int, ApiResult<ApiBaseItem<List<CategoryBanner>>>>> =
         _carouselResult
 
     private var _videosResult =
@@ -127,18 +126,13 @@ class HomeViewModel : BaseViewModel() {
 
     private var job = Job()
 
-    fun loadNestedStatisticsListForCarousel(position: Int, src: HomeTemplate.Carousel) {
+    fun loadNestedStatisticsListForCarousel(position: Int, src: HomeTemplate.Carousel, isAdult: Boolean = false) {
         viewModelScope.launch {
             flow {
-                val resp = domainManager.getApiRepository().statisticsHomeVideos(
-                    isAdult = src.isAdult,
-                    offset = 0,
-                    limit = CAROUSEL_LIMIT
-                )
-                if (!resp.isSuccessful) throw HttpException(resp)
+                val resp = domainManager.getApiRepository().fetchHomeBanner(if(isAdult) 2 else 1)
+                if(!resp.isSuccessful) throw HttpException(resp)
                 emit(ApiResult.success(resp.body()))
-            }
-                .flowOn(Dispatchers.IO)
+            }.flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }

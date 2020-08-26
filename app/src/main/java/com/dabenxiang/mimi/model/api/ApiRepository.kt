@@ -351,10 +351,7 @@ class ApiRepository(private val apiService: ApiService) {
     /**
      * 取得影片Banner
      */
-    suspend fun fetchHomeBanner(
-            position: Int?,
-            bannerCategory: String?
-    ) = apiService.fetchHomeBanner(position, bannerCategory)
+    suspend fun fetchHomeBanner(bannerCategory: Int) = apiService.fetchHomeBanner(bannerCategory)
 
     /**********************************************************
      *

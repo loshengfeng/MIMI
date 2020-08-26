@@ -11,10 +11,8 @@ class OrderPagingSource(
     private val domainManager: DomainManager
 ) : PagingSource<Long, OrderItem>() {
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, OrderItem> {
-        Timber.d("@@load")
         return try {
             val offset = params.key ?: 0L
-            Timber.d("@@load offset: $offset, loadSize: ${params.loadSize}")
             val result =
                 domainManager.getApiRepository()
                     .getOrder(offset.toString(), params.loadSize.toString())
@@ -37,7 +35,6 @@ class OrderPagingSource(
                 nextKey = nextOffset
             )
         } catch (exception: Exception) {
-            Timber.e("@@@.........$exception")
             LoadResult.Error(exception)
         }
     }

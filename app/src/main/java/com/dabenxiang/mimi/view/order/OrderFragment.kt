@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.order
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -54,7 +55,7 @@ class OrderFragment : BaseFragment() {
                 getChatAttachment = { id, pos, update -> viewModel.getAttachment(id, pos, update) },
                 onChatItemClick = { item -> onChatItemClick(item) },
                 getOrderProxyAttachment = { id, update -> viewModel.getProxyAttachment(id, update) },
-                onContactClick = { id, chatId -> Timber.d("onContactClick $id, $chatId") }
+                onContactClick = { orderId, chatListItem -> onContactClick(orderId, chatListItem)}
             ))
     }
 
@@ -115,6 +116,26 @@ class OrderFragment : BaseFragment() {
                 }
             }
         })
+
+        viewModel.createOrderChatResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Success -> {
+                    val chatId = it.result.first.chatId
+                    val chatListItem = it.result.second
+                    onChatItemClick(
+                        ChatListItem(
+                            id = chatId,
+                            name = chatListItem.name,
+                            avatarAttachmentId = chatListItem.avatarAttachmentId,
+                            lastReadTime = chatListItem.lastReadTime
+                        )
+                    )
+                }
+                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -157,11 +178,20 @@ class OrderFragment : BaseFragment() {
     }
 
     private fun onChatItemClick(item: ChatListItem) {
+        Timber.d("onChatItemClick: $item")
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_orderFragment_to_chatContentFragment,
                 ChatContentFragment.createBundle(item)
             )
         )
+    }
+
+    private fun onContactClick(orderId: Long, item: ChatListItem) {
+        if (item.id != 0L) {
+            onChatItemClick(item)
+        } else {
+            viewModel.createOrderChat(orderId, item)
+        }
     }
 }

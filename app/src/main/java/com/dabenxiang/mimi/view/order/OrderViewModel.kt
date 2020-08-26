@@ -8,9 +8,7 @@ import androidx.paging.*
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiRepository.Companion.NETWORK_PAGE_SIZE
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.BalanceItem
-import com.dabenxiang.mimi.model.api.vo.ChatListItem
-import com.dabenxiang.mimi.model.api.vo.OrderItem
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.chathistory.ChatHistoryListDataSource
@@ -31,6 +29,9 @@ class OrderViewModel : BaseViewModel() {
 
     private val _unreadOrderResult = MutableLiveData<ApiResult<Int>>()
     val unreadOrderResult: LiveData<ApiResult<Int>> = _unreadOrderResult
+
+    private val _createOrderChatResult = MutableLiveData<ApiResult<Pair<CreateOrderChatItem, ChatListItem>>>()
+    val createOrderChatResult: LiveData<ApiResult<Pair<CreateOrderChatItem, ChatListItem>>> = _createOrderChatResult
 
     var unreadCount = 0
     var unreadOrderCount = 0
@@ -192,6 +193,20 @@ class OrderViewModel : BaseViewModel() {
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _unreadOrderResult.value = it }
+        }
+    }
+
+    fun createOrderChat(orderId: Long, item: ChatListItem) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().createOrderChat(CreateChatRequest(orderId))
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(Pair(result.body()?.content?: CreateOrderChatItem(),item)))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _createOrderChatResult.value = it }
         }
     }
 }
