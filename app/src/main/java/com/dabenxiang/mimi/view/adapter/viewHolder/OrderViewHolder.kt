@@ -16,7 +16,6 @@ import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.order.OrderFuncItem
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_order.view.*
-import timber.log.Timber
 
 class OrderViewHolder(view: View) : BaseViewHolder(view) {
     private val clRoot: ConstraintLayout = view.cl_root
