@@ -20,7 +20,9 @@ import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_my_follow.*
+import kotlinx.android.synthetic.main.item_follow_no_data.view.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import kotlinx.android.synthetic.main.view_my_follow_pager_content.*
 import timber.log.Timber
 
 class MyFollowFragment : BaseFragment() {
@@ -250,8 +252,17 @@ class MyFollowFragment : BaseFragment() {
         tv_title.setText(R.string.follow_title)
     }
 
-    private fun refreshUi(type: Int, size: Int) {
+    private fun refreshUi(witch: Int, size: Int) {
+        rv_content.visibility = when (size) {
+            NO_DATA -> View.GONE
+            else -> View.VISIBLE
+        }
+
+        item_no_data.visibility = when (size) {
+            NO_DATA -> View.VISIBLE
+            else -> View.GONE
+        }
         tv_clean.isEnabled = size != NO_DATA
-        vpAdapter?.refreshUi(type, size)
+        vpAdapter?.refreshUi(witch, size)
     }
 }

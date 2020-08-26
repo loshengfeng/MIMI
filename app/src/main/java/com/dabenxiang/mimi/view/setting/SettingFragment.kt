@@ -10,6 +10,7 @@ import android.graphics.Matrix
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.TextUtils
 import android.view.View
 import androidx.activity.addCallback
 import androidx.core.content.FileProvider
@@ -73,7 +74,12 @@ class SettingFragment : BaseFragment() {
                     tv_email.text = viewModel.profileData?.email
                     tv_account.text = viewModel.profileData?.username
                     gender_info.text = getString(viewModel.profileData!!.getGenderRes())
-                    birthday_info.text = viewModel.profileData?.birthday!!.split("T")[0]
+
+                    val birthday = viewModel.profileData?.birthday ?: ""
+                    if (!TextUtils.isEmpty(birthday)) {
+                        birthday_info.text = birthday.split("T")[0]
+                    }
+
                     var img: Drawable? = null
 
                     if (viewModel.isEmailConfirmed()) {
@@ -148,7 +154,8 @@ class SettingFragment : BaseFragment() {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Empty -> {}
+                is Empty -> {
+                }
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -258,10 +265,11 @@ class SettingFragment : BaseFragment() {
                 REQUEST_CODE_ALBUM -> {
                     val type = data?.data?.let { requireActivity().contentResolver.getType(it) }
                     data?.data?.takeIf { type?.startsWith("image") == true }?.let {
-                        if (android.os.Build.VERSION.SDK_INT >= 29){
-                            val source = ImageDecoder.createSource(requireContext().contentResolver, it)
+                        if (android.os.Build.VERSION.SDK_INT >= 29) {
+                            val source =
+                                ImageDecoder.createSource(requireContext().contentResolver, it)
                             ImageDecoder.decodeBitmap(source)
-                        } else{
+                        } else {
                             MediaStore.Images.Media.getBitmap(requireContext().contentResolver, it)
                         }
                     }
@@ -285,7 +293,11 @@ class SettingFragment : BaseFragment() {
     private fun openCamera() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             takePictureIntent.resolveActivity(requireContext().packageManager)?.also {
-                val uri = FileProvider.getUriForFile(requireContext(), BuildConfig.APPLICATION_ID + ".fileProvider", file)
+                val uri = FileProvider.getUriForFile(
+                    requireContext(),
+                    BuildConfig.APPLICATION_ID + ".fileProvider",
+                    file
+                )
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
                 startActivityForResult(takePictureIntent, REQUEST_CODE_CAMERA)
             }
