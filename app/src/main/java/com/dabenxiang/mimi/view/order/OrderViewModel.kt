@@ -30,8 +30,8 @@ class OrderViewModel : BaseViewModel() {
     private val _unreadOrderResult = MutableLiveData<ApiResult<Int>>()
     val unreadOrderResult: LiveData<ApiResult<Int>> = _unreadOrderResult
 
-    private val _createOrderChatResult = MutableLiveData<ApiResult<Pair<CreateOrderChatItem, ChatListItem>>>()
-    val createOrderChatResult: LiveData<ApiResult<Pair<CreateOrderChatItem, ChatListItem>>> = _createOrderChatResult
+    private val _createOrderChatResult = MutableLiveData<ApiResult<Triple<CreateOrderChatItem, ChatListItem, OrderItem>>>()
+    val createOrderChatResult: LiveData<ApiResult<Triple<CreateOrderChatItem, ChatListItem, OrderItem>>> = _createOrderChatResult
 
     var unreadCount = 0
     var unreadOrderCount = 0
@@ -196,12 +196,12 @@ class OrderViewModel : BaseViewModel() {
         }
     }
 
-    fun createOrderChat(orderId: Long, item: ChatListItem) {
+    fun createOrderChat(chatListItem: ChatListItem, orderItem: OrderItem) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().createOrderChat(CreateChatRequest(orderId))
+                val result = domainManager.getApiRepository().createOrderChat(CreateChatRequest(orderItem.id))
                 if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(Pair(result.body()?.content?: CreateOrderChatItem(),item)))
+                emit(ApiResult.success(Triple(result.body()?.content?: CreateOrderChatItem(), chatListItem, orderItem)))
             }
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }

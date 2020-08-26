@@ -7,9 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.ChatContentItem
-import com.dabenxiang.mimi.model.api.vo.ChatContentPayloadItem
-import com.dabenxiang.mimi.model.api.vo.MQTTChatItem
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.ChatMessageType
 import com.dabenxiang.mimi.model.enums.VideoDownloadStatusType
 import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager.Companion.PREFIX_CHAT
@@ -21,6 +19,8 @@ import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.eclipse.paho.client.mqttv3.IMqttActionListener
+import org.eclipse.paho.client.mqttv3.IMqttToken
 import org.eclipse.paho.client.mqttv3.MqttMessage
 import retrofit2.HttpException
 import timber.log.Timber
@@ -64,12 +64,16 @@ class ChatContentViewModel : BaseViewModel() {
     private var _updatePushData = MutableLiveData<ChatContentItem>()
     val updatePushData: LiveData<ChatContentItem> = _updatePushData
 
-    var topic: String = ""
+    private var _updateOrderChatStatusResult = MutableLiveData<ApiResult<Nothing>>()
+    val updateOrderChatStatusResult: LiveData<ApiResult<Nothing>> = _updateOrderChatStatusResult
+
     var messageType: Int = ChatMessageType.TEXT.ordinal
     var isLoading: Boolean = false
     var chatId: Long = -1
+    var traceLogId: Long = -1
     var offset: Int = 0
     var noMore: Boolean = false
+    var isOnline: Boolean = false
 
     var videoCache: HashMap<String, ChatContentItem> = HashMap()
     var fileUploadCache: HashMap<String, Int> = HashMap()
@@ -77,15 +81,23 @@ class ChatContentViewModel : BaseViewModel() {
     fun getChatContent() {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().getMessage(
-                    chatId,
-                    offset = offset.toString(),
-                    limit = PER_LIMIT
-                )
+                val result = if (isOnline) {
+                    domainManager.getApiRepository().getOrderChatContent(
+                        traceLogId,
+                        offset = offset.toString(),
+                        limit = PER_LIMIT
+                    )
+                } else {
+                    domainManager.getApiRepository().getMessage(
+                        chatId,
+                        offset = offset.toString(),
+                        limit = PER_LIMIT
+                    )
+                }
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()
                 val size = item?.content?.messages?.size ?: 0
-                val messages = adjustData(item?.content?.messages ?: ArrayList<ChatContentItem>())
+                val messages = adjustData(item?.content?.messages ?: ArrayList())
                 val totalCount = item?.paging?.count ?: 0
                 val nextPageKey = when {
                     hasNextPage(totalCount, item?.paging?.offset ?: 0, size) -> {
@@ -112,7 +124,11 @@ class ChatContentViewModel : BaseViewModel() {
     fun setLastRead() {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().setLastReadMessageTime(chatId)
+                val result = if (isOnline) {
+                    domainManager.getApiRepository().updateOrderChatLastReadTime(traceLogId)
+                } else {
+                    domainManager.getApiRepository().setLastReadMessageTime(chatId)
+                }
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }
@@ -361,6 +377,38 @@ class ChatContentViewModel : BaseViewModel() {
             sendTime
         }
         val mqttChatItem = MQTTChatItem(ext, message, pushTime, messageType)
-        mqttManager.publishMessage(topic, gson.toJson(mqttChatItem))
+        mqttManager.publishMessage(getChatTopic(), gson.toJson(mqttChatItem), mqttCallback)
+    }
+
+    private val mqttCallback by lazy {
+        object : IMqttActionListener {
+            override fun onSuccess(asyncActionToken: IMqttToken?) {
+                Timber.d("mqttCallback onSuccess")
+                if (isOnline) {
+                    updateOrderChatStatus()
+                }
+            }
+
+            override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+                Timber.e("mqttCallback onFailure: $exception")
+            }
+        }
+    }
+
+    fun updateOrderChatStatus() {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().updateOrderChatStatus(traceLogId)
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    _updateOrderChatStatusResult.value = it
+                }
+        }
     }
 }
