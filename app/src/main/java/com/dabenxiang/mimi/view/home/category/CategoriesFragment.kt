@@ -15,10 +15,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult.*
+import com.dabenxiang.mimi.model.api.ApiResult.Error
+import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoSearchItem
+import com.dabenxiang.mimi.model.vo.CarouselHolderItem
 import com.dabenxiang.mimi.model.vo.CategoriesItem
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.adapter.FilterTabAdapter
@@ -84,6 +86,8 @@ class CategoriesFragment : BaseFragment() {
         override fun onLoadClipViewHolder(vh: HomeClipViewHolder) {}
         override fun onLoadPictureViewHolder(vh: HomePictureViewHolder) {}
         override fun onLoadClubViewHolder(vh: HomeClubViewHolder) {}
+        override fun onClickBanner(item: CarouselHolderItem) {}
+
         override fun onLoadStatisticsViewHolder(
             vh: HomeStatisticsViewHolder,
             src: HomeTemplate.Statistics

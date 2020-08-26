@@ -83,6 +83,7 @@
     <string name="favorite_follow">+关注</string>
     <string name="favorite_btn_clean">是否要清除所有收藏</string>
     <string name="favorite_delete_favorite">取消收藏</string>
+    <string name="favorite_no_data">尚未收藏影片，快去看片吧！</string>
     <string name="favorite_delete_this_favorite">是否要清除此收藏</string>
 
     <!-- Personal -->
@@ -184,6 +185,7 @@
     <string name="follow_clean">清除</string>
     <string name="follow_clean_member_dlg_msg">是否要清除所有关注的人</string>
     <string name="follow_clean_club_dlg_msg">是否要清除所有关注的圈子</string>
+    <string name="follow_no_data">尚未有任何关注，快去关注一下吧！</string>
     <string name="text_more">更多</string>
     <string name="text_search">搜寻</string>
     <string name="text_follow">关注</string>
@@ -312,6 +314,7 @@
 
     <string name="report_success">问题回报成功</string>
     <string name="report_error">请选择回报问题</string>
+    <string name="is_post_delete">是否要删除此帖子</string>
 
     <!--  Search Post -->
     <string name="search_result">搜索\"%s\", 共找到 %,d 个视频</string>
@@ -371,6 +374,8 @@
     <string name="order_detail_payment_wx">微信付款</string>
     <string name="order_detail_create_order">建立订单</string>
     <string name="order_detail_total_amount">总计</string>
+    <string name="order_contact_mimi_service">蜜蜜客服</string>
+
 
     <!-- Order Result -->
     <string name="order_result_create_order">建立订单</string>

@@ -30,7 +30,7 @@
             android:ellipsize="end"
             android:gravity="center"
             android:maxLines="2"
-            tools:text="AAAAAAAA"/>
+            tools:text="TITLE"/>
     </LinearLayout>
 
     <ImageView
@@ -39,6 +39,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ico_new"
         android:contentDescription="@null"
+        android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 

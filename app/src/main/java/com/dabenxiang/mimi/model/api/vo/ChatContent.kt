@@ -4,8 +4,5 @@ import com.google.gson.annotations.SerializedName
 
 data class ChatContent(
         @SerializedName("withAgentFriendlyName")
-        val withAgentFriendlyName: String? = "",
-
-        @SerializedName("messages")
-        val messages: ArrayList<ChatContentItem>? = null
-)
+        val withAgentFriendlyName: String? = ""
+): BaseChatContentItem()

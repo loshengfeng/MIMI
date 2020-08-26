@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingData
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -17,9 +19,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_order.*
-import kotlinx.android.synthetic.main.fragment_order.viewPager
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import kotlinx.android.synthetic.main.item_setting_bar.tv_title
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
@@ -52,7 +52,7 @@ class OrderFragment : BaseFragment() {
                 getChatAttachment = { id, pos, update -> viewModel.getAttachment(id, pos, update) },
                 onChatItemClick = { item -> onChatItemClick(item) },
                 getOrderProxyAttachment = { id, update -> viewModel.getProxyAttachment(id, update) },
-                onContactClick = { id, chatId -> Timber.d("onContactClick $id, $chatId") }
+                onContactClick = { chatListItem, orderItem -> onContactClick(chatListItem, orderItem) }
             ))
     }
 
@@ -63,6 +63,9 @@ class OrderFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback {
+            navigateTo(NavigateItem.Up)
+        }
         initSettings()
     }
 
@@ -72,7 +75,7 @@ class OrderFragment : BaseFragment() {
 
     override fun setupObservers() {
         viewModel.balanceResult.observe(viewLifecycleOwner, Observer {
-            for (i in 0..tl_type.tabCount) {
+            for (i in 0 until tl_type.tabCount) {
                 val title = tabTitle[i]
                 tl_type.getTabAt(i)?.also { tab ->
                     tab.customView?.findViewById<TextView>(R.id.tv_title)?.text = when (i) {
@@ -80,8 +83,56 @@ class OrderFragment : BaseFragment() {
                         1 -> "$title(${it.isOnlineCount})"
                         else -> "$title(${(it.allCount ?: 0) - (it.isOnlineCount ?: 0)})"
                     }
-                    tab.customView?.findViewById<ImageView>(R.id.iv_new)?.visibility = View.VISIBLE
                 }
+            }
+        })
+
+        viewModel.unreadResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Success -> {
+                    viewModel.unreadCount = it.result
+                    tl_type.getTabAt(2)?.takeIf { viewModel.unreadCount > 0 }?.also { tab ->
+                        tab.customView?.findViewById<ImageView>(R.id.iv_new)?.visibility = View.VISIBLE
+                    }
+                }
+            }
+            viewModel.getUnReadOrderCount()
+        })
+
+        viewModel.unreadOrderResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Success -> {
+                    viewModel.unreadOrderCount = it.result
+                    tl_type.getTabAt(1)?.takeIf { viewModel.unreadOrderCount > 0 }?.also { tab ->
+                        tab.customView?.findViewById<ImageView>(R.id.iv_new)?.visibility = View.VISIBLE
+                    }
+
+                    tl_type.getTabAt(0)?.takeIf { viewModel.unreadCount + viewModel.unreadOrderCount > 0 }?.also { tab ->
+                        tab.customView?.findViewById<ImageView>(R.id.iv_new)?.visibility = View.VISIBLE
+                    }
+                }
+            }
+        })
+
+        viewModel.createOrderChatResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Success -> {
+                    val createOrderChatItem = it.result.first
+                    val chatListItem = it.result.second
+                    val orderItem = it.result.third
+                    onChatItemClick(
+                        ChatListItem(
+                            id = createOrderChatItem.chatId,
+                            name = chatListItem.name,
+                            avatarAttachmentId = chatListItem.avatarAttachmentId,
+                            lastReadTime = chatListItem.lastReadTime
+                        ),
+                        OrderItem(traceLogId = createOrderChatItem.id, isOnline = orderItem.isOnline)
+                    )
+                }
+                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is ApiResult.Error -> onApiError(it.throwable)
             }
         })
     }
@@ -110,6 +161,10 @@ class OrderFragment : BaseFragment() {
         }.attach()
     }
 
+    override fun initSettings() {
+        super.initSettings()
+        viewModel.getUnread()
+    }
 
     private var getOrderJob: Job? = null
     private fun getOrderByPaging3(update: ((PagingData<OrderItem>, CoroutineScope) -> Unit)) {
@@ -121,12 +176,22 @@ class OrderFragment : BaseFragment() {
         }
     }
 
-    private fun onChatItemClick(item: ChatListItem) {
+    private fun onChatItemClick(item: ChatListItem, orderItem: OrderItem = OrderItem()) {
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_orderFragment_to_chatContentFragment,
-                ChatContentFragment.createBundle(item)
+                ChatContentFragment.createBundle(item, orderItem.traceLogId, orderItem.isOnline)
             )
         )
+    }
+
+    private fun onContactClick(chatListItem: ChatListItem, orderItem: OrderItem) {
+        Timber.d("@@chatListItem: $chatListItem")
+        Timber.d("@@orderItem: $orderItem")
+        if (chatListItem.id != 0L && orderItem.traceLogId != 0L) {
+            onChatItemClick(chatListItem, orderItem)
+        } else {
+            viewModel.createOrderChat(chatListItem, orderItem)
+        }
     }
 }
