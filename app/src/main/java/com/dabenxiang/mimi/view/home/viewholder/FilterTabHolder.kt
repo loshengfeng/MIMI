@@ -1,6 +1,8 @@
 package com.dabenxiang.mimi.view.home.viewholder
 
+import android.content.Context
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.dabenxiang.mimi.R
@@ -8,6 +10,8 @@ import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import kotlinx.android.synthetic.main.item_filter.view.*
 import timber.log.Timber
+import tw.gov.president.utils.general.app.GeneralUtils
+import kotlin.math.roundToInt
 
 class FilterTabHolder(itemView: View, listener: FilterTabHolderListener, var isAdult: Boolean) :
     BaseIndexViewHolder<String>(itemView, object : IndexViewHolderListener {
@@ -29,7 +33,9 @@ class FilterTabHolder(itemView: View, listener: FilterTabHolderListener, var isA
 
     override fun updated(model: String?) {
         if (model == CategoriesFragment.TEXT_ALL && index == 0) {
-            tvTitle.width = 0
+            tvTitle.visibility = View.GONE
+        } else {
+            tvTitle.visibility = View.VISIBLE
         }
         tvTitle.text = model
     }
