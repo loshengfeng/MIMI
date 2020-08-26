@@ -35,6 +35,9 @@ import timber.log.Timber
 import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.text.SimpleDateFormat
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
@@ -294,5 +297,22 @@ object GeneralUtils {
 
     fun getWindowsHeight(): Int {
         return App.applicationContext().resources.displayMetrics.heightPixels
+    }
+
+    fun getDateTime(time: String): String {
+        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            val offsetDateTime = OffsetDateTime.parse(time).plusHours(1)
+            val formatter = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm")
+            offsetDateTime.format(formatter)
+        } else {
+            val time = time.substring(0, time.length - 6).plus("Z")
+            val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'")
+            val date = sdf.parse(time)
+            val calendar = Calendar.getInstance()
+            calendar.time = date
+            calendar.add(Calendar.HOUR_OF_DAY, 1)
+            val formatter = SimpleDateFormat("YYYY-MM-dd HH:mm")
+            formatter.format(calendar.time)
+        }
     }
 }

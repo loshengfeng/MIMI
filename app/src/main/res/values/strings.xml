@@ -84,6 +84,7 @@
     <string name="favorite_btn_clean">是否要清除所有收藏</string>
     <string name="favorite_delete_favorite">取消收藏</string>
     <string name="favorite_no_data">尚未收藏影片，快去看片吧！</string>
+    <string name="favorite_delete_this_favorite">是否要清除此收藏</string>
 
     <!-- Personal -->
     <string name="personal_title">我的</string>
@@ -136,7 +137,21 @@
     <string name="topup_all">全部</string>
     <string name="topup_online_pay">在线支付</string>
     <string name="topup_proxy_pay">代理支付</string>
-    <string name="topup_pay">支付金额</string>
+    <string name="topup_proxy_order">代理订单</string>
+    <string name="topup_proxy_chat">对话记录</string>
+    <string name="topup_pay">支付金额(¥)</string>
+    <string name="topup_order_id">充值订单编号</string>
+    <string name="topup_point">蜜币</string>
+    <string name="topup_time">充值时间</string>
+    <string name="topup_check_info">查看打款资讯</string>
+    <string name="topup_contact">联系客服</string>
+    <string name="topup_pending">交易进行中</string>
+    <string name="topup_transaction">Transaction</string>
+    <string name="topup_order_creating">订单建立中</string>
+    <string name="topup_order_create_fail">订单建立失败</string>
+    <string name="topup_completed">交易成功</string>
+    <string name="topup_canceled">Canceled</string>
+    <string name="topup_failed">交易失败</string>
     <string name="title_chat_history">对话记录</string>
     <string name="edit_hint_chat">留下评论</string>
     <string name="issue_report">问题回报</string>
@@ -299,6 +314,7 @@
 
     <string name="report_success">问题回报成功</string>
     <string name="report_error">请选择回报问题</string>
+    <string name="is_post_delete">是否要删除此帖子</string>
 
     <!--  Search Post -->
     <string name="search_result">搜索\"%s\", 共找到 %,d 个视频</string>
@@ -372,5 +388,6 @@
 
     <string name="filter_empty">无搜寻结果</string>
     <string name="copy_url">已将连结保存到剪贴簿</string>
+    <string name="topup_default_time">-</string>
 
 </resources>

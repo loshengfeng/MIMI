@@ -286,6 +286,7 @@ class MainViewModel : BaseViewModel() {
     private val messageListener = object : MessageListener {
         override fun onMsgReceive(message: MqttMessage) {
             val data = gson.fromJson(String(message.payload), OrderItem::class.java)
+            Timber.d("Payload: ${String(message.payload)}")
             _orderItem.postValue(data)
         }
     }

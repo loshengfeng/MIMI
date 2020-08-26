@@ -1,15 +1,18 @@
 package com.dabenxiang.mimi.view.orderresult
 
+import android.text.TextUtils
 import com.airbnb.epoxy.TypedEpoxyController
-import com.dabenxiang.mimi.model.vo.mqtt.OrderItem
+import com.dabenxiang.mimi.model.vo.mqtt.OrderPayloadItem
 import com.dabenxiang.mimi.view.orderresult.itemview.*
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
+
 
 class OrderResultEpoxyController(
     private val failedListener: OrderResultFailedItemView.OrderResultFailedListener,
     private val successListener: OrderResultSuccessItemView.OrderResultSuccessListener
-) : TypedEpoxyController<OrderItem>() {
+) : TypedEpoxyController<OrderPayloadItem>() {
 
-    override fun buildModels(item: OrderItem?) {
+    override fun buildModels(item: OrderPayloadItem?) {
         if (item == null) {
             addOrderResultWaitingItemView()
         } else {
@@ -34,9 +37,15 @@ class OrderResultEpoxyController(
         }
     }
 
-    private fun addOrderResultSuccessfulItemView(item: OrderItem) {
+    private fun addOrderResultSuccessfulItemView(item: OrderPayloadItem) {
+
+        val dateTime = when {
+            TextUtils.isEmpty(item.createTime) -> ""
+            else -> GeneralUtils.getDateTime(item.createTime)
+        }
+
         val timeout = StringBuilder("请于 ")
-            .append(item.createTime)
+            .append(dateTime)
             .append(" 前完成打款动作，避免订单超时")
             .toString()
 

@@ -2,10 +2,10 @@ package com.dabenxiang.mimi.model.api.vo
 
 import com.google.gson.annotations.SerializedName
 
-data class OperatorsVideoRequest(
+class CreateOrderChatItem(
     @SerializedName("id")
-    val it: Int?,
+    val id: Long = 0,
 
-    @SerializedName("status")
-    val status: Int?
+    @SerializedName("chatId")
+    val chatId: Long = 0
 )

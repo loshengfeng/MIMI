@@ -23,6 +23,7 @@ class ApiRepository(private val apiService: ApiService) {
         fun isRefreshTokenFailed(code: String?): Boolean {
             return code == TOKEN_NOT_FOUND
         }
+
         const val NETWORK_PAGE_SIZE = 20
     }
 
@@ -754,7 +755,7 @@ class ApiRepository(private val apiService: ApiService) {
         isOnline: Boolean,
         offset: String,
         limit: String
-    ): Response<ApiBasePagingItem<ArrayList<OrderItem>>> {
+    ): Response<ApiBasePagingItem<OrderContentItem>> {
         return apiService.getOrderByOnline(isOnline, offset, limit)
     }
 
@@ -768,7 +769,7 @@ class ApiRepository(private val apiService: ApiService) {
     /**
      * 建立工單聊天室
      */
-    suspend fun createOrderChat(request: CreateChatRequest): Response<Void> {
+    suspend fun createOrderChat(request: CreateChatRequest): Response<ApiBaseItem<CreateOrderChatItem>> {
         return apiService.createOrderChat(request)
     }
 

@@ -573,7 +573,6 @@ interface ApiService {
         @Query("sign") sign: String?
     ): Response<ApiBaseItem<VideoM3u8Source>>
 
-
     /**********************************************************
      *
      *                  Ordering
@@ -611,7 +610,7 @@ interface ApiService {
         @Query("isOnline") isOnline: Boolean,
         @Query("offset") offset: String,
         @Query("limit") limit: String
-    ): Response<ApiBasePagingItem<ArrayList<OrderItem>>>
+    ): Response<ApiBasePagingItem<OrderContentItem>>
 
     @GET("/v1/Member/Me/Order/GetPendingOrder")
     suspend fun getPendingOrderCount(): Response<ApiBaseItem<PendingOrderItem>>
@@ -622,7 +621,7 @@ interface ApiService {
      *
      ***********************************************************/
     @POST("/v1/Members/Me/Order/TraceLog")
-    suspend fun createOrderChat(@Body request: CreateChatRequest): Response<Void>
+    suspend fun createOrderChat(@Body request: CreateChatRequest): Response<ApiBaseItem<CreateOrderChatItem>>
 
     @GET("/v1/Members/Me/Order/TraceLog/UnRead")
     suspend fun getUnReadOrderCount(): Response<ApiBaseItem<Int>>

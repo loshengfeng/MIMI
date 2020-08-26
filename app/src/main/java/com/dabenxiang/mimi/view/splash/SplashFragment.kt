@@ -81,7 +81,7 @@ class SplashFragment : BaseFragment() {
         viewModel.versionStatus.observe(this, Observer {
 
             Timber.i("versionStatus=$it   isVersionChecked=${mainViewModel?.isVersionChecked}")
-            if(mainViewModel?.isVersionChecked == true) return@Observer
+            if (mainViewModel?.isVersionChecked == true) return@Observer
             when (it) {
                 VersionStatus.UPDATE -> {
                     if (viewModel.isUpgradeApp()) {
@@ -103,15 +103,6 @@ class SplashFragment : BaseFragment() {
 
     private fun requestPermissions() {
         val requestList = getNotGrantedPermissions(permissions)
-        for (i in requestList.indices) {
-            if (ActivityCompat.checkSelfPermission(
-                    requireContext(),
-                    requestList[i]
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                requestList.add(requestList[i])
-            }
-        }
 
         if (requestList.size > 0) {
             requestPermissions(requestList.toTypedArray(), PERMISSION_REQUEST_CODE)
@@ -195,13 +186,13 @@ class SplashFragment : BaseFragment() {
                     } else {
                         viewModel.updateApp(progressCallback)
                     }
-                    mainViewModel?.isVersionChecked =true
+                    mainViewModel?.isVersionChecked = true
                 }
 
                 override fun onCancel() {
                     viewModel.setupRecordTimestamp()
                     initSettings()
-                    mainViewModel?.isVersionChecked =true
+                    mainViewModel?.isVersionChecked = true
                 }
 
             }

@@ -6,9 +6,6 @@ data class PlayListRequest(
     @SerializedName("videoId")
     val videoId: Long?,
 
-//    @SerializedName("videoEpisodeId")
-//    val videoEpisodeId: Int?,
-
     @SerializedName("playlistType")
     val playlistType: Int?
 )

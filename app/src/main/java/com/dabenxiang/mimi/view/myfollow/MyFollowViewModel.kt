@@ -113,9 +113,7 @@ class MyFollowViewModel : BaseViewModel() {
         }
 
         override fun onTotalCount(count: Long, isInitial: Boolean) {
-            val total = if (isInitial) count.toInt()
-            else _memberCount.value?.plus(count.toInt())
-            _memberCount.postValue(total)
+            _memberCount.postValue(count.toInt())
             if(isInitial) _cleanMemberRemovedPosList.postValue(null)
         }
 
@@ -138,10 +136,8 @@ class MyFollowViewModel : BaseViewModel() {
             Timber.e(throwable)
         }
 
-        override fun onTotalCount(count: Long, isInitial: Boolean) {
-            val total = if (isInitial) count.toInt()
-            else _clubCount.value?.plus(count.toInt())
-            _clubCount.postValue(total)
+        override fun onTotalCount(count: Long, isInitial:Boolean) {
+            _clubCount.postValue(count.toInt())
             if(isInitial) _cleanClubRemovedPosList.postValue(null)
         }
 

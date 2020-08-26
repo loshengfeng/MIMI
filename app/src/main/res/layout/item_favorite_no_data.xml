@@ -26,6 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:gravity="center"
+        android:text="@string/favorite_no_data"
         android:textSize="18sp"
         android:textColor="@color/color_black_1"
         app:layout_constraintEnd_toEndOf="parent"

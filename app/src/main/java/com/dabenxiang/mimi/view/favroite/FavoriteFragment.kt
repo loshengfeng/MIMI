@@ -9,7 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
@@ -23,8 +23,11 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.dialog.GeneralDialog
+import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
+import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
@@ -94,67 +97,61 @@ class FavoriteFragment : BaseFragment() {
 
         viewModel.cleanResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Empty -> {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Empty -> {
                     viewModel.videoIDList.clear()
                     viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
                 }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.likeResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> {
-                    favoriteAdapter.notifyDataSetChanged()
-                }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> favoriteAdapter.notifyDataSetChanged()
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.followResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> {
-                    favoriteAdapter.notifyDataSetChanged()
-                }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> favoriteAdapter.notifyDataSetChanged()
+                is Error -> onApiError(it.throwable)
             }
         })
 
 
         viewModel.favoriteResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> {
                     viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
                     GeneralUtils.showToast(
                         requireContext(),
                         getString(R.string.favorite_delete_favorite)
                     )
                 }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.reportResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> {
-                }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.attachmentByTypeResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     val attachmentItem = it.result
                     LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
                     when (attachmentItem.type) {
@@ -168,20 +165,20 @@ class FavoriteFragment : BaseFragment() {
                         }
                     }
                 }
-                is ApiResult.Error -> Timber.e(it.throwable)
+                is Error -> Timber.e(it.throwable)
             }
         })
 
         viewModel.isEmailConfirmed.observe(this, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     if (!it.result) {
                         interactionListener?.changeNavigationPosition(R.id.navigation_personal)
                     } else {
                         initView()
                     }
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
     }
@@ -315,10 +312,7 @@ class FavoriteFragment : BaseFragment() {
         }
 
         item_no_data.visibility = when (size) {
-            NO_DATA -> {
-                item_no_data.tv_text.text = getString(R.string.favorite_no_data)
-                View.VISIBLE
-            }
+            NO_DATA -> View.VISIBLE
             else -> View.GONE
         }
 
@@ -333,7 +327,7 @@ class FavoriteFragment : BaseFragment() {
     private fun setTabPosition(type: Int, index: Int) {
         when (type) {
             TAB_PRIMARY -> {
-                if(lastPrimaryIndex != index) {
+                if (lastPrimaryIndex != index) {
                     lastPrimaryIndex = index
                     primaryAdapter.setLastSelectedIndex(lastPrimaryIndex)
                     favoriteAdapter.setAdult(index != TYPE_NORMAL)
@@ -393,18 +387,29 @@ class FavoriteFragment : BaseFragment() {
 
                 FunctionType.FAVORITE -> {
                     // 點擊後加入收藏,
-                    when (item) {
-                        is PlayItem -> {
-                            viewModel.currentPlayItem = item
-                            item.videoId?.let {
-                                viewModel.modifyFavorite(it)
-                            }
-                        }
-                        is MemberPostItem -> {
-                            viewModel.currentPostItem = item
-                            viewModel.removePostFavorite(item.id)
-                        }
-                    }
+                    GeneralDialog.newInstance(
+                        GeneralDialogData(
+                            titleRes = R.string.favorite_delete_this_favorite,
+                            messageIcon = R.drawable.ico_default_photo,
+                            secondBtn = getString(R.string.btn_confirm),
+                            secondBlock = {
+                                when (item) {
+                                    is PlayItem -> {
+                                        viewModel.currentPlayItem = item
+                                        item.videoId?.let {
+                                            viewModel.modifyFavorite(it)
+                                        }
+                                    }
+                                    is MemberPostItem -> {
+                                        viewModel.currentPostItem = item
+                                        viewModel.removePostFavorite(item.id)
+                                    }
+                                }
+                            },
+                            firstBtn = getString(R.string.cancel),
+                            isMessageIcon = false
+                        )
+                    ).show(requireActivity().supportFragmentManager)
                 }
 
                 FunctionType.SHARE -> {

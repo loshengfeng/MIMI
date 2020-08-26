@@ -135,7 +135,7 @@ class HomeFragment : BaseFragment() {
         requireActivity().onBackPressedDispatcher.addCallback { backToDesktop() }
         recyclerview_tab.adapter = tabAdapter
         setupRecyclerByPosition(0)
-        refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
+
         btn_ranking.visibility = View.GONE
         iv_post.visibility = View.GONE
 

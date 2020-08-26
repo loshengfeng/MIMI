@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.ClubListener
 import com.dabenxiang.mimi.callback.PostAttachmentListener
-import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.view.adapter.ChooseClubAdapter
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
@@ -63,12 +63,12 @@ class ChooseClubDialogFragment : BaseDialogFragment() {
 
         viewModel.attachmentByTypeResult.observe(viewLifecycleOwner, Observer {
             when(it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     val attachmentItem = it.result
                     LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
                     adapter.updateItem(attachmentItem.position!!)
                 }
-                is ApiResult.Error -> Timber.e(it.throwable)
+                is Error -> Timber.e(it.throwable)
             }
         })
 
