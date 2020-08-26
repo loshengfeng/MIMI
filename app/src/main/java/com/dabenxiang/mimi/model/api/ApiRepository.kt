@@ -9,6 +9,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
+import retrofit2.http.Query
 import java.io.File
 
 class ApiRepository(private val apiService: ApiService) {
@@ -341,6 +342,19 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun cancelFollowClub(clubId: Long): Response<Void> {
         return apiService.cancelFollowClub(clubId)
     }
+
+    /**********************************************************
+     *
+     *                   Members/Home/Banner
+     *
+     ***********************************************************/
+    /**
+     * 取得影片Banner
+     */
+    suspend fun fetchHomeBanner(
+            position: Int?,
+            bannerCategory: String?
+    ) = apiService.fetchHomeBanner(position, bannerCategory)
 
     /**********************************************************
      *
