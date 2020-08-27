@@ -6,6 +6,7 @@ import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.paging.PagingData
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
@@ -82,10 +83,6 @@ class MyFollowFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        viewModel.showProgress.observe(this, Observer {
-            vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, it)
-        })
 
         viewModel.clubCount.observe(this, Observer {
             if (layout_tab.selectedTabPosition == TYPE_CLUB) refreshUi(TYPE_CLUB, it)
@@ -234,6 +231,14 @@ class MyFollowFragment : BaseFragment() {
             }
 
         })
+        memberFollowAdapter.addLoadStateListener { loadState ->
+            handleLoadState(loadState.refresh)
+            handleLoadState(loadState.append)
+        }
+        clubFollowAdapter.addLoadStateListener { loadState ->
+            handleLoadState(loadState.refresh)
+            handleLoadState(loadState.append)
+        }
         vpAdapter = MyFollowViewPagerAdapter(
             requireContext(),
             memberFollowAdapter,
@@ -246,6 +251,22 @@ class MyFollowFragment : BaseFragment() {
 
         tv_clean.visibility = View.VISIBLE
         tv_title.setText(R.string.follow_title)
+    }
+
+    private fun handleLoadState(loadState: LoadState) {
+        when (loadState) {
+            is LoadState.Loading -> {
+                vpAdapter?.changeIsRefreshing(
+                    layout_tab.selectedTabPosition,
+                    true
+                )
+            }
+            is LoadState.NotLoading -> vpAdapter?.changeIsRefreshing(
+                layout_tab.selectedTabPosition,
+                false
+            )
+            is LoadState.Error -> onApiError(loadState.error)
+        }
     }
 
     private fun refreshUi(type: Int, size: Int) {

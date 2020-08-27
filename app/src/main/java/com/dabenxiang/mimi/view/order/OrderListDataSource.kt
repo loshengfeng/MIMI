@@ -4,6 +4,7 @@ import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.OrderItem
+import com.dabenxiang.mimi.model.enums.OrderType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -15,7 +16,7 @@ class OrderListDataSource constructor(
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
     private val pagingCallback: PagingCallback,
-    private val isOnline: Boolean? = null
+    private val type: OrderType? = null
 ) : PageKeyedDataSource<Long, OrderItem>() {
 
     companion object {
@@ -31,8 +32,8 @@ class OrderListDataSource constructor(
     ) {
         viewModelScope.launch {
             flow {
-                val result = isOnline?.let {
-                    domainManager.getApiRepository().getOrderByOnline(it, "0", PER_LIMIT)
+                val result = type?.let {
+                    domainManager.getApiRepository().getOrderByType(it, "0", PER_LIMIT)
                 } ?: let { domainManager.getApiRepository().getOrder("0", PER_LIMIT) }
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()
@@ -48,7 +49,7 @@ class OrderListDataSource constructor(
                 }
                 emit(InitResult(clubs ?: arrayListOf(), nextPageKey))
 
-                if (isOnline == null) {
+                if (type == null) {
                     pagingCallback.onGetAny(item?.content?.balance)
                 }
             }
@@ -70,8 +71,8 @@ class OrderListDataSource constructor(
         val next = params.key
         viewModelScope.launch {
             flow {
-                val result = isOnline?.let {
-                    domainManager.getApiRepository().getOrderByOnline(it, next.toString(), PER_LIMIT)
+                val result = type?.let {
+                    domainManager.getApiRepository().getOrderByType(it, next.toString(), PER_LIMIT)
                 } ?: let { domainManager.getApiRepository().getOrder(next.toString(), PER_LIMIT) }
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(result)
