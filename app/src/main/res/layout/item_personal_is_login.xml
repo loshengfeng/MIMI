@@ -24,7 +24,7 @@
             android:layout_height="50dp"
             android:layout_marginStart="18dp"
             android:contentDescription="@null"
-            android:src="@drawable/ico_default_photo"
+            android:src="@drawable/default_profile_picture"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
