@@ -19,7 +19,6 @@ class MemberFollowListDataSource constructor(
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, MemberFollowItem> {
         val offset = params.key ?: 0
         return try {
-            pagingCallback.onLoading()
             val result =
                 domainManager.getApiRepository().getMyMemberFollow(offset.toString(), PER_LIMIT)
             if (!result.isSuccessful) throw HttpException(result)
@@ -36,7 +35,6 @@ class MemberFollowListDataSource constructor(
                 idList.add(it.userId)
             }
             pagingCallback.onIdList(idList, false)
-            pagingCallback.onLoaded()
             LoadResult.Page(items ?: listOf(), null, nextKey)
         } catch (e: Exception) {
             LoadResult.Error(e)

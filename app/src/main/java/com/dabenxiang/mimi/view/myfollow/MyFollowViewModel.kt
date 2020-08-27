@@ -20,7 +20,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import timber.log.Timber
 
 class MyFollowViewModel : BaseViewModel() {
 
@@ -83,18 +82,6 @@ class MyFollowViewModel : BaseViewModel() {
     }
 
     private val memberPagingCallback = object : MyFollowPagingCallback {
-        override fun onLoading() {
-            setShowProgress(true)
-        }
-
-        override fun onLoaded() {
-            setShowProgress(false)
-        }
-
-        override fun onThrowable(throwable: Throwable) {
-            Timber.e(throwable)
-        }
-
         override fun onTotalCount(count: Long) {
             _memberCount.postValue(count.toInt())
             _cleanMemberRemovedPosList.postValue(null)
@@ -107,18 +94,6 @@ class MyFollowViewModel : BaseViewModel() {
     }
 
     private val clubPagingCallback = object : MyFollowPagingCallback {
-        override fun onLoading() {
-            setShowProgress(true)
-        }
-
-        override fun onLoaded() {
-            setShowProgress(false)
-        }
-
-        override fun onThrowable(throwable: Throwable) {
-            Timber.e(throwable)
-        }
-
         override fun onTotalCount(count: Long) {
             _clubCount.postValue(count.toInt())
             _cleanClubRemovedPosList.postValue(null)

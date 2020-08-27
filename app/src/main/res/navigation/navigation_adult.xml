@@ -65,6 +65,10 @@
         <action
             android:id="@+id/action_adultHomeFragment_to_categoriesFragment"
             app:destination="@id/categoriesFragment" />
+
+        <action
+            android:id="@+id/action_adultHomeFragment_to_postVideoFragment"
+            app:destination="@id/postVideoFragment" />
         <action
             android:id="@+id/action_to_myPostFragment"
             app:destination="@id/navigation_my_post" />

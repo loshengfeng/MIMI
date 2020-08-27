@@ -19,7 +19,6 @@ class ClubFollowListDataSource constructor(
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, ClubFollowItem> {
         val offset = params.key ?: 0
         return try {
-            pagingCallback.onLoading()
             val result =
                 domainManager.getApiRepository().getMyClubFollow(offset.toString(), PER_LIMIT)
             if (!result.isSuccessful) throw HttpException(result)
@@ -36,7 +35,6 @@ class ClubFollowListDataSource constructor(
                 idList.add(it.clubId)
             }
             pagingCallback.onIdList(idList, false)
-            pagingCallback.onLoaded()
             LoadResult.Page(items ?: listOf(), null, nextKey)
         } catch (e: Exception) {
             LoadResult.Error(e)
