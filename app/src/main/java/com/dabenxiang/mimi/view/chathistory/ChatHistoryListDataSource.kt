@@ -18,7 +18,7 @@ class ChatHistoryListDataSource(
 ) : PageKeyedDataSource<Long, ChatListItem>() {
 
     companion object {
-        const val PER_LIMIT = "10"
+        const val PER_LIMIT = "20"
         val PER_LIMIT_LONG = PER_LIMIT.toLong()
     }
 

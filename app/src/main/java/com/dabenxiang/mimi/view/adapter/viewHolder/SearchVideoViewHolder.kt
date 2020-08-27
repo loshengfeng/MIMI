@@ -72,6 +72,7 @@ class SearchVideoViewHolder(
                     data!!
             )
         }
+        tvMore.visibility = View.GONE
     }
 
     override fun updated() {

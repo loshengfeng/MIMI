@@ -141,8 +141,7 @@ class AdultHomeFragment : BaseFragment() {
 
     override fun setupFirstTime() {
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        viewModel.adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
-
+        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
         setupUI()
 
         if (mainViewModel?.adult == null) {
@@ -270,7 +269,8 @@ class AdultHomeFragment : BaseFragment() {
                     val viewHolder = homeCarouselViewHolderMap[it.first]
                     val carousel = carouselMap[it.first]
                     val carouselHolderItems =
-                        response.result.content?.statisticsItemToCarouselHolderItem(carousel!!.isAdult)
+                        response.result.content?.categoryBannerItemCarouselHolderItem()
+//                        response.result.content?.statisticsItemToCarouselHolderItem(carousel!!.isAdult)
                     viewHolder?.submitList(carouselHolderItems)
                 }
                 is Error -> onApiError(response.throwable)
@@ -734,7 +734,6 @@ class AdultHomeFragment : BaseFragment() {
                     rv_second.adapter = followPostPagedAdapter
                     viewModel.getPostFollows()
                 }?: run {
-                    Timber.d("@@followPostPagedAdapter.itemCount ${followPostPagedAdapter.itemCount}")
                     cl_no_data.visibility = followPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }?.let { View.GONE } ?: let { View.VISIBLE }
                 }
             }
@@ -1091,7 +1090,7 @@ class AdultHomeFragment : BaseFragment() {
         ) {
             homeCarouselViewHolderMap[vh.adapterPosition] = vh
             carouselMap[vh.adapterPosition] = src
-            viewModel.loadNestedStatisticsListForCarousel(vh.adapterPosition, src)
+            viewModel.loadNestedStatisticsListForCarousel(vh.adapterPosition, src, true)
         }
 
         override fun onLoadClipViewHolder(vh: HomeClipViewHolder) {
@@ -1107,6 +1106,10 @@ class AdultHomeFragment : BaseFragment() {
         override fun onLoadClubViewHolder(vh: HomeClubViewHolder) {
             homeClubViewHolderMap[vh.adapterPosition] = vh
             viewModel.loadNestedClubList(vh.adapterPosition)
+        }
+
+        override fun onClickBanner(item: CarouselHolderItem) {
+            GeneralUtils.openWebView(requireContext(), item.url)
         }
     }
 

@@ -22,7 +22,8 @@ class CategoriesDataSource(
     private val domainManager: DomainManager,
     private val pagingCallback: PagingCallback,
     private val adWidth: Int,
-    private val adHeight: Int
+    private val adHeight: Int,
+    private val tag: String = ""
 ) : PageKeyedDataSource<Long, BaseVideoItem>() {
 
     companion object {
@@ -49,7 +50,8 @@ class CategoriesDataSource(
                     country = country,
                     years = years,
                     offset = "0",
-                    limit = PER_LIMIT
+                    limit = PER_LIMIT,
+                    tag = tag
                 )
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()
@@ -100,7 +102,8 @@ class CategoriesDataSource(
                     country = country,
                     years = years,
                     offset = next.toString(),
-                    limit = PER_LIMIT
+                    limit = PER_LIMIT,
+                    tag = tag
                 )
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()

@@ -18,12 +18,11 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.MediaItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PostMemberRequest
-import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
@@ -89,7 +88,7 @@ open class BasePostFragment : BaseFragment() {
     override fun setupObservers() {
         viewModel.clubItemResult.observe(viewLifecycleOwner, Observer {
             when(it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     txt_clubName.text = it.result.first().title
                     txt_hashtagName.text = it.result.first().tag
 
@@ -104,17 +103,17 @@ open class BasePostFragment : BaseFragment() {
                         Glide.with(requireContext()).load(bitmap).circleCrop().into(iv_avatar)
                     }
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.bitmapResult.observe(viewLifecycleOwner, Observer {
             when(it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     val bitmap = LruCacheUtils.getLruCache(it.result)
                     Glide.with(requireContext()).load(bitmap).circleCrop().into(iv_avatar)
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
     }

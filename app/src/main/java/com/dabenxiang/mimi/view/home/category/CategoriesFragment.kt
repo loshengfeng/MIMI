@@ -15,10 +15,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ApiResult.Error
+import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoSearchItem
+import com.dabenxiang.mimi.model.vo.CarouselHolderItem
 import com.dabenxiang.mimi.model.vo.CategoriesItem
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.adapter.FilterTabAdapter
@@ -32,6 +34,7 @@ import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_categories.*
+import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem as CategoriesData
 
@@ -45,6 +48,7 @@ class CategoriesFragment : BaseFragment() {
         const val TEXT_ALL = "全部"
 
         fun createBundle(title: String, categories: String?, item: CategoriesData?): Bundle {
+            Timber.d("@@CategoriesData: $item")
             val data = CategoriesItem()
             data.title = title
             data.categories = categories
@@ -84,6 +88,8 @@ class CategoriesFragment : BaseFragment() {
         override fun onLoadClipViewHolder(vh: HomeClipViewHolder) {}
         override fun onLoadPictureViewHolder(vh: HomePictureViewHolder) {}
         override fun onLoadClubViewHolder(vh: HomeClubViewHolder) {}
+        override fun onClickBanner(item: CarouselHolderItem) {}
+
         override fun onLoadStatisticsViewHolder(
             vh: HomeStatisticsViewHolder,
             src: HomeTemplate.Statistics
@@ -200,11 +206,6 @@ class CategoriesFragment : BaseFragment() {
 
             recyclerview_content.layoutManager = GridLayoutManager(requireContext(), when(isAdult) { true -> 2 else -> 3})
             recyclerview_content.adapter = videoListAdapter
-            if (isAdult) {
-                recyclerview_content.setPadding(0, GeneralUtils.dpToPx(requireContext(), 50), 0, 0)
-                ll_filter_1.visibility = View.GONE
-                ll_filter_2.visibility = View.GONE
-            }
 
             viewModel.getCategoryDetail(data.title, isAdult)
             if (isAdult) {
@@ -223,11 +224,11 @@ class CategoriesFragment : BaseFragment() {
 
         viewModel.getCategoryDetailResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     progressHUD?.dismiss()
                     setupFilterArea(it.result)
                 }
-                is ApiResult.Error -> {
+                is Error -> {
                     progressHUD?.dismiss()
                 }
             }
@@ -307,19 +308,29 @@ class CategoriesFragment : BaseFragment() {
         recyclerview_content.removeOnScrollListener(onScrollListener)
     }
 
-    private fun setupFilterArea(item: VideoSearchItem) {
+    private fun setupFilterArea(item: VideoSearchItem?) {
         (arguments?.getSerializable(KEY_CATEGORY) as CategoriesData?)?.also { data ->
             var notEmptyCount = 0
             val typeList = arrayListOf<String>()
             data.categories?.forEach { item -> typeList.add(item.name) }
-            val areasCategory = item.category?.areas ?: arrayListOf()
-            val yearsCategory = item.category?.years ?: arrayListOf()
             takeIf { typeList.isNotEmpty() }?.also { notEmptyCount++ }
-            takeIf { areasCategory.isNotEmpty() }?.also { notEmptyCount++ }
-            takeIf { yearsCategory.isNotEmpty() }?.also { notEmptyCount++ }
             setupFilter(0, typeList)
-            setupFilter(1, areasCategory)
-            setupFilter(2, yearsCategory)
+            if (isAdult) {
+                val firstPosition = viewModel.filterPositionData(0)?.value ?: 0
+                val secondCategory = arrayListOf<String>()
+                val thirdCategory = arrayListOf<String>()
+                data.categories?.get(firstPosition)?.categories?.forEach { item -> secondCategory.add(item.name) }
+                takeIf { secondCategory.isNotEmpty() }?.also { notEmptyCount++ }
+                setupFilter(1, secondCategory)
+                setupFilter(2, thirdCategory)
+            } else {
+                val areasCategory = item?.category?.areas ?: arrayListOf()
+                val yearsCategory = item?.category?.years ?: arrayListOf()
+                takeIf { areasCategory.isNotEmpty() }?.also { notEmptyCount++ }
+                takeIf { yearsCategory.isNotEmpty() }?.also { notEmptyCount++ }
+                setupFilter(1, areasCategory)
+                setupFilter(2, yearsCategory)
+            }
 
             filterTVList.forEach { tv -> tv.visibility = View.VISIBLE }
             setupCollapsingText()
@@ -333,6 +344,7 @@ class CategoriesFragment : BaseFragment() {
     }
 
     private fun setupFilter(index: Int, list: List<String>) {
+        if (index < filterDataList.size) filterDataList.removeAt(index)
         filterDataList.add(index, list)
         val adapter = FilterTabAdapter(object : FilterTabAdapter.FilterTabAdapterListener {
             override fun onSelectedFilterTab(
@@ -342,6 +354,14 @@ class CategoriesFragment : BaseFragment() {
             ) {
                 viewModel.updatedFilterPosition(index, position)
                 takeIf { index == 0 }?.also { //選擇第一欄
+                    if (isAdult) { //更新第二欄
+                        (arguments?.getSerializable(KEY_CATEGORY) as CategoriesData?)?.also { data ->
+                            val secondCategory = arrayListOf<String>()
+                            data.categories?.get(position)?.categories?.forEach { item -> secondCategory.add(item.name) }
+                            Timber.d("@@secondCategory $secondCategory")
+                            setupFilter(1, secondCategory)
+                        }
+                    }
                     updateFirstTab(index, false)
                     viewModel.updatedFilterPosition(index, position)
                     for (i in 1..2) { //更新其它欄至"全部"
@@ -361,9 +381,7 @@ class CategoriesFragment : BaseFragment() {
 
         filterRVList[index].adapter = adapter
         filterAdapterList[index] = adapter
-        if (list.isEmpty()) {
-            filterLLList[index].visibility = View.GONE
-        }
+        filterLLList[index].visibility = if (list.isEmpty()) { View.GONE } else {View.VISIBLE }
 
         viewModel.filterPositionData(index)?.observe(viewLifecycleOwner, Observer { position ->
             adapter.setLastSelectedIndex(position)
@@ -396,7 +414,12 @@ class CategoriesFragment : BaseFragment() {
         }
 
         progressHUD?.show()
-        viewModel.getVideoFilterList(filterKeyList[0], filterKeyList[1], filterKeyList[2], isAdult)
+        if (isAdult) {
+            val tag = if (filterKeyList[1] == "全部") "" else filterKeyList[1]?: ""
+            viewModel.getVideoFilterList(filterKeyList[0], null, null, isAdult, tag)
+        } else {
+            viewModel.getVideoFilterList(filterKeyList[0], filterKeyList[1], filterKeyList[2], isAdult)
+        }
     }
 
     private fun setupCollapsingText() {

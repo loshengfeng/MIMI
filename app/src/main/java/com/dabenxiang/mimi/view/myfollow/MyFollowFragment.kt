@@ -5,8 +5,10 @@ import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.PagingData
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
 import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
 import com.dabenxiang.mimi.view.adapter.ClubFollowAdapter
@@ -21,6 +23,9 @@ import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_my_follow.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class MyFollowFragment : BaseFragment() {
@@ -90,17 +95,9 @@ class MyFollowFragment : BaseFragment() {
             if (layout_tab.selectedTabPosition == TYPE_MEMBER) refreshUi(TYPE_MEMBER, it)
         })
 
-        viewModel.clubList.observe(this, Observer {
-            clubFollowAdapter.submitList(it)
-        })
-
-        viewModel.memberList.observe(this, Observer {
-            memberFollowAdapter.submitList(it)
-        })
-
         viewModel.attachmentResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     val attachmentItem = it.result
                     if (attachmentItem.id != null && attachmentItem.bitmap != null) {
                         LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
@@ -110,13 +107,13 @@ class MyFollowFragment : BaseFragment() {
                         }
                     }
                 }
-                is ApiResult.Error -> Timber.e(it.throwable)
+                is Error -> Timber.e(it.throwable)
             }
         })
 
         viewModel.clubDetail.observe(this, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     val bundle = ClubDetailFragment.createBundle(it.result)
                     navigateTo(
                         NavigateItem.Destination(
@@ -125,27 +122,28 @@ class MyFollowFragment : BaseFragment() {
                         )
                     )
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.cleanResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Loading -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, true)
-                is ApiResult.Loaded -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, false)
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Loading -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, true)
+                is Loaded -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, false)
+                is Empty -> getData()
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.cancelOneClub.observe(this, Observer {
             when (it) {
-                is ApiResult.Loading -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, true)
-                is ApiResult.Loaded -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, false)
-                is ApiResult.Success -> {
+                is Loading -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, true)
+                is Loaded -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, false)
+                is Success -> {
                     clubFollowAdapter.removedPosList.add(it.result)
                     clubFollowAdapter.notifyItemChanged(it.result)
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -155,13 +153,13 @@ class MyFollowFragment : BaseFragment() {
 
         viewModel.cancelOneMember.observe(this, Observer {
             when (it) {
-                is ApiResult.Loading -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, true)
-                is ApiResult.Loaded -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, false)
-                is ApiResult.Success -> {
+                is Loading -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, true)
+                is Loaded -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, false)
+                is Success -> {
                     memberFollowAdapter.removedPosList.add(it.result)
                     memberFollowAdapter.notifyItemChanged(it.result)
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -232,7 +230,7 @@ class MyFollowFragment : BaseFragment() {
             }
 
             override fun onTabSelected(tab: TabLayout.Tab) {
-                viewModel.initData(layout_tab.selectedTabPosition)
+                getData()
             }
 
         })
@@ -241,7 +239,7 @@ class MyFollowFragment : BaseFragment() {
             memberFollowAdapter,
             clubFollowAdapter
         ) {
-            viewModel.initData(layout_tab.selectedTabPosition)
+            getData()
         }
         vp.adapter = vpAdapter
         layout_tab.setupWithViewPager(vp)
@@ -253,5 +251,28 @@ class MyFollowFragment : BaseFragment() {
     private fun refreshUi(type: Int, size: Int) {
         tv_clean.isEnabled = size != NO_DATA
         vpAdapter?.refreshUi(type, size)
+    }
+
+    private var job: Job? = null
+    private fun getData() {
+        job?.cancel()
+        job = lifecycleScope.launch {
+            when (layout_tab.selectedTabPosition) {
+                TYPE_MEMBER -> {
+                    memberFollowAdapter.submitData(PagingData.empty())
+                    viewModel.getMemberList()
+                        .collectLatest {
+                            memberFollowAdapter.submitData(it)
+                        }
+                }
+                TYPE_CLUB -> {
+                    clubFollowAdapter.submitData(PagingData.empty())
+                    viewModel.getClubList()
+                        .collectLatest {
+                            clubFollowAdapter.submitData(it)
+                        }
+                }
+            }
+        }
     }
 }

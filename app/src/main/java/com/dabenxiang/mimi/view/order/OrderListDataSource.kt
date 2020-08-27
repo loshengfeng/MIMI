@@ -14,11 +14,12 @@ import timber.log.Timber
 class OrderListDataSource constructor(
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
-    private val pagingCallback: PagingCallback
+    private val pagingCallback: PagingCallback,
+    private val isOnline: Boolean? = null
 ) : PageKeyedDataSource<Long, OrderItem>() {
 
     companion object {
-        const val PER_LIMIT = "10"
+        const val PER_LIMIT = "20"
         val PER_LIMIT_LONG = PER_LIMIT.toLong()
     }
 
@@ -30,7 +31,9 @@ class OrderListDataSource constructor(
     ) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().getOrder("0", PER_LIMIT)
+                val result = isOnline?.let {
+                    domainManager.getApiRepository().getOrderByOnline(it, "0", PER_LIMIT)
+                } ?: let { domainManager.getApiRepository().getOrder("0", PER_LIMIT) }
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()
                 val clubs = item?.content?.orders
@@ -45,6 +48,9 @@ class OrderListDataSource constructor(
                 }
                 emit(InitResult(clubs ?: arrayListOf(), nextPageKey))
 
+                if (isOnline == null) {
+                    pagingCallback.onGetAny(item?.content?.balance)
+                }
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> pagingCallback.onThrowable(e) }
@@ -64,8 +70,9 @@ class OrderListDataSource constructor(
         val next = params.key
         viewModelScope.launch {
             flow {
-                val result =
-                    domainManager.getApiRepository().getOrder(next.toString(), PER_LIMIT)
+                val result = isOnline?.let {
+                    domainManager.getApiRepository().getOrderByOnline(it, next.toString(), PER_LIMIT)
+                } ?: let { domainManager.getApiRepository().getOrder(next.toString(), PER_LIMIT) }
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(result)
             }
@@ -74,18 +81,15 @@ class OrderListDataSource constructor(
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect { response ->
                     response.body()?.also { item ->
-                        item.content?.also { list ->
-                            val nextPageKey = when {
-                                hasNextPage(
-                                    item.paging.count,
-                                    item.paging.offset,
-                                    0
-                                ) -> next + PER_LIMIT_LONG
-                                else -> null
-                            }
-
-                            callback.onResult(arrayListOf(), nextPageKey)
+                        val nextPageKey = when {
+                            hasNextPage(
+                                item.paging.count,
+                                item.paging.offset,
+                                0
+                            ) -> next + PER_LIMIT_LONG
+                            else -> null
                         }
+                        callback.onResult(item.content?.orders ?: arrayListOf(), nextPageKey)
                     }
                 }
         }

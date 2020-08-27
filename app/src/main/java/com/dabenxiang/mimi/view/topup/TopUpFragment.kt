@@ -207,18 +207,14 @@ class TopUpFragment : BaseFragment() {
         rg_type.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.rb_online_pay -> {
-                    // FIXME: 下階段的訂單, Release先隱藏
-                    if (BuildConfig.DEBUG) {
-                        layout_online_pay.visibility = View.VISIBLE
-                        rv_proxy_pay.visibility = View.GONE
-                        tv_proxy_empty.visibility = View.GONE
-                    }
+                    layout_online_pay.visibility = View.VISIBLE
+                    rv_proxy_pay.visibility = View.GONE
+                    tv_proxy_empty.visibility = View.GONE
                 }
                 R.id.rb_proxy_pay -> {
                     layout_online_pay.visibility = View.GONE
                     rv_proxy_pay.visibility = View.VISIBLE
                     tv_proxy_empty.visibility = View.VISIBLE
-                    tv_online_empty.visibility = View.GONE
                     viewModel.getProxyPayList()
                 }
             }
@@ -272,14 +268,7 @@ class TopUpFragment : BaseFragment() {
     }
 
     override fun initSettings() {
-
-        // FIXME: 下階段的訂單, Release先隱藏
-        if (BuildConfig.DEBUG) {
-            rg_type.check(R.id.rb_online_pay)
-        } else {
-            rg_type.check(R.id.rb_proxy_pay)
-            rb_online_pay.isClickable = false
-        }
+        rg_type.check(R.id.rb_online_pay)
 
         when (viewModel.isLogin()) {
             true -> {
@@ -297,14 +286,6 @@ class TopUpFragment : BaseFragment() {
     }
 
     private fun initTopUp() {
-
-        // FIXME: 下階段的訂單, Release先隱藏
-        if (BuildConfig.DEBUG) {
-            tv_record_top_up.visibility = View.VISIBLE
-        } else {
-            tv_record_top_up.visibility = View.GONE
-        }
-
         item_is_Login.visibility = View.VISIBLE
         item_is_not_Login.visibility = View.GONE
 
@@ -323,15 +304,11 @@ class TopUpFragment : BaseFragment() {
         rv_proxy_pay.layoutManager = LinearLayoutManager(context)
         rv_proxy_pay.adapter = agentAdapter
 
+        tl_type.getTabAt(0)?.select()
+
         onlinePayAdapter.clearSelectItem()
-
         viewModel.getMe()
-
-        // FIXME: 下階段的訂單, Release先隱藏
-        if (BuildConfig.DEBUG) {
-            tl_type.getTabAt(0)?.select()
-            viewModel.getOrderingPackage()
-        }
+        viewModel.getOrderingPackage()
     }
 
     private val agentListener = object : TopUpAgentAdapter.EventListener {

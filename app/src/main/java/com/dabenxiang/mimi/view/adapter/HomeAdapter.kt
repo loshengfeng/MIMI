@@ -12,6 +12,7 @@ import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.HomeItemType
+import com.dabenxiang.mimi.model.vo.CarouselHolderItem
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.club.ClubFuncItem
@@ -74,7 +75,7 @@ class HomeAdapter(
                         R.layout.item_carousel,
                         parent,
                         false
-                    ), listener, isAdult
+                    ), listener, isAdult, memberPostFuncItem
                 )
             }
             HomeItemType.STATISTICS -> {
@@ -166,5 +167,6 @@ class HomeAdapter(
         fun onLoadClipViewHolder(vh: HomeClipViewHolder)
         fun onLoadPictureViewHolder(vh: HomePictureViewHolder)
         fun onLoadClubViewHolder(vh: HomeClubViewHolder)
+        fun onClickBanner(item: CarouselHolderItem);
     }
 }
