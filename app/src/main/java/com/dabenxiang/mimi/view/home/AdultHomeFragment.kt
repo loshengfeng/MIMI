@@ -588,7 +588,7 @@ class AdultHomeFragment : BaseFragment() {
             }
 
             PostType.VIDEO -> {
-                val bundle = ClipFragment.createBundle(arrayListOf(memberPostItem), -1, false)
+                val bundle = ClipFragment.createBundle(arrayListOf(memberPostItem), 0, false)
                 navigationToClip(bundle)
             }
         }
