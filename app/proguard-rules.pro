@@ -29,9 +29,8 @@
 # for All Throwable
 -keep class * extends java.lang.Throwable
 
-# for app bean
+# for app vo
 -keep class com.dabenxiang.mimi.model.vo.** {*;}
-# -keep class com.dabenxiang.mimi.model.api.vo.device.** {*;}
 -keep class com.dabenxiang.mimi.model.api.vo.** {*;}
 
 # for okhttp (from okhttp3.pro)

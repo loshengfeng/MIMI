@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.view.order
 
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -20,9 +19,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_order.*
-import kotlinx.android.synthetic.main.fragment_order.viewPager
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import kotlinx.android.synthetic.main.item_setting_bar.tv_title
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
@@ -55,7 +52,7 @@ class OrderFragment : BaseFragment() {
                 getChatAttachment = { id, pos, update -> viewModel.getAttachment(id, pos, update) },
                 onChatItemClick = { item -> onChatItemClick(item) },
                 getOrderProxyAttachment = { id, update -> viewModel.getProxyAttachment(id, update) },
-                onContactClick = { orderId, chatListItem -> onContactClick(orderId, chatListItem)}
+                onContactClick = { chatListItem, orderItem -> onContactClick(chatListItem, orderItem) }
             ))
     }
 
@@ -121,15 +118,17 @@ class OrderFragment : BaseFragment() {
             when(it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Success -> {
-                    val chatId = it.result.first.chatId
+                    val createOrderChatItem = it.result.first
                     val chatListItem = it.result.second
+                    val orderItem = it.result.third
                     onChatItemClick(
                         ChatListItem(
-                            id = chatId,
+                            id = createOrderChatItem.chatId,
                             name = chatListItem.name,
                             avatarAttachmentId = chatListItem.avatarAttachmentId,
                             lastReadTime = chatListItem.lastReadTime
-                        )
+                        ),
+                        OrderItem(traceLogId = createOrderChatItem.id, isOnline = orderItem.isOnline)
                     )
                 }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
@@ -177,21 +176,22 @@ class OrderFragment : BaseFragment() {
         }
     }
 
-    private fun onChatItemClick(item: ChatListItem) {
-        Timber.d("onChatItemClick: $item")
+    private fun onChatItemClick(item: ChatListItem, orderItem: OrderItem = OrderItem()) {
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_orderFragment_to_chatContentFragment,
-                ChatContentFragment.createBundle(item)
+                ChatContentFragment.createBundle(item, orderItem.traceLogId, orderItem.isOnline)
             )
         )
     }
 
-    private fun onContactClick(orderId: Long, item: ChatListItem) {
-        if (item.id != 0L) {
-            onChatItemClick(item)
+    private fun onContactClick(chatListItem: ChatListItem, orderItem: OrderItem) {
+        Timber.d("@@chatListItem: $chatListItem")
+        Timber.d("@@orderItem: $orderItem")
+        if (chatListItem.id != 0L && orderItem.traceLogId != 0L) {
+            onChatItemClick(chatListItem, orderItem)
         } else {
-            viewModel.createOrderChat(orderId, item)
+            viewModel.createOrderChat(chatListItem, orderItem)
         }
     }
 }

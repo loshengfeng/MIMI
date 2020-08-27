@@ -39,11 +39,15 @@ class ChatContentFragment : BaseFragment() {
 
     companion object {
         private const val KEY_CHAT_LIST_ITEM = "chat_list_item"
+        private const val KEY_TRACE_LOG_ID = "trace_log_id"
+        private const val KEY_IS_ONLINE = "is_online"
         private const val INTENT_SELECT_IMG: Int = 100
         private const val PRELOAD_ITEM: Int = 4
-        fun createBundle(item: ChatListItem): Bundle {
+        fun createBundle(item: ChatListItem, traceLogId: Long = -1, isOnline: Boolean = false): Bundle {
             return Bundle().also {
                 it.putSerializable(KEY_CHAT_LIST_ITEM, item)
+                it.putLong(KEY_TRACE_LOG_ID, traceLogId)
+                it.putBoolean(KEY_IS_ONLINE, isOnline)
             }
         }
     }
@@ -67,6 +71,14 @@ class ChatContentFragment : BaseFragment() {
         }
 
         initSettings()
+
+        arguments?.getLong(KEY_TRACE_LOG_ID)?.also {
+            viewModel.traceLogId = it
+        }
+
+        arguments?.getBoolean(KEY_IS_ONLINE)?.also {
+            viewModel.isOnline = it
+        }
 
         arguments?.getSerializable(KEY_CHAT_LIST_ITEM)?.let { data ->
             data as ChatListItem
@@ -183,6 +195,12 @@ class ChatContentFragment : BaseFragment() {
                 is Error -> onApiError(it.throwable)
             }
         })
+
+        viewModel.updateOrderChatStatusResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -244,7 +262,7 @@ class ChatContentFragment : BaseFragment() {
                             null,
                             null
                         )
-                    );
+                    )
                 }) ?: return
 
                 viewModel.postAttachment(uriImage, requireContext())

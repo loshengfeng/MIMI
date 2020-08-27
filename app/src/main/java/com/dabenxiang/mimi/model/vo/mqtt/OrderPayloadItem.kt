@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.model.vo.mqtt
 
 import com.dabenxiang.mimi.model.enums.NotifyType
 import com.google.gson.annotations.SerializedName
+import java.util.*
 
 data class OrderPayloadItem(
 
@@ -36,7 +37,7 @@ data class OrderPayloadItem(
     val amount: Float = 0f,
 
     @SerializedName("createTime")
-    val createTime: String = "",
+    val createTime: Date? = null,
 
     @SerializedName("isSuccessful")
     val isSuccessful: Boolean = false

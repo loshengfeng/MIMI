@@ -85,8 +85,8 @@ class TopUpViewModel : BaseViewModel() {
                 val result = domainManager.getApiRepository().getOrderingPackage()
                 if (!result.isSuccessful) throw HttpException(result)
                 val orderPackageMap = hashMapOf<PaymentType, ArrayList<OrderingPackageItem>>()
-                val orderingPackageItems = result.body()?.content ?: arrayListOf()
-                orderingPackageItems.forEach {
+                val orderingPackageItems = result.body()?.content
+                orderingPackageItems?.forEach {
                     if (orderPackageMap[it.paymentType] == null) {
                         orderPackageMap[it.paymentType] = arrayListOf()
                     }

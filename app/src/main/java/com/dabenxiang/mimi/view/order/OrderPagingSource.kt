@@ -4,8 +4,6 @@ import androidx.paging.PagingSource
 import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.model.manager.DomainManager
 import retrofit2.HttpException
-import timber.log.Timber
-import java.lang.Exception
 
 class OrderPagingSource(
     private val domainManager: DomainManager
