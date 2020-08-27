@@ -24,6 +24,7 @@ import com.dabenxiang.mimi.view.home.AdultHomeFragment
 import com.dabenxiang.mimi.view.home.HomeViewModel
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.REQUEST_VIDEO_CAPTURE
+import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.RotateUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.snackbar.Snackbar
@@ -108,7 +109,10 @@ class PostManager {
             val extras = data?.extras
 
             if (extras == null) {
-                RotateUtils().rotateImage(file)
+                val bitmap = RotateUtils().rotateImage(file)
+                bitmap?.also {
+                    FileUtil.saveBitmapToJpegFile(it, it.width, it.height, destPath = file.absolutePath)
+                }
             } else {
                 val extrasData = extras["data"]
                 val imageBitmap = extrasData as Bitmap?
