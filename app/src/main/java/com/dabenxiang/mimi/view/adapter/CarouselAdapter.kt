@@ -8,7 +8,6 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.vo.CarouselHolderItem
 import com.dabenxiang.mimi.view.home.viewholder.CarouselViewHolder
-import timber.log.Timber
 
 class CarouselAdapter(
     private val nestedListener: HomeAdapter.EventListener,

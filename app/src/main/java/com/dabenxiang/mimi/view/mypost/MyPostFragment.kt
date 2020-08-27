@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
+import com.dabenxiang.mimi.callback.OnMeMoreDialogListener
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.AdultTabType
@@ -642,7 +643,7 @@ class MyPostFragment : BaseFragment() {
         }
     }
 
-    private val onMeMoreDialogListener = object : MyPostMoreDialogFragment.OnMoreDialogListener {
+    private val onMeMoreDialogListener = object : OnMeMoreDialogListener {
         override fun onCancel() {
             meMoreDialog?.dismiss()
         }

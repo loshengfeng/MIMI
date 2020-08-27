@@ -316,6 +316,7 @@ open class BasePostFragment : BaseFragment() {
             chip.setCloseIconSizeResource(R.dimen.dp_24)
             chip.setOnCloseIconClickListener {
                 chipGroup.removeView(it)
+                setTagCount()
             }
             chipGroup.addView(chip)
             setTagCount()

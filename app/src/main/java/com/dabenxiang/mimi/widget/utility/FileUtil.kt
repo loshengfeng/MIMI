@@ -79,7 +79,7 @@ object FileUtil {
         var scale: Bitmap? = Bitmap.createScaledBitmap(bitmap, destWidth, destHeight, true)
         try {
             val bos = BufferedOutputStream(FileOutputStream(destPath))
-            if (scale!!.compress(Bitmap.CompressFormat.JPEG, 100, bos)) {
+            if (scale!!.compress(Bitmap.CompressFormat.JPEG, 50, bos)) {
                 bos.flush()
             }
             bos.close()

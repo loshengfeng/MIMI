@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
+import com.dabenxiang.mimi.callback.OnMeMoreDialogListener
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.*
@@ -44,6 +45,7 @@ import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.OnChooseUploadMethodDialogListener
+import com.dabenxiang.mimi.view.dialog.comment.MyPostMoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.home.HomeViewModel.Companion.TYPE_COVER
 import com.dabenxiang.mimi.view.home.HomeViewModel.Companion.TYPE_PIC
@@ -102,6 +104,7 @@ class AdultHomeFragment : BaseFragment() {
     private val homePictureViewHolderMap = hashMapOf<Int, HomePictureViewHolder>()
     private val homeClubViewHolderMap = hashMapOf<Int, HomeClubViewHolder>()
 
+    private var meMoreDialog: MyPostMoreDialogFragment? = null
     private var moreDialog: MoreDialogFragment? = null
 
     private var interactionListener: InteractionListener? = null
@@ -141,8 +144,7 @@ class AdultHomeFragment : BaseFragment() {
 
     override fun setupFirstTime() {
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        viewModel.adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
-
+        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
         setupUI()
 
         if (mainViewModel?.adult == null) {
@@ -201,11 +203,14 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private fun showSnackBar() {
-        snackBar = PostManager().showSnackBar(snackBarLayout, this, object : PostManager.CancelDialogListener {
-            override fun onCancel() {
-                cancelDialog()
-            }
-        })
+        snackBar = PostManager().showSnackBar(
+            snackBarLayout,
+            this,
+            object : PostManager.CancelDialogListener {
+                override fun onCancel() {
+                    cancelDialog()
+                }
+            })
     }
 
     private fun cancelDialog() {
@@ -389,7 +394,8 @@ class AdultHomeFragment : BaseFragment() {
                 is Success -> {
                     picParameter.id = it.result.toString()
                     viewModel.clearLiveDataValue()
-                    val realPath = UriUtils.getPath(requireContext(), Uri.parse(uploadVideoUri[0].videoUrl))
+                    val realPath =
+                        UriUtils.getPath(requireContext(), Uri.parse(uploadVideoUri[0].videoUrl))
                     uploadVideoUri[0].videoUrl = realPath!!
 
                     val outPutPath = PostManager().getCompressPath(realPath, requireContext())
@@ -443,7 +449,8 @@ class AdultHomeFragment : BaseFragment() {
 
         viewModel.totalCountResult.observe(viewLifecycleOwner, Observer {
             it?.also { totalCount ->
-                cl_no_data.visibility = takeIf { totalCount > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
+                cl_no_data.visibility =
+                    takeIf { totalCount > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
                 takeIf { rv_sixth.visibility == View.VISIBLE }?.also {
                     clubMemberAdapter.totalCount = totalCount
                 }
@@ -474,6 +481,31 @@ class AdultHomeFragment : BaseFragment() {
                 is Error -> onApiError(it.throwable)
             }
         })
+
+        viewModel.deletePostResult.observe(viewLifecycleOwner, Observer {
+            when (lastPosition) {
+                2, 3, 4, 5 -> {
+                    when (it) {
+                        is Success -> {
+                            val adapter = getCurrentAdapter() as MemberPostPagedAdapter
+                            adapter.removedPosList.add(it.result)
+                            adapter.notifyItemChanged(it.result)
+                        }
+                        is Error -> onApiError(it.throwable)
+                    }
+                }
+            }
+        })
+
+        viewModel.cleanRemovedPosList.observe(viewLifecycleOwner, Observer {
+            when (lastPosition) {
+                2, 3, 4, 5 -> {
+                    val adapter = getCurrentAdapter() as MemberPostPagedAdapter
+                    adapter.removedPosList.clear()
+                }
+            }
+        })
+
     }
 
     private fun uploadPhoto() {
@@ -497,20 +529,23 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private fun compressVideoAndUpload(realPath: String, outPutPath: String) {
-        PostManager().videoCompress(realPath, outPutPath, object : PostManager.VideoCompressListener {
-            override fun onSuccess() {
-                uploadVideoUri[0].videoUrl = outPutPath
-                viewModel.postAttachment(
-                    uploadVideoUri[0].videoUrl,
-                    requireContext(),
-                    TYPE_VIDEO
-                )
-            }
+        PostManager().videoCompress(
+            realPath,
+            outPutPath,
+            object : PostManager.VideoCompressListener {
+                override fun onSuccess() {
+                    uploadVideoUri[0].videoUrl = outPutPath
+                    viewModel.postAttachment(
+                        uploadVideoUri[0].videoUrl,
+                        requireContext(),
+                        TYPE_VIDEO
+                    )
+                }
 
-            override fun onFail() {
-                resetAndCancelJob(Throwable(), getString(R.string.post_error))
-            }
-        })
+                override fun onFail() {
+                    resetAndCancelJob(Throwable(), getString(R.string.post_error))
+                }
+            })
     }
 
     private fun getCurrentAdapter(): RecyclerView.Adapter<*>? {
@@ -525,11 +560,16 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private fun setSnackBarPostStatus(postId: Long = 0) {
-        PostManager().dismissSnackBar(snackBar!!, postId, memberPostItem, viewModel, object : PostManager.SnackBarListener {
-            override fun onClick(memberPostItem: MemberPostItem) {
-                postNavigation(memberPostItem)
-            }
-        })
+        PostManager().dismissSnackBar(
+            snackBar!!,
+            postId,
+            memberPostItem,
+            viewModel,
+            object : PostManager.SnackBarListener {
+                override fun onClick(memberPostItem: MemberPostItem) {
+                    postNavigation(memberPostItem)
+                }
+            })
 
         uploadCurrentPicPosition = 0
         uploadPicUri.clear()
@@ -548,7 +588,7 @@ class AdultHomeFragment : BaseFragment() {
             }
 
             PostType.VIDEO -> {
-                val bundle = ClipFragment.createBundle(arrayListOf(memberPostItem), -1, false)
+                val bundle = ClipFragment.createBundle(arrayListOf(memberPostItem), 0, false)
                 navigationToClip(bundle)
             }
         }
@@ -726,8 +766,10 @@ class AdultHomeFragment : BaseFragment() {
                     rv_second.layoutManager = LinearLayoutManager(requireContext())
                     rv_second.adapter = followPostPagedAdapter
                     viewModel.getPostFollows()
-                }?: run {
-                    cl_no_data.visibility = followPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }?.let { View.GONE } ?: let { View.VISIBLE }
+                } ?: run {
+                    cl_no_data.visibility =
+                        followPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
+                            ?.let { View.GONE } ?: let { View.VISIBLE }
                 }
             }
             3 -> {
@@ -739,7 +781,11 @@ class AdultHomeFragment : BaseFragment() {
                     rv_third.layoutManager = LinearLayoutManager(requireContext())
                     rv_third.adapter = clipPostPagedAdapter
                     viewModel.getClipPosts()
-                }?: run { cl_no_data.visibility = clipPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }?.let { View.GONE } ?: let { View.VISIBLE } }
+                } ?: run {
+                    cl_no_data.visibility =
+                        clipPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
+                            ?.let { View.GONE } ?: let { View.VISIBLE }
+                }
             }
             4 -> {
                 rv_fourth.visibility = View.VISIBLE
@@ -750,7 +796,11 @@ class AdultHomeFragment : BaseFragment() {
                     rv_fourth.layoutManager = LinearLayoutManager(requireContext())
                     rv_fourth.adapter = picturePostPagedAdapter
                     viewModel.getPicturePosts()
-                }?: run { cl_no_data.visibility = picturePostPagedAdapter.currentList.takeUnless { isListEmpty(it) }?.let { View.GONE } ?: let { View.VISIBLE } }
+                } ?: run {
+                    cl_no_data.visibility =
+                        picturePostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
+                            ?.let { View.GONE } ?: let { View.VISIBLE }
+                }
             }
             5 -> {
                 rv_fifth.visibility = View.VISIBLE
@@ -761,7 +811,11 @@ class AdultHomeFragment : BaseFragment() {
                     rv_fifth.layoutManager = LinearLayoutManager(requireContext())
                     rv_fifth.adapter = textPostPagedAdapter
                     viewModel.getTextPosts()
-                }?: run { cl_no_data.visibility = textPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }?.let { View.GONE } ?: let { View.VISIBLE } }
+                } ?: run {
+                    cl_no_data.visibility =
+                        textPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
+                            ?.let { View.GONE } ?: let { View.VISIBLE }
+                }
             }
             else -> {
                 rv_sixth.visibility = View.VISIBLE
@@ -772,7 +826,11 @@ class AdultHomeFragment : BaseFragment() {
                     rv_sixth.layoutManager = MiMiLinearLayoutManager(requireContext())
                     rv_sixth.adapter = clubMemberAdapter
                     viewModel.getClubs()
-                }?: run { cl_no_data.visibility = clubMemberAdapter.currentList.takeUnless { isClubListEmpty(it) }?.let { View.GONE } ?: let { View.VISIBLE } }
+                } ?: run {
+                    cl_no_data.visibility =
+                        clubMemberAdapter.currentList.takeUnless { isClubListEmpty(it) }
+                            ?.let { View.GONE } ?: let { View.VISIBLE }
+                }
             }
         }
     }
@@ -934,11 +992,23 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onMoreClick(item: MemberPostItem) {
-            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
-                it.show(
-                    requireActivity().supportFragmentManager,
-                    MoreDialogFragment::class.java.simpleName
-                )
+            val isMe = viewModel.accountManager.getProfile().userId == item.creatorId
+            if (isMe) {
+                meMoreDialog =
+                    MyPostMoreDialogFragment.newInstance(item, onMeMoreDialogListener)
+                        .also {
+                            it.show(
+                                requireActivity().supportFragmentManager,
+                                MoreDialogFragment::class.java.simpleName
+                            )
+                        }
+            } else {
+                moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
+                    it.show(
+                        requireActivity().supportFragmentManager,
+                        MoreDialogFragment::class.java.simpleName
+                    )
+                }
             }
         }
 
@@ -960,7 +1030,8 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
-            val bundle = ClipFragment.createBundle(ArrayList(item.subList(1, item.size)), position-1)
+            val bundle =
+                ClipFragment.createBundle(ArrayList(item.subList(1, item.size)), position - 1)
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_adultHomeFragment_to_clipFragment,
@@ -1003,6 +1074,60 @@ class AdultHomeFragment : BaseFragment() {
                 isAdultTheme = true
             )
             navigateTo(NavigateItem.Destination(R.id.action_to_myPostFragment, bundle))
+        }
+    }
+
+    private val onMeMoreDialogListener = object : OnMeMoreDialogListener {
+        override fun onCancel() {
+            meMoreDialog?.dismiss()
+        }
+
+        override fun onDelete(item: BaseMemberPostItem) {
+            GeneralDialog.newInstance(
+                GeneralDialogData(
+                    titleRes = R.string.is_post_delete,
+                    messageIcon = R.drawable.ico_default_photo,
+                    secondBtn = getString(R.string.btn_confirm),
+                    secondBlock = {
+                        viewModel.deletePost(
+                            item as MemberPostItem,
+                            ArrayList((getCurrentAdapter() as MemberPostPagedAdapter).currentList as List<MemberPostItem>)
+                        )
+                    },
+                    firstBtn = getString(R.string.cancel),
+                    isMessageIcon = false
+                )
+            ).show(requireActivity().supportFragmentManager)
+        }
+
+        override fun onEdit(item: BaseMemberPostItem) {
+            // TODO
+//            item as MemberPostItem
+//            if (item.type == PostType.TEXT) {
+//                val bundle = Bundle()
+//                item.id
+//                bundle.putBoolean(MyPostFragment.EDIT, true)
+//                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+//                findNavController().navigate(
+//                    R.id.action_adultHomeFragment_to_postArticleFragment,
+//                    bundle
+//                )
+//            } else if (item.type == PostType.IMAGE) {
+//                val bundle = Bundle()
+//                bundle.putBoolean(MyPostFragment.EDIT, true)
+//                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+//                findNavController().navigate(R.id.action_adultHomeFragment_to_postPicFragment, bundle)
+//            } else if (item.type == PostType.VIDEO) {
+//                val bundle = Bundle()
+//                bundle.putBoolean(MyPostFragment.EDIT, true)
+//                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+//                findNavController().navigate(
+//                    R.id.action_adultHomeFragment_to_postVideoFragment,
+//                    bundle
+//                )
+//            }
+
+            meMoreDialog?.dismiss()
         }
     }
 
@@ -1132,14 +1257,22 @@ class AdultHomeFragment : BaseFragment() {
 
                 REQUEST_VIDEO_CAPTURE -> {
                     val videoUri: Uri? = data?.data
-                    val myUri = Uri.fromFile(File(UriUtils.getPath(requireContext(), videoUri!!) ?: ""))
+                    val myUri =
+                        Uri.fromFile(File(UriUtils.getPath(requireContext(), videoUri!!) ?: ""))
 
                     if (PostManager().isVideoTimeValid(myUri, requireContext())) {
                         val bundle = Bundle()
                         bundle.putString(BUNDLE_VIDEO_URI, myUri.toString())
-                        findNavController().navigate(R.id.action_adultHomeFragment_to_editVideoFragment, bundle)
+                        findNavController().navigate(
+                            R.id.action_adultHomeFragment_to_editVideoFragment,
+                            bundle
+                        )
                     } else {
-                        Toast.makeText(requireContext(), R.string.post_video_length_error, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            R.string.post_video_length_error,
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
 

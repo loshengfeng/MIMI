@@ -5,6 +5,9 @@ import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
+import androidx.paging.PagingData
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
@@ -20,9 +23,10 @@ import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_my_follow.*
-import kotlinx.android.synthetic.main.item_follow_no_data.view.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import kotlinx.android.synthetic.main.view_my_follow_pager_content.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class MyFollowFragment : BaseFragment() {
@@ -80,24 +84,12 @@ class MyFollowFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.showProgress.observe(this, Observer {
-            vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, it)
-        })
-
         viewModel.clubCount.observe(this, Observer {
             if (layout_tab.selectedTabPosition == TYPE_CLUB) refreshUi(TYPE_CLUB, it)
         })
 
         viewModel.memberCount.observe(this, Observer {
             if (layout_tab.selectedTabPosition == TYPE_MEMBER) refreshUi(TYPE_MEMBER, it)
-        })
-
-        viewModel.clubList.observe(this, Observer {
-            clubFollowAdapter.submitList(it)
-        })
-
-        viewModel.memberList.observe(this, Observer {
-            memberFollowAdapter.submitList(it)
         })
 
         viewModel.attachmentResult.observe(this, Observer {
@@ -135,6 +127,7 @@ class MyFollowFragment : BaseFragment() {
             when (it) {
                 is Loading -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, true)
                 is Loaded -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, false)
+                is Empty -> getData()
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -234,16 +227,24 @@ class MyFollowFragment : BaseFragment() {
             }
 
             override fun onTabSelected(tab: TabLayout.Tab) {
-                viewModel.initData(layout_tab.selectedTabPosition)
+                getData()
             }
 
         })
+        memberFollowAdapter.addLoadStateListener { loadState ->
+            handleLoadState(loadState.refresh)
+            handleLoadState(loadState.append)
+        }
+        clubFollowAdapter.addLoadStateListener { loadState ->
+            handleLoadState(loadState.refresh)
+            handleLoadState(loadState.append)
+        }
         vpAdapter = MyFollowViewPagerAdapter(
             requireContext(),
             memberFollowAdapter,
             clubFollowAdapter
         ) {
-            viewModel.initData(layout_tab.selectedTabPosition)
+            getData()
         }
         vp.adapter = vpAdapter
         layout_tab.setupWithViewPager(vp)
@@ -252,17 +253,47 @@ class MyFollowFragment : BaseFragment() {
         tv_title.setText(R.string.follow_title)
     }
 
-    private fun refreshUi(witch: Int, size: Int) {
-        rv_content.visibility = when (size) {
-            NO_DATA -> View.GONE
-            else -> View.VISIBLE
+    private fun handleLoadState(loadState: LoadState) {
+        when (loadState) {
+            is LoadState.Loading -> {
+                vpAdapter?.changeIsRefreshing(
+                    layout_tab.selectedTabPosition,
+                    true
+                )
+            }
+            is LoadState.NotLoading -> vpAdapter?.changeIsRefreshing(
+                layout_tab.selectedTabPosition,
+                false
+            )
+            is LoadState.Error -> onApiError(loadState.error)
         }
+    }
 
-        item_no_data.visibility = when (size) {
-            NO_DATA -> View.VISIBLE
-            else -> View.GONE
-        }
+    private fun refreshUi(type: Int, size: Int) {
         tv_clean.isEnabled = size != NO_DATA
-        vpAdapter?.refreshUi(witch, size)
+        vpAdapter?.refreshUi(type, size)
+    }
+
+    private var job: Job? = null
+    private fun getData() {
+        job?.cancel()
+        job = lifecycleScope.launch {
+            when (layout_tab.selectedTabPosition) {
+                TYPE_MEMBER -> {
+                    memberFollowAdapter.submitData(PagingData.empty())
+                    viewModel.getMemberList()
+                        .collectLatest {
+                            memberFollowAdapter.submitData(it)
+                        }
+                }
+                TYPE_CLUB -> {
+                    clubFollowAdapter.submitData(PagingData.empty())
+                    viewModel.getClubList()
+                        .collectLatest {
+                            clubFollowAdapter.submitData(it)
+                        }
+                }
+            }
+        }
     }
 }

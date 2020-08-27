@@ -5,7 +5,6 @@ import com.dabenxiang.mimi.model.enums.PaymentStatus
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.google.gson.annotations.SerializedName
 import java.util.*
-import kotlin.collections.ArrayList
 
 data class OrderItem(
     @SerializedName("id")
@@ -48,10 +47,10 @@ data class OrderItem(
     val status: OrderStatus = OrderStatus.PENDING,
 
     @SerializedName("createTime")
-    val createTime: String = "",
+    val createTime: Date? = null,
 
     @SerializedName("completionTime")
-    val completionTime: String? = null,
+    val completionTime: Date? = null,
 
     @SerializedName("accountName")
     val accountName: String = "",

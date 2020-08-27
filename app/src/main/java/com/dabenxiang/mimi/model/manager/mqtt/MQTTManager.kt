@@ -83,10 +83,22 @@ class MQTTManager(val context: Context, private val pref: Pref) {
         })
     }
 
-    fun publishMessage(publishTopic: String, publishMessage: String) {
+
+    private val defaultMqttCallback by lazy {
+        object : IMqttActionListener {
+            override fun onSuccess(asyncActionToken: IMqttToken?) {
+                Timber.d("@@onSuccess")
+            }
+            override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+                Timber.e("@@onFailure: $exception")
+            }
+        }
+    }
+
+    fun publishMessage(publishTopic: String, publishMessage: String, callback: IMqttActionListener = defaultMqttCallback) {
         val message = MqttMessage()
         message.payload = publishMessage.toByteArray()
-        client?.publish(publishTopic, message)
+        client?.publish(publishTopic, message, null, callback)
         Timber.d("Message Published")
 
         if (!client!!.isConnected) {

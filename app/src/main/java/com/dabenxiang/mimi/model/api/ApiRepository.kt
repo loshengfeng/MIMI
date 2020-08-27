@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.model.api
 
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.api.vo.error.TOKEN_NOT_FOUND
+import com.dabenxiang.mimi.model.enums.OrderType
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.StatisticsType
@@ -9,7 +10,6 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
-import retrofit2.http.Query
 import java.io.File
 
 class ApiRepository(private val apiService: ApiService) {
@@ -748,12 +748,12 @@ class ApiRepository(private val apiService: ApiService) {
     /**
      * 依據isOnline, 取得充值管理
      */
-    suspend fun getOrderByOnline(
-        isOnline: Boolean,
+    suspend fun getOrderByType(
+        type: OrderType,
         offset: String,
         limit: String
     ): Response<ApiBasePagingItem<OrderContentItem>> {
-        return apiService.getOrderByOnline(isOnline, offset, limit)
+        return apiService.getOrderByType(type.value, offset, limit)
     }
 
     /**

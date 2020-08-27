@@ -16,10 +16,10 @@ import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.order.OrderFuncItem
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_order.view.*
-import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.*
 
 class OrderViewHolder(view: View) : BaseViewHolder(view) {
-    private val clRoot: ConstraintLayout = view.cl_root
     private val tvStatus: TextView = view.tv_status
     private val ivType: ImageView = view.iv_type
     private val clProxy: ConstraintLayout = view.cl_proxy
@@ -38,10 +38,9 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
     fun bind(orderItem: OrderItem?, orderFuncItem: OrderFuncItem?) {
         this.orderItem = orderItem
 
-
         tvStatus.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0)
         tvStatus.compoundDrawablePadding = 0
-        when(orderItem?.status) {
+        when (orderItem?.status) {
             OrderStatus.PENDING -> {
                 tvStatus.setTextColor(tvStatus.context.getColor(R.color.color_black_1))
                 tvStatus.text = tvStatus.context.getString(R.string.topup_pending)
@@ -69,24 +68,33 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
             OrderStatus.FAILED -> {
                 tvStatus.setTextColor(tvStatus.context.getColor(R.color.color_red_1))
                 tvStatus.text = tvStatus.context.getString(R.string.topup_failed)
-                tvStatus.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ico_attention, 0)
+                tvStatus.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                    0,
+                    0,
+                    R.drawable.ico_attention,
+                    0
+                )
                 tvStatus.compoundDrawablePadding = 4
             }
         }
 
-        when(orderItem?.isOnline) {
+        when (orderItem?.isOnline) {
             false -> {
                 ivType.visibility = View.INVISIBLE
                 clProxy.visibility = View.VISIBLE
                 tvName.text = orderItem.merchantUserFriendlyName
                 orderItem.merchantUserAvatarAttachmentId?.toString()
                     .takeIf { !TextUtils.isEmpty(it) && it != LruCacheUtils.ZERO_ID }?.also { id ->
-                    LruCacheUtils.getLruCache(id)?.also { bitmap ->
-                        Glide.with(ivAvatar.context).load(bitmap).into(ivAvatar)
+                        LruCacheUtils.getLruCache(id)?.also { bitmap ->
+                            Glide.with(ivAvatar.context).load(bitmap).into(ivAvatar)
+                        } ?: run {
+                            orderFuncItem?.getOrderProxyAttachment?.invoke(id) { id ->
+                                updateAvatar(
+                                    id
+                                )
+                            }
+                        }
                     } ?: run {
-                        orderFuncItem?.getOrderProxyAttachment?.invoke(id) { id -> updateAvatar(id) }
-                    }
-                } ?: run {
                     Glide.with(ivAvatar.context).load(R.drawable.icon_cs_photo)
                         .into(ivAvatar)
                 }
@@ -112,8 +120,9 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
         tvOrderId.text = orderItem?.id.toString()
 
         // 格式為YYYY-MM-DD hh:mm
-        tvTime.text = orderItem?.completionTime
-            ?: let { tvTime.context.getString(R.string.topup_default_time) }
+        tvTime.text = orderItem?.completionTime?.let { date ->
+            SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(date)
+        } ?: let { tvTime.context.getString(R.string.topup_default_time) }
 
         // 僅顯示會員充值的蜜幣數量
         tvPoint.text = orderItem?.packagePoint.toString()
@@ -124,7 +133,6 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
         btnContact.setOnClickListener {
             orderItem?.also {
                 orderFuncItem?.onContactClick?.invoke(
-                    it.id,
                     ChatListItem(
                         id = it.chatId,
                         name = if (TextUtils.isEmpty(it.merchantUserFriendlyName)) btnContact.context.getString(
@@ -132,14 +140,16 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
                         ) else it.merchantUserFriendlyName,
                         avatarAttachmentId = it.merchantUserAvatarAttachmentId,
                         lastReadTime = it.lastReadTime
-                    )
+                    ),
+                    orderItem
                 )
             }
         }
 
-        ivNew.visibility = orderItem?.takeIf { it.lastReadTime?.time?:0 < it.lastReplyTime?.time?:0 }?.let {
-            View.VISIBLE
-        } ?: let { View.GONE }
+        ivNew.visibility =
+            orderItem?.takeIf { it.lastReadTime?.time ?: 0 < it.lastReplyTime?.time ?: 0 }?.let {
+                View.VISIBLE
+            } ?: let { View.GONE }
     }
 
     private fun updateAvatar(id: String) {

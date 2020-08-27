@@ -15,6 +15,7 @@ import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_add_pic.view.*
 import kotlinx.android.synthetic.main.item_pic.view.*
+import java.io.File
 
 class ScrollPicAdapter(private val postPicItemListener: PostPicItemListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -121,7 +122,7 @@ class ScrollPicAdapter(private val postPicItemListener: PostPicItemListener) : R
             val viewItem = ViewerItem()
             if (item.attachmentId.isEmpty()) {
                 val uriP = Uri.parse(item.uri)
-                imgPic.setImageURI(uriP)
+                Glide.with(context).load(File(uriP.path)).into(imgPic)
                 viewItem.url = item.uri
             } else {
                 if (LruCacheUtils.getLruCache(item.attachmentId) == null) {

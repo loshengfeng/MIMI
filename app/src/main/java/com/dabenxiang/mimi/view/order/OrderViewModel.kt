@@ -9,6 +9,7 @@ import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiRepository.Companion.NETWORK_PAGE_SIZE
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.enums.OrderType
 import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.chathistory.ChatHistoryListDataSource
@@ -30,16 +31,22 @@ class OrderViewModel : BaseViewModel() {
     private val _unreadOrderResult = MutableLiveData<ApiResult<Int>>()
     val unreadOrderResult: LiveData<ApiResult<Int>> = _unreadOrderResult
 
-    private val _createOrderChatResult = MutableLiveData<ApiResult<Pair<CreateOrderChatItem, ChatListItem>>>()
-    val createOrderChatResult: LiveData<ApiResult<Pair<CreateOrderChatItem, ChatListItem>>> = _createOrderChatResult
+    private val _chatUnreadResult = MutableLiveData<ApiResult<Boolean>>()
+    val chatUnreadResult: LiveData<ApiResult<Boolean>> = _chatUnreadResult
+
+    private val _proxyOrderUnreadResult = MutableLiveData<ApiResult<Boolean>>()
+    val proxyOrderUnreadResult: LiveData<ApiResult<Boolean>> = _proxyOrderUnreadResult
+
+    private val _createOrderChatResult = MutableLiveData<ApiResult<Triple<CreateOrderChatItem, ChatListItem, OrderItem>>>()
+    val createOrderChatResult: LiveData<ApiResult<Triple<CreateOrderChatItem, ChatListItem, OrderItem>>> = _createOrderChatResult
 
     var unreadCount = 0
     var unreadOrderCount = 0
 
-    fun getOrderByPaging2(isOnline: Boolean?, update: ((PagedList<OrderItem>) -> Unit)) {
+    fun getOrderByPaging2(type: OrderType?, update: ((PagedList<OrderItem>) -> Unit)) {
         viewModelScope.launch {
             val dataSrc =
-                OrderListDataSource(viewModelScope, domainManager, pagingCallback, isOnline)
+                OrderListDataSource(viewModelScope, domainManager, pagingCallback, type)
             dataSrc.isInvalid
             val factory = OrderListFactory(dataSrc)
             val config = PagedList.Config.Builder()
@@ -196,17 +203,58 @@ class OrderViewModel : BaseViewModel() {
         }
     }
 
-    fun createOrderChat(orderId: Long, item: ChatListItem) {
+    fun createOrderChat(chatListItem: ChatListItem, orderItem: OrderItem) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().createOrderChat(CreateChatRequest(orderId))
+                val result = domainManager.getApiRepository().createOrderChat(CreateChatRequest(orderItem.id))
                 if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(Pair(result.body()?.content?: CreateOrderChatItem(),item)))
+                emit(ApiResult.success(Triple(result.body()?.content?: CreateOrderChatItem(), chatListItem, orderItem)))
             }
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _createOrderChatResult.value = it }
+        }
+    }
+
+    fun getProxyOrderUnread(update: ((Int, Boolean) -> Unit)) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.getOrderByType(OrderType.MERCHANT2USER, "0", "1")
+                if (!result.isSuccessful) throw HttpException(result)
+                val item = result.body()?.content?.orders?.get(0)
+                item?.also {
+                    emit(ApiResult.success(it.lastReplyTime?.time ?: 0 > it.lastReadTime?.time ?: 0))
+                } ?: emit(ApiResult.success(true))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect {
+                    when (it) {
+                        is ApiResult.Success -> update(0, it.result)
+                    }
+                }
+        }
+    }
+
+    fun getChatUnread(update: ((Int, Boolean) -> Unit)) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.getUnread()
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success((result.body()?.content as Int) > 0))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect {
+                    when (it) {
+                        is ApiResult.Success -> update(1, it.result)
+                    }
+                }
         }
     }
 }

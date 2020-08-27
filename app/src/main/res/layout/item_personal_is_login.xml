@@ -24,7 +24,7 @@
             android:layout_height="50dp"
             android:layout_marginStart="18dp"
             android:contentDescription="@null"
-            android:src="@drawable/ico_default_photo"
+            android:src="@drawable/default_profile_picture"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -111,7 +111,6 @@
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:text="@string/personal_order"
-            android:visibility="visible"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_follow" />
 
