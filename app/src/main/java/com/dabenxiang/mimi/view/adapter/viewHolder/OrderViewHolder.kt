@@ -20,7 +20,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class OrderViewHolder(view: View) : BaseViewHolder(view) {
-    private val clRoot: ConstraintLayout = view.cl_root
     private val tvStatus: TextView = view.tv_status
     private val ivType: ImageView = view.iv_type
     private val clProxy: ConstraintLayout = view.cl_proxy

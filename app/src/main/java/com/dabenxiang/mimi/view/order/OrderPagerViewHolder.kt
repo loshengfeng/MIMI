@@ -9,6 +9,7 @@ import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderItem
+import com.dabenxiang.mimi.model.enums.OrderType
 import com.dabenxiang.mimi.view.adapter.ChatHistoryAdapter
 import com.dabenxiang.mimi.view.adapter.FavoriteTabAdapter
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
@@ -88,7 +89,7 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
             rvOrder.tag = position
             rvOrder.adapter = orderAdapter
 //            orderFuncItem.getOrderByPaging3 { data, scope -> updateOrderList3(data, scope) }
-            orderFuncItem.getOrderByPaging2(getOnlineStatus(position)) { list -> updateOrderList2(list) }
+            orderFuncItem.getOrderByPaging2(getOrderType(position)) { list -> updateOrderList2(list) }
             swipeRefreshLayout.isRefreshing = true
         }
 
@@ -100,14 +101,14 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
                             orderFuncItem.getChatList { list -> updateChatList(list) }
                         }
                         else -> {
-                            orderFuncItem.getOrderByPaging2(getOnlineStatus(position)) { list ->
+                            orderFuncItem.getOrderByPaging2(getOrderType(position)) { list ->
                                 updateOrderList2(list)
                             }
                         }
                     }
                 }
                 else ->
-                    orderFuncItem.getOrderByPaging2(getOnlineStatus(position)) { list ->
+                    orderFuncItem.getOrderByPaging2(getOrderType(position)) { list ->
                         updateOrderList2(list)
                     }
             }
@@ -138,11 +139,11 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
         chatAdapter.update(position)
     }
 
-    private fun getOnlineStatus(position: Int): Boolean? {
+    private fun getOrderType(position: Int): OrderType? {
         return when(position) {
             0 -> null
-            1 -> true
-            else -> false
+            1 -> OrderType.USER2ONLINE
+            else -> OrderType.MERCHANT2USER
         }
     }
 }
