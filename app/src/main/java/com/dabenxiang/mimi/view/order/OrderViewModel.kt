@@ -9,6 +9,7 @@ import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiRepository.Companion.NETWORK_PAGE_SIZE
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.enums.OrderType
 import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.chathistory.ChatHistoryListDataSource
@@ -36,10 +37,10 @@ class OrderViewModel : BaseViewModel() {
     var unreadCount = 0
     var unreadOrderCount = 0
 
-    fun getOrderByPaging2(isOnline: Boolean?, update: ((PagedList<OrderItem>) -> Unit)) {
+    fun getOrderByPaging2(type: OrderType?, update: ((PagedList<OrderItem>) -> Unit)) {
         viewModelScope.launch {
             val dataSrc =
-                OrderListDataSource(viewModelScope, domainManager, pagingCallback, isOnline)
+                OrderListDataSource(viewModelScope, domainManager, pagingCallback, type)
             dataSrc.isInvalid
             val factory = OrderListFactory(dataSrc)
             val config = PagedList.Config.Builder()

@@ -6,6 +6,9 @@ class BalanceItem (
     @SerializedName("allCount")
     val allCount: Long?,
 
-    @SerializedName("isOnlineCount")
-    val isOnlineCount: Long?
+    @SerializedName("merchant2UserCount")
+    val merchant2UserCount: Long?,
+
+    @SerializedName("user2Online")
+    val user2Online: Long?
 )

@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.model.api
 
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.api.vo.error.TOKEN_NOT_FOUND
+import com.dabenxiang.mimi.model.enums.OrderType
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.StatisticsType
@@ -747,12 +748,12 @@ class ApiRepository(private val apiService: ApiService) {
     /**
      * 依據isOnline, 取得充值管理
      */
-    suspend fun getOrderByOnline(
-        isOnline: Boolean,
+    suspend fun getOrderByType(
+        type: OrderType,
         offset: String,
         limit: String
     ): Response<ApiBasePagingItem<OrderContentItem>> {
-        return apiService.getOrderByOnline(isOnline, offset, limit)
+        return apiService.getOrderByType(type.value, offset, limit)
     }
 
     /**

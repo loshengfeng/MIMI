@@ -605,8 +605,8 @@ interface ApiService {
     ): Response<ApiBasePagingItem<OrderContentItem>>
 
     @GET("/v1/Members/Me/Order")
-    suspend fun getOrderByOnline(
-        @Query("isOnline") isOnline: Boolean,
+    suspend fun getOrderByType(
+        @Query("type") type: Int,
         @Query("offset") offset: String,
         @Query("limit") limit: String
     ): Response<ApiBasePagingItem<OrderContentItem>>

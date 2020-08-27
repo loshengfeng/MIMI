@@ -42,9 +42,9 @@ class OrderFragment : BaseFragment() {
         OrderPagerAdapter(
             OrderFuncItem(
                 getOrderByPaging3 = { update -> getOrderByPaging3(update) },
-                getOrderByPaging2 = { isOnline, update ->
+                getOrderByPaging2 = { type, update ->
                     viewModel.getOrderByPaging2(
-                        isOnline,
+                        type,
                         update
                     )
                 },
@@ -80,8 +80,8 @@ class OrderFragment : BaseFragment() {
                 tl_type.getTabAt(i)?.also { tab ->
                     tab.customView?.findViewById<TextView>(R.id.tv_title)?.text = when (i) {
                         0 -> "$title(${it.allCount})"
-                        1 -> "$title(${it.isOnlineCount})"
-                        else -> "$title(${(it.allCount ?: 0) - (it.isOnlineCount ?: 0)})"
+                        1 -> "$title(${it.user2Online})"
+                        else -> "$title(${it.merchant2UserCount})"
                     }
                 }
             }
