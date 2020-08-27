@@ -4,6 +4,7 @@ import com.dabenxiang.mimi.model.enums.OrderStatus
 import com.dabenxiang.mimi.model.enums.PaymentStatus
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.google.gson.annotations.SerializedName
+import java.util.*
 
 data class OrderItem(
     @SerializedName("id")
@@ -67,10 +68,10 @@ data class OrderItem(
     val traceLogId: Long = 0,
 
     @SerializedName("lastReplyTime")
-    val lastReplyTime: String = "",
+    val lastReplyTime: Date? = null,
 
     @SerializedName("lastReadTime")
-    val lastReadTime: String = "",
+    val lastReadTime: Date? = null,
 
     @SerializedName("actualAmount")
     val actualAmount: Float = 0f,

@@ -17,8 +17,9 @@ import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.vo.CarouselHolderItem
 import com.dabenxiang.mimi.model.vo.PlayerItem
-import com.dabenxiang.mimi.model.vo.statisticsItemToCarouselHolderItem
+import com.dabenxiang.mimi.model.vo.categoryBannerItemCarouselHolderItem
 import com.dabenxiang.mimi.model.vo.statisticsItemToVideoItem
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
@@ -106,7 +107,8 @@ class HomeFragment : BaseFragment() {
                     val viewHolder = homeCarouselViewHolderMap[it.first]
                     val carousel = carouselMap[it.first]
                     val carouselHolderItems =
-                        response.result.content?.statisticsItemToCarouselHolderItem(carousel!!.isAdult)
+                        response.result.content?.categoryBannerItemCarouselHolderItem()
+//                        response.result.content?.statisticsItemToCarouselHolderItem(carousel!!.isAdult)
                     viewHolder?.submitList(carouselHolderItems)
                 }
                 is Error -> onApiError(response.throwable)
@@ -140,8 +142,7 @@ class HomeFragment : BaseFragment() {
         iv_post.visibility = View.GONE
 
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        viewModel.adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
-
+        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
         if (mainViewModel?.normal == null) {
             mainViewModel?.getHomeCategories()
         }
@@ -388,6 +389,10 @@ class HomeFragment : BaseFragment() {
 
         override fun onLoadClubViewHolder(vh: HomeClubViewHolder) {
 
+        }
+
+        override fun onClickBanner(item: CarouselHolderItem) {
+            GeneralUtils.openWebView(requireContext(), item.url)
         }
     }
 

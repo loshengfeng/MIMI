@@ -2,7 +2,7 @@ package com.dabenxiang.mimi.view.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
@@ -12,7 +12,7 @@ import com.dabenxiang.mimi.view.adapter.viewHolder.DeletedItemViewHolder
 
 class ClubFollowAdapter(
     val listener: EventListener
-) : PagedListAdapter<ClubFollowItem, RecyclerView.ViewHolder>(diffCallback) {
+) : PagingDataAdapter<ClubFollowItem, RecyclerView.ViewHolder>(diffCallback) {
     companion object {
         private const val VIEW_TYPE_NORMAL = 0
         private const val VIEW_TYPE_DELETED = 1

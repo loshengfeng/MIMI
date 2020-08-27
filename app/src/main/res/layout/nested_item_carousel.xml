@@ -3,12 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:cardBackgroundColor="@color/color_black_1"
     app:cardCornerRadius="6dp">
 
     <ImageView
         android:id="@+id/iv_poster"
-        android:src="@color/color_red_2"
+        android:src="@drawable/img_nopic_03"
         android:scaleType="centerCrop"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

@@ -42,8 +42,6 @@ class MyFollowViewPagerAdapter(
         when (position) {
             TYPE_MEMBER -> viewMember = view
             TYPE_CLUB -> viewClub = view
-            else -> {
-            }
         }
         return view
     }

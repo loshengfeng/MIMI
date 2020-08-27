@@ -8,9 +8,7 @@ import androidx.paging.*
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiRepository.Companion.NETWORK_PAGE_SIZE
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.BalanceItem
-import com.dabenxiang.mimi.model.api.vo.ChatListItem
-import com.dabenxiang.mimi.model.api.vo.OrderItem
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.chathistory.ChatHistoryListDataSource
@@ -31,6 +29,9 @@ class OrderViewModel : BaseViewModel() {
 
     private val _unreadOrderResult = MutableLiveData<ApiResult<Int>>()
     val unreadOrderResult: LiveData<ApiResult<Int>> = _unreadOrderResult
+
+    private val _createOrderChatResult = MutableLiveData<ApiResult<Triple<CreateOrderChatItem, ChatListItem, OrderItem>>>()
+    val createOrderChatResult: LiveData<ApiResult<Triple<CreateOrderChatItem, ChatListItem, OrderItem>>> = _createOrderChatResult
 
     var unreadCount = 0
     var unreadOrderCount = 0
@@ -192,6 +193,20 @@ class OrderViewModel : BaseViewModel() {
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _unreadOrderResult.value = it }
+        }
+    }
+
+    fun createOrderChat(chatListItem: ChatListItem, orderItem: OrderItem) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().createOrderChat(CreateChatRequest(orderItem.id))
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(Triple(result.body()?.content?: CreateOrderChatItem(), chatListItem, orderItem)))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _createOrderChatResult.value = it }
         }
     }
 }

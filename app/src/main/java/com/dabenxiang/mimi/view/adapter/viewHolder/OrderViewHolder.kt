@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.model.enums.OrderStatus
 import com.dabenxiang.mimi.model.enums.PaymentType
@@ -15,7 +16,6 @@ import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.order.OrderFuncItem
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_order.view.*
-import timber.log.Timber
 
 class OrderViewHolder(view: View) : BaseViewHolder(view) {
     private val clRoot: ConstraintLayout = view.cl_root
@@ -37,10 +37,9 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
     fun bind(orderItem: OrderItem?, orderFuncItem: OrderFuncItem?) {
         this.orderItem = orderItem
 
-
         tvStatus.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0)
         tvStatus.compoundDrawablePadding = 0
-        when(orderItem?.status) {
+        when (orderItem?.status) {
             OrderStatus.PENDING -> {
                 tvStatus.setTextColor(tvStatus.context.getColor(R.color.color_black_1))
                 tvStatus.text = tvStatus.context.getString(R.string.topup_pending)
@@ -68,24 +67,33 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
             OrderStatus.FAILED -> {
                 tvStatus.setTextColor(tvStatus.context.getColor(R.color.color_red_1))
                 tvStatus.text = tvStatus.context.getString(R.string.topup_failed)
-                tvStatus.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ico_attention, 0)
+                tvStatus.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                    0,
+                    0,
+                    R.drawable.ico_attention,
+                    0
+                )
                 tvStatus.compoundDrawablePadding = 4
             }
         }
 
-        when(orderItem?.isOnline) {
+        when (orderItem?.isOnline) {
             false -> {
                 ivType.visibility = View.INVISIBLE
                 clProxy.visibility = View.VISIBLE
                 tvName.text = orderItem.merchantUserFriendlyName
                 orderItem.merchantUserAvatarAttachmentId?.toString()
                     .takeIf { !TextUtils.isEmpty(it) && it != LruCacheUtils.ZERO_ID }?.also { id ->
-                    LruCacheUtils.getLruCache(id)?.also { bitmap ->
-                        Glide.with(ivAvatar.context).load(bitmap).into(ivAvatar)
+                        LruCacheUtils.getLruCache(id)?.also { bitmap ->
+                            Glide.with(ivAvatar.context).load(bitmap).into(ivAvatar)
+                        } ?: run {
+                            orderFuncItem?.getOrderProxyAttachment?.invoke(id) { id ->
+                                updateAvatar(
+                                    id
+                                )
+                            }
+                        }
                     } ?: run {
-                        orderFuncItem?.getOrderProxyAttachment?.invoke(id) { id -> updateAvatar(id) }
-                    }
-                } ?: run {
                     Glide.with(ivAvatar.context).load(R.drawable.icon_cs_photo)
                         .into(ivAvatar)
                 }
@@ -122,13 +130,24 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
 
         btnContact.setOnClickListener {
             orderItem?.also {
-                orderFuncItem?.onContactClick?.invoke(it.id, it.chatId)
+                orderFuncItem?.onContactClick?.invoke(
+                    ChatListItem(
+                        id = it.chatId,
+                        name = if (TextUtils.isEmpty(it.merchantUserFriendlyName)) btnContact.context.getString(
+                            R.string.order_contact_mimi_service
+                        ) else it.merchantUserFriendlyName,
+                        avatarAttachmentId = it.merchantUserAvatarAttachmentId,
+                        lastReadTime = it.lastReadTime
+                    ),
+                    orderItem
+                )
             }
         }
 
-        ivNew.visibility = orderItem?.takeIf { it.lastReadTime < it.lastReplyTime }?.let {
-            View.VISIBLE
-        } ?: let { View.GONE }
+        ivNew.visibility =
+            orderItem?.takeIf { it.lastReadTime?.time ?: 0 < it.lastReplyTime?.time ?: 0 }?.let {
+                View.VISIBLE
+            } ?: let { View.GONE }
     }
 
     private fun updateAvatar(id: String) {

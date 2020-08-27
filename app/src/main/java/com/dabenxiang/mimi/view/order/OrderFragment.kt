@@ -19,9 +19,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_order.*
-import kotlinx.android.synthetic.main.fragment_order.viewPager
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import kotlinx.android.synthetic.main.item_setting_bar.tv_title
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
@@ -54,7 +52,7 @@ class OrderFragment : BaseFragment() {
                 getChatAttachment = { id, pos, update -> viewModel.getAttachment(id, pos, update) },
                 onChatItemClick = { item -> onChatItemClick(item) },
                 getOrderProxyAttachment = { id, update -> viewModel.getProxyAttachment(id, update) },
-                onContactClick = { id, chatId -> Timber.d("onContactClick $id, $chatId") }
+                onContactClick = { chatListItem, orderItem -> onContactClick(chatListItem, orderItem) }
             ))
     }
 
@@ -115,6 +113,28 @@ class OrderFragment : BaseFragment() {
                 }
             }
         })
+
+        viewModel.createOrderChatResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Success -> {
+                    val createOrderChatItem = it.result.first
+                    val chatListItem = it.result.second
+                    val orderItem = it.result.third
+                    onChatItemClick(
+                        ChatListItem(
+                            id = createOrderChatItem.chatId,
+                            name = chatListItem.name,
+                            avatarAttachmentId = chatListItem.avatarAttachmentId,
+                            lastReadTime = chatListItem.lastReadTime
+                        ),
+                        OrderItem(traceLogId = createOrderChatItem.id, isOnline = orderItem.isOnline)
+                    )
+                }
+                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -156,12 +176,22 @@ class OrderFragment : BaseFragment() {
         }
     }
 
-    private fun onChatItemClick(item: ChatListItem) {
+    private fun onChatItemClick(item: ChatListItem, orderItem: OrderItem = OrderItem()) {
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_orderFragment_to_chatContentFragment,
-                ChatContentFragment.createBundle(item)
+                ChatContentFragment.createBundle(item, orderItem.traceLogId, orderItem.isOnline)
             )
         )
+    }
+
+    private fun onContactClick(chatListItem: ChatListItem, orderItem: OrderItem) {
+        Timber.d("@@chatListItem: $chatListItem")
+        Timber.d("@@orderItem: $orderItem")
+        if (chatListItem.id != 0L && orderItem.traceLogId != 0L) {
+            onChatItemClick(chatListItem, orderItem)
+        } else {
+            viewModel.createOrderChat(chatListItem, orderItem)
+        }
     }
 }
