@@ -3,18 +3,17 @@ package com.dabenxiang.mimi.view.dialog.comment
 import android.os.Bundle
 import android.view.View
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.OnMeMoreDialogListener
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
-import kotlinx.android.synthetic.main.fragment_dialog_choose_upload_method.*
 import kotlinx.android.synthetic.main.fragment_dialog_my_post_more.*
-import kotlinx.android.synthetic.main.fragment_dialog_my_post_more.background
 
 class MyPostMoreDialogFragment : BaseDialogFragment() {
 
     companion object {
         fun newInstance(
             item: BaseMemberPostItem? = null,
-            listener: OnMoreDialogListener
+            listener: OnMeMoreDialogListener
         ): MyPostMoreDialogFragment {
             val fragment = MyPostMoreDialogFragment()
             fragment.item = item
@@ -24,7 +23,7 @@ class MyPostMoreDialogFragment : BaseDialogFragment() {
     }
 
     var item: BaseMemberPostItem? = null
-    var listener: OnMoreDialogListener? = null
+    var listener: OnMeMoreDialogListener? = null
 
     override fun isFullLayout(): Boolean {
         return true
@@ -51,11 +50,5 @@ class MyPostMoreDialogFragment : BaseDialogFragment() {
         }
 
         background.setOnClickListener { dismiss() }
-    }
-
-    interface OnMoreDialogListener {
-        fun onEdit(item: BaseMemberPostItem)
-        fun onDelete(item: BaseMemberPostItem)
-        fun onCancel()
     }
 }
