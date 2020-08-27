@@ -47,10 +47,10 @@ data class OrderItem(
     val status: OrderStatus = OrderStatus.PENDING,
 
     @SerializedName("createTime")
-    val createTime: String = "",
+    val createTime: Date? = null,
 
     @SerializedName("completionTime")
-    val completionTime: String? = null,
+    val completionTime: Date? = null,
 
     @SerializedName("accountName")
     val accountName: String = "",
