@@ -29,4 +29,8 @@ abstract class BaseTabAdapter<M : Any, VH : RecyclerView.ViewHolder> : RecyclerV
     override fun getItemCount(): Int {
         return tabList?.size ?: 0
     }
+
+    fun getSelectedPosition(): Int? {
+        return lastSelected
+    }
 }

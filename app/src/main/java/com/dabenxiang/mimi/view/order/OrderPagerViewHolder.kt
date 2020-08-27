@@ -76,11 +76,10 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
                         App.self.getString(R.string.topup_proxy_order),
                         App.self.getString(R.string.topup_proxy_chat)
                     )
-                    tabAdapter.submitList(secondaryList, FavoriteFragment.lastSecondaryIndex)
+                    tabAdapter.submitList(secondaryList, 0)
                     rvTab.adapter = tabAdapter
                 }
                 rvTab.visibility = View.VISIBLE
-
             }
             else -> rvTab.visibility = View.GONE
         }
@@ -91,6 +90,27 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
 //            orderFuncItem.getOrderByPaging3 { data, scope -> updateOrderList3(data, scope) }
             orderFuncItem.getOrderByPaging2(getOnlineStatus(position)) { list -> updateOrderList2(list) }
             swipeRefreshLayout.isRefreshing = true
+        }
+
+        swipeRefreshLayout.setOnRefreshListener {
+            when(position) {
+                2 -> {
+                    when(tabAdapter.getSelectedPosition()) {
+                        1 -> {
+                            orderFuncItem.getChatList { list -> updateChatList(list) }
+                        }
+                        else -> {
+                            orderFuncItem.getOrderByPaging2(getOnlineStatus(position)) { list ->
+                                updateOrderList2(list)
+                            }
+                        }
+                    }
+                }
+                else ->
+                    orderFuncItem.getOrderByPaging2(getOnlineStatus(position)) { list ->
+                        updateOrderList2(list)
+                    }
+            }
         }
     }
 
