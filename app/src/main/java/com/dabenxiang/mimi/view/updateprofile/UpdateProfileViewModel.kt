@@ -4,12 +4,11 @@ import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ProfileItem
 import com.dabenxiang.mimi.model.api.vo.ProfileRequest
+import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.EditTextMutableLiveData
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -23,6 +22,7 @@ class UpdateProfileViewModel : BaseViewModel() {
     lateinit var profileItem: ProfileItem
 
     var type = UpdateProfileFragment.TYPE_NAME
+
     //FIXME !!!  use the same content !!!!
     val content = EditTextMutableLiveData()
     val birthday = EditTextMutableLiveData()
@@ -46,15 +46,20 @@ class UpdateProfileViewModel : BaseViewModel() {
     }
 
     private fun isValidateFriendlyName(): String {
-
         val name = content.value ?: ""
-        return when {
-            TextUtils.isEmpty(name) -> app.getString(R.string.login_name)
-            !GeneralUtils.isFriendlyNameValid(name) -> app.getString(R.string.friendly_name_format_error_1)
-            name.length > 20 -> app.getString(R.string.friendly_name_format_error_2)
-            else -> {
-                profileItem.friendlyName = name
-                ""
+        if (TextUtils.isEmpty(name)) {
+            return app.getString(R.string.login_name)
+        } else {
+            if (name.length > 20) {
+                return app.getString(R.string.friendly_name_format_error_2)
+            } else {
+                return when {
+                    !GeneralUtils.isFriendlyNameValid(name) -> app.getString(R.string.friendly_name_format_error_1)
+                    else -> {
+                        profileItem.friendlyName = name
+                        ""
+                    }
+                }
             }
         }
     }
