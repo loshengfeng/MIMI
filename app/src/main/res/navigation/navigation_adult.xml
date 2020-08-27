@@ -20,10 +20,6 @@
             app:destination="@id/categoriesFragment" />
 
         <action
-            android:id="@+id/action_to_searchVideoFragment"
-            app:destination="@id/searchVideoFragment" />
-
-        <action
             android:id="@+id/action_homeFragment_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
 
@@ -80,9 +76,6 @@
         android:id="@+id/categoriesFragment"
         android:name="com.dabenxiang.mimi.view.home.category.CategoriesFragment"
         tools:layout="@layout/fragment_categories">
-        <action
-            android:id="@+id/action_to_searchVideoFragment"
-            app:destination="@id/searchVideoFragment" />
 
         <action
             android:id="@+id/action_categoriesFragment_to_loginFragment"
@@ -113,18 +106,6 @@
         <action
             android:id="@+id/action_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
-        <action
-            android:id="@+id/action_to_settingFragment"
-            app:destination="@id/navigation_setting" />
-        <action
-            android:id="@+id/action_to_loginFragment"
-            app:destination="@id/navigation_login" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/searchVideoFragment"
-        android:name="com.dabenxiang.mimi.view.search.video.SearchVideoFragment"
-        tools:layout="@layout/fragment_search_video">
         <action
             android:id="@+id/action_to_settingFragment"
             app:destination="@id/navigation_setting" />

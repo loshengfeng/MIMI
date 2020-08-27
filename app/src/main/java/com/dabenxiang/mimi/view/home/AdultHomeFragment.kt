@@ -589,30 +589,22 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         iv_bg_search.setOnClickListener {
-            if (lastPosition == 0 || lastPosition == 1) {
-                val bundle = SearchVideoFragment.createBundle("", "", true)
-                navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_to_searchVideoFragment,
-                        bundle
-                    )
-                )
-            } else {
-                val item: SearchPostItem = when (lastPosition) {
-                    2 -> SearchPostItem(isPostFollow = true)
-                    3 -> SearchPostItem(type = PostType.VIDEO)
-                    4 -> SearchPostItem(type = PostType.IMAGE)
-                    5 -> SearchPostItem(type = PostType.TEXT)
-                    else -> SearchPostItem(isClub = true)
-                }
-                val bundle = SearchPostFragment.createBundle(item)
-                navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_homeFragment_to_searchPostFragment,
-                        bundle
-                    )
-                )
+            val item: SearchPostItem = when (lastPosition) {
+                0 -> SearchPostItem(type = PostType.HYBRID)
+                1 -> SearchPostItem(type = PostType.VIDEO_ON_DEMAND)
+                2 -> SearchPostItem(isPostFollow = true)
+                3 -> SearchPostItem(type = PostType.VIDEO)
+                4 -> SearchPostItem(type = PostType.IMAGE)
+                5 -> SearchPostItem(type = PostType.TEXT)
+                else -> SearchPostItem(isClub = true)
             }
+            val bundle = SearchPostFragment.createBundle(item)
+            navigateTo(
+                    NavigateItem.Destination(
+                            R.id.action_homeFragment_to_searchPostFragment,
+                            bundle
+                    )
+            )
         }
 
         iv_post.setOnClickListener {

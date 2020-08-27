@@ -14,6 +14,7 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
@@ -26,6 +27,8 @@ import com.dabenxiang.mimi.view.search.post.keyword.SearchPostByKeywordDataSourc
 import com.dabenxiang.mimi.view.search.post.keyword.SearchPostByKeywordFactory
 import com.dabenxiang.mimi.view.search.post.tag.SearchPostByTagDataSource
 import com.dabenxiang.mimi.view.search.post.tag.SearchPostByTagFactory
+import com.dabenxiang.mimi.view.search.video.SearchVideoFactory
+import com.dabenxiang.mimi.view.search.video.SearchVideoListDataSource
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -62,6 +65,9 @@ class SearchPostViewModel : BaseViewModel() {
 
     private val _followResult = MutableLiveData<ApiResult<Nothing>>()
     val followResult: LiveData<ApiResult<Nothing>> = _followResult
+
+    private val _searchingListResult = MutableLiveData<PagedList<VideoItem>>()
+    val searchingListResult: LiveData<PagedList<VideoItem>> = _searchingListResult
 
     var adWidth = 0
     var adHeight = 0
@@ -204,7 +210,18 @@ class SearchPostViewModel : BaseViewModel() {
     fun getSearchPostsByKeyword(type: PostType, keyword: String, isPostFollow: Boolean) {
         viewModelScope.launch {
             getSearchPostByKeywordPagingItems(type, keyword, isPostFollow).asFlow()
-                .collect { _searchPostItemByKeywordListResult.value = it }
+                .collect {
+                    _searchPostItemByKeywordListResult.value = it
+                }
+        }
+    }
+
+    fun getSearchVideoList(searchingTag: String, searchingStr: String) {
+        viewModelScope.launch {
+            getVideoPagingItems(true, searchingTag, searchingStr).asFlow()
+                    .collect {
+                        _searchingListResult.value = it
+                    }
         }
     }
 
@@ -321,6 +338,29 @@ class SearchPostViewModel : BaseViewModel() {
             .setPrefetchDistance(4)
             .build()
         return LivePagedListBuilder(factory, config).build()
+    }
+
+    private fun getVideoPagingItems(
+            isAdult: Boolean,
+            searchingTag: String,
+            searchingStr: String
+    ): LiveData<PagedList<VideoItem>> {
+        val searchVideoDataSource =
+                SearchVideoListDataSource(
+                        viewModelScope,
+                        domainManager,
+                        pagingCallback,
+                        isAdult,
+                        searchingTag,
+                        searchingStr,
+                        adWidth,
+                        adHeight
+                )
+        val videoFactory = SearchVideoFactory(searchVideoDataSource)
+        val config = PagedList.Config.Builder()
+                .setPrefetchDistance(4)
+                .build()
+        return LivePagedListBuilder(videoFactory, config).build()
     }
 
     fun getClubs(keyword: String) {
