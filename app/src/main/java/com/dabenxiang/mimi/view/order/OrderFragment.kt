@@ -52,7 +52,8 @@ class OrderFragment : BaseFragment() {
                 getChatAttachment = { id, pos, update -> viewModel.getAttachment(id, pos, update) },
                 onChatItemClick = { item -> onChatItemClick(item) },
                 getOrderProxyAttachment = { id, update -> viewModel.getProxyAttachment(id, update) },
-                onContactClick = { chatListItem, orderItem -> onContactClick(chatListItem, orderItem) }
+                onContactClick = { chatListItem, orderItem -> onContactClick(chatListItem, orderItem) },
+                getProxyUnread = { update -> getProxyUnread(update) }
             ))
     }
 
@@ -186,12 +187,15 @@ class OrderFragment : BaseFragment() {
     }
 
     private fun onContactClick(chatListItem: ChatListItem, orderItem: OrderItem) {
-        Timber.d("@@chatListItem: $chatListItem")
-        Timber.d("@@orderItem: $orderItem")
         if (chatListItem.id != 0L && orderItem.traceLogId != 0L) {
             onChatItemClick(chatListItem, orderItem)
         } else {
             viewModel.createOrderChat(chatListItem, orderItem)
         }
+    }
+
+    private fun getProxyUnread(update: ((Int, Boolean) -> Unit)) {
+        viewModel.getProxyOrderUnread(update)
+        viewModel.getChatUnread(update)
     }
 }

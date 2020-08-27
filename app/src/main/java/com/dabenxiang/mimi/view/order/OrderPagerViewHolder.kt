@@ -11,16 +11,11 @@ import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.model.enums.OrderType
 import com.dabenxiang.mimi.view.adapter.ChatHistoryAdapter
-import com.dabenxiang.mimi.view.adapter.FavoriteTabAdapter
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
-import com.dabenxiang.mimi.view.favroite.FavoriteFragment
 import kotlinx.android.synthetic.main.item_order_pager.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
     private val rvTab: RecyclerView = itemView.rv_tab
@@ -32,12 +27,20 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
     private var orderFuncItem: OrderFuncItem? = null
 
     private val tabAdapter by lazy {
-        FavoriteTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
+        ProxyTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
                 setTabPosition(index)
             }
-        }, false)
+        })
     }
+
+    private val tabList by lazy {
+        mutableListOf(
+            Pair(App.self.getString(R.string.topup_proxy_order), false),
+            Pair(App.self.getString(R.string.topup_proxy_chat), false)
+        )
+    }
+
     private val orderAdapter by lazy { OrderAdapter(orderFuncItem) }
     private val chatAdapter by lazy { ChatHistoryAdapter(listener) }
     private val listener = object : ChatHistoryAdapter.EventListener {
@@ -73,14 +76,11 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
                     orderFuncItem.getChatList { list -> updateChatList(list) }
                 }
                 if (rvTab.adapter == null) {
-                    val secondaryList = listOf(
-                        App.self.getString(R.string.topup_proxy_order),
-                        App.self.getString(R.string.topup_proxy_chat)
-                    )
-                    tabAdapter.submitList(secondaryList, 0)
+                    tabAdapter.submitList(tabList, 0)
                     rvTab.adapter = tabAdapter
                 }
                 rvTab.visibility = View.VISIBLE
+                orderFuncItem.getProxyUnread { pos, isNew -> updateUnread(pos, isNew) }
             }
             else -> rvTab.visibility = View.GONE
         }
@@ -145,5 +145,11 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
             1 -> OrderType.USER2ONLINE
             else -> OrderType.MERCHANT2USER
         }
+    }
+
+    private fun updateUnread(position: Int, isNew: Boolean) {
+        val pair = tabList[position]
+        tabList[position] = Pair(pair.first, isNew)
+        tabAdapter.notifyItemChanged(position)
     }
 }
