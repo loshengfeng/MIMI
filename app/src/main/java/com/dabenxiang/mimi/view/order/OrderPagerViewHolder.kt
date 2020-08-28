@@ -18,6 +18,7 @@ import kotlinx.android.synthetic.main.item_order_no_data.view.*
 import kotlinx.android.synthetic.main.item_order_pager.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.util.*
 
 class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
     private val rvTab: RecyclerView = itemView.rv_tab
@@ -48,13 +49,19 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
     private val orderAdapter by lazy { OrderAdapter(orderFuncItem) }
     private val chatAdapter by lazy { ChatHistoryAdapter(listener) }
     private val listener = object : ChatHistoryAdapter.EventListener {
-        override fun onClickListener(item: ChatListItem) {
+        override fun onClickListener(item: ChatListItem, position: Int) {
+            updateChatItem(item, position)
             orderFuncItem?.onChatItemClick?.invoke(item)
         }
 
         override fun onGetAttachment(id: String, position: Int) {
             orderFuncItem?.getChatAttachment?.invoke(id, position) { pos -> updateChatAvatar(pos) }
         }
+    }
+
+    private fun updateChatItem(item: ChatListItem, position: Int) {
+        item.lastReadTime = Date(System.currentTimeMillis())
+        chatAdapter.update(position)
     }
 
     private fun setTabPosition(index: Int) {
