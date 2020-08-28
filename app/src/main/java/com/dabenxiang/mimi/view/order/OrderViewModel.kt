@@ -31,12 +31,6 @@ class OrderViewModel : BaseViewModel() {
     private val _unreadOrderResult = MutableLiveData<ApiResult<Int>>()
     val unreadOrderResult: LiveData<ApiResult<Int>> = _unreadOrderResult
 
-    private val _chatUnreadResult = MutableLiveData<ApiResult<Boolean>>()
-    val chatUnreadResult: LiveData<ApiResult<Boolean>> = _chatUnreadResult
-
-    private val _proxyOrderUnreadResult = MutableLiveData<ApiResult<Boolean>>()
-    val proxyOrderUnreadResult: LiveData<ApiResult<Boolean>> = _proxyOrderUnreadResult
-
     private val _createOrderChatResult = MutableLiveData<ApiResult<Triple<CreateOrderChatItem, ChatListItem, OrderItem>>>()
     val createOrderChatResult: LiveData<ApiResult<Triple<CreateOrderChatItem, ChatListItem, OrderItem>>> = _createOrderChatResult
 
@@ -85,14 +79,9 @@ class OrderViewModel : BaseViewModel() {
     }
 
     private val chatPagingCallback = object : PagingCallback {
-        override fun onLoading() {
-        }
-
-        override fun onLoaded() {
-        }
-
-        override fun onThrowable(throwable: Throwable) {
-        }
+        override fun onLoading() {}
+        override fun onLoaded() {}
+        override fun onThrowable(throwable: Throwable) {}
     }
 
     private fun getChatHistoryPagingItems(): LiveData<PagedList<ChatListItem>> {

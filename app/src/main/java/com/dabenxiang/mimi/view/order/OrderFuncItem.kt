@@ -15,5 +15,6 @@ class OrderFuncItem(
     val onChatItemClick: ((ChatListItem) -> Unit) = { _ -> },
     val getOrderProxyAttachment: ((String, ((String) -> Unit)) -> Unit) = { _, _ -> },
     val onContactClick: ((ChatListItem, OrderItem) -> Unit) = { _, _ -> },
-    val getProxyUnread: (((Int, Boolean) -> Unit) -> Unit) = { _ -> }
+    val getProxyUnread: (((Int, Boolean) -> Unit) -> Unit) = { _ -> },
+    val onTopUpClick: (() -> Unit) = {}
 )
