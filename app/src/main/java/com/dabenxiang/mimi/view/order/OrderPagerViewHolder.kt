@@ -18,7 +18,6 @@ import kotlinx.android.synthetic.main.item_order_no_data.view.*
 import kotlinx.android.synthetic.main.item_order_pager.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
     private val rvTab: RecyclerView = itemView.rv_tab

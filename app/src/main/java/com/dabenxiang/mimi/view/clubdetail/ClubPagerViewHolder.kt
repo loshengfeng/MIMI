@@ -25,7 +25,7 @@ class ClubPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
         position: Int,
         clubDetailFuncItem: ClubDetailFuncItem,
         adultListener: AdultListener
-    ) {
+    ): MemberPostPagedAdapter? {
         onParentFollowClick = clubDetailFuncItem.onFollowClick
 
         swipeRefreshLayout.setColorSchemeColors(swipeRefreshLayout.context.getColor(R.color.color_red_1))
@@ -35,21 +35,24 @@ class ClubPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
 
         if (rvPost.adapter == null || rvPost.tag != position) {
             rvPost.tag = position
-            rvPost.adapter =
-                MemberPostPagedAdapter(
-                    rvPost.context,
-                    adultListener,
-                    "",
-                    MemberPostFuncItem(
-                        onItemClick = {},
-                        getBitmap = clubDetailFuncItem.getBitmap,
-                        onFollowClick = { item, _, isFollow, _ -> onFollowClick(item, isFollow) },
-                        onLikeClick = clubDetailFuncItem.onLikeClick
-                    )
+            val adapter = MemberPostPagedAdapter(
+                rvPost.context,
+                adultListener,
+                "",
+                MemberPostFuncItem(
+                    onItemClick = {},
+                    getBitmap = clubDetailFuncItem.getBitmap,
+                    onFollowClick = { item, _, isFollow, _ -> onFollowClick(item, isFollow) },
+                    onLikeClick = clubDetailFuncItem.onLikeClick
                 )
+            )
+            rvPost.adapter = adapter
+
             clubDetailFuncItem.getMemberPost(getOrderType(position)) { list -> updateList(list) }
             swipeRefreshLayout.isRefreshing = true
+            return adapter
         }
+        return null
     }
 
     private fun onFollowClick(memberPostItem: MemberPostItem, isFollow: Boolean) {
