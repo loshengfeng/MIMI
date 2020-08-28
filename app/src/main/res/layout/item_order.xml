@@ -32,8 +32,8 @@
             android:layout_marginStart="10dp"
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/viewLine">
+            app:layout_constraintTop_toTopOf="@id/iv_type"
+            app:layout_constraintBottom_toBottomOf="@id/iv_type">
 
             <ImageView
                 android:id="@+id/img_avatar"
@@ -88,7 +88,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginStart="10dp"
+            android:layout_marginHorizontal="10dp"
             android:padding="9dp"
             android:textSize="12sp"
             android:textColor="@color/color_red_1"

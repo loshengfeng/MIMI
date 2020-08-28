@@ -6,6 +6,8 @@ import android.content.Intent
 import android.content.pm.PackageInstaller
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.LayoutInflater
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
@@ -21,6 +23,7 @@ import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
+import com.dabenxiang.mimi.model.enums.BottomNavType
 import com.dabenxiang.mimi.model.vo.StatusItem
 import com.dabenxiang.mimi.view.base.BaseActivity
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
@@ -36,6 +39,8 @@ import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.view.setting.SettingFragment
 import com.dabenxiang.mimi.widget.utility.FileUtil.deleteExternalFile
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.google.android.material.bottomnavigation.BottomNavigationItemView
+import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
 import java.util.*
@@ -43,6 +48,8 @@ import java.util.*
 class MainActivity : BaseActivity(), InteractionListener {
 
     private val viewModel: MainViewModel by viewModels()
+
+    private val badgeViewMap = mutableMapOf<BottomNavType, View>()
 
     override fun getLayoutId(): Int {
         return R.layout.activity_main
@@ -74,6 +81,16 @@ class MainActivity : BaseActivity(), InteractionListener {
                 is Error -> Timber.e(it.throwable)
             }
         })
+    }
+
+    private fun addBadgeView(bottomNavType: BottomNavType) {
+        val menuView =
+            bottom_navigation.getChildAt(0) as BottomNavigationMenuView
+        val itemView = menuView.getChildAt(bottomNavType.value) as BottomNavigationItemView
+        val notificationBadge = LayoutInflater.from(this)
+            .inflate(R.layout.custom_menu_badge, menuView, false)
+        badgeViewMap[bottomNavType] = notificationBadge
+        itemView.addView(notificationBadge)
     }
 
     /**
@@ -110,6 +127,10 @@ class MainActivity : BaseActivity(), InteractionListener {
             viewModel.setAdultMode(isAdult)
             setUiMode(isAdult)
         })
+
+        for (type in BottomNavType.values()) {
+            addBadgeView(type)
+        }
     }
 
     private fun setUiMode(isAdult: Boolean) {
