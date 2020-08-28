@@ -14,11 +14,9 @@ import androidx.lifecycle.Observer
 import androidx.navigation.NavDeepLinkBuilder
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
-import com.dabenxiang.mimi.App
-import com.dabenxiang.mimi.NAVIGATE_TO_ACTION
-import com.dabenxiang.mimi.PACKAGE_INSTALLED_ACTION
-import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.*
 import com.dabenxiang.mimi.extension.setupWithNavController
+import com.dabenxiang.mimi.extension.switchTab
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -254,6 +252,8 @@ class MainActivity : BaseActivity(), InteractionListener {
             val dest = intent.getIntExtra(PlayerActivity.KEY_DEST_ID, 0)
             if (dest != 0)
                 Navigation.findNavController(this, R.id.nav_host_fragment).navigate(dest, extras)
+        } else if(NAVIGATE_TO_TOPUP_ACTION == intent?.action){
+            bottom_navigation.switchTab(2)
         }
     }
 

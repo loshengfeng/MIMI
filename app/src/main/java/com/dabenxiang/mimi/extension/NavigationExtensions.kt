@@ -39,6 +39,8 @@ import timber.log.Timber
  */
 
 var firstFragmentGraphId = 0
+// Map of tags
+val graphIdToTagMap = SparseArray<String>()
 
 fun BottomNavigationView.setupWithNavController(
     navGraphIds: List<Int>,
@@ -50,8 +52,6 @@ fun BottomNavigationView.setupWithNavController(
     onEmailUnconfirmed: () -> Unit
 ): LiveData<NavController> {
 
-    // Map of tags
-    val graphIdToTagMap = SparseArray<String>()
     // Result. Mutable live data with the selected controlled
     val selectedNavController = MutableLiveData<NavController>()
 
@@ -310,3 +310,13 @@ private fun FragmentManager.isOnBackStack(backStackName: String): Boolean {
 private fun getFragmentTag(index: Int) = "bottomNavigation#$index"
 private fun getIndex(fragmentTag: String) =
     fragmentTag.substringAfter("bottomNavigation#").toInt()
+
+fun BottomNavigationView.switchTab(index:Int){
+    val tag = getFragmentTag(index)
+    graphIdToTagMap.forEach { key, value ->
+        Timber.i("switchTab key= $key    value=$value")
+        if(value == tag){
+            this.selectedItemId =key
+        }
+    }
+}

@@ -124,12 +124,6 @@ class HomeViewModel : BaseViewModel() {
     private val _followResult = MutableLiveData<ApiResult<Nothing>>()
     val followResult: LiveData<ApiResult<Nothing>> = _followResult
 
-    private var _deletePostResult = MutableLiveData<ApiResult<Int>>()
-    val deletePostResult: LiveData<ApiResult<Int>> = _deletePostResult
-
-    private val _cleanRemovedPosList = MutableLiveData<Nothing>()
-    val cleanRemovedPosList: LiveData<Nothing> = _cleanRemovedPosList
-
     private var job = Job()
 
     fun loadNestedStatisticsListForCarousel(position: Int, src: HomeTemplate.Carousel, isAdult: Boolean = false) {
@@ -481,7 +475,7 @@ class HomeViewModel : BaseViewModel() {
         override fun onTotalCount(count: Long, isInitial: Boolean) {
             totalCount = if (isInitial) count.toInt()
             else totalCount.plus(count.toInt())
-            if(isInitial) _cleanRemovedPosList.value = null
+            if(isInitial) cleanRemovedPosList()
         }
     }
 
@@ -578,25 +572,6 @@ class HomeViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _postArticleResult.value = it }
-        }
-    }
-
-    fun deletePost(
-        item: MemberPostItem,
-        items: ArrayList<MemberPostItem>
-    ) {
-        viewModelScope.launch {
-            flow {
-                val apiRepository = domainManager.getApiRepository()
-                val result = apiRepository.deleteMyPost(item.id)
-                if (!result.isSuccessful) throw HttpException(result)
-                val position = items.indexOf(item)
-                items.remove(item)
-                emit(ApiResult.success(position))
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _deletePostResult.value = it }
         }
     }
 

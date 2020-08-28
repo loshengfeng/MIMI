@@ -464,7 +464,7 @@ class PlayerViewModel : BaseViewModel() {
             when {
                 costPoint == 0L || isDeducted -> VideoConsumeResult.PAID
                 else -> when {
-                    availablePoint > costPoint -> VideoConsumeResult.PAID_YET
+                    availablePoint >= costPoint -> VideoConsumeResult.PAID_YET
                     else -> VideoConsumeResult.POINT_NOT_ENOUGH
                 }
             }
