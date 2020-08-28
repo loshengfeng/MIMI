@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.MQTT_HOST_URL
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.enums.OrderType
 import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager
 import com.dabenxiang.mimi.model.manager.mqtt.callback.ConnectCallback
 import com.dabenxiang.mimi.model.manager.mqtt.callback.ExtendedCallback
@@ -56,6 +57,9 @@ class MainViewModel : BaseViewModel() {
 
     private val _orderItem = MutableLiveData<OrderItem>()
     val orderItem: LiveData<OrderItem> = _orderItem
+
+    private val _totalUnreadResult = MutableLiveData<ApiResult<Int>>()
+    val totalUnreadResult: LiveData<ApiResult<Int>> = _totalUnreadResult
 
     private var _normal: CategoriesItem? = null
     val normal
@@ -291,4 +295,20 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
+    fun getTotalUnread(){
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val chatUnreadResult = apiRepository.getUnread()
+                val chatUnread = if (!chatUnreadResult.isSuccessful) 0 else chatUnreadResult.body()?.content?: 0
+                val orderUnreadResult = apiRepository.getUnReadOrderCount()
+                val orderUnread = if (!orderUnreadResult.isSuccessful) 0 else orderUnreadResult.body()?.content?: 0
+                emit(ApiResult.success(chatUnread + orderUnread))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _totalUnreadResult.value = it }
+        }
+    }
 }

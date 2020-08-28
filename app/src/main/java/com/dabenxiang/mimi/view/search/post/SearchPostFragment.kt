@@ -53,6 +53,16 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_post.*
+import kotlinx.android.synthetic.main.fragment_search_post.chip_group_search_text
+import kotlinx.android.synthetic.main.fragment_search_post.edit_search
+import kotlinx.android.synthetic.main.fragment_search_post.ib_back
+import kotlinx.android.synthetic.main.fragment_search_post.iv_clean
+import kotlinx.android.synthetic.main.fragment_search_post.iv_clear_search_text
+import kotlinx.android.synthetic.main.fragment_search_post.layout_search_history
+import kotlinx.android.synthetic.main.fragment_search_post.layout_search_text
+import kotlinx.android.synthetic.main.fragment_search_post.tv_search
+import kotlinx.android.synthetic.main.fragment_search_post.tv_search_text
+import kotlin.collections.ArrayList
 
 class SearchPostFragment : BaseFragment() {
 
@@ -78,6 +88,7 @@ class SearchPostFragment : BaseFragment() {
     private var concatAdapter: ConcatAdapter? = null
     private var memberPostAdapter: MemberPostPagedAdapter? = null
     private var videoListAdapter: SearchVideoAdapter? = null
+    private var hybridItemsCount: Long = -1L
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -227,7 +238,15 @@ class SearchPostFragment : BaseFragment() {
         })
 
         viewModel.searchTotalCount.observe(viewLifecycleOwner, Observer { count ->
-            tv_search_text.text = getSearchText(currentPostType, searchKeyword, count, isPostFollow)
+            if(currentPostType == PostType.HYBRID) {
+                if(hybridItemsCount == -1L)
+                    hybridItemsCount = count
+                else {
+                    tv_search_text.text = getSearchText(currentPostType, searchKeyword, hybridItemsCount + count, isPostFollow)
+                    hybridItemsCount = -1L
+                }
+            } else
+                tv_search_text.text = getSearchText(currentPostType, searchKeyword, count, isPostFollow)
         })
 
         viewModel.clubItemListResult.observe(viewLifecycleOwner, Observer {
@@ -324,6 +343,7 @@ class SearchPostFragment : BaseFragment() {
                 getSearchHistory()
                 (concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).submitList(null)
                 clubMemberAdapter.submitList(null)
+                (concatAdapter?.adapters?.get(1) as SearchVideoAdapter).submitList(null)
             }
         }
     }

@@ -2,10 +2,10 @@ package com.dabenxiang.mimi.view.ranking
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.PostStatisticsItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.StatisticsType
+import com.dabenxiang.mimi.model.manager.DomainManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -35,21 +35,21 @@ class RankingDataSource constructor(
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository()
-                    .getRankingList(statisticsType= statisticsType, postType =postType, offset = "0", limit = PER_LIMIT)
+                    .getRankingList(
+                        statisticsType = statisticsType,
+                        postType = postType,
+                        offset = "0",
+                        limit = PER_LIMIT
+                    )
                 if (!result.isSuccessful) throw HttpException(result)
-                val item = result.body()
-                val clubs = item?.content
-
-                val nextPageKey = when {
-                    hasNextPage(
-                        item?.paging?.count ?: 0,
-                        item?.paging?.offset ?: 0,
-                        clubs?.size ?: 0
-                    ) -> PER_LIMIT_LONG
-                    else -> null
+                val items = result.body()?.content
+                items?.forEach {
+                    val resultPost = domainManager.getApiRepository().getMemberPostDetail(it.id)
+                    if (!resultPost.isSuccessful) throw HttpException(resultPost)
+                    val itemPost = resultPost.body()?.content?: throw HttpException(resultPost)
+                    it.detail = itemPost
                 }
-                emit(InitResult(clubs ?: arrayListOf(), nextPageKey))
-
+                emit(InitResult(items ?: arrayListOf(), null))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> pagingCallback.onThrowable(e) }
@@ -60,50 +60,17 @@ class RankingDataSource constructor(
         }
     }
 
-    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Long, PostStatisticsItem>) {
+    override fun loadBefore(
+        params: LoadParams<Long>,
+        callback: LoadCallback<Long, PostStatisticsItem>
+    ) {
         Timber.d("loadBefore")
     }
 
-    override fun loadAfter(params: LoadParams<Long>, callback: LoadCallback<Long, PostStatisticsItem>) {
+    override fun loadAfter(
+        params: LoadParams<Long>,
+        callback: LoadCallback<Long, PostStatisticsItem>
+    ) {
         Timber.d("loadAfter")
-        val next = params.key
-        viewModelScope.launch {
-            flow {
-                val result =
-                    domainManager.getApiRepository().getRankingList(statisticsType= statisticsType,
-                        postType = postType, offset = next.toString(), limit = PER_LIMIT)
-                if (!result.isSuccessful) throw HttpException(result)
-                emit(result)
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { e -> pagingCallback.onThrowable(e) }
-                .onCompletion { pagingCallback.onLoaded() }
-                .collect { response ->
-                    response.body()?.also { item ->
-                        item.content?.also { list ->
-                            val nextPageKey = when {
-                                hasNextPage(
-                                    item.paging.count,
-                                    item.paging.offset,
-                                    list.size
-                                ) -> next + PER_LIMIT_LONG
-                                else -> null
-                            }
-
-                            callback.onResult(list, nextPageKey)
-                        }
-                    }
-                }
-        }
-    }
-
-    private fun hasNextPage(total: Long, offset: Long, currentSize: Int): Boolean {
-        // Spec: Only show 10 data
-        return false
-//        return when {
-//            currentSize < PER_LIMIT_LONG -> false
-//            offset >= total -> false
-//            else -> true
-//        }
     }
 }
