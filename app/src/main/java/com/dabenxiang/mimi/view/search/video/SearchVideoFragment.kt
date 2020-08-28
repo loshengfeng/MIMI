@@ -93,7 +93,6 @@ class SearchVideoFragment : BaseFragment() {
 
             if (data.tag.isNotBlank()) {
                 viewModel.searchingTag = data.tag
-                tv_search_text.text = genResultText()
                 viewModel.getSearchList()
             }
 
@@ -211,7 +210,6 @@ class SearchVideoFragment : BaseFragment() {
         })
 
         viewModel.searchingListResult.observe(viewLifecycleOwner, Observer {
-            tv_search_text.text = genResultText()
             videoListAdapter.submitList(it)
         })
 

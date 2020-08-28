@@ -137,7 +137,7 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
                 )
             }
 
-            if (getProfile().userId == 0L) {
+            if (getProfile().userId == 0L || getProfile().account != userName) {
                 val meResult = domainManager.getApiRepository().getMe()
                 if (!meResult.isSuccessful) throw HttpException(meResult)
 
