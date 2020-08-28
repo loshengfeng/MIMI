@@ -69,7 +69,9 @@ class TopUpFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.getTotalUnread()
+        if(BuildConfig.DEBUG) { //TODO: Order
+            viewModel.getTotalUnread()
+        }
     }
 
     override fun getLayoutId(): Int {
@@ -287,6 +289,10 @@ class TopUpFragment : BaseFragment() {
 
     override fun initSettings() {
         rg_type.check(R.id.rb_online_pay)
+
+        if(!BuildConfig.DEBUG) { //TODO: Order
+            tv_record_top_up.visibility = View.GONE
+        }
 
         when (viewModel.isLogin()) {
             true -> {

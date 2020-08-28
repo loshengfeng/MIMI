@@ -88,7 +88,9 @@ class MainActivity : BaseActivity(), InteractionListener {
             }
         })
 
-        viewModel.getTotalUnread()
+        if(BuildConfig.DEBUG) { //TODO: Order
+            viewModel.getTotalUnread()
+        }
     }
 
     private fun addBadgeView(bottomNavType: BottomNavType) {
