@@ -32,7 +32,7 @@ class HomeClubAdapter(
     }
 
     override fun getItemCount(): Int {
-        return memberClubItems.size
+        return if(memberClubItems.size > 10) 10 else memberClubItems.size
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {

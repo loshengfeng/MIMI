@@ -120,7 +120,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="46dp"
             android:src="@drawable/ico_new"
-            android:visibility="visible"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/tv_topup_history"
             app:layout_constraintEnd_toEndOf="@id/tv_topup_history"
             app:layout_constraintTop_toTopOf="@id/tv_topup_history"

@@ -51,7 +51,9 @@ class PersonalFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.getTotalUnread()
+        if(BuildConfig.DEBUG) { //TODO: Order
+            viewModel.getTotalUnread()
+        }
     }
 
     override fun setupObservers() {
@@ -190,6 +192,9 @@ class PersonalFragment : BaseFragment() {
         tv_version_is_login.text = BuildConfig.VERSION_NAME
         tv_version_is_not_login.text = BuildConfig.VERSION_NAME
         tv_topup.visibility = View.INVISIBLE
+        if(!BuildConfig.DEBUG) { //TODO: Order
+            tv_topup_history.visibility = View.GONE
+        }
 
         when (viewModel.isLogin()) {
             true -> {

@@ -86,12 +86,8 @@ class MQTTManager(val context: Context, private val pref: Pref) {
 
     private val defaultMqttCallback by lazy {
         object : IMqttActionListener {
-            override fun onSuccess(asyncActionToken: IMqttToken?) {
-                Timber.d("@@onSuccess")
-            }
-            override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                Timber.e("@@onFailure: $exception")
-            }
+            override fun onSuccess(asyncActionToken: IMqttToken?) {}
+            override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {}
         }
     }
 
