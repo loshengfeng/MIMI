@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import retrofit2.HttpException
+import timber.log.Timber
 import java.util.*
 
 class AccountManager(private val pref: Pref, private val domainManager: DomainManager) {
@@ -191,6 +192,6 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
 
     fun logoutLocal() {
         pref.clearMemberToken()
-        pref.clearProfile()
+        if(!keepAccount) pref.clearProfile()
     }
 }
