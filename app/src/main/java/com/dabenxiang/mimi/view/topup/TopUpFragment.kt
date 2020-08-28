@@ -290,10 +290,6 @@ class TopUpFragment : BaseFragment() {
     override fun initSettings() {
         rg_type.check(R.id.rb_online_pay)
 
-        if(!BuildConfig.DEBUG) { //TODO: Order
-            tv_record_top_up.visibility = View.GONE
-        }
-
         when (viewModel.isLogin()) {
             true -> {
                 //TODO: 目前先不判斷是否有驗證過
@@ -310,6 +306,10 @@ class TopUpFragment : BaseFragment() {
     }
 
     private fun initTopUp() {
+        if(BuildConfig.DEBUG) { //TODO: Order
+            tv_record_top_up.visibility = View.VISIBLE
+        }
+
         item_is_Login.visibility = View.VISIBLE
         item_is_not_Login.visibility = View.GONE
 
