@@ -1,5 +1,7 @@
 package com.dabenxiang.mimi.view.order
 
+import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -8,6 +10,7 @@ import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavDeepLinkBuilder
 import androidx.paging.PagingData
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
@@ -17,6 +20,8 @@ import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
+import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.main.MainActivity
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_order.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
@@ -53,14 +58,24 @@ class OrderFragment : BaseFragment() {
                 onChatItemClick = { item -> onChatItemClick(item) },
                 getOrderProxyAttachment = { id, update -> viewModel.getProxyAttachment(id, update) },
                 onContactClick = { chatListItem, orderItem -> onContactClick(chatListItem, orderItem) },
-                getProxyUnread = { update -> getProxyUnread(update) }
+                getProxyUnread = { update -> getProxyUnread(update) },
+                onTopUpClick = { onTopUpClick() }
             ))
     }
 
-
-
     override val bottomNavigationVisibility: Int
         get() = View.GONE
+
+    private var interactionListener: InteractionListener? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        try {
+            interactionListener = context as InteractionListener
+        } catch (e: ClassCastException) {
+            Timber.e("OrderFragment interaction listener can't cast")
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -197,5 +212,14 @@ class OrderFragment : BaseFragment() {
     private fun getProxyUnread(update: ((Int, Boolean) -> Unit)) {
         viewModel.getProxyOrderUnread(update)
         viewModel.getChatUnread(update)
+    }
+
+    private fun onTopUpClick() {
+        NavDeepLinkBuilder(requireContext())
+            .setComponentName(MainActivity::class.java)
+            .setGraph(R.navigation.navigation_topup)
+            .setDestination(R.id.topupFragment)
+            .createPendingIntent()
+            .send()
     }
 }

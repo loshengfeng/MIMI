@@ -5,7 +5,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
-import kotlinx.android.synthetic.main.item_tab.view.*
 import kotlinx.android.synthetic.main.item_tab.view.iv_selected
 import kotlinx.android.synthetic.main.item_tab.view.tv_title
 import kotlinx.android.synthetic.main.item_tab_favorite_secondary.view.*

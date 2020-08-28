@@ -8,19 +8,25 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.PROJECT_NAME
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ExceptionResult
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.manager.DomainManager
-import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager
 import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getExceptionDetail
 import com.google.gson.Gson
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import retrofit2.HttpException
 import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
+import java.util.*
 
 abstract class BaseViewModel : ViewModel(), KoinComponent {
 
@@ -83,6 +89,35 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
 
     fun getMeAvatar(): ByteArray? {
         return accountManager.getMeAvatarCache()
+    }
+
+    private var _deletePostResult = MutableLiveData<ApiResult<Int>>()
+    val deletePostResult: LiveData<ApiResult<Int>> = _deletePostResult
+
+    private val _cleanRemovedPosList = MutableLiveData<Nothing>()
+    val cleanRemovedPosList: LiveData<Nothing> = _cleanRemovedPosList
+
+    fun deletePost(
+        item: MemberPostItem,
+        items: ArrayList<MemberPostItem>
+    ) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.deleteMyPost(item.id)
+                if (!result.isSuccessful) throw HttpException(result)
+                val position = items.indexOf(item)
+                items.remove(item)
+                emit(ApiResult.success(position))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _deletePostResult.value = it }
+        }
+    }
+
+    fun cleanRemovedPosList() {
+        _cleanRemovedPosList.value = null
     }
 
 }

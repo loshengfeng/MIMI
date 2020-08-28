@@ -23,7 +23,6 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.ApiResult.*
-import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
@@ -45,8 +44,6 @@ import com.dabenxiang.mimi.view.club.ClubFuncItem
 import com.dabenxiang.mimi.view.club.ClubMemberAdapter
 import com.dabenxiang.mimi.view.club.MiMiLinearLayoutManager
 import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
-import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
-import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
@@ -65,7 +62,6 @@ import kotlinx.android.synthetic.main.fragment_search_post.layout_search_history
 import kotlinx.android.synthetic.main.fragment_search_post.layout_search_text
 import kotlinx.android.synthetic.main.fragment_search_post.tv_search
 import kotlinx.android.synthetic.main.fragment_search_post.tv_search_text
-import timber.log.Timber
 import kotlin.collections.ArrayList
 
 class SearchPostFragment : BaseFragment() {
@@ -80,8 +76,6 @@ class SearchPostFragment : BaseFragment() {
     }
 
     private val viewModel: SearchPostViewModel by viewModels()
-
-    private var moreDialog: MoreDialogFragment? = null
 
     private var currentPostType: PostType = PostType.TEXT
     private var mTag: String = ""
@@ -292,6 +286,22 @@ class SearchPostFragment : BaseFragment() {
                 is Success -> (concatAdapter?.adapters?.get(1) as SearchVideoAdapter).notifyDataSetChanged()
                 is Error -> onApiError(it.throwable)
             }
+        })
+
+        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, {
+            when (it) {
+                is Success -> {
+                    memberPostAdapter?.also { adapter ->
+                        adapter.removedPosList.add(it.result)
+                        adapter.notifyItemChanged(it.result)
+                    }
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.cleanRemovedPosList.observe(viewLifecycleOwner, {
+            memberPostAdapter?.removedPosList?.clear()
         })
     }
 
@@ -531,17 +541,6 @@ class SearchPostFragment : BaseFragment() {
         )
     }
 
-    private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-        override fun onProblemReport(item: BaseMemberPostItem) {
-            moreDialog?.dismiss()
-            checkStatus { (requireActivity() as MainActivity).showReportDialog(item) }
-        }
-
-        override fun onCancel() {
-            moreDialog?.dismiss()
-        }
-    }
-
     private val adultListener = object : AdultListener {
         override fun onFollowPostClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
             checkStatus { viewModel.followPost(item, position, isFollow) }
@@ -587,11 +586,14 @@ class SearchPostFragment : BaseFragment() {
             }
         }
 
-        override fun onMoreClick(item: MemberPostItem) {
-            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
-                it.show(
-                    requireActivity().supportFragmentManager,
-                    MoreDialogFragment::class.java.simpleName
+        override fun onMoreClick(item: MemberPostItem, items:List<MemberPostItem>) {
+            memberPostAdapter?.also {
+                onMoreClick(
+                    item,
+                    ArrayList(items),
+                    onEdit = {
+                        // TODO #1180
+                    }
                 )
             }
         }
@@ -635,7 +637,7 @@ class SearchPostFragment : BaseFragment() {
             val memberPostItemList = arrayListOf<MemberPostItem>()
             while (iterator.hasNext()) {
                 val data = iterator.next()
-                if(data.type != PostType.AD) memberPostItemList.add(data)
+                if (data.type != PostType.AD) memberPostItemList.add(data)
             }
             val mappingPosition = position - (position / 3)
             val bundle = ClipFragment.createBundle(ArrayList(memberPostItemList), mappingPosition)

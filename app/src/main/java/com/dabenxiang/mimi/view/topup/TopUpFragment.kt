@@ -33,6 +33,9 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_top_up.*
+import kotlinx.android.synthetic.main.fragment_top_up.iv_photo
+import kotlinx.android.synthetic.main.fragment_top_up.tv_name
+import kotlinx.android.synthetic.main.item_personal_is_login.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import timber.log.Timber
 
@@ -62,6 +65,11 @@ class TopUpFragment : BaseFragment() {
             interactionListener?.changeNavigationPosition(R.id.navigation_home)
         }
         initSettings()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.getTotalUnread()
     }
 
     override fun getLayoutId(): Int {
@@ -190,6 +198,16 @@ class TopUpFragment : BaseFragment() {
                 tv_proxy_empty.visibility = View.VISIBLE
             } else {
                 tv_proxy_empty.visibility = View.GONE
+            }
+        })
+
+        viewModel.totalUnreadResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    iv_new_badge.visibility = if (it.result == 0) View.INVISIBLE else View.VISIBLE
+                    interactionListener?.refreshBottomNavigationBadge(it.result)
+                }
+                is Error -> onApiError(it.throwable)
             }
         })
     }
