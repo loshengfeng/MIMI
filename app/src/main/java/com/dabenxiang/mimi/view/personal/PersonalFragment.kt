@@ -51,7 +51,7 @@ class PersonalFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.getUnread()
+        viewModel.getTotalUnread()
     }
 
     override fun setupObservers() {
@@ -123,7 +123,17 @@ class PersonalFragment : BaseFragment() {
         viewModel.unreadResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-//                    tv_new.visibility = if (it.result == 0) View.INVISIBLE else View.VISIBLE
+                    tv_new.visibility = if (it.result == 0) View.INVISIBLE else View.VISIBLE
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.totalUnreadResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    iv_new.visibility = if (it.result == 0) View.INVISIBLE else View.VISIBLE
+                    interactionListener?.refreshBottomNavigationBadge(it.result)
                 }
                 is Error -> onApiError(it.throwable)
             }

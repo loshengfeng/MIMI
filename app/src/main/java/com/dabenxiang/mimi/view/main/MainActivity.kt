@@ -79,6 +79,16 @@ class MainActivity : BaseActivity(), InteractionListener {
                 is Error -> Timber.e(it.throwable)
             }
         })
+
+        viewModel.totalUnreadResult.observe(this, Observer {
+            when(it) {
+                is Success -> {
+                    refreshBottomNavigationBadge(it.result)
+                }
+            }
+        })
+
+        viewModel.getTotalUnread()
     }
 
     private fun addBadgeView(bottomNavType: BottomNavType) {
@@ -152,6 +162,13 @@ class MainActivity : BaseActivity(), InteractionListener {
     override fun setAdult(isAdult: Boolean) {
         viewModel.setAdultMode(isAdult)
         setUiMode(isAdult)
+    }
+
+    override fun refreshBottomNavigationBadge(unreadCount: Int) {
+        Timber.d("@@refreshBottomNavigationBadge: $unreadCount")
+        val visibility = takeIf { unreadCount > 0 }?.let { View.VISIBLE } ?: let { View.GONE }
+        badgeViewMap[BottomNavType.TOPUP]?.visibility = visibility
+        badgeViewMap[BottomNavType.PERSONAL]?.visibility = visibility
     }
 
     @SuppressLint("RestrictedApi")
