@@ -9,3 +9,4 @@ const val APK_NAME = "MiMi.apk"
 const val PACKAGE_INSTALLED_ACTION =
     "com.example.android.apis.content.SESSION_API_PACKAGE_INSTALLED"
 const val NAVIGATE_TO_ACTION = "NAVIGATE_TO_ACTION"
+const val NAVIGATE_TO_TOPUP_ACTION = "NAVIGATE_TO_TOPUP_ACTION"

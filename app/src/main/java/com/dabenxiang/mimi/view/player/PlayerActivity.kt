@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.LinearSnapHelper
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.NAVIGATE_TO_ACTION
+import com.dabenxiang.mimi.NAVIGATE_TO_TOPUP_ACTION
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.addKeyboardToggleListener
 import com.dabenxiang.mimi.extension.handleException
@@ -44,6 +45,7 @@ import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
+import com.dabenxiang.mimi.view.topup.TopUpFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.OrientationDetector
 import com.google.android.exoplayer2.*
@@ -105,6 +107,7 @@ class PlayerActivity : BaseActivity() {
     private var reportDialog: ReportDialogFragment? = null
     private var isFirstInit = true
     private var isKeyboardShown = false
+    private var oldPlayerItem: PlayerItem = PlayerItem(-1, false)
 
     private val sourceListAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
@@ -133,6 +136,7 @@ class PlayerActivity : BaseActivity() {
 //                startActivity(intent)
 //
 //                finish()
+                oldPlayerItem = PlayerItem(viewModel.videoId, obtainIsAdult())
                 isFirstInit = true
                 player?.clearVideoDecoderOutputBufferRenderer()
                 player?.stop()
@@ -1660,7 +1664,16 @@ class PlayerActivity : BaseActivity() {
                 isHtml = true,
                 message = getString(R.string.point_not_enough_message),
                 firstBtn = getString(R.string.btn_cancel),
-                secondBtn = getString(R.string.recharge)
+                secondBtn = getString(R.string.recharge),
+                secondBlock = {
+                    val bundle = Bundle()
+                    navigateTo(
+                        MainActivity::class.java,
+                        R.id.navigation_topup,
+                        bundle,
+                        NAVIGATE_TO_TOPUP_ACTION
+                    )
+                }
             )
         )
             .setCancel(false)
@@ -1681,6 +1694,13 @@ class PlayerActivity : BaseActivity() {
                 isHtml = true,
                 message = message,
                 firstBtn = getString(R.string.btn_cancel),
+                firstBlock = {
+                    isFirstInit = true
+                    player?.clearVideoDecoderOutputBufferRenderer()
+                    player?.stop()
+                    viewModel.clearStreamData()
+                    loadVideo(oldPlayerItem)
+                    viewModel.setupCommentDataSource(playerInfoAdapter)},
                 secondBtn = getString(R.string.btn_confirm),
                 secondBlock = { viewModel.getStreamUrl(obtainIsAdult()) }
             )
@@ -1759,10 +1779,11 @@ class PlayerActivity : BaseActivity() {
     private fun navigateTo(
         activity: Class<out Activity>,
         destId: Int,
-        bundle: Bundle
+        bundle: Bundle,
+        action: String = NAVIGATE_TO_ACTION
     ) {
         var intent = Intent(this, activity)
-        intent.setAction(NAVIGATE_TO_ACTION)
+        intent.setAction(action)
         intent.putExtras(bundle)
         intent.putExtra(KEY_DEST_ID, destId)
         startActivity(intent)
