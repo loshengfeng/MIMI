@@ -65,6 +65,7 @@ import kotlinx.android.synthetic.main.fragment_search_post.layout_search_history
 import kotlinx.android.synthetic.main.fragment_search_post.layout_search_text
 import kotlinx.android.synthetic.main.fragment_search_post.tv_search
 import kotlinx.android.synthetic.main.fragment_search_post.tv_search_text
+import timber.log.Timber
 import kotlin.collections.ArrayList
 
 class SearchPostFragment : BaseFragment() {
@@ -93,6 +94,7 @@ class SearchPostFragment : BaseFragment() {
     private var concatAdapter: ConcatAdapter? = null
     private var memberPostAdapter: MemberPostPagedAdapter? = null
     private var videoListAdapter: SearchVideoAdapter? = null
+    private var hybridItemsCount: Long = -1L
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -242,7 +244,15 @@ class SearchPostFragment : BaseFragment() {
         })
 
         viewModel.searchTotalCount.observe(viewLifecycleOwner, Observer { count ->
-            tv_search_text.text = getSearchText(currentPostType, searchKeyword, count, isPostFollow)
+            if(currentPostType == PostType.HYBRID) {
+                if(hybridItemsCount == -1L)
+                    hybridItemsCount = count
+                else {
+                    tv_search_text.text = getSearchText(currentPostType, searchKeyword, hybridItemsCount + count, isPostFollow)
+                    hybridItemsCount = -1L
+                }
+            } else
+                tv_search_text.text = getSearchText(currentPostType, searchKeyword, count, isPostFollow)
         })
 
         viewModel.clubItemListResult.observe(viewLifecycleOwner, Observer {
