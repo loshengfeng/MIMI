@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.order
 
 import android.view.View
+import android.widget.TextView
 import androidx.paging.PagedList
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.RecyclerView
@@ -11,33 +12,39 @@ import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.model.enums.OrderType
 import com.dabenxiang.mimi.view.adapter.ChatHistoryAdapter
-import com.dabenxiang.mimi.view.adapter.FavoriteTabAdapter
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
-import com.dabenxiang.mimi.view.favroite.FavoriteFragment
+import kotlinx.android.synthetic.main.item_order_no_data.view.*
 import kotlinx.android.synthetic.main.item_order_pager.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
     private val rvTab: RecyclerView = itemView.rv_tab
     private val swipeRefreshLayout: SwipeRefreshLayout = itemView.swipeRefreshLayout
     private val rvOrder: RecyclerView = itemView.rv_order
     private val rvChat: RecyclerView = itemView.rv_chat
-    private val clNoData: View = itemView.item_no_data
+    private val itemOrderNoData: View = itemView.item_order_no_data
+    private val itemChatNoData: View = itemView.item_chat_no_data
+    private val tvTopUp: TextView = itemView.tv_topup
 
     private var orderFuncItem: OrderFuncItem? = null
 
     private val tabAdapter by lazy {
-        FavoriteTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
+        ProxyTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
                 setTabPosition(index)
             }
-        }, false)
+        })
     }
+
+    private val tabList by lazy {
+        mutableListOf(
+            Pair(App.self.getString(R.string.topup_proxy_order), false),
+            Pair(App.self.getString(R.string.topup_proxy_chat), false)
+        )
+    }
+
     private val orderAdapter by lazy { OrderAdapter(orderFuncItem) }
     private val chatAdapter by lazy { ChatHistoryAdapter(listener) }
     private val listener = object : ChatHistoryAdapter.EventListener {
@@ -56,10 +63,18 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
             0 -> {
                 rvOrder.visibility = View.VISIBLE
                 rvChat.visibility = View.GONE
+                itemChatNoData.visibility = View.GONE
+                itemOrderNoData.visibility =
+                    takeIf { orderAdapter.currentList?.size ?: 0 > 0 }?.let { View.GONE }
+                        ?: let { View.VISIBLE }
             }
             else -> {
                 rvOrder.visibility = View.GONE
                 rvChat.visibility = View.VISIBLE
+                itemOrderNoData.visibility = View.GONE
+                itemChatNoData.visibility =
+                    takeIf { chatAdapter.currentList?.size ?: 0 > 0 }?.let { View.GONE }
+                        ?: let { View.VISIBLE }
             }
         }
     }
@@ -73,14 +88,11 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
                     orderFuncItem.getChatList { list -> updateChatList(list) }
                 }
                 if (rvTab.adapter == null) {
-                    val secondaryList = listOf(
-                        App.self.getString(R.string.topup_proxy_order),
-                        App.self.getString(R.string.topup_proxy_chat)
-                    )
-                    tabAdapter.submitList(secondaryList, 0)
+                    tabAdapter.submitList(tabList, 0)
                     rvTab.adapter = tabAdapter
                 }
                 rvTab.visibility = View.VISIBLE
+                orderFuncItem.getProxyUnread { pos, isNew -> updateUnread(pos, isNew) }
             }
             else -> rvTab.visibility = View.GONE
         }
@@ -94,6 +106,8 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         swipeRefreshLayout.setOnRefreshListener {
+            itemOrderNoData.visibility = View.GONE
+            itemChatNoData.visibility = View.GONE
             when(position) {
                 2 -> {
                     when(tabAdapter.getSelectedPosition()) {
@@ -113,12 +127,16 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
                     }
             }
         }
+
+        tvTopUp.setOnClickListener {
+            orderFuncItem.onTopUpClick.invoke()
+        }
     }
 
     private fun updateOrderList2(list: PagedList<OrderItem>) {
         swipeRefreshLayout.isRefreshing = false
         orderAdapter.submitList(list)
-        clNoData.visibility = takeIf { list.size > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
+        itemOrderNoData.visibility = takeIf { list.size > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
     }
 
     private fun updateOrderList3(data: PagingData<OrderItem>, coroutineScope: CoroutineScope) {
@@ -132,7 +150,7 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
     private fun updateChatList(list: PagedList<ChatListItem>) {
         swipeRefreshLayout.isRefreshing = false
         chatAdapter.submitList(list)
-        clNoData.visibility = takeIf { list.size > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
+        itemChatNoData.visibility = takeIf { list.size > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
     }
 
     private fun updateChatAvatar(position: Int) {
@@ -145,5 +163,11 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
             1 -> OrderType.USER2ONLINE
             else -> OrderType.MERCHANT2USER
         }
+    }
+
+    private fun updateUnread(position: Int, isNew: Boolean) {
+        val pair = tabList[position]
+        tabList[position] = Pair(pair.first, isNew)
+        tabAdapter.notifyItemChanged(position)
     }
 }
