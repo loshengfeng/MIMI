@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.search.post
 
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.SpannableStringBuilder
@@ -9,12 +10,14 @@ import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.ImageView
 import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
@@ -23,11 +26,15 @@ import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
+import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter
+import com.dabenxiang.mimi.view.adapter.SearchVideoAdapter
 import com.dabenxiang.mimi.view.adapter.viewHolder.ClipPostHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.TextPostHolder
@@ -42,11 +49,23 @@ import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
+import com.dabenxiang.mimi.view.player.PlayerActivity
+import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_post.*
+import kotlinx.android.synthetic.main.fragment_search_post.chip_group_search_text
+import kotlinx.android.synthetic.main.fragment_search_post.edit_search
+import kotlinx.android.synthetic.main.fragment_search_post.ib_back
+import kotlinx.android.synthetic.main.fragment_search_post.iv_clean
+import kotlinx.android.synthetic.main.fragment_search_post.iv_clear_search_text
+import kotlinx.android.synthetic.main.fragment_search_post.layout_search_history
+import kotlinx.android.synthetic.main.fragment_search_post.layout_search_text
+import kotlinx.android.synthetic.main.fragment_search_post.tv_search
+import kotlinx.android.synthetic.main.fragment_search_post.tv_search_text
+import kotlin.collections.ArrayList
 
 class SearchPostFragment : BaseFragment() {
 
@@ -71,7 +90,9 @@ class SearchPostFragment : BaseFragment() {
     private var isPostFollow: Boolean = false
     private var isClub: Boolean = false
 
-    private var adapter: MemberPostPagedAdapter? = null
+    private var concatAdapter: ConcatAdapter? = null
+    private var memberPostAdapter: MemberPostPagedAdapter? = null
+    private var videoListAdapter: SearchVideoAdapter? = null
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -105,16 +126,20 @@ class SearchPostFragment : BaseFragment() {
             layout_search_text.visibility = View.VISIBLE
         }
 
-        adapter = MemberPostPagedAdapter(
+        memberPostAdapter = MemberPostPagedAdapter(
             requireContext(), adultListener, mTag, memberPostFuncItem, true
         )
+
+        videoListAdapter = SearchVideoAdapter(requireContext(), videoAdapterListener, true)
         recycler_search_result.layoutManager = LinearLayoutManager(requireContext())
+
+        concatAdapter = ConcatAdapter(memberPostAdapter, videoListAdapter)
 
         takeIf { isClub }?.also {
             recycler_search_result.layoutManager = MiMiLinearLayoutManager(requireContext())
             recycler_search_result.adapter = clubMemberAdapter
         }
-            ?: run { recycler_search_result.adapter = adapter }
+            ?: run { recycler_search_result.adapter = concatAdapter }
 
         if (!TextUtils.isEmpty(mTag)) {
             updateTag(mTag)
@@ -144,7 +169,7 @@ class SearchPostFragment : BaseFragment() {
                         AttachmentType.ADULT_TAB_CLIP,
                         AttachmentType.ADULT_TAB_PICTURE,
                         AttachmentType.ADULT_TAB_TEXT -> {
-                            adapter?.notifyItemChanged(attachmentItem.position!!)
+                            concatAdapter?.adapters?.get(0)?.notifyItemChanged(attachmentItem.position!!)
                         }
                         else -> {
                         }
@@ -160,10 +185,10 @@ class SearchPostFragment : BaseFragment() {
                     val attachmentItem = it.result
                     LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
                     when (val holder =
-                        adapter?.viewHolderMap?.get(attachmentItem.parentPosition)) {
+                            (concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).viewHolderMap?.get(attachmentItem.parentPosition)) {
                         is PicturePostHolder -> {
                             if (holder.pictureRecycler.tag == attachmentItem.parentPosition) {
-                                adapter?.updateInternalItem(holder)
+                                (concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).updateInternalItem(holder)
                             }
                         }
                     }
@@ -175,11 +200,11 @@ class SearchPostFragment : BaseFragment() {
         viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    when (adapter?.viewHolderMap?.get(it.result)) {
+                    when ((concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).viewHolderMap?.get(it.result)) {
                         is ClipPostHolder,
                         is PicturePostHolder,
                         is TextPostHolder -> {
-                            adapter?.notifyItemChanged(
+                            (concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).notifyItemChanged(
                                 it.result,
                                 MemberPostPagedAdapter.PAYLOAD_UPDATE_LIKE
                             )
@@ -193,11 +218,11 @@ class SearchPostFragment : BaseFragment() {
         viewModel.likePostResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    when (adapter?.viewHolderMap?.get(it.result)) {
+                    when ((concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).viewHolderMap?.get(it.result)) {
                         is ClipPostHolder,
                         is PicturePostHolder,
                         is TextPostHolder -> {
-                            adapter?.notifyItemChanged(
+                            (concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).notifyItemChanged(
                                 it.result,
                                 MemberPostPagedAdapter.PAYLOAD_UPDATE_LIKE
                             )
@@ -209,11 +234,11 @@ class SearchPostFragment : BaseFragment() {
         })
 
         viewModel.searchPostItemByTagListResult.observe(viewLifecycleOwner, Observer {
-            adapter?.submitList(it)
+            (concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).submitList(it)
         })
 
         viewModel.searchPostItemByKeywordListResult.observe(viewLifecycleOwner, Observer {
-            adapter?.submitList(it)
+            (concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).submitList(it)
         })
 
         viewModel.searchTotalCount.observe(viewLifecycleOwner, Observer { count ->
@@ -233,6 +258,28 @@ class SearchPostFragment : BaseFragment() {
                         MemberPostPagedAdapter.PAYLOAD_UPDATE_FOLLOW
                     )
                 }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.searchingListResult.observe(viewLifecycleOwner, Observer {
+            (concatAdapter?.adapters?.get(1) as SearchVideoAdapter).submitList(it)
+        })
+
+        viewModel.likeVideoResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> (concatAdapter?.adapters?.get(1) as SearchVideoAdapter).notifyDataSetChanged()
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.favoriteVideoResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> (concatAdapter?.adapters?.get(1) as SearchVideoAdapter).notifyDataSetChanged()
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -274,7 +321,7 @@ class SearchPostFragment : BaseFragment() {
                 layout_search_history.visibility = View.VISIBLE
                 layout_search_text.visibility = View.GONE
                 getSearchHistory()
-                adapter?.submitList(null)
+                (concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).submitList(null)
                 clubMemberAdapter.submitList(null)
             }
         }
@@ -299,12 +346,100 @@ class SearchPostFragment : BaseFragment() {
             viewModel.getClubs(edit_search.text.toString())
             progressHUD?.show()
         } else {
-            viewModel.getSearchPostsByKeyword(
-                currentPostType,
-                edit_search.text.toString(),
-                isPostFollow
-            )
+            when (currentPostType) {
+                PostType.VIDEO_ON_DEMAND -> viewModel.getSearchVideoList("", edit_search.text.toString())
+                PostType.HYBRID -> {
+                    viewModel.getSearchVideoList("", edit_search.text.toString())
+                    viewModel.getSearchPostsByKeyword(
+                            currentPostType,
+                            edit_search.text.toString(),
+                            isPostFollow
+                    )
+                }
+                else -> {
+                    viewModel.getSearchPostsByKeyword(
+                            currentPostType,
+                            edit_search.text.toString(),
+                            isPostFollow
+                    )
+                }
+            }
         }
+    }
+
+    private val videoAdapterListener = object : SearchVideoAdapter.EventListener {
+        override fun onVideoClick(item: VideoItem) {
+            val playerData = PlayerItem(
+                    item.id ?: 0,
+                    item.isAdult
+            )
+            val intent = Intent(requireContext(), PlayerActivity::class.java)
+            intent.putExtras(PlayerActivity.createBundle(playerData))
+            startActivityForResult(intent, SearchVideoFragment.REQUEST_LOGIN)
+        }
+
+        override fun onFunctionClick(type: FunctionType, view: View, item: VideoItem) {
+            when (type) {
+                FunctionType.LIKE -> {
+                    // 點擊更改喜歡,
+                    checkStatus {
+                        viewModel.currentVideoItem = item
+                        item.id?.let {
+                            viewModel.modifyVideoLike(it)
+                        }
+                    }
+                }
+
+                FunctionType.FAVORITE -> {
+                    // 點擊後加入收藏,
+                    checkStatus {
+                        viewModel.currentVideoItem = item
+                        item.id?.let {
+                            viewModel.modifyVideoFavorite(it)
+                        }
+                    }
+                }
+
+                FunctionType.SHARE -> {
+                    /* 點擊後複製網址 */
+                    checkStatus {
+                        if (item.tags == null || (item.tags as String).isEmpty() || item.id == null) {
+                            GeneralUtils.showToast(requireContext(), "copy url error")
+                        } else {
+                            GeneralUtils.copyToClipboard(
+                                    requireContext(),
+                                    viewModel.getShareUrl(item.tags, item.id)
+                            )
+                            GeneralUtils.showToast(
+                                    requireContext(),
+                                    requireContext().getString(R.string.copy_url)
+                            )
+                        }
+                    }
+                }
+
+                FunctionType.MSG -> {
+                    // 點擊評論，進入播放頁面滾動到最下面
+                    val playerData = PlayerItem(
+                            item.id ?: 0,
+                            item.isAdult
+                    )
+                    val intent = Intent(requireContext(), PlayerActivity::class.java)
+                    intent.putExtras(PlayerActivity.createBundle(playerData, true))
+                    startActivityForResult(intent, SearchVideoFragment.REQUEST_LOGIN)
+                }
+
+                FunctionType.MORE -> {
+                }
+                else -> {
+                }
+            }
+        }
+        override fun onChipClick(text: String){
+            viewModel.getSearchVideoList(text, "")
+            GeneralUtils.hideKeyboard(requireActivity())
+        }
+        override fun onAvatarDownload(view: ImageView, id: String){}
     }
 
     private fun getSearchText(
@@ -329,7 +464,7 @@ class SearchPostFragment : BaseFragment() {
             val typeText = when (type) {
                 PostType.TEXT -> getString(R.string.search_type_text)
                 PostType.IMAGE -> getString(R.string.search_type_picture)
-                PostType.VIDEO -> getString(R.string.search_type_clip)
+                PostType.VIDEO, PostType.VIDEO_ON_DEMAND -> getString(R.string.search_type_clip)
                 else -> ""
             }
             word.append(typeText)
@@ -539,12 +674,12 @@ class SearchPostFragment : BaseFragment() {
             searchText = edit_search.text.toString()
             mTag = tag
             searchKeyword = edit_search.text.toString()
-            adapter?.setupTag(tag)
+            (concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).setupTag(tag)
         } else {
             searchText = ""
             mTag = tag
             searchKeyword = tag
-            adapter?.setupTag(tag)
+            (concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).setupTag(tag)
             edit_search.setText("")
         }
     }
@@ -587,11 +722,26 @@ class SearchPostFragment : BaseFragment() {
                     viewModel.getClubs(edit_search.text.toString())
                     progressHUD?.show()
                 } else {
-                    viewModel.getSearchPostsByKeyword(
-                        currentPostType,
-                        edit_search.text.toString(),
-                        isPostFollow
-                    )
+                    when (currentPostType) {
+                        PostType.VIDEO_ON_DEMAND -> {
+                            viewModel.getSearchVideoList("", edit_search.text.toString())
+                        }
+                        PostType.HYBRID -> {
+                            viewModel.getSearchVideoList("", edit_search.text.toString())
+                            viewModel.getSearchPostsByKeyword(
+                                    currentPostType,
+                                    edit_search.text.toString(),
+                                    isPostFollow
+                            )
+                        }
+                        else -> {
+                            viewModel.getSearchPostsByKeyword(
+                                    currentPostType,
+                                    edit_search.text.toString(),
+                                    isPostFollow
+                            )
+                        }
+                    }
                 }
             }
             chip_group_search_text.addView(chip)

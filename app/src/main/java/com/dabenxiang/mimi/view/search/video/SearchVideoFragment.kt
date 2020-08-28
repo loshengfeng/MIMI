@@ -44,7 +44,7 @@ import java.util.*
 class SearchVideoFragment : BaseFragment() {
 
     companion object {
-        private const val REQUEST_LOGIN = 1000
+        const val REQUEST_LOGIN = 1000
         const val KEY_DATA = "data"
 
         fun createBundle(title: String = "", tag: String = "", isAdult: Boolean = false): Bundle {

@@ -79,14 +79,9 @@ class OrderViewModel : BaseViewModel() {
     }
 
     private val chatPagingCallback = object : PagingCallback {
-        override fun onLoading() {
-        }
-
-        override fun onLoaded() {
-        }
-
-        override fun onThrowable(throwable: Throwable) {
-        }
+        override fun onLoading() {}
+        override fun onLoaded() {}
+        override fun onThrowable(throwable: Throwable) {}
     }
 
     private fun getChatHistoryPagingItems(): LiveData<PagedList<ChatListItem>> {
@@ -208,6 +203,47 @@ class OrderViewModel : BaseViewModel() {
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _createOrderChatResult.value = it }
+        }
+    }
+
+    fun getProxyOrderUnread(update: ((Int, Boolean) -> Unit)) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.getOrderByType(OrderType.MERCHANT2USER, "0", "1")
+                if (!result.isSuccessful) throw HttpException(result)
+                val item = result.body()?.content?.orders?.get(0)
+                item?.also {
+                    emit(ApiResult.success(it.lastReplyTime?.time ?: 0 > it.lastReadTime?.time ?: 0))
+                } ?: emit(ApiResult.success(true))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect {
+                    when (it) {
+                        is ApiResult.Success -> update(0, it.result)
+                    }
+                }
+        }
+    }
+
+    fun getChatUnread(update: ((Int, Boolean) -> Unit)) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.getUnread()
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success((result.body()?.content as Int) > 0))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect {
+                    when (it) {
+                        is ApiResult.Success -> update(1, it.result)
+                    }
+                }
         }
     }
 }

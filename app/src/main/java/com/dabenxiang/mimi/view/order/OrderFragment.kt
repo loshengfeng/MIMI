@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.order
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -17,6 +18,7 @@ import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
+import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_order.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
@@ -52,14 +54,25 @@ class OrderFragment : BaseFragment() {
                 getChatAttachment = { id, pos, update -> viewModel.getAttachment(id, pos, update) },
                 onChatItemClick = { item -> onChatItemClick(item) },
                 getOrderProxyAttachment = { id, update -> viewModel.getProxyAttachment(id, update) },
-                onContactClick = { chatListItem, orderItem -> onContactClick(chatListItem, orderItem) }
+                onContactClick = { chatListItem, orderItem -> onContactClick(chatListItem, orderItem) },
+                getProxyUnread = { update -> getProxyUnread(update) },
+                onTopUpClick = { navigateTo(NavigateItem.Up) }
             ))
     }
 
-
-
     override val bottomNavigationVisibility: Int
         get() = View.GONE
+
+    private var interactionListener: InteractionListener? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        try {
+            interactionListener = context as InteractionListener
+        } catch (e: ClassCastException) {
+            Timber.e("OrderFragment interaction listener can't cast")
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -186,12 +199,15 @@ class OrderFragment : BaseFragment() {
     }
 
     private fun onContactClick(chatListItem: ChatListItem, orderItem: OrderItem) {
-        Timber.d("@@chatListItem: $chatListItem")
-        Timber.d("@@orderItem: $orderItem")
         if (chatListItem.id != 0L && orderItem.traceLogId != 0L) {
             onChatItemClick(chatListItem, orderItem)
         } else {
             viewModel.createOrderChat(chatListItem, orderItem)
         }
+    }
+
+    private fun getProxyUnread(update: ((Int, Boolean) -> Unit)) {
+        viewModel.getProxyOrderUnread(update)
+        viewModel.getChatUnread(update)
     }
 }
