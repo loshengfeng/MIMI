@@ -366,6 +366,7 @@ class SearchPostViewModel : BaseViewModel() {
         override fun onTotalCount(count: Long, isInitial: Boolean) {
             totalCount = if (isInitial) count.toInt()
             else totalCount.plus(count.toInt())
+            if(isInitial) cleanRemovedPosList()
         }
     }
 

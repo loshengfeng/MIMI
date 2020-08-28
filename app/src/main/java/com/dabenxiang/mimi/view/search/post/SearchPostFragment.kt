@@ -20,7 +20,6 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.ApiResult.*
-import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
@@ -38,8 +37,6 @@ import com.dabenxiang.mimi.view.club.ClubFuncItem
 import com.dabenxiang.mimi.view.club.ClubMemberAdapter
 import com.dabenxiang.mimi.view.club.MiMiLinearLayoutManager
 import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
-import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
-import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
@@ -60,8 +57,6 @@ class SearchPostFragment : BaseFragment() {
     }
 
     private val viewModel: SearchPostViewModel by viewModels()
-
-    private var moreDialog: MoreDialogFragment? = null
 
     private var currentPostType: PostType = PostType.TEXT
     private var mTag: String = ""
@@ -236,6 +231,22 @@ class SearchPostFragment : BaseFragment() {
                 is Error -> onApiError(it.throwable)
             }
         })
+
+        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, {
+            when (it) {
+                is Success -> {
+                    adapter?.also { adapter ->
+                        adapter.removedPosList.add(it.result)
+                        adapter.notifyItemChanged(it.result)
+                    }
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.cleanRemovedPosList.observe(viewLifecycleOwner, {
+            adapter?.removedPosList?.clear()
+        })
     }
 
     override fun setupListeners() {
@@ -385,17 +396,6 @@ class SearchPostFragment : BaseFragment() {
         )
     }
 
-    private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-        override fun onProblemReport(item: BaseMemberPostItem) {
-            moreDialog?.dismiss()
-            checkStatus { (requireActivity() as MainActivity).showReportDialog(item) }
-        }
-
-        override fun onCancel() {
-            moreDialog?.dismiss()
-        }
-    }
-
     private val adultListener = object : AdultListener {
         override fun onFollowPostClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
             checkStatus { viewModel.followPost(item, position, isFollow) }
@@ -441,16 +441,22 @@ class SearchPostFragment : BaseFragment() {
             }
         }
 
-        override fun onMoreClick(item: MemberPostItem) {
-            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
-                it.show(
-                    requireActivity().supportFragmentManager,
-                    MoreDialogFragment::class.java.simpleName
+        override fun onMoreClick(item: MemberPostItem, items:List<MemberPostItem>) {
+            adapter?.also {
+                onMoreClick(
+                    item,
+                    ArrayList(items),
+                    onEdit = {
+                        // TODO #1180
+                    }
                 )
             }
         }
 
-        override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
+        override fun onItemClick(
+            item: MemberPostItem,
+            adultTabType: AdultTabType
+        ) {
             when (adultTabType) {
                 AdultTabType.PICTURE -> {
                     val bundle = PictureDetailFragment.createBundle(item, 0)
@@ -484,15 +490,21 @@ class SearchPostFragment : BaseFragment() {
             }
         }
 
-        override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
+        override fun onClipItemClick(
+            item: List<MemberPostItem>,
+            position: Int
+        ) {
             val iterator = item.iterator()
             val memberPostItemList = arrayListOf<MemberPostItem>()
             while (iterator.hasNext()) {
                 val data = iterator.next()
-                if(data.type != PostType.AD) memberPostItemList.add(data)
+                if (data.type != PostType.AD) memberPostItemList.add(data)
             }
             val mappingPosition = position - (position / 3)
-            val bundle = ClipFragment.createBundle(ArrayList(memberPostItemList), mappingPosition)
+            val bundle = ClipFragment.createBundle(
+                ArrayList(memberPostItemList),
+                mappingPosition
+            )
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_searchPostFragment_to_clipFragment,
@@ -501,7 +513,10 @@ class SearchPostFragment : BaseFragment() {
             )
         }
 
-        override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {
+        override fun onClipCommentClick(
+            item: List<MemberPostItem>,
+            position: Int
+        ) {
             checkStatus {
                 val bundle = ClipFragment.createBundle(ArrayList(item), position)
                 navigateTo(
@@ -563,7 +578,10 @@ class SearchPostFragment : BaseFragment() {
 
     private fun onItemClick(item: MemberClubItem) {
         val bundle = ClubDetailFragment.createBundle(item)
-        findNavController().navigate(R.id.action_searchPostFragment_to_clubDetailFragment, bundle)
+        findNavController().navigate(
+            R.id.action_searchPostFragment_to_clubDetailFragment,
+            bundle
+        )
     }
 
 
@@ -604,7 +622,14 @@ class SearchPostFragment : BaseFragment() {
         isFollow: Boolean,
         update: (Boolean) -> Unit
     ) {
-        checkStatus { viewModel.followMember(memberPostItem, ArrayList(items), isFollow, update) }
+        checkStatus {
+            viewModel.followMember(
+                memberPostItem,
+                ArrayList(items),
+                isFollow,
+                update
+            )
+        }
     }
 
     private fun likePost(

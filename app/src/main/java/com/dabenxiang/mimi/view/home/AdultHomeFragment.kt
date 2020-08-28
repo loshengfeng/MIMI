@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
-import com.dabenxiang.mimi.callback.OnMeMoreDialogListener
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.*
@@ -42,10 +41,8 @@ import com.dabenxiang.mimi.view.club.MiMiLinearLayoutManager
 import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
-import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.OnChooseUploadMethodDialogListener
-import com.dabenxiang.mimi.view.dialog.comment.MyPostMoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.home.HomeViewModel.Companion.TYPE_COVER
 import com.dabenxiang.mimi.view.home.HomeViewModel.Companion.TYPE_PIC
@@ -53,7 +50,6 @@ import com.dabenxiang.mimi.view.home.HomeViewModel.Companion.TYPE_VIDEO
 import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.listener.InteractionListener
-import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
@@ -103,9 +99,6 @@ class AdultHomeFragment : BaseFragment() {
     private val homeClipViewHolderMap = hashMapOf<Int, HomeClipViewHolder>()
     private val homePictureViewHolderMap = hashMapOf<Int, HomePictureViewHolder>()
     private val homeClubViewHolderMap = hashMapOf<Int, HomeClubViewHolder>()
-
-    private var meMoreDialog: MyPostMoreDialogFragment? = null
-    private var moreDialog: MoreDialogFragment? = null
 
     private var interactionListener: InteractionListener? = null
     private var uploadPicItem = arrayListOf<UploadPicItem>()
@@ -482,7 +475,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.deletePostResult.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
             when (lastPosition) {
                 2, 3, 4, 5 -> {
                     when (it) {
@@ -999,25 +992,14 @@ class AdultHomeFragment : BaseFragment() {
             }
         }
 
-        override fun onMoreClick(item: MemberPostItem) {
-            val isMe = viewModel.accountManager.getProfile().userId == item.creatorId
-            if (isMe) {
-                meMoreDialog =
-                    MyPostMoreDialogFragment.newInstance(item, onMeMoreDialogListener)
-                        .also {
-                            it.show(
-                                requireActivity().supportFragmentManager,
-                                MoreDialogFragment::class.java.simpleName
-                            )
-                        }
-            } else {
-                moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
-                    it.show(
-                        requireActivity().supportFragmentManager,
-                        MoreDialogFragment::class.java.simpleName
-                    )
+        override fun onMoreClick(item: MemberPostItem, items: List<MemberPostItem>) {
+            onMoreClick(
+                item,
+                ArrayList(items),
+                onEdit = {
+                    // TODO #1180
                 }
-            }
+            )
         }
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
@@ -1082,71 +1064,6 @@ class AdultHomeFragment : BaseFragment() {
                 isAdultTheme = true
             )
             navigateTo(NavigateItem.Destination(R.id.action_to_myPostFragment, bundle))
-        }
-    }
-
-    private val onMeMoreDialogListener = object : OnMeMoreDialogListener {
-        override fun onCancel() {
-            meMoreDialog?.dismiss()
-        }
-
-        override fun onDelete(item: BaseMemberPostItem) {
-            GeneralDialog.newInstance(
-                GeneralDialogData(
-                    titleRes = R.string.is_post_delete,
-                    messageIcon = R.drawable.ico_default_photo,
-                    secondBtn = getString(R.string.btn_confirm),
-                    secondBlock = {
-                        viewModel.deletePost(
-                            item as MemberPostItem,
-                            ArrayList((getCurrentAdapter() as MemberPostPagedAdapter).currentList as List<MemberPostItem>)
-                        )
-                    },
-                    firstBtn = getString(R.string.cancel),
-                    isMessageIcon = false
-                )
-            ).show(requireActivity().supportFragmentManager)
-        }
-
-        override fun onEdit(item: BaseMemberPostItem) {
-            // TODO
-//            item as MemberPostItem
-//            if (item.type == PostType.TEXT) {
-//                val bundle = Bundle()
-//                item.id
-//                bundle.putBoolean(MyPostFragment.EDIT, true)
-//                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
-//                findNavController().navigate(
-//                    R.id.action_adultHomeFragment_to_postArticleFragment,
-//                    bundle
-//                )
-//            } else if (item.type == PostType.IMAGE) {
-//                val bundle = Bundle()
-//                bundle.putBoolean(MyPostFragment.EDIT, true)
-//                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
-//                findNavController().navigate(R.id.action_adultHomeFragment_to_postPicFragment, bundle)
-//            } else if (item.type == PostType.VIDEO) {
-//                val bundle = Bundle()
-//                bundle.putBoolean(MyPostFragment.EDIT, true)
-//                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
-//                findNavController().navigate(
-//                    R.id.action_adultHomeFragment_to_postVideoFragment,
-//                    bundle
-//                )
-//            }
-
-            meMoreDialog?.dismiss()
-        }
-    }
-
-    private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-        override fun onProblemReport(item: BaseMemberPostItem) {
-            moreDialog?.dismiss()
-            checkStatus { (requireActivity() as MainActivity).showReportDialog(item) }
-        }
-
-        override fun onCancel() {
-            moreDialog?.dismiss()
         }
     }
 
