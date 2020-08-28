@@ -137,12 +137,7 @@ class PlayerActivity : BaseActivity() {
 //
 //                finish()
                 oldPlayerItem = PlayerItem(viewModel.videoId, obtainIsAdult())
-                isFirstInit = true
-                player?.clearVideoDecoderOutputBufferRenderer()
-                player?.stop()
-                viewModel.clearStreamData()
-                loadVideo(item)
-                viewModel.setupCommentDataSource(playerInfoAdapter)
+                reloadVideoInfo(item)
             }
         }, obtainIsAdult())
     }
@@ -1664,6 +1659,13 @@ class PlayerActivity : BaseActivity() {
                 isHtml = true,
                 message = getString(R.string.point_not_enough_message),
                 firstBtn = getString(R.string.btn_cancel),
+                firstBlock = {
+                    if(oldPlayerItem.videoId == -1L)
+                        finish()
+                    else {
+                        reloadVideoInfo(oldPlayerItem)
+                    }
+                },
                 secondBtn = getString(R.string.recharge),
                 secondBlock = {
                     val bundle = Bundle()
@@ -1695,18 +1697,27 @@ class PlayerActivity : BaseActivity() {
                 message = message,
                 firstBtn = getString(R.string.btn_cancel),
                 firstBlock = {
-                    isFirstInit = true
-                    player?.clearVideoDecoderOutputBufferRenderer()
-                    player?.stop()
-                    viewModel.clearStreamData()
-                    loadVideo(oldPlayerItem)
-                    viewModel.setupCommentDataSource(playerInfoAdapter)},
+                    if(oldPlayerItem.videoId == -1L)
+                        finish()
+                    else {
+                        reloadVideoInfo(oldPlayerItem)
+                    }
+                },
                 secondBtn = getString(R.string.btn_confirm),
                 secondBlock = { viewModel.getStreamUrl(obtainIsAdult()) }
             )
         )
             .setCancel(false)
             .show(supportFragmentManager)
+    }
+
+    private fun reloadVideoInfo(playerItem: PlayerItem) {
+        isFirstInit = true
+        player?.clearVideoDecoderOutputBufferRenderer()
+        player?.stop()
+        viewModel.clearStreamData()
+        loadVideo(playerItem)
+        viewModel.setupCommentDataSource(playerInfoAdapter)
     }
 
     /**

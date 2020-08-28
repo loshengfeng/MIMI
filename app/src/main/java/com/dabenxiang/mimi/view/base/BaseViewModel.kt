@@ -77,7 +77,7 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
         return result.toString()
     }
 
-    private fun sendCrashReport(data: String) {
+    fun sendCrashReport(data: String) {
         SendLogManager.e(PROJECT_NAME, data)
     }
 
