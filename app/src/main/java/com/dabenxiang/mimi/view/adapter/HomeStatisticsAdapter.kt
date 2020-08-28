@@ -42,7 +42,7 @@ class HomeStatisticsAdapter(
         return when {
             count == null -> 0
             count < 2 -> count
-            else -> Int.MAX_VALUE
+            else -> 10
         }
     }
 
