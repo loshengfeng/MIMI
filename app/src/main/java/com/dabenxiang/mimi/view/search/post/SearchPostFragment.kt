@@ -323,6 +323,7 @@ class SearchPostFragment : BaseFragment() {
                 getSearchHistory()
                 (concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).submitList(null)
                 clubMemberAdapter.submitList(null)
+                (concatAdapter?.adapters?.get(1) as SearchVideoAdapter).submitList(null)
             }
         }
     }
