@@ -16,10 +16,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.OnMeMoreDialogListener
 import com.dabenxiang.mimi.extension.handleException
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.PostAttachmentItem
@@ -27,6 +30,8 @@ import com.dabenxiang.mimi.model.vo.PostVideoAttachment
 import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
+import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
+import com.dabenxiang.mimi.view.dialog.comment.MyPostMoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.home.HomeViewModel
 import com.dabenxiang.mimi.view.main.MainActivity
@@ -754,5 +759,72 @@ abstract class BaseFragment : Fragment() {
                 bundle
             )
         )
+    }
+
+    fun onMoreClick(item: MemberPostItem, items: ArrayList<MemberPostItem>, onEdit: (BaseMemberPostItem) -> Unit){
+        val isMe = mainViewModel?.accountManager?.getProfile()?.userId == item.creatorId
+        if (isMe) {
+            showMeMoreDialog(item, items, onEdit)
+        } else {
+            showMoreDialog(item)
+        }
+    }
+
+    private var meMoreDialog: MyPostMoreDialogFragment? = null
+    private fun showMeMoreDialog(
+        item: MemberPostItem,
+        items: ArrayList<MemberPostItem>,
+        onEdit: (BaseMemberPostItem) -> Unit
+    ) {
+        val onMeMoreDialogListener = object : OnMeMoreDialogListener {
+            override fun onCancel() {
+                meMoreDialog?.dismiss()
+            }
+
+            override fun onDelete(item: BaseMemberPostItem) {
+                GeneralDialog.newInstance(
+                    GeneralDialogData(
+                        titleRes = R.string.is_post_delete,
+                        messageIcon = R.drawable.ico_default_photo,
+                        secondBtn = getString(R.string.btn_confirm),
+                        secondBlock = { mainViewModel?.deletePost(item as MemberPostItem, items) },
+                        firstBtn = getString(R.string.cancel),
+                        isMessageIcon = false
+                    )
+                ).show(requireActivity().supportFragmentManager)
+            }
+
+            override fun onEdit(item: BaseMemberPostItem) {
+                onEdit(item)
+                meMoreDialog?.dismiss()
+            }
+        }
+        meMoreDialog = MyPostMoreDialogFragment.newInstance(item, onMeMoreDialogListener)
+                .also {
+                    it.show(
+                        requireActivity().supportFragmentManager,
+                        MoreDialogFragment::class.java.simpleName
+                    )
+                }
+    }
+
+    private var moreDialog: MoreDialogFragment? = null
+    private fun showMoreDialog(item: MemberPostItem){
+        val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
+            override fun onProblemReport(item: BaseMemberPostItem) {
+                moreDialog?.dismiss()
+                checkStatus { (requireActivity() as MainActivity).showReportDialog(item) }
+            }
+
+            override fun onCancel() {
+                moreDialog?.dismiss()
+            }
+        }
+        moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
+            it.show(
+                requireActivity().supportFragmentManager,
+                MoreDialogFragment::class.java.simpleName
+            )
+        }
     }
 }

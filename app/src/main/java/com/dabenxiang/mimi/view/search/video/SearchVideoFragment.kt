@@ -44,7 +44,7 @@ import java.util.*
 class SearchVideoFragment : BaseFragment() {
 
     companion object {
-        private const val REQUEST_LOGIN = 1000
+        const val REQUEST_LOGIN = 1000
         const val KEY_DATA = "data"
 
         fun createBundle(title: String = "", tag: String = "", isAdult: Boolean = false): Bundle {
@@ -93,7 +93,6 @@ class SearchVideoFragment : BaseFragment() {
 
             if (data.tag.isNotBlank()) {
                 viewModel.searchingTag = data.tag
-                tv_search_text.text = genResultText()
                 viewModel.getSearchList()
             }
 
@@ -211,7 +210,6 @@ class SearchVideoFragment : BaseFragment() {
         })
 
         viewModel.searchingListResult.observe(viewLifecycleOwner, Observer {
-            tv_search_text.text = genResultText()
             videoListAdapter.submitList(it)
         })
 

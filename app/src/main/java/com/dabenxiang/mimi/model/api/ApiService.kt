@@ -168,7 +168,8 @@ interface ApiService {
         @Query("offset") offset: Int,
         @Query("limit") limit: Int,
         @Query("isAdult") isAdult: Boolean = true,
-        @Query("orderBy") orderBy: Int = 1
+        @Query("orderBy") orderBy: Int = 1,
+        @Query("status") status: Int = 1
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     @GET("/v1/Members/Post")
@@ -177,7 +178,8 @@ interface ApiService {
         @Query("limit") limit: Int,
         @Query("creatorId") creatorId: Long,
         @Query("isAdult") isAdult: Boolean = true,
-        @Query("orderBy") orderBy: Int = 1
+        @Query("orderBy") orderBy: Int = 1,
+        @Query("status") status: Int = 1
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     @GET("/v1/Members/Post/{id}")
@@ -257,7 +259,8 @@ interface ApiService {
         @Query("tag") tag: String = "",
         @Query("orderBy") orderBy: Int = 1,
         @Query("isAdult") isAdult: Boolean = true,
-        @Query("isFullContent") isFullContent: Boolean = false
+        @Query("isFullContent") isFullContent: Boolean = false,
+        @Query("status") status: Int = 1
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     @POST("/v1/Members/Club/{clubId}/Follow")
@@ -484,7 +487,8 @@ interface ApiService {
         @Query("limit") limit: Int,
         @Query("orderBy") orderBy: Int = 1,
         @Query("isFullContent") isFullContent: Boolean = false,
-        @Query("isAdult") isAdult: Boolean = true
+        @Query("isAdult") isAdult: Boolean = true,
+        @Query("status") status: Int = 1
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     @GET("/v1/Members/Post")
@@ -494,7 +498,8 @@ interface ApiService {
         @Query("limit") limit: Int,
         @Query("orderBy") orderBy: Int = 1,
         @Query("isFullContent") isFullContent: Boolean = false,
-        @Query("isAdult") isAdult: Boolean = true
+        @Query("isAdult") isAdult: Boolean = true,
+        @Query("status") status: Int = 1
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
 
@@ -506,7 +511,8 @@ interface ApiService {
         @Query("limit") limit: Int,
         @Query("orderBy") orderBy: Int = 1,
         @Query("isFullContent") isFullContent: Boolean = false,
-        @Query("isAdult") isAdult: Boolean = true
+        @Query("isAdult") isAdult: Boolean = true,
+        @Query("status") status: Int = 1
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     @GET("/v1/Members/Post")
@@ -516,7 +522,8 @@ interface ApiService {
         @Query("limit") limit: Int,
         @Query("orderBy") orderBy: Int = 1,
         @Query("isFullContent") isFullContent: Boolean = false,
-        @Query("isAdult") isAdult: Boolean = true
+        @Query("isAdult") isAdult: Boolean = true,
+        @Query("status") status: Int = 1
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     /**********************************************************

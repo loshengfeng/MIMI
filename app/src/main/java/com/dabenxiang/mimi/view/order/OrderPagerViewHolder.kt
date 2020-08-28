@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.order
 
 import android.view.View
+import android.widget.TextView
 import androidx.paging.PagedList
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.RecyclerView
@@ -13,6 +14,7 @@ import com.dabenxiang.mimi.model.enums.OrderType
 import com.dabenxiang.mimi.view.adapter.ChatHistoryAdapter
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import kotlinx.android.synthetic.main.item_order_no_data.view.*
 import kotlinx.android.synthetic.main.item_order_pager.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -22,7 +24,9 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
     private val swipeRefreshLayout: SwipeRefreshLayout = itemView.swipeRefreshLayout
     private val rvOrder: RecyclerView = itemView.rv_order
     private val rvChat: RecyclerView = itemView.rv_chat
-    private val clNoData: View = itemView.item_no_data
+    private val itemOrderNoData: View = itemView.item_order_no_data
+    private val itemChatNoData: View = itemView.item_chat_no_data
+    private val tvTopUp: TextView = itemView.tv_topup
 
     private var orderFuncItem: OrderFuncItem? = null
 
@@ -59,10 +63,18 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
             0 -> {
                 rvOrder.visibility = View.VISIBLE
                 rvChat.visibility = View.GONE
+                itemChatNoData.visibility = View.GONE
+                itemOrderNoData.visibility =
+                    takeIf { orderAdapter.currentList?.size ?: 0 > 0 }?.let { View.GONE }
+                        ?: let { View.VISIBLE }
             }
             else -> {
                 rvOrder.visibility = View.GONE
                 rvChat.visibility = View.VISIBLE
+                itemOrderNoData.visibility = View.GONE
+                itemChatNoData.visibility =
+                    takeIf { chatAdapter.currentList?.size ?: 0 > 0 }?.let { View.GONE }
+                        ?: let { View.VISIBLE }
             }
         }
     }
@@ -94,6 +106,8 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
         }
 
         swipeRefreshLayout.setOnRefreshListener {
+            itemOrderNoData.visibility = View.GONE
+            itemChatNoData.visibility = View.GONE
             when(position) {
                 2 -> {
                     when(tabAdapter.getSelectedPosition()) {
@@ -113,12 +127,16 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
                     }
             }
         }
+
+        tvTopUp.setOnClickListener {
+            orderFuncItem.onTopUpClick.invoke()
+        }
     }
 
     private fun updateOrderList2(list: PagedList<OrderItem>) {
         swipeRefreshLayout.isRefreshing = false
         orderAdapter.submitList(list)
-        clNoData.visibility = takeIf { list.size > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
+        itemOrderNoData.visibility = takeIf { list.size > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
     }
 
     private fun updateOrderList3(data: PagingData<OrderItem>, coroutineScope: CoroutineScope) {
@@ -132,7 +150,7 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
     private fun updateChatList(list: PagedList<ChatListItem>) {
         swipeRefreshLayout.isRefreshing = false
         chatAdapter.submitList(list)
-        clNoData.visibility = takeIf { list.size > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
+        itemChatNoData.visibility = takeIf { list.size > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
     }
 
     private fun updateChatAvatar(position: Int) {

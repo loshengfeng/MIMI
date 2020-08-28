@@ -84,6 +84,7 @@
         android:id="@+id/categoriesFragment"
         android:name="com.dabenxiang.mimi.view.home.category.CategoriesFragment"
         tools:layout="@layout/fragment_categories">
+
         <action
             android:id="@+id/action_to_searchVideoFragment"
             app:destination="@id/searchVideoFragment" />

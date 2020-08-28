@@ -9,6 +9,7 @@ import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.File;
@@ -258,10 +259,19 @@ public class VideoController {
 
         long startTime = -1;
         long endTime = -1;
-
-        int rotationValue = Integer.valueOf(rotation);
-        int originalWidth = Integer.valueOf(width);
-        int originalHeight = Integer.valueOf(height);
+        //FIXME  java.lang.NumberFormatException: null !!!
+        int rotationValue = 0;
+        if (!TextUtils.isEmpty(rotation)) {
+            rotationValue = Integer.valueOf(rotation);
+        }
+        int originalWidth = 480;
+        if (!TextUtils.isEmpty(width)) {
+            originalWidth = Integer.valueOf(width);
+        }
+        int originalHeight = 640;
+        if (!TextUtils.isEmpty(height)) {
+            originalHeight = Integer.valueOf(height);
+        }
 
         int resultWidth;
         int resultHeight;

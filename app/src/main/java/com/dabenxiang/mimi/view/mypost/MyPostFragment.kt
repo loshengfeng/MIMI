@@ -11,9 +11,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
-import com.dabenxiang.mimi.callback.OnMeMoreDialogListener
 import com.dabenxiang.mimi.model.api.ApiResult.*
-import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
@@ -24,12 +22,6 @@ import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
-import com.dabenxiang.mimi.view.dialog.GeneralDialog
-import com.dabenxiang.mimi.view.dialog.GeneralDialogData
-import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
-import com.dabenxiang.mimi.view.dialog.comment.MyPostMoreDialogFragment
-import com.dabenxiang.mimi.view.dialog.show
-import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.USER_ID_ME
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
@@ -43,9 +35,6 @@ import timber.log.Timber
 class MyPostFragment : BaseFragment() {
 
     private lateinit var adapter: MyPostPagedAdapter
-
-    private var meMoreDialog: MyPostMoreDialogFragment? = null
-    private var moreDialog: MoreDialogFragment? = null
 
     private val viewModel: MyPostViewModel by viewModels()
 
@@ -210,7 +199,7 @@ class MyPostFragment : BaseFragment() {
             }
         })
 
-        viewModel.deletePostResult.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
                     adapter.removedPosList.add(it.result)
@@ -281,91 +270,41 @@ class MyPostFragment : BaseFragment() {
         }
     }
 
-    private val onMeMoreDialogListener = object : OnMeMoreDialogListener {
-        override fun onCancel() {
-            meMoreDialog?.dismiss()
-        }
-
-        override fun onDelete(item: BaseMemberPostItem) {
-            GeneralDialog.newInstance(
-                GeneralDialogData(
-                    titleRes = R.string.is_post_delete,
-                    messageIcon = R.drawable.ico_default_photo,
-                    secondBtn = getString(R.string.btn_confirm),
-                    secondBlock = {
-                        viewModel.deletePost(
-                            item as MemberPostItem,
-                            ArrayList(adapter.currentList as List<MemberPostItem>)
-                        )
-                    },
-                    firstBtn = getString(R.string.cancel),
-                    isMessageIcon = false
-                )
-            ).show(requireActivity().supportFragmentManager)
-        }
-
-        override fun onEdit(item: BaseMemberPostItem) {
-            item as MemberPostItem
-            if (item.type == PostType.TEXT) {
-                val bundle = Bundle()
-                item.id
-                bundle.putBoolean(EDIT, true)
-                bundle.putSerializable(MEMBER_DATA, item)
-                findNavController().navigate(
-                    R.id.action_myPostFragment_to_postArticleFragment,
-                    bundle
-                )
-            } else if (item.type == PostType.IMAGE) {
-                val bundle = Bundle()
-                bundle.putBoolean(EDIT, true)
-                bundle.putSerializable(MEMBER_DATA, item)
-                findNavController().navigate(R.id.action_myPostFragment_to_postPicFragment, bundle)
-            } else if (item.type == PostType.VIDEO) {
-                val bundle = Bundle()
-                bundle.putBoolean(EDIT, true)
-                bundle.putSerializable(MEMBER_DATA, item)
-                findNavController().navigate(
-                    R.id.action_myPostFragment_to_postVideoFragment,
-                    bundle
-                )
-            }
-
-            meMoreDialog?.dismiss()
-        }
-    }
-
-    private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-        override fun onProblemReport(item: BaseMemberPostItem) {
-            moreDialog?.dismiss()
-            checkStatus { (requireActivity() as MainActivity).showReportDialog(item) }
-        }
-
-        override fun onCancel() {
-            moreDialog?.dismiss()
-        }
-    }
-
     private val myPostListener = object : MyPostListener {
         override fun onMoreClick(item: MemberPostItem) {
-            val isMe = viewModel.accountManager.getProfile().userId == item.creatorId
-            if (isMe) {
-                meMoreDialog =
-                    MyPostMoreDialogFragment.newInstance(item, onMeMoreDialogListener)
-                        .also {
-                            it.show(
-                                requireActivity().supportFragmentManager,
-                                MoreDialogFragment::class.java.simpleName
-                            )
-                        }
-            } else {
-                moreDialog =
-                    MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
-                        it.show(
-                            requireActivity().supportFragmentManager,
-                            MoreDialogFragment::class.java.simpleName
+            onMoreClick(item, ArrayList(adapter.currentList as List<MemberPostItem>), onEdit = {
+                it as MemberPostItem
+                when (item.type) {
+                    PostType.TEXT -> {
+                        val bundle = Bundle()
+                        item.id
+                        bundle.putBoolean(EDIT, true)
+                        bundle.putSerializable(MEMBER_DATA, item)
+                        findNavController().navigate(
+                            R.id.action_myPostFragment_to_postArticleFragment,
+                            bundle
                         )
                     }
-            }
+                    PostType.IMAGE -> {
+                        val bundle = Bundle()
+                        bundle.putBoolean(EDIT, true)
+                        bundle.putSerializable(MEMBER_DATA, item)
+                        findNavController().navigate(
+                            R.id.action_myPostFragment_to_postPicFragment,
+                            bundle
+                        )
+                    }
+                    PostType.VIDEO -> {
+                        val bundle = Bundle()
+                        bundle.putBoolean(EDIT, true)
+                        bundle.putSerializable(MEMBER_DATA, item)
+                        findNavController().navigate(
+                            R.id.action_myPostFragment_to_postVideoFragment,
+                            bundle
+                        )
+                    }
+                }
+            })
         }
 
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
