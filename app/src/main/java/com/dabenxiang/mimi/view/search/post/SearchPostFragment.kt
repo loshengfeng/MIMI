@@ -265,6 +265,24 @@ class SearchPostFragment : BaseFragment() {
         viewModel.searchingListResult.observe(viewLifecycleOwner, Observer {
             (concatAdapter?.adapters?.get(1) as SearchVideoAdapter).submitList(it)
         })
+
+        viewModel.likeVideoResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> (concatAdapter?.adapters?.get(1) as SearchVideoAdapter).notifyDataSetChanged()
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.favoriteVideoResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> (concatAdapter?.adapters?.get(1) as SearchVideoAdapter).notifyDataSetChanged()
+                is Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -361,6 +379,61 @@ class SearchPostFragment : BaseFragment() {
         }
 
         override fun onFunctionClick(type: FunctionType, view: View, item: VideoItem) {
+            when (type) {
+                FunctionType.LIKE -> {
+                    // 點擊更改喜歡,
+                    checkStatus {
+                        viewModel.currentVideoItem = item
+                        item.id?.let {
+                            viewModel.modifyVideoLike(it)
+                        }
+                    }
+                }
+
+                FunctionType.FAVORITE -> {
+                    // 點擊後加入收藏,
+                    checkStatus {
+                        viewModel.currentVideoItem = item
+                        item.id?.let {
+                            viewModel.modifyVideoFavorite(it)
+                        }
+                    }
+                }
+
+                FunctionType.SHARE -> {
+                    /* 點擊後複製網址 */
+                    checkStatus {
+                        if (item.tags == null || (item.tags as String).isEmpty() || item.id == null) {
+                            GeneralUtils.showToast(requireContext(), "copy url error")
+                        } else {
+                            GeneralUtils.copyToClipboard(
+                                    requireContext(),
+                                    viewModel.getShareUrl(item.tags, item.id)
+                            )
+                            GeneralUtils.showToast(
+                                    requireContext(),
+                                    requireContext().getString(R.string.copy_url)
+                            )
+                        }
+                    }
+                }
+
+                FunctionType.MSG -> {
+                    // 點擊評論，進入播放頁面滾動到最下面
+                    val playerData = PlayerItem(
+                            item.id ?: 0,
+                            item.isAdult
+                    )
+                    val intent = Intent(requireContext(), PlayerActivity::class.java)
+                    intent.putExtras(PlayerActivity.createBundle(playerData, true))
+                    startActivityForResult(intent, SearchVideoFragment.REQUEST_LOGIN)
+                }
+
+                FunctionType.MORE -> {
+                }
+                else -> {
+                }
+            }
         }
         override fun onChipClick(text: String){
             viewModel.getSearchVideoList(text, "")
@@ -392,7 +465,6 @@ class SearchPostFragment : BaseFragment() {
                 PostType.TEXT -> getString(R.string.search_type_text)
                 PostType.IMAGE -> getString(R.string.search_type_picture)
                 PostType.VIDEO, PostType.VIDEO_ON_DEMAND -> getString(R.string.search_type_clip)
-                PostType.HYBRID -> "結果"
                 else -> ""
             }
             word.append(typeText)

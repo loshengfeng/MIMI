@@ -11,10 +11,7 @@ import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.callback.SearchPagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.LikeRequest
-import com.dabenxiang.mimi.model.api.vo.MemberClubItem
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.VideoItem
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
@@ -69,8 +66,16 @@ class SearchPostViewModel : BaseViewModel() {
     private val _searchingListResult = MutableLiveData<PagedList<VideoItem>>()
     val searchingListResult: LiveData<PagedList<VideoItem>> = _searchingListResult
 
+    private val _likeVideoResult = MutableLiveData<ApiResult<Long>>()
+    val likeVideoResult: LiveData<ApiResult<Long>> = _likeVideoResult
+
+    private val _favoriteVideoResult = MutableLiveData<ApiResult<Long>>()
+    val favoriteVideoResult: LiveData<ApiResult<Long>> = _favoriteVideoResult
+
     var adWidth = 0
     var adHeight = 0
+
+    var currentVideoItem: VideoItem? = null
 
     fun getAttachment(id: String, position: Int, type: AttachmentType) {
         viewModelScope.launch {
@@ -480,6 +485,57 @@ class SearchPostViewModel : BaseViewModel() {
                         }
                     }
                 }
+        }
+    }
+
+    fun modifyVideoLike(videoID: Long) {
+        val likeType = if (currentVideoItem?.like == true) LikeType.DISLIKE else LikeType.LIKE
+        val likeRequest = LikeRequest(likeType)
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository()
+                        .like(videoID, likeRequest)
+                if (!result.isSuccessful) {
+                    throw HttpException(result)
+                }
+                currentVideoItem?.run {
+                    like = like != true
+                    likeCount = if (like == true) (likeCount ?: 0) + 1 else (likeCount ?: 0) - 1
+                }
+                emit(ApiResult.success(videoID))
+            }
+                    .flowOn(Dispatchers.IO)
+                    .onStart { emit(ApiResult.loading()) }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .collect { _likeVideoResult.value = it }
+        }
+    }
+
+    fun modifyVideoFavorite(videoID: Long) {
+        viewModelScope.launch {
+            flow {
+                val result = if (currentVideoItem?.favorite == false) {
+                    domainManager.getApiRepository().postMePlaylist(PlayListRequest(videoID, 1))
+                } else {
+                    domainManager.getApiRepository().deleteMePlaylist(videoID.toString())
+                }
+
+                if (!result.isSuccessful) {
+                    throw HttpException(result)
+                }
+                currentVideoItem?.run {
+                    favorite = favorite != true
+                    favoriteCount = if (favorite == true) (favoriteCount
+                            ?: 0) + 1 else (favoriteCount ?: 0) - 1
+                }
+                emit(ApiResult.success(videoID))
+            }
+                    .flowOn(Dispatchers.IO)
+                    .onStart { emit(ApiResult.loading()) }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .collect { _favoriteVideoResult.value = it }
         }
     }
 }
