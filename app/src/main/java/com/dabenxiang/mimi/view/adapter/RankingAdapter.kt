@@ -21,9 +21,10 @@ import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_ranking.view.*
 
-class RankingAdapter(private val context: Context,
-                     private val rankingFuncItem: RankingFuncItem = RankingFuncItem())
-    : PagedListAdapter<PostStatisticsItem, RecyclerView.ViewHolder>(diffCallback) {
+class RankingAdapter(
+    private val context: Context,
+    private val rankingFuncItem: RankingFuncItem = RankingFuncItem()
+) : PagedListAdapter<PostStatisticsItem, RecyclerView.ViewHolder>(diffCallback) {
 
     companion object {
         private val diffCallback = object : DiffUtil.ItemCallback<PostStatisticsItem>() {
@@ -47,34 +48,39 @@ class RankingAdapter(private val context: Context,
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         holder as RankingViewHolder
-        holder.bind(context, position, currentList?.toMutableList()!!, getItem(position)!!, rankingFuncItem)
+        holder.bind(
+            context,
+            position,
+            currentList?.toMutableList()!!,
+            getItem(position)!!,
+            rankingFuncItem
+        )
     }
 
     class RankingViewHolder(itemView: View) : BaseViewHolder(itemView) {
-        val layout:ConstraintLayout= itemView.cl_ranking
+        val layout: ConstraintLayout = itemView.cl_ranking
         val picture: ImageView = itemView.iv_photo
-        val title :TextView = itemView.tv_title
-        val hot:TextView = itemView.tv_hot
-        val ranking:TextView = itemView.tv_no
+        val title: TextView = itemView.tv_title
+        val hot: TextView = itemView.tv_hot
+        val ranking: TextView = itemView.tv_no
 
         fun bind(
             context: Context,
             position: Int,
-            items:MutableList<PostStatisticsItem>,
+            items: MutableList<PostStatisticsItem>,
             item: PostStatisticsItem,
             rankingFuncItem: RankingFuncItem
         ) {
 
             ranking.let {
-                ranking.text =""
-                when(position){
-                    0-> it.background = context.getDrawable(R.drawable.ico_fire_01)
-                    1-> it.background = context.getDrawable(R.drawable.ico_fire_02)
-                    2-> it.background = context.getDrawable(R.drawable.ico_fire_03)
-                    else->{
+                ranking.text = ""
+                when (position) {
+                    0 -> it.background = context.getDrawable(R.drawable.ico_fire_01)
+                    1 -> it.background = context.getDrawable(R.drawable.ico_fire_02)
+                    2 -> it.background = context.getDrawable(R.drawable.ico_fire_03)
+                    else -> {
                         it.background = context.getDrawable(R.drawable.ico_fire)
-                        ranking.text =(position+1).toString()
-
+                        ranking.text = (position + 1).toString()
                     }
                 }
             }
@@ -83,14 +89,20 @@ class RankingAdapter(private val context: Context,
             contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
                 images[0].also { image ->
                     if (TextUtils.isEmpty(image.url)) {
-                        image.id.takeIf { !TextUtils.isEmpty(it) && it != LruCacheUtils.ZERO_ID }?.also { id ->
-                            LruCacheUtils.getLruCache(id)?.also { bitmap ->
-                                Glide.with(picture.context).load(bitmap).centerCrop().into(picture)
-                            } ?: run {   rankingFuncItem.getBitmap(id, position) }
-                        } ?: run { Glide.with(picture.context).load(R.drawable.img_nopic_03).centerCrop().into(picture) }
+                        image.id.takeIf { !TextUtils.isEmpty(it) && it != LruCacheUtils.ZERO_ID }
+                            ?.also { id ->
+                                LruCacheUtils.getLruCache(id)?.also { bitmap ->
+                                    Glide.with(picture.context).load(bitmap).centerCrop()
+                                        .into(picture)
+                                } ?: run { rankingFuncItem.getBitmap(id, position) }
+                            } ?: run {
+                            Glide.with(picture.context).load(R.drawable.img_nopic_03).centerCrop()
+                                .into(picture)
+                        }
                     } else {
                         Glide.with(picture.context)
-                            .load(image.url).placeholder(R.drawable.img_nopic_03).centerCrop().into(picture)
+                            .load(image.url).placeholder(R.drawable.img_nopic_03).centerCrop()
+                            .into(picture)
                     }
                 }
             }
@@ -102,8 +114,6 @@ class RankingAdapter(private val context: Context,
             }
         }
     }
-
-
 
 
 }
