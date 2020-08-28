@@ -1,8 +1,5 @@
 package com.dabenxiang.mimi.view.home
 
-import android.content.Context
-import android.media.MediaMetadataRetriever
-import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
@@ -16,7 +13,6 @@ import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
-import com.dabenxiang.mimi.model.vo.UploadPicItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.home.club.ClubDataSource
 import com.dabenxiang.mimi.view.home.club.ClubFactory
@@ -27,15 +23,11 @@ import com.dabenxiang.mimi.view.home.postfollow.PostFollowFactory
 import com.dabenxiang.mimi.view.home.video.VideoDataSource
 import com.dabenxiang.mimi.view.home.video.VideoFactory
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
-import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import timber.log.Timber
-import java.io.File
-import java.net.URLEncoder
 import java.util.*
 
 class HomeViewModel : BaseViewModel() {
@@ -97,29 +89,8 @@ class HomeViewModel : BaseViewModel() {
     private val _clubItemListResult = MutableLiveData<PagedList<MemberClubItem>>()
     val clubItemListResult: LiveData<PagedList<MemberClubItem>> = _clubItemListResult
 
-    private val _postPicResult = MutableLiveData<ApiResult<Long>>()
-    val postPicResult: LiveData<ApiResult<Long>> = _postPicResult
-
-    private val _postCoverResult = MutableLiveData<ApiResult<Long>>()
-    val postCoverResult: LiveData<ApiResult<Long>> = _postCoverResult
-
-    private val _postVideoResult = MutableLiveData<ApiResult<Long>>()
-    val postVideoResult: LiveData<ApiResult<Long>> = _postVideoResult
-
-    private val _uploadPicItem = MutableLiveData<UploadPicItem>()
-    val uploadPicItem: LiveData<UploadPicItem> = _uploadPicItem
-
-    private val _uploadCoverItem = MutableLiveData<PicParameter>()
-    val uploadCoverItem: LiveData<PicParameter> = _uploadCoverItem
-
-    private val _postVideoMemberResult = MutableLiveData<ApiResult<Long>>()
-    val postVideoMemberResult: LiveData<ApiResult<Long>> = _postVideoMemberResult
-
     private val _totalCountResult = MutableLiveData<Int>()
     val totalCountResult: LiveData<Int> = _totalCountResult
-
-    private val _postArticleResult = MutableLiveData<ApiResult<Long>>()
-    val postArticleResult: LiveData<ApiResult<Long>> = _postArticleResult
 
     private val _followResult = MutableLiveData<ApiResult<Nothing>>()
     val followResult: LiveData<ApiResult<Nothing>> = _followResult
@@ -129,8 +100,6 @@ class HomeViewModel : BaseViewModel() {
 
     private val _cleanRemovedPosList = MutableLiveData<Nothing>()
     val cleanRemovedPosList: LiveData<Nothing> = _cleanRemovedPosList
-
-    private var job = Job()
 
     fun loadNestedStatisticsListForCarousel(position: Int, src: HomeTemplate.Carousel, isAdult: Boolean = false) {
         viewModelScope.launch {
@@ -485,102 +454,6 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-    fun postAttachment(pic: String, context: Context, type: String) {
-        viewModelScope.launch(context = job) {
-            flow {
-                val realPath =  when (type) {
-                    TYPE_VIDEO -> pic
-                    TYPE_PIC -> pic
-                    else -> UriUtils.getPath(context, Uri.parse(pic))
-                }
-                val fileNameSplit = realPath?.split("/")
-                val fileName = fileNameSplit?.last()
-                val extSplit = fileName?.split(".")
-                val ext = "." + extSplit?.last()
-                var mime: String? = null
-
-                if (type == TYPE_PIC) {
-                    val uploadPicItem = UploadPicItem(ext = ext)
-                    _uploadPicItem.postValue(uploadPicItem)
-                } else if (type == TYPE_COVER) {
-                    val picParameter = PicParameter(ext = ext)
-                    _uploadCoverItem.postValue(picParameter)
-                } else if (type == TYPE_VIDEO) {
-                    val mmr = MediaMetadataRetriever()
-                    mmr.setDataSource(realPath)
-                    mime = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE);
-                }
-
-                Timber.d("Upload photo path : $realPath")
-                Timber.d("Upload photo ext : $ext")
-
-                val result = if (mime == null) {
-                    domainManager.getApiRepository().postAttachment(
-                        File(realPath!!),
-                        fileName = URLEncoder.encode(fileName, "UTF-8")
-                    )
-                } else {
-                    domainManager.getApiRepository().postAttachment(
-                        File(realPath!!),
-                        fileName = URLEncoder.encode(fileName, "UTF-8"),
-                        type = mime
-                    )
-                }
-
-                if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(result.body()?.content))
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect {
-                    when (type) {
-                        TYPE_PIC -> _postPicResult.postValue(it)
-                        TYPE_COVER -> _postCoverResult.postValue(it)
-                        TYPE_VIDEO -> _postVideoResult.postValue(it)
-                    }
-                }
-        }
-    }
-
-    fun postPic(request: PostMemberRequest, content: String) {
-        viewModelScope.launch(context = job) {
-            flow {
-                request.content = content
-                Timber.d("Post member request : $request")
-                val resp = domainManager.getApiRepository().postMembersPost(request)
-                if (!resp.isSuccessful) throw HttpException(resp)
-                emit(ApiResult.success(resp.body()?.content))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _postVideoMemberResult.value = it }
-        }
-    }
-
-    fun postArticle(title: String, content: String, tags: ArrayList<String>) {
-        viewModelScope.launch {
-            flow {
-                val request = PostMemberRequest(
-                    title = title,
-                    content = content,
-                    type = PostType.TEXT.value,
-                    tags = tags
-                )
-
-                val resp = domainManager.getApiRepository().postMembersPost(request)
-                if (!resp.isSuccessful) throw HttpException(resp)
-                emit(ApiResult.success(resp.body()?.content))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _postArticleResult.value = it }
-        }
-    }
-
     fun deletePost(
         item: MemberPostItem,
         items: ArrayList<MemberPostItem>
@@ -600,14 +473,7 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-    fun cancelJob() {
-        job.cancel()
-    }
-
     fun clearLiveDataValue() {
-        _postPicResult.value = null
-        _postCoverResult.value = null
-        _postVideoResult.value = null
         _totalCountResult.value = null
     }
 }
