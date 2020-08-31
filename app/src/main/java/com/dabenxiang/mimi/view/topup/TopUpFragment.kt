@@ -69,9 +69,7 @@ class TopUpFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        if(BuildConfig.DEBUG) { //TODO: Order
-            viewModel.getTotalUnread()
-        }
+        viewModel.getTotalUnread()
     }
 
     override fun getLayoutId(): Int {
@@ -306,9 +304,7 @@ class TopUpFragment : BaseFragment() {
     }
 
     private fun initTopUp() {
-        if(BuildConfig.DEBUG) { //TODO: Order
-            tv_record_top_up.visibility = View.VISIBLE
-        }
+        tv_record_top_up.visibility = View.VISIBLE
 
         item_is_Login.visibility = View.VISIBLE
         item_is_not_Login.visibility = View.GONE
