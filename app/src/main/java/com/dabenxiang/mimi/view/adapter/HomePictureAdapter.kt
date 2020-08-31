@@ -27,7 +27,7 @@ class HomePictureAdapter(
     }
 
     override fun getItemCount(): Int {
-        return memberPostItems.size
+        return if(memberPostItems.size > 10) 10 else memberPostItems.size
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {

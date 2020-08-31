@@ -444,6 +444,7 @@ class SearchVideoFragment : BaseFragment() {
             val chip = LayoutInflater.from(chip_group_search_text.context)
                 .inflate(R.layout.chip_item, chip_group_search_text, false) as Chip
             chip.text = text
+            chip.ellipsize = TextUtils.TruncateAt.END
 
             if (viewModel.isAdult) {
                 chip.chipBackgroundColor = ColorStateList.valueOf(

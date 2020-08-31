@@ -21,5 +21,5 @@ data class ChatListItem(
         val lastMessageTime: Date? = null,
 
         @SerializedName("lastReadTime")
-        val lastReadTime: Date? = null
+        var lastReadTime: Date? = null
 ) : Serializable

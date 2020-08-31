@@ -48,7 +48,6 @@ class CategoriesFragment : BaseFragment() {
         const val TEXT_ALL = "全部"
 
         fun createBundle(title: String, categories: String?, item: CategoriesData?): Bundle {
-            Timber.d("@@CategoriesData: $item")
             val data = CategoriesItem()
             data.title = title
             data.categories = categories

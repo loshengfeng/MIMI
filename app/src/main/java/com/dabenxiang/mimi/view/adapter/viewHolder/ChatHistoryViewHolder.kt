@@ -43,7 +43,7 @@ class ChatHistoryViewHolder(
         }
 
         btnChatHistory.setOnClickListener {
-            data?.let { data -> listener.onClickListener(data) }
+            data?.let { data -> listener.onClickListener(data, position) }
         }
 
         data?.avatarAttachmentId?.let {

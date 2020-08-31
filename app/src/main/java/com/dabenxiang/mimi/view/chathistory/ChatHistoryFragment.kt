@@ -24,7 +24,7 @@ class ChatHistoryFragment : BaseFragment() {
 
     private val adapter by lazy { ChatHistoryAdapter(listener) }
     private val listener = object : ChatHistoryAdapter.EventListener {
-        override fun onClickListener(item: ChatListItem) {
+        override fun onClickListener(item: ChatListItem, position: Int) {
             val bundle = ChatContentFragment.createBundle(item)
             navigateTo(
                 NavigateItem.Destination(

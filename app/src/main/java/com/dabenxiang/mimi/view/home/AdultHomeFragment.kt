@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -50,6 +51,7 @@ import com.dabenxiang.mimi.view.home.HomeViewModel.Companion.TYPE_VIDEO
 import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
@@ -74,6 +76,7 @@ import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 import java.io.File
@@ -131,7 +134,22 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         useAdultTheme(true)
+        checkPageState()
         getCurrentAdapter()?.notifyDataSetChanged()
+    }
+
+    private fun checkPageState() {
+        when(lastPosition){
+            2-> {
+                if(accountManager.isLogin()) {
+                    showLoginToggle(false)
+                    refresh.isRefreshing
+                    getData(lastPosition)
+                }
+                else  showLoginToggle(true)
+            }
+            else  -> showLoginToggle(false)
+        }
     }
 
     override fun setupFirstTime() {
@@ -704,10 +722,38 @@ class AdultHomeFragment : BaseFragment() {
             }
         }
 
+        tv_login.setOnClickListener {
+            Timber.i("tv_login tv_login tv_login")
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_loginFragment,
+                    LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                )
+            )
+
+        }
+        tv_register.setOnClickListener {
+            Timber.i("tv_register tv_register tv_register")
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_loginFragment,
+                    LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                )
+            )
+        }
+
         recyclerview_tab.adapter = tabAdapter
         setupRecyclerByPosition(0)
 
         refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
+    }
+
+    private fun showLoginToggle(isShow:Boolean){
+        if(isShow){
+            item_is_not_Login.visibility = View.VISIBLE
+        } else {
+            item_is_not_Login.visibility = View.GONE
+        }
     }
 
     private fun setupRecyclerByPosition(position: Int) {
@@ -728,6 +774,7 @@ class AdultHomeFragment : BaseFragment() {
             0 -> {
                 btn_ranking.visibility = View.VISIBLE
                 rv_home.visibility = View.VISIBLE
+                showLoginToggle(false)
                 takeIf { rv_home.adapter == null }?.also {
                     refresh.isRefreshing = true
                     rv_home.background =
@@ -740,6 +787,7 @@ class AdultHomeFragment : BaseFragment() {
             1 -> {
                 btn_filter.visibility = View.VISIBLE
                 rv_first.visibility = View.VISIBLE
+                showLoginToggle(false)
                 takeIf { rv_first.adapter == null }?.also {
                     refresh.isRefreshing = true
                     rv_first.background =
@@ -763,9 +811,13 @@ class AdultHomeFragment : BaseFragment() {
                         followPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
                             ?.let { View.GONE } ?: let { View.VISIBLE }
                 }
+                takeIf{ !accountManager.isLogin() }?.also {
+                    showLoginToggle(true)
+                }
             }
             3 -> {
                 rv_third.visibility = View.VISIBLE
+                showLoginToggle(false)
                 takeIf { rv_third.adapter == null }?.also {
                     refresh.isRefreshing = true
                     rv_third.background =
@@ -781,6 +833,7 @@ class AdultHomeFragment : BaseFragment() {
             }
             4 -> {
                 rv_fourth.visibility = View.VISIBLE
+                showLoginToggle(false)
                 takeIf { rv_fourth.adapter == null }?.also {
                     refresh.isRefreshing = true
                     rv_fourth.background =
@@ -796,6 +849,7 @@ class AdultHomeFragment : BaseFragment() {
             }
             5 -> {
                 rv_fifth.visibility = View.VISIBLE
+                showLoginToggle(false)
                 takeIf { rv_fifth.adapter == null }?.also {
                     refresh.isRefreshing = true
                     rv_fifth.background =
@@ -811,6 +865,7 @@ class AdultHomeFragment : BaseFragment() {
             }
             else -> {
                 rv_sixth.visibility = View.VISIBLE
+                showLoginToggle(false)
                 takeIf { rv_sixth.adapter == null }?.also {
                     refresh.isRefreshing = true
                     rv_sixth.background =
