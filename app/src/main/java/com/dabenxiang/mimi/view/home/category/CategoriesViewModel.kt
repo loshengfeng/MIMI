@@ -64,7 +64,8 @@ class CategoriesViewModel : BaseViewModel() {
                     domainManager,
                     pagingCallback,
                     adWidth,
-                    adHeight
+                    adHeight,
+                        false
                 )
             val factory =
                 VideoFactory(dataSrc)

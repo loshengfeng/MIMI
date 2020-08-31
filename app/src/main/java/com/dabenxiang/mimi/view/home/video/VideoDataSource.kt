@@ -7,6 +7,8 @@ import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.model.vo.searchItemToVideoItem
 import com.dabenxiang.mimi.model.vo.simpleVideoItemToVideoItem
+import com.dabenxiang.mimi.model.vo.statisticsItemToVideoItem
+import com.dabenxiang.mimi.view.home.HomeViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -20,7 +22,8 @@ class VideoDataSource(
     private val domainManager: DomainManager,
     private val pagingCallback: PagingCallback,
     private val adWidth: Int,
-    private val adHeight: Int
+    private val adHeight: Int,
+    private val isStatistics: Boolean
 ) : PageKeyedDataSource<Long, BaseVideoItem>() {
 
     companion object {
@@ -42,26 +45,52 @@ class VideoDataSource(
                 returnList.add(BaseVideoItem.Banner(item))
 
                 if (category != null) {
-                    val result = domainManager.getApiRepository().searchWithCategory(
-                        category, isAdult, "0",
-                        PER_LIMIT
-                    )
-                    if (!result.isSuccessful) throw HttpException(result)
+                    var nextPageKey: Long?
+                    if(!isStatistics) {
+                        val result = domainManager.getApiRepository().searchWithCategory(
+                                category, isAdult, "0",
+                                PER_LIMIT
+                        )
+                        if (!result.isSuccessful) throw HttpException(result)
 
-                    val item = result.body()
-                    val videos = item?.content
-                    if (videos != null) {
-                        returnList.addAll(videos.simpleVideoItemToVideoItem(isAdult))
-                    }
+                        val item = result.body()
+                        val videos = item?.content
+                        if (videos != null) {
+                            returnList.addAll(videos.simpleVideoItemToVideoItem(isAdult))
+                        }
 
-                    val nextPageKey = when {
-                        hasNextPage(
-                            item?.paging?.count ?: 0,
-                            item?.paging?.offset ?: 0,
-                            videos?.size ?: 0
-                        ) -> PER_LIMIT_LONG
-                        else -> null
+                        nextPageKey = when {
+                            hasNextPage(
+                                    item?.paging?.count ?: 0,
+                                    item?.paging?.offset ?: 0,
+                                    videos?.size ?: 0
+                            ) -> PER_LIMIT_LONG
+                            else -> null
+                        }
+                    } else {
+                        val result = domainManager.getApiRepository().statisticsHomeVideos(
+                                category = category,
+                                isAdult = isAdult,
+                                offset = 0,
+                                limit = HomeViewModel.PAGING_LIMIT
+                        )
+                        if (!result.isSuccessful) throw HttpException(result)
+                        val item = result.body()
+                        val videos = item?.content
+                        if (videos != null) {
+                            returnList.addAll(videos.statisticsItemToVideoItem(isAdult))
+                        }
+
+                        nextPageKey = when {
+                            hasNextPage(
+                                    item?.paging?.count ?: 0,
+                                    item?.paging?.offset ?: 0,
+                                    videos?.size ?: 0
+                            ) -> PER_LIMIT_LONG
+                            else -> null
+                        }
                     }
+                    
                     emit(
                         LoadResult(
                             returnList,
