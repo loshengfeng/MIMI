@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -152,6 +151,287 @@ class AdultHomeFragment : BaseFragment() {
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        mainViewModel?.categoriesData?.observe(this, Observer {
+            when (it) {
+                is Loading -> refresh.isRefreshing = true
+                is Loaded -> refresh.isRefreshing = false
+                is Success -> {
+                    val list = mutableListOf<String>()
+                    list.add(getString(R.string.home))
+                    mainViewModel?.setupAdultCategoriesItem(it.result.content?.getAdult())
+                    mainViewModel?.adult?.categories?.also { level2 ->
+                        for (i in 0 until level2.count()) {
+                            val detail = level2[i]
+                            list.add(detail.name)
+                        }
+                        tabAdapter.submitList(list, lastPosition)
+                        setupHomeData(mainViewModel?.adult)
+                    }
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
+        mainViewModel?.getAdHomeResult?.observe(this, Observer {
+            when (val response = it.second) {
+                is Success -> {
+                    val viewHolder = homeBannerViewHolderMap[it.first]
+                    viewHolder?.updateItem(response.result)
+                }
+                is Error -> onApiError(response.throwable)
+            }
+        })
+
+        viewModel.showProgress.observe(this, Observer { showProgress ->
+            showProgress?.takeUnless { it }?.also { refresh.isRefreshing = it }
+        })
+
+        viewModel.videoList.observe(this, Observer {
+            videoListAdapter.submitList(it)
+            videoListAdapter.notifyDataSetChanged()
+        })
+
+        viewModel.carouselResult.observe(this, Observer {
+            when (val response = it.second) {
+                is Success -> {
+                    val viewHolder = homeCarouselViewHolderMap[it.first]
+                    val carousel = carouselMap[it.first]
+                    val carouselHolderItems =
+                        response.result.content?.categoryBannerItemCarouselHolderItem()
+//                        response.result.content?.statisticsItemToCarouselHolderItem(carousel!!.isAdult)
+                    viewHolder?.submitList(carouselHolderItems)
+                }
+                is Error -> onApiError(response.throwable)
+            }
+        })
+
+        viewModel.videosResult.observe(this, Observer {
+            when (val response = it.second) {
+                is Loaded -> {
+                    val viewHolder = homeStatisticsViewHolderMap[it.first]
+                    viewHolder?.hideProgressBar()
+                }
+                is Success -> {
+                    val viewHolder = homeStatisticsViewHolderMap[it.first]
+                    val statistics = statisticsMap[it.first]
+                    val videoHolderItems =
+                        response.result.content?.statisticsItemToVideoItem(statistics!!.isAdult)
+                    viewHolder?.submitList(videoHolderItems)
+                }
+                is Error -> onApiError(response.throwable)
+            }
+        })
+
+        viewModel.clipsResult.observe(this, Observer {
+            when (val response = it.second) {
+                is Loaded -> {
+                    val viewHolder = homeClipViewHolderMap[it.first]
+                    viewHolder?.hideProgressBar()
+                }
+                is Success -> {
+                    val viewHolder = homeClipViewHolderMap[it.first]
+                    val memberPostItems = response.result.content ?: arrayListOf()
+                    viewHolder?.submitList(memberPostItems)
+                }
+                is Error -> onApiError(response.throwable)
+            }
+        })
+
+        viewModel.pictureResult.observe(this, Observer {
+            when (val response = it.second) {
+                is Loaded -> {
+                    val viewHolder = homePictureViewHolderMap[it.first]
+                    viewHolder?.hideProgressBar()
+                }
+                is Success -> {
+                    val viewHolder = homePictureViewHolderMap[it.first]
+                    val memberPostItems = response.result.content ?: arrayListOf()
+                    viewHolder?.submitList(memberPostItems)
+                }
+                is Error -> onApiError(response.throwable)
+            }
+        })
+
+        viewModel.clubResult.observe(this, Observer {
+            when (val response = it.second) {
+                is Loaded -> {
+                    val viewHolder = homeClubViewHolderMap[it.first]
+                    viewHolder?.hideProgressBar()
+                }
+                is Success -> {
+                    val viewHolder = homeClubViewHolderMap[it.first]
+                    val memberClubItems = response.result.content ?: arrayListOf()
+                    viewHolder?.submitList(memberClubItems)
+                }
+                is Error -> onApiError(response.throwable)
+            }
+        })
+
+        viewModel.postFollowItemListResult.observe(this, Observer {
+            followPostPagedAdapter.submitList(it)
+            followPostPagedAdapter.notifyDataSetChanged()
+        })
+
+        viewModel.clipPostItemListResult.observe(this, Observer {
+            clipPostPagedAdapter.submitList(it)
+            clipPostPagedAdapter.notifyDataSetChanged()
+        })
+
+        viewModel.picturePostItemListResult.observe(this, Observer {
+            picturePostPagedAdapter.submitList(it)
+            picturePostPagedAdapter.notifyDataSetChanged()
+        })
+
+        viewModel.textPostItemListResult.observe(this, Observer {
+            textPostPagedAdapter.submitList(it)
+            textPostPagedAdapter.notifyDataSetChanged()
+        })
+
+        viewModel.clubItemListResult.observe(this, Observer {
+            clubMemberAdapter.submitList(it)
+            clubMemberAdapter.notifyDataSetChanged()
+        })
+
+        viewModel.postPicResult.observe(this, Observer {
+            when (it) {
+                is Success -> {
+                    uploadPicItem[uploadCurrentPicPosition].id = it.result
+                    uploadCurrentPicPosition += 1
+
+                    if (uploadCurrentPicPosition > uploadPicUri.size - 1) {
+                        uploadPhoto()
+                    } else {
+                        val pic = uploadPicUri[uploadCurrentPicPosition]
+                        viewModel.postAttachment(pic.uri, requireContext(), TYPE_PIC)
+                    }
+                }
+                is Error -> {
+                    resetAndCancelJob(it.throwable, getString(R.string.post_error))
+                }
+            }
+        })
+
+        viewModel.postCoverResult.observe(this, Observer {
+            when (it) {
+                is Success -> {
+                    picParameter.id = it.result.toString()
+                    viewModel.clearLiveDataValue()
+                    val realPath =
+                        UriUtils.getPath(requireContext(), Uri.parse(uploadVideoUri[0].videoUrl))
+                    uploadVideoUri[0].videoUrl = realPath!!
+
+                    val outPutPath = PostManager().getCompressPath(realPath, requireContext())
+                    compressVideoAndUpload(realPath, outPutPath)
+                }
+                is Error -> {
+                    resetAndCancelJob(it.throwable, getString(R.string.post_error))
+                }
+            }
+        })
+
+        viewModel.postVideoResult.observe(this, Observer {
+            when (it) {
+                is Success -> {
+                    val mediaItem = MediaItem()
+                    val videoParameter = VideoParameter(
+                        id = it.result.toString(),
+                        length = uploadVideoUri[0].length
+                    )
+                    mediaItem.picParameter.add(picParameter)
+                    mediaItem.videoParameter = videoParameter
+                    mediaItem.textContent = postMemberRequest.content
+                    val content = Gson().toJson(mediaItem)
+                    memberPostItem.content = content
+                    Timber.d("Post video content item : $content")
+                    viewModel.clearLiveDataValue()
+                    viewModel.postPic(postMemberRequest, content)
+
+                    postType = PostType.VIDEO
+                }
+                is Error -> {
+                    resetAndCancelJob(it.throwable, getString(R.string.post_error))
+                }
+            }
+        })
+
+        viewModel.uploadPicItem.observe(this, Observer {
+            uploadPicItem.add(it)
+        })
+
+        viewModel.postVideoMemberResult.observe(this, Observer {
+            when (it) {
+                is Success -> setSnackBarPostStatus(it.result)
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.uploadCoverItem.observe(this, Observer {
+            picParameter = it
+        })
+
+        viewModel.totalCountResult.observe(this, Observer {
+            it?.also { totalCount ->
+                cl_no_data.visibility =
+                    takeIf { totalCount > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
+                takeIf { rv_sixth.visibility == View.VISIBLE }?.also {
+                    clubMemberAdapter.totalCount = totalCount
+                }
+                viewModel.clearLiveDataValue()
+            }
+        })
+
+        viewModel.postArticleResult.observe(this, Observer {
+            when (it) {
+                is Success -> {
+                    postType = PostType.TEXT
+                    setSnackBarPostStatus(it.result)
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.followResult.observe(this, Observer {
+            when (it) {
+                is Empty -> {
+                    getCurrentAdapter()?.notifyItemRangeChanged(
+                        0,
+                        viewModel.totalCount,
+                        PAYLOAD_UPDATE_FOLLOW
+                    )
+                    viewModel.getAllOtherPosts(lastPosition)
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
+        mainViewModel?.deletePostResult?.observe(this, Observer {
+            when (lastPosition) {
+                2, 3, 4, 5 -> {
+                    when (it) {
+                        is Success -> {
+                            val adapter = getCurrentAdapter() as MemberPostPagedAdapter
+                            adapter.removedPosList.add(it.result)
+                            adapter.notifyItemChanged(it.result)
+                        }
+                        is Error -> onApiError(it.throwable)
+                    }
+                }
+            }
+        })
+
+        viewModel.cleanRemovedPosList.observe(this, Observer {
+            when (lastPosition) {
+                2, 3, 4, 5 -> {
+                    val adapter = getCurrentAdapter() as MemberPostPagedAdapter
+                    adapter.removedPosList.clear()
+                }
+            }
+        })
+    }
+
     override fun setupFirstTime() {
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
@@ -239,283 +519,6 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        mainViewModel?.categoriesData?.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Loading -> refresh.isRefreshing = true
-                is Loaded -> refresh.isRefreshing = false
-                is Success -> {
-                    val list = mutableListOf<String>()
-                    list.add(getString(R.string.home))
-                    mainViewModel?.setupAdultCategoriesItem(it.result.content?.getAdult())
-                    mainViewModel?.adult?.categories?.also { level2 ->
-                        for (i in 0 until level2.count()) {
-                            val detail = level2[i]
-                            list.add(detail.name)
-                        }
-                        tabAdapter.submitList(list, lastPosition)
-                        setupHomeData(mainViewModel?.adult)
-                    }
-                }
-                is Error -> onApiError(it.throwable)
-            }
-        })
-
-        mainViewModel?.getAdHomeResult?.observe(viewLifecycleOwner, Observer {
-            when (val response = it.second) {
-                is Success -> {
-                    val viewHolder = homeBannerViewHolderMap[it.first]
-                    viewHolder?.updateItem(response.result)
-                }
-                is Error -> onApiError(response.throwable)
-            }
-        })
-
-        viewModel.showProgress.observe(viewLifecycleOwner, Observer { showProgress ->
-            showProgress?.takeUnless { it }?.also { refresh.isRefreshing = it }
-        })
-
-        viewModel.videoList.observe(viewLifecycleOwner, Observer {
-            videoListAdapter.submitList(it)
-            videoListAdapter.notifyDataSetChanged()
-        })
-
-        viewModel.carouselResult.observe(viewLifecycleOwner, Observer {
-            when (val response = it.second) {
-                is Success -> {
-                    val viewHolder = homeCarouselViewHolderMap[it.first]
-                    val carousel = carouselMap[it.first]
-                    val carouselHolderItems =
-                        response.result.content?.categoryBannerItemCarouselHolderItem()
-//                        response.result.content?.statisticsItemToCarouselHolderItem(carousel!!.isAdult)
-                    viewHolder?.submitList(carouselHolderItems)
-                }
-                is Error -> onApiError(response.throwable)
-            }
-        })
-
-        viewModel.videosResult.observe(viewLifecycleOwner, Observer {
-            when (val response = it.second) {
-                is Loaded -> {
-                    val viewHolder = homeStatisticsViewHolderMap[it.first]
-                    viewHolder?.hideProgressBar()
-                }
-                is Success -> {
-                    val viewHolder = homeStatisticsViewHolderMap[it.first]
-                    val statistics = statisticsMap[it.first]
-                    val videoHolderItems =
-                        response.result.content?.statisticsItemToVideoItem(statistics!!.isAdult)
-                    viewHolder?.submitList(videoHolderItems)
-                }
-                is Error -> onApiError(response.throwable)
-            }
-        })
-
-        viewModel.clipsResult.observe(viewLifecycleOwner, Observer {
-            when (val response = it.second) {
-                is Loaded -> {
-                    val viewHolder = homeClipViewHolderMap[it.first]
-                    viewHolder?.hideProgressBar()
-                }
-                is Success -> {
-                    val viewHolder = homeClipViewHolderMap[it.first]
-                    val memberPostItems = response.result.content ?: arrayListOf()
-                    viewHolder?.submitList(memberPostItems)
-                }
-                is Error -> onApiError(response.throwable)
-            }
-        })
-
-        viewModel.pictureResult.observe(viewLifecycleOwner, Observer {
-            when (val response = it.second) {
-                is Loaded -> {
-                    val viewHolder = homePictureViewHolderMap[it.first]
-                    viewHolder?.hideProgressBar()
-                }
-                is Success -> {
-                    val viewHolder = homePictureViewHolderMap[it.first]
-                    val memberPostItems = response.result.content ?: arrayListOf()
-                    viewHolder?.submitList(memberPostItems)
-                }
-                is Error -> onApiError(response.throwable)
-            }
-        })
-
-        viewModel.clubResult.observe(viewLifecycleOwner, Observer {
-            when (val response = it.second) {
-                is Loaded -> {
-                    val viewHolder = homeClubViewHolderMap[it.first]
-                    viewHolder?.hideProgressBar()
-                }
-                is Success -> {
-                    val viewHolder = homeClubViewHolderMap[it.first]
-                    val memberClubItems = response.result.content ?: arrayListOf()
-                    viewHolder?.submitList(memberClubItems)
-                }
-                is Error -> onApiError(response.throwable)
-            }
-        })
-
-        viewModel.postFollowItemListResult.observe(viewLifecycleOwner, Observer {
-            followPostPagedAdapter.submitList(it)
-            followPostPagedAdapter.notifyDataSetChanged()
-        })
-
-        viewModel.clipPostItemListResult.observe(viewLifecycleOwner, Observer {
-            clipPostPagedAdapter.submitList(it)
-            clipPostPagedAdapter.notifyDataSetChanged()
-        })
-
-        viewModel.picturePostItemListResult.observe(viewLifecycleOwner, Observer {
-            picturePostPagedAdapter.submitList(it)
-            picturePostPagedAdapter.notifyDataSetChanged()
-        })
-
-        viewModel.textPostItemListResult.observe(viewLifecycleOwner, Observer {
-            textPostPagedAdapter.submitList(it)
-            textPostPagedAdapter.notifyDataSetChanged()
-        })
-
-        viewModel.clubItemListResult.observe(viewLifecycleOwner, Observer {
-            clubMemberAdapter.submitList(it)
-            clubMemberAdapter.notifyDataSetChanged()
-        })
-
-        viewModel.postPicResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Success -> {
-                    uploadPicItem[uploadCurrentPicPosition].id = it.result
-                    uploadCurrentPicPosition += 1
-
-                    if (uploadCurrentPicPosition > uploadPicUri.size - 1) {
-                        uploadPhoto()
-                    } else {
-                        val pic = uploadPicUri[uploadCurrentPicPosition]
-                        viewModel.postAttachment(pic.uri, requireContext(), TYPE_PIC)
-                    }
-                }
-                is Error -> {
-                    resetAndCancelJob(it.throwable, getString(R.string.post_error))
-                }
-            }
-        })
-
-        viewModel.postCoverResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Success -> {
-                    picParameter.id = it.result.toString()
-                    viewModel.clearLiveDataValue()
-                    val realPath =
-                        UriUtils.getPath(requireContext(), Uri.parse(uploadVideoUri[0].videoUrl))
-                    uploadVideoUri[0].videoUrl = realPath!!
-
-                    val outPutPath = PostManager().getCompressPath(realPath, requireContext())
-                    compressVideoAndUpload(realPath, outPutPath)
-                }
-                is Error -> {
-                    resetAndCancelJob(it.throwable, getString(R.string.post_error))
-                }
-            }
-        })
-
-        viewModel.postVideoResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Success -> {
-                    val mediaItem = MediaItem()
-                    val videoParameter = VideoParameter(
-                        id = it.result.toString(),
-                        length = uploadVideoUri[0].length
-                    )
-                    mediaItem.picParameter.add(picParameter)
-                    mediaItem.videoParameter = videoParameter
-                    mediaItem.textContent = postMemberRequest.content
-                    val content = Gson().toJson(mediaItem)
-                    memberPostItem.content = content
-                    Timber.d("Post video content item : $content")
-                    viewModel.clearLiveDataValue()
-                    viewModel.postPic(postMemberRequest, content)
-
-                    postType = PostType.VIDEO
-                }
-                is Error -> {
-                    resetAndCancelJob(it.throwable, getString(R.string.post_error))
-                }
-            }
-        })
-
-        viewModel.uploadPicItem.observe(viewLifecycleOwner, Observer {
-            uploadPicItem.add(it)
-        })
-
-        viewModel.postVideoMemberResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Success -> setSnackBarPostStatus(it.result)
-                is Error -> onApiError(it.throwable)
-            }
-        })
-
-        viewModel.uploadCoverItem.observe(viewLifecycleOwner, Observer {
-            picParameter = it
-        })
-
-        viewModel.totalCountResult.observe(viewLifecycleOwner, Observer {
-            it?.also { totalCount ->
-                cl_no_data.visibility =
-                    takeIf { totalCount > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
-                takeIf { rv_sixth.visibility == View.VISIBLE }?.also {
-                    clubMemberAdapter.totalCount = totalCount
-                }
-                viewModel.clearLiveDataValue()
-            }
-        })
-
-        viewModel.postArticleResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Success -> {
-                    postType = PostType.TEXT
-                    setSnackBarPostStatus(it.result)
-                }
-                is Error -> onApiError(it.throwable)
-            }
-        })
-
-        viewModel.followResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Empty -> {
-                    getCurrentAdapter()?.notifyItemRangeChanged(
-                        0,
-                        viewModel.totalCount,
-                        PAYLOAD_UPDATE_FOLLOW
-                    )
-                    viewModel.getAllOtherPosts(lastPosition)
-                }
-                is Error -> onApiError(it.throwable)
-            }
-        })
-
-        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
-            when (lastPosition) {
-                2, 3, 4, 5 -> {
-                    when (it) {
-                        is Success -> {
-                            val adapter = getCurrentAdapter() as MemberPostPagedAdapter
-                            adapter.removedPosList.add(it.result)
-                            adapter.notifyItemChanged(it.result)
-                        }
-                        is Error -> onApiError(it.throwable)
-                    }
-                }
-            }
-        })
-
-        viewModel.cleanRemovedPosList.observe(viewLifecycleOwner, Observer {
-            when (lastPosition) {
-                2, 3, 4, 5 -> {
-                    val adapter = getCurrentAdapter() as MemberPostPagedAdapter
-                    adapter.removedPosList.clear()
-                }
-            }
-        })
-
     }
 
     private fun uploadPhoto() {
