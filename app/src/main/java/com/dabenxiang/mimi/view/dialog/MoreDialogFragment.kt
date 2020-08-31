@@ -15,16 +15,19 @@ class MoreDialogFragment : BaseDialogFragment() {
     companion object {
         fun newInstance(
             item: BaseMemberPostItem,
-            listener: OnMoreDialogListener
+            listener: OnMoreDialogListener,
+            isComment: Boolean? = false
         ): MoreDialogFragment {
             val fragment = MoreDialogFragment()
             fragment.item = item
             fragment.listener = listener
+            fragment.isComment = isComment
             return fragment
         }
     }
 
     var item: BaseMemberPostItem? = null
+    var isComment: Boolean? = false
     var listener: OnMoreDialogListener? = null
 
     override fun isFullLayout(): Boolean {
@@ -49,7 +52,7 @@ class MoreDialogFragment : BaseDialogFragment() {
             tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1))
             tv_problem_report.setOnClickListener {
                 Timber.i(" isReport=$isReport")
-                listener?.onProblemReport(item!!)
+                listener?.onProblemReport(item!!, isComment!!)
             }
         }
 
@@ -63,7 +66,7 @@ class MoreDialogFragment : BaseDialogFragment() {
     }
 
     interface OnMoreDialogListener {
-        fun onProblemReport(item: BaseMemberPostItem)
+        fun onProblemReport(item: BaseMemberPostItem, isComment:Boolean)
         fun onCancel()
     }
 }

@@ -47,6 +47,7 @@
     <string name="forget_password">忘记密码</string>
     <string name="login_yet">尚未登录</string>
     <string name="login_message">请立即登录享受线上强档</string>
+    <string name="login_message_account">请登录帐户</string>
     <string name="error_bad_request">参数错误</string>
     <string name="error_username_or_password_incorrect">使用者名称或密码错误</string>
     <string name="error_account_disable">此帐户已停用</string>
@@ -287,6 +288,11 @@
         <item>垃圾内容或误导性内容</item>
         <item>仇恨与恶意内容</item>
         <item>有害的危险行为</item>
+    </string-array>
+
+    <string-array name="video_comment_problem_report_item">
+        <item>垃圾内容或误导性内容</item>
+        <item>仇恨与恶意内容</item>
     </string-array>
 
     <string-array name="picture_problem_report_item">

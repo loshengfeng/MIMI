@@ -56,9 +56,9 @@ class CommentDialogFragment : BaseDialogFragment() {
     var moreDialog: MoreDialogFragment? = null
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-        override fun onProblemReport(item: BaseMemberPostItem) {
+        override fun onProblemReport(item: BaseMemberPostItem, isComment:Boolean) {
             moreDialog?.dismiss()
-            (requireActivity() as MainActivity).showReportDialog(item, data)
+            (requireActivity() as MainActivity).showReportDialog(item, data, isComment)
         }
 
         override fun onCancel() {
@@ -133,7 +133,7 @@ class CommentDialogFragment : BaseDialogFragment() {
             }
 
             override fun onMoreClick(item: MembersPostCommentItem) {
-                moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
+                moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener, true).also {
                     it.show(
                         requireActivity().supportFragmentManager,
                         MoreDialogFragment::class.java.simpleName
