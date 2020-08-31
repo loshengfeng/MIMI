@@ -29,9 +29,6 @@ class ClubDetailViewModel : BaseViewModel() {
     private var _followClubResult = MutableLiveData<ApiResult<Boolean>>()
     val followClubResult: LiveData<ApiResult<Boolean>> = _followClubResult
 
-    private var _followMemberResult = MutableLiveData<ApiResult<Nothing>>()
-    val followMemberResult: LiveData<ApiResult<Nothing>> = _followMemberResult
-
     fun getMemberPosts(
         tag: String,
         orderBy: OrderBy,
@@ -86,7 +83,6 @@ class ClubDetailViewModel : BaseViewModel() {
         }
     }
 
-    var totalCount: Int = 0
     fun followMember(
         item: MemberPostItem,
         items: List<MemberPostItem>,
@@ -180,15 +176,8 @@ class ClubDetailViewModel : BaseViewModel() {
             setShowProgress(false)
         }
 
-        override fun onThrowable(throwable: Throwable) {
-        }
-
-        override fun onSucceed() {
-        }
-
         override fun onTotalCount(count: Long, isInitial: Boolean) {
-            totalCount = if (isInitial) count.toInt()
-            else totalCount.plus(count.toInt())
+            if(isInitial) cleanRemovedPosList()
         }
     }
 }

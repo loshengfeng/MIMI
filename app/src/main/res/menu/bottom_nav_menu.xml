@@ -14,7 +14,7 @@
         android:id="@+id/navigation_topup"
         android:enabled="true"
         android:icon="@drawable/btn_micoin"
-        android:title="@string/nav_topup" />
+        android:title="@string/nav_topup"/>
     <item
         android:id="@+id/navigation_favorite"
         android:enabled="true"

@@ -36,25 +36,29 @@ open class BaseChatContentViewHolder(
 
     override fun updated(position: Int) {
         super.updated(position)
-        val avatarId = if (TextUtils.equals(pref.profileItem.userId.toString(), data?.username)) {
-            pref.profileItem.avatarAttachmentId.toString()
+        val avatarId: String
+        val defaultRes: Int
+        if (TextUtils.equals(pref.profileItem.userId.toString(), data?.username)) {
+            avatarId = pref.profileItem.avatarAttachmentId.toString()
+            defaultRes = R.drawable.default_profile_picture
         } else {
-            listener.getSenderAvatar()
+            avatarId = listener.getSenderAvatar()
+            defaultRes =  R.drawable.icon_cs_photo
         }
 
         avatarId.let {
             LruCacheUtils.getLruArrayCache(avatarId)?.also { array ->
                 val options: RequestOptions = RequestOptions()
                     .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                    .placeholder(R.drawable.default_profile_picture)
-                    .error(R.drawable.default_profile_picture)
+                    .placeholder(defaultRes)
+                    .error(defaultRes)
                     .priority(Priority.NORMAL)
 
                 Glide.with(App.self).asBitmap()
                     .load(array)
                     .apply(options)
                     .into(ivHead)
-            } ?: run {
+            } ?: takeIf { avatarId != "0" }?.run {
                 listener.onGetAvatarAttachment(avatarId, position)
             }
         }

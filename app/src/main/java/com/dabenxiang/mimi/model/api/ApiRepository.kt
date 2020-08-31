@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.model.api
 
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.api.vo.error.TOKEN_NOT_FOUND
+import com.dabenxiang.mimi.model.enums.OrderType
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.StatisticsType
@@ -22,6 +23,8 @@ class ApiRepository(private val apiService: ApiService) {
         fun isRefreshTokenFailed(code: String?): Boolean {
             return code == TOKEN_NOT_FOUND
         }
+
+        const val NETWORK_PAGE_SIZE = 20
     }
 
     /**********************************************************
@@ -339,6 +342,16 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun cancelFollowClub(clubId: Long): Response<Void> {
         return apiService.cancelFollowClub(clubId)
     }
+
+    /**********************************************************
+     *
+     *                   Members/Home/Banner
+     *
+     ***********************************************************/
+    /**
+     * 取得影片Banner
+     */
+    suspend fun fetchHomeBanner(bannerCategory: Int) = apiService.fetchHomeBanner(bannerCategory)
 
     /**********************************************************
      *
@@ -692,6 +705,16 @@ class ApiRepository(private val apiService: ApiService) {
     ) = apiService.getVideoStreamM3u8(streamId, userId, utcTime, sign)
 
     /**
+     * 取得m3u8播放列表檔案
+     */
+    suspend fun getVideoM3u8Source(
+        streamId: Long,
+        userId: Long? = null,
+        utcTime: Long? = null,
+        sign: String? = null
+    ) = apiService.getVideoM3u8Source(streamId, userId, utcTime, sign)
+
+    /**
      * 取得在線支付
      */
     suspend fun getOrderingPackage(): Response<ApiBaseItem<ArrayList<OrderingPackageItem>>> {
@@ -718,25 +741,32 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun getOrder(
         offset: String,
         limit: String
-    ): Response<ApiBasePagingItem<ArrayList<OrderItem>>> {
+    ): Response<ApiBasePagingItem<OrderContentItem>> {
         return apiService.getOrder(offset, limit)
     }
 
     /**
      * 依據isOnline, 取得充值管理
      */
-    suspend fun getOrderByOnline(
-        isOnline: Boolean,
+    suspend fun getOrderByType(
+        type: OrderType,
         offset: String,
         limit: String
-    ): Response<ApiBasePagingItem<ArrayList<OrderItem>>> {
-        return apiService.getOrderByOnline(isOnline, offset, limit)
+    ): Response<ApiBasePagingItem<OrderContentItem>> {
+        return apiService.getOrderByType(type.value, offset, limit)
+    }
+
+    /**
+     * 取得未完成訂單
+     */
+    suspend fun getPendingOrderCount(): Response<ApiBaseItem<PendingOrderItem>> {
+        return apiService.getPendingOrderCount()
     }
 
     /**
      * 建立工單聊天室
      */
-    suspend fun createOrderChat(request: CreateChatRequest): Response<Void> {
+    suspend fun createOrderChat(request: CreateChatRequest): Response<ApiBaseItem<CreateOrderChatItem>> {
         return apiService.createOrderChat(request)
     }
 

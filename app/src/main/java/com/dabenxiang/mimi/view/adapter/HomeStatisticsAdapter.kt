@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
@@ -10,6 +11,8 @@ import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.viewholder.VideoViewHolder
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import kotlinx.android.synthetic.main.nested_item_home_statistics.view.*
 
 class HomeStatisticsAdapter(
     private val nestedListener: HomeAdapter.EventListener,
@@ -22,6 +25,15 @@ class HomeStatisticsAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.nested_item_home_statistics, parent, false)
+        val layoutParams = view.layout_card.layoutParams as ConstraintLayout.LayoutParams
+        if(isAdult) {
+            layoutParams.width = (((200.0 / 360.0)) * GeneralUtils.getWindowsWidth()).toInt()
+            layoutParams.height = (((113.0 / 640.0)) * GeneralUtils.getWindowsHeight()).toInt()
+        } else {
+            layoutParams.width = (((100.0 / 360.0)) * GeneralUtils.getWindowsWidth()).toInt()
+            layoutParams.height = (((144.0 / 640.0)) * GeneralUtils.getWindowsHeight()).toInt()
+        }
+        view.layout_card.layoutParams = layoutParams
         return VideoViewHolder(view, videoViewHolderListener)
     }
 
@@ -30,7 +42,7 @@ class HomeStatisticsAdapter(
         return when {
             count == null -> 0
             count < 2 -> count
-            else -> Int.MAX_VALUE
+            else -> 10
         }
     }
 

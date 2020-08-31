@@ -11,20 +11,17 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
-import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
+import com.dabenxiang.mimi.model.api.ApiResult.Error
+import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
-import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
-import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
-import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
@@ -57,8 +54,6 @@ class ClubDetailFragment : BaseFragment() {
     private val viewModel: ClubDetailViewModel by viewModels()
 
     private val memberClubItem by lazy { arguments?.getSerializable(KEY_DATA) as MemberClubItem }
-
-    private var moreDialog: MoreDialogFragment? = null
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -111,11 +106,27 @@ class ClubDetailFragment : BaseFragment() {
     override fun setupObservers() {
         viewModel.followClubResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     updateFollow()
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
+        })
+
+        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    val adapter = (viewPager.adapter as ClubPagerAdapter).getListAdapter(tabLayout.selectedTabPosition)
+                    adapter.removedPosList.add(it.result)
+                    adapter.notifyItemChanged(it.result)
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.cleanRemovedPosList.observe(viewLifecycleOwner, Observer {
+            val adapter = (viewPager.adapter as ClubPagerAdapter).getListAdapter(tabLayout.selectedTabPosition)
+            adapter.removedPosList.clear()
         })
     }
 
@@ -187,13 +198,14 @@ class ClubDetailFragment : BaseFragment() {
             }
         }
 
-        override fun onMoreClick(item: MemberPostItem) {
-            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
-                it.show(
-                    requireActivity().supportFragmentManager,
-                    MoreDialogFragment::class.java.simpleName
-                )
-            }
+        override fun onMoreClick(item: MemberPostItem, items: List<MemberPostItem>) {
+            onMoreClick(
+                item,
+                ArrayList(items),
+                onEdit = {
+                    // TODO #1180
+                }
+            )
         }
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
@@ -276,17 +288,6 @@ class ClubDetailFragment : BaseFragment() {
                     bundle
                 )
             )
-        }
-    }
-
-    private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-        override fun onProblemReport(item: BaseMemberPostItem) {
-            moreDialog?.dismiss()
-            checkStatus { (requireActivity() as MainActivity).showReportDialog(item) }
-        }
-
-        override fun onCancel() {
-            moreDialog?.dismiss()
         }
     }
 

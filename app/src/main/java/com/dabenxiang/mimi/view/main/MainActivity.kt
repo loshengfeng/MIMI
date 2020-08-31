@@ -6,21 +6,22 @@ import android.content.Intent
 import android.content.pm.PackageInstaller
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.LayoutInflater
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.NavDeepLinkBuilder
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
-import com.dabenxiang.mimi.App
-import com.dabenxiang.mimi.NAVIGATE_TO_ACTION
-import com.dabenxiang.mimi.PACKAGE_INSTALLED_ACTION
-import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.*
 import com.dabenxiang.mimi.extension.setupWithNavController
-import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.extension.switchTab
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
+import com.dabenxiang.mimi.model.enums.BottomNavType
 import com.dabenxiang.mimi.model.vo.StatusItem
 import com.dabenxiang.mimi.view.base.BaseActivity
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
@@ -36,6 +37,8 @@ import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.view.setting.SettingFragment
 import com.dabenxiang.mimi.widget.utility.FileUtil.deleteExternalFile
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.google.android.material.bottomnavigation.BottomNavigationItemView
+import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
 import java.util.*
@@ -44,36 +47,58 @@ class MainActivity : BaseActivity(), InteractionListener {
 
     private val viewModel: MainViewModel by viewModels()
 
+    private val badgeViewMap = mutableMapOf<BottomNavType, View>()
+
     override fun getLayoutId(): Int {
         return R.layout.activity_main
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Timber.i("MainActivity onCreate")
+
         setupBottomNavigationBar()
 
         viewModel.postReportResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Empty -> {
+                is Empty -> {
                     GeneralUtils.showToast(this, getString(R.string.report_success))
                 }
-                is ApiResult.Error -> Timber.e(it.throwable)
+                is Error -> Timber.e(it.throwable)
             }
         })
 
         viewModel.checkStatusResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     when (it.result.status) {
                         StatusItem.NOT_LOGIN -> showNotLoginDialog()
                         StatusItem.LOGIN_BUT_EMAIL_NOT_CONFIRMED -> showEmailConfirmDialog()
                         StatusItem.LOGIN_AND_EMAIL_CONFIRMED -> it.result.onLoginAndEmailConfirmed()
                     }
                 }
-                is ApiResult.Error -> Timber.e(it.throwable)
+                is Error -> Timber.e(it.throwable)
             }
         })
+
+        viewModel.totalUnreadResult.observe(this, Observer {
+            when(it) {
+                is Success -> {
+                    refreshBottomNavigationBadge(it.result)
+                }
+            }
+        })
+
+        viewModel.getTotalUnread()
+    }
+
+    private fun addBadgeView(bottomNavType: BottomNavType) {
+        val menuView =
+            bottom_navigation.getChildAt(0) as BottomNavigationMenuView
+        val itemView = menuView.getChildAt(bottomNavType.value) as BottomNavigationItemView
+        val notificationBadge = LayoutInflater.from(this)
+            .inflate(R.layout.custom_menu_badge, menuView, false)
+        badgeViewMap[bottomNavType] = notificationBadge
+        itemView.addView(notificationBadge)
     }
 
     /**
@@ -107,10 +132,13 @@ class MainActivity : BaseActivity(), InteractionListener {
                     R.id.navigation_adult -> true
                     else -> false
                 }
-
             viewModel.setAdultMode(isAdult)
             setUiMode(isAdult)
         })
+
+        for (type in BottomNavType.values()) {
+            addBadgeView(type)
+        }
     }
 
     private fun setUiMode(isAdult: Boolean) {
@@ -119,7 +147,6 @@ class MainActivity : BaseActivity(), InteractionListener {
             bottom_navigation.setBackgroundColor(getColor(R.color.adult_color_status_bar))
             bottom_navigation.itemTextColor =
                 resources.getColorStateList(R.color.bottom_nav_adult_text_selector, null)
-
         } else {
             window?.statusBarColor = getColor(R.color.normal_color_status_bar)
             bottom_navigation.setBackgroundColor(getColor(R.color.normal_color_status_bar))
@@ -135,6 +162,12 @@ class MainActivity : BaseActivity(), InteractionListener {
     override fun setAdult(isAdult: Boolean) {
         viewModel.setAdultMode(isAdult)
         setUiMode(isAdult)
+    }
+
+    override fun refreshBottomNavigationBadge(unreadCount: Int) {
+        val visibility = takeIf { unreadCount > 0 }?.let { View.VISIBLE } ?: let { View.GONE }
+        badgeViewMap[BottomNavType.TOPUP]?.visibility = visibility
+        badgeViewMap[BottomNavType.PERSONAL]?.visibility = visibility
     }
 
     @SuppressLint("RestrictedApi")
@@ -154,31 +187,31 @@ class MainActivity : BaseActivity(), InteractionListener {
                 finish()
             }
         } else if ((supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter(
-                        "/"
-                ).toString()
-                        .toLowerCase(Locale.getDefault()) == SearchVideoFragment::class.java.simpleName.toLowerCase(
-                        Locale.getDefault()
-                ))
-                || (supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter(
-                        "/"
-                ).toString()
-                        .toLowerCase(Locale.getDefault()) == MyPostFragment::class.java.simpleName.toLowerCase(
-                        Locale.getDefault()
-                ))
-                || (supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter(
-                        "/"
-                ).toString()
-                        .toLowerCase(Locale.getDefault()) == SettingFragment::class.java.simpleName.toLowerCase(
-                        Locale.getDefault()
-                ))
+                "/"
+            ).toString()
+                .toLowerCase(Locale.getDefault()) == SearchVideoFragment::class.java.simpleName.toLowerCase(
+                Locale.getDefault()
+            ))
+            || (supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter(
+                "/"
+            ).toString()
+                .toLowerCase(Locale.getDefault()) == MyPostFragment::class.java.simpleName.toLowerCase(
+                Locale.getDefault()
+            ))
+            || (supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter(
+                "/"
+            ).toString()
+                .toLowerCase(Locale.getDefault()) == SettingFragment::class.java.simpleName.toLowerCase(
+                Locale.getDefault()
+            ))
         ) {
-            if (viewModel.isFromPlayer){
+            if (viewModel.isFromPlayer) {
                 viewModel.isFromPlayer = false
                 deepLinkTo(
-                        MainActivity::class.java,
-                        R.navigation.navigation_home,
-                        R.id.homeFragment,
-                        null
+                    MainActivity::class.java,
+                    R.navigation.navigation_home,
+                    R.id.homeFragment,
+                    null
                 )
             } else
                 super.onBackPressed()
@@ -231,11 +264,12 @@ class MainActivity : BaseActivity(), InteractionListener {
                     Timber.d("unrecognized status received from installer")
                 }
             }
-        }
-        else if(NAVIGATE_TO_ACTION == intent?.action){
+        } else if (NAVIGATE_TO_ACTION == intent?.action) {
             val dest = intent.getIntExtra(PlayerActivity.KEY_DEST_ID, 0)
             if (dest != 0)
                 Navigation.findNavController(this, R.id.nav_host_fragment).navigate(dest, extras)
+        } else if(NAVIGATE_TO_TOPUP_ACTION == intent?.action){
+            bottom_navigation.switchTab(2)
         }
     }
 
@@ -335,5 +369,4 @@ class MainActivity : BaseActivity(), InteractionListener {
             )
         ).show(supportFragmentManager)
     }
-
 }

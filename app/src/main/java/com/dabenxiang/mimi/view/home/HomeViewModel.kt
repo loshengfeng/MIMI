@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.home
 
 import android.content.Context
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -51,13 +52,14 @@ class HomeViewModel : BaseViewModel() {
     var adHeight = 0
 
     var lastListIndex = 0 // 垂直recycler view 跳出後的最後一筆資料
+    var lastPosition = 0
 
     private var _videoList = MutableLiveData<PagedList<BaseVideoItem>>()
     val videoList: LiveData<PagedList<BaseVideoItem>> = _videoList
 
     private var _carouselResult =
-        MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<StatisticsItem>>>>>()
-    val carouselResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<StatisticsItem>>>>> =
+        MutableLiveData<Pair<Int, ApiResult<ApiBaseItem<List<CategoryBanner>>>>>()
+    val carouselResult: LiveData<Pair<Int, ApiResult<ApiBaseItem<List<CategoryBanner>>>>> =
         _carouselResult
 
     private var _videosResult =
@@ -124,18 +126,13 @@ class HomeViewModel : BaseViewModel() {
 
     private var job = Job()
 
-    fun loadNestedStatisticsListForCarousel(position: Int, src: HomeTemplate.Carousel) {
+    fun loadNestedStatisticsListForCarousel(position: Int, src: HomeTemplate.Carousel, isAdult: Boolean = false) {
         viewModelScope.launch {
             flow {
-                val resp = domainManager.getApiRepository().statisticsHomeVideos(
-                    isAdult = src.isAdult,
-                    offset = 0,
-                    limit = CAROUSEL_LIMIT
-                )
-                if (!resp.isSuccessful) throw HttpException(resp)
+                val resp = domainManager.getApiRepository().fetchHomeBanner(if(isAdult) 2 else 1)
+                if(!resp.isSuccessful) throw HttpException(resp)
                 emit(ApiResult.success(resp.body()))
-            }
-                .flowOn(Dispatchers.IO)
+            }.flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
@@ -323,6 +320,7 @@ class HomeViewModel : BaseViewModel() {
                     when (it) {
                         is ApiResult.Success -> {
                             update(isLike, it.result)
+                            getAllOtherPosts(lastPosition)
                         }
                     }
                 }
@@ -354,6 +352,15 @@ class HomeViewModel : BaseViewModel() {
                     }
                 }
         }
+    }
+
+    fun getAllOtherPosts(lastPosition: Int){
+        if(lastPosition != 1) getVideos(null, true)
+        if(lastPosition != 2) getPostFollows()
+        if(lastPosition != 3) getClipPosts()
+        if(lastPosition != 4) getPicturePosts()
+        if(lastPosition != 5) getTextPosts()
+        if(lastPosition != 6) getClubs()
     }
 
     fun getVideos(category: String?, isAdult: Boolean) {
@@ -423,7 +430,7 @@ class HomeViewModel : BaseViewModel() {
         isAdult: Boolean
     ): LiveData<PagedList<BaseVideoItem>> {
         val videoDataSource = VideoDataSource(
-            isAdult, category, viewModelScope, domainManager, pagingCallback, adWidth, adHeight
+            isAdult, category, viewModelScope, domainManager, pagingCallback, adWidth, adHeight, true
         )
         val videoFactory = VideoFactory(videoDataSource)
         val config = PagedList.Config.Builder()
@@ -468,6 +475,7 @@ class HomeViewModel : BaseViewModel() {
         override fun onTotalCount(count: Long, isInitial: Boolean) {
             totalCount = if (isInitial) count.toInt()
             else totalCount.plus(count.toInt())
+            if(isInitial) cleanRemovedPosList()
         }
     }
 
@@ -483,6 +491,7 @@ class HomeViewModel : BaseViewModel() {
                 val fileName = fileNameSplit?.last()
                 val extSplit = fileName?.split(".")
                 val ext = "." + extSplit?.last()
+                var mime: String? = null
 
                 if (type == TYPE_PIC) {
                     val uploadPicItem = UploadPicItem(ext = ext)
@@ -490,15 +499,27 @@ class HomeViewModel : BaseViewModel() {
                 } else if (type == TYPE_COVER) {
                     val picParameter = PicParameter(ext = ext)
                     _uploadCoverItem.postValue(picParameter)
+                } else if (type == TYPE_VIDEO) {
+                    val mmr = MediaMetadataRetriever()
+                    mmr.setDataSource(realPath)
+                    mime = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE);
                 }
 
                 Timber.d("Upload photo path : $realPath")
                 Timber.d("Upload photo ext : $ext")
 
-                val result = domainManager.getApiRepository().postAttachment(
-                    File(realPath),
-                    fileName = URLEncoder.encode(fileName, "UTF-8")
-                )
+                val result = if (mime == null) {
+                    domainManager.getApiRepository().postAttachment(
+                        File(realPath!!),
+                        fileName = URLEncoder.encode(fileName, "UTF-8")
+                    )
+                } else {
+                    domainManager.getApiRepository().postAttachment(
+                        File(realPath!!),
+                        fileName = URLEncoder.encode(fileName, "UTF-8"),
+                        type = mime
+                    )
+                }
 
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(result.body()?.content))

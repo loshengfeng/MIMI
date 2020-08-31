@@ -20,6 +20,7 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+#noinspection ShrinkerUnresolvedReference
 -keepattributes SourceFile,LineNumberTable
 
 # for enum
@@ -28,9 +29,8 @@
 # for All Throwable
 -keep class * extends java.lang.Throwable
 
-# for app bean
+# for app vo
 -keep class com.dabenxiang.mimi.model.vo.** {*;}
-# -keep class com.dabenxiang.mimi.model.api.vo.device.** {*;}
 -keep class com.dabenxiang.mimi.model.api.vo.** {*;}
 
 # for okhttp (from okhttp3.pro)
@@ -61,7 +61,7 @@
 -dontwarn kotlin.Unit
 # Top-level functions that can only be used by Kotlin.
 -dontwarn retrofit2.KotlinExtensions
--dontwarn retrofit2.KotlinExtensions$*
+#-dontwarn retrofit2.KotlinExtensions$*
 
 # Gson
 -keepattributes Signature
@@ -95,3 +95,20 @@
 -keep class android.support.design.** { *; }
 -keep interface android.support.design.** { *; }
 -keep public class android.support.design.R$* { *; }
+
+# LiveEventBus
+-dontwarn com.jeremyliao.liveeventbus.**
+-keep class com.jeremyliao.liveeventbus.** { *; }
+
+# Glide
+-keep public class * implements com.bumptech.glide.module.GlideModule
+-keep class * extends com.bumptech.glide.module.AppGlideModule {
+ <init>(...);
+}
+-keep public enum com.bumptech.glide.load.ImageHeaderParser$** {
+  **[] $VALUES;
+  public *;
+}
+-keep class com.bumptech.glide.load.data.ParcelFileDescriptorRewinder$InternalRewinder {
+  *** rewind();
+}

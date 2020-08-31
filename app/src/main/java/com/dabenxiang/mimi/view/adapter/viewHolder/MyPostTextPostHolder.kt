@@ -11,6 +11,7 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.TextContentItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
@@ -19,7 +20,6 @@ import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
@@ -58,7 +58,7 @@ class MyPostTextPostHolder(
         item: MemberPostItem,
         itemList: List<MemberPostItem>?,
         position: Int,
-        myPostListener: MyPostFragment.MyPostListener,
+        myPostListener: MyPostListener,
         attachmentListener: AttachmentListener
     ) {
 
@@ -115,7 +115,7 @@ class MyPostTextPostHolder(
                 )
             )
             chip.setOnClickListener { view ->
-                myPostListener.onChipClick(PostType.VIDEO, (view as Chip).text.toString())
+                myPostListener.onChipClick(PostType.TEXT, (view as Chip).text.toString())
             }
             tagChipGroup.addView(chip)
         }

@@ -5,23 +5,28 @@ import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
+import androidx.paging.PagingData
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
 import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
 import com.dabenxiang.mimi.view.adapter.ClubFollowAdapter
-import com.dabenxiang.mimi.view.adapter.FavoriteTabAdapter
 import com.dabenxiang.mimi.view.adapter.MemberFollowAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
-import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
+import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_my_follow.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class MyFollowFragment : BaseFragment() {
@@ -32,21 +37,6 @@ class MyFollowFragment : BaseFragment() {
         const val NO_DATA = 0
         const val TYPE_MEMBER = 0
         const val TYPE_CLUB = 1
-        var lastTab = TYPE_MEMBER
-    }
-
-    private val primaryAdapter by lazy {
-        FavoriteTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
-            override fun onClickItemIndex(view: View, index: Int) {
-                setTabPosition(index)
-                viewModel.initData(lastTab)
-            }
-        })
-    }
-
-    private fun setTabPosition(index: Int) {
-        lastTab = index
-        primaryAdapter.setLastSelectedIndex(lastTab)
     }
 
     private val clubFollowAdapter by lazy { ClubFollowAdapter(clubFollowListener) }
@@ -86,53 +76,41 @@ class MyFollowFragment : BaseFragment() {
         }
     }
 
+    private var vpAdapter: MyFollowViewPagerAdapter? = null
+
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.showProgress.observe(this, Observer {
-            layout_refresh.isRefreshing = it
-        })
-
         viewModel.clubCount.observe(this, Observer {
-            refreshUi(TYPE_CLUB, it)
+            if (layout_tab.selectedTabPosition == TYPE_CLUB) refreshUi(TYPE_CLUB, it)
         })
 
         viewModel.memberCount.observe(this, Observer {
-            refreshUi(TYPE_MEMBER, it)
-        })
-
-        viewModel.clubList.observe(this, Observer {
-            rv_content.adapter = clubFollowAdapter
-            clubFollowAdapter.submitList(it)
-        })
-
-        viewModel.memberList.observe(this, Observer {
-            rv_content.adapter = memberFollowAdapter
-            memberFollowAdapter.submitList(it)
+            if (layout_tab.selectedTabPosition == TYPE_MEMBER) refreshUi(TYPE_MEMBER, it)
         })
 
         viewModel.attachmentResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     val attachmentItem = it.result
                     if (attachmentItem.id != null && attachmentItem.bitmap != null) {
                         LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
-                        when (lastTab) {
+                        when (layout_tab.selectedTabPosition) {
                             TYPE_MEMBER -> memberFollowAdapter.update(attachmentItem.position ?: 0)
                             TYPE_CLUB -> clubFollowAdapter.update(attachmentItem.position ?: 0)
                         }
                     }
                 }
-                is ApiResult.Error -> Timber.e(it.throwable)
+                is Error -> Timber.e(it.throwable)
             }
         })
 
         viewModel.clubDetail.observe(this, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     val bundle = ClubDetailFragment.createBundle(it.result)
                     navigateTo(
                         NavigateItem.Destination(
@@ -141,27 +119,28 @@ class MyFollowFragment : BaseFragment() {
                         )
                     )
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.cleanResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Loading -> layout_refresh.isRefreshing = true
-                is ApiResult.Loaded -> layout_refresh.isRefreshing = false
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Loading -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, true)
+                is Loaded -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, false)
+                is Empty -> getData()
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.cancelOneClub.observe(this, Observer {
             when (it) {
-                is ApiResult.Loading -> layout_refresh.isRefreshing = true
-                is ApiResult.Loaded -> layout_refresh.isRefreshing = false
-                is ApiResult.Success -> {
+                is Loading -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, true)
+                is Loaded -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, false)
+                is Success -> {
                     clubFollowAdapter.removedPosList.add(it.result)
                     clubFollowAdapter.notifyItemChanged(it.result)
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -171,13 +150,13 @@ class MyFollowFragment : BaseFragment() {
 
         viewModel.cancelOneMember.observe(this, Observer {
             when (it) {
-                is ApiResult.Loading -> layout_refresh.isRefreshing = true
-                is ApiResult.Loaded -> layout_refresh.isRefreshing = false
-                is ApiResult.Success -> {
+                is Loading -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, true)
+                is Loaded -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, false)
+                is Success -> {
                     memberFollowAdapter.removedPosList.add(it.result)
                     memberFollowAdapter.notifyItemChanged(it.result)
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -192,7 +171,6 @@ class MyFollowFragment : BaseFragment() {
             navigateTo(NavigateItem.Up)
         }
         useAdultTheme(false)
-        viewModel.initData(lastTab)
     }
 
     override fun setupFirstTime() {
@@ -207,7 +185,7 @@ class MyFollowFragment : BaseFragment() {
 
     private val onCleanDialogListener = object : OnCleanDialogListener {
         override fun onClean() {
-            if (lastTab == TYPE_MEMBER) {
+            if (layout_tab.selectedTabPosition == TYPE_MEMBER) {
                 viewModel.cleanAllFollowMember()
             } else {
                 viewModel.cleanAllFollowClub()
@@ -221,7 +199,7 @@ class MyFollowFragment : BaseFragment() {
                 R.id.tv_back -> navigateTo(NavigateItem.Up)
                 R.id.tv_clean -> CleanDialogFragment.newInstance(
                     onCleanDialogListener,
-                    if (lastTab == TYPE_MEMBER)
+                    if (layout_tab.selectedTabPosition == TYPE_MEMBER)
                         R.string.follow_clean_member_dlg_msg
                     else
                         R.string.follow_clean_club_dlg_msg
@@ -236,48 +214,86 @@ class MyFollowFragment : BaseFragment() {
             tv_back.setOnClickListener(it)
             tv_clean.setOnClickListener(it)
         }
-
-        layout_refresh.setOnRefreshListener {
-            layout_refresh.isRefreshing = false
-            viewModel.initData(lastTab)
-        }
     }
 
     override fun initSettings() {
-        rv_primary.adapter = primaryAdapter
+        layout_tab.newTab().setText(R.string.follow_people)
+        layout_tab.newTab().setText(R.string.follow_circle)
+        layout_tab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabReselected(tab: TabLayout.Tab) {
+            }
 
-        val primaryList = listOf(
-            getString(R.string.follow_people),
-            getString(R.string.follow_circle)
-        )
+            override fun onTabUnselected(tab: TabLayout.Tab) {
+            }
 
-        primaryAdapter.submitList(primaryList, lastTab)
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                getData()
+            }
+
+        })
+        memberFollowAdapter.addLoadStateListener { loadState ->
+            handleLoadState(loadState.refresh)
+            handleLoadState(loadState.append)
+        }
+        clubFollowAdapter.addLoadStateListener { loadState ->
+            handleLoadState(loadState.refresh)
+            handleLoadState(loadState.append)
+        }
+        vpAdapter = MyFollowViewPagerAdapter(
+            requireContext(),
+            memberFollowAdapter,
+            clubFollowAdapter
+        ) {
+            getData()
+        }
+        vp.adapter = vpAdapter
+        layout_tab.setupWithViewPager(vp)
 
         tv_clean.visibility = View.VISIBLE
         tv_title.setText(R.string.follow_title)
-        tv_all.text = getString(R.string.follow_clubs_total_num, "0")
-
-        setTabPosition(TYPE_MEMBER)
-        rv_content.adapter = memberFollowAdapter
     }
 
-    private fun refreshUi(witch: Int, size: Int) {
-        rv_content.visibility = when (size) {
-            NO_DATA -> View.GONE
-            else -> View.VISIBLE
+    private fun handleLoadState(loadState: LoadState) {
+        when (loadState) {
+            is LoadState.Loading -> {
+                vpAdapter?.changeIsRefreshing(
+                    layout_tab.selectedTabPosition,
+                    true
+                )
+            }
+            is LoadState.NotLoading -> vpAdapter?.changeIsRefreshing(
+                layout_tab.selectedTabPosition,
+                false
+            )
+            is LoadState.Error -> onApiError(loadState.error)
         }
+    }
 
-        item_no_data.visibility = when (size) {
-            NO_DATA -> View.VISIBLE
-            else -> View.GONE
-        }
-
+    private fun refreshUi(type: Int, size: Int) {
         tv_clean.isEnabled = size != NO_DATA
+        vpAdapter?.refreshUi(type, size)
+    }
 
-        tv_all.text =
-            if (witch == TYPE_MEMBER)
-                getString(R.string.follow_members_total_num, size.toString())
-            else
-                getString(R.string.follow_clubs_total_num, size.toString())
+    private var job: Job? = null
+    private fun getData() {
+        job?.cancel()
+        job = lifecycleScope.launch {
+            when (layout_tab.selectedTabPosition) {
+                TYPE_MEMBER -> {
+                    memberFollowAdapter.submitData(PagingData.empty())
+                    viewModel.getMemberList()
+                        .collectLatest {
+                            memberFollowAdapter.submitData(it)
+                        }
+                }
+                TYPE_CLUB -> {
+                    clubFollowAdapter.submitData(PagingData.empty())
+                    viewModel.getClubList()
+                        .collectLatest {
+                            clubFollowAdapter.submitData(it)
+                        }
+                }
+            }
+        }
     }
 }

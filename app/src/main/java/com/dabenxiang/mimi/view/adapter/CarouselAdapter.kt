@@ -5,12 +5,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.vo.CarouselHolderItem
 import com.dabenxiang.mimi.view.home.viewholder.CarouselViewHolder
 
 class CarouselAdapter(
     private val nestedListener: HomeAdapter.EventListener,
-    private val isAdult: Boolean
+    private val isAdult: Boolean,
+    private val memberPostFuncItem: MemberPostFuncItem
 ) : ListAdapter<CarouselHolderItem, CarouselViewHolder>(DIFF_CALLBACK) {
 
     companion object {
@@ -39,7 +41,7 @@ class CarouselAdapter(
                 R.layout.nested_item_carousel,
                 parent,
                 false
-            ), nestedListener, isAdult
+            ), nestedListener, isAdult, memberPostFuncItem
         )
     }
 

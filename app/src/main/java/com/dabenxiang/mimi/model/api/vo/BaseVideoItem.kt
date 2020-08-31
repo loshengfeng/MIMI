@@ -103,3 +103,20 @@ data class VideoStream(
     @SerializedName("streamName")
     val streamName: String? = ""
 )
+
+data class VideoM3u8Source(
+    @SerializedName("id")
+    val id: Long? = 0,
+
+    @SerializedName("videoEpisodeId")
+    val videoEpisodeId: Long? = 0,
+
+    @SerializedName("streamName")
+    val streamName: String? = "",
+
+    @SerializedName("streamUrl")
+    val streamUrl: String? = "",
+
+    @SerializedName("isContent")
+    val isContent: Boolean = false
+)

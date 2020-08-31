@@ -43,7 +43,7 @@ class TopUpProxyPayViewHolder(
                         .load(array)
                         .apply(options)
                         .into(ivPhoto)
-            } ?: run {
+            } ?: takeIf { avatarId != LruCacheUtils.ZERO_ID }?.run {
                 listener.onGetAvatarAttachment(avatarId, adapterPosition)
             }
         }

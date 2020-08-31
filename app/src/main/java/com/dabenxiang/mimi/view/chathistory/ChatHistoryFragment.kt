@@ -7,7 +7,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.view.adapter.ChatHistoryAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -24,13 +24,13 @@ class ChatHistoryFragment : BaseFragment() {
 
     private val adapter by lazy { ChatHistoryAdapter(listener) }
     private val listener = object : ChatHistoryAdapter.EventListener {
-        override fun onClickListener(item: ChatListItem) {
+        override fun onClickListener(item: ChatListItem, position: Int) {
             val bundle = ChatContentFragment.createBundle(item)
             navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_chatHistoryFragment_to_chatContentFragment,
-                            bundle
-                    )
+                NavigateItem.Destination(
+                    R.id.action_chatHistoryFragment_to_chatContentFragment,
+                    bundle
+                )
             )
         }
 
@@ -64,20 +64,22 @@ class ChatHistoryFragment : BaseFragment() {
         viewModel.chatHistory.observe(viewLifecycleOwner, Observer { adapter.submitList(it) })
         viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     val attachmentItem = it.result
-                    LruCacheUtils.putLruArrayCache(attachmentItem.id ?: "", attachmentItem.fileArray
-                            ?: ByteArray(0))
+                    LruCacheUtils.putLruArrayCache(
+                        attachmentItem.id ?: "", attachmentItem.fileArray
+                            ?: ByteArray(0)
+                    )
                     adapter.update(attachmentItem.position ?: 0)
                 }
-                is ApiResult.Error -> Timber.e(it.throwable)
+                is Error -> Timber.e(it.throwable)
             }
         })
 
         viewModel.pagingResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Loaded,
-                is ApiResult.Error -> {
+                is Loaded,
+                is Error -> {
                     swipeRefreshLayout.isRefreshing = false
                 }
             }
@@ -101,7 +103,8 @@ class ChatHistoryFragment : BaseFragment() {
     override fun initSettings() {
         super.initSettings()
         tv_title.setText(R.string.title_chat_history)
-        rv_content.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        rv_content.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         rv_content.adapter = adapter
         swipeRefreshLayout.setColorSchemeColors(swipeRefreshLayout.context.getColor(R.color.color_red_1))
     }

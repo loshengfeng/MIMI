@@ -11,6 +11,11 @@ import timber.log.Timber
 
 class MQTTManager(val context: Context, private val pref: Pref) {
 
+    companion object {
+        const val PREFIX_CHAT = "/chat/"
+        const val PREFIX_NOTIFICATION = "/notification/"
+    }
+
     private var client: MqttAndroidClient? = null
     private var options: MqttConnectOptions? = null
 
@@ -76,16 +81,20 @@ class MQTTManager(val context: Context, private val pref: Pref) {
                 subscribeCallback.onFailure(asyncActionToken, exception)
             }
         })
-
-//        client?.subscribe(subscriptionTopic, 1) { topic, message ->
-//            subscribeCallback.onSubscribe(topic, message)
-//        }
     }
 
-    fun publishMessage(publishTopic: String, publishMessage: String) {
+
+    private val defaultMqttCallback by lazy {
+        object : IMqttActionListener {
+            override fun onSuccess(asyncActionToken: IMqttToken?) {}
+            override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {}
+        }
+    }
+
+    fun publishMessage(publishTopic: String, publishMessage: String, callback: IMqttActionListener = defaultMqttCallback) {
         val message = MqttMessage()
         message.payload = publishMessage.toByteArray()
-        client?.publish(publishTopic, message)
+        client?.publish(publishTopic, message, null, callback)
         Timber.d("Message Published")
 
         if (!client!!.isConnected) {

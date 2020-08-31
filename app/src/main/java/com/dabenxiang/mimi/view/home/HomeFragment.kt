@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.home
 
 import android.app.Activity
 import android.content.Intent
+import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
@@ -16,8 +17,9 @@ import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.vo.CarouselHolderItem
 import com.dabenxiang.mimi.model.vo.PlayerItem
-import com.dabenxiang.mimi.model.vo.statisticsItemToCarouselHolderItem
+import com.dabenxiang.mimi.model.vo.categoryBannerItemCarouselHolderItem
 import com.dabenxiang.mimi.model.vo.statisticsItemToVideoItem
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
@@ -35,6 +37,10 @@ import kotlinx.android.synthetic.main.fragment_home.*
 
 class HomeFragment : BaseFragment() {
 
+    companion object {
+        private const val REQUEST_LOGIN = 1000
+    }
+
     private val viewModel: HomeViewModel by viewModels()
 
     private var lastTabPosition = 0
@@ -46,34 +52,16 @@ class HomeFragment : BaseFragment() {
     private val homeStatisticsViewHolderMap = hashMapOf<Int, HomeStatisticsViewHolder>()
     private val statisticsMap = hashMapOf<Int, HomeTemplate.Statistics>()
 
-    companion object {
-        private const val REQUEST_LOGIN = 1000
-    }
-
     override fun getLayoutId() = R.layout.fragment_home
 
-    override fun setupFirstTime() {
-        requireActivity().onBackPressedDispatcher.addCallback { backToDesktop() }
-        recyclerview_tab.adapter = tabAdapter
-        setupRecyclerByPosition(0)
-        refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
-        btn_ranking.visibility = View.GONE
-        iv_post.visibility = View.GONE
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        viewModel.adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
-
-        if (mainViewModel?.normal == null) {
-            mainViewModel?.getHomeCategories()
-        }
-    }
-
-    override fun setupObservers() {
-        viewModel.showProgress.observe(viewLifecycleOwner, Observer { showProgress ->
+        viewModel.showProgress.observe(this, Observer { showProgress ->
             showProgress?.takeUnless { it }?.also { refresh.isRefreshing = it }
         })
 
-        mainViewModel?.categoriesData?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.categoriesData?.observe(this, Observer {
             when (it) {
                 is Loading -> refresh.isRefreshing = true
                 is Loaded -> refresh.isRefreshing = false
@@ -94,7 +82,7 @@ class HomeFragment : BaseFragment() {
             }
         })
 
-        mainViewModel?.getAdHomeResult?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.getAdHomeResult?.observe(this, Observer {
             when (val response = it.second) {
                 is Success -> {
                     val viewHolder = homeBannerViewHolderMap[it.first]
@@ -104,7 +92,7 @@ class HomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.videoList.observe(viewLifecycleOwner, Observer {
+        viewModel.videoList.observe(this, Observer {
             when (lastTabPosition) {
                 1 -> movieListAdapter.submitList(it)
                 2 -> dramaListAdapter.submitList(it)
@@ -113,20 +101,21 @@ class HomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.carouselResult.observe(viewLifecycleOwner, Observer {
+        viewModel.carouselResult.observe(this, Observer {
             when (val response = it.second) {
                 is Success -> {
                     val viewHolder = homeCarouselViewHolderMap[it.first]
                     val carousel = carouselMap[it.first]
                     val carouselHolderItems =
-                        response.result.content?.statisticsItemToCarouselHolderItem(carousel!!.isAdult)
+                        response.result.content?.categoryBannerItemCarouselHolderItem()
+//                        response.result.content?.statisticsItemToCarouselHolderItem(carousel!!.isAdult)
                     viewHolder?.submitList(carouselHolderItems)
                 }
                 is Error -> onApiError(response.throwable)
             }
         })
 
-        viewModel.videosResult.observe(viewLifecycleOwner, Observer {
+        viewModel.videosResult.observe(this, Observer {
             when (val response = it.second) {
                 is Loaded -> {
                     val viewHolder = homeStatisticsViewHolderMap[it.first]
@@ -142,6 +131,24 @@ class HomeFragment : BaseFragment() {
                 is Error -> onApiError(response.throwable)
             }
         })
+    }
+
+    override fun setupFirstTime() {
+        requireActivity().onBackPressedDispatcher.addCallback { backToDesktop() }
+        recyclerview_tab.adapter = tabAdapter
+        setupRecyclerByPosition(0)
+
+        btn_ranking.visibility = View.GONE
+        iv_post.visibility = View.GONE
+
+        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
+        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
+        if (mainViewModel?.normal == null) {
+            mainViewModel?.getHomeCategories()
+        }
+    }
+
+    override fun setupObservers() {
     }
 
     override fun setupListeners() {
@@ -204,7 +211,7 @@ class HomeFragment : BaseFragment() {
                 rv_first.visibility = View.VISIBLE
                 takeIf { rv_first.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_first.layoutManager = GridLayoutManager(requireContext(), 2)
+                    rv_first.layoutManager = GridLayoutManager(requireContext(), 3)
                     rv_first.adapter = movieListAdapter
                     getData(position)
                 }
@@ -213,7 +220,7 @@ class HomeFragment : BaseFragment() {
                 rv_second.visibility = View.VISIBLE
                 takeIf { rv_second.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_second.layoutManager = GridLayoutManager(requireContext(), 2)
+                    rv_second.layoutManager = GridLayoutManager(requireContext(), 3)
                     rv_second.adapter = dramaListAdapter
                     getData(position)
                 }
@@ -222,7 +229,7 @@ class HomeFragment : BaseFragment() {
                 rv_third.visibility = View.VISIBLE
                 takeIf { rv_third.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_third.layoutManager = GridLayoutManager(requireContext(), 2)
+                    rv_third.layoutManager = GridLayoutManager(requireContext(), 3)
                     rv_third.adapter = varietyListAdapter
                     getData(position)
                 }
@@ -231,7 +238,7 @@ class HomeFragment : BaseFragment() {
                 rv_fourth.visibility = View.VISIBLE
                 takeIf { rv_fourth.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_fourth.layoutManager = GridLayoutManager(requireContext(), 2)
+                    rv_fourth.layoutManager = GridLayoutManager(requireContext(), 3)
                     rv_fourth.adapter = animationListAdapter
                     getData(position)
                 }
@@ -294,7 +301,7 @@ class HomeFragment : BaseFragment() {
         MemberPostFuncItem(
             {},
             { id, function -> getBitmap(id, function) },
-            { _,_, _, _ -> }
+            { _, _, _, _ -> }
         )
     }
 
@@ -383,6 +390,10 @@ class HomeFragment : BaseFragment() {
         override fun onLoadClubViewHolder(vh: HomeClubViewHolder) {
 
         }
+
+        override fun onClickBanner(item: CarouselHolderItem) {
+            GeneralUtils.openWebView(requireContext(), item.url)
+        }
     }
 
     private fun getBitmap(id: String, update: ((String) -> Unit)) {
@@ -395,7 +406,10 @@ class HomeFragment : BaseFragment() {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 REQUEST_LOGIN -> {
-                    findNavController().navigate(R.id.action_homeFragment_to_loginFragment, data?.extras)
+                    findNavController().navigate(
+                        R.id.action_homeFragment_to_loginFragment,
+                        data?.extras
+                    )
                 }
             }
         }

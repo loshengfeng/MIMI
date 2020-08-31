@@ -17,6 +17,7 @@ import com.dabenxiang.mimi.view.adapter.ChatHistoryAdapter
 import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -32,10 +33,6 @@ class ChatHistoryViewHolder(
     private val textDate: TextView = itemView.findViewById(R.id.textDate) as TextView
     private val btnChatHistory: ConstraintLayout = itemView.findViewById(R.id.btnChatHistory) as ConstraintLayout
 
-    init {
-        btnChatHistory.setOnClickListener { data?.let { data -> listener.onClickListener(data) } }
-    }
-
     override fun updated(position: Int) {
         if (data?.lastReadTime == null || data?.lastMessageTime == null || data?.lastReadTime!!.after(data?.lastMessageTime!!)) {
             btnChatHistory.setBackgroundResource(R.drawable.btn_chat_history)
@@ -45,12 +42,16 @@ class ChatHistoryViewHolder(
             imgIsNew.visibility = View.VISIBLE
         }
 
+        btnChatHistory.setOnClickListener {
+            data?.let { data -> listener.onClickListener(data, position) }
+        }
+
         data?.avatarAttachmentId?.let {
             LruCacheUtils.getLruArrayCache(it.toString())?.also { array ->
                 val options: RequestOptions = RequestOptions()
                         .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                        .placeholder(R.drawable.default_profile_picture)
-                        .error(R.drawable.default_profile_picture)
+                        .placeholder(R.drawable.icon_cs_photo)
+                        .error(R.drawable.icon_cs_photo)
                         .priority(Priority.NORMAL)
 
                 Glide.with(App.self)

@@ -1,37 +1,83 @@
 package com.dabenxiang.mimi.view.order
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavDeepLinkBuilder
+import androidx.paging.PagingData
+import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.view.adapter.OrderAdapter
+import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.ChatListItem
+import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.google.android.material.tabs.TabLayout
+import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
+import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.main.MainActivity
+import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_order.*
-import kotlinx.android.synthetic.main.item_order_no_data.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class OrderFragment : BaseFragment() {
 
-    private val viewModel: OrderViewModel by viewModels()
-
     companion object {
-        const val NO_DATA = 0
-        const val TYPE_ALL = 0
-        const val TYPE_ONLINE_PAY = 1
-        const val TYPE_PROXY_PAY = 2
+        val tabTitle = arrayListOf(
+            App.self.getString(R.string.topup_all),
+            App.self.getString(R.string.topup_online_pay),
+            App.self.getString(R.string.topup_proxy_pay)
+        )
     }
 
-    private val orderAdapter by lazy { OrderAdapter() }
+    private val viewModel: OrderViewModel by viewModels()
+
+    private var updateProxyTab: ((Int, Boolean) -> Unit)? = null
+
+    private val orderPagerAdapter by lazy {
+        OrderPagerAdapter(
+            OrderFuncItem(
+                getOrderByPaging3 = { update -> getOrderByPaging3(update) },
+                getOrderByPaging2 = { type, update -> viewModel.getOrderByPaging2(type, update) },
+                getChatList = { update -> viewModel.getChatList(update) },
+                getChatAttachment = { id, pos, update -> viewModel.getAttachment(id, pos, update) },
+                onChatItemClick = { item -> onChatItemClick(item) },
+                getOrderProxyAttachment = { id, update -> viewModel.getProxyAttachment(id, update) },
+                onContactClick = { chatListItem, orderItem -> onContactClick(chatListItem, orderItem) },
+                getProxyUnread = { update -> getProxyUnread(update) },
+                onTopUpClick = { onTopUpClick() }
+            ))
+    }
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
+    private var interactionListener: InteractionListener? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        try {
+            interactionListener = context as InteractionListener
+        } catch (e: ClassCastException) {
+            Timber.e("OrderFragment interaction listener can't cast")
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback {
+            navigateTo(NavigateItem.Up)
+        }
         initSettings()
     }
 
@@ -40,63 +86,144 @@ class OrderFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.orderList.observe(viewLifecycleOwner, Observer {
-            refreshUi(it.size)
-            orderAdapter.submitList(it)
+        viewModel.balanceResult.observe(viewLifecycleOwner, Observer {
+            for (i in 0 until tl_type.tabCount) {
+                val title = tabTitle[i]
+                tl_type.getTabAt(i)?.also { tab ->
+                    tab.customView?.findViewById<TextView>(R.id.tv_title)?.text = when (i) {
+                        0 -> "$title(${it.allCount})"
+                        1 -> "$title(${it.user2Online})"
+                        else -> "$title(${it.merchant2UserCount})"
+                    }
+                }
+            }
+        })
+
+        viewModel.unreadResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Success -> {
+                    viewModel.unreadCount = it.result
+                    tl_type.getTabAt(2)?.also { tab ->
+                        tab.customView?.findViewById<ImageView>(R.id.iv_new)?.visibility =
+                            takeIf { viewModel.unreadCount > 0 }?.let { View.VISIBLE }
+                                ?: let { View.GONE }
+                    }
+                }
+            }
+            viewModel.getUnReadOrderCount()
+        })
+
+        viewModel.unreadOrderResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Success -> {
+                    viewModel.unreadOrderCount = it.result
+                    tl_type.getTabAt(1)?.also { tab ->
+                        tab.customView?.findViewById<ImageView>(R.id.iv_new)?.visibility =
+                            takeIf { viewModel.unreadOrderCount > 0 }?.let { View.VISIBLE }
+                                ?: let { View.GONE }
+                    }
+
+                    tl_type.getTabAt(0)?.also { tab ->
+                        tab.customView?.findViewById<ImageView>(R.id.iv_new)?.visibility =
+                            takeIf { viewModel.unreadCount + viewModel.unreadOrderCount > 0 }?.let { View.VISIBLE }
+                                ?: let { View.GONE }
+                    }
+                }
+            }
+        })
+
+        viewModel.createOrderChatResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Success -> {
+                    val createOrderChatItem = it.result.first
+                    val chatListItem = it.result.second
+                    val orderItem = it.result.third
+                    onChatItemClick(
+                        ChatListItem(
+                            id = createOrderChatItem.chatId,
+                            name = chatListItem.name,
+                            avatarAttachmentId = chatListItem.avatarAttachmentId,
+                            lastReadTime = chatListItem.lastReadTime
+                        ),
+                        OrderItem(traceLogId = createOrderChatItem.id, isOnline = orderItem.isOnline)
+                    )
+                }
+                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
         })
     }
 
     override fun setupListeners() {
-        tl_type.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab) {
-                viewModel.getOrder(tab.position)
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab) {}
-            override fun onTabReselected(tab: TabLayout.Tab) {}
-        })
-
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.tv_back -> navigateTo(NavigateItem.Up)
-                R.id.tv_topup -> GeneralUtils.showToast(requireContext(), "btn_topup")
             }
         }.also {
             tv_back.setOnClickListener(it)
-            tv_topup.setOnClickListener(it)
         }
+    }
 
-        layout_refresh.setOnRefreshListener {
-            layout_refresh.isRefreshing = false
-            viewModel.getOrder(tl_type.selectedTabPosition)
-        }
+    override fun setupFirstTime() {
+        super.setupFirstTime()
+
+        tv_title.text = getString(R.string.personal_order)
+
+        viewPager.adapter = orderPagerAdapter
+
+        TabLayoutMediator(tl_type, viewPager) { tab, position ->
+            tab.setCustomView(R.layout.badged_tab)
+            tab.customView?.findViewById<TextView>(R.id.tv_title)?.text = tabTitle[position]
+            viewPager.setCurrentItem(tab.position, true)
+        }.attach()
     }
 
     override fun initSettings() {
-        tv_title.text = getString(R.string.personal_order)
-        tv_text.text = "文字文字"
-        viewModel.getOrder(TYPE_ALL)
-        rv_content.adapter = orderAdapter
+        super.initSettings()
+        viewModel.getUnread()
+        updateProxyTab?.also { getProxyUnread(it) }
     }
 
-    private fun refreshUi(size: Int) {
-        layout_refresh.visibility = when (size) {
-            NO_DATA -> View.GONE
-            else -> View.VISIBLE
+    private var getOrderJob: Job? = null
+    private fun getOrderByPaging3(update: ((PagingData<OrderItem>, CoroutineScope) -> Unit)) {
+        getOrderJob?.cancel()
+        getOrderJob = lifecycleScope.launch {
+            viewModel.getOrderByPaging3().collectLatest {
+                update(it, this)
+            }
         }
+    }
 
-        item_no_data.visibility = when (size) {
-            NO_DATA -> View.VISIBLE
-            else -> View.GONE
+    private fun onChatItemClick(item: ChatListItem, orderItem: OrderItem = OrderItem()) {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_orderFragment_to_chatContentFragment,
+                ChatContentFragment.createBundle(item, orderItem.traceLogId, orderItem.isOnline)
+            )
+        )
+    }
+
+    private fun onContactClick(chatListItem: ChatListItem, orderItem: OrderItem) {
+        if (chatListItem.id != 0L && orderItem.traceLogId != 0L) {
+            onChatItemClick(chatListItem, orderItem)
+        } else {
+            viewModel.createOrderChat(chatListItem, orderItem)
         }
+    }
 
-        val title = when (tl_type.selectedTabPosition) {
-            TYPE_ALL -> getString(R.string.topup_all)
-            TYPE_ONLINE_PAY -> getString(R.string.topup_online_pay)
-            else -> getString(R.string.topup_proxy_pay)
-        }
+    private fun getProxyUnread(update: ((Int, Boolean) -> Unit)) {
+        updateProxyTab = update
+        viewModel.getProxyOrderUnread(update)
+        viewModel.getChatUnread(update)
+    }
 
-        tl_type.getTabAt(tl_type.selectedTabPosition)?.text =
-            StringBuilder(title).append("(").append(size).append(")").toString()
+    private fun onTopUpClick() {
+        NavDeepLinkBuilder(requireContext())
+            .setComponentName(MainActivity::class.java)
+            .setGraph(R.navigation.navigation_topup)
+            .setDestination(R.id.topupFragment)
+            .createPendingIntent()
+            .send()
     }
 }

@@ -168,7 +168,8 @@ interface ApiService {
         @Query("offset") offset: Int,
         @Query("limit") limit: Int,
         @Query("isAdult") isAdult: Boolean = true,
-        @Query("orderBy") orderBy: Int = 1
+        @Query("orderBy") orderBy: Int = 1,
+        @Query("status") status: Int = 1
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     @GET("/v1/Members/Post")
@@ -177,7 +178,8 @@ interface ApiService {
         @Query("limit") limit: Int,
         @Query("creatorId") creatorId: Long,
         @Query("isAdult") isAdult: Boolean = true,
-        @Query("orderBy") orderBy: Int = 1
+        @Query("orderBy") orderBy: Int = 1,
+        @Query("status") status: Int = 1
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     @GET("/v1/Members/Post/{id}")
@@ -257,7 +259,8 @@ interface ApiService {
         @Query("tag") tag: String = "",
         @Query("orderBy") orderBy: Int = 1,
         @Query("isAdult") isAdult: Boolean = true,
-        @Query("isFullContent") isFullContent: Boolean = false
+        @Query("isFullContent") isFullContent: Boolean = false,
+        @Query("status") status: Int = 1
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     @POST("/v1/Members/Club/{clubId}/Follow")
@@ -265,6 +268,16 @@ interface ApiService {
 
     @DELETE("/v1/Members/Club/{clubId}/Follow")
     suspend fun cancelFollowClub(@Path("clubId") clubId: Long): Response<Void>
+
+    /**********************************************************
+     *
+     *                  Members/Home/Banner
+     *
+     ***********************************************************/
+    @GET("/v1/Members/Home/Banner")
+    suspend fun fetchHomeBanner(
+        @Query("bannerCategory") bannerCategory: Int
+    ): Response<ApiBaseItem<List<CategoryBanner>>>
 
     /**********************************************************
      *
@@ -403,7 +416,8 @@ interface ApiService {
     @GET("/v1/Members/Me/PostFollow")
     suspend fun getPostFollow(
         @Query("offset") offset: Int,
-        @Query("limit") limit: Int
+        @Query("limit") limit: Int,
+        @Query("status") status: Int = 1
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     @GET("/v1/Members/Me/Profile")
@@ -474,7 +488,8 @@ interface ApiService {
         @Query("limit") limit: Int,
         @Query("orderBy") orderBy: Int = 1,
         @Query("isFullContent") isFullContent: Boolean = false,
-        @Query("isAdult") isAdult: Boolean = true
+        @Query("isAdult") isAdult: Boolean = true,
+        @Query("status") status: Int = 1
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     @GET("/v1/Members/Post")
@@ -484,7 +499,8 @@ interface ApiService {
         @Query("limit") limit: Int,
         @Query("orderBy") orderBy: Int = 1,
         @Query("isFullContent") isFullContent: Boolean = false,
-        @Query("isAdult") isAdult: Boolean = true
+        @Query("isAdult") isAdult: Boolean = true,
+        @Query("status") status: Int = 1
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
 
@@ -496,7 +512,8 @@ interface ApiService {
         @Query("limit") limit: Int,
         @Query("orderBy") orderBy: Int = 1,
         @Query("isFullContent") isFullContent: Boolean = false,
-        @Query("isAdult") isAdult: Boolean = true
+        @Query("isAdult") isAdult: Boolean = true,
+        @Query("status") status: Int = 1
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     @GET("/v1/Members/Post")
@@ -506,7 +523,8 @@ interface ApiService {
         @Query("limit") limit: Int,
         @Query("orderBy") orderBy: Int = 1,
         @Query("isFullContent") isFullContent: Boolean = false,
-        @Query("isAdult") isAdult: Boolean = true
+        @Query("isAdult") isAdult: Boolean = true,
+        @Query("status") status: Int = 1
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     /**********************************************************
@@ -554,6 +572,13 @@ interface ApiService {
         @Path("sign") sign: String?
     ): Response<Void>
 
+    @GET("/v1/Player/VideoStreamUrl/{streamId}")
+    suspend fun getVideoM3u8Source(
+        @Path("streamId") streamId: Long,
+        @Query("userId") userId: Long?,
+        @Query("utcTime") utcTime: Long?,
+        @Query("sign") sign: String?
+    ): Response<ApiBaseItem<VideoM3u8Source>>
 
     /**********************************************************
      *
@@ -585,14 +610,17 @@ interface ApiService {
     suspend fun getOrder(
         @Query("offset") offset: String,
         @Query("limit") limit: String
-    ): Response<ApiBasePagingItem<ArrayList<OrderItem>>>
+    ): Response<ApiBasePagingItem<OrderContentItem>>
 
     @GET("/v1/Members/Me/Order")
-    suspend fun getOrderByOnline(
-        @Query("isOnline") isOnline: Boolean,
+    suspend fun getOrderByType(
+        @Query("type") type: Int,
         @Query("offset") offset: String,
         @Query("limit") limit: String
-    ): Response<ApiBasePagingItem<ArrayList<OrderItem>>>
+    ): Response<ApiBasePagingItem<OrderContentItem>>
+
+    @GET("/v1/Member/Me/Order/GetPendingOrder")
+    suspend fun getPendingOrderCount(): Response<ApiBaseItem<PendingOrderItem>>
 
     /**********************************************************
      *
@@ -600,7 +628,7 @@ interface ApiService {
      *
      ***********************************************************/
     @POST("/v1/Members/Me/Order/TraceLog")
-    suspend fun createOrderChat(@Body request: CreateChatRequest): Response<Void>
+    suspend fun createOrderChat(@Body request: CreateChatRequest): Response<ApiBaseItem<CreateOrderChatItem>>
 
     @GET("/v1/Members/Me/Order/TraceLog/UnRead")
     suspend fun getUnReadOrderCount(): Response<ApiBaseItem<Int>>

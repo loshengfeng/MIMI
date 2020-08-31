@@ -51,7 +51,7 @@ class PersonalFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.getUnread()
+        viewModel.getTotalUnread()
     }
 
     override fun setupObservers() {
@@ -108,7 +108,6 @@ class PersonalFragment : BaseFragment() {
                             data.errorItem.message?.also { message ->
                                 GeneralDialog.newInstance(
                                     GeneralDialogData(
-                                        titleRes = 0,
                                         message = message,
                                         messageIcon = R.drawable.ico_default_photo,
                                         secondBtn = getString(R.string.btn_confirm)
@@ -124,7 +123,17 @@ class PersonalFragment : BaseFragment() {
         viewModel.unreadResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-//                    tv_new.visibility = if (it.result == 0) View.INVISIBLE else View.VISIBLE
+                    tv_new.visibility = if (it.result == 0) View.INVISIBLE else View.VISIBLE
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.totalUnreadResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    iv_new.visibility = if (it.result == 0) View.INVISIBLE else View.VISIBLE
+                    interactionListener?.refreshBottomNavigationBadge(it.result)
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -182,7 +191,7 @@ class PersonalFragment : BaseFragment() {
         tv_version_is_not_login.text = BuildConfig.VERSION_NAME
         tv_topup.visibility = View.INVISIBLE
 
-        when (viewModel.accountManager.isLogin()) {
+        when (viewModel.isLogin()) {
             true -> {
                 item_is_Login.visibility = View.VISIBLE
                 item_is_not_Login.visibility = View.GONE

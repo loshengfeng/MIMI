@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.dabenxiang.mimi.R
@@ -11,11 +12,14 @@ import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.HomeItemType
+import com.dabenxiang.mimi.model.vo.CarouselHolderItem
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.club.ClubFuncItem
 import com.dabenxiang.mimi.view.home.HomeTemplate
 import com.dabenxiang.mimi.view.home.viewholder.*
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import kotlinx.android.synthetic.main.item_home_statistics.view.*
 
 class HomeAdapter(
     val context: Context,
@@ -71,16 +75,20 @@ class HomeAdapter(
                         R.layout.item_carousel,
                         parent,
                         false
-                    ), listener, isAdult
+                    ), listener, isAdult, memberPostFuncItem
                 )
             }
             HomeItemType.STATISTICS -> {
+                val view = layoutInflater.inflate(
+                    R.layout.item_home_statistics,
+                    parent,
+                    false
+                )
+                val params = view.recyclerview_statistics.layoutParams as ConstraintLayout.LayoutParams
+                if(isAdult) params.height =  (((165.0 / 640.0)) * GeneralUtils.getWindowsHeight()).toInt()
+                else params.height = (((190.0 / 640.0)) * GeneralUtils.getWindowsHeight()).toInt()
                 HomeStatisticsViewHolder(
-                    layoutInflater.inflate(
-                        R.layout.item_home_statistics,
-                        parent,
-                        false
-                    ), listener, isAdult
+                    view, listener, isAdult
                 )
             }
             HomeItemType.CLIP -> {
@@ -159,5 +167,6 @@ class HomeAdapter(
         fun onLoadClipViewHolder(vh: HomeClipViewHolder)
         fun onLoadPictureViewHolder(vh: HomePictureViewHolder)
         fun onLoadClubViewHolder(vh: HomeClubViewHolder)
+        fun onClickBanner(item: CarouselHolderItem);
     }
 }

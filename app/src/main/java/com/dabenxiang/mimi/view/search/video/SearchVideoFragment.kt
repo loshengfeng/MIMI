@@ -20,7 +20,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
@@ -44,7 +44,7 @@ import java.util.*
 class SearchVideoFragment : BaseFragment() {
 
     companion object {
-        private const val REQUEST_LOGIN = 1000
+        const val REQUEST_LOGIN = 1000
         const val KEY_DATA = "data"
 
         fun createBundle(title: String = "", tag: String = "", isAdult: Boolean = false): Bundle {
@@ -64,7 +64,7 @@ class SearchVideoFragment : BaseFragment() {
     var moreDialog: MoreDialogFragment? = null
 
     private val videoListAdapter by lazy {
-        SearchVideoAdapter(requireContext(), adapterListener)
+        SearchVideoAdapter(requireContext(), adapterListener, viewModel.isAdult)
     }
 
     override fun getLayoutId(): Int {
@@ -93,7 +93,6 @@ class SearchVideoFragment : BaseFragment() {
 
             if (data.tag.isNotBlank()) {
                 viewModel.searchingTag = data.tag
-                tv_search_text.text = genResultText()
                 viewModel.getSearchList()
             }
 
@@ -211,7 +210,6 @@ class SearchVideoFragment : BaseFragment() {
         })
 
         viewModel.searchingListResult.observe(viewLifecycleOwner, Observer {
-            tv_search_text.text = genResultText()
             videoListAdapter.submitList(it)
         })
 
@@ -221,23 +219,19 @@ class SearchVideoFragment : BaseFragment() {
 
         viewModel.likeResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> {
-                    videoListAdapter.notifyDataSetChanged()
-                }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> videoListAdapter.notifyDataSetChanged()
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.favoriteResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Error -> onApiError(it.throwable)
-                is ApiResult.Success -> {
-                    videoListAdapter.notifyDataSetChanged()
-                }
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> videoListAdapter.notifyDataSetChanged()
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -450,6 +444,7 @@ class SearchVideoFragment : BaseFragment() {
             val chip = LayoutInflater.from(chip_group_search_text.context)
                 .inflate(R.layout.chip_item, chip_group_search_text, false) as Chip
             chip.text = text
+            chip.ellipsize = TextUtils.TruncateAt.END
 
             if (viewModel.isAdult) {
                 chip.chipBackgroundColor = ColorStateList.valueOf(

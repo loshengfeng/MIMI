@@ -1,16 +1,10 @@
 package com.dabenxiang.mimi.view.mypost
 
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -18,7 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
-import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.callback.MyPostListener
+import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
@@ -33,39 +28,37 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
-import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
-import com.dabenxiang.mimi.view.dialog.comment.MyPostMoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
-import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.TYPE_COVER
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.TYPE_VIDEO
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.USER_ID_ME
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
-import com.dabenxiang.mimi.view.post.article.PostArticleFragment
-import com.dabenxiang.mimi.view.post.pic.PostPicFragment
-import com.dabenxiang.mimi.view.post.video.PostVideoFragment
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.DELETE_ATTACHMENT
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.MEMBER_REQUEST
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.PIC_URI
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.POST_ID
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.REQUEST
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.TAG
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.TITLE
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.UPLOAD_ARTICLE
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.UPLOAD_PIC
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.UPLOAD_VIDEO
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.VIDEO_DATA
+import com.dabenxiang.mimi.view.post.utility.PostManager
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
-import com.video.trimmer.utils.RealPathUtil
-import com.vincent.videocompressor.VideoCompress
 import kotlinx.android.synthetic.main.fragment_my_post.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import timber.log.Timber
-import java.io.File
-import java.util.*
-import kotlin.collections.ArrayList
 
 
 class MyPostFragment : BaseFragment() {
 
     private lateinit var adapter: MyPostPagedAdapter
-
-    private var meMoreDialog: MyPostMoreDialogFragment? = null
-    private var moreDialog: MoreDialogFragment? = null
 
     private val viewModel: MyPostViewModel by viewModels()
 
@@ -165,39 +158,39 @@ class MyPostFragment : BaseFragment() {
     }
 
     private fun handleUpdatePost() {
-        val isNeedUpdateArticle = arguments?.getBoolean(PostArticleFragment.UPLOAD_ARTICLE)
+        val isNeedUpdateArticle = arguments?.getBoolean(UPLOAD_ARTICLE)
 
-        val isNeedPicUpload = arguments?.getBoolean(PostPicFragment.UPLOAD_PIC)
-        val isNeedVideoUpload = arguments?.getBoolean(PostVideoFragment.UPLOAD_VIDEO)
+        val isNeedPicUpload = arguments?.getBoolean(UPLOAD_PIC)
+        val isNeedVideoUpload = arguments?.getBoolean(UPLOAD_VIDEO)
 
         if (isNeedPicUpload != null && isNeedPicUpload) {
             handlePicUpload()
         } else if (isNeedVideoUpload != null && isNeedVideoUpload) {
             handleVideoUpload()
         } else if (isNeedUpdateArticle != null && isNeedUpdateArticle) {
-            arguments?.remove(PostArticleFragment.UPLOAD_ARTICLE)
+            arguments?.remove(UPLOAD_ARTICLE)
             showSnackBar()
-            val title = arguments?.getString(PostArticleFragment.TITLE)
-            val request = arguments?.getString(PostArticleFragment.REQUEST)
-            val tags = arguments?.getStringArrayList(PostArticleFragment.TAG)
+            val title = arguments?.getString(TITLE)
+            val request = arguments?.getString(REQUEST)
+            val tags = arguments?.getStringArrayList(TAG)
             memberPostItem = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
             viewModel.updateArticle(title!!, request!!, tags!!, memberPostItem)
         }
     }
 
     private fun handlePicUpload() {
-        arguments?.remove(PostPicFragment.UPLOAD_PIC)
+        arguments?.remove(UPLOAD_PIC)
         postType = PostType.IMAGE
 
         showSnackBar()
 
-        deletePicList = arguments?.getStringArrayList(PostPicFragment.DELETE_ATTACHMENT)!!
+        deletePicList = arguments?.getStringArrayList(DELETE_ATTACHMENT)!!
         memberPostItem = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
-        postId = arguments?.getLong(PostPicFragment.POST_ID)!!
+        postId = arguments?.getLong(POST_ID)!!
 
         val memberRequest =
-            arguments?.getParcelable<PostMemberRequest>(PostPicFragment.MEMBER_REQUEST)
-        val picList = arguments?.getParcelableArrayList<PostAttachmentItem>(PostPicFragment.PIC_URI)
+            arguments?.getParcelable<PostMemberRequest>(MEMBER_REQUEST)
+        val picList = arguments?.getParcelableArrayList<PostAttachmentItem>(PIC_URI)
 
         postMemberRequest = memberRequest!!
 
@@ -235,19 +228,19 @@ class MyPostFragment : BaseFragment() {
     }
 
     private fun handleVideoUpload() {
-        arguments?.remove(PostVideoFragment.UPLOAD_VIDEO)
+        arguments?.remove(UPLOAD_VIDEO)
         postType = PostType.VIDEO
 
-        arguments?.remove(PostVideoFragment.UPLOAD_VIDEO)
+        arguments?.remove(UPLOAD_VIDEO)
         showSnackBar()
 
-        deleteVideoItem = arguments?.getParcelableArrayList(PostVideoFragment.DELETE_ATTACHMENT)!!
-        uploadVideoList = arguments?.getParcelableArrayList(PostVideoFragment.VIDEO_DATA)!!
+        deleteVideoItem = arguments?.getParcelableArrayList(DELETE_ATTACHMENT)!!
+        uploadVideoList = arguments?.getParcelableArrayList(VIDEO_DATA)!!
         memberPostItem = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
-        postId = arguments?.getLong(PostVideoFragment.POST_ID)!!
+        postId = arguments?.getLong(POST_ID)!!
 
         val memberRequest =
-            arguments?.getParcelable<PostMemberRequest>(PostVideoFragment.MEMBER_REQUEST)
+            arguments?.getParcelable<PostMemberRequest>(MEMBER_REQUEST)
 
         postMemberRequest = memberRequest!!
 
@@ -293,7 +286,7 @@ class MyPostFragment : BaseFragment() {
 
         viewModel.attachmentByTypeResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     val attachmentItem = it.result
                     LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
 
@@ -308,13 +301,13 @@ class MyPostFragment : BaseFragment() {
                     }
 
                 }
-                is ApiResult.Error -> Timber.e(it.throwable)
+                is Error -> Timber.e(it.throwable)
             }
         })
 
         viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     val attachmentItem = it.result
                     LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
                     when (val holder =
@@ -326,54 +319,54 @@ class MyPostFragment : BaseFragment() {
                         }
                     }
                 }
-                is ApiResult.Error -> Timber.e(it.throwable)
+                is Error -> Timber.e(it.throwable)
             }
         })
 
         viewModel.likePostResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     adapter.notifyItemChanged(
                         it.result,
                         MyPostPagedAdapter.PAYLOAD_UPDATE_LIKE
                     )
                 }
-                is ApiResult.Error -> Timber.e(it.throwable)
+                is Error -> Timber.e(it.throwable)
             }
         })
 
         viewModel.favoriteResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     adapter.notifyItemChanged(
                         it.result,
                         MyPostPagedAdapter.PAYLOAD_UPDATE_FAVORITE
                     )
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.followResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Empty -> {
+                is Empty -> {
                     adapter.notifyItemRangeChanged(
                         0,
                         viewModel.totalCount,
                         MyPostPagedAdapter.PAYLOAD_UPDATE_FOLLOW
                     )
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
-        viewModel.deletePostResult.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     adapter.removedPosList.add(it.result)
                     adapter.notifyItemChanged(it.result)
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -387,7 +380,7 @@ class MyPostFragment : BaseFragment() {
 
         viewModel.postPicResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     uploadPicList[uploadCurrentPicPosition].id = it.result.toString()
                     uploadCurrentPicPosition += 1
 
@@ -401,7 +394,7 @@ class MyPostFragment : BaseFragment() {
                         Timber.d("Post pic content item : $content")
 
 
-                        val postId = arguments?.getLong(PostPicFragment.POST_ID)
+                        val postId = arguments?.getLong(POST_ID)
 
                         viewModel.postPic(postId!!, postMemberRequest, content)
                     } else {
@@ -409,7 +402,7 @@ class MyPostFragment : BaseFragment() {
                         viewModel.postAttachment(pic.url, requireContext(), TYPE_PIC)
                     }
                 }
-                is ApiResult.Error -> resetAndCancelJob(
+                is Error -> resetAndCancelJob(
                     it.throwable,
                     getString(R.string.post_error)
                 )
@@ -418,7 +411,7 @@ class MyPostFragment : BaseFragment() {
 
         viewModel.postVideoMemberResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     if (deletePicList.isNotEmpty()) {
                         viewModel.deleteAttachment(deletePicList[deleteCurrentPicPosition])
                     } else if (deleteVideoItem.isNotEmpty()) {
@@ -431,7 +424,7 @@ class MyPostFragment : BaseFragment() {
                         viewModel.clearLiveData()
                     }
                 }
-                is ApiResult.Error -> resetAndCancelJob(
+                is Error -> resetAndCancelJob(
                     it.throwable,
                     getString(R.string.post_error)
                 )
@@ -453,63 +446,33 @@ class MyPostFragment : BaseFragment() {
 
         viewModel.postCoverResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     uploadVideoList[0].picAttachmentId = it.result.toString()
 
                     val realPath =
                         UriUtils.getPath(requireContext(), Uri.parse(uploadVideoList[0].videoUrl))
                     uploadVideoList[0].videoUrl = realPath!!
 
-                    val videoUri = Uri.parse(uploadVideoList[0].videoUrl)
-                    val file = File(videoUri.path ?: "")
-                    val destinationPath = Environment.getExternalStorageDirectory()
-                        .toString() + File.separator + "temp" + File.separator + "Videos" + File.separator
-                    val root = File(destinationPath)
-                    val outputFileUri = Uri.fromFile(
-                        File(
-                            root,
-                            "t_${Calendar.getInstance().timeInMillis}_" + file.nameWithoutExtension + ".mp4"
-                        )
-                    )
-                    val outPutPath =
-                        RealPathUtil.realPathFromUriApi19(requireContext(), outputFileUri)
-                            ?: File(
-                                root,
-                                "t_${Calendar.getInstance().timeInMillis}_" + videoUri.path?.substring(
-                                    videoUri.path!!.lastIndexOf("/") + 1
-                                )
-                            ).absolutePath
-
-                    VideoCompress.compressVideoLow(
+                    val outPutPath = PostManager().getCompressPath(realPath, requireContext())
+                    PostManager().videoCompress(
                         realPath,
                         outPutPath,
-                        object : VideoCompress.CompressListener {
-                            override fun onStart() {
-                                Timber.d("Start compress")
-                            }
-
+                        object : PostManager.VideoCompressListener {
                             override fun onSuccess() {
-                                Timber.d("Compress success")
                                 uploadVideoList[0].videoUrl = outPutPath
                                 viewModel.postAttachment(
                                     uploadVideoList[0].videoUrl,
                                     requireContext(),
                                     TYPE_VIDEO
                                 )
-
                             }
 
                             override fun onFail() {
-                                Timber.d("Compress fail")
                                 resetAndCancelJob(Throwable(), getString(R.string.post_error))
-                            }
-
-                            override fun onProgress(percent: Float) {
-                                Timber.d("Compress progress : $percent")
                             }
                         })
                 }
-                is ApiResult.Error -> resetAndCancelJob(
+                is Error -> resetAndCancelJob(
                     it.throwable,
                     getString(R.string.post_error)
                 )
@@ -518,10 +481,10 @@ class MyPostFragment : BaseFragment() {
 
         viewModel.postVideoResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     uploadVideoList[0].videoAttachmentId = it.result.toString()
 
-                    val postId = arguments?.getLong(PostVideoFragment.POST_ID)
+                    val postId = arguments?.getLong(POST_ID)
 
                     val mediaItem = MediaItem()
                     val videoParameter = VideoParameter(
@@ -544,7 +507,7 @@ class MyPostFragment : BaseFragment() {
                     Timber.d("Post video content item : $content")
                     viewModel.postPic(postId!!, postMemberRequest, content)
                 }
-                is ApiResult.Error -> {
+                is Error -> {
                     Timber.e(it.throwable)
 
                     resetAndCancelJob(it.throwable, getString(R.string.post_error))
@@ -555,106 +518,93 @@ class MyPostFragment : BaseFragment() {
 
         viewModel.postDeleteCoverAttachment.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Success -> viewModel.deleteVideoAttachment(
+                is Success -> viewModel.deleteVideoAttachment(
                     deleteVideoItem[0].picAttachmentId,
                     TYPE_VIDEO
                 )
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.postDeleteVideoAttachment.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Success -> setSnackBarPostStatus(postId)
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Success -> setSnackBarPostStatus(postId)
+                is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.postArticleResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Success -> {
+                is Success -> {
                     postType = PostType.TEXT
                     setSnackBarPostStatus(it.result)
                     viewModel.clearLiveData()
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is Error -> onApiError(it.throwable)
             }
         })
     }
 
     private fun setSnackBarPostStatus(postId: Long = 0) {
-        val snackBarLayout: Snackbar.SnackbarLayout = snackBar?.view as Snackbar.SnackbarLayout
-        val progressBar =
-            snackBarLayout.findViewById(R.id.contentLoadingProgressBar) as ContentLoadingProgressBar
-        val imgSuccess = snackBarLayout.findViewById(R.id.iv_success) as ImageView
-
-        val txtSuccess = snackBarLayout.findViewById(R.id.txt_postSuccess) as TextView
-        val txtUploading = snackBarLayout.findViewById(R.id.txt_uploading) as TextView
-
-        val imgCancel = snackBarLayout.findViewById(R.id.iv_cancel) as ImageView
-        val txtCancel = snackBarLayout.findViewById(R.id.txt_cancel) as TextView
-        val imgPost = snackBarLayout.findViewById(R.id.iv_viewPost) as ImageView
-        val txtPost = snackBarLayout.findViewById(R.id.txt_viewPost) as TextView
-
-        progressBar.visibility = View.GONE
-        imgSuccess.visibility = View.VISIBLE
-
-        txtSuccess.visibility = View.VISIBLE
-        txtUploading.visibility = View.GONE
-
-        imgCancel.visibility = View.GONE
-        txtCancel.visibility = View.GONE
-
-        imgPost.visibility = View.VISIBLE
-        txtPost.visibility = View.VISIBLE
-
-        imgPost.setOnClickListener {
-            findNavController().navigate(R.id.action_to_myPostFragment)
-        }
-
-        txtPost.setOnClickListener {
-            when (postType) {
-                PostType.TEXT -> {
-                    memberPostItem.id = postId
-                    val bundle = TextDetailFragment.createBundle(memberPostItem, -1)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_myPostFragment_to_textDetailFragment,
-                            bundle
-                        )
-                    )
+        PostManager().dismissSnackBar(
+            snackBar!!,
+            postId,
+            memberPostItem,
+            null,
+            object : PostManager.SnackBarListener {
+                override fun onClick(memberPostItem: MemberPostItem) {
+                    postNavigation(memberPostItem)
                 }
-                PostType.IMAGE -> {
-                    memberPostItem.id = postId
-//                    memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
-//                    memberPostItem.avatarAttachmentId =
-//                        viewModel.pref.profileItem.avatarAttachmentId
-                    val bundle = PictureDetailFragment.createBundle(memberPostItem, -1)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_myPostFragment_to_pictureDetailFragment,
-                            bundle
-                        )
-                    )
-                }
-                PostType.VIDEO -> {
-                    memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
-                    val bundle = ClipFragment.createBundle(arrayListOf(memberPostItem), -1, false)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_myPostFragment_to_clipFragment,
-                            bundle
-                        )
-                    )
-                }
-            }
-        }
+            })
 
         uploadCurrentPicPosition = 0
+    }
 
-        Handler().postDelayed({
-            snackBar?.dismiss()
-        }, 3000)
+    private fun postNavigation(memberPostItem: MemberPostItem) {
+        when (postType) {
+            PostType.TEXT -> {
+                val bundle = TextDetailFragment.createBundle(memberPostItem, -1)
+                navigationToText(bundle)
+
+            }
+            PostType.IMAGE -> {
+                val bundle = PictureDetailFragment.createBundle(memberPostItem, -1)
+                navigationToPicture(bundle)
+
+            }
+            PostType.VIDEO -> {
+                memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
+                val bundle = ClipFragment.createBundle(arrayListOf(memberPostItem), -1, false)
+                navigationToVideo(bundle)
+            }
+        }
+    }
+
+    private fun navigationToText(bundle: Bundle) {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_myPostFragment_to_textDetailFragment,
+                bundle
+            )
+        )
+    }
+
+    private fun navigationToPicture(bundle: Bundle) {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_myPostFragment_to_pictureDetailFragment,
+                bundle
+            )
+        )
+    }
+
+    private fun navigationToVideo(bundle: Bundle) {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_myPostFragment_to_clipFragment,
+                bundle
+            )
+        )
     }
 
     override fun setupListeners() {
@@ -686,80 +636,41 @@ class MyPostFragment : BaseFragment() {
         }
     }
 
-    private val onMeMoreDialogListener = object : MyPostMoreDialogFragment.OnMoreDialogListener {
-        override fun onCancel() {
-            meMoreDialog?.dismiss()
-        }
-
-        override fun onDelete(item: BaseMemberPostItem) {
-            viewModel.deletePost(
-                item as MemberPostItem,
-                ArrayList(adapter.currentList as List<MemberPostItem>)
-            )
-        }
-
-        override fun onEdit(item: BaseMemberPostItem) {
-            item as MemberPostItem
-            if (item.type == PostType.TEXT) {
-                val bundle = Bundle()
-                item.id
-                bundle.putBoolean(EDIT, true)
-                bundle.putSerializable(MEMBER_DATA, item)
-                findNavController().navigate(
-                    R.id.action_myPostFragment_to_postArticleFragment,
-                    bundle
-                )
-            } else if (item.type == PostType.IMAGE) {
-                val bundle = Bundle()
-                bundle.putBoolean(EDIT, true)
-                bundle.putSerializable(MEMBER_DATA, item)
-                findNavController().navigate(R.id.action_myPostFragment_to_postPicFragment, bundle)
-            } else if (item.type == PostType.VIDEO) {
-                val bundle = Bundle()
-                bundle.putBoolean(EDIT, true)
-                bundle.putSerializable(MEMBER_DATA, item)
-                findNavController().navigate(
-                    R.id.action_myPostFragment_to_postVideoFragment,
-                    bundle
-                )
-            }
-
-            meMoreDialog?.dismiss()
-        }
-    }
-
-    private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-        override fun onProblemReport(item: BaseMemberPostItem) {
-            moreDialog?.dismiss()
-            checkStatus { (requireActivity() as MainActivity).showReportDialog(item) }
-        }
-
-        override fun onCancel() {
-            moreDialog?.dismiss()
-        }
-    }
-
     private val myPostListener = object : MyPostListener {
         override fun onMoreClick(item: MemberPostItem) {
-            val isMe = viewModel.accountManager.getProfile().userId == item.creatorId
-            if (isMe) {
-                meMoreDialog =
-                    MyPostMoreDialogFragment.newInstance(item, onMeMoreDialogListener)
-                        .also {
-                            it.show(
-                                requireActivity().supportFragmentManager,
-                                MoreDialogFragment::class.java.simpleName
-                            )
-                        }
-            } else {
-                moreDialog =
-                    MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
-                        it.show(
-                            requireActivity().supportFragmentManager,
-                            MoreDialogFragment::class.java.simpleName
+            onMoreClick(item, ArrayList(adapter.currentList as List<MemberPostItem>), onEdit = {
+                it as MemberPostItem
+                when (item.type) {
+                    PostType.TEXT -> {
+                        val bundle = Bundle()
+                        item.id
+                        bundle.putBoolean(EDIT, true)
+                        bundle.putSerializable(MEMBER_DATA, item)
+                        findNavController().navigate(
+                            R.id.action_myPostFragment_to_postArticleFragment,
+                            bundle
                         )
                     }
-            }
+                    PostType.IMAGE -> {
+                        val bundle = Bundle()
+                        bundle.putBoolean(EDIT, true)
+                        bundle.putSerializable(MEMBER_DATA, item)
+                        findNavController().navigate(
+                            R.id.action_myPostFragment_to_postPicFragment,
+                            bundle
+                        )
+                    }
+                    PostType.VIDEO -> {
+                        val bundle = Bundle()
+                        bundle.putBoolean(EDIT, true)
+                        bundle.putSerializable(MEMBER_DATA, item)
+                        findNavController().navigate(
+                            R.id.action_myPostFragment_to_postVideoFragment,
+                            bundle
+                        )
+                    }
+                }
+            })
         }
 
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
@@ -769,23 +680,13 @@ class MyPostFragment : BaseFragment() {
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {
             checkStatus {
                 val bundle = ClipFragment.createBundle(ArrayList(mutableListOf(item[position])), 0)
-                navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_myPostFragment_to_clipFragment,
-                        bundle
-                    )
-                )
+                navigationToVideo(bundle)
             }
         }
 
         override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
             val bundle = ClipFragment.createBundle(ArrayList(mutableListOf(item[position])), 0)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_myPostFragment_to_clipFragment,
-                    bundle
-                )
-            )
+            navigationToVideo(bundle)
         }
 
         override fun onChipClick(type: PostType, tag: String) {
@@ -803,23 +704,11 @@ class MyPostFragment : BaseFragment() {
             when (adultTabType) {
                 AdultTabType.PICTURE -> {
                     val bundle = PictureDetailFragment.createBundle(item, 0)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_myPostFragment_to_pictureDetailFragment,
-                            bundle
-                        )
-                    )
+                    navigationToPicture(bundle)
                 }
                 AdultTabType.TEXT -> {
                     val bundle = TextDetailFragment.createBundle(item, 0)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_myPostFragment_to_textDetailFragment,
-                            bundle
-                        )
-                    )
-                }
-                else -> {
+                    navigationToText(bundle)
                 }
             }
         }
@@ -829,23 +718,11 @@ class MyPostFragment : BaseFragment() {
                 when (adultTabType) {
                     AdultTabType.PICTURE -> {
                         val bundle = PictureDetailFragment.createBundle(item, 1)
-                        navigateTo(
-                            NavigateItem.Destination(
-                                R.id.action_myPostFragment_to_pictureDetailFragment,
-                                bundle
-                            )
-                        )
+                        navigationToPicture(bundle)
                     }
                     AdultTabType.TEXT -> {
                         val bundle = TextDetailFragment.createBundle(item, 1)
-                        navigateTo(
-                            NavigateItem.Destination(
-                                R.id.action_myPostFragment_to_textDetailFragment,
-                                bundle
-                            )
-                        )
-                    }
-                    else -> {
+                        navigationToText(bundle)
                     }
                 }
             }
@@ -869,46 +746,15 @@ class MyPostFragment : BaseFragment() {
         }
     }
 
-    interface MyPostListener {
-        fun onMoreClick(item: MemberPostItem)
-        fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean)
-        fun onClipCommentClick(item: List<MemberPostItem>, position: Int)
-        fun onClipItemClick(item: List<MemberPostItem>, position: Int)
-        fun onChipClick(type: PostType, tag: String)
-        fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType)
-        fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType)
-        fun onFavoriteClick(
-            item: MemberPostItem,
-            position: Int,
-            isFavorite: Boolean,
-            type: AttachmentType
-        )
-
-        fun onFollowClick(items: List<MemberPostItem>, position: Int, isFollow: Boolean)
-    }
-
     private fun showSnackBar() {
-        snackBar = Snackbar.make(snackBarLayout, "", Snackbar.LENGTH_INDEFINITE)
-        val snackBarLayout: Snackbar.SnackbarLayout = snackBar?.view as Snackbar.SnackbarLayout
-        val textView = snackBarLayout.findViewById(R.id.snackbar_text) as TextView
-        textView.visibility = View.INVISIBLE
-
-        val snackView: View = layoutInflater.inflate(R.layout.snackbar_upload, null)
-        snackBarLayout.addView(snackView, 0)
-        snackBarLayout.setPadding(15, 0, 15, 0)
-        snackBarLayout.setBackgroundColor(Color.TRANSPARENT)
-        snackBar?.show()
-
-        val imgCancel = snackBarLayout.findViewById(R.id.iv_cancel) as ImageView
-        val txtCancel = snackBarLayout.findViewById(R.id.txt_cancel) as TextView
-
-        txtCancel.setOnClickListener {
-            cancelDialog()
-        }
-
-        imgCancel.setOnClickListener {
-            cancelDialog()
-        }
+        snackBar = PostManager().showSnackBar(
+            snackBarLayout,
+            this,
+            object : PostManager.CancelDialogListener {
+                override fun onCancel() {
+                    cancelDialog()
+                }
+            })
     }
 
     private fun cancelDialog() {

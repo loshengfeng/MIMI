@@ -9,6 +9,7 @@ import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.File;
@@ -17,9 +18,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 @SuppressLint("NewApi")
 public class VideoController {
@@ -152,11 +150,12 @@ public class VideoController {
 
     /**
      * Background conversion for queueing tasks
+     *
      * @param path source file to compress
      * @param dest destination directory to put result
      */
 
-public void scheduleVideoConvert(String path, String dest) {
+    public void scheduleVideoConvert(String path, String dest) {
         startVideoConvertFromQueue(path, dest);
     }
 
@@ -242,13 +241,14 @@ public void scheduleVideoConvert(String path, String dest) {
 
     /**
      * Perform the actual video compression. Processes the frames and does the magic
-     * @param sourcePath the source uri for the file as per
+     *
+     * @param sourcePath      the source uri for the file as per
      * @param destinationPath the destination directory where compressed video is eventually saved
      * @return
      */
     @TargetApi(16)
-    public boolean  convertVideo(final String sourcePath, String destinationPath, int quality, CompressProgressListener listener) {
-        this.path=sourcePath;
+    public boolean convertVideo(final String sourcePath, String destinationPath, int quality, CompressProgressListener listener) {
+        this.path = sourcePath;
 
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(path);
@@ -259,10 +259,19 @@ public void scheduleVideoConvert(String path, String dest) {
 
         long startTime = -1;
         long endTime = -1;
-
-        int rotationValue = Integer.valueOf(rotation);
-        int originalWidth = Integer.valueOf(width);
-        int originalHeight = Integer.valueOf(height);
+        //FIXME  java.lang.NumberFormatException: null !!!
+        int rotationValue = 0;
+        if (!TextUtils.isEmpty(rotation)) {
+            rotationValue = Integer.valueOf(rotation);
+        }
+        int originalWidth = 480;
+        if (!TextUtils.isEmpty(width)) {
+            originalWidth = Integer.valueOf(width);
+        }
+        int originalHeight = 640;
+        if (!TextUtils.isEmpty(height)) {
+            originalHeight = Integer.valueOf(height);
+        }
 
         int resultWidth;
         int resultHeight;
@@ -282,7 +291,7 @@ public void scheduleVideoConvert(String path, String dest) {
             case COMPRESS_QUALITY_LOW:
                 resultWidth = originalWidth / 2;
                 resultHeight = originalHeight / 2;
-                bitrate = (resultWidth/2) * (resultHeight/2) * 10;
+                bitrate = (resultWidth / 2) * (resultHeight / 2) * 10;
                 break;
         }
 
@@ -710,7 +719,7 @@ public void scheduleVideoConvert(String path, String dest) {
         }
         didWriteData(true, error);
 
-        cachedFile=cacheFile;
+        cachedFile = cacheFile;
 
        /* File fdelete = inputFile;
         if (fdelete.exists()) {
@@ -722,9 +731,9 @@ public void scheduleVideoConvert(String path, String dest) {
         }*/
 
         //inputFile.delete();
-        Log.e("ViratPath",path+"");
-        Log.e("ViratPath",cacheFile.getPath()+"");
-        Log.e("ViratPath",inputFile.getPath()+"");
+        Log.e("ViratPath", path + "");
+        Log.e("ViratPath", cacheFile.getPath() + "");
+        Log.e("ViratPath", inputFile.getPath() + "");
 
 
        /* Log.e("ViratPath",path+"");
@@ -750,7 +759,7 @@ public void scheduleVideoConvert(String path, String dest) {
         }
 */
 
-    //    cacheFile.delete();
+        //    cacheFile.delete();
 
        /* try {
            // copyFile(cacheFile,inputFile);
@@ -759,21 +768,17 @@ public void scheduleVideoConvert(String path, String dest) {
         } catch (IOException e) {
             e.printStackTrace();
         }*/
-         // cacheFile.delete();
-       // inputFile.delete();
+        // cacheFile.delete();
+        // inputFile.delete();
         return true;
     }
 
-    public static void copyFile(File src, File dst) throws IOException
-    {
+    public static void copyFile(File src, File dst) throws IOException {
         FileChannel inChannel = new FileInputStream(src).getChannel();
         FileChannel outChannel = new FileOutputStream(dst).getChannel();
-        try
-        {
+        try {
             inChannel.transferTo(1, inChannel.size(), outChannel);
-        }
-        finally
-        {
+        } finally {
             if (inChannel != null)
                 inChannel.close();
             if (outChannel != null)

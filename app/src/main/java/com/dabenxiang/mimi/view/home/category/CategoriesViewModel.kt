@@ -64,7 +64,8 @@ class CategoriesViewModel : BaseViewModel() {
                     domainManager,
                     pagingCallback,
                     adWidth,
-                    adHeight
+                    adHeight,
+                        false
                 )
             val factory =
                 VideoFactory(dataSrc)
@@ -78,7 +79,7 @@ class CategoriesViewModel : BaseViewModel() {
         }
     }
 
-    fun getVideoFilterList(category: String?, country: String?, years: String?, isAdult: Boolean) {
+    fun getVideoFilterList(category: String?, country: String?, years: String?, isAdult: Boolean, tag: String = "") {
         viewModelScope.launch {
             val dataSrc =
                 CategoriesDataSource(
@@ -90,7 +91,8 @@ class CategoriesViewModel : BaseViewModel() {
                     domainManager = domainManager,
                     pagingCallback = pagingCallback,
                     adWidth = adWidth,
-                    adHeight = adHeight
+                    adHeight = adHeight,
+                    tag = tag
                 )
             val factory =
                 CategoriesFactory(dataSrc)

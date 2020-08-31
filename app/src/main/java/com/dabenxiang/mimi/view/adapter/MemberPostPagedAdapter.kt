@@ -11,10 +11,7 @@ import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
-import com.dabenxiang.mimi.view.adapter.viewHolder.ClipPostHolder
-import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
-import com.dabenxiang.mimi.view.adapter.viewHolder.TextPostHolder
+import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
@@ -33,6 +30,7 @@ class MemberPostPagedAdapter(
         const val VIEW_TYPE_PICTURE = 1
         const val VIEW_TYPE_TEXT = 2
         const val VIEW_TYPE_AD = 3
+        const val VIEW_TYPE_DELETED = 4
 
         val diffCallback = object : DiffUtil.ItemCallback<MemberPostItem>() {
             override fun areItemsTheSame(
@@ -53,13 +51,19 @@ class MemberPostPagedAdapter(
 
     val viewHolderMap = hashMapOf<Int, BaseViewHolder>()
 
+    var removedPosList = ArrayList<Int>()
+
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
-        return when (item?.type) {
-            PostType.VIDEO -> VIEW_TYPE_CLIP
-            PostType.IMAGE -> VIEW_TYPE_PICTURE
-            PostType.AD -> VIEW_TYPE_AD
-            else -> VIEW_TYPE_TEXT
+        return if (removedPosList.contains(position)) {
+            VIEW_TYPE_DELETED
+        } else {
+            when (item?.type) {
+                PostType.VIDEO -> VIEW_TYPE_CLIP
+                PostType.IMAGE -> VIEW_TYPE_PICTURE
+                PostType.AD -> VIEW_TYPE_AD
+                else -> VIEW_TYPE_TEXT
+            }
         }
     }
 
@@ -83,10 +87,16 @@ class MemberPostPagedAdapter(
                         .inflate(R.layout.item_picture_post, parent, false)
                 )
             }
-            else -> {
+            VIEW_TYPE_TEXT -> {
                 TextPostHolder(
                     LayoutInflater.from(parent.context)
                         .inflate(R.layout.item_text_post, parent, false)
+                )
+            }
+            else -> {
+                DeletedItemViewHolder(
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_deleted, parent, false)
                 )
             }
         }

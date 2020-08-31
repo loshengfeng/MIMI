@@ -63,16 +63,12 @@ class RankingFragment : BaseFragment() {
         RankingAdapter(requireActivity(),
             RankingFuncItem(
                 onItemClick = { items, position ->
-                    val memberPostItems = items.map {
-                        MemberPostItem(
-                            id = it.id!!,
-                            content = it.content
-                        )
-                    }.let {
-                        arrayListOf<MemberPostItem>().also { arrayList ->
-                            arrayList.addAll(it)
+                    val memberPostItems = items.mapNotNull { it.detail }
+                        .let {
+                            arrayListOf<MemberPostItem>().also { arrayList ->
+                                arrayList.addAll(it)
+                            }
                         }
-                    }
 
                     when (viewModel.postTypeSelected) {
                         PostType.VIDEO -> {
@@ -153,7 +149,7 @@ class RankingFragment : BaseFragment() {
                     it.result,
                     RankingAdapter
                 )
-//                is ApiResult.Error -> onApiError(it.throwable)
+                is ApiResult.Error -> onApiError(it.throwable)
             }
         })
     }
@@ -205,7 +201,10 @@ class RankingFragment : BaseFragment() {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 REQUEST_LOGIN -> {
-                    findNavController().navigate(R.id.action_rankingFragment_to_loginFragment, data?.extras)
+                    findNavController().navigate(
+                        R.id.action_rankingFragment_to_loginFragment,
+                        data?.extras
+                    )
                 }
             }
         }

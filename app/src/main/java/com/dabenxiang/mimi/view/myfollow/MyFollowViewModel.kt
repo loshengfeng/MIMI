@@ -2,10 +2,11 @@ package com.dabenxiang.mimi.view.myfollow
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import androidx.paging.LivePagedListBuilder
-import androidx.paging.PagedList
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.MyFollowPagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -14,23 +15,16 @@ import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
 import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.myfollow.MyFollowFragment.Companion.TYPE_CLUB
-import com.dabenxiang.mimi.view.myfollow.MyFollowFragment.Companion.TYPE_MEMBER
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import timber.log.Timber
 
 class MyFollowViewModel : BaseViewModel() {
-    private val _clubList = MutableLiveData<PagedList<ClubFollowItem>>()
-    val clubList: LiveData<PagedList<ClubFollowItem>> = _clubList
 
     private val _clubCount = MutableLiveData<Int>()
     val clubCount: LiveData<Int> = _clubCount
-
-    private val _memberList = MutableLiveData<PagedList<MemberFollowItem>>()
-    val memberList: LiveData<PagedList<MemberFollowItem>> = _memberList
 
     private val _memberCount = MutableLiveData<Int>()
     val memberCount: LiveData<Int> = _memberCount
@@ -59,64 +53,38 @@ class MyFollowViewModel : BaseViewModel() {
     private val _clubIdList = ArrayList<Long>()
     private val _userIdList = ArrayList<Long>()
 
-    fun initData(type: Int) {
-        viewModelScope.launch {
-            when (type) {
-                TYPE_MEMBER -> {
-                    val dataSrc = MemberFollowListDataSource(
-                        viewModelScope,
-                        domainManager,
-                        memberPagingCallback
-                    )
-                    dataSrc.isInvalid
-                    val factory = MemberFollowListFactory(dataSrc)
-                    val config = PagedList.Config.Builder()
-                        .setPageSize(MemberFollowListDataSource.PER_LIMIT.toInt())
-                        .build()
-
-                    LivePagedListBuilder(factory, config).build().asFlow().collect {
-                        _memberList.value = it
-                    }
-                }
-
-                TYPE_CLUB -> {
-                    val dataSrc = ClubFollowListDataSource(
-                        viewModelScope,
-                        domainManager,
-                        clubPagingCallback
-                    )
-                    dataSrc.isInvalid
-                    val factory = ClubFollowListFactory(dataSrc)
-                    val config = PagedList.Config.Builder()
-                        .setPageSize(ClubFollowListDataSource.PER_LIMIT.toInt())
-                        .build()
-
-                    LivePagedListBuilder(factory, config).build().asFlow().collect {
-                        _clubList.value = it
-                    }
-                }
+    fun getMemberList(): Flow<PagingData<MemberFollowItem>> {
+        return Pager(
+            config = PagingConfig(pageSize = MemberFollowListDataSource.PER_LIMIT.toInt()),
+            pagingSourceFactory = {
+                MemberFollowListDataSource(
+                    domainManager,
+                    memberPagingCallback
+                )
             }
-        }
+        )
+            .flow
+            .cachedIn(viewModelScope)
+    }
+
+    fun getClubList(): Flow<PagingData<ClubFollowItem>> {
+        return Pager(
+            config = PagingConfig(pageSize = ClubFollowListDataSource.PER_LIMIT.toInt()),
+            pagingSourceFactory = {
+                ClubFollowListDataSource(
+                    domainManager,
+                    clubPagingCallback
+                )
+            }
+        )
+            .flow
+            .cachedIn(viewModelScope)
     }
 
     private val memberPagingCallback = object : MyFollowPagingCallback {
-        override fun onLoading() {
-            setShowProgress(true)
-        }
-
-        override fun onLoaded() {
-            setShowProgress(false)
-        }
-
-        override fun onThrowable(throwable: Throwable) {
-            Timber.e(throwable)
-        }
-
-        override fun onTotalCount(count: Long, isInitial: Boolean) {
-            val total = if (isInitial) count.toInt()
-            else _memberCount.value?.plus(count.toInt())
-            _memberCount.postValue(total)
-            if(isInitial) _cleanMemberRemovedPosList.postValue(null)
+        override fun onTotalCount(count: Long) {
+            _memberCount.postValue(count.toInt())
+            _cleanMemberRemovedPosList.postValue(null)
         }
 
         override fun onIdList(list: ArrayList<Long>, isInitial: Boolean) {
@@ -126,23 +94,9 @@ class MyFollowViewModel : BaseViewModel() {
     }
 
     private val clubPagingCallback = object : MyFollowPagingCallback {
-        override fun onLoading() {
-            setShowProgress(true)
-        }
-
-        override fun onLoaded() {
-            setShowProgress(false)
-        }
-
-        override fun onThrowable(throwable: Throwable) {
-            Timber.e(throwable)
-        }
-
-        override fun onTotalCount(count: Long, isInitial: Boolean) {
-            val total = if (isInitial) count.toInt()
-            else _clubCount.value?.plus(count.toInt())
-            _clubCount.postValue(total)
-            if(isInitial) _cleanClubRemovedPosList.postValue(null)
+        override fun onTotalCount(count: Long) {
+            _clubCount.postValue(count.toInt())
+            _cleanClubRemovedPosList.postValue(null)
         }
 
         override fun onIdList(list: ArrayList<Long>, isInitial: Boolean) {
@@ -152,6 +106,7 @@ class MyFollowViewModel : BaseViewModel() {
     }
 
     fun getAttachment(id: String, position: Int) {
+        if(id == LruCacheUtils.ZERO_ID) return
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getAttachment(id)
@@ -226,7 +181,6 @@ class MyFollowViewModel : BaseViewModel() {
                 }
                 _userIdList.removeAll(tmpList)
                 emit(ApiResult.success(null))
-                initData(TYPE_MEMBER)
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
@@ -244,11 +198,10 @@ class MyFollowViewModel : BaseViewModel() {
                 val tmpList = ArrayList<Long>()
                 _clubIdList.forEach { clubId ->
                     val result = domainManager.getApiRepository().cancelMyClubFollow(clubId)
-                    if(result.isSuccessful) tmpList.add(clubId)
+                    if (result.isSuccessful) tmpList.add(clubId)
                 }
                 _clubIdList.removeAll(tmpList)
                 emit(ApiResult.success(null))
-                initData(TYPE_CLUB)
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }

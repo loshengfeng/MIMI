@@ -225,7 +225,7 @@
                 android:layout_marginEnd="44dp"
                 android:drawablePadding="7dp"
                 android:gravity="center"
-                android:text="@string/setting_gender"
+                tools:text="@string/setting_gender"
                 app:layout_constraintBottom_toBottomOf="@+id/btn_gender"
                 app:layout_constraintEnd_toEndOf="@+id/btn_gender"
                 app:layout_constraintTop_toTopOf="@+id/btn_gender" />
@@ -249,6 +249,17 @@
                 android:text="@string/setting_birthday"
                 app:layout_constraintEnd_toEndOf="@id/btn_account"
                 app:layout_constraintTop_toBottomOf="@id/line_gender" />
+
+            <TextView
+                android:id="@+id/birthday_info"
+                style="@style/settingStyle_2"
+                android:layout_marginEnd="44dp"
+                android:drawablePadding="7dp"
+                android:gravity="center"
+                tools:text="@string/setting_gender"
+                app:layout_constraintBottom_toBottomOf="@+id/btn_birthday"
+                app:layout_constraintEnd_toEndOf="@+id/btn_birthday"
+                app:layout_constraintTop_toTopOf="@+id/btn_birthday" />
 
             <TextView
                 android:id="@+id/btn_binding_invitation"

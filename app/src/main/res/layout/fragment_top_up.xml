@@ -33,6 +33,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/iv_new_badge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:translationX="10dp"
+        android:translationY="-10dp"
+        android:src="@drawable/ico_new"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/tv_record_top_up"
+        app:layout_constraintTop_toTopOf="@id/tv_record_top_up"
+        android:contentDescription="@null" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/item_is_Login"
         android:layout_width="match_parent"
@@ -41,7 +53,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_title"
-        tools:visibility="gone">
+        tools:visibility="visible">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layout_config"
@@ -131,19 +143,18 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/rg_Type"
+            app:layout_constraintBottom_toTopOf="@id/rg_type"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/view_line"
             tools:text="副标内容副标内容" />
 
         <RadioGroup
-            android:id="@+id/rg_Type"
+            android:id="@+id/rg_type"
             android:layout_width="220dp"
             android:layout_height="40dp"
             android:layout_marginTop="30dp"
             android:background="@drawable/bg_checkbox_2"
-            android:checkedButton="@id/rb_proxy_pay"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -155,7 +166,6 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/bg_radio_button_selector"
                 android:button="@null"
-                android:clickable="false"
                 android:gravity="center"
                 android:text="@string/topup_online_pay"
                 android:textColor="@color/cb_selector" />
@@ -169,7 +179,6 @@
                 android:gravity="center"
                 android:text="@string/topup_proxy_pay"
                 android:textColor="@color/cb_selector" />
-
         </RadioGroup>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -177,11 +186,17 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="30dp"
-            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/rg_Type">
+            app:layout_constraintTop_toBottomOf="@id/rg_type">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_bottom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.857" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/layout_online_pay_1"
@@ -189,9 +204,10 @@
                 android:layout_height="0dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
+                android:layout_marginBottom="20dp"
                 android:background="@drawable/bg_gray_10_stroke_1_radius_4"
-                android:paddingBottom="12dp"
-                app:layout_constraintBottom_toTopOf="@id/layout_total"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/guideline_bottom"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -215,31 +231,31 @@
                     app:tabTextColor="@color/color_black_1_50">
 
                     <com.google.android.material.tabs.TabItem
-                        android:id="@+id/ti_wechat_pay"
+                        android:id="@+id/ti_bank"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
 
                     <com.google.android.material.tabs.TabItem
-                        android:id="@+id/ti_alipay"
+                        android:id="@+id/ti_ali"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
 
                     <com.google.android.material.tabs.TabItem
-                        android:id="@+id/ti_china_pay"
+                        android:id="@+id/ti_wx_pay"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
                 </com.google.android.material.tabs.TabLayout>
 
                 <ImageView
-                    android:id="@+id/iv_wechat"
+                    android:id="@+id/iv_bank"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:contentDescription="@null"
                     android:paddingStart="22dp"
                     android:paddingEnd="22dp"
-                    android:src="@drawable/ico_wechat_pay"
+                    android:src="@drawable/ico_bank"
                     app:layout_constraintBottom_toBottomOf="@id/tl_type"
-                    app:layout_constraintEnd_toStartOf="@id/iv_alipay"
+                    app:layout_constraintEnd_toStartOf="@id/iv_ali"
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintHorizontal_weight="1"
                     app:layout_constraintStart_toStartOf="@id/tl_type"
@@ -249,12 +265,12 @@
                     android:layout_width="1dp"
                     android:layout_height="0dp"
                     android:background="@color/color_gray_10"
-                    app:layout_constraintBottom_toBottomOf="@id/iv_alipay"
-                    app:layout_constraintStart_toStartOf="@id/iv_alipay"
-                    app:layout_constraintTop_toTopOf="@id/iv_alipay" />
+                    app:layout_constraintBottom_toBottomOf="@id/iv_ali"
+                    app:layout_constraintStart_toStartOf="@id/iv_ali"
+                    app:layout_constraintTop_toTopOf="@id/iv_ali" />
 
                 <ImageView
-                    android:id="@+id/iv_alipay"
+                    android:id="@+id/iv_ali"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:contentDescription="@null"
@@ -262,114 +278,163 @@
                     android:paddingEnd="22dp"
                     android:src="@drawable/ico_alipay"
                     app:layout_constraintBottom_toBottomOf="@id/tl_type"
-                    app:layout_constraintEnd_toStartOf="@id/iv_china_pay"
+                    app:layout_constraintEnd_toStartOf="@id/iv_wx"
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintHorizontal_weight="1"
-                    app:layout_constraintStart_toEndOf="@id/iv_wechat"
+                    app:layout_constraintStart_toEndOf="@id/iv_bank"
                     app:layout_constraintTop_toTopOf="@id/tl_type" />
 
                 <View
                     android:layout_width="1dp"
                     android:layout_height="0dp"
                     android:background="@color/color_gray_10"
-                    app:layout_constraintBottom_toBottomOf="@id/iv_alipay"
-                    app:layout_constraintEnd_toEndOf="@id/iv_alipay"
-                    app:layout_constraintTop_toTopOf="@id/iv_alipay" />
+                    app:layout_constraintBottom_toBottomOf="@id/iv_ali"
+                    app:layout_constraintEnd_toEndOf="@id/iv_ali"
+                    app:layout_constraintTop_toTopOf="@id/iv_ali" />
 
                 <ImageView
-                    android:id="@+id/iv_china_pay"
+                    android:id="@+id/iv_wx"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:contentDescription="@null"
                     android:paddingStart="22dp"
                     android:paddingEnd="22dp"
-                    android:src="@drawable/ico_china_pay"
+                    android:src="@drawable/ico_wechat_pay"
                     app:layout_constraintBottom_toBottomOf="@id/tl_type"
                     app:layout_constraintEnd_toEndOf="@id/tl_type"
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintHorizontal_weight="1"
-                    app:layout_constraintStart_toEndOf="@id/iv_alipay"
+                    app:layout_constraintStart_toEndOf="@id/iv_ali"
                     app:layout_constraintTop_toTopOf="@id/tl_type" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_online_pay"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:visibility="visible"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
+                    android:overScrollMode="never"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tl_type" />
+
+                <TextView
+                    android:id="@+id/tv_online_empty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/topup_online_empty"
+                    android:textColor="@color/color_black_1"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tl_type" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/layout_total"
+                android:id="@+id/layout_error"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="23dp"
+                android:layout_height="0dp"
                 android:background="@color/color_gray_2"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layout_online_pay_1">
+                app:layout_constraintTop_toTopOf="@id/guideline_bottom">
 
-                <TextView
-                    android:id="@+id/tv_total_title"
-                    android:layout_width="42dp"
-                    android:layout_height="20dp"
-                    android:text="@string/topup_total"
-                    android:textColor="@color/color_black_1"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline_verification_end"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.675" />
+
+                <ImageView
+                    android:id="@+id/iv_verification"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:src="@drawable/img_verification_mail"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/tv_total"
-                    app:layout_constraintHorizontal_chainStyle="packed"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/tv_total"
-                    android:layout_width="73dp"
-                    android:layout_height="28dp"
+                    android:id="@+id/tv_pending_order"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
                     android:textColor="@color/color_black_1"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
+                    android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/tv_total_title"
+                    app:layout_constraintRight_toRightOf="@+id/guideline_verification_end"
+                    app:layout_constraintLeft_toRightOf="@+id/iv_verification"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:text="¥ 50.00" />
+                    tools:text="尚有N笔充值作业未完成，请稍后再试" />
 
-                <Button
-                    android:id="@+id/btn_pay"
-                    android:layout_width="92dp"
-                    android:layout_height="33dp"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginEnd="9dp"
-                    android:background="@drawable/bg_red_1_radius_6"
-                    android:text="@string/topup_confirm_pay"
-                    android:textColor="@color/color_white_1"
+                <ImageView
+                    android:id="@+id/iv_go"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:src="@drawable/btn_arrow_pink_n"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_goto_top_up_manage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/topup_goto_top_up_manage"
+                    android:textColor="@color/color_red_1"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintRight_toLeftOf="@+id/iv_go"
                     app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_next"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:background="@color/color_gray_2"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/guideline_bottom">
+
+                <Button
+                    android:id="@+id/btn_next"
+                    android:layout_width="wrap_content"
+                    android:layout_height="33dp"
+                    android:layout_marginEnd="9dp"
+                    android:background="@drawable/bg_red_1_radius_6"
+                    android:text="@string/topup_next"
+                    android:textColor="@color/color_white_1"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
-            android:id="@+id/txt_empty_message"
+            android:id="@+id/tv_proxy_empty"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="@string/topup_proxy_empty"
-            android:visibility="visible"
+            android:textColor="@color/color_black_1"
+            android:textSize="14sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/rg_Type" />
+            app:layout_constraintTop_toBottomOf="@id/rg_type" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_proxy_pay"
@@ -378,21 +443,24 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="30dp"
             android:layout_marginEnd="8dp"
+            android:overScrollMode="never"
             android:paddingBottom="12dp"
-            android:visibility="visible"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/rg_Type" />
+            app:layout_constraintTop_toBottomOf="@id/rg_type" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/tv_title"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/tv_title">
+
         <include
             android:id="@+id/item_is_not_Login"
             layout="@layout/item_personal_is_not_login"
@@ -401,6 +469,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:visibility="visible" />
+            tools:visibility="gone" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

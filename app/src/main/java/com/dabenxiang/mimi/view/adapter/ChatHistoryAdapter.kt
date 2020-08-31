@@ -29,7 +29,7 @@ class ChatHistoryAdapter(
     }
 
     interface EventListener {
-        fun onClickListener(item: ChatListItem)
+        fun onClickListener(item: ChatListItem, position: Int)
         fun onGetAttachment(id: String, position: Int)
     }
 

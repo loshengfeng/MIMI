@@ -3,22 +3,39 @@ package com.dabenxiang.mimi.view.main
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.dabenxiang.mimi.MQTT_HOST_URL
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.enums.OrderType
+import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager
+import com.dabenxiang.mimi.model.manager.mqtt.callback.ConnectCallback
+import com.dabenxiang.mimi.model.manager.mqtt.callback.ExtendedCallback
+import com.dabenxiang.mimi.model.manager.mqtt.callback.MessageListener
+import com.dabenxiang.mimi.model.manager.mqtt.callback.SubscribeCallback
 import com.dabenxiang.mimi.model.vo.CheckStatusItem
 import com.dabenxiang.mimi.model.vo.StatusItem
+import com.dabenxiang.mimi.model.vo.mqtt.OrderItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
+import org.eclipse.paho.client.mqttv3.IMqttToken
+import org.eclipse.paho.client.mqttv3.MqttMessage
 import retrofit2.HttpException
+import timber.log.Timber
+import java.util.*
 
 class MainViewModel : BaseViewModel() {
 
     var needCloseApp = false // 判斷是否需要離開 app
-
     var isFromPlayer = false
+    var isMqttConnect = false
+
+    val messageListenerMap = hashMapOf<String, MessageListener>()
+
+    private val clientId = UUID.randomUUID().toString()
 
     private val _adultMode = MutableLiveData(false)
     val adultMode: LiveData<Boolean> = _adultMode
@@ -31,6 +48,18 @@ class MainViewModel : BaseViewModel() {
 
     private val _getAdHomeResult = MutableLiveData<Pair<Int, ApiResult<AdItem>>>()
     val getAdHomeResult: LiveData<Pair<Int, ApiResult<AdItem>>> = _getAdHomeResult
+
+    private val _checkStatusResult by lazy { MutableLiveData<ApiResult<CheckStatusItem>>() }
+    val checkStatusResult: LiveData<ApiResult<CheckStatusItem>> get() = _checkStatusResult
+
+    private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
+    val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
+
+    private val _orderItem = MutableLiveData<OrderItem>()
+    val orderItem: LiveData<OrderItem> = _orderItem
+
+    private val _totalUnreadResult = MutableLiveData<ApiResult<Int>>()
+    val totalUnreadResult: LiveData<ApiResult<Int>> = _totalUnreadResult
 
     private var _normal: CategoriesItem? = null
     val normal
@@ -103,7 +132,6 @@ class MainViewModel : BaseViewModel() {
 
     /**
      * 按下 back 離開的 timer
-     *
      */
     fun startBackExitAppTimer() {
         needCloseApp = true
@@ -126,8 +154,6 @@ class MainViewModel : BaseViewModel() {
         return result
     }
 
-    private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
-    val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
     fun sendPostReport(item: MemberPostItem, content: String) {
         viewModelScope.launch {
             flow {
@@ -169,8 +195,6 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
-    private val _checkStatusResult by lazy { MutableLiveData<ApiResult<CheckStatusItem>>() }
-    val checkStatusResult: LiveData<ApiResult<CheckStatusItem>> get() = _checkStatusResult
     fun checkStatus(onConfirmed: () -> Unit) {
         viewModelScope.launch {
             flow {
@@ -185,8 +209,10 @@ class MainViewModel : BaseViewModel() {
 //                        StatusItem.LOGIN_BUT_EMAIL_NOT_CONFIRMED
 //                    }
 //                }
-                val status =
-                    if (accountManager.isLogin()) StatusItem.LOGIN_AND_EMAIL_CONFIRMED else StatusItem.NOT_LOGIN
+                val status = when {
+                    accountManager.isLogin() -> StatusItem.LOGIN_AND_EMAIL_CONFIRMED
+                    else -> StatusItem.NOT_LOGIN
+                }
                 emit(ApiResult.success(CheckStatusItem(status, onConfirmed)))
             }
                 .onStart { emit(ApiResult.loading()) }
@@ -196,4 +222,93 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
+    fun startMQTT() {
+        mqttManager.init(MQTT_HOST_URL, clientId, extendedCallback)
+        mqttManager.connect(connectCallback)
+    }
+
+    fun subscribeToTopic(topic: String) {
+        mqttManager.subscribeToTopic(topic, object : SubscribeCallback {
+            override fun onSuccess(asyncActionToken: IMqttToken) {
+                Timber.d("onSuccess: $topic, $asyncActionToken")
+            }
+
+            override fun onFailure(asyncActionToken: IMqttToken, exception: Throwable) {
+                Timber.d("onFailure: $asyncActionToken, $exception")
+            }
+
+            override fun onSubscribe(topic: String, message: MqttMessage) {
+                Timber.d("onSubscribe: $topic, $message")
+            }
+        })
+    }
+
+    fun publishMessageByTopic(topic: String, msg: String) {
+        mqttManager.publishMessage(topic, msg)
+    }
+
+    fun getNotificationTopic(): String {
+        val userId = accountManager.getProfile().userId
+        return StringBuilder(MQTTManager.PREFIX_NOTIFICATION).append(userId).toString()
+    }
+
+    private val extendedCallback = object : ExtendedCallback {
+        override fun onConnectComplete(reconnect: Boolean, serverURI: String) {
+            Timber.d("Reconnect: $reconnect, ServerURI: $serverURI")
+        }
+
+        override fun onMessageArrived(topic: String, message: MqttMessage) {
+            Timber.d("Incoming topic:: $topic")
+            Timber.d("Incoming message:: ${String(message.payload)}")
+            messageListenerMap[topic]?.onMsgReceive(message)
+        }
+
+        override fun onConnectionLost(cause: Throwable) {
+            Timber.e("The Connection was lost: $cause")
+        }
+
+        override fun onDeliveryComplete(token: IMqttDeliveryToken) {
+            Timber.d("DeliveryComplete message:: ${String(token.message.payload)}")
+        }
+    }
+
+    private val connectCallback = object : ConnectCallback {
+        override fun onSuccess(asyncActionToken: IMqttToken) {
+            Timber.d("Connection onSuccess")
+            isMqttConnect = true
+            val topic = getNotificationTopic()
+            messageListenerMap[topic] = messageListener
+            subscribeToTopic(topic)
+        }
+
+        override fun onFailure(asyncActionToken: IMqttToken, exception: Throwable) {
+            Timber.e("Connection onFailure: $exception")
+            isMqttConnect = false
+        }
+    }
+
+    private val messageListener = object : MessageListener {
+        override fun onMsgReceive(message: MqttMessage) {
+            val data = gson.fromJson(String(message.payload), OrderItem::class.java)
+            Timber.d("Payload: ${String(message.payload)}")
+            _orderItem.postValue(data)
+        }
+    }
+
+    fun getTotalUnread(){
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val chatUnreadResult = apiRepository.getUnread()
+                val chatUnread = if (!chatUnreadResult.isSuccessful) 0 else chatUnreadResult.body()?.content?: 0
+                val orderUnreadResult = apiRepository.getUnReadOrderCount()
+                val orderUnread = if (!orderUnreadResult.isSuccessful) 0 else orderUnreadResult.body()?.content?: 0
+                emit(ApiResult.success(chatUnread + orderUnread))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _totalUnreadResult.value = it }
+        }
+    }
 }

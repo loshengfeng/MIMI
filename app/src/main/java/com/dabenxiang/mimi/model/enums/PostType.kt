@@ -15,6 +15,8 @@ enum class PostType(val value: Int) {
     @SerializedName("8")
     VIDEO_ON_DEMAND(8),
 
+    HYBRID(16),
+
     AD(1024);
 
     companion object {

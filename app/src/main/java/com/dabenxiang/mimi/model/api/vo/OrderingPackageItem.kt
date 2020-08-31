@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.model.api.vo
 
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class OrderingPackageItem(
 
@@ -11,7 +12,7 @@ data class OrderingPackageItem(
     @SerializedName("name")
     val name: String = "",
 
-    @SerializedName("type")
+    @SerializedName("paymentType")
     val paymentType: PaymentType = PaymentType.BANK,
 
     @SerializedName("listPrice")
@@ -21,5 +22,6 @@ data class OrderingPackageItem(
     val price: Float = 0f,
 
     @SerializedName("point")
-    val point: Int = 0
-)
+    val point: Float = 0f
+
+): Serializable
