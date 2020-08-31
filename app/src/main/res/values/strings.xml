@@ -38,7 +38,7 @@
     <string name="password_format_error_1">请填写密码</string>
     <string name="password_format_error_2">请填写8~20字的英文、数字或特殊符号，区分大小写</string>
     <string name="password_format_error_3">请填写确认密码</string>
-    <string name="password_format_error_4">密码不相符</string>
+    <string name="password_format_error_4">与密码不相符合，请确认</string>
     <string name="receive_mail">请收验证信</string>
     <string name="desc_register">请至信箱查看验证信以完成账号注册</string>
     <string name="desc_email">已传送新密码至您的邮箱\n%s\n请至邮箱确认</string>
