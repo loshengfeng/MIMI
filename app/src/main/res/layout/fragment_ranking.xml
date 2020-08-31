@@ -10,20 +10,24 @@
         android:id="@+id/toolbarContainer"
         layout="@layout/toolbar" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/adult_color_status_bar"
+        app:layout_constraintBottom_toBottomOf="@id/tab_temporal_filter"
+        app:layout_constraintEnd_toEndOf="@id/tab_temporal_filter"
+        app:layout_constraintStart_toStartOf="@id/tab_temporal_filter"
+        app:layout_constraintTop_toTopOf="@id/tab_temporal_filter" />
+
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_temporal_filter"
-        android:layout_width="match_parent"
+        android:layout_width="318dp"
         android:layout_height="wrap_content"
-        android:paddingStart="5dp"
-        android:paddingEnd="5dp"
-        android:background="@color/adult_color_status_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbarContainer"
-        app:tabGravity="fill"
+        app:tabIndicator="@drawable/bg_tab_ranking"
         app:tabIndicatorColor="@color/color_red_1"
-        app:tabIndicatorFullWidth="false"
-        app:tabIndicatorHeight="5dp"
         app:tabMode="fixed"
         app:tabSelectedTextColor="@color/color_white_1"
         app:tabTextAppearance="@style/ranking_tab_item_text"
@@ -56,22 +60,22 @@
         android:id="@+id/tab_type_filter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/adult_color_background"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
-        android:background="@color/adult_color_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tab_temporal_filter"
+        app:tabBackground="@drawable/bg_ranking_type_selector"
         app:tabGravity="fill"
         app:tabIndicatorColor="@color/color_red_1"
         app:tabIndicatorFullWidth="false"
         app:tabIndicatorHeight="0dp"
+        app:tabInlineLabel="true"
         app:tabMode="fixed"
-        app:tabBackground="@drawable/bg_ranking_type_selector"
         app:tabSelectedTextColor="@color/color_white_1"
         app:tabTextAppearance="@style/ranking_tab_item_type_text"
-        app:tabTextColor="@color/color_white_1_50"
-        app:tabInlineLabel="true">
+        app:tabTextColor="@color/color_white_1_50">
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/ti_video_type"
@@ -103,9 +107,9 @@
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:background="@color/color_black_6"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tab_type_filter">
 
         <androidx.recyclerview.widget.RecyclerView

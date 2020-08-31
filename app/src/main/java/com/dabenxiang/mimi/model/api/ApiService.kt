@@ -413,7 +413,7 @@ interface ApiService {
         @Path("postFavoriteId") postFavoriteId: String
     ): Response<Void>
 
-    @GET("/v1/Members/Me/PostFollow")
+    @GET("/v1/Members/Me/PostFollow") // TODO: 待 api 更新後還要加"是否上架"參數
     suspend fun getPostFollow(
         @Query("offset") offset: Int,
         @Query("limit") limit: Int
