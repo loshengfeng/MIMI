@@ -88,7 +88,9 @@ class MainActivity : BaseActivity(), InteractionListener {
             }
         })
 
-        viewModel.getTotalUnread()
+        if(BuildConfig.DEBUG) { //TODO: Order
+            viewModel.getTotalUnread()
+        }
     }
 
     private fun addBadgeView(bottomNavType: BottomNavType) {
@@ -165,7 +167,6 @@ class MainActivity : BaseActivity(), InteractionListener {
     }
 
     override fun refreshBottomNavigationBadge(unreadCount: Int) {
-        Timber.d("@@refreshBottomNavigationBadge: $unreadCount")
         val visibility = takeIf { unreadCount > 0 }?.let { View.VISIBLE } ?: let { View.GONE }
         badgeViewMap[BottomNavType.TOPUP]?.visibility = visibility
         badgeViewMap[BottomNavType.PERSONAL]?.visibility = visibility
