@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -44,6 +43,7 @@ import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.OnChooseUploadMethodDialogListener
+import com.dabenxiang.mimi.view.dialog.login_request.LoginRequestDialog
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.home.HomeViewModel.Companion.TYPE_COVER
 import com.dabenxiang.mimi.view.home.HomeViewModel.Companion.TYPE_PIC
@@ -51,6 +51,7 @@ import com.dabenxiang.mimi.view.home.HomeViewModel.Companion.TYPE_VIDEO
 import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.listener.OnLoginRequestDialogListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
@@ -76,7 +77,6 @@ import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_home.*
-import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 import java.io.File
@@ -112,6 +112,8 @@ class AdultHomeFragment : BaseFragment() {
     private var snackBar: Snackbar? = null
     private var picParameter = PicParameter()
 
+    private var loginDialog:LoginRequestDialog? = null
+
     val accountManager: AccountManager by inject()
 
     companion object {
@@ -142,13 +144,14 @@ class AdultHomeFragment : BaseFragment() {
         when(lastPosition){
             2-> {
                 if(accountManager.isLogin()) {
-                    showLoginToggle(false)
+                    Timber.i("isLogin")
+                    showNoLoginToggle(false)
                     refresh.isRefreshing
                     getData(lastPosition)
                 }
-                else  showLoginToggle(true)
+                else  showNoLoginToggle(true)
             }
-            else  -> showLoginToggle(false)
+            else  -> showNoLoginToggle(false)
         }
     }
 
@@ -722,37 +725,51 @@ class AdultHomeFragment : BaseFragment() {
             }
         }
 
-        tv_login.setOnClickListener {
-            Timber.i("tv_login tv_login tv_login")
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_to_loginFragment,
-                    LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
-                )
-            )
-
-        }
-        tv_register.setOnClickListener {
-            Timber.i("tv_register tv_register tv_register")
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_to_loginFragment,
-                    LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
-                )
-            )
-        }
-
         recyclerview_tab.adapter = tabAdapter
         setupRecyclerByPosition(0)
 
         refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
     }
 
-    private fun showLoginToggle(isShow:Boolean){
+    private fun showNoLoginToggle(isShow:Boolean){
         if(isShow){
-            item_is_not_Login.visibility = View.VISIBLE
+            cl_no_login.visibility = View.VISIBLE
+            cl_no_data.visibility = View.GONE
+            refresh.visibility = View.GONE
         } else {
-            item_is_not_Login.visibility = View.GONE
+            cl_no_login.visibility = View.GONE
+            refresh.visibility = View.VISIBLE
+        }
+    }
+
+    private fun showLoginDialog(){
+        loginDialog?.dismiss()
+        loginDialog = LoginRequestDialog.newInstance(object : OnLoginRequestDialogListener{
+            override fun onRegister() {
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_to_loginFragment,
+                        LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                    )
+                )
+            }
+
+            override fun onLogin() {
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_to_loginFragment,
+                        LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                    )
+                )
+            }
+
+            override fun onCancel() {}
+
+        }).also {
+            it.show(
+                requireActivity().supportFragmentManager,
+                LoginRequestDialog::class.java.simpleName
+            )
         }
     }
 
@@ -769,12 +786,14 @@ class AdultHomeFragment : BaseFragment() {
 
         btn_ranking.visibility = View.GONE
         btn_filter.visibility = View.GONE
-
+        cl_no_login.visibility = View.GONE
+        cl_no_login.background =
+            requireActivity().getDrawable(R.color.adult_color_background)
         when (position) {
             0 -> {
                 btn_ranking.visibility = View.VISIBLE
                 rv_home.visibility = View.VISIBLE
-                showLoginToggle(false)
+                showNoLoginToggle(false)
                 takeIf { rv_home.adapter == null }?.also {
                     refresh.isRefreshing = true
                     rv_home.background =
@@ -787,7 +806,7 @@ class AdultHomeFragment : BaseFragment() {
             1 -> {
                 btn_filter.visibility = View.VISIBLE
                 rv_first.visibility = View.VISIBLE
-                showLoginToggle(false)
+                showNoLoginToggle(false)
                 takeIf { rv_first.adapter == null }?.also {
                     refresh.isRefreshing = true
                     rv_first.background =
@@ -812,12 +831,14 @@ class AdultHomeFragment : BaseFragment() {
                             ?.let { View.GONE } ?: let { View.VISIBLE }
                 }
                 takeIf{ !accountManager.isLogin() }?.also {
-                    showLoginToggle(true)
+                    showNoLoginToggle(true)
+                    showLoginDialog()
                 }
+
             }
             3 -> {
                 rv_third.visibility = View.VISIBLE
-                showLoginToggle(false)
+                showNoLoginToggle(false)
                 takeIf { rv_third.adapter == null }?.also {
                     refresh.isRefreshing = true
                     rv_third.background =
@@ -833,7 +854,7 @@ class AdultHomeFragment : BaseFragment() {
             }
             4 -> {
                 rv_fourth.visibility = View.VISIBLE
-                showLoginToggle(false)
+                showNoLoginToggle(false)
                 takeIf { rv_fourth.adapter == null }?.also {
                     refresh.isRefreshing = true
                     rv_fourth.background =
@@ -849,7 +870,7 @@ class AdultHomeFragment : BaseFragment() {
             }
             5 -> {
                 rv_fifth.visibility = View.VISIBLE
-                showLoginToggle(false)
+                showNoLoginToggle(false)
                 takeIf { rv_fifth.adapter == null }?.also {
                     refresh.isRefreshing = true
                     rv_fifth.background =
@@ -865,7 +886,7 @@ class AdultHomeFragment : BaseFragment() {
             }
             else -> {
                 rv_sixth.visibility = View.VISIBLE
-                showLoginToggle(false)
+                showNoLoginToggle(false)
                 takeIf { rv_sixth.adapter == null }?.also {
                     refresh.isRefreshing = true
                     rv_sixth.background =
