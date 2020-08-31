@@ -326,7 +326,7 @@ class TextDetailFragment : BaseFragment() {
         }
 
         override fun onMoreClick(item: MembersPostCommentItem) {
-            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
+            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener, true).also {
                 it.show(
                     requireActivity().supportFragmentManager,
                     MoreDialogFragment::class.java.simpleName
@@ -369,12 +369,13 @@ class TextDetailFragment : BaseFragment() {
     }
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-        override fun onProblemReport(item: BaseMemberPostItem) {
+        override fun onProblemReport(item: BaseMemberPostItem, isComment:Boolean) {
             moreDialog?.dismiss()
             checkStatus {
                 (requireActivity() as MainActivity).showReportDialog(
                     item,
-                    memberPostItem
+                    memberPostItem,
+                    isComment
                 )
             }
         }

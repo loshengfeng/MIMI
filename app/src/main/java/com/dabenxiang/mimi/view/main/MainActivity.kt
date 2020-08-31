@@ -290,9 +290,9 @@ class MainActivity : BaseActivity(), InteractionListener {
     }
 
     private var reportDialog: ReportDialogFragment? = null
-    fun showReportDialog(item: BaseMemberPostItem, postItem: MemberPostItem? = null) {
+    fun showReportDialog(item: BaseMemberPostItem, postItem: MemberPostItem? = null, isComment:Boolean? = false) {
         reportDialog =
-            ReportDialogFragment.newInstance(item, onReportDialogListener, postItem).also {
+            ReportDialogFragment.newInstance(item, onReportDialogListener, postItem, isComment).also {
                 it.show(supportFragmentManager, ReportDialogFragment::class.java.simpleName)
             }
     }
