@@ -118,6 +118,7 @@
             android:id="@+id/layout_search_history"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:visibility="invisible"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -157,23 +158,27 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layout_search_text"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:visibility="invisible"
-            app:layout_constraintLeft_toLeftOf="parent"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 android:id="@+id/tv_search_text"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_marginStart="20dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
                 android:textColor="@android:color/black"
                 android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="搜索躲貓貓" />
+                android:text="212354212354212354212354212354212354212354212354212354212354"
+                 />
 
             <ImageView
                 android:id="@+id/line"
