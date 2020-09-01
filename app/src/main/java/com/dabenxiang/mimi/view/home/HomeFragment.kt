@@ -173,7 +173,9 @@ class HomeFragment : BaseFragment() {
         }
 
         iv_bg_search.setOnClickListener {
-            val bundle = SearchVideoFragment.createBundle("")
+            val category =
+                if (lastTabPosition != 0) mainViewModel?.normal?.categories?.get(lastTabPosition - 1)?.name else null
+            val bundle = SearchVideoFragment.createBundle(category = category ?: "")
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_to_searchVideoFragment,

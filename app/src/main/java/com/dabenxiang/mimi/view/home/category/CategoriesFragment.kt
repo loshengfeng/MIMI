@@ -259,7 +259,7 @@ class CategoriesFragment : BaseFragment() {
         }
 
         iv_search.setOnClickListener {
-            val bundle = SearchVideoFragment.createBundle()
+            val bundle = SearchVideoFragment.createBundle(category = tv_title.text.toString())
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_to_searchVideoFragment,
