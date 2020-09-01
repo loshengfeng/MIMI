@@ -3,7 +3,6 @@ package com.dabenxiang.mimi.view.base
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,8 +20,6 @@ import com.dabenxiang.mimi.extension.handleException
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.api.vo.*
-import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.PostAttachmentItem
@@ -57,6 +54,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.*
 import timber.log.Timber
+import java.io.Serializable
 import java.net.UnknownHostException
 
 abstract class BaseFragment : Fragment() {
@@ -68,6 +66,8 @@ abstract class BaseFragment : Fragment() {
     var firstCreateView = false
 
     var snackBar: Snackbar? = null
+
+    private var moreDialog: MoreDialogFragment? = null
 
     private var postType = PostType.TEXT
 
@@ -338,6 +338,31 @@ abstract class BaseFragment : Fragment() {
         })
     }
 
+    private fun setPostTpe(type: PostType) {
+        arguments?.remove(UPLOAD_ARTICLE)
+        arguments?.remove(UPLOAD_PIC)
+        arguments?.remove(UPLOAD_VIDEO)
+
+        showSnackBar()
+        postType = type
+    }
+
+    private fun combinationDataAndPostText(bundle: Bundle) {
+        val title = bundle.getString(BasePostFragment.TITLE)
+        val request = bundle.getString(BasePostFragment.REQUEST)
+        val tags = bundle.getStringArrayList(BasePostFragment.TAG)
+        val data = bundle.getSerializable(MyPostFragment.MEMBER_DATA)
+
+        memberPostItem.title = title!!
+        memberPostItem.content = request!!
+        memberPostItem.tags = tags
+
+        if (data != null) {
+            memberPostItem = data as MemberPostItem
+        }
+        mainViewModel?.postArticle(title, request, tags!!, memberPostItem)
+    }
+
     fun handleBackStackData() {
         arguments?.let {
             val isNeedArticleUpload = it.getBoolean(UPLOAD_ARTICLE, false)
@@ -346,28 +371,11 @@ abstract class BaseFragment : Fragment() {
 
             when {
                 isNeedArticleUpload -> {
-                    it.remove(UPLOAD_ARTICLE)
-                    showSnackBar()
-
-                    val title = it.getString(BasePostFragment.TITLE)
-                    val request = it.getString(BasePostFragment.REQUEST)
-                    val tags = it.getStringArrayList(BasePostFragment.TAG)
-                    val data = it.getSerializable(MyPostFragment.MEMBER_DATA)
-
-                    memberPostItem.title = title!!
-                    memberPostItem.content = request!!
-                    memberPostItem.tags = tags
-
-                    if (data != null) {
-                        memberPostItem = data as MemberPostItem
-                    }
-                    mainViewModel?.postArticle(title, request, tags!!, memberPostItem)
+                    setPostTpe(PostType.TEXT)
+                    combinationDataAndPostText(it)
                 }
                 isNeedPicUpload -> {
-                    it.remove(UPLOAD_PIC)
-
-                    showSnackBar()
-                    postType = PostType.IMAGE
+                    setPostTpe(PostType.IMAGE)
 
                     val memberRequest = it.getParcelable<PostMemberRequest>(MEMBER_REQUEST)
                     val picUriList = it.getParcelableArrayList<PostAttachmentItem>(PIC_URI)
@@ -377,54 +385,13 @@ abstract class BaseFragment : Fragment() {
                     val data = it.getSerializable(MyPostFragment.MEMBER_DATA)
 
                     if (data != null) {
-                        deletePicList = it.getStringArrayList(BasePostFragment.DELETE_ATTACHMENT)!!
-                        memberPostItem = data as MemberPostItem
-                        postId = it.getLong(BasePostFragment.POST_ID)
-
-                        for (pic in picUriList!!) {
-                            if (pic.attachmentId.isBlank()) {
-                                uploadPicList.add(PicParameter(url = pic.uri))
-                            } else {
-                                val picParameter = PicParameter(id = pic.attachmentId, ext = pic.ext)
-                                picParameterList.add(picParameter)
-                            }
-                        }
-
-                        if (uploadPicList.isNotEmpty()) {
-                            val pic = uploadPicList[uploadCurrentPicPosition]
-                            mainViewModel?.postAttachment(pic.url, requireContext(), MyPostFragment.TYPE_PIC)
-                        } else {
-                            val mediaItem = MediaItem()
-
-                            for (pic in picUriList) {
-                                mediaItem.picParameter.add(
-                                    PicParameter(
-                                        id = pic.attachmentId,
-                                        ext = pic.ext
-                                    )
-                                )
-                            }
-
-                            mediaItem.textContent = postMemberRequest.content
-                            val content = Gson().toJson(mediaItem)
-                            memberPostItem.content = content
-                            Timber.d("Post pic content item : $content")
-
-                            mainViewModel?.postPic(postId, postMemberRequest, content)
-                        }
+                        updateImagePost(it, data, picUriList!!)
                     } else {
-                        uploadPicUri.addAll(picUriList!!)
-                        val pic = uploadPicUri[uploadCurrentPicPosition]
-                        mainViewModel?.postAttachment(pic.uri, requireContext(), HomeViewModel.TYPE_PIC)
-
-                        memberPostItem.title = memberRequest.title
-                        memberPostItem.tags = memberRequest.tags
+                        newImagePost(picUriList!!, memberRequest)
                     }
                 }
                 isNeedVideoUpload -> {
-                    it.remove(UPLOAD_VIDEO)
-                    postType = PostType.VIDEO
-                    showSnackBar()
+                    setPostTpe(PostType.VIDEO)
 
                     val memberRequest = it.getParcelable<PostMemberRequest>(MEMBER_REQUEST)
 
@@ -433,47 +400,102 @@ abstract class BaseFragment : Fragment() {
                     postId = it.getLong(BasePostFragment.POST_ID, 0)
 
                     if (postId.toInt() == 0) {
-                        postMemberRequest = memberRequest!!
-                        memberPostItem.title = memberRequest.title
-                        memberPostItem.tags = memberRequest.tags
-                        mainViewModel?.postAttachment(uploadVideoList[0].picUrl, requireContext(),
-                            HomeViewModel.TYPE_COVER
-                        )
+                        newVideoPost(memberRequest!!)
                     } else {
-                        if (uploadVideoList[0].picAttachmentId.isBlank()) {
-                            mainViewModel?.postAttachment(
-                                uploadVideoList[0].picUrl, requireContext(),
-                                MyPostViewModel.TYPE_COVER
-                            )
-                        } else {
-                            val mediaItem = MediaItem()
-
-                            val videoParameter = VideoParameter(
-                                id = uploadVideoList[0].videoAttachmentId,
-                                length = uploadVideoList[0].length
-                            )
-
-                            val picParameter = PicParameter(
-                                id = uploadVideoList[0].picAttachmentId,
-                                ext = uploadVideoList[0].ext
-                            )
-
-                            mediaItem.textContent = memberRequest!!.content
-                            mediaItem.videoParameter = videoParameter
-                            mediaItem.picParameter.add(picParameter)
-
-                            val content = Gson().toJson(mediaItem)
-                            memberPostItem.content = content
-                            Timber.d("Post video content item : $content")
-
-                            mainViewModel?.postPic(postId, memberRequest, content)
-                        }
+                        updateVideoPost(memberRequest!!)
                     }
                 }
                 else -> {
 
                 }
             }
+        }
+    }
+
+    private fun newImagePost(picUriList: ArrayList<PostAttachmentItem>, memberRequest: PostMemberRequest) {
+        uploadPicUri.addAll(picUriList)
+        val pic = uploadPicUri[uploadCurrentPicPosition]
+        mainViewModel?.postAttachment(pic.uri, requireContext(), HomeViewModel.TYPE_PIC)
+
+        memberPostItem.title = memberRequest.title
+        memberPostItem.tags = memberRequest.tags
+    }
+
+    private fun updateImagePost(bundle: Bundle, data: Serializable, picUriList: ArrayList<PostAttachmentItem>) {
+        deletePicList = bundle.getStringArrayList(BasePostFragment.DELETE_ATTACHMENT)!!
+        memberPostItem = data as MemberPostItem
+        postId = bundle.getLong(BasePostFragment.POST_ID)
+
+        for (pic in picUriList) {
+            if (pic.attachmentId.isBlank()) {
+                uploadPicList.add(PicParameter(url = pic.uri))
+            } else {
+                val picParameter = PicParameter(id = pic.attachmentId, ext = pic.ext)
+                picParameterList.add(picParameter)
+            }
+        }
+
+        if (uploadPicList.isNotEmpty()) {
+            val pic = uploadPicList[uploadCurrentPicPosition]
+            mainViewModel?.postAttachment(pic.url, requireContext(), MyPostFragment.TYPE_PIC)
+        } else {
+            val mediaItem = MediaItem()
+
+            for (pic in picUriList) {
+                mediaItem.picParameter.add(
+                    PicParameter(
+                        id = pic.attachmentId,
+                        ext = pic.ext
+                    )
+                )
+            }
+
+            mediaItem.textContent = postMemberRequest.content
+            val content = Gson().toJson(mediaItem)
+            memberPostItem.content = content
+            Timber.d("Post pic content item : $content")
+
+            mainViewModel?.postPic(postId, postMemberRequest, content)
+        }
+    }
+
+    private fun newVideoPost(memberRequest: PostMemberRequest) {
+        postMemberRequest = memberRequest
+        memberPostItem.title = memberRequest.title
+        memberPostItem.tags = memberRequest.tags
+        mainViewModel?.postAttachment(uploadVideoList[0].picUrl, requireContext(),
+            HomeViewModel.TYPE_COVER
+        )
+    }
+
+    private fun updateVideoPost(memberRequest: PostMemberRequest) {
+        if (uploadVideoList[0].picAttachmentId.isBlank()) {
+            mainViewModel?.postAttachment(
+                uploadVideoList[0].picUrl, requireContext(),
+                MyPostViewModel.TYPE_COVER
+            )
+        } else {
+            val mediaItem = MediaItem()
+
+            val videoParameter = VideoParameter(
+                id = uploadVideoList[0].videoAttachmentId,
+                length = uploadVideoList[0].length
+            )
+
+            val picParameter = PicParameter(
+                id = uploadVideoList[0].picAttachmentId,
+                ext = uploadVideoList[0].ext
+            )
+
+            mediaItem.textContent = memberRequest.content
+            mediaItem.videoParameter = videoParameter
+            mediaItem.picParameter.add(picParameter)
+
+            val content = Gson().toJson(mediaItem)
+            memberPostItem.content = content
+            Timber.d("Post video content item : $content")
+
+            mainViewModel?.postPic(postId, memberRequest, content)
         }
     }
 
@@ -809,7 +831,6 @@ abstract class BaseFragment : Fragment() {
                 }
     }
 
-    private var moreDialog: MoreDialogFragment? = null
     private fun showMoreDialog(item: MemberPostItem){
         val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
             override fun onProblemReport(item: BaseMemberPostItem, isComment:Boolean) {
