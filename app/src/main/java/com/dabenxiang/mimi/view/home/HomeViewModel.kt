@@ -291,7 +291,7 @@ class HomeViewModel : BaseViewModel() {
                     when (it) {
                         is ApiResult.Success -> {
                             update(isLike, it.result)
-                            getAllOtherPosts(lastPosition)
+//                            getAllOtherPosts(lastPosition)
                         }
                     }
                 }

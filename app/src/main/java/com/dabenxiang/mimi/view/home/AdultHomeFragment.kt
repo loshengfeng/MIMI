@@ -185,7 +185,7 @@ class AdultHomeFragment : BaseFragment() {
 
         viewModel.videoList.observe(this, Observer {
             videoListAdapter.submitList(it)
-            videoListAdapter.notifyDataSetChanged()
+//            videoListAdapter.notifyDataSetChanged()
         })
 
         viewModel.carouselResult.observe(this, Observer {
@@ -266,27 +266,27 @@ class AdultHomeFragment : BaseFragment() {
 
         viewModel.postFollowItemListResult.observe(this, Observer {
             followPostPagedAdapter.submitList(it)
-            followPostPagedAdapter.notifyDataSetChanged()
+//            followPostPagedAdapter.notifyDataSetChanged()
         })
 
         viewModel.clipPostItemListResult.observe(this, Observer {
             clipPostPagedAdapter.submitList(it)
-            clipPostPagedAdapter.notifyDataSetChanged()
+//            clipPostPagedAdapter.notifyDataSetChanged()
         })
 
         viewModel.picturePostItemListResult.observe(this, Observer {
             picturePostPagedAdapter.submitList(it)
-            picturePostPagedAdapter.notifyDataSetChanged()
+//            picturePostPagedAdapter.notifyDataSetChanged()
         })
 
         viewModel.textPostItemListResult.observe(this, Observer {
             textPostPagedAdapter.submitList(it)
-            textPostPagedAdapter.notifyDataSetChanged()
+//            textPostPagedAdapter.notifyDataSetChanged()
         })
 
         viewModel.clubItemListResult.observe(this, Observer {
             clubMemberAdapter.submitList(it)
-            clubMemberAdapter.notifyDataSetChanged()
+//            clubMemberAdapter.notifyDataSetChanged()
         })
 
         viewModel.totalCountResult.observe(this, Observer {
@@ -308,7 +308,6 @@ class AdultHomeFragment : BaseFragment() {
                         viewModel.totalCount,
                         PAYLOAD_UPDATE_FOLLOW
                     )
-                    viewModel.getAllOtherPosts(lastPosition)
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -544,8 +543,8 @@ class AdultHomeFragment : BaseFragment() {
                         requireActivity().getDrawable(R.color.adult_color_background)
                     rv_home.layoutManager = LinearLayoutManager(requireContext())
                     rv_home.adapter = homeAdapter
-                    mainViewModel?.getHomeCategories()
                 }
+                mainViewModel?.getHomeCategories()
             }
             1 -> {
                 btn_filter.visibility = View.VISIBLE
@@ -557,8 +556,8 @@ class AdultHomeFragment : BaseFragment() {
                         requireActivity().getDrawable(R.color.adult_color_background)
                     rv_first.layoutManager = GridLayoutManager(requireContext(), 2)
                     rv_first.adapter = videoListAdapter
-                    viewModel.getVideos(null, true)
                 }
+                viewModel.getVideos(null, true)
             }
             2 -> {
                 rv_second.visibility = View.VISIBLE
@@ -568,7 +567,6 @@ class AdultHomeFragment : BaseFragment() {
                         requireActivity().getDrawable(R.color.adult_color_background)
                     rv_second.layoutManager = LinearLayoutManager(requireContext())
                     rv_second.adapter = followPostPagedAdapter
-                    viewModel.getPostFollows()
                 } ?: run {
                     cl_no_data.visibility =
                         followPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
@@ -578,7 +576,7 @@ class AdultHomeFragment : BaseFragment() {
                     showNoLoginToggle(true)
                     showLoginDialog()
                 }
-
+                viewModel.getPostFollows()
             }
             3 -> {
                 rv_third.visibility = View.VISIBLE
@@ -589,12 +587,12 @@ class AdultHomeFragment : BaseFragment() {
                         requireActivity().getDrawable(R.color.adult_color_background)
                     rv_third.layoutManager = LinearLayoutManager(requireContext())
                     rv_third.adapter = clipPostPagedAdapter
-                    viewModel.getClipPosts()
                 } ?: run {
                     cl_no_data.visibility =
                         clipPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
                             ?.let { View.GONE } ?: let { View.VISIBLE }
                 }
+                viewModel.getClipPosts()
             }
             4 -> {
                 rv_fourth.visibility = View.VISIBLE
@@ -605,12 +603,12 @@ class AdultHomeFragment : BaseFragment() {
                         requireActivity().getDrawable(R.color.adult_color_background)
                     rv_fourth.layoutManager = LinearLayoutManager(requireContext())
                     rv_fourth.adapter = picturePostPagedAdapter
-                    viewModel.getPicturePosts()
                 } ?: run {
                     cl_no_data.visibility =
                         picturePostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
                             ?.let { View.GONE } ?: let { View.VISIBLE }
                 }
+                viewModel.getPicturePosts()
             }
             5 -> {
                 rv_fifth.visibility = View.VISIBLE
@@ -621,12 +619,12 @@ class AdultHomeFragment : BaseFragment() {
                         requireActivity().getDrawable(R.color.adult_color_background)
                     rv_fifth.layoutManager = LinearLayoutManager(requireContext())
                     rv_fifth.adapter = textPostPagedAdapter
-                    viewModel.getTextPosts()
                 } ?: run {
                     cl_no_data.visibility =
                         textPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
                             ?.let { View.GONE } ?: let { View.VISIBLE }
                 }
+                viewModel.getTextPosts()
             }
             else -> {
                 rv_sixth.visibility = View.VISIBLE
@@ -637,12 +635,12 @@ class AdultHomeFragment : BaseFragment() {
                         requireActivity().getDrawable(R.color.adult_color_background)
                     rv_sixth.layoutManager = MiMiLinearLayoutManager(requireContext())
                     rv_sixth.adapter = clubMemberAdapter
-                    viewModel.getClubs()
                 } ?: run {
                     cl_no_data.visibility =
                         clubMemberAdapter.currentList.takeUnless { isClubListEmpty(it) }
                             ?.let { View.GONE } ?: let { View.VISIBLE }
                 }
+                viewModel.getClubs()
             }
         }
     }
