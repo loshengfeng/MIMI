@@ -43,9 +43,12 @@ import com.dabenxiang.mimi.view.club.MiMiLinearLayoutManager
 import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.OnChooseUploadMethodDialogListener
+import com.dabenxiang.mimi.view.dialog.login_request.LoginRequestDialog
 import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.listener.OnLoginRequestDialogListener
+import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
@@ -86,6 +89,8 @@ class AdultHomeFragment : BaseFragment() {
 
     private var interactionListener: InteractionListener? = null
 
+    private var loginDialog: LoginRequestDialog? = null
+
     val accountManager: AccountManager by inject()
 
     companion object {
@@ -100,6 +105,7 @@ class AdultHomeFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        handleBackStackData()
         requireActivity().onBackPressedDispatcher.addCallback {
             interactionListener?.changeNavigationPosition(
                 R.id.navigation_home
@@ -107,7 +113,26 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         useAdultTheme(true)
+        checkPageState()
         getCurrentAdapter()?.notifyDataSetChanged()
+    }
+
+    override fun setupObservers() {
+    }
+
+    private fun checkPageState() {
+        when(lastPosition){
+            2-> {
+                if(accountManager.isLogin()) {
+                    Timber.i("isLogin")
+                    showNoLoginToggle(false)
+                    refresh.isRefreshing
+                    getData(lastPosition)
+                }
+                else  showNoLoginToggle(true)
+            }
+            else  -> showNoLoginToggle(false)
+        }
     }
 
     override fun setupFirstTime() {
@@ -120,8 +145,10 @@ class AdultHomeFragment : BaseFragment() {
         }
     }
 
-    override fun setupObservers() {
-        mainViewModel?.categoriesData?.observe(viewLifecycleOwner, Observer {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        mainViewModel?.categoriesData?.observe(this, Observer {
             when (it) {
                 is Loading -> refresh.isRefreshing = true
                 is Loaded -> refresh.isRefreshing = false
@@ -142,7 +169,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        mainViewModel?.getAdHomeResult?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.getAdHomeResult?.observe(this, Observer {
             when (val response = it.second) {
                 is Success -> {
                     val viewHolder = homeBannerViewHolderMap[it.first]
@@ -152,16 +179,16 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.showProgress.observe(viewLifecycleOwner, Observer { showProgress ->
+        viewModel.showProgress.observe(this, Observer { showProgress ->
             showProgress?.takeUnless { it }?.also { refresh.isRefreshing = it }
         })
 
-        viewModel.videoList.observe(viewLifecycleOwner, Observer {
+        viewModel.videoList.observe(this, Observer {
             videoListAdapter.submitList(it)
             videoListAdapter.notifyDataSetChanged()
         })
 
-        viewModel.carouselResult.observe(viewLifecycleOwner, Observer {
+        viewModel.carouselResult.observe(this, Observer {
             when (val response = it.second) {
                 is Success -> {
                     val viewHolder = homeCarouselViewHolderMap[it.first]
@@ -175,7 +202,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.videosResult.observe(viewLifecycleOwner, Observer {
+        viewModel.videosResult.observe(this, Observer {
             when (val response = it.second) {
                 is Loaded -> {
                     val viewHolder = homeStatisticsViewHolderMap[it.first]
@@ -192,7 +219,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.clipsResult.observe(viewLifecycleOwner, Observer {
+        viewModel.clipsResult.observe(this, Observer {
             when (val response = it.second) {
                 is Loaded -> {
                     val viewHolder = homeClipViewHolderMap[it.first]
@@ -207,7 +234,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.pictureResult.observe(viewLifecycleOwner, Observer {
+        viewModel.pictureResult.observe(this, Observer {
             when (val response = it.second) {
                 is Loaded -> {
                     val viewHolder = homePictureViewHolderMap[it.first]
@@ -222,7 +249,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.clubResult.observe(viewLifecycleOwner, Observer {
+        viewModel.clubResult.observe(this, Observer {
             when (val response = it.second) {
                 is Loaded -> {
                     val viewHolder = homeClubViewHolderMap[it.first]
@@ -237,32 +264,32 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.postFollowItemListResult.observe(viewLifecycleOwner, Observer {
+        viewModel.postFollowItemListResult.observe(this, Observer {
             followPostPagedAdapter.submitList(it)
             followPostPagedAdapter.notifyDataSetChanged()
         })
 
-        viewModel.clipPostItemListResult.observe(viewLifecycleOwner, Observer {
+        viewModel.clipPostItemListResult.observe(this, Observer {
             clipPostPagedAdapter.submitList(it)
             clipPostPagedAdapter.notifyDataSetChanged()
         })
 
-        viewModel.picturePostItemListResult.observe(viewLifecycleOwner, Observer {
+        viewModel.picturePostItemListResult.observe(this, Observer {
             picturePostPagedAdapter.submitList(it)
             picturePostPagedAdapter.notifyDataSetChanged()
         })
 
-        viewModel.textPostItemListResult.observe(viewLifecycleOwner, Observer {
+        viewModel.textPostItemListResult.observe(this, Observer {
             textPostPagedAdapter.submitList(it)
             textPostPagedAdapter.notifyDataSetChanged()
         })
 
-        viewModel.clubItemListResult.observe(viewLifecycleOwner, Observer {
+        viewModel.clubItemListResult.observe(this, Observer {
             clubMemberAdapter.submitList(it)
             clubMemberAdapter.notifyDataSetChanged()
         })
 
-        viewModel.totalCountResult.observe(viewLifecycleOwner, Observer {
+        viewModel.totalCountResult.observe(this, Observer {
             it?.also { totalCount ->
                 cl_no_data.visibility =
                     takeIf { totalCount > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
@@ -273,7 +300,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.followResult.observe(viewLifecycleOwner, Observer {
+        viewModel.followResult.observe(this, Observer {
             when (it) {
                 is Empty -> {
                     getCurrentAdapter()?.notifyItemRangeChanged(
@@ -287,7 +314,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.deletePostResult?.observe(this, Observer {
             when (lastPosition) {
                 2, 3, 4, 5 -> {
                     when (it) {
@@ -302,7 +329,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.cleanRemovedPosList.observe(viewLifecycleOwner, Observer {
+        viewModel.cleanRemovedPosList.observe(this, Observer {
             when (lastPosition) {
                 2, 3, 4, 5 -> {
                     val adapter = getCurrentAdapter() as MemberPostPagedAdapter
@@ -448,6 +475,48 @@ class AdultHomeFragment : BaseFragment() {
         refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
     }
 
+    private fun showNoLoginToggle(isShow:Boolean){
+        if(isShow){
+            cl_no_login.visibility = View.VISIBLE
+            cl_no_data.visibility = View.GONE
+            refresh.visibility = View.GONE
+        } else {
+            cl_no_login.visibility = View.GONE
+            refresh.visibility = View.VISIBLE
+        }
+    }
+
+    private fun showLoginDialog(){
+        loginDialog?.dismiss()
+        loginDialog = LoginRequestDialog.newInstance(object : OnLoginRequestDialogListener {
+            override fun onRegister() {
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_to_loginFragment,
+                        LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                    )
+                )
+            }
+
+            override fun onLogin() {
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_to_loginFragment,
+                        LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                    )
+                )
+            }
+
+            override fun onCancel() {}
+
+        }).also {
+            it.show(
+                requireActivity().supportFragmentManager,
+                LoginRequestDialog::class.java.simpleName
+            )
+        }
+    }
+
     private fun setupRecyclerByPosition(position: Int) {
         cl_no_data.visibility = View.GONE
 
@@ -461,11 +530,14 @@ class AdultHomeFragment : BaseFragment() {
 
         btn_ranking.visibility = View.GONE
         btn_filter.visibility = View.GONE
-
+        cl_no_login.visibility = View.GONE
+        cl_no_login.background =
+            requireActivity().getDrawable(R.color.adult_color_background)
         when (position) {
             0 -> {
                 btn_ranking.visibility = View.VISIBLE
                 rv_home.visibility = View.VISIBLE
+                showNoLoginToggle(false)
                 takeIf { rv_home.adapter == null }?.also {
                     refresh.isRefreshing = true
                     rv_home.background =
@@ -478,6 +550,7 @@ class AdultHomeFragment : BaseFragment() {
             1 -> {
                 btn_filter.visibility = View.VISIBLE
                 rv_first.visibility = View.VISIBLE
+                showNoLoginToggle(false)
                 takeIf { rv_first.adapter == null }?.also {
                     refresh.isRefreshing = true
                     rv_first.background =
@@ -501,9 +574,15 @@ class AdultHomeFragment : BaseFragment() {
                         followPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
                             ?.let { View.GONE } ?: let { View.VISIBLE }
                 }
+                takeIf{ !accountManager.isLogin() }?.also {
+                    showNoLoginToggle(true)
+                    showLoginDialog()
+                }
+
             }
             3 -> {
                 rv_third.visibility = View.VISIBLE
+                showNoLoginToggle(false)
                 takeIf { rv_third.adapter == null }?.also {
                     refresh.isRefreshing = true
                     rv_third.background =
@@ -519,6 +598,7 @@ class AdultHomeFragment : BaseFragment() {
             }
             4 -> {
                 rv_fourth.visibility = View.VISIBLE
+                showNoLoginToggle(false)
                 takeIf { rv_fourth.adapter == null }?.also {
                     refresh.isRefreshing = true
                     rv_fourth.background =
@@ -534,6 +614,7 @@ class AdultHomeFragment : BaseFragment() {
             }
             5 -> {
                 rv_fifth.visibility = View.VISIBLE
+                showNoLoginToggle(false)
                 takeIf { rv_fifth.adapter == null }?.also {
                     refresh.isRefreshing = true
                     rv_fifth.background =
@@ -549,6 +630,7 @@ class AdultHomeFragment : BaseFragment() {
             }
             else -> {
                 rv_sixth.visibility = View.VISIBLE
+                showNoLoginToggle(false)
                 takeIf { rv_sixth.adapter == null }?.also {
                     refresh.isRefreshing = true
                     rv_sixth.background =

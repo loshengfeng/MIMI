@@ -338,7 +338,7 @@ abstract class BaseFragment : Fragment() {
         })
     }
 
-    private fun handleBackStackData() {
+    fun handleBackStackData() {
         arguments?.let {
             val isNeedArticleUpload = it.getBoolean(UPLOAD_ARTICLE, false)
             val isNeedPicUpload = it.getBoolean(UPLOAD_PIC, false)
@@ -809,9 +809,9 @@ abstract class BaseFragment : Fragment() {
     private var moreDialog: MoreDialogFragment? = null
     private fun showMoreDialog(item: MemberPostItem){
         val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-            override fun onProblemReport(item: BaseMemberPostItem) {
+            override fun onProblemReport(item: BaseMemberPostItem, isComment:Boolean) {
                 moreDialog?.dismiss()
-                checkStatus { (requireActivity() as MainActivity).showReportDialog(item) }
+                checkStatus { (requireActivity() as MainActivity).showReportDialog(item, isComment = isComment) }
             }
 
             override fun onCancel() {

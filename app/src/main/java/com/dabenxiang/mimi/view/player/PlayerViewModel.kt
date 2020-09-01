@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.player
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import android.net.Uri
+import android.text.TextUtils
 import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.blankj.utilcode.util.ImageUtils
+import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.callback.GuessLikePagingCallBack
 import com.dabenxiang.mimi.event.SingleLiveEvent
 import com.dabenxiang.mimi.extension.downloadFile
@@ -32,6 +34,7 @@ import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
+import com.google.gson.Gson
 import io.ktor.client.*
 import io.ktor.client.engine.android.*
 import kotlinx.coroutines.Dispatchers
@@ -358,6 +361,8 @@ class PlayerViewModel : BaseViewModel() {
                 )
                 if (!streamResp.isSuccessful) throw HttpException(streamResp)
                 deleteCacheFile()
+                if(TextUtils.isEmpty(streamResp.body()?.content?.streamUrl))
+                    sendCrashReport("stream url is Empty, Video id ${streamResp.body()?.content?.id}, ".plus(Gson().toJson(streamResp.body()?.content)))
                 // 取得轉址Url
                 when (streamResp.body()?.content?.isContent) {
                     false -> nextVideoUrl = streamResp.body()?.content?.streamUrl
@@ -434,6 +439,8 @@ class PlayerViewModel : BaseViewModel() {
                 )
                 if (!streamResp.isSuccessful) throw HttpException(streamResp)
                 deleteCacheFile()
+                if(TextUtils.isEmpty(streamResp.body()?.content?.streamUrl))
+                    sendCrashReport("stream url is Empty, Video id ${streamResp.body()?.content?.id}, ".plus(Gson().toJson(streamResp.body()?.content)))
                 // 取得轉址Url
                 when (streamResp.body()?.content?.isContent) {
                     false -> {

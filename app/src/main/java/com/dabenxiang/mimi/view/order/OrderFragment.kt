@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.order
 
-import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.view.View
@@ -43,16 +42,13 @@ class OrderFragment : BaseFragment() {
 
     private val viewModel: OrderViewModel by viewModels()
 
+    private var updateProxyTab: ((Int, Boolean) -> Unit)? = null
+
     private val orderPagerAdapter by lazy {
         OrderPagerAdapter(
             OrderFuncItem(
                 getOrderByPaging3 = { update -> getOrderByPaging3(update) },
-                getOrderByPaging2 = { type, update ->
-                    viewModel.getOrderByPaging2(
-                        type,
-                        update
-                    )
-                },
+                getOrderByPaging2 = { type, update -> viewModel.getOrderByPaging2(type, update) },
                 getChatList = { update -> viewModel.getChatList(update) },
                 getChatAttachment = { id, pos, update -> viewModel.getAttachment(id, pos, update) },
                 onChatItemClick = { item -> onChatItemClick(item) },
@@ -107,8 +103,10 @@ class OrderFragment : BaseFragment() {
             when(it) {
                 is ApiResult.Success -> {
                     viewModel.unreadCount = it.result
-                    tl_type.getTabAt(2)?.takeIf { viewModel.unreadCount > 0 }?.also { tab ->
-                        tab.customView?.findViewById<ImageView>(R.id.iv_new)?.visibility = View.VISIBLE
+                    tl_type.getTabAt(2)?.also { tab ->
+                        tab.customView?.findViewById<ImageView>(R.id.iv_new)?.visibility =
+                            takeIf { viewModel.unreadCount > 0 }?.let { View.VISIBLE }
+                                ?: let { View.GONE }
                     }
                 }
             }
@@ -119,12 +117,16 @@ class OrderFragment : BaseFragment() {
             when(it) {
                 is ApiResult.Success -> {
                     viewModel.unreadOrderCount = it.result
-                    tl_type.getTabAt(1)?.takeIf { viewModel.unreadOrderCount > 0 }?.also { tab ->
-                        tab.customView?.findViewById<ImageView>(R.id.iv_new)?.visibility = View.VISIBLE
+                    tl_type.getTabAt(1)?.also { tab ->
+                        tab.customView?.findViewById<ImageView>(R.id.iv_new)?.visibility =
+                            takeIf { viewModel.unreadOrderCount > 0 }?.let { View.VISIBLE }
+                                ?: let { View.GONE }
                     }
 
-                    tl_type.getTabAt(0)?.takeIf { viewModel.unreadCount + viewModel.unreadOrderCount > 0 }?.also { tab ->
-                        tab.customView?.findViewById<ImageView>(R.id.iv_new)?.visibility = View.VISIBLE
+                    tl_type.getTabAt(0)?.also { tab ->
+                        tab.customView?.findViewById<ImageView>(R.id.iv_new)?.visibility =
+                            takeIf { viewModel.unreadCount + viewModel.unreadOrderCount > 0 }?.let { View.VISIBLE }
+                                ?: let { View.GONE }
                     }
                 }
             }
@@ -180,6 +182,7 @@ class OrderFragment : BaseFragment() {
     override fun initSettings() {
         super.initSettings()
         viewModel.getUnread()
+        updateProxyTab?.also { getProxyUnread(it) }
     }
 
     private var getOrderJob: Job? = null
@@ -210,6 +213,7 @@ class OrderFragment : BaseFragment() {
     }
 
     private fun getProxyUnread(update: ((Int, Boolean) -> Unit)) {
+        updateProxyTab = update
         viewModel.getProxyOrderUnread(update)
         viewModel.getChatUnread(update)
     }

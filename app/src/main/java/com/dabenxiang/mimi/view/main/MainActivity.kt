@@ -165,7 +165,6 @@ class MainActivity : BaseActivity(), InteractionListener {
     }
 
     override fun refreshBottomNavigationBadge(unreadCount: Int) {
-        Timber.d("@@refreshBottomNavigationBadge: $unreadCount")
         val visibility = takeIf { unreadCount > 0 }?.let { View.VISIBLE } ?: let { View.GONE }
         badgeViewMap[BottomNavType.TOPUP]?.visibility = visibility
         badgeViewMap[BottomNavType.PERSONAL]?.visibility = visibility
@@ -291,9 +290,9 @@ class MainActivity : BaseActivity(), InteractionListener {
     }
 
     private var reportDialog: ReportDialogFragment? = null
-    fun showReportDialog(item: BaseMemberPostItem, postItem: MemberPostItem? = null) {
+    fun showReportDialog(item: BaseMemberPostItem, postItem: MemberPostItem? = null, isComment:Boolean? = false) {
         reportDialog =
-            ReportDialogFragment.newInstance(item, onReportDialogListener, postItem).also {
+            ReportDialogFragment.newInstance(item, onReportDialogListener, postItem, isComment).also {
                 it.show(supportFragmentManager, ReportDialogFragment::class.java.simpleName)
             }
     }

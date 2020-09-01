@@ -401,7 +401,7 @@ class HomeViewModel : BaseViewModel() {
         isAdult: Boolean
     ): LiveData<PagedList<BaseVideoItem>> {
         val videoDataSource = VideoDataSource(
-            isAdult, category, viewModelScope, domainManager, pagingCallback, adWidth, adHeight
+            isAdult, category, viewModelScope, domainManager, pagingCallback, adWidth, adHeight, true
         )
         val videoFactory = VideoFactory(videoDataSource)
         val config = PagedList.Config.Builder()

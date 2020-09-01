@@ -26,7 +26,6 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.adapter.PictureAdapter
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
@@ -112,7 +111,7 @@ class MyPostPicturePostHolder(
                 )
             )
             chip.setOnClickListener { view ->
-                myPostListener.onChipClick(PostType.VIDEO, (view as Chip).text.toString())
+                myPostListener.onChipClick(PostType.IMAGE, (view as Chip).text.toString())
             }
             tagChipGroup.addView(chip)
         }

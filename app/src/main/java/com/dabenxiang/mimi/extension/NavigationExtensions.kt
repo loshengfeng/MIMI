@@ -314,9 +314,6 @@ private fun getIndex(fragmentTag: String) =
 fun BottomNavigationView.switchTab(index:Int){
     val tag = getFragmentTag(index)
     graphIdToTagMap.forEach { key, value ->
-        Timber.i("switchTab key= $key    value=$value")
-        if(value == tag){
-            this.selectedItemId =key
-        }
+        if(value == tag) this.selectedItemId = key
     }
 }

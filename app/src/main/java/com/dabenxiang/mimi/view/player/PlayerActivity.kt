@@ -136,12 +136,7 @@ class PlayerActivity : BaseActivity() {
 //
 //                finish()
                 oldPlayerItem = PlayerItem(viewModel.videoId, obtainIsAdult())
-                isFirstInit = true
-                player?.clearVideoDecoderOutputBufferRenderer()
-                player?.stop()
-                viewModel.clearStreamData()
-                loadVideo(item)
-                viewModel.setupCommentDataSource(playerInfoAdapter)
+                reloadVideoInfo(item)
             }
         }, obtainIsAdult())
     }
@@ -242,7 +237,7 @@ class PlayerActivity : BaseActivity() {
                 Timber.i("playerInfoAdapter onMoreClick")
                 if (item.id != null) {
                     viewModel.isCommentReport = true
-                    showMoreDialog(item.id, PostType.VIDEO, item.reported ?: false)
+                    showMoreDialog(item.id, PostType.VIDEO, item.reported ?: false, true)
                 }
             }
 
@@ -962,7 +957,12 @@ class PlayerActivity : BaseActivity() {
 
     }
 
-    private fun showMoreDialog(id: Long, type: PostType, isReported: Boolean) {
+    private fun showMoreDialog(
+        id: Long,
+        type: PostType,
+        isReported: Boolean,
+        isComment: Boolean = false
+    ) {
         Timber.i("id=$id")
         Timber.i("isReported=$isReported")
         moreDialog = MoreDialogFragment.newInstance(
@@ -970,8 +970,7 @@ class PlayerActivity : BaseActivity() {
                 id = id,
                 type = type,
                 reported = isReported
-
-            ), onMoreDialogListener
+            ), onMoreDialogListener, isComment
         ).also {
             it.show(
                 supportFragmentManager,
@@ -998,10 +997,9 @@ class PlayerActivity : BaseActivity() {
     }
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-        override fun onProblemReport(item: BaseMemberPostItem) {
+        override fun onProblemReport(item: BaseMemberPostItem, isComment: Boolean) {
             viewModel.checkStatus {
                 if ((item as MemberPostItem).reported) {
-
                     viewModel.isCommentReport = false
                     GeneralUtils.showToast(
                         App.applicationContext(),
@@ -1009,7 +1007,11 @@ class PlayerActivity : BaseActivity() {
                     )
                 } else {
                     reportDialog =
-                        ReportDialogFragment.newInstance(item, onReportDialogListener).also {
+                        ReportDialogFragment.newInstance(
+                            item = item,
+                            listener = onReportDialogListener,
+                            isComment = isComment
+                        ).also {
                             it.show(
                                 supportFragmentManager,
                                 ReportDialogFragment::class.java.simpleName
@@ -1663,6 +1665,13 @@ class PlayerActivity : BaseActivity() {
                 isHtml = true,
                 message = getString(R.string.point_not_enough_message),
                 firstBtn = getString(R.string.btn_cancel),
+                firstBlock = {
+                    if (oldPlayerItem.videoId == -1L)
+                        finish()
+                    else {
+                        reloadVideoInfo(oldPlayerItem)
+                    }
+                },
                 secondBtn = getString(R.string.recharge),
                 secondBlock = {
                     val bundle = Bundle()
@@ -1694,18 +1703,27 @@ class PlayerActivity : BaseActivity() {
                 message = message,
                 firstBtn = getString(R.string.btn_cancel),
                 firstBlock = {
-                    isFirstInit = true
-                    player?.clearVideoDecoderOutputBufferRenderer()
-                    player?.stop()
-                    viewModel.clearStreamData()
-                    loadVideo(oldPlayerItem)
-                    viewModel.setupCommentDataSource(playerInfoAdapter)},
+                    if (oldPlayerItem.videoId == -1L)
+                        finish()
+                    else {
+                        reloadVideoInfo(oldPlayerItem)
+                    }
+                },
                 secondBtn = getString(R.string.btn_confirm),
                 secondBlock = { viewModel.getStreamUrl(obtainIsAdult()) }
             )
         )
             .setCancel(false)
             .show(supportFragmentManager)
+    }
+
+    private fun reloadVideoInfo(playerItem: PlayerItem) {
+        isFirstInit = true
+        player?.clearVideoDecoderOutputBufferRenderer()
+        player?.stop()
+        viewModel.clearStreamData()
+        loadVideo(playerItem)
+        viewModel.setupCommentDataSource(playerInfoAdapter)
     }
 
     /**

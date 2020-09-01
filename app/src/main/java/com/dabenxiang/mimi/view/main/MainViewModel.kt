@@ -135,8 +135,8 @@ class MainViewModel : BaseViewModel() {
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _categoriesData.value = it }
         }
     }
@@ -490,16 +490,20 @@ class MainViewModel : BaseViewModel() {
         job.cancel()
     }
 
-    fun getTotalUnread(){
+    fun getTotalUnread() {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val chatUnreadResult = apiRepository.getUnread()
-                val chatUnread = if (!chatUnreadResult.isSuccessful) 0 else chatUnreadResult.body()?.content?: 0
+                val chatUnread =
+                    if (!chatUnreadResult.isSuccessful) 0 else chatUnreadResult.body()?.content ?: 0
                 val orderUnreadResult = apiRepository.getUnReadOrderCount()
-                val orderUnread = if (!orderUnreadResult.isSuccessful) 0 else orderUnreadResult.body()?.content?: 0
+                val orderUnread =
+                    if (!orderUnreadResult.isSuccessful) 0 else orderUnreadResult.body()?.content
+                        ?: 0
                 emit(ApiResult.success(chatUnread + orderUnread))
             }
+                .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }

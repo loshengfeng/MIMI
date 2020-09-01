@@ -741,6 +741,7 @@ class SearchPostFragment : BaseFragment() {
             val chip = LayoutInflater.from(chip_group_search_text.context)
                 .inflate(R.layout.chip_item, chip_group_search_text, false) as Chip
             chip.text = text
+            chip.ellipsize = TextUtils.TruncateAt.END
             chip.setTextColor(requireContext().getColor(R.color.color_white_1_50))
             chip.chipBackgroundColor = ColorStateList.valueOf(
                 ContextCompat.getColor(requireContext(), R.color.color_black_6)
