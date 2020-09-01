@@ -279,7 +279,7 @@ class SearchPostFragment : BaseFragment() {
             }
         })
 
-        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, {
+        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
                     memberPostAdapter?.also { adapter ->
@@ -291,7 +291,7 @@ class SearchPostFragment : BaseFragment() {
             }
         })
 
-        viewModel.cleanRemovedPosList.observe(viewLifecycleOwner, {
+        viewModel.cleanRemovedPosList.observe(viewLifecycleOwner, Observer {
             memberPostAdapter?.removedPosList?.clear()
         })
     }
