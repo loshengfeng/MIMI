@@ -149,7 +149,6 @@ abstract class BaseFragment : Fragment() {
             if (it == null) {
                 return@Observer
             }
-            Log.d("arvin", "uploadPicItem = " + it)
             val data = arguments?.getSerializable(MyPostFragment.MEMBER_DATA)
             if (data == null) {
                 uploadPicItem.add(it)
@@ -459,16 +458,15 @@ abstract class BaseFragment : Fragment() {
                                 ext = uploadVideoList[0].ext
                             )
 
-                            mediaItem.textContent = postMemberRequest.content
+                            mediaItem.textContent = memberRequest!!.content
                             mediaItem.videoParameter = videoParameter
                             mediaItem.picParameter.add(picParameter)
 
-                            mediaItem.textContent = postMemberRequest.content
                             val content = Gson().toJson(mediaItem)
                             memberPostItem.content = content
                             Timber.d("Post video content item : $content")
 
-                            mainViewModel?.postPic(postId, postMemberRequest, content)
+                            mainViewModel?.postPic(postId, memberRequest, content)
                         }
                     }
                 }

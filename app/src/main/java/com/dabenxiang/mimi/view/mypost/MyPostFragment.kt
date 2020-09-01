@@ -24,6 +24,8 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.USER_ID_ME
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.MY_POST
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.PAGE
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
@@ -279,6 +281,7 @@ class MyPostFragment : BaseFragment() {
                         val bundle = Bundle()
                         item.id
                         bundle.putBoolean(EDIT, true)
+                        bundle.putString(PAGE, MY_POST)
                         bundle.putSerializable(MEMBER_DATA, item)
                         findNavController().navigate(
                             R.id.action_myPostFragment_to_postArticleFragment,
@@ -288,6 +291,7 @@ class MyPostFragment : BaseFragment() {
                     PostType.IMAGE -> {
                         val bundle = Bundle()
                         bundle.putBoolean(EDIT, true)
+                        bundle.putString(PAGE, MY_POST)
                         bundle.putSerializable(MEMBER_DATA, item)
                         findNavController().navigate(
                             R.id.action_myPostFragment_to_postPicFragment,
@@ -297,6 +301,7 @@ class MyPostFragment : BaseFragment() {
                     PostType.VIDEO -> {
                         val bundle = Bundle()
                         bundle.putBoolean(EDIT, true)
+                        bundle.putString(PAGE, MY_POST)
                         bundle.putSerializable(MEMBER_DATA, item)
                         findNavController().navigate(
                             R.id.action_myPostFragment_to_postVideoFragment,

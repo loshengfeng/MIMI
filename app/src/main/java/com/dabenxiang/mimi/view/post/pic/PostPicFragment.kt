@@ -16,12 +16,14 @@ import com.dabenxiang.mimi.model.api.vo.MediaItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.PostAttachmentItem
+import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.model.vo.ViewerItem
 import com.dabenxiang.mimi.view.adapter.ScrollPicAdapter
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.post.utility.PostManager
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment.Companion.VIEWER_DATA
+import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.android.synthetic.main.fragment_post_article.edt_hashtag
@@ -84,8 +86,19 @@ class PostPicFragment : BasePostFragment() {
     }
 
     private fun navigation() {
-        val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
+        var isEdit = false
         val title = edt_title.text.toString()
+        var page = ""
+        var searchPostItem: SearchPostItem? = null
+
+        arguments?.let {
+            isEdit = it.getBoolean(MyPostFragment.EDIT, false)
+            page = it.getString(PAGE, "")
+            val data = it.getSerializable(SearchPostFragment.KEY_DATA)
+            if (data != null) {
+                searchPostItem = data as SearchPostItem
+            }
+        }
 
         val request = getRequest(title, PostType.IMAGE.value)
 
@@ -96,10 +109,24 @@ class PostPicFragment : BasePostFragment() {
         bundle.putStringArrayList(DELETE_ATTACHMENT, deletePicList)
         bundle.putLong(POST_ID, postId)
 
-        if (isEdit != null && isEdit) {
+        if (isEdit && page == MY_POST) {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
             findNavController().navigate(R.id.action_postPicFragment_to_myPostFragment, bundle)
+        } else if (isEdit && page == ADULT) {
+            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+            findNavController().navigate(R.id.action_postPicFragment_to_adultHomeFragment, bundle)
+        } else if (isEdit && page == SEARCH) {
+            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+            bundle.putSerializable(SearchPostFragment.KEY_DATA, searchPostItem)
+            findNavController().navigate(R.id.action_postPicFragment_to_searchPostFragment, bundle)
+        } else if (isEdit && page == CLUB) {
+            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+            bundle.putSerializable(SearchPostFragment.KEY_DATA, searchPostItem)
+            findNavController().navigate(R.id.action_postPicFragment_to_clubDetailFragment, bundle)
         } else {
             findNavController().navigate(R.id.action_postPicFragment_to_adultHomeFragment, bundle)
         }

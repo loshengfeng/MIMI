@@ -20,8 +20,10 @@ import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.ApiResult.*
-import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
@@ -39,18 +41,17 @@ import com.dabenxiang.mimi.view.club.ClubFuncItem
 import com.dabenxiang.mimi.view.club.ClubMemberAdapter
 import com.dabenxiang.mimi.view.club.MiMiLinearLayoutManager
 import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
-import com.dabenxiang.mimi.view.dialog.GeneralDialog
-import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.OnChooseUploadMethodDialogListener
-import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.ADULT
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.BUNDLE_PIC_URI
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.PAGE
 import com.dabenxiang.mimi.view.post.utility.PostManager
 import com.dabenxiang.mimi.view.post.video.EditVideoFragment.Companion.BUNDLE_VIDEO_URI
 import com.dabenxiang.mimi.view.ranking.RankingFragment
@@ -725,7 +726,32 @@ class AdultHomeFragment : BaseFragment() {
                 item,
                 ArrayList(items),
                 onEdit = {
-                    // TODO #1180
+                    val bundle = Bundle()
+                    bundle.putBoolean(MyPostFragment.EDIT, true)
+                    bundle.putString(PAGE, ADULT)
+                    bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+
+                    it as MemberPostItem
+                    when (item.type) {
+                        PostType.TEXT -> {
+                            findNavController().navigate(
+                                R.id.action_adultHomeFragment_to_postArticleFragment,
+                                bundle
+                            )
+                        }
+                        PostType.IMAGE -> {
+                            findNavController().navigate(
+                                R.id.action_adultHomeFragment_to_postPicFragment,
+                                bundle
+                            )
+                        }
+                        PostType.VIDEO -> {
+                            findNavController().navigate(
+                                R.id.action_adultHomeFragment_to_postVideoFragment,
+                                bundle
+                            )
+                        }
+                    }
                 }
             )
         }
