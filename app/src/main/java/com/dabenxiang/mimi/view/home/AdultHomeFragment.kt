@@ -15,6 +15,7 @@ import androidx.paging.PagedList
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.load.model.GlideUrl
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
@@ -751,7 +752,8 @@ class AdultHomeFragment : BaseFragment() {
             { id, func -> getBitmap(id, func) },
             { item, items, isFollow, func -> followMember(item, items, isFollow, func) },
             { item, isLike, func -> likePost(item, isLike, func) },
-            { item, isFavorite, func -> favoritePost(item, isFavorite, func) }
+            { item, isFavorite, func -> favoritePost(item, isFavorite, func) },
+            { id, func -> getImageUrl(id, func) }
         )
     }
 
@@ -1074,6 +1076,10 @@ class AdultHomeFragment : BaseFragment() {
 
     private fun getBitmap(id: String, update: ((String) -> Unit)) {
         viewModel.getBitmap(id, update)
+    }
+
+    private fun getImageUrl(id: String, update: ((GlideUrl) -> Unit)) {
+        viewModel.getImageUrl(id, update)
     }
 
     private fun followMember(
