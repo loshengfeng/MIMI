@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.load.model.GlideUrl
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.ApiResult.*
@@ -38,6 +39,8 @@ import kotlinx.android.synthetic.main.fragment_home.*
 class HomeFragment : BaseFragment() {
 
     companion object {
+        const val TYPE_BITMAP = 0
+        const val TYPE_URL = 1
         private const val REQUEST_LOGIN = 1000
     }
 
@@ -303,7 +306,10 @@ class HomeFragment : BaseFragment() {
         MemberPostFuncItem(
             {},
             { id, function -> getBitmap(id, function) },
-            { _, _, _, _ -> }
+            { _, _, _, _ -> },
+            { _, _, _ -> },
+            { _, _, _ -> },
+            { id, function -> getImageUrl(id, function) }
         )
     }
 
@@ -402,6 +408,9 @@ class HomeFragment : BaseFragment() {
         viewModel.getBitmap(id, update)
     }
 
+    private fun getImageUrl(id: String, update: ((GlideUrl) -> Unit)) {
+        viewModel.getImageUrl(id, update)
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

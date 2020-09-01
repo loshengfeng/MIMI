@@ -7,7 +7,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.blankj.utilcode.util.ImageUtils
+import com.bumptech.glide.load.model.GlideUrl
+import com.bumptech.glide.load.model.LazyHeaders
 import com.dabenxiang.mimi.callback.PagingCallback
+import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
@@ -196,6 +199,30 @@ class HomeViewModel : BaseViewModel() {
                 val bitmap = ImageUtils.bytes2Bitmap(byteArray)
                 LruCacheUtils.putLruCache(id, bitmap)
                 emit(ApiResult.success(id))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    when (it) {
+                        is ApiResult.Success -> {
+                            update(it.result)
+                        }
+                    }
+                }
+        }
+    }
+
+    fun getImageUrl(id: String, update: ((GlideUrl) -> Unit)) {
+        viewModelScope.launch {
+            flow {
+                val accessToken = pref.memberToken.accessToken
+                val auth = StringBuilder(ApiRepository.BEARER).append(accessToken).toString()
+                val url = domainManager.getApiDomain().plus("/v1/Attachments/").plus(id)
+                val glideUrl = GlideUrl(
+                    url,
+                    LazyHeaders.Builder().addHeader(ApiRepository.AUTHORIZATION, auth).build()
+                )
+                emit(ApiResult.success(glideUrl))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
