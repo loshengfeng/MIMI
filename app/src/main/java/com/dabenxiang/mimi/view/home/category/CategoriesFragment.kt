@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.addCallback
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -34,7 +35,6 @@ import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_categories.*
-import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem as CategoriesData
 
@@ -129,7 +129,7 @@ class CategoriesFragment : BaseFragment() {
                 } else {
                     R.color.normal_color_background
                 }.let { res ->
-                    requireActivity().getDrawable(res)
+                    ContextCompat.getDrawable(requireContext(), res)
                 }
 
             tv_no_data.setTextColor(takeIf { isAdult }?.let {
@@ -144,7 +144,7 @@ class CategoriesFragment : BaseFragment() {
                 } else {
                     R.color.normal_color_status_bar
                 }.let { res ->
-                    requireActivity().getDrawable(res)
+                    ContextCompat.getDrawable(requireContext(), res)
                 }
 
             ib_back.setImageResource(
@@ -203,7 +203,12 @@ class CategoriesFragment : BaseFragment() {
                 }
             )
 
-            recyclerview_content.layoutManager = GridLayoutManager(requireContext(), when(isAdult) { true -> 2 else -> 3})
+            recyclerview_content.layoutManager = GridLayoutManager(
+                requireContext(), when (isAdult) {
+                    true -> 2
+                    else -> 3
+                }
+            )
             recyclerview_content.adapter = videoListAdapter
 
             viewModel.getCategoryDetail(data.title, isAdult)
@@ -280,6 +285,11 @@ class CategoriesFragment : BaseFragment() {
                 filterAdapterList[it]?.updateLastSelected(null)
             }
             doOnTabSelected()
+
+            if (isAdult) { //第一欄按"全部" -> 清空第二欄
+                setupFilter(1, arrayListOf())
+                adjustContentRV(1)
+            }
         }
 
         tv_all_1.setOnClickListener {
@@ -318,7 +328,11 @@ class CategoriesFragment : BaseFragment() {
                 val firstPosition = viewModel.filterPositionData(0)?.value ?: 0
                 val secondCategory = arrayListOf<String>()
                 val thirdCategory = arrayListOf<String>()
-                data.categories?.get(firstPosition)?.categories?.forEach { item -> secondCategory.add(item.name) }
+                data.categories?.get(firstPosition)?.categories?.forEach { item ->
+                    secondCategory.add(
+                        item.name
+                    )
+                }
                 takeIf { secondCategory.isNotEmpty() }?.also { notEmptyCount++ }
                 setupFilter(1, secondCategory)
                 setupFilter(2, thirdCategory)
@@ -333,12 +347,7 @@ class CategoriesFragment : BaseFragment() {
 
             filterTVList.forEach { tv -> tv.visibility = View.VISIBLE }
             setupCollapsingText()
-            recyclerview_content.setPadding(
-                0,
-                GeneralUtils.dpToPx(requireContext(), 50) * notEmptyCount,
-                0,
-                0
-            )
+            adjustContentRV(notEmptyCount)
         }
     }
 
@@ -356,10 +365,12 @@ class CategoriesFragment : BaseFragment() {
                     if (isAdult) { //更新第二欄
                         (arguments?.getSerializable(KEY_CATEGORY) as CategoriesData?)?.also { data ->
                             val secondCategory = arrayListOf<String>()
-                            data.categories?.get(position)?.categories?.forEach { item -> secondCategory.add(item.name) }
-                            Timber.d("@@secondCategory $secondCategory")
+                            data.categories?.get(position)?.categories?.forEach { item ->
+                                secondCategory.add(item.name)
+                            }
                             setupFilter(1, secondCategory)
                         }
+                        adjustContentRV(2)
                     }
                     updateFirstTab(index, false)
                     viewModel.updatedFilterPosition(index, position)
@@ -380,7 +391,11 @@ class CategoriesFragment : BaseFragment() {
 
         filterRVList[index].adapter = adapter
         filterAdapterList[index] = adapter
-        filterLLList[index].visibility = if (list.isEmpty()) { View.GONE } else {View.VISIBLE }
+        filterLLList[index].visibility = if (list.isEmpty()) {
+            View.GONE
+        } else {
+            View.VISIBLE
+        }
 
         viewModel.filterPositionData(index)?.observe(viewLifecycleOwner, Observer { position ->
             adapter.setLastSelectedIndex(position)
@@ -414,10 +429,12 @@ class CategoriesFragment : BaseFragment() {
 
         progressHUD?.show()
         if (isAdult) {
-            val tag = if (filterKeyList[1] == "全部") "" else filterKeyList[1]?: ""
+            val tag = if (filterKeyList[1] == TEXT_ALL) "" else filterKeyList[1] ?: ""
             viewModel.getVideoFilterList(filterKeyList[0], null, null, isAdult, tag)
         } else {
-            viewModel.getVideoFilterList(filterKeyList[0], filterKeyList[1], filterKeyList[2], isAdult)
+            viewModel.getVideoFilterList(
+                filterKeyList[0], filterKeyList[1], filterKeyList[2], isAdult
+            )
         }
     }
 
@@ -512,7 +529,8 @@ class CategoriesFragment : BaseFragment() {
         }
         takeIf { isSelect }?.also {
             tv.setTextColor(requireContext().getColor(R.color.color_white_1))
-            tv.background = requireContext().getDrawable(R.drawable.bg_red_1_radius_6)
+            tv.background =
+                ContextCompat.getDrawable(requireContext(), R.drawable.bg_red_1_radius_6)
         } ?: run {
             tv.setTextColor(takeIf { isAdult }?.let { requireContext().getColor(R.color.color_white_1) }
                 ?: let { requireContext().getColor(R.color.normal_color_text) })
@@ -526,9 +544,21 @@ class CategoriesFragment : BaseFragment() {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 REQUEST_LOGIN -> {
-                    findNavController().navigate(R.id.action_categoriesFragment_to_loginFragment, data?.extras)
+                    findNavController().navigate(
+                        R.id.action_categoriesFragment_to_loginFragment,
+                        data?.extras
+                    )
                 }
             }
         }
+    }
+
+    private fun adjustContentRV(notEmptyCount: Int) {
+        recyclerview_content.setPadding(
+            0,
+            GeneralUtils.dpToPx(requireContext(), 50) * notEmptyCount,
+            0,
+            0
+        )
     }
 }
