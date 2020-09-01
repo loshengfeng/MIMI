@@ -118,7 +118,7 @@ class CategoriesFragment : BaseFragment() {
         requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
 
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        viewModel.adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
+        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
 
         (arguments?.getSerializable(KEY_DATA) as CategoriesItem?)?.also { data ->
             tv_title.text = data.title

@@ -23,7 +23,6 @@ import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
-import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.fullpicture.FullPictureFragment
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
@@ -35,7 +34,6 @@ import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_picture_detail.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
-import timber.log.Timber
 
 class PictureDetailFragment : BaseFragment() {
 
@@ -80,7 +78,7 @@ class PictureDetailFragment : BaseFragment() {
         requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
 
         adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
+        adHeight = (adWidth * 0.142).toInt()
 
         text_toolbar_title.text = getString(R.string.picture_detail_title)
         toolbarContainer.toolbar.navigationIcon =
@@ -339,7 +337,7 @@ class PictureDetailFragment : BaseFragment() {
         }
 
         override fun onMoreClick(item: MembersPostCommentItem) {
-            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
+            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener, true).also {
                 it.show(
                     requireActivity().supportFragmentManager,
                     MoreDialogFragment::class.java.simpleName
@@ -394,9 +392,9 @@ class PictureDetailFragment : BaseFragment() {
     }
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-        override fun onProblemReport(item: BaseMemberPostItem) {
+        override fun onProblemReport(item: BaseMemberPostItem, isComment:Boolean) {
             moreDialog?.dismiss()
-            checkStatus { (requireActivity() as MainActivity).showReportDialog(item, memberPostItem) }
+            checkStatus { (requireActivity() as MainActivity).showReportDialog(item, memberPostItem, isComment) }
         }
 
         override fun onCancel() {

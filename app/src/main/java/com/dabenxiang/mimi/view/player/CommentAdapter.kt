@@ -369,7 +369,7 @@ abstract class BaseCommentProvider(
         holder.setGone(R.id.btn_show_comment_reply, true)
 
         data.creationDate?.let { date ->
-            SimpleDateFormat("yyyy-MM-dd hh:mm", Locale.getDefault()).format(date)
+            SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(date)
         }.also {
             holder.setText(R.id.tv_date, it)
         }

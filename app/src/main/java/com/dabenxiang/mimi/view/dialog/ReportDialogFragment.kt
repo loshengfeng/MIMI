@@ -13,7 +13,6 @@ import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.dpToPx
 import com.google.android.material.radiobutton.MaterialRadioButton
 import kotlinx.android.synthetic.main.fragment_dialog_report.*
-import timber.log.Timber
 
 
 class ReportDialogFragment : BaseDialogFragment() {
@@ -22,12 +21,14 @@ class ReportDialogFragment : BaseDialogFragment() {
         fun newInstance(
             item: BaseMemberPostItem,
             listener: OnReportDialogListener,
-            postItem: MemberPostItem? = null
+            postItem: MemberPostItem? = null,
+            isComment: Boolean? = false
         ): ReportDialogFragment {
             val fragment = ReportDialogFragment()
             fragment.item = item
             fragment.listener = listener
             fragment.postItem = postItem
+            fragment.isComment = isComment
             return fragment
         }
     }
@@ -35,6 +36,7 @@ class ReportDialogFragment : BaseDialogFragment() {
     var item: BaseMemberPostItem? = null
     var listener: OnReportDialogListener? = null
     var postItem: MemberPostItem? = null
+    var isComment: Boolean? = false
 
     override fun isFullLayout(): Boolean {
         return true
@@ -54,7 +56,7 @@ class ReportDialogFragment : BaseDialogFragment() {
                 val id = when ((item as MemberPostItem).type) {
                     PostType.IMAGE -> R.array.picture_problem_report_item
                     PostType.TEXT -> R.array.text_problem_report_item
-                    else -> R.array.video_problem_report_item
+                    else -> if(isComment == true) R.array.video_comment_problem_report_item else R.array.video_problem_report_item
                 }
                 requireContext().resources?.getStringArray(id)
             }

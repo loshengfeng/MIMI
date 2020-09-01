@@ -237,7 +237,7 @@ class PlayerActivity : BaseActivity() {
                 Timber.i("playerInfoAdapter onMoreClick")
                 if (item.id != null) {
                     viewModel.isCommentReport = true
-                    showMoreDialog(item.id, PostType.VIDEO, item.reported ?: false)
+                    showMoreDialog(item.id, PostType.VIDEO, item.reported ?: false, true)
                 }
             }
 
@@ -922,7 +922,7 @@ class PlayerActivity : BaseActivity() {
         }
 
         val adWidth = ((GeneralUtils.getScreenSize(this).first) * 0.333).toInt()
-        val adHeight = (GeneralUtils.getScreenSize(this).second * 0.0245).toInt()
+        val adHeight = (adWidth * 0.142).toInt()
         viewModel.getAd(adWidth, adHeight)
 
         exo_play_pause.setOnClickListener {
@@ -957,7 +957,12 @@ class PlayerActivity : BaseActivity() {
 
     }
 
-    private fun showMoreDialog(id: Long, type: PostType, isReported: Boolean) {
+    private fun showMoreDialog(
+        id: Long,
+        type: PostType,
+        isReported: Boolean,
+        isComment: Boolean = false
+    ) {
         Timber.i("id=$id")
         Timber.i("isReported=$isReported")
         moreDialog = MoreDialogFragment.newInstance(
@@ -965,8 +970,7 @@ class PlayerActivity : BaseActivity() {
                 id = id,
                 type = type,
                 reported = isReported
-
-            ), onMoreDialogListener
+            ), onMoreDialogListener, isComment
         ).also {
             it.show(
                 supportFragmentManager,
@@ -993,10 +997,9 @@ class PlayerActivity : BaseActivity() {
     }
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-        override fun onProblemReport(item: BaseMemberPostItem) {
+        override fun onProblemReport(item: BaseMemberPostItem, isComment: Boolean) {
             viewModel.checkStatus {
                 if ((item as MemberPostItem).reported) {
-
                     viewModel.isCommentReport = false
                     GeneralUtils.showToast(
                         App.applicationContext(),
@@ -1004,7 +1007,11 @@ class PlayerActivity : BaseActivity() {
                     )
                 } else {
                     reportDialog =
-                        ReportDialogFragment.newInstance(item, onReportDialogListener).also {
+                        ReportDialogFragment.newInstance(
+                            item = item,
+                            listener = onReportDialogListener,
+                            isComment = isComment
+                        ).also {
                             it.show(
                                 supportFragmentManager,
                                 ReportDialogFragment::class.java.simpleName
@@ -1659,7 +1666,7 @@ class PlayerActivity : BaseActivity() {
                 message = getString(R.string.point_not_enough_message),
                 firstBtn = getString(R.string.btn_cancel),
                 firstBlock = {
-                    if(oldPlayerItem.videoId == -1L)
+                    if (oldPlayerItem.videoId == -1L)
                         finish()
                     else {
                         reloadVideoInfo(oldPlayerItem)
@@ -1696,7 +1703,7 @@ class PlayerActivity : BaseActivity() {
                 message = message,
                 firstBtn = getString(R.string.btn_cancel),
                 firstBlock = {
-                    if(oldPlayerItem.videoId == -1L)
+                    if (oldPlayerItem.videoId == -1L)
                         finish()
                     else {
                         reloadVideoInfo(oldPlayerItem)

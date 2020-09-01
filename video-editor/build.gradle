@@ -108,11 +108,11 @@ dependencies {
 }
 
 ////apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
-apply from: 'https://raw.githubusercontent.com/CKS-ROC/Useful_Gradle/master/install.gradle'
-File f = this.file('bintray.properties')
-if (f.exists() && !f.isDirectory()) {
-    apply from: 'https://raw.githubusercontent.com/CKS-ROC/Useful_Gradle/master/bintray.gradle'
-}
+//apply from: 'https://raw.githubusercontent.com/CKS-ROC/Useful_Gradle/master/install.gradle'
+//File f = this.file('bintray.properties')
+//if (f.exists() && !f.isDirectory()) {
+//    apply from: 'https://raw.githubusercontent.com/CKS-ROC/Useful_Gradle/master/bintray.gradle'
+//}
 
 task showCurrentVersion {
     group "version Tasks"

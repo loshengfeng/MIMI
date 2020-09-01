@@ -17,11 +17,13 @@ import android.widget.TextView
 import androidx.core.content.FileProvider
 import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModel
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.home.AdultHomeFragment
 import com.dabenxiang.mimi.view.home.HomeViewModel
+import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.REQUEST_VIDEO_CAPTURE
 import com.dabenxiang.mimi.widget.utility.FileUtil
@@ -151,7 +153,7 @@ class PostManager {
         return snackBar
     }
 
-    fun dismissSnackBar(snackBar: Snackbar, postId: Long, memberPostItem: MemberPostItem, viewModel: HomeViewModel?, listener: SnackBarListener) {
+    fun dismissSnackBar(snackBar: Snackbar, postId: Long, memberPostItem: MemberPostItem, viewModel: MainViewModel?, listener: SnackBarListener) {
         val snackBarLayout: Snackbar.SnackbarLayout = snackBar.view as Snackbar.SnackbarLayout
         val progressBar =
             snackBarLayout.findViewById(R.id.contentLoadingProgressBar) as ContentLoadingProgressBar
