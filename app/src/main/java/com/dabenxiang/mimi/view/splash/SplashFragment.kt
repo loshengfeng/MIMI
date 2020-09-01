@@ -1,11 +1,8 @@
 package com.dabenxiang.mimi.view.splash
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
-import androidx.core.app.ActivityCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -29,25 +26,10 @@ import tw.gov.president.manager.submanager.update.data.VersionStatus
 
 class SplashFragment : BaseFragment() {
 
-    companion object {
-        const val PERMISSION_REQUEST_CODE = 637
-    }
-
-    val locationPermissions = arrayOf(
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_FINE_LOCATION
-    )
-
-    private val externalPermissions = arrayOf(
-        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE
-    )
-
-    private val cameraPermissions = arrayOf(Manifest.permission.CAMERA)
-
-    private val permissions = locationPermissions + externalPermissions + cameraPermissions
-
     private val viewModel: SplashViewModel by viewModels()
+
+    override var permissions = externalPermissions
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.i("onCreate")
@@ -61,7 +43,8 @@ class SplashFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Timber.i("onViewCreated")
-        requestPermissions()
+//        requestPermissions()
+        checkVersion()
     }
 
     override val bottomNavigationVisibility: Int
@@ -102,12 +85,11 @@ class SplashFragment : BaseFragment() {
     override fun setupListeners() {}
 
     private fun requestPermissions() {
-        val requestList = getNotGrantedPermissions(permissions)
+        val requestList = getNotGrantedPermissions(externalPermissions)
 
         if (requestList.size > 0) {
-            requestPermissions(requestList.toTypedArray(), PERMISSION_REQUEST_CODE)
+            requestPermissions(requestList.toTypedArray(), PERMISSION_EXTERNAL_REQUEST_CODE)
         } else {
-//            initSettings()
             checkVersion()
         }
     }
@@ -118,21 +100,10 @@ class SplashFragment : BaseFragment() {
         grantResults: IntArray
     ) {
         Timber.i("onRequestPermissionsResult")
-        if (requestCode == PERMISSION_REQUEST_CODE) {
-            var isPermissionAllGranted = true
-            for (i in permissions.indices) {
-                if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
-                    isPermissionAllGranted = false
-                    break
-                }
-            }
-
-            if (isPermissionAllGranted) {
-//                initSettings()
-                checkVersion()
-            } else {
-                requestPermissions()
-            }
+        if (requestCode == PERMISSION_EXTERNAL_REQUEST_CODE && getNotGrantedPermissions(externalPermissions).isEmpty()) {
+            checkVersion()
+        } else {
+            requestPermissions()
         }
     }
 
@@ -181,7 +152,7 @@ class SplashFragment : BaseFragment() {
                     if (requestList.size > 0) {
                         requestPermissions(
                             requestList.toTypedArray(),
-                            PERMISSION_REQUEST_CODE
+                            PERMISSION_EXTERNAL_REQUEST_CODE
                         )
                     } else {
                         viewModel.updateApp(progressCallback)
