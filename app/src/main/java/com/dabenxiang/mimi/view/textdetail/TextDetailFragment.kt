@@ -77,7 +77,7 @@ class TextDetailFragment : BaseFragment() {
         requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
 
         adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
+        adHeight = (adWidth * 0.142).toInt()
 
         text_toolbar_title.text = getString(R.string.text_detail_title)
         toolbarContainer.toolbar.navigationIcon =

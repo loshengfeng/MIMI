@@ -102,7 +102,7 @@ class SearchPostFragment : BaseFragment() {
         useAdultTheme(true)
 
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        viewModel.adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
+        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
 
         if (TextUtils.isEmpty(mTag) && TextUtils.isEmpty(searchText)) {
             layout_search_history.visibility = View.VISIBLE
