@@ -922,7 +922,7 @@ class PlayerActivity : BaseActivity() {
         }
 
         val adWidth = ((GeneralUtils.getScreenSize(this).first) * 0.333).toInt()
-        val adHeight = (GeneralUtils.getScreenSize(this).second * 0.0245).toInt()
+        val adHeight = (adWidth * 0.142).toInt()
         viewModel.getAd(adWidth, adHeight)
 
         exo_play_pause.setOnClickListener {
