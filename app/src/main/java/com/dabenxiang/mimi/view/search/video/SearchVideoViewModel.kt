@@ -8,7 +8,9 @@ import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.dabenxiang.mimi.callback.SearchPagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.api.vo.LikeRequest
+import com.dabenxiang.mimi.model.api.vo.PlayListRequest
+import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.vo.SearchHistoryItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
@@ -21,6 +23,7 @@ import retrofit2.HttpException
 
 class SearchVideoViewModel : BaseViewModel() {
 
+    var category = ""
     var searchingTag = ""
     var searchingStr = ""
     var isAdult = false
@@ -52,6 +55,7 @@ class SearchVideoViewModel : BaseViewModel() {
                 domainManager,
                 pagingCallback,
                 isAdult,
+                category,
                 searchingTag,
                 searchingStr,
                 adWidth,

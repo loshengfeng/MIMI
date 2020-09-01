@@ -72,6 +72,11 @@ open class BasePostFragment : BaseFragment() {
         const val VIDEO_DATA = "video_data"
         const val BUNDLE_TRIMMER_URI = "bundle_trimmer_uri"
         const val BUNDLE_COVER_URI = "bundle_cover_uri"
+        const val PAGE = "page"
+        const val ADULT = "adult"
+        const val MY_POST = "my_post"
+        const val SEARCH = "search"
+        const val CLUB = "club"
     }
 
     override val bottomNavigationVisibility: Int

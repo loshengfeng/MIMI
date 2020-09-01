@@ -172,13 +172,13 @@ class MainActivity : BaseActivity(), InteractionListener {
 
     @SuppressLint("RestrictedApi")
     override fun onBackPressed() {
-        // 判斷當前的頁面是停留在 homeFragment，顯示退出 app 訊息
-        if (supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter(
+        val fragmentName =
+            supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter(
                 "/"
             ).toString()
-                .toLowerCase(Locale.getDefault()) == HomeFragment::class.java.simpleName.toLowerCase(
-                Locale.getDefault()
-            )
+        // 判斷當前的頁面是停留在 homeFragment，顯示退出 app 訊息
+        if (fragmentName.toLowerCase(Locale.getDefault()) ==
+            HomeFragment::class.java.simpleName.toLowerCase(Locale.getDefault())
         ) {
             if (!viewModel.needCloseApp) {
                 viewModel.startBackExitAppTimer()
@@ -186,24 +186,12 @@ class MainActivity : BaseActivity(), InteractionListener {
             } else {
                 finish()
             }
-        } else if ((supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter(
-                "/"
-            ).toString()
-                .toLowerCase(Locale.getDefault()) == SearchVideoFragment::class.java.simpleName.toLowerCase(
-                Locale.getDefault()
-            ))
-            || (supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter(
-                "/"
-            ).toString()
-                .toLowerCase(Locale.getDefault()) == MyPostFragment::class.java.simpleName.toLowerCase(
-                Locale.getDefault()
-            ))
-            || (supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter(
-                "/"
-            ).toString()
-                .toLowerCase(Locale.getDefault()) == SettingFragment::class.java.simpleName.toLowerCase(
-                Locale.getDefault()
-            ))
+        } else if ((fragmentName.toLowerCase(Locale.getDefault()) ==
+                    SearchVideoFragment::class.java.simpleName.toLowerCase(Locale.getDefault()))
+            || (fragmentName.toLowerCase(Locale.getDefault()) ==
+                    MyPostFragment::class.java.simpleName.toLowerCase(Locale.getDefault()))
+            || (fragmentName.toLowerCase(Locale.getDefault()) ==
+                    SettingFragment::class.java.simpleName.toLowerCase(Locale.getDefault()))
         ) {
             if (viewModel.isFromPlayer) {
                 viewModel.isFromPlayer = false
@@ -290,9 +278,9 @@ class MainActivity : BaseActivity(), InteractionListener {
     }
 
     private var reportDialog: ReportDialogFragment? = null
-    fun showReportDialog(item: BaseMemberPostItem, postItem: MemberPostItem? = null) {
+    fun showReportDialog(item: BaseMemberPostItem, postItem: MemberPostItem? = null, isComment:Boolean? = false) {
         reportDialog =
-            ReportDialogFragment.newInstance(item, onReportDialogListener, postItem).also {
+            ReportDialogFragment.newInstance(item, onReportDialogListener, postItem, isComment).also {
                 it.show(supportFragmentManager, ReportDialogFragment::class.java.simpleName)
             }
     }

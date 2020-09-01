@@ -290,6 +290,11 @@
         <item>有害的危险行为</item>
     </string-array>
 
+    <string-array name="video_comment_problem_report_item">
+        <item>垃圾内容或误导性内容</item>
+        <item>仇恨与恶意内容</item>
+    </string-array>
+
     <string-array name="picture_problem_report_item">
         <item>图片与内容不符</item>
         <item>垃圾内容或误导性内容</item>

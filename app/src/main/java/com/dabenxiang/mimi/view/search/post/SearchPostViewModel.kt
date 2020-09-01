@@ -352,14 +352,15 @@ class SearchPostViewModel : BaseViewModel() {
     ): LiveData<PagedList<VideoItem>> {
         val searchVideoDataSource =
                 SearchVideoListDataSource(
-                        viewModelScope,
-                        domainManager,
-                        pagingCallback,
-                        isAdult,
-                        searchingTag,
-                        searchingStr,
-                        adWidth,
-                        adHeight
+                    viewModelScope,
+                    domainManager,
+                    pagingCallback,
+                    isAdult,
+                    "",
+                    searchingTag,
+                    searchingStr,
+                    adHeight,
+                    adWidth
                 )
         val videoFactory = SearchVideoFactory(searchVideoDataSource)
         val config = PagedList.Config.Builder()

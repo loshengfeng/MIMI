@@ -77,7 +77,7 @@ class TextDetailFragment : BaseFragment() {
         requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
 
         adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
+        adHeight = (adWidth * 0.142).toInt()
 
         text_toolbar_title.text = getString(R.string.text_detail_title)
         toolbarContainer.toolbar.navigationIcon =
@@ -326,7 +326,7 @@ class TextDetailFragment : BaseFragment() {
         }
 
         override fun onMoreClick(item: MembersPostCommentItem) {
-            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
+            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener, true).also {
                 it.show(
                     requireActivity().supportFragmentManager,
                     MoreDialogFragment::class.java.simpleName
@@ -369,12 +369,13 @@ class TextDetailFragment : BaseFragment() {
     }
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-        override fun onProblemReport(item: BaseMemberPostItem) {
+        override fun onProblemReport(item: BaseMemberPostItem, isComment:Boolean) {
             moreDialog?.dismiss()
             checkStatus {
                 (requireActivity() as MainActivity).showReportDialog(
                     item,
-                    memberPostItem
+                    memberPostItem,
+                    isComment
                 )
             }
         }

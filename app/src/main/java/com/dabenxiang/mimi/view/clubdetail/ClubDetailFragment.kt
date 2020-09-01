@@ -24,6 +24,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
+import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -71,7 +72,7 @@ class ClubDetailFragment : BaseFragment() {
         super.setupFirstTime()
 
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        viewModel.adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
+        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
 
         setUpUI()
     }
@@ -203,7 +204,32 @@ class ClubDetailFragment : BaseFragment() {
                 item,
                 ArrayList(items),
                 onEdit = {
-                    // TODO #1180
+                    val bundle = Bundle()
+                    bundle.putBoolean(MyPostFragment.EDIT, true)
+                    bundle.putString(BasePostFragment.PAGE, BasePostFragment.ADULT)
+                    bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+
+                    it as MemberPostItem
+                    when (item.type) {
+                        PostType.TEXT -> {
+                            findNavController().navigate(
+                                R.id.action_clubDetailFragment_to_postArticleFragment,
+                                bundle
+                            )
+                        }
+                        PostType.IMAGE -> {
+                            findNavController().navigate(
+                                R.id.action_clubDetailFragment_to_postPicFragment,
+                                bundle
+                            )
+                        }
+                        PostType.VIDEO -> {
+                            findNavController().navigate(
+                                R.id.action_clubDetailFragment_to_postVideoFragment,
+                                bundle
+                            )
+                        }
+                    }
                 }
             )
         }

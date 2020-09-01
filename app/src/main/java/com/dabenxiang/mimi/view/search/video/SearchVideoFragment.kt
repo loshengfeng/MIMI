@@ -47,10 +47,16 @@ class SearchVideoFragment : BaseFragment() {
         const val REQUEST_LOGIN = 1000
         const val KEY_DATA = "data"
 
-        fun createBundle(title: String = "", tag: String = "", isAdult: Boolean = false): Bundle {
+        fun createBundle(
+            title: String = "",
+            tag: String = "",
+            category: String = "",
+            isAdult: Boolean = false
+        ): Bundle {
             val data = SearchingVideoItem()
             data.title = title
             data.tag = tag
+            data.category = category
             data.isAdult = isAdult
 
             return Bundle().also {
@@ -80,13 +86,13 @@ class SearchVideoFragment : BaseFragment() {
         requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
 
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        viewModel.adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
+        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
 
         viewModel.isAdult = mainViewModel?.adultMode?.value ?: false
 
         (arguments?.getSerializable(KEY_DATA) as SearchingVideoItem?)?.also { data ->
             Timber.d("key data from args is title: ${data.title}, tag: ${data.tag} and isAdult: ${data.isAdult}")
-            if (arguments?.getBoolean(KEY_IS_FROM_PLAYER) == true){
+            if (arguments?.getBoolean(KEY_IS_FROM_PLAYER) == true) {
                 viewModel.isAdult = data.isAdult
                 useAdultTheme(viewModel.isAdult)
             }
@@ -95,6 +101,8 @@ class SearchVideoFragment : BaseFragment() {
                 viewModel.searchingTag = data.tag
                 viewModel.getSearchList()
             }
+
+            viewModel.category = data.category
 
             if (TextUtils.isEmpty(viewModel.searchingTag) && TextUtils.isEmpty(viewModel.searchingStr)) {
                 layout_search_history.visibility = View.VISIBLE
@@ -427,9 +435,14 @@ class SearchVideoFragment : BaseFragment() {
     }
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-        override fun onProblemReport(item: BaseMemberPostItem) {
+        override fun onProblemReport(item: BaseMemberPostItem, isComment: Boolean) {
             moreDialog?.dismiss()
-            checkStatus { (requireActivity() as MainActivity).showReportDialog(item) }
+            checkStatus {
+                (requireActivity() as MainActivity).showReportDialog(
+                    item,
+                    isComment = isComment
+                )
+            }
         }
 
         override fun onCancel() {

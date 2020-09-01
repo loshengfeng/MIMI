@@ -124,6 +124,15 @@
         <action
             android:id="@+id/action_to_loginFragment"
             app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_searchPostFragment_to_postArticleFragment"
+            app:destination="@id/postArticleFragment" />
+        <action
+            android:id="@+id/action_searchPostFragment_to_postPicFragment"
+            app:destination="@id/postPicFragment" />
+        <action
+            android:id="@+id/action_searchPostFragment_to_postVideoFragment"
+            app:destination="@id/postVideoFragment" />
     </fragment>
 
     <fragment
@@ -161,6 +170,11 @@
             android:id="@+id/action_postArticleFragment_to_adultHomeFragment"
             app:destination="@id/adultHomeFragment"
             app:popUpTo="@+id/adultHomeFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_postArticleFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment"
+            app:popUpTo="@+id/searchPostFragment"
             app:popUpToInclusive="true" />
     </fragment>
 
@@ -221,6 +235,11 @@
             app:destination="@id/adultHomeFragment"
             app:popUpTo="@+id/adultHomeFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_postPicFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment"
+            app:popUpTo="@+id/searchPostFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -238,6 +257,11 @@
             android:id="@+id/action_postVideoFragment_to_adultHomeFragment"
             app:destination="@+id/adultHomeFragment"
             app:popUpTo="@+id/adultHomeFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_postVideoFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment"
+            app:popUpTo="@+id/searchPostFragment"
             app:popUpToInclusive="true" />
     </fragment>
     <fragment
