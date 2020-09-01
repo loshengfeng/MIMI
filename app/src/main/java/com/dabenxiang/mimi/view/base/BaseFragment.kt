@@ -645,7 +645,10 @@ abstract class BaseFragment : Fragment() {
     }
 
     private fun resetAndCancelJob(t: Throwable = Throwable(), msg: String = "") {
-        onApiError(t)
+        if (t.message != null) {
+            onApiError(t)
+        }
+
         mainViewModel?.cancelJob()
         snackBar?.dismiss()
         uploadCurrentPicPosition = 0
