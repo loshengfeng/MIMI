@@ -323,8 +323,14 @@ class VideoTrimmer @JvmOverloads constructor(context: Context, attrs: AttributeS
                 mEndPosition = (mDuration * value / 100L)
             }
         }
-        setTimeFrames()
         mTimeVideo = mEndPosition - mStartPosition
+
+        if((mTimeVideo > mMaxDuration)) {
+            val outOfPositionRange = mTimeVideo - mMaxDuration
+            mEndPosition -= outOfPositionRange
+            mTimeVideo = mEndPosition - mStartPosition
+        }
+        setTimeFrames()
     }
 
     private fun onStopSeekThumbs() {

@@ -489,8 +489,9 @@ dependencies {
     implementation project(path: ':domain_libs')
 
     // Video Editor
-    implementation 'org.cks.utils.video:video-editor:0.0.3'
+//    implementation 'org.cks.utils.video:video-editor:0.0.3'
     implementation 'org.cks.ffmpeg:FFmpegAndroid:0.3.3'
+    implementation project(path: ':video-editor')
 
     //Video compressor
     implementation project(path: ':videocompressor')
