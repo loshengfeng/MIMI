@@ -89,18 +89,6 @@ class ClipFragment : BaseFragment() {
             }
         })
 
-        viewModel.bitmapResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Loading -> progressHUD?.show()
-                is Loaded -> progressHUD?.dismiss()
-                is Success -> rv_third.adapter?.notifyItemChanged(
-                    it.result,
-                    ClipAdapter.PAYLOAD_UPDATE_UI
-                )
-                is Error -> onApiError(it.throwable)
-            }
-        })
-
         viewModel.followResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Loading -> progressHUD?.show()
@@ -156,7 +144,7 @@ class ClipFragment : BaseFragment() {
                 position,
                 ClipFuncItem(
                     { id, pos -> getClip(id, pos) },
-                    { id, pos -> getBitmap(id, pos) },
+                    { id, view, type -> viewModel.loadImage(id, view, type) },
                     { item, pos, isFollow -> onFollowClick(item, pos, isFollow) },
                     { item, pos, isFavorite -> onFavoriteClick(item, pos, isFavorite) },
                     { item, pos, isLike -> onLikeClick(item, pos, isLike) },
@@ -213,11 +201,6 @@ class ClipFragment : BaseFragment() {
     private fun getClip(id: String, pos: Int) {
         Timber.d("getClip, id: $id, position: $pos")
         viewModel.getClip(id, pos)
-    }
-
-    private fun getBitmap(id: String, pos: Int) {
-        Timber.d("getCover, id: $id, position: $pos")
-        viewModel.getBitmap(id, pos)
     }
 
     private fun onFollowClick(item: MemberPostItem, pos: Int, isFollow: Boolean) {

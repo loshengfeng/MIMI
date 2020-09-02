@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.mypost
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -15,10 +16,10 @@ import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.adapter.MyPostPagedAdapter
-import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
@@ -28,7 +29,6 @@ import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.MY_POST
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.PAGE
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_my_post.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import timber.log.Timber
@@ -123,45 +123,6 @@ class MyPostFragment : BaseFragment() {
 
         viewModel.myPostItemListResult.observe(viewLifecycleOwner, Observer {
             adapter.submitList(it)
-        })
-
-        viewModel.attachmentByTypeResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Success -> {
-                    val attachmentItem = it.result
-                    LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
-
-                    when (attachmentItem.type) {
-                        AttachmentType.ADULT_TAB_CLIP,
-                        AttachmentType.ADULT_TAB_PICTURE,
-                        AttachmentType.ADULT_TAB_TEXT -> {
-                            adapter.notifyItemChanged(attachmentItem.position!!)
-                        }
-                        else -> {
-                        }
-                    }
-
-                }
-                is Error -> Timber.e(it.throwable)
-            }
-        })
-
-        viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Success -> {
-                    val attachmentItem = it.result
-                    LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
-                    when (val holder =
-                        adapter.viewHolderMap[attachmentItem.parentPosition]) {
-                        is PicturePostHolder -> {
-                            if (holder.pictureRecycler.tag == attachmentItem.parentPosition) {
-                                adapter.updateInternalItem(holder)
-                            }
-                        }
-                    }
-                }
-                is Error -> Timber.e(it.throwable)
-            }
         })
 
         viewModel.likePostResult.observe(viewLifecycleOwner, Observer {
@@ -263,12 +224,11 @@ class MyPostFragment : BaseFragment() {
     }
 
     private val attachmentListener = object : AttachmentListener {
-        override fun onGetAttachment(id: String, position: Int, type: AttachmentType) {
-            viewModel.getAttachment(id, position, type)
+        override fun onGetAttachment(id: Long?, view:ImageView, type:LoadImageType) {
+            viewModel.loadImage(id, view, type)
         }
 
         override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
-            viewModel.getAttachment(id, parentPosition, position)
         }
     }
 
@@ -388,12 +348,8 @@ class MyPostFragment : BaseFragment() {
     private val memberPostFuncItem by lazy {
         MemberPostFuncItem(
             {},
-            { id, function -> getBitmap(id, function) },
+            { id, view, type -> viewModel.loadImage(id, view, type) },
             { _, _, _, _ -> }
         )
-    }
-
-    private fun getBitmap(id: String, update: ((String) -> Unit)) {
-        viewModel.getBitmap(id, update)
     }
 }

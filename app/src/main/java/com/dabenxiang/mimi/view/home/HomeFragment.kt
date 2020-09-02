@@ -302,7 +302,7 @@ class HomeFragment : BaseFragment() {
     private val memberPostFuncItem by lazy {
         MemberPostFuncItem(
             {},
-            { id, function -> getBitmap(id, function) },
+            { id, view, type -> viewModel.loadImage(id, view, type) },
             { _, _, _, _ -> }
         )
     }
@@ -397,11 +397,6 @@ class HomeFragment : BaseFragment() {
             GeneralUtils.openWebView(requireContext(), item.url)
         }
     }
-
-    private fun getBitmap(id: String, update: ((String) -> Unit)) {
-        viewModel.getBitmap(id, update)
-    }
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

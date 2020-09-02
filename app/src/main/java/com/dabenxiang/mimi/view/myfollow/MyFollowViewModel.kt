@@ -7,15 +7,12 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.MyFollowPagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
-import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -28,9 +25,6 @@ class MyFollowViewModel : BaseViewModel() {
 
     private val _memberCount = MutableLiveData<Int>()
     val memberCount: LiveData<Int> = _memberCount
-
-    private var _attachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
-    val attachmentResult: LiveData<ApiResult<AttachmentItem>> = _attachmentResult
 
     private val _clubDetail = MutableLiveData<ApiResult<MemberClubItem>>()
     val clubDetail: LiveData<ApiResult<MemberClubItem>> = _clubDetail
@@ -102,29 +96,6 @@ class MyFollowViewModel : BaseViewModel() {
         override fun onIdList(list: ArrayList<Long>, isInitial: Boolean) {
             if (isInitial) _clubIdList.clear()
             _clubIdList.addAll(list)
-        }
-    }
-
-    fun getAttachment(id: String, position: Int) {
-        if(id == LruCacheUtils.ZERO_ID) return
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository().getAttachment(id)
-                if (!result.isSuccessful) throw HttpException(result)
-                val byteArray = result.body()?.bytes()
-                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
-                val item = AttachmentItem(
-                    id = id,
-                    bitmap = bitmap,
-                    position = position
-                )
-                emit(ApiResult.success(item))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _attachmentResult.value = it }
         }
     }
 

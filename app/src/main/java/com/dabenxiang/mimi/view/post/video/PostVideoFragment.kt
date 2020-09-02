@@ -14,6 +14,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.PostVideoItemListener
 import com.dabenxiang.mimi.model.api.vo.MediaItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.PostVideoAttachment
 import com.dabenxiang.mimi.model.vo.SearchPostItem
@@ -55,7 +56,8 @@ class PostVideoFragment : BasePostFragment() {
     override fun initSettings() {
         adapter = ScrollVideoAdapter(postPicItemListener)
         adapter.submitList(videoAttachmentList)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
+        recyclerView.layoutManager =
+            LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         recyclerView.adapter = adapter
 
         tv_clean.isEnabled = true
@@ -76,7 +78,8 @@ class PostVideoFragment : BasePostFragment() {
             }
 
             if (videoAttachmentList.isEmpty()) {
-                Toast.makeText(requireContext(), R.string.post_warning_video, Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), R.string.post_warning_video, Toast.LENGTH_SHORT)
+                    .show()
                 return@setOnClickListener
             }
 
@@ -122,12 +125,18 @@ class PostVideoFragment : BasePostFragment() {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
             bundle.putSerializable(SearchPostFragment.KEY_DATA, searchPostItem)
-            findNavController().navigate(R.id.action_postVideoFragment_to_searchPostFragment, bundle)
+            findNavController().navigate(
+                R.id.action_postVideoFragment_to_searchPostFragment,
+                bundle
+            )
         } else if (isEdit && page == CLUB) {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
             bundle.putSerializable(SearchPostFragment.KEY_DATA, searchPostItem)
-            findNavController().navigate(R.id.action_postVideoFragment_to_clubDetailFragment, bundle)
+            findNavController().navigate(
+                R.id.action_postVideoFragment_to_clubDetailFragment,
+                bundle
+            )
         } else {
             findNavController().navigate(R.id.action_postVideoFragment_to_adultHomeFragment, bundle)
         }
@@ -164,7 +173,7 @@ class PostVideoFragment : BasePostFragment() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (resultCode == RESULT_OK) {
-            when(requestCode) {
+            when (requestCode) {
                 REQUEST_VIDEO_CAPTURE -> {
                     handTakeVideo(data)
                 }
@@ -187,19 +196,22 @@ class PostVideoFragment : BasePostFragment() {
 
                 bundle.putBoolean(MyPostFragment.EDIT, true)
                 bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
-                findNavController().navigate(R.id.action_postVideoFragment_to_editVideoFragment2, bundle)
+                findNavController().navigate(
+                    R.id.action_postVideoFragment_to_editVideoFragment2,
+                    bundle
+                )
 
             } else {
-                findNavController().navigate(R.id.action_postVideoFragment_to_editVideoFragment, bundle)
+                findNavController().navigate(
+                    R.id.action_postVideoFragment_to_editVideoFragment,
+                    bundle
+                )
             }
         } else {
-            Toast.makeText(requireContext(), R.string.post_video_length_error, Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.post_video_length_error, Toast.LENGTH_SHORT)
+                .show()
 
         }
-    }
-
-    private fun getBitmap(id: String, update: ((String) -> Unit)) {
-        viewModel.getBitmap(id, update)
     }
 
     private fun openRecorder() {
@@ -208,7 +220,7 @@ class PostVideoFragment : BasePostFragment() {
 
     private fun deleteVideo(item: PostVideoAttachment) {
         deleteVideoList.clear()
-        if (item.videoAttachmentId ==  videoAttachmentList[0].videoAttachmentId) {
+        if (item.videoAttachmentId == videoAttachmentList[0].videoAttachmentId) {
             deleteVideoList.add(item)
         }
 
@@ -217,7 +229,7 @@ class PostVideoFragment : BasePostFragment() {
 
     private val postPicItemListener by lazy {
         PostVideoItemListener(
-            { id, function -> getBitmap(id, function) },
+            { id, view -> viewModel.loadImage(id, view, LoadImageType.THUMBNAIL) },
             { openRecorder() },
             { item -> deleteVideo(item) },
             { viewerItem -> openViewerPage(viewerItem) }
@@ -232,12 +244,23 @@ class PostVideoFragment : BasePostFragment() {
 
     private fun setVideoTime() {
         if (videoAttachmentList[0].videoAttachmentId.isBlank()) {
-            val timeInMillisec = PostManager().getVideoTime(Uri.parse(videoAttachmentList[0].videoUrl), requireContext())
+            val timeInMillisec = PostManager().getVideoTime(
+                Uri.parse(videoAttachmentList[0].videoUrl),
+                requireContext()
+            )
 
-            val length = String.format("%02d:%02d:%02d",
+            val length = String.format(
+                "%02d:%02d:%02d",
                 TimeUnit.MILLISECONDS.toHours(timeInMillisec),
-                TimeUnit.MILLISECONDS.toMinutes(timeInMillisec) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(timeInMillisec)),
-                TimeUnit.MILLISECONDS.toSeconds(timeInMillisec) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(timeInMillisec)))
+                TimeUnit.MILLISECONDS.toMinutes(timeInMillisec) - TimeUnit.HOURS.toMinutes(
+                    TimeUnit.MILLISECONDS.toHours(
+                        timeInMillisec
+                    )
+                ),
+                TimeUnit.MILLISECONDS.toSeconds(timeInMillisec) - TimeUnit.MINUTES.toSeconds(
+                    TimeUnit.MILLISECONDS.toMinutes(timeInMillisec)
+                )
+            )
             videoAttachmentList[0].length = length
         }
     }

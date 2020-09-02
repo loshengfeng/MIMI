@@ -121,17 +121,16 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private fun checkPageState() {
-        when(lastPosition){
-            2-> {
-                if(accountManager.isLogin()) {
+        when (lastPosition) {
+            2 -> {
+                if (accountManager.isLogin()) {
                     Timber.i("isLogin")
                     showNoLoginToggle(false)
                     refresh.isRefreshing
                     getData(lastPosition)
-                }
-                else  showNoLoginToggle(true)
+                } else showNoLoginToggle(true)
             }
-            else  -> showNoLoginToggle(false)
+            else -> showNoLoginToggle(false)
         }
     }
 
@@ -396,10 +395,10 @@ class AdultHomeFragment : BaseFragment() {
             }
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_homeFragment_to_searchPostFragment,
-                            bundle
-                    )
+                NavigateItem.Destination(
+                    R.id.action_homeFragment_to_searchPostFragment,
+                    bundle
+                )
             )
         }
 
@@ -474,8 +473,8 @@ class AdultHomeFragment : BaseFragment() {
         refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
     }
 
-    private fun showNoLoginToggle(isShow:Boolean){
-        if(isShow){
+    private fun showNoLoginToggle(isShow: Boolean) {
+        if (isShow) {
             cl_no_login.visibility = View.VISIBLE
             cl_no_data.visibility = View.GONE
             refresh.visibility = View.GONE
@@ -485,7 +484,7 @@ class AdultHomeFragment : BaseFragment() {
         }
     }
 
-    private fun showLoginDialog(){
+    private fun showLoginDialog() {
         loginDialog?.dismiss()
         loginDialog = LoginRequestDialog.newInstance(object : OnLoginRequestDialogListener {
             override fun onRegister() {
@@ -572,7 +571,7 @@ class AdultHomeFragment : BaseFragment() {
                         followPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
                             ?.let { View.GONE } ?: let { View.VISIBLE }
                 }
-                takeIf{ !accountManager.isLogin() }?.also {
+                takeIf { !accountManager.isLogin() }?.also {
                     showNoLoginToggle(true)
                     showLoginDialog()
                 }
@@ -748,7 +747,7 @@ class AdultHomeFragment : BaseFragment() {
     private val memberPostFuncItem by lazy {
         MemberPostFuncItem(
             {},
-            { id, func -> getBitmap(id, func) },
+            { id, view, type -> viewModel.loadImage(id, view, type) },
             { item, items, isFollow, func -> followMember(item, items, isFollow, func) },
             { item, isLike, func -> likePost(item, isLike, func) },
             { item, isFavorite, func -> favoritePost(item, isFavorite, func) }
@@ -758,7 +757,7 @@ class AdultHomeFragment : BaseFragment() {
     private val clubFuncItem by lazy {
         ClubFuncItem(
             { item -> onItemClick(item) },
-            { id, function -> getBitmap(id, function) },
+            { id, view, type -> viewModel.loadImage(id, view, type) },
             { item, isFollow, function -> clubFollow(item, isFollow, function) })
     }
 
@@ -1070,10 +1069,6 @@ class AdultHomeFragment : BaseFragment() {
     private fun onItemClick(item: MemberClubItem) {
         val bundle = ClubDetailFragment.createBundle(item)
         findNavController().navigate(R.id.action_adultHomeFragment_to_clubDetailFragment, bundle)
-    }
-
-    private fun getBitmap(id: String, update: ((String) -> Unit)) {
-        viewModel.getBitmap(id, update)
     }
 
     private fun followMember(

@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.clip
 
-import android.text.TextUtils
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -8,13 +7,12 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.manager.AccountManager
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_clip.view.*
@@ -52,14 +50,7 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view), KoinComponent 
         tvLike.text = item.likeCount.toString()
         tvComment.text = item.commentCount.toString()
 
-        item.avatarAttachmentId.toString()
-            .takeIf { !TextUtils.isEmpty(it) && it != LruCacheUtils.ZERO_ID }?.also { id ->
-            LruCacheUtils.getLruCache(id)?.also { bitmap ->
-                Glide.with(ivHead.context).load(bitmap).circleCrop().into(ivHead)
-            } ?: run { clipFuncItem.getBitmap(id, pos) }
-        } ?: run {
-            Glide.with(ivHead.context).load(R.drawable.default_profile_picture).circleCrop().into(ivHead)
-        }
+        clipFuncItem.getBitmap(item.avatarAttachmentId, ivHead, LoadImageType.AVATAR)
 
         var contentItem: MediaContentItem? = null
         try {
@@ -67,23 +58,11 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view), KoinComponent 
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        contentItem?.images?.takeIf { it.isNotEmpty() }?.also { images ->
-            images[0].also { image ->
-                if (TextUtils.isEmpty(image.url)) {
-                    image.id.takeIf { !TextUtils.isEmpty(it) && it != LruCacheUtils.ZERO_ID }
-                        ?.also { id ->
-                            LruCacheUtils.getLruCache(id)?.also { bitmap ->
-                                Glide.with(ivCover.context).load(bitmap).into(ivCover)
-                            } ?: run { clipFuncItem.getBitmap(id, pos) }
-                        } ?: run {
-                        Glide.with(ivCover.context).load(R.drawable.img_nopic_03).into(ivCover)
-                    }
-                } else {
-                    Glide.with(ivCover.context)
-                        .load(image.url).placeholder(R.drawable.img_nopic_03).into(ivCover)
-                }
-            }
-        }
+        clipFuncItem.getBitmap(
+            contentItem?.images?.get(0)?.id?.toLongOrNull(),
+            ivCover,
+            LoadImageType.THUMBNAIL
+        )
 
         ibBack.setOnClickListener { clipFuncItem.onBackClick() }
 
@@ -106,6 +85,12 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view), KoinComponent 
         val isMe = accountManager.getProfile().userId == item.creatorId
         ivAdd.visibility = if (item.isFollow || isMe) View.GONE else View.VISIBLE
 
-        if (!isMe) clAvatar.setOnClickListener { clipFuncItem.onFollowClick(item, pos, !item.isFollow) }
+        if (!isMe) clAvatar.setOnClickListener {
+            clipFuncItem.onFollowClick(
+                item,
+                pos,
+                !item.isFollow
+            )
+        }
     }
 }

@@ -1,17 +1,15 @@
 package com.dabenxiang.mimi.view.picturedetail
 
 import android.content.Context
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ImageItem
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.picturedetail.viewholder.PictureGridViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 
 class PhotoGridAdapter(
     val context: Context,
@@ -46,21 +44,7 @@ class PhotoGridAdapter(
             holder.cardView.layoutParams = cardParams
         }
 
-        if (!TextUtils.isEmpty(imageItem.url)) {
-            Glide.with(context)
-                .load(imageItem.url)
-                .placeholder(R.drawable.img_nopic_03)
-                .into(holder.picture)
-        } else {
-            if (LruCacheUtils.getLruCache(imageItem.id) == null) {
-                onPictureDetailListener.onGetAttachment(imageItem.id, position)
-            } else {
-                val bitmap = LruCacheUtils.getLruCache(imageItem.id)
-                Glide.with(context)
-                    .load(bitmap)
-                    .into(holder.picture)
-            }
-        }
+        onPictureDetailListener.onGetAttachment(imageItem.id.toLongOrNull(), holder.picture, LoadImageType.THUMBNAIL)
 
         if (position == 5) {
             holder.mask.visibility = View.VISIBLE

@@ -3,20 +3,16 @@ package com.dabenxiang.mimi.view.fullpicture
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import android.widget.ImageView
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult.Error
-import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.ImageItem
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseFragment
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_full_picture.*
-import timber.log.Timber
 
 class FullPictureFragment : BaseFragment() {
 
@@ -71,16 +67,6 @@ class FullPictureFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Success -> {
-                    val item = it.result
-                    LruCacheUtils.putLruCache(item.id!!, item.bitmap!!)
-                    adapter?.notifyItemChanged(item.position!!)
-                }
-                is Error -> onApiError(it.throwable)
-            }
-        })
     }
 
     override fun setupListeners() {
@@ -92,8 +78,8 @@ class FullPictureFragment : BaseFragment() {
     }
 
     private val onFullPictureListener = object : FullPictureAdapter.OnFullPictureListener {
-        override fun onGetAttachment(id: String, position: Int) {
-            viewModel.getAttachment(id, position)
+        override fun onGetAttachment(id: Long?, view: ImageView) {
+            viewModel.loadImage(id, view, LoadImageType.PICTURE)
         }
     }
 }

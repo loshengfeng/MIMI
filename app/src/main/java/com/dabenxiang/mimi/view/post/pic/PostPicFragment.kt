@@ -14,6 +14,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.PostPicItemListener
 import com.dabenxiang.mimi.model.api.vo.MediaItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.PostAttachmentItem
 import com.dabenxiang.mimi.model.vo.SearchPostItem
@@ -55,7 +56,8 @@ class PostPicFragment : BasePostFragment() {
     override fun initSettings() {
         adapter = ScrollPicAdapter(postPicItemListener)
         adapter.submitList(attachmentList)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
+        recyclerView.layoutManager =
+            LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         recyclerView.adapter = adapter
 
         tv_clean.isEnabled = true
@@ -77,7 +79,8 @@ class PostPicFragment : BasePostFragment() {
             }
 
             if (adapter.getData().isEmpty()) {
-                Toast.makeText(requireContext(), R.string.post_warning_pic, Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), R.string.post_warning_pic, Toast.LENGTH_SHORT)
+                    .show()
                 return@setOnClickListener
             }
 
@@ -139,9 +142,12 @@ class PostPicFragment : BasePostFragment() {
             val postAttachmentItem = PostAttachmentItem(uri = uri!!)
             attachmentList.add(postAttachmentItem)
         }
-        txt_picCount.text = String.format(getString(R.string.select_pic_count, attachmentList.size,
-            PHOTO_LIMIT
-        ))
+        txt_picCount.text = String.format(
+            getString(
+                R.string.select_pic_count, attachmentList.size,
+                PHOTO_LIMIT
+            )
+        )
     }
 
     override fun setUI(item: MediaItem) {
@@ -152,18 +158,24 @@ class PostPicFragment : BasePostFragment() {
             attachmentList.add(postAttachmentItem)
         }
 
-        txt_picCount.text = String.format(getString(R.string.select_pic_count, attachmentList.size,
-            PHOTO_LIMIT
-        ))
+        txt_picCount.text = String.format(
+            getString(
+                R.string.select_pic_count, attachmentList.size,
+                PHOTO_LIMIT
+            )
+        )
     }
 
     private fun updateCountPicView() {
         attachmentList.clear()
         attachmentList.addAll(adapter.getData())
         adapter.notifyDataSetChanged()
-        txt_picCount.text = String.format(getString(R.string.select_pic_count, attachmentList.size,
-            PHOTO_LIMIT
-        ))
+        txt_picCount.text = String.format(
+            getString(
+                R.string.select_pic_count, attachmentList.size,
+                PHOTO_LIMIT
+            )
+        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -205,16 +217,12 @@ class PostPicFragment : BasePostFragment() {
 
     private val postPicItemListener by lazy {
         PostPicItemListener(
-            { id, function -> getBitmap(id, function) },
+            { id, view -> viewModel.loadImage(id, view, LoadImageType.THUMBNAIL) },
             { item -> handleDeletePic(item) },
             { updateCountPicView() },
             { addPic() },
             { viewerItem -> openViewerPage(viewerItem) }
         )
-    }
-
-    private fun getBitmap(id: String, update: ((String) -> Unit)) {
-        viewModel.getBitmap(id, update)
     }
 
     private fun handleDeletePic(item: PostAttachmentItem) {

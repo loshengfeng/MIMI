@@ -1,12 +1,10 @@
 package com.dabenxiang.mimi.view.club
 
-import android.text.TextUtils
 import android.view.View
-import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_club_member.view.*
 
 /**
@@ -52,29 +50,12 @@ class ClubMemberViewHolder(view: View) : BaseViewHolder(view) {
             rvPost.adapter = ClubMemberPostAdapter(rvPost.context, item.posts, item, clubFuncItem)
         }
 
-        item.avatarAttachmentId.toString()
-            .takeIf { !TextUtils.isEmpty(it) && it != LruCacheUtils.ZERO_ID }?.also { id ->
-            LruCacheUtils.getLruCache(id)?.also { bitmap ->
-                Glide.with(ivAvatar.context).load(bitmap).circleCrop().into(ivAvatar)
-            } ?: run {
-                ivAvatar.tag = id
-                clubFuncItem.getBitmap(item.avatarAttachmentId.toString()) { id -> updateAvatar(id) }
-            }
-        } ?: run {
-            Glide.with(ivAvatar.context)
-                .load(ivAvatar.context.getDrawable(R.drawable.img_avatar_a_01)).centerCrop()
-                .into(ivAvatar)
+        item.avatarAttachmentId.also {id->
+            clubFuncItem.getBitmap(id, ivAvatar, LoadImageType.AVATAR)
         }
 
         clMemberPost.setOnClickListener {
             clubFuncItem.onItemClick(item)
-        }
-    }
-
-    private fun updateAvatar(id: String) {
-        takeIf { ivAvatar.tag == id }?.also {
-            val bitmap = LruCacheUtils.getLruCache(id)
-            Glide.with(ivAvatar.context).load(bitmap).circleCrop().into(ivAvatar)
         }
     }
 

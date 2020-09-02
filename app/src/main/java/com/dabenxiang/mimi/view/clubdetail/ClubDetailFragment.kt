@@ -92,7 +92,7 @@ class ClubDetailFragment : BaseFragment() {
         viewPager.adapter =
             ClubPagerAdapter(
                 ClubDetailFuncItem({ orderBy, function -> getPost(orderBy, function) },
-                    { id, function -> getBitmap(id, function) },
+                    { id, view, resId -> viewModel.loadImage(id,view,resId) },
                     { item, items, isFollow, func -> followMember(item, items, isFollow, func) },
                     { item, isLike, func -> likePost(item, isLike, func) }),
                 adultListener
@@ -319,10 +319,6 @@ class ClubDetailFragment : BaseFragment() {
 
     private fun getPost(orderBy: OrderBy, update: ((PagedList<MemberPostItem>) -> Unit)) {
         viewModel.getMemberPosts(memberClubItem.tag, orderBy, update)
-    }
-
-    private fun getBitmap(id: String, update: ((String) -> Unit)) {
-        viewModel.getBitmap(id, update)
     }
 
     private fun followMember(

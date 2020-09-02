@@ -6,7 +6,6 @@ import android.os.Environment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.AvatarRequest
 import com.dabenxiang.mimi.model.api.vo.EmailRequest
@@ -15,7 +14,6 @@ import com.dabenxiang.mimi.model.api.vo.ProfileRequest
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.FileUtil
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -45,14 +43,11 @@ class SettingViewModel : BaseViewModel() {
     private val _postResult = MutableLiveData<ApiResult<Long>>()
     val postResult: LiveData<ApiResult<Long>> = _postResult
 
-    private val _putResult = MutableLiveData<ApiResult<Nothing>>()
-    val putResult: LiveData<ApiResult<Nothing>> = _putResult
+    private val _putResult = MutableLiveData<ApiResult<Long>>()
+    val putResult: LiveData<ApiResult<Long>> = _putResult
 
     private val _isBinding: MutableLiveData<Boolean> = MutableLiveData()
     val isBinding: MutableLiveData<Boolean> = _isBinding
-
-    private val _imageBitmap = MutableLiveData<ApiResult<Bitmap>>()
-    val imageBitmap: LiveData<ApiResult<Bitmap>> = _imageBitmap
 
     var profileData: ProfileItem? = null
 
@@ -62,38 +57,12 @@ class SettingViewModel : BaseViewModel() {
                 val result = domainManager.getApiRepository().getProfile()
                 if (!result.isSuccessful) throw HttpException(result)
                 profileData = result.body()?.content
-                profileData?.let {
-                    it.avatarAttachmentId?.also { id ->
-                        LruCacheUtils.getLruCache(id.toString())?.also { bitmap ->
-                            _imageBitmap.value = ApiResult.success(bitmap)
-                        } ?: getAttachment(id)
-                    }
-                }
                 emit(ApiResult.success(result.body()?.content))
             }
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _profileItem.value = it }
-        }
-    }
-
-    fun getAttachment(id: Long) {
-        if (id.toString() == LruCacheUtils.ZERO_ID) return
-        viewModelScope.launch {
-            flow {
-                val apiRepository = domainManager.getApiRepository()
-                val result = apiRepository.getAttachment(id.toString())
-                if (!result.isSuccessful) throw HttpException(result)
-                val byteArray = result.body()?.bytes()
-                accountManager.setupMeAvatarCache(byteArray)
-                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
-                emit(ApiResult.success(bitmap))
-            }
-                .onStart { emit(ApiResult.loading()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .collect { _imageBitmap.value = it }
         }
     }
 
@@ -168,7 +137,7 @@ class SettingViewModel : BaseViewModel() {
             flow {
                 val result = domainManager.getApiRepository().putAvatar(AvatarRequest(id))
                 if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(null))
+                emit(ApiResult.success(id))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
@@ -176,13 +145,6 @@ class SettingViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect {
                     _putResult.value = it
-                    when (it) {
-                        is ApiResult.Empty -> {
-                            LruCacheUtils.getLruCache(id.toString())?.also { bitmap ->
-                                _imageBitmap.value = ApiResult.success(bitmap)
-                            } ?: getAttachment(id)
-                        }
-                    }
                 }
         }
     }

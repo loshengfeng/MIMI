@@ -10,12 +10,9 @@ import com.dabenxiang.mimi.model.api.ApiRepository.Companion.NETWORK_PAGE_SIZE
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.OrderType
-import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.chathistory.ChatHistoryListDataSource
 import com.dabenxiang.mimi.view.chathistory.ChatHistoryListFactory
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -103,61 +100,6 @@ class OrderViewModel : BaseViewModel() {
             getChatHistoryPagingItems().asFlow()
                 .collect {
                     updateList(it)
-                }
-        }
-    }
-
-    fun getAttachment(id: String, position: Int, update: (Int) -> Unit) {
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository().getAttachment(id)
-                if (!result.isSuccessful) throw HttpException(result)
-                val byteArray = result.body()?.bytes()
-                val item = AttachmentItem(
-                    id = id,
-                    fileArray = byteArray,
-                    position = position
-                )
-                emit(ApiResult.success(item))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect {
-                    when(it) {
-                        is ApiResult.Success -> {
-                            val attachmentItem = it.result
-                            LruCacheUtils.putLruArrayCache(
-                                attachmentItem.id ?: "",
-                                attachmentItem.fileArray ?: ByteArray(0)
-                            )
-                            update(attachmentItem.position ?: 0)
-                        }
-                    }
-                }
-        }
-    }
-
-    fun getProxyAttachment(id: String, update: (String) -> Unit) {
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository().getAttachment(id)
-                if (!result.isSuccessful) throw HttpException(result)
-                val byteArray = result.body()?.bytes()
-                LruCacheUtils.putLruArrayCache(id, byteArray ?: ByteArray(0))
-                emit(ApiResult.success(null))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect {
-                    when (it) {
-                        is ApiResult.Empty -> {
-                            update(id)
-                        }
-                    }
                 }
         }
     }

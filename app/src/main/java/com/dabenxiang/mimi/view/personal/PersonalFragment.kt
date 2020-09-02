@@ -8,14 +8,10 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
-import com.bumptech.glide.Priority
-import com.bumptech.glide.load.MultiTransformation
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.CircleCrop
-import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
@@ -70,24 +66,7 @@ class PersonalFragment : BaseFragment() {
 //                    takeUnless { meItem.isEmailConfirmed == true }?.run {
 //                        (requireActivity() as MainActivity).showEmailConfirmDialog()
 //                    }
-                }
-                is Error -> onApiError(it.throwable)
-            }
-        })
-
-        viewModel.imageBitmap.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Loading -> progressHUD?.show()
-                is Loaded -> progressHUD?.dismiss()
-                is Success -> {
-                    val options: RequestOptions = RequestOptions()
-                        .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                        .placeholder(R.drawable.default_profile_picture)
-                        .error(R.drawable.default_profile_picture)
-                        .priority(Priority.NORMAL)
-                    Glide.with(this).load(it.result)
-                        .apply(options)
-                        .into(iv_photo)
+                    viewModel.loadImage(meItem.avatarAttachmentId, iv_photo, LoadImageType.AVATAR)
                 }
                 is Error -> onApiError(it.throwable)
             }

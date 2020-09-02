@@ -6,14 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.EditVideoAdapterListener
 import com.dabenxiang.mimi.callback.PostVideoItemListener
 import com.dabenxiang.mimi.model.vo.PostVideoAttachment
 import com.dabenxiang.mimi.model.vo.ViewerItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_pic.view.*
 
 class ScrollVideoAdapter(private val listener: PostVideoItemListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -95,16 +92,7 @@ class ScrollVideoAdapter(private val listener: PostVideoItemListener) : Recycler
                 imgPic.setImageURI(uriP)
                 viewItem.url = postVideoAttachment.picUrl
             } else {
-                if (LruCacheUtils.getLruCache(postVideoAttachment.picAttachmentId) == null) {
-                    listener.getBitmap(postVideoAttachment.picAttachmentId) { id ->
-                        val bitmap = LruCacheUtils.getLruCache(id)
-                        Glide.with(context).load(bitmap).into(imgPic)
-                    }
-                } else {
-                    val bitmap = LruCacheUtils.getLruCache(postVideoAttachment.picAttachmentId)
-                    Glide.with(context).load(bitmap).into(imgPic)
-                }
-
+                listener.getBitmap(postVideoAttachment.picAttachmentId.toLongOrNull(),imgPic)
                 viewItem.attachmentId = postVideoAttachment.picAttachmentId
             }
 

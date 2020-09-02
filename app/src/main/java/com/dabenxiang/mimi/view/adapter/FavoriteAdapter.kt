@@ -4,14 +4,15 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
-import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.FunctionType
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_ADULT
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_NORMAL
 import com.dabenxiang.mimi.view.favroite.FavoritePlayViewHolder
@@ -45,7 +46,7 @@ class FavoriteAdapter(
         )
 
         fun onChipClick(text: String, type: Int? = -1)
-        fun onGetAttachment(id: String, position: Int, type: AttachmentType)
+        fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType)
         fun onAvatarClick(userId: Long, name: String)
     }
 
@@ -57,19 +58,21 @@ class FavoriteAdapter(
         return when (viewType) {
             TYPE_NORMAL -> {
                 FavoritePlayViewHolder(
-                layoutInflater.inflate(
-                    R.layout.item_general_normal,
-                    parent,
-                    false
-                ), listener
-            )}
+                    layoutInflater.inflate(
+                        R.layout.item_general_normal,
+                        parent,
+                        false
+                    ), listener
+                )
+            }
             TYPE_ADULT ->
                 FavoritePlayViewHolder(
                     layoutInflater.inflate(
                         R.layout.item_favorite_normal,
                         parent,
                         false
-                    ), listener)
+                    ), listener
+                )
             else ->
                 FavoritePostViewHolder(
                     layoutInflater.inflate(
@@ -93,9 +96,10 @@ class FavoriteAdapter(
 
     override fun getItemViewType(position: Int): Int {
         val isPlayItem = getItem(position) is PlayItem
-        val item = if(isPlayItem) getItem(position) as PlayItem else getItem(position) as MemberPostItem
+        val item =
+            if (isPlayItem) getItem(position) as PlayItem else getItem(position) as MemberPostItem
         return when (isPlayItem) {
-            true -> if((item as PlayItem).isAdult!!) TYPE_ADULT else TYPE_NORMAL
+            true -> if ((item as PlayItem).isAdult!!) TYPE_ADULT else TYPE_NORMAL
             else -> TYPE_SHORT_VIDEO
         }
     }
