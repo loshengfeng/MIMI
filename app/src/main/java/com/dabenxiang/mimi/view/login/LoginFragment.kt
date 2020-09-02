@@ -179,7 +179,8 @@ class LoginFragment : BaseFragment() {
                             message = viewModel.accountManager.getProfile().friendlyName,
                             messageIcon = R.drawable.ico_default_photo,
                             secondBtn = getString(R.string.btn_confirm),
-                            secondBlock = { navigateTo(NavigateItem.Up) }
+                            secondBlock = { navigateTo(NavigateItem.Up) },
+                            attachmentId = viewModel.accountManager.getProfile().avatarAttachmentId
                         )
                     ).setCancel(false).show(requireActivity().supportFragmentManager)
                 }

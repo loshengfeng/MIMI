@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.model.manager
 
+import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ChangePasswordRequest
 import com.dabenxiang.mimi.model.api.vo.MeItem
@@ -10,10 +11,10 @@ import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.model.vo.ProfileItem
 import com.dabenxiang.mimi.model.vo.TokenItem
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import retrofit2.HttpException
-import timber.log.Timber
 import java.util.*
 
 class AccountManager(private val pref: Pref, private val domainManager: DomainManager) {
@@ -153,6 +154,16 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
                         isEmailConfirmed = meItem?.isEmailConfirmed ?: false
                     )
                 )
+            }
+
+            // get user photo
+            val attachmentId = getProfile().avatarAttachmentId.toString()
+            if(LruCacheUtils.getLruCache(attachmentId) == null) {
+                val attResult = domainManager.getApiRepository().getAttachment(attachmentId)
+                if (!attResult.isSuccessful) throw HttpException(attResult)
+                val byteArray = attResult.body()?.bytes()
+                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
+                LruCacheUtils.putLruCache(attachmentId, bitmap)
             }
 
             emit(ApiResult.success(null))

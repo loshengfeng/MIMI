@@ -6,9 +6,20 @@ import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.fragment.app.FragmentManager
+import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.load.MultiTransformation
+import com.bumptech.glide.load.model.GlideUrl
+import com.bumptech.glide.load.model.LazyHeaders
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_dialog_general.*
+import timber.log.Timber
 import java.io.Serializable
 import java.util.*
 
@@ -24,7 +35,8 @@ class GeneralDialogData(
     val secondBtn: String = "",
     val secondBlock: (() -> Unit)? = null,
     val closeBlock: (() -> Unit)? = null,
-    val isMessageIcon: Boolean = true
+    val isMessageIcon: Boolean = true,
+    val attachmentId: Long = 0
 ) : Serializable
 
 fun GeneralDialog.show(manager: FragmentManager): GeneralDialog {
@@ -62,7 +74,15 @@ class GeneralDialog : BaseDialogFragment() {
                 tv_title.text = data.titleString
             }
 
-            iv_message.setImageResource(data.messageIcon)
+            if(data.attachmentId != 0L) {
+                val options: RequestOptions = RequestOptions()
+                    .transform(MultiTransformation(CenterCrop(), CircleCrop()))
+                    .placeholder(data.messageIcon)
+                    .error(data.messageIcon)
+                    .priority(Priority.NORMAL)
+                context?.let { Glide.with(it).load(LruCacheUtils.getLruCache(data.attachmentId.toString())).apply(options).into(iv_message) }
+            } else
+                iv_message.setImageResource(data.messageIcon)
             iv_message.visibility =
                 if (data.isMessageIcon) {
                     View.VISIBLE
