@@ -98,6 +98,9 @@ class AdultHomeFragment : BaseFragment() {
         private const val REQUEST_VIDEO_CAPTURE = 10002
         private const val REQUEST_LOGIN = 10003
 
+        private const val PERMISSION_VIDEO_REQUEST_CODE = 20001
+        private const val PERMISSION_PIC_REQUEST_CODE = 20002
+
         const val RECORD_LIMIT_TIME = 15
     }
 
@@ -992,12 +995,28 @@ class AdultHomeFragment : BaseFragment() {
 
     private val onChooseUploadMethodDialogListener = object : OnChooseUploadMethodDialogListener {
         override fun onUploadVideo() {
-            PostManager().selectVideo(this@AdultHomeFragment)
+            val requestList = getNotGrantedPermissions(externalPermissions + cameraPermissions)
+            if (requestList.size > 0) {
+                requestPermissions(
+                    requestList.toTypedArray(),
+                    PERMISSION_VIDEO_REQUEST_CODE
+                )
+            } else {
+                PostManager().selectVideo(this@AdultHomeFragment)
+            }
         }
 
         override fun onUploadPic() {
-            file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
-            PostManager().selectPics(this@AdultHomeFragment, file)
+            val requestList = getNotGrantedPermissions(externalPermissions + cameraPermissions)
+            if (requestList.size > 0) {
+                requestPermissions(
+                    requestList.toTypedArray(),
+                    PERMISSION_PIC_REQUEST_CODE
+                )
+            } else {
+                file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
+                PostManager().selectPics(this@AdultHomeFragment, file)
+            }
         }
 
         override fun onUploadArticle() {
@@ -1115,5 +1134,44 @@ class AdultHomeFragment : BaseFragment() {
 
     private fun isClubListEmpty(list: PagedList<MemberClubItem>?): Boolean {
         return list == null || list.size == 0 || (list.size == 1 && list[0]?.adItem != null)
+    }
+
+    private fun requestVideoPermissions() {
+        val requestList = getNotGrantedPermissions(externalPermissions + cameraPermissions)
+
+        if (requestList.size == 0) {
+            PostManager().selectVideo(this@AdultHomeFragment)
+        }
+    }
+
+    private fun requestPicPermissions() {
+        val requestList = getNotGrantedPermissions(externalPermissions + cameraPermissions)
+
+        if (requestList.size == 0) {
+            file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
+            PostManager().selectPics(this@AdultHomeFragment, file)
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        Timber.i("onRequestPermissionsResult")
+        if (requestCode == PERMISSION_VIDEO_REQUEST_CODE) {
+            if (getNotGrantedPermissions(externalPermissions + cameraPermissions).isEmpty()) {
+                PostManager().selectVideo(this@AdultHomeFragment)
+            } else {
+                requestVideoPermissions()
+            }
+        } else if (requestCode == PERMISSION_PIC_REQUEST_CODE) {
+            if (getNotGrantedPermissions(externalPermissions + cameraPermissions).isEmpty()) {
+                file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
+                PostManager().selectPics(this@AdultHomeFragment, file)
+            } else {
+                requestPicPermissions()
+            }
+        }
     }
 }

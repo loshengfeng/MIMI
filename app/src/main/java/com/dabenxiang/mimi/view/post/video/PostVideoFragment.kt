@@ -24,11 +24,13 @@ import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.post.utility.PostManager
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
+import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.android.synthetic.main.fragment_post_article.edt_hashtag
 import kotlinx.android.synthetic.main.fragment_post_article.edt_title
 import kotlinx.android.synthetic.main.fragment_post_pic.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import timber.log.Timber
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -203,7 +205,15 @@ class PostVideoFragment : BasePostFragment() {
     }
 
     private fun openRecorder() {
-        PostManager().selectVideo(this@PostVideoFragment)
+        val requestList = getNotGrantedPermissions(externalPermissions + cameraPermissions)
+        if (requestList.size > 0) {
+            requestPermissions(
+                requestList.toTypedArray(),
+                PERMISSION_VIDEO_REQUEST_CODE
+            )
+        } else {
+            PostManager().selectVideo(this@PostVideoFragment)
+        }
     }
 
     private fun deleteVideo(item: PostVideoAttachment) {
@@ -239,6 +249,29 @@ class PostVideoFragment : BasePostFragment() {
                 TimeUnit.MILLISECONDS.toMinutes(timeInMillisec) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(timeInMillisec)),
                 TimeUnit.MILLISECONDS.toSeconds(timeInMillisec) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(timeInMillisec)))
             videoAttachmentList[0].length = length
+        }
+    }
+
+    private fun requestPermissions() {
+        val requestList = getNotGrantedPermissions(externalPermissions + cameraPermissions)
+
+        if (requestList.size == 0) {
+            PostManager().selectVideo(this@PostVideoFragment)
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        Timber.i("onRequestPermissionsResult")
+        if (requestCode == PERMISSION_VIDEO_REQUEST_CODE) {
+            if (getNotGrantedPermissions(externalPermissions + cameraPermissions).isEmpty()) {
+                PostManager().selectVideo(this@PostVideoFragment)
+            } else {
+                requestPermissions()
+            }
         }
     }
 }
