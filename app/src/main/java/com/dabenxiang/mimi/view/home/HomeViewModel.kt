@@ -215,7 +215,10 @@ class HomeViewModel : BaseViewModel() {
     fun getImageUrl(id: String, update: ((GlideUrl) -> Unit)) {
         viewModelScope.launch {
             flow {
-                val accessToken = pref.memberToken.accessToken
+                val accessToken = if(accountManager.isLogin())
+                    pref.memberToken.accessToken
+                else
+                    pref.publicToken.accessToken
                 val auth = StringBuilder(ApiRepository.BEARER).append(accessToken).toString()
                 val url = domainManager.getApiDomain().plus("/v1/Attachments/").plus(id)
                 val glideUrl = GlideUrl(
