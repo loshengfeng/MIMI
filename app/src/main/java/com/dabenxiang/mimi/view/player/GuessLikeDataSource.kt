@@ -115,7 +115,7 @@ class GuessLikeDataSource(
 
     private fun hasNextPage(total: Long, offset: Long, currentSize: Int): Boolean {
         return when {
-            currentSize < PER_LIMIT_LONG -> false
+            currentSize <= PER_LIMIT_LONG -> false
             offset >= total -> false
             else -> true
         }
