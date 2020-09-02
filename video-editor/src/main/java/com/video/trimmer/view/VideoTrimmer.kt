@@ -309,7 +309,16 @@ class VideoTrimmer @JvmOverloads constructor(context: Context, attrs: AttributeS
 
     private fun setTimeFrames() {
         val seconds = context.getString(R.string.short_seconds)
-        textTimeSelection.text = String.format("%s %s - %s %s", TrimVideoUtils.stringForTime(mStartPosition), seconds, TrimVideoUtils.stringForTime(mEndPosition), seconds)
+
+        val duration = mEndPosition - mStartPosition
+        var endPosition = mEndPosition
+
+        if (duration > mMaxDuration) {
+            val redundantDuration = duration - mMaxDuration
+            endPosition -= redundantDuration
+        }
+
+        textTimeSelection.text = String.format("%s %s - %s %s", TrimVideoUtils.stringForTime(mStartPosition), seconds, TrimVideoUtils.stringForTime(endPosition), seconds)
         endDuration = (mEndPosition - mStartPosition).toInt()
     }
 
@@ -323,14 +332,8 @@ class VideoTrimmer @JvmOverloads constructor(context: Context, attrs: AttributeS
                 mEndPosition = (mDuration * value / 100L)
             }
         }
-        mTimeVideo = mEndPosition - mStartPosition
-
-        if((mTimeVideo > mMaxDuration)) {
-            val outOfPositionRange = mTimeVideo - mMaxDuration
-            mEndPosition -= outOfPositionRange
-            mTimeVideo = mEndPosition - mStartPosition
-        }
         setTimeFrames()
+        mTimeVideo = mEndPosition - mStartPosition
     }
 
     private fun onStopSeekThumbs() {
