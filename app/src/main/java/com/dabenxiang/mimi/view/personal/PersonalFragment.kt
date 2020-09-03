@@ -33,6 +33,15 @@ class PersonalFragment : BaseFragment() {
     private val viewModel: PersonalViewModel by viewModels()
     private var interactionListener: InteractionListener? = null
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        try {
+            interactionListener = context as InteractionListener
+        } catch (e: ClassCastException) {
+            Timber.e("PersonalFragment interaction listener can't cast")
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback {
@@ -122,7 +131,7 @@ class PersonalFragment : BaseFragment() {
     override fun setupListeners() {
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
-                R.id.tv_topup -> GeneralUtils.showToast(requireContext(), "btnTopup")
+                R.id.tv_topup -> interactionListener?.changeNavigationPosition(R.id.navigation_topup)
                 R.id.tv_follow -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
                 R.id.tv_topup_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_orderFragment))
                 R.id.tv_chat_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_chatHistoryFragment))
@@ -132,9 +141,8 @@ class PersonalFragment : BaseFragment() {
                 )
                 R.id.tv_logout -> {
                     Glide.with(this).clear(iv_photo)
+                    Glide.with(this).load(R.drawable.default_profile_picture).into(iv_photo)
                     viewModel.signOut()
-                    Glide.with(this).load(R.drawable.default_profile_picture)
-                        .into(iv_photo)
                 }
                 R.id.tv_login -> navigateTo(
                     NavigateItem.Destination(
@@ -168,27 +176,14 @@ class PersonalFragment : BaseFragment() {
 
         tv_version_is_login.text = BuildConfig.VERSION_NAME
         tv_version_is_not_login.text = BuildConfig.VERSION_NAME
-        tv_topup.visibility = View.INVISIBLE
 
-        when (viewModel.isLogin()) {
-            true -> {
-                item_is_Login.visibility = View.VISIBLE
-                item_is_not_Login.visibility = View.GONE
-                viewModel.getMe()
-            }
-            false -> {
-                item_is_Login.visibility = View.GONE
-                item_is_not_Login.visibility = View.VISIBLE
-            }
-        }
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        try {
-            interactionListener = context as InteractionListener
-        } catch (e: ClassCastException) {
-            Timber.e("PersonalFragment interaction listener can't cast")
+        if (viewModel.isLogin()) {
+            item_is_Login.visibility = View.VISIBLE
+            item_is_not_Login.visibility = View.GONE
+            viewModel.getMe()
+        } else {
+            item_is_Login.visibility = View.GONE
+            item_is_not_Login.visibility = View.VISIBLE
         }
     }
 }
