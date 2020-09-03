@@ -238,7 +238,7 @@ class PostVideoFragment : BasePostFragment() {
 
     private val postPicItemListener by lazy {
         PostVideoItemListener(
-            { id, view -> viewModel.loadImage(id, view, LoadImageType.THUMBNAIL) },
+            { id, view -> viewModel.loadImage(id, view, LoadImageType.PICTURE_THUMBNAIL) },
             { openRecorder() },
             { item -> deleteVideo(item) },
             { viewerItem -> openViewerPage(viewerItem) }

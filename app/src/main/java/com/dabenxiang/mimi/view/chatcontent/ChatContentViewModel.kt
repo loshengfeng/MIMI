@@ -13,7 +13,6 @@ import com.dabenxiang.mimi.model.api.vo.MQTTChatItem
 import com.dabenxiang.mimi.model.enums.ChatMessageType
 import com.dabenxiang.mimi.model.enums.VideoDownloadStatusType
 import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager.Companion.PREFIX_CHAT
-import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.model.vo.UploadPicItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.FileUtil
@@ -41,8 +40,6 @@ class ChatContentViewModel : BaseViewModel() {
     companion object {
         const val FILE_LIMIT = 5
         const val PER_LIMIT = "10"
-        const val TAG_IMAGE = 0
-        const val TAG_VIDEO = 1
     }
 
     private val _chatListResult = MutableLiveData<ApiResult<ArrayList<ChatContentItem>>>()
@@ -51,8 +48,8 @@ class ChatContentViewModel : BaseViewModel() {
     private val _setLastReadResult = MutableLiveData<ApiResult<Nothing>>()
     val setLastReadResult: LiveData<ApiResult<Nothing>> = _setLastReadResult
 
-    private var _attachmentResult = MutableLiveData<ApiResult<out Any>>()
-    val attachmentResult: LiveData<ApiResult<out Any>> = _attachmentResult
+    private var _attachmentResult = MutableLiveData<ApiResult<String>>()
+    val attachmentResult: LiveData<ApiResult<String>> = _attachmentResult
 
     private var _postAttachmentResult = MutableLiveData<ApiResult<UploadPicItem>>()
     val postAttachmentResult: LiveData<ApiResult<UploadPicItem>> = _postAttachmentResult
@@ -142,34 +139,25 @@ class ChatContentViewModel : BaseViewModel() {
         }
     }
 
-    fun getAttachment(context: Context, id: String, position: Int, type: Int = TAG_IMAGE) {
+    fun getAttachment(context: Context, id: String) {
         var fileName = ""
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getAttachment(id)
                 if (!result.isSuccessful) throw HttpException(result)
                 val byteArray = result.body()?.bytes()
-                if (type == TAG_IMAGE) {
-                    val item = AttachmentItem(
-                        id = id,
-                        fileArray = byteArray,
-                        position = position
-                    )
-                    emit(ApiResult.success(item))
-                } else {
-                    fileName = result.headers()["Content-Disposition"]
-                        ?.substringAfter("UTF-8''")
-                        .toString()
-                    if (fileName == null || fileName.isEmpty() || byteArray == null) throw Exception(
-                        "File name or array error"
-                    )
+                fileName = result.headers()["Content-Disposition"]
+                    ?.substringAfter("UTF-8''")
+                    .toString()
+                if (fileName == null || fileName.isEmpty() || byteArray == null) throw Exception(
+                    "File name or array error"
+                )
 
-                    val path = "${FileUtil.getVideoFolderPath(context)}$fileName"
-                    if (!File(path).exists()) {
-                        convertByteToVideo(context, byteArray, fileName)
-                    }
-                    emit(ApiResult.success(path))
+                val path = "${FileUtil.getVideoFolderPath(context)}$fileName"
+                if (!File(path).exists()) {
+                    convertByteToVideo(context, byteArray, fileName)
                 }
+                emit(ApiResult.success(path))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading(fileName)) }

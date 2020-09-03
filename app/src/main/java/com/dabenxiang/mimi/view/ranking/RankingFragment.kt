@@ -54,7 +54,7 @@ class RankingFragment : BaseFragment() {
                     intent.putExtras(PlayerActivity.createBundle(playerData))
                     startActivityForResult(intent, REQUEST_LOGIN)
                 },
-                getBitmap = { id, view -> viewModel.loadImage(id, view, LoadImageType.THUMBNAIL) }
+                getBitmap = { id, view -> viewModel.loadImage(id, view, LoadImageType.PICTURE_THUMBNAIL) }
             )
         )
     }
@@ -96,7 +96,7 @@ class RankingFragment : BaseFragment() {
                     }
 
                 },
-                getBitmap = { id, view -> viewModel.loadImage(id, view, LoadImageType.THUMBNAIL) }
+                getBitmap = { id, view -> viewModel.loadImage(id, view, LoadImageType.PICTURE_THUMBNAIL) }
             )
         )
     }

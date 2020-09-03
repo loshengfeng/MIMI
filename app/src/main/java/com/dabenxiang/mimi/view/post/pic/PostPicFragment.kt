@@ -218,7 +218,7 @@ class PostPicFragment : BasePostFragment() {
 
     private val postPicItemListener by lazy {
         PostPicItemListener(
-            { id, view -> viewModel.loadImage(id, view, LoadImageType.THUMBNAIL) },
+            { id, view -> viewModel.loadImage(id, view, LoadImageType.PICTURE_THUMBNAIL) },
             { item -> handleDeletePic(item) },
             { updateCountPicView() },
             { addPic() },

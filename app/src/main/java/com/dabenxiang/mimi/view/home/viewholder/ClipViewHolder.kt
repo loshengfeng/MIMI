@@ -57,7 +57,7 @@ class ClipViewHolder(
         memberPostFuncItem.getBitmap(
             postImageItem?.id?.toLongOrNull(),
             videoImage,
-            LoadImageType.THUMBNAIL
+            LoadImageType.PICTURE_THUMBNAIL
         )
         memberPostFuncItem.getBitmap(model?.avatarAttachmentId, avatarImg, LoadImageType.AVATAR)
     }

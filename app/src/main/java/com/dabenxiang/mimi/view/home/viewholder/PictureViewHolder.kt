@@ -50,7 +50,7 @@ class PictureViewHolder(
             )
         )
 
-        memberPostFuncItem.getBitmap(postImageItem?.id?.toLongOrNull(), pictureImage, LoadImageType.THUMBNAIL)
+        memberPostFuncItem.getBitmap(postImageItem?.id?.toLongOrNull(), pictureImage, LoadImageType.PICTURE_THUMBNAIL)
 
         memberPostFuncItem.getBitmap(model?.avatarAttachmentId, avatarImg, LoadImageType.AVATAR)
     }

@@ -79,7 +79,7 @@ class FullPictureFragment : BaseFragment() {
 
     private val onFullPictureListener = object : FullPictureAdapter.OnFullPictureListener {
         override fun onGetAttachment(id: Long?, view: ImageView) {
-            viewModel.loadImage(id, view, LoadImageType.PICTURE)
+            viewModel.loadImage(id, view, LoadImageType.PICTURE_FULL)
         }
     }
 }

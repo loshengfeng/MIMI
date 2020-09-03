@@ -126,7 +126,7 @@ class FavoritePostViewHolder(
         listener.onGetAttachment(
             contentItem.images?.get(0)?.id?.toLongOrNull(),
             ivPhoto,
-            LoadImageType.THUMBNAIL
+            LoadImageType.PICTURE_THUMBNAIL
         )
 
         if (!isMe) {

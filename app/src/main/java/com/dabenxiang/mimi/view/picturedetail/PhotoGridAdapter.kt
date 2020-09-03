@@ -44,7 +44,7 @@ class PhotoGridAdapter(
             holder.cardView.layoutParams = cardParams
         }
 
-        onPictureDetailListener.onGetAttachment(imageItem.id.toLongOrNull(), holder.picture, LoadImageType.THUMBNAIL)
+        onPictureDetailListener.onGetAttachment(imageItem.id.toLongOrNull(), holder.picture, LoadImageType.PICTURE_THUMBNAIL)
 
         if (position == 5) {
             holder.mask.visibility = View.VISIBLE

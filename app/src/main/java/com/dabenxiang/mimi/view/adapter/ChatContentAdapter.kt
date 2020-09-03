@@ -3,11 +3,13 @@ package com.dabenxiang.mimi.view.adapter
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ChatContentItem
 import com.dabenxiang.mimi.model.enums.ChatAdapterViewType
 import com.dabenxiang.mimi.model.enums.ChatMessageType
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.view.adapter.viewHolder.chat.ChatContentDateTitleViewHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.chat.ChatContentFileViewHolder
@@ -24,8 +26,7 @@ class ChatContentAdapter(
     private var data = ArrayList<ChatContentItem>()
 
     interface EventListener {
-        fun onGetAvatarAttachment(id: String, position: Int)
-        fun onGetAttachment(id: String, position: Int)
+        fun onGetAttachment(id: Long?, view:ImageView, type:LoadImageType)
         fun onImageClick(imageArray: ByteArray?)
         fun onVideoClick(item: ChatContentItem?, position: Int)
         fun getSenderAvatar(): String

@@ -31,7 +31,7 @@ class ClubMemberPostViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
             images[0].id.toLongOrNull()?.also { id ->
-                clubFuncItem.getBitmap(id, ivCover, LoadImageType.THUMBNAIL)
+                clubFuncItem.getBitmap(id, ivCover, LoadImageType.PICTURE_THUMBNAIL)
             }
         }
 
