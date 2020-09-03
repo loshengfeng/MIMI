@@ -2,7 +2,6 @@ package com.dabenxiang.mimi.view.textdetail
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -126,7 +125,10 @@ class TextDetailAdapter(
                 holder.title.text = memberPostItem.title
                 holder.desc.text = contentItem.text
 
-                onTextDetailListener.onGetAttachment(memberPostItem.avatarAttachmentId, holder.avatarImg)
+                onTextDetailListener.onGetAttachment(
+                    memberPostItem.avatarAttachmentId,
+                    holder.avatarImg
+                )
 
                 if (accountManager.getProfile().userId != memberPostItem.creatorId) {
                     holder.follow.visibility = View.VISIBLE
@@ -251,16 +253,16 @@ class TextDetailAdapter(
             onTextDetailListener.onCommandDislike(replyId, succeededBlock)
         }
 
-        override fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit) {
-            onTextDetailListener.onGetCommandAvatar(id, succeededBlock)
-        }
-
         override fun onMoreClick(item: MembersPostCommentItem) {
             onTextDetailListener.onMoreClick(item)
         }
 
         override fun onAvatarClick(userId: Long, name: String) {
             onTextDetailListener.onAvatarClick(userId, name)
+        }
+
+        override fun loadAvatar(id: Long?, view: ImageView) {
+            onTextDetailListener.onGetAttachment(id, view)
         }
     }
 
@@ -271,7 +273,6 @@ class TextDetailAdapter(
         fun onGetReplyCommand(parentNode: RootCommentNode, succeededBlock: () -> Unit)
         fun onCommandLike(commentId: Long?, isLike: Boolean, succeededBlock: () -> Unit)
         fun onCommandDislike(commentId: Long?, succeededBlock: () -> Unit)
-        fun onGetCommandAvatar(id: Long, succeededBlock: (Bitmap) -> Unit)
         fun onReplyComment(replyId: Long?, replyName: String?)
         fun onMoreClick(item: MembersPostCommentItem)
         fun onChipClick(type: PostType, tag: String)

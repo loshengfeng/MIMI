@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.view.player
 
 import android.graphics.Bitmap
-import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -15,7 +14,6 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.CommentViewType
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.yulichswift.roundedview.widget.RoundedTextView
 import timber.log.Timber
 import java.text.SimpleDateFormat
@@ -34,9 +32,9 @@ class CommentAdapter(isAdult: Boolean, listener: PlayerInfoListener, type: Comme
         fun replyComment(replyId: Long?, replyName: String?)
         fun setCommentLikeType(replyId: Long?, isLike: Boolean, succeededBlock: () -> Unit)
         fun removeCommentLikeType(replyId: Long?, succeededBlock: () -> Unit)
-        fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit)
         fun onMoreClick(item: MembersPostCommentItem)
         fun onAvatarClick(userId: Long, name: String)
+        fun loadAvatar(id:Long?, view:ImageView)
     }
 
     init {
@@ -325,13 +323,7 @@ abstract class BaseCommentProvider(
         }
 
         holder.getView<ImageView>(R.id.iv_avatar).apply {
-            data.postAvatarAttachmentId.toString().takeIf { !TextUtils.isEmpty(it) }?.also { id ->
-                LruCacheUtils.getLruCache(id)?.also { bitmap ->
-                    Glide.with(context).load(bitmap).circleCrop().into(this)
-                } ?: run {
-                    listener.getBitmap(id.toLong()) { bitmap -> updateAvatar(holder, bitmap) }
-                }
-            }
+            listener.loadAvatar(data.postAvatarAttachmentId, this)
         }
 
         holder.setBackgroundResource(
