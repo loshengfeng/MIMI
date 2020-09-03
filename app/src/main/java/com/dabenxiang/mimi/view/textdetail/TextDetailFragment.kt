@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
+import android.widget.ImageView
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -17,6 +18,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -77,7 +79,7 @@ class TextDetailFragment : BaseFragment() {
         requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
 
         adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
+        adHeight = (adWidth * 0.142).toInt()
 
         text_toolbar_title.text = getString(R.string.text_detail_title)
         toolbarContainer.toolbar.navigationIcon =
@@ -270,6 +272,10 @@ class TextDetailFragment : BaseFragment() {
     }
 
     private val onTextDetailListener = object : TextDetailAdapter.OnTextDetailListener {
+        override fun onGetAttachment(id: Long?, view: ImageView) {
+            viewModel.loadImage(id, view, LoadImageType.AVATAR)
+        }
+
         override fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
             checkStatus { viewModel.followPost(item, position, isFollow) }
         }

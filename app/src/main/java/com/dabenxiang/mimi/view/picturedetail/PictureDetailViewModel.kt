@@ -13,7 +13,6 @@ import com.dabenxiang.mimi.model.api.vo.PostCommentRequest
 import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
 import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.LikeType
-import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.CommentDataSource
@@ -27,9 +26,6 @@ import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 
 class PictureDetailViewModel : BaseViewModel() {
-
-    private var _attachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
-    val attachmentResult: LiveData<ApiResult<AttachmentItem>> = _attachmentResult
 
     private var _followPostResult = MutableLiveData<ApiResult<Int>>()
     val followPostResult: LiveData<ApiResult<Int>> = _followPostResult
@@ -56,29 +52,6 @@ class PictureDetailViewModel : BaseViewModel() {
     private var _currentCommentType = CommentType.NEWEST
     val currentCommentType: CommentType
         get() = _currentCommentType
-
-    fun getAttachment(id: String, position: Int) {
-        if (id == LruCacheUtils.ZERO_ID) return
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository().getAttachment(id)
-                if (!result.isSuccessful) throw HttpException(result)
-                val byteArray = result.body()?.bytes()
-                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
-                val item = AttachmentItem(
-                    id = id,
-                    bitmap = bitmap,
-                    position = position
-                )
-                emit(ApiResult.success(item))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _attachmentResult.value = it }
-        }
-    }
 
     fun getAvatar(id: String) {
         if (id == LruCacheUtils.ZERO_ID) return

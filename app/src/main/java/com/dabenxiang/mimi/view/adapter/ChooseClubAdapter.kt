@@ -11,14 +11,12 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
-import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.ClubListener
 import com.dabenxiang.mimi.callback.PostAttachmentListener
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDataSource
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_choose_club.view.*
 import kotlinx.android.synthetic.main.item_list_loading.view.*
 
@@ -103,26 +101,7 @@ class ChooseClubAdapter(
                     clubListener.onClick(item)
                 }
 
-                val avatarId = item.avatarAttachmentId.toString()
-                if (avatarId != LruCacheUtils.ZERO_ID) {
-                    if (LruCacheUtils.getLruCache(avatarId) == null) {
-                        attachmentListener.getAttachment(
-                            item.avatarAttachmentId.toString(),
-                            position
-                        )
-                    } else {
-                        val bitmap = LruCacheUtils.getLruCache(item.avatarAttachmentId.toString())
-                        Glide.with(context)
-                            .load(bitmap)
-                            .circleCrop()
-                            .into(holder.avatar)
-                    }
-                } else {
-                    Glide.with(context)
-                        .load(R.drawable.img_avatar_a_01)
-                        .circleCrop()
-                        .into(holder.avatar)
-                }
+                attachmentListener.getAttachment(item.avatarAttachmentId, holder.avatar)
             }
 
             is ListLoadingViewHolder -> {

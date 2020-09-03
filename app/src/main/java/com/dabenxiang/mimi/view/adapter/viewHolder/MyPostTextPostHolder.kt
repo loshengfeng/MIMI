@@ -7,7 +7,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
@@ -15,13 +14,12 @@ import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.TextContentItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
-import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
@@ -88,19 +86,7 @@ class MyPostTextPostHolder(
             Timber.e(e)
         }
 
-        if (LruCacheUtils.getLruCache(item.avatarAttachmentId.toString()) == null) {
-            attachmentListener.onGetAttachment(
-                item.avatarAttachmentId.toString(),
-                position,
-                AttachmentType.ADULT_TAB_TEXT
-            )
-        } else {
-            val bitmap = LruCacheUtils.getLruCache(item.avatarAttachmentId.toString())
-            Glide.with(imgAvatar.context)
-                .load(bitmap)
-                .circleCrop()
-                .into(imgAvatar)
-        }
+        attachmentListener.onGetAttachment(item.avatarAttachmentId, imgAvatar, LoadImageType.AVATAR)
 
         tagChipGroup.removeAllViews()
         item.tags?.forEach {

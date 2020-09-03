@@ -2,14 +2,27 @@ package com.dabenxiang.mimi.view.base
 
 import android.app.Application
 import android.net.Uri
+import android.widget.ImageView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.load.MultiTransformation
+import com.bumptech.glide.load.model.GlideUrl
+import com.bumptech.glide.load.model.LazyHeaders
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.PROJECT_NAME
+import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager
@@ -87,10 +100,6 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
         SendLogManager.e(PROJECT_NAME, data)
     }
 
-    fun getMeAvatar(): ByteArray? {
-        return accountManager.getMeAvatarCache()
-    }
-
     private var _deletePostResult = MutableLiveData<ApiResult<Int>>()
     val deletePostResult: LiveData<ApiResult<Int>> = _deletePostResult
 
@@ -120,4 +129,46 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
         _cleanRemovedPosList.value = null
     }
 
+    fun loadImage(id: Long?, view: ImageView, type: LoadImageType) {
+        val defaultResId = when (type) {
+            LoadImageType.AVATAR -> R.drawable.default_profile_picture
+            LoadImageType.THUMBNAIL -> R.drawable.img_nopic_03
+            LoadImageType.PICTURE -> R.drawable.img_nopic_03
+            LoadImageType.CLUB -> R.drawable.ico_group
+            LoadImageType.CHAT_CONTENT -> R.drawable.bg_gray_6_radius_16
+        }
+        if (id == null || id == 0L) {
+            Glide.with(view.context).load(defaultResId).into(view)
+        } else {
+            val accessToken =
+                if (accountManager.isLogin()) pref.memberToken.accessToken else pref.publicToken.accessToken
+            val auth = StringBuilder(ApiRepository.BEARER).append(accessToken).toString()
+            val url = "${domainManager.getApiDomain()}/v1/Attachments/$id"
+            val glideUrl = GlideUrl(
+                url,
+                LazyHeaders.Builder().addHeader(ApiRepository.AUTHORIZATION, auth).build()
+            )
+            val options = RequestOptions()
+                .priority(Priority.NORMAL)
+                .placeholder(defaultResId)
+                .error(defaultResId)
+            when (type) {
+                LoadImageType.CLUB,
+                LoadImageType.AVATAR -> {
+                    options.transform(MultiTransformation(CenterCrop(), CircleCrop()))
+                }
+                LoadImageType.THUMBNAIL -> {
+                    options.transform(MultiTransformation(CenterCrop()))
+                }
+                LoadImageType.PICTURE -> {
+                }
+                LoadImageType.CHAT_CONTENT -> {
+                    options.transform(CenterCrop(), RoundedCorners(16))
+                }
+            }
+            Glide.with(view.context).load(glideUrl)
+                .apply(options)
+                .into(view)
+        }
+    }
 }

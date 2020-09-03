@@ -1,11 +1,15 @@
 package com.dabenxiang.mimi.view.main
 
+import android.content.Context
+import android.media.MediaMetadataRetriever
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.MQTT_HOST_URL
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager
 import com.dabenxiang.mimi.model.manager.mqtt.callback.ConnectCallback
 import com.dabenxiang.mimi.model.manager.mqtt.callback.ExtendedCallback
@@ -15,7 +19,11 @@ import com.dabenxiang.mimi.model.vo.CheckStatusItem
 import com.dabenxiang.mimi.model.vo.StatusItem
 import com.dabenxiang.mimi.model.vo.mqtt.OrderItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.home.HomeViewModel
+import com.dabenxiang.mimi.view.mypost.MyPostViewModel
+import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -24,6 +32,8 @@ import org.eclipse.paho.client.mqttv3.IMqttToken
 import org.eclipse.paho.client.mqttv3.MqttMessage
 import retrofit2.HttpException
 import timber.log.Timber
+import java.io.File
+import java.net.URLEncoder
 import java.util.*
 
 class MainViewModel : BaseViewModel() {
@@ -57,6 +67,33 @@ class MainViewModel : BaseViewModel() {
     private val _orderItem = MutableLiveData<OrderItem>()
     val orderItem: LiveData<OrderItem> = _orderItem
 
+    private val _uploadPicItem = MutableLiveData<PicParameter>()
+    val uploadPicItem: LiveData<PicParameter> = _uploadPicItem
+
+    private val _uploadCoverItem = MutableLiveData<PicParameter>()
+    val uploadCoverItem: LiveData<PicParameter> = _uploadCoverItem
+
+    private val _postPicResult = MutableLiveData<ApiResult<Long>>()
+    val postPicResult: LiveData<ApiResult<Long>> = _postPicResult
+
+    private val _postCoverResult = MutableLiveData<ApiResult<Long>>()
+    val postCoverResult: LiveData<ApiResult<Long>> = _postCoverResult
+
+    private val _postVideoResult = MutableLiveData<ApiResult<Long>>()
+    val postVideoResult: LiveData<ApiResult<Long>> = _postVideoResult
+
+    private val _postVideoMemberResult = MutableLiveData<ApiResult<Long>>()
+    val postVideoMemberResult: LiveData<ApiResult<Long>> = _postVideoMemberResult
+
+    private val _postDeleteAttachment = MutableLiveData<ApiResult<Nothing>>()
+    val postDeleteAttachment: LiveData<ApiResult<Nothing>> = _postDeleteAttachment
+
+    private val _postDeleteCoverAttachment = MutableLiveData<ApiResult<Nothing>>()
+    val postDeleteCoverAttachment: LiveData<ApiResult<Nothing>> = _postDeleteCoverAttachment
+
+    private val _postDeleteVideoAttachment = MutableLiveData<ApiResult<Nothing>>()
+    val postDeleteVideoAttachment: LiveData<ApiResult<Nothing>> = _postDeleteVideoAttachment
+
     private val _totalUnreadResult = MutableLiveData<ApiResult<Int>>()
     val totalUnreadResult: LiveData<ApiResult<Int>> = _totalUnreadResult
 
@@ -69,6 +106,11 @@ class MainViewModel : BaseViewModel() {
         get() = _adult
 
     var isVersionChecked = false
+
+    private val _postArticleResult = MutableLiveData<ApiResult<Long>>()
+    val postArticleResult: LiveData<ApiResult<Long>> = _postArticleResult
+
+    private var job = Job()
 
     fun setupNormalCategoriesItem(item: CategoriesItem?) {
         _normal = item
@@ -292,6 +334,160 @@ class MainViewModel : BaseViewModel() {
             Timber.d("Payload: ${String(message.payload)}")
             _orderItem.postValue(data)
         }
+    }
+
+    fun postArticle(title: String, content: String, tags: ArrayList<String>, item: MemberPostItem) {
+        viewModelScope.launch {
+            flow {
+                val request = PostMemberRequest(
+                    title = title,
+                    content = content,
+                    type = PostType.TEXT.value,
+                    tags = tags
+                )
+
+                if (item.id.toInt() == 0) {
+                    val resp = domainManager.getApiRepository().postMembersPost(request)
+                    if (!resp.isSuccessful) throw HttpException(resp)
+                    emit(ApiResult.success(resp.body()?.content))
+                } else {
+                    val resp = domainManager.getApiRepository().updatePost(item.id, request)
+                    if (!resp.isSuccessful) throw HttpException(resp)
+                    emit(ApiResult.success(item.id))
+                }
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _postArticleResult.value = it }
+        }
+    }
+
+    fun postAttachment(pic: String, context: Context, type: String) {
+        viewModelScope.launch(context = job) {
+            flow {
+                val realPath =  when (type) {
+                    HomeViewModel.TYPE_VIDEO -> pic
+                    HomeViewModel.TYPE_PIC -> pic
+                    else -> UriUtils.getPath(context, Uri.parse(pic))
+                }
+                val fileNameSplit = realPath?.split("/")
+                val fileName = fileNameSplit?.last()
+                val extSplit = fileName?.split(".")
+                val ext = "." + extSplit?.last()
+                var mime: String? = null
+
+                if (type == HomeViewModel.TYPE_PIC) {
+                    val picParameter = PicParameter(ext = ext)
+                    _uploadPicItem.postValue(picParameter)
+                } else if (type == HomeViewModel.TYPE_COVER) {
+                    val picParameter = PicParameter(ext = ext)
+                    _uploadCoverItem.postValue(picParameter)
+                } else if (type == HomeViewModel.TYPE_VIDEO) {
+                    val mmr = MediaMetadataRetriever()
+                    mmr.setDataSource(realPath)
+                    mime = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE);
+                }
+
+                Timber.d("Upload photo path : $realPath")
+                Timber.d("Upload photo ext : $ext")
+
+                val result = if (mime == null) {
+                    domainManager.getApiRepository().postAttachment(
+                        File(realPath!!),
+                        fileName = URLEncoder.encode(fileName, "UTF-8")
+                    )
+                } else {
+                    domainManager.getApiRepository().postAttachment(
+                        File(realPath!!),
+                        fileName = URLEncoder.encode(fileName, "UTF-8"),
+                        type = mime
+                    )
+                }
+
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(result.body()?.content))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    when (type) {
+                        HomeViewModel.TYPE_PIC -> _postPicResult.postValue(it)
+                        HomeViewModel.TYPE_COVER -> _postCoverResult.postValue(it)
+                        HomeViewModel.TYPE_VIDEO -> _postVideoResult.postValue(it)
+                    }
+                }
+        }
+    }
+
+    fun postPic(id: Long = 0, request: PostMemberRequest, content: String) {
+        viewModelScope.launch(context = job) {
+            flow {
+                request.content = content
+                Timber.d("Post member request : $request")
+
+                if (id.toInt() == 0) {
+                    val resp = domainManager.getApiRepository().postMembersPost(request)
+                    if (!resp.isSuccessful) throw HttpException(resp)
+                    emit(ApiResult.success(resp.body()?.content))
+                } else {
+                    val resp = domainManager.getApiRepository().updatePost(id, request)
+                    if (!resp.isSuccessful) throw HttpException(resp)
+                    emit(ApiResult.success(id))
+                }
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _postVideoMemberResult.value = it }
+        }
+    }
+
+    fun deleteAttachment(id: String) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository().deleteAttachment(id)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _postDeleteAttachment.value = it }
+        }
+    }
+
+    fun deleteVideoAttachment(id: String, type: String) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository().deleteAttachment(id)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    if (type == MyPostViewModel.TYPE_COVER) {
+                        _postDeleteCoverAttachment.postValue(it)
+                    } else if (type == MyPostViewModel.TYPE_VIDEO) {
+                        _postDeleteVideoAttachment.postValue(it)
+                    }
+                }
+        }
+    }
+
+    fun clearLiveDataValue() {
+        _postArticleResult.value = null
+        _postPicResult.value = null
+        _postCoverResult.value = null
+        _postVideoResult.value = null
+        _uploadPicItem.value = null
+        _uploadCoverItem.value = null
+    }
+
+    fun cancelJob() {
+        job.cancel()
     }
 
     fun getTotalUnread() {

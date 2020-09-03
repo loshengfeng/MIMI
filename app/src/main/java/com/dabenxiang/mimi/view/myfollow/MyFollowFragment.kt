@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.myfollow
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -12,6 +13,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
 import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.adapter.ClubFollowAdapter
 import com.dabenxiang.mimi.view.adapter.MemberFollowAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -20,14 +22,12 @@ import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_my_follow.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class MyFollowFragment : BaseFragment() {
 
@@ -45,8 +45,8 @@ class MyFollowFragment : BaseFragment() {
             viewModel.getClub(item.clubId)
         }
 
-        override fun onGetAttachment(id: String, position: Int) {
-            viewModel.getAttachment(id, position)
+        override fun onGetAttachment(id: Long, view: ImageView) {
+            viewModel.loadImage(id, view, LoadImageType.AVATAR)
         }
 
         override fun onCancelFollow(clubId: Long, position: Int) {
@@ -67,8 +67,8 @@ class MyFollowFragment : BaseFragment() {
             )
         }
 
-        override fun onGetAttachment(id: String, position: Int) {
-            viewModel.getAttachment(id, position)
+        override fun onGetAttachment(id: Long, view: ImageView) {
+            viewModel.loadImage(id, view, LoadImageType.AVATAR)
         }
 
         override fun onCancelFollow(userId: Long, position: Int) {
@@ -90,22 +90,6 @@ class MyFollowFragment : BaseFragment() {
 
         viewModel.memberCount.observe(this, Observer {
             if (layout_tab.selectedTabPosition == TYPE_MEMBER) refreshUi(TYPE_MEMBER, it)
-        })
-
-        viewModel.attachmentResult.observe(this, Observer {
-            when (it) {
-                is Success -> {
-                    val attachmentItem = it.result
-                    if (attachmentItem.id != null && attachmentItem.bitmap != null) {
-                        LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
-                        when (layout_tab.selectedTabPosition) {
-                            TYPE_MEMBER -> memberFollowAdapter.update(attachmentItem.position ?: 0)
-                            TYPE_CLUB -> clubFollowAdapter.update(attachmentItem.position ?: 0)
-                        }
-                    }
-                }
-                is Error -> Timber.e(it.throwable)
-            }
         })
 
         viewModel.clubDetail.observe(this, Observer {
@@ -255,12 +239,10 @@ class MyFollowFragment : BaseFragment() {
 
     private fun handleLoadState(loadState: LoadState) {
         when (loadState) {
-            is LoadState.Loading -> {
-                vpAdapter?.changeIsRefreshing(
-                    layout_tab.selectedTabPosition,
-                    true
-                )
-            }
+            is LoadState.Loading -> vpAdapter?.changeIsRefreshing(
+                layout_tab.selectedTabPosition,
+                true
+            )
             is LoadState.NotLoading -> vpAdapter?.changeIsRefreshing(
                 layout_tab.selectedTabPosition,
                 false

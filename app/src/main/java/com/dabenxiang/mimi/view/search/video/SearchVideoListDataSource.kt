@@ -2,10 +2,10 @@ package com.dabenxiang.mimi.view.search.video
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.SearchPagingCallback
-import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.manager.DomainManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -18,10 +18,11 @@ class SearchVideoListDataSource(
     private val domainManager: DomainManager,
     private val pagingCallback: SearchPagingCallback,
     private val isAdult: Boolean = false,
+    private val category: String = "",
     private val tag: String = "",
     private val name: String = "",
-    private val adWidth: Int,
-    private val adHeight: Int
+    private val adHeight: Int,
+    private val adWidth: Int
 ) : PageKeyedDataSource<Long, VideoItem>() {
 
     companion object {
@@ -45,7 +46,8 @@ class SearchVideoListDataSource(
                     isAdult = isAdult,
                     offset = "0",
                     limit = PER_LIMIT,
-                    tag = tag
+                    tag = tag,
+                    category = category
                 )
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()
@@ -102,7 +104,8 @@ class SearchVideoListDataSource(
                     isAdult = isAdult,
                     offset = next.toString(),
                     limit = PER_LIMIT,
-                    tag = tag
+                    tag = tag,
+                    category = category
                 )
                 if (!result.isSuccessful) throw HttpException(result)
 

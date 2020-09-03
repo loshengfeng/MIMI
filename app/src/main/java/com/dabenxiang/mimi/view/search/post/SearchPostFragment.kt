@@ -27,7 +27,6 @@ import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
-import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.PlayerItem
@@ -47,27 +46,17 @@ import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.PlayerActivity
+import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_post.*
-import kotlinx.android.synthetic.main.fragment_search_post.chip_group_search_text
-import kotlinx.android.synthetic.main.fragment_search_post.edit_search
-import kotlinx.android.synthetic.main.fragment_search_post.ib_back
-import kotlinx.android.synthetic.main.fragment_search_post.iv_clean
-import kotlinx.android.synthetic.main.fragment_search_post.iv_clear_search_text
-import kotlinx.android.synthetic.main.fragment_search_post.layout_search_history
-import kotlinx.android.synthetic.main.fragment_search_post.layout_search_text
-import kotlinx.android.synthetic.main.fragment_search_post.tv_search
-import kotlinx.android.synthetic.main.fragment_search_post.tv_search_text
-import kotlin.collections.ArrayList
 
 class SearchPostFragment : BaseFragment() {
 
     companion object {
-        private const val KEY_DATA = "data"
+        const val KEY_DATA = "data"
         fun createBundle(item: SearchPostItem): Bundle {
             return Bundle().also {
                 it.putSerializable(KEY_DATA, item)
@@ -111,7 +100,7 @@ class SearchPostFragment : BaseFragment() {
         useAdultTheme(true)
 
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        viewModel.adHeight = (GeneralUtils.getScreenSize(requireActivity()).second * 0.0245).toInt()
+        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
 
         if (TextUtils.isEmpty(mTag) && TextUtils.isEmpty(searchText)) {
             layout_search_history.visibility = View.VISIBLE
@@ -154,43 +143,6 @@ class SearchPostFragment : BaseFragment() {
     override fun setupObservers() {
         viewModel.showProgress.observe(viewLifecycleOwner, Observer { showProgress ->
             showProgress?.takeUnless { it }?.also { progressHUD?.dismiss() }
-        })
-
-        viewModel.attachmentByTypeResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Success -> {
-                    val attachmentItem = it.result
-                    LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
-                    when (attachmentItem.type) {
-                        AttachmentType.ADULT_TAB_CLIP,
-                        AttachmentType.ADULT_TAB_PICTURE,
-                        AttachmentType.ADULT_TAB_TEXT -> {
-                            concatAdapter?.adapters?.get(0)?.notifyItemChanged(attachmentItem.position!!)
-                        }
-                        else -> {
-                        }
-                    }
-                }
-                is Error -> onApiError(it.throwable)
-            }
-        })
-
-        viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Success -> {
-                    val attachmentItem = it.result
-                    LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
-                    when (val holder =
-                            (concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).viewHolderMap?.get(attachmentItem.parentPosition)) {
-                        is PicturePostHolder -> {
-                            if (holder.pictureRecycler.tag == attachmentItem.parentPosition) {
-                                (concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).updateInternalItem(holder)
-                            }
-                        }
-                    }
-                }
-                is Error -> onApiError(it.throwable)
-            }
         })
 
         viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
@@ -288,7 +240,7 @@ class SearchPostFragment : BaseFragment() {
             }
         })
 
-        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, {
+        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
                     memberPostAdapter?.also { adapter ->
@@ -300,7 +252,7 @@ class SearchPostFragment : BaseFragment() {
             }
         })
 
-        viewModel.cleanRemovedPosList.observe(viewLifecycleOwner, {
+        viewModel.cleanRemovedPosList.observe(viewLifecycleOwner, Observer{
             memberPostAdapter?.removedPosList?.clear()
         })
     }
@@ -527,14 +479,14 @@ class SearchPostFragment : BaseFragment() {
     private val clubFuncItem by lazy {
         ClubFuncItem(
             { item -> onItemClick(item) },
-            { id, function -> getBitmap(id, function) },
+            { id, view, type -> viewModel.loadImage(id, view, type) },
             { item, isFollow, function -> clubFollow(item, isFollow, function) })
     }
 
     private val memberPostFuncItem by lazy {
         MemberPostFuncItem(
             {},
-            { id, func -> getBitmap(id, func) },
+            { id, view, type -> viewModel.loadImage(id, view, type) },
             { item, items, isFollow, func -> followMember(item, items, isFollow, func) },
             { item, isLike, func -> likePost(item, isLike, func) },
             { item, isFavorite, func -> favoritePost(item, isFavorite, func) }
@@ -587,12 +539,40 @@ class SearchPostFragment : BaseFragment() {
         }
 
         override fun onMoreClick(item: MemberPostItem, items:List<MemberPostItem>) {
+            val searchPostItem = arguments?.getSerializable(KEY_DATA) as SearchPostItem
+
             memberPostAdapter?.also {
                 onMoreClick(
                     item,
                     ArrayList(items),
                     onEdit = {
-                        // TODO #1180
+                        val bundle = Bundle()
+                        bundle.putBoolean(MyPostFragment.EDIT, true)
+                        bundle.putString(BasePostFragment.PAGE, BasePostFragment.SEARCH)
+                        bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+                        bundle.putSerializable(KEY_DATA, searchPostItem)
+
+                        it as MemberPostItem
+                        when (item.type) {
+                            PostType.TEXT -> {
+                                findNavController().navigate(
+                                    R.id.action_searchPostFragment_to_postArticleFragment,
+                                    bundle
+                                )
+                            }
+                            PostType.IMAGE -> {
+                                findNavController().navigate(
+                                    R.id.action_searchPostFragment_to_postPicFragment,
+                                    bundle
+                                )
+                            }
+                            PostType.VIDEO -> {
+                                findNavController().navigate(
+                                    R.id.action_searchPostFragment_to_postVideoFragment,
+                                    bundle
+                                )
+                            }
+                        }
                     }
                 )
             }
@@ -695,10 +675,6 @@ class SearchPostFragment : BaseFragment() {
             (concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).setupTag(tag)
             edit_search.setText("")
         }
-    }
-
-    private fun getBitmap(id: String, update: ((String) -> Unit)) {
-        viewModel.getBitmap(id, update)
     }
 
     private fun clubFollow(

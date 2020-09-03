@@ -1,22 +1,19 @@
 package com.dabenxiang.mimi.view.favroite
 
 import android.content.res.ColorStateList
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.adapter.FavoriteAdapter
 import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
@@ -48,7 +45,12 @@ class FavoritePostViewHolder(
     private val tvMore = itemView.findViewById(R.id.tv_more) as TextView
 
     init {
-        ivHead.setOnClickListener { listener.onAvatarClick(data!!.creatorId, data!!.postFriendlyName) }
+        ivHead.setOnClickListener {
+            listener.onAvatarClick(
+                data!!.creatorId,
+                data!!.postFriendlyName
+            )
+        }
         tvShare.visibility = View.GONE
         tvMore.visibility = View.INVISIBLE
     }
@@ -104,20 +106,11 @@ class FavoritePostViewHolder(
                 position
             )
         }
-        data?.avatarAttachmentId
-            .takeIf { it != null && it.toString() != LruCacheUtils.ZERO_ID }?.also { id ->
-                LruCacheUtils.getLruCache(id.toString())?.also { bitmap ->
-                    Glide.with(ivHead.context).load(bitmap).circleCrop().into(ivHead)
-                } ?: run {
-                    listener.onGetAttachment(
-                        data!!.avatarAttachmentId!!.toString(),
-                        position,
-                        AttachmentType.ADULT_AVATAR
-                    )
-                }
-            } ?: run {
-            Glide.with(ivHead.context).load(R.drawable.default_profile_picture).circleCrop().into(ivHead)
-        }
+        listener.onGetAttachment(
+            data?.avatarAttachmentId,
+            ivHead,
+            LoadImageType.AVATAR
+        )
 
         tvName.text = data?.postFriendlyName
         tvTitle.text = data?.title
@@ -130,25 +123,11 @@ class FavoritePostViewHolder(
         val contentItem = Gson().fromJson(data?.content.toString(), MediaContentItem::class.java)
         tvLength.text = contentItem?.shortVideo?.length
 
-        contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
-            images[0].also { image ->
-                if (TextUtils.isEmpty(image.url)) {
-                    image.id.takeIf { !TextUtils.isEmpty(it) }?.also { id ->
-                        LruCacheUtils.getLruCache(id)?.also { bitmap ->
-                            Glide.with(ivPhoto.context).load(bitmap).into(ivPhoto)
-                        } ?: run {
-                            listener.onGetAttachment(
-                                image.id,
-                                position,
-                                AttachmentType.ADULT_HOME_CLIP
-                            )
-                        }
-                    }
-                } else {
-                    Glide.with(ivPhoto.context).load(image.url).into(ivPhoto)
-                }
-            }
-        }
+        listener.onGetAttachment(
+            contentItem.images?.get(0)?.id?.toLongOrNull(),
+            ivPhoto,
+            LoadImageType.THUMBNAIL
+        )
 
         if (!isMe) {
             tvFollow.visibility = View.VISIBLE

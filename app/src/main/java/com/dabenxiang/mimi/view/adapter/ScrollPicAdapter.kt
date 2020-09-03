@@ -12,7 +12,6 @@ import com.dabenxiang.mimi.callback.PostPicItemListener
 import com.dabenxiang.mimi.model.vo.PostAttachmentItem
 import com.dabenxiang.mimi.model.vo.ViewerItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_add_pic.view.*
 import kotlinx.android.synthetic.main.item_pic.view.*
 import java.io.File
@@ -125,16 +124,7 @@ class ScrollPicAdapter(private val postPicItemListener: PostPicItemListener) : R
                 Glide.with(context).load(File(uriP.path)).into(imgPic)
                 viewItem.url = item.uri
             } else {
-                if (LruCacheUtils.getLruCache(item.attachmentId) == null) {
-                    postPicItemListener.getBitmap(item.attachmentId) { id ->
-                        val bitmap = LruCacheUtils.getLruCache(id)
-                        Glide.with(context).load(bitmap).into(imgPic)
-                    }
-                } else {
-                    val bitmap = LruCacheUtils.getLruCache(item.attachmentId)
-                    Glide.with(context).load(bitmap).into(imgPic)
-                }
-
+                postPicItemListener.getBitmap(item.attachmentId.toLongOrNull(),imgPic)
                 viewItem.attachmentId = item.attachmentId
             }
 

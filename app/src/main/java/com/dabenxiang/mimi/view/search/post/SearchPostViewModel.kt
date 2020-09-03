@@ -7,15 +7,12 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.callback.SearchPagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
-import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.model.vo.SearchHistoryItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.home.club.ClubDataSource
@@ -26,7 +23,6 @@ import com.dabenxiang.mimi.view.search.post.tag.SearchPostByTagDataSource
 import com.dabenxiang.mimi.view.search.post.tag.SearchPostByTagFactory
 import com.dabenxiang.mimi.view.search.video.SearchVideoFactory
 import com.dabenxiang.mimi.view.search.video.SearchVideoListDataSource
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -44,12 +40,6 @@ class SearchPostViewModel : BaseViewModel() {
     private val _searchPostItemByKeywordListResult = MutableLiveData<PagedList<MemberPostItem>>()
     val searchPostItemByKeywordListResult: LiveData<PagedList<MemberPostItem>> =
         _searchPostItemByKeywordListResult
-
-    private var _attachmentByTypeResult = MutableLiveData<ApiResult<AttachmentItem>>()
-    val attachmentByTypeResult: LiveData<ApiResult<AttachmentItem>> = _attachmentByTypeResult
-
-    private var _attachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
-    val attachmentResult: LiveData<ApiResult<AttachmentItem>> = _attachmentResult
 
     private var _followPostResult = MutableLiveData<ApiResult<Int>>()
     val followPostResult: LiveData<ApiResult<Int>> = _followPostResult
@@ -76,52 +66,6 @@ class SearchPostViewModel : BaseViewModel() {
     var adHeight = 0
 
     var currentVideoItem: VideoItem? = null
-
-    fun getAttachment(id: String, position: Int, type: AttachmentType) {
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository().getAttachment(id)
-                if (!result.isSuccessful) throw HttpException(result)
-                val byteArray = result.body()?.bytes()
-                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
-                val item = AttachmentItem(
-                    id = id,
-                    bitmap = bitmap,
-                    position = position,
-                    type = type
-                )
-                emit(ApiResult.success(item))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _attachmentByTypeResult.value = it }
-        }
-    }
-
-    fun getAttachment(id: String, parentPosition: Int, position: Int) {
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository().getAttachment(id)
-                if (!result.isSuccessful) throw HttpException(result)
-                val byteArray = result.body()?.bytes()
-                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
-                val item = AttachmentItem(
-                    id = id,
-                    bitmap = bitmap,
-                    parentPosition = parentPosition,
-                    position = position
-                )
-                emit(ApiResult.success(item))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _attachmentResult.value = it }
-        }
-    }
 
     fun followPost(item: MemberPostItem, position: Int, isFollow: Boolean) {
         viewModelScope.launch {
@@ -230,28 +174,6 @@ class SearchPostViewModel : BaseViewModel() {
         }
     }
 
-    fun getBitmap(id: String, update: ((String) -> Unit)) {
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository().getAttachment(id)
-                if (!result.isSuccessful) throw HttpException(result)
-                val byteArray = result.body()?.bytes()
-                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
-                LruCacheUtils.putLruCache(id, bitmap)
-                emit(ApiResult.success(id))
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect {
-                    when (it) {
-                        is ApiResult.Success -> {
-                            update(it.result)
-                        }
-                    }
-                }
-        }
-    }
-
     fun clubFollow(item: MemberClubItem, isFollow: Boolean, update: ((Boolean) -> Unit)) {
         viewModelScope.launch {
             flow {
@@ -352,14 +274,15 @@ class SearchPostViewModel : BaseViewModel() {
     ): LiveData<PagedList<VideoItem>> {
         val searchVideoDataSource =
                 SearchVideoListDataSource(
-                        viewModelScope,
-                        domainManager,
-                        pagingCallback,
-                        isAdult,
-                        searchingTag,
-                        searchingStr,
-                        adWidth,
-                        adHeight
+                    viewModelScope,
+                    domainManager,
+                    pagingCallback,
+                    isAdult,
+                    "",
+                    searchingTag,
+                    searchingStr,
+                    adHeight,
+                    adWidth
                 )
         val videoFactory = SearchVideoFactory(searchVideoDataSource)
         val config = PagedList.Config.Builder()

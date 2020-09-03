@@ -8,7 +8,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
@@ -16,11 +15,11 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.TextContentItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
@@ -70,17 +69,7 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
 
         updateLikeAndFollowItem(item, itemList, memberPostFuncItem)
 
-        val avatarId = item.avatarAttachmentId.toString()
-        if (avatarId != LruCacheUtils.ZERO_ID) {
-            if (LruCacheUtils.getLruCache(avatarId) == null) {
-                memberPostFuncItem.getBitmap(avatarId) { id -> updateAvatar(id) }
-            } else {
-                updateAvatar(avatarId)
-            }
-        } else {
-            Glide.with(avatarImg.context).load(R.drawable.default_profile_picture).circleCrop()
-                .into(avatarImg)
-        }
+        memberPostFuncItem.getBitmap(item.avatarAttachmentId, avatarImg, LoadImageType.AVATAR)
 
         tagChipGroup.removeAllViews()
         item.tags?.forEach {
@@ -120,11 +109,6 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
         avatarImg.setOnClickListener {
             adultListener.onAvatarClick(item.creatorId, item.postFriendlyName)
         }
-    }
-
-    private fun updateAvatar(id: String) {
-        val bitmap = LruCacheUtils.getLruCache(id)
-        Glide.with(avatarImg.context).load(bitmap).circleCrop().into(avatarImg)
     }
 
     private fun updateLikeAndFollowItem(

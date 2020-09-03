@@ -18,11 +18,13 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult.*
+import com.dabenxiang.mimi.model.api.ApiResult.Error
+import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.MediaItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PostMemberRequest
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
@@ -58,6 +60,9 @@ open class BasePostFragment : BaseFragment() {
         private const val HASHTAG_TEXT_LIMIT = 10
         private const val INIT_VALUE = 0
 
+        const val PERMISSION_VIDEO_REQUEST_CODE = 20001
+        const val PERMISSION_PIC_REQUEST_CODE = 20002
+
         const val TAG = "tag"
         const val REQUEST = "request"
         const val TITLE = "title"
@@ -72,6 +77,11 @@ open class BasePostFragment : BaseFragment() {
         const val VIDEO_DATA = "video_data"
         const val BUNDLE_TRIMMER_URI = "bundle_trimmer_uri"
         const val BUNDLE_COVER_URI = "bundle_cover_uri"
+        const val PAGE = "page"
+        const val ADULT = "adult"
+        const val MY_POST = "my_post"
+        const val SEARCH = "search"
+        const val CLUB = "club"
     }
 
     override val bottomNavigationVisibility: Int
@@ -87,7 +97,7 @@ open class BasePostFragment : BaseFragment() {
 
     override fun setupObservers() {
         viewModel.clubItemResult.observe(viewLifecycleOwner, Observer {
-            when(it) {
+            when (it) {
                 is Success -> {
                     txt_clubName.text = it.result.first().title
                     txt_hashtagName.text = it.result.first().tag
@@ -96,22 +106,11 @@ open class BasePostFragment : BaseFragment() {
                     txt_clubName.visibility = View.VISIBLE
                     txt_hashtagName.visibility = View.VISIBLE
 
-                    if (LruCacheUtils.getLruCache(it.result.first().avatarAttachmentId.toString()) == null) {
-                        viewModel.getBitmap(it.result.first().avatarAttachmentId.toString())
-                    } else {
-                        val bitmap = LruCacheUtils.getLruCache(it.result.first().avatarAttachmentId.toString())
-                        Glide.with(requireContext()).load(bitmap).circleCrop().into(iv_avatar)
-                    }
-                }
-                is Error -> onApiError(it.throwable)
-            }
-        })
-
-        viewModel.bitmapResult.observe(viewLifecycleOwner, Observer {
-            when(it) {
-                is Success -> {
-                    val bitmap = LruCacheUtils.getLruCache(it.result)
-                    Glide.with(requireContext()).load(bitmap).circleCrop().into(iv_avatar)
+                    viewModel.loadImage(
+                        it.result.first().avatarAttachmentId,
+                        iv_avatar,
+                        LoadImageType.CLUB
+                    )
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -152,9 +151,12 @@ open class BasePostFragment : BaseFragment() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                txt_titleCount.text = String.format(getString(R.string.typing_count, s?.length,
-                    TITLE_LIMIT
-                ))
+                txt_titleCount.text = String.format(
+                    getString(
+                        R.string.typing_count, s?.length,
+                        TITLE_LIMIT
+                    )
+                )
             }
         })
 
@@ -176,13 +178,21 @@ open class BasePostFragment : BaseFragment() {
         }
 
         edt_hashtag.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE){
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
                 if (chipGroup.size == HASHTAG_LIMIT) {
-                    Toast.makeText(requireContext(), R.string.post_warning_tag_limit, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        R.string.post_warning_tag_limit,
+                        Toast.LENGTH_SHORT
+                    ).show()
                 } else {
                     val tag = edt_hashtag.text.toString()
                     if (isTagExist(tag)) {
-                        Toast.makeText(requireContext(), R.string.post_tag_already_have, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            R.string.post_tag_already_have,
+                            Toast.LENGTH_SHORT
+                        ).show()
                     } else {
                         addTag(tag)
                         edt_hashtag.text.clear()
@@ -207,8 +217,10 @@ open class BasePostFragment : BaseFragment() {
         val img = requireContext().getDrawable(R.drawable.btn_close_n)
         tv_back.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null)
 
-        txt_titleCount.text = String.format(getString(R.string.typing_count, INIT_VALUE, TITLE_LIMIT))
-        txt_hashtagCount.text = String.format(getString(R.string.typing_count, INIT_VALUE, HASHTAG_LIMIT))
+        txt_titleCount.text =
+            String.format(getString(R.string.typing_count, INIT_VALUE, TITLE_LIMIT))
+        txt_hashtagCount.text =
+            String.format(getString(R.string.typing_count, INIT_VALUE, HASHTAG_LIMIT))
 
         if (isEdit != null && isEdit) {
             tv_title.text = getString(R.string.edit_post_title)
@@ -241,8 +253,10 @@ open class BasePostFragment : BaseFragment() {
             addEditTag(tag)
         }
 
-        txt_titleCount.text = String.format(getString(R.string.typing_count, item.title.length, TITLE_LIMIT))
-        txt_hashtagCount.text = String.format(getString(R.string.typing_count, item.tags?.size, HASHTAG_LIMIT))
+        txt_titleCount.text =
+            String.format(getString(R.string.typing_count, item.title.length, TITLE_LIMIT))
+        txt_hashtagCount.text =
+            String.format(getString(R.string.typing_count, item.tags?.size, HASHTAG_LIMIT))
 
         haveMainTag = true
 
@@ -254,14 +268,18 @@ open class BasePostFragment : BaseFragment() {
     }
 
     private fun addEditTag(tag: String) {
-        val chip = LayoutInflater.from(requireContext()).inflate(R.layout.chip_item, chipGroup, false) as Chip
+        val chip = LayoutInflater.from(requireContext())
+            .inflate(R.layout.chip_item, chipGroup, false) as Chip
         chip.text = tag
         chip.setTextColor(chip.context.getColor(R.color.color_black_1_50))
         chip.chipBackgroundColor =
             ColorStateList.valueOf(chip.context.getColor(R.color.color_black_1_10))
 
         if (chipGroup.size >= 1) {
-            chip.closeIcon = ContextCompat.getDrawable(requireContext(), R.drawable.btn_close_circle_small_black_n)
+            chip.closeIcon = ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.btn_close_circle_small_black_n
+            )
             chip.isCloseIconVisible = true
             chip.setCloseIconSizeResource(R.dimen.dp_24)
             chip.setOnCloseIconClickListener {
@@ -276,11 +294,13 @@ open class BasePostFragment : BaseFragment() {
     }
 
     private fun setTagCount() {
-        txt_hashtagCount.text = String.format(getString(R.string.typing_count, chipGroup.size, HASHTAG_LIMIT))
+        txt_hashtagCount.text =
+            String.format(getString(R.string.typing_count, chipGroup.size, HASHTAG_LIMIT))
     }
 
     private fun addTag(tag: String, isMainTag: Boolean = false) {
-        val chip = LayoutInflater.from(requireContext()).inflate(R.layout.chip_item, chipGroup, false) as Chip
+        val chip = LayoutInflater.from(requireContext())
+            .inflate(R.layout.chip_item, chipGroup, false) as Chip
         chip.text = tag
         chip.setTextColor(chip.context.getColor(R.color.color_black_1_50))
         chip.chipBackgroundColor =
@@ -311,7 +331,10 @@ open class BasePostFragment : BaseFragment() {
                 }
             }
         } else {
-            chip.closeIcon = ContextCompat.getDrawable(requireContext(), R.drawable.btn_close_circle_small_black_n)
+            chip.closeIcon = ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.btn_close_circle_small_black_n
+            )
             chip.isCloseIconVisible = true
             chip.setCloseIconSizeResource(R.dimen.dp_24)
             chip.setOnCloseIconClickListener {
@@ -350,7 +373,11 @@ open class BasePostFragment : BaseFragment() {
                 .into(iv_avatar)
 
             if (chipGroup.size == HASHTAG_LIMIT) {
-                Toast.makeText(requireContext(), R.string.post_warning_tag_limit, Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    R.string.post_warning_tag_limit,
+                    Toast.LENGTH_SHORT
+                ).show()
             } else {
                 addTag(item.tag, true)
                 txt_placeholder.visibility = View.GONE
@@ -360,7 +387,7 @@ open class BasePostFragment : BaseFragment() {
         }
     }
 
-    private fun isTagExist(tag: String): Boolean  {
+    private fun isTagExist(tag: String): Boolean {
         for (i in 0 until chipGroup.childCount) {
             val chip = chipGroup.getChildAt(i) as Chip
             if (chip.text == tag) {

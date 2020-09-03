@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -12,8 +13,8 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
-import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.FunctionType
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.model.vo.SearchPostItem
@@ -35,7 +36,6 @@ import com.dabenxiang.mimi.view.player.PlayerActivity
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_post_favorite.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
@@ -145,26 +145,6 @@ class FavoriteFragment : BaseFragment() {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
                 is Error -> onApiError(it.throwable)
-            }
-        })
-
-        viewModel.attachmentByTypeResult.observe(this, Observer {
-            when (it) {
-                is Success -> {
-                    val attachmentItem = it.result
-                    LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
-                    when (attachmentItem.type) {
-                        AttachmentType.ADULT_HOME_CLIP -> {
-                            favoriteAdapter.update(attachmentItem.position ?: 0)
-                        }
-                        AttachmentType.ADULT_AVATAR -> {
-                            favoriteAdapter.update(attachmentItem.position ?: 0)
-                        }
-                        else -> {
-                        }
-                    }
-                }
-                is Error -> Timber.e(it.throwable)
             }
         })
 
@@ -341,8 +321,8 @@ class FavoriteFragment : BaseFragment() {
 
     private val listener = object : FavoriteAdapter.EventListener {
 
-        override fun onGetAttachment(id: String, position: Int, type: AttachmentType) {
-            viewModel.getAttachment(id, position, type)
+        override fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType) {
+            viewModel.loadImage(id,view,type)
         }
 
         override fun onVideoClick(item: Any, position: Int?) {

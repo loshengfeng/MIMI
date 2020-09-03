@@ -1,13 +1,12 @@
 package com.dabenxiang.mimi.view.home.viewholder
 
 import android.view.View
-import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.vo.BannerIdContentItem
 import com.dabenxiang.mimi.model.vo.CarouselHolderItem
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.nested_item_carousel.view.*
 
@@ -30,18 +29,7 @@ class CarouselViewHolder(
     override fun updated() {
         data?.also {
             val banner = Gson().fromJson(it.content, BannerIdContentItem::class.java)
-            if (LruCacheUtils.getLruCache(banner.app) == null) {
-                memberPostFuncItem.getBitmap(banner.app) { id ->
-                    updateImage(id)
-                }
-            } else {
-                updateImage(banner.app)
-            }
+            memberPostFuncItem.getBitmap(banner.app.toLongOrNull(), ivPoster, LoadImageType.THUMBNAIL)
         }
-    }
-
-    private fun updateImage(id: String) {
-        val bitmap = LruCacheUtils.getLruCache(id)
-        Glide.with(itemView.context).load(bitmap).centerCrop().into(ivPoster)
     }
 }

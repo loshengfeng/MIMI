@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.order
 
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.paging.PagedList
 import androidx.paging.PagingData
@@ -54,8 +55,8 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
             orderFuncItem?.onChatItemClick?.invoke(item)
         }
 
-        override fun onGetAttachment(id: String, position: Int) {
-            orderFuncItem?.getChatAttachment?.invoke(id, position) { pos -> updateChatAvatar(pos) }
+        override fun onGetAttachment(id: Long?, view: ImageView) {
+            orderFuncItem?.getChatAttachment?.invoke(id, view)
         }
     }
 

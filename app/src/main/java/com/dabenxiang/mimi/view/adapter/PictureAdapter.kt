@@ -1,19 +1,17 @@
 package com.dabenxiang.mimi.view.adapter
 
 import android.content.Context
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.OnItemClickListener
 import com.dabenxiang.mimi.model.api.vo.ImageItem
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_picture.view.*
 import java.util.*
 
@@ -48,29 +46,11 @@ class PictureAdapter(
             onItemClickListener: OnItemClickListener,
             memberPostFuncItem: MemberPostFuncItem
         ) {
-            if (!TextUtils.isEmpty(item.url)) {
-                Glide.with(picture.context)
-                    .load(item.url).placeholder(R.drawable.img_nopic_03).into(picture)
-            } else {
-                if (!TextUtils.isEmpty(item.id) && item.id != LruCacheUtils.ZERO_ID) {
-                    if (LruCacheUtils.getLruCache(item.id) == null) {
-                        memberPostFuncItem.getBitmap(item.id) { id -> updatePicture(id)}
-                    } else {
-                        updatePicture(item.id)
-                    }
-                } else {
-                    Glide.with(picture.context).load(R.drawable.img_nopic_03).into(picture)
-                }
-            }
+            memberPostFuncItem.getBitmap(item.id.toLongOrNull(), picture, LoadImageType.THUMBNAIL)
 
             picture.setOnClickListener {
                 onItemClickListener.onItemClick()
             }
-        }
-
-        private fun updatePicture(id: String) {
-            val bitmap = LruCacheUtils.getLruCache(id)
-            Glide.with(picture.context).load(bitmap).into(picture)
         }
     }
 

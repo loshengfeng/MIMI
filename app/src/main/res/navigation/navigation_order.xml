@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/navigation_order"
+    app:startDestination="@id/orderFragment">
+
+    <include app:graph="@navigation/navigation_topup" />
+
+    <fragment
+        android:id="@+id/orderFragment"
+        android:name="com.dabenxiang.mimi.view.order.OrderFragment"
+        android:label="OrderFragment">
+        <action
+            android:id="@+id/action_orderFragment_to_topupFragment"
+            app:destination="@id/navigation_topup" />
+        <action
+            android:id="@+id/action_orderFragment_to_chatContentFragment"
+            app:destination="@id/chatContentFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/chatContentFragment"
+        android:name="com.dabenxiang.mimi.view.chatcontent.ChatContentFragment"
+        android:label="ChatContentFragment" />
+
+</navigation>

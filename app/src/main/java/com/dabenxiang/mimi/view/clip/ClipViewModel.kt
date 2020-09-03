@@ -4,16 +4,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.blankj.utilcode.util.FileIOUtils
-import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.FileUtil
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.File
@@ -22,9 +23,6 @@ class ClipViewModel : BaseViewModel() {
 
     private var _clipResult = MutableLiveData<ApiResult<Triple<String, Int, File>>>()
     val clipResult: LiveData<ApiResult<Triple<String, Int, File>>> = _clipResult
-
-    private var _bitmapResult = MutableLiveData<ApiResult<Int>>()
-    val bitmapResult: LiveData<ApiResult<Int>> = _bitmapResult
 
     private var _followResult = MutableLiveData<ApiResult<Int>>()
     val followResult: LiveData<ApiResult<Int>> = _followResult
@@ -56,23 +54,6 @@ class ClipViewModel : BaseViewModel() {
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _clipResult.value = it }
-        }
-    }
-
-    fun getBitmap(id: String, position: Int) {
-        if (id == "0") return
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository().getAttachment(id)
-                if (!result.isSuccessful) throw HttpException(result)
-                val byteArray = result.body()?.bytes()
-                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
-                LruCacheUtils.putLruCache(id, bitmap)
-                emit(ApiResult.success(position))
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _bitmapResult.value = it }
         }
     }
 

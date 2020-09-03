@@ -87,6 +87,15 @@
         <action
             android:id="@+id/action_to_loginFragment"
             app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_searchPostFragment_to_postArticleFragment"
+            app:destination="@id/postArticleFragment" />
+        <action
+            android:id="@+id/action_searchPostFragment_to_postPicFragment"
+            app:destination="@id/postPicFragment" />
+        <action
+            android:id="@+id/action_searchPostFragment_to_postVideoFragment"
+            app:destination="@id/postVideoFragment" />
     </fragment>
 
     <fragment
@@ -137,6 +146,11 @@
             app:destination="@id/myPostFragment"
             app:popUpTo="@+id/myPostFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_postArticleFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment"
+            app:popUpTo="@+id/searchPostFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -151,6 +165,11 @@
             android:id="@+id/action_postPicFragment_to_myPostFragment"
             app:destination="@id/myPostFragment"
             app:popUpTo="@+id/myPostFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_postPicFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment"
+            app:popUpTo="@+id/searchPostFragment"
             app:popUpToInclusive="true" />
     </fragment>
 
@@ -173,6 +192,11 @@
         <action
             android:id="@+id/action_postVideoFragment_to_editVideoFragment2"
             app:destination="@id/editVideoFragment2" />
+        <action
+            android:id="@+id/action_postVideoFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment"
+            app:popUpTo="@+id/searchPostFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment

@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -28,7 +29,6 @@ import com.dabenxiang.mimi.view.player.CommentLoadMoreView
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.view.textdetail.viewholder.TextDetailViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
 import org.koin.core.KoinComponent
@@ -126,18 +126,7 @@ class TextDetailAdapter(
                 holder.title.text = memberPostItem.title
                 holder.desc.text = contentItem.text
 
-                val avatarId = memberPostItem.avatarAttachmentId.toString()
-                if (avatarId != LruCacheUtils.ZERO_ID) {
-                    val bitmap = LruCacheUtils.getLruCache(avatarId)
-                    Glide.with(context)
-                        .load(bitmap)
-                        .circleCrop()
-                        .into(holder.avatarImg)
-                } else {
-                    Glide.with(holder.avatarImg.context).load(R.drawable.default_profile_picture)
-                        .circleCrop()
-                        .into(holder.avatarImg)
-                }
+                onTextDetailListener.onGetAttachment(memberPostItem.avatarAttachmentId, holder.avatarImg)
 
                 if (accountManager.getProfile().userId != memberPostItem.creatorId) {
                     holder.follow.visibility = View.VISIBLE
@@ -276,6 +265,7 @@ class TextDetailAdapter(
     }
 
     interface OnTextDetailListener {
+        fun onGetAttachment(id: Long?, view: ImageView)
         fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean)
         fun onGetCommandInfo(adapter: CommentAdapter, type: CommentType)
         fun onGetReplyCommand(parentNode: RootCommentNode, succeededBlock: () -> Unit)
