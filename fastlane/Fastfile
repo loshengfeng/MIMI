@@ -32,8 +32,8 @@ platform :android do
   lane :build_release do
     begin
 #        build(flavor: "mimi", build_type: "Dev_Release")
-#        build(flavor: "mimi", build_type: "Sit_Release")
-        build(flavor: "mimi", build_type: "Prod_Release")
+        build(flavor: "mimi", build_type: "Sit_Release")
+#        build(flavor: "mimi", build_type: "Prod_Release")
         upload_to_slack()
     rescue => exception
                on_error(exception)
