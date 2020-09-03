@@ -60,6 +60,9 @@ open class BasePostFragment : BaseFragment() {
         private const val HASHTAG_TEXT_LIMIT = 10
         private const val INIT_VALUE = 0
 
+        const val PERMISSION_VIDEO_REQUEST_CODE = 20001
+        const val PERMISSION_PIC_REQUEST_CODE = 20002
+
         const val TAG = "tag"
         const val REQUEST = "request"
         const val TITLE = "title"

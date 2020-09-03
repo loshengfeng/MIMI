@@ -31,6 +31,7 @@ import kotlinx.android.synthetic.main.fragment_post_article.edt_hashtag
 import kotlinx.android.synthetic.main.fragment_post_article.edt_title
 import kotlinx.android.synthetic.main.fragment_post_pic.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import timber.log.Timber
 import java.io.File
 
 
@@ -234,13 +235,46 @@ class PostPicFragment : BasePostFragment() {
     }
 
     private fun addPic() {
-        file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
-        PostManager().selectPics(this@PostPicFragment, file)
+        val requestList = getNotGrantedPermissions(externalPermissions + cameraPermissions)
+        if (requestList.size > 0) {
+            requestPermissions(
+                requestList.toTypedArray(),
+                PERMISSION_PIC_REQUEST_CODE
+            )
+        } else {
+            file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
+            PostManager().selectPics(this@PostPicFragment, file)
+        }
     }
 
     private fun openViewerPage(viewerItem: ViewerItem) {
         val bundle = Bundle()
         bundle.putSerializable(VIEWER_DATA, viewerItem)
         findNavController().navigate(R.id.action_postPicFragment_to_postViewerFragment, bundle)
+    }
+
+    private fun requestPermissions() {
+        val requestList = getNotGrantedPermissions(externalPermissions + cameraPermissions)
+
+        if (requestList.size == 0) {
+            file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
+            PostManager().selectPics(this@PostPicFragment, file)
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        Timber.i("onRequestPermissionsResult")
+        if (requestCode == PERMISSION_PIC_REQUEST_CODE) {
+            if (getNotGrantedPermissions(externalPermissions + cameraPermissions).isEmpty()) {
+                file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
+                PostManager().selectPics(this@PostPicFragment, file)
+            } else {
+                requestPermissions()
+            }
+        }
     }
 }

@@ -263,13 +263,35 @@ class SettingFragment : BaseFragment() {
 
     private val onChoosePickerDialogListener = object : OnChoosePickerDialogListener {
         override fun onPickFromCamera() {
-            openCamera()
+            requestPermissions()
         }
 
         override fun onPickFromAlbum() {
             openAlbum()
         }
     }
+
+    private fun requestPermissions() {
+        val requestList = getNotGrantedPermissions(cameraPermissions)
+
+        if (requestList.size > 0) {
+            requestPermissions(requestList.toTypedArray(), PERMISSION_CAMERA_REQUEST_CODE)
+        } else {
+            openCamera()
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == PERMISSION_CAMERA_REQUEST_CODE
+            && getNotGrantedPermissions(cameraPermissions).isEmpty()) {
+            openCamera()
+        }
+    }
+
 
     private fun openCamera() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->

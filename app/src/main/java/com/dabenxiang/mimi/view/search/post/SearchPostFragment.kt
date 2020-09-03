@@ -252,7 +252,7 @@ class SearchPostFragment : BaseFragment() {
             }
         })
 
-        viewModel.cleanRemovedPosList.observe(viewLifecycleOwner, Observer {
+        viewModel.cleanRemovedPosList.observe(viewLifecycleOwner, Observer{
             memberPostAdapter?.removedPosList?.clear()
         })
     }

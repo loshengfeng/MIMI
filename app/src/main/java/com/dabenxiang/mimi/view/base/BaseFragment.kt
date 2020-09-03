@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.base
 
+import android.Manifest
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -59,12 +60,30 @@ import java.net.UnknownHostException
 
 abstract class BaseFragment : Fragment() {
 
+    companion object {
+        const val PERMISSION_EXTERNAL_REQUEST_CODE = 637
+        const val PERMISSION_CAMERA_REQUEST_CODE = 699
+    }
+
     open var mainViewModel: MainViewModel? = null
     var progressHUD: KProgressHUD? = null
 
     var mView: View? = null
     var firstCreateView = false
 
+//    val locationPermissions = arrayOf(
+//        Manifest.permission.ACCESS_COARSE_LOCATION,
+//        Manifest.permission.ACCESS_FINE_LOCATION
+//    )
+
+    val externalPermissions = arrayOf(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
+    )
+
+    val cameraPermissions = arrayOf(Manifest.permission.CAMERA)
+
+    open var permissions = externalPermissions + cameraPermissions
     var snackBar: Snackbar? = null
 
     private var moreDialog: MoreDialogFragment? = null

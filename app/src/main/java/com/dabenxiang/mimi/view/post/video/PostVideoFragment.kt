@@ -30,6 +30,7 @@ import kotlinx.android.synthetic.main.fragment_post_article.edt_hashtag
 import kotlinx.android.synthetic.main.fragment_post_article.edt_title
 import kotlinx.android.synthetic.main.fragment_post_pic.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import timber.log.Timber
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -215,7 +216,15 @@ class PostVideoFragment : BasePostFragment() {
     }
 
     private fun openRecorder() {
-        PostManager().selectVideo(this@PostVideoFragment)
+        val requestList = getNotGrantedPermissions(externalPermissions + cameraPermissions)
+        if (requestList.size > 0) {
+            requestPermissions(
+                requestList.toTypedArray(),
+                PERMISSION_VIDEO_REQUEST_CODE
+            )
+        } else {
+            PostManager().selectVideo(this@PostVideoFragment)
+        }
     }
 
     private fun deleteVideo(item: PostVideoAttachment) {
@@ -262,6 +271,29 @@ class PostVideoFragment : BasePostFragment() {
                 )
             )
             videoAttachmentList[0].length = length
+        }
+    }
+
+    private fun requestPermissions() {
+        val requestList = getNotGrantedPermissions(externalPermissions + cameraPermissions)
+
+        if (requestList.size == 0) {
+            PostManager().selectVideo(this@PostVideoFragment)
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        Timber.i("onRequestPermissionsResult")
+        if (requestCode == PERMISSION_VIDEO_REQUEST_CODE) {
+            if (getNotGrantedPermissions(externalPermissions + cameraPermissions).isEmpty()) {
+                PostManager().selectVideo(this@PostVideoFragment)
+            } else {
+                requestPermissions()
+            }
         }
     }
 }
