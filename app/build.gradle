@@ -111,6 +111,7 @@ android {
     buildTypes {
         debug {
             matchingFallbacks = ['release', 'debug']
+            getIsDefault().set(true)
             zipAlignEnabled false
             minifyEnabled false
             debuggable true
@@ -150,6 +151,7 @@ android {
     productFlavors {
         mimi {
             dimension = "normal"
+            getIsDefault().set(true)
             ext {
                 mqtt = [sit: "wss://mqtt.ymmsp.com:443", dev: "ws://10.1.1.121:8083", prod: "ws://10.1.1.121:8083"]
             }
