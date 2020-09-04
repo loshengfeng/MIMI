@@ -11,8 +11,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.RankingFuncItem
-import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.adapter.RankingAdapter
@@ -54,7 +54,7 @@ class RankingFragment : BaseFragment() {
                     intent.putExtras(PlayerActivity.createBundle(playerData))
                     startActivityForResult(intent, REQUEST_LOGIN)
                 },
-                getBitmap = { id, position -> viewModel.getBitmap(id = id, position = position) }
+                getBitmap = { id, view -> viewModel.loadImage(id, view, LoadImageType.PICTURE_THUMBNAIL) }
             )
         )
     }
@@ -96,7 +96,7 @@ class RankingFragment : BaseFragment() {
                     }
 
                 },
-                getBitmap = { id, position -> viewModel.getBitmap(id = id, position = position) }
+                getBitmap = { id, view -> viewModel.loadImage(id, view, LoadImageType.PICTURE_THUMBNAIL) }
             )
         )
     }
@@ -138,18 +138,6 @@ class RankingFragment : BaseFragment() {
             lifecycleScope.launch {
                 delay(500)
                 layout_refresh?.isRefreshing = false
-            }
-        })
-
-        viewModel.bitmapResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Loaded -> progressHUD?.dismiss()
-                is ApiResult.Success -> rv_ranking_content.adapter?.notifyItemChanged(
-                    it.result,
-                    RankingAdapter
-                )
-                is ApiResult.Error -> onApiError(it.throwable)
             }
         })
     }

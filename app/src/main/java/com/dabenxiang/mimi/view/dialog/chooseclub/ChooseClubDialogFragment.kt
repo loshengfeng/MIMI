@@ -2,20 +2,19 @@ package com.dabenxiang.mimi.view.dialog.chooseclub
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.ClubListener
 import com.dabenxiang.mimi.callback.PostAttachmentListener
-import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.adapter.ChooseClubAdapter
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_dialog_choose_club.*
 import kotlinx.android.synthetic.main.fragment_dialog_choose_upload_method.txt_cancel
-import timber.log.Timber
 
 class ChooseClubDialogFragment : BaseDialogFragment() {
 
@@ -61,17 +60,6 @@ class ChooseClubDialogFragment : BaseDialogFragment() {
             adapter.submitList(it)
         })
 
-        viewModel.attachmentByTypeResult.observe(viewLifecycleOwner, Observer {
-            when(it) {
-                is Success -> {
-                    val attachmentItem = it.result
-                    LruCacheUtils.putLruCache(attachmentItem.id!!, attachmentItem.bitmap!!)
-                    adapter.updateItem(attachmentItem.position!!)
-                }
-                is Error -> Timber.e(it.throwable)
-            }
-        })
-
         viewModel.loadingStatus.observe(viewLifecycleOwner, Observer {
             if (it) {
                 progress_bar.visibility = View.VISIBLE
@@ -88,8 +76,8 @@ class ChooseClubDialogFragment : BaseDialogFragment() {
     }
 
     private val attachmentListener = object : PostAttachmentListener {
-        override fun getAttachment(id: String, position: Int) {
-            viewModel.getAttachment(id, position)
+        override fun getAttachment(id: Long?, view: ImageView) {
+            viewModel.loadImage(id, view, LoadImageType.AVATAR)
         }
     }
 

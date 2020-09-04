@@ -73,6 +73,7 @@ class EditVideoFragment : BaseFragment() {
             val editVideoRangeFragment = editVideoFragmentPagerAdapter.getFragment(0) as EditVideoRangeFragment
             editVideoRangeFragment.setEditVideoListener(editTrimmerVideoListener)
             editVideoRangeFragment.save()
+            tv_clean.isEnabled = false
         }
 
         tabLayout.addOnTabSelectedListener(object :
@@ -142,6 +143,7 @@ class EditVideoFragment : BaseFragment() {
         }
 
         override fun onFinish(resourceUri: Uri) {
+            tv_clean.isEnabled = true
             isCropPicFinish = true
 
             dismissDialog()

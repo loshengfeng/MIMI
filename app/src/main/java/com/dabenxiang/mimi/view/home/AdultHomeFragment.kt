@@ -98,6 +98,9 @@ class AdultHomeFragment : BaseFragment() {
         private const val REQUEST_VIDEO_CAPTURE = 10002
         private const val REQUEST_LOGIN = 10003
 
+        private const val PERMISSION_VIDEO_REQUEST_CODE = 20001
+        private const val PERMISSION_PIC_REQUEST_CODE = 20002
+
         const val RECORD_LIMIT_TIME = 15
     }
 
@@ -185,7 +188,7 @@ class AdultHomeFragment : BaseFragment() {
 
         viewModel.videoList.observe(this, Observer {
             videoListAdapter.submitList(it)
-            videoListAdapter.notifyDataSetChanged()
+//            videoListAdapter.notifyDataSetChanged()
         })
 
         viewModel.carouselResult.observe(this, Observer {
@@ -266,27 +269,27 @@ class AdultHomeFragment : BaseFragment() {
 
         viewModel.postFollowItemListResult.observe(this, Observer {
             followPostPagedAdapter.submitList(it)
-            followPostPagedAdapter.notifyDataSetChanged()
+//            followPostPagedAdapter.notifyDataSetChanged()
         })
 
         viewModel.clipPostItemListResult.observe(this, Observer {
             clipPostPagedAdapter.submitList(it)
-            clipPostPagedAdapter.notifyDataSetChanged()
+//            clipPostPagedAdapter.notifyDataSetChanged()
         })
 
         viewModel.picturePostItemListResult.observe(this, Observer {
             picturePostPagedAdapter.submitList(it)
-            picturePostPagedAdapter.notifyDataSetChanged()
+//            picturePostPagedAdapter.notifyDataSetChanged()
         })
 
         viewModel.textPostItemListResult.observe(this, Observer {
             textPostPagedAdapter.submitList(it)
-            textPostPagedAdapter.notifyDataSetChanged()
+//            textPostPagedAdapter.notifyDataSetChanged()
         })
 
         viewModel.clubItemListResult.observe(this, Observer {
             clubMemberAdapter.submitList(it)
-            clubMemberAdapter.notifyDataSetChanged()
+//            clubMemberAdapter.notifyDataSetChanged()
         })
 
         viewModel.totalCountResult.observe(this, Observer {
@@ -308,7 +311,6 @@ class AdultHomeFragment : BaseFragment() {
                         viewModel.totalCount,
                         PAYLOAD_UPDATE_FOLLOW
                     )
-                    viewModel.getAllOtherPosts(lastPosition)
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -397,10 +399,10 @@ class AdultHomeFragment : BaseFragment() {
             }
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_homeFragment_to_searchPostFragment,
-                            bundle
-                    )
+                NavigateItem.Destination(
+                    R.id.action_homeFragment_to_searchPostFragment,
+                    bundle
+                )
             )
         }
 
@@ -475,8 +477,8 @@ class AdultHomeFragment : BaseFragment() {
         refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
     }
 
-    private fun showNoLoginToggle(isShow:Boolean){
-        if(isShow){
+    private fun showNoLoginToggle(isShow: Boolean) {
+        if (isShow) {
             cl_no_login.visibility = View.VISIBLE
             cl_no_data.visibility = View.GONE
             refresh.visibility = View.GONE
@@ -486,7 +488,7 @@ class AdultHomeFragment : BaseFragment() {
         }
     }
 
-    private fun showLoginDialog(){
+    private fun showLoginDialog() {
         loginDialog?.dismiss()
         loginDialog = LoginRequestDialog.newInstance(object : OnLoginRequestDialogListener {
             override fun onRegister() {
@@ -544,8 +546,8 @@ class AdultHomeFragment : BaseFragment() {
                         requireActivity().getDrawable(R.color.adult_color_background)
                     rv_home.layoutManager = LinearLayoutManager(requireContext())
                     rv_home.adapter = homeAdapter
-                    mainViewModel?.getHomeCategories()
                 }
+                mainViewModel?.getHomeCategories()
             }
             1 -> {
                 btn_filter.visibility = View.VISIBLE
@@ -557,8 +559,8 @@ class AdultHomeFragment : BaseFragment() {
                         requireActivity().getDrawable(R.color.adult_color_background)
                     rv_first.layoutManager = GridLayoutManager(requireContext(), 2)
                     rv_first.adapter = videoListAdapter
-                    viewModel.getVideos(null, true)
                 }
+                viewModel.getVideos(null, true)
             }
             2 -> {
                 rv_second.visibility = View.VISIBLE
@@ -568,17 +570,16 @@ class AdultHomeFragment : BaseFragment() {
                         requireActivity().getDrawable(R.color.adult_color_background)
                     rv_second.layoutManager = LinearLayoutManager(requireContext())
                     rv_second.adapter = followPostPagedAdapter
-                    viewModel.getPostFollows()
                 } ?: run {
                     cl_no_data.visibility =
                         followPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
                             ?.let { View.GONE } ?: let { View.VISIBLE }
                 }
-                takeIf{ !accountManager.isLogin() }?.also {
+                takeIf { !accountManager.isLogin() }?.also {
                     showNoLoginToggle(true)
                     showLoginDialog()
                 }
-
+                viewModel.getPostFollows()
             }
             3 -> {
                 rv_third.visibility = View.VISIBLE
@@ -589,12 +590,12 @@ class AdultHomeFragment : BaseFragment() {
                         requireActivity().getDrawable(R.color.adult_color_background)
                     rv_third.layoutManager = LinearLayoutManager(requireContext())
                     rv_third.adapter = clipPostPagedAdapter
-                    viewModel.getClipPosts()
                 } ?: run {
                     cl_no_data.visibility =
                         clipPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
                             ?.let { View.GONE } ?: let { View.VISIBLE }
                 }
+                viewModel.getClipPosts()
             }
             4 -> {
                 rv_fourth.visibility = View.VISIBLE
@@ -605,12 +606,12 @@ class AdultHomeFragment : BaseFragment() {
                         requireActivity().getDrawable(R.color.adult_color_background)
                     rv_fourth.layoutManager = LinearLayoutManager(requireContext())
                     rv_fourth.adapter = picturePostPagedAdapter
-                    viewModel.getPicturePosts()
                 } ?: run {
                     cl_no_data.visibility =
                         picturePostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
                             ?.let { View.GONE } ?: let { View.VISIBLE }
                 }
+                viewModel.getPicturePosts()
             }
             5 -> {
                 rv_fifth.visibility = View.VISIBLE
@@ -621,12 +622,12 @@ class AdultHomeFragment : BaseFragment() {
                         requireActivity().getDrawable(R.color.adult_color_background)
                     rv_fifth.layoutManager = LinearLayoutManager(requireContext())
                     rv_fifth.adapter = textPostPagedAdapter
-                    viewModel.getTextPosts()
                 } ?: run {
                     cl_no_data.visibility =
                         textPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
                             ?.let { View.GONE } ?: let { View.VISIBLE }
                 }
+                viewModel.getTextPosts()
             }
             else -> {
                 rv_sixth.visibility = View.VISIBLE
@@ -637,12 +638,12 @@ class AdultHomeFragment : BaseFragment() {
                         requireActivity().getDrawable(R.color.adult_color_background)
                     rv_sixth.layoutManager = MiMiLinearLayoutManager(requireContext())
                     rv_sixth.adapter = clubMemberAdapter
-                    viewModel.getClubs()
                 } ?: run {
                     cl_no_data.visibility =
                         clubMemberAdapter.currentList.takeUnless { isClubListEmpty(it) }
                             ?.let { View.GONE } ?: let { View.VISIBLE }
                 }
+                viewModel.getClubs()
             }
         }
     }
@@ -750,7 +751,7 @@ class AdultHomeFragment : BaseFragment() {
     private val memberPostFuncItem by lazy {
         MemberPostFuncItem(
             {},
-            { id, func -> getBitmap(id, func) },
+            { id, view, type -> viewModel.loadImage(id, view, type) },
             { item, items, isFollow, func -> followMember(item, items, isFollow, func) },
             { item, isLike, func -> likePost(item, isLike, func) },
             { item, isFavorite, func -> favoritePost(item, isFavorite, func) }
@@ -760,7 +761,7 @@ class AdultHomeFragment : BaseFragment() {
     private val clubFuncItem by lazy {
         ClubFuncItem(
             { item -> onItemClick(item) },
-            { id, function -> getBitmap(id, function) },
+            { id, view, type -> viewModel.loadImage(id, view, type) },
             { item, isFollow, function -> clubFollow(item, isFollow, function) })
     }
 
@@ -994,12 +995,28 @@ class AdultHomeFragment : BaseFragment() {
 
     private val onChooseUploadMethodDialogListener = object : OnChooseUploadMethodDialogListener {
         override fun onUploadVideo() {
-            PostManager().selectVideo(this@AdultHomeFragment)
+            val requestList = getNotGrantedPermissions(externalPermissions + cameraPermissions)
+            if (requestList.size > 0) {
+                requestPermissions(
+                    requestList.toTypedArray(),
+                    PERMISSION_VIDEO_REQUEST_CODE
+                )
+            } else {
+                PostManager().selectVideo(this@AdultHomeFragment)
+            }
         }
 
         override fun onUploadPic() {
-            file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
-            PostManager().selectPics(this@AdultHomeFragment, file)
+            val requestList = getNotGrantedPermissions(externalPermissions + cameraPermissions)
+            if (requestList.size > 0) {
+                requestPermissions(
+                    requestList.toTypedArray(),
+                    PERMISSION_PIC_REQUEST_CODE
+                )
+            } else {
+                file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
+                PostManager().selectPics(this@AdultHomeFragment, file)
+            }
         }
 
         override fun onUploadArticle() {
@@ -1074,10 +1091,6 @@ class AdultHomeFragment : BaseFragment() {
         findNavController().navigate(R.id.action_adultHomeFragment_to_clubDetailFragment, bundle)
     }
 
-    private fun getBitmap(id: String, update: ((String) -> Unit)) {
-        viewModel.getBitmap(id, update)
-    }
-
     private fun followMember(
         memberPostItem: MemberPostItem,
         items: List<MemberPostItem>,
@@ -1117,5 +1130,44 @@ class AdultHomeFragment : BaseFragment() {
 
     private fun isClubListEmpty(list: PagedList<MemberClubItem>?): Boolean {
         return list == null || list.size == 0 || (list.size == 1 && list[0]?.adItem != null)
+    }
+
+    private fun requestVideoPermissions() {
+        val requestList = getNotGrantedPermissions(externalPermissions + cameraPermissions)
+
+        if (requestList.size == 0) {
+            PostManager().selectVideo(this@AdultHomeFragment)
+        }
+    }
+
+    private fun requestPicPermissions() {
+        val requestList = getNotGrantedPermissions(externalPermissions + cameraPermissions)
+
+        if (requestList.size == 0) {
+            file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
+            PostManager().selectPics(this@AdultHomeFragment, file)
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        Timber.i("onRequestPermissionsResult")
+        if (requestCode == PERMISSION_VIDEO_REQUEST_CODE) {
+            if (getNotGrantedPermissions(externalPermissions + cameraPermissions).isEmpty()) {
+                PostManager().selectVideo(this@AdultHomeFragment)
+            } else {
+                requestVideoPermissions()
+            }
+        } else if (requestCode == PERMISSION_PIC_REQUEST_CODE) {
+            if (getNotGrantedPermissions(externalPermissions + cameraPermissions).isEmpty()) {
+                file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
+                PostManager().selectPics(this@AdultHomeFragment, file)
+            } else {
+                requestPicPermissions()
+            }
+        }
     }
 }

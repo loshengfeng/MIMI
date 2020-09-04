@@ -14,6 +14,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.PostPicItemListener
 import com.dabenxiang.mimi.model.api.vo.MediaItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.PostAttachmentItem
 import com.dabenxiang.mimi.model.vo.SearchPostItem
@@ -30,6 +31,7 @@ import kotlinx.android.synthetic.main.fragment_post_article.edt_hashtag
 import kotlinx.android.synthetic.main.fragment_post_article.edt_title
 import kotlinx.android.synthetic.main.fragment_post_pic.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import timber.log.Timber
 import java.io.File
 
 
@@ -55,7 +57,8 @@ class PostPicFragment : BasePostFragment() {
     override fun initSettings() {
         adapter = ScrollPicAdapter(postPicItemListener)
         adapter.submitList(attachmentList)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
+        recyclerView.layoutManager =
+            LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         recyclerView.adapter = adapter
 
         tv_clean.isEnabled = true
@@ -77,7 +80,8 @@ class PostPicFragment : BasePostFragment() {
             }
 
             if (adapter.getData().isEmpty()) {
-                Toast.makeText(requireContext(), R.string.post_warning_pic, Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), R.string.post_warning_pic, Toast.LENGTH_SHORT)
+                    .show()
                 return@setOnClickListener
             }
 
@@ -139,9 +143,12 @@ class PostPicFragment : BasePostFragment() {
             val postAttachmentItem = PostAttachmentItem(uri = uri!!)
             attachmentList.add(postAttachmentItem)
         }
-        txt_picCount.text = String.format(getString(R.string.select_pic_count, attachmentList.size,
-            PHOTO_LIMIT
-        ))
+        txt_picCount.text = String.format(
+            getString(
+                R.string.select_pic_count, attachmentList.size,
+                PHOTO_LIMIT
+            )
+        )
     }
 
     override fun setUI(item: MediaItem) {
@@ -152,18 +159,24 @@ class PostPicFragment : BasePostFragment() {
             attachmentList.add(postAttachmentItem)
         }
 
-        txt_picCount.text = String.format(getString(R.string.select_pic_count, attachmentList.size,
-            PHOTO_LIMIT
-        ))
+        txt_picCount.text = String.format(
+            getString(
+                R.string.select_pic_count, attachmentList.size,
+                PHOTO_LIMIT
+            )
+        )
     }
 
     private fun updateCountPicView() {
         attachmentList.clear()
         attachmentList.addAll(adapter.getData())
         adapter.notifyDataSetChanged()
-        txt_picCount.text = String.format(getString(R.string.select_pic_count, attachmentList.size,
-            PHOTO_LIMIT
-        ))
+        txt_picCount.text = String.format(
+            getString(
+                R.string.select_pic_count, attachmentList.size,
+                PHOTO_LIMIT
+            )
+        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -205,16 +218,12 @@ class PostPicFragment : BasePostFragment() {
 
     private val postPicItemListener by lazy {
         PostPicItemListener(
-            { id, function -> getBitmap(id, function) },
+            { id, view -> viewModel.loadImage(id, view, LoadImageType.PICTURE_THUMBNAIL) },
             { item -> handleDeletePic(item) },
             { updateCountPicView() },
             { addPic() },
             { viewerItem -> openViewerPage(viewerItem) }
         )
-    }
-
-    private fun getBitmap(id: String, update: ((String) -> Unit)) {
-        viewModel.getBitmap(id, update)
     }
 
     private fun handleDeletePic(item: PostAttachmentItem) {
@@ -226,13 +235,46 @@ class PostPicFragment : BasePostFragment() {
     }
 
     private fun addPic() {
-        file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
-        PostManager().selectPics(this@PostPicFragment, file)
+        val requestList = getNotGrantedPermissions(externalPermissions + cameraPermissions)
+        if (requestList.size > 0) {
+            requestPermissions(
+                requestList.toTypedArray(),
+                PERMISSION_PIC_REQUEST_CODE
+            )
+        } else {
+            file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
+            PostManager().selectPics(this@PostPicFragment, file)
+        }
     }
 
     private fun openViewerPage(viewerItem: ViewerItem) {
         val bundle = Bundle()
         bundle.putSerializable(VIEWER_DATA, viewerItem)
         findNavController().navigate(R.id.action_postPicFragment_to_postViewerFragment, bundle)
+    }
+
+    private fun requestPermissions() {
+        val requestList = getNotGrantedPermissions(externalPermissions + cameraPermissions)
+
+        if (requestList.size == 0) {
+            file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
+            PostManager().selectPics(this@PostPicFragment, file)
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        Timber.i("onRequestPermissionsResult")
+        if (requestCode == PERMISSION_PIC_REQUEST_CODE) {
+            if (getNotGrantedPermissions(externalPermissions + cameraPermissions).isEmpty()) {
+                file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
+                PostManager().selectPics(this@PostPicFragment, file)
+            } else {
+                requestPermissions()
+            }
+        }
     }
 }

@@ -1,8 +1,9 @@
 package com.dabenxiang.mimi.callback
 
-import com.dabenxiang.mimi.model.enums.AttachmentType
+import android.widget.ImageView
+import com.dabenxiang.mimi.model.enums.LoadImageType
 
 interface AttachmentListener {
-    fun onGetAttachment(id: String, position: Int, type: AttachmentType)
+    fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType)
     fun onGetAttachment(id: String, parentPosition: Int, position: Int)
 }

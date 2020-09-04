@@ -6,23 +6,14 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.PostStatisticsItem
 import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.StatisticsType
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import timber.log.Timber
 
 class RankingViewModel : BaseViewModel() {
 
@@ -31,9 +22,6 @@ class RankingViewModel : BaseViewModel() {
 
     private val _rankingVideosList = MutableLiveData<PagedList<StatisticsItem>>()
     val rankingVideosList: LiveData<PagedList<StatisticsItem>> = _rankingVideosList
-
-    private var _bitmapResult = MutableLiveData<ApiResult<Int>>()
-    val bitmapResult: LiveData<ApiResult<Int>> = _bitmapResult
 
     var statisticsTypeSelected: StatisticsType = StatisticsType.TODAY
     var postTypeSelected: PostType = PostType.VIDEO_ON_DEMAND
@@ -114,23 +102,4 @@ class RankingViewModel : BaseViewModel() {
 
         override fun onThrowable(throwable: Throwable) {}
     }
-
-    fun getBitmap(id: String, position: Int) {
-        Timber.i("getBitmap id=$id")
-        if (id == "0") return
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository().getAttachment(id)
-                if (!result.isSuccessful) throw HttpException(result)
-                val byteArray = result.body()?.bytes()
-                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
-                LruCacheUtils.putLruCache(id, bitmap)
-                emit(ApiResult.success(position))
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _bitmapResult.value = it }
-        }
-    }
-
 }

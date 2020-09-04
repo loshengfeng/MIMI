@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.ColorStateList
-import android.graphics.Bitmap
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.text.Html
@@ -14,6 +13,7 @@ import android.text.TextUtils
 import android.view.*
 import android.view.View.VISIBLE
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -31,10 +31,7 @@ import com.dabenxiang.mimi.extension.setNot
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.api.vo.*
-import com.dabenxiang.mimi.model.enums.CommentViewType
-import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
-import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.model.enums.VideoConsumeResult
+import com.dabenxiang.mimi.model.enums.*
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.model.vo.StatusItem
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
@@ -228,11 +225,6 @@ class PlayerActivity : BaseActivity() {
                 }
             }
 
-            override fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit) {
-                Timber.i("playerInfoAdapter getBitmap")
-                viewModel.getBitmap(id.toString(), succeededBlock)
-            }
-
             override fun onMoreClick(item: MembersPostCommentItem) {
                 Timber.i("playerInfoAdapter onMoreClick")
                 if (item.id != null) {
@@ -254,6 +246,10 @@ class PlayerActivity : BaseActivity() {
                     R.id.action_to_myPostFragment,
                     bundle
                 )
+            }
+
+            override fun loadAvatar(id: Long?, view: ImageView) {
+                viewModel.loadImage(id, view, LoadImageType.AVATAR)
             }
         }, CommentViewType.VIDEO).apply {
             loadMoreModule.apply {

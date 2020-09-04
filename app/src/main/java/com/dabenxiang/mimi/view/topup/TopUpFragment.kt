@@ -3,23 +3,19 @@ package com.dabenxiang.mimi.view.topup
 import android.content.Context
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.Glide
-import com.bumptech.glide.Priority
-import com.bumptech.glide.load.MultiTransformation
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.CircleCrop
-import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.AgentItem
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderingPackageItem
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.view.adapter.TopUpAgentAdapter
 import com.dabenxiang.mimi.view.adapter.TopUpOnlinePayAdapter
@@ -30,12 +26,8 @@ import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.orderinfo.OrderInfoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_top_up.*
-import kotlinx.android.synthetic.main.fragment_top_up.iv_photo
-import kotlinx.android.synthetic.main.fragment_top_up.tv_name
-import kotlinx.android.synthetic.main.item_personal_is_login.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import timber.log.Timber
 
@@ -82,34 +74,11 @@ class TopUpFragment : BaseFragment() {
                 is Success -> {
                     tv_name.text = it.result.friendlyName
                     tv_coco.text = it.result.availablePoint.toString()
-                }
-                is Error -> onApiError(it.throwable)
-            }
-        })
-
-        viewModel.avatar.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Success -> {
-                    val attachmentItem = it.result
-                    LruCacheUtils.putLruArrayCache(
-                        attachmentItem.id
-                            ?: "", attachmentItem.fileArray
-                            ?: ByteArray(0)
+                    viewModel.loadImage(
+                        it.result.avatarAttachmentId,
+                        iv_photo,
+                        LoadImageType.AVATAR
                     )
-                    if (attachmentItem.position == viewModel.TAG_MY_AVATAR) {
-                        val options: RequestOptions = RequestOptions()
-                            .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                            .placeholder(R.drawable.default_profile_picture)
-                            .error(R.drawable.default_profile_picture)
-                            .priority(Priority.NORMAL)
-
-                        Glide.with(this).asBitmap()
-                            .load(attachmentItem.fileArray)
-                            .apply(options)
-                            .into(iv_photo)
-                    } else {
-                        agentAdapter.update(attachmentItem.position ?: 0)
-                    }
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -336,8 +305,8 @@ class TopUpFragment : BaseFragment() {
             viewModel.createChatRoom(item)
         }
 
-        override fun onGetAvatarAttachment(id: String, position: Int) {
-            viewModel.getAttachment(id, position)
+        override fun onGetAvatarAttachment(id: Long?, view: ImageView) {
+            viewModel.loadImage(id, view, LoadImageType.AVATAR)
         }
     }
 

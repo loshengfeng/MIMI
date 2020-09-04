@@ -309,6 +309,14 @@ class VideoTrimmer @JvmOverloads constructor(context: Context, attrs: AttributeS
 
     private fun setTimeFrames() {
         val seconds = context.getString(R.string.short_seconds)
+
+        val duration = mEndPosition - mStartPosition
+
+        if (duration > mMaxDuration) {
+            val redundantDuration = duration - mMaxDuration
+            mEndPosition -= redundantDuration
+        }
+
         textTimeSelection.text = String.format("%s %s - %s %s", TrimVideoUtils.stringForTime(mStartPosition), seconds, TrimVideoUtils.stringForTime(mEndPosition), seconds)
         endDuration = (mEndPosition - mStartPosition).toInt()
     }

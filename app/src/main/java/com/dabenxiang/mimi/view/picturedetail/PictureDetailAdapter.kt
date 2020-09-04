@@ -2,10 +2,10 @@ package com.dabenxiang.mimi.view.picturedetail
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +18,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.CommentViewType
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
@@ -28,7 +29,6 @@ import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.CommentLoadMoreView
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
 import org.koin.core.KoinComponent
@@ -121,18 +121,11 @@ class PictureDetailAdapter(
                     GeneralUtils.getTimeDiff(memberPostItem.creationDate, Date())
                 holder.title.text = memberPostItem.title
 
-                val avatarId = memberPostItem.avatarAttachmentId.toString()
-                if (avatarId != LruCacheUtils.ZERO_ID) {
-                    val bitmap = LruCacheUtils.getLruCache(avatarId)
-                    Glide.with(context)
-                        .load(bitmap)
-                        .circleCrop()
-                        .into(holder.avatarImg)
-                } else {
-                    Glide.with(holder.avatarImg.context).load(R.drawable.default_profile_picture)
-                        .circleCrop()
-                        .into(holder.avatarImg)
-                }
+                onPictureDetailListener.onGetAttachment(
+                    memberPostItem.avatarAttachmentId,
+                    holder.avatarImg,
+                    LoadImageType.AVATAR
+                )
 
                 if (accountManager.getProfile().userId != memberPostItem.creatorId) {
                     holder.follow.visibility = View.VISIBLE
@@ -271,10 +264,6 @@ class PictureDetailAdapter(
             onPictureDetailListener.onCommandDislike(replyId, succeededBlock)
         }
 
-        override fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit) {
-            onPictureDetailListener.onGetCommandAvatar(id, succeededBlock)
-        }
-
         override fun onMoreClick(item: MembersPostCommentItem) {
             onPictureDetailListener.onMoreClick(item)
         }
@@ -282,16 +271,19 @@ class PictureDetailAdapter(
         override fun onAvatarClick(userId: Long, name: String) {
             onPictureDetailListener.onAvatarClick(userId, name)
         }
+
+        override fun loadAvatar(id: Long?, view: ImageView) {
+            onPictureDetailListener.onGetAttachment(id, view, LoadImageType.AVATAR)
+        }
     }
 
     interface OnPictureDetailListener {
-        fun onGetAttachment(id: String, position: Int)
+        fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType)
         fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean)
         fun onGetCommandInfo(adapter: CommentAdapter, type: CommentType)
         fun onGetReplyCommand(parentNode: RootCommentNode, succeededBlock: () -> Unit)
         fun onCommandLike(commentId: Long?, isLike: Boolean, succeededBlock: () -> Unit)
         fun onCommandDislike(commentId: Long?, succeededBlock: () -> Unit)
-        fun onGetCommandAvatar(id: Long, succeededBlock: (Bitmap) -> Unit)
         fun onReplyComment(replyId: Long?, replyName: String?)
         fun onMoreClick(item: MembersPostCommentItem)
         fun onChipClick(type: PostType, tag: String)

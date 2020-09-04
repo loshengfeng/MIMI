@@ -83,21 +83,7 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
                 ivType.visibility = View.INVISIBLE
                 clProxy.visibility = View.VISIBLE
                 tvName.text = orderItem.merchantUserFriendlyName
-                orderItem.merchantUserAvatarAttachmentId?.toString()
-                    .takeIf { !TextUtils.isEmpty(it) && it != LruCacheUtils.ZERO_ID }?.also { id ->
-                        LruCacheUtils.getLruCache(id)?.also { bitmap ->
-                            Glide.with(ivAvatar.context).load(bitmap).into(ivAvatar)
-                        } ?: run {
-                            orderFuncItem?.getOrderProxyAttachment?.invoke(id) { id ->
-                                updateAvatar(
-                                    id
-                                )
-                            }
-                        }
-                    } ?: run {
-                    Glide.with(ivAvatar.context).load(R.drawable.icon_cs_photo)
-                        .into(ivAvatar)
-                }
+                orderFuncItem?.getOrderProxyAttachment?.invoke(orderItem.merchantUserAvatarAttachmentId,ivAvatar)
             }
             true -> {
                 clProxy.visibility = View.GONE

@@ -242,6 +242,7 @@ class MainActivity : BaseActivity(), InteractionListener {
                 PackageInstaller.STATUS_FAILURE_INVALID,
                 PackageInstaller.STATUS_FAILURE_STORAGE -> {
                     Timber.d("STATUS_FAILURE ${extras.getInt(PackageInstaller.EXTRA_STATUS)}")
+                    Timber.d("STATUS_FAILURE MESSAGE ${extras.getString(PackageInstaller.EXTRA_STATUS_MESSAGE)}")
                     Toast.makeText(
                         this,
                         getString(R.string.install_apk_failed_alert),

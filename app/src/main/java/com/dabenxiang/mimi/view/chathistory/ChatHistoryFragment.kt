@@ -2,21 +2,22 @@ package com.dabenxiang.mimi.view.chathistory
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult.*
+import com.dabenxiang.mimi.model.api.ApiResult.Error
+import com.dabenxiang.mimi.model.api.ApiResult.Loaded
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.adapter.ChatHistoryAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_chat_history.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import timber.log.Timber
 
 class ChatHistoryFragment : BaseFragment() {
 
@@ -34,8 +35,8 @@ class ChatHistoryFragment : BaseFragment() {
             )
         }
 
-        override fun onGetAttachment(id: String, position: Int) {
-            viewModel.getAttachment(id, position)
+        override fun onGetAttachment(id: Long?, view: ImageView) {
+            viewModel.loadImage(id, view, LoadImageType.AVATAR)
         }
 
     }
@@ -62,19 +63,6 @@ class ChatHistoryFragment : BaseFragment() {
 
     override fun setupObservers() {
         viewModel.chatHistory.observe(viewLifecycleOwner, Observer { adapter.submitList(it) })
-        viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Success -> {
-                    val attachmentItem = it.result
-                    LruCacheUtils.putLruArrayCache(
-                        attachmentItem.id ?: "", attachmentItem.fileArray
-                            ?: ByteArray(0)
-                    )
-                    adapter.update(attachmentItem.position ?: 0)
-                }
-                is Error -> Timber.e(it.throwable)
-            }
-        })
 
         viewModel.pagingResult.observe(viewLifecycleOwner, Observer {
             when (it) {

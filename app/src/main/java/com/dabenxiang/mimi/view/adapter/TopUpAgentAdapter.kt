@@ -4,12 +4,12 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.AgentItem
-import com.dabenxiang.mimi.view.listener.AdapterEventListener
 import com.dabenxiang.mimi.view.topup.TopUpProxyPayViewHolder
 
 class TopUpAgentAdapter(
@@ -17,7 +17,7 @@ class TopUpAgentAdapter(
 ) : PagedListAdapter<AgentItem, RecyclerView.ViewHolder>(diffCallback) {
     interface EventListener {
         fun onItemClick(view: View, item: AgentItem)
-        fun onGetAvatarAttachment(id: String, position: Int)
+        fun onGetAvatarAttachment(id: Long?, view:ImageView)
     }
 
     companion object {

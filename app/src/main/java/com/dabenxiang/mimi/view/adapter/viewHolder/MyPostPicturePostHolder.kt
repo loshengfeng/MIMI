@@ -10,7 +10,6 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
@@ -20,14 +19,13 @@ import com.dabenxiang.mimi.callback.OnItemClickListener
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
-import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.adapter.PictureAdapter
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
@@ -84,19 +82,7 @@ class MyPostPicturePostHolder(
         tvTitle.text = item.title
         tvFollow.visibility = if(accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
 
-        if (LruCacheUtils.getLruCache(item.avatarAttachmentId.toString()) == null) {
-            attachmentListener.onGetAttachment(
-                item.avatarAttachmentId.toString(),
-                position,
-                AttachmentType.ADULT_TAB_PICTURE
-            )
-        } else {
-            val bitmap = LruCacheUtils.getLruCache(item.avatarAttachmentId.toString())
-            Glide.with(imgAvatar.context)
-                .load(bitmap)
-                .circleCrop()
-                .into(imgAvatar)
-        }
+        attachmentListener.onGetAttachment(item.avatarAttachmentId, imgAvatar, LoadImageType.AVATAR)
 
         tagChipGroup.removeAllViews()
         item.tags?.forEach {

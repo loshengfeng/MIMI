@@ -10,7 +10,6 @@ import com.dabenxiang.mimi.callback.TopUpPagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.PaymentType
-import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.model.vo.ProfileItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.flow.*
@@ -19,7 +18,6 @@ import retrofit2.HttpException
 
 class TopUpViewModel : BaseViewModel() {
 
-    val TAG_MY_AVATAR = -1
     var currentItem: AgentItem? = null
 
     private val _agentList = MutableLiveData<PagedList<AgentItem>>()
@@ -30,9 +28,6 @@ class TopUpViewModel : BaseViewModel() {
 
     private val _meItem = MutableLiveData<ApiResult<MeItem>>()
     val meItem: LiveData<ApiResult<MeItem>> = _meItem
-
-    private val _avatar = MutableLiveData<ApiResult<AttachmentItem>>()
-    val avatar: LiveData<ApiResult<AttachmentItem>> = _avatar
 
     private val _createChatRoomResult = MutableLiveData<ApiResult<String>>()
     val createChatRoomResult: LiveData<ApiResult<String>> = _createChatRoomResult
@@ -107,37 +102,12 @@ class TopUpViewModel : BaseViewModel() {
                 val result = domainManager.getApiRepository().getMe()
                 if (!result.isSuccessful) throw HttpException(result)
                 val meItem = result.body()?.content
-                meItem?.let {
-                    accountManager.setupProfile(it)
-                    it.avatarAttachmentId?.also { id -> getAttachment(id.toString()) }
-                }
                 emit(ApiResult.success(meItem))
             }
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _meItem.value = it }
-        }
-    }
-
-    fun getAttachment(id: String, position: Int = TAG_MY_AVATAR) {
-        viewModelScope.launch {
-            flow {
-                val apiRepository = domainManager.getApiRepository()
-                val result = apiRepository.getAttachment(id)
-                if (!result.isSuccessful) throw HttpException(result)
-                val byteArray = result.body()?.bytes()
-                val item = AttachmentItem(
-                    id = id,
-                    fileArray = byteArray,
-                    position = position
-                )
-                emit(ApiResult.success(item))
-            }
-                .onStart { emit(ApiResult.loading()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .collect { _avatar.value = it }
         }
     }
 

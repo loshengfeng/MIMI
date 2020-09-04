@@ -6,7 +6,6 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
@@ -22,7 +21,6 @@ import com.dabenxiang.mimi.view.home.postfollow.PostFollowDataSource
 import com.dabenxiang.mimi.view.home.postfollow.PostFollowFactory
 import com.dabenxiang.mimi.view.home.video.VideoDataSource
 import com.dabenxiang.mimi.view.home.video.VideoFactory
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
@@ -187,28 +185,6 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-    fun getBitmap(id: String, update: ((String) -> Unit)) {
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository().getAttachment(id)
-                if (!result.isSuccessful) throw HttpException(result)
-                val byteArray = result.body()?.bytes()
-                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
-                LruCacheUtils.putLruCache(id, bitmap)
-                emit(ApiResult.success(id))
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect {
-                    when (it) {
-                        is ApiResult.Success -> {
-                            update(it.result)
-                        }
-                    }
-                }
-        }
-    }
-
     fun clubFollow(item: MemberClubItem, isFollow: Boolean, update: ((Boolean) -> Unit)) {
         viewModelScope.launch {
             flow {
@@ -291,7 +267,7 @@ class HomeViewModel : BaseViewModel() {
                     when (it) {
                         is ApiResult.Success -> {
                             update(isLike, it.result)
-                            getAllOtherPosts(lastPosition)
+//                            getAllOtherPosts(lastPosition)
                         }
                     }
                 }

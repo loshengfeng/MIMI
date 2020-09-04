@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -32,7 +33,7 @@ class ClubFollowAdapter(
 
     interface EventListener {
         fun onDetail(item: ClubFollowItem)
-        fun onGetAttachment(id: String, position: Int)
+        fun onGetAttachment(id: Long, view:ImageView)
         fun onCancelFollow(clubId: Long, position: Int)
     }
 

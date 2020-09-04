@@ -7,6 +7,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.fragment.app.FragmentManager
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import kotlinx.android.synthetic.main.fragment_dialog_general.*
 import java.io.Serializable
@@ -24,7 +25,8 @@ class GeneralDialogData(
     val secondBtn: String = "",
     val secondBlock: (() -> Unit)? = null,
     val closeBlock: (() -> Unit)? = null,
-    val isMessageIcon: Boolean = true
+    val isMessageIcon: Boolean = true,
+    val attachmentId: Long = 0
 ) : Serializable
 
 fun GeneralDialog.show(manager: FragmentManager): GeneralDialog {
@@ -69,6 +71,9 @@ class GeneralDialog : BaseDialogFragment() {
                 } else {
                     View.GONE
                 }
+
+            if (data.attachmentId != 0L)
+                mainViewModel?.loadImage(data.attachmentId, iv_avatar, LoadImageType.AVATAR)
 
             if (data.isHtml)
                 tv_message.text = Html.fromHtml(data.message, Html.FROM_HTML_MODE_COMPACT)

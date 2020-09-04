@@ -1,10 +1,8 @@
 package com.dabenxiang.mimi.view.picturedetail
 
-import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.event.SingleLiveEvent
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
@@ -13,13 +11,11 @@ import com.dabenxiang.mimi.model.api.vo.PostCommentRequest
 import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
 import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.LikeType
-import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.CommentDataSource
 import com.dabenxiang.mimi.view.player.NestedCommentNode
 import com.dabenxiang.mimi.view.player.RootCommentNode
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -28,14 +24,8 @@ import retrofit2.HttpException
 
 class PictureDetailViewModel : BaseViewModel() {
 
-    private var _attachmentResult = MutableLiveData<ApiResult<AttachmentItem>>()
-    val attachmentResult: LiveData<ApiResult<AttachmentItem>> = _attachmentResult
-
     private var _followPostResult = MutableLiveData<ApiResult<Int>>()
     val followPostResult: LiveData<ApiResult<Int>> = _followPostResult
-
-    private var _avatarResult = MutableLiveData<ApiResult<Bitmap>>()
-    val avatarResult: LiveData<ApiResult<Bitmap>> = _avatarResult
 
     private val _replyCommentResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
     val replyCommentResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _replyCommentResult
@@ -56,46 +46,6 @@ class PictureDetailViewModel : BaseViewModel() {
     private var _currentCommentType = CommentType.NEWEST
     val currentCommentType: CommentType
         get() = _currentCommentType
-
-    fun getAttachment(id: String, position: Int) {
-        if (id == LruCacheUtils.ZERO_ID) return
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository().getAttachment(id)
-                if (!result.isSuccessful) throw HttpException(result)
-                val byteArray = result.body()?.bytes()
-                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
-                val item = AttachmentItem(
-                    id = id,
-                    bitmap = bitmap,
-                    position = position
-                )
-                emit(ApiResult.success(item))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _attachmentResult.value = it }
-        }
-    }
-
-    fun getAvatar(id: String) {
-        if (id == LruCacheUtils.ZERO_ID) return
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository().getAttachment(id)
-                if (!result.isSuccessful) throw HttpException(result)
-                val byteArray = result.body()?.bytes()
-                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
-                LruCacheUtils.putLruCache(id, bitmap)
-                emit(ApiResult.success(bitmap))
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _avatarResult.value = it }
-        }
-    }
 
     fun followPost(item: MemberPostItem, position: Int, isFollow: Boolean) {
         viewModelScope.launch {

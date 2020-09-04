@@ -4,20 +4,10 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.bumptech.glide.Glide
-import com.bumptech.glide.Priority
-import com.bumptech.glide.load.MultiTransformation
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.CircleCrop
-import com.bumptech.glide.request.RequestOptions
-import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.view.adapter.ChatHistoryAdapter
 import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
-import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -46,23 +36,7 @@ class ChatHistoryViewHolder(
             data?.let { data -> listener.onClickListener(data, position) }
         }
 
-        data?.avatarAttachmentId?.let {
-            LruCacheUtils.getLruArrayCache(it.toString())?.also { array ->
-                val options: RequestOptions = RequestOptions()
-                        .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                        .placeholder(R.drawable.icon_cs_photo)
-                        .error(R.drawable.icon_cs_photo)
-                        .priority(Priority.NORMAL)
-
-                Glide.with(App.self)
-                        .asBitmap()
-                        .load(array)
-                        .apply(options)
-                        .into(imgChatPhoto)
-            } ?: run {
-                listener.onGetAttachment(it.toString(), position)
-            }
-        }
+        listener.onGetAttachment(data?.avatarAttachmentId, imgChatPhoto)
 
         textName.text = data?.name
         textContent.text = data?.message.toString()

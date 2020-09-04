@@ -1,14 +1,12 @@
 package com.dabenxiang.mimi.view.adapter.viewHolder
 
 import android.content.res.ColorStateList
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
@@ -17,12 +15,11 @@ import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
@@ -34,7 +31,7 @@ import java.util.*
 class MyPostClipPostHolder(
     itemView: View,
     private val isAdultTheme: Boolean
-) : BaseViewHolder(itemView),KoinComponent {
+) : BaseViewHolder(itemView), KoinComponent {
 
     private val accountManager: AccountManager by inject()
 
@@ -55,7 +52,7 @@ class MyPostClipPostHolder(
     private val ivFavorite: ImageView = itemView.iv_favorite
     private val tvFavoriteCount: TextView = itemView.tv_favorite_count
     private val layoutClip: ConstraintLayout = itemView.layout_clip
-    private val vSeparator:View = itemView.v_separator
+    private val vSeparator: View = itemView.v_separator
 
     fun onBind(
         item: MemberPostItem,
@@ -80,21 +77,10 @@ class MyPostClipPostHolder(
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         tvTitle.text = item.title
-        tvFollow.visibility = if(accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
+        tvFollow.visibility =
+            if (accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
 
-        if (LruCacheUtils.getLruCache(item.avatarAttachmentId.toString()) == null) {
-            attachmentListener.onGetAttachment(
-                item.avatarAttachmentId.toString(),
-                position,
-                AttachmentType.ADULT_TAB_CLIP
-            )
-        } else {
-            val bitmap = LruCacheUtils.getLruCache(item.avatarAttachmentId.toString())
-            Glide.with(ivAvatar.context)
-                .load(bitmap)
-                .circleCrop()
-                .into(ivAvatar)
-        }
+        attachmentListener.onGetAttachment(item.avatarAttachmentId, ivAvatar, LoadImageType.AVATAR)
 
         tagChipGroup.removeAllViews()
         item.tags?.forEach {
@@ -117,25 +103,11 @@ class MyPostClipPostHolder(
         val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
 
         tvLength.text = contentItem.shortVideo?.length
-        contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
-            images[0].also { image ->
-                if (TextUtils.isEmpty(image.url)) {
-                    image.id.takeIf { !TextUtils.isEmpty(it) }?.also { id ->
-                        LruCacheUtils.getLruCache(id)?.also { bitmap ->
-                            Glide.with(ivPhoto.context).load(bitmap).into(ivPhoto)
-                        } ?: run {
-                            attachmentListener.onGetAttachment(
-                                id,
-                                position,
-                                AttachmentType.ADULT_TAB_CLIP
-                            )
-                        }
-                    }
-                } else {
-                    Glide.with(ivPhoto.context).load(image.url).into(ivPhoto)
-                }
-            }
-        }
+        attachmentListener.onGetAttachment(
+            contentItem.images?.get(0)?.id?.toLongOrNull(),
+            ivPhoto,
+            LoadImageType.PICTURE_THUMBNAIL
+        )
 
         if (isMe) {
             tvFollow.visibility = View.GONE

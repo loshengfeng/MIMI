@@ -2,10 +2,10 @@ package com.dabenxiang.mimi.view.textdetail
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -28,7 +28,6 @@ import com.dabenxiang.mimi.view.player.CommentLoadMoreView
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.view.textdetail.viewholder.TextDetailViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
 import org.koin.core.KoinComponent
@@ -126,18 +125,10 @@ class TextDetailAdapter(
                 holder.title.text = memberPostItem.title
                 holder.desc.text = contentItem.text
 
-                val avatarId = memberPostItem.avatarAttachmentId.toString()
-                if (avatarId != LruCacheUtils.ZERO_ID) {
-                    val bitmap = LruCacheUtils.getLruCache(avatarId)
-                    Glide.with(context)
-                        .load(bitmap)
-                        .circleCrop()
-                        .into(holder.avatarImg)
-                } else {
-                    Glide.with(holder.avatarImg.context).load(R.drawable.default_profile_picture)
-                        .circleCrop()
-                        .into(holder.avatarImg)
-                }
+                onTextDetailListener.onGetAttachment(
+                    memberPostItem.avatarAttachmentId,
+                    holder.avatarImg
+                )
 
                 if (accountManager.getProfile().userId != memberPostItem.creatorId) {
                     holder.follow.visibility = View.VISIBLE
@@ -262,10 +253,6 @@ class TextDetailAdapter(
             onTextDetailListener.onCommandDislike(replyId, succeededBlock)
         }
 
-        override fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit) {
-            onTextDetailListener.onGetCommandAvatar(id, succeededBlock)
-        }
-
         override fun onMoreClick(item: MembersPostCommentItem) {
             onTextDetailListener.onMoreClick(item)
         }
@@ -273,15 +260,19 @@ class TextDetailAdapter(
         override fun onAvatarClick(userId: Long, name: String) {
             onTextDetailListener.onAvatarClick(userId, name)
         }
+
+        override fun loadAvatar(id: Long?, view: ImageView) {
+            onTextDetailListener.onGetAttachment(id, view)
+        }
     }
 
     interface OnTextDetailListener {
+        fun onGetAttachment(id: Long?, view: ImageView)
         fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean)
         fun onGetCommandInfo(adapter: CommentAdapter, type: CommentType)
         fun onGetReplyCommand(parentNode: RootCommentNode, succeededBlock: () -> Unit)
         fun onCommandLike(commentId: Long?, isLike: Boolean, succeededBlock: () -> Unit)
         fun onCommandDislike(commentId: Long?, succeededBlock: () -> Unit)
-        fun onGetCommandAvatar(id: Long, succeededBlock: (Bitmap) -> Unit)
         fun onReplyComment(replyId: Long?, replyName: String?)
         fun onMoreClick(item: MembersPostCommentItem)
         fun onChipClick(type: PostType, tag: String)

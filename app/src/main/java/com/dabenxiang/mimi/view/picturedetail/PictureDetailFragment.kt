@@ -1,9 +1,9 @@
 package com.dabenxiang.mimi.view.picturedetail
 
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
+import android.widget.ImageView
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -18,6 +18,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -30,7 +31,6 @@ import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_picture_detail.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
@@ -57,7 +57,6 @@ class PictureDetailFragment : BaseFragment() {
 
     private var replyCommentBlock: (() -> Unit)? = null
     private var commentLikeBlock: (() -> Unit)? = null
-    private var avatarBlock: ((Bitmap) -> Unit)? = null
 
     private var moreDialog: MoreDialogFragment? = null
 
@@ -114,27 +113,9 @@ class PictureDetailFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Success -> {
-                    val item = it.result
-                    LruCacheUtils.putLruCache(item.id!!, item.bitmap!!)
-                    pictureDetailAdapter?.updatePhotoGridItem(item.position!!)
-                }
-                is Error -> onApiError(it.throwable)
-            }
-        })
-
         viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> pictureDetailAdapter?.notifyItemChanged(it.result)
-                is Error -> onApiError(it.throwable)
-            }
-        })
-
-        viewModel.avatarResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Success -> avatarBlock?.invoke(it.result)
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -270,8 +251,8 @@ class PictureDetailFragment : BaseFragment() {
     }
 
     private val onPictureDetailListener = object : PictureDetailAdapter.OnPictureDetailListener {
-        override fun onGetAttachment(id: String, position: Int) {
-            viewModel.getAttachment(id, position)
+        override fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType) {
+            viewModel.loadImage(id, view, type)
         }
 
         override fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
@@ -312,11 +293,6 @@ class PictureDetailFragment : BaseFragment() {
                 commentLikeBlock = succeededBlock
                 viewModel.deleteCommentLike(commentId!!, memberPostItem!!)
             }
-        }
-
-        override fun onGetCommandAvatar(id: Long, succeededBlock: (Bitmap) -> Unit) {
-            avatarBlock = succeededBlock
-            viewModel.getAvatar(id.toString())
         }
 
         override fun onReplyComment(replyId: Long?, replyName: String?) {

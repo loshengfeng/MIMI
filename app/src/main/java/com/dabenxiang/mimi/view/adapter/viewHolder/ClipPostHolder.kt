@@ -7,7 +7,6 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
@@ -15,11 +14,11 @@ import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
@@ -68,18 +67,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
             if (accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
         updateLikeAndFollowItem(item, itemList, memberPostFuncItem)
 
-        val avatarId = item.avatarAttachmentId.toString()
-        if (avatarId != LruCacheUtils.ZERO_ID) {
-            if (LruCacheUtils.getLruCache(avatarId) == null) {
-                memberPostFuncItem.getBitmap(avatarId) { id -> updateAvatar(id) }
-            } else {
-                updateAvatar(item.avatarAttachmentId.toString())
-            }
-        } else {
-            Glide.with(ivAvatar.context).load(R.drawable.default_profile_picture).circleCrop()
-                .into(ivAvatar)
-        }
-
+        memberPostFuncItem.getBitmap(item.avatarAttachmentId, ivAvatar, LoadImageType.AVATAR)
         tagChipGroup.removeAllViews()
         item.tags?.forEach {
             val chip = LayoutInflater.from(tagChipGroup.context)
@@ -114,19 +102,8 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
 
         tvLength.text = contentItem?.shortVideo?.length
         contentItem?.images?.takeIf { it.isNotEmpty() }?.also { images ->
-            images[0].also { image ->
-                if (TextUtils.isEmpty(image.url)) {
-                    image.id.takeIf { !TextUtils.isEmpty(it) && it != "0" }?.also { id ->
-                        LruCacheUtils.getLruCache(id)?.also { bitmap ->
-                            Glide.with(ivPhoto.context).load(bitmap).into(ivPhoto)
-                        } ?: run { memberPostFuncItem.getBitmap(id) { id -> updatePicture(id) } }
-                    } ?: run {
-                        Glide.with(ivPhoto.context).load(R.drawable.img_nopic_03).into(ivPhoto)
-                    }
-                } else {
-                    Glide.with(ivPhoto.context)
-                        .load(image.url).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
-                }
+            images[0].id.toLongOrNull()?.also { id ->
+                memberPostFuncItem.getBitmap(id, ivPhoto, LoadImageType.PICTURE_THUMBNAIL)
             }
         }
 
@@ -151,16 +128,6 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
         ivAvatar.setOnClickListener {
             adultListener.onAvatarClick(item.creatorId, item.postFriendlyName)
         }
-    }
-
-    private fun updatePicture(id: String) {
-        val bitmap = LruCacheUtils.getLruCache(id)
-        Glide.with(ivPhoto.context).load(bitmap).into(ivPhoto)
-    }
-
-    private fun updateAvatar(id: String) {
-        val bitmap = LruCacheUtils.getLruCache(id)
-        Glide.with(ivAvatar.context).load(bitmap).circleCrop().into(ivAvatar)
     }
 
     private fun updateLikeAndFollowItem(

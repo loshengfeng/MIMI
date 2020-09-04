@@ -6,20 +6,12 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 
 class ChooseClubDialogViewModel : BaseViewModel() {
-
-    private var _attachmentByTypeResult = MutableLiveData<ApiResult<AttachmentItem>>()
-    val attachmentByTypeResult: LiveData<ApiResult<AttachmentItem>> = _attachmentByTypeResult
 
     private val _postList = MutableLiveData<PagedList<Any>>()
     val postList: LiveData<PagedList<Any>> = _postList
@@ -46,28 +38,6 @@ class ChooseClubDialogViewModel : BaseViewModel() {
 
             LivePagedListBuilder(factory, config).build().asFlow()
                 .collect { _postList.postValue(it) }
-        }
-    }
-
-    fun getAttachment(id: String, position: Int) {
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository().getAttachment(id)
-                if (!result.isSuccessful) throw HttpException(result)
-                val byteArray = result.body()?.bytes()
-                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
-                val item = AttachmentItem(
-                    id = id,
-                    bitmap = bitmap,
-                    position = position
-                )
-                emit(ApiResult.success(item))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _attachmentByTypeResult.value = it }
         }
     }
 

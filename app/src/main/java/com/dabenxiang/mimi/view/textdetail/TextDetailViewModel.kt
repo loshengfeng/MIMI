@@ -1,10 +1,8 @@
 package com.dabenxiang.mimi.view.textdetail
 
-import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.blankj.utilcode.util.ImageUtils
 import com.dabenxiang.mimi.event.SingleLiveEvent
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
@@ -15,7 +13,6 @@ import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.CommentDataSource
 import com.dabenxiang.mimi.view.player.NestedCommentNode
 import com.dabenxiang.mimi.view.player.RootCommentNode
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -35,9 +32,6 @@ class TextDetailViewModel : BaseViewModel() {
 
     private val _postCommentResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
     val postCommentResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _postCommentResult
-
-    private var _avatarResult = MutableLiveData<ApiResult<Bitmap>>()
-    val avatarResult: LiveData<ApiResult<Bitmap>> = _avatarResult
 
     private val _replyCommentResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
     val replyCommentResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _replyCommentResult
@@ -162,23 +156,6 @@ class TextDetailViewModel : BaseViewModel() {
                     }
                 }
             }
-        }
-    }
-
-    fun getAvatar(id: String) {
-        if (id == LruCacheUtils.ZERO_ID) return
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository().getAttachment(id)
-                if (!result.isSuccessful) throw HttpException(result)
-                val byteArray = result.body()?.bytes()
-                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
-                LruCacheUtils.putLruCache(id, bitmap)
-                emit(ApiResult.success(bitmap))
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _avatarResult.value = it }
         }
     }
 

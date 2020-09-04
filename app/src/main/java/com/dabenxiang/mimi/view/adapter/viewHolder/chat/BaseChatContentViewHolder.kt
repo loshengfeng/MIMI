@@ -4,19 +4,12 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.Priority
-import com.bumptech.glide.load.MultiTransformation
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.CircleCrop
-import com.bumptech.glide.request.RequestOptions
-import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ChatContentItem
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.view.adapter.ChatContentAdapter
 import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -36,32 +29,17 @@ open class BaseChatContentViewHolder(
 
     override fun updated(position: Int) {
         super.updated(position)
-        val avatarId: String
-        val defaultRes: Int
+        val avatarId: Long?
+        val type: LoadImageType
         if (TextUtils.equals(pref.profileItem.userId.toString(), data?.username)) {
-            avatarId = pref.profileItem.avatarAttachmentId.toString()
-            defaultRes = R.drawable.default_profile_picture
+            avatarId = pref.profileItem.avatarAttachmentId
+            type = LoadImageType.AVATAR
         } else {
-            avatarId = listener.getSenderAvatar()
-            defaultRes =  R.drawable.icon_cs_photo
+            avatarId = listener.getSenderAvatar().toLongOrNull()
+            type =  LoadImageType.AVATAR_CS
         }
+        listener.onGetAttachment(avatarId, ivHead, type)
 
-        avatarId.let {
-            LruCacheUtils.getLruArrayCache(avatarId)?.also { array ->
-                val options: RequestOptions = RequestOptions()
-                    .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                    .placeholder(defaultRes)
-                    .error(defaultRes)
-                    .priority(Priority.NORMAL)
-
-                Glide.with(App.self).asBitmap()
-                    .load(array)
-                    .apply(options)
-                    .into(ivHead)
-            } ?: takeIf { avatarId != "0" }?.run {
-                listener.onGetAvatarAttachment(avatarId, position)
-            }
-        }
         txtTime.text = data?.payload?.sendTime?.let { date ->
             SimpleDateFormat(
                 "YYYY-MM-dd HH:mm",
