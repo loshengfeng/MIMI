@@ -543,7 +543,8 @@ dependencies {
     implementation "org.conscrypt:conscrypt-android:$conscrypt_version"
 
     // CKS
-    implementation "org.cks.utils:BaseManager:$cks_log_version"
+
+    implementation("org.cks.utils:BaseManager:$cks_manager")
     implementation "org.cks.utils:DeviceInfoProvider:$cks_provider"
     implementation "org.cks.utils:logmanager:$cks_log_version"
     implementation "org.cks.utils:utils_device:$cks_utils"
