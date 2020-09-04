@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.textdetail
 
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
@@ -59,7 +58,6 @@ class TextDetailFragment : BaseFragment() {
 
     private var replyCommentBlock: (() -> Unit)? = null
     private var commentLikeBlock: (() -> Unit)? = null
-    private var avatarBlock: ((Bitmap) -> Unit)? = null
 
     private var adWidth = 0
     private var adHeight = 0
@@ -168,13 +166,6 @@ class TextDetailFragment : BaseFragment() {
                     }
                     is Error -> onApiError(it.throwable)
                 }
-            }
-        })
-
-        viewModel.avatarResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Success -> avatarBlock?.invoke(it.result)
-                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -307,11 +298,6 @@ class TextDetailFragment : BaseFragment() {
                 commentLikeBlock = succeededBlock
                 viewModel.deleteCommentLike(commentId!!, memberPostItem!!)
             }
-        }
-
-        override fun onGetCommandAvatar(id: Long, succeededBlock: (Bitmap) -> Unit) {
-            avatarBlock = succeededBlock
-            viewModel.getAvatar(id.toString())
         }
 
         override fun onReplyComment(replyId: Long?, replyName: String?) {

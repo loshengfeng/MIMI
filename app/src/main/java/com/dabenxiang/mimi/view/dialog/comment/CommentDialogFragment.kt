@@ -1,9 +1,9 @@
 package com.dabenxiang.mimi.view.dialog.comment
 
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
+import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -12,6 +12,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.CommentViewType
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.main.MainActivity
@@ -56,7 +57,7 @@ class CommentDialogFragment : BaseDialogFragment() {
     var moreDialog: MoreDialogFragment? = null
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-        override fun onProblemReport(item: BaseMemberPostItem, isComment:Boolean) {
+        override fun onProblemReport(item: BaseMemberPostItem, isComment: Boolean) {
             moreDialog?.dismiss()
             (requireActivity() as MainActivity).showReportDialog(item, data, isComment)
         }
@@ -128,10 +129,6 @@ class CommentDialogFragment : BaseDialogFragment() {
                 }
             }
 
-            override fun getBitmap(id: Long, succeededBlock: (Bitmap) -> Unit) {
-                viewModel.getBitmap(id.toString(), succeededBlock)
-            }
-
             override fun onMoreClick(item: MembersPostCommentItem) {
                 moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener, true).also {
                     it.show(
@@ -144,6 +141,10 @@ class CommentDialogFragment : BaseDialogFragment() {
             override fun onAvatarClick(userId: Long, name: String) {
                 dismiss()
                 commentListener?.onAvatarClick(userId, name)
+            }
+
+            override fun loadAvatar(id: Long?, view: ImageView) {
+                viewModel.loadImage(id, view, LoadImageType.AVATAR)
             }
 
         }, CommentViewType.CLIP).apply {

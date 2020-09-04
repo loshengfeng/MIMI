@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.view.View
+import android.widget.ImageView
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -19,17 +20,15 @@ import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.ChatContentItem
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.enums.ChatMessageType
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.VideoDownloadStatusType
 import com.dabenxiang.mimi.model.manager.mqtt.callback.MessageListener
-import com.dabenxiang.mimi.model.vo.AttachmentItem
 import com.dabenxiang.mimi.view.adapter.ChatContentAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.chatcontent.ChatContentViewModel.Companion.TAG_VIDEO
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.preview.ImagePreviewDialogFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_chat_content.*
 import org.eclipse.paho.client.mqttv3.MqttMessage
 import timber.log.Timber
@@ -43,7 +42,11 @@ class ChatContentFragment : BaseFragment() {
         private const val KEY_IS_ONLINE = "is_online"
         private const val INTENT_SELECT_IMG: Int = 100
         private const val PRELOAD_ITEM: Int = 4
-        fun createBundle(item: ChatListItem, traceLogId: Long = -1, isOnline: Boolean = false): Bundle {
+        fun createBundle(
+            item: ChatListItem,
+            traceLogId: Long = -1,
+            isOnline: Boolean = false
+        ): Bundle {
             return Bundle().also {
                 it.putSerializable(KEY_CHAT_LIST_ITEM, item)
                 it.putLong(KEY_TRACE_LOG_ID, traceLogId)
@@ -137,29 +140,15 @@ class ChatContentFragment : BaseFragment() {
                     viewModel.videoCache[fileName]?.downloadStatus =
                         VideoDownloadStatusType.DOWNLOADING
                     viewModel.videoCache[fileName]?.position?.let { position ->
-                        adapter.update(position)
+                        adapter.update(
+                            position
+                        )
                     }
                 }
                 is Success -> {
-                    when (it.result) {
-                        is AttachmentItem -> {
-                            val attachmentItem = it.result
-                            LruCacheUtils.putLruArrayCache(
-                                attachmentItem.id
-                                    ?: "", attachmentItem.fileArray ?: ByteArray(0)
-                            )
-                            adapter.update(attachmentItem.position ?: -1)
-                        }
-                        is String -> {
-                            val fileName = it.result.substringBefore(".").substringAfterLast("/")
-                            viewModel.videoCache[fileName]?.downloadStatus =
-                                VideoDownloadStatusType.FINISH
-                            adapter.update(
-                                viewModel.videoCache[fileName]?.position
-                                    ?: -1
-                            )
-                        }
-                    }
+                    val fileName = it.result.substringBefore(".").substringAfterLast("/")
+                    viewModel.videoCache[fileName]?.downloadStatus = VideoDownloadStatusType.FINISH
+                    adapter.update(viewModel.videoCache[fileName]?.position ?: -1)
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -272,12 +261,8 @@ class ChatContentFragment : BaseFragment() {
     }
 
     private val listener = object : ChatContentAdapter.EventListener {
-        override fun onGetAvatarAttachment(id: String, position: Int) {
-            viewModel.getAttachment(requireContext(), id, position)
-        }
-
-        override fun onGetAttachment(id: String, position: Int) {
-            viewModel.getAttachment(requireContext(), id, position)
+        override fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType) {
+            viewModel.loadImage(id, view, type)
         }
 
         override fun onImageClick(imageArray: ByteArray?) {
@@ -311,12 +296,7 @@ class ChatContentFragment : BaseFragment() {
                         item.position = position
                         // update videoCache
                         viewModel.videoCache[payload.content] = item
-                        viewModel.getAttachment(
-                            requireContext(),
-                            payload.content,
-                            position,
-                            TAG_VIDEO
-                        )
+                        viewModel.getAttachment(requireContext(), payload.content)
                     } else {
                         viewModel.videoCache[payload.content]?.let { cacheItem ->
                             if (cacheItem.payload?.content == null || cacheItem.payload.ext == null) {

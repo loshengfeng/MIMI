@@ -70,7 +70,7 @@ class ClubViewHolder(
 
             val contentItem = Gson().fromJson(postItem.content, MediaContentItem::class.java)
             val imageItem = contentItem?.images?.get(0)
-            clubFuncItem.getBitmap(imageItem?.id?.toLongOrNull(),clubImg, LoadImageType.THUMBNAIL)
+            clubFuncItem.getBitmap(imageItem?.id?.toLongOrNull(),clubImg, LoadImageType.PICTURE_THUMBNAIL)
         } else {
             Glide.with(itemView.context)
                 .load(R.drawable.img_nopic_03)

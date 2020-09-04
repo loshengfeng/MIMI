@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.picturedetail
 
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
@@ -58,7 +57,6 @@ class PictureDetailFragment : BaseFragment() {
 
     private var replyCommentBlock: (() -> Unit)? = null
     private var commentLikeBlock: (() -> Unit)? = null
-    private var avatarBlock: ((Bitmap) -> Unit)? = null
 
     private var moreDialog: MoreDialogFragment? = null
 
@@ -118,13 +116,6 @@ class PictureDetailFragment : BaseFragment() {
         viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> pictureDetailAdapter?.notifyItemChanged(it.result)
-                is Error -> onApiError(it.throwable)
-            }
-        })
-
-        viewModel.avatarResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Success -> avatarBlock?.invoke(it.result)
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -302,11 +293,6 @@ class PictureDetailFragment : BaseFragment() {
                 commentLikeBlock = succeededBlock
                 viewModel.deleteCommentLike(commentId!!, memberPostItem!!)
             }
-        }
-
-        override fun onGetCommandAvatar(id: Long, succeededBlock: (Bitmap) -> Unit) {
-            avatarBlock = succeededBlock
-            viewModel.getAvatar(id.toString())
         }
 
         override fun onReplyComment(replyId: Long?, replyName: String?) {

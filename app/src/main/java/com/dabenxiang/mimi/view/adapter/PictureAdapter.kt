@@ -46,7 +46,7 @@ class PictureAdapter(
             onItemClickListener: OnItemClickListener,
             memberPostFuncItem: MemberPostFuncItem
         ) {
-            memberPostFuncItem.getBitmap(item.id.toLongOrNull(), picture, LoadImageType.THUMBNAIL)
+            memberPostFuncItem.getBitmap(item.id.toLongOrNull(), picture, LoadImageType.PICTURE_THUMBNAIL)
 
             picture.setOnClickListener {
                 onItemClickListener.onItemClick()

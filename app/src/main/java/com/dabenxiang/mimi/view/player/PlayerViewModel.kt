@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.view.player
 
 import android.content.pm.ActivityInfo
-import android.graphics.Bitmap
 import android.net.Uri
 import android.text.TextUtils
 import android.view.View
@@ -11,8 +10,6 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.blankj.utilcode.util.ImageUtils
-import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.callback.GuessLikePagingCallBack
 import com.dabenxiang.mimi.event.SingleLiveEvent
 import com.dabenxiang.mimi.extension.downloadFile
@@ -24,7 +21,6 @@ import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.model.vo.CheckStatusItem
 import com.dabenxiang.mimi.model.vo.StatusItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
 import com.google.android.exoplayer2.source.MediaSource
@@ -127,9 +123,6 @@ class PlayerViewModel : BaseViewModel() {
 
     private val _apiReportResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
     val apiReportResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _apiReportResult
-
-    private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
-    val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
 
     private val _getAdResult = MutableLiveData<ApiResult<AdItem>>()
     val getAdResult: LiveData<ApiResult<AdItem>> = _getAdResult
@@ -787,28 +780,6 @@ class PlayerViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect {
                     _apiReportResult.value = SingleLiveEvent(it)
-                }
-        }
-    }
-
-    fun getBitmap(id: String, succeededBlock: ((Bitmap) -> Unit)) {
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository().getAttachment(id)
-                if (!result.isSuccessful) throw HttpException(result)
-                val byteArray = result.body()?.bytes()
-                val bitmap = ImageUtils.bytes2Bitmap(byteArray)
-                LruCacheUtils.putLruCache(id, bitmap)
-                emit(ApiResult.success(bitmap))
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect {
-                    when (it) {
-                        is ApiResult.Success -> {
-                            succeededBlock(it.result)
-                        }
-                    }
                 }
         }
     }

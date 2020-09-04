@@ -61,7 +61,7 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view), KoinComponent 
         clipFuncItem.getBitmap(
             contentItem?.images?.get(0)?.id?.toLongOrNull(),
             ivCover,
-            LoadImageType.THUMBNAIL
+            LoadImageType.PICTURE_THUMBNAIL
         )
 
         ibBack.setOnClickListener { clipFuncItem.onBackClick() }

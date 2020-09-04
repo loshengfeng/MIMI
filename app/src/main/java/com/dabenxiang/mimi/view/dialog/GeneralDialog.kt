@@ -6,15 +6,9 @@ import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.fragment.app.FragmentManager
-import com.bumptech.glide.Glide
-import com.bumptech.glide.Priority
-import com.bumptech.glide.load.MultiTransformation
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.CircleCrop
-import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_dialog_general.*
 import java.io.Serializable
 import java.util.*
@@ -70,21 +64,16 @@ class GeneralDialog : BaseDialogFragment() {
                 tv_title.text = data.titleString
             }
 
-            if(data.attachmentId != 0L) {
-                val options: RequestOptions = RequestOptions()
-                    .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                    .placeholder(data.messageIcon)
-                    .error(data.messageIcon)
-                    .priority(Priority.NORMAL)
-                context?.let { Glide.with(it).load(LruCacheUtils.getLruCache(data.attachmentId.toString())).apply(options).into(iv_message) }
-            } else
-                iv_message.setImageResource(data.messageIcon)
+            iv_message.setImageResource(data.messageIcon)
             iv_message.visibility =
                 if (data.isMessageIcon) {
                     View.VISIBLE
                 } else {
                     View.GONE
                 }
+
+            if (data.attachmentId != 0L)
+                mainViewModel?.loadImage(data.attachmentId, iv_avatar, LoadImageType.AVATAR)
 
             if (data.isHtml)
                 tv_message.text = Html.fromHtml(data.message, Html.FROM_HTML_MODE_COMPACT)

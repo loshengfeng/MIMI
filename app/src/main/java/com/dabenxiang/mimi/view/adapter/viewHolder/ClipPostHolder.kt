@@ -103,7 +103,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
         tvLength.text = contentItem?.shortVideo?.length
         contentItem?.images?.takeIf { it.isNotEmpty() }?.also { images ->
             images[0].id.toLongOrNull()?.also { id ->
-                memberPostFuncItem.getBitmap(id, ivPhoto, LoadImageType.THUMBNAIL)
+                memberPostFuncItem.getBitmap(id, ivPhoto, LoadImageType.PICTURE_THUMBNAIL)
             }
         }
 

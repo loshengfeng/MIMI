@@ -88,6 +88,38 @@ android {
     }
 
     def version = this.ext.default_version()
+    def gittag = getlastTAG()
+    println "Show last git TAG : " + gittag
+    if (!gittag.equals(version.versionName)) {
+        if (gittag.contains(".")) {
+            version.versionName = gittag.toString()
+            def rawversioinfo = gittag.split("\\.")
+            def len = rawversioinfo.length
+            def prefixn = 1
+            def apifeaturen = 0
+            def buildn = 0
+            def hotfixn = 0
+            if (len < 4) {
+                prefixn = rawversioinfo[len - len].toInteger()
+//            println "Show prefixn : " + prefixn
+                apifeaturen = rawversioinfo[len - len + 1].toInteger()
+//            println "Show hotfixn : " + hotfixn
+                buildn = rawversioinfo[len - len + 2].toInteger()
+            } else {
+                prefixn = rawversioinfo[len - len].toInteger()
+//            println "Show prefixn : " + prefixn
+                apifeaturen = rawversioinfo[len - len + 1].toInteger()
+//            println "Show hotfixn : " + hotfixn
+                buildn = rawversioinfo[len - len + 2].toInteger()
+                hotfixn = rawversioinfo[len - len + 3].toInteger()
+            }
+            this.ext.syncversionandtag("", prefixn, apifeaturen, buildn, hotfixn)
+            version = this.ext.default_version()
+        } else {
+            println "Show error !!! "
+        }
+    }
+
     defaultConfig {
         applicationId "com.dabenxiang.mimi"
         minSdkVersion 24
@@ -111,6 +143,7 @@ android {
     buildTypes {
         debug {
             matchingFallbacks = ['release', 'debug']
+            getIsDefault().set(true)
             zipAlignEnabled false
             minifyEnabled false
             debuggable true
@@ -150,6 +183,7 @@ android {
     productFlavors {
         mimi {
             dimension = "normal"
+            getIsDefault().set(true)
             ext {
                 mqtt = [sit: "wss://mqtt.ymmsp.com:443", dev: "ws://10.1.1.121:8083", prod: "ws://10.1.1.121:8083"]
             }
@@ -195,19 +229,20 @@ android {
         def flavor_version = this.ext.default_version(flavorName)
         println "Show " + flavorName + " current flavor_version versionName " + flavor_version.versionName
         println "Show " + flavorName + " current _version versionCode :   " + flavor_version.versionCode
-        def current_branch = gitBranch()
-//        println "Show current_branch :   " + current_branch
-        if (full_buildTypename.equals("prod_release")  ) {
-            println "Show match  prod_release !!"
-            if (current_branch.equals("release") || current_branch.equals("master")){
-                println "Show match git branch  release || master !!"
-                this.project.ext.increaseVersion(flavorName)
-                flavor_version = this.ext.default_version(flavorName)
-                setAndpushTag(flavor_version.versionName)
-                println "prod_release get " + flavorName + " new flavor_version versionName " + flavor_version.versionName
-                println "prod_release get " + flavorName + " new flavor_version versionCode :   " + flavor_version.versionCode
-            }
-        }
+//        def current_branch = gitBranch()
+////        println "Show current_branch :   " + current_branch
+//        if (full_buildTypename.equals("prod_release")) {
+//            println "Show match  prod_release !!"
+//            if (current_branch.equals("release") || current_branch.equals("master")) {
+//                println "Show match git branch  release || master !!"
+//                this.project.ext.increaseVersion(flavorName)
+//                flavor_version = this.ext.default_version(flavorName)
+//                commitVersionProperties(flavor_version.versionName)
+//                setAndpushTag(flavor_version.versionName)
+//                println "prod_release get " + flavorName + " new flavor_version versionName " + flavor_version.versionName
+//                println "prod_release get " + flavorName + " new flavor_version versionCode :   " + flavor_version.versionCode
+//            }
+//        }
         variant.buildConfigField "String", "API_HOST", "\"${getAPI_Host(buildtype)}\""
         variant.buildConfigField "String", "AD_API_HOST", "\"${getAD_API_Host(buildtype)}\""
 //        variant.buildConfigField "String", "MQTT_HOST", "\"${getMQTT_Host(buildtype)}\""
@@ -313,16 +348,49 @@ def gitBranch() {
     branch
 }
 
+def commitVersionProperties(String tagName) {
+    println("commit  version.properties ")
+    def proc = "git add .".execute()
+    proc.in.eachLine { line -> println line }
+    proc.err.eachLine { line -> println line }
+    proc.waitFor()
+    proc = "git commit -m \"[ Release ] Release v$tagName \"".execute()
+    proc.in.eachLine { line -> println line }
+    proc.err.eachLine { line -> println line }
+    proc.waitFor()
+    proc = "git push --all".execute()
+    proc.in.eachLine { line -> println line }
+    proc.err.eachLine { line -> println line }
+    proc.waitFor()
+}
+
 def setAndpushTag(String tagName) {
     println("Show tagname  = $tagName")
-    def proc = "git tag $tagName".execute()
-    proc.in.eachLine { line -> branch = line }
+    def proc = "git tag v$tagName".execute()
     proc.err.eachLine { line -> println line }
     proc.waitFor()
     proc = "git push --tags".execute()
     proc.in.eachLine { line -> branch = line }
     proc.err.eachLine { line -> println line }
     proc.waitFor()
+}
+
+def getlastTAG() {
+    def proc = "git fetch --all ".execute()
+    proc.in.eachLine { line -> println line }
+    proc.err.eachLine { line -> println line }
+    proc.waitFor()
+    def current = "1.0.0"
+    println("Show tags")
+    proc = "git tag ".execute()
+    proc.in.eachLine { line ->
+        line.replace("v", "")
+        current = line.replace("v", "")
+        println current
+    }
+    proc.err.eachLine { line -> println line }
+    proc.waitFor()
+    current
 }
 
 def isWithSubmoduleBranch() {
@@ -475,7 +543,8 @@ dependencies {
     implementation "org.conscrypt:conscrypt-android:$conscrypt_version"
 
     // CKS
-    implementation "org.cks.utils:BaseManager:$cks_log_version"
+
+    implementation("org.cks.utils:BaseManager:$cks_manager")
     implementation "org.cks.utils:DeviceInfoProvider:$cks_provider"
     implementation "org.cks.utils:logmanager:$cks_log_version"
     implementation "org.cks.utils:utils_device:$cks_utils"

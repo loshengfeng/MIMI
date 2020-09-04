@@ -29,7 +29,7 @@ class CarouselViewHolder(
     override fun updated() {
         data?.also {
             val banner = Gson().fromJson(it.content, BannerIdContentItem::class.java)
-            memberPostFuncItem.getBitmap(banner.app.toLongOrNull(), ivPoster, LoadImageType.THUMBNAIL)
+            memberPostFuncItem.getBitmap(banner.app.toLongOrNull(), ivPoster, LoadImageType.PICTURE_THUMBNAIL)
         }
     }
 }

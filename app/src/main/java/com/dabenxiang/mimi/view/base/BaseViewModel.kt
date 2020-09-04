@@ -132,8 +132,9 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     fun loadImage(id: Long?, view: ImageView, type: LoadImageType) {
         val defaultResId = when (type) {
             LoadImageType.AVATAR -> R.drawable.default_profile_picture
-            LoadImageType.THUMBNAIL -> R.drawable.img_nopic_03
-            LoadImageType.PICTURE -> R.drawable.img_nopic_03
+            LoadImageType.AVATAR_CS -> R.drawable.icon_cs_photo
+            LoadImageType.PICTURE_THUMBNAIL -> R.drawable.img_nopic_03
+            LoadImageType.PICTURE_FULL -> R.drawable.img_nopic_03
             LoadImageType.CLUB -> R.drawable.ico_group
             LoadImageType.CHAT_CONTENT -> R.drawable.bg_gray_6_radius_16
         }
@@ -153,14 +154,15 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
                 .placeholder(defaultResId)
                 .error(defaultResId)
             when (type) {
-                LoadImageType.CLUB,
-                LoadImageType.AVATAR -> {
+                LoadImageType.AVATAR,
+                LoadImageType.AVATAR_CS,
+                LoadImageType.CLUB -> {
                     options.transform(MultiTransformation(CenterCrop(), CircleCrop()))
                 }
-                LoadImageType.THUMBNAIL -> {
+                LoadImageType.PICTURE_THUMBNAIL -> {
                     options.transform(MultiTransformation(CenterCrop()))
                 }
-                LoadImageType.PICTURE -> {
+                LoadImageType.PICTURE_FULL -> {
                 }
                 LoadImageType.CHAT_CONTENT -> {
                     options.transform(CenterCrop(), RoundedCorners(16))
