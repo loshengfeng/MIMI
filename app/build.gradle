@@ -3,7 +3,6 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
-apply from: 'https://raw.githubusercontent.com/CKS-ROC/Useful_Gradle/master/version.gradle'
 
 def android_builder_version = "3.5.3"
 def android_builder_main_version = 3
@@ -52,22 +51,14 @@ android {
         }
     }
 
-    //WARNING: DSL element 'android.dataBinding.enabled' is obsolete and has been replaced with 'android.buildFeatures.dataBinding'.
-    if (android_builder_main_version < 4) {
-        dataBinding {
-            enabled = false
-        }
-    } else {
-        buildFeatures {
-            dataBinding false
-            // for view binding:
-            // viewBinding true
-        }
+    buildFeatures {
+        dataBinding false
     }
+
     androidExtensions {
         experimental = true
     }
-//Ref : https://juejin.im/post/6844904004955144205
+
     lintOptions {
         disable 'MissingDefaultResource'
     }
@@ -87,44 +78,10 @@ android {
         return ip.substring(ip.indexOf('/') + 1, ip.length())
     }
 
-    def version = this.ext.default_version()
-    def gittag = getlastTAG()
-    println "Show last git TAG : " + gittag
-    if (!gittag.equals(version.versionName)) {
-        if (gittag.contains(".")) {
-            version.versionName = gittag.toString()
-            def rawversioinfo = gittag.split("\\.")
-            def len = rawversioinfo.length
-            def prefixn = 1
-            def apifeaturen = 0
-            def buildn = 0
-            def hotfixn = 0
-            if (len < 4) {
-                prefixn = rawversioinfo[len - len].toInteger()
-//            println "Show prefixn : " + prefixn
-                apifeaturen = rawversioinfo[len - len + 1].toInteger()
-//            println "Show hotfixn : " + hotfixn
-                buildn = rawversioinfo[len - len + 2].toInteger()
-            } else {
-                prefixn = rawversioinfo[len - len].toInteger()
-//            println "Show prefixn : " + prefixn
-                apifeaturen = rawversioinfo[len - len + 1].toInteger()
-//            println "Show hotfixn : " + hotfixn
-                buildn = rawversioinfo[len - len + 2].toInteger()
-                hotfixn = rawversioinfo[len - len + 3].toInteger()
-            }
-            this.ext.syncversionandtag("", prefixn, apifeaturen, buildn, hotfixn)
-            version = this.ext.default_version()
-        } else {
-            println "Show error !!! "
-        }
-    }
-
+    Version version = readVersion()
     defaultConfig {
         applicationId "com.dabenxiang.mimi"
         minSdkVersion 24
-        //FIXME Note :  if use video-editor  & com.writingminds:FFmpegAndroid:0.3.2 the targetSdkVersion must below 28 if want over 29/30 (Android Q) change to branch dev_sub_FFmpegAndroid
-        //FIXME : branch dev_sub_FFmpegAndroid submodule !!
         targetSdkVersion 30
         versionCode version.versionCode.toInteger()
         versionName version.versionName
@@ -190,72 +147,32 @@ android {
         }
     }
 
-//    //FIXME Ref : https://stackoverflow.com/questions/35478189/how-to-list-all-flavors-in-buildconfig-via-gradle-in-android
-//        demo  manifestPlaceholders &  applicationIdSuffix
     productFlavors.all { flavor ->
         println "ProductFlavors Show flavor name " + flavor.name
-//        flavor.manifestPlaceholders = [
-//                PERMISSION_PREFIX: flavor.name,
-//        ]
-//
-//        if (flavor.name != "mimi") {
-//            flavor.applicationIdSuffix "." + flavor.name
-//        }
-    }
-
-    variantFilter { variant ->
-        def flavorName = variant.name
-//        println "Show  flavorName !!  " + flavorName//
-        def buildTypename = variant.buildType.name.toString()
-//        println "Show  buildTypename !!  " + buildTypename//
-        def isDev = buildTypename.contains("dev")
-        if (buildTypename.equals('release') || buildTypename.equals('debug')) {
-//            println "Show match  buildtype "+variant.buildType.name
-            variant.setIgnore(true)
-        }
     }
 
     applicationVariants.all { variant ->
         def flavor = variant.productFlavors[0]
         def flavorName = variant.flavorName
-//        println "Show  flavorName !!  " + flavorName//
+        println "Show  flavorName !!  " + flavorName//
         def full_buildTypename = variant.buildType.name.toString()
-//        println "Show  full_buildTypename !!  " + full_buildTypename
+        println "Show  full_buildTypename !!  " + full_buildTypename
         def buildtype = full_buildTypename
         if (full_buildTypename.contains("_")) {
             buildtype = full_buildTypename.split("_")[0]
         }
 
-        def flavor_version = this.ext.default_version(flavorName)
-        println "Show " + flavorName + " current flavor_version versionName " + flavor_version.versionName
-        println "Show " + flavorName + " current _version versionCode :   " + flavor_version.versionCode
-//        def current_branch = gitBranch()
-////        println "Show current_branch :   " + current_branch
-//        if (full_buildTypename.equals("prod_release")) {
-//            println "Show match  prod_release !!"
-//            if (current_branch.equals("release") || current_branch.equals("master")) {
-//                println "Show match git branch  release || master !!"
-//                this.project.ext.increaseVersion(flavorName)
-//                flavor_version = this.ext.default_version(flavorName)
-//                commitVersionProperties(flavor_version.versionName)
-//                setAndpushTag(flavor_version.versionName)
-//                println "prod_release get " + flavorName + " new flavor_version versionName " + flavor_version.versionName
-//                println "prod_release get " + flavorName + " new flavor_version versionCode :   " + flavor_version.versionCode
-//            }
-//        }
+//        def flavor_version = this.ext.default_version(flavorName)
+        println "Show " + flavorName + " current flavor_version versionName " + version.versionName
+        println "Show " + flavorName + " current _version versionCode :   " + version.versionCode
         variant.buildConfigField "String", "API_HOST", "\"${getAPI_Host(buildtype)}\""
         variant.buildConfigField "String", "AD_API_HOST", "\"${getAD_API_Host(buildtype)}\""
 //        variant.buildConfigField "String", "MQTT_HOST", "\"${getMQTT_Host(buildtype)}\""
         variant.buildConfigField "String", "MQTT_HOST", "\"${flavor.ext.mqtt[buildtype]}\""
-        //        //FIXME Cannot set readonly property: manifestPlaceholders for class: com.android.build.gradle.internal.api.ReadOnlyProductFlavor
-//        flavor.manifestPlaceholders = [
-//                PERMISSION_PREFIX: flavor.name,
-//        ]
-//        //FIXME Could not set unknown property 'manifestPlaceholders' for object of type com.android.build.gradle.internal.api.ApplicationVariantImpl.
-//        manifestPlaceholders = [ PERMISSION_PREFIX: flavor.name ]
+
         variant.outputs.each { output ->
-            output.versionNameOverride = flavor_version.versionName
-            output.versionCodeOverride = flavor_version.versionCode.toInteger()
+            output.versionNameOverride = version.versionName
+            output.versionCodeOverride = version.versionCode.toInteger()
         }
     }
 
@@ -292,112 +209,6 @@ project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
                 "-progressive"
         ]
         jvmTarget = "1.8"
-    }
-}
-
-def getAPI_Host(String buildtype) {
-    def path = "http://api.vsense.dev-121.silkrode.io"
-    switch (buildtype) {
-        case "sit":
-            path = "http://api.vsense.dev-121.silkrode.io"
-            break
-        case "dev":
-            path = "http://api.vsense.dev-121.silkrode.io"
-            break
-        case "prod":
-        default:
-            break
-    }
-    return path
-}
-
-def getAD_API_Host(String buildtype) {
-    def path = "http://api.promotion.dev-121.silkrode.io"
-    switch (buildtype) {
-        case "sit":
-        case "dev":
-        case "prod":
-        default:
-            break
-    }
-    return path
-}
-
-def getMQTT_Host(String buildtype) {
-    def path = "ws://10.1.1.121:8083"
-    switch (buildtype) {
-        case "sit":
-            path = "wss://mqtt.ymmsp.com:443"
-            break
-        case "dev":
-            path = "ws://10.1.1.121:8083"
-            break
-        case "prod":
-        default:
-            break
-    }
-    return path
-}
-
-def gitBranch() {
-    def branch = ""
-    def proc = "git rev-parse --abbrev-ref HEAD".execute()
-    proc.in.eachLine { line -> branch = line }
-    proc.err.eachLine { line -> println line }
-    proc.waitFor()
-    branch
-}
-
-def commitVersionProperties(String tagName) {
-    println("commit  version.properties ")
-    def proc = "git add .".execute()
-    proc.in.eachLine { line -> println line }
-    proc.err.eachLine { line -> println line }
-    proc.waitFor()
-    proc = "git commit -m \"[ Release ] Release v$tagName \"".execute()
-    proc.in.eachLine { line -> println line }
-    proc.err.eachLine { line -> println line }
-    proc.waitFor()
-    proc = "git push --all".execute()
-    proc.in.eachLine { line -> println line }
-    proc.err.eachLine { line -> println line }
-    proc.waitFor()
-}
-
-def setAndpushTag(String tagName) {
-    println("Show tagname  = $tagName")
-    def proc = "git tag v$tagName".execute()
-    proc.err.eachLine { line -> println line }
-    proc.waitFor()
-    proc = "git push --tags".execute()
-    proc.in.eachLine { line -> branch = line }
-    proc.err.eachLine { line -> println line }
-    proc.waitFor()
-}
-
-def getlastTAG() {
-    def proc = "git fetch --all ".execute()
-    proc.in.eachLine { line -> println line }
-    proc.err.eachLine { line -> println line }
-    proc.waitFor()
-    def current = "1.0.0"
-    println("Show tags")
-    proc = "git tag ".execute()
-    proc.in.eachLine { line ->
-        line.replace("v", "")
-        current = line.replace("v", "")
-        println current
-    }
-    proc.err.eachLine { line -> println line }
-    proc.waitFor()
-    current
-}
-
-def isWithSubmoduleBranch() {
-    if (gitBranch().contains("dev_sub")) {
-        return true
-    } else {
-        return false
     }
 }
 
@@ -543,7 +354,6 @@ dependencies {
     implementation "org.conscrypt:conscrypt-android:$conscrypt_version"
 
     // CKS
-
     implementation("org.cks.utils:BaseManager:$cks_manager")
     implementation "org.cks.utils:DeviceInfoProvider:$cks_provider"
     implementation "org.cks.utils:logmanager:$cks_log_version"
@@ -582,21 +392,124 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:$android_test_ext_version"
 }
 
-task showCurrentVersion {
-    group "version Tasks"
-    this.project.ext.currentVersion("")
+class Version {
+    def versionCode
+    def versionName
+}
+
+Version readVersion() {
+    readVersion('version.properties')
+}
+
+Version readVersion(String version_properties_path) {
+    Properties defaultVersionProps = new Properties()
+    def pfile = file(version_properties_path)
+    if (!pfile.exists()) {
+        pfile = file('version.properties')
+    }
+    defaultVersionProps.load(new FileInputStream(pfile))
+    def defaultBuildVersionCode = defaultVersionProps['VERSION_CODE']
+    def hotfix = defaultVersionProps['VERSION_NAME_HOTFIX']
+    def defaultBuildVersionName
+    if (hotfix != "0") {
+        defaultBuildVersionName = defaultVersionProps['VERSION_NAME_PREFIX'] + "." + defaultVersionProps['VERSION_NAME_BUILD'] + "." + hotfix
+    } else {
+        defaultBuildVersionName = defaultVersionProps['VERSION_NAME_PREFIX'] + "." + defaultVersionProps['VERSION_NAME_BUILD']
+    }
+    return new Version(versionCode: defaultBuildVersionCode, versionName: defaultBuildVersionName)
+}
+
+def getAPI_Host(String buildtype) {
+    def path = "http://api.vsense.dev-121.silkrode.io"
+    switch (buildtype) {
+        case "sit":
+            path = "http://api.vsense.dev-121.silkrode.io"
+            break
+        case "dev":
+            path = "http://api.vsense.dev-121.silkrode.io"
+            break
+        case "prod":
+        default:
+            break
+    }
+    return path
+}
+
+def getAD_API_Host(String buildtype) {
+    def path = "http://api.promotion.dev-121.silkrode.io"
+    switch (buildtype) {
+        case "sit":
+        case "dev":
+        case "prod":
+        default:
+            break
+    }
+    return path
+}
+
+def getMQTT_Host(String buildtype) {
+    def path = "ws://10.1.1.121:8083"
+    switch (buildtype) {
+        case "sit":
+            path = "wss://mqtt.ymmsp.com:443"
+            break
+        case "dev":
+            path = "ws://10.1.1.121:8083"
+            break
+        case "prod":
+        default:
+            break
+    }
+    return path
 }
 
 task increaseVersion {
     group "version Tasks"
     doLast {
-        this.project.ext.increaseVersion("")
+        increaseVersion()
     }
 }
 
-task decreaseVersion {
+task increaseHotfixVersion {
     group "version Tasks"
     doLast {
-        this.project.ext.decreaseVersion("")
+        increaseHotfixVersion()
     }
+}
+
+def increaseVersion() {
+    increaseVersion('version.properties')
+}
+
+def increaseVersion(String version_properties_path) {
+    Properties versionProps = new Properties()
+    def file = file(version_properties_path)
+    versionProps.load(new FileInputStream(file))
+    def hotfix = versionProps['VERSION_NAME_HOTFIX'].toInteger()
+    def nextCode = versionProps['VERSION_CODE'].toInteger() - hotfix + 10
+    versionProps['VERSION_CODE'] = nextCode.toString()
+    def nextBuild = versionProps['VERSION_NAME_BUILD'].toInteger() + 1
+    versionProps['VERSION_NAME_BUILD'] = nextBuild.toString()
+    hotfix = 0
+    versionProps['VERSION_NAME_HOTFIX'] = hotfix.toString()
+    versionProps.store(file.newWriter(), null)
+    def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD']
+    println "Increase $buildVersionName"
+}
+
+def increaseHotfixVersion() {
+    increaseHotfixVersion('version.properties')
+}
+
+def increaseHotfixVersion(String version_properties_path) {
+    Properties versionProps = new Properties()
+    def file = file(version_properties_path)
+    versionProps.load(new FileInputStream(file))
+    def nextCode = versionProps['VERSION_CODE'].toInteger() + 1
+    versionProps['VERSION_CODE'] = nextCode.toString()
+    def hotfix = versionProps['VERSION_NAME_HOTFIX'].toInteger() + 1
+    versionProps['VERSION_NAME_HOTFIX'] = hotfix.toString()
+    versionProps.store(file.newWriter(), null)
+    def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD'] + "." + versionProps['VERSION_NAME_HOTFIX']
+    println "Increase $buildVersionName"
 }
