@@ -238,7 +238,7 @@ class PlayerActivity : BaseActivity() {
                 val bundle = MyPostFragment.createBundle(
                     userId, name,
                     isAdult = true,
-                    isAdultTheme = obtainIsAdult()
+                    isAdultTheme = true
                 )
                 bundle.putBoolean(KEY_IS_FROM_PLAYER, true)
                 navigateTo(
