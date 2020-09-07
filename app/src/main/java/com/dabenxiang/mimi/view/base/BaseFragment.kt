@@ -55,6 +55,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.*
 import timber.log.Timber
+import java.io.File
 import java.io.Serializable
 import java.net.UnknownHostException
 
@@ -224,6 +225,8 @@ abstract class BaseFragment : Fragment() {
         mainViewModel?.postVideoMemberResult?.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Success -> {
+                    deleteTempFile()
+
                     if (deletePicList.isNotEmpty()) {
                         mainViewModel?.deleteAttachment(deletePicList[deleteCurrentPicPosition])
                     } else if (deleteVideoItem.isNotEmpty()) {
@@ -355,6 +358,19 @@ abstract class BaseFragment : Fragment() {
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
+    }
+
+    private  fun deleteTempFile() {
+        try {
+            val picPath = UriUtils.getPath(requireContext(), Uri.parse(uploadVideoList[0].picUrl))
+
+            val videoFile = File(uploadVideoList[0].videoUrl)
+            val picFile = File(picPath)
+            videoFile.delete()
+            picFile.delete()
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
     }
 
     private fun setPostTpe(type: PostType) {
