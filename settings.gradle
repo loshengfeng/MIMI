@@ -1,8 +1,6 @@
 rootProject.name = 'MiMi'
 include ':app'
 include ':domain_libs'
-include ':videocompressor'
-include ':video-editor'
 def gitBranch() {
     def branch = ""
     def proc = "git rev-parse --abbrev-ref HEAD".execute()

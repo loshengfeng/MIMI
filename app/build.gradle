@@ -368,11 +368,13 @@ dependencies {
     implementation project(path: ':domain_libs')
 
     // Video Editor
-    implementation 'org.cks.ffmpeg:FFmpegAndroid:0.3.3'
-    implementation project(path: ':video-editor')
+    implementation "org.cks.ffmpeg:FFmpegAndroid:$video_ffmpeg"
+//    implementation project(path: ':video-editor')
+    implementation "org.cks.utils.video:video-editor:$video_editor"
 
     //Video compressor
-    implementation project(path: ':videocompressor')
+//    implementation project(path: ':videocompressor')
+    implementation "org.cks.utils.video:videocompressor:$video_compressor"
 
     // Test
     testImplementation "io.mockk:mockk:$mokk_version"
