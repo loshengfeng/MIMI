@@ -4,6 +4,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_order_busy_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.15" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_order_busy_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.85" />
+
     <ImageView
         android:id="@+id/iv_create_order_busy"
         android:layout_width="wrap_content"
@@ -15,16 +29,29 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/tv_create_order_busy"
-        android:layout_width="wrap_content"
+        android:id="@+id/tv_create_order_busy_1"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="@string/order_result_create_order_busy"
+        android:gravity="center"
+        android:text="@string/order_result_create_order_busy_1"
         android:textColor="@color/color_black_1"
         android:textSize="14sp"
-        app:layout_constraintLeft_toLeftOf="@+id/iv_create_order_busy"
-        app:layout_constraintRight_toRightOf="@+id/iv_create_order_busy"
+        app:layout_constraintLeft_toLeftOf="@+id/gl_order_busy_start"
+        app:layout_constraintRight_toRightOf="@+id/gl_order_busy_end"
         app:layout_constraintTop_toBottomOf="@+id/iv_create_order_busy" />
+
+    <TextView
+        android:id="@+id/tv_create_order_busy_2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/order_result_create_order_busy_2"
+        android:textColor="@color/color_black_1"
+        android:textSize="14sp"
+        app:layout_constraintLeft_toLeftOf="@+id/gl_order_busy_start"
+        app:layout_constraintRight_toRightOf="@+id/gl_order_busy_end"
+        app:layout_constraintTop_toBottomOf="@+id/tv_create_order_busy_1" />
 
     <Button
         android:id="@+id/btn_confirm"
@@ -41,6 +68,6 @@
         android:textSize="15sp"
         app:layout_constraintLeft_toLeftOf="@+id/iv_create_order_busy"
         app:layout_constraintRight_toRightOf="@+id/iv_create_order_busy"
-        app:layout_constraintTop_toBottomOf="@+id/tv_create_order_busy" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_create_order_busy_2" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
