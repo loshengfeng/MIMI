@@ -14,7 +14,8 @@ import timber.log.Timber
 class ChatHistoryListDataSource(
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
-    private val pagingCallback: PagingCallback
+    private val pagingCallback: PagingCallback,
+    private val updateNoData: ((Int) -> Unit) = {}
 ) : PageKeyedDataSource<Long, ChatListItem>() {
 
     companion object {
@@ -46,6 +47,7 @@ class ChatHistoryListDataSource(
                     ) -> PER_LIMIT_LONG
                     else -> null
                 }
+                updateNoData(totalCount.toInt())
                 emit(InitResult(messages ?: ArrayList(), nextPageKey))
             }
                     .flowOn(Dispatchers.IO)

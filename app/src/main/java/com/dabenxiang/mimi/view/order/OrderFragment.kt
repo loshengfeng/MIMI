@@ -49,8 +49,8 @@ class OrderFragment : BaseFragment() {
         OrderPagerAdapter(
             OrderFuncItem(
                 getOrderByPaging3 = { update -> getOrderByPaging3(update) },
-                getOrderByPaging2 = { type, update -> viewModel.getOrderByPaging2(type, update) },
-                getChatList = { update -> viewModel.getChatList(update) },
+                getOrderByPaging2 = { type, update, updateNoData -> viewModel.getOrderByPaging2(type, update, updateNoData) },
+                getChatList = { update, updateNoData -> viewModel.getChatList(update, updateNoData) },
                 getChatAttachment = { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR_CS) },
                 onChatItemClick = { item -> onChatItemClick(item) },
                 getOrderProxyAttachment = { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR_CS) },
