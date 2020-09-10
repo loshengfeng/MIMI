@@ -86,7 +86,6 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
                         ?: let { View.VISIBLE }
             }
         }
-        Timber.d("@@setTabPosition, index: $index, itemOrderNoData visibility: ${itemOrderNoData.visibility}, itemChatNoData visibility: ${itemChatNoData.visibility}")
     }
 
     fun onBind(position: Int, orderFuncItem: OrderFuncItem) {

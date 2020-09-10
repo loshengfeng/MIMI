@@ -15,6 +15,7 @@ import com.dabenxiang.mimi.model.enums.OrderType
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.order.OrderFuncItem
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_order.view.*
 import java.text.SimpleDateFormat
@@ -115,7 +116,7 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
         tvPoint.text = orderItem?.packagePoint.toString()
 
         // 若未登入顯示「-」
-        tvSellingPrice.text = orderItem?.sellingPrice.toString()
+        tvSellingPrice.text = GeneralUtils.getAmountFormat(orderItem?.sellingPrice ?: 0f)
 
         btnContact.setOnClickListener {
             orderItem?.also {
