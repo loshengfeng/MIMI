@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.OrderingPackageItem
 import com.dabenxiang.mimi.view.topup.TopUpOnlinePayViewHolder
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
 class TopUpOnlinePayAdapter(val context: Context) :
     RecyclerView.Adapter<TopUpOnlinePayViewHolder>() {
@@ -32,8 +33,10 @@ class TopUpOnlinePayAdapter(val context: Context) :
         val item = orderingPackageItems?.get(position)
         holder.tvPackageName.text = item?.name
 
-        holder.price.text = String.format("%.2f", item?.price)
-        holder.listPrice.text = StringBuilder("¥ ").append(String.format("%.2f", item?.listPrice)).toString()
+        holder.price.text = GeneralUtils.getAmountFormat(item?.price ?: 0f)
+        holder.listPrice.text = StringBuilder("¥ ")
+            .append(GeneralUtils.getAmountFormat(item?.listPrice ?: 0f))
+            .toString()
 
         holder.listPrice.paint.flags = Paint.STRIKE_THRU_TEXT_FLAG
 

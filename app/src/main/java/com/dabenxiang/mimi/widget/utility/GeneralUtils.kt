@@ -35,11 +35,14 @@ import timber.log.Timber
 import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.text.DecimalFormat
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
 
 object GeneralUtils {
+
+    private val decimalFormat = DecimalFormat("###,###.00")
 
     fun showToast(context: Context, text: String) {
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
@@ -294,5 +297,9 @@ object GeneralUtils {
 
     fun getWindowsHeight(): Int {
         return App.applicationContext().resources.displayMetrics.heightPixels
+    }
+
+    fun getAmountFormat(amount: Float): String {
+        return decimalFormat.format(amount)
     }
 }

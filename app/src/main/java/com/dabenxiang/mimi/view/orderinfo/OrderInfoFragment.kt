@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.orderinfo
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -15,6 +16,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.orderresult.OrderResultFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_order_info.*
 import kotlinx.android.synthetic.main.fragment_text_detail.toolbarContainer
 import kotlinx.android.synthetic.main.toolbar.*
@@ -45,8 +47,10 @@ class OrderInfoFragment : BaseFragment() {
 
         toolbar.setBackgroundColor(requireContext().getColor(R.color.color_gray_2))
         text_toolbar_title.setTextColor(requireContext().getColor(R.color.color_black_1))
-        toolbarContainer.toolbar.navigationIcon =
-            requireContext().getDrawable(R.drawable.btn_back_black_n)
+        toolbarContainer.toolbar.navigationIcon = ContextCompat.getDrawable(
+            requireContext(), R.drawable.btn_back_black_n
+        )
+
         toolbarContainer.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
@@ -68,17 +72,19 @@ class OrderInfoFragment : BaseFragment() {
         productName.append(")")
         tv_product_name.text = productName
 
+        val price = GeneralUtils.getAmountFormat(orderingPackageItem.price)
+
         tv_product_count.text = StringBuilder("¥ ")
-            .append(orderingPackageItem.price)
+            .append(price)
             .append(" x 1")
             .toString()
 
         tv_total.text = StringBuilder("¥ ")
-            .append(orderingPackageItem.price)
+            .append(price)
             .toString()
 
         tv_total_amount.text = StringBuilder("¥ ")
-            .append(orderingPackageItem.price)
+            .append(price)
             .toString()
     }
 

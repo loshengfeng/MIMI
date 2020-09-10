@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.orderresult
 import com.airbnb.epoxy.TypedEpoxyController
 import com.dabenxiang.mimi.model.vo.mqtt.OrderPayloadItem
 import com.dabenxiang.mimi.view.orderresult.itemview.*
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -70,7 +71,7 @@ class OrderResultEpoxyController(
             setupBank(bank)
             setupCity(city)
             setupAccount(item.accountNumber)
-            setupAmount(item.amount.toString())
+            setupAmount(GeneralUtils.getAmountFormat(item.amount))
             setupClickListener(successListener)
         }
     }
