@@ -175,6 +175,7 @@ class LoginFragment : BaseFragment() {
                     mainViewModel?.startMQTT()
                     GeneralDialog.newInstance(
                         GeneralDialogData(
+                            titleIcon = R.drawable.img_login_success,
                             titleRes = R.string.desc_success,
                             message = viewModel.accountManager.getProfile().friendlyName,
                             messageIcon = R.drawable.ico_default_photo,
