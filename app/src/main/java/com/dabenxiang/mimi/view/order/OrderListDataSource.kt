@@ -86,7 +86,7 @@ class OrderListDataSource constructor(
                             hasNextPage(
                                 item.paging.count,
                                 item.paging.offset,
-                                0
+                                item.content?.orders?.size ?: 0
                             ) -> next + PER_LIMIT_LONG
                             else -> null
                         }
