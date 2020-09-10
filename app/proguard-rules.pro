@@ -100,6 +100,11 @@
 -dontwarn com.jeremyliao.liveeventbus.**
 -keep class com.jeremyliao.liveeventbus.** { *; }
 
+# MQTT
+-keep class org.eclipse.paho.clent.mqttv3.** {*;}
+-keep class org.eclipse.paho.client.mqttv3.*$* { *; }
+-keep class org.eclipse.paho.client.mqttv3.logging.JSR47Logger { *; }
+
 # Glide
 -keep public class * implements com.bumptech.glide.module.GlideModule
 -keep class * extends com.bumptech.glide.module.AppGlideModule {

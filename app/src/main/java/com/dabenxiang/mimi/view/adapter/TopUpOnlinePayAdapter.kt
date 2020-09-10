@@ -32,8 +32,9 @@ class TopUpOnlinePayAdapter(val context: Context) :
         val item = orderingPackageItems?.get(position)
         holder.tvPackageName.text = item?.name
 
-        holder.price.text = item?.price.toString()
-        holder.listPrice.text = StringBuilder("¥ ").append(item?.listPrice).toString()
+        holder.price.text = String.format("%.2f", item?.price)
+        holder.listPrice.text = StringBuilder("¥ ").append(String.format("%.2f", item?.listPrice)).toString()
+
         holder.listPrice.paint.flags = Paint.STRIKE_THRU_TEXT_FLAG
 
         if (selectItem != null && selectItem?.id == item?.id) {
