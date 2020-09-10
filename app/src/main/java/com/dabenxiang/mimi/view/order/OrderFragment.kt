@@ -17,6 +17,7 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
+import com.dabenxiang.mimi.model.enums.OrderType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
@@ -146,7 +147,7 @@ class OrderFragment : BaseFragment() {
                             avatarAttachmentId = chatListItem.avatarAttachmentId,
                             lastReadTime = chatListItem.lastReadTime
                         ),
-                        OrderItem(traceLogId = createOrderChatItem.id, isOnline = orderItem.isOnline)
+                        OrderItem(traceLogId = createOrderChatItem.id, type = orderItem.type)
                     )
                 }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
@@ -199,7 +200,7 @@ class OrderFragment : BaseFragment() {
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_orderFragment_to_chatContentFragment,
-                ChatContentFragment.createBundle(item, orderItem.traceLogId, orderItem.isOnline)
+                ChatContentFragment.createBundle(item, orderItem.traceLogId, orderItem.type == OrderType.USER2ONLINE)
             )
         )
     }

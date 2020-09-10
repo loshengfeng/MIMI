@@ -11,6 +11,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.model.enums.OrderStatus
+import com.dabenxiang.mimi.model.enums.OrderType
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.order.OrderFuncItem
@@ -78,14 +79,8 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
             }
         }
 
-        when (orderItem?.isOnline) {
-            false -> {
-                ivType.visibility = View.INVISIBLE
-                clProxy.visibility = View.VISIBLE
-                tvName.text = orderItem.merchantUserFriendlyName
-                orderFuncItem?.getOrderProxyAttachment?.invoke(orderItem.merchantUserAvatarAttachmentId,ivAvatar)
-            }
-            true -> {
+        when (orderItem?.type) {
+            OrderType.USER2ONLINE -> {
                 clProxy.visibility = View.GONE
                 ivType.visibility = View.VISIBLE
                 ivType.setBackgroundResource(
@@ -95,6 +90,12 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
                         else -> R.drawable.ico_bank
                     }
                 )
+            }
+            else -> {
+                ivType.visibility = View.INVISIBLE
+                clProxy.visibility = View.VISIBLE
+                tvName.text = orderItem?.merchantUserFriendlyName
+                orderFuncItem?.getOrderProxyAttachment?.invoke(orderItem?.merchantUserAvatarAttachmentId,ivAvatar)
             }
         }
 

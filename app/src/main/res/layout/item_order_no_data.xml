@@ -29,10 +29,11 @@
         android:gravity="center"
         android:textColor="@color/color_black_1"
         android:textSize="18sp"
+        android:text="@string/order_no_data"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/iv_icon"
-        tools:text="文字文字" />
+        tools:text="尚未有充值纪录，快去充值吧！" />
 
     <TextView
         android:id="@+id/tv_topup"
