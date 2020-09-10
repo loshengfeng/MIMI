@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.model.api.vo
 
 import com.dabenxiang.mimi.model.enums.OrderStatus
+import com.dabenxiang.mimi.model.enums.OrderType
 import com.dabenxiang.mimi.model.enums.PaymentStatus
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.google.gson.annotations.SerializedName
@@ -33,6 +34,9 @@ data class OrderItem(
 
     @SerializedName("merchantUserAvatarAttachmentId")
     val merchantUserAvatarAttachmentId: Long? = 0,
+
+    @SerializedName("type")
+    val type: OrderType = OrderType.USER2ONLINE,
 
     @SerializedName("paymentType")
     val paymentType: PaymentType = PaymentType.BANK,

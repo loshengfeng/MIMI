@@ -381,6 +381,7 @@
     <string name="order_detail_create_order">建立订单</string>
     <string name="order_detail_total_amount">总计</string>
     <string name="order_contact_mimi_service">蜜蜜客服</string>
+    <string name="order_no_data">尚未有充值纪录，快去充值吧！</string>
 
 
     <!-- Order Result -->

@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.item_order_no_data.view.*
 import kotlinx.android.synthetic.main.item_order_pager.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.*
 
 class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
@@ -85,6 +86,7 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
                         ?: let { View.VISIBLE }
             }
         }
+        Timber.d("@@setTabPosition, index: $index, itemOrderNoData visibility: ${itemOrderNoData.visibility}, itemChatNoData visibility: ${itemChatNoData.visibility}")
     }
 
     fun onBind(position: Int, orderFuncItem: OrderFuncItem) {
