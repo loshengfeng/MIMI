@@ -51,9 +51,9 @@ class OrderFragment : BaseFragment() {
                 getOrderByPaging3 = { update -> getOrderByPaging3(update) },
                 getOrderByPaging2 = { type, update -> viewModel.getOrderByPaging2(type, update) },
                 getChatList = { update -> viewModel.getChatList(update) },
-                getChatAttachment = { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR) },
+                getChatAttachment = { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR_CS) },
                 onChatItemClick = { item -> onChatItemClick(item) },
-                getOrderProxyAttachment = { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR) },
+                getOrderProxyAttachment = { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR_CS) },
                 onContactClick = { chatListItem, orderItem -> onContactClick(chatListItem, orderItem) },
                 getProxyUnread = { update -> getProxyUnread(update) },
                 onTopUpClick = { onTopUpClick() }
