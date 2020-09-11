@@ -48,7 +48,6 @@ class OrderListDataSource constructor(
                     ) -> PER_LIMIT_LONG
                     else -> null
                 }
-                updateNoData(item?.paging?.count?.toInt() ?: 0)
                 emit(InitResult(clubs ?: arrayListOf(), nextPageKey))
 
                 if (type == null) {
@@ -60,6 +59,7 @@ class OrderListDataSource constructor(
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect { response ->
                     callback.onResult(response.list, null, response.nextKey)
+                    updateNoData(response.list.size)
                 }
         }
     }

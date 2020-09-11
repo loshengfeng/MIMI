@@ -47,9 +47,8 @@ class ChatHistoryListDataSource(
                     ) -> PER_LIMIT_LONG
                     else -> null
                 }
-                updateNoData(totalCount.toInt())
                 emit(InitResult(messages ?: ArrayList(), nextPageKey))
-            }
+\            }
                     .flowOn(Dispatchers.IO)
                     .onStart { pagingCallback.onLoading() }
                     .catch { e -> pagingCallback.onThrowable(e) }
@@ -57,6 +56,7 @@ class ChatHistoryListDataSource(
                     .collect {response->
                         pagingCallback.onSucceed()
                         callback.onResult(response.list, null, response.nextKey)
+                        updateNoData(response.list.size)
                     }
 
         }
