@@ -42,7 +42,7 @@ import kotlin.math.roundToInt
 
 object GeneralUtils {
 
-    private val decimalFormat = DecimalFormat("###,###.00")
+    private val decimalFormat = DecimalFormat("###,##0.00")
 
     fun showToast(context: Context, text: String) {
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
