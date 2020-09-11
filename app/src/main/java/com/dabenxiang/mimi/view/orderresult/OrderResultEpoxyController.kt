@@ -50,7 +50,7 @@ class OrderResultEpoxyController(
             .append(" 前完成打款动作，避免订单超时")
             .toString()
 
-        val bank = StringBuilder(item.bankBranchName)
+        val bank = StringBuilder(item.bankName)
             .append("(")
             .append(item.bankCode)
             .append(") ")

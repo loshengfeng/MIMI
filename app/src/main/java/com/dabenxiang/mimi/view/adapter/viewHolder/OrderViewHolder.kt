@@ -50,7 +50,9 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
             OrderStatus.PENDING -> {
                 tvStatus.setTextColor(tvStatus.context.getColor(R.color.color_black_1))
                 tvStatus.text = tvStatus.context.getString(R.string.topup_pending)
-                clPaymentInfo.visibility = View.VISIBLE
+                takeIf { orderItem.type == OrderType.USER2ONLINE }?.run {
+                    clPaymentInfo.visibility = View.VISIBLE
+                }
             }
             OrderStatus.TRANSACTION -> {
                 tvStatus.setTextColor(tvStatus.context.getColor(R.color.color_black_1))
