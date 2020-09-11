@@ -48,7 +48,7 @@ class ChatHistoryListDataSource(
                     else -> null
                 }
                 emit(InitResult(messages ?: ArrayList(), nextPageKey))
-\            }
+            }
                     .flowOn(Dispatchers.IO)
                     .onStart { pagingCallback.onLoading() }
                     .catch { e -> pagingCallback.onThrowable(e) }
