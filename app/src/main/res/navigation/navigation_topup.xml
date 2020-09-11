@@ -53,7 +53,8 @@
 
         <action
             android:id="@+id/action_orderResultFragment_to_orderFragment"
-            app:destination="@id/orderFragment" />
+            app:destination="@id/orderFragment"
+            app:popUpTo="@id/topupFragment" />
 
         <action
             android:id="@+id/action_orderResultFragment_to_topupFragment"

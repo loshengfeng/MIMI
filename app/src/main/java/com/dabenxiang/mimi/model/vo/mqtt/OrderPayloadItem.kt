@@ -10,7 +10,7 @@ data class OrderPayloadItem(
     val type: NotifyType = NotifyType.CREATE_ORDER,
 
     @SerializedName("orderId")
-    val orderId: Long = 0,
+    val orderId: String = "",
 
     @SerializedName("accountName")
     val accountName: String = "",
@@ -36,7 +36,7 @@ data class OrderPayloadItem(
     @SerializedName("amount")
     val amount: Float = 0f,
 
-    @SerializedName("createTime")
+    @SerializedName("CreateTime")
     val createTime: Date? = null,
 
     @SerializedName("isSuccessful")

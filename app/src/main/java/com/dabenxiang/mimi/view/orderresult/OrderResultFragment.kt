@@ -30,7 +30,7 @@ class OrderResultFragment : BaseFragment() {
 
     private val viewModel: OrderResultViewModel by viewModels()
 
-    private val timer = Timer()
+    private lateinit var timer: Timer
 
     private val epoxyController by lazy {
         OrderResultEpoxyController(failedListener, successListener)
@@ -141,6 +141,7 @@ class OrderResultFragment : BaseFragment() {
         val task = timerTask {
             epoxyController.setData(OrderPayloadItem(isSuccessful = false))
         }
+        timer = Timer()
         timer.schedule(task, DELAY_TIME)
     }
 
