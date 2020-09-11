@@ -37,7 +37,7 @@ data class OrderItem(
     val merchantUserAvatarAttachmentId: Long? = 0,
 
     @SerializedName("type")
-    val type: OrderType = OrderType.USER2ONLINE,
+    val type: OrderType = OrderType.OTHER,
 
     @SerializedName("paymentType")
     val paymentType: PaymentType = PaymentType.BANK,
@@ -76,7 +76,7 @@ data class OrderItem(
     val lastReplyTime: Date? = null,
 
     @SerializedName("lastReadTime")
-    val lastReadTime: Date? = null,
+    var lastReadTime: Date? = null,
 
     @SerializedName("actualAmount")
     val actualAmount: Float = 0f,

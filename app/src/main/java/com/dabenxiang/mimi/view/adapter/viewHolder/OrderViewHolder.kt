@@ -138,6 +138,8 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
                     ),
                     orderItem
                 )
+                it.lastReadTime = Calendar.getInstance().time
+                ivNew.visibility = View.GONE
             }
         }
 
