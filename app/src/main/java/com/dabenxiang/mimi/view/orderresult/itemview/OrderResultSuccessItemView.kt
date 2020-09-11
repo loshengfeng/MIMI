@@ -43,7 +43,7 @@ class OrderResultSuccessItemView(context: Context) : ConstraintLayout(context) {
 
     @ModelProp
     fun setupBank(text: String) {
-        tv_back.text = text
+        tv_bank.text = text
     }
 
     @ModelProp

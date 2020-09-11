@@ -5,6 +5,7 @@ import com.dabenxiang.mimi.model.enums.OrderType
 import com.dabenxiang.mimi.model.enums.PaymentStatus
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 import java.util.*
 
 data class OrderItem(
@@ -85,4 +86,4 @@ data class OrderItem(
 
     @SerializedName("failureReason")
     val failureReason: String = ""
-)
+): Serializable

@@ -34,6 +34,7 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
     private val tvSellingPrice: TextView = view.tv_selling_price
     private val btnContact: Button = view.btn_contact
     private val ivNew: ImageView = view.iv_new
+    private val clPaymentInfo: ConstraintLayout = view.cl_payment_info
 
     private var orderItem: OrderItem? = null
 
@@ -42,10 +43,14 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
 
         tvStatus.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0)
         tvStatus.compoundDrawablePadding = 0
+
+        clPaymentInfo.visibility = View.GONE
+
         when (orderItem?.status) {
             OrderStatus.PENDING -> {
                 tvStatus.setTextColor(tvStatus.context.getColor(R.color.color_black_1))
                 tvStatus.text = tvStatus.context.getString(R.string.topup_pending)
+                clPaymentInfo.visibility = View.VISIBLE
             }
             OrderStatus.TRANSACTION -> {
                 tvStatus.setTextColor(tvStatus.context.getColor(R.color.color_black_1))
@@ -132,6 +137,10 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
                     orderItem
                 )
             }
+        }
+
+        clPaymentInfo.setOnClickListener {
+            orderItem?.also { orderFuncItem?.onPaymentInfoClick?.invoke(it) }
         }
 
         ivNew.visibility =

@@ -195,7 +195,7 @@
                 tools:text="王大明" />
 
             <TextView
-                android:id="@+id/tv_back"
+                android:id="@+id/tv_bank"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -213,7 +213,7 @@
                 android:textColor="@color/color_black_1"
                 android:textSize="14sp"
                 app:layout_constraintLeft_toLeftOf="@+id/guideline_account_start"
-                app:layout_constraintTop_toBottomOf="@+id/tv_back"
+                app:layout_constraintTop_toBottomOf="@+id/tv_bank"
                 tools:text="开户省/开户市/开户行" />
 
             <TextView

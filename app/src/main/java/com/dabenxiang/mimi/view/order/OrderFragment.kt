@@ -16,12 +16,14 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderItem
+import com.dabenxiang.mimi.model.api.vo.PaymentInfoItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.OrderType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.paymentInfo.PaymentInfoFragment
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_order.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
@@ -56,7 +58,8 @@ class OrderFragment : BaseFragment() {
                 getOrderProxyAttachment = { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR_CS) },
                 onContactClick = { chatListItem, orderItem -> onContactClick(chatListItem, orderItem) },
                 getProxyUnread = { update -> getProxyUnread(update) },
-                onTopUpClick = { onTopUpClick() }
+                onTopUpClick = { onTopUpClick() },
+                onPaymentInfoClick = { orderItem -> onPaymentInfoClick(orderItem) }
             ))
     }
 
@@ -222,5 +225,14 @@ class OrderFragment : BaseFragment() {
     private fun onTopUpClick() {
         findNavController().navigateUp()
         interactionListener?.changeNavigationPosition(R.id.navigation_topup)
+    }
+
+    private fun onPaymentInfoClick(orderItem: OrderItem = OrderItem()) {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_orderFragment_to_paymentInfoFragment,
+                PaymentInfoFragment.createBundle(orderItem)
+            )
+        )
     }
 }

@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.model.api.vo
 
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class PaymentInfoItem(
 
@@ -34,4 +35,4 @@ data class PaymentInfoItem(
 
     @SerializedName("paymentType")
     val paymentType: PaymentType = PaymentType.BANK
-)
+): Serializable
