@@ -12,7 +12,9 @@ import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import kotlinx.android.synthetic.main.fragment_payment_info.*
 import kotlinx.android.synthetic.main.item_order_result_successful.*
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -27,6 +29,8 @@ class PaymentInfoFragment: BaseFragment() {
             }
         }
     }
+
+    override val bottomNavigationVisibility: Int = View.GONE
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -55,7 +59,7 @@ class PaymentInfoFragment: BaseFragment() {
                 .append(" 前完成打款动作，避免订单超时")
                 .toString()
 
-            val bank = StringBuilder(paymentInfoItem.bankBranchName)
+            val bank = StringBuilder(paymentInfoItem.bankName)
                 .append("(")
                 .append(paymentInfoItem.bankCode)
                 .append(") ")
@@ -74,8 +78,11 @@ class PaymentInfoFragment: BaseFragment() {
             tv_bank.text = bank
             tv_city.text = city
             tv_account.text = paymentInfoItem.accountNumber
-            tv_amount.text = GeneralUtils.getAmountFormat(orderItem.actualAmount)
+            tv_amount.text = GeneralUtils.getAmountFormat(orderItem.sellingPrice)
+        }
 
+        ib_close.setOnClickListener {
+            navigateTo(NavigateItem.Up)
         }
     }
 
