@@ -1,11 +1,14 @@
 package com.dabenxiang.mimi.view.adapter.viewHolder.chat
 
+import android.graphics.Bitmap
 import android.view.View
 import android.widget.ImageView
+import androidx.core.graphics.drawable.toBitmap
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.view.adapter.ChatContentAdapter
+import java.io.ByteArrayOutputStream
 
 
 class ChatContentImageViewHolder(
@@ -18,7 +21,11 @@ class ChatContentImageViewHolder(
 
     init {
         imgFile.setOnClickListener {
-            listener.onImageClick(fileArray)
+            val bitmap = (it as ImageView).drawable.toBitmap()
+            val stream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+            val bitmapdata: ByteArray = stream.toByteArray()
+            listener.onImageClick(bitmapdata)
         }
     }
 
