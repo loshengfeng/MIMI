@@ -331,22 +331,30 @@ class ChatContentFragment : BaseFragment() {
      * 打開多媒體選擇器
      */
     private fun openChooser() {
-        val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        galleryIntent.type = "image/* video/*"
+        val requestList = getNotGrantedPermissions(externalPermissions + cameraPermissions)
+        if (requestList.size > 0) {
+            requestPermissions(
+                requestList.toTypedArray(),
+                PERMISSION_GALLERY_REQUEST_CODE
+            )
+        } else {
+            val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            galleryIntent.type = "image/* video/*"
 
-        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        val videoIntent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
+            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            val videoIntent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
 
-        val chooser = Intent(Intent.ACTION_CHOOSER)
-        chooser.putExtra(Intent.EXTRA_INTENT, galleryIntent)
-        chooser.putExtra(
-            Intent.EXTRA_TITLE,
-            requireContext().getString(R.string.chat_content_media_chooser)
-        )
+            val chooser = Intent(Intent.ACTION_CHOOSER)
+            chooser.putExtra(Intent.EXTRA_INTENT, galleryIntent)
+            chooser.putExtra(
+                Intent.EXTRA_TITLE,
+                requireContext().getString(R.string.chat_content_media_chooser)
+            )
 
-        val intentArray = arrayOf(cameraIntent, videoIntent)
-        chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
-        startActivityForResult(chooser, INTENT_SELECT_IMG)
+            val intentArray = arrayOf(cameraIntent, videoIntent)
+            chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
+            startActivityForResult(chooser, INTENT_SELECT_IMG)
+        }
     }
 
     private val messageListener = object : MessageListener {
