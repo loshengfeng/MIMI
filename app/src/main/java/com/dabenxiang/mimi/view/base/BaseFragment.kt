@@ -64,6 +64,9 @@ abstract class BaseFragment : Fragment() {
     companion object {
         const val PERMISSION_EXTERNAL_REQUEST_CODE = 637
         const val PERMISSION_CAMERA_REQUEST_CODE = 699
+        const val PERMISSION_VIDEO_REQUEST_CODE = 20001
+        const val PERMISSION_PIC_REQUEST_CODE = 20002
+        const val PERMISSION_GALLERY_REQUEST_CODE = 20003
     }
 
     open var mainViewModel: MainViewModel? = null
