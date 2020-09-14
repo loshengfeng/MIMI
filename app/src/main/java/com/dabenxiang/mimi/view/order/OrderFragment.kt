@@ -16,11 +16,14 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderItem
+import com.dabenxiang.mimi.model.api.vo.PaymentInfoItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
+import com.dabenxiang.mimi.model.enums.OrderType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.paymentInfo.PaymentInfoFragment
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_order.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
@@ -48,14 +51,15 @@ class OrderFragment : BaseFragment() {
         OrderPagerAdapter(
             OrderFuncItem(
                 getOrderByPaging3 = { update -> getOrderByPaging3(update) },
-                getOrderByPaging2 = { type, update -> viewModel.getOrderByPaging2(type, update) },
-                getChatList = { update -> viewModel.getChatList(update) },
-                getChatAttachment = { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR) },
+                getOrderByPaging2 = { type, update, updateNoData -> viewModel.getOrderByPaging2(type, update, updateNoData) },
+                getChatList = { update, updateNoData -> viewModel.getChatList(update, updateNoData) },
+                getChatAttachment = { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR_CS) },
                 onChatItemClick = { item -> onChatItemClick(item) },
-                getOrderProxyAttachment = { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR) },
+                getOrderProxyAttachment = { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR_CS) },
                 onContactClick = { chatListItem, orderItem -> onContactClick(chatListItem, orderItem) },
                 getProxyUnread = { update -> getProxyUnread(update) },
-                onTopUpClick = { onTopUpClick() }
+                onTopUpClick = { onTopUpClick() },
+                onPaymentInfoClick = { orderItem -> onPaymentInfoClick(orderItem) }
             ))
     }
 
@@ -146,7 +150,7 @@ class OrderFragment : BaseFragment() {
                             avatarAttachmentId = chatListItem.avatarAttachmentId,
                             lastReadTime = chatListItem.lastReadTime
                         ),
-                        OrderItem(traceLogId = createOrderChatItem.id, isOnline = orderItem.isOnline)
+                        OrderItem(traceLogId = createOrderChatItem.id, type = orderItem.type)
                     )
                 }
                 is ApiResult.Loaded -> progressHUD?.dismiss()
@@ -199,7 +203,7 @@ class OrderFragment : BaseFragment() {
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_orderFragment_to_chatContentFragment,
-                ChatContentFragment.createBundle(item, orderItem.traceLogId, orderItem.isOnline)
+                ChatContentFragment.createBundle(item, orderItem.traceLogId, orderItem.type == OrderType.USER2ONLINE)
             )
         )
     }
@@ -221,5 +225,14 @@ class OrderFragment : BaseFragment() {
     private fun onTopUpClick() {
         findNavController().navigateUp()
         interactionListener?.changeNavigationPosition(R.id.navigation_topup)
+    }
+
+    private fun onPaymentInfoClick(orderItem: OrderItem = OrderItem()) {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_orderFragment_to_paymentInfoFragment,
+                PaymentInfoFragment.createBundle(orderItem)
+            )
+        )
     }
 }

@@ -190,18 +190,43 @@
             tools:text="¥ 50.00" />
 
         <TextView
+            android:id="@+id/tv_title_create_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginBottom="10dp"
+            android:text="@string/topup_create_time"
+            android:textColor="@color/color_black_2_50"
+            app:layout_constraintTop_toBottomOf="@id/tv_title_selling_price"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_create_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="15dp"
+            android:textColor="@color/color_black_1"
+            android:textSize="14sp"
+            android:text="@string/topup_default_time"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_title_create_time"
+            app:layout_constraintBottom_toBottomOf="@id/tv_title_create_time"/>
+
+        <TextView
             android:id="@+id/tv_title_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="14sp"
             android:layout_marginTop="10dp"
             android:layout_marginStart="15dp"
-            android:layout_marginBottom="15dp"
-            android:text="@string/topup_time"
+            android:layout_marginBottom="10dp"
+            android:text="@string/topup_completion_time"
             android:textColor="@color/color_black_2_50"
-            app:layout_constraintTop_toBottomOf="@id/tv_title_selling_price"
+            app:layout_constraintTop_toBottomOf="@id/tv_title_create_time"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/btn_contact" />
+            app:layout_constraintBottom_toTopOf="@id/cl_payment_info" />
 
         <TextView
             android:id="@+id/tv_time"
@@ -215,16 +240,66 @@
             app:layout_constraintTop_toTopOf="@id/tv_title_time"
             app:layout_constraintBottom_toBottomOf="@id/tv_title_time"/>
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_payment_info"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="15dp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_title_time"
+            app:layout_constraintBottom_toTopOf="@id/btn_contact">
+            <View
+                android:id="@+id/top_divider"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@color/color_black_1_05"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_payment_info_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingVertical="10dp"
+                android:text="@string/topup_check_info"
+                android:textColor="@color/color_blue_2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/top_divider" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/btn_arrow_black_n"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_payment_info_title"
+                app:layout_constraintBottom_toBottomOf="@id/tv_payment_info_title"
+                android:contentDescription="@null" />
+
+            <View
+                android:id="@+id/bottom_divider"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@color/color_black_1_05"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <Button
             android:id="@+id/btn_contact"
             android:layout_width="90dp"
             android:layout_height="32dp"
             android:layout_marginEnd="15dp"
             android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
             android:textColor="@color/color_red_1"
             android:background="@drawable/bg_order_contact_btn"
             android:text="@string/topup_contact"
-            app:layout_constraintTop_toBottomOf="@id/tv_title_time"
+            app:layout_constraintTop_toBottomOf="@id/cl_payment_info"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
 

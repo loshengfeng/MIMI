@@ -14,7 +14,8 @@ import timber.log.Timber
 class ChatHistoryListDataSource(
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
-    private val pagingCallback: PagingCallback
+    private val pagingCallback: PagingCallback,
+    private val updateNoData: ((Int) -> Unit) = {}
 ) : PageKeyedDataSource<Long, ChatListItem>() {
 
     companion object {
@@ -55,6 +56,7 @@ class ChatHistoryListDataSource(
                     .collect {response->
                         pagingCallback.onSucceed()
                         callback.onResult(response.list, null, response.nextKey)
+                        updateNoData(response.list.size)
                     }
 
         }

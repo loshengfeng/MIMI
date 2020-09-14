@@ -34,10 +34,10 @@ class OrderViewModel : BaseViewModel() {
     var unreadCount = 0
     var unreadOrderCount = 0
 
-    fun getOrderByPaging2(type: OrderType?, update: ((PagedList<OrderItem>) -> Unit)) {
+    fun getOrderByPaging2(type: OrderType?, update: ((PagedList<OrderItem>) -> Unit), updateNoData: ((Int) -> Unit)) {
         viewModelScope.launch {
             val dataSrc =
-                OrderListDataSource(viewModelScope, domainManager, pagingCallback, type)
+                OrderListDataSource(viewModelScope, domainManager, pagingCallback, type, updateNoData)
             dataSrc.isInvalid
             val factory = OrderListFactory(dataSrc)
             val config = PagedList.Config.Builder()
@@ -81,11 +81,12 @@ class OrderViewModel : BaseViewModel() {
         override fun onThrowable(throwable: Throwable) {}
     }
 
-    private fun getChatHistoryPagingItems(): LiveData<PagedList<ChatListItem>> {
+    private fun getChatHistoryPagingItems(updateNoData: ((Int) -> Unit) = {}): LiveData<PagedList<ChatListItem>> {
         val dataSrc = ChatHistoryListDataSource(
             viewModelScope,
             domainManager,
-            chatPagingCallback
+            chatPagingCallback,
+            updateNoData
         )
         val factory = ChatHistoryListFactory(dataSrc)
         val config = PagedList.Config.Builder()
@@ -95,7 +96,7 @@ class OrderViewModel : BaseViewModel() {
         return LivePagedListBuilder(factory, config).build()
     }
 
-    fun getChatList(updateList: ((PagedList<ChatListItem>) -> Unit)) {
+    fun getChatList(updateList: ((PagedList<ChatListItem>) -> Unit), updateNoData: ((Int) -> Unit)) {
         viewModelScope.launch {
             getChatHistoryPagingItems().asFlow()
                 .collect {

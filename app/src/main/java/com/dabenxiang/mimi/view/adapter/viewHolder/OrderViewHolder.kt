@@ -11,9 +11,11 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.model.enums.OrderStatus
+import com.dabenxiang.mimi.model.enums.OrderType
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.order.OrderFuncItem
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_order.view.*
 import java.text.SimpleDateFormat
@@ -27,11 +29,13 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
     private val ivAvatar: ImageView = view.img_avatar
     private val tvName: TextView = view.tv_name
     private val tvOrderId: TextView = view.tv_order_id
+    private val tvCreateTime: TextView = view.tv_create_time
     private val tvTime: TextView = view.tv_time
     private val tvPoint: TextView = view.tv_point
     private val tvSellingPrice: TextView = view.tv_selling_price
     private val btnContact: Button = view.btn_contact
     private val ivNew: ImageView = view.iv_new
+    private val clPaymentInfo: ConstraintLayout = view.cl_payment_info
 
     private var orderItem: OrderItem? = null
 
@@ -40,10 +44,16 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
 
         tvStatus.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0)
         tvStatus.compoundDrawablePadding = 0
+
+        clPaymentInfo.visibility = View.GONE
+
         when (orderItem?.status) {
             OrderStatus.PENDING -> {
                 tvStatus.setTextColor(tvStatus.context.getColor(R.color.color_black_1))
                 tvStatus.text = tvStatus.context.getString(R.string.topup_pending)
+                takeIf { orderItem.type == OrderType.USER2ONLINE }?.run {
+                    clPaymentInfo.visibility = View.VISIBLE
+                }
             }
             OrderStatus.TRANSACTION -> {
                 tvStatus.setTextColor(tvStatus.context.getColor(R.color.color_black_1))
@@ -78,14 +88,8 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
             }
         }
 
-        when (orderItem?.isOnline) {
-            false -> {
-                ivType.visibility = View.INVISIBLE
-                clProxy.visibility = View.VISIBLE
-                tvName.text = orderItem.merchantUserFriendlyName
-                orderFuncItem?.getOrderProxyAttachment?.invoke(orderItem.merchantUserAvatarAttachmentId,ivAvatar)
-            }
-            true -> {
+        when (orderItem?.type) {
+            OrderType.USER2ONLINE -> {
                 clProxy.visibility = View.GONE
                 ivType.visibility = View.VISIBLE
                 ivType.setBackgroundResource(
@@ -96,6 +100,12 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
                     }
                 )
             }
+            else -> {
+                ivType.visibility = View.INVISIBLE
+                clProxy.visibility = View.VISIBLE
+                tvName.text = orderItem?.merchantUserFriendlyName
+                orderFuncItem?.getOrderProxyAttachment?.invoke(orderItem?.merchantUserAvatarAttachmentId,ivAvatar)
+            }
         }
 
         orderItem?.failureReason?.takeIf { !TextUtils.isEmpty(it) }?.also {
@@ -104,6 +114,10 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
         } ?: run { tvFailureReason.visibility = View.GONE }
 
         tvOrderId.text = orderItem?.id.toString()
+
+        tvCreateTime.text = orderItem?.createTime?.let { date ->
+            SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(date)
+        } ?: let { tvTime.context.getString(R.string.topup_default_time) }
 
         // 格式為YYYY-MM-DD hh:mm
         tvTime.text = orderItem?.completionTime?.let { date ->
@@ -114,7 +128,7 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
         tvPoint.text = orderItem?.packagePoint.toString()
 
         // 若未登入顯示「-」
-        tvSellingPrice.text = orderItem?.sellingPrice.toString()
+        tvSellingPrice.text = GeneralUtils.getAmountFormat(orderItem?.sellingPrice ?: 0f)
 
         btnContact.setOnClickListener {
             orderItem?.also {
@@ -129,7 +143,13 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
                     ),
                     orderItem
                 )
+                it.lastReadTime = Calendar.getInstance().time
+                ivNew.visibility = View.GONE
             }
+        }
+
+        clPaymentInfo.setOnClickListener {
+            orderItem?.also { orderFuncItem?.onPaymentInfoClick?.invoke(it) }
         }
 
         ivNew.visibility =

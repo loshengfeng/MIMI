@@ -16,7 +16,8 @@ class OrderListDataSource constructor(
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
     private val pagingCallback: PagingCallback,
-    private val type: OrderType? = null
+    private val type: OrderType? = null,
+    private val updateNoData: ((Int) -> Unit) = {}
 ) : PageKeyedDataSource<Long, OrderItem>() {
 
     companion object {
@@ -58,6 +59,7 @@ class OrderListDataSource constructor(
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect { response ->
                     callback.onResult(response.list, null, response.nextKey)
+                    updateNoData(response.list.size)
                 }
         }
     }
@@ -86,7 +88,7 @@ class OrderListDataSource constructor(
                             hasNextPage(
                                 item.paging.count,
                                 item.paging.offset,
-                                0
+                                item.content?.orders?.size ?: 0
                             ) -> next + PER_LIMIT_LONG
                             else -> null
                         }

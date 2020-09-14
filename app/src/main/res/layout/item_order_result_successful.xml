@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/color_white_1">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_line_top"
@@ -103,8 +104,8 @@
         android:id="@+id/tv_timeout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textSize="12sp"
         android:textColor="@color/color_blue_2"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@+id/line"
         app:layout_constraintLeft_toRightOf="@+id/guideline_timeout_start"
         app:layout_constraintRight_toLeftOf="@+id/guideline_timeout_end"
@@ -126,7 +127,8 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_gray_1_stroke_radius_4">
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline_account_bottom"
@@ -195,7 +197,7 @@
                 tools:text="王大明" />
 
             <TextView
-                android:id="@+id/tv_back"
+                android:id="@+id/tv_bank"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -213,7 +215,7 @@
                 android:textColor="@color/color_black_1"
                 android:textSize="14sp"
                 app:layout_constraintLeft_toLeftOf="@+id/guideline_account_start"
-                app:layout_constraintTop_toBottomOf="@+id/tv_back"
+                app:layout_constraintTop_toBottomOf="@+id/tv_bank"
                 tools:text="开户省/开户市/开户行" />
 
             <TextView

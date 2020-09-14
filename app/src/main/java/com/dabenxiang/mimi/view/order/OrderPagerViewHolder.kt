@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.item_order_no_data.view.*
 import kotlinx.android.synthetic.main.item_order_pager.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.*
 
 class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
@@ -93,7 +94,7 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
             2 -> {
                 if (rvChat.adapter == null) {
                     rvChat.adapter = chatAdapter
-                    orderFuncItem.getChatList { list -> updateChatList(list) }
+                    orderFuncItem.getChatList({ list -> updateChatList(list) }, { size -> updateChatNoData(size)})
                 }
                 if (rvTab.adapter == null) {
                     tabAdapter.submitList(tabList, 0)
@@ -109,7 +110,7 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
             rvOrder.tag = position
             rvOrder.adapter = orderAdapter
 //            orderFuncItem.getOrderByPaging3 { data, scope -> updateOrderList3(data, scope) }
-            orderFuncItem.getOrderByPaging2(getOrderType(position)) { list -> updateOrderList2(list) }
+            orderFuncItem.getOrderByPaging2(getOrderType(position), { list -> updateOrderList2(list) }, { size -> updateOrderNoData(size)})
             swipeRefreshLayout.isRefreshing = true
         }
 
@@ -120,19 +121,15 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
                 2 -> {
                     when(tabAdapter.getSelectedPosition()) {
                         1 -> {
-                            orderFuncItem.getChatList { list -> updateChatList(list) }
+                            orderFuncItem.getChatList({ list -> updateChatList(list) }, { size -> updateChatNoData(size)})
                         }
                         else -> {
-                            orderFuncItem.getOrderByPaging2(getOrderType(position)) { list ->
-                                updateOrderList2(list)
-                            }
+                            orderFuncItem.getOrderByPaging2(getOrderType(position), { list -> updateOrderList2(list) }, { size -> updateOrderNoData(size)})
                         }
                     }
                 }
                 else ->
-                    orderFuncItem.getOrderByPaging2(getOrderType(position)) { list ->
-                        updateOrderList2(list)
-                    }
+                    orderFuncItem.getOrderByPaging2(getOrderType(position), { list -> updateOrderList2(list) }, { size -> updateOrderNoData(size)})
             }
         }
 
@@ -144,7 +141,6 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
     private fun updateOrderList2(list: PagedList<OrderItem>) {
         swipeRefreshLayout.isRefreshing = false
         orderAdapter.submitList(list)
-        itemOrderNoData.visibility = takeIf { list.size > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
     }
 
     private fun updateOrderList3(data: PagingData<OrderItem>, coroutineScope: CoroutineScope) {
@@ -158,11 +154,14 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
     private fun updateChatList(list: PagedList<ChatListItem>) {
         swipeRefreshLayout.isRefreshing = false
         chatAdapter.submitList(list)
-        itemChatNoData.visibility = takeIf { list.size > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
     }
 
-    private fun updateChatAvatar(position: Int) {
-        chatAdapter.update(position)
+    private fun updateOrderNoData(size: Int) {
+        itemOrderNoData.visibility = takeIf { size > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
+    }
+
+    private fun updateChatNoData(size: Int) {
+        itemChatNoData.visibility = takeIf { size > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
     }
 
     private fun getOrderType(position: Int): OrderType? {
