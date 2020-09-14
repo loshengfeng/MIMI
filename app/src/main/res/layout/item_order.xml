@@ -190,6 +190,31 @@
             tools:text="¥ 50.00" />
 
         <TextView
+            android:id="@+id/tv_title_create_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginBottom="10dp"
+            android:text="@string/topup_create_time"
+            android:textColor="@color/color_black_2_50"
+            app:layout_constraintTop_toBottomOf="@id/tv_title_selling_price"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_create_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="15dp"
+            android:textColor="@color/color_black_1"
+            android:textSize="14sp"
+            android:text="@string/topup_default_time"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_title_create_time"
+            app:layout_constraintBottom_toBottomOf="@id/tv_title_create_time"/>
+
+        <TextView
             android:id="@+id/tv_title_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -197,9 +222,9 @@
             android:layout_marginTop="10dp"
             android:layout_marginStart="15dp"
             android:layout_marginBottom="10dp"
-            android:text="@string/topup_time"
+            android:text="@string/topup_completion_time"
             android:textColor="@color/color_black_2_50"
-            app:layout_constraintTop_toBottomOf="@id/tv_title_selling_price"
+            app:layout_constraintTop_toBottomOf="@id/tv_title_create_time"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toTopOf="@id/cl_payment_info" />
 

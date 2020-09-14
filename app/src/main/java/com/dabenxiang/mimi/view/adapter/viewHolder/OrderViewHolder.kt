@@ -29,6 +29,7 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
     private val ivAvatar: ImageView = view.img_avatar
     private val tvName: TextView = view.tv_name
     private val tvOrderId: TextView = view.tv_order_id
+    private val tvCreateTime: TextView = view.tv_create_time
     private val tvTime: TextView = view.tv_time
     private val tvPoint: TextView = view.tv_point
     private val tvSellingPrice: TextView = view.tv_selling_price
@@ -113,6 +114,10 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
         } ?: run { tvFailureReason.visibility = View.GONE }
 
         tvOrderId.text = orderItem?.id.toString()
+
+        tvCreateTime.text = orderItem?.createTime?.let { date ->
+            SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(date)
+        } ?: let { tvTime.context.getString(R.string.topup_default_time) }
 
         // 格式為YYYY-MM-DD hh:mm
         tvTime.text = orderItem?.completionTime?.let { date ->
