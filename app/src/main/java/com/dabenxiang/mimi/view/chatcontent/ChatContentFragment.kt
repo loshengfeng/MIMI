@@ -10,9 +10,10 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import androidx.activity.addCallback
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
@@ -30,6 +31,8 @@ import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.preview.ImagePreviewDialogFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_chat_content.*
+import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.android.synthetic.main.toolbar.view.*
 import org.eclipse.paho.client.mqttv3.MqttMessage
 import timber.log.Timber
 import java.io.File
@@ -85,7 +88,7 @@ class ChatContentFragment : BaseFragment() {
 
         arguments?.getSerializable(KEY_CHAT_LIST_ITEM)?.let { data ->
             data as ChatListItem
-            textTitle.text = data.name
+            text_toolbar_title.text = data.name
             senderAvatarId = data.avatarAttachmentId.toString()
             data.id?.let { id ->
                 viewModel.chatId = id
@@ -114,8 +117,22 @@ class ChatContentFragment : BaseFragment() {
 
     override fun initSettings() {
         super.initSettings()
-        recyclerContent.layoutManager =
-            LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
+
+        toolbar.setBackgroundColor(requireContext().getColor(R.color.color_gray_2))
+        text_toolbar_title.setTextColor(requireContext().getColor(R.color.color_black_1))
+        toolbarContainer.toolbar.navigationIcon = ContextCompat.getDrawable(
+            requireContext(), R.drawable.btn_close_n
+        )
+
+        toolbarContainer.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
+
+        recyclerContent.layoutManager = LinearLayoutManager(
+            context,
+            LinearLayoutManager.VERTICAL,
+            true
+        )
         recyclerContent.adapter = adapter
     }
 
@@ -194,10 +211,6 @@ class ChatContentFragment : BaseFragment() {
 
     override fun setupListeners() {
         Timber.d("${ChatContentFragment::class.java.simpleName}_setupListeners")
-
-        btnClose.setOnClickListener {
-            Navigation.findNavController(requireView()).navigateUp()
-        }
 
         btnSend.setOnClickListener {
             if (editChat.text.isNotEmpty()) {
