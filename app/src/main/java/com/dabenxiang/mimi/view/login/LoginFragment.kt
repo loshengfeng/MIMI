@@ -142,9 +142,7 @@ class LoginFragment : BaseFragment() {
 
         viewModel.registerResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Loading -> progressHUD?.show()
                 is Empty -> {
-                    progressHUD?.dismiss()
                     GeneralDialog.newInstance(
                         GeneralDialogData(
                             titleRes = R.string.receive_mail,
