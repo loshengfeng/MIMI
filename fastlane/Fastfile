@@ -33,7 +33,7 @@ platform :android do
     begin
 #        build(flavor: "mimi", build_type: "Dev_Release")
         build(flavor: "mimi", build_type: "Sit_Release")
-#        build(flavor: "mimi", build_type: "Prod_Release")
+        build(flavor: "mimi", build_type: "Prod_Release")
         upload_to_slack()
     rescue => exception
                on_error(exception)
