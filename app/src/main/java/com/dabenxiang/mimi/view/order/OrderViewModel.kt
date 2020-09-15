@@ -54,7 +54,6 @@ class OrderViewModel : BaseViewModel() {
     }
 
     fun getOrderByPaging2(type: OrderType?, update: ((PagedList<OrderItem>) -> Unit), updateNoData: ((Int) -> Unit)) {
-        Timber.d("@@getOrderByPaging2")
         viewModelScope.launch {
             val dataSrc =
                 OrderListDataSource(viewModelScope, domainManager, pagingCallback, type, updateNoData)
@@ -89,7 +88,6 @@ class OrderViewModel : BaseViewModel() {
         override fun onThrowable(throwable: Throwable) {}
 
         override fun onGetAny(obj: Any?) {
-            Timber.d("@@onGetAny: $obj")
             if (obj is BalanceItem) {
                 _balanceResult.postValue(obj)
             }
@@ -156,12 +154,14 @@ class OrderViewModel : BaseViewModel() {
         }
     }
 
-    fun createOrderChat(chatListItem: ChatListItem, orderItem: OrderItem) {
+    fun createOrderChat(chatListItem: ChatListItem, orderItem: OrderItem, updateChatId: ((CreateOrderChatItem) -> Unit)) {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().createOrderChat(CreateChatRequest(orderItem.id))
                 if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(Triple(result.body()?.content?: CreateOrderChatItem(), chatListItem, orderItem)))
+                val createOrderChatItem = result.body()?.content?: CreateOrderChatItem()
+                updateChatId(createOrderChatItem)
+                emit(ApiResult.success(Triple(createOrderChatItem, chatListItem, orderItem)))
             }
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
