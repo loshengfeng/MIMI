@@ -210,10 +210,21 @@ class OrderFragment : BaseFragment() {
     }
 
     private fun onContactClick(chatListItem: ChatListItem, orderItem: OrderItem, updateChatId: ((CreateOrderChatItem) -> Unit)) {
-        if (chatListItem.id != 0L && orderItem.traceLogId != 0L) {
-            onChatItemClick(chatListItem, orderItem)
-        } else {
-            viewModel.createOrderChat(chatListItem, orderItem, updateChatId)
+        when(orderItem.type) {
+            OrderType.USER2ONLINE -> {
+                if (orderItem.chatId != 0L && orderItem.traceLogId != 0L) {
+                    onChatItemClick(chatListItem, orderItem)
+                } else {
+                    viewModel.createOrderChat(chatListItem, orderItem, updateChatId)
+                }
+            }
+            else -> {
+                if (orderItem.chatId != 0L) {
+                    onChatItemClick(chatListItem, orderItem)
+                } else {
+                    viewModel.createOrderChat(chatListItem, orderItem, updateChatId)
+                }
+            }
         }
     }
 
