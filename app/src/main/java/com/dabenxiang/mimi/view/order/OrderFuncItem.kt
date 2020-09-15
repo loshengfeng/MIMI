@@ -20,5 +20,5 @@ class OrderFuncItem(
     val getProxyUnread: (((Int, Boolean) -> Unit) -> Unit) = { _ -> },
     val onTopUpClick: (() -> Unit) = {},
     val onPaymentInfoClick: ((OrderItem) -> Unit) = {},
-    val getBalanceItem: (() -> Unit) = {}
+    val updateTab: (() -> Unit) = {}
 )

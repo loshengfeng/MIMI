@@ -16,7 +16,6 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderItem
-import com.dabenxiang.mimi.model.api.vo.PaymentInfoItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.OrderType
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -60,7 +59,7 @@ class OrderFragment : BaseFragment() {
                 getProxyUnread = { update -> getProxyUnread(update) },
                 onTopUpClick = { onTopUpClick() },
                 onPaymentInfoClick = { orderItem -> onPaymentInfoClick(orderItem) },
-                getBalanceItem = { viewModel.getBalanceItem() }
+                updateTab = { updateTab() }
             ))
     }
 
@@ -235,5 +234,10 @@ class OrderFragment : BaseFragment() {
                 PaymentInfoFragment.createBundle(orderItem)
             )
         )
+    }
+
+    private fun updateTab() {
+        viewModel.getUnread()
+        viewModel.getBalanceItem()
     }
 }

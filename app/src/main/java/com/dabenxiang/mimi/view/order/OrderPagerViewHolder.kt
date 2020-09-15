@@ -19,7 +19,6 @@ import kotlinx.android.synthetic.main.item_order_no_data.view.*
 import kotlinx.android.synthetic.main.item_order_pager.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.util.*
 
 class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
@@ -117,7 +116,7 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
         swipeRefreshLayout.setOnRefreshListener {
             itemOrderNoData.visibility = View.GONE
             itemChatNoData.visibility = View.GONE
-            orderFuncItem.getBalanceItem() //for updating tab count
+            orderFuncItem.updateTab() //for updating tab count
             when(position) {
                 2 -> {
                     when(tabAdapter.getSelectedPosition()) {
