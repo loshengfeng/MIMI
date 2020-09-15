@@ -54,7 +54,6 @@ class OrderResultEpoxyController(
             .append("(")
             .append(item.bankCode)
             .append(") ")
-            .append(item.bankBranchName)
             .toString()
 
         val city = StringBuilder(item.bankBranchProvince)
