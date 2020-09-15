@@ -4,6 +4,7 @@ import android.widget.ImageView
 import androidx.paging.PagedList
 import androidx.paging.PagingData
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
+import com.dabenxiang.mimi.model.api.vo.CreateOrderChatItem
 import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.model.api.vo.PaymentInfoItem
 import com.dabenxiang.mimi.model.enums.OrderType
@@ -16,8 +17,9 @@ class OrderFuncItem(
     val getChatAttachment: ((Long?, ImageView) -> Unit) = { _, _ -> },
     val onChatItemClick: ((ChatListItem) -> Unit) = { _ -> },
     val getOrderProxyAttachment: ((Long?, ImageView) -> Unit) = { _, _ -> },
-    val onContactClick: ((ChatListItem, OrderItem) -> Unit) = { _, _ -> },
+    val onContactClick: ((ChatListItem, OrderItem, ((CreateOrderChatItem) -> Unit)) -> Unit) = { _, _, _ -> },
     val getProxyUnread: (((Int, Boolean) -> Unit) -> Unit) = { _ -> },
     val onTopUpClick: (() -> Unit) = {},
-    val onPaymentInfoClick: ((OrderItem) -> Unit) = {}
+    val onPaymentInfoClick: ((OrderItem) -> Unit) = {},
+    val updateTab: (() -> Unit) = {}
 )

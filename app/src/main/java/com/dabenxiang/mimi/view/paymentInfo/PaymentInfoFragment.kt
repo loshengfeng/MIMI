@@ -62,8 +62,7 @@ class PaymentInfoFragment: BaseFragment() {
             val bank = StringBuilder(paymentInfoItem.bankName)
                 .append("(")
                 .append(paymentInfoItem.bankCode)
-                .append(") ")
-                .append(paymentInfoItem.bankBranchName)
+                .append(")")
                 .toString()
 
             val city = StringBuilder(paymentInfoItem.bankBranchProvince)

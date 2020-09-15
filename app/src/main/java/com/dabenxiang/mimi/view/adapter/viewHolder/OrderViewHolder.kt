@@ -9,6 +9,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
+import com.dabenxiang.mimi.model.api.vo.CreateOrderChatItem
+import com.dabenxiang.mimi.model.api.vo.OrderChatContentItem
 import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.model.enums.OrderStatus
 import com.dabenxiang.mimi.model.enums.OrderType
@@ -18,6 +20,7 @@ import com.dabenxiang.mimi.view.order.OrderFuncItem
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_order.view.*
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -142,7 +145,7 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
                         lastReadTime = it.lastReadTime
                     ),
                     orderItem
-                )
+                ) { item -> updateChatId(item) }
                 it.lastReadTime = Calendar.getInstance().time
                 ivNew.visibility = View.GONE
             }
@@ -158,9 +161,8 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
             } ?: let { View.GONE }
     }
 
-    private fun updateAvatar(id: String) {
-        val bitmap = LruCacheUtils.getLruCache(id)
-        Glide.with(ivAvatar.context).load(bitmap).into(ivAvatar)
+    private fun updateChatId(createOrderChatItem: CreateOrderChatItem) {
+        orderItem?.traceLogId = createOrderChatItem.id
+        orderItem?.chatId = createOrderChatItem.chatId
     }
-
 }
