@@ -59,7 +59,8 @@ class OrderFragment : BaseFragment() {
                 onContactClick = { chatListItem, orderItem -> onContactClick(chatListItem, orderItem) },
                 getProxyUnread = { update -> getProxyUnread(update) },
                 onTopUpClick = { onTopUpClick() },
-                onPaymentInfoClick = { orderItem -> onPaymentInfoClick(orderItem) }
+                onPaymentInfoClick = { orderItem -> onPaymentInfoClick(orderItem) },
+                getBalanceItem = { viewModel.getBalanceItem() }
             ))
     }
 

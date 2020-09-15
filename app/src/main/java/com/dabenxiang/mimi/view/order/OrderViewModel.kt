@@ -16,6 +16,7 @@ import com.dabenxiang.mimi.view.chathistory.ChatHistoryListFactory
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
 class OrderViewModel : BaseViewModel() {
 
@@ -34,7 +35,26 @@ class OrderViewModel : BaseViewModel() {
     var unreadCount = 0
     var unreadOrderCount = 0
 
+    fun getBalanceItem() {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getOrder("0", "1")
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(result.body()?.content?.balance))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect {
+                    when(it) {
+                        is ApiResult.Success -> _balanceResult.postValue(it.result)
+                    }
+                }
+        }
+    }
+
     fun getOrderByPaging2(type: OrderType?, update: ((PagedList<OrderItem>) -> Unit), updateNoData: ((Int) -> Unit)) {
+        Timber.d("@@getOrderByPaging2")
         viewModelScope.launch {
             val dataSrc =
                 OrderListDataSource(viewModelScope, domainManager, pagingCallback, type, updateNoData)
@@ -69,6 +89,7 @@ class OrderViewModel : BaseViewModel() {
         override fun onThrowable(throwable: Throwable) {}
 
         override fun onGetAny(obj: Any?) {
+            Timber.d("@@onGetAny: $obj")
             if (obj is BalanceItem) {
                 _balanceResult.postValue(obj)
             }

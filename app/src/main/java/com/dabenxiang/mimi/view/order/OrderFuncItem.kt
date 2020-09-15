@@ -19,5 +19,6 @@ class OrderFuncItem(
     val onContactClick: ((ChatListItem, OrderItem) -> Unit) = { _, _ -> },
     val getProxyUnread: (((Int, Boolean) -> Unit) -> Unit) = { _ -> },
     val onTopUpClick: (() -> Unit) = {},
-    val onPaymentInfoClick: ((OrderItem) -> Unit) = {}
+    val onPaymentInfoClick: ((OrderItem) -> Unit) = {},
+    val getBalanceItem: (() -> Unit) = {}
 )

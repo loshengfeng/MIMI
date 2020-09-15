@@ -117,6 +117,7 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
         swipeRefreshLayout.setOnRefreshListener {
             itemOrderNoData.visibility = View.GONE
             itemChatNoData.visibility = View.GONE
+            orderFuncItem.getBalanceItem() //for updating tab count
             when(position) {
                 2 -> {
                     when(tabAdapter.getSelectedPosition()) {
