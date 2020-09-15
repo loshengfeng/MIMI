@@ -3,6 +3,8 @@ package com.dabenxiang.mimi.view.chatcontent
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -10,11 +12,15 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import androidx.activity.addCallback
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.ChatContentItem
@@ -28,8 +34,11 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.preview.ImagePreviewDialogFragment
+import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_chat_content.*
+import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.android.synthetic.main.toolbar.view.*
 import org.eclipse.paho.client.mqttv3.MqttMessage
 import timber.log.Timber
 import java.io.File
@@ -61,6 +70,7 @@ class ChatContentFragment : BaseFragment() {
 
     private val adapter by lazy { ChatContentAdapter(viewModel.pref, listener) }
     private var senderAvatarId = ""
+    private val file: File = FileUtil.getAvatarFile()
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -85,7 +95,7 @@ class ChatContentFragment : BaseFragment() {
 
         arguments?.getSerializable(KEY_CHAT_LIST_ITEM)?.let { data ->
             data as ChatListItem
-            textTitle.text = data.name
+            text_toolbar_title.text = data.name
             senderAvatarId = data.avatarAttachmentId.toString()
             data.id?.let { id ->
                 viewModel.chatId = id
@@ -114,8 +124,22 @@ class ChatContentFragment : BaseFragment() {
 
     override fun initSettings() {
         super.initSettings()
-        recyclerContent.layoutManager =
-            LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
+
+        toolbar.setBackgroundColor(requireContext().getColor(R.color.color_gray_2))
+        text_toolbar_title.setTextColor(requireContext().getColor(R.color.color_black_1))
+        toolbarContainer.toolbar.navigationIcon = ContextCompat.getDrawable(
+            requireContext(), R.drawable.btn_close_n
+        )
+
+        toolbarContainer.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
+
+        recyclerContent.layoutManager = LinearLayoutManager(
+            context,
+            LinearLayoutManager.VERTICAL,
+            true
+        )
         recyclerContent.adapter = adapter
     }
 
@@ -195,10 +219,6 @@ class ChatContentFragment : BaseFragment() {
     override fun setupListeners() {
         Timber.d("${ChatContentFragment::class.java.simpleName}_setupListeners")
 
-        btnClose.setOnClickListener {
-            Navigation.findNavController(requireView()).navigateUp()
-        }
-
         btnSend.setOnClickListener {
             if (editChat.text.isNotEmpty()) {
                 if (editChat.text.length < 500) {
@@ -242,16 +262,8 @@ class ChatContentFragment : BaseFragment() {
                 val uriImage = (if (it.data != null) {
                     it.data
                 } else {
-                    val extras = it.extras
-                    val imageBitmap = extras!!["data"] as Bitmap?
-                    Uri.parse(
-                        MediaStore.Images.Media.insertImage(
-                            requireContext().contentResolver,
-                            imageBitmap,
-                            null,
-                            null
-                        )
-                    )
+                    rotateImage(BitmapFactory.decodeFile(file.absolutePath))
+                    Uri.fromFile(file)
                 }) ?: return
 
                 viewModel.postAttachment(uriImage, requireContext())
@@ -342,6 +354,15 @@ class ChatContentFragment : BaseFragment() {
             galleryIntent.type = "image/* video/*"
 
             val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            cameraIntent.resolveActivity(requireContext().packageManager)?.also {
+                val uri = FileProvider.getUriForFile(
+                        requireContext(),
+                        BuildConfig.APPLICATION_ID + ".fileProvider",
+                        file
+                )
+                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
+            }
+
             val videoIntent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
 
             val chooser = Intent(Intent.ACTION_CHOOSER)
@@ -361,5 +382,33 @@ class ChatContentFragment : BaseFragment() {
         override fun onMsgReceive(message: MqttMessage) {
             viewModel.processMessage(message)
         }
+    }
+
+    private fun rotateImage(bitmap: Bitmap): Bitmap? {
+        val ei = ExifInterface(file.absolutePath)
+
+        val orientation: Int = ei.getAttributeInt(
+                ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_UNDEFINED
+        )
+
+        val rotatedBitmap: Bitmap?
+        rotatedBitmap = when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(bitmap, 90f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(bitmap, 180f)
+            ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(bitmap, 270f)
+            ExifInterface.ORIENTATION_NORMAL -> bitmap
+            else -> bitmap
+        }
+        return rotatedBitmap
+    }
+
+    private fun rotateImage(source: Bitmap, angle: Float): Bitmap? {
+        val matrix = Matrix()
+        matrix.postRotate(angle)
+        return Bitmap.createBitmap(
+                source, 0, 0, source.width, source.height,
+                matrix, true
+        )
     }
 }
