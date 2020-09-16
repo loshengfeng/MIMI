@@ -258,7 +258,7 @@ class MainActivity : BaseActivity(), InteractionListener {
             if (dest != 0)
                 Navigation.findNavController(this, R.id.nav_host_fragment).navigate(dest, extras)
         } else if(NAVIGATE_TO_TOPUP_ACTION == intent?.action){
-            bottom_navigation.switchTab(2)
+            bottom_navigation switchTab 2
         }
     }
 

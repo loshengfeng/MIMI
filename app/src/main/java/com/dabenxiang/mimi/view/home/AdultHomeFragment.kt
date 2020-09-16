@@ -432,7 +432,7 @@ class AdultHomeFragment : BaseFragment() {
         layout_top.background = requireActivity().getDrawable(R.color.adult_color_status_bar)
 
         layout_search_bar.background = requireActivity().getDrawable(R.color.adult_color_background)
-        iv_bg_search.setBtnSolidColor(requireActivity().getColor(R.color.adult_color_search_bar))
+        iv_bg_search setBtnSolidColor requireActivity().getColor(R.color.adult_color_search_bar)
 
         iv_search.setImageResource(R.drawable.adult_btn_search)
         tv_search.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))

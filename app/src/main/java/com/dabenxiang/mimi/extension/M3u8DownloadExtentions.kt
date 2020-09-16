@@ -16,7 +16,7 @@ import timber.log.Timber
 import java.io.File
 import java.net.URI
 
-suspend fun HttpClient.downloadFile(url: String): Flow<DownloadResult> {
+suspend infix fun HttpClient.downloadFile(url: String): Flow<DownloadResult> {
     return flow {
         try {
             val REMOVE_HEADER_COUNT = 2

@@ -186,7 +186,7 @@ fun BottomNavigationView.setupWithNavController(
 
     // Finally, ensure that we update our BottomNavigationView when the back stack changes
     fragmentManager.addOnBackStackChangedListener {
-        if (!isOnFirstFragment && !fragmentManager.isOnBackStack(firstFragmentTag)) {
+        if (!isOnFirstFragment && !(fragmentManager isOnBackStack firstFragmentTag)) {
             this.selectedItemId = firstFragmentGraphId
         }
 
@@ -296,7 +296,7 @@ private fun obtainNavHostFragment(
     return navHostFragment
 }
 
-private fun FragmentManager.isOnBackStack(backStackName: String): Boolean {
+private infix fun FragmentManager.isOnBackStack(backStackName: String): Boolean {
     val backStackCount = backStackEntryCount
     for (index in 0 until backStackCount) {
         if (getBackStackEntryAt(index).name == backStackName) {
@@ -311,7 +311,7 @@ private fun getFragmentTag(index: Int) = "bottomNavigation#$index"
 private fun getIndex(fragmentTag: String) =
     fragmentTag.substringAfter("bottomNavigation#").toInt()
 
-fun BottomNavigationView.switchTab(index:Int){
+infix fun BottomNavigationView.switchTab(index:Int){
     val tag = getFragmentTag(index)
     graphIdToTagMap.forEach { key, value ->
         if(value == tag) this.selectedItemId = key
