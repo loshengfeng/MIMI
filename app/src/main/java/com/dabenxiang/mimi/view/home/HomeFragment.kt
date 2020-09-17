@@ -108,7 +108,6 @@ class HomeFragment : BaseFragment() {
                     val carousel = carouselMap[it.first]
                     val carouselHolderItems =
                         response.result.content?.categoryBannerItemCarouselHolderItem()
-//                        response.result.content?.statisticsItemToCarouselHolderItem(carousel!!.isAdult)
                     viewHolder?.submitList(carouselHolderItems)
                 }
                 is Error -> onApiError(response.throwable)
