@@ -14,6 +14,9 @@ data class MemberPostItem(
     @SerializedName("title")
     var title: String = "",
 
+    @SerializedName("cover")
+    var cover: String = "",
+
     @SerializedName("content")
     var content: String = "",
 

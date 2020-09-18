@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
@@ -102,8 +103,13 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
 
         tvLength.text = contentItem?.shortVideo?.length
         contentItem?.images?.takeIf { it.isNotEmpty() }?.also { images ->
-            images[0].id.toLongOrNull()?.also { id ->
-                memberPostFuncItem.getBitmap(id, ivPhoto, LoadImageType.PICTURE_THUMBNAIL)
+            if (!TextUtils.isEmpty(images[0].url)) {
+                Glide.with(ivPhoto.context)
+                    .load(images[0].url).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
+            } else {
+                images[0].id.toLongOrNull()?.also { id ->
+                    memberPostFuncItem.getBitmap(id, ivPhoto, LoadImageType.PICTURE_THUMBNAIL)
+                }
             }
         }
 
