@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.home.viewholder
 
 import android.content.Context
+import android.text.TextUtils
 import android.view.View
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
@@ -70,7 +71,18 @@ class ClubViewHolder(
 
             val contentItem = Gson().fromJson(postItem.content, MediaContentItem::class.java)
             val imageItem = contentItem?.images?.get(0)
-            clubFuncItem.getBitmap(imageItem?.id?.toLongOrNull(),clubImg, LoadImageType.PICTURE_THUMBNAIL)
+            imageItem?.also {
+                if (!TextUtils.isEmpty(imageItem.url)) {
+                    Glide.with(clubImg.context)
+                        .load(imageItem.url).placeholder(R.drawable.img_nopic_03).into(clubImg)
+                } else {
+                    clubFuncItem.getBitmap(
+                        imageItem.id.toLongOrNull(),
+                        clubImg,
+                        LoadImageType.PICTURE_THUMBNAIL
+                    )
+                }
+            }
         } else {
             Glide.with(itemView.context)
                 .load(R.drawable.img_nopic_03)

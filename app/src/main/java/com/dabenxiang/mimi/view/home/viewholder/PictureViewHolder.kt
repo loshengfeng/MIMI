@@ -1,6 +1,8 @@
 package com.dabenxiang.mimi.view.home.viewholder
 
+import android.text.TextUtils
 import android.view.View
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
@@ -50,7 +52,18 @@ class PictureViewHolder(
             )
         )
 
-        memberPostFuncItem.getBitmap(postImageItem?.id?.toLongOrNull(), pictureImage, LoadImageType.PICTURE_THUMBNAIL)
+        postImageItem?.also {
+            if (!TextUtils.isEmpty(postImageItem.url)) {
+                Glide.with(pictureImage.context)
+                    .load(postImageItem.url).placeholder(R.drawable.img_nopic_03).into(pictureImage)
+            } else {
+                memberPostFuncItem.getBitmap(
+                    postImageItem.id.toLongOrNull(),
+                    pictureImage,
+                    LoadImageType.PICTURE_THUMBNAIL
+                )
+            }
+        }
 
         memberPostFuncItem.getBitmap(model?.avatarAttachmentId, avatarImg, LoadImageType.AVATAR)
     }
