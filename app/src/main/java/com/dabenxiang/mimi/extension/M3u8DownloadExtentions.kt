@@ -29,6 +29,7 @@ suspend infix fun HttpClient.downloadFile(url: String): Flow<DownloadResult> {
             val tsPattern = ".ts"
             val indexPattern = "index.m3u8"
             val ENCRYPTION_KEY = "encryption.key"
+            val mp4Pattern = ".mp4/"
 
             val data = response.readBytes()
 
@@ -40,7 +41,8 @@ suspend infix fun HttpClient.downloadFile(url: String): Flow<DownloadResult> {
                 var redirector = false
                 withContext(Dispatchers.IO) {
                     data.inputStream().bufferedReader().useLines { lines ->
-                        val domainUrl = url.replace(indexPattern, "")
+                        var domainUrl = url.replace(indexPattern, "")
+                        domainUrl = domainUrl.split(mp4Pattern)[0].plus(mp4Pattern)
                         lines.forEach {
                             if (count <= REMOVE_HEADER_COUNT) {
                                 if (redirector) emit(Redirect(url.replace(indexPattern, it)))
