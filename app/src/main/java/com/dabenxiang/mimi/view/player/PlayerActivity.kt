@@ -911,7 +911,7 @@ class PlayerActivity : BaseActivity() {
         })
 
         //Detect key keyboard shown/hide
-        this.addKeyboardToggleListener { shown ->
+        this addKeyboardToggleListener { shown ->
             isKeyboardShown = shown
             if (!shown && requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
                 commentEditorToggle(false)

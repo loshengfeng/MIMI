@@ -21,6 +21,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_order.view.*
 import timber.log.Timber
+import tw.gov.president.manager.submanager.update.di.updateManagerModule
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -144,8 +145,9 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
                         avatarAttachmentId = it.merchantUserAvatarAttachmentId,
                         lastReadTime = it.lastReadTime
                     ),
-                    orderItem
-                ) { item -> updateChatId(item) }
+                    orderItem,
+                    ::updateChatId
+                )
                 it.lastReadTime = Calendar.getInstance().time
                 ivNew.visibility = View.GONE
             }

@@ -85,7 +85,7 @@ abstract class BaseDialogFragment : DialogFragment() {
         onHttpErrorBlock: ((ExceptionResult.HttpError) -> Unit)? = null
     ) {
         when (val errorHandler =
-            throwable.handleException { ex -> mainViewModel?.processException(ex) }) {
+            throwable handleException { ex -> mainViewModel?.processException(ex) }) {
             is ExceptionResult.HttpError -> {
                 if (onHttpErrorBlock == null) handleHttpError(errorHandler)
                 else onHttpErrorBlock(errorHandler)

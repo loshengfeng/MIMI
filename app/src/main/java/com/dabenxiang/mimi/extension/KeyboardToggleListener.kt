@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewTreeObserver
 import kotlin.math.roundToInt
 
-fun Activity.addKeyboardToggleListener(onKeyboardToggleAction: (shown: Boolean) -> Unit): KeyboardToggleListener? {
+infix fun Activity.addKeyboardToggleListener(onKeyboardToggleAction: (shown: Boolean) -> Unit): KeyboardToggleListener? {
     val root = findViewById<View>(android.R.id.content)
     val listener = KeyboardToggleListener(root, onKeyboardToggleAction)
     return root?.viewTreeObserver?.run {
@@ -23,7 +23,7 @@ open class KeyboardToggleListener(
     override fun onGlobalLayout() {
         root?.run {
             val heightDiff = rootView.height - height
-            val keyboardShown = heightDiff > dpToPx(200f)
+            val keyboardShown = heightDiff > this dpToPx 200f
             if (shown != keyboardShown) {
                 onKeyboardToggleAction.invoke(keyboardShown)
                 shown = keyboardShown
@@ -32,4 +32,4 @@ open class KeyboardToggleListener(
     }
 }
 
-fun View.dpToPx(dp: Float) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources.displayMetrics).roundToInt()
+infix fun View.dpToPx(dp: Float) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources.displayMetrics).roundToInt()

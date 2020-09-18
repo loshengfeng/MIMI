@@ -6,7 +6,7 @@ import com.dabenxiang.mimi.model.api.ExceptionResult.*
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import retrofit2.HttpException
 
-fun Throwable.handleException(processException: (ExceptionResult) -> Unit): ExceptionResult {
+infix fun Throwable.handleException(processException: (ExceptionResult) -> Unit): ExceptionResult {
     val result = when (this) {
         is HttpException -> {
             val httpExceptionItem = GeneralUtils.getHttpExceptionData(this)

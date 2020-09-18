@@ -142,7 +142,7 @@ class SearchVideoFragment : BaseFragment() {
                 } else {
                     R.color.normal_color_background
                 }.let {
-                    requireActivity().getDrawable(it)
+                    ContextCompat.getDrawable(requireContext(), it)
                 }
 
             recyclerview_content.layoutManager = LinearLayoutManager(requireContext())
@@ -154,7 +154,7 @@ class SearchVideoFragment : BaseFragment() {
                 } else {
                     R.color.normal_color_background
                 }.let {
-                    requireActivity().getDrawable(it)
+                    ContextCompat.getDrawable(requireContext(), it)
                 }
 
             layout_top.background =
@@ -163,7 +163,7 @@ class SearchVideoFragment : BaseFragment() {
                 } else {
                     R.color.normal_color_status_bar
                 }.let {
-                    requireActivity().getDrawable(it)
+                    ContextCompat.getDrawable(requireContext(), it)
                 }
 
             ib_back.setImageResource(

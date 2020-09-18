@@ -1,11 +1,13 @@
 package com.dabenxiang.mimi.view.adapter
 
 import android.content.Context
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.OnItemClickListener
@@ -46,7 +48,16 @@ class PictureAdapter(
             onItemClickListener: OnItemClickListener,
             memberPostFuncItem: MemberPostFuncItem
         ) {
-            memberPostFuncItem.getBitmap(item.id.toLongOrNull(), picture, LoadImageType.PICTURE_THUMBNAIL)
+            if (!TextUtils.isEmpty(item.url)) {
+                Glide.with(picture.context)
+                    .load(item.url).placeholder(R.drawable.img_nopic_03).into(picture)
+            } else {
+                memberPostFuncItem.getBitmap(
+                    item.id.toLongOrNull(),
+                    picture,
+                    LoadImageType.PICTURE_THUMBNAIL
+                )
+            }
 
             picture.setOnClickListener {
                 onItemClickListener.onItemClick()

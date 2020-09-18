@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.adapter
 
 import android.content.Context
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.RankingFuncItem
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
@@ -83,7 +85,18 @@ class RankingAdapter(
             }
 
             val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
-            rankingFuncItem.getBitmap(contentItem.images?.get(0)?.id?.toLongOrNull(), picture)
+            contentItem.images?.also { images ->
+                if (!TextUtils.isEmpty(images[0].url)) {
+                    Glide.with(picture.context)
+                        .load(images[0].url).placeholder(R.drawable.img_nopic_03)
+                        .into(picture)
+                } else {
+                    rankingFuncItem.getBitmap(
+                        images[0].id.toLongOrNull(),
+                        picture
+                    )
+                }
+            }
 
             title.text = item.title
             hot.text = item.count.toString()

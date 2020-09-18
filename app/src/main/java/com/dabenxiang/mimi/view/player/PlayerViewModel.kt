@@ -207,7 +207,7 @@ class PlayerViewModel : BaseViewModel() {
     }
 
     private suspend fun downloadM3U8(uriString: String) {
-        HttpClient(Android).downloadFile(uriString)
+        (HttpClient(Android) downloadFile uriString)
             .collect {
                 withContext(Dispatchers.IO) {
                     when (it) {

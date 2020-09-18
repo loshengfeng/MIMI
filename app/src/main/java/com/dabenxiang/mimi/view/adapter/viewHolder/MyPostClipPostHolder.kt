@@ -1,12 +1,14 @@
 package com.dabenxiang.mimi.view.adapter.viewHolder
 
 import android.content.res.ColorStateList
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
@@ -103,11 +105,18 @@ class MyPostClipPostHolder(
         val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
 
         tvLength.text = contentItem.shortVideo?.length
-        attachmentListener.onGetAttachment(
-            contentItem.images?.get(0)?.id?.toLongOrNull(),
-            ivPhoto,
-            LoadImageType.PICTURE_THUMBNAIL
-        )
+        contentItem.images?.also { images ->
+            if (!TextUtils.isEmpty(images[0].url)) {
+                Glide.with(ivPhoto.context)
+                    .load(images[0].url).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
+            } else {
+                attachmentListener.onGetAttachment(
+                    images[0].id.toLongOrNull(),
+                    ivPhoto,
+                    LoadImageType.PICTURE_THUMBNAIL
+                )
+            }
+        }
 
         if (isMe) {
             tvFollow.visibility = View.GONE

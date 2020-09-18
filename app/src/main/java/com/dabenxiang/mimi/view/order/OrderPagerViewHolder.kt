@@ -93,14 +93,14 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
             2 -> {
                 if (rvChat.adapter == null) {
                     rvChat.adapter = chatAdapter
-                    orderFuncItem.getChatList({ list -> updateChatList(list) }, { size -> updateChatNoData(size)})
+                    orderFuncItem.getChatList(::updateChatList, ::updateChatNoData)
                 }
                 if (rvTab.adapter == null) {
                     tabAdapter.submitList(tabList, 0)
                     rvTab.adapter = tabAdapter
                 }
                 rvTab.visibility = View.VISIBLE
-                orderFuncItem.getProxyUnread { pos, isNew -> updateUnread(pos, isNew) }
+                orderFuncItem.getProxyUnread(::updateUnread)
             }
             else -> rvTab.visibility = View.GONE
         }
@@ -109,7 +109,7 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
             rvOrder.tag = position
             rvOrder.adapter = orderAdapter
 //            orderFuncItem.getOrderByPaging3 { data, scope -> updateOrderList3(data, scope) }
-            orderFuncItem.getOrderByPaging2(getOrderType(position), { list -> updateOrderList2(list) }, { size -> updateOrderNoData(size)})
+            orderFuncItem.getOrderByPaging2(getOrderType(position), ::updateOrderList2, ::updateOrderNoData)
             swipeRefreshLayout.isRefreshing = true
         }
 
@@ -121,15 +121,15 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
                 2 -> {
                     when(tabAdapter.getSelectedPosition()) {
                         1 -> {
-                            orderFuncItem.getChatList({ list -> updateChatList(list) }, { size -> updateChatNoData(size)})
+                            orderFuncItem.getChatList(::updateChatList, ::updateChatNoData)
                         }
                         else -> {
-                            orderFuncItem.getOrderByPaging2(getOrderType(position), { list -> updateOrderList2(list) }, { size -> updateOrderNoData(size)})
+                            orderFuncItem.getOrderByPaging2(getOrderType(position), ::updateOrderList2, ::updateOrderNoData)
                         }
                     }
                 }
                 else ->
-                    orderFuncItem.getOrderByPaging2(getOrderType(position), { list -> updateOrderList2(list) }, { size -> updateOrderNoData(size)})
+                    orderFuncItem.getOrderByPaging2(getOrderType(position), ::updateOrderList2, ::updateOrderNoData)
             }
         }
 
