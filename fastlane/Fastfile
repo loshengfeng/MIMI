@@ -24,44 +24,37 @@ platform :android do
     f = File.open("../local.properties", "w")
     f.puts ENV["ANDROID_SDK_DIR"]
     f.close
-
     gradle(task: "clean")
   end
 
-  desc "Assemble Build RELEASE"
-  lane :build_release do
-    begin
-#        build(flavor: "mimi", build_type: "Dev_Release")
-        build(flavor: "mimi", build_type: "Sit_Release")
-#        build(flavor: "mimi", build_type: "Prod_Release")
-        upload_to_slack()
-    rescue => exception
-               on_error(exception)
-    end
+  desc "Build APK & Send To Slack"
+  lane :build_release_apk do
+    build(flavor: "mimi", build_type: "Dev_Release")
+    build(flavor: "mimi", build_type: "Sit_Release")
+    build(flavor: "mimi", build_type: "Prod_Release")
   end
 
   desc "Building APK"
   private_lane :build do |options|
-    gradle(
-      task: "assemble",
-      build_type: options[:build_type],
-      flavor: options[:flavor],
-      properties: {
-        "android.injected.signing.store.file" => ENV["KEYSTORE_PATH"],
-        "android.injected.signing.store.password" => ENV["KEY_PASSWORD"],
-        "android.injected.signing.key.alias" => ENV["KEY_ALIAS"],
-        "android.injected.signing.key.password" => ENV["KEY_PASSWORD"],
-      }
-    )
-  end
-
-  desc "Upload to Slack channel"
-  private_lane :upload_to_slack do |options|
-    lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].each do |file_path|
-        file_name = file_path.gsub(/\/.*\//,"")
-        sh "echo Uploading " + file_name + " to Slack"
-        sh "curl https://slack.com/api/files.upload -F token=\"xoxb-437838910263-807725924710-yslGXXEwYPSq2gl7CQRXYbvC\" -F channels=\"#team_mobile\" -F title=\"" + file_name + "\" -F filename=\"" + file_name + "\" -F file=@" + file_path
-        on_success()
+    begin
+      gradle(
+        task: "assemble",
+        build_type: options[:build_type],
+        flavor: options[:flavor],
+        properties: {
+          "android.injected.signing.store.file" => ENV["KEYSTORE_PATH"],
+          "android.injected.signing.store.password" => ENV["KEY_PASSWORD"],
+          "android.injected.signing.key.alias" => ENV["KEY_ALIAS"],
+          "android.injected.signing.key.password" => ENV["KEY_PASSWORD"],
+        }
+      )
+      file_path = lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
+      file_name = file_path.gsub(/\/.*\//,"")
+      sh "echo Uploading " + file_name + " to Slack"
+      sh "curl https://slack.com/api/files.upload -F token=\"xoxb-437838910263-807725924710-yslGXXEwYPSq2gl7CQRXYbvC\" -F channels=\"#team_mobile\" -F title=\"" + file_name + "\" -F filename=\"" + file_name + "\" -F file=@" + file_path
+      on_success()
+    rescue => exception
+      on_error(exception)
     end
   end
 
