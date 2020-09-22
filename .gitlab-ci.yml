@@ -1,14 +1,16 @@
 image: "registry.silkrode.com.tw/team_mobile/mimi:1.0.1"
 
 stages:
-  - depoly
+  - build
 
-depoly:
-  stage: depoly
+build_job:
+  stage: build
   tags:
     - docker
   script:
     - fastlane init_env
-    - fastlane build_release
+    - fastlane build_release_apk
+  cache:
+    untracked: true
   only:
     - release
