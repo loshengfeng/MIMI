@@ -3,7 +3,7 @@ package com.dabenxiang.mimi.extension
 import com.yulichswift.roundedview.tool.RoundedDrawable
 import com.yulichswift.roundedview.widget.RoundedTextView
 
-fun RoundedTextView.setBtnSolidColor(color: Int) {
+infix fun RoundedTextView.setBtnSolidColor(color: Int) {
     val drawable = RoundedDrawable(true)
     drawable.setSolidColorsAndPressedColor(normal = color, pressed = -1, selected = 0, disable = 0)
     background = drawable

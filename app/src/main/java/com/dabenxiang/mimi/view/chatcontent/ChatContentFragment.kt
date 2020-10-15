@@ -350,15 +350,16 @@ class ChatContentFragment : BaseFragment() {
                 PERMISSION_GALLERY_REQUEST_CODE
             )
         } else {
-            val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            val galleryIntent =
+                Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             galleryIntent.type = "image/* video/*"
 
             val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             cameraIntent.resolveActivity(requireContext().packageManager)?.also {
                 val uri = FileProvider.getUriForFile(
-                        requireContext(),
-                        BuildConfig.APPLICATION_ID + ".fileProvider",
-                        file
+                    requireContext(),
+                    BuildConfig.APPLICATION_ID + ".fileProvider",
+                    file
                 )
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
             }
@@ -388,8 +389,8 @@ class ChatContentFragment : BaseFragment() {
         val ei = ExifInterface(file.absolutePath)
 
         val orientation: Int = ei.getAttributeInt(
-                ExifInterface.TAG_ORIENTATION,
-                ExifInterface.ORIENTATION_UNDEFINED
+            ExifInterface.TAG_ORIENTATION,
+            ExifInterface.ORIENTATION_UNDEFINED
         )
 
         val rotatedBitmap: Bitmap?
@@ -407,8 +408,8 @@ class ChatContentFragment : BaseFragment() {
         val matrix = Matrix()
         matrix.postRotate(angle)
         return Bitmap.createBitmap(
-                source, 0, 0, source.width, source.height,
-                matrix, true
+            source, 0, 0, source.width, source.height,
+            matrix, true
         )
     }
 }

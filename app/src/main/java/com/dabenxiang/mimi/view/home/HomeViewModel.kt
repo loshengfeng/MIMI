@@ -22,7 +22,6 @@ import com.dabenxiang.mimi.view.home.postfollow.PostFollowFactory
 import com.dabenxiang.mimi.view.home.video.VideoDataSource
 import com.dabenxiang.mimi.view.home.video.VideoFactory
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -31,7 +30,6 @@ import java.util.*
 class HomeViewModel : BaseViewModel() {
 
     companion object {
-        const val CAROUSEL_LIMIT = 5
         const val PAGING_LIMIT = 20
         const val TYPE_PIC = "type_pic"
         const val TYPE_COVER = "type_cover"
@@ -93,13 +91,15 @@ class HomeViewModel : BaseViewModel() {
     private val _followResult = MutableLiveData<ApiResult<Nothing>>()
     val followResult: LiveData<ApiResult<Nothing>> = _followResult
 
-    private var job = Job()
-
-    fun loadNestedStatisticsListForCarousel(position: Int, src: HomeTemplate.Carousel, isAdult: Boolean = false) {
+    fun loadNestedStatisticsListForCarousel(
+        position: Int,
+        src: HomeTemplate.Carousel,
+        isAdult: Boolean = false
+    ) {
         viewModelScope.launch {
             flow {
-                val resp = domainManager.getApiRepository().fetchHomeBanner(if(isAdult) 2 else 1)
-                if(!resp.isSuccessful) throw HttpException(resp)
+                val resp = domainManager.getApiRepository().fetchHomeBanner(if (isAdult) 2 else 1)
+                if (!resp.isSuccessful) throw HttpException(resp)
                 emit(ApiResult.success(resp.body()))
             }.flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
@@ -301,13 +301,13 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-    fun getAllOtherPosts(lastPosition: Int){
-        if(lastPosition != 1) getVideos(null, true)
-        if(lastPosition != 2) getPostFollows()
-        if(lastPosition != 3) getClipPosts()
-        if(lastPosition != 4) getPicturePosts()
-        if(lastPosition != 5) getTextPosts()
-        if(lastPosition != 6) getClubs()
+    fun getAllOtherPosts(lastPosition: Int) {
+        if (lastPosition != 1) getVideos(null, true)
+        if (lastPosition != 2) getPostFollows()
+        if (lastPosition != 3) getClipPosts()
+        if (lastPosition != 4) getPicturePosts()
+        if (lastPosition != 5) getTextPosts()
+        if (lastPosition != 6) getClubs()
     }
 
     fun getVideos(category: String?, isAdult: Boolean) {
@@ -377,7 +377,14 @@ class HomeViewModel : BaseViewModel() {
         isAdult: Boolean
     ): LiveData<PagedList<BaseVideoItem>> {
         val videoDataSource = VideoDataSource(
-            isAdult, category, viewModelScope, domainManager, pagingCallback, adWidth, adHeight, true
+            isAdult,
+            category,
+            viewModelScope,
+            domainManager,
+            pagingCallback,
+            adWidth,
+            adHeight,
+            true
         )
         val videoFactory = VideoFactory(videoDataSource)
         val config = PagedList.Config.Builder()
@@ -422,7 +429,7 @@ class HomeViewModel : BaseViewModel() {
         override fun onTotalCount(count: Long, isInitial: Boolean) {
             totalCount = if (isInitial) count.toInt()
             else totalCount.plus(count.toInt())
-            if(isInitial) cleanRemovedPosList()
+            if (isInitial) cleanRemovedPosList()
         }
     }
 

@@ -13,6 +13,7 @@ import android.provider.MediaStore
 import android.text.TextUtils
 import android.view.View
 import androidx.activity.addCallback
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.viewModels
@@ -38,15 +39,15 @@ import java.io.File
 
 class SettingFragment : BaseFragment() {
 
-    private val viewModel: SettingViewModel by viewModels()
-
-    val file: File = FileUtil.getAvatarFile()
-
     companion object {
         private const val REQUEST_CODE_CAMERA = 100
         private const val REQUEST_CODE_ALBUM = 200
         private const val KEY_PHOTO = "PHOTO"
     }
+
+    private val viewModel: SettingViewModel by viewModels()
+
+    val file: File = FileUtil.getAvatarFile()
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -80,14 +81,20 @@ class SettingFragment : BaseFragment() {
                     var img: Drawable? = null
 
                     if (viewModel.isEmailConfirmed()) {
-                        img = requireContext().resources.getDrawable(R.drawable.ico_checked)
+                        img = ContextCompat.getDrawable(
+                            requireContext(), R.drawable.ico_checked
+                        )
                         btn_resend.visibility = View.GONE
                     } else {
                         btn_resend.visibility = View.VISIBLE
                     }
 
                     tv_email.setCompoundDrawablesWithIntrinsicBounds(null, null, img, null)
-                    viewModel.loadImage(viewModel.profileData?.avatarAttachmentId, iv_photo, LoadImageType.AVATAR)
+                    viewModel.loadImage(
+                        viewModel.profileData?.avatarAttachmentId,
+                        iv_photo,
+                        LoadImageType.AVATAR
+                    )
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -154,8 +161,7 @@ class SettingFragment : BaseFragment() {
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.tv_back -> {
-                    if (mainViewModel?.isFromPlayer == true)
-                        activity?.onBackPressed()
+                    if (mainViewModel?.isFromPlayer == true) activity?.onBackPressed()
                     else navigateTo(NavigateItem.Up)
                 }
                 R.id.btn_photo -> {
@@ -287,7 +293,8 @@ class SettingFragment : BaseFragment() {
         grantResults: IntArray
     ) {
         if (requestCode == PERMISSION_CAMERA_REQUEST_CODE
-            && getNotGrantedPermissions(cameraPermissions).isEmpty()) {
+            && getNotGrantedPermissions(cameraPermissions).isEmpty()
+        ) {
             openCamera()
         }
     }

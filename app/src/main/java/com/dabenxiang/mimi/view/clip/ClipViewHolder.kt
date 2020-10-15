@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.clip
 
+import android.text.TextUtils
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -7,6 +8,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -58,11 +60,18 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view), KoinComponent 
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        clipFuncItem.getBitmap(
-            contentItem?.images?.get(0)?.id?.toLongOrNull(),
-            ivCover,
-            LoadImageType.PICTURE_THUMBNAIL
-        )
+        contentItem?.images?.also {images->
+            if (!TextUtils.isEmpty(images[0].url)) {
+                Glide.with(ivCover.context)
+                    .load(images[0].url).placeholder(R.drawable.img_nopic_03).into(ivCover)
+            } else {
+                clipFuncItem.getBitmap(
+                    images[0].id.toLongOrNull(),
+                    ivCover,
+                    LoadImageType.PICTURE_THUMBNAIL
+                )
+            }
+        }
 
         ibBack.setOnClickListener { clipFuncItem.onBackClick() }
 

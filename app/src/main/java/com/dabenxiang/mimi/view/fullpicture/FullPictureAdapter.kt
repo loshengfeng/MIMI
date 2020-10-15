@@ -1,11 +1,13 @@
 package com.dabenxiang.mimi.view.fullpicture
 
 import android.content.Context
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ImageItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
@@ -30,7 +32,12 @@ class FullPictureAdapter(
     override fun onBindViewHolder(holder: FullPictureViewHolder, position: Int) {
         val imageItem = imageItems[position]
 
-        onFullPictureListener.onGetAttachment(imageItem.id.toLongOrNull(), holder.picture)
+        if (!TextUtils.isEmpty(imageItem.url)) {
+            Glide.with(holder.picture.context)
+                .load(imageItem.url).placeholder(R.drawable.img_nopic_03).into(holder.picture)
+        } else {
+            onFullPictureListener.onGetAttachment(imageItem.id.toLongOrNull(), holder.picture)
+        }
     }
 
     class FullPictureViewHolder(itemView: View) : BaseViewHolder(itemView) {

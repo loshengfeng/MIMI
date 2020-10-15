@@ -1,10 +1,12 @@
 package com.dabenxiang.mimi.view.favroite
 
 import android.content.res.ColorStateList
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -122,12 +124,18 @@ class FavoritePostViewHolder(
         }
         val contentItem = Gson().fromJson(data?.content.toString(), MediaContentItem::class.java)
         tvLength.text = contentItem?.shortVideo?.length
-
-        listener.onGetAttachment(
-            contentItem.images?.get(0)?.id?.toLongOrNull(),
-            ivPhoto,
-            LoadImageType.PICTURE_THUMBNAIL
-        )
+        contentItem.images?.also {images->
+            if (!TextUtils.isEmpty(images[0].url)) {
+                Glide.with(ivPhoto.context)
+                    .load(images[0].url).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
+            } else {
+                listener.onGetAttachment(
+                    images[0].id.toLongOrNull(),
+                    ivPhoto,
+                    LoadImageType.PICTURE_THUMBNAIL
+                )
+            }
+        }
 
         if (!isMe) {
             tvFollow.visibility = View.VISIBLE

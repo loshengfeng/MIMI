@@ -16,6 +16,7 @@ import com.dabenxiang.mimi.view.chathistory.ChatHistoryListFactory
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
 class OrderViewModel : BaseViewModel() {
 
@@ -33,6 +34,24 @@ class OrderViewModel : BaseViewModel() {
 
     var unreadCount = 0
     var unreadOrderCount = 0
+
+    fun getBalanceItem() {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getOrder("0", "1")
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(result.body()?.content?.balance))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect {
+                    when(it) {
+                        is ApiResult.Success -> _balanceResult.postValue(it.result)
+                    }
+                }
+        }
+    }
 
     fun getOrderByPaging2(type: OrderType?, update: ((PagedList<OrderItem>) -> Unit), updateNoData: ((Int) -> Unit)) {
         viewModelScope.launch {
@@ -135,12 +154,14 @@ class OrderViewModel : BaseViewModel() {
         }
     }
 
-    fun createOrderChat(chatListItem: ChatListItem, orderItem: OrderItem) {
+    fun createOrderChat(chatListItem: ChatListItem, orderItem: OrderItem, updateChatId: ((CreateOrderChatItem) -> Unit)) {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().createOrderChat(CreateChatRequest(orderItem.id))
                 if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(Triple(result.body()?.content?: CreateOrderChatItem(), chatListItem, orderItem)))
+                val createOrderChatItem = result.body()?.content?: CreateOrderChatItem()
+                updateChatId(createOrderChatItem)
+                emit(ApiResult.success(Triple(createOrderChatItem, chatListItem, orderItem)))
             }
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }

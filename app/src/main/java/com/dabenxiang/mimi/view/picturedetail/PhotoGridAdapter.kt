@@ -1,10 +1,12 @@
 package com.dabenxiang.mimi.view.picturedetail
 
 import android.content.Context
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ImageItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
@@ -43,8 +45,16 @@ class PhotoGridAdapter(
             cardParams.height = GeneralUtils.dpToPx(context, 102)
             holder.cardView.layoutParams = cardParams
         }
-
-        onPictureDetailListener.onGetAttachment(imageItem.id.toLongOrNull(), holder.picture, LoadImageType.PICTURE_THUMBNAIL)
+        if (!TextUtils.isEmpty(imageItem.url)) {
+            Glide.with(holder.picture.context)
+                .load(imageItem.url).placeholder(R.drawable.img_nopic_03).into(holder.picture)
+        } else {
+            onPictureDetailListener.onGetAttachment(
+                imageItem.id.toLongOrNull(),
+                holder.picture,
+                LoadImageType.PICTURE_THUMBNAIL
+            )
+        }
 
         if (position == 5) {
             holder.mask.visibility = View.VISIBLE

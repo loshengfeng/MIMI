@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.clubdetail
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -92,7 +93,7 @@ class ClubDetailFragment : BaseFragment() {
         viewPager.adapter =
             ClubPagerAdapter(
                 ClubDetailFuncItem({ orderBy, function -> getPost(orderBy, function) },
-                    { id, view, resId -> viewModel.loadImage(id,view,resId) },
+                    { id, view, resId -> viewModel.loadImage(id, view, resId) },
                     { item, items, isFollow, func -> followMember(item, items, isFollow, func) },
                     { item, isLike, func -> likePost(item, isLike, func) }),
                 adultListener
@@ -117,7 +118,8 @@ class ClubDetailFragment : BaseFragment() {
         mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    val adapter = (viewPager.adapter as ClubPagerAdapter).getListAdapter(tabLayout.selectedTabPosition)
+                    val adapter =
+                        (viewPager.adapter as ClubPagerAdapter).getListAdapter(tabLayout.selectedTabPosition)
                     adapter.removedPosList.add(it.result)
                     adapter.notifyItemChanged(it.result)
                 }
@@ -126,7 +128,8 @@ class ClubDetailFragment : BaseFragment() {
         })
 
         viewModel.cleanRemovedPosList.observe(viewLifecycleOwner, Observer {
-            val adapter = (viewPager.adapter as ClubPagerAdapter).getListAdapter(tabLayout.selectedTabPosition)
+            val adapter =
+                (viewPager.adapter as ClubPagerAdapter).getListAdapter(tabLayout.selectedTabPosition)
             adapter.removedPosList.clear()
         })
     }
@@ -147,13 +150,15 @@ class ClubDetailFragment : BaseFragment() {
         val isFollow = memberClubItem.isFollow
         if (isFollow) {
             tv_follow.text = requireContext().getString(R.string.followed)
-            tv_follow.background =
-                requireContext().getDrawable(R.drawable.bg_white_1_stroke_radius_16)
+            tv_follow.background = ContextCompat.getDrawable(
+                requireContext(), R.drawable.bg_white_1_stroke_radius_16
+            )
             tv_follow.setTextColor(requireContext().getColor(R.color.color_white_1))
         } else {
             tv_follow.text = requireContext().getString(R.string.follow)
-            tv_follow.background =
-                requireContext().getDrawable(R.drawable.bg_red_1_stroke_radius_16)
+            tv_follow.background = ContextCompat.getDrawable(
+                requireContext(), R.drawable.bg_red_1_stroke_radius_16
+            )
             tv_follow.setTextColor(requireContext().getColor(R.color.color_red_1))
         }
     }
@@ -229,6 +234,8 @@ class ClubDetailFragment : BaseFragment() {
                                 bundle
                             )
                         }
+                        else -> {
+                        }
                     }
                 }
             )
@@ -264,7 +271,6 @@ class ClubDetailFragment : BaseFragment() {
                     )
                 }
                 else -> {
-
                 }
             }
         }

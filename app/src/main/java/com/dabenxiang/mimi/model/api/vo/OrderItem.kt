@@ -13,7 +13,7 @@ data class OrderItem(
     val id: Long = 0,
 
     @SerializedName("chatId")
-    val chatId: Long = 0,
+    var chatId: Long = 0,
 
     @SerializedName("userFriendlyName")
     val userFriendlyName: String = "",
@@ -70,7 +70,7 @@ data class OrderItem(
     val paymentInfos: ArrayList<PaymentInfoItem> = arrayListOf(),
 
     @SerializedName("traceLogId")
-    val traceLogId: Long = 0,
+    var traceLogId: Long = 0,
 
     @SerializedName("lastReplyTime")
     val lastReplyTime: Date? = null,

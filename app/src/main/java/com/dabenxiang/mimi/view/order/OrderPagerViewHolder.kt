@@ -19,7 +19,6 @@ import kotlinx.android.synthetic.main.item_order_no_data.view.*
 import kotlinx.android.synthetic.main.item_order_pager.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.util.*
 
 class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
@@ -94,14 +93,14 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
             2 -> {
                 if (rvChat.adapter == null) {
                     rvChat.adapter = chatAdapter
-                    orderFuncItem.getChatList({ list -> updateChatList(list) }, { size -> updateChatNoData(size)})
+                    orderFuncItem.getChatList(::updateChatList, ::updateChatNoData)
                 }
                 if (rvTab.adapter == null) {
                     tabAdapter.submitList(tabList, 0)
                     rvTab.adapter = tabAdapter
                 }
                 rvTab.visibility = View.VISIBLE
-                orderFuncItem.getProxyUnread { pos, isNew -> updateUnread(pos, isNew) }
+                orderFuncItem.getProxyUnread(::updateUnread)
             }
             else -> rvTab.visibility = View.GONE
         }
@@ -110,26 +109,27 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
             rvOrder.tag = position
             rvOrder.adapter = orderAdapter
 //            orderFuncItem.getOrderByPaging3 { data, scope -> updateOrderList3(data, scope) }
-            orderFuncItem.getOrderByPaging2(getOrderType(position), { list -> updateOrderList2(list) }, { size -> updateOrderNoData(size)})
+            orderFuncItem.getOrderByPaging2(getOrderType(position), ::updateOrderList2, ::updateOrderNoData)
             swipeRefreshLayout.isRefreshing = true
         }
 
         swipeRefreshLayout.setOnRefreshListener {
             itemOrderNoData.visibility = View.GONE
             itemChatNoData.visibility = View.GONE
+            orderFuncItem.updateTab() //for updating tab count
             when(position) {
                 2 -> {
                     when(tabAdapter.getSelectedPosition()) {
                         1 -> {
-                            orderFuncItem.getChatList({ list -> updateChatList(list) }, { size -> updateChatNoData(size)})
+                            orderFuncItem.getChatList(::updateChatList, ::updateChatNoData)
                         }
                         else -> {
-                            orderFuncItem.getOrderByPaging2(getOrderType(position), { list -> updateOrderList2(list) }, { size -> updateOrderNoData(size)})
+                            orderFuncItem.getOrderByPaging2(getOrderType(position), ::updateOrderList2, ::updateOrderNoData)
                         }
                     }
                 }
                 else ->
-                    orderFuncItem.getOrderByPaging2(getOrderType(position), { list -> updateOrderList2(list) }, { size -> updateOrderNoData(size)})
+                    orderFuncItem.getOrderByPaging2(getOrderType(position), ::updateOrderList2, ::updateOrderNoData)
             }
         }
 

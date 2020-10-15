@@ -15,8 +15,8 @@ import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
+import com.dabenxiang.mimi.model.api.vo.CreateOrderChatItem
 import com.dabenxiang.mimi.model.api.vo.OrderItem
-import com.dabenxiang.mimi.model.api.vo.PaymentInfoItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.OrderType
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -56,10 +56,11 @@ class OrderFragment : BaseFragment() {
                 getChatAttachment = { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR_CS) },
                 onChatItemClick = { item -> onChatItemClick(item) },
                 getOrderProxyAttachment = { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR_CS) },
-                onContactClick = { chatListItem, orderItem -> onContactClick(chatListItem, orderItem) },
+                onContactClick = { chatListItem, orderItem, updateChatId -> onContactClick(chatListItem, orderItem, updateChatId) },
                 getProxyUnread = { update -> getProxyUnread(update) },
                 onTopUpClick = { onTopUpClick() },
-                onPaymentInfoClick = { orderItem -> onPaymentInfoClick(orderItem) }
+                onPaymentInfoClick = { orderItem -> onPaymentInfoClick(orderItem) },
+                updateTab = { updateTab() }
             ))
     }
 
@@ -208,11 +209,22 @@ class OrderFragment : BaseFragment() {
         )
     }
 
-    private fun onContactClick(chatListItem: ChatListItem, orderItem: OrderItem) {
-        if (chatListItem.id != 0L && orderItem.traceLogId != 0L) {
-            onChatItemClick(chatListItem, orderItem)
-        } else {
-            viewModel.createOrderChat(chatListItem, orderItem)
+    private fun onContactClick(chatListItem: ChatListItem, orderItem: OrderItem, updateChatId: ((CreateOrderChatItem) -> Unit)) {
+        when(orderItem.type) {
+            OrderType.USER2ONLINE -> {
+                if (orderItem.chatId != 0L && orderItem.traceLogId != 0L) {
+                    onChatItemClick(chatListItem, orderItem)
+                } else {
+                    viewModel.createOrderChat(chatListItem, orderItem, updateChatId)
+                }
+            }
+            else -> {
+                if (orderItem.chatId != 0L) {
+                    onChatItemClick(chatListItem, orderItem)
+                } else {
+                    viewModel.createOrderChat(chatListItem, orderItem, updateChatId)
+                }
+            }
         }
     }
 
@@ -235,4 +247,14 @@ class OrderFragment : BaseFragment() {
             )
         )
     }
+
+    private fun updateTab() {
+        viewModel.getUnread()
+        viewModel.getBalanceItem()
+    }
+
+    infix fun <T, Q, R> ((T) -> Q).pipe(anotherFun: (Q) -> R): (T) -> R {
+        return { x: T -> anotherFun(this(x)) }
+    }
 }
+

@@ -1,7 +1,9 @@
 package com.dabenxiang.mimi.view.club
 
+import android.text.TextUtils
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
@@ -29,9 +31,14 @@ class ClubMemberPostViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
 
-        contentItem.images?.takeIf { it.isNotEmpty() }?.also { images ->
-            images[0].id.toLongOrNull()?.also { id ->
-                clubFuncItem.getBitmap(id, ivCover, LoadImageType.PICTURE_THUMBNAIL)
+        contentItem.images?.also { images ->
+            if (!TextUtils.isEmpty(images[0].url)) {
+                Glide.with(ivCover.context)
+                    .load(images[0].url).placeholder(R.drawable.img_nopic_03).into(ivCover)
+            } else {
+                images[0].id.toLongOrNull()?.also { id ->
+                    clubFuncItem.getBitmap(id, ivCover, LoadImageType.PICTURE_THUMBNAIL)
+                }
             }
         }
 

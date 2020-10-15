@@ -322,7 +322,7 @@ class FavoriteFragment : BaseFragment() {
     private val listener = object : FavoriteAdapter.EventListener {
 
         override fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType) {
-            viewModel.loadImage(id,view,type)
+            viewModel.loadImage(id, view, type)
         }
 
         override fun onVideoClick(item: Any, position: Int?) {
