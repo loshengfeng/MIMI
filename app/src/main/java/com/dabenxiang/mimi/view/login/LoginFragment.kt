@@ -60,32 +60,36 @@ class LoginFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.friendlyNameError.observe(viewLifecycleOwner, Observer {
+        viewModel.accountError.observe(viewLifecycleOwner, Observer {
             if (it == "") {
-                edit_friendly_name.setBackgroundResource(R.drawable.edit_text_rectangle)
-                tv_friendly_name_error.visibility = View.INVISIBLE
+                edit_account.setBackgroundResource(R.drawable.edit_text_rectangle)
+                tv_account_error.visibility = View.INVISIBLE
             } else {
-                edit_friendly_name.setBackgroundResource(R.drawable.edit_text_error_rectangle)
-                tv_friendly_name_error.text = it
-                tv_friendly_name_error.visibility = View.VISIBLE
+                edit_account.setBackgroundResource(R.drawable.edit_text_error_rectangle)
+                tv_account_error.text = it
+                tv_account_error.visibility = View.VISIBLE
             }
         })
 
-        viewModel.emailError.observe(viewLifecycleOwner, Observer {
+        viewModel.mobileError.observe(viewLifecycleOwner, Observer {
             if (it == "") {
-                tv_email_error.visibility = View.INVISIBLE
+                layout_mobile.setBackgroundResource(R.drawable.layout_rectangle)
+                tv_mobile_error.visibility = View.INVISIBLE
             } else {
-                tv_email_error.text = it
-                tv_email_error.visibility = View.VISIBLE
+                layout_mobile.setBackgroundResource(R.drawable.layout_rectangle_error)
+                tv_mobile_error.text = it
+                tv_mobile_error.visibility = View.VISIBLE
             }
         })
 
-        viewModel.registerAccountError.observe(viewLifecycleOwner, Observer {
+        viewModel.validateCodeError.observe(viewLifecycleOwner, Observer {
             if (it == "") {
-                tv_register_account_error.visibility = View.INVISIBLE
+                layout_verification_code.setBackgroundResource(R.drawable.layout_rectangle)
+                tv_validate_code_error.visibility = View.INVISIBLE
             } else {
-                tv_register_account_error.text = it
-                tv_register_account_error.visibility = View.VISIBLE
+                layout_verification_code.setBackgroundResource(R.drawable.layout_rectangle_error)
+                tv_validate_code_error.text = it
+                tv_validate_code_error.visibility = View.VISIBLE
             }
         })
 
@@ -113,10 +117,10 @@ class LoginFragment : BaseFragment() {
 
         viewModel.loginAccountError.observe(viewLifecycleOwner, Observer {
             if (it == "") {
-                edit_login_account.setBackgroundResource(R.drawable.edit_text_rectangle)
+                layout_login.setBackgroundResource(R.drawable.layout_rectangle)
                 tv_login_account_error.visibility = View.INVISIBLE
             } else {
-                edit_login_account.setBackgroundResource(R.drawable.edit_text_error_rectangle)
+                layout_login.setBackgroundResource(R.drawable.layout_rectangle_error)
                 tv_login_account_error.text = it
                 tv_login_account_error.visibility = View.VISIBLE
             }
@@ -143,7 +147,7 @@ class LoginFragment : BaseFragment() {
                             messageIcon = R.drawable.ico_default_photo,
                             secondBtn = getString(R.string.btn_confirm),
                             secondBlock = {
-                                viewModel.registerAccount.value?.let { it1 ->
+                                viewModel.mobile.value?.let { it1 ->
                                     viewModel.registerPw.value?.let { it2 ->
                                         viewModel.doLogin(it1, it2)
                                     }
@@ -239,7 +243,7 @@ class LoginFragment : BaseFragment() {
                     NavigateItem.Up
                 )
                 R.id.btn_register -> {
-                    viewModel.doRegisterValidateAndSubmit(tv_call_prefix.text.toString())
+                    viewModel.doRegisterValidateAndSubmit(tv_call_prefix.text.toString(), edit_verification_code.text.toString())
                 }
                 R.id.btn_forget -> navigateTo(NavigateItem.Destination(R.id.action_loginFragment_to_forgetPasswordFragment))
                 R.id.btn_login -> viewModel.doLoginValidateAndSubmit(tv_login_call_prefix.text.toString())
@@ -325,7 +329,7 @@ class LoginFragment : BaseFragment() {
         viewModel.mobile.bindingEditText = edit_mobile
         viewModel.verificationCode.bindingEditText = edit_verification_code
         viewModel.inviteCode.bindingEditText = edit_invite_code
-        viewModel.friendlyName.bindingEditText = edit_friendly_name
+        viewModel.account.bindingEditText = edit_account
         viewModel.registerPw.bindingEditText = edit_register_pw
         viewModel.confirmPw.bindingEditText = edit_register_confirm_pw
         viewModel.loginAccount.bindingEditText = edit_login_account

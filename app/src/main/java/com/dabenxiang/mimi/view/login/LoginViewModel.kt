@@ -16,7 +16,6 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils.isAccountValid
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.isEmailValid
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.isFriendlyNameValid
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.isPasswordValid
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -32,9 +31,7 @@ class LoginViewModel : BaseViewModel() {
     var changePrefixCount = 0
     var timer: Timer? = null
 
-    val friendlyName = EditTextMutableLiveData()
-    val registerAccount = EditTextMutableLiveData() //TODO need delete
-    val email = EditTextMutableLiveData() //TODO need delete
+    val account = EditTextMutableLiveData()
     val registerPw = EditTextMutableLiveData()
     val confirmPw = EditTextMutableLiveData()
 
@@ -45,20 +42,20 @@ class LoginViewModel : BaseViewModel() {
     val inviteCode = EditTextMutableLiveData()
 
     // Register
-    private val _friendlyNameError = MutableLiveData<String>()
-    val friendlyNameError: LiveData<String> = _friendlyNameError
-
-    private val _emailError = MutableLiveData<String>()
-    val emailError: LiveData<String> = _emailError
-
-    private val _registerAccountError = MutableLiveData<String>()
-    val registerAccountError: LiveData<String> = _registerAccountError
+    private val _mobileError = MutableLiveData<String>()
+    val mobileError: LiveData<String> = _mobileError
 
     private val _registerPasswordError = MutableLiveData<String>()
     val registerPasswordError: LiveData<String> = _registerPasswordError
 
     private val _confirmPasswordError = MutableLiveData<String>()
     val confirmPasswordError: LiveData<String> = _confirmPasswordError
+
+    private val _validateCodeError = MutableLiveData<String>()
+    val validateCodeError: LiveData<String> = _validateCodeError
+
+    private val _accountError = MutableLiveData<String>()
+    val accountError: LiveData<String> = _accountError
 
     private val _registerResult = MutableLiveData<ApiResult<Nothing>>()
     val registerResult: LiveData<ApiResult<Nothing>> = _registerResult
@@ -76,29 +73,31 @@ class LoginViewModel : BaseViewModel() {
     private val _validateMessageResult = MutableLiveData<ApiResult<Nothing>>()
     val validateMessageResult: LiveData<ApiResult<Nothing>> = _validateMessageResult
 
-    fun doRegisterValidateAndSubmit(callPrefix: String) {
-        _friendlyNameError.value = isValidateFriendlyName(friendlyName.value ?: "")
-        _emailError.value = isValidateEmail(email.value ?: "")
-        _registerAccountError.value = isValidateAccount(registerAccount.value ?: "")
+    fun doRegisterValidateAndSubmit(callPrefix: String, code: String) {
+        _accountError.value = isValidateFriendlyName(account.value ?: "")
+        _mobileError.value = isValidateMobile(mobile.value ?: "")
+//        _registerAccountError.value = isValidateAccount(registerAccount.value ?: "")
+        _validateCodeError.value = isValidateValidateCode(code)
         _registerPasswordError.value = isValidatePassword(registerPw.value ?: "")
         _confirmPasswordError.value =
             isValidateConfirmPassword(registerPw.value ?: "", confirmPw.value ?: "")
 
-        if ("" == _friendlyNameError.value &&
-            "" == _emailError.value &&
-            "" == _registerAccountError.value &&
+        if ("" == _accountError.value &&
+            "" == _mobileError.value &&
             "" == _registerPasswordError.value &&
-            "" == _confirmPasswordError.value
+            "" == _confirmPasswordError.value &&
+            "" == _validateCodeError.value
         ) {
             viewModelScope.launch {
                 accountManager.signUp(
                     SingUpRequest(
-                        username = registerAccount.value,
-                        email = email.value,
-                        friendlyName = friendlyName.value,
+                        username = account.value,
+                        email = mobile.value,
+                        friendlyName = null,
                         password = registerPw.value,
 //                        promoCode = PROMO_CODE,
-                        validationUrl = domainManager.getWebDomain() + DomainManager.PARAM_SIGNUP_CODE
+                        validationUrl = domainManager.getWebDomain() + DomainManager.PARAM_SIGNUP_CODE,
+                        code = code
                     )
                 ).collect {
                     _registerResult.value = it
@@ -134,19 +133,23 @@ class LoginViewModel : BaseViewModel() {
         }
     }
 
-    private fun isValidateEmail(email: String): String {
+    private fun isValidateMobile(mobile: String): String {
         return when {
-            TextUtils.isEmpty(email) -> app.getString(R.string.email_format_error_1)
-            !isEmailValid(email) -> app.getString(R.string.email_format_error_2)
-            email.length > 100 -> app.getString(R.string.email_format_error_3)
+            TextUtils.isEmpty(mobile) -> app.getString(R.string.mobile_format_error_1)
+            else -> ""
+        }
+    }
+
+    private fun isValidateValidateCode(mobile: String): String {
+        return when {
+            TextUtils.isEmpty(mobile) -> app.getString(R.string.invalidate_code_error_1)
             else -> ""
         }
     }
 
     private fun isValidateAccount(account: String): String {
         return when {
-            TextUtils.isEmpty(account) -> app.getString(R.string.account_format_error_1)
-            !isAccountValid(account) -> app.getString(R.string.account_format_error_2)
+            TextUtils.isEmpty(account) -> app.getString(R.string.mobile_format_error_1)
             else -> ""
         }
     }

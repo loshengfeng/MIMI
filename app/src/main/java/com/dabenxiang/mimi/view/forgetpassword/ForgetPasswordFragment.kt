@@ -35,21 +35,23 @@ class ForgetPasswordFragment : BaseFragment() {
     override fun setupObservers() {
         viewModel.accountError.observe(viewLifecycleOwner, Observer {
             if (it == "") {
+                edit_account.setBackgroundResource(R.drawable.edit_text_rectangle)
                 tv_account_error.visibility = View.INVISIBLE
             } else {
+                edit_account.setBackgroundResource(R.drawable.edit_text_error_rectangle)
                 tv_account_error.text = it
                 tv_account_error.visibility = View.VISIBLE
             }
         })
 
-        viewModel.emailError.observe(viewLifecycleOwner, Observer {
+        viewModel.mobileError.observe(viewLifecycleOwner, Observer {
             if (it == "") {
-                edit_email.setBackgroundResource(R.drawable.edit_text_rectangle)
-                tv_email_error.visibility = View.INVISIBLE
+                layout_mobile.setBackgroundResource(R.drawable.layout_rectangle)
+                tv_mobile_error.visibility = View.INVISIBLE
             } else {
-                edit_email.setBackgroundResource(R.drawable.edit_text_error_rectangle)
-                tv_email_error.text = it
-                tv_email_error.visibility = View.VISIBLE
+                layout_mobile.setBackgroundResource(R.drawable.layout_rectangle_error)
+                tv_mobile_error.text = it
+                tv_mobile_error.visibility = View.VISIBLE
             }
         })
 
@@ -62,7 +64,7 @@ class ForgetPasswordFragment : BaseFragment() {
                     GeneralDialog.newInstance(
                         GeneralDialogData(
                             titleRes = R.string.reset_pw_success,
-                            message = getString(R.string.desc_email, viewModel.email.value),
+                            message = getString(R.string.desc_email, viewModel.mobile.value),
                             messageIcon = R.drawable.ico_email,
                             secondBtn = getString(R.string.btn_confirm),
                             secondBlock = { navigateTo(NavigateItem.Up) }
@@ -107,7 +109,7 @@ class ForgetPasswordFragment : BaseFragment() {
 
     override fun initSettings() {
         super.initSettings()
-        viewModel.email.bindingEditText = edit_email
+        viewModel.account.bindingEditText = edit_account
         viewModel.mobile.bindingEditText = edit_mobile
     }
 

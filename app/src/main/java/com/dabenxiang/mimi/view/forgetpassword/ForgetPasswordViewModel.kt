@@ -12,7 +12,6 @@ import com.dabenxiang.mimi.model.api.vo.ForgetPasswordRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.EditTextMutableLiveData
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.isAccountValid
-import com.dabenxiang.mimi.widget.utility.GeneralUtils.isEmailValid
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -27,40 +26,37 @@ class ForgetPasswordViewModel : BaseViewModel() {
     var timer: Timer? = null
 
     val account = EditTextMutableLiveData()
-    val email = EditTextMutableLiveData()
     val mobile = EditTextMutableLiveData()
+
+    private val _mobileError = MutableLiveData<String>()
+    val mobileError: LiveData<String> = _mobileError
 
     private val _accountError = MutableLiveData<String>()
     val accountError: LiveData<String> = _accountError
-
-    private val _emailError = MutableLiveData<String>()
-    val emailError: LiveData<String> = _emailError
 
     private val _result = MutableLiveData<ApiResult<Nothing>>()
     val result: LiveData<ApiResult<Nothing>> = _result
 
     fun doValidateAndSubmit(callPrefix: String) {
+        _mobileError.value = isValidateMobile(mobile.value ?: "")
         _accountError.value = isValidateAccount(account.value ?: "")
-        _emailError.value = isValidateEmail(email.value ?: "")
 
-        if ("" == _accountError.value && "" == _emailError.value) {
-            account.value?.let { it1 -> email.value?.let { it2 -> doReset(it1, it2) } }
+        if ("" == _accountError.value && "" == _mobileError.value) {
+            account.value?.let { it1 -> mobile.value?.let { it2 -> doReset(it1, it2) } }
         }
     }
 
     private fun isValidateAccount(account: String): String {
         return when {
-            TextUtils.isEmpty(account) -> app.getString(R.string.account_format_error_1)
+            TextUtils.isEmpty(account) -> app.getString(R.string.account_error_1)
             !isAccountValid(account) -> app.getString(R.string.account_format_error_2)
             else -> ""
         }
     }
 
-    private fun isValidateEmail(email: String): String {
+    private fun isValidateMobile(mobile: String): String {
         return when {
-            TextUtils.isEmpty(email) -> app.getString(R.string.email_format_error_1)
-            !isEmailValid(email) -> app.getString(R.string.email_format_error_2)
-            email.length > 100 -> app.getString(R.string.email_format_error_3)
+            TextUtils.isEmpty(mobile) -> app.getString(R.string.mobile_format_error_1)
             else -> ""
         }
     }

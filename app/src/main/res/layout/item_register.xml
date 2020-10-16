@@ -13,7 +13,7 @@
     app:layout_constraintTop_toTopOf="parent">
 
     <EditText
-        android:id="@+id/edit_friendly_name"
+        android:id="@+id/edit_account"
         style="@style/login_edit_text"
         android:layout_height="wrap_content"
         android:layout_marginTop="0dp"
@@ -27,14 +27,14 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/tv_friendly_name_error"
+        android:id="@+id/tv_account_error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/color_red_2"
         android:textSize="12sp"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_friendly_name"
+        app:layout_constraintTop_toBottomOf="@+id/edit_account"
         tools:text="错误讯息"
         tools:visibility="visible" />
 
@@ -45,7 +45,7 @@
         android:layout_height="42dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_friendly_name">
+        app:layout_constraintTop_toBottomOf="@+id/edit_account">
 
         <TextView
             android:id="@+id/tv_call_prefix"
@@ -63,6 +63,8 @@
             android:layout_width="1dp"
             android:layout_height="0dp"
             android:layout_marginStart="15dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginBottom="1dp"
             android:background="@color/color_gray_1"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/tv_call_prefix"
@@ -88,7 +90,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
-        android:id="@+id/tv_email_error"
+        android:id="@+id/tv_mobile_error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/color_red_2"
@@ -142,7 +144,7 @@
 
 
     <TextView
-        android:id="@+id/tv_register_account_error"
+        android:id="@+id/tv_validate_code_error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/color_red_2"
