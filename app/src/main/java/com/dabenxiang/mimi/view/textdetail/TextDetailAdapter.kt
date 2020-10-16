@@ -1,12 +1,10 @@
 package com.dabenxiang.mimi.view.textdetail
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
@@ -137,7 +135,7 @@ class TextDetailAdapter(
                         holder.follow.text = context.getString(R.string.followed)
                         holder.follow.background =
                             context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
-                        holder.follow.setTextColor(context.getColor(R.color.color_white_1))
+                        holder.follow.setTextColor(context.getColor(R.color.color_black_1_60))
                     } else {
                         holder.follow.text = context.getString(R.string.follow)
                         holder.follow.background =
@@ -156,10 +154,7 @@ class TextDetailAdapter(
                     val chip = LayoutInflater.from(holder.tagChipGroup.context)
                         .inflate(R.layout.chip_item, holder.tagChipGroup, false) as Chip
                     chip.text = it
-                    chip.setTextColor(context.getColor(R.color.color_white_1_50))
-                    chip.chipBackgroundColor = ColorStateList.valueOf(
-                        ContextCompat.getColor(context, R.color.adult_color_status_bar)
-                    )
+                    chip.setTextColor(context.getColor(R.color.color_black_1_50))
                     chip.setOnClickListener { view ->
                         onTextDetailListener.onChipClick(
                             PostType.TEXT,
@@ -179,13 +174,13 @@ class TextDetailAdapter(
             is CommentTitleViewHolder -> {
                 holder.newestComment.setOnClickListener {
                     holder.newestComment.setTextColor(context.getColor(R.color.color_red_1))
-                    holder.topComment.setTextColor(context.getColor(R.color.color_white_1_30))
+                    holder.topComment.setTextColor(context.getColor(R.color.color_black_1_30))
                     updateCommandItem(CommentType.NEWEST)
                 }
 
                 holder.topComment.setOnClickListener {
                     holder.topComment.setTextColor(context.getColor(R.color.color_red_1))
-                    holder.newestComment.setTextColor(context.getColor(R.color.color_white_1_30))
+                    holder.newestComment.setTextColor(context.getColor(R.color.color_black_1_30))
                     updateCommandItem(CommentType.TOP)
                 }
             }

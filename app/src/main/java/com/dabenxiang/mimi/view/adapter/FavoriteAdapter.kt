@@ -14,7 +14,6 @@ import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_ADULT
-import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_NORMAL
 import com.dabenxiang.mimi.view.favroite.FavoritePlayViewHolder
 import com.dabenxiang.mimi.view.favroite.FavoritePostViewHolder
 
@@ -56,15 +55,6 @@ class FavoriteAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            TYPE_NORMAL -> {
-                FavoritePlayViewHolder(
-                    layoutInflater.inflate(
-                        R.layout.item_general_normal,
-                        parent,
-                        false
-                    ), listener
-                )
-            }
             TYPE_ADULT ->
                 FavoritePlayViewHolder(
                     layoutInflater.inflate(
@@ -99,7 +89,7 @@ class FavoriteAdapter(
         val item =
             if (isPlayItem) getItem(position) as PlayItem else getItem(position) as MemberPostItem
         return when (isPlayItem) {
-            true -> if ((item as PlayItem).isAdult!!) TYPE_ADULT else TYPE_NORMAL
+            true -> TYPE_ADULT
             else -> TYPE_SHORT_VIDEO
         }
     }

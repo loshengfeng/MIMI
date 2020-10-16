@@ -89,21 +89,15 @@ class RootCommentProvider(
             if (!node.isExpanded && node.data.commentCount != null && node.data.commentCount > 0) {
                 val solidColor = when (type) {
                     CommentViewType.CLIP -> R.color.transparent
-                    CommentViewType.VIDEO -> {
-                        if (isAdult) R.color.color_white_1_10
-                        else R.color.color_black_1_05
-                    }
-                    else -> R.color.color_white_1_10
+                    CommentViewType.VIDEO -> R.color.color_black_1_05
+                    else -> R.color.color_black_1_05
                 }.let { colorRes ->
                     it.resources.getColor(colorRes, null)
                 }
 
                 val pressedColor = when (type) {
                     CommentViewType.CLIP -> R.color.transparent
-                    CommentViewType.VIDEO -> {
-                        if (isAdult) R.color.color_white_1_30
-                        else R.color.color_black_1_30
-                    }
+                    CommentViewType.VIDEO -> R.color.color_black_1_30
                     else -> R.color.color_white_1_30
                 }.let { colorRes ->
                     it.resources.getColor(colorRes, null)
@@ -295,12 +289,7 @@ abstract class BaseCommentProvider(
                         visibility = View.GONE
                     } else {
                         visibility = View.VISIBLE
-                        when {
-                            isAdult -> R.color.color_white_1
-                            else -> R.color.color_black_1_05
-                        }.run {
-                            setBackgroundResource(this)
-                        }
+                        setBackgroundResource(R.color.color_black_1_05)
                     }
                 }
                 CommentViewType.CLIP -> {
@@ -308,7 +297,7 @@ abstract class BaseCommentProvider(
                         visibility = View.GONE
                     } else {
                         visibility = View.VISIBLE
-                        setBackgroundResource(R.color.color_black_1_20)
+                        setBackgroundResource(R.color.color_black_1_05)
                     }
                 }
                 else -> {
@@ -316,7 +305,7 @@ abstract class BaseCommentProvider(
                         visibility = View.GONE
                     } else {
                         visibility = View.VISIBLE
-                        setBackgroundResource(R.color.color_black_1_20)
+                        setBackgroundResource(R.color.color_black_1_05)
                     }
                 }
             }
@@ -332,16 +321,14 @@ abstract class BaseCommentProvider(
                 CommentViewType.CLIP -> R.color.transparent
                 CommentViewType.VIDEO -> {
                     if (holder.layoutPosition == 1) {
-                        if (isAdult) R.drawable.bg_adult_comment_top_radius_10
-                        else R.drawable.bg_comment_top_radius_10
+                        R.drawable.bg_comment_top_radius_10
                     } else {
-                        if (isAdult) R.color.color_white_1_10
-                        else R.color.color_gray_2
+                        R.color.color_gray_2
                     }
                 }
                 else -> {
                     if (holder.layoutPosition == 0) R.drawable.bg_adult_comment_top_radius_10
-                    else R.color.color_white_1_10
+                    else R.color.color_gray_2
                 }
             }
         )
@@ -367,7 +354,7 @@ abstract class BaseCommentProvider(
         }
 
         holder.getView<ImageView>(R.id.btn_more)
-            .setBackgroundResource(if (isAdult) R.drawable.btn_more_white_n else R.drawable.btn_more_gray_n)
+            .setBackgroundResource(R.drawable.btn_more_gray_n)
         updateLikeCountAndDislikeCount(holder, data)
     }
 
@@ -394,20 +381,15 @@ abstract class BaseCommentProvider(
         }
     }
 
-    private fun getTextColor() = if (isAdult) R.color.color_white_1_50 else R.color.color_black_1_50
+    private fun getTextColor() = R.color.color_black_1_50
 
-    private fun getMessageTextColor() =
-        if (isAdult) R.color.color_white_1 else R.color.color_black_1
+    private fun getMessageTextColor() = R.color.color_black_1
 
     private fun getLikeRes(isLike: Boolean): Int {
         return if (isLike) {
             R.drawable.ico_nice_s
         } else {
-            if (isAdult) {
-                R.drawable.ico_nice
-            } else {
-                R.drawable.ico_nice_gray
-            }
+            R.drawable.ico_nice_gray
         }
     }
 
@@ -415,11 +397,7 @@ abstract class BaseCommentProvider(
         return if (isDislike) {
             R.drawable.ico_bad_s
         } else {
-            if (isAdult) {
-                R.drawable.ico_bad
-            } else {
-                R.drawable.ico_bad_gray
-            }
+            R.drawable.ico_bad_gray
         }
     }
 

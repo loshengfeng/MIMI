@@ -54,7 +54,7 @@ class TopUpFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback {
-            interactionListener?.changeNavigationPosition(R.id.navigation_home)
+            interactionListener?.changeNavigationPosition(R.id.navigation_adult)
         }
         initSettings()
     }

@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -19,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
-import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem
@@ -112,11 +110,11 @@ class AdultHomeFragment : BaseFragment() {
         handleBackStackData()
         requireActivity().onBackPressedDispatcher.addCallback {
             interactionListener?.changeNavigationPosition(
-                R.id.navigation_home
+                R.id.navigation_adult
             )
         }
 
-        useAdultTheme(true)
+        useAdultTheme(false)
         checkPageState()
         getCurrentAdapter()?.notifyDataSetChanged()
     }
@@ -424,25 +422,25 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private fun setupUI() {
-        layout_top.background = ContextCompat.getDrawable(
-            requireContext(), R.color.adult_color_status_bar
-        )
-
-        layout_search_bar.background = ContextCompat.getDrawable(
-            requireContext(), R.color.adult_color_background
-        )
-
-        iv_bg_search setBtnSolidColor requireActivity().getColor(R.color.adult_color_search_bar)
-
-        iv_search.setImageResource(R.drawable.adult_btn_search)
-        tv_search.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
-
-        btn_filter.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
-        btn_filter.setBtnSolidColor(
-            requireActivity().getColor(R.color.color_white_1_30),
-            requireActivity().getColor(R.color.color_red_1),
-            resources.getDimension(R.dimen.dp_6)
-        )
+//        layout_top.background = ContextCompat.getDrawable(
+//            requireContext(), R.color.adult_color_status_bar
+//        )
+//
+//        layout_search_bar.background = ContextCompat.getDrawable(
+//            requireContext(), R.color.adult_color_background
+//        )
+//
+//        iv_bg_search setBtnSolidColor requireActivity().getColor(R.color.adult_color_search_bar)
+//
+//        iv_search.setImageResource(R.drawable.adult_btn_search)
+//        tv_search.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
+//
+//        btn_filter.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
+//        btn_filter.setBtnSolidColor(
+//            requireActivity().getColor(R.color.color_white_1_30),
+//            requireActivity().getColor(R.color.color_red_1),
+//            resources.getDimension(R.dimen.dp_6)
+//        )
 
         iv_post.visibility = View.VISIBLE
         btn_filter.visibility = View.GONE
@@ -460,6 +458,7 @@ class AdultHomeFragment : BaseFragment() {
 
         btn_filter.setOnClickListener {
             val category = mainViewModel?.adult?.categories?.get(0)
+            Timber.d("Abbie: category: $category")
             category?.also {
                 val bundle = CategoriesFragment.createBundle(it.name, it.name, category)
                 navigateTo(
@@ -533,9 +532,9 @@ class AdultHomeFragment : BaseFragment() {
         btn_ranking.visibility = View.GONE
         btn_filter.visibility = View.GONE
         cl_no_login.visibility = View.GONE
-        cl_no_login.background = ContextCompat.getDrawable(
-            requireContext(), R.color.adult_color_background
-        )
+//        cl_no_login.background = ContextCompat.getDrawable(
+//            requireContext(), R.color.adult_color_background
+//        )
 
         when (position) {
             0 -> {
@@ -544,9 +543,9 @@ class AdultHomeFragment : BaseFragment() {
                 showNoLoginToggle(false)
                 takeIf { rv_home.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_home.background = ContextCompat.getDrawable(
-                        requireContext(), R.color.adult_color_background
-                    )
+//                    rv_home.background = ContextCompat.getDrawable(
+//                        requireContext(), R.color.adult_color_background
+//                    )
 
                     rv_home.layoutManager = LinearLayoutManager(requireContext())
                     rv_home.adapter = homeAdapter
@@ -559,9 +558,9 @@ class AdultHomeFragment : BaseFragment() {
                 showNoLoginToggle(false)
                 takeIf { rv_first.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_first.background = ContextCompat.getDrawable(
-                        requireContext(), R.color.adult_color_background
-                    )
+//                    rv_first.background = ContextCompat.getDrawable(
+//                        requireContext(), R.color.adult_color_background
+//                    )
                     rv_first.layoutManager = GridLayoutManager(requireContext(), 2)
                     rv_first.adapter = videoListAdapter
                 }
@@ -571,9 +570,9 @@ class AdultHomeFragment : BaseFragment() {
                 rv_second.visibility = View.VISIBLE
                 takeIf { rv_second.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_second.background = ContextCompat.getDrawable(
-                        requireContext(), R.color.adult_color_background
-                    )
+//                    rv_second.background = ContextCompat.getDrawable(
+//                        requireContext(), R.color.adult_color_background
+//                    )
                     rv_second.layoutManager = LinearLayoutManager(requireContext())
                     rv_second.adapter = followPostPagedAdapter
                 } ?: run {
@@ -592,9 +591,9 @@ class AdultHomeFragment : BaseFragment() {
                 showNoLoginToggle(false)
                 takeIf { rv_third.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_third.background = ContextCompat.getDrawable(
-                        requireContext(), R.color.adult_color_background
-                    )
+//                    rv_third.background = ContextCompat.getDrawable(
+//                        requireContext(), R.color.adult_color_background
+//                    )
                     rv_third.layoutManager = LinearLayoutManager(requireContext())
                     rv_third.adapter = clipPostPagedAdapter
                 } ?: run {
@@ -609,9 +608,6 @@ class AdultHomeFragment : BaseFragment() {
                 showNoLoginToggle(false)
                 takeIf { rv_fourth.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_fourth.background = ContextCompat.getDrawable(
-                        requireContext(), R.color.adult_color_background
-                    )
                     rv_fourth.layoutManager = LinearLayoutManager(requireContext())
                     rv_fourth.adapter = picturePostPagedAdapter
                 } ?: run {
@@ -626,9 +622,6 @@ class AdultHomeFragment : BaseFragment() {
                 showNoLoginToggle(false)
                 takeIf { rv_fifth.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_fifth.background = ContextCompat.getDrawable(
-                        requireContext(), R.color.adult_color_background
-                    )
                     rv_fifth.layoutManager = LinearLayoutManager(requireContext())
                     rv_fifth.adapter = textPostPagedAdapter
                 } ?: run {
@@ -643,9 +636,6 @@ class AdultHomeFragment : BaseFragment() {
                 showNoLoginToggle(false)
                 takeIf { rv_sixth.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_sixth.background = ContextCompat.getDrawable(
-                        requireContext(), R.color.adult_color_background
-                    )
                     rv_sixth.layoutManager = MiMiLinearLayoutManager(requireContext())
                     rv_sixth.adapter = clubMemberAdapter
                 } ?: run {
@@ -704,7 +694,7 @@ class AdultHomeFragment : BaseFragment() {
             override fun onClickItemIndex(view: View, index: Int) {
                 setTab(index)
             }
-        }, true)
+        }, false)
     }
 
     private val homeAdapter by lazy {

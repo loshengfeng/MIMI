@@ -111,7 +111,7 @@ class RankingFragment : BaseFragment() {
 
         text_toolbar_title.text = getString(R.string.text_ranking)
         toolbarContainer.toolbar.navigationIcon =
-            requireContext().getDrawable(R.drawable.btn_back_white_n)
+            requireContext().getDrawable(R.drawable.btn_back_black_n)
         toolbarContainer.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }

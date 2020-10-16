@@ -2,7 +2,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/adult_color_background"
+    android:background="@color/color_white_1"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -10,7 +10,7 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/adult_color_background"
+        android:background="@color/normal_color_status_bar"
         android:elevation="10dp">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
@@ -24,7 +24,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:elevation="1dp"
-                android:background="@color/adult_color_background"
                 app:contentInsetStart="0dp"
                 app:layout_collapseMode="pin">
 
@@ -38,7 +37,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="10dp"
-                        android:src="@drawable/adult_btn_back"
+                        android:src="@drawable/btn_back_black_n"
                         android:background="@null"
                         android:contentDescription="@null"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -86,7 +85,7 @@
                     android:id="@+id/tv_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/color_white_1"
+                    android:textColor="@color/color_black_1"
                     android:textSize="18sp"
                     android:maxLines="1"
                     android:paddingHorizontal="10dp"
@@ -100,7 +99,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:textColor="@color/color_white_1"
+                    android:textColor="@color/color_black_1"
                     android:textSize="12sp"
                     android:maxLines="1"
                     android:paddingHorizontal="10dp"
@@ -123,7 +122,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/text_follow"
-                        android:textColor="@color/color_white_1_50"
+                        android:textColor="@color/color_black_1_30"
                         android:textSize="12sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -133,7 +132,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
-                        android:textColor="@color/color_white_1"
+                        android:textColor="@color/color_black_1"
                         android:textSize="12sp"
                         app:layout_constraintLeft_toRightOf="@+id/tv_follow_title"
                         app:layout_constraintTop_toTopOf="parent"
@@ -145,7 +144,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="15dp"
                         android:text="@string/text_post"
-                        android:textColor="@color/color_white_1_50"
+                        android:textColor="@color/color_black_1_30"
                         android:textSize="12sp"
                         app:layout_constraintLeft_toRightOf="@+id/tv_follow_count"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -155,7 +154,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
-                        android:textColor="@color/color_white_1"
+                        android:textColor="@color/color_black_1"
                         android:textSize="12sp"
                         app:layout_constraintLeft_toRightOf="@+id/tv_post_title"
                         app:layout_constraintTop_toTopOf="parent"
@@ -179,8 +178,8 @@
             app:tabIndicatorFullWidth="false"
             app:tabIndicatorHeight="3dp"
             app:tabMode="fixed"
-            app:tabSelectedTextColor="@color/color_white_1"
-            app:tabTextColor="@color/color_white_1">
+            app:tabSelectedTextColor="@color/color_black_1"
+            app:tabTextColor="@color/color_black_1_50">
 
             <com.google.android.material.tabs.TabItem
                 android:id="@+id/ti_hottest"

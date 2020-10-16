@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.content.res.ColorStateList
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.text.Html
@@ -15,7 +14,6 @@ import android.view.View.VISIBLE
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearSnapHelper
@@ -238,7 +236,7 @@ class PlayerActivity : BaseActivity() {
                 val bundle = MyPostFragment.createBundle(
                     userId, name,
                     isAdult = true,
-                    isAdultTheme = true
+                    isAdultTheme = false
                 )
                 bundle.putBoolean(KEY_IS_FROM_PLAYER, true)
                 navigateTo(
@@ -281,21 +279,10 @@ class PlayerActivity : BaseActivity() {
 
         recycler_info.adapter = playerInfoAdapter
 
-        val backgroundColor = if (isAdult) {
-            getColor(R.color.adult_color_background)
-        } else {
-            getColor(R.color.normal_color_background)
-        }
+        val backgroundColor = getColor(R.color.normal_color_background)
         recycler_info.setBackgroundColor(backgroundColor)
 
-        val titleColor =
-            if (isAdult) {
-                R.color.adult_color_text
-            } else {
-                R.color.normal_color_text
-            }.let {
-                getColor(it)
-            }
+        val titleColor = getColor(R.color.normal_color_text)
 
         headVideoInfo.tv_title.setTextColor(titleColor)
         headSource.title_source.setTextColor(titleColor)
@@ -303,30 +290,12 @@ class PlayerActivity : BaseActivity() {
         headComment.title_comment.setTextColor(titleColor)
         headNoComment.title_no_comment.setTextColor(titleColor)
 
-        val subTitleColor =
-            if (isAdult) {
-                R.color.color_white_1_50
-            } else {
-                R.color.color_black_1_50
-            }.let {
-                getColor(it)
-            }
+        val subTitleColor = getColor(R.color.color_black_1_50)
+
         headVideoInfo.btn_show_introduction.setTextColor(subTitleColor)
         headVideoInfo.tv_introduction.setTextColor(subTitleColor)
         headVideoInfo.tv_info.setTextColor(subTitleColor)
-        headVideoInfo.tv_introduction.setBackgroundResource(
-            if (isAdult) {
-                R.drawable.bg_white_stroke_1_radius_2
-            } else {
-                R.drawable.bg_black_stroke_1_radius_2
-            }
-        )
-
-        val lineColor =
-            if (isAdult) getColor(R.color.color_white_1_10) else getColor(R.color.color_black_1_05)
-        headSource.line_source.setBackgroundColor(lineColor)
-        headComment.line_comment.setBackgroundColor(lineColor)
-        headComment.line_separate.setBackgroundColor(lineColor)
+        headVideoInfo.tv_introduction.setBackgroundResource(R.drawable.bg_black_stroke_1_radius_2)
 
         headVideoInfo.btn_show_introduction.setOnClickListener {
             viewModel.showIntroduction.setNot()
@@ -334,19 +303,8 @@ class PlayerActivity : BaseActivity() {
 
         viewModel.showIntroduction.observe(this, Observer { isShow ->
             val drawableRes =
-                if (isAdult) {
-                    if (isShow) {
-                        R.drawable.btn_arrowup_white_n
-                    } else {
-                        R.drawable.btn_arrowdown_white_n
-                    }
-                } else {
-                    if (isShow) {
-                        R.drawable.btn_arrowup_gray_n
-                    } else {
-                        R.drawable.btn_arrowdown_gray_n
-                    }
-                }
+                if (isShow) R.drawable.btn_arrowup_gray_n
+                else R.drawable.btn_arrowdown_gray_n
             headVideoInfo.tv_introduction.visibility = if (isShow) View.VISIBLE else View.GONE
             headVideoInfo.btn_show_introduction.setCompoundDrawablesWithIntrinsicBounds(
                 0,
@@ -356,77 +314,47 @@ class PlayerActivity : BaseActivity() {
             )
         })
 
-        bottom_func_bar.setBackgroundResource(
-            if (isAdult) {
-                R.drawable.bg_adult_top_line
-            } else {
-                R.drawable.bg_gray_2_top_line
-            }
-        )
+        bottom_func_bar.setBackgroundResource(R.drawable.bg_gray_2_top_line)
 
-        bottom_func_input.setBackgroundResource(
-            if (isAdult) {
-                R.drawable.bg_adult_top_line
-            } else {
-                R.drawable.bg_gray_2_top_line
-            }
-        )
+        bottom_func_input.setBackgroundResource(R.drawable.bg_gray_2_top_line)
 
 
         btn_write_comment.let {
             it.setTextColor(
-                getColor(
-                    if (isAdult) {
-                        R.color.color_white_1_30
-                    } else {
-                        R.color.color_gray_9
-                    }
-                )
+                getColor(R.color.color_gray_9)
             )
-            it.background = getDrawable(
-                if (isAdult) R.drawable.bg_black_1_30_radius_18
-                else R.drawable.bg_gray_1_30_radius_18
-            )
+            it.background = getDrawable(R.drawable.bg_gray_1_30_radius_18)
         }
 
         tv_comment.setCompoundDrawablesRelativeWithIntrinsicBounds(
-            if (isAdult) R.drawable.ico_messege_adult else R.drawable.ico_messege_adult_gray,
+            R.drawable.ico_messege_adult_gray,
             0,
             0,
             0
         )
         et_message.let {
             it.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                if (isAdult) R.drawable.ico_messege_adult else R.drawable.ico_messege_adult_gray,
+                R.drawable.ico_messege_adult_gray,
                 0,
                 0,
                 0
             )
             it.compoundDrawablePadding = 5
-            it.setBackgroundColor(getColor(if (isAdult) R.color.color_black_1 else R.color.color_gray_1))
-            it.setTextColor(getColor(if (isAdult) R.color.color_white_1 else R.color.color_black_1))
-            it.setHintTextColor(getColor(if (isAdult) R.color.color_gray_1 else R.color.color_gray_9))
+            it.setBackgroundColor(getColor(R.color.color_gray_1))
+            it.setTextColor(getColor(R.color.color_black_1))
+            it.setHintTextColor(getColor(R.color.color_gray_9))
         }
 
-        iv_bar.setImageResource(
-            if (isAdult) R.drawable.bg_black_1_30_radius_18
-            else R.drawable.bg_gray_1_30_radius_18
-        )
+        iv_bar.setImageResource(R.drawable.bg_gray_1_30_radius_18)
 
         tv_like.setTextColor(titleColor)
         iv_favorite.setTextColor(titleColor)
         tv_comment.setTextColor(titleColor)
 
-        iv_share.setImageResource(if (isAdult) R.drawable.btn_share_white_n else R.drawable.btn_share_gray_n)
-        iv_more.setImageResource(if (isAdult) R.drawable.btn_more_white_n else R.drawable.btn_more_gray_n)
+        iv_share.setImageResource(R.drawable.btn_share_gray_n)
+        iv_more.setImageResource(R.drawable.btn_more_gray_n)
 
-        tv_replay_name.setTextColor(if (obtainIsAdult()) {
-            R.color.color_white_1
-        } else {
-            R.color.color_black_1
-        }.let {
-            getColor(it)
-        })
+        tv_replay_name.setTextColor(getColor(R.color.color_black_1))
 
 
         viewModel.fastForwardTime.observe(this, Observer {
@@ -590,14 +518,7 @@ class PlayerActivity : BaseActivity() {
                         Timber.i(" apiVideoInfo result.commentCount == 0L")
                         headNoComment.title_no_comment.visibility = View.VISIBLE
                         headNoComment.title_no_comment.setTextColor(titleColor)
-                        val bgColor =
-                            if (isAdult) {
-                                R.color.color_white_1_10
-                            } else {
-                                R.color.color_black_1_10
-                            }.let { colorRes ->
-                                getColor(colorRes)
-                            }
+                        val bgColor = getColor(R.color.color_black_1_10)
                         headNoComment.title_no_comment.setBtnSolidColor(
                             bgColor,
                             bgColor,
@@ -643,11 +564,7 @@ class PlayerActivity : BaseActivity() {
         viewModel.likeVideo.observe(this, Observer {
             val res = when (it) {
                 true -> R.drawable.ico_nice_s
-                else ->
-                    when (isAdult) {
-                        true -> R.drawable.ico_nice
-                        else -> R.drawable.ico_nice_gray
-                    }
+                else ->R.drawable.ico_nice_gray
             }
 
             tv_like.setCompoundDrawablesRelativeWithIntrinsicBounds(res, 0, 0, 0)
@@ -660,11 +577,7 @@ class PlayerActivity : BaseActivity() {
         viewModel.favoriteVideo.observe(this, Observer {
             val res = when (it) {
                 true -> R.drawable.btn_favorite_white_s
-                else ->
-                    when (isAdult) {
-                        true -> R.drawable.btn_favorite_white_n
-                        else -> R.drawable.btn_favorite_n
-                    }
+                else -> R.drawable.btn_favorite_n
             }
 
             iv_favorite.setCompoundDrawablesRelativeWithIntrinsicBounds(res, 0, 0, 0)
@@ -1457,7 +1370,7 @@ class PlayerActivity : BaseActivity() {
     }
 
     private fun obtainIsAdult(): Boolean {
-        return (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerItem?)?.isAdult ?: false
+        return true
     }
 
     private fun openLoginDialog() {
@@ -1575,25 +1488,7 @@ class PlayerActivity : BaseActivity() {
 
             val isAdult = obtainIsAdult()
 
-            chip.setTextColor(
-                if (isAdult) {
-                    R.color.color_white_1_50
-                } else {
-                    R.color.color_black_1_50
-                }.let { colorRes ->
-                    getColor(colorRes)
-                }
-            )
-
-            chip.chipBackgroundColor = ColorStateList.valueOf(
-                ContextCompat.getColor(
-                    this, if (isAdult) {
-                        R.color.adult_color_status_bar
-                    } else {
-                        R.color.color_black_1_10
-                    }
-                )
-            )
+            chip.setTextColor(getColor(R.color.color_black_1_50))
 
             chip.setOnClickListener(
                 View.OnClickListener {

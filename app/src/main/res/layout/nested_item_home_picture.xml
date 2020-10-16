@@ -40,13 +40,14 @@
 
     <TextView
         android:id="@+id/tv_name"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="6dp"
         android:layout_marginTop="10dp"
-        android:textColor="@color/color_white_1"
+        android:textColor="@color/color_black_1"
         android:textSize="12sp"
-        app:layout_constraintLeft_toRightOf="@+id/img_avatar"
+        app:layout_constraintEnd_toEndOf="@id/layout_card"
+        app:layout_constraintStart_toEndOf="@+id/img_avatar"
         app:layout_constraintTop_toBottomOf="@+id/layout_card"
         tools:text="名称名称" />
 
@@ -55,7 +56,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="6dp"
-        android:textColor="@color/color_white_1_50"
+        android:textColor="@color/color_black_1_50"
         android:textSize="12sp"
         app:layout_constraintLeft_toRightOf="@+id/img_avatar"
         app:layout_constraintTop_toBottomOf="@+id/tv_name"
@@ -68,7 +69,7 @@
         android:layout_marginTop="10dp"
         android:ellipsize="end"
         android:lines="2"
-        android:textColor="@color/color_white_1"
+        android:textColor="@color/color_black_1"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="@id/layout_card"
         app:layout_constraintStart_toStartOf="@id/layout_card"
