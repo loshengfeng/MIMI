@@ -308,5 +308,13 @@
     <fragment
         android:id="@+id/inviteVipFragment"
         android:name="com.dabenxiang.mimi.view.invitevip.InviteVipFragment"
-        android:label="InviteVipFragment" />
+        android:label="InviteVipFragment" >
+        <action
+            android:id="@+id/action_inviteVipFragment_to_inviteVipRecordFragment"
+            app:destination="@id/inviteVipRecordFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/inviteVipRecordFragment"
+        android:name="com.dabenxiang.mimi.view.inviteviprecord.InviteVipRecordFragment"
+        android:label="InviteVipRecordFragment" />
 </navigation>

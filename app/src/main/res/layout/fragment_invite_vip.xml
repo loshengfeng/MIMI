@@ -58,7 +58,7 @@
         app:srcCompat="@drawable/img_vip_word" />
 
     <ImageView
-        android:id="@+id/imageView7"
+        android:id="@+id/iv_invite_vip_back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -68,7 +68,7 @@
         app:srcCompat="@drawable/adult_btn_back" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/tv_to_invite_vip_record"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"

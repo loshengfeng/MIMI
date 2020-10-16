@@ -400,4 +400,7 @@
     <string name="copy_url">已将连结保存到剪贴簿</string>
     <string name="topup_default_time">-</string>
 
+    <!-- Invite Vip -->
+    <string name="invite_vip_record_title">推广记录</string>
+
 </resources>
