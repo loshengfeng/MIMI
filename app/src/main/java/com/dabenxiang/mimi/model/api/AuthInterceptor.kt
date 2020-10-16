@@ -7,6 +7,7 @@ import com.dabenxiang.mimi.model.enums.TokenResult
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.pref.Pref
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
@@ -117,6 +118,8 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
             val auth = StringBuilder(ApiRepository.BEARER).append(accessToken).toString()
             requestBuilder.addHeader(ApiRepository.AUTHORIZATION, auth)
         }
+
+        requestBuilder.addHeader(ApiRepository.X_DEVICE_ID, GeneralUtils.getAndroidID())
 
         return requestBuilder.build()
     }
