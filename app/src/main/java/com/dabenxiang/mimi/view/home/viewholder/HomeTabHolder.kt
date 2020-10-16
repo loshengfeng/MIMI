@@ -31,11 +31,7 @@ class HomeTabHolder(itemView: View, listener: IndexViewHolderListener, var isAdu
             }
 
         if (isSelected) {
-            if (isAdult) {
-                R.color.adult_color_text
-            } else {
-                R.color.normal_color_text
-            }
+            R.color.normal_color_text
         } else {
             R.color.color_tab_unselected_text
         }.let {

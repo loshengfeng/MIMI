@@ -92,6 +92,8 @@ class AdultHomeFragment : BaseFragment() {
 
     val accountManager: AccountManager by inject()
 
+    private val categoryTypeList: ArrayList<CategoryType> = arrayListOf()
+
     companion object {
         private const val REQUEST_PHOTO = 10001
         private const val REQUEST_VIDEO_CAPTURE = 10002
@@ -156,11 +158,24 @@ class AdultHomeFragment : BaseFragment() {
                 is Success -> {
                     val list = mutableListOf<String>()
                     list.add(getString(R.string.home))
+                    categoryTypeList.add(CategoryType.HOME)
                     mainViewModel?.setupAdultCategoriesItem(it.result.content?.getAdult())
                     mainViewModel?.adult?.categories?.also { level2 ->
                         for (i in 0 until level2.count()) {
                             val detail = level2[i]
-                            list.add(detail.name)
+                            val type = when (detail.name) {
+                                getString(R.string.home_tab_video) -> CategoryType.VIDEO
+                                getString(R.string.home_tab_follow) -> CategoryType.FOLLOW
+                                getString(R.string.home_tab_clip) -> CategoryType.CLIP
+                                getString(R.string.home_tab_picture) -> CategoryType.PICTURE
+                                getString(R.string.home_tab_text) -> CategoryType.TEXT
+                                getString(R.string.home_tab_club) -> CategoryType.CLUB
+                                else -> null
+                            }
+                            type?.let {
+                                list.add(detail.name)
+                                categoryTypeList.add(type)
+                            }
                         }
                         tabAdapter.submitList(list, lastPosition)
                         setupHomeData(mainViewModel?.adult)
@@ -289,7 +304,7 @@ class AdultHomeFragment : BaseFragment() {
             it?.also { totalCount ->
                 cl_no_data.visibility =
                     takeIf { totalCount > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
-                takeIf { rv_sixth.visibility == View.VISIBLE }?.also {
+                takeIf { rv_club.visibility == View.VISIBLE }?.also {
                     clubMemberAdapter.totalCount = totalCount
                 }
                 viewModel.clearLiveDataValue()
@@ -337,12 +352,12 @@ class AdultHomeFragment : BaseFragment() {
 
     private fun getCurrentAdapter(): RecyclerView.Adapter<*>? {
         return when (lastPosition) {
-            1 -> rv_first.adapter
-            2 -> rv_second.adapter
-            3 -> rv_third.adapter
-            4 -> rv_fourth.adapter
-            5 -> rv_fifth.adapter
-            else -> rv_sixth.adapter
+            1 -> rv_video.adapter
+            2 -> rv_follow.adapter
+            3 -> rv_clip.adapter
+            4 -> rv_picture.adapter
+            5 -> rv_text.adapter
+            else -> rv_club.adapter
         }
     }
 
@@ -471,7 +486,7 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         recyclerview_tab.adapter = tabAdapter
-        setupRecyclerByPosition(0)
+        setupRecyclerByType(CategoryType.HOME)
 
         refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
     }
@@ -518,63 +533,60 @@ class AdultHomeFragment : BaseFragment() {
         }
     }
 
-    private fun setupRecyclerByPosition(position: Int) {
+    enum class CategoryType {
+        HOME,
+        VIDEO,
+        FOLLOW,
+        CLIP,
+        PICTURE,
+        TEXT,
+        CLUB
+    }
+
+    private fun setupRecyclerByType(type: CategoryType) {
         cl_no_data.visibility = View.GONE
 
         rv_home.visibility = View.GONE
-        rv_first.visibility = View.GONE
-        rv_second.visibility = View.GONE
-        rv_third.visibility = View.GONE
-        rv_fourth.visibility = View.GONE
-        rv_fifth.visibility = View.GONE
-        rv_sixth.visibility = View.GONE
+        rv_video.visibility = View.GONE
+        rv_follow.visibility = View.GONE
+        rv_clip.visibility = View.GONE
+        rv_picture.visibility = View.GONE
+        rv_text.visibility = View.GONE
+        rv_club.visibility = View.GONE
 
         btn_ranking.visibility = View.GONE
         btn_filter.visibility = View.GONE
         cl_no_login.visibility = View.GONE
-//        cl_no_login.background = ContextCompat.getDrawable(
-//            requireContext(), R.color.adult_color_background
-//        )
 
-        when (position) {
-            0 -> {
+        when (type) {
+            CategoryType.HOME -> {
                 btn_ranking.visibility = View.VISIBLE
                 rv_home.visibility = View.VISIBLE
                 showNoLoginToggle(false)
                 takeIf { rv_home.adapter == null }?.also {
                     refresh.isRefreshing = true
-//                    rv_home.background = ContextCompat.getDrawable(
-//                        requireContext(), R.color.adult_color_background
-//                    )
-
                     rv_home.layoutManager = LinearLayoutManager(requireContext())
                     rv_home.adapter = homeAdapter
                 }
                 mainViewModel?.getHomeCategories()
             }
-            1 -> {
+            CategoryType.VIDEO -> {
                 btn_filter.visibility = View.VISIBLE
-                rv_first.visibility = View.VISIBLE
+                rv_video.visibility = View.VISIBLE
                 showNoLoginToggle(false)
-                takeIf { rv_first.adapter == null }?.also {
+                takeIf { rv_video.adapter == null }?.also {
                     refresh.isRefreshing = true
-//                    rv_first.background = ContextCompat.getDrawable(
-//                        requireContext(), R.color.adult_color_background
-//                    )
-                    rv_first.layoutManager = GridLayoutManager(requireContext(), 2)
-                    rv_first.adapter = videoListAdapter
+                    rv_video.layoutManager = GridLayoutManager(requireContext(), 2)
+                    rv_video.adapter = videoListAdapter
                 }
                 viewModel.getVideos(null, true)
             }
-            2 -> {
-                rv_second.visibility = View.VISIBLE
-                takeIf { rv_second.adapter == null }?.also {
+            CategoryType.FOLLOW -> {
+                rv_follow.visibility = View.VISIBLE
+                takeIf { rv_follow.adapter == null }?.also {
                     refresh.isRefreshing = true
-//                    rv_second.background = ContextCompat.getDrawable(
-//                        requireContext(), R.color.adult_color_background
-//                    )
-                    rv_second.layoutManager = LinearLayoutManager(requireContext())
-                    rv_second.adapter = followPostPagedAdapter
+                    rv_follow.layoutManager = LinearLayoutManager(requireContext())
+                    rv_follow.adapter = followPostPagedAdapter
                 } ?: run {
                     cl_no_data.visibility =
                         followPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
@@ -586,16 +598,13 @@ class AdultHomeFragment : BaseFragment() {
                 }
                 viewModel.getPostFollows()
             }
-            3 -> {
-                rv_third.visibility = View.VISIBLE
+            CategoryType.CLIP -> {
+                rv_clip.visibility = View.VISIBLE
                 showNoLoginToggle(false)
-                takeIf { rv_third.adapter == null }?.also {
+                takeIf { rv_clip.adapter == null }?.also {
                     refresh.isRefreshing = true
-//                    rv_third.background = ContextCompat.getDrawable(
-//                        requireContext(), R.color.adult_color_background
-//                    )
-                    rv_third.layoutManager = LinearLayoutManager(requireContext())
-                    rv_third.adapter = clipPostPagedAdapter
+                    rv_clip.layoutManager = LinearLayoutManager(requireContext())
+                    rv_clip.adapter = clipPostPagedAdapter
                 } ?: run {
                     cl_no_data.visibility =
                         clipPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
@@ -603,13 +612,13 @@ class AdultHomeFragment : BaseFragment() {
                 }
                 viewModel.getClipPosts()
             }
-            4 -> {
-                rv_fourth.visibility = View.VISIBLE
+            CategoryType.PICTURE -> {
+                rv_picture.visibility = View.VISIBLE
                 showNoLoginToggle(false)
-                takeIf { rv_fourth.adapter == null }?.also {
+                takeIf { rv_picture.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_fourth.layoutManager = LinearLayoutManager(requireContext())
-                    rv_fourth.adapter = picturePostPagedAdapter
+                    rv_picture.layoutManager = LinearLayoutManager(requireContext())
+                    rv_picture.adapter = picturePostPagedAdapter
                 } ?: run {
                     cl_no_data.visibility =
                         picturePostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
@@ -617,13 +626,13 @@ class AdultHomeFragment : BaseFragment() {
                 }
                 viewModel.getPicturePosts()
             }
-            5 -> {
-                rv_fifth.visibility = View.VISIBLE
+            CategoryType.TEXT -> {
+                rv_text.visibility = View.VISIBLE
                 showNoLoginToggle(false)
-                takeIf { rv_fifth.adapter == null }?.also {
+                takeIf { rv_text.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_fifth.layoutManager = LinearLayoutManager(requireContext())
-                    rv_fifth.adapter = textPostPagedAdapter
+                    rv_text.layoutManager = LinearLayoutManager(requireContext())
+                    rv_text.adapter = textPostPagedAdapter
                 } ?: run {
                     cl_no_data.visibility =
                         textPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
@@ -631,13 +640,13 @@ class AdultHomeFragment : BaseFragment() {
                 }
                 viewModel.getTextPosts()
             }
-            else -> {
-                rv_sixth.visibility = View.VISIBLE
+            CategoryType.CLUB -> {
+                rv_club.visibility = View.VISIBLE
                 showNoLoginToggle(false)
-                takeIf { rv_sixth.adapter == null }?.also {
+                takeIf { rv_club.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_sixth.layoutManager = MiMiLinearLayoutManager(requireContext())
-                    rv_sixth.adapter = clubMemberAdapter
+                    rv_club.layoutManager = MiMiLinearLayoutManager(requireContext())
+                    rv_club.adapter = clubMemberAdapter
                 } ?: run {
                     cl_no_data.visibility =
                         clubMemberAdapter.currentList.takeUnless { isClubListEmpty(it) }
@@ -686,7 +695,7 @@ class AdultHomeFragment : BaseFragment() {
         viewModel.lastPosition = index
         tabAdapter.setLastSelectedIndex(lastPosition)
         recyclerview_tab.scrollToPosition(index)
-        setupRecyclerByPosition(index)
+        setupRecyclerByType(categoryTypeList[index])
     }
 
     private val tabAdapter by lazy {

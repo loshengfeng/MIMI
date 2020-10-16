@@ -58,12 +58,12 @@ class ClipFragment : BaseFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        (rv_third.adapter as ClipAdapter).releasePlayer()
+        (rv_clip.adapter as ClipAdapter).releasePlayer()
     }
 
     override fun onPause() {
         super.onPause()
-        (rv_third.adapter as ClipAdapter).pausePlayer()
+        (rv_clip.adapter as ClipAdapter).pausePlayer()
     }
 
     override fun getLayoutId(): Int {
@@ -83,7 +83,7 @@ class ClipFragment : BaseFragment() {
                     val result = it.result
                     clipMap[result.first] = result.third
                     Timber.d("clipResult notifyItemChanged: ${result.second}")
-                    rv_third.adapter?.notifyItemChanged(result.second)
+                    rv_clip.adapter?.notifyItemChanged(result.second)
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -93,7 +93,7 @@ class ClipFragment : BaseFragment() {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Success -> rv_third.adapter?.notifyItemChanged(
+                is Success -> rv_clip.adapter?.notifyItemChanged(
                     it.result,
                     ClipAdapter.PAYLOAD_UPDATE_UI
                 )
@@ -105,7 +105,7 @@ class ClipFragment : BaseFragment() {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Success -> rv_third.adapter?.notifyItemChanged(
+                is Success -> rv_clip.adapter?.notifyItemChanged(
                     it.result,
                     ClipAdapter.PAYLOAD_UPDATE_UI
                 )
@@ -118,7 +118,7 @@ class ClipFragment : BaseFragment() {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
                 is Success -> {
-                    rv_third.adapter?.notifyItemChanged(
+                    rv_clip.adapter?.notifyItemChanged(
                         it.result,
                         ClipAdapter.PAYLOAD_UPDATE_UI
                     )
@@ -137,7 +137,7 @@ class ClipFragment : BaseFragment() {
 
         (arguments?.getSerializable(KEY_DATA) as ArrayList<MemberPostItem>).also { data ->
             memberPostItems.addAll(data)
-            rv_third.adapter = ClipAdapter(
+            rv_clip.adapter = ClipAdapter(
                 requireContext(),
                 memberPostItems,
                 clipMap,
@@ -151,18 +151,18 @@ class ClipFragment : BaseFragment() {
                     { item -> onCommentClick(item) },
                     { onBackClick() })
             )
-            (rv_third.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-            PagerSnapHelper().attachToRecyclerView(rv_third)
-            rv_third.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            (rv_clip.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+            PagerSnapHelper().attachToRecyclerView(rv_clip)
+            rv_clip.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)
                     when (newState) {
                         RecyclerView.SCROLL_STATE_IDLE -> {
                             val currentPos =
-                                (rv_third.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                                (rv_clip.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
                             Timber.d("SCROLL_STATE_IDLE position: $currentPos")
 
-                            val clipAdapter = rv_third.adapter as ClipAdapter
+                            val clipAdapter = rv_clip.adapter as ClipAdapter
                             val lastPosition = clipAdapter.getCurrentPos()
                             Timber.d("SCROLL_STATE_IDLE lastPosition: $lastPosition")
                             takeIf { currentPos >= 0 && currentPos != lastPosition }?.also {
@@ -175,7 +175,7 @@ class ClipFragment : BaseFragment() {
                     }
                 }
             })
-            rv_third.scrollToPosition(position)
+            rv_clip.scrollToPosition(position)
 
             (arguments?.getSerializable(KEY_SHOW_COMMENT) as Boolean).takeIf { it }?.also {
                 val item = data[position]
@@ -251,7 +251,7 @@ class ClipFragment : BaseFragment() {
                 val index = memberPostItems.indexOf(item)
                 if (index >= 0) {
                     memberPostItems[index].commentCount = count
-                    rv_third.adapter?.notifyItemChanged(index, ClipAdapter.PAYLOAD_UPDATE_UI)
+                    rv_clip.adapter?.notifyItemChanged(index, ClipAdapter.PAYLOAD_UPDATE_UI)
                 }
             }
         }
