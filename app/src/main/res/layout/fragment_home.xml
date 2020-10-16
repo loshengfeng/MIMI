@@ -185,6 +185,14 @@
                 android:layout_height="match_parent"
                 android:background="@color/normal_color_background"
                 android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/iv_invitevip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|bottom"
+                android:layout_margin="16dp"
+                android:src="@drawable/ico_invitevip" />
         </FrameLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
