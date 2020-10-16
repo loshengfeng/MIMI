@@ -18,10 +18,16 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils.isPasswordValid
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import java.util.*
+import kotlin.concurrent.schedule
 
 @ExperimentalCoroutinesApi
 class LoginViewModel : BaseViewModel() {
     var type = TYPE_REGISTER
+
+    var changePrefixCount = 0
+    var timer: Timer? = null
 
     val friendlyName = EditTextMutableLiveData()
     val registerAccount = EditTextMutableLiveData() //TODO need delete
@@ -152,6 +158,16 @@ class LoginViewModel : BaseViewModel() {
             TextUtils.isEmpty(confirmPw) -> app.getString(R.string.password_format_error_3)
             pwd != confirmPw -> app.getString(R.string.password_format_error_4)
             else -> ""
+        }
+    }
+
+    fun startTimer() {
+        timer = Timer()
+        timer?.schedule(10000) {
+            changePrefixCount = 0
+            timer?.cancel()
+            timer = null
+            Timber.d("timer cancel")
         }
     }
 }

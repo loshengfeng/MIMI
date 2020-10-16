@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import com.blankj.utilcode.util.ToastUtils
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.ExceptionResult
@@ -271,6 +272,40 @@ class LoginFragment : BaseFragment() {
                     tv_get_code.text = String.format(getString(R.string.send_code_count_down), p0 / 1000)
                 }
             }.start()
+        }
+
+        tv_call_prefix.setOnClickListener {
+            viewModel.changePrefixCount++
+            if (viewModel.changePrefixCount == 10) {
+                viewModel.changePrefixCount = 0
+
+                if (tv_call_prefix.text == getString(R.string.login_mobile_call_prefix_taiwan)) {
+                    tv_call_prefix.text = getString(R.string.login_mobile_call_prefix_china)
+                    ToastUtils.showShort("Change to +86")
+                } else {
+                    tv_call_prefix.text = getString(R.string.login_mobile_call_prefix_taiwan)
+                    ToastUtils.showShort("Change to +886")
+                }
+            }
+
+            if (viewModel.timer == null) viewModel.startTimer()
+        }
+
+        tv_login_call_prefix.setOnClickListener {
+            viewModel.changePrefixCount++
+            if (viewModel.changePrefixCount == 10) {
+                viewModel.changePrefixCount = 0
+
+                if (tv_login_call_prefix.text == getString(R.string.login_mobile_call_prefix_taiwan)) {
+                    tv_login_call_prefix.text = getString(R.string.login_mobile_call_prefix_china)
+                    ToastUtils.showShort("Change to +86")
+                } else {
+                    tv_login_call_prefix.text = getString(R.string.login_mobile_call_prefix_taiwan)
+                    ToastUtils.showShort("Change to +886")
+                }
+            }
+
+            if (viewModel.timer == null) viewModel.startTimer()
         }
     }
 

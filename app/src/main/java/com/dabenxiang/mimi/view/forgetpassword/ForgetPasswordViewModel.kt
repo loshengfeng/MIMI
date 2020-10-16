@@ -17,8 +17,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
+import java.util.*
+import kotlin.concurrent.schedule
 
 class ForgetPasswordViewModel : BaseViewModel() {
+
+    var changePrefixCount = 0
+    var timer: Timer? = null
+
     val account = EditTextMutableLiveData()
     val email = EditTextMutableLiveData()
     val mobile = EditTextMutableLiveData()
@@ -73,6 +80,16 @@ class ForgetPasswordViewModel : BaseViewModel() {
                 .collect {
                     _result.value = it
                 }
+        }
+    }
+
+    fun startTimer() {
+        timer = Timer()
+        timer?.schedule(10000) {
+            changePrefixCount = 0
+            timer?.cancel()
+            timer = null
+            Timber.d("timer cancel")
         }
     }
 }

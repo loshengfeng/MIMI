@@ -183,6 +183,7 @@
     <string name="username_or_password_incorrect">使用者名称或密码错误</string>
     <string name="send_code_count_down">%1$ds</string>
     <string name="login_mobile_call_prefix_china">+86</string>
+    <string name="login_mobile_call_prefix_taiwan">+886</string>
 
     <!-- Home -->
     <string name="follow_title">我的关注</string>

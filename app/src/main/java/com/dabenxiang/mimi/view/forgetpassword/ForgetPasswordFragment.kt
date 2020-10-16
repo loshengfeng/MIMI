@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import com.blankj.utilcode.util.ToastUtils
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ExceptionResult
@@ -14,6 +15,7 @@ import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
 import kotlinx.android.synthetic.main.fragment_forget_password.*
+import kotlinx.android.synthetic.main.item_login.*
 
 class ForgetPasswordFragment : BaseFragment() {
 
@@ -83,6 +85,23 @@ class ForgetPasswordFragment : BaseFragment() {
         }.also {
             btn_cancel.setOnClickListener(it)
             btn_send.setOnClickListener(it)
+        }
+
+        tv_call_prefix.setOnClickListener {
+            viewModel.changePrefixCount++
+            if (viewModel.changePrefixCount == 10) {
+                viewModel.changePrefixCount = 0
+
+                if (tv_call_prefix.text == getString(R.string.login_mobile_call_prefix_taiwan)) {
+                    tv_call_prefix.text = getString(R.string.login_mobile_call_prefix_china)
+                    ToastUtils.showShort("Change to +86")
+                } else {
+                    tv_call_prefix.text = getString(R.string.login_mobile_call_prefix_taiwan)
+                    ToastUtils.showShort("Change to +886")
+                }
+            }
+
+            if (viewModel.timer == null) viewModel.startTimer()
         }
     }
 
