@@ -231,6 +231,8 @@ class ApiRepository(private val apiService: ApiService) {
         return apiService.cancelFollowPost(userId)
     }
 
+    suspend fun validateMessage(body: ValidateMessageRequest) = apiService.validateMessage(body)
+
     /**********************************************************
      *
      *                  Members/Post

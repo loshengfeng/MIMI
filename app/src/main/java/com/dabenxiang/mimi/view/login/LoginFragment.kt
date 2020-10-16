@@ -189,6 +189,27 @@ class LoginFragment : BaseFragment() {
                 tv_get_code.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_black_1))
             }
         })
+
+        viewModel.validateMessageResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Empty -> {
+                    object : CountDownTimer( 60000, 1000) {
+                        override fun onFinish() {
+                            tv_get_code.isEnabled = true
+                            tv_get_code.text = getString(R.string.login_get_code)
+                        }
+
+                        override fun onTick(p0: Long) {
+                            tv_get_code.isEnabled = false
+                            tv_get_code.text = String.format(getString(R.string.send_code_count_down), p0 / 1000)
+                        }
+                    }.start()
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -261,17 +282,7 @@ class LoginFragment : BaseFragment() {
         }
 
         tv_get_code.setOnClickListener {
-            object : CountDownTimer( 60000, 1000) {
-                override fun onFinish() {
-                    tv_get_code.isEnabled = true
-                    tv_get_code.text = getString(R.string.login_get_code)
-                }
-
-                override fun onTick(p0: Long) {
-                    tv_get_code.isEnabled = false
-                    tv_get_code.text = String.format(getString(R.string.send_code_count_down), p0 / 1000)
-                }
-            }.start()
+            viewModel.callValidateMessage(edit_mobile.text.toString())
         }
 
         tv_call_prefix.setOnClickListener {

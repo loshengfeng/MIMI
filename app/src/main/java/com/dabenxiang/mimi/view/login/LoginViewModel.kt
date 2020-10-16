@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.SingUpRequest
+import com.dabenxiang.mimi.model.api.vo.ValidateMessageRequest
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
@@ -15,9 +16,11 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils.isAccountValid
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.isEmailValid
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.isFriendlyNameValid
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.isPasswordValid
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import timber.log.Timber
 import java.util.*
 import kotlin.concurrent.schedule
@@ -69,6 +72,9 @@ class LoginViewModel : BaseViewModel() {
 
     private val _loginResult = MutableLiveData<ApiResult<Nothing>>()
     val loginResult: LiveData<ApiResult<Nothing>> = _loginResult
+
+    private val _validateMessageResult = MutableLiveData<ApiResult<Nothing>>()
+    val validateMessageResult: LiveData<ApiResult<Nothing>> = _validateMessageResult
 
     fun doRegisterValidateAndSubmit(callPrefix: String) {
         _friendlyNameError.value = isValidateFriendlyName(friendlyName.value ?: "")
@@ -158,6 +164,23 @@ class LoginViewModel : BaseViewModel() {
             TextUtils.isEmpty(confirmPw) -> app.getString(R.string.password_format_error_3)
             pwd != confirmPw -> app.getString(R.string.password_format_error_4)
             else -> ""
+        }
+    }
+
+    fun callValidateMessage(mobile: String) {
+        viewModelScope.launch {
+            flow {
+                val body = ValidateMessageRequest(mobile)
+
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.validateMessage(body)
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(null))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _validateMessageResult.value = it }
         }
     }
 

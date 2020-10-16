@@ -157,6 +157,11 @@ interface ApiService {
         @Path("userId") userId: Long
     ): Response<Void>
 
+    @POST("/v1/Members/ValidateMessage")
+    suspend fun validateMessage(
+        @Body body: ValidateMessageRequest
+    ): Response<Void>
+
     /**********************************************************
      *
      *                  Members/Post
