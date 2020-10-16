@@ -21,6 +21,8 @@
     <color name="normal_color_card_background">@color/color_black_1</color>
     <color name="item_color_card_background">@color/color_black_4</color>
     <color name="item_color_club_card_background">@color/color_white_2</color>
+    <color name="color_invite_vip_copy_bg">#32597ef7</color>
+    <color name="color_invite_vip_text">#597ef7</color>
 
     <color name="adult_color_card_background">@color/color_black_1_20</color>
 
@@ -28,6 +30,7 @@
     <color name="color_white_1_05">#0DFFFFFF</color>
     <color name="color_white_1_10">#1Affffff</color>
     <color name="color_white_1_30">#4dffffff</color>
+    <color name="color_white_1_40">#64000000</color>
     <color name="color_white_1_50">#80ffffff</color>
     <color name="color_white_1_60">#99FFFFFF</color>
     <color name="color_white_1_65625">#a8ffffff</color>
