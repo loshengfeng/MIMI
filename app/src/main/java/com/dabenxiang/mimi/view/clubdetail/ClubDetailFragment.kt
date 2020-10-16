@@ -79,7 +79,7 @@ class ClubDetailFragment : BaseFragment() {
     }
 
     private fun setUpUI() {
-        useAdultTheme(true)
+        useAdultTheme(false)
         tv_title.text = memberClubItem.title
         tv_desc.text = memberClubItem.description
         tv_follow_count.text = memberClubItem.followerCount.toString()
@@ -153,7 +153,7 @@ class ClubDetailFragment : BaseFragment() {
             tv_follow.background = ContextCompat.getDrawable(
                 requireContext(), R.drawable.bg_white_1_stroke_radius_16
             )
-            tv_follow.setTextColor(requireContext().getColor(R.color.color_white_1))
+            tv_follow.setTextColor(requireContext().getColor(R.color.color_black_1_60))
         } else {
             tv_follow.text = requireContext().getString(R.string.follow)
             tv_follow.background = ContextCompat.getDrawable(
