@@ -22,5 +22,17 @@ data class MeItem(
     val isEmailConfirmed: Boolean?,
 
     @SerializedName("avatarAttachmentId")
-    val avatarAttachmentId: Long?
+    val avatarAttachmentId: Boolean?,
+
+    @SerializedName("IsSubscribed")
+    val IsSubscribed: Boolean?,
+
+    @SerializedName("ExpiryDate")
+    val ExpiryDate: Long?,
+
+    @SerializedName("VideoCount")
+    val VideoCount: Long?,
+
+    @SerializedName("VideoOnDemandCount")
+    val VideoOnDemandCount: Long?
 )
