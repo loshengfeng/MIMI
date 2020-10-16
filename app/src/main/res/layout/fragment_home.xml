@@ -186,13 +186,30 @@
                 android:background="@color/normal_color_background"
                 android:visibility="gone" />
 
-            <ImageView
-                android:id="@+id/iv_invitevip"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_invitevip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|bottom"
                 android:layout_margin="16dp"
-                android:src="@drawable/ico_invitevip" />
+                android:background="@color/color_white_1_10">
+
+                <ImageView
+                    android:id="@+id/iv_invitevip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ico_invitevip"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <ImageView
+                    android:id="@+id/iv_invitevip_close"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/btn_close_white_n"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </FrameLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
