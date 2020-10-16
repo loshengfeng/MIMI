@@ -21,6 +21,7 @@ import retrofit2.HttpException
 class ForgetPasswordViewModel : BaseViewModel() {
     val account = EditTextMutableLiveData()
     val email = EditTextMutableLiveData()
+    val mobile = EditTextMutableLiveData()
 
     private val _accountError = MutableLiveData<String>()
     val accountError: LiveData<String> = _accountError
@@ -31,7 +32,7 @@ class ForgetPasswordViewModel : BaseViewModel() {
     private val _result = MutableLiveData<ApiResult<Nothing>>()
     val result: LiveData<ApiResult<Nothing>> = _result
 
-    fun doValidateAndSubmit() {
+    fun doValidateAndSubmit(callPrefix: String) {
         _accountError.value = isValidateAccount(account.value ?: "")
         _emailError.value = isValidateEmail(email.value ?: "")
 

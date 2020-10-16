@@ -24,13 +24,16 @@ class LoginViewModel : BaseViewModel() {
     var type = TYPE_REGISTER
 
     val friendlyName = EditTextMutableLiveData()
-    val registerAccount = EditTextMutableLiveData()
-    val email = EditTextMutableLiveData()
+    val registerAccount = EditTextMutableLiveData() //TODO need delete
+    val email = EditTextMutableLiveData() //TODO need delete
     val registerPw = EditTextMutableLiveData()
     val confirmPw = EditTextMutableLiveData()
 
     val loginAccount = EditTextMutableLiveData()
     val loginPw = EditTextMutableLiveData()
+    val mobile = EditTextMutableLiveData()
+    val verificationCode = EditTextMutableLiveData()
+    val inviteCode = EditTextMutableLiveData()
 
     // Register
     private val _friendlyNameError = MutableLiveData<String>()
@@ -61,7 +64,7 @@ class LoginViewModel : BaseViewModel() {
     private val _loginResult = MutableLiveData<ApiResult<Nothing>>()
     val loginResult: LiveData<ApiResult<Nothing>> = _loginResult
 
-    fun doRegisterValidateAndSubmit() {
+    fun doRegisterValidateAndSubmit(callPrefix: String) {
         _friendlyNameError.value = isValidateFriendlyName(friendlyName.value ?: "")
         _emailError.value = isValidateEmail(email.value ?: "")
         _registerAccountError.value = isValidateAccount(registerAccount.value ?: "")
@@ -92,7 +95,7 @@ class LoginViewModel : BaseViewModel() {
         }
     }
 
-    fun doLoginValidateAndSubmit() {
+    fun doLoginValidateAndSubmit(callPrefix: String) {
         _loginAccountError.value = isValidateAccount(loginAccount.value ?: "")
         _loginPasswordError.value = isValidatePassword(loginPw.value ?: "")
 

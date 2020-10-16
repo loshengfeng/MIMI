@@ -33,10 +33,8 @@ class ForgetPasswordFragment : BaseFragment() {
     override fun setupObservers() {
         viewModel.accountError.observe(viewLifecycleOwner, Observer {
             if (it == "") {
-                edit_account.setBackgroundResource(R.drawable.edit_text_rectangle)
                 tv_account_error.visibility = View.INVISIBLE
             } else {
-                edit_account.setBackgroundResource(R.drawable.edit_text_error_rectangle)
                 tv_account_error.text = it
                 tv_account_error.visibility = View.VISIBLE
             }
@@ -80,7 +78,7 @@ class ForgetPasswordFragment : BaseFragment() {
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.btn_cancel -> navigateTo(NavigateItem.Up)
-                R.id.btn_send -> viewModel.doValidateAndSubmit()
+                R.id.btn_send -> viewModel.doValidateAndSubmit(tv_call_prefix.text.toString())
             }
         }.also {
             btn_cancel.setOnClickListener(it)
@@ -90,8 +88,8 @@ class ForgetPasswordFragment : BaseFragment() {
 
     override fun initSettings() {
         super.initSettings()
-        viewModel.account.bindingEditText = edit_account
         viewModel.email.bindingEditText = edit_email
+        viewModel.mobile.bindingEditText = edit_mobile
     }
 
     override fun handleHttpError(errorHandler: ExceptionResult.HttpError) {
