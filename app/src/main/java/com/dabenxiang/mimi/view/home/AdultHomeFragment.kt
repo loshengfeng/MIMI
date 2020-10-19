@@ -24,6 +24,7 @@ import com.dabenxiang.mimi.model.api.vo.CategoriesItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
+import com.dabenxiang.mimi.model.enums.CategoryType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.*
@@ -117,16 +118,14 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         useAdultTheme(false)
-        checkPageState()
-        getCurrentAdapter()?.notifyDataSetChanged()
     }
 
     override fun setupObservers() {
     }
 
     private fun checkPageState() {
-        when (lastPosition) {
-            2 -> {
+        when (categoryTypeList[lastPosition]) {
+            CategoryType.FOLLOW -> {
                 if (accountManager.isLogin()) {
                     Timber.i("isLogin")
                     showNoLoginToggle(false)
@@ -180,6 +179,8 @@ class AdultHomeFragment : BaseFragment() {
                         tabAdapter.submitList(list, lastPosition)
                         setupHomeData(mainViewModel?.adult)
                     }
+                    checkPageState()
+                    getCurrentAdapter()?.notifyDataSetChanged()
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -325,8 +326,8 @@ class AdultHomeFragment : BaseFragment() {
         })
 
         mainViewModel?.deletePostResult?.observe(this, Observer {
-            when (lastPosition) {
-                2, 3, 4, 5 -> {
+            when (categoryTypeList[lastPosition]) {
+                CategoryType.FOLLOW, CategoryType.CLIP, CategoryType.PICTURE, CategoryType.TEXT -> {
                     when (it) {
                         is Success -> {
                             val adapter = getCurrentAdapter() as MemberPostPagedAdapter
@@ -340,8 +341,8 @@ class AdultHomeFragment : BaseFragment() {
         })
 
         viewModel.cleanRemovedPosList.observe(this, Observer {
-            when (lastPosition) {
-                2, 3, 4, 5 -> {
+            when (categoryTypeList[lastPosition]) {
+                CategoryType.FOLLOW, CategoryType.CLIP, CategoryType.PICTURE, CategoryType.TEXT -> {
                     val adapter = getCurrentAdapter() as MemberPostPagedAdapter
                     adapter.removedPosList.clear()
                 }
@@ -351,12 +352,12 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private fun getCurrentAdapter(): RecyclerView.Adapter<*>? {
-        return when (lastPosition) {
-            1 -> rv_video.adapter
-            2 -> rv_follow.adapter
-            3 -> rv_clip.adapter
-            4 -> rv_picture.adapter
-            5 -> rv_text.adapter
+        return when (categoryTypeList[lastPosition]) {
+            CategoryType.VIDEO -> rv_video.adapter
+            CategoryType.FOLLOW -> rv_follow.adapter
+            CategoryType.CLIP -> rv_clip.adapter
+            CategoryType.PICTURE -> rv_picture.adapter
+            CategoryType.TEXT -> rv_text.adapter
             else -> rv_club.adapter
         }
     }
@@ -396,13 +397,13 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         iv_bg_search.setOnClickListener {
-            val item: SearchPostItem = when (lastPosition) {
-                0 -> SearchPostItem(type = PostType.HYBRID)
-                1 -> SearchPostItem(type = PostType.VIDEO_ON_DEMAND)
-                2 -> SearchPostItem(isPostFollow = true)
-                3 -> SearchPostItem(type = PostType.VIDEO)
-                4 -> SearchPostItem(type = PostType.IMAGE)
-                5 -> SearchPostItem(type = PostType.TEXT)
+            val item: SearchPostItem = when (categoryTypeList[lastPosition]) {
+                CategoryType.HOME -> SearchPostItem(type = PostType.HYBRID)
+                CategoryType.VIDEO -> SearchPostItem(type = PostType.VIDEO_ON_DEMAND)
+                CategoryType.FOLLOW -> SearchPostItem(isPostFollow = true)
+                CategoryType.CLIP -> SearchPostItem(type = PostType.VIDEO)
+                CategoryType.PICTURE -> SearchPostItem(type = PostType.IMAGE)
+                CategoryType.TEXT -> SearchPostItem(type = PostType.TEXT)
                 else -> SearchPostItem(isClub = true)
             }
             val bundle = SearchPostFragment.createBundle(item)
@@ -473,7 +474,6 @@ class AdultHomeFragment : BaseFragment() {
 
         btn_filter.setOnClickListener {
             val category = mainViewModel?.adult?.categories?.get(0)
-            Timber.d("Abbie: category: $category")
             category?.also {
                 val bundle = CategoriesFragment.createBundle(it.name, it.name, category)
                 navigateTo(
@@ -531,16 +531,6 @@ class AdultHomeFragment : BaseFragment() {
                 LoginRequestDialog::class.java.simpleName
             )
         }
-    }
-
-    enum class CategoryType {
-        HOME,
-        VIDEO,
-        FOLLOW,
-        CLIP,
-        PICTURE,
-        TEXT,
-        CLUB
     }
 
     private fun setupRecyclerByType(type: CategoryType) {
@@ -658,14 +648,15 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private fun getData(position: Int) {
-        when (position) {
-            0 -> mainViewModel?.getHomeCategories()
-            1 -> viewModel.getVideos(null, true)
-            2 -> viewModel.getPostFollows()
-            3 -> viewModel.getClipPosts()
-            4 -> viewModel.getPicturePosts()
-            5 -> viewModel.getTextPosts()
-            6 -> viewModel.getClubs()
+        if(categoryTypeList.isEmpty()) return
+        when (categoryTypeList[position]) {
+            CategoryType.HOME -> mainViewModel?.getHomeCategories()
+            CategoryType.VIDEO -> viewModel.getVideos(null, true)
+            CategoryType.FOLLOW -> viewModel.getPostFollows()
+            CategoryType.CLIP -> viewModel.getClipPosts()
+            CategoryType.PICTURE -> viewModel.getPicturePosts()
+            CategoryType.TEXT -> viewModel.getTextPosts()
+            CategoryType.CLUB -> viewModel.getClubs()
         }
     }
 
@@ -677,13 +668,13 @@ class AdultHomeFragment : BaseFragment() {
 
         if (root?.categories != null) {
             for (item in root.categories) {
-                if (item.name == "关注" || item.name == "短文") continue
+                if (item.name == getString(R.string.home_tab_follow) || item.name == getString(R.string.home_tab_text)) continue
                 templateList.add(HomeTemplate.Header(null, item.name, item.name))
                 when (item.name) {
-                    "蜜蜜影视" -> templateList.add(HomeTemplate.Statistics(item.name, null, true))
-                    "短视频" -> templateList.add(HomeTemplate.Clip())
-                    "图片" -> templateList.add(HomeTemplate.Picture())
-                    "圈子" -> templateList.add(HomeTemplate.Club())
+                    getString(R.string.home_tab_video) -> templateList.add(HomeTemplate.Statistics(item.name, null, true))
+                    getString(R.string.home_tab_clip) -> templateList.add(HomeTemplate.Clip())
+                    getString(R.string.home_tab_picture) -> templateList.add(HomeTemplate.Picture())
+                    getString(R.string.home_tab_club) -> templateList.add(HomeTemplate.Club())
                 }
             }
         }
@@ -866,8 +857,8 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onChipClick(type: PostType, tag: String) {
-            val item = when (lastPosition) {
-                2 -> SearchPostItem(type, tag, true)
+            val item = when (categoryTypeList[lastPosition]) {
+                CategoryType.FOLLOW -> SearchPostItem(type, tag, true)
                 else -> SearchPostItem(type, tag)
             }
 
@@ -892,14 +883,18 @@ class AdultHomeFragment : BaseFragment() {
 
     private val adapterListener = object : HomeAdapter.EventListener {
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
-            val position = when (item.title) {
-                "蜜蜜影视" -> 1
-                "短视频" -> 3
-                "图片" -> 4
-                "圈子" -> 6
-                else -> 1
+            val type = when (item.title) {
+                getString(R.string.home_tab_video) -> CategoryType.VIDEO
+                getString(R.string.home_tab_follow) -> CategoryType.FOLLOW
+                getString(R.string.home_tab_clip) -> CategoryType.CLIP
+                getString(R.string.home_tab_picture) -> CategoryType.PICTURE
+                getString(R.string.home_tab_text) -> CategoryType.TEXT
+                getString(R.string.home_tab_club) -> CategoryType.CLUB
+                else -> null
             }
-            setTab(position)
+            type?.let{
+                setTab(categoryTypeList.indexOf(it))
+            }
         }
 
         override fun onVideoClick(view: View, item: PlayerItem) {

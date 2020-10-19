@@ -437,7 +437,7 @@ class FavoriteFragment : BaseFragment() {
 
         override fun onChipClick(text: String, type: Int?) {
             // 點擊標籤後進入 Search page
-            useAdultTheme(lastPrimaryIndex == TYPE_ADULT)
+            useAdultTheme(false)
             if (lastPrimaryIndex == TYPE_MIMI) {
                 val bundle = SearchVideoFragment.createBundle(tag = text)
                 navigateTo(
@@ -500,7 +500,7 @@ class FavoriteFragment : BaseFragment() {
                 getString(R.string.unexpected_error)
             )
         } else {
-            useAdultTheme(true)
+            useAdultTheme(false)
             val bundle = ClipFragment.createBundle(viewModel.currentPostList, position, false)
             navigateTo(
                 NavigateItem.Destination(

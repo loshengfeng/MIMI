@@ -68,7 +68,7 @@ class TextDetailFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        useAdultTheme(true)
+        useAdultTheme(false)
 
         memberPostItem =
             arguments?.getSerializable(PictureDetailFragment.KEY_DATA) as MemberPostItem
