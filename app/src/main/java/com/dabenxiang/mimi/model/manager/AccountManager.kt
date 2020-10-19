@@ -143,10 +143,10 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
                         avatarAttachmentId = meItem?.avatarAttachmentId ?: 0,
                         isEmailConfirmed = meItem?.isEmailConfirmed ?: false,
                         isSubscribed = meItem?.isSubscribed ?: false,
-                        expiryDate = meItem?.expiryDate ?: "",
+                        expiryDate = meItem?.expiryDate ?: Date(),
                         videoCount = meItem?.videoCount ?: 0,
                         videoOnDemandCount = meItem?.videoOnDemandCount ?: 0,
-                        creationDate = meItem?.creationDate ?: ""
+                        creationDate = meItem?.creationDate ?: Date()
                     )
                 )
             }

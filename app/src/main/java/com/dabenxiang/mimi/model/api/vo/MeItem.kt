@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.model.api.vo
 
 import com.google.gson.annotations.SerializedName
+import java.util.*
 
 data class MeItem(
     @SerializedName("id")
@@ -28,7 +29,7 @@ data class MeItem(
     val isSubscribed: Boolean,
 
     @SerializedName("expiryDate")
-    val expiryDate: String?,
+    val expiryDate: Date = Date(),
 
     @SerializedName("videoCount")
     val videoCount: Int?,
@@ -37,5 +38,5 @@ data class MeItem(
     val videoOnDemandCount: Int?,
 
     @SerializedName("creationDate")
-    val creationDate: String?,
+    val creationDate: Date = Date(),
 )
