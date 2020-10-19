@@ -8,5 +8,10 @@ data class ProfileItem(
     var avatarAttachmentId: Long = 0,
     var friendlyName: String = "",
     var point: Int = 0,
-    var isEmailConfirmed: Boolean = false
+    var isEmailConfirmed: Boolean = false,
+    var isSubscribed: Boolean = false,
+    var expiryDate: String= "",
+    var videoCount: Int = 0,
+    var videoOnDemandCount: Int = 0,
+    var creationDate:String= ""
 )

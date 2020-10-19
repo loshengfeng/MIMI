@@ -10,7 +10,7 @@ import android.os.Bundle
 import android.text.Html
 import android.text.TextUtils
 import android.view.*
-import android.view.View.VISIBLE
+import android.view.View.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import androidx.activity.viewModels
@@ -56,6 +56,7 @@ import kotlinx.android.synthetic.main.head_no_comment.view.*
 import kotlinx.android.synthetic.main.head_source.view.*
 import kotlinx.android.synthetic.main.head_video_info.view.*
 import kotlinx.android.synthetic.main.item_ad.view.*
+import kotlinx.android.synthetic.main.recharge_reminder.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -369,7 +370,7 @@ class PlayerActivity : BaseActivity() {
 
         viewModel.isLoadingActive.observe(this, Observer {
             if (it) {
-                progress_video.visibility = View.VISIBLE
+                progress_video.visibility = VISIBLE
             } else {
                 progress_video.visibility = View.GONE
             }
@@ -378,7 +379,7 @@ class PlayerActivity : BaseActivity() {
         viewModel.isPlaying.observe(this, Observer {
             iv_player.visibility = when (it) {
                 true -> View.GONE
-                false -> View.VISIBLE
+                false -> VISIBLE
             }
         })
 
@@ -397,7 +398,8 @@ class PlayerActivity : BaseActivity() {
             Timber.i("episodePosition =$it")
             if (it >= 0) {
                 episodeAdapter.setLastSelectedIndex(it)
-                viewModel.checkConsumeResult()
+                viewModel.getMe()
+//                viewModel.checkConsumeResult()
             }
             scrollToBottom()
         })
@@ -516,7 +518,7 @@ class PlayerActivity : BaseActivity() {
 
                     if (result.commentCount == 0L) {
                         Timber.i(" apiVideoInfo result.commentCount == 0L")
-                        headNoComment.title_no_comment.visibility = View.VISIBLE
+                        headNoComment.title_no_comment.visibility = VISIBLE
                         headNoComment.title_no_comment.setTextColor(titleColor)
                         val bgColor = getColor(R.color.color_black_1_10)
                         headNoComment.title_no_comment.setBtnSolidColor(
@@ -592,18 +594,20 @@ class PlayerActivity : BaseActivity() {
         })
 
         viewModel.consumeResult.observe(this, Observer {
+            Timber.i("consumeResult isDeducted:${viewModel.isDeducted}")
+            Timber.i("consumeResult VideoConsumeResult:$it")
             consumeDialog?.dismiss()
             when (it) {
+                VideoConsumeResult.PAID_YET,
                 VideoConsumeResult.PAID -> {
+                    showRechargeReminder(false)
                     viewModel.getStreamUrl(obtainIsAdult())
                 }
-                VideoConsumeResult.PAID_YET -> {
-                    consumeDialog = showCostPointDialog()
-                }
                 VideoConsumeResult.POINT_NOT_ENOUGH -> {
-                    consumeDialog = showPointNotEnoughDialog()
+                    showRechargeReminder(true)
                 }
             }
+
             scrollToBottom()
         })
 
@@ -823,6 +827,16 @@ class PlayerActivity : BaseActivity() {
             }
         })
 
+        viewModel.meItem.observe(this, {
+            when (it) {
+                is Success -> {
+                    viewModel.checkConsumeResult(it.result)
+                }
+
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
         //Detect key keyboard shown/hide
         this addKeyboardToggleListener { shown ->
             isKeyboardShown = shown
@@ -853,7 +867,7 @@ class PlayerActivity : BaseActivity() {
         iv_player.setOnClickListener {
             viewModel.checkStatus {
                 Timber.d("iv_player confirmed")
-                if (it.visibility == View.VISIBLE) {
+                if (it.visibility == VISIBLE) {
                     player?.playWhenReady = true
                     viewModel.setPlaying(true)
                     exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
@@ -864,6 +878,19 @@ class PlayerActivity : BaseActivity() {
             Timber.i("RecyclerView=setOnClickListener")
         }
 
+        btn_vip.setOnClickListener {
+            Timber.i("btn_vip Click")
+        }
+
+        btn_promote.setOnClickListener {
+            Timber.i("btn_promote Click")
+        }
+    }
+
+    private fun showRechargeReminder(isShow:Boolean) {
+        Timber.i("showRechargeReminder")
+        player_view.visibility = if(isShow)  INVISIBLE else VISIBLE
+        recharge_reminder.visibility = if(isShow) VISIBLE else GONE
     }
 
     private fun showMoreDialog(
@@ -940,12 +967,12 @@ class PlayerActivity : BaseActivity() {
         Timber.i("commentEditorToggle enable:$enable")
         when (enable) {
             true -> {
-                bottom_func_input.visibility = View.VISIBLE
+                bottom_func_input.visibility = VISIBLE
                 bottom_func_bar.visibility = View.GONE
             }
             else -> {
                 bottom_func_input.visibility = View.GONE
-                bottom_func_bar.visibility = View.VISIBLE
+                bottom_func_bar.visibility = VISIBLE
             }
         }
 
@@ -959,7 +986,7 @@ class PlayerActivity : BaseActivity() {
                     tv_replay_name.visibility = View.GONE
                 } else {
                     tv_replay_name.text = "@$currentreplyName"
-                    tv_replay_name.visibility = View.VISIBLE
+                    tv_replay_name.visibility = VISIBLE
                 }
             }
 
@@ -1138,7 +1165,7 @@ class PlayerActivity : BaseActivity() {
                     isMove = if (abs(dx) >= SWIPE_DISTANCE_UNIT || abs(dy) >= SWIPE_DISTANCE_UNIT) {
                         if (abs(dx) > abs(dy)) {
                             if (viewModel.isPlaying.value == true) {
-                                tv_forward_backward.visibility = View.VISIBLE
+                                tv_forward_backward.visibility = VISIBLE
                                 tv_sound_tune.visibility = View.GONE
                                 if (dx > 0)
                                     viewModel.setFastForwardTime((dx.toInt() / SWIPE_DISTANCE_UNIT) * JUMP_TIME)
@@ -1147,7 +1174,7 @@ class PlayerActivity : BaseActivity() {
                             }
                         } else {
                             tv_forward_backward.visibility = View.GONE
-                            tv_sound_tune.visibility = View.VISIBLE
+                            tv_sound_tune.visibility = VISIBLE
                             if (abs(dy) > SWIPE_SOUND_LEAST) {
                                 if (dy > 0)
                                     viewModel.setSoundLevel(player!!.volume - 0.1f)
@@ -1283,7 +1310,7 @@ class PlayerActivity : BaseActivity() {
                 ExoPlayer.STATE_BUFFERING -> "ExoPlayer.STATE_BUFFERING"
                 ExoPlayer.STATE_READY -> {
                     viewModel.activateLoading(false)
-                    player_view.visibility = View.VISIBLE
+                    player_view.visibility = VISIBLE
                     "ExoPlayer.STATE_READY"
                 }
 
@@ -1672,8 +1699,8 @@ class PlayerActivity : BaseActivity() {
             bottom_func_bar.visibility = View.GONE
             bottom_func_input.visibility = View.GONE
         } else {
-            recycler_info?.visibility = View.VISIBLE
-            bottom_func_bar?.visibility = View.VISIBLE
+            recycler_info?.visibility = VISIBLE
+            bottom_func_bar?.visibility = VISIBLE
             bottom_func_input.visibility = View.GONE
         }
     }

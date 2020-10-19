@@ -53,6 +53,8 @@ class ClipAdapter(
                 }
             }
         const val PAYLOAD_UPDATE_UI = 0
+
+        var playingItem:MemberPostItem ?= null
     }
 
     private var currentViewHolder: ClipViewHolder? = null
@@ -130,37 +132,42 @@ class ClipAdapter(
                 holder.progress.visibility = View.GONE
             }
 
-            holder.ibReplay.setOnClickListener {
-                exoPlayer?.also { player ->
-                    player.seekTo(0)
-                    player.playWhenReady = true
+            if(item.deducted ){
+                holder.ibReplay.setOnClickListener {
+                    exoPlayer?.also { player ->
+                        player.seekTo(0)
+                        player.playWhenReady = true
+                    }
+                    it.visibility = View.GONE
                 }
-                it.visibility = View.GONE
-            }
 
-            holder.playerView.setOnClickListener {
-                takeIf { exoPlayer?.isPlaying ?: false }?.also {
-                    exoPlayer?.playWhenReady = false
-                    holder.ibPlay.visibility = View.VISIBLE
-                } ?: run {
-                    exoPlayer?.playWhenReady = true
-                    holder.ibPlay.visibility = View.GONE
+                holder.playerView.setOnClickListener {
+                    takeIf { exoPlayer?.isPlaying ?: false }?.also {
+                        exoPlayer?.playWhenReady = false
+                        holder.ibPlay.visibility = View.VISIBLE
+                    } ?: run {
+                        exoPlayer?.playWhenReady = true
+                        holder.ibPlay.visibility = View.GONE
+                    }
                 }
-            }
 
-            holder.ibPlay.setOnClickListener {
-                takeUnless { exoPlayer?.isPlaying ?: true }?.also {
-                    exoPlayer?.playWhenReady = true
-                    holder.ibPlay.visibility = View.GONE
+                holder.ibPlay.setOnClickListener {
+                    takeUnless { exoPlayer?.isPlaying ?: true }?.also {
+                        exoPlayer?.playWhenReady = true
+                        holder.ibPlay.visibility = View.GONE
+                    }
                 }
-            }
 
-            processClip(
-                holder.playerView,
-                contentItem?.shortVideo?.id.toString(),
-                contentItem?.shortVideo?.url.toString(),
-                position
-            )
+                processClip(
+                    holder.playerView,
+                    contentItem?.shortVideo?.id.toString(),
+                    contentItem?.shortVideo?.url.toString(),
+                    position
+                )
+            }else{
+                holder.progress.visibility = View.GONE
+                clipFuncItem.getPostDetail(item, position)
+            }
         }
     }
 
@@ -170,7 +177,7 @@ class ClipAdapter(
     private fun processClip(playerView: PlayerView, id: String, url: String, position: Int) {
         Timber.d("processClip position:$position")
         val item = memberPostItems[position]
-
+        playingItem = item
         var contentItem: MediaContentItem? = null
         try {
             contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
@@ -281,6 +288,10 @@ class ClipAdapter(
                     //showErrorDialog("UNKNOWN")
                 }
             }
+            playingItem?.let {
+                clipFuncItem.onPlayerError(it, error.message?: "error: UNKNOWN")
+            }
+
         }
     }
 
