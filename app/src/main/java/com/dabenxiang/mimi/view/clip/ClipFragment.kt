@@ -126,6 +126,20 @@ class ClipFragment : BaseFragment() {
                 is Error -> onApiError(it.throwable)
             }
         })
+
+        viewModel.postDetailResult.observe(viewLifecycleOwner, {
+            when (it) {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> {
+                    rv_third.adapter?.notifyItemChanged(
+                        it.result,
+                        ClipAdapter.PAYLOAD_UPDATE_UI
+                    )
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -149,7 +163,9 @@ class ClipFragment : BaseFragment() {
                     { item, pos, isFavorite -> onFavoriteClick(item, pos, isFavorite) },
                     { item, pos, isLike -> onLikeClick(item, pos, isLike) },
                     { item -> onCommentClick(item) },
-                    { onBackClick() })
+                    { onBackClick() },
+                    { item, pos -> viewModel.getPostDetail(item, pos) },
+                    { item, error -> viewModel.sendPlayerError(item, error) })
             )
             (rv_third.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             PagerSnapHelper().attachToRecyclerView(rv_third)

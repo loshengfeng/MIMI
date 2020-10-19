@@ -141,7 +141,12 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
                         password = password,
                         friendlyName = meItem?.friendlyName ?: "",
                         avatarAttachmentId = meItem?.avatarAttachmentId ?: 0,
-                        isEmailConfirmed = meItem?.isEmailConfirmed ?: false
+                        isEmailConfirmed = meItem?.isEmailConfirmed ?: false,
+                        isSubscribed = meItem?.isSubscribed ?: false,
+                        expiryDate = meItem?.expiryDate ?: "",
+                        videoCount = meItem?.videoCount ?: 0,
+                        videoOnDemandCount = meItem?.videoOnDemandCount ?: 0,
+                        creationDate = meItem?.creationDate ?: ""
                     )
                 )
             }

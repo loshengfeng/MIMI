@@ -470,7 +470,8 @@ class PlayerActivity : BaseActivity() {
             Timber.i("episodePosition =$it")
             if (it >= 0) {
                 episodeAdapter.setLastSelectedIndex(it)
-                viewModel.checkConsumeResult()
+                viewModel.getMe()
+//                viewModel.checkConsumeResult()
             }
             scrollToBottom()
         })
@@ -680,6 +681,8 @@ class PlayerActivity : BaseActivity() {
         })
 
         viewModel.consumeResult.observe(this, Observer {
+            Timber.i("consumeResult isDeducted:${viewModel.isDeducted}")
+            Timber.i("consumeResult VideoConsumeResult:$it")
             consumeDialog?.dismiss()
             when (it) {
                 VideoConsumeResult.PAID_YET,
@@ -687,11 +690,7 @@ class PlayerActivity : BaseActivity() {
                     showRechargeReminder(false)
                     viewModel.getStreamUrl(obtainIsAdult())
                 }
-//                VideoConsumeResult.PAID_YET -> {
-//                    consumeDialog = showCostPointDialog()
-//                }
                 VideoConsumeResult.POINT_NOT_ENOUGH -> {
-//                    consumeDialog = showPointNotEnoughDialog()
                     showRechargeReminder(true)
                 }
             }
@@ -912,6 +911,16 @@ class PlayerActivity : BaseActivity() {
                     }
                 }
                 is Error -> Timber.e(it.throwable)
+            }
+        })
+
+        viewModel.meItem.observe(this, {
+            when (it) {
+                is Success -> {
+                    viewModel.checkConsumeResult(it.result)
+                }
+
+                is Error -> onApiError(it.throwable)
             }
         })
 

@@ -127,6 +127,9 @@ class PlayerViewModel : BaseViewModel() {
     private val _getAdResult = MutableLiveData<ApiResult<AdItem>>()
     val getAdResult: LiveData<ApiResult<AdItem>> = _getAdResult
 
+    private val _meItem = MutableLiveData<ApiResult<MeItem>>()
+    val meItem: LiveData<ApiResult<MeItem>> = _meItem
+
     fun updatedSelectedNewestComment(isNewest: Boolean) {
         _isSelectedNewestComment.value = isNewest
     }
@@ -459,14 +462,15 @@ class PlayerViewModel : BaseViewModel() {
         }
     }
 
-    fun checkConsumeResult() {
+    fun checkConsumeResult(me:MeItem) {
+        Timber.i("checkConsumeResult me:$me")
         val result =
             when {
-                costPoint == 0L || isDeducted -> VideoConsumeResult.PAID
-                else -> when {
-                    availablePoint >= costPoint -> VideoConsumeResult.PAID_YET
-                    else -> VideoConsumeResult.POINT_NOT_ENOUGH
-                }
+                costPoint == 0L || isDeducted || me.isSubscribed -> VideoConsumeResult.PAID
+
+                me.isSubscribed && !isDeducted -> VideoConsumeResult.PAID_YET
+                me.videoOnDemandCount ?: 0> 0 && isDeducted  -> VideoConsumeResult.PAID_YET
+                else -> VideoConsumeResult.POINT_NOT_ENOUGH
             }
 
         _consumeResult.value = result
@@ -820,5 +824,23 @@ class PlayerViewModel : BaseViewModel() {
     fun deleteCacheFile() {
         // remove cache file
         if (!nextVideoUrl.isNullOrEmpty() && File(nextVideoUrl).isFile) File(nextVideoUrl).delete()
+    }
+
+    fun getMe() {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getMe()
+                if (!result.isSuccessful) throw HttpException(result)
+                val meItem = result.body()?.content
+                meItem?.let {
+                    accountManager.setupProfile(it)
+                }
+                emit(ApiResult.success(meItem))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _meItem.value = it }
+        }
     }
 }

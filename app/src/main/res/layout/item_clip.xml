@@ -187,6 +187,7 @@
         layout="@layout/recharge_reminder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="gone"
         app:layout_constraintLeft_toLeftOf="@+id/player_view"
         app:layout_constraintRight_toRightOf="@+id/player_view"
         app:layout_constraintTop_toTopOf="@+id/player_view"
