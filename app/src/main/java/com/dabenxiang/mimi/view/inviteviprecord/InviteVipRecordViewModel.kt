@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.model.api.vo.ChatListItem
+import com.dabenxiang.mimi.model.api.vo.ReferrerHistoryItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.chathistory.ChatHistoryListDataSource
 import kotlinx.coroutines.flow.collect
@@ -21,7 +21,7 @@ class InviteVipRecordViewModel : BaseViewModel() {
         override fun onThrowable(throwable: Throwable) {}
     }
 
-    private fun getChatHistoryPagingItems(updateNoData: ((Int) -> Unit) = {}): LiveData<PagedList<ChatListItem>> {
+    private fun getChatHistoryPagingItems(updateNoData: ((Int) -> Unit) = {}): LiveData<PagedList<ReferrerHistoryItem>> {
         val dataSrc = InviteVipRecordListDataSource(
             viewModelScope,
             domainManager,

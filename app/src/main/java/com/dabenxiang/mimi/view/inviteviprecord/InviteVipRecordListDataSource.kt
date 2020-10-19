@@ -4,6 +4,7 @@ import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
+import com.dabenxiang.mimi.model.api.vo.ReferrerHistoryItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -16,34 +17,36 @@ class InviteVipRecordListDataSource(
     private val domainManager: DomainManager,
     private val pagingCallback: PagingCallback,
     private val updateNoData: ((Int) -> Unit) = {}
-) : PageKeyedDataSource<Long, ChatListItem>() {
+) : PageKeyedDataSource<Long, ReferrerHistoryItem>() {
 
     companion object {
         const val PER_LIMIT = "20"
         val PER_LIMIT_LONG = PER_LIMIT.toLong()
     }
 
-    private data class InitResult(val list: List<ChatListItem>, val nextKey: Long?)
+    private data class InitResult(val list: List<ReferrerHistoryItem>, val nextKey: Long?)
+
 
     override fun loadInitial(
             params: LoadInitialParams<Long>,
-            callback: LoadInitialCallback<Long, ChatListItem>
+            callback: LoadInitialCallback<Long, ReferrerHistoryItem>
     ) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().getChats(
+                val result = domainManager.getApiRepository().getReferrerHistory(
                         offset = "0",
                         limit = PER_LIMIT
                 )
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()
                 val messages = item?.content
+                Timber.d("catkingg body: $messages")
                 val totalCount = item?.paging?.count ?: 0
                 val nextPageKey = when {
                     hasNextPage(
                             totalCount,
                             item?.paging?.offset ?: 0,
-                            messages?.size ?: 0
+                            messages?.size?: 0
                     ) -> PER_LIMIT_LONG
                     else -> null
                 }
@@ -62,20 +65,20 @@ class InviteVipRecordListDataSource(
         }
     }
 
-    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Long, ChatListItem>) {
+    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Long, ReferrerHistoryItem>) {
         Timber.d("loadBefore")
     }
 
     override fun loadAfter(
             params: LoadParams<Long>,
-            callback: LoadCallback<Long, ChatListItem>
+            callback: LoadCallback<Long, ReferrerHistoryItem>
     ) {
         Timber.d("loadAfter")
         val next = params.key
 
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().getChats(
+                val result = domainManager.getApiRepository().getReferrerHistory(
                         offset = next.toString(),
                         limit = PER_LIMIT
                 )

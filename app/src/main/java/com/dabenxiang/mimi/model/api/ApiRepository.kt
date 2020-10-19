@@ -802,5 +802,14 @@ class ApiRepository(private val apiService: ApiService) {
         return apiService.updateOrderChatStatus(id)
     }
 
+    /**
+     * 邀請朋友名單
+     */
+    suspend fun getReferrerHistory(
+        offset: String,
+        limit: String
+    ): Response<ApiBasePagingItem<ArrayList<ReferrerHistoryItem>>> {
+        return apiService.getReferrerHistory(offset, limit)
+    }
 }
 

@@ -6,7 +6,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.ChatListItem
+import com.dabenxiang.mimi.model.api.vo.ReferrerHistoryItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import kotlinx.android.synthetic.main.fragment_invite_vip_record.*
 import kotlinx.android.synthetic.main.fragment_text_detail.toolbarContainer
@@ -20,7 +20,7 @@ class InviteVipRecordFragment : BaseFragment() {
 
     private val inviteVipRecordAdapter by lazy { InviteVipRecordAdapter(listener) }
     private val listener = object : InviteVipRecordAdapter.EventListener {
-        override fun onClickListener(item: ChatListItem, position: Int) {
+        override fun onClickListener(item: ReferrerHistoryItem, position: Int) {
             Timber.d("catkingg click")
         }
     }

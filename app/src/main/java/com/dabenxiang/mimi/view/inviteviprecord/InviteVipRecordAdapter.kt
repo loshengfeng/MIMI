@@ -7,28 +7,28 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.ChatListItem
+import com.dabenxiang.mimi.model.api.vo.ReferrerHistoryItem
 
 class InviteVipRecordAdapter(
         private val listener: EventListener
-) : PagedListAdapter<ChatListItem, RecyclerView.ViewHolder>(diffCallback) {
+) : PagedListAdapter<ReferrerHistoryItem, RecyclerView.ViewHolder>(diffCallback) {
     companion object {
-        private val diffCallback = object : DiffUtil.ItemCallback<ChatListItem>() {
+        private val diffCallback = object : DiffUtil.ItemCallback<ReferrerHistoryItem>() {
             override fun areItemsTheSame(
-                    oldItem: ChatListItem,
-                    newItem: ChatListItem
+                    oldItem: ReferrerHistoryItem,
+                    newItem: ReferrerHistoryItem
             ): Boolean = oldItem == newItem
 
             @SuppressLint("DiffUtilEquals")
             override fun areContentsTheSame(
-                    oldItem: ChatListItem,
-                    newItem: ChatListItem
+                    oldItem: ReferrerHistoryItem,
+                    newItem: ReferrerHistoryItem
             ): Boolean = oldItem == newItem
         }
     }
 
     interface EventListener {
-        fun onClickListener(item: ChatListItem, position: Int)
+        fun onClickListener(item: ReferrerHistoryItem, position: Int)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InviteVipRecordViewHolder {
