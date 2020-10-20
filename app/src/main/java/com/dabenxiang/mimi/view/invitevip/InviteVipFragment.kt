@@ -9,6 +9,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.widget.utility.QrCodeUtils
 import kotlinx.android.synthetic.main.fragment_invite_vip.*
 
 class InviteVipFragment : BaseFragment() {
@@ -35,6 +36,7 @@ class InviteVipFragment : BaseFragment() {
                     tv_invite_code.text = viewModel.promotionData?.promotion_code
                     tv_invite_vip_days.text = viewModel.promotionData?.cumulativeDays.toString()
                     tv_invite_vip_people.text = viewModel.promotionData?.promotionNumber.toString()
+                    iv_invite_vip_qrcode.setImageBitmap(QrCodeUtils.generateQrCodeImage("www.google.com", 300))
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
