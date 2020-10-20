@@ -132,7 +132,7 @@
                 android:layout_width="200dp"
                 android:layout_height="113dp"
                 android:layout_marginTop="10dp"
-                app:cardBackgroundColor="@color/item_color_card_background"
+                app:cardBackgroundColor="@color/adult_color_card_background"
                 app:cardCornerRadius="6dp"
                 app:cardElevation="0dp"
                 app:cardUseCompatPadding="false"
