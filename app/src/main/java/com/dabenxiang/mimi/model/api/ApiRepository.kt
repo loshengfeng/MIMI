@@ -559,6 +559,25 @@ class ApiRepository(private val apiService: ApiService) {
         body: ProfileRequest
     ) = apiService.updateProfile(body)
 
+    /**
+     * 取得推廣資訊
+     */
+    suspend fun getPromotionItem(
+        url: String
+    ): Response<ApiBaseItem<PromotionItem>> {
+        return apiService.getPromotionItem(url)
+    }
+
+    /**
+     * 邀請朋友名單
+     */
+    suspend fun getReferrerHistory(
+        offset: String,
+        limit: String
+    ): Response<ApiBasePagingItem<ArrayList<ReferrerHistoryItem>>> {
+        return apiService.getReferrerHistory(offset, limit)
+    }
+
     /**********************************************************
      *
      *                  Members/Me/Post

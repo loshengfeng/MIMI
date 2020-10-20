@@ -390,6 +390,10 @@ dependencies {
     androidTestImplementation "androidx.test:runner:$android_test_version"
     androidTestImplementation "androidx.test:rules:$android_test_version"
     androidTestImplementation "androidx.test.ext:junit:$android_test_ext_version"
+
+    // QrCode
+    implementation "com.journeyapps:zxing-android-embedded:$zxing_android_embedded_version"
+    implementation "com.google.zxing:core:$zxing_core_version"
 }
 
 class Version {

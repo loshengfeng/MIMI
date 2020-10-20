@@ -21,6 +21,8 @@
     <color name="normal_color_card_background">@color/color_black_1</color>
     <color name="item_color_card_background">@color/color_black_1_50</color>
     <color name="item_color_club_card_background">@color/color_white_2</color>
+    <color name="color_invite_vip_copy_bg">#32597ef7</color>
+    <color name="color_invite_vip_text">#597ef7</color>
 
     <color name="adult_color_card_background">@color/color_black_1_20</color>
 
@@ -28,6 +30,7 @@
     <color name="color_white_1_05">#0DFFFFFF</color>
     <color name="color_white_1_10">#1Affffff</color>
     <color name="color_white_1_30">#4dffffff</color>
+    <color name="color_white_1_40">#64000000</color>
     <color name="color_white_1_50">#80ffffff</color>
     <color name="color_white_1_60">#99FFFFFF</color>
     <color name="color_white_1_65625">#a8ffffff</color>
@@ -45,6 +48,7 @@
     <color name="color_black_1_50">#80000000</color>
     <color name="color_black_1_60">#99000000</color>
     <color name="color_black_1_70">#B3000000</color>
+    <color name="color_black_2">#222222</color>
     <color name="color_black_2_40">#66222222</color>
     <color name="color_black_2_50">#80222222</color>
     <color name="color_black_3">#101428</color>
@@ -52,6 +56,8 @@
     <color name="color_black_4_50">#80141932</color>
     <color name="color_black_5">#b3000000</color>
     <color name="color_black_6">#1e233a</color>
+    <color name="color_black_7">#02000000</color>
+    <color name="color_black_8">#0c000000</color>
     <color name="color_red_1">#ff4d4d</color>
     <color name="color_red_2">#e57c7c</color>
     <color name="color_red_3">#ed5063</color>
