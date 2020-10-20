@@ -394,7 +394,7 @@
     <string name="order_detail_title">订单资讯</string>
     <string name="order_detail_product_name">商品名称</string>
     <string name="order_detail_total">小計</string>
-    <string name="order_detail_point">蜜币</string>
+    <string name="order_detail_content">VIP %s(%s)</string>
     <string name="order_detail_payment_bank">银行卡付款</string>
     <string name="order_detail_payment_ali">支付宝付款</string>
     <string name="order_detail_payment_wx">微信付款</string>

@@ -80,7 +80,6 @@ class TopUpFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     tv_name.text = it.result.friendlyName
-//                    tv_coco.text = it.result.availablePoint.toString()
                     it.result.expiryDate?.let {date ->
                         tv_expiry_date.visibility =View.VISIBLE
                         tv_expiry_date.text = getString(R.string.vip_expiry_date,
