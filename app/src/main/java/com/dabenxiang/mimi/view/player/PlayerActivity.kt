@@ -398,7 +398,8 @@ class PlayerActivity : BaseActivity() {
             Timber.i("episodePosition =$it")
             if (it >= 0) {
                 episodeAdapter.setLastSelectedIndex(it)
-                viewModel.getMe()
+                if (viewModel.isLogin()) viewModel.getMe()
+                else viewModel.getGuestInfo()
 //                viewModel.checkConsumeResult()
             }
             scrollToBottom()
@@ -648,8 +649,8 @@ class PlayerActivity : BaseActivity() {
 
         btn_full_screen.setOnClickListener {
 //            viewModel.checkStatus {
-                viewModel.lockFullScreen = !viewModel.lockFullScreen
-                switchScreenOrientation()
+            viewModel.lockFullScreen = !viewModel.lockFullScreen
+            switchScreenOrientation()
 //            }
         }
 
@@ -829,10 +830,7 @@ class PlayerActivity : BaseActivity() {
 
         viewModel.meItem.observe(this, {
             when (it) {
-                is Success -> {
-                    viewModel.checkConsumeResult(it.result)
-                }
-
+                is Success -> viewModel.checkConsumeResult(it.result)
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -867,11 +865,11 @@ class PlayerActivity : BaseActivity() {
         iv_player.setOnClickListener {
 //            viewModel.checkStatus {
 //                Timber.d("iv_player confirmed")
-                if (it.visibility == VISIBLE) {
-                    player?.playWhenReady = true
-                    viewModel.setPlaying(true)
-                    exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
-                }
+            if (it.visibility == VISIBLE) {
+                player?.playWhenReady = true
+                viewModel.setPlaying(true)
+                exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
+            }
 //            }
         }
         recycler_info.setOnClickListener {
@@ -1029,11 +1027,7 @@ class PlayerActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
 
-//        if (!viewModel.isLogin() && (dialog == null || dialog?.isVisible == false)) {
-//            openLoginDialog()
-//        } else {
         loadVideo()
-//        }
 
         //hideSystemUi()
 

@@ -805,5 +805,10 @@ class ApiRepository(private val apiService: ApiService) {
         return apiService.updateOrderChatStatus(id)
     }
 
+    /**
+     * 取得訪客資訊
+     */
+    suspend fun getGuestInfo(
+    ) = apiService.getGuestInfo()
 }
 
