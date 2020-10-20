@@ -51,8 +51,7 @@ class FavoriteFragment : BaseFragment() {
         const val TYPE_ADULT = 1
         private const val TYPE_MIMI = 0
         const val TYPE_SHORT_VIDEO = 1
-        var lastPrimaryIndex = TYPE_NORMAL
-        var lastSecondaryIndex = TYPE_MIMI
+        var lastPrimaryIndex = TYPE_MIMI
     }
 
     private val viewModel: FavoriteViewModel by viewModels()
@@ -64,19 +63,10 @@ class FavoriteFragment : BaseFragment() {
     private val primaryAdapter by lazy {
         FavoriteTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
-                setTabPosition(TAB_PRIMARY, index)
-                viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
+                setTabPosition(index)
+                viewModel.initData(lastPrimaryIndex)
             }
         }, true)
-    }
-
-    private val secondaryAdapter by lazy {
-        FavoriteTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
-            override fun onClickItemIndex(view: View, index: Int) {
-                setTabPosition(TAB_SECONDARY, index)
-                viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
-            }
-        }, false)
     }
 
     private var needRefresh = false
@@ -85,11 +75,11 @@ class FavoriteFragment : BaseFragment() {
         super.onCreate(savedInstanceState)
 
         viewModel.playList.observe(this, Observer {
-            if (!(lastPrimaryIndex == TYPE_ADULT && lastSecondaryIndex == TYPE_SHORT_VIDEO))
+            if (lastPrimaryIndex != TYPE_SHORT_VIDEO)
                 favoriteAdapter.submitList(it)
         })
         viewModel.postList.observe(this, Observer {
-            if (lastPrimaryIndex == TYPE_ADULT && lastSecondaryIndex == TYPE_SHORT_VIDEO)
+            if (lastPrimaryIndex == TYPE_SHORT_VIDEO)
                 favoriteAdapter.submitList(it)
         })
         viewModel.dataCount.observe(this, Observer { refreshUi(it) })
@@ -100,7 +90,7 @@ class FavoriteFragment : BaseFragment() {
                 is Loaded -> progressHUD?.dismiss()
                 is Empty -> {
                     viewModel.videoIDList.clear()
-                    viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
+                    viewModel.initData(lastPrimaryIndex)
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -124,13 +114,12 @@ class FavoriteFragment : BaseFragment() {
             }
         })
 
-
         viewModel.favoriteResult.observe(this, Observer {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
                 is Success -> {
-                    viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
+                    viewModel.initData(lastPrimaryIndex)
                     GeneralUtils.showToast(
                         requireContext(),
                         getString(R.string.favorite_delete_favorite)
@@ -166,7 +155,7 @@ class FavoriteFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback {
             interactionListener?.changeNavigationPosition(
-                R.id.navigation_home
+                R.id.navigation_adult
             )
         }
         useAdultTheme(false)
@@ -176,24 +165,15 @@ class FavoriteFragment : BaseFragment() {
 
     override fun setupFirstTime() {
         val primaryList = listOf(
-            getString(R.string.favorite_normal),
-            getString(R.string.favorite_adult)
-        )
-
-        primaryAdapter.submitList(primaryList, lastPrimaryIndex)
-
-        rv_secondary.adapter = secondaryAdapter
-
-        val secondaryList = listOf(
             getString(R.string.favorite_tab_mimi),
             getString(R.string.favorite_tab_short)
         )
 
-        secondaryAdapter.submitList(secondaryList, lastSecondaryIndex)
+        primaryAdapter.submitList(primaryList, lastPrimaryIndex)
 
         rv_content.adapter = favoriteAdapter
 
-        viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
+        viewModel.initData(lastPrimaryIndex)
     }
 
     override fun getLayoutId(): Int {
@@ -248,7 +228,7 @@ class FavoriteFragment : BaseFragment() {
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
-            viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
+            viewModel.initData(lastPrimaryIndex)
         }
     }
 
@@ -271,7 +251,7 @@ class FavoriteFragment : BaseFragment() {
         }
         if (needRefresh) {
             needRefresh = false
-            viewModel.initData(lastPrimaryIndex, lastSecondaryIndex)
+            viewModel.initData(lastPrimaryIndex)
         }
     }
 
@@ -296,27 +276,11 @@ class FavoriteFragment : BaseFragment() {
         }
 
         tv_clean.isEnabled = size > 0
-
-        when (lastPrimaryIndex) {
-            TYPE_NORMAL -> layout_adult.visibility = View.GONE
-            TYPE_ADULT -> layout_adult.visibility = View.VISIBLE
-        }
     }
 
-    private fun setTabPosition(type: Int, index: Int) {
-        when (type) {
-            TAB_PRIMARY -> {
-                if (lastPrimaryIndex != index) {
-                    lastPrimaryIndex = index
-                    primaryAdapter.setLastSelectedIndex(lastPrimaryIndex)
-                    favoriteAdapter.setAdult(index != TYPE_NORMAL)
-                }
-            }
-            TAB_SECONDARY -> {
-                lastSecondaryIndex = index
-                secondaryAdapter.setLastSelectedIndex(lastSecondaryIndex)
-            }
-        }
+    private fun setTabPosition(index: Int) {
+        lastPrimaryIndex = index
+        primaryAdapter.setLastSelectedIndex(lastPrimaryIndex)
     }
 
     private val listener = object : FavoriteAdapter.EventListener {
@@ -473,8 +437,8 @@ class FavoriteFragment : BaseFragment() {
 
         override fun onChipClick(text: String, type: Int?) {
             // 點擊標籤後進入 Search page
-            useAdultTheme(lastPrimaryIndex == TYPE_ADULT)
-            if (lastSecondaryIndex == TYPE_MIMI) {
+            useAdultTheme(false)
+            if (lastPrimaryIndex == TYPE_MIMI) {
                 val bundle = SearchVideoFragment.createBundle(tag = text)
                 navigateTo(
                     NavigateItem.Destination(
@@ -515,7 +479,7 @@ class FavoriteFragment : BaseFragment() {
 
     private val onCleanDialogListener = object : OnCleanDialogListener {
         override fun onClean() {
-            if (lastPrimaryIndex == TYPE_ADULT && lastSecondaryIndex == TYPE_SHORT_VIDEO) {
+            if (lastPrimaryIndex == TYPE_SHORT_VIDEO) {
                 viewModel.deleteAllPostFavorite()
             } else {
                 viewModel.deleteFavorite()
@@ -536,7 +500,7 @@ class FavoriteFragment : BaseFragment() {
                 getString(R.string.unexpected_error)
             )
         } else {
-            useAdultTheme(true)
+            useAdultTheme(false)
             val bundle = ClipFragment.createBundle(viewModel.currentPostList, position, false)
             navigateTo(
                 NavigateItem.Destination(

@@ -77,6 +77,14 @@
     <string name="topup_pending_order_2">笔充值作业未完成，请稍后再试</string>
     <string name="topup_goto_top_up_manage">前往充值管理</string>
 
+    <!-- Home -->
+    <string name="home_tab_video">蜜蜜影视</string>
+    <string name="home_tab_follow">关注</string>
+    <string name="home_tab_clip">短视频</string>
+    <string name="home_tab_picture">图片</string>
+    <string name="home_tab_text">短文</string>
+    <string name="home_tab_club">圈子</string>
+
     <!-- Favorite -->
     <string name="favorite_title">我的收藏</string>
     <string name="favorite_clean">清除所有收藏</string>
@@ -187,7 +195,8 @@
     <string name="send_code_count_down">%1$ds</string>
     <string name="login_mobile_call_prefix_china">+86</string>
     <string name="login_mobile_call_prefix_taiwan">+886</string>
-
+    <string name="vip_expiry_date">VIP 於 %s 到期</string>
+    
     <!-- Home -->
     <string name="follow_title">我的关注</string>
     <string name="follow_people">关注的人</string>

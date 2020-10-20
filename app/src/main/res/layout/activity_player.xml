@@ -18,6 +18,17 @@
         app:rewind_increment="30000"
         app:show_timeout="5000" />
 
+    <include
+        android:id="@+id/recharge_reminder"
+        layout="@layout/recharge_reminder"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="@+id/player_view"
+        app:layout_constraintRight_toRightOf="@+id/player_view"
+        app:layout_constraintTop_toTopOf="@+id/player_view"
+        app:layout_constraintBottom_toBottomOf="@+id/player_view"/>
+
     <ImageView
         android:id="@+id/iv_player"
         android:layout_width="60dp"

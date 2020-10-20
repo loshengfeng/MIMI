@@ -53,15 +53,6 @@ class VideoViewHolder(itemView: View, onClickListener: IndexViewHolderListener) 
                 View.VISIBLE
             }
 
-            if (model.isAdult) {
-                card.setCardBackgroundColor(
-                    itemView.resources.getColor(
-                        R.color.adult_color_card_background,
-                        null
-                    )
-                )
-                tvTitle.setTextColor(itemView.resources.getColor(R.color.adult_color_text, null))
-            } else {
                 card.setCardBackgroundColor(
                     itemView.resources.getColor(
                         R.color.normal_color_card_background,
@@ -69,7 +60,6 @@ class VideoViewHolder(itemView: View, onClickListener: IndexViewHolderListener) 
                     )
                 )
                 tvTitle.setTextColor(itemView.resources.getColor(R.color.normal_color_text, null))
-            }
 
             Glide.with(itemView.context)
                 .load(model.imgUrl)

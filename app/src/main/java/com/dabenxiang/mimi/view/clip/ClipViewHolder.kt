@@ -39,8 +39,11 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view), KoinComponent 
     var tvLike: TextView = view.tv_like
     var tvComment: TextView = view.tv_comment
     var progress: ProgressBar = view.progress_video
+    var reminder: View =view.recharge_reminder
+
 
     fun onBind(item: MemberPostItem, clipFuncItem: ClipFuncItem, pos: Int) {
+
         ibReplay.visibility = View.GONE
         ibPlay.visibility = View.GONE
         tvTitle.text = item.title
@@ -82,24 +85,29 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view), KoinComponent 
         }
         tvLike.setCompoundDrawablesRelativeWithIntrinsicBounds(0, likeRes, 0, 0)
         val isLike = item.likeType == LikeType.LIKE
-        tvLike.setOnClickListener { clipFuncItem.onLikeClick(item, pos, !isLike) }
 
         val favoriteRes =
             if (item.isFavorite) R.drawable.btn_favorite_forvideo_s else R.drawable.btn_favorite_forvideo_n
         tvFavorite.setCompoundDrawablesRelativeWithIntrinsicBounds(0, favoriteRes, 0, 0)
-        tvFavorite.setOnClickListener { clipFuncItem.onFavoriteClick(item, pos, !item.isFavorite) }
-
-        tvComment.setOnClickListener { clipFuncItem.onCommentClick(item) }
 
         val isMe = accountManager.getProfile().userId == item.creatorId
         ivAdd.visibility = if (item.isFollow || isMe) View.GONE else View.VISIBLE
 
-        if (!isMe) clAvatar.setOnClickListener {
-            clipFuncItem.onFollowClick(
-                item,
-                pos,
-                !item.isFollow
-            )
+        if(item.deducted){
+            tvLike.setOnClickListener { clipFuncItem.onLikeClick(item, pos, !isLike) }
+            tvFavorite.setOnClickListener { clipFuncItem.onFavoriteClick(item, pos, !item.isFavorite) }
+            tvComment.setOnClickListener { clipFuncItem.onCommentClick(item) }
+            if (!isMe) clAvatar.setOnClickListener {
+                clipFuncItem.onFollowClick(
+                    item,
+                    pos,
+                    !item.isFollow
+                )
+            }
+
+            reminder.visibility = View.GONE
+        } else{
+            reminder.visibility = View.VISIBLE
         }
     }
 }

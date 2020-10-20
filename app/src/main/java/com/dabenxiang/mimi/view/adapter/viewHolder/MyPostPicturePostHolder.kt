@@ -183,7 +183,7 @@ class MyPostPicturePostHolder(
     fun updateFollow(item: MemberPostItem) {
         tvFollow.setText(if (item.isFollow) R.string.followed else R.string.follow)
         tvFollow.setBackgroundResource(if (item.isFollow) R.drawable.bg_white_1_stroke_radius_16 else R.drawable.bg_red_1_stroke_radius_16)
-        tvFollow.setTextColor(App.self.getColor(if (item.isFollow) R.color.color_white_1 else R.color.color_red_1))
+        tvFollow.setTextColor(App.self.getColor(if (item.isFollow) R.color.color_black_1_60 else R.color.color_red_1))
     }
 
 }

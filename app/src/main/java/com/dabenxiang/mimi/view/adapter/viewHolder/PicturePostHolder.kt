@@ -1,13 +1,11 @@
 package com.dabenxiang.mimi.view.adapter.viewHolder
 
-import android.content.res.ColorStateList
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -75,16 +73,13 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
             val chip = LayoutInflater.from(tagChipGroup.context)
                 .inflate(R.layout.chip_item, tagChipGroup, false) as Chip
             chip.text = it
-            chip.chipBackgroundColor = ColorStateList.valueOf(
-                ContextCompat.getColor(tagChipGroup.context, R.color.adult_color_status_bar)
-            )
             if (TextUtils.isEmpty(tag)) {
-                chip.setTextColor(tagChipGroup.context.getColor(R.color.color_white_1_50))
+                chip.setTextColor(tagChipGroup.context.getColor(R.color.color_black_1_50))
             } else {
                 if (it == tag) {
                     chip.setTextColor(chip.context.getColor(R.color.color_red_1))
                 } else {
-                    chip.setTextColor(tagChipGroup.context.getColor(R.color.color_white_1_50))
+                    chip.setTextColor(tagChipGroup.context.getColor(R.color.color_black_1_50))
                 }
             }
             chip.setOnClickListener { view ->
@@ -151,7 +146,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
             follow.text = follow.context.getString(R.string.followed)
             follow.background =
                 follow.context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
-            follow.setTextColor(follow.context.getColor(R.color.color_white_1))
+            follow.setTextColor(follow.context.getColor(R.color.color_black_1_60))
         } else {
             follow.text = follow.context.getString(R.string.follow)
             follow.background =
@@ -163,7 +158,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
         if (likeType == LikeType.LIKE) {
             likeImage.setImageResource(R.drawable.ico_nice_s)
         } else {
-            likeImage.setImageResource(R.drawable.ico_nice)
+            likeImage.setImageResource(R.drawable.ico_nice_gray)
         }
 
         follow.setOnClickListener {
@@ -186,7 +181,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
         if (isFollow) {
             follow.text = follow.context.getString(R.string.followed)
             follow.background = follow.context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
-            follow.setTextColor(follow.context.getColor(R.color.color_white_1))
+            follow.setTextColor(follow.context.getColor(R.color.color_black_1_60))
         } else {
             follow.text = follow.context.getString(R.string.follow)
             follow.background = follow.context.getDrawable(R.drawable.bg_red_1_stroke_radius_16)
@@ -198,7 +193,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
         if (isLike) {
             likeImage.setImageResource(R.drawable.ico_nice_s)
         } else {
-            likeImage.setImageResource(R.drawable.ico_nice)
+            likeImage.setImageResource(R.drawable.ico_nice_gray)
         }
         likeCount.text = count.toString()
     }

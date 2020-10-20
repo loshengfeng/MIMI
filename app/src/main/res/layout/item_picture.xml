@@ -8,6 +8,7 @@
         android:id="@+id/layout_card"
         android:layout_width="0dp"
         android:layout_height="180dp"
+        app:cardBackgroundColor="@color/item_color_card_background"
         app:cardCornerRadius="6dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

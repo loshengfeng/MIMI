@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="10dp"
-    android:background="@color/adult_color_background">
+    android:background="@color/normal_color_background">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_left"
@@ -63,7 +63,7 @@
         android:layout_marginStart="15dp"
         android:ellipsize="end"
         android:maxLines="2"
-        android:textColor="@color/color_white_1"
+        android:textColor="@color/color_black_1"
         android:textSize="14sp"
         android:layout_marginEnd="@dimen/_20sdp"
         app:layout_constraintLeft_toRightOf="@id/iv_photo"
@@ -86,7 +86,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:maxLines="1"
-        android:textColor="@color/color_white_1_50"
+        android:textColor="@color/color_black_1_50"
         android:textSize="12sp"
         android:layout_marginEnd="@dimen/_20sdp"
         app:layout_constraintLeft_toRightOf="@id/iv_hot"

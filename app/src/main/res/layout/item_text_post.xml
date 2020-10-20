@@ -5,7 +5,6 @@
     android:id="@+id/layout_text_post_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/item_color_card_background"
     android:paddingStart="20dp"
     android:paddingTop="10dp"
     android:paddingEnd="20dp"
@@ -27,7 +26,7 @@
         android:layout_marginStart="10dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textColor="@color/color_white_1"
+        android:textColor="@color/color_black_1"
         android:textSize="14sp"
         app:layout_constraintEnd_toStartOf="@id/tv_follow"
         app:layout_constraintStart_toEndOf="@+id/img_avatar"
@@ -39,7 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:textColor="@color/color_white_1_50"
+        android:textColor="@color/color_black_1_50"
         android:textSize="12sp"
         app:layout_constraintLeft_toRightOf="@+id/img_avatar"
         app:layout_constraintTop_toBottomOf="@+id/tv_name"
@@ -75,7 +74,7 @@
             android:id="@+id/layout_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/color_white_1_10"
+            android:background="@drawable/bg_white_stroke_2_radius_6"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -113,7 +112,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="@color/color_white_1"
+                android:textColor="@color/color_black_1"
                 android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="@+id/tv_text"
                 app:layout_constraintEnd_toEndOf="@+id/gl_title_end"
@@ -132,7 +131,7 @@
                 android:maxLines="3"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:textColor="@color/color_white_1"
+                android:textColor="@color/color_black_1_70"
                 android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -167,7 +166,7 @@
         android:id="@+id/iv_like"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ico_nice"
+        android:src="@drawable/ico_nice_gray"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sv_hip_group_tag" />
 
@@ -176,7 +175,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="3dp"
-        android:textColor="@color/color_white_1"
+        android:textColor="@color/color_black_1"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@+id/iv_like"
         app:layout_constraintLeft_toRightOf="@+id/iv_like"
@@ -188,7 +187,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="33dp"
-        android:src="@drawable/ico_messege_adult"
+        android:src="@drawable/ico_messege_adult_gray"
         app:layout_constraintLeft_toRightOf="@+id/tv_like_count"
         app:layout_constraintTop_toBottomOf="@+id/sv_hip_group_tag" />
 
@@ -197,7 +196,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="3dp"
-        android:textColor="@color/color_white_1"
+        android:textColor="@color/color_black_1"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@+id/iv_comment"
         app:layout_constraintLeft_toRightOf="@+id/iv_comment"
@@ -208,7 +207,7 @@
         android:id="@+id/iv_more"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/btn_more_white_n"
+        android:src="@drawable/btn_more_gray_n"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sv_hip_group_tag" />
 
@@ -217,7 +216,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="20dp"
-        android:background="@color/color_white_1_30"
+        android:background="@color/color_black_1_05"
         app:layout_constraintTop_toBottomOf="@+id/iv_like" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
