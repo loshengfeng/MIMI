@@ -650,4 +650,13 @@ interface ApiService {
 
     @PUT("/v1/Members/Me/Order/TraceLog/{id}/Status")
     suspend fun updateOrderChatStatus(@Path("id") id: Long): Response<Void>
+
+    /**********************************************************
+     *
+     *                  Members/Subscription
+     *
+     ***********************************************************/
+    @GET("/v1/Members/Subscription")
+    suspend fun getGuestInfo(): Response<ApiBaseItem<MeItem>>
+
 }

@@ -3,12 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginTop="6dp"
+    android:layout_marginBottom="6dp"
     app:cardCornerRadius="6dp">
 
     <ImageView
         android:id="@+id/iv_poster"
-        android:src="@drawable/img_nopic_03"
-        android:scaleType="centerCrop"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:background="@color/color_black_1_20"
+        android:scaleType="centerCrop"
+        android:src="@drawable/img_nopic_03" />
 </androidx.cardview.widget.CardView>
