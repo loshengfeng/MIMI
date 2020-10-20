@@ -29,7 +29,7 @@ data class MeItem(
     val isSubscribed: Boolean,
 
     @SerializedName("expiryDate")
-    val expiryDate: Date = Date(),
+    val expiryDate: Date?,
 
     @SerializedName("videoCount")
     val videoCount: Int?,

@@ -57,6 +57,8 @@
             app:layout_constraintEnd_toEndOf="@+id/gl_topup_start"
             app:layout_constraintStart_toEndOf="@id/iv_photo"
             app:layout_constraintTop_toTopOf="@id/iv_photo"
+            app:layout_constraintBottom_toTopOf="@+id/tv_expiry_date"
+            app:layout_goneMarginTop="20dp"
             tools:text="好大一棵洋梨" />
 
         <TextView
@@ -67,8 +69,10 @@
             android:gravity="center"
             android:textColor="@color/color_white_1"
             android:textSize="12sp"
+            android:visibility="gone"
             app:layout_constraintStart_toStartOf="@+id/tv_name"
             app:layout_constraintTop_toBottomOf="@id/tv_name"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_photo"
             tools:text="VIP 於 2020-02-10 到期" />
 
         <TextView
@@ -80,7 +84,7 @@
             android:text="@string/personal_topup"
             android:textColor="@color/color_red_6"
             android:textSize="15sp"
-            app:layout_constraintBottom_toBottomOf="@id/tv_expiry_date"
+            app:layout_constraintBottom_toBottomOf="@id/tv_name"
             app:layout_constraintEnd_toEndOf="@id/gl_topup_end"
             app:layout_constraintStart_toStartOf="@+id/gl_topup_start"
             app:layout_constraintTop_toTopOf="@+id/tv_name" />
