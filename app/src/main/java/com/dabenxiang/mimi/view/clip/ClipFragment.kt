@@ -137,6 +137,19 @@ class ClipFragment : BaseFragment() {
                         ClipAdapter.PAYLOAD_UPDATE_UI
                     )
                 }
+                is Error -> {
+                    progressHUD?.dismiss()
+                    onApiError(it.throwable)
+                }
+
+            }
+        })
+
+        viewModel.meItem.observe(viewLifecycleOwner, {
+            when (it) {
+                is Success -> {
+                }
+
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -165,8 +178,12 @@ class ClipFragment : BaseFragment() {
                     { item -> onCommentClick(item) },
                     { onBackClick() },
                     { item, pos -> viewModel.getPostDetail(item, pos) },
-                    { item, error -> viewModel.sendPlayerError(item, error) })
+                    { item, error -> viewModel.sendPlayerError(item, error) },
+                    { onVipClick()},
+                    { onPromoteClick() }
+                )
             )
+
             (rv_clip.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             PagerSnapHelper().attachToRecyclerView(rv_clip)
             rv_clip.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -198,6 +215,14 @@ class ClipFragment : BaseFragment() {
                 showCommentDialog(item)
             }
         }
+    }
+
+    private fun onPromoteClick() {
+         //TODO
+    }
+
+    private fun onVipClick() {
+        navigateTo(NavigateItem.Destination(R.id.action_to_topup))
     }
 
     override fun onAttach(context: Context) {

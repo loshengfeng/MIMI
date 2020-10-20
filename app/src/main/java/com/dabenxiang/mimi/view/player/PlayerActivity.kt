@@ -880,6 +880,13 @@ class PlayerActivity : BaseActivity() {
 
         btn_vip.setOnClickListener {
             Timber.i("btn_vip Click")
+            val bundle = Bundle()
+            navigateTo(
+                MainActivity::class.java,
+                R.id.navigation_topup,
+                bundle,
+                NAVIGATE_TO_TOPUP_ACTION
+            )
         }
 
         btn_promote.setOnClickListener {
