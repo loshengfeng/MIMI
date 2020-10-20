@@ -89,24 +89,25 @@
                 android:textSize="14sp"
                 app:layout_constraintStart_toEndOf="@id/iv_photo"
                 app:layout_constraintTop_toTopOf="@id/iv_photo"
+                app:layout_constraintBottom_toTopOf="@+id/tv_expiry_date"
+                app:layout_goneMarginTop="20dp"
                 tools:text="好大一棵洋梨" />
 
+
             <TextView
-                android:id="@+id/tv_coco"
+                android:id="@+id/tv_expiry_date"
                 android:layout_width="wrap_content"
                 android:layout_height="20dp"
-                android:layout_marginTop="2dp"
-                android:background="@drawable/bg_coin"
-                android:drawableStart="@drawable/ico_micoin_small"
-                android:drawablePadding="2dp"
-                android:paddingStart="4dp"
-                android:paddingEnd="4dp"
+                android:layout_marginTop="5dp"
+                android:gravity="center"
                 android:textColor="@color/color_white_1"
-                android:textSize="14sp"
+                android:textSize="12sp"
+                android:visibility="gone"
                 app:layout_constraintStart_toStartOf="@+id/tv_name"
                 app:layout_constraintTop_toBottomOf="@id/tv_name"
-                tools:ignore="RtlSymmetry"
-                tools:text="200" />
+                app:layout_constraintBottom_toBottomOf="@+id/iv_photo"
+                tools:text="VIP 於 2020-02-10 到期" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View
