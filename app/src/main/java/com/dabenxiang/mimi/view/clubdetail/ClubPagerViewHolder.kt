@@ -30,7 +30,9 @@ class ClubPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
 
         swipeRefreshLayout.setColorSchemeColors(swipeRefreshLayout.context.getColor(R.color.color_red_1))
         swipeRefreshLayout.setOnRefreshListener {
-            clubDetailFuncItem.getMemberPost(getOrderType(position)) { list -> updateList(list) }
+            clubDetailFuncItem.getMemberPost(getOrderType(position),
+                { list -> updateList(list) },
+                { count -> updateNoDataView(count) })
         }
 
         if (rvPost.adapter == null || rvPost.tag != position) {
@@ -48,7 +50,9 @@ class ClubPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
             )
             rvPost.adapter = adapter
 
-            clubDetailFuncItem.getMemberPost(getOrderType(position)) { list -> updateList(list) }
+            clubDetailFuncItem.getMemberPost(getOrderType(position),
+                { list -> updateList(list) },
+                { count -> updateNoDataView(count) })
             swipeRefreshLayout.isRefreshing = true
             return adapter
         }
@@ -70,7 +74,10 @@ class ClubPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
     private fun updateList(list: PagedList<MemberPostItem>) {
         swipeRefreshLayout.isRefreshing = false
         (rvPost.adapter as MemberPostPagedAdapter).submitList(list)
-        clNoData.visibility = takeIf { list.size > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
+    }
+
+    private fun updateNoDataView(itemCount: Int) {
+        clNoData.visibility = takeIf { itemCount > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
     }
 
     private fun getOrderType(position: Int): OrderBy {

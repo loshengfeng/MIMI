@@ -23,7 +23,8 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:elevation="1dp"
+                android:elevation="0.1dp"
+                android:background="@color/normal_color_status_bar"
                 app:contentInsetStart="0dp"
                 app:layout_collapseMode="pin">
 
@@ -78,6 +79,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
+                android:background="@color/normal_color_status_bar"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:layout_collapseMode="parallax">
 
