@@ -89,6 +89,8 @@ class ClubDetailFragment : BaseFragment() {
 
         viewPager.isUserInputEnabled = false
 
+        viewPager.offscreenPageLimit = 3
+
         viewPager.adapter =
             ClubPagerAdapter(
                 ClubDetailFuncItem({ orderBy, funUpdateList, funUpdateCount ->
