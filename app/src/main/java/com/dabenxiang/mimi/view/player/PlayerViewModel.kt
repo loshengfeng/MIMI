@@ -468,8 +468,8 @@ class PlayerViewModel : BaseViewModel() {
             when {
                 costPoint == 0L || isDeducted || me.isSubscribed -> VideoConsumeResult.PAID
 
-                me.isSubscribed && !isDeducted -> VideoConsumeResult.PAID_YET
-                me.videoOnDemandCount ?: 0> 0 && isDeducted  -> VideoConsumeResult.PAID_YET
+                me.isSubscribed -> VideoConsumeResult.PAID_YET
+                me.videoOnDemandCount ?: 0> 0  -> VideoConsumeResult.PAID_YET
                 else -> VideoConsumeResult.POINT_NOT_ENOUGH
             }
 

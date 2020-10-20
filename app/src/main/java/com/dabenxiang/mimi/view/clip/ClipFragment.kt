@@ -132,6 +132,7 @@ class ClipFragment : BaseFragment() {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
                 is Success -> {
+                    Timber.i("postDetailResult Success")
                     rv_clip.adapter?.notifyItemChanged(
                         it.result,
                         ClipAdapter.PAYLOAD_UPDATE_UI
@@ -177,7 +178,7 @@ class ClipFragment : BaseFragment() {
                     { item, pos, isLike -> onLikeClick(item, pos, isLike) },
                     { item -> onCommentClick(item) },
                     { onBackClick() },
-                    { item, pos -> viewModel.getPostDetail(item, pos) },
+                    { item, pos -> viewModel.getMe(item, pos) },
                     { item, error -> viewModel.sendPlayerError(item, error) },
                     { onVipClick()},
                     { onPromoteClick() }

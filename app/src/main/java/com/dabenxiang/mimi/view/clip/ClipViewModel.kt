@@ -162,8 +162,10 @@ class ClipViewModel : BaseViewModel() {
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect {
+                    Timber.i("getMe item:${it}")
                     when (it) {
                         is ApiResult.Success -> {
+                            Timber.i("Me item:${it.result}")
                             it.result.takeIf { checkConsumeResult(it) }?.let {
                                 getPostDetail(item, position)
                             }
