@@ -27,6 +27,8 @@ import kotlinx.android.synthetic.main.item_personal_is_login.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import retrofit2.HttpException
 import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.*
 
 class PersonalFragment : BaseFragment() {
 
@@ -69,7 +71,16 @@ class PersonalFragment : BaseFragment() {
 
                     val meItem = it.result
                     tv_name.text = meItem.friendlyName.toString()
-                    tv_Point.text = meItem.availablePoint.toString()
+
+                    meItem.expiryDate?.let {date ->
+                        tv_expiry_date.visibility =View.VISIBLE
+                        tv_expiry_date.text = getString(R.string.vip_expiry_date,
+                            SimpleDateFormat(
+                                "yyyy-MM-dd",
+                                Locale.getDefault()
+                            ).format(date)
+                        )
+                    }
 
                     //TODO: 目前先不判斷是否有驗證過
 //                    takeUnless { meItem.isEmailConfirmed == true }?.run {

@@ -1,13 +1,16 @@
 package com.dabenxiang.mimi.view.login
 
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
 import androidx.activity.addCallback
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import com.blankj.utilcode.util.ToastUtils
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.ExceptionResult
@@ -57,42 +60,36 @@ class LoginFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.friendlyNameError.observe(viewLifecycleOwner, Observer {
+        viewModel.accountError.observe(viewLifecycleOwner, Observer {
             if (it == "") {
-                edit_friendly_name.setBackgroundResource(R.drawable.edit_text_rectangle)
-                tv_friendly_name_error.visibility = View.INVISIBLE
+                edit_account.setBackgroundResource(R.drawable.edit_text_rectangle)
+                tv_account_error.visibility = View.INVISIBLE
             } else {
-                edit_friendly_name.setBackgroundResource(R.drawable.edit_text_error_rectangle)
-                tv_friendly_name_error.text = it
-                tv_friendly_name_error.visibility = View.VISIBLE
+                edit_account.setBackgroundResource(R.drawable.edit_text_error_rectangle)
+                tv_account_error.text = it
+                tv_account_error.visibility = View.VISIBLE
             }
         })
 
-        viewModel.emailError.observe(viewLifecycleOwner, Observer {
-            cb_email.visibility = View.VISIBLE
+        viewModel.mobileError.observe(viewLifecycleOwner, Observer {
             if (it == "") {
-                edit_email.setBackgroundResource(R.drawable.edit_text_rectangle)
-                tv_email_error.visibility = View.INVISIBLE
-                cb_email.isChecked = true
+                layout_mobile.setBackgroundResource(R.drawable.layout_rectangle)
+                tv_mobile_error.visibility = View.INVISIBLE
             } else {
-                edit_email.setBackgroundResource(R.drawable.edit_text_error_rectangle)
-                tv_email_error.text = it
-                tv_email_error.visibility = View.VISIBLE
-                cb_email.isChecked = false
+                layout_mobile.setBackgroundResource(R.drawable.layout_rectangle_error)
+                tv_mobile_error.text = it
+                tv_mobile_error.visibility = View.VISIBLE
             }
         })
 
-        viewModel.registerAccountError.observe(viewLifecycleOwner, Observer {
-            cb_register_account.visibility = View.VISIBLE
+        viewModel.validateCodeError.observe(viewLifecycleOwner, Observer {
             if (it == "") {
-                edit_register_account.setBackgroundResource(R.drawable.edit_text_rectangle)
-                tv_register_account_error.visibility = View.INVISIBLE
-                cb_register_account.isChecked = true
+                layout_verification_code.setBackgroundResource(R.drawable.layout_rectangle)
+                tv_validate_code_error.visibility = View.INVISIBLE
             } else {
-                edit_register_account.setBackgroundResource(R.drawable.edit_text_error_rectangle)
-                tv_register_account_error.text = it
-                tv_register_account_error.visibility = View.VISIBLE
-                cb_register_account.isChecked = false
+                layout_verification_code.setBackgroundResource(R.drawable.layout_rectangle_error)
+                tv_validate_code_error.text = it
+                tv_validate_code_error.visibility = View.VISIBLE
             }
         })
 
@@ -120,10 +117,10 @@ class LoginFragment : BaseFragment() {
 
         viewModel.loginAccountError.observe(viewLifecycleOwner, Observer {
             if (it == "") {
-                edit_login_account.setBackgroundResource(R.drawable.edit_text_rectangle)
+                layout_login.setBackgroundResource(R.drawable.layout_rectangle)
                 tv_login_account_error.visibility = View.INVISIBLE
             } else {
-                edit_login_account.setBackgroundResource(R.drawable.edit_text_error_rectangle)
+                layout_login.setBackgroundResource(R.drawable.layout_rectangle_error)
                 tv_login_account_error.text = it
                 tv_login_account_error.visibility = View.VISIBLE
             }
@@ -150,7 +147,7 @@ class LoginFragment : BaseFragment() {
                             messageIcon = R.drawable.ico_default_photo,
                             secondBtn = getString(R.string.btn_confirm),
                             secondBlock = {
-                                viewModel.registerAccount.value?.let { it1 ->
+                                viewModel.mobile.value?.let { it1 ->
                                     viewModel.registerPw.value?.let { it2 ->
                                         viewModel.doLogin(it1, it2)
                                     }
@@ -186,6 +183,37 @@ class LoginFragment : BaseFragment() {
                 is Error -> onApiError(it.throwable)
             }
         })
+
+        viewModel.mobile.observe(viewLifecycleOwner, Observer {
+            if (it == null || viewModel.isValidateMobile(it, tv_call_prefix.text.toString()).isNotBlank()) {
+                tv_get_code.isEnabled = false
+                tv_get_code.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_black_1_30))
+            } else {
+                tv_get_code.isEnabled = true
+                tv_get_code.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_black_1))
+            }
+        })
+
+        viewModel.validateMessageResult.observe(viewLifecycleOwner, Observer {
+            when(it) {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Empty -> {
+                    object : CountDownTimer( 60000, 1000) {
+                        override fun onFinish() {
+                            tv_get_code.isEnabled = true
+                            tv_get_code.text = getString(R.string.login_get_code)
+                        }
+
+                        override fun onTick(p0: Long) {
+                            tv_get_code.isEnabled = false
+                            tv_get_code.text = String.format(getString(R.string.send_code_count_down), p0 / 1000)
+                        }
+                    }.start()
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -214,9 +242,11 @@ class LoginFragment : BaseFragment() {
                 R.id.btnClose, R.id.btn_register_cancel, R.id.btn_login_cancel -> navigateTo(
                     NavigateItem.Up
                 )
-                R.id.btn_register -> viewModel.doRegisterValidateAndSubmit()
+                R.id.btn_register -> {
+                    viewModel.doRegisterValidateAndSubmit(tv_call_prefix.text.toString())
+                }
                 R.id.btn_forget -> navigateTo(NavigateItem.Destination(R.id.action_loginFragment_to_forgetPasswordFragment))
-                R.id.btn_login -> viewModel.doLoginValidateAndSubmit()
+                R.id.btn_login -> viewModel.doLoginValidateAndSubmit(tv_login_call_prefix.text.toString())
             }
         }.also {
             btnClose.setOnClickListener(it)
@@ -254,13 +284,52 @@ class LoginFragment : BaseFragment() {
         cb_keep_account.setOnCheckedChangeListener { _, isChecked ->
             viewModel.accountManager.keepAccount = isChecked
         }
+
+        tv_get_code.setOnClickListener {
+            viewModel.callValidateMessage(tv_call_prefix.text.toString())
+        }
+
+        tv_call_prefix.setOnClickListener {
+            viewModel.changePrefixCount++
+            if (viewModel.changePrefixCount == 10) {
+                viewModel.changePrefixCount = 0
+
+                if (tv_call_prefix.text == getString(R.string.login_mobile_call_prefix_taiwan)) {
+                    tv_call_prefix.text = getString(R.string.login_mobile_call_prefix_china)
+                    ToastUtils.showShort("Change to +86")
+                } else {
+                    tv_call_prefix.text = getString(R.string.login_mobile_call_prefix_taiwan)
+                    ToastUtils.showShort("Change to +886")
+                }
+            }
+
+            if (viewModel.timer == null) viewModel.startTimer()
+        }
+
+        tv_login_call_prefix.setOnClickListener {
+            viewModel.changePrefixCount++
+            if (viewModel.changePrefixCount == 10) {
+                viewModel.changePrefixCount = 0
+
+                if (tv_login_call_prefix.text == getString(R.string.login_mobile_call_prefix_taiwan)) {
+                    tv_login_call_prefix.text = getString(R.string.login_mobile_call_prefix_china)
+                    ToastUtils.showShort("Change to +86")
+                } else {
+                    tv_login_call_prefix.text = getString(R.string.login_mobile_call_prefix_taiwan)
+                    ToastUtils.showShort("Change to +886")
+                }
+            }
+
+            if (viewModel.timer == null) viewModel.startTimer()
+        }
     }
 
     override fun initSettings() {
         useAdultTheme(false)
-        viewModel.registerAccount.bindingEditText = edit_register_account
-        viewModel.email.bindingEditText = edit_email
-        viewModel.friendlyName.bindingEditText = edit_friendly_name
+        viewModel.mobile.bindingEditText = edit_mobile
+        viewModel.verificationCode.bindingEditText = edit_verification_code
+        viewModel.inviteCode.bindingEditText = edit_invite_code
+        viewModel.account.bindingEditText = edit_account
         viewModel.registerPw.bindingEditText = edit_register_pw
         viewModel.confirmPw.bindingEditText = edit_register_confirm_pw
         viewModel.loginAccount.bindingEditText = edit_login_account
@@ -281,8 +350,7 @@ class LoginFragment : BaseFragment() {
             false -> ""
         }
 
-        cb_register_account.isEnabled = false
-        cb_email.isEnabled = false
+        tv_get_code.isEnabled = false
     }
 
     override fun navigateTo(item: NavigateItem) {
@@ -313,7 +381,6 @@ class LoginFragment : BaseFragment() {
     override fun handleHttpError(errorHandler: ExceptionResult.HttpError) {
         when (errorHandler.httpExceptionItem.errorItem.code) {
             LOGIN_400000 -> {
-                cb_email.isChecked = false
                 showErrorMessageDialog(getString(R.string.error_email_duplicate))
             }
             LOGIN_403001 -> showErrorMessageDialog(getString(R.string.error_username_or_password_incorrect))
@@ -332,7 +399,6 @@ class LoginFragment : BaseFragment() {
                     .show(requireActivity().supportFragmentManager)
             }
             LOGIN_409000 -> {
-                cb_register_account.isChecked = false
                 showErrorMessageDialog(getString(R.string.error_account_duplicate))
             }
         }

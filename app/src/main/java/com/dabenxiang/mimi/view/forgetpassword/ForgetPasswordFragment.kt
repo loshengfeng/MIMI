@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import com.blankj.utilcode.util.ToastUtils
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ExceptionResult
@@ -14,6 +15,7 @@ import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
 import kotlinx.android.synthetic.main.fragment_forget_password.*
+import kotlinx.android.synthetic.main.item_login.*
 
 class ForgetPasswordFragment : BaseFragment() {
 
@@ -42,14 +44,14 @@ class ForgetPasswordFragment : BaseFragment() {
             }
         })
 
-        viewModel.emailError.observe(viewLifecycleOwner, Observer {
+        viewModel.mobileError.observe(viewLifecycleOwner, Observer {
             if (it == "") {
-                edit_email.setBackgroundResource(R.drawable.edit_text_rectangle)
-                tv_email_error.visibility = View.INVISIBLE
+                layout_mobile.setBackgroundResource(R.drawable.layout_rectangle)
+                tv_mobile_error.visibility = View.INVISIBLE
             } else {
-                edit_email.setBackgroundResource(R.drawable.edit_text_error_rectangle)
-                tv_email_error.text = it
-                tv_email_error.visibility = View.VISIBLE
+                layout_mobile.setBackgroundResource(R.drawable.layout_rectangle_error)
+                tv_mobile_error.text = it
+                tv_mobile_error.visibility = View.VISIBLE
             }
         })
 
@@ -62,7 +64,7 @@ class ForgetPasswordFragment : BaseFragment() {
                     GeneralDialog.newInstance(
                         GeneralDialogData(
                             titleRes = R.string.reset_pw_success,
-                            message = getString(R.string.desc_email, viewModel.email.value),
+                            message = getString(R.string.desc_email, viewModel.mobile.value),
                             messageIcon = R.drawable.ico_email,
                             secondBtn = getString(R.string.btn_confirm),
                             secondBlock = { navigateTo(NavigateItem.Up) }
@@ -80,18 +82,35 @@ class ForgetPasswordFragment : BaseFragment() {
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.btn_cancel -> navigateTo(NavigateItem.Up)
-                R.id.btn_send -> viewModel.doValidateAndSubmit()
+                R.id.btn_send -> viewModel.doValidateAndSubmit(tv_call_prefix.text.toString())
             }
         }.also {
             btn_cancel.setOnClickListener(it)
             btn_send.setOnClickListener(it)
+        }
+
+        tv_call_prefix.setOnClickListener {
+            viewModel.changePrefixCount++
+            if (viewModel.changePrefixCount == 10) {
+                viewModel.changePrefixCount = 0
+
+                if (tv_call_prefix.text == getString(R.string.login_mobile_call_prefix_taiwan)) {
+                    tv_call_prefix.text = getString(R.string.login_mobile_call_prefix_china)
+                    ToastUtils.showShort("Change to +86")
+                } else {
+                    tv_call_prefix.text = getString(R.string.login_mobile_call_prefix_taiwan)
+                    ToastUtils.showShort("Change to +886")
+                }
+            }
+
+            if (viewModel.timer == null) viewModel.startTimer()
         }
     }
 
     override fun initSettings() {
         super.initSettings()
         viewModel.account.bindingEditText = edit_account
-        viewModel.email.bindingEditText = edit_email
+        viewModel.mobile.bindingEditText = edit_mobile
     }
 
     override fun handleHttpError(errorHandler: ExceptionResult.HttpError) {

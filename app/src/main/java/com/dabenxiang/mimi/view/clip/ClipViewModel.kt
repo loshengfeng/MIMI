@@ -5,16 +5,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.blankj.utilcode.util.FileIOUtils
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.ApiBaseItem
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.File
@@ -32,6 +30,9 @@ class ClipViewModel : BaseViewModel() {
 
     private var _likePostResult = MutableLiveData<ApiResult<Int>>()
     val likePostResult: LiveData<ApiResult<Int>> = _likePostResult
+
+    private var _postDetailResult = MutableLiveData<ApiResult<Int>>()
+    val postDetailResult: LiveData<ApiResult<Int>> = _postDetailResult
 
     fun getClip(id: String, pos: Int) {
         viewModelScope.launch {
@@ -73,6 +74,26 @@ class ClipViewModel : BaseViewModel() {
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _followResult.value = it }
         }
+    }
+
+    fun getPostDetail(item: MemberPostItem, position: Int) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.getMemberPostDetail(item.id)
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(position))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _postDetailResult.value = it }
+        }
+    }
+
+    fun sendPlayerError(item: MemberPostItem, error: String){
+        //TODO
     }
 
     fun favoritePost(item: MemberPostItem, position: Int, isFavorite: Boolean) {

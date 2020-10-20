@@ -47,7 +47,7 @@
             android:id="@+id/tv_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="10dp"
             android:layout_marginTop="5dp"
             android:ellipsize="end"
             android:maxLines="1"
@@ -57,24 +57,23 @@
             app:layout_constraintEnd_toEndOf="@+id/gl_topup_start"
             app:layout_constraintStart_toEndOf="@id/iv_photo"
             app:layout_constraintTop_toTopOf="@id/iv_photo"
+            app:layout_constraintBottom_toTopOf="@+id/tv_expiry_date"
+            app:layout_goneMarginTop="20dp"
             tools:text="好大一棵洋梨" />
 
         <TextView
-            android:id="@+id/tv_Point"
+            android:id="@+id/tv_expiry_date"
             android:layout_width="wrap_content"
             android:layout_height="20dp"
-            android:layout_marginTop="2dp"
-            android:background="@drawable/bg_coin"
-            android:drawablePadding="2dp"
+            android:layout_marginTop="5dp"
             android:gravity="center"
-            android:paddingStart="4dp"
-            android:paddingEnd="6dp"
             android:textColor="@color/color_white_1"
-            android:textSize="14sp"
-            app:drawableStartCompat="@drawable/ico_micoin_small"
+            android:textSize="12sp"
+            android:visibility="gone"
             app:layout_constraintStart_toStartOf="@+id/tv_name"
             app:layout_constraintTop_toBottomOf="@id/tv_name"
-            tools:text="200" />
+            app:layout_constraintBottom_toBottomOf="@+id/iv_photo"
+            tools:text="VIP 於 2020-02-10 到期" />
 
         <TextView
             android:id="@+id/tv_topup"
@@ -85,7 +84,7 @@
             android:text="@string/personal_topup"
             android:textColor="@color/color_red_6"
             android:textSize="15sp"
-            app:layout_constraintBottom_toBottomOf="@id/tv_Point"
+            app:layout_constraintBottom_toBottomOf="@id/tv_name"
             app:layout_constraintEnd_toEndOf="@id/gl_topup_end"
             app:layout_constraintStart_toStartOf="@+id/gl_topup_start"
             app:layout_constraintTop_toTopOf="@+id/tv_name" />
