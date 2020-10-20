@@ -653,6 +653,16 @@ interface ApiService {
 
     /**********************************************************
      *
+     *                  Get Invite Vip
+     *
+     ***********************************************************/
+    @GET("/v1/Members/Me/Promotion")
+    suspend fun getPromotionItem(
+        @Query("url") url: String,
+    ): Response<ApiBaseItem<PromotionItem>>
+
+    /**********************************************************
+     *
      *                  Get Invite Vip History
      *
      ***********************************************************/

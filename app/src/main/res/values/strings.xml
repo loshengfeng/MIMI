@@ -420,6 +420,12 @@
     <string name="topup_default_time">-</string>
 
     <!-- Invite Vip -->
+    <string name="invite_vip_reward_text">每成功推广 1 人, 增加 2 天 VIP, 无限叠加</string>
+    <string name="invite_vip_plus_text">+</string>
+    <string name="invite_vip_invite_code_text">邀请码</string>
+    <string name="invite_vip_invite_copy_btn">复制</string>
+    <string name="invite_vip_people_text">已推广人数</string>
+    <string name="invite_vip_days_text">累计 VIP 天数</string>
     <string name="invite_vip_record_title">推广记录</string>
     <string name="invite_vip_record_text_name">用户名称</string>
     <string name="invite_vip_record_text_phone">手机号</string>
