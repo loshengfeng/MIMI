@@ -74,6 +74,9 @@ data class MemberPostItem(
     val adItem: AdItem? = null,
 
     @SerializedName("isFullContent")
-    val isFullContent: Boolean = false
+    val isFullContent: Boolean = false,
+
+    @SerializedName("deducted")
+    val deducted: Boolean = false
 
 ) : BaseMemberPostItem()

@@ -4,13 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/color_black_4">
+    android:background="@color/normal_color_background">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_search_bar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/app_bar_height"
-        android:background="@color/color_black_6"
+        android:background="@color/normal_color_status_bar"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
@@ -19,7 +19,7 @@
             android:layout_height="40dp"
             android:layout_marginStart="12dp"
             android:background="@null"
-            android:src="@drawable/btn_back_white_n"
+            android:src="@drawable/btn_back_black_n"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -30,7 +30,7 @@
             android:layout_height="36dp"
             android:layout_marginStart="60dp"
             android:layout_marginEnd="68dp"
-            android:src="@drawable/bg_black_1_30_radius_18"
+            android:src="@drawable/bg_white_1_65625_border_gray_11_radius_18"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -45,20 +45,19 @@
             android:background="@null"
             android:hint="@string/search_text"
             android:singleLine="true"
-            android:textColor="@color/color_white_1"
-            android:textColorHint="@color/color_white_1_30"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/iv_clean"
             app:layout_constraintStart_toEndOf="@id/iv_search"
             app:layout_constraintTop_toTopOf="parent"
-            android:imeOptions="actionSearch"/>
+            android:imeOptions="actionSearch"
+            tools:text="冰"/>
 
         <ImageView
             android:id="@+id/iv_search"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:src="@drawable/btn_search_white_n"
+            android:src="@drawable/btn_search_black_n"
             app:layout_constraintBottom_toBottomOf="@id/iv_search_bar"
             app:layout_constraintStart_toStartOf="@id/iv_search_bar"
             app:layout_constraintTop_toTopOf="@id/iv_search_bar" />
@@ -69,7 +68,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
             android:background="@null"
-            android:src="@drawable/btn_close_circle_p"
+            android:src="@drawable/btn_close_1_n"
             app:layout_constraintBottom_toBottomOf="@id/iv_search_bar"
             app:layout_constraintEnd_toEndOf="@id/iv_search_bar"
             app:layout_constraintTop_toTopOf="@id/iv_search_bar" />
@@ -109,7 +108,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="15dp"
                 android:text="@string/search_history"
-                android:textColor="@color/color_white_1"
+                android:textColor="@color/color_black_1"
                 android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -120,7 +119,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="20dp"
-                android:src="@drawable/btn_trash_white_n"
+                android:src="@drawable/btn_trash_n"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -152,7 +151,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:layout_marginTop="15dp"
-                android:textColor="@color/color_white_1"
+                android:textColor="@color/color_black_1"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -166,7 +165,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="20dp"
-                android:background="@color/color_white_1_10"
+                android:background="@color/color_black_1_05"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_search_text" />
@@ -179,7 +178,6 @@
         android:id="@+id/recycler_search_result"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@color/color_black_4"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layout_search" />
 

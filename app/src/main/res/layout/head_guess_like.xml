@@ -4,6 +4,18 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <View
+        android:id="@+id/line_source"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/color_black_1_05" />
+
     <TextView
         android:id="@+id/title_guess_like"
         android:layout_width="wrap_content"
@@ -13,7 +25,7 @@
         android:text="@string/guess_u_like"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/line_source" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview_guess_like"

@@ -31,7 +31,7 @@ class ClubMemberViewHolder(view: View) : BaseViewHolder(view) {
             tvFollow.text = tvFollow.context.getString(R.string.followed)
             tvFollow.background =
                 tvFollow.context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
-            tvFollow.setTextColor(tvFollow.context.getColor(R.color.color_white_1))
+            tvFollow.setTextColor(tvFollow.context.getColor(R.color.color_black_1_60))
         } else {
             tvFollow.text = tvFollow.context.getString(R.string.follow)
             tvFollow.background = tvFollow.context.getDrawable(R.drawable.bg_red_1_stroke_radius_16)
@@ -64,7 +64,7 @@ class ClubMemberViewHolder(view: View) : BaseViewHolder(view) {
             tvFollow.text = tvFollow.context.getString(R.string.followed)
             tvFollow.background =
                 tvFollow.context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
-            tvFollow.setTextColor(tvFollow.context.getColor(R.color.color_white_1))
+            tvFollow.setTextColor(tvFollow.context.getColor(R.color.color_black_1_60))
         } else {
             tvFollow.text = tvFollow.context.getString(R.string.follow)
             tvFollow.background = tvFollow.context.getDrawable(R.drawable.bg_red_1_stroke_radius_16)

@@ -17,6 +17,7 @@ class ApiRepository(private val apiService: ApiService) {
     companion object {
         const val MEDIA_TYPE_JSON = "application/json"
         const val AUTHORIZATION = "Authorization"
+        const val X_DEVICE_ID = "X-Device-Id"
         const val BEARER = "Bearer "
         const val FILE = "file"
         const val MEDIA_TYPE_IMAGE = "image/*"
@@ -230,6 +231,8 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun cancelFollowPost(userId: Long): Response<Void> {
         return apiService.cancelFollowPost(userId)
     }
+
+    suspend fun validateMessage(body: ValidateMessageRequest) = apiService.validateMessage(body)
 
     /**********************************************************
      *

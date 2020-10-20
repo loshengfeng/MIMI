@@ -12,8 +12,6 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_ADULT
-import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_NORMAL
 import com.dabenxiang.mimi.view.favroite.FavoriteFragment.Companion.TYPE_SHORT_VIDEO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -54,16 +52,16 @@ class FavoriteViewModel : BaseViewModel() {
     private val _isEmailConfirmed = MutableLiveData<ApiResult<Boolean>>()
     val isEmailConfirmed: LiveData<ApiResult<Boolean>> get() = _isEmailConfirmed
 
-    fun initData(primaryType: Int, secondaryType: Int) {
+    fun initData(primaryType: Int) {
         viewModelScope.launch {
             when {
-                primaryType == TYPE_NORMAL || (primaryType == TYPE_ADULT && secondaryType != TYPE_SHORT_VIDEO) -> {
+                primaryType != TYPE_SHORT_VIDEO -> {
                     val dataSrc = FavoritePlayListDataSource(
                         viewModelScope,
                         domainManager,
                         favoritePagingCallback,
                         1,
-                        primaryType == TYPE_ADULT
+                        true
                     )
                     dataSrc.isInvalid
                     val factory = FavoritePlayListFactory(dataSrc)

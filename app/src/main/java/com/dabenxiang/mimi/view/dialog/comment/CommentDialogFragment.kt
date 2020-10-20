@@ -170,7 +170,7 @@ class CommentDialogFragment : BaseDialogFragment() {
 
         Glide.with(requireContext())
             .load(R.drawable.bg_comment_dialog)
-            .transform(BlurTransformation(25, 5))
+            .transform(BlurTransformation(15, 5))
             .into(iv_blur)
 
         (arguments?.getSerializable(KEY_DATA) as MemberPostItem).also { memberPostItem ->

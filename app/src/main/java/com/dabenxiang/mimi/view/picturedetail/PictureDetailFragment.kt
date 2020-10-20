@@ -69,7 +69,7 @@ class PictureDetailFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        useAdultTheme(true)
+        useAdultTheme(false)
 
         memberPostItem = arguments?.getSerializable(KEY_DATA) as MemberPostItem
         val position = arguments?.getInt(KEY_POSITION) ?: 0
@@ -81,7 +81,7 @@ class PictureDetailFragment : BaseFragment() {
 
         text_toolbar_title.text = getString(R.string.picture_detail_title)
         toolbarContainer.toolbar.navigationIcon =
-            requireContext().getDrawable(R.drawable.btn_back_white_n)
+            requireContext().getDrawable(R.drawable.btn_back_black_n)
         toolbarContainer.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
@@ -100,7 +100,7 @@ class PictureDetailFragment : BaseFragment() {
         if (memberPostItem!!.likeType == LikeType.LIKE) {
             iv_like.setImageResource(R.drawable.ico_nice_s)
         } else {
-            iv_like.setImageResource(R.drawable.ico_nice)
+            iv_like.setImageResource(R.drawable.ico_nice_gray)
         }
         tv_like_count.text = memberPostItem!!.likeCount.toString()
         tv_comment_count.text = memberPostItem!!.commentCount.toString()
@@ -185,7 +185,7 @@ class PictureDetailFragment : BaseFragment() {
                     if (item.likeType == LikeType.LIKE) {
                         iv_like.setImageResource(R.drawable.ico_nice_s)
                     } else {
-                        iv_like.setImageResource(R.drawable.ico_nice)
+                        iv_like.setImageResource(R.drawable.ico_nice_gray)
                     }
                     tv_like_count.text = item.likeCount.toString()
 
@@ -340,7 +340,7 @@ class PictureDetailFragment : BaseFragment() {
             val bundle = MyPostFragment.createBundle(
                 userId, name,
                 isAdult = true,
-                isAdultTheme = true
+                isAdultTheme = false
             )
             navigateTo(NavigateItem.Destination(R.id.action_to_myPostFragment, bundle))
         }

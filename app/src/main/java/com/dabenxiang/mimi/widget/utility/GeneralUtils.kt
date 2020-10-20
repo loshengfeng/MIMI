@@ -133,6 +133,14 @@ object GeneralUtils {
         )
     }
 
+    fun isMobileValid(callPrefix: String, mobile: String): Boolean {
+        return if (callPrefix == "+86") {
+            mobile.length < 11
+        } else {
+            mobile.length < 10
+        }
+    }
+
     fun getScreenSize(activity: Activity): Pair<Int, Int> {
         val displayMetrics = DisplayMetrics()
         activity.windowManager.defaultDisplay.getMetrics(displayMetrics)

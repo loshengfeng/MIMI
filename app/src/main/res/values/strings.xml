@@ -39,6 +39,9 @@
     <string name="password_format_error_2">请填写8~20字的英文、数字或特殊符号，区分大小写</string>
     <string name="password_format_error_3">请填写确认密码</string>
     <string name="password_format_error_4">与密码不相符合，请确认</string>
+    <string name="mobile_format_error_1">请填写电话</string>
+    <string name="account_error_1">請填写名稱</string>
+    <string name="invalidate_code_error_1">请填写验证码</string>
     <string name="receive_mail">请收验证信</string>
     <string name="desc_register">请至信箱查看验证信以完成账号注册</string>
     <string name="desc_email">已传送新密码至您的邮箱\n%s\n请至邮箱确认</string>
@@ -73,6 +76,14 @@
     <string name="topup_pending_order_1">尚有</string>
     <string name="topup_pending_order_2">笔充值作业未完成，请稍后再试</string>
     <string name="topup_goto_top_up_manage">前往充值管理</string>
+
+    <!-- Home -->
+    <string name="home_tab_video">蜜蜜影视</string>
+    <string name="home_tab_follow">关注</string>
+    <string name="home_tab_clip">短视频</string>
+    <string name="home_tab_picture">图片</string>
+    <string name="home_tab_text">短文</string>
+    <string name="home_tab_club">圈子</string>
 
     <!-- Favorite -->
     <string name="favorite_title">我的收藏</string>
@@ -170,14 +181,22 @@
     <string name="btn_login">登录</string>
     <string name="login_name">请填写名称</string>
     <string name="login_email">请填写Email</string>
+    <string name="login_mobile">请填写手机号</string>
     <string name="login_account">请填写帐号</string>
     <string name="login_pw">请填写密码</string>
-    <string name="login_confirm_pw">请填写确认密码</string>
+    <string name="login_verification_code">请填写验证码</string>
+    <string name="login_invite_code">请填写邀请码</string>
+    <string name="login_confirm_pw">请再次填写密码</string>
     <string name="login_desc">点选「注册」即表示您同意接受<font fgcolor="#ff4d4d">服务条款</font>及<font fgcolor="#ff4d4d">隐私权保护政策</font></string>
     <string name="login_keep_account">记住帐号</string>
     <string name="login_forget">忘记密码?</string>
+    <string name="login_get_code">获取验证码</string>
     <string name="username_or_password_incorrect">使用者名称或密码错误</string>
-
+    <string name="send_code_count_down">%1$ds</string>
+    <string name="login_mobile_call_prefix_china">+86</string>
+    <string name="login_mobile_call_prefix_taiwan">+886</string>
+    <string name="vip_expiry_date">VIP 於 %s 到期</string>
+    
     <!-- Home -->
     <string name="follow_title">我的关注</string>
     <string name="follow_people">关注的人</string>
@@ -403,4 +422,8 @@
     <!-- Invite Vip -->
     <string name="invite_vip_record_title">推广记录</string>
 
+    <!-- Order Result -->
+    <string name="recharge_reminder_message"><font fgcolor="#ffffff">免费观看次数已用完\n成功推广 1 人赠送</font> <font fgcolor='#FF4D4D'>2</font><font fgcolor="#ffffff">天 VIP\n可无限叠加，免费观看所有视频</font></string>
+    <string name="recharge_reminder_btn_vip">充值 VIP</string>
+    <string name="recharge_reminder_btn_promote">推广好友</string>
 </resources>

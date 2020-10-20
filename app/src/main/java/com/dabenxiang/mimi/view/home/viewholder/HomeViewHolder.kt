@@ -78,13 +78,7 @@ class HeaderViewHolder(
 
             tvTitle.text = data.title
             tvTitle.setTextColor(
-                if (isAdult) {
-                    R.color.adult_color_text
-                } else {
-                    R.color.normal_color_text
-                }.let {
-                    itemView.resources.getColor(it, null)
-                }
+                itemView.resources.getColor(R.color.normal_color_text, null)
             )
         }
     }
