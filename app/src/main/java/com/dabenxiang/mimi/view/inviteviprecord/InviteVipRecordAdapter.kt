@@ -33,7 +33,7 @@ class InviteVipRecordAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InviteVipRecordViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        return InviteVipRecordViewHolder(layoutInflater.inflate(R.layout.item_chat_history, parent, false), listener)
+        return InviteVipRecordViewHolder(layoutInflater.inflate(R.layout.item_invite_vip_record, parent, false), listener)
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
