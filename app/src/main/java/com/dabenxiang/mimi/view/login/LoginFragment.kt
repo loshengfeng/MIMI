@@ -185,7 +185,7 @@ class LoginFragment : BaseFragment() {
         })
 
         viewModel.mobile.observe(viewLifecycleOwner, Observer {
-            if (it.isNullOrBlank()) {
+            if (it == null || viewModel.isValidateMobile(it, tv_call_prefix.text.toString()).isNotBlank()) {
                 tv_get_code.isEnabled = false
                 tv_get_code.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_black_1_30))
             } else {
@@ -243,7 +243,7 @@ class LoginFragment : BaseFragment() {
                     NavigateItem.Up
                 )
                 R.id.btn_register -> {
-                    viewModel.doRegisterValidateAndSubmit(tv_call_prefix.text.toString(), edit_verification_code.text.toString())
+                    viewModel.doRegisterValidateAndSubmit(tv_call_prefix.text.toString())
                 }
                 R.id.btn_forget -> navigateTo(NavigateItem.Destination(R.id.action_loginFragment_to_forgetPasswordFragment))
                 R.id.btn_login -> viewModel.doLoginValidateAndSubmit(tv_login_call_prefix.text.toString())
@@ -286,7 +286,7 @@ class LoginFragment : BaseFragment() {
         }
 
         tv_get_code.setOnClickListener {
-            viewModel.callValidateMessage(edit_mobile.text.toString())
+            viewModel.callValidateMessage(tv_call_prefix.text.toString())
         }
 
         tv_call_prefix.setOnClickListener {

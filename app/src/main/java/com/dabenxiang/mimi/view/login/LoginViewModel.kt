@@ -15,6 +15,7 @@ import com.dabenxiang.mimi.widget.utility.EditTextMutableLiveData
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.isAccountValid
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.isEmailValid
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.isFriendlyNameValid
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.isMobileValid
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.isPasswordValid
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -73,11 +74,11 @@ class LoginViewModel : BaseViewModel() {
     private val _validateMessageResult = MutableLiveData<ApiResult<Nothing>>()
     val validateMessageResult: LiveData<ApiResult<Nothing>> = _validateMessageResult
 
-    fun doRegisterValidateAndSubmit(callPrefix: String, code: String) {
+    fun doRegisterValidateAndSubmit(callPrefix: String) {
         _accountError.value = isValidateFriendlyName(account.value ?: "")
-        _mobileError.value = isValidateMobile(mobile.value ?: "")
+        _mobileError.value = isValidateMobile(mobile.value ?: "", callPrefix)
 //        _registerAccountError.value = isValidateAccount(registerAccount.value ?: "")
-        _validateCodeError.value = isValidateValidateCode(code)
+        _validateCodeError.value = isValidateValidateCode(verificationCode.value ?: "")
         _registerPasswordError.value = isValidatePassword(registerPw.value ?: "")
         _confirmPasswordError.value =
             isValidateConfirmPassword(registerPw.value ?: "", confirmPw.value ?: "")
@@ -91,13 +92,11 @@ class LoginViewModel : BaseViewModel() {
             viewModelScope.launch {
                 accountManager.signUp(
                     SingUpRequest(
-                        username = account.value,
-                        email = mobile.value,
-                        friendlyName = null,
+                        username = callPrefix + mobile.value,
+                        friendlyName = account.value,
                         password = registerPw.value,
-//                        promoCode = PROMO_CODE,
-                        validationUrl = domainManager.getWebDomain() + DomainManager.PARAM_SIGNUP_CODE,
-                        code = code
+                        referrerCode = inviteCode.value,
+                        code = verificationCode.value
                     )
                 ).collect {
                     _registerResult.value = it
@@ -113,7 +112,7 @@ class LoginViewModel : BaseViewModel() {
         if ("" == _loginAccountError.value &&
             "" == _loginPasswordError.value
         ) {
-            loginAccount.value?.let { loginPw.value?.let { it1 -> doLogin(it, it1) } }
+            loginAccount.value?.let { loginPw.value?.let { it1 -> doLogin(callPrefix + it, it1) } }
         }
     }
 
@@ -133,9 +132,10 @@ class LoginViewModel : BaseViewModel() {
         }
     }
 
-    private fun isValidateMobile(mobile: String): String {
+    fun isValidateMobile(mobile: String, callPrefix: String): String {
         return when {
             TextUtils.isEmpty(mobile) -> app.getString(R.string.mobile_format_error_1)
+            isMobileValid(callPrefix, mobile) -> app.getString(R.string.mobile_format_error_1)
             else -> ""
         }
     }
@@ -170,10 +170,10 @@ class LoginViewModel : BaseViewModel() {
         }
     }
 
-    fun callValidateMessage(mobile: String) {
+    fun callValidateMessage(callPrefix: String) {
         viewModelScope.launch {
             flow {
-                val body = ValidateMessageRequest(mobile)
+                val body = ValidateMessageRequest(callPrefix + mobile.value)
 
                 val apiRepository = domainManager.getApiRepository()
                 val result = apiRepository.validateMessage(body)
