@@ -7,14 +7,17 @@ import com.blankj.utilcode.util.FileIOUtils
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ApiBaseItem
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
+import com.dabenxiang.mimi.model.api.vo.MeItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 import java.io.File
 
 class ClipViewModel : BaseViewModel() {
@@ -33,6 +36,9 @@ class ClipViewModel : BaseViewModel() {
 
     private var _postDetailResult = MutableLiveData<ApiResult<Int>>()
     val postDetailResult: LiveData<ApiResult<Int>> = _postDetailResult
+
+    private val _meItem = MutableLiveData<ApiResult<MeItem>>()
+    val meItem: LiveData<ApiResult<MeItem>> = _meItem
 
     fun getClip(id: String, pos: Int) {
         viewModelScope.launch {
@@ -92,7 +98,7 @@ class ClipViewModel : BaseViewModel() {
         }
     }
 
-    fun sendPlayerError(item: MemberPostItem, error: String){
+    fun sendPlayerError(item: MemberPostItem, error: String) {
         //TODO
     }
 
@@ -138,6 +144,45 @@ class ClipViewModel : BaseViewModel() {
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _likePostResult.value = it }
+        }
+    }
+
+    fun getMe(item: MemberPostItem, position: Int) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getMe()
+                if (!result.isSuccessful) throw HttpException(result)
+                val meItem = result.body()?.content
+                meItem?.let {
+                    accountManager.setupProfile(it)
+                }
+                emit(ApiResult.success(meItem))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect {
+                    when (it) {
+                        is ApiResult.Success -> {
+                            it.result.takeIf { checkConsumeResult(it) }?.let {
+                                getPostDetail(item, position)
+                            }
+                        }
+                        is ApiResult.Error -> _meItem.value = it
+                        else -> _meItem.value = it
+                    }
+
+                }
+        }
+
+    }
+
+    private fun checkConsumeResult(me: MeItem): Boolean {
+        Timber.i("checkConsumeResult me:$me")
+        return when {
+            me.isSubscribed -> true
+            me.videoCount ?: 0 > 0 -> true
+            else -> false
         }
     }
 }
