@@ -72,12 +72,16 @@ class PersonalFragment : BaseFragment() {
                     val meItem = it.result
                     tv_name.text = meItem.friendlyName.toString()
 
-                    tv_expiry_date.text = getString(R.string.vip_expiry_date, meItem?.expiryDate.let { date ->
-                        SimpleDateFormat(
-                            "yyyy-MM-dd",
-                            Locale.getDefault()
-                        ).format(date)
-                    })
+                    meItem.expiryDate?.let {date ->
+                        tv_expiry_date.visibility =View.VISIBLE
+                        tv_expiry_date.text = getString(R.string.vip_expiry_date,
+                            SimpleDateFormat(
+                                "yyyy-MM-dd",
+                                Locale.getDefault()
+                            ).format(date)
+                        )
+                    }
+
                     //TODO: 目前先不判斷是否有驗證過
 //                    takeUnless { meItem.isEmailConfirmed == true }?.run {
 //                        (requireActivity() as MainActivity).showEmailConfirmDialog()
