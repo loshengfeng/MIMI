@@ -28,8 +28,15 @@ import com.dabenxiang.mimi.view.orderinfo.OrderInfoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_top_up.*
+import kotlinx.android.synthetic.main.fragment_top_up.iv_photo
+import kotlinx.android.synthetic.main.fragment_top_up.tv_expiry_date
+import kotlinx.android.synthetic.main.fragment_top_up.tv_name
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class TopUpFragment : BaseFragment() {
 
@@ -73,7 +80,16 @@ class TopUpFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     tv_name.text = it.result.friendlyName
-                    tv_coco.text = it.result.availablePoint.toString()
+                    it.result.expiryDate?.let {date ->
+                        tv_expiry_date.visibility =View.VISIBLE
+                        tv_expiry_date.text = getString(R.string.vip_expiry_date,
+                            SimpleDateFormat(
+                                "yyyy-MM-dd",
+                                Locale.getDefault()
+                            ).format(date)
+                        )
+                    }
+
                     viewModel.loadImage(
                         it.result.avatarAttachmentId,
                         iv_photo,
@@ -285,7 +301,7 @@ class TopUpFragment : BaseFragment() {
 
         val userItem = viewModel.getUserData()
         tv_name.text = userItem.friendlyName
-        tv_coco.text = userItem.point.toString()
+        tv_expiry_date.visibility = View.GONE
 
         rv_online_pay.layoutManager = GridLayoutManager(context, 2)
         rv_online_pay.adapter = onlinePayAdapter

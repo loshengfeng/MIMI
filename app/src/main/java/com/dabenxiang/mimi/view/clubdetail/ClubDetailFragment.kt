@@ -88,7 +88,9 @@ class ClubDetailFragment : BaseFragment() {
         bitmap?.also { Glide.with(requireContext()).load(it).circleCrop().into(iv_avatar) }
 
         viewPager.isUserInputEnabled = false
+
         viewPager.offscreenPageLimit = 3
+
         viewPager.adapter =
             ClubPagerAdapter(
                 ClubDetailFuncItem({ orderBy, funUpdateList, funUpdateCount ->

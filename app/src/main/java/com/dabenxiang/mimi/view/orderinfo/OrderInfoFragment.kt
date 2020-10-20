@@ -60,16 +60,17 @@ class OrderInfoFragment : BaseFragment() {
         orderingPackageItem =
             arguments?.getSerializable(PictureDetailFragment.KEY_DATA) as OrderingPackageItem
 
-        val productName = StringBuilder(orderingPackageItem.point.toString())
-            .append(" ")
-            .append(getString(R.string.order_detail_point))
-            .append("(")
-        when (orderingPackageItem.paymentType) {
-            PaymentType.BANK -> productName.append(getString(R.string.order_detail_payment_bank))
-            PaymentType.ALI -> productName.append(getString(R.string.order_detail_payment_ali))
-            else -> productName.append(getString(R.string.order_detail_payment_wx))
-        }
-        productName.append(")")
+        val productName = getString(
+            R.string.order_detail_content, orderingPackageItem.name,
+            getString(
+                when (orderingPackageItem.paymentType) {
+                    PaymentType.BANK -> R.string.order_detail_payment_bank
+                    PaymentType.ALI -> R.string.order_detail_payment_ali
+                    else -> R.string.order_detail_payment_wx
+                }
+            )
+        )
+
         tv_product_name.text = productName
 
         val price = GeneralUtils.getAmountFormat(orderingPackageItem.price)
