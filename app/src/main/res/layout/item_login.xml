@@ -52,7 +52,7 @@
             android:hint="@string/login_mobile"
             android:importantForAutofill="no"
             android:inputType="phone"
-            android:maxLength="20"
+            android:maxLength="11"
             android:textSize="14sp"
             android:layout_marginStart="15dp"
             app:layout_constraintBottom_toBottomOf="parent"
