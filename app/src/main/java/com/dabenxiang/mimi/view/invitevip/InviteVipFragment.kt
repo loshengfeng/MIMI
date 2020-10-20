@@ -9,10 +9,16 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.copyToClipboard
 import com.dabenxiang.mimi.widget.utility.QrCodeUtils
 import kotlinx.android.synthetic.main.fragment_invite_vip.*
 
 class InviteVipFragment : BaseFragment() {
+    companion object {
+        private const val SHOW_COPY_HINT_TIME = 3500L
+        private const val SHOW_COPY_HINT_DURATION = 800L
+    }
+
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
@@ -41,6 +47,17 @@ class InviteVipFragment : BaseFragment() {
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
+
+        viewModel.showCopyHint.observe(viewLifecycleOwner, Observer {
+                if(it == true) {
+                    bt_invite_copy.isEnabled = false
+                    tv_invite_vip_copy_hint.visibility = View.VISIBLE
+                    tv_invite_vip_copy_hint?.animate()?.alpha(1.0f)?.setDuration(SHOW_COPY_HINT_DURATION)
+                } else {
+                    bt_invite_copy.isEnabled = true
+                    tv_invite_vip_copy_hint?.animate()?.alpha(0.0f)?.setDuration(SHOW_COPY_HINT_DURATION)
+                }
+        })
     }
 
     override fun setupListeners() {
@@ -55,6 +72,11 @@ class InviteVipFragment : BaseFragment() {
                     null
                 )
             )
+        }
+
+        bt_invite_copy.setOnClickListener {
+            copyToClipboard(requireContext(), tv_invite_code.text.toString())
+            viewModel.setShowCopyHint(SHOW_COPY_HINT_TIME)
         }
 
     }

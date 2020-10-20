@@ -426,6 +426,7 @@
     <string name="invite_vip_invite_copy_btn">复制</string>
     <string name="invite_vip_people_text">已推广人数</string>
     <string name="invite_vip_days_text">累计 VIP 天数</string>
+    <string name="invite_vip_invite_copy_hint">已复制邀请码</string>
     <string name="invite_vip_record_title">推广记录</string>
     <string name="invite_vip_record_text_name">用户名称</string>
     <string name="invite_vip_record_text_phone">手机号</string>
