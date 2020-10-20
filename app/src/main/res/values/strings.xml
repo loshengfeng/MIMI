@@ -153,7 +153,7 @@
     <string name="topup_proxy_chat">对话记录</string>
     <string name="topup_pay">支付金额(¥)</string>
     <string name="topup_order_id">充值订单编号</string>
-    <string name="topup_point">蜜币</string>
+    <string name="topup_point">方案</string>
     <string name="topup_create_time">訂單建立時間</string>
     <string name="topup_completion_time">充值完成時間</string>
     <string name="topup_check_info">查看打款资讯</string>

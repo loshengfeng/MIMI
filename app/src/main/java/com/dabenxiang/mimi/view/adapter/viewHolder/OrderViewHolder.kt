@@ -128,8 +128,8 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
             SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(date)
         } ?: let { tvTime.context.getString(R.string.topup_default_time) }
 
-        // 僅顯示會員充值的蜜幣數量
-        tvPoint.text = orderItem?.packagePoint.toString()
+        // 僅顯示會員充值的方案
+        tvPoint.text = orderItem?.packageName
 
         // 若未登入顯示「-」
         tvSellingPrice.text = GeneralUtils.getAmountFormat(orderItem?.sellingPrice ?: 0f)
