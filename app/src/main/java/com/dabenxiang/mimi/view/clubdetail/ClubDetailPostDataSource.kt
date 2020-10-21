@@ -64,7 +64,7 @@ class ClubDetailPostDataSource(
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect {
-                    pagingCallback.onTotalCount(it.count, true)
+                    pagingCallback.onCurrentItemCount(it.count, true)
                     callback.onResult(it.list, null, it.nextKey)
                 }
         }
@@ -90,7 +90,7 @@ class ClubDetailPostDataSource(
                 .collect {
                     it.body()?.also { item ->
                         item.content?.also { list ->
-                            pagingCallback.onTotalCount(list.size.toLong(), false)
+                            pagingCallback.onCurrentItemCount(list.size.toLong(), false)
                             val nextPageKey = when {
                                 hasNextPage(
                                     item.paging.count,

@@ -130,9 +130,6 @@ class PlayerViewModel : BaseViewModel() {
     private val _meItem = MutableLiveData<ApiResult<MeItem>>()
     val meItem: LiveData<ApiResult<MeItem>> = _meItem
 
-    private val _guestItem = MutableLiveData<ApiResult<MeItem>>()
-    val guestItem: LiveData<ApiResult<MeItem>> = _guestItem
-
     fun updatedSelectedNewestComment(isNewest: Boolean) {
         _isSelectedNewestComment.value = isNewest
     }
@@ -474,7 +471,7 @@ class PlayerViewModel : BaseViewModel() {
     }
 
     fun checkConsumeResult(me: MeItem) {
-        Timber.i("checkConsumeResult me:$me isDeducted:$isDeducted")
+        Timber.i("checkConsumeResult me:$me")
         val result =
             when {
                 costPoint == 0L || isDeducted || me.isSubscribed -> VideoConsumeResult.PAID
@@ -839,11 +836,11 @@ class PlayerViewModel : BaseViewModel() {
             flow {
                 val result = domainManager.getApiRepository().getMe()
                 if (!result.isSuccessful) throw HttpException(result)
-                val meItem = result.body()?.content
-                meItem?.let {
+                val me = result.body()?.content
+                me?.let {
                     accountManager.setupProfile(it)
                 }
-                emit(ApiResult.success(meItem))
+                emit(ApiResult.success(me))
             }
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
@@ -854,17 +851,15 @@ class PlayerViewModel : BaseViewModel() {
 
     fun getGuestInfo() {
         viewModelScope.launch {
-            flow<ApiResult<MeItem>> {
+            flow {
                 val result = domainManager.getApiRepository().getGuestInfo()
                 if (!result.isSuccessful) throw HttpException(result)
-                result.body()?.content?.let { guest ->
-                    checkConsumeResult(guest)
-                }
-                emit(ApiResult.success(null))
+                val guest = result.body()?.content
+                emit(ApiResult.success(guest))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect {}
+                .collect { _meItem.value = it }
         }
     }
 
