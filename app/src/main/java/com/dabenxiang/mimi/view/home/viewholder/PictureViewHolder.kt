@@ -45,13 +45,6 @@ class PictureViewHolder(
         posterTime.text = GeneralUtils.getTimeDiff(model?.creationDate ?: Date(), Date())
         title.text = model?.title
 
-        card.setCardBackgroundColor(
-            itemView.resources.getColor(
-                R.color.adult_color_card_background,
-                null
-            )
-        )
-
         postImageItem?.also {
             if (!TextUtils.isEmpty(postImageItem.url)) {
                 Glide.with(pictureImage.context)

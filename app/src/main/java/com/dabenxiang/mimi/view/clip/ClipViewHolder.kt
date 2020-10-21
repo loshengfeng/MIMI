@@ -18,6 +18,8 @@ import com.dabenxiang.mimi.model.manager.AccountManager
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_clip.view.*
+import kotlinx.android.synthetic.main.item_clip.view.recharge_reminder
+import kotlinx.android.synthetic.main.recharge_reminder.view.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
@@ -40,7 +42,8 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view), KoinComponent 
     var tvComment: TextView = view.tv_comment
     var progress: ProgressBar = view.progress_video
     var reminder: View =view.recharge_reminder
-
+    var reminder_btn_vip: View =view.btn_vip
+    var reminder_btn_promote: View =view.btn_promote
 
     fun onBind(item: MemberPostItem, clipFuncItem: ClipFuncItem, pos: Int) {
 
@@ -108,6 +111,13 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view), KoinComponent 
             reminder.visibility = View.GONE
         } else{
             reminder.visibility = View.VISIBLE
+        }
+
+        reminder_btn_vip.setOnClickListener {
+            clipFuncItem.onVipClick()
+        }
+        reminder_btn_promote.setOnClickListener {
+            clipFuncItem.onPromoteClick()
         }
     }
 }

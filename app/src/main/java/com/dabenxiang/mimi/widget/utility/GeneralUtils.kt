@@ -137,7 +137,7 @@ object GeneralUtils {
         return if (callPrefix == "+86") {
             mobile.length < 11
         } else {
-            mobile.length < 10
+            mobile.length < 9
         }
     }
 

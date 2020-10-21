@@ -1,7 +1,10 @@
 package com.dabenxiang.mimi.view.login
 
+import android.R.attr.maxLength
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.text.InputFilter
+import android.text.InputFilter.LengthFilter
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
@@ -24,6 +27,7 @@ import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.item_login.*
 import kotlinx.android.synthetic.main.item_register.*
+
 
 class LoginFragment : BaseFragment() {
 
@@ -297,9 +301,11 @@ class LoginFragment : BaseFragment() {
                 if (tv_call_prefix.text == getString(R.string.login_mobile_call_prefix_taiwan)) {
                     tv_call_prefix.text = getString(R.string.login_mobile_call_prefix_china)
                     ToastUtils.showShort("Change to +86")
+                    edit_mobile.filters = arrayOf<InputFilter>(LengthFilter(11))
                 } else {
                     tv_call_prefix.text = getString(R.string.login_mobile_call_prefix_taiwan)
                     ToastUtils.showShort("Change to +886")
+                    edit_mobile.filters = arrayOf<InputFilter>(LengthFilter(9))
                 }
             }
 
@@ -314,9 +320,11 @@ class LoginFragment : BaseFragment() {
                 if (tv_login_call_prefix.text == getString(R.string.login_mobile_call_prefix_taiwan)) {
                     tv_login_call_prefix.text = getString(R.string.login_mobile_call_prefix_china)
                     ToastUtils.showShort("Change to +86")
+                    edit_login_account.filters = arrayOf<InputFilter>(LengthFilter(11))
                 } else {
                     tv_login_call_prefix.text = getString(R.string.login_mobile_call_prefix_taiwan)
                     ToastUtils.showShort("Change to +886")
+                    edit_login_account.filters = arrayOf<InputFilter>(LengthFilter(9))
                 }
             }
 
@@ -345,7 +353,11 @@ class LoginFragment : BaseFragment() {
         viewModel.loginAccount.value = when (keepAccount) {
             true -> {
                 val profile = viewModel.accountManager.getProfile()
-                profile.account
+                if (tv_login_call_prefix.text == "+86") {
+                    profile.account.substring(3, profile.account.length)
+                } else {
+                    profile.account.substring(4, profile.account.length)
+                }
             }
             false -> ""
         }

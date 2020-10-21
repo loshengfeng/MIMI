@@ -823,5 +823,11 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun updateOrderChatStatus(id: Long): Response<Void> {
         return apiService.updateOrderChatStatus(id)
     }
+
+    /**
+     * 取得訪客資訊
+     */
+    suspend fun getGuestInfo(
+    ) = apiService.getGuestInfo()
 }
 

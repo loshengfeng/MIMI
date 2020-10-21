@@ -164,7 +164,7 @@ class ClipAdapter(
                     contentItem?.shortVideo?.url.toString(),
                     position
                 )
-            }else{
+            } else {
                 holder.progress.visibility = View.GONE
                 clipFuncItem.getPostDetail(item, position)
             }

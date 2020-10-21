@@ -132,11 +132,25 @@ class ClipFragment : BaseFragment() {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
                 is Success -> {
+                    Timber.i("postDetailResult Success")
                     rv_clip.adapter?.notifyItemChanged(
                         it.result,
                         ClipAdapter.PAYLOAD_UPDATE_UI
                     )
                 }
+                is Error -> {
+                    progressHUD?.dismiss()
+                    onApiError(it.throwable)
+                }
+
+            }
+        })
+
+        viewModel.meItem.observe(viewLifecycleOwner, {
+            when (it) {
+                is Success -> {
+                }
+
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -164,9 +178,13 @@ class ClipFragment : BaseFragment() {
                     { item, pos, isLike -> onLikeClick(item, pos, isLike) },
                     { item -> onCommentClick(item) },
                     { onBackClick() },
-                    { item, pos -> viewModel.getPostDetail(item, pos) },
-                    { item, error -> viewModel.sendPlayerError(item, error) })
+                    { item, pos -> viewModel.getMe(item, pos) },
+                    { item, error -> viewModel.sendPlayerError(item, error) },
+                    { onVipClick()},
+                    { onPromoteClick() }
+                )
             )
+
             (rv_clip.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             PagerSnapHelper().attachToRecyclerView(rv_clip)
             rv_clip.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -198,6 +216,14 @@ class ClipFragment : BaseFragment() {
                 showCommentDialog(item)
             }
         }
+    }
+
+    private fun onPromoteClick() {
+         //TODO
+    }
+
+    private fun onVipClick() {
+        navigateTo(NavigateItem.Destination(R.id.action_to_topup))
     }
 
     override fun onAttach(context: Context) {

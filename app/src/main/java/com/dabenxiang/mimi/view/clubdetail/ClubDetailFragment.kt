@@ -79,7 +79,6 @@ class ClubDetailFragment : BaseFragment() {
     }
 
     private fun setUpUI() {
-        useAdultTheme(false)
         tv_title.text = memberClubItem.title
         tv_desc.text = memberClubItem.description
         tv_follow_count.text = memberClubItem.followerCount.toString()
@@ -90,12 +89,21 @@ class ClubDetailFragment : BaseFragment() {
 
         viewPager.isUserInputEnabled = false
 
+        viewPager.offscreenPageLimit = 3
+
         viewPager.adapter =
             ClubPagerAdapter(
-                ClubDetailFuncItem({ orderBy, function -> getPost(orderBy, function) },
+                ClubDetailFuncItem({ orderBy, funUpdateList, funUpdateCount ->
+                    getPost(
+                        orderBy,
+                        funUpdateList,
+                        funUpdateCount
+                    )
+                },
                     { id, view, resId -> viewModel.loadImage(id, view, resId) },
                     { item, items, isFollow, func -> followMember(item, items, isFollow, func) },
-                    { item, isLike, func -> likePost(item, isLike, func) }),
+                    { item, isLike, func -> likePost(item, isLike, func) }
+                ),
                 adultListener
             )
 
@@ -131,6 +139,18 @@ class ClubDetailFragment : BaseFragment() {
             val adapter =
                 (viewPager.adapter as ClubPagerAdapter).getListAdapter(tabLayout.selectedTabPosition)
             adapter.removedPosList.clear()
+        })
+
+        viewModel.updateCountHottest.observe(viewLifecycleOwner, Observer {
+            updateCountHottest.invoke(it)
+        })
+
+        viewModel.updateCountNewest.observe(viewLifecycleOwner, Observer {
+            updateCountNewest.invoke(it)
+        })
+
+        viewModel.updateCountVideo.observe(viewLifecycleOwner, Observer {
+            updateCountVideo.invoke(it)
         })
     }
 
@@ -323,8 +343,21 @@ class ClubDetailFragment : BaseFragment() {
         }
     }
 
-    private fun getPost(orderBy: OrderBy, update: ((PagedList<MemberPostItem>) -> Unit)) {
-        viewModel.getMemberPosts(memberClubItem.tag, orderBy, update)
+    private lateinit var updateCountHottest: (Int) -> Unit
+    private lateinit var updateCountNewest: (Int) -> Unit
+    private lateinit var updateCountVideo: (Int) -> Unit
+
+    private fun getPost(
+        orderBy: OrderBy,
+        updateList: ((PagedList<MemberPostItem>) -> Unit),
+        updateCount: (Int) -> Unit
+    ) {
+        viewModel.getMemberPosts(memberClubItem.tag, orderBy, updateList)
+        when (orderBy) {
+            OrderBy.HOTTEST -> updateCountHottest = updateCount
+            OrderBy.NEWEST -> updateCountNewest = updateCount
+            OrderBy.VIDEO -> updateCountVideo = updateCount
+        }
     }
 
     private fun followMember(

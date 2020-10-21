@@ -398,7 +398,8 @@ class PlayerActivity : BaseActivity() {
             Timber.i("episodePosition =$it")
             if (it >= 0) {
                 episodeAdapter.setLastSelectedIndex(it)
-                viewModel.getMe()
+                if (viewModel.isLogin()) viewModel.getMe()
+                else viewModel.getGuestInfo()
 //                viewModel.checkConsumeResult()
             }
             scrollToBottom()
@@ -566,7 +567,7 @@ class PlayerActivity : BaseActivity() {
         viewModel.likeVideo.observe(this, Observer {
             val res = when (it) {
                 true -> R.drawable.ico_nice_s
-                else ->R.drawable.ico_nice_gray
+                else -> R.drawable.ico_nice_gray
             }
 
             tv_like.setCompoundDrawablesRelativeWithIntrinsicBounds(res, 0, 0, 0)
@@ -647,10 +648,10 @@ class PlayerActivity : BaseActivity() {
         })
 
         btn_full_screen.setOnClickListener {
-            viewModel.checkStatus {
-                viewModel.lockFullScreen = !viewModel.lockFullScreen
-                switchScreenOrientation()
-            }
+//            viewModel.checkStatus {
+            viewModel.lockFullScreen = !viewModel.lockFullScreen
+            switchScreenOrientation()
+//            }
         }
 
         orientationDetector =
@@ -829,10 +830,7 @@ class PlayerActivity : BaseActivity() {
 
         viewModel.meItem.observe(this, {
             when (it) {
-                is Success -> {
-                    viewModel.checkConsumeResult(it.result)
-                }
-
+                is Success -> viewModel.checkConsumeResult(it.result)
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -865,14 +863,14 @@ class PlayerActivity : BaseActivity() {
         }
 
         iv_player.setOnClickListener {
-            viewModel.checkStatus {
-                Timber.d("iv_player confirmed")
-                if (it.visibility == VISIBLE) {
-                    player?.playWhenReady = true
-                    viewModel.setPlaying(true)
-                    exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
-                }
+//            viewModel.checkStatus {
+//                Timber.d("iv_player confirmed")
+            if (it.visibility == VISIBLE) {
+                player?.playWhenReady = true
+                viewModel.setPlaying(true)
+                exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
             }
+//            }
         }
         recycler_info.setOnClickListener {
             Timber.i("RecyclerView=setOnClickListener")
@@ -880,6 +878,13 @@ class PlayerActivity : BaseActivity() {
 
         btn_vip.setOnClickListener {
             Timber.i("btn_vip Click")
+            val bundle = Bundle()
+            navigateTo(
+                MainActivity::class.java,
+                R.id.navigation_topup,
+                bundle,
+                NAVIGATE_TO_TOPUP_ACTION
+            )
         }
 
         btn_promote.setOnClickListener {
@@ -887,10 +892,10 @@ class PlayerActivity : BaseActivity() {
         }
     }
 
-    private fun showRechargeReminder(isShow:Boolean) {
+    private fun showRechargeReminder(isShow: Boolean) {
         Timber.i("showRechargeReminder")
-        player_view.visibility = if(isShow)  INVISIBLE else VISIBLE
-        recharge_reminder.visibility = if(isShow) VISIBLE else GONE
+        player_view.visibility = if (isShow) INVISIBLE else VISIBLE
+        recharge_reminder.visibility = if (isShow) VISIBLE else GONE
     }
 
     private fun showMoreDialog(
@@ -1022,11 +1027,7 @@ class PlayerActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
 
-        if (!viewModel.isLogin() && (dialog == null || dialog?.isVisible == false)) {
-            openLoginDialog()
-        } else {
-            loadVideo()
-        }
+        loadVideo()
 
         //hideSystemUi()
 
@@ -1135,10 +1136,8 @@ class PlayerActivity : BaseActivity() {
 //        viewModel.downloadM3U8(url)
 
         viewModel.getMediaSource(url, sourceFactory)?.also {
-            viewModel.checkStatus {
-                Timber.d("player ready confirmed")
-                player?.prepare(it, isReset, isReset)
-            }
+            Timber.d("player ready confirmed")
+            player?.prepare(it, isReset, isReset)
         }
     }
 

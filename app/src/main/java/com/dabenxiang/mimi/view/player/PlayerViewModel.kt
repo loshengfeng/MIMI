@@ -130,6 +130,9 @@ class PlayerViewModel : BaseViewModel() {
     private val _meItem = MutableLiveData<ApiResult<MeItem>>()
     val meItem: LiveData<ApiResult<MeItem>> = _meItem
 
+    private val _guestItem = MutableLiveData<ApiResult<MeItem>>()
+    val guestItem: LiveData<ApiResult<MeItem>> = _guestItem
+
     fun updatedSelectedNewestComment(isNewest: Boolean) {
         _isSelectedNewestComment.value = isNewest
     }
@@ -357,8 +360,12 @@ class PlayerViewModel : BaseViewModel() {
                 )
                 if (!streamResp.isSuccessful) throw HttpException(streamResp)
                 deleteCacheFile()
-                if(TextUtils.isEmpty(streamResp.body()?.content?.streamUrl))
-                    sendCrashReport("stream url is Empty, Video id ${streamResp.body()?.content?.id}, ".plus(Gson().toJson(streamResp.body()?.content)))
+                if (TextUtils.isEmpty(streamResp.body()?.content?.streamUrl))
+                    sendCrashReport(
+                        "stream url is Empty, Video id ${streamResp.body()?.content?.id}, ".plus(
+                            Gson().toJson(streamResp.body()?.content)
+                        )
+                    )
                 // 取得轉址Url
                 when (streamResp.body()?.content?.isContent) {
                     false -> nextVideoUrl = streamResp.body()?.content?.streamUrl
@@ -435,8 +442,12 @@ class PlayerViewModel : BaseViewModel() {
                 )
                 if (!streamResp.isSuccessful) throw HttpException(streamResp)
                 deleteCacheFile()
-                if(TextUtils.isEmpty(streamResp.body()?.content?.streamUrl))
-                    sendCrashReport("stream url is Empty, Video id ${streamResp.body()?.content?.id}, ".plus(Gson().toJson(streamResp.body()?.content)))
+                if (TextUtils.isEmpty(streamResp.body()?.content?.streamUrl))
+                    sendCrashReport(
+                        "stream url is Empty, Video id ${streamResp.body()?.content?.id}, ".plus(
+                            Gson().toJson(streamResp.body()?.content)
+                        )
+                    )
                 // 取得轉址Url
                 when (streamResp.body()?.content?.isContent) {
                     false -> {
@@ -462,17 +473,15 @@ class PlayerViewModel : BaseViewModel() {
         }
     }
 
-    fun checkConsumeResult(me:MeItem) {
-        Timber.i("checkConsumeResult me:$me")
+    fun checkConsumeResult(me: MeItem) {
+        Timber.i("checkConsumeResult me:$me isDeducted:$isDeducted")
         val result =
             when {
                 costPoint == 0L || isDeducted || me.isSubscribed -> VideoConsumeResult.PAID
-
-                me.isSubscribed && !isDeducted -> VideoConsumeResult.PAID_YET
-                me.videoOnDemandCount ?: 0> 0 && isDeducted  -> VideoConsumeResult.PAID_YET
+                me.isSubscribed -> VideoConsumeResult.PAID_YET
+                me.videoOnDemandCount ?: 0 > 0 -> VideoConsumeResult.PAID_YET
                 else -> VideoConsumeResult.POINT_NOT_ENOUGH
             }
-
         _consumeResult.value = result
     }
 
@@ -484,7 +493,6 @@ class PlayerViewModel : BaseViewModel() {
     }
 
     fun setStreamPosition(position: Int) {
-
         Timber.i("setStreamPosition position=${position}  _episodePosition.value =${_episodePosition.value}")
         if (position != _episodePosition.value) {
             _episodePosition.postValue(position)
@@ -843,4 +851,21 @@ class PlayerViewModel : BaseViewModel() {
                 .collect { _meItem.value = it }
         }
     }
+
+    fun getGuestInfo() {
+        viewModelScope.launch {
+            flow<ApiResult<MeItem>> {
+                val result = domainManager.getApiRepository().getGuestInfo()
+                if (!result.isSuccessful) throw HttpException(result)
+                result.body()?.content?.let { guest ->
+                    checkConsumeResult(guest)
+                }
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {}
+        }
+    }
+
 }
