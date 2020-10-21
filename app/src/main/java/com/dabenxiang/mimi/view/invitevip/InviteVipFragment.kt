@@ -17,6 +17,7 @@ class InviteVipFragment : BaseFragment() {
     companion object {
         private const val SHOW_COPY_HINT_TIME = 3500L
         private const val SHOW_COPY_HINT_DURATION = 800L
+
     }
 
     override val bottomNavigationVisibility: Int
@@ -42,7 +43,12 @@ class InviteVipFragment : BaseFragment() {
                     tv_invite_code.text = viewModel.promotionData?.promotion_code
                     tv_invite_vip_days.text = viewModel.promotionData?.cumulativeDays.toString()
                     tv_invite_vip_people.text = viewModel.promotionData?.promotionNumber.toString()
-                    iv_invite_vip_qrcode.setImageBitmap(QrCodeUtils.generateQrCodeImage(viewModel.promotionData?.promotion_url, 300))
+                    iv_invite_vip_qrcode.setImageBitmap(
+                        QrCodeUtils.generateQrCodeImage(
+                            viewModel.promotionData?.promotion_url?:viewModel.getWebsiteDomain(),
+                            300
+                        )
+                    )
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
