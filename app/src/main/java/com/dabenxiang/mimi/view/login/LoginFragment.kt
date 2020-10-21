@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.login
 
-import android.R.attr.maxLength
+import android.content.ClipboardManager
+import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.InputFilter
@@ -14,6 +15,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.blankj.utilcode.util.ToastUtils
+import com.dabenxiang.mimi.MIMI_INVITE_CODE
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.ExceptionResult
@@ -57,6 +59,8 @@ class LoginFragment : BaseFragment() {
         if (viewModel.isLogin()) {
             navigateTo(NavigateItem.Up)
         }
+
+        setCopyText()
     }
 
     override fun getLayoutId(): Int {
@@ -425,5 +429,16 @@ class LoginFragment : BaseFragment() {
                 secondBtn = getString(R.string.btn_confirm)
             )
         ).show(requireActivity().supportFragmentManager)
+    }
+
+    private fun setCopyText() {
+        val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipData = clipboard.primaryClip
+        val clipDataItem = clipData?.getItemAt(0)
+        val copyText = clipDataItem?.text.toString() ?: ""
+
+        if (copyText.contains(MIMI_INVITE_CODE)) {
+            viewModel.inviteCode.value = copyText
+        }
     }
 }
