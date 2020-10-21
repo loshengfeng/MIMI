@@ -9,6 +9,7 @@ import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MeItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import kotlinx.coroutines.Dispatchers
@@ -80,12 +81,13 @@ class ClipViewModel : BaseViewModel() {
         }
     }
 
-    fun getPostDetail(item: MemberPostItem, position: Int) {
+    fun getPostDetail(item: MemberPostItem, position: Int, videoConsumeType: VideoConsumeResult) {
         viewModelScope.launch {
             flow {
-                val apiRepository = domainManager.getApiRepository()
-                val result = apiRepository.getMemberPostDetail(item.id)
-                if (!result.isSuccessful) throw HttpException(result)
+                if(videoConsumeType != VideoConsumeResult.POINT_NOT_ENOUGH) {
+                    val result = domainManager.getApiRepository().getMemberPostDetail(item.id)
+                    if (!result.isSuccessful) throw HttpException(result)
+                }
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
@@ -155,10 +157,9 @@ class ClipViewModel : BaseViewModel() {
                 val meItem = result.body()?.content
                 meItem?.let {
                     if (isLogin()) accountManager.setupProfile(it)
-                    if (checkConsumeResult(it, item.deducted)) {
-                        item.canWatch = true
-                        getPostDetail(item, position)
-                    }
+                    item.videoConsumeType = checkConsumeResult(it, item.deducted)
+                    Timber.i("videoConsumeType:${item.videoConsumeType?.name}")
+                    getPostDetail(item, position, item.videoConsumeType!!)
                 }
                 emit(ApiResult.success(meItem))
             }
@@ -171,12 +172,12 @@ class ClipViewModel : BaseViewModel() {
         }
     }
 
-    private fun checkConsumeResult(me: MeItem, deducted: Boolean): Boolean {
+    private fun checkConsumeResult(me: MeItem, deducted: Boolean): VideoConsumeResult {
         Timber.i("checkConsumeResult me:$me deducted:$deducted")
         return when {
-            deducted || me.isSubscribed -> true
-            me.videoCount ?: 0 > 0 -> true
-            else -> false
+            deducted || me.isSubscribed -> VideoConsumeResult.PAID
+            me.videoCount ?: 0 > 0 -> VideoConsumeResult.PAID_YET
+            else -> VideoConsumeResult.POINT_NOT_ENOUGH
         }
     }
 }
