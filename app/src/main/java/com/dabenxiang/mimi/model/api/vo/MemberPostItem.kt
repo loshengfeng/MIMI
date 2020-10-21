@@ -77,6 +77,8 @@ data class MemberPostItem(
     val isFullContent: Boolean = false,
 
     @SerializedName("deducted")
-    val deducted: Boolean = false
+    val deducted: Boolean = false,
+
+    var canWatch: Boolean = false // vip, deducted=true or videoCount enough
 
 ) : BaseMemberPostItem()

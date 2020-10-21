@@ -18,7 +18,6 @@ import com.dabenxiang.mimi.model.manager.AccountManager
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_clip.view.*
-import kotlinx.android.synthetic.main.item_clip.view.recharge_reminder
 import kotlinx.android.synthetic.main.recharge_reminder.view.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -96,7 +95,7 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view), KoinComponent 
         val isMe = accountManager.getProfile().userId == item.creatorId
         ivAdd.visibility = if (item.isFollow || isMe) View.GONE else View.VISIBLE
 
-        if(item.deducted){
+        if(item.canWatch){
             tvLike.setOnClickListener { clipFuncItem.onLikeClick(item, pos, !isLike) }
             tvFavorite.setOnClickListener { clipFuncItem.onFavoriteClick(item, pos, !item.isFavorite) }
             tvComment.setOnClickListener { clipFuncItem.onCommentClick(item) }

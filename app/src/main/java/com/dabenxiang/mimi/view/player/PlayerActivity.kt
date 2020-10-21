@@ -648,10 +648,8 @@ class PlayerActivity : BaseActivity() {
         })
 
         btn_full_screen.setOnClickListener {
-//            viewModel.checkStatus {
             viewModel.lockFullScreen = !viewModel.lockFullScreen
             switchScreenOrientation()
-//            }
         }
 
         orientationDetector =
@@ -847,30 +845,25 @@ class PlayerActivity : BaseActivity() {
         viewModel.getAd(adWidth, adHeight)
 
         exo_play_pause.setOnClickListener {
-            viewModel.checkStatus {
-                Timber.d("exo_play_pause confirmed")
-                player?.also {
-                    it.playWhenReady.also { playing ->
-                        it.playWhenReady = !playing
-                        viewModel.setPlaying(!playing)
-                        if (!playing)
-                            exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
-                        else
-                            exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_play))
-                    }
+            Timber.d("exo_play_pause confirmed")
+            player?.also {
+                it.playWhenReady.also { playing ->
+                    it.playWhenReady = !playing
+                    viewModel.setPlaying(!playing)
+                    if (!playing)
+                        exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
+                    else
+                        exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_play))
                 }
             }
         }
 
         iv_player.setOnClickListener {
-//            viewModel.checkStatus {
-//                Timber.d("iv_player confirmed")
             if (it.visibility == VISIBLE) {
                 player?.playWhenReady = true
                 viewModel.setPlaying(true)
                 exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
             }
-//            }
         }
         recycler_info.setOnClickListener {
             Timber.i("RecyclerView=setOnClickListener")

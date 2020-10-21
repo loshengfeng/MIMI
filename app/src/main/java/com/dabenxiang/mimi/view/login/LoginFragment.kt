@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.login
 
-import android.R.attr.maxLength
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.InputFilter
@@ -353,7 +352,11 @@ class LoginFragment : BaseFragment() {
         viewModel.loginAccount.value = when (keepAccount) {
             true -> {
                 val profile = viewModel.accountManager.getProfile()
-                profile.account
+                if (tv_login_call_prefix.text == "+86") {
+                    profile.account.substring(3, profile.account.length)
+                } else {
+                    profile.account.substring(4, profile.account.length)
+                }
             }
             false -> ""
         }

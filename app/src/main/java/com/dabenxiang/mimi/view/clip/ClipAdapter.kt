@@ -25,7 +25,6 @@ import com.google.android.exoplayer2.util.Util
 import com.google.gson.Gson
 import timber.log.Timber
 import java.io.File
-import java.lang.Exception
 
 class ClipAdapter(
     private val context: Context,
@@ -132,7 +131,7 @@ class ClipAdapter(
                 holder.progress.visibility = View.GONE
             }
 
-            if(item.deducted ){
+            if(item.deducted){
                 holder.ibReplay.setOnClickListener {
                     exoPlayer?.also { player ->
                         player.seekTo(0)

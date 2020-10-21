@@ -88,7 +88,6 @@
             android:id="@+id/cv_photo"
             android:layout_width="0dp"
             android:layout_height="180dp"
-            app:cardBackgroundColor="@color/item_color_card_background"
             app:cardCornerRadius="6dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -96,6 +95,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
+                android:background="@color/color_black_1_20"
                 android:id="@+id/iv_photo"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
