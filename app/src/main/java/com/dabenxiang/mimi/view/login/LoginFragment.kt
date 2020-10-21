@@ -148,22 +148,11 @@ class LoginFragment : BaseFragment() {
         viewModel.registerResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Empty -> {
-                    GeneralDialog.newInstance(
-                        GeneralDialogData(
-                            titleRes = R.string.receive_mail,
-                            message = getString(R.string.desc_register),
-                            messageIcon = R.drawable.ico_default_photo,
-                            secondBtn = getString(R.string.btn_confirm),
-                            secondBlock = {
-                                viewModel.mobile.value?.let { it1 ->
-                                    viewModel.registerPw.value?.let { it2 ->
-                                        viewModel.doLogin(it1, it2)
-                                    }
-                                }
-                            }
-                        )
-                    ).setCancel(false)
-                        .show(requireActivity().supportFragmentManager)
+                    viewModel.mobile.value?.let { it1 ->
+                        viewModel.registerPw.value?.let { it2 ->
+                            viewModel.doLogin((tv_login_call_prefix.text.toString() + it1), it2)
+                        }
+                    }
                 }
                 is Error -> onApiError(it.throwable)
             }
