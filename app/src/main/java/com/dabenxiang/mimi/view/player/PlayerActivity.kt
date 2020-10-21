@@ -881,7 +881,12 @@ class PlayerActivity : BaseActivity() {
         }
 
         btn_promote.setOnClickListener {
-            Timber.i("btn_promote Click")
+            val bundle = Bundle()
+            navigateTo(
+                MainActivity::class.java,
+                R.id.inviteVipFragment,
+                bundle
+            )
         }
     }
 

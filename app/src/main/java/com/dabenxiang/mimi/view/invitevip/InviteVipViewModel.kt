@@ -44,5 +44,9 @@ class InviteVipViewModel : BaseViewModel() {
         }
     }
 
+    fun getWebsiteDomain(): String {
+        return domainManager.getWebDomain()
+    }
+
 
 }

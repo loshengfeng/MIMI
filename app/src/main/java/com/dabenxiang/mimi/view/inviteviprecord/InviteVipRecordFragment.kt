@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ReferrerHistoryItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import kotlinx.android.synthetic.main.fragment_invite_vip_record.*
+import kotlinx.android.synthetic.main.fragment_invite_vip_record.cl_no_data
 import kotlinx.android.synthetic.main.fragment_text_detail.toolbarContainer
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
@@ -21,7 +23,7 @@ class InviteVipRecordFragment : BaseFragment() {
     private val inviteVipRecordAdapter by lazy { InviteVipRecordAdapter(listener) }
     private val listener = object : InviteVipRecordAdapter.EventListener {
         override fun onClickListener(item: ReferrerHistoryItem, position: Int) {
-            Timber.d("catkingg click")
+            Timber.d("inviteVipRecord click")
         }
     }
 
@@ -48,12 +50,17 @@ class InviteVipRecordFragment : BaseFragment() {
 
     override fun setupObservers() {
 
+        viewModel.onTotalCountResult.observe(viewLifecycleOwner, Observer {
+            cl_no_data.visibility =
+                it.takeIf { it == 0L }?.let { View.VISIBLE } ?: let { View.GONE }
+        })
+
     }
 
     override fun setupListeners() {
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
-            viewModel.getChatList(inviteVipRecordAdapter)
+            viewModel.getInviteVipRecordList(inviteVipRecordAdapter)
         }
 
     }
@@ -61,6 +68,6 @@ class InviteVipRecordFragment : BaseFragment() {
     override fun setupFirstTime() {
         super.setupFirstTime()
         rv_record.adapter = inviteVipRecordAdapter
-        viewModel.getChatList(inviteVipRecordAdapter)
+        viewModel.getInviteVipRecordList(inviteVipRecordAdapter)
     }
 }
