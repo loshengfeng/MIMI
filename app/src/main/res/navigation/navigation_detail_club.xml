@@ -10,6 +10,18 @@
     <include app:graph="@navigation/navigation_topup" />
 
     <fragment
+        android:id="@+id/inviteVipRecordFragment"
+        android:name="com.dabenxiang.mimi.view.inviteviprecord.InviteVipRecordFragment"
+        android:label="InviteVipRecordFragment" />
+    <fragment
+        android:id="@+id/inviteVipFragment"
+        android:name="com.dabenxiang.mimi.view.invitevip.InviteVipFragment"
+        android:label="InviteVipFragment">
+        <action
+            android:id="@+id/action_inviteVipFragment_to_inviteVipRecordFragment"
+            app:destination="@id/inviteVipRecordFragment" />
+    </fragment>
+    <fragment
         android:id="@+id/clubDetailFragment"
         android:name="com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment"
         android:label="ClubDetailFragment"
@@ -143,6 +155,9 @@
         <action
             android:id="@+id/action_to_settingFragment"
             app:destination="@id/navigation_setting" />
+        <action
+            android:id="@+id/action_to_inviteVipFragment"
+            app:destination="@id/inviteVipFragment" />
         <action
             android:id="@+id/action_to_topup"
             app:destination="@id/navigation_topup" />

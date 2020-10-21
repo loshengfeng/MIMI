@@ -11,6 +11,18 @@
     <include app:graph="@navigation/navigation_topup" />
 
     <fragment
+        android:id="@+id/inviteVipRecordFragment"
+        android:name="com.dabenxiang.mimi.view.inviteviprecord.InviteVipRecordFragment"
+        android:label="InviteVipRecordFragment" />
+    <fragment
+        android:id="@+id/inviteVipFragment"
+        android:name="com.dabenxiang.mimi.view.invitevip.InviteVipFragment"
+        android:label="InviteVipFragment">
+        <action
+            android:id="@+id/action_inviteVipFragment_to_inviteVipRecordFragment"
+            app:destination="@id/inviteVipRecordFragment" />
+    </fragment>
+    <fragment
         android:id="@+id/postFavoriteFragment"
         android:name="com.dabenxiang.mimi.view.favroite.FavoriteFragment"
         tools:layout="@layout/fragment_post_favorite">
@@ -42,6 +54,9 @@
         <action
             android:id="@+id/action_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_to_inviteVipFragment"
+            app:destination="@id/inviteVipFragment" />
         <action
             android:id="@+id/action_to_topup"
             app:destination="@id/navigation_topup" />

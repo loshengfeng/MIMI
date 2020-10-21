@@ -80,7 +80,7 @@
             android:id="@+id/action_to_settingFragment"
             app:destination="@id/navigation_setting" />
         <action
-            android:id="@+id/action_adultHomeFragment_to_inviteVipFragment"
+            android:id="@+id/action_to_inviteVipFragment"
             app:destination="@id/inviteVipFragment" />
     </fragment>
 
@@ -149,6 +149,9 @@
         <action
             android:id="@+id/action_to_loginFragment"
             app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_inviteVipFragment"
+            app:destination="@id/inviteVipFragment" />
     </fragment>
 
     <fragment
@@ -164,6 +167,9 @@
         <action
             android:id="@+id/action_to_settingFragment"
             app:destination="@id/navigation_setting" />
+        <action
+            android:id="@+id/action_to_inviteVipFragment"
+            app:destination="@id/inviteVipFragment" />
         <action
             android:id="@+id/action_to_topup"
             app:destination="@id/navigation_topup" />

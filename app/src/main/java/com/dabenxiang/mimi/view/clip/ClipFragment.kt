@@ -219,7 +219,12 @@ class ClipFragment : BaseFragment() {
     }
 
     private fun onPromoteClick() {
-         //TODO
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_to_inviteVipFragment,
+                null
+            )
+        )
     }
 
     private fun onVipClick() {
