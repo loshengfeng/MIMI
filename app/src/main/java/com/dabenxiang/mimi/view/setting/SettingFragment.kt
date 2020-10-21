@@ -7,13 +7,11 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.graphics.Matrix
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.view.View
 import androidx.activity.addCallback
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.viewModels
@@ -69,7 +67,6 @@ class SettingFragment : BaseFragment() {
                 is Loaded -> progressHUD?.dismiss()
                 is Success -> {
                     tv_name.text = viewModel.profileData?.friendlyName
-                    tv_email.text = viewModel.profileData?.email
                     tv_account.text = viewModel.profileData?.username
                     gender_info.text = getString(viewModel.profileData!!.getGenderRes())
 
@@ -78,18 +75,6 @@ class SettingFragment : BaseFragment() {
                         birthday_info.text = birthday.split("T")[0]
                     }
 
-                    var img: Drawable? = null
-
-                    if (viewModel.isEmailConfirmed()) {
-                        img = ContextCompat.getDrawable(
-                            requireContext(), R.drawable.ico_checked
-                        )
-                        btn_resend.visibility = View.GONE
-                    } else {
-                        btn_resend.visibility = View.VISIBLE
-                    }
-
-                    tv_email.setCompoundDrawablesWithIntrinsicBounds(null, null, img, null)
                     viewModel.loadImage(
                         viewModel.profileData?.avatarAttachmentId,
                         iv_photo,
@@ -183,18 +168,6 @@ class SettingFragment : BaseFragment() {
                             })
                     )
                 }
-                R.id.btn_email -> {
-                    navigateTo(
-                        NavigateItem.Destination(R.id.updateProfileFragment,
-                            viewModel.profileData?.let {
-                                UpdateProfileFragment.createBundle(
-                                    UpdateProfileFragment.TYPE_EMAIL,
-                                    it
-                                )
-                            })
-                    )
-                }
-                R.id.btn_resend -> viewModel.resendEmail()
                 R.id.btn_chang_pw -> navigateTo(NavigateItem.Destination(R.id.action_settingFragment_to_changePasswordFragment))
                 R.id.btn_gender -> {
                     navigateTo(
@@ -226,8 +199,6 @@ class SettingFragment : BaseFragment() {
             tv_back.setOnClickListener(it)
             btn_photo.setOnClickListener(it)
             btn_name.setOnClickListener(it)
-            btn_email.setOnClickListener(it)
-            btn_resend.setOnClickListener(it)
             btn_chang_pw.setOnClickListener(it)
             btn_gender.setOnClickListener(it)
             btn_birthday.setOnClickListener(it)
