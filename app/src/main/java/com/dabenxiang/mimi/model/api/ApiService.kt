@@ -650,4 +650,32 @@ interface ApiService {
 
     @PUT("/v1/Members/Me/Order/TraceLog/{id}/Status")
     suspend fun updateOrderChatStatus(@Path("id") id: Long): Response<Void>
+
+    /**********************************************************
+     *
+     *                  Members/Subscription
+     *
+     ***********************************************************/
+    @GET("/v1/Members/Subscription")
+    suspend fun getGuestInfo(): Response<ApiBaseItem<MeItem>>
+
+    /**********************************************************
+     *                  Get Invite Vip
+     *
+     ***********************************************************/
+    @GET("/v1/Members/Me/Promotion")
+    suspend fun getPromotionItem(
+        @Query("url") url: String,
+    ): Response<ApiBaseItem<PromotionItem>>
+
+    /**********************************************************
+     *
+     *                  Get Invite Vip History
+     *
+     ***********************************************************/
+    @GET("/v1/Members/Me/ReferrerHistory")
+    suspend fun getReferrerHistory(
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ): Response<ApiBasePagingItem<ArrayList<ReferrerHistoryItem>>>
 }

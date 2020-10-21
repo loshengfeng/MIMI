@@ -28,6 +28,7 @@ import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_clip_post.view.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import timber.log.Timber
 import java.util.*
 
 class MyPostClipPostHolder(
@@ -106,6 +107,7 @@ class MyPostClipPostHolder(
 
         tvLength.text = contentItem.shortVideo?.length
         contentItem.images?.also { images ->
+            Timber.i("images $images")
             if (!TextUtils.isEmpty(images[0].url)) {
                 Glide.with(ivPhoto.context)
                     .load(images[0].url).placeholder(R.drawable.img_nopic_03).into(ivPhoto)

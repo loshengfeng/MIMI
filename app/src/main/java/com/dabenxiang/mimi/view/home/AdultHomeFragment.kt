@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.view.View.GONE
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
@@ -425,6 +426,19 @@ class AdultHomeFragment : BaseFragment() {
                         )
                     }
             }
+        }
+
+        iv_invitevip.setOnClickListener {
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_adultHomeFragment_to_inviteVipFragment,
+                    null
+                )
+            )
+        }
+
+        iv_invitevip_close.setOnClickListener {
+            layout_invitevip.visibility = GONE
         }
     }
 
