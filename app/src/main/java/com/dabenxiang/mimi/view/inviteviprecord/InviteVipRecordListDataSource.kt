@@ -3,7 +3,6 @@ package com.dabenxiang.mimi.view.inviteviprecord
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.manager.DomainManager
-import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.ReferrerHistoryItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,8 +14,7 @@ import timber.log.Timber
 class InviteVipRecordListDataSource(
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
-    private val pagingCallback: PagingCallback,
-    private val updateNoData: ((Int) -> Unit) = {}
+    private val pagingCallback: PagingCallback
 ) : PageKeyedDataSource<Long, ReferrerHistoryItem>() {
 
     companion object {
@@ -40,8 +38,8 @@ class InviteVipRecordListDataSource(
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()
                 val messages = item?.content
-                Timber.d("catkingg body: $messages")
                 val totalCount = item?.paging?.count ?: 0
+                pagingCallback.onTotalCount(totalCount)
                 val nextPageKey = when {
                     hasNextPage(
                             totalCount,
@@ -59,7 +57,6 @@ class InviteVipRecordListDataSource(
                     .collect {response->
                         pagingCallback.onSucceed()
                         callback.onResult(response.list, null, response.nextKey)
-                        updateNoData(response.list.size)
                     }
 
         }
@@ -94,6 +91,7 @@ class InviteVipRecordListDataSource(
                         pagingCallback.onSucceed()
                         it.body()?.run {
                             content?.run {
+                                pagingCallback.onTotalCount(size.toLong(), false)
                                 val nextPageKey = when {
                                     hasNextPage(
                                             paging.count,
