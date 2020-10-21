@@ -431,7 +431,7 @@ class AdultHomeFragment : BaseFragment() {
         iv_invitevip.setOnClickListener {
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_adultHomeFragment_to_inviteVipFragment,
+                    R.id.action_to_inviteVipFragment,
                     null
                 )
             )
