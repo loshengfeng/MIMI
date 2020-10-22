@@ -386,7 +386,7 @@ class LoginFragment : BaseFragment() {
     override fun handleHttpError(errorHandler: ExceptionResult.HttpError) {
         when (errorHandler.httpExceptionItem.errorItem.code) {
             LOGIN_400000 -> {
-                showErrorMessageDialog(getString(R.string.error_email_duplicate))
+                showErrorMessageDialog(getString(R.string.error_validation))
             }
             LOGIN_403001 -> showErrorMessageDialog(getString(R.string.error_username_or_password_incorrect))
             LOGIN_403002 -> showErrorMessageDialog(getString(R.string.error_account_disable))
