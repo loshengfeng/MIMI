@@ -3,7 +3,6 @@ package com.dabenxiang.mimi.model.api.vo
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostStatus
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.google.gson.annotations.SerializedName
 import java.util.*
 
@@ -78,8 +77,6 @@ data class MemberPostItem(
     val isFullContent: Boolean = false,
 
     @SerializedName("deducted")
-    val deducted: Boolean = false,
-
-    var videoConsumeType: VideoConsumeResult? = null
+    var deducted: Boolean = false
 
 ) : BaseMemberPostItem()

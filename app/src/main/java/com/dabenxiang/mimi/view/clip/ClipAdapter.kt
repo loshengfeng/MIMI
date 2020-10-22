@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.ListAdapter
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.view.player.PlayerViewModel
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
@@ -53,7 +52,7 @@ class ClipAdapter(
                 }
             }
         const val PAYLOAD_UPDATE_UI = 0
-        const val PAYLOAD_UPDATE_CONSUME_TYPE = 1
+        const val PAYLOAD_UPDATE_DEDUCTED = 1
 
         var playingItem: MemberPostItem? = null
     }
@@ -121,9 +120,9 @@ class ClipAdapter(
                 PAYLOAD_UPDATE_UI -> {
                     holder.onBind(item, clipFuncItem, position)
                 }
-                PAYLOAD_UPDATE_CONSUME_TYPE -> {
-                    holder.onBind(item, clipFuncItem, position)
-                    if(item.videoConsumeType!=VideoConsumeResult.POINT_NOT_ENOUGH) {
+                PAYLOAD_UPDATE_DEDUCTED -> {
+                    holder.onUpdateByDeducted(item, clipFuncItem, position)
+                    if (item.deducted) {
                         takeIf { currentPosition == position }?.also {
                             currentViewHolder = holder
                             holder.progress.visibility = View.VISIBLE
@@ -168,7 +167,9 @@ class ClipAdapter(
             }
         } ?: run {
             holder.onBind(item, clipFuncItem, position)
-            clipFuncItem.getPostDetail(item, position)
+            if (currentPosition == position) {
+                clipFuncItem.getPostDetail(item, position)
+            }
         }
     }
 

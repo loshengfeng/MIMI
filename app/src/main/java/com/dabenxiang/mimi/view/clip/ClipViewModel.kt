@@ -9,14 +9,12 @@ import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MeItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LikeType
-import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import timber.log.Timber
 import java.io.File
 
 class ClipViewModel : BaseViewModel() {
@@ -81,13 +79,16 @@ class ClipViewModel : BaseViewModel() {
         }
     }
 
-    fun getPostDetail(item: MemberPostItem, position: Int, videoConsumeType: VideoConsumeResult) {
+    fun getPostDetail(item: MemberPostItem, position: Int) {
         viewModelScope.launch {
             flow {
-                if(videoConsumeType != VideoConsumeResult.POINT_NOT_ENOUGH) {
-                    val result = domainManager.getApiRepository().getMemberPostDetail(item.id)
-                    if (!result.isSuccessful) throw HttpException(result)
-                }
+                /** for debug **/
+                if (isLogin()) domainManager.getApiRepository().getMe()
+                else domainManager.getApiRepository().getGuestInfo()
+                /**-----------**/
+                val result = domainManager.getApiRepository().getMemberPostDetail(item.id)
+                if (!result.isSuccessful) throw HttpException(result)
+                result.body()?.content?.deducted?.let { item.deducted = it }
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
@@ -147,7 +148,7 @@ class ClipViewModel : BaseViewModel() {
         }
     }
 
-    fun getMe(item: MemberPostItem, position: Int) {
+    fun getMe() {
         viewModelScope.launch {
             flow {
                 val result =
@@ -155,29 +156,14 @@ class ClipViewModel : BaseViewModel() {
                     else domainManager.getApiRepository().getGuestInfo()
                 if (!result.isSuccessful) throw HttpException(result)
                 val meItem = result.body()?.content
-                meItem?.let {
-                    if (isLogin()) accountManager.setupProfile(it)
-                    item.videoConsumeType = checkConsumeResult(it, item.deducted)
-                    Timber.i("videoConsumeType:${item.videoConsumeType?.name}")
-                    getPostDetail(item, position, item.videoConsumeType!!)
-                }
                 emit(ApiResult.success(meItem))
             }
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect {
-                    _meItem.value = it
+                    //_meItem.value = it
                 }
-        }
-    }
-
-    private fun checkConsumeResult(me: MeItem, deducted: Boolean): VideoConsumeResult {
-        Timber.i("checkConsumeResult me:$me deducted:$deducted")
-        return when {
-            deducted || me.isSubscribed -> VideoConsumeResult.PAID
-            me.videoCount ?: 0 > 0 -> VideoConsumeResult.PAID_YET
-            else -> VideoConsumeResult.POINT_NOT_ENOUGH
         }
     }
 }
