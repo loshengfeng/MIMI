@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.clip
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import com.dabenxiang.mimi.NAVIGATE_TO_TOPUP_ACTION
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -18,7 +20,9 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.comment.CommentDialogFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.player.PlayerActivity
 import kotlinx.android.synthetic.main.fragment_clip.*
 import timber.log.Timber
 import java.io.File
@@ -228,7 +232,9 @@ class ClipFragment : BaseFragment() {
     }
 
     private fun onVipClick() {
-        navigateTo(NavigateItem.Destination(R.id.action_to_topup))
+        val intent = Intent(requireContext(), MainActivity::class.java)
+        intent.action = NAVIGATE_TO_TOPUP_ACTION
+        startActivity(intent)
     }
 
     override fun onAttach(context: Context) {
