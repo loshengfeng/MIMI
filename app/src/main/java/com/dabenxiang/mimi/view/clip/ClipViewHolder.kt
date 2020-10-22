@@ -14,7 +14,6 @@ import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.LoadImageType
-import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.gson.Gson
@@ -46,7 +45,6 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view), KoinComponent 
     var reminder_btn_promote: View = view.btn_promote
 
     fun onBind(item: MemberPostItem, clipFuncItem: ClipFuncItem, pos: Int) {
-
         ibReplay.visibility = View.GONE
         ibPlay.visibility = View.GONE
         tvTitle.text = item.title
@@ -87,7 +85,6 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view), KoinComponent 
             R.drawable.ico_nice_forvideo
         }
         tvLike.setCompoundDrawablesRelativeWithIntrinsicBounds(0, likeRes, 0, 0)
-        val isLike = item.likeType == LikeType.LIKE
 
         val favoriteRes =
             if (item.isFavorite) R.drawable.btn_favorite_forvideo_s else R.drawable.btn_favorite_forvideo_n
@@ -95,38 +92,40 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view), KoinComponent 
 
         val isMe = accountManager.getProfile().userId == item.creatorId
         ivAdd.visibility = if (item.isFollow || isMe) View.GONE else View.VISIBLE
+    }
 
-        item.videoConsumeType?.also {
-            if (it != VideoConsumeResult.POINT_NOT_ENOUGH) {
-                tvLike.setOnClickListener { clipFuncItem.onLikeClick(item, pos, !isLike) }
-                tvFavorite.setOnClickListener {
-                    clipFuncItem.onFavoriteClick(
-                        item,
-                        pos,
-                        !item.isFavorite
-                    )
-                }
-                tvComment.setOnClickListener { clipFuncItem.onCommentClick(item) }
-                if (!isMe) clAvatar.setOnClickListener {
-                    clipFuncItem.onFollowClick(
-                        item,
-                        pos,
-                        !item.isFollow
-                    )
-                }
-
-                reminder.visibility = View.GONE
-            } else {
-                reminder.visibility = View.VISIBLE
-                progress.visibility = View.GONE
+    fun onUpdateByDeducted(item: MemberPostItem, clipFuncItem: ClipFuncItem, pos: Int){
+        if (item.deducted) {
+            val isLike = item.likeType == LikeType.LIKE
+            tvLike.setOnClickListener { clipFuncItem.onLikeClick(item, pos, !isLike) }
+            tvFavorite.setOnClickListener {
+                clipFuncItem.onFavoriteClick(
+                    item,
+                    pos,
+                    !item.isFavorite
+                )
             }
+            tvComment.setOnClickListener { clipFuncItem.onCommentClick(item) }
+            val isMe = accountManager.getProfile().userId == item.creatorId
+            if (!isMe) clAvatar.setOnClickListener {
+                clipFuncItem.onFollowClick(
+                    item,
+                    pos,
+                    !item.isFollow
+                )
+            }
+
+            reminder.visibility = View.GONE
+        } else {
+            reminder_btn_vip.setOnClickListener {
+                clipFuncItem.onVipClick()
+            }
+            reminder_btn_promote.setOnClickListener {
+                clipFuncItem.onPromoteClick()
+            }
+            reminder.visibility = View.VISIBLE
+            progress.visibility = View.GONE
         }
 
-        reminder_btn_vip.setOnClickListener {
-            clipFuncItem.onVipClick()
-        }
-        reminder_btn_promote.setOnClickListener {
-            clipFuncItem.onPromoteClick()
-        }
     }
 }
