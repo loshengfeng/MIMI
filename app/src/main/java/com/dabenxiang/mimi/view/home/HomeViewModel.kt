@@ -9,6 +9,7 @@ import androidx.paging.PagedList
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.enums.CategoryType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
@@ -85,8 +86,8 @@ class HomeViewModel : BaseViewModel() {
     private val _clubItemListResult = MutableLiveData<PagedList<MemberClubItem>>()
     val clubItemListResult: LiveData<PagedList<MemberClubItem>> = _clubItemListResult
 
-    private val _totalCountResult = MutableLiveData<Int>()
-    val totalCountResult: LiveData<Int> = _totalCountResult
+    private val _totalCountResult = MutableLiveData<Pair<CategoryType,Int>>()
+    val totalCountResult: LiveData<Pair<CategoryType,Int>> = _totalCountResult
 
     private val _followResult = MutableLiveData<ApiResult<Nothing>>()
     val followResult: LiveData<ApiResult<Nothing>> = _followResult
@@ -347,7 +348,7 @@ class HomeViewModel : BaseViewModel() {
 
     private fun getPostFollowPagingItems(): LiveData<PagedList<MemberPostItem>> {
         val postFollowDataSource =
-            PostFollowDataSource(pagingCallback, viewModelScope, domainManager, adWidth, adHeight)
+            PostFollowDataSource(HomePagingCallBack(CategoryType.FOLLOW), viewModelScope, domainManager, adWidth, adHeight)
         val pictureFactory = PostFollowFactory(postFollowDataSource)
         val config = PagedList.Config.Builder()
             .setPrefetchDistance(4)
@@ -358,7 +359,7 @@ class HomeViewModel : BaseViewModel() {
     private fun getMemberPostPagingItems(postType: PostType): LiveData<PagedList<MemberPostItem>> {
         val pictureDataSource =
             MemberPostDataSource(
-                pagingCallback,
+                HomePagingCallBack(CategoryType.valueOf(postType.name)),
                 viewModelScope,
                 domainManager,
                 postType,
@@ -381,7 +382,7 @@ class HomeViewModel : BaseViewModel() {
             category,
             viewModelScope,
             domainManager,
-            pagingCallback,
+            HomePagingCallBack(CategoryType.VIDEO_ON_DEMAND),
             adWidth,
             adHeight,
             true
@@ -402,14 +403,18 @@ class HomeViewModel : BaseViewModel() {
 
     private fun getClubPagingItems(): LiveData<PagedList<MemberClubItem>> {
         val clubDataSource = ClubDataSource(
-            pagingCallback, viewModelScope, domainManager, adWidth, adHeight
+            HomePagingCallBack(CategoryType.CLUB), viewModelScope, domainManager, adWidth, adHeight
         )
         val clubFactory = ClubFactory(clubDataSource)
         val config = PagedList.Config.Builder().setPrefetchDistance(4).build()
         return LivePagedListBuilder(clubFactory, config).build()
     }
 
-    private val pagingCallback = object : PagingCallback {
+    fun clearLiveDataValue() {
+        _totalCountResult.value = null
+    }
+
+    inner class HomePagingCallBack(private val type: CategoryType) : PagingCallback {
         override fun onLoading() {
             setShowProgress(true)
         }
@@ -423,7 +428,7 @@ class HomeViewModel : BaseViewModel() {
         }
 
         override fun onTotalCount(count: Long) {
-            _totalCountResult.postValue(count.toInt())
+            _totalCountResult.postValue(Pair(type, count.toInt()))
         }
 
         override fun onCurrentItemCount(count: Long, isInitial: Boolean) {
@@ -431,9 +436,5 @@ class HomeViewModel : BaseViewModel() {
             else totalCount.plus(count.toInt())
             if (isInitial) cleanRemovedPosList()
         }
-    }
-
-    fun clearLiveDataValue() {
-        _totalCountResult.value = null
     }
 }

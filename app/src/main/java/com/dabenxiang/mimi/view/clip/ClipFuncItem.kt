@@ -12,7 +12,6 @@ data class ClipFuncItem(
     val onLikeClick: ((MemberPostItem, Int, Boolean) -> Unit) = { _, _, _ -> },
     val onCommentClick: ((MemberPostItem) -> Unit) = { _ -> },
     val onBackClick: (() -> Unit) = {},
-    val getPostDetail: ((MemberPostItem, Int) -> Unit) = { _, _ -> },
     val onPlayerError: ((MemberPostItem, String) -> Unit) = { _, _ -> },
     val onVipClick: (() -> Unit) = {},
     val onPromoteClick: (() -> Unit) = {}

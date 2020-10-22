@@ -190,7 +190,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
         if (isFollow) {
             follow.text = follow.context.getString(R.string.followed)
             follow.background = follow.context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
-            follow.setTextColor(follow.context.getColor(R.color.color_white_1))
+            follow.setTextColor(follow.context.getColor(R.color.color_black_1_60))
         } else {
             follow.text = follow.context.getString(R.string.follow)
             follow.background = follow.context.getDrawable(R.drawable.bg_red_1_stroke_radius_16)
