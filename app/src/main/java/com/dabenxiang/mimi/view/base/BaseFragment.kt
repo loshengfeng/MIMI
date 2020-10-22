@@ -85,9 +85,8 @@ abstract class BaseFragment : Fragment() {
         Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
 
-    val cameraPermissions = arrayOf(Manifest.permission.CAMERA)
+    val cameraPermissions = externalPermissions + arrayOf(Manifest.permission.CAMERA)
 
-    open var permissions = externalPermissions + cameraPermissions
     var snackBar: Snackbar? = null
 
     private var moreDialog: MoreDialogFragment? = null
