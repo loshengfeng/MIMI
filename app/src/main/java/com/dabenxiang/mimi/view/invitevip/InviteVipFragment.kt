@@ -9,9 +9,11 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.copyToClipboard
 import com.dabenxiang.mimi.widget.utility.QrCodeUtils
 import kotlinx.android.synthetic.main.fragment_invite_vip.*
+import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 
 class InviteVipFragment : BaseFragment() {
     companion object {
@@ -67,28 +69,52 @@ class InviteVipFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
-        iv_invite_vip_back.setOnClickListener {
-            findNavController().navigateUp()
-        }
-
-        tv_to_invite_vip_record.setOnClickListener {
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_inviteVipFragment_to_inviteVipRecordFragment,
-                    null
+        View.OnClickListener { buttonView ->
+            when (buttonView.id) {
+                R.id.iv_invite_vip_back, R.id.iv_not_login_back -> findNavController().navigateUp()
+                R.id.tv_to_invite_vip_record -> navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_inviteVipFragment_to_inviteVipRecordFragment,
+                        null
+                    )
                 )
-            )
-        }
-
-        bt_invite_copy.setOnClickListener {
-            copyToClipboard(requireContext(), tv_invite_code.text.toString())
-            viewModel.setShowCopyHint(SHOW_COPY_HINT_TIME)
+                R.id.bt_invite_copy -> {
+                    copyToClipboard(requireContext(), tv_invite_code.text.toString())
+                    viewModel.setShowCopyHint(SHOW_COPY_HINT_TIME)
+                }
+                R.id.tv_login -> navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_inviteVipFragment_to_navigation_login,
+                        LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                    )
+                )
+                R.id.tv_register -> navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_inviteVipFragment_to_navigation_login,
+                        LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                    )
+                )
+            }
+        }.also {
+            iv_invite_vip_back.setOnClickListener(it)
+            iv_not_login_back.setOnClickListener(it)
+            tv_to_invite_vip_record.setOnClickListener(it)
+            bt_invite_copy.setOnClickListener(it)
+            tv_login.setOnClickListener(it)
+            tv_register.setOnClickListener(it)
         }
 
     }
 
     override fun initSettings() {
         super.initSettings()
-        viewModel.getPromotionItem()
+        if (viewModel.isLogin()) {
+            page_is_Login.visibility = View.VISIBLE
+            page_is_not_Login.visibility = View.GONE
+            viewModel.getPromotionItem()
+        } else {
+            page_is_Login.visibility = View.GONE
+            page_is_not_Login.visibility = View.VISIBLE
+        }
     }
 }
