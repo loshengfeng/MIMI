@@ -10,7 +10,6 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ReferrerHistoryItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import kotlinx.android.synthetic.main.fragment_invite_vip_record.*
-import kotlinx.android.synthetic.main.fragment_invite_vip_record.cl_no_data
 import kotlinx.android.synthetic.main.fragment_text_detail.toolbarContainer
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*

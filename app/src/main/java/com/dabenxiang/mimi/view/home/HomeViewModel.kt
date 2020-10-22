@@ -426,7 +426,7 @@ class HomeViewModel : BaseViewModel() {
             _totalCountResult.postValue(count.toInt())
         }
 
-        override fun onTotalCount(count: Long, isInitial: Boolean) {
+        override fun onCurrentItemCount(count: Long, isInitial: Boolean) {
             totalCount = if (isInitial) count.toInt()
             else totalCount.plus(count.toInt())
             if (isInitial) cleanRemovedPosList()

@@ -52,7 +52,7 @@ class MyPostDataSource(
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect {
-                    pagingCallback.onTotalCount(it.list.size.toLong(), true)
+                    pagingCallback.onCurrentItemCount(it.list.size.toLong(), true)
                     callback.onResult(it.list, null, it.nextKey)
                 }
         }
@@ -80,7 +80,7 @@ class MyPostDataSource(
                 .collect {
                     it.body()?.also { item ->
                         item.content?.also { list ->
-                            pagingCallback.onTotalCount(list.size.toLong(), false)
+                            pagingCallback.onCurrentItemCount(list.size.toLong(), false)
                             val nextPageKey = when {
                                 hasNextPage(
                                     item.paging.count,

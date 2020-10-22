@@ -2,8 +2,8 @@ package com.dabenxiang.mimi.view.inviteviprecord
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.ReferrerHistoryItem
+import com.dabenxiang.mimi.model.manager.DomainManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -91,7 +91,7 @@ class InviteVipRecordListDataSource(
                         pagingCallback.onSucceed()
                         it.body()?.run {
                             content?.run {
-                                pagingCallback.onTotalCount(size.toLong(), false)
+                                pagingCallback.onTotalCount(size.toLong())
                                 val nextPageKey = when {
                                     hasNextPage(
                                             paging.count,

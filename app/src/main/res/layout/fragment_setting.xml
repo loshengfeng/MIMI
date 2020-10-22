@@ -92,94 +92,15 @@
                 app:layout_constraintStart_toStartOf="@+id/btn_name"
                 app:layout_constraintTop_toBottomOf="@+id/btn_name" />
 
-            <View
-                android:id="@+id/line_split_email"
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:background="@color/color_black_1_02"
-                app:layout_constraintEnd_toEndOf="@+id/line_split_name"
-                app:layout_constraintStart_toStartOf="@+id/line_split_name"
-                app:layout_constraintTop_toBottomOf="@+id/btn_email" />
-
-            <TextView
-                android:id="@+id/btn_email"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:background="@color/color_white_1"
-                android:gravity="top"
-                android:paddingStart="16dp"
-                android:paddingTop="20dp"
-                android:paddingEnd="16dp"
-                android:text="@string/setting_email"
-                android:textColor="@color/color_black_1_50"
-                android:textSize="14sp"
-                app:layout_constraintBottom_toBottomOf="@+id/guideline"
-                app:layout_constraintEnd_toEndOf="@+id/btn_name"
-                app:layout_constraintHeight_min="60dp"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@+id/btn_name"
-                app:layout_constraintTop_toBottomOf="@+id/line_split_name"
-                app:layout_constraintVertical_bias="0.0" />
-
-            <ImageView
-                android:id="@+id/iv_email_arrow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:src="@drawable/btn_arrow_black_n"
-                app:layout_constraintBottom_toBottomOf="@id/tv_email"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/tv_email" />
-
-            <Button
-                android:id="@+id/btn_resend"
-                android:layout_width="92dp"
-                android:layout_height="32dp"
-                android:layout_marginTop="15dp"
-                android:background="@drawable/bg_red_1_radius_6"
-                android:gravity="center"
-                android:text="@string/setting_resend_mail"
-                android:textColor="@color/color_white_1"
-                android:visibility="gone"
-                app:layout_constraintBottom_toTopOf="@id/line_split_email"
-                app:layout_constraintEnd_toEndOf="@+id/iv_email_arrow"
-                app:layout_constraintTop_toBottomOf="@id/tv_email"
-                app:layout_constraintVertical_bias="0"
-                tools:visibility="visible" />
-
-            <View
-                android:id="@+id/guideline"
-                android:layout_width="wrap_content"
-                android:layout_height="1dp"
-                android:layout_marginTop="10dp"
-                app:layout_constraintEnd_toEndOf="@+id/btn_resend"
-                app:layout_constraintStart_toStartOf="@+id/btn_resend"
-                app:layout_constraintTop_toBottomOf="@+id/btn_resend"
-                app:layout_goneMarginTop="10dp" />
-
-            <TextView
-                android:id="@+id/tv_email"
-                style="@style/settingStyle_2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="17dp"
-                android:layout_marginEnd="40dp"
-                android:drawableEnd="@drawable/ico_checked"
-                android:drawablePadding="7dp"
-                android:gravity="center|right"
-                app:layout_constraintEnd_toEndOf="@+id/btn_email"
-                app:layout_constraintTop_toTopOf="@+id/btn_email"
-                tools:text="jeff.yu@silkrode.com.tw" />
-
             <TextView
                 android:id="@+id/btn_account"
                 style="@style/settingStyle_1"
                 android:gravity="center_vertical"
                 android:paddingStart="16dp"
-                android:text="@string/setting_account"
+                android:text="@string/phone_num"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/line_split_email" />
+                app:layout_constraintTop_toBottomOf="@id/line_split_name" />
 
             <TextView
                 android:id="@+id/tv_account"

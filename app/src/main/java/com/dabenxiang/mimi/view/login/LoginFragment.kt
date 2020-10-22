@@ -148,22 +148,11 @@ class LoginFragment : BaseFragment() {
         viewModel.registerResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Empty -> {
-                    GeneralDialog.newInstance(
-                        GeneralDialogData(
-                            titleRes = R.string.receive_mail,
-                            message = getString(R.string.desc_register),
-                            messageIcon = R.drawable.ico_default_photo,
-                            secondBtn = getString(R.string.btn_confirm),
-                            secondBlock = {
-                                viewModel.mobile.value?.let { it1 ->
-                                    viewModel.registerPw.value?.let { it2 ->
-                                        viewModel.doLogin(it1, it2)
-                                    }
-                                }
-                            }
-                        )
-                    ).setCancel(false)
-                        .show(requireActivity().supportFragmentManager)
+                    viewModel.mobile.value?.let { it1 ->
+                        viewModel.registerPw.value?.let { it2 ->
+                            viewModel.doLogin((tv_login_call_prefix.text.toString() + it1), it2)
+                        }
+                    }
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -209,13 +198,13 @@ class LoginFragment : BaseFragment() {
                 is Empty -> {
                     object : CountDownTimer( 60000, 1000) {
                         override fun onFinish() {
-                            tv_get_code.isEnabled = true
-                            tv_get_code.text = getString(R.string.login_get_code)
+                            tv_get_code?.isEnabled = true
+                            tv_get_code?.text = getString(R.string.login_get_code)
                         }
 
                         override fun onTick(p0: Long) {
-                            tv_get_code.isEnabled = false
-                            tv_get_code.text = String.format(getString(R.string.send_code_count_down), p0 / 1000)
+                            tv_get_code?.isEnabled = false
+                            tv_get_code?.text = String.format(getString(R.string.send_code_count_down), p0 / 1000)
                         }
                     }.start()
                 }

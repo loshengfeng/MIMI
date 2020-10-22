@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.blankj.utilcode.util.FileIOUtils
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.ApiBaseItem
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MeItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -82,12 +81,13 @@ class ClipViewModel : BaseViewModel() {
         }
     }
 
-    fun getPostDetail(item: MemberPostItem, position: Int) {
+    fun getPostDetail(item: MemberPostItem, position: Int, videoConsumeType: VideoConsumeResult) {
         viewModelScope.launch {
             flow {
-                val apiRepository = domainManager.getApiRepository()
-                val result = apiRepository.getMemberPostDetail(item.id)
-                if (!result.isSuccessful) throw HttpException(result)
+                if(videoConsumeType != VideoConsumeResult.POINT_NOT_ENOUGH) {
+                    val result = domainManager.getApiRepository().getMemberPostDetail(item.id)
+                    if (!result.isSuccessful) throw HttpException(result)
+                }
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
@@ -150,11 +150,16 @@ class ClipViewModel : BaseViewModel() {
     fun getMe(item: MemberPostItem, position: Int) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().getMe()
+                val result =
+                    if (isLogin()) domainManager.getApiRepository().getMe()
+                    else domainManager.getApiRepository().getGuestInfo()
                 if (!result.isSuccessful) throw HttpException(result)
                 val meItem = result.body()?.content
                 meItem?.let {
-                    accountManager.setupProfile(it)
+                    if (isLogin()) accountManager.setupProfile(it)
+                    item.videoConsumeType = checkConsumeResult(it, item.deducted)
+                    Timber.i("videoConsumeType:${item.videoConsumeType?.name}")
+                    getPostDetail(item, position, item.videoConsumeType!!)
                 }
                 emit(ApiResult.success(meItem))
             }
@@ -162,29 +167,17 @@ class ClipViewModel : BaseViewModel() {
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect {
-                    Timber.i("getMe item:${it}")
-                    when (it) {
-                        is ApiResult.Success -> {
-                            Timber.i("Me item:${it.result}")
-                            it.result.takeIf { checkConsumeResult(it) }?.let {
-                                getPostDetail(item, position)
-                            }
-                        }
-                        is ApiResult.Error -> _meItem.value = it
-                        else -> _meItem.value = it
-                    }
-
+                    _meItem.value = it
                 }
         }
-
     }
 
-    private fun checkConsumeResult(me: MeItem): Boolean {
-        Timber.i("checkConsumeResult me:$me")
+    private fun checkConsumeResult(me: MeItem, deducted: Boolean): VideoConsumeResult {
+        Timber.i("checkConsumeResult me:$me deducted:$deducted")
         return when {
-            me.isSubscribed -> true
-            me.videoCount ?: 0 > 0 -> true
-            else -> false
+            deducted || me.isSubscribed -> VideoConsumeResult.PAID
+            me.videoCount ?: 0 > 0 -> VideoConsumeResult.PAID_YET
+            else -> VideoConsumeResult.POINT_NOT_ENOUGH
         }
     }
 }

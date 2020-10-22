@@ -60,7 +60,7 @@ class ClubDetailViewModel : BaseViewModel() {
                 setShowProgress(false)
             }
 
-            override fun onTotalCount(count: Long, isInitial: Boolean) {
+            override fun onCurrentItemCount(count: Long, isInitial: Boolean) {
                 if (isInitial) cleanRemovedPosList()
                 when (orderBy) {
                     OrderBy.HOTTEST -> _updateCountHottest.value = count.toInt()

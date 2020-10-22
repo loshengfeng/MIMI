@@ -135,7 +135,7 @@ class ClipFragment : BaseFragment() {
                     Timber.i("postDetailResult Success")
                     rv_clip.adapter?.notifyItemChanged(
                         it.result,
-                        ClipAdapter.PAYLOAD_UPDATE_UI
+                        ClipAdapter.PAYLOAD_UPDATE_CONSUME_TYPE
                     )
                 }
                 is Error -> {

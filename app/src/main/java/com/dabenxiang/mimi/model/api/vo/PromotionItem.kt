@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.model.api.vo
 
-import com.dabenxiang.mimi.R
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 

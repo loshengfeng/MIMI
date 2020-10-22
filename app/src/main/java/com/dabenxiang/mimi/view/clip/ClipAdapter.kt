@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.ListAdapter
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.view.player.PlayerViewModel
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
@@ -25,7 +26,6 @@ import com.google.android.exoplayer2.util.Util
 import com.google.gson.Gson
 import timber.log.Timber
 import java.io.File
-import java.lang.Exception
 
 class ClipAdapter(
     private val context: Context,
@@ -53,8 +53,9 @@ class ClipAdapter(
                 }
             }
         const val PAYLOAD_UPDATE_UI = 0
+        const val PAYLOAD_UPDATE_CONSUME_TYPE = 1
 
-        var playingItem:MemberPostItem ?= null
+        var playingItem: MemberPostItem? = null
     }
 
     private var currentViewHolder: ClipViewHolder? = null
@@ -120,54 +121,54 @@ class ClipAdapter(
                 PAYLOAD_UPDATE_UI -> {
                     holder.onBind(item, clipFuncItem, position)
                 }
+                PAYLOAD_UPDATE_CONSUME_TYPE -> {
+                    holder.onBind(item, clipFuncItem, position)
+                    if(item.videoConsumeType!=VideoConsumeResult.POINT_NOT_ENOUGH) {
+                        takeIf { currentPosition == position }?.also {
+                            currentViewHolder = holder
+                            holder.progress.visibility = View.VISIBLE
+                        } ?: run {
+                            holder.ivCover.visibility = View.VISIBLE
+                            holder.progress.visibility = View.GONE
+                        }
+
+                        holder.ibReplay.setOnClickListener {
+                            exoPlayer?.also { player ->
+                                player.seekTo(0)
+                                player.playWhenReady = true
+                            }
+                            it.visibility = View.GONE
+                        }
+
+                        holder.playerView.setOnClickListener {
+                            takeIf { exoPlayer?.isPlaying ?: false }?.also {
+                                exoPlayer?.playWhenReady = false
+                                holder.ibPlay.visibility = View.VISIBLE
+                            } ?: run {
+                                exoPlayer?.playWhenReady = true
+                                holder.ibPlay.visibility = View.GONE
+                            }
+                        }
+
+                        holder.ibPlay.setOnClickListener {
+                            takeUnless { exoPlayer?.isPlaying ?: true }?.also {
+                                exoPlayer?.playWhenReady = true
+                                holder.ibPlay.visibility = View.GONE
+                            }
+                        }
+
+                        processClip(
+                            holder.playerView,
+                            contentItem?.shortVideo?.id.toString(),
+                            contentItem?.shortVideo?.url.toString(),
+                            position
+                        )
+                    }
+                }
             }
         } ?: run {
             holder.onBind(item, clipFuncItem, position)
-
-            takeIf { currentPosition == position }?.also {
-                currentViewHolder = holder
-                holder.progress.visibility = View.VISIBLE
-            } ?: run {
-                holder.ivCover.visibility = View.VISIBLE
-                holder.progress.visibility = View.GONE
-            }
-
-            if(item.deducted ){
-                holder.ibReplay.setOnClickListener {
-                    exoPlayer?.also { player ->
-                        player.seekTo(0)
-                        player.playWhenReady = true
-                    }
-                    it.visibility = View.GONE
-                }
-
-                holder.playerView.setOnClickListener {
-                    takeIf { exoPlayer?.isPlaying ?: false }?.also {
-                        exoPlayer?.playWhenReady = false
-                        holder.ibPlay.visibility = View.VISIBLE
-                    } ?: run {
-                        exoPlayer?.playWhenReady = true
-                        holder.ibPlay.visibility = View.GONE
-                    }
-                }
-
-                holder.ibPlay.setOnClickListener {
-                    takeUnless { exoPlayer?.isPlaying ?: true }?.also {
-                        exoPlayer?.playWhenReady = true
-                        holder.ibPlay.visibility = View.GONE
-                    }
-                }
-
-                processClip(
-                    holder.playerView,
-                    contentItem?.shortVideo?.id.toString(),
-                    contentItem?.shortVideo?.url.toString(),
-                    position
-                )
-            } else {
-                holder.progress.visibility = View.GONE
-                clipFuncItem.getPostDetail(item, position)
-            }
+            clipFuncItem.getPostDetail(item, position)
         }
     }
 
@@ -289,7 +290,7 @@ class ClipAdapter(
                 }
             }
             playingItem?.let {
-                clipFuncItem.onPlayerError(it, error.message?: "error: UNKNOWN")
+                clipFuncItem.onPlayerError(it, error.message ?: "error: UNKNOWN")
             }
 
         }

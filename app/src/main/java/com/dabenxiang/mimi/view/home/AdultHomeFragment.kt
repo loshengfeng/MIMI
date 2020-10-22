@@ -304,6 +304,7 @@ class AdultHomeFragment : BaseFragment() {
 
         viewModel.totalCountResult.observe(this, Observer {
             it?.also { totalCount ->
+                Timber.d("current: ${categoryTypeList[lastPosition].name} total count: $it")
                 cl_no_data.visibility =
                     takeIf { totalCount > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
                 takeIf { rv_club.visibility == View.VISIBLE }?.also {
@@ -594,10 +595,6 @@ class AdultHomeFragment : BaseFragment() {
                     refresh.isRefreshing = true
                     rv_follow.layoutManager = LinearLayoutManager(requireContext())
                     rv_follow.adapter = followPostPagedAdapter
-                } ?: run {
-                    cl_no_data.visibility =
-                        followPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
-                            ?.let { View.GONE } ?: let { View.VISIBLE }
                 }
                 takeIf { !accountManager.isLogin() }?.also {
                     showNoLoginToggle(true)
@@ -612,10 +609,6 @@ class AdultHomeFragment : BaseFragment() {
                     refresh.isRefreshing = true
                     rv_clip.layoutManager = LinearLayoutManager(requireContext())
                     rv_clip.adapter = clipPostPagedAdapter
-                } ?: run {
-                    cl_no_data.visibility =
-                        clipPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
-                            ?.let { View.GONE } ?: let { View.VISIBLE }
                 }
                 viewModel.getClipPosts()
             }
@@ -626,10 +619,6 @@ class AdultHomeFragment : BaseFragment() {
                     refresh.isRefreshing = true
                     rv_picture.layoutManager = LinearLayoutManager(requireContext())
                     rv_picture.adapter = picturePostPagedAdapter
-                } ?: run {
-                    cl_no_data.visibility =
-                        picturePostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
-                            ?.let { View.GONE } ?: let { View.VISIBLE }
                 }
                 viewModel.getPicturePosts()
             }
@@ -640,10 +629,6 @@ class AdultHomeFragment : BaseFragment() {
                     refresh.isRefreshing = true
                     rv_text.layoutManager = LinearLayoutManager(requireContext())
                     rv_text.adapter = textPostPagedAdapter
-                } ?: run {
-                    cl_no_data.visibility =
-                        textPostPagedAdapter.currentList.takeUnless { isListEmpty(it) }
-                            ?.let { View.GONE } ?: let { View.VISIBLE }
                 }
                 viewModel.getTextPosts()
             }
@@ -651,14 +636,10 @@ class AdultHomeFragment : BaseFragment() {
                 rv_club.visibility = View.VISIBLE
                 showNoLoginToggle(false)
                 takeIf { rv_club.adapter == null }?.also {
-                    refresh.isRefreshing = true
                     rv_club.layoutManager = MiMiLinearLayoutManager(requireContext())
                     rv_club.adapter = clubMemberAdapter
-                } ?: run {
-                    cl_no_data.visibility =
-                        clubMemberAdapter.currentList.takeUnless { isClubListEmpty(it) }
-                            ?.let { View.GONE } ?: let { View.VISIBLE }
                 }
+                refresh.isRefreshing = true
                 viewModel.getClubs()
             }
         }
@@ -1167,5 +1148,11 @@ class AdultHomeFragment : BaseFragment() {
                 requestPicPermissions()
             }
         }
+    }
+
+    fun checkIsNoData(){
+//        cl_no_data.visibility =
+//            (getCurrentAdapter() as MemberPostPagedAdapter).currentList.takeUnless { isListEmpty(it) }
+//                ?.let { View.GONE } ?: let { View.VISIBLE }
     }
 }
