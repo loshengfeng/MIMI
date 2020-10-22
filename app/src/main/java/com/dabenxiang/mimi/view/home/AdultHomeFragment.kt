@@ -1149,10 +1149,4 @@ class AdultHomeFragment : BaseFragment() {
             }
         }
     }
-
-    fun checkIsNoData(){
-//        cl_no_data.visibility =
-//            (getCurrentAdapter() as MemberPostPagedAdapter).currentList.takeUnless { isListEmpty(it) }
-//                ?.let { View.GONE } ?: let { View.VISIBLE }
-    }
 }

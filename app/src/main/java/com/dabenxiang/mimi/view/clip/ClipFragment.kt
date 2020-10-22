@@ -22,7 +22,6 @@ import com.dabenxiang.mimi.view.dialog.comment.CommentDialogFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.view.player.PlayerActivity
 import kotlinx.android.synthetic.main.fragment_clip.*
 import timber.log.Timber
 import java.io.File
@@ -52,6 +51,8 @@ class ClipFragment : BaseFragment() {
     private val clipMap: HashMap<String, File> = hashMapOf()
     private val memberPostItems: ArrayList<MemberPostItem> = arrayListOf()
     private var interactionListener: InteractionListener? = null
+
+    private var isShowComment = false
 
     override val bottomNavigationVisibility = View.GONE
 
@@ -87,7 +88,10 @@ class ClipFragment : BaseFragment() {
                     val result = it.result
                     clipMap[result.first] = result.third
                     Timber.d("clipResult notifyItemChanged: ${result.second}")
-                    rv_clip.adapter?.notifyItemChanged(result.second)
+                    rv_clip.adapter?.notifyItemChanged(
+                        result.second,
+                        ClipAdapter.PAYLOAD_UPDATE_PLAYER
+                    )
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -136,9 +140,11 @@ class ClipFragment : BaseFragment() {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
                 is Success -> {
-                    Timber.i("postDetailResult Success")
+                    val position = it.result
+                    if (memberPostItems[position].deducted && isShowComment)
+                        showCommentDialog(memberPostItems[position])
                     rv_clip.adapter?.notifyItemChanged(
-                        it.result,
+                        position,
                         ClipAdapter.PAYLOAD_UPDATE_DEDUCTED
                     )
                 }
@@ -146,16 +152,14 @@ class ClipFragment : BaseFragment() {
                     progressHUD?.dismiss()
                     onApiError(it.throwable)
                 }
-
             }
         })
 
         viewModel.meItem.observe(viewLifecycleOwner, {
             when (it) {
-                is Success -> {
-                }
-
                 is Error -> onApiError(it.throwable)
+                else -> {
+                }
             }
         })
     }
@@ -182,9 +186,8 @@ class ClipFragment : BaseFragment() {
                     { item, pos, isLike -> onLikeClick(item, pos, isLike) },
                     { item -> onCommentClick(item) },
                     { onBackClick() },
-                    { item, pos -> viewModel.getPostDetail(item, pos) },
                     { item, error -> viewModel.sendPlayerError(item, error) },
-                    { onVipClick()},
+                    { onVipClick() },
                     { onPromoteClick() }
                 )
             )
@@ -207,7 +210,8 @@ class ClipFragment : BaseFragment() {
                                 clipAdapter.releasePlayer()
                                 clipAdapter.updateCurrentPosition(currentPos)
                                 clipAdapter.notifyItemChanged(lastPosition)
-                                clipAdapter.notifyItemChanged(currentPos)
+//                                clipAdapter.notifyItemChanged(currentPos)
+                                viewModel.getPostDetail(memberPostItems[currentPos], currentPos)
                             } ?: clipAdapter.updateCurrentPosition(lastPosition)
                         }
                     }
@@ -215,10 +219,9 @@ class ClipFragment : BaseFragment() {
             })
             rv_clip.scrollToPosition(position)
 
-            (arguments?.getSerializable(KEY_SHOW_COMMENT) as Boolean).takeIf { it }?.also {
-                val item = data[position]
-                showCommentDialog(item)
-            }
+            isShowComment = arguments?.getSerializable(KEY_SHOW_COMMENT) as Boolean
+
+            viewModel.getPostDetail(memberPostItems[position], position)
         }
     }
 

@@ -53,6 +53,7 @@ class ClipAdapter(
             }
         const val PAYLOAD_UPDATE_UI = 0
         const val PAYLOAD_UPDATE_DEDUCTED = 1
+        const val PAYLOAD_UPDATE_PLAYER = 2
 
         var playingItem: MemberPostItem? = null
     }
@@ -155,7 +156,6 @@ class ClipAdapter(
                                 holder.ibPlay.visibility = View.GONE
                             }
                         }
-
                         processClip(
                             holder.playerView,
                             contentItem?.shortVideo?.id.toString(),
@@ -164,12 +164,17 @@ class ClipAdapter(
                         )
                     }
                 }
+                PAYLOAD_UPDATE_PLAYER -> {
+                    processClip(
+                        holder.playerView,
+                        contentItem?.shortVideo?.id.toString(),
+                        contentItem?.shortVideo?.url.toString(),
+                        position
+                    )
+                }
             }
         } ?: run {
             holder.onBind(item, clipFuncItem, position)
-            if (currentPosition == position) {
-                clipFuncItem.getPostDetail(item, position)
-            }
         }
     }
 
