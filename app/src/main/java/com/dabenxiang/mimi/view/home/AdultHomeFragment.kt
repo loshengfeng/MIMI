@@ -6,7 +6,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.view.View.GONE
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
@@ -164,10 +163,10 @@ class AdultHomeFragment : BaseFragment() {
                         for (i in 0 until level2.count()) {
                             val detail = level2[i]
                             val type = when (detail.name) {
-                                getString(R.string.home_tab_video) -> CategoryType.VIDEO
+                                getString(R.string.home_tab_video) -> CategoryType.VIDEO_ON_DEMAND
                                 getString(R.string.home_tab_follow) -> CategoryType.FOLLOW
-                                getString(R.string.home_tab_clip) -> CategoryType.CLIP
-                                getString(R.string.home_tab_picture) -> CategoryType.PICTURE
+                                getString(R.string.home_tab_clip) -> CategoryType.VIDEO
+                                getString(R.string.home_tab_picture) -> CategoryType.IMAGE
                                 getString(R.string.home_tab_text) -> CategoryType.TEXT
                                 getString(R.string.home_tab_club) -> CategoryType.CLUB
                                 else -> null
@@ -303,14 +302,16 @@ class AdultHomeFragment : BaseFragment() {
         })
 
         viewModel.totalCountResult.observe(this, Observer {
-            it?.also { totalCount ->
-                Timber.d("current: ${categoryTypeList[lastPosition].name} total count: $it")
-                cl_no_data.visibility =
-                    takeIf { totalCount > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
-                takeIf { rv_club.visibility == View.VISIBLE }?.also {
-                    clubMemberAdapter.totalCount = totalCount
+            it?.also {
+                val type = it.first
+                val totalCount = it.second
+                Timber.d("total count: $totalCount from $type /current: ${categoryTypeList[lastPosition].name}")
+                if (type == categoryTypeList[lastPosition]) {
+                    cl_no_data.visibility =
+                        takeIf { totalCount > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
+                    if (type == CategoryType.CLUB) { clubMemberAdapter.totalCount = totalCount }
+                    viewModel.clearLiveDataValue()
                 }
-                viewModel.clearLiveDataValue()
             }
         })
 
@@ -329,7 +330,7 @@ class AdultHomeFragment : BaseFragment() {
 
         mainViewModel?.deletePostResult?.observe(this, Observer {
             when (categoryTypeList[lastPosition]) {
-                CategoryType.FOLLOW, CategoryType.CLIP, CategoryType.PICTURE, CategoryType.TEXT -> {
+                CategoryType.FOLLOW, CategoryType.VIDEO, CategoryType.IMAGE, CategoryType.TEXT -> {
                     when (it) {
                         is Success -> {
                             val adapter = getCurrentAdapter() as MemberPostPagedAdapter
@@ -344,7 +345,7 @@ class AdultHomeFragment : BaseFragment() {
 
         viewModel.cleanRemovedPosList.observe(this, Observer {
             when (categoryTypeList[lastPosition]) {
-                CategoryType.FOLLOW, CategoryType.CLIP, CategoryType.PICTURE, CategoryType.TEXT -> {
+                CategoryType.FOLLOW, CategoryType.VIDEO, CategoryType.IMAGE, CategoryType.TEXT -> {
                     val adapter = getCurrentAdapter() as MemberPostPagedAdapter
                     adapter.removedPosList.clear()
                 }
@@ -355,10 +356,10 @@ class AdultHomeFragment : BaseFragment() {
 
     private fun getCurrentAdapter(): RecyclerView.Adapter<*>? {
         return when (categoryTypeList[lastPosition]) {
-            CategoryType.VIDEO -> rv_video.adapter
+            CategoryType.VIDEO_ON_DEMAND -> rv_video.adapter
             CategoryType.FOLLOW -> rv_follow.adapter
-            CategoryType.CLIP -> rv_clip.adapter
-            CategoryType.PICTURE -> rv_picture.adapter
+            CategoryType.VIDEO -> rv_clip.adapter
+            CategoryType.IMAGE -> rv_picture.adapter
             CategoryType.TEXT -> rv_text.adapter
             else -> rv_club.adapter
         }
@@ -401,10 +402,10 @@ class AdultHomeFragment : BaseFragment() {
         iv_bg_search.setOnClickListener {
             val item: SearchPostItem = when (categoryTypeList[lastPosition]) {
                 CategoryType.HOME -> SearchPostItem(type = PostType.HYBRID)
-                CategoryType.VIDEO -> SearchPostItem(type = PostType.VIDEO_ON_DEMAND)
+                CategoryType.VIDEO_ON_DEMAND -> SearchPostItem(type = PostType.VIDEO_ON_DEMAND)
                 CategoryType.FOLLOW -> SearchPostItem(isPostFollow = true)
-                CategoryType.CLIP -> SearchPostItem(type = PostType.VIDEO)
-                CategoryType.PICTURE -> SearchPostItem(type = PostType.IMAGE)
+                CategoryType.VIDEO -> SearchPostItem(type = PostType.VIDEO)
+                CategoryType.IMAGE -> SearchPostItem(type = PostType.IMAGE)
                 CategoryType.TEXT -> SearchPostItem(type = PostType.TEXT)
                 else -> SearchPostItem(isClub = true)
             }
@@ -439,7 +440,7 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         iv_invitevip_close.setOnClickListener {
-            layout_invitevip.visibility = GONE
+            layout_invitevip.visibility = View.GONE
         }
     }
 
@@ -575,7 +576,7 @@ class AdultHomeFragment : BaseFragment() {
                 }
                 mainViewModel?.getHomeCategories()
             }
-            CategoryType.VIDEO -> {
+            CategoryType.VIDEO_ON_DEMAND -> {
                 btn_filter.visibility = View.VISIBLE
                 rv_video.visibility = View.VISIBLE
                 showNoLoginToggle(false)
@@ -599,7 +600,7 @@ class AdultHomeFragment : BaseFragment() {
                 }
                 viewModel.getPostFollows()
             }
-            CategoryType.CLIP -> {
+            CategoryType.VIDEO -> {
                 rv_clip.visibility = View.VISIBLE
                 showNoLoginToggle(false)
                 takeIf { rv_clip.adapter == null }?.also {
@@ -609,7 +610,7 @@ class AdultHomeFragment : BaseFragment() {
                 }
                 viewModel.getClipPosts()
             }
-            CategoryType.PICTURE -> {
+            CategoryType.IMAGE -> {
                 rv_picture.visibility = View.VISIBLE
                 showNoLoginToggle(false)
                 takeIf { rv_picture.adapter == null }?.also {
@@ -643,13 +644,13 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private fun getData(position: Int) {
-        if(categoryTypeList.isEmpty()) return
+        if (categoryTypeList.isEmpty()) return
         when (categoryTypeList[position]) {
             CategoryType.HOME -> mainViewModel?.getHomeCategories()
-            CategoryType.VIDEO -> viewModel.getVideos(null, true)
+            CategoryType.VIDEO_ON_DEMAND -> viewModel.getVideos(null, true)
             CategoryType.FOLLOW -> viewModel.getPostFollows()
-            CategoryType.CLIP -> viewModel.getClipPosts()
-            CategoryType.PICTURE -> viewModel.getPicturePosts()
+            CategoryType.VIDEO -> viewModel.getClipPosts()
+            CategoryType.IMAGE -> viewModel.getPicturePosts()
             CategoryType.TEXT -> viewModel.getTextPosts()
             CategoryType.CLUB -> viewModel.getClubs()
         }
@@ -666,7 +667,13 @@ class AdultHomeFragment : BaseFragment() {
                 if (item.name == getString(R.string.home_tab_follow) || item.name == getString(R.string.home_tab_text)) continue
                 templateList.add(HomeTemplate.Header(null, item.name, item.name))
                 when (item.name) {
-                    getString(R.string.home_tab_video) -> templateList.add(HomeTemplate.Statistics(item.name, null, true))
+                    getString(R.string.home_tab_video) -> templateList.add(
+                        HomeTemplate.Statistics(
+                            item.name,
+                            null,
+                            true
+                        )
+                    )
                     getString(R.string.home_tab_clip) -> templateList.add(HomeTemplate.Clip())
                     getString(R.string.home_tab_picture) -> templateList.add(HomeTemplate.Picture())
                     getString(R.string.home_tab_club) -> templateList.add(HomeTemplate.Club())
@@ -879,15 +886,15 @@ class AdultHomeFragment : BaseFragment() {
     private val adapterListener = object : HomeAdapter.EventListener {
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {
             val type = when (item.title) {
-                getString(R.string.home_tab_video) -> CategoryType.VIDEO
+                getString(R.string.home_tab_video) -> CategoryType.VIDEO_ON_DEMAND
                 getString(R.string.home_tab_follow) -> CategoryType.FOLLOW
-                getString(R.string.home_tab_clip) -> CategoryType.CLIP
-                getString(R.string.home_tab_picture) -> CategoryType.PICTURE
+                getString(R.string.home_tab_clip) -> CategoryType.VIDEO
+                getString(R.string.home_tab_picture) -> CategoryType.IMAGE
                 getString(R.string.home_tab_text) -> CategoryType.TEXT
                 getString(R.string.home_tab_club) -> CategoryType.CLUB
                 else -> null
             }
-            type?.let{
+            type?.let {
                 setTab(categoryTypeList.indexOf(it))
             }
         }

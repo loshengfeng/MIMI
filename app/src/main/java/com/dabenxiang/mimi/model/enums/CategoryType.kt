@@ -2,10 +2,10 @@ package com.dabenxiang.mimi.model.enums
 
 enum class CategoryType {
     HOME,
-    VIDEO,
+    VIDEO_ON_DEMAND,
     FOLLOW,
-    CLIP,
-    PICTURE,
+    VIDEO,
+    IMAGE,
     TEXT,
     CLUB
 }
