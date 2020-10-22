@@ -20,6 +20,9 @@
         <action
             android:id="@+id/action_inviteVipFragment_to_inviteVipRecordFragment"
             app:destination="@id/inviteVipRecordFragment" />
+        <action
+            android:id="@+id/action_inviteVipFragment_to_navigation_login"
+            app:destination="@id/navigation_login" />
     </fragment>
     <fragment
         android:id="@+id/clubDetailFragment"

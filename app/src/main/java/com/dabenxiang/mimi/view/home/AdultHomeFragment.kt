@@ -430,15 +430,12 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         iv_invitevip.setOnClickListener {
-            if(!accountManager.isLogin())
-                showLoginDialog()
-            else
-                navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_to_inviteVipFragment,
-                        null
-                    )
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_inviteVipFragment,
+                    null
                 )
+            )
         }
 
         iv_invitevip_close.setOnClickListener {
@@ -1148,11 +1145,5 @@ class AdultHomeFragment : BaseFragment() {
                 requestPicPermissions()
             }
         }
-    }
-
-    fun checkIsNoData(){
-//        cl_no_data.visibility =
-//            (getCurrentAdapter() as MemberPostPagedAdapter).currentList.takeUnless { isListEmpty(it) }
-//                ?.let { View.GONE } ?: let { View.VISIBLE }
     }
 }
