@@ -4,6 +4,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.EditVideoListener
@@ -16,6 +17,7 @@ import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.BUNDLE_COVER_URI
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.BUNDLE_TRIMMER_URI
 import com.google.android.material.tabs.TabLayout
@@ -66,7 +68,7 @@ class EditVideoFragment : BaseFragment() {
 
     override fun setupListeners() {
         tv_back.setOnClickListener {
-            handleBackEvent()
+            discardDialog()
         }
 
         tv_clean.setOnClickListener {
@@ -90,11 +92,11 @@ class EditVideoFragment : BaseFragment() {
         })
 
         requireActivity().onBackPressedDispatcher.addCallback(this) {
-            handleBackEvent()
+            discardDialog()
         }
     }
 
-    private fun handleBackEvent() {
+    private fun discardDialog() {
         GeneralDialog.newInstance(
             GeneralDialogData(
                 titleRes = R.string.whether_to_discard_content,
@@ -103,10 +105,30 @@ class EditVideoFragment : BaseFragment() {
                 secondBtn = getString(R.string.btn_confirm),
                 isMessageIcon = false,
                 secondBlock = {
-                    findNavController().navigateUp()
+                    handleBackEvent()
                 }
             )
         ).show(requireActivity().supportFragmentManager)
+    }
+
+    private fun handleBackEvent() {
+        var page = ""
+
+        arguments?.let {
+            page = it.getString(BasePostFragment.PAGE, "")
+        }
+
+        if (page == BasePostFragment.MY_POST) {
+            Navigation.findNavController(requireView()).popBackStack(R.id.myPostFragment, false)
+        } else if (page == BasePostFragment.ADULT) {
+            Navigation.findNavController(requireView()).popBackStack(R.id.adultHomeFragment, false)
+        } else if (page == BasePostFragment.SEARCH) {
+            Navigation.findNavController(requireView()).popBackStack(R.id.searchPostFragment, false)
+        } else if (page == BasePostFragment.CLUB) {
+            Navigation.findNavController(requireView()).popBackStack(R.id.clubDetailFragment, false)
+        } else {
+            Navigation.findNavController(requireView()).popBackStack(R.id.adultHomeFragment, false)
+        }
     }
 
     override fun initSettings() {
@@ -163,10 +185,9 @@ class EditVideoFragment : BaseFragment() {
 
                 bundle.putBoolean(MyPostFragment.EDIT, true)
                 bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
-                findNavController().navigate(R.id.action_editVideoFragment2_to_postVideoFragment, bundle)
-            } else {
-                findNavController().navigate(R.id.action_editVideoFragment_to_postVideoFragment, bundle)
             }
+
+            findNavController().navigate(R.id.action_editVideoFragment_to_postVideoFragment, bundle)
         }
     }
 
