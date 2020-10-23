@@ -27,6 +27,7 @@ import com.dabenxiang.mimi.view.base.BaseActivity
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
+import com.dabenxiang.mimi.view.dialog.dailycheckin.DailyCheckInDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.home.AdultHomeFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
@@ -86,6 +87,13 @@ class MainActivity : BaseActivity(), InteractionListener {
                     refreshBottomNavigationBadge(it.result)
                 }
             }
+        })
+
+        viewModel.dailyCheckInItem.observe(this, Observer {
+            DailyCheckInDialogFragment.newInstance().show(
+                supportFragmentManager,
+                DailyCheckInDialogFragment::class.simpleName
+            )
         })
 
         viewModel.getTotalUnread()

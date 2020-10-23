@@ -12,15 +12,10 @@ import kotlinx.android.synthetic.main.fragment_dialog_daily_check_in.*
 class DailyCheckInDialogFragment : BaseDialogFragment() {
 
     private val viewModel: DailyCheckInDialogViewModel by viewModels()
-    private var onConfirm: (() -> Unit)? = null
 
     companion object {
-        fun newInstance(
-            onConfirm: (() -> Unit)? = null,
-        ): DailyCheckInDialogFragment {
-            val fragment = DailyCheckInDialogFragment()
-            fragment.onConfirm = onConfirm
-            return fragment
+        fun newInstance(): DailyCheckInDialogFragment {
+            return DailyCheckInDialogFragment()
         }
     }
 
@@ -62,7 +57,6 @@ class DailyCheckInDialogFragment : BaseDialogFragment() {
     override fun setupListeners() {
         super.setupListeners()
         btn_confirm.setOnClickListener {
-            onConfirm?.invoke()
             dismiss()
         }
     }

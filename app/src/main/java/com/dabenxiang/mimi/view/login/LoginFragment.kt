@@ -24,7 +24,6 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
-import com.dabenxiang.mimi.view.dialog.dailycheckin.DailyCheckInDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_login.*
@@ -166,16 +165,7 @@ class LoginFragment : BaseFragment() {
                 is Empty -> {
                     progressHUD?.dismiss()
                     mainViewModel?.startMQTT()
-                    if (!viewModel.accountManager.getProfile().isDailyCheckIn && !viewModel.accountManager.getProfile().isSubscribed) {
-                        DailyCheckInDialogFragment.newInstance(
-                            onConfirm = { navigateTo(NavigateItem.Up) }
-                        ).show(
-                            requireActivity().supportFragmentManager,
-                            DailyCheckInDialogFragment::class.simpleName
-                        )
-                    } else {
-                        navigateTo(NavigateItem.Up)
-                    }
+                    navigateTo(NavigateItem.Up)
                 }
                 is Error -> onApiError(it.throwable)
             }
