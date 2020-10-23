@@ -154,14 +154,6 @@ class ClipFragment : BaseFragment() {
                 }
             }
         })
-
-        viewModel.meItem.observe(viewLifecycleOwner, {
-            when (it) {
-                is Error -> onApiError(it.throwable)
-                else -> {
-                }
-            }
-        })
     }
 
     override fun setupListeners() {

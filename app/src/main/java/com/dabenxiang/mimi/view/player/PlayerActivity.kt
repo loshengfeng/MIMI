@@ -398,9 +398,7 @@ class PlayerActivity : BaseActivity() {
             Timber.i("episodePosition =$it")
             if (it >= 0) {
                 episodeAdapter.setLastSelectedIndex(it)
-                if (viewModel.isLogin()) viewModel.getMe()
-                else viewModel.getGuestInfo()
-//                viewModel.checkConsumeResult()
+                viewModel.getAdultStreamUrl()
             }
             scrollToBottom()
         })
@@ -414,7 +412,15 @@ class PlayerActivity : BaseActivity() {
                 is Loading -> progressHUD.show()
                 is Loaded -> progressHUD.dismiss()
                 is Empty -> loadVideo()
-                is Error -> onApiError(it.throwable)
+                is Error -> {
+                    when (it.throwable) {
+                        is PlayerViewModel.NotDeductedException -> {
+                            showRechargeReminder(true)
+                            scrollToBottom()
+                        }
+                        else -> onApiError(it.throwable)
+                    }
+                }
             }
         })
 
@@ -826,12 +832,12 @@ class PlayerActivity : BaseActivity() {
             }
         })
 
-        viewModel.meItem.observe(this, {
-            when (it) {
-                is Success -> viewModel.checkConsumeResult(it.result)
-                is Error -> onApiError(it.throwable)
-            }
-        })
+//        viewModel.meItem.observe(this, {
+//            when (it) {
+//                is Success -> viewModel.checkConsumeResult(it.result)
+//                is Error -> onApiError(it.throwable)
+//            }
+//        })
 
         //Detect key keyboard shown/hide
         this addKeyboardToggleListener { shown ->

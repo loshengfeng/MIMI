@@ -39,4 +39,7 @@ data class MeItem(
 
     @SerializedName("creationDate")
     val creationDate: Date = Date(),
+
+    @SerializedName("IsDailyCheckIn")
+    val isDailyCheckIn: Boolean,
 )
