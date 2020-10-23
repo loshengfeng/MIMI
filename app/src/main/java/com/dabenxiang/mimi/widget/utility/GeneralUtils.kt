@@ -10,6 +10,7 @@ import android.content.Intent
 import android.content.pm.PackageInstaller
 import android.net.Uri
 import android.provider.MediaStore
+import android.provider.Settings
 import android.util.DisplayMetrics
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
@@ -49,12 +50,11 @@ object GeneralUtils {
 
     @SuppressLint("HardwareIds")
     fun getAndroidID(): String {
-        //fixme debug
-//        return Settings.Secure.getString(
-//            App.applicationContext().contentResolver,
-//            Settings.Secure.ANDROID_ID
-//        )
-        return "1234567890"
+        return Settings.Secure.getString(
+            App.applicationContext().contentResolver,
+            Settings.Secure.ANDROID_ID
+        )
+//        return "1234567890"
     }
 
     fun getHttpExceptionData(httpException: HttpException): HttpExceptionItem {
