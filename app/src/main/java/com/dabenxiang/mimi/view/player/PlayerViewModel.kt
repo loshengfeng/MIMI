@@ -315,6 +315,17 @@ class PlayerViewModel : BaseViewModel() {
     fun getAdultStreamUrl() {
         viewModelScope.launch {
             flow {
+                /** for debug **/
+                if (isLogin()) domainManager.getApiRepository().getMe()
+                else domainManager.getApiRepository().getGuestInfo()
+                /**-----------**/
+
+                val videoInfoResp = domainManager.getApiRepository().getVideoInfo(videoId)
+                if (!videoInfoResp.isSuccessful) throw HttpException(videoInfoResp)
+                isDeducted = videoInfoResp.body()?.content?.deducted ?: false
+                if (!isDeducted) throw NotDeductedException()
+                else Timber.d("video is deducted! can watch!")
+
                 val source = sourceList?.get(sourceListPosition.value!!)!!
                 val episode = source.videoEpisodes?.get(0)!!
                 episodeId = episode.id!!
@@ -323,20 +334,6 @@ class PlayerViewModel : BaseViewModel() {
 
                 val episodeResp = apiRepository.getVideoEpisode(videoId, episodeId)
                 if (!episodeResp.isSuccessful) throw HttpException(episodeResp)
-
-                if (!isDeducted) {
-                    val videoInfoResp = domainManager.getApiRepository().getVideoInfo(videoId)
-                    if (!videoInfoResp.isSuccessful) throw HttpException(videoInfoResp)
-                    isDeducted = videoInfoResp.body()?.content?.deducted ?: false
-                }
-
-                /** for debug **/
-                if (isLogin()) domainManager.getApiRepository().getMe()
-                else domainManager.getApiRepository().getGuestInfo()
-                /**-----------**/
-
-                if (!isDeducted) throw NotDeductedException()
-                else Timber.d("video is deducted! can watch!")
 
                 val episodeInfo = episodeResp.body()?.content
                 Timber.i("episodeInfo =$episodeInfo")
