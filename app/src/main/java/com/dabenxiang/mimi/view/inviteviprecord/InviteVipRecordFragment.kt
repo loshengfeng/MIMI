@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.inviteviprecord
 
 import android.os.Bundle
 import android.view.View
+import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -9,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ReferrerHistoryItem
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.base.NavigateItem
 import kotlinx.android.synthetic.main.fragment_invite_vip_record.*
 import kotlinx.android.synthetic.main.fragment_text_detail.toolbarContainer
 import kotlinx.android.synthetic.main.toolbar.*
@@ -30,6 +32,7 @@ class InviteVipRecordFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
         text_toolbar_title.text = getString(R.string.invite_vip_record_title)
 
         toolbar.setBackgroundColor(requireContext().getColor(R.color.color_gray_2))

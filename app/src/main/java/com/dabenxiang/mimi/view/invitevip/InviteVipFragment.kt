@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.invitevip
 
 import android.os.Bundle
 import android.view.View
+import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -33,6 +34,7 @@ class InviteVipFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
         initSettings()
     }
 
