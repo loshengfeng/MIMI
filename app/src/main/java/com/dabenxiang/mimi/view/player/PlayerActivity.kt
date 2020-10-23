@@ -482,7 +482,7 @@ class PlayerActivity : BaseActivity() {
                 is Loaded -> progressHUD.dismiss()
                 is Success -> {
                     val result = it.result
-                    viewModel.category = result.categories?.get(0) ?: ""
+                    viewModel.category = if(result.categories.isNotEmpty()) result.categories.get(0) else ""
 
                     if (isFirstInit) {
                         isFirstInit = false
@@ -509,7 +509,7 @@ class PlayerActivity : BaseActivity() {
 
                         setupSourceList(viewModel.sourceList)
 
-                        val categoriesString = result.categories?.last()
+                        val categoriesString = if(result.categories.isNotEmpty()) result.categories.last() else ""
                         viewModel.setupGuessLikeList(categoriesString, isAdult)
                     }
 
