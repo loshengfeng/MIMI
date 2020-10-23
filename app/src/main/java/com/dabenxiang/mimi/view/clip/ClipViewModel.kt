@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.blankj.utilcode.util.FileIOUtils
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
-import com.dabenxiang.mimi.model.api.vo.MeItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
@@ -33,9 +32,6 @@ class ClipViewModel : BaseViewModel() {
 
     private var _postDetailResult = MutableLiveData<ApiResult<Int>>()
     val postDetailResult: LiveData<ApiResult<Int>> = _postDetailResult
-
-    private val _meItem = MutableLiveData<ApiResult<MeItem>>()
-    val meItem: LiveData<ApiResult<MeItem>> = _meItem
 
     fun getClip(id: String, pos: Int) {
         viewModelScope.launch {
@@ -145,25 +141,6 @@ class ClipViewModel : BaseViewModel() {
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _likePostResult.value = it }
-        }
-    }
-
-    fun getMe() {
-        viewModelScope.launch {
-            flow {
-                val result =
-                    if (isLogin()) domainManager.getApiRepository().getMe()
-                    else domainManager.getApiRepository().getGuestInfo()
-                if (!result.isSuccessful) throw HttpException(result)
-                val meItem = result.body()?.content
-                emit(ApiResult.success(meItem))
-            }
-                .onStart { emit(ApiResult.loading()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .collect {
-                    //_meItem.value = it
-                }
         }
     }
 }

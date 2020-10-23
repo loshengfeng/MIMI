@@ -54,6 +54,7 @@ object GeneralUtils {
             App.applicationContext().contentResolver,
             Settings.Secure.ANDROID_ID
         )
+//        return "1234567890"
     }
 
     fun getHttpExceptionData(httpException: HttpException): HttpExceptionItem {

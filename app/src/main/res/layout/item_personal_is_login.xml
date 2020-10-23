@@ -54,10 +54,10 @@
             android:singleLine="true"
             android:textColor="@color/color_white_1"
             android:textSize="14sp"
+            app:layout_constraintBottom_toTopOf="@+id/tv_expiry_date"
             app:layout_constraintEnd_toEndOf="@+id/gl_topup_start"
             app:layout_constraintStart_toEndOf="@id/iv_photo"
             app:layout_constraintTop_toTopOf="@id/iv_photo"
-            app:layout_constraintBottom_toTopOf="@+id/tv_expiry_date"
             app:layout_goneMarginTop="20dp"
             tools:text="好大一棵洋梨" />
 
@@ -70,17 +70,19 @@
             android:textColor="@color/color_white_1"
             android:textSize="12sp"
             android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_photo"
             app:layout_constraintStart_toStartOf="@+id/tv_name"
             app:layout_constraintTop_toBottomOf="@id/tv_name"
-            app:layout_constraintBottom_toBottomOf="@+id/iv_photo"
             tools:text="VIP 於 2020-02-10 到期" />
 
         <TextView
             android:id="@+id/tv_topup"
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:background="@drawable/bg_white_radius_6"
             android:gravity="center_vertical|center_horizontal"
+            android:paddingTop="@dimen/_6sdp"
+            android:paddingBottom="@dimen/_6sdp"
             android:text="@string/personal_topup"
             android:textColor="@color/color_red_6"
             android:textSize="15sp"
@@ -111,15 +113,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:background="@color/color_gray_3"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_follow" />
-
         <TextView
             android:id="@+id/tv_topup_history"
             style="@style/personalStyle"
@@ -130,6 +123,16 @@
             app:drawableEndCompat="@drawable/btn_arrow_black_n"
             app:drawableStartCompat="@drawable/btn_note_n"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_follow" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="@color/color_black_1_05"
+            app:layout_constraintEnd_toEndOf="@id/tv_follow"
+            app:layout_constraintStart_toStartOf="@id/tv_follow"
             app:layout_constraintTop_toBottomOf="@id/tv_follow" />
 
         <ImageView
@@ -143,15 +146,6 @@
             app:layout_constraintBottom_toBottomOf="@id/tv_topup_history"
             app:layout_constraintEnd_toEndOf="@id/tv_topup_history"
             app:layout_constraintTop_toTopOf="@id/tv_topup_history" />
-
-        <View
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:background="@color/color_gray_3"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_topup_history" />
 
         <TextView
             android:id="@+id/tv_chat_history"
@@ -181,15 +175,6 @@
             app:layout_constraintEnd_toEndOf="@id/tv_chat_history"
             app:layout_constraintTop_toTopOf="@id/tv_chat_history" />
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:background="@color/color_gray_3"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_chat_history" />
-
         <TextView
             android:id="@+id/tv_my_post"
             style="@style/personalStyle"
@@ -203,13 +188,26 @@
             app:layout_constraintTop_toBottomOf="@id/tv_chat_history" />
 
         <View
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/color_gray_3"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="@color/color_black_1_05"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_my_post" />
+            app:layout_constraintTop_toBottomOf="@id/tv_topup_history" />
+
+        <View
+            android:id="@+id/v_line_chat"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="@color/color_black_1_05"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_chat_history" />
 
         <TextView
             android:id="@+id/tv_setting"
@@ -220,6 +218,16 @@
             android:text="@string/personal_setting"
             app:drawableEndCompat="@drawable/btn_arrow_black_n"
             app:drawableStartCompat="@drawable/ico_setting"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_my_post" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="@color/color_black_1_05"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_my_post" />
 
