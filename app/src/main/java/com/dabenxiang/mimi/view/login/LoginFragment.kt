@@ -24,6 +24,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
+import com.dabenxiang.mimi.view.dialog.dailycheckin.DailyCheckInDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_login.*
@@ -165,38 +166,49 @@ class LoginFragment : BaseFragment() {
                 is Empty -> {
                     progressHUD?.dismiss()
                     mainViewModel?.startMQTT()
-                    GeneralDialog.newInstance(
-                        GeneralDialogData(
-                            titleIcon = R.drawable.img_login_success,
-                            titleRes = R.string.desc_success,
-                            message = viewModel.accountManager.getProfile().friendlyName,
-                            messageIcon = R.drawable.ico_default_photo,
-                            secondBtn = getString(R.string.btn_confirm),
-                            secondBlock = { navigateTo(NavigateItem.Up) },
-                            attachmentId = viewModel.accountManager.getProfile().avatarAttachmentId
+                    if (!viewModel.accountManager.getProfile().isDailyCheckIn && !viewModel.accountManager.getProfile().isSubscribed) {
+                        DailyCheckInDialogFragment.newInstance(
+                            onConfirm = { navigateTo(NavigateItem.Up) }
+                        ).show(
+                            requireActivity().supportFragmentManager,
+                            DailyCheckInDialogFragment::class.simpleName
                         )
-                    ).setCancel(false).show(requireActivity().supportFragmentManager)
+                    } else {
+                        navigateTo(NavigateItem.Up)
+                    }
                 }
                 is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.mobile.observe(viewLifecycleOwner, Observer {
-            if (it == null || viewModel.isValidateMobile(it, tv_call_prefix.text.toString()).isNotBlank()) {
+            if (it == null || viewModel.isValidateMobile(it, tv_call_prefix.text.toString())
+                    .isNotBlank()
+            ) {
                 tv_get_code.isEnabled = false
-                tv_get_code.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_black_1_30))
+                tv_get_code.setTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.color_black_1_30
+                    )
+                )
             } else {
                 tv_get_code.isEnabled = true
-                tv_get_code.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_black_1))
+                tv_get_code.setTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.color_black_1
+                    )
+                )
             }
         })
 
         viewModel.validateMessageResult.observe(viewLifecycleOwner, Observer {
-            when(it) {
+            when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
                 is Empty -> {
-                    object : CountDownTimer( 60000, 1000) {
+                    object : CountDownTimer(60000, 1000) {
                         override fun onFinish() {
                             tv_get_code?.isEnabled = true
                             tv_get_code?.text = getString(R.string.login_get_code)
@@ -204,7 +216,8 @@ class LoginFragment : BaseFragment() {
 
                         override fun onTick(p0: Long) {
                             tv_get_code?.isEnabled = false
-                            tv_get_code?.text = String.format(getString(R.string.send_code_count_down), p0 / 1000)
+                            tv_get_code?.text =
+                                String.format(getString(R.string.send_code_count_down), p0 / 1000)
                         }
                     }.start()
                 }
@@ -421,7 +434,8 @@ class LoginFragment : BaseFragment() {
     }
 
     private fun setCopyText() {
-        val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipboard =
+            requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clipData = clipboard.primaryClip
         val clipDataItem = clipData?.getItemAt(0)
         val copyText = clipDataItem?.text.toString() ?: ""

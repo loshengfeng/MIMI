@@ -146,7 +146,8 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
                         expiryDate = meItem?.expiryDate ?: Date(),
                         videoCount = meItem?.videoCount ?: 0,
                         videoOnDemandCount = meItem?.videoOnDemandCount ?: 0,
-                        creationDate = meItem?.creationDate ?: Date()
+                        creationDate = meItem?.creationDate ?: Date(),
+                        isDailyCheckIn = meItem?.isDailyCheckIn ?: false
                     )
                 )
             }
