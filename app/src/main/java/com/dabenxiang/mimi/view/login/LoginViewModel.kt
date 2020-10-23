@@ -170,6 +170,10 @@ class LoginViewModel : BaseViewModel() {
         }
     }
 
+    fun inviteCodeError() {
+        _validateCodeError.value = app.getString(R.string.error_validation)
+    }
+
     fun callValidateMessage(callPrefix: String) {
         viewModelScope.launch {
             flow {
