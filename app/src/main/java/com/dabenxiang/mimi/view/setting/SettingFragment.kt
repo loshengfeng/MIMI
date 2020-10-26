@@ -191,9 +191,9 @@ class SettingFragment : BaseFragment() {
                             })
                     )
                 }
-                R.id.btn_binding_invitation -> {
-                    showInvitationEditorDialog(requireContext())
-                }
+//                R.id.btn_binding_invitation -> {
+//                    showInvitationEditorDialog(requireContext())
+//                }
             }
         }.also {
             tv_back.setOnClickListener(it)
@@ -202,7 +202,7 @@ class SettingFragment : BaseFragment() {
             btn_chang_pw.setOnClickListener(it)
             btn_gender.setOnClickListener(it)
             btn_birthday.setOnClickListener(it)
-            btn_binding_invitation.setOnClickListener(it)
+//            btn_binding_invitation.setOnClickListener(it)
         }
     }
 
