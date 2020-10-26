@@ -270,6 +270,7 @@ class MainViewModel : BaseViewModel() {
     }
 
     fun startMQTT() {
+        //test serverUrl use: tcp://172.x.x.x:1883
         mqttManager.init(MQTT_HOST_URL, clientId, extendedCallback)
         mqttManager.connect(connectCallback)
     }
@@ -342,6 +343,10 @@ class MainViewModel : BaseViewModel() {
             when (payload.optInt("type", 0)) {
                 NotifyType.DAILY_CHECK_IN.value -> {
                     val data = gson.fromJson(String(message.payload), DailyCheckInItem::class.java)
+                    val profileItem = accountManager.getProfile()
+                    data.dailyCheckInPayLoadItem?.videoCount?.let { profileItem.videoCount = it }
+                    data.dailyCheckInPayLoadItem?.videoOnDemandCount?.let { profileItem.videoOnDemandCount = it }
+                    accountManager.setupProfile(profileItem)
                     _dailyCheckInItem.postValue(data)
                 }
                 NotifyType.CREATE_ORDER.value,
