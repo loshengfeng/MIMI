@@ -832,13 +832,6 @@ class PlayerActivity : BaseActivity() {
             }
         })
 
-//        viewModel.meItem.observe(this, {
-//            when (it) {
-//                is Success -> viewModel.checkConsumeResult(it.result)
-//                is Error -> onApiError(it.throwable)
-//            }
-//        })
-
         //Detect key keyboard shown/hide
         this addKeyboardToggleListener { shown ->
             isKeyboardShown = shown
@@ -1739,7 +1732,7 @@ class PlayerActivity : BaseActivity() {
                     val bundle = Bundle().also { it.putBoolean(KEY_IS_FROM_PLAYER, true) }
                     navigateTo(
                         MainActivity::class.java,
-                        R.id.settingFragment,
+                        R.id.action_to_settingFragment,
                         bundle
                     )
                 }
@@ -1761,7 +1754,7 @@ class PlayerActivity : BaseActivity() {
                     bundle.putInt(LoginFragment.KEY_TYPE, LoginFragment.TYPE_REGISTER)
                     navigateTo(
                         MainActivity::class.java,
-                        R.id.loginFragment,
+                        R.id.action_to_loginFragment,
                         bundle
                     )
                 },
@@ -1770,7 +1763,7 @@ class PlayerActivity : BaseActivity() {
                     bundle.putInt(LoginFragment.KEY_TYPE, LoginFragment.TYPE_LOGIN)
                     navigateTo(
                         MainActivity::class.java,
-                        R.id.loginFragment,
+                        R.id.action_to_loginFragment,
                         bundle
                     )
                 },
