@@ -195,22 +195,22 @@ class LoginFragment : BaseFragment() {
             when(it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Empty -> {
-                    object : CountDownTimer( 60000, 1000) {
-                        override fun onFinish() {
-                            tv_get_code?.isEnabled = true
-                            tv_get_code?.text = getString(R.string.login_get_code)
-                        }
-
-                        override fun onTick(p0: Long) {
-                            tv_get_code?.isEnabled = false
-                            tv_get_code?.text = String.format(getString(R.string.send_code_count_down), p0 / 1000)
-                        }
-                    }.start()
-                }
+                is Empty -> countDownTimer.start()
                 is Error -> onApiError(it.throwable)
             }
         })
+    }
+
+    private val countDownTimer =  object : CountDownTimer( 60000, 1000) {
+        override fun onFinish() {
+            tv_get_code?.isEnabled = true
+            tv_get_code?.text = getString(R.string.login_get_code)
+        }
+
+        override fun onTick(p0: Long) {
+            tv_get_code?.isEnabled = false
+            tv_get_code?.text = String.format(getString(R.string.send_code_count_down), p0 / 1000)
+        }
     }
 
     override fun setupListeners() {
@@ -408,6 +408,10 @@ class LoginFragment : BaseFragment() {
                 viewModel.inviteCodeError()
             }
             LOGIN_409000 -> {
+                countDownTimer.cancel()
+                countDownTimer.onFinish()
+                viewModel.onAccountExitError()
+                edit_verification_code.setText("")
                 showErrorMessageDialog(getString(R.string.error_account_duplicate))
             }
         }

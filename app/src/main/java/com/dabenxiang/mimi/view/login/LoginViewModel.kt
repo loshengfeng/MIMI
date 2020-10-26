@@ -61,6 +61,9 @@ class LoginViewModel : BaseViewModel() {
     private val _registerResult = MutableLiveData<ApiResult<Nothing>>()
     val registerResult: LiveData<ApiResult<Nothing>> = _registerResult
 
+    private val _accountExistError = MutableLiveData<String>()
+    val accountExistError: LiveData<String> = _accountExistError
+
     // Login
     private val _loginAccountError = MutableLiveData<String>()
     val loginAccountError: LiveData<String> = _loginAccountError
@@ -171,7 +174,7 @@ class LoginViewModel : BaseViewModel() {
     }
 
     fun inviteCodeError() {
-        _validateCodeError.value = app.getString(R.string.error_validation)
+        _validateCodeError.value = app.getString(R.string.error_account_duplicate)
     }
 
     fun callValidateMessage(callPrefix: String) {
@@ -189,6 +192,10 @@ class LoginViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _validateMessageResult.value = it }
         }
+    }
+
+    fun onAccountExitError() {
+        _mobileError.value = app.getString(R.string.error_account_duplicate)
     }
 
     fun startTimer() {
