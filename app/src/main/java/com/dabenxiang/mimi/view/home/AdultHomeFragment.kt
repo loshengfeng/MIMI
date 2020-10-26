@@ -6,10 +6,12 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.GridLayoutManager
@@ -64,6 +66,9 @@ import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 import java.io.File
@@ -92,6 +97,7 @@ class AdultHomeFragment : BaseFragment() {
     private var loginDialog: LoginRequestDialog? = null
 
     val accountManager: AccountManager by inject()
+    var inviteJob: Job? = null
 
     private val categoryTypeList: ArrayList<CategoryType> = arrayListOf()
 
@@ -144,6 +150,13 @@ class AdultHomeFragment : BaseFragment() {
 
         if (mainViewModel?.adult == null) {
             mainViewModel?.getHomeCategories()
+        }
+
+        inviteJob = lifecycleScope.launch {
+            while(true){
+                iv_invitevip.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.anim_shake))
+                delay(8000)
+            }
         }
     }
 
@@ -440,6 +453,7 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         iv_invitevip_close.setOnClickListener {
+            inviteJob?.cancel()
             layout_invitevip.visibility = View.GONE
         }
     }
