@@ -182,7 +182,8 @@
                 app:layout_constraintEnd_toEndOf="@+id/btn_birthday"
                 app:layout_constraintTop_toTopOf="@+id/btn_birthday" />
 
-            <TextView
+            <!-- Debug use -->
+            <!--<TextView
                 android:id="@+id/btn_binding_invitation"
                 style="@style/settingStyle_1"
                 android:layout_marginTop="15dp"
@@ -192,7 +193,7 @@
                 android:paddingEnd="16dp"
                 android:text="@string/setting_binding_invitation"
                 app:layout_constraintEnd_toEndOf="@id/btn_account"
-                app:layout_constraintTop_toBottomOf="@id/btn_birthday" />
+                app:layout_constraintTop_toBottomOf="@id/btn_birthday" />-->
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
