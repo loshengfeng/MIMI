@@ -230,10 +230,14 @@ object GeneralUtils {
     }
 
     fun openWebView(context: Context, url: String) {
-        val intent = Intent(Intent.ACTION_VIEW);
-        val url = Uri.parse(url)
-        intent.data = url
-        context.startActivity(intent)
+        try {
+            val intent = Intent(Intent.ACTION_VIEW);
+            val url = Uri.parse(url)
+            intent.data = url
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
     }
 
     private fun getStackTrace(t: Throwable): String {

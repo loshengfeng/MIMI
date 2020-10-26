@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.activity.addCallback
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,6 +22,9 @@ import com.dabenxiang.mimi.model.vo.PostVideoAttachment
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.model.vo.ViewerItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.ScrollVideoAdapter
+import com.dabenxiang.mimi.view.dialog.GeneralDialog
+import com.dabenxiang.mimi.view.dialog.GeneralDialogData
+import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.post.utility.PostManager
@@ -38,6 +43,8 @@ import java.util.concurrent.TimeUnit
 class PostVideoFragment : BasePostFragment() {
 
     private var haveMainTag = false
+    private var isEdit = false
+    private var page = ""
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_post_video
@@ -68,6 +75,11 @@ class PostVideoFragment : BasePostFragment() {
         edt_hashtag.imeOptions = EditorInfo.IME_ACTION_DONE
 
         useAdultTheme(false)
+
+        arguments?.let {
+            isEdit = it.getBoolean(MyPostFragment.EDIT, false)
+            page = it.getString(PAGE, "")
+        }
     }
 
     override fun setupListeners() {
@@ -86,17 +98,21 @@ class PostVideoFragment : BasePostFragment() {
 
             navigation()
         }
+
+        requireActivity().onBackPressedDispatcher.addCallback {
+            discardDialog()
+        }
+
+        tv_back.setOnClickListener {
+            discardDialog()
+        }
     }
 
     private fun navigation() {
-        var isEdit = false
         val title = edt_title.text.toString()
-        var page = ""
         var searchPostItem: SearchPostItem? = null
 
         arguments?.let {
-            isEdit = it.getBoolean(MyPostFragment.EDIT, false)
-            page = it.getString(PAGE, "")
             val data = it.getSerializable(SearchPostFragment.KEY_DATA)
             if (data != null) {
                 searchPostItem = data as SearchPostItem
@@ -187,27 +203,22 @@ class PostVideoFragment : BasePostFragment() {
         val myUri = Uri.fromFile(File(UriUtils.getPath(requireContext(), videoUri!!) ?: ""))
 
         if (PostManager().isVideoTimeValid(myUri, requireContext())) {
-            val isEdit = arguments?.getBoolean(MyPostFragment.EDIT)
 
             val bundle = Bundle()
             bundle.putString(EditVideoFragment.BUNDLE_VIDEO_URI, myUri.toString())
+            bundle.putString(PAGE, page)
 
-            if (isEdit != null && isEdit) {
+            if (isEdit) {
                 val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
 
                 bundle.putBoolean(MyPostFragment.EDIT, true)
                 bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
-                findNavController().navigate(
-                    R.id.action_postVideoFragment_to_editVideoFragment2,
-                    bundle
-                )
-
-            } else {
-                findNavController().navigate(
-                    R.id.action_postVideoFragment_to_editVideoFragment,
-                    bundle
-                )
             }
+
+            findNavController().navigate(
+                R.id.action_postVideoFragment_to_editVideoFragment,
+                bundle
+            )
         } else {
             Toast.makeText(requireContext(), R.string.post_video_length_error, Toast.LENGTH_SHORT)
                 .show()
@@ -279,6 +290,35 @@ class PostVideoFragment : BasePostFragment() {
 
         if (requestList.size == 0) {
             PostManager().selectVideo(this@PostVideoFragment)
+        }
+    }
+
+    private fun discardDialog() {
+        GeneralDialog.newInstance(
+            GeneralDialogData(
+                titleRes = R.string.whether_to_discard_content,
+                messageIcon = R.drawable.ico_default_photo,
+                firstBtn = getString(R.string.btn_cancel),
+                secondBtn = getString(R.string.btn_confirm),
+                isMessageIcon = false,
+                secondBlock = {
+                    handleBackEvent()
+                }
+            )
+        ).show(requireActivity().supportFragmentManager)
+    }
+
+    private fun handleBackEvent() {
+        if (isEdit && page == MY_POST) {
+            Navigation.findNavController(requireView()).popBackStack(R.id.myPostFragment, false)
+        } else if (isEdit && page == ADULT) {
+            Navigation.findNavController(requireView()).popBackStack(R.id.adultHomeFragment, false)
+        } else if (isEdit && page == SEARCH) {
+            Navigation.findNavController(requireView()).popBackStack(R.id.searchPostFragment, false)
+        } else if (isEdit && page == CLUB) {
+            Navigation.findNavController(requireView()).popBackStack(R.id.clubDetailFragment, false)
+        } else {
+            Navigation.findNavController(requireView()).popBackStack(R.id.adultHomeFragment, false)
         }
     }
 

@@ -212,8 +212,8 @@
             app:popUpTo="@+id/myPostFragment"
             app:popUpToInclusive="true" />
         <action
-            android:id="@+id/action_postVideoFragment_to_editVideoFragment2"
-            app:destination="@id/editVideoFragment2" />
+            android:id="@+id/action_postVideoFragment_to_editVideoFragment"
+            app:destination="@id/editVideoFragment" />
         <action
             android:id="@+id/action_postVideoFragment_to_searchPostFragment"
             app:destination="@id/searchPostFragment"
@@ -231,11 +231,11 @@
         android:name="com.dabenxiang.mimi.view.fullpicture.FullPictureFragment"
         tools:layout="@layout/fragment_full_picture" />
     <fragment
-        android:id="@+id/editVideoFragment2"
+        android:id="@+id/editVideoFragment"
         android:name="com.dabenxiang.mimi.view.post.video.EditVideoFragment"
         android:label="EditVideoFragment" >
         <action
-            android:id="@+id/action_editVideoFragment2_to_postVideoFragment"
+            android:id="@+id/action_editVideoFragment_to_postVideoFragment"
             app:destination="@id/postVideoFragment" />
     </fragment>
 

@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.forgetpassword
 
 import android.os.Bundle
+import android.text.InputFilter
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -97,9 +98,11 @@ class ForgetPasswordFragment : BaseFragment() {
                 if (tv_call_prefix.text == getString(R.string.login_mobile_call_prefix_taiwan)) {
                     tv_call_prefix.text = getString(R.string.login_mobile_call_prefix_china)
                     ToastUtils.showShort("Change to +86")
+                    edit_mobile.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(11))
                 } else {
                     tv_call_prefix.text = getString(R.string.login_mobile_call_prefix_taiwan)
                     ToastUtils.showShort("Change to +886")
+                    edit_mobile.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(9))
                 }
             }
 

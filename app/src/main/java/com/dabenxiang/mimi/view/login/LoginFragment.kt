@@ -403,6 +403,10 @@ class LoginFragment : BaseFragment() {
                 ).setCancel(false)
                     .show(requireActivity().supportFragmentManager)
             }
+            NOT_FOUND -> {
+                showErrorMessageDialog(getString(R.string.error_validation))
+                viewModel.inviteCodeError()
+            }
             LOGIN_409000 -> {
                 showErrorMessageDialog(getString(R.string.error_account_duplicate))
             }
@@ -427,7 +431,10 @@ class LoginFragment : BaseFragment() {
         val copyText = clipDataItem?.text.toString() ?: ""
 
         if (copyText.contains(MIMI_INVITE_CODE)) {
-            viewModel.inviteCode.value = copyText
+            val startIndex = copyText.lastIndexOf(MIMI_INVITE_CODE) + MIMI_INVITE_CODE.length
+
+            val inviteCode = copyText.substring(startIndex, copyText.length)
+            viewModel.inviteCode.value = inviteCode
         }
     }
 }
