@@ -292,9 +292,7 @@ class FavoriteFragment : BaseFragment() {
         override fun onVideoClick(item: Any, position: Int?) {
             when (item) {
                 is PlayItem -> {
-                    val playerData = PlayerItem(
-                        item.videoId ?: 0, item.isAdult ?: false
-                    )
+                    val playerData = PlayerItem(item.videoId ?: 0)
                     val intent = Intent(requireContext(), PlayerActivity::class.java)
                     intent.putExtras(PlayerActivity.createBundle(playerData))
                     startActivity(intent)
@@ -390,10 +388,7 @@ class FavoriteFragment : BaseFragment() {
                                 )
                             } else {
                                 val playerData =
-                                    PlayerItem(
-                                        item.videoId ?: 0, item.isAdult
-                                            ?: false
-                                    )
+                                    PlayerItem(item.videoId)
                                 val intent = Intent(requireContext(), PlayerActivity::class.java)
                                 intent.putExtras(PlayerActivity.createBundle(playerData, true))
                                 startActivity(intent)

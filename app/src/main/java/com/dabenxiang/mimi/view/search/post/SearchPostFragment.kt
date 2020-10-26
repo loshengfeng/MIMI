@@ -341,10 +341,7 @@ class SearchPostFragment : BaseFragment() {
 
     private val videoAdapterListener = object : SearchVideoAdapter.EventListener {
         override fun onVideoClick(item: VideoItem) {
-            val playerData = PlayerItem(
-                    item.id ?: 0,
-                    item.isAdult
-            )
+            val playerData = PlayerItem(item.id ?: 0)
             val intent = Intent(requireContext(), PlayerActivity::class.java)
             intent.putExtras(PlayerActivity.createBundle(playerData))
             startActivityForResult(intent, SearchVideoFragment.REQUEST_LOGIN)
@@ -392,10 +389,7 @@ class SearchPostFragment : BaseFragment() {
 
                 FunctionType.MSG -> {
                     // 點擊評論，進入播放頁面滾動到最下面
-                    val playerData = PlayerItem(
-                            item.id ?: 0,
-                            item.isAdult
-                    )
+                    val playerData = PlayerItem(item.id ?: 0)
                     val intent = Intent(requireContext(), PlayerActivity::class.java)
                     intent.putExtras(PlayerActivity.createBundle(playerData, true))
                     startActivityForResult(intent, SearchVideoFragment.REQUEST_LOGIN)
