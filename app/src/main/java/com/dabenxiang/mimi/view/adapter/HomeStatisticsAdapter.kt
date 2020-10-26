@@ -83,7 +83,7 @@ class HomeStatisticsAdapter(
             override fun onClickItemIndex(view: View, index: Int) {
                 if (index > -1) {
                     list?.get(index)?.also {
-                        nestedListener.onVideoClick(view, PlayerItem.parser(it, isAdult))
+                        nestedListener.onVideoClick(view, PlayerItem.parser(it))
                     }
                 }
             }

@@ -49,7 +49,7 @@ class RankingFragment : BaseFragment() {
             RankingFuncItem(
                 onVideoItemClick = {
                     val playerData =
-                        PlayerItem(it.id!!, true)
+                        PlayerItem(it.id ?: 0)
                     val intent = Intent(requireContext(), PlayerActivity::class.java)
                     intent.putExtras(PlayerActivity.createBundle(playerData))
                     startActivityForResult(intent, REQUEST_LOGIN)

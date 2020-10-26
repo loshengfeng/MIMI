@@ -69,7 +69,7 @@ class CategoriesFragment : BaseFragment() {
 
     private val videoListAdapter by lazy {
         val isAdult = mainViewModel?.adultMode?.value ?: false
-        HomeVideoListAdapter(adapterListener, isAdult)
+        HomeVideoListAdapter(adapterListener)
     }
 
     private val adapterListener = object : HomeAdapter.EventListener {

@@ -102,7 +102,7 @@ class PlayerActivity : BaseActivity() {
     private var reportDialog: ReportDialogFragment? = null
     private var isFirstInit = true
     private var isKeyboardShown = false
-    private var oldPlayerItem: PlayerItem = PlayerItem(-1, false)
+    private var oldPlayerItem: PlayerItem = PlayerItem(-1)
 
     private val sourceListAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
@@ -131,7 +131,7 @@ class PlayerActivity : BaseActivity() {
 //                startActivity(intent)
 //
 //                finish()
-                oldPlayerItem = PlayerItem(viewModel.videoId, obtainIsAdult())
+                oldPlayerItem = PlayerItem(viewModel.videoId)
                 reloadVideoInfo(item)
             }
         }, obtainIsAdult())
@@ -1106,10 +1106,7 @@ class PlayerActivity : BaseActivity() {
     }
 
     private fun loadVideo(
-        playerItem: PlayerItem = PlayerItem(
-            -1,
-            false
-        )
+        playerItem: PlayerItem = PlayerItem(-1)
     ) {
         if (playerItem.videoId != -1L) {
             viewModel.videoId = playerItem.videoId
