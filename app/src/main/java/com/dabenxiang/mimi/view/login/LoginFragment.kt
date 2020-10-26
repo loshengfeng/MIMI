@@ -165,17 +165,7 @@ class LoginFragment : BaseFragment() {
                 is Empty -> {
                     progressHUD?.dismiss()
                     mainViewModel?.startMQTT()
-                    GeneralDialog.newInstance(
-                        GeneralDialogData(
-                            titleIcon = R.drawable.img_login_success,
-                            titleRes = R.string.desc_success,
-                            message = viewModel.accountManager.getProfile().friendlyName,
-                            messageIcon = R.drawable.ico_default_photo,
-                            secondBtn = getString(R.string.btn_confirm),
-                            secondBlock = { navigateTo(NavigateItem.Up) },
-                            attachmentId = viewModel.accountManager.getProfile().avatarAttachmentId
-                        )
-                    ).setCancel(false).show(requireActivity().supportFragmentManager)
+                    navigateTo(NavigateItem.Up)
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -192,7 +182,7 @@ class LoginFragment : BaseFragment() {
         })
 
         viewModel.validateMessageResult.observe(viewLifecycleOwner, Observer {
-            when(it) {
+            when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
                 is Empty -> countDownTimer.start()

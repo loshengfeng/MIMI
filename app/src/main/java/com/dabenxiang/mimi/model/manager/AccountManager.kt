@@ -23,16 +23,20 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
             pref.keepAccount = value
         }
 
-    private fun setupProfile(profileItem: ProfileItem) {
+    fun setupProfile(profileItem: ProfileItem) {
         pref.profileItem = profileItem
     }
 
     fun setupProfile(meItem: MeItem) {
-        pref.profileItem.userId = meItem.id ?: 0
-        pref.profileItem.avatarAttachmentId = meItem.avatarAttachmentId ?: 0
-        pref.profileItem.friendlyName = meItem.friendlyName ?: ""
-        pref.profileItem.point = meItem.availablePoint ?: 0
-        pref.profileItem.isEmailConfirmed = meItem.isEmailConfirmed ?: false
+        pref.profileItem = ProfileItem(
+            userId = meItem.id ?: 0,
+            avatarAttachmentId = meItem.avatarAttachmentId ?: 0,
+            friendlyName = meItem.friendlyName ?: "",
+            point = meItem.availablePoint ?: 0,
+            isEmailConfirmed = meItem.isEmailConfirmed ?: false,
+            videoCount = meItem.videoCount ?: 0,
+            videoOnDemandCount = meItem.videoOnDemandCount ?: 0
+        )
     }
 
     fun getProfile(): ProfileItem {
@@ -146,7 +150,8 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
                         expiryDate = meItem?.expiryDate ?: Date(),
                         videoCount = meItem?.videoCount ?: 0,
                         videoOnDemandCount = meItem?.videoOnDemandCount ?: 0,
-                        creationDate = meItem?.creationDate ?: Date()
+                        creationDate = meItem?.creationDate ?: Date(),
+                        isDailyCheckIn = meItem?.isDailyCheckIn ?: false
                     )
                 )
             }
@@ -187,6 +192,6 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
 
     fun logoutLocal() {
         pref.clearMemberToken()
-        if(!keepAccount) pref.clearProfile()
+        if (!keepAccount) pref.clearProfile()
     }
 }

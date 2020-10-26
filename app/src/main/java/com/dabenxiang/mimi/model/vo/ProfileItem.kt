@@ -15,5 +15,6 @@ data class ProfileItem(
     var expiryDate: Date = Date(),
     var videoCount: Int = 0,
     var videoOnDemandCount: Int = 0,
-    var creationDate: Date = Date()
+    var creationDate: Date = Date(),
+    var isDailyCheckIn: Boolean = false
 )

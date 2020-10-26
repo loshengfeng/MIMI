@@ -438,4 +438,10 @@
     <string name="recharge_reminder_message"><font fgcolor="#ffffff">免费观看次数已用完\n成功推广 1 人赠送</font> <font fgcolor='#FF4D4D'>2</font><font fgcolor="#ffffff">天 VIP\n可无限叠加，免费观看所有视频</font></string>
     <string name="recharge_reminder_btn_vip">充值 VIP</string>
     <string name="recharge_reminder_btn_promote">推广好友</string>
+
+    <!-- Check In -->
+    <string name="daily_check_in_success">签到成功</string>
+    <string name="daily_check_in">每日签到</string>
+    <string name="daily_check_in_hint">赠送秘密视频 %1$d 部、短视频 %2$d 部</string>
+
 </resources>

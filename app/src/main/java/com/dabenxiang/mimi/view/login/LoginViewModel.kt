@@ -8,12 +8,9 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.SingUpRequest
 import com.dabenxiang.mimi.model.api.vo.ValidateMessageRequest
-import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
 import com.dabenxiang.mimi.widget.utility.EditTextMutableLiveData
-import com.dabenxiang.mimi.widget.utility.GeneralUtils.isAccountValid
-import com.dabenxiang.mimi.widget.utility.GeneralUtils.isEmailValid
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.isFriendlyNameValid
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.isMobileValid
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.isPasswordValid
