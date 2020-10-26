@@ -18,10 +18,8 @@
 
     <ImageView
         android:id="@+id/iv_selected"
-        android:layout_width="0dp"
-        android:layout_height="5dp"
-        android:paddingStart="5dp"
-        android:paddingEnd="5dp"
+        android:layout_width="30dp"
+        android:layout_height="4dp"
         android:src="@drawable/bg_tab_red_1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/tv_title"
