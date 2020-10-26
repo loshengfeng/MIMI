@@ -16,7 +16,6 @@ import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
 import kotlinx.android.synthetic.main.fragment_forget_password.*
-import kotlinx.android.synthetic.main.item_login.*
 
 class ForgetPasswordFragment : BaseFragment() {
 
@@ -65,10 +64,11 @@ class ForgetPasswordFragment : BaseFragment() {
                     GeneralDialog.newInstance(
                         GeneralDialogData(
                             titleRes = R.string.reset_pw_success,
-                            message = getString(R.string.desc_email, viewModel.mobile.value),
+                            message = getString(R.string.desc_mobile, tv_call_prefix.text.toString() + viewModel.mobile.value),
                             messageIcon = R.drawable.ico_email,
                             secondBtn = getString(R.string.btn_confirm),
-                            secondBlock = { navigateTo(NavigateItem.Up) }
+                            secondBlock = { navigateTo(NavigateItem.Up)},
+                            isMessageIcon = false
                         )
                     ).setCancel(false)
                         .show(requireActivity().supportFragmentManager)
