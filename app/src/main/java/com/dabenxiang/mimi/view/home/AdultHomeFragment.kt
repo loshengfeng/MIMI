@@ -753,7 +753,7 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val videoListAdapter by lazy {
-        HomeVideoListAdapter(adapterListener, true)
+        HomeVideoListAdapter(adapterListener)
     }
 
     private val adultListener = object : AdultListener {
