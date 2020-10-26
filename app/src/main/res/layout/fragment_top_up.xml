@@ -144,22 +144,36 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/rg_type"
+            app:layout_constraintBottom_toTopOf="@id/tv_teaching"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/view_line"
             tools:text="副标内容副标内容" />
 
+        <TextView
+            android:id="@+id/tv_teaching"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:autoLink="all"
+            android:linksClickable="true"
+            android:text="@string/topup_teaching"
+            android:textColor="@color/color_blue_2"
+            app:layout_constraintBottom_toTopOf="@id/rg_type"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_subtitle" />
+
         <RadioGroup
             android:id="@+id/rg_type"
             android:layout_width="220dp"
             android:layout_height="40dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="20dp"
             android:background="@drawable/bg_checkbox_2"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_subtitle">
+            app:layout_constraintTop_toBottomOf="@id/tv_teaching">
 
             <RadioButton
                 android:id="@+id/rb_online_pay"
