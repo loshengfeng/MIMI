@@ -42,7 +42,7 @@ class ForgetPasswordViewModel : BaseViewModel() {
         _accountError.value = isValidateAccount(account.value ?: "")
 
         if ("" == _accountError.value && "" == _mobileError.value) {
-            account.value?.let { it1 -> mobile.value?.let { it2 -> doReset(it1, it2) } }
+            account.value?.let { it1 -> mobile.value?.let { it2 -> doReset(callPrefix + it2) } }
         }
     }
 
@@ -61,11 +61,11 @@ class ForgetPasswordViewModel : BaseViewModel() {
         }
     }
 
-    private fun doReset(account: String, email: String) {
+    private fun doReset(account: String) {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository()
-                    .forgetPassword(ForgetPasswordRequest(account, email))
+                    .forgetPassword(ForgetPasswordRequest(account))
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }

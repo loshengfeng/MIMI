@@ -165,17 +165,7 @@ class LoginFragment : BaseFragment() {
                 is Empty -> {
                     progressHUD?.dismiss()
                     mainViewModel?.startMQTT()
-                    GeneralDialog.newInstance(
-                        GeneralDialogData(
-                            titleIcon = R.drawable.img_login_success,
-                            titleRes = R.string.desc_success,
-                            message = viewModel.accountManager.getProfile().friendlyName,
-                            messageIcon = R.drawable.ico_default_photo,
-                            secondBtn = getString(R.string.btn_confirm),
-                            secondBlock = { navigateTo(NavigateItem.Up) },
-                            attachmentId = viewModel.accountManager.getProfile().avatarAttachmentId
-                        )
-                    ).setCancel(false).show(requireActivity().supportFragmentManager)
+                    navigateTo(NavigateItem.Up)
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -192,25 +182,25 @@ class LoginFragment : BaseFragment() {
         })
 
         viewModel.validateMessageResult.observe(viewLifecycleOwner, Observer {
-            when(it) {
+            when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Empty -> {
-                    object : CountDownTimer( 60000, 1000) {
-                        override fun onFinish() {
-                            tv_get_code?.isEnabled = true
-                            tv_get_code?.text = getString(R.string.login_get_code)
-                        }
-
-                        override fun onTick(p0: Long) {
-                            tv_get_code?.isEnabled = false
-                            tv_get_code?.text = String.format(getString(R.string.send_code_count_down), p0 / 1000)
-                        }
-                    }.start()
-                }
+                is Empty -> countDownTimer.start()
                 is Error -> onApiError(it.throwable)
             }
         })
+    }
+
+    private val countDownTimer =  object : CountDownTimer( 60000, 1000) {
+        override fun onFinish() {
+            tv_get_code?.isEnabled = true
+            tv_get_code?.text = getString(R.string.login_get_code)
+        }
+
+        override fun onTick(p0: Long) {
+            tv_get_code?.isEnabled = false
+            tv_get_code?.text = String.format(getString(R.string.send_code_count_down), p0 / 1000)
+        }
     }
 
     override fun setupListeners() {
@@ -408,6 +398,10 @@ class LoginFragment : BaseFragment() {
                 viewModel.inviteCodeError()
             }
             LOGIN_409000 -> {
+                countDownTimer.cancel()
+                countDownTimer.onFinish()
+                viewModel.onAccountExitError()
+                edit_verification_code.setText("")
                 showErrorMessageDialog(getString(R.string.error_account_duplicate))
             }
         }

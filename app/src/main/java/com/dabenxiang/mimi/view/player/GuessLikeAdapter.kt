@@ -45,7 +45,7 @@ class GuessLikeAdapter(
             override fun onClickItemIndex(view: View, index: Int) {
                 if (index > -1) {
                     getItem(index)?.also {
-                        val playerData = PlayerItem.parser(it, isAdult)
+                        val playerData = PlayerItem.parser(it)
                         listener.onVideoClick(view, playerData)
                     }
                 }

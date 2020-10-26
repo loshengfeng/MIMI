@@ -1,14 +1,9 @@
 package com.dabenxiang.mimi.model.vo.mqtt
 
-import com.dabenxiang.mimi.model.enums.NotifyType
 import com.google.gson.annotations.SerializedName
 import java.util.*
 
 data class OrderPayloadItem(
-
-    @SerializedName("type")
-    val type: NotifyType = NotifyType.CREATE_ORDER,
-
     @SerializedName("orderId")
     val orderId: String = "",
 
@@ -41,4 +36,5 @@ data class OrderPayloadItem(
 
     @SerializedName("isSuccessful")
     val isSuccessful: Boolean = false
-)
+
+) : PayloadItem()

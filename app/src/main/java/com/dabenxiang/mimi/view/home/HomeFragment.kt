@@ -307,19 +307,19 @@ class HomeFragment : BaseFragment() {
     }
 
     private val movieListAdapter by lazy {
-        HomeVideoListAdapter(adapterListener, false)
+        HomeVideoListAdapter(adapterListener)
     }
 
     private val dramaListAdapter by lazy {
-        HomeVideoListAdapter(adapterListener, false)
+        HomeVideoListAdapter(adapterListener)
     }
 
     private val varietyListAdapter by lazy {
-        HomeVideoListAdapter(adapterListener, false)
+        HomeVideoListAdapter(adapterListener)
     }
 
     private val animationListAdapter by lazy {
-        HomeVideoListAdapter(adapterListener, false)
+        HomeVideoListAdapter(adapterListener)
     }
 
     private val adapterListener = object : HomeAdapter.EventListener {

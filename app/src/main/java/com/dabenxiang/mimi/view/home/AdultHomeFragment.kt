@@ -644,7 +644,10 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private fun getData(position: Int) {
-        if (categoryTypeList.isEmpty()) return
+        if (categoryTypeList.isEmpty()) {
+                mainViewModel?.getHomeCategories()
+                return
+        }
         when (categoryTypeList[position]) {
             CategoryType.HOME -> mainViewModel?.getHomeCategories()
             CategoryType.VIDEO_ON_DEMAND -> viewModel.getVideos(null, true)
@@ -750,7 +753,7 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val videoListAdapter by lazy {
-        HomeVideoListAdapter(adapterListener, true)
+        HomeVideoListAdapter(adapterListener)
     }
 
     private val adultListener = object : AdultListener {
