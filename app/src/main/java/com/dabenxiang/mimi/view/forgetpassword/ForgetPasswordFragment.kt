@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.forgetpassword
 
 import android.os.Bundle
+import android.text.InputFilter
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -15,7 +16,6 @@ import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
 import kotlinx.android.synthetic.main.fragment_forget_password.*
-import kotlinx.android.synthetic.main.item_login.*
 
 class ForgetPasswordFragment : BaseFragment() {
 
@@ -97,9 +97,11 @@ class ForgetPasswordFragment : BaseFragment() {
                 if (tv_call_prefix.text == getString(R.string.login_mobile_call_prefix_taiwan)) {
                     tv_call_prefix.text = getString(R.string.login_mobile_call_prefix_china)
                     ToastUtils.showShort("Change to +86")
+                    edit_mobile.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(11))
                 } else {
                     tv_call_prefix.text = getString(R.string.login_mobile_call_prefix_taiwan)
                     ToastUtils.showShort("Change to +886")
+                    edit_mobile.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(9))
                 }
             }
 

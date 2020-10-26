@@ -88,10 +88,7 @@ class HomeVideoListAdapter(
             object : GridLayoutManager.SpanSizeLookup() {
                 override fun getSpanSize(position: Int): Int {
                     return when (getItemViewType(position)) {
-                        BANNER -> when(isAdult) {
-                            true -> 2
-                            else -> 3
-                        }
+                        BANNER -> 2
                         else -> 1
                     }
                 }

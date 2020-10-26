@@ -8,12 +8,9 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.SingUpRequest
 import com.dabenxiang.mimi.model.api.vo.ValidateMessageRequest
-import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
 import com.dabenxiang.mimi.widget.utility.EditTextMutableLiveData
-import com.dabenxiang.mimi.widget.utility.GeneralUtils.isAccountValid
-import com.dabenxiang.mimi.widget.utility.GeneralUtils.isEmailValid
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.isFriendlyNameValid
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.isMobileValid
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.isPasswordValid
@@ -60,6 +57,9 @@ class LoginViewModel : BaseViewModel() {
 
     private val _registerResult = MutableLiveData<ApiResult<Nothing>>()
     val registerResult: LiveData<ApiResult<Nothing>> = _registerResult
+
+    private val _accountExistError = MutableLiveData<String>()
+    val accountExistError: LiveData<String> = _accountExistError
 
     // Login
     private val _loginAccountError = MutableLiveData<String>()
@@ -170,6 +170,10 @@ class LoginViewModel : BaseViewModel() {
         }
     }
 
+    fun inviteCodeError() {
+        _validateCodeError.value = app.getString(R.string.error_account_duplicate)
+    }
+
     fun callValidateMessage(callPrefix: String) {
         viewModelScope.launch {
             flow {
@@ -185,6 +189,10 @@ class LoginViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _validateMessageResult.value = it }
         }
+    }
+
+    fun onAccountExitError() {
+        _mobileError.value = app.getString(R.string.error_account_duplicate)
     }
 
     fun startTimer() {

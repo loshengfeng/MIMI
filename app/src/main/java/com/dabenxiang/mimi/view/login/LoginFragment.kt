@@ -172,24 +172,12 @@ class LoginFragment : BaseFragment() {
         })
 
         viewModel.mobile.observe(viewLifecycleOwner, Observer {
-            if (it == null || viewModel.isValidateMobile(it, tv_call_prefix.text.toString())
-                    .isNotBlank()
-            ) {
+            if (it == null || viewModel.isValidateMobile(it, tv_call_prefix.text.toString()).isNotBlank()) {
                 tv_get_code.isEnabled = false
-                tv_get_code.setTextColor(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        R.color.color_black_1_30
-                    )
-                )
+                tv_get_code.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_black_1_30))
             } else {
                 tv_get_code.isEnabled = true
-                tv_get_code.setTextColor(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        R.color.color_black_1
-                    )
-                )
+                tv_get_code.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_black_1))
             }
         })
 
@@ -197,23 +185,22 @@ class LoginFragment : BaseFragment() {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Empty -> {
-                    object : CountDownTimer(60000, 1000) {
-                        override fun onFinish() {
-                            tv_get_code?.isEnabled = true
-                            tv_get_code?.text = getString(R.string.login_get_code)
-                        }
-
-                        override fun onTick(p0: Long) {
-                            tv_get_code?.isEnabled = false
-                            tv_get_code?.text =
-                                String.format(getString(R.string.send_code_count_down), p0 / 1000)
-                        }
-                    }.start()
-                }
+                is Empty -> countDownTimer.start()
                 is Error -> onApiError(it.throwable)
             }
         })
+    }
+
+    private val countDownTimer =  object : CountDownTimer( 60000, 1000) {
+        override fun onFinish() {
+            tv_get_code?.isEnabled = true
+            tv_get_code?.text = getString(R.string.login_get_code)
+        }
+
+        override fun onTick(p0: Long) {
+            tv_get_code?.isEnabled = false
+            tv_get_code?.text = String.format(getString(R.string.send_code_count_down), p0 / 1000)
+        }
     }
 
     override fun setupListeners() {
@@ -406,7 +393,15 @@ class LoginFragment : BaseFragment() {
                 ).setCancel(false)
                     .show(requireActivity().supportFragmentManager)
             }
+            NOT_FOUND -> {
+                showErrorMessageDialog(getString(R.string.error_validation))
+                viewModel.inviteCodeError()
+            }
             LOGIN_409000 -> {
+                countDownTimer.cancel()
+                countDownTimer.onFinish()
+                viewModel.onAccountExitError()
+                edit_verification_code.setText("")
                 showErrorMessageDialog(getString(R.string.error_account_duplicate))
             }
         }
@@ -424,14 +419,16 @@ class LoginFragment : BaseFragment() {
     }
 
     private fun setCopyText() {
-        val clipboard =
-            requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clipData = clipboard.primaryClip
         val clipDataItem = clipData?.getItemAt(0)
         val copyText = clipDataItem?.text.toString() ?: ""
 
         if (copyText.contains(MIMI_INVITE_CODE)) {
-            viewModel.inviteCode.value = copyText
+            val startIndex = copyText.lastIndexOf(MIMI_INVITE_CODE) + MIMI_INVITE_CODE.length
+
+            val inviteCode = copyText.substring(startIndex, copyText.length)
+            viewModel.inviteCode.value = inviteCode
         }
     }
 }
