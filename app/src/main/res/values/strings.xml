@@ -66,7 +66,7 @@
     <string name="error_email_not_confirmed_msg">Email 尚未验证，请先完成验证后登录</string>
 
     <!-- Top Up -->
-    <string name="topup_desc">蜜币购买</string>
+    <string name="topup_desc">购买 VIP</string>
     <string name="topup_total">总计</string>
     <string name="topup_next">下一步</string>
     <string name="topup_subtitle">会员尊享 每天无限观看</string>
@@ -167,6 +167,8 @@
     <string name="topup_completed">交易成功</string>
     <string name="topup_canceled">Canceled</string>
     <string name="topup_failed">交易失败</string>
+<!--    <string name="topup_teaching"><a href="https://www.google.com/?hl=zh_tw">充值教学 ></a></string>-->
+    <string name="topup_teaching">充值教学 ></string>
     <string name="title_chat_history">对话记录</string>
     <string name="edit_hint_chat">留下评论</string>
     <string name="issue_report">问题回报</string>

@@ -1,7 +1,11 @@
 package com.dabenxiang.mimi.view.topup
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.text.Html
+import android.text.method.LinkMovementMethod
 import android.view.View
 import android.widget.ImageView
 import androidx.activity.addCallback
@@ -28,15 +32,11 @@ import com.dabenxiang.mimi.view.orderinfo.OrderInfoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_top_up.*
-import kotlinx.android.synthetic.main.fragment_top_up.iv_photo
-import kotlinx.android.synthetic.main.fragment_top_up.tv_expiry_date
-import kotlinx.android.synthetic.main.fragment_top_up.tv_name
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
+
 
 class TopUpFragment : BaseFragment() {
 
@@ -80,9 +80,10 @@ class TopUpFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     tv_name.text = it.result.friendlyName
-                    it.result.expiryDate?.let {date ->
-                        tv_expiry_date.visibility =View.VISIBLE
-                        tv_expiry_date.text = getString(R.string.vip_expiry_date,
+                    it.result.expiryDate?.let { date ->
+                        tv_expiry_date.visibility = View.VISIBLE
+                        tv_expiry_date.text = getString(
+                            R.string.vip_expiry_date,
                             SimpleDateFormat(
                                 "yyyy-MM-dd",
                                 Locale.getDefault()
@@ -298,6 +299,20 @@ class TopUpFragment : BaseFragment() {
         layout_next.visibility = View.VISIBLE
 
         tv_subtitle.text = getString(R.string.topup_subtitle)
+
+        tv_teaching.text = Html.fromHtml(
+            getString(R.string.topup_teaching),
+            Html.FROM_HTML_MODE_LEGACY
+        )
+        tv_teaching.setOnClickListener {
+            /*
+                Because of the network_security_config to influence, the url string cannot be
+                opened directly. So use Intent to open the webpage
+            */
+            //TODO Waiting for url
+            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("http://www.google.com"))
+            startActivity(browserIntent)
+        }
 
         val userItem = viewModel.getUserData()
         tv_name.text = userItem.friendlyName
