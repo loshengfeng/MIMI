@@ -46,7 +46,6 @@ class ChangePasswordViewModel : BaseViewModel() {
     private fun isValidateCurrent(pwd: String): String {
         return when {
             TextUtils.isEmpty(pwd) -> app.getString(R.string.setting_current_password_error_1)
-            accountManager.getProfile().password != pwd -> app.getString(R.string.setting_current_password_error_2)
             else -> ""
         }
     }
