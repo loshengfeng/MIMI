@@ -23,6 +23,7 @@ import com.dabenxiang.mimi.view.home.postfollow.PostFollowFactory
 import com.dabenxiang.mimi.view.home.video.VideoDataSource
 import com.dabenxiang.mimi.view.home.video.VideoFactory
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -91,6 +92,9 @@ class HomeViewModel : BaseViewModel() {
 
     private val _followResult = MutableLiveData<ApiResult<Nothing>>()
     val followResult: LiveData<ApiResult<Nothing>> = _followResult
+
+    private val _inviteVipShake = MutableLiveData<Boolean>()
+    val inviteVipShake: LiveData<Boolean> = _inviteVipShake
 
     fun loadNestedStatisticsListForCarousel(
         position: Int,
@@ -435,6 +439,14 @@ class HomeViewModel : BaseViewModel() {
             totalCount = if (isInitial) count.toInt()
             else totalCount.plus(count.toInt())
             if (isInitial) cleanRemovedPosList()
+        }
+    }
+
+    fun startAnim(inverval: Long){
+        viewModelScope.launch {
+                _inviteVipShake.postValue(true)
+                delay(inverval)
+                _inviteVipShake.postValue(false)
         }
     }
 }
