@@ -362,17 +362,12 @@ class AdultHomeFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        inviteJob = lifecycleScope.launch {
+        inviteJob = viewLifecycleOwner.lifecycleScope.launch {
             while(true){
                 iv_invitevip.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.anim_shake))
-                delay(8000)
+                delay(6500)
             }
         }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        inviteJob?.cancel()
     }
 
     private fun getCurrentAdapter(): RecyclerView.Adapter<*>? {
