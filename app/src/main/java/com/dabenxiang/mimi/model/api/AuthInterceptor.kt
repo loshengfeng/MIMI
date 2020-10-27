@@ -42,6 +42,7 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
         if (hasMemberToken) {
             when (accountManager.getMemberTokenResult()) {
                 TokenResult.EXPIRED -> doRefreshToken()
+                TokenResult.EMPTY -> getMemberToken()
             }
         } else {
             when (accountManager.getPublicTokenResult()) {
@@ -142,7 +143,10 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
                 .collect {
                     when (it) {
                         is Empty -> Timber.d("Refresh token successful!")
-                        is Error -> Timber.e("Refresh token error: $it")
+                        is Error -> {
+                            Timber.e("Refresh token error: $it")
+                            getMemberToken()
+                        }
                     }
                 }
         }
@@ -153,8 +157,23 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
             accountManager.getPublicToken()
                 .collect {
                     when (it) {
-                        is Empty -> Timber.d("Get token successful!")
-                        is Error -> Timber.e("Get token error: $it")
+                        is Empty -> Timber.d("Get public token successful!")
+                        is Error -> Timber.e("Get public token error: $it")
+                    }
+                }
+        }
+    }
+
+    private fun getMemberToken() {
+        runBlocking(Dispatchers.IO) {
+            val account = accountManager.getProfile().account
+            val password = accountManager.getProfile().password
+            Timber.d("getMemberToken: $account")
+            accountManager.signIn(account, password)
+                .collect {
+                    when (it) {
+                        is Empty -> Timber.d("Get member token successful!")
+                        is Error -> Timber.e("Get member token in error: $it")
                     }
                 }
         }
