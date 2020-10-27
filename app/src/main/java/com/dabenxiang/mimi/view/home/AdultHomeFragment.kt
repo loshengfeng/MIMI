@@ -11,7 +11,6 @@ import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.GridLayoutManager
@@ -66,9 +65,6 @@ import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.android.synthetic.main.fragment_home.*
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 import java.io.File
@@ -97,7 +93,6 @@ class AdultHomeFragment : BaseFragment() {
     private var loginDialog: LoginRequestDialog? = null
 
     val accountManager: AccountManager by inject()
-    var inviteJob: Job? = null
 
     private val categoryTypeList: ArrayList<CategoryType> = arrayListOf()
 
@@ -110,6 +105,7 @@ class AdultHomeFragment : BaseFragment() {
         private const val PERMISSION_PIC_REQUEST_CODE = 20002
 
         const val RECORD_LIMIT_TIME = 15
+        private const val ANIMATE_INTERVAL = 6500L
     }
 
     override fun getLayoutId() = R.layout.fragment_home
@@ -151,6 +147,7 @@ class AdultHomeFragment : BaseFragment() {
         if (mainViewModel?.adult == null) {
             mainViewModel?.getHomeCategories()
         }
+        viewModel.startAnim(ANIMATE_INTERVAL)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -358,18 +355,14 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if(layout_invitevip.visibility != View.GONE){
-            inviteJob = viewLifecycleOwner.lifecycleScope.launch {
-                while(true){
+        viewModel.inviteVipShake.observe(this, Observer {
+            if(layout_invitevip.visibility != View.GONE){
+                if(it == true)
                     iv_invitevip.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.anim_shake))
-                    delay(6500)
-                }
+                else
+                    viewModel.startAnim(ANIMATE_INTERVAL)
             }
-        }
+        })
     }
 
     private fun getCurrentAdapter(): RecyclerView.Adapter<*>? {
@@ -458,7 +451,6 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         iv_invitevip_close.setOnClickListener {
-            inviteJob?.cancel()
             layout_invitevip.visibility = View.GONE
         }
     }
