@@ -362,10 +362,12 @@ class AdultHomeFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        inviteJob = viewLifecycleOwner.lifecycleScope.launch {
-            while(true){
-                iv_invitevip.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.anim_shake))
-                delay(6500)
+        if(layout_invitevip.visibility != View.GONE){
+            inviteJob = viewLifecycleOwner.lifecycleScope.launch {
+                while(true){
+                    iv_invitevip.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.anim_shake))
+                    delay(6500)
+                }
             }
         }
     }
