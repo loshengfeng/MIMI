@@ -28,7 +28,7 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
     }
 
     fun setupProfile(meItem: MeItem) {
-        pref.profileItem = ProfileItem(
+        pref.profileItem = getProfile().copy(
             userId = meItem.id ?: 0,
             avatarAttachmentId = meItem.avatarAttachmentId ?: 0,
             friendlyName = meItem.friendlyName ?: "",
