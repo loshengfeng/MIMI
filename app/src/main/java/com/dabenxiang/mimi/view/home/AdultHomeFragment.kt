@@ -151,13 +151,6 @@ class AdultHomeFragment : BaseFragment() {
         if (mainViewModel?.adult == null) {
             mainViewModel?.getHomeCategories()
         }
-
-        inviteJob = lifecycleScope.launch {
-            while(true){
-                iv_invitevip.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.anim_shake))
-                delay(8000)
-            }
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -365,6 +358,21 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        inviteJob = lifecycleScope.launch {
+            while(true){
+                iv_invitevip.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.anim_shake))
+                delay(8000)
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        inviteJob?.cancel()
     }
 
     private fun getCurrentAdapter(): RecyclerView.Adapter<*>? {
