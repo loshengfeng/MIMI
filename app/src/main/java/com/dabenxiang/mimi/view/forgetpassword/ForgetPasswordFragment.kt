@@ -33,17 +33,6 @@ class ForgetPasswordFragment : BaseFragment() {
     override val bottomNavigationVisibility = View.GONE
 
     override fun setupObservers() {
-        viewModel.accountError.observe(viewLifecycleOwner, Observer {
-            if (it == "") {
-                edit_account.setBackgroundResource(R.drawable.edit_text_rectangle)
-                tv_account_error.visibility = View.INVISIBLE
-            } else {
-                edit_account.setBackgroundResource(R.drawable.edit_text_error_rectangle)
-                tv_account_error.text = it
-                tv_account_error.visibility = View.VISIBLE
-            }
-        })
-
         viewModel.mobileError.observe(viewLifecycleOwner, Observer {
             if (it == "") {
                 layout_mobile.setBackgroundResource(R.drawable.layout_rectangle)
@@ -112,7 +101,6 @@ class ForgetPasswordFragment : BaseFragment() {
 
     override fun initSettings() {
         super.initSettings()
-        viewModel.account.bindingEditText = edit_account
         viewModel.mobile.bindingEditText = edit_mobile
     }
 

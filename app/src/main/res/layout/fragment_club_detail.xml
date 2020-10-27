@@ -176,9 +176,8 @@
             android:orientation="horizontal"
             app:tabMinWidth="70dp"
             app:tabGravity="center"
+            app:tabIndicator="@drawable/bg_tab_login"
             app:tabIndicatorColor="@color/adult_color_bottom_bar_item"
-            app:tabIndicatorFullWidth="false"
-            app:tabIndicatorHeight="3dp"
             app:tabMode="fixed"
             app:tabSelectedTextColor="@color/color_black_1"
             app:tabTextColor="@color/color_black_1_50">
