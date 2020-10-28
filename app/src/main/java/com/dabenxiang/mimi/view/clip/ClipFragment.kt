@@ -154,6 +154,17 @@ class ClipFragment : BaseFragment() {
                 }
             }
         })
+
+        viewModel.videoReport.observe(viewLifecycleOwner, {
+            when (it) {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> {
+                    Timber.i("videoReported")
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -178,7 +189,7 @@ class ClipFragment : BaseFragment() {
                     { item, pos, isLike -> onLikeClick(item, pos, isLike) },
                     { item -> onCommentClick(item) },
                     { onBackClick() },
-                    { item, error -> viewModel.sendPlayerError(item, error) },
+                    { id, error -> viewModel.sendVideoReport(id, error) },
                     { onVipClick() },
                     { onPromoteClick() }
                 )

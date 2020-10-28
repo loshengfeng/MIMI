@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.di
 
+import android.content.Context
 import com.dabenxiang.mimi.API_HOST_URL
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.model.api.ApiRepository
@@ -8,6 +9,7 @@ import com.dabenxiang.mimi.model.api.AuthInterceptor
 import com.dabenxiang.mimi.model.pref.Pref
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.gson.Gson
+import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.dsl.module
@@ -21,7 +23,6 @@ val apiModule = module {
     single { provideOkHttpClient(get(), get()) }
     single { provideApiService(get()) }
     single { provideApiRepository(get()) }
-
 }
 
 fun provideAuthInterceptor(pref: Pref): AuthInterceptor {

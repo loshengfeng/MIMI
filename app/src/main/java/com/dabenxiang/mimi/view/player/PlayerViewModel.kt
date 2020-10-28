@@ -16,6 +16,7 @@ import com.dabenxiang.mimi.extension.downloadFile
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.model.vo.CheckStatusItem
@@ -129,6 +130,9 @@ class PlayerViewModel : BaseViewModel() {
 
     private val _meItem = MutableLiveData<ApiResult<MeItem>>()
     val meItem: LiveData<ApiResult<MeItem>> = _meItem
+
+    private val _videoReport = MutableLiveData<ApiResult<Nothing>>()
+    val videoReport: LiveData<ApiResult<Nothing>> = _videoReport
 
     fun updatedSelectedNewestComment(isNewest: Boolean) {
         _isSelectedNewestComment.value = isNewest
@@ -864,4 +868,18 @@ class PlayerViewModel : BaseViewModel() {
         }
     }
 
+    fun sendVideoReport(){
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getMemberVideoReport(
+                    videoId= videoId, type = PostType.VIDEO_ON_DEMAND.value)
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _videoReport.value = it }
+        }
+
+    }
 }

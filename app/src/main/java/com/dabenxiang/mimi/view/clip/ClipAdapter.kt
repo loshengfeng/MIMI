@@ -55,7 +55,7 @@ class ClipAdapter(
         const val PAYLOAD_UPDATE_DEDUCTED = 1
         const val PAYLOAD_UPDATE_PLAYER = 2
 
-        var playingItem: MemberPostItem? = null
+        var playingId: String = ""
     }
 
     private var currentViewHolder: ClipViewHolder? = null
@@ -184,7 +184,7 @@ class ClipAdapter(
     private fun processClip(playerView: PlayerView, id: String, url: String, position: Int) {
         Timber.d("processClip position:$position")
         val item = memberPostItems[position]
-        playingItem = item
+        playingId = id
         var contentItem: MediaContentItem? = null
         try {
             contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
@@ -295,9 +295,10 @@ class ClipAdapter(
                     //showErrorDialog("UNKNOWN")
                 }
             }
-            playingItem?.let {
-                clipFuncItem.onPlayerError(it, error.message ?: "error: UNKNOWN")
+            playingId?.takeIf { it.isNotEmpty() }?.also {id->
+                clipFuncItem.onPlayerError(id, error.message ?: "error: UNKNOWN")
             }
+
 
         }
     }

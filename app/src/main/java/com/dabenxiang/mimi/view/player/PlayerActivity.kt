@@ -832,6 +832,17 @@ class PlayerActivity : BaseActivity() {
             }
         })
 
+        viewModel.videoReport.observe(this, {
+            when (it) {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> {
+                    Timber.i("videoReported")
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
         //Detect key keyboard shown/hide
         this addKeyboardToggleListener { shown ->
             isKeyboardShown = shown
@@ -1303,6 +1314,7 @@ class PlayerActivity : BaseActivity() {
                 ExoPlayer.STATE_BUFFERING -> "ExoPlayer.STATE_BUFFERING"
                 ExoPlayer.STATE_READY -> {
                     viewModel.activateLoading(false)
+                    viewModel.sendVideoReport()
                     player_view.visibility = VISIBLE
                     "ExoPlayer.STATE_READY"
                 }
@@ -1356,6 +1368,7 @@ class PlayerActivity : BaseActivity() {
                     //showErrorDialog("UNKNOWN")
                 }
             }
+            viewModel.sendVideoReport()
         }
     }
 
