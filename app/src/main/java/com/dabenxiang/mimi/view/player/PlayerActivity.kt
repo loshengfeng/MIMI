@@ -1314,7 +1314,6 @@ class PlayerActivity : BaseActivity() {
                 ExoPlayer.STATE_BUFFERING -> "ExoPlayer.STATE_BUFFERING"
                 ExoPlayer.STATE_READY -> {
                     viewModel.activateLoading(false)
-                    viewModel.sendVideoReport()
                     player_view.visibility = VISIBLE
                     "ExoPlayer.STATE_READY"
                 }
