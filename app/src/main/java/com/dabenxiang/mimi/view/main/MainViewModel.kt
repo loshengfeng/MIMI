@@ -270,9 +270,11 @@ class MainViewModel : BaseViewModel() {
     }
 
     fun startMQTT() {
-        //test serverUrl use: tcp://172.x.x.x:1883
-        mqttManager.init(MQTT_HOST_URL, clientId, extendedCallback)
-        mqttManager.connect(connectCallback)
+        if(!isMqttConnect) {
+            //test serverUrl use: tcp://172.x.x.x:1883
+            mqttManager.init(MQTT_HOST_URL, clientId, extendedCallback)
+            mqttManager.connect(connectCallback)
+        }
     }
 
     fun subscribeToTopic(topic: String) {
