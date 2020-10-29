@@ -192,6 +192,7 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
 
     fun logoutLocal() {
         pref.clearMemberToken()
+        pref.clearSearchHistory()
         if (!keepAccount) pref.clearProfile()
     }
 }

@@ -336,7 +336,9 @@ class LoginFragment : BaseFragment() {
         viewModel.loginAccount.value = when (keepAccount) {
             true -> {
                 val profile = viewModel.accountManager.getProfile()
-                if (tv_login_call_prefix.text == "+86") {
+                if (profile.account.isBlank()) {
+                    ""
+                } else if (tv_login_call_prefix.text == "+86") {
                     profile.account.substring(3, profile.account.length)
                 } else {
                     profile.account.substring(4, profile.account.length)
