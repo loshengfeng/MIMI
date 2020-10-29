@@ -35,6 +35,7 @@ class PersonalFragment : BaseFragment() {
     private val viewModel: PersonalViewModel by viewModels()
     private var interactionListener: InteractionListener? = null
 
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         try {

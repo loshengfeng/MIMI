@@ -25,15 +25,19 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
+import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.main.MainActivity
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.item_login.*
 import kotlinx.android.synthetic.main.item_register.*
+import timber.log.Timber
 
 
 class LoginFragment : BaseFragment() {
 
     private val viewModel: LoginViewModel by viewModels()
+    private var interactionListener: InteractionListener? = null
 
     companion object {
         const val KEY_TYPE = "TYPE"
@@ -52,6 +56,22 @@ class LoginFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
         initSettings()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        when (requireActivity()) {
+            is MainActivity -> {
+                try {
+                    interactionListener = context as InteractionListener
+                } catch (e: ClassCastException) {
+                    Timber.e("LoginFragment interaction listener can't cast")
+                }
+            }
+            else -> Timber.i("The activity currently is not MainActivity ")
+        }
+
     }
 
     override fun onResume() {
@@ -226,9 +246,17 @@ class LoginFragment : BaseFragment() {
 
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
-                R.id.btnClose, R.id.btn_register_cancel, R.id.btn_login_cancel -> navigateTo(
+                R.id.btnClose -> navigateTo(
                     NavigateItem.Up
                 )
+
+                R.id.btn_register_cancel, R.id.btn_login_cancel -> {
+                    if (requireActivity() is MainActivity) {
+                    interactionListener?.changeNavigationPosition(R.id.navigation_adult)
+                    }
+                    navigateTo(NavigateItem.Up)
+                }
+
                 R.id.btn_register -> {
                     viewModel.doRegisterValidateAndSubmit(tv_call_prefix.text.toString())
                 }
