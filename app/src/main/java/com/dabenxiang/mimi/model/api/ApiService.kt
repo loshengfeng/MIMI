@@ -162,6 +162,11 @@ interface ApiService {
         @Body body: ValidateMessageRequest
     ): Response<Void>
 
+    @GET("/v1/Members/VideoReport")
+    suspend fun getMemberVideoReport(@Query("videoId") videoId: Long,
+                                     @Query("type") type: Int,
+                                     @Query("unhealthy") unhealthy:Boolean): Response<Void>
+
     /**********************************************************
      *
      *                  Members/Post

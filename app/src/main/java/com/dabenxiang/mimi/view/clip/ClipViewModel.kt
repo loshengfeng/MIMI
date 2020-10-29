@@ -8,6 +8,7 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import kotlinx.coroutines.Dispatchers
@@ -32,6 +33,9 @@ class ClipViewModel : BaseViewModel() {
 
     private var _postDetailResult = MutableLiveData<ApiResult<Int>>()
     val postDetailResult: LiveData<ApiResult<Int>> = _postDetailResult
+
+    private val _videoReport = MutableLiveData<ApiResult<Nothing>>()
+    val videoReport: LiveData<ApiResult<Nothing>> = _videoReport
 
     fun getClip(id: String, pos: Int) {
         viewModelScope.launch {
@@ -95,10 +99,6 @@ class ClipViewModel : BaseViewModel() {
         }
     }
 
-    fun sendPlayerError(item: MemberPostItem, error: String) {
-        //TODO
-    }
-
     fun favoritePost(item: MemberPostItem, position: Int, isFavorite: Boolean) {
         viewModelScope.launch {
             flow {
@@ -142,5 +142,20 @@ class ClipViewModel : BaseViewModel() {
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _likePostResult.value = it }
         }
+    }
+
+    fun sendVideoReport(id: String, error: String){
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getMemberVideoReport(
+                    videoId= id.toLong(), type = PostType.VIDEO.value)
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _videoReport.value = it }
+        }
+
     }
 }

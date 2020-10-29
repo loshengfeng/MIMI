@@ -46,6 +46,7 @@ class SplashViewModel : BaseViewModel() {
             viewModelScope.launch {
                 val profile = accountManager.getProfile()
                 if (TextUtils.isEmpty(profile.account) || TextUtils.isEmpty(profile.password)) {
+                    accountManager.logoutLocal()
                     _autoLoginResult.value = ApiResult.success(null)
                 } else {
                     signIn(profile.account, profile.password)
