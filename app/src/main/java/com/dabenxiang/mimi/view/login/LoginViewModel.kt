@@ -170,8 +170,8 @@ class LoginViewModel : BaseViewModel() {
         }
     }
 
-    fun inviteCodeError() {
-        _validateCodeError.value = app.getString(R.string.error_account_duplicate)
+    fun inviteCodeError(s: Int) {
+        _validateCodeError.value = app.getString(s)
     }
 
     fun callValidateMessage(callPrefix: String) {
@@ -192,7 +192,7 @@ class LoginViewModel : BaseViewModel() {
     }
 
     fun onAccountExitError() {
-        _mobileError.value = app.getString(R.string.error_account_duplicate)
+        _mobileError.value = app.getString(R.string.error_mobile_duplicate)
     }
 
     fun startTimer() {

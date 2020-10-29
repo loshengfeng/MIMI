@@ -200,7 +200,18 @@ class LoginFragment : BaseFragment() {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Empty -> countDownTimer.start()
+                is Empty -> {
+                    countDownTimer.start()
+                    GeneralDialog.newInstance(
+                        GeneralDialogData(
+                            titleRes = R.string.login_yet,
+                            message = getString(R.string.send_msg),
+                            messageIcon = R.drawable.ico_default_photo,
+                            secondBtn = getString(R.string.btn_confirm),
+                            isMessageIcon = false
+                        )
+                    ).show(requireActivity().supportFragmentManager)
+                }
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -410,16 +421,18 @@ class LoginFragment : BaseFragment() {
                 ).setCancel(false)
                     .show(requireActivity().supportFragmentManager)
             }
+            LOGIN_406000 -> {
+                viewModel.inviteCodeError(R.string.error_validation_code)
+            }
             NOT_FOUND -> {
                 showErrorMessageDialog(getString(R.string.error_validation))
-                viewModel.inviteCodeError()
+//                viewModel.inviteCodeError()
             }
             LOGIN_409000 -> {
                 countDownTimer.cancel()
                 countDownTimer.onFinish()
                 viewModel.onAccountExitError()
                 edit_verification_code.setText("")
-                showErrorMessageDialog(getString(R.string.error_account_duplicate))
             }
         }
     }
