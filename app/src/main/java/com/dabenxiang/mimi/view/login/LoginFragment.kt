@@ -61,15 +61,10 @@ class LoginFragment : BaseFragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        when (requireActivity()) {
-            is MainActivity -> {
-                try {
-                    interactionListener = context as InteractionListener
-                } catch (e: ClassCastException) {
-                    Timber.e("LoginFragment interaction listener can't cast")
-                }
-            }
-            else -> Timber.i("The activity currently is not MainActivity ")
+        try {
+            interactionListener = context as InteractionListener
+        } catch (e: ClassCastException) {
+            Timber.e("LoginFragment interaction listener can't cast")
         }
 
     }
@@ -251,9 +246,7 @@ class LoginFragment : BaseFragment() {
                 )
 
                 R.id.btn_register_cancel, R.id.btn_login_cancel -> {
-                    if (requireActivity() is MainActivity) {
                     interactionListener?.changeNavigationPosition(R.id.navigation_adult)
-                    }
                     navigateTo(NavigateItem.Up)
                 }
 
@@ -381,13 +374,7 @@ class LoginFragment : BaseFragment() {
     override fun navigateTo(item: NavigateItem) {
         findNavController().also { navController ->
             when (item) {
-                NavigateItem.Up -> {
-                    when (navController.navigateUp()) {
-                        false -> when (val activity = requireActivity()) {
-                            is LoginActivity -> activity.finish()
-                        }
-                    }
-                }
+                NavigateItem.Up -> navController.navigateUp()
                 is NavigateItem.PopBackStack -> navController.popBackStack(
                     item.fragmentId,
                     item.inclusive
