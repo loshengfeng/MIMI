@@ -21,6 +21,7 @@ import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderingPackageItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PaymentType
+
 import com.dabenxiang.mimi.view.adapter.TopUpAgentAdapter
 import com.dabenxiang.mimi.view.adapter.TopUpOnlinePayAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -33,6 +34,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_top_up.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
+
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
@@ -307,11 +309,15 @@ class TopUpFragment : BaseFragment() {
         tv_teaching.setOnClickListener {
             /*
                 Because of the network_security_config to influence, the url string cannot be
-                opened directly. So use Intent to open the webpage
+                opened directly. So use Intent to open the web page
             */
-            //TODO Waiting for url
-            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("http://www.google.com"))
-            startActivity(browserIntent)
+            viewModel.domainManager.getDomain().takeIf { it.isNotBlank() }?.let {
+                val url = StringBuilder("https://storage.").append(it).append("/mimi/manual-app.pdf").toString()
+                Timber.i("teaching url=$url")
+                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                startActivity(browserIntent)
+            }
+
         }
 
         val userItem = viewModel.getUserData()
