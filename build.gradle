@@ -41,7 +41,7 @@ buildscript {
     ext.stetho_version = "1.5.1"
     ext.flurry_version = '12.3.0@aar'
     ext.mock_webserver_version = '4.7.2'
-    ext.security_crypto_version = '1.0.0-rc01'
+    ext.security_crypto_version = '1.1.0-alpha02'
     ext.mqtt_version = '1.2.5'
     ext.paho_service_version = '1.1.1'
     ext.local_broadcast_manager_version = '1.0.0'
