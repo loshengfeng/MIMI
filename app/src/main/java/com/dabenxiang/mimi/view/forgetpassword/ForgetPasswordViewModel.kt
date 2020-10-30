@@ -11,6 +11,7 @@ import com.dabenxiang.mimi.model.api.ApiResult.Companion.loading
 import com.dabenxiang.mimi.model.api.vo.ForgetPasswordRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.EditTextMutableLiveData
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -33,18 +34,23 @@ class ForgetPasswordViewModel : BaseViewModel() {
     val result: LiveData<ApiResult<Nothing>> = _result
 
     fun doValidateAndSubmit(callPrefix: String) {
-        _mobileError.value = isValidateMobile(mobile.value ?: "")
+        _mobileError.value = isValidateMobile(mobile.value ?: "", callPrefix)
 
         if ("" == _mobileError.value) {
             mobile.value?.let { it -> doReset(callPrefix + it) }
         }
     }
 
-    private fun isValidateMobile(mobile: String): String {
+    private fun isValidateMobile(mobile: String, callPrefix: String): String {
         return when {
             TextUtils.isEmpty(mobile) -> app.getString(R.string.mobile_format_error_1)
+            GeneralUtils.isMobileValid(callPrefix, mobile) -> app.getString(R.string.mobile_format_error_2)
             else -> ""
         }
+    }
+
+    fun mobileNotFoundError() {
+        _mobileError.value = app.getString(R.string.mobile_format_error_2)
     }
 
     private fun doReset(account: String) {

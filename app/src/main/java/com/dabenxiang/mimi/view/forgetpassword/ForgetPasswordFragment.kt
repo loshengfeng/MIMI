@@ -109,14 +109,7 @@ class ForgetPasswordFragment : BaseFragment() {
 
         when (errorHandler.httpExceptionItem.errorItem.code) {
             NOT_FOUND -> {
-                GeneralDialog.newInstance(
-                    GeneralDialogData(
-                        titleRes = R.string.login_yet,
-                        message = getString(R.string.desc_email_account_not_match),
-                        messageIcon = R.drawable.ico_email,
-                        secondBtn = getString(R.string.btn_confirm)
-                    )
-                ).show(requireActivity().supportFragmentManager)
+                viewModel.mobileNotFoundError()
             }
         }
     }

@@ -106,7 +106,7 @@ class LoginViewModel : BaseViewModel() {
     }
 
     fun doLoginValidateAndSubmit(callPrefix: String) {
-        _loginAccountError.value = isValidateAccount(loginAccount.value ?: "")
+        _loginAccountError.value = isValidateMobile(loginAccount.value ?: "", callPrefix)
         _loginPasswordError.value = isValidatePassword(loginPw.value ?: "")
 
         if ("" == _loginAccountError.value &&
@@ -135,7 +135,7 @@ class LoginViewModel : BaseViewModel() {
     fun isValidateMobile(mobile: String, callPrefix: String): String {
         return when {
             TextUtils.isEmpty(mobile) -> app.getString(R.string.mobile_format_error_1)
-            isMobileValid(callPrefix, mobile) -> app.getString(R.string.mobile_format_error_1)
+            isMobileValid(callPrefix, mobile) -> app.getString(R.string.mobile_format_error_2)
             else -> ""
         }
     }

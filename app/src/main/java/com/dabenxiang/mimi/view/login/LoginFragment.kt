@@ -9,6 +9,7 @@ import android.text.InputFilter.LengthFilter
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
+import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
@@ -26,7 +27,6 @@ import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.listener.InteractionListener
-import com.dabenxiang.mimi.view.main.MainActivity
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.item_login.*
@@ -334,11 +334,13 @@ class LoginFragment : BaseFragment() {
 
                 if (tv_login_call_prefix.text == getString(R.string.login_mobile_call_prefix_taiwan)) {
                     tv_login_call_prefix.text = getString(R.string.login_mobile_call_prefix_china)
-                    ToastUtils.showShort("Change to +86")
+//                    ToastUtils.showShort("Change to +86")
+                    Toast.makeText(requireContext(), "Change to +86", Toast.LENGTH_SHORT).show()
                     edit_login_account.filters = arrayOf<InputFilter>(LengthFilter(11))
                 } else {
                     tv_login_call_prefix.text = getString(R.string.login_mobile_call_prefix_taiwan)
-                    ToastUtils.showShort("Change to +886")
+//                    ToastUtils.showShort("Change to +886")
+                    Toast.makeText(requireContext(), "Change to +886", Toast.LENGTH_SHORT).show()
                     edit_login_account.filters = arrayOf<InputFilter>(LengthFilter(9))
                 }
             }

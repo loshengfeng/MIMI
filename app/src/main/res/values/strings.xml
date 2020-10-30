@@ -40,6 +40,7 @@
     <string name="password_format_error_3">请填写确认密码</string>
     <string name="password_format_error_4">与密码不相符合，请确认</string>
     <string name="mobile_format_error_1">请填写手机号</string>
+    <string name="mobile_format_error_2">请填写正确的手机号</string>
     <string name="account_error_1">請填写名稱</string>
     <string name="invalidate_code_error_1">请填写验证码</string>
     <string name="receive_mail">请收验证信</string>
