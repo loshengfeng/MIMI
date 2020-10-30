@@ -27,6 +27,7 @@ import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.item_login.*
@@ -315,11 +316,11 @@ class LoginFragment : BaseFragment() {
 
                 if (tv_call_prefix.text == getString(R.string.login_mobile_call_prefix_taiwan)) {
                     tv_call_prefix.text = getString(R.string.login_mobile_call_prefix_china)
-                    ToastUtils.showShort("Change to +86")
+                    GeneralUtils.showToast(requireContext(), "Change to +86")
                     edit_mobile.filters = arrayOf<InputFilter>(LengthFilter(11))
                 } else {
                     tv_call_prefix.text = getString(R.string.login_mobile_call_prefix_taiwan)
-                    ToastUtils.showShort("Change to +886")
+                    GeneralUtils.showToast(requireContext(), "Change to +886")
                     edit_mobile.filters = arrayOf<InputFilter>(LengthFilter(9))
                 }
             }
@@ -334,13 +335,11 @@ class LoginFragment : BaseFragment() {
 
                 if (tv_login_call_prefix.text == getString(R.string.login_mobile_call_prefix_taiwan)) {
                     tv_login_call_prefix.text = getString(R.string.login_mobile_call_prefix_china)
-//                    ToastUtils.showShort("Change to +86")
-                    Toast.makeText(requireContext(), "Change to +86", Toast.LENGTH_SHORT).show()
+                    GeneralUtils.showToast(requireContext(), "Change to +86")
                     edit_login_account.filters = arrayOf<InputFilter>(LengthFilter(11))
                 } else {
                     tv_login_call_prefix.text = getString(R.string.login_mobile_call_prefix_taiwan)
-//                    ToastUtils.showShort("Change to +886")
-                    Toast.makeText(requireContext(), "Change to +886", Toast.LENGTH_SHORT).show()
+                    GeneralUtils.showToast(requireContext(), "Change to +886")
                     edit_login_account.filters = arrayOf<InputFilter>(LengthFilter(9))
                 }
             }
