@@ -91,7 +91,7 @@
                     android:textSize="14sp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:text="300 蜜币 (银行卡付款)" />
+                    tools:text="VIP  月卡(银行卡付款)" />
 
                 <TextView
                     android:id="@+id/tv_total"

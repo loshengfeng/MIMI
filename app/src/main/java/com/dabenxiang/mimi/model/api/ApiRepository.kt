@@ -10,6 +10,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
+import retrofit2.http.Query
 import java.io.File
 
 class ApiRepository(private val apiService: ApiService) {
@@ -17,6 +18,7 @@ class ApiRepository(private val apiService: ApiService) {
     companion object {
         const val MEDIA_TYPE_JSON = "application/json"
         const val AUTHORIZATION = "Authorization"
+        const val X_DEVICE_ID = "X-Device-Id"
         const val BEARER = "Bearer "
         const val FILE = "file"
         const val MEDIA_TYPE_IMAGE = "image/*"
@@ -230,6 +232,14 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun cancelFollowPost(userId: Long): Response<Void> {
         return apiService.cancelFollowPost(userId)
     }
+
+    suspend fun validateMessage(body: ValidateMessageRequest) = apiService.validateMessage(body)
+
+    suspend fun getMemberVideoReport(
+        videoId: Long,
+        type: Int,
+        unhealthy:Boolean =true
+    ) = apiService.getMemberVideoReport(videoId, type, unhealthy)
 
     /**********************************************************
      *
@@ -556,6 +566,25 @@ class ApiRepository(private val apiService: ApiService) {
         body: ProfileRequest
     ) = apiService.updateProfile(body)
 
+    /**
+     * 取得推廣資訊
+     */
+    suspend fun getPromotionItem(
+        url: String
+    ): Response<ApiBaseItem<PromotionItem>> {
+        return apiService.getPromotionItem(url)
+    }
+
+    /**
+     * 邀請朋友名單
+     */
+    suspend fun getReferrerHistory(
+        offset: String,
+        limit: String
+    ): Response<ApiBasePagingItem<ArrayList<ReferrerHistoryItem>>> {
+        return apiService.getReferrerHistory(offset, limit)
+    }
+
     /**********************************************************
      *
      *                  Members/Me/Post
@@ -802,5 +831,10 @@ class ApiRepository(private val apiService: ApiService) {
         return apiService.updateOrderChatStatus(id)
     }
 
+    /**
+     * 取得訪客資訊
+     */
+    suspend fun getGuestInfo(
+    ) = apiService.getGuestInfo()
 }
 

@@ -7,7 +7,7 @@ import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.OrderBy
 
 class ClubDetailFuncItem(
-    val getMemberPost: (OrderBy, ((PagedList<MemberPostItem>) -> Unit)) -> Unit = { _, _ -> },
+    val getMemberPost: (OrderBy, ((PagedList<MemberPostItem>) -> Unit), (Int) -> Unit) -> Unit = { _, _, _ -> },
     val getBitmap: ((Long?, ImageView, LoadImageType) -> Unit) = { _, _, _ -> },
     val onFollowClick: ((MemberPostItem, List<MemberPostItem>, Boolean, ((Boolean) -> Unit)) -> Unit) = { _, _, _, _ -> },
     val onLikeClick: ((MemberPostItem, Boolean, ((Boolean, Int) -> Unit)) -> Unit) = { _, _, _ -> },

@@ -18,9 +18,9 @@ import com.dabenxiang.mimi.view.home.viewholder.VideoViewHolder
 import kotlinx.android.synthetic.main.layout_item_video.view.*
 
 class HomeVideoListAdapter(
-    private val nestedListener: HomeAdapter.EventListener,
-    private val isAdult: Boolean
-) : PagedListAdapter<BaseVideoItem, BaseViewHolder>(diffCallback) {
+    private val nestedListener: HomeAdapter.EventListener) : PagedListAdapter<BaseVideoItem, BaseViewHolder>(diffCallback) {
+
+    private val isAdult: Boolean =true
 
     companion object {
         val diffCallback = object : DiffUtil.ItemCallback<BaseVideoItem>() {
@@ -46,11 +46,7 @@ class HomeVideoListAdapter(
                 val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.nested_item_video, parent, false)
                 val layoutParams = view.layout_card.layoutParams as ConstraintLayout.LayoutParams
-                if(isAdult) {
-                    layoutParams.dimensionRatio = "155:87"
-                } else {
-                    layoutParams.dimensionRatio = "100:134"
-                }
+                layoutParams.dimensionRatio = "155:87"
                 view.layout_card.layoutParams = layoutParams
                 VideoViewHolder(view, videoViewHolderListener)
             }
@@ -88,10 +84,7 @@ class HomeVideoListAdapter(
             object : GridLayoutManager.SpanSizeLookup() {
                 override fun getSpanSize(position: Int): Int {
                     return when (getItemViewType(position)) {
-                        BANNER -> when(isAdult) {
-                            true -> 2
-                            else -> 3
-                        }
+                        BANNER -> 2
                         else -> 1
                     }
                 }
@@ -103,7 +96,7 @@ class HomeVideoListAdapter(
             override fun onClickItemIndex(view: View, index: Int) {
                 if (index > -1) {
                     getItem(index)?.also {
-                        val playerData = PlayerItem.parser(it, isAdult)
+                        val playerData = PlayerItem.parser(it)
                         nestedListener.onVideoClick(view, playerData)
                     }
                 }

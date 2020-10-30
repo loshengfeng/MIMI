@@ -1,12 +1,10 @@
 package com.dabenxiang.mimi.view.adapter.viewHolder
 
-import android.content.res.ColorStateList
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
@@ -74,16 +72,13 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
             val chip = LayoutInflater.from(tagChipGroup.context)
                 .inflate(R.layout.chip_item, tagChipGroup, false) as Chip
             chip.text = it
-            chip.chipBackgroundColor = ColorStateList.valueOf(
-                ContextCompat.getColor(tagChipGroup.context, R.color.adult_color_status_bar)
-            )
             if (TextUtils.isEmpty(tag)) {
-                chip.setTextColor(tagChipGroup.context.getColor(R.color.color_white_1_50))
+                chip.setTextColor(tagChipGroup.context.getColor(R.color.color_black_1_50))
             } else {
                 if (it == tag) {
                     chip.setTextColor(chip.context.getColor(R.color.color_red_1))
                 } else {
-                    chip.setTextColor(tagChipGroup.context.getColor(R.color.color_white_1_50))
+                    chip.setTextColor(tagChipGroup.context.getColor(R.color.color_black_1_50))
                 }
             }
 
@@ -148,7 +143,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
         if (item.isFollow) {
             follow.text = follow.context.getString(R.string.followed)
             follow.background = follow.context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
-            follow.setTextColor(follow.context.getColor(R.color.color_white_1))
+            follow.setTextColor(follow.context.getColor(R.color.color_black_1_60))
         } else {
             follow.text = follow.context.getString(R.string.follow)
             follow.background = follow.context.getDrawable(R.drawable.bg_red_1_stroke_radius_16)
@@ -159,13 +154,13 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
         if (likeType == LikeType.LIKE) {
             likeImage.setImageResource(R.drawable.ico_nice_s)
         } else {
-            likeImage.setImageResource(R.drawable.ico_nice)
+            likeImage.setImageResource(R.drawable.ico_nice_gray)
         }
 
         if (item.isFavorite) {
             favoriteImage.setImageResource(R.drawable.btn_favorite_white_s)
         } else {
-            favoriteImage.setImageResource(R.drawable.btn_favorite_white_n)
+            favoriteImage.setImageResource(R.drawable.btn_favorite_n)
         }
 
         follow.setOnClickListener {
@@ -195,7 +190,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
         if (isFollow) {
             follow.text = follow.context.getString(R.string.followed)
             follow.background = follow.context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
-            follow.setTextColor(follow.context.getColor(R.color.color_white_1))
+            follow.setTextColor(follow.context.getColor(R.color.color_black_1_60))
         } else {
             follow.text = follow.context.getString(R.string.follow)
             follow.background = follow.context.getDrawable(R.drawable.bg_red_1_stroke_radius_16)
@@ -207,7 +202,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
         if (isLike) {
             likeImage.setImageResource(R.drawable.ico_nice_s)
         } else {
-            likeImage.setImageResource(R.drawable.ico_nice)
+            likeImage.setImageResource(R.drawable.ico_nice_gray)
         }
         likeCount.text = count.toString()
     }
@@ -216,7 +211,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
         if (isFavorite) {
             favoriteImage.setImageResource(R.drawable.btn_favorite_white_s)
         } else {
-            favoriteImage.setImageResource(R.drawable.btn_favorite_white_n)
+            favoriteImage.setImageResource(R.drawable.btn_favorite_n)
         }
         favoriteCount.text = count.toString()
     }

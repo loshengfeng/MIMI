@@ -52,13 +52,19 @@ class ClubDetailPostDataSource(
                     ) -> PER_LIMIT
                     else -> null
                 }
-                emit(InitResult(memberPostItems ?: arrayListOf(), nextPageKey))
+                emit(
+                    InitResult(
+                        memberPostItems ?: arrayListOf(),
+                        body?.paging?.count ?: 0,
+                        nextPageKey
+                    )
+                )
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect {
-                    pagingCallback.onTotalCount(it.list.size.toLong(), true)
+                    pagingCallback.onCurrentItemCount(it.count, true)
                     callback.onResult(it.list, null, it.nextKey)
                 }
         }
@@ -84,7 +90,7 @@ class ClubDetailPostDataSource(
                 .collect {
                     it.body()?.also { item ->
                         item.content?.also { list ->
-                            pagingCallback.onTotalCount(list.size.toLong(), false)
+                            pagingCallback.onCurrentItemCount(list.size.toLong(), false)
                             val nextPageKey = when {
                                 hasNextPage(
                                     item.paging.count,
@@ -108,6 +114,10 @@ class ClubDetailPostDataSource(
         }
     }
 
-    private data class InitResult(val list: List<MemberPostItem>, val nextKey: Int?)
+    private data class InitResult(
+        val list: List<MemberPostItem>,
+        val count: Long,
+        val nextKey: Int?
+    )
 
 }

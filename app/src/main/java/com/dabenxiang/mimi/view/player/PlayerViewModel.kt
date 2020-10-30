@@ -16,6 +16,7 @@ import com.dabenxiang.mimi.extension.downloadFile
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.model.vo.CheckStatusItem
@@ -126,6 +127,12 @@ class PlayerViewModel : BaseViewModel() {
 
     private val _getAdResult = MutableLiveData<ApiResult<AdItem>>()
     val getAdResult: LiveData<ApiResult<AdItem>> = _getAdResult
+
+    private val _meItem = MutableLiveData<ApiResult<MeItem>>()
+    val meItem: LiveData<ApiResult<MeItem>> = _meItem
+
+    private val _videoReport = MutableLiveData<ApiResult<Nothing>>()
+    val videoReport: LiveData<ApiResult<Nothing>> = _videoReport
 
     fun updatedSelectedNewestComment(isNewest: Boolean) {
         _isSelectedNewestComment.value = isNewest
@@ -307,13 +314,22 @@ class PlayerViewModel : BaseViewModel() {
         }
     }
 
-    private fun updated() {
+    inner class NotDeductedException : Exception()
 
-    }
-
-    private fun getAdultStreamUrl() {
+    fun getAdultStreamUrl() {
         viewModelScope.launch {
             flow {
+                /** for debug **/
+                if (isLogin()) domainManager.getApiRepository().getMe()
+                else domainManager.getApiRepository().getGuestInfo()
+                /**-----------**/
+
+                val videoInfoResp = domainManager.getApiRepository().getVideoInfo(videoId)
+                if (!videoInfoResp.isSuccessful) throw HttpException(videoInfoResp)
+                isDeducted = videoInfoResp.body()?.content?.deducted ?: false
+                if (!isDeducted) throw NotDeductedException()
+                else Timber.d("video is deducted! can watch!")
+
                 val source = sourceList?.get(sourceListPosition.value!!)!!
                 val episode = source.videoEpisodes?.get(0)!!
                 episodeId = episode.id!!
@@ -322,14 +338,6 @@ class PlayerViewModel : BaseViewModel() {
 
                 val episodeResp = apiRepository.getVideoEpisode(videoId, episodeId)
                 if (!episodeResp.isSuccessful) throw HttpException(episodeResp)
-
-                if (!isDeducted) {
-                    val videoInfoResp = domainManager.getApiRepository().getVideoInfo(videoId)
-                    if (!videoInfoResp.isSuccessful) throw HttpException(videoInfoResp)
-                    isDeducted = videoInfoResp.body()?.content?.deducted ?: false
-                }
-
-                if (!isDeducted) throw Exception("點數不足")
 
                 val episodeInfo = episodeResp.body()?.content
                 Timber.i("episodeInfo =$episodeInfo")
@@ -354,8 +362,12 @@ class PlayerViewModel : BaseViewModel() {
                 )
                 if (!streamResp.isSuccessful) throw HttpException(streamResp)
                 deleteCacheFile()
-                if(TextUtils.isEmpty(streamResp.body()?.content?.streamUrl))
-                    sendCrashReport("stream url is Empty, Video id ${streamResp.body()?.content?.id}, ".plus(Gson().toJson(streamResp.body()?.content)))
+                if (TextUtils.isEmpty(streamResp.body()?.content?.streamUrl))
+                    sendCrashReport(
+                        "stream url is Empty, Video id ${streamResp.body()?.content?.id}, ".plus(
+                            Gson().toJson(streamResp.body()?.content)
+                        )
+                    )
                 // 取得轉址Url
                 when (streamResp.body()?.content?.isContent) {
                     false -> nextVideoUrl = streamResp.body()?.content?.streamUrl
@@ -380,95 +392,98 @@ class PlayerViewModel : BaseViewModel() {
     }
 
     private fun getStreamUrl() {
-        viewModelScope.launch {
-            flow {
-                val source = sourceList?.get(sourceListPosition.value!!)!!
-                var sortEpisode: MutableList<VideoEpisode> = mutableListOf()
-                for (i in 0..(source.videoEpisodes?.size!! - 1)) {
-                    sortEpisode.add(source.videoEpisodes?.get(i))
-                }
-                sortEpisode.sortBy { sort -> sort.episode }
-//                val episode = source.videoEpisodes?.get(episodePosition.value!!)!!
-                val episode = sortEpisode.get(episodePosition.value!!)
-                episodeId = episode.id ?: 0L
-                Timber.i("getStreamUrl episodeId =$episodeId")
-                val apiRepository = domainManager.getApiRepository()
-
-                val episodeResp = apiRepository.getVideoEpisode(videoId, episodeId)
-                if (!episodeResp.isSuccessful) throw HttpException(episodeResp)
-
-                if (!isDeducted) {
-                    val videoInfoResp = domainManager.getApiRepository().getVideoInfo(videoId)
-                    if (!videoInfoResp.isSuccessful) throw HttpException(videoInfoResp)
-                    isDeducted = videoInfoResp.body()?.content?.deducted ?: false
-                    videoInfoResp.body()?.content?.source
-                }
-
-                if (!isDeducted) throw Exception("點數不足")
-
-                val episodeInfo = episodeResp.body()?.content
-                Timber.i("episodeInfo =$episodeInfo")
-                isReported = episodeInfo?.reported ?: false
-                Timber.i("isReported =$isReported")
-
-                // 目前不貌似不支援將集數加入收藏，若未來有支援，直接打開即可
-//                videoId = episodeInfo?.id ?: 0
-
-                val stream = episodeInfo?.videoStreams?.get(0)!!
-
-//                val streamResp = apiRepository.getVideoStreamOfEpisode(
-//                    videoId,
-//                    episodeId,
+//        viewModelScope.launch {
+//            flow {
+//                val source = sourceList?.get(sourceListPosition.value!!)!!
+//                var sortEpisode: MutableList<VideoEpisode> = mutableListOf()
+//                for (i in 0..(source.videoEpisodes?.size!! - 1)) {
+//                    sortEpisode.add(source.videoEpisodes?.get(i))
+//                }
+//                sortEpisode.sortBy { sort -> sort.episode }
+////                val episode = source.videoEpisodes?.get(episodePosition.value!!)!!
+//                val episode = sortEpisode.get(episodePosition.value!!)
+//                episodeId = episode.id ?: 0L
+//                Timber.i("getStreamUrl episodeId =$episodeId")
+//                val apiRepository = domainManager.getApiRepository()
+//
+//                val episodeResp = apiRepository.getVideoEpisode(videoId, episodeId)
+//                if (!episodeResp.isSuccessful) throw HttpException(episodeResp)
+//
+//                if (!isDeducted) {
+//                    val videoInfoResp = domainManager.getApiRepository().getVideoInfo(videoId)
+//                    if (!videoInfoResp.isSuccessful) throw HttpException(videoInfoResp)
+//                    isDeducted = videoInfoResp.body()?.content?.deducted ?: false
+//                    videoInfoResp.body()?.content?.source
+//                }
+//
+//                if (!isDeducted) throw Exception("點數不足")
+//
+//                val episodeInfo = episodeResp.body()?.content
+//                Timber.i("episodeInfo =$episodeInfo")
+//                isReported = episodeInfo?.reported ?: false
+//                Timber.i("isReported =$isReported")
+//
+//                // 目前不貌似不支援將集數加入收藏，若未來有支援，直接打開即可
+////                videoId = episodeInfo?.id ?: 0
+//
+//                val stream = episodeInfo?.videoStreams?.get(0)!!
+//
+////                val streamResp = apiRepository.getVideoStreamOfEpisode(
+////                    videoId,
+////                    episodeId,
+////                    stream.id!!,
+////                    accountManager.getProfile().userId,
+////                    stream.utcTime,
+////                    stream.sign
+////                )
+//                val streamResp = apiRepository.getVideoM3u8Source(
 //                    stream.id!!,
 //                    accountManager.getProfile().userId,
 //                    stream.utcTime,
 //                    stream.sign
 //                )
-                val streamResp = apiRepository.getVideoM3u8Source(
-                    stream.id!!,
-                    accountManager.getProfile().userId,
-                    stream.utcTime,
-                    stream.sign
-                )
-                if (!streamResp.isSuccessful) throw HttpException(streamResp)
-                deleteCacheFile()
-                if(TextUtils.isEmpty(streamResp.body()?.content?.streamUrl))
-                    sendCrashReport("stream url is Empty, Video id ${streamResp.body()?.content?.id}, ".plus(Gson().toJson(streamResp.body()?.content)))
-                // 取得轉址Url
-                when (streamResp.body()?.content?.isContent) {
-                    false -> {
-                        nextVideoUrl = streamResp.body()?.content?.streamUrl
-                    }
-                    true -> {
-                        downloadM3U8(streamResp.body()?.content?.streamUrl!!)
-                    }
-                }
-
-                emit(ApiResult.success(null))
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { e ->
-                    Timber.e(e)
-                    emit(ApiResult.error(e))
-                }
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .collect {
-                    _apiStreamResult.value = it
-                }
-        }
+//                if (!streamResp.isSuccessful) throw HttpException(streamResp)
+//                deleteCacheFile()
+//                if (TextUtils.isEmpty(streamResp.body()?.content?.streamUrl))
+//                    sendCrashReport(
+//                        "stream url is Empty, Video id ${streamResp.body()?.content?.id}, ".plus(
+//                            Gson().toJson(streamResp.body()?.content)
+//                        )
+//                    )
+//                // 取得轉址Url
+//                when (streamResp.body()?.content?.isContent) {
+//                    false -> {
+//                        nextVideoUrl = streamResp.body()?.content?.streamUrl
+//                    }
+//                    true -> {
+//                        downloadM3U8(streamResp.body()?.content?.streamUrl!!)
+//                    }
+//                }
+//
+//                emit(ApiResult.success(null))
+//            }
+//                .flowOn(Dispatchers.IO)
+//                .catch { e ->
+//                    Timber.e(e)
+//                    emit(ApiResult.error(e))
+//                }
+//                .onStart { emit(ApiResult.loading()) }
+//                .onCompletion { emit(ApiResult.loaded()) }
+//                .collect {
+//                    _apiStreamResult.value = it
+//                }
+//        }
     }
 
-    fun checkConsumeResult() {
+    fun checkConsumeResult(me: MeItem) {
+        Timber.i("checkConsumeResult me:$me")
         val result =
             when {
-                costPoint == 0L || isDeducted -> VideoConsumeResult.PAID
-                else -> when {
-                    availablePoint >= costPoint -> VideoConsumeResult.PAID_YET
-                    else -> VideoConsumeResult.POINT_NOT_ENOUGH
-                }
+                costPoint == 0L || isDeducted || me.isSubscribed -> VideoConsumeResult.PAID
+                me.isSubscribed -> VideoConsumeResult.PAID_YET
+                me.videoOnDemandCount ?: 0 > 0 -> VideoConsumeResult.PAID_YET
+                else -> VideoConsumeResult.POINT_NOT_ENOUGH
             }
-
         _consumeResult.value = result
     }
 
@@ -480,7 +495,6 @@ class PlayerViewModel : BaseViewModel() {
     }
 
     fun setStreamPosition(position: Int) {
-
         Timber.i("setStreamPosition position=${position}  _episodePosition.value =${_episodePosition.value}")
         if (position != _episodePosition.value) {
             _episodePosition.postValue(position)
@@ -820,5 +834,52 @@ class PlayerViewModel : BaseViewModel() {
     fun deleteCacheFile() {
         // remove cache file
         if (!nextVideoUrl.isNullOrEmpty() && File(nextVideoUrl).isFile) File(nextVideoUrl).delete()
+    }
+
+    fun getMe() {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getMe()
+                if (!result.isSuccessful) throw HttpException(result)
+                val me = result.body()?.content
+                me?.let {
+                    accountManager.setupProfile(it)
+                }
+                emit(ApiResult.success(me))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _meItem.value = it }
+        }
+    }
+
+    fun getGuestInfo() {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getGuestInfo()
+                if (!result.isSuccessful) throw HttpException(result)
+                val guest = result.body()?.content
+                emit(ApiResult.success(guest))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _meItem.value = it }
+        }
+    }
+
+    fun sendVideoReport(){
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getMemberVideoReport(
+                    videoId= videoId, type = PostType.VIDEO_ON_DEMAND.value)
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _videoReport.value = it }
+        }
+
     }
 }

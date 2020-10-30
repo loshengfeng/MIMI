@@ -109,7 +109,7 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
         }
     }
 
-    private fun getDomain(): String {
+    fun getDomain(): String {
         return when {
             currentDomainIndex < domainList.size -> domainList[currentDomainIndex]
             else -> {

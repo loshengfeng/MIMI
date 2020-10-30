@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/adult_color_background">
+    android:background="@color/normal_color_background">
 
     <include
         android:id="@+id/toolbarContainer"
@@ -13,7 +13,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@color/adult_color_status_bar"
+        android:background="@color/normal_color_status_bar"
         app:layout_constraintBottom_toBottomOf="@id/tab_temporal_filter"
         app:layout_constraintEnd_toEndOf="@id/tab_temporal_filter"
         app:layout_constraintStart_toStartOf="@id/tab_temporal_filter"
@@ -29,9 +29,9 @@
         app:tabIndicator="@drawable/bg_tab_ranking"
         app:tabIndicatorColor="@color/color_red_1"
         app:tabMode="fixed"
-        app:tabSelectedTextColor="@color/color_white_1"
+        app:tabSelectedTextColor="@color/color_black_1"
         app:tabTextAppearance="@style/ranking_tab_item_text"
-        app:tabTextColor="@color/color_white_1_50">
+        app:tabTextColor="@color/color_black_1_50">
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/ti_ranking_day"
@@ -60,9 +60,7 @@
         android:id="@+id/tab_type_filter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/adult_color_background"
-        android:paddingStart="5dp"
-        android:paddingEnd="5dp"
+        android:background="@color/normal_color_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tab_temporal_filter"
@@ -73,9 +71,9 @@
         app:tabIndicatorHeight="0dp"
         app:tabInlineLabel="true"
         app:tabMode="fixed"
-        app:tabSelectedTextColor="@color/color_white_1"
+        app:tabSelectedTextColor="@color/color_black_1"
         app:tabTextAppearance="@style/ranking_tab_item_type_text"
-        app:tabTextColor="@color/color_white_1_50">
+        app:tabTextColor="@color/color_black_1_50">
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/ti_video_type"
@@ -106,7 +104,7 @@
         android:id="@+id/layout_refresh"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:background="@color/color_black_6"
+        android:background="@color/normal_color_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

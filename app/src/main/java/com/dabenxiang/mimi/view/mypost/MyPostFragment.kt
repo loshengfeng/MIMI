@@ -84,7 +84,7 @@ class MyPostFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        useAdultTheme(isAdultTheme)
+        useAdultTheme(false)
         requireActivity().onBackPressedDispatcher.addCallback {
             navigateTo(NavigateItem.Up)
         }
@@ -95,7 +95,7 @@ class MyPostFragment : BaseFragment() {
             userId = it.getLong(KEY_USER_ID, USER_ID_ME)
             userName = it.getString(KEY_USER_NAME, "")
             isAdult = it.getBoolean(KEY_IS_ADULT, true)
-            isAdultTheme = it.getBoolean(KEY_IS_ADULT_THEME, false)
+            isAdultTheme = false
         }
 
         adapter = MyPostPagedAdapter(

@@ -1,7 +1,11 @@
 package com.dabenxiang.mimi.view.topup
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.text.Html
+import android.text.method.LinkMovementMethod
 import android.view.View
 import android.widget.ImageView
 import androidx.activity.addCallback
@@ -17,6 +21,7 @@ import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderingPackageItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PaymentType
+
 import com.dabenxiang.mimi.view.adapter.TopUpAgentAdapter
 import com.dabenxiang.mimi.view.adapter.TopUpOnlinePayAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -29,7 +34,11 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_top_up.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
+
 import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.*
+
 
 class TopUpFragment : BaseFragment() {
 
@@ -54,7 +63,7 @@ class TopUpFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback {
-            interactionListener?.changeNavigationPosition(R.id.navigation_home)
+            interactionListener?.changeNavigationPosition(R.id.navigation_adult)
         }
         initSettings()
     }
@@ -73,7 +82,17 @@ class TopUpFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     tv_name.text = it.result.friendlyName
-                    tv_coco.text = it.result.availablePoint.toString()
+                    it.result.expiryDate?.let { date ->
+                        tv_expiry_date.visibility = View.VISIBLE
+                        tv_expiry_date.text = getString(
+                            R.string.vip_expiry_date,
+                            SimpleDateFormat(
+                                "yyyy-MM-dd",
+                                Locale.getDefault()
+                            ).format(date)
+                        )
+                    }
+
                     viewModel.loadImage(
                         it.result.avatarAttachmentId,
                         iv_photo,
@@ -283,9 +302,27 @@ class TopUpFragment : BaseFragment() {
 
         tv_subtitle.text = getString(R.string.topup_subtitle)
 
+        tv_teaching.text = Html.fromHtml(
+            getString(R.string.topup_teaching),
+            Html.FROM_HTML_MODE_LEGACY
+        )
+        tv_teaching.setOnClickListener {
+            /*
+                Because of the network_security_config to influence, the url string cannot be
+                opened directly. So use Intent to open the web page
+            */
+            viewModel.domainManager.getDomain().takeIf { it.isNotBlank() }?.let {
+                val url = StringBuilder("https://storage.").append(it).append("/mimi/manual-app.pdf").toString()
+                Timber.i("teaching url=$url")
+                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                startActivity(browserIntent)
+            }
+
+        }
+
         val userItem = viewModel.getUserData()
         tv_name.text = userItem.friendlyName
-        tv_coco.text = userItem.point.toString()
+        tv_expiry_date.visibility = View.GONE
 
         rv_online_pay.layoutManager = GridLayoutManager(context, 2)
         rv_online_pay.adapter = onlinePayAdapter

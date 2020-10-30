@@ -93,7 +93,7 @@ android {
         buildConfigField "int", "LOCAL_SOCKET_PORT", "8080"
         archivesBaseName = "$applicationName-v$versionName"
         ndk {
-            abiFilters "armeabi-v7a", "arm64-v8a"
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86"
         }
     }
 
@@ -114,7 +114,7 @@ android {
             minifyEnabled true
             debuggable false
             shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-android-optimize.txt'
             signingConfig signingConfigs.release
         }
 
@@ -349,7 +349,7 @@ dependencies {
 
     // AndroidUtilCode
     implementation "com.blankj:utilcodex:$utilcodex_version"
-
+    
     // Conscrypt
     implementation "org.conscrypt:conscrypt-android:$conscrypt_version"
 
@@ -390,6 +390,10 @@ dependencies {
     androidTestImplementation "androidx.test:runner:$android_test_version"
     androidTestImplementation "androidx.test:rules:$android_test_version"
     androidTestImplementation "androidx.test.ext:junit:$android_test_ext_version"
+
+    // QrCode
+    implementation "com.journeyapps:zxing-android-embedded:$zxing_android_embedded_version"
+    implementation "com.google.zxing:core:$zxing_core_version"
 }
 
 class Version {

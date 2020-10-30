@@ -25,7 +25,6 @@ import com.google.android.exoplayer2.util.Util
 import com.google.gson.Gson
 import timber.log.Timber
 import java.io.File
-import java.lang.Exception
 
 class ClipAdapter(
     private val context: Context,
@@ -53,6 +52,10 @@ class ClipAdapter(
                 }
             }
         const val PAYLOAD_UPDATE_UI = 0
+        const val PAYLOAD_UPDATE_DEDUCTED = 1
+        const val PAYLOAD_UPDATE_PLAYER = 2
+
+        var playingId: String = ""
     }
 
     private var currentViewHolder: ClipViewHolder? = null
@@ -118,49 +121,60 @@ class ClipAdapter(
                 PAYLOAD_UPDATE_UI -> {
                     holder.onBind(item, clipFuncItem, position)
                 }
+                PAYLOAD_UPDATE_DEDUCTED -> {
+                    holder.onUpdateByDeducted(item, clipFuncItem, position)
+                    if (item.deducted) {
+                        takeIf { currentPosition == position }?.also {
+                            currentViewHolder = holder
+                            holder.progress.visibility = View.VISIBLE
+                        } ?: run {
+                            holder.ivCover.visibility = View.VISIBLE
+                            holder.progress.visibility = View.GONE
+                        }
+
+                        holder.ibReplay.setOnClickListener {
+                            exoPlayer?.also { player ->
+                                player.seekTo(0)
+                                player.playWhenReady = true
+                            }
+                            it.visibility = View.GONE
+                        }
+
+                        holder.playerView.setOnClickListener {
+                            takeIf { exoPlayer?.isPlaying ?: false }?.also {
+                                exoPlayer?.playWhenReady = false
+                                holder.ibPlay.visibility = View.VISIBLE
+                            } ?: run {
+                                exoPlayer?.playWhenReady = true
+                                holder.ibPlay.visibility = View.GONE
+                            }
+                        }
+
+                        holder.ibPlay.setOnClickListener {
+                            takeUnless { exoPlayer?.isPlaying ?: true }?.also {
+                                exoPlayer?.playWhenReady = true
+                                holder.ibPlay.visibility = View.GONE
+                            }
+                        }
+                        processClip(
+                            holder.playerView,
+                            contentItem?.shortVideo?.id.toString(),
+                            contentItem?.shortVideo?.url.toString(),
+                            position
+                        )
+                    }
+                }
+                PAYLOAD_UPDATE_PLAYER -> {
+                    processClip(
+                        holder.playerView,
+                        contentItem?.shortVideo?.id.toString(),
+                        contentItem?.shortVideo?.url.toString(),
+                        position
+                    )
+                }
             }
         } ?: run {
             holder.onBind(item, clipFuncItem, position)
-
-            takeIf { currentPosition == position }?.also {
-                currentViewHolder = holder
-                holder.progress.visibility = View.VISIBLE
-            } ?: run {
-                holder.ivCover.visibility = View.VISIBLE
-                holder.progress.visibility = View.GONE
-            }
-
-            holder.ibReplay.setOnClickListener {
-                exoPlayer?.also { player ->
-                    player.seekTo(0)
-                    player.playWhenReady = true
-                }
-                it.visibility = View.GONE
-            }
-
-            holder.playerView.setOnClickListener {
-                takeIf { exoPlayer?.isPlaying ?: false }?.also {
-                    exoPlayer?.playWhenReady = false
-                    holder.ibPlay.visibility = View.VISIBLE
-                } ?: run {
-                    exoPlayer?.playWhenReady = true
-                    holder.ibPlay.visibility = View.GONE
-                }
-            }
-
-            holder.ibPlay.setOnClickListener {
-                takeUnless { exoPlayer?.isPlaying ?: true }?.also {
-                    exoPlayer?.playWhenReady = true
-                    holder.ibPlay.visibility = View.GONE
-                }
-            }
-
-            processClip(
-                holder.playerView,
-                contentItem?.shortVideo?.id.toString(),
-                contentItem?.shortVideo?.url.toString(),
-                position
-            )
         }
     }
 
@@ -170,7 +184,7 @@ class ClipAdapter(
     private fun processClip(playerView: PlayerView, id: String, url: String, position: Int) {
         Timber.d("processClip position:$position")
         val item = memberPostItems[position]
-
+        playingId = id
         var contentItem: MediaContentItem? = null
         try {
             contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
@@ -281,6 +295,11 @@ class ClipAdapter(
                     //showErrorDialog("UNKNOWN")
                 }
             }
+            playingId?.takeIf { it.isNotEmpty() }?.also {id->
+                clipFuncItem.onPlayerError(id, error.message ?: "error: UNKNOWN")
+            }
+
+
         }
     }
 

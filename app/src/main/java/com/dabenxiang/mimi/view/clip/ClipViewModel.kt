@@ -8,13 +8,11 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.File
@@ -32,6 +30,12 @@ class ClipViewModel : BaseViewModel() {
 
     private var _likePostResult = MutableLiveData<ApiResult<Int>>()
     val likePostResult: LiveData<ApiResult<Int>> = _likePostResult
+
+    private var _postDetailResult = MutableLiveData<ApiResult<Int>>()
+    val postDetailResult: LiveData<ApiResult<Int>> = _postDetailResult
+
+    private val _videoReport = MutableLiveData<ApiResult<Nothing>>()
+    val videoReport: LiveData<ApiResult<Nothing>> = _videoReport
 
     fun getClip(id: String, pos: Int) {
         viewModelScope.launch {
@@ -72,6 +76,26 @@ class ClipViewModel : BaseViewModel() {
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _followResult.value = it }
+        }
+    }
+
+    fun getPostDetail(item: MemberPostItem, position: Int) {
+        viewModelScope.launch {
+            flow {
+                /** for debug **/
+                if (isLogin()) domainManager.getApiRepository().getMe()
+                else domainManager.getApiRepository().getGuestInfo()
+                /**-----------**/
+                val result = domainManager.getApiRepository().getMemberPostDetail(item.id)
+                if (!result.isSuccessful) throw HttpException(result)
+                result.body()?.content?.deducted?.let { item.deducted = it }
+                emit(ApiResult.success(position))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _postDetailResult.value = it }
         }
     }
 
@@ -118,5 +142,20 @@ class ClipViewModel : BaseViewModel() {
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _likePostResult.value = it }
         }
+    }
+
+    fun sendVideoReport(id: String, error: String){
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getMemberVideoReport(
+                    videoId= id.toLong(), type = PostType.VIDEO.value)
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _videoReport.value = it }
+        }
+
     }
 }

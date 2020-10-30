@@ -7,13 +7,11 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.graphics.Matrix
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.view.View
 import androidx.activity.addCallback
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.viewModels
@@ -69,7 +67,6 @@ class SettingFragment : BaseFragment() {
                 is Loaded -> progressHUD?.dismiss()
                 is Success -> {
                     tv_name.text = viewModel.profileData?.friendlyName
-                    tv_email.text = viewModel.profileData?.email
                     tv_account.text = viewModel.profileData?.username
                     gender_info.text = getString(viewModel.profileData!!.getGenderRes())
 
@@ -78,18 +75,6 @@ class SettingFragment : BaseFragment() {
                         birthday_info.text = birthday.split("T")[0]
                     }
 
-                    var img: Drawable? = null
-
-                    if (viewModel.isEmailConfirmed()) {
-                        img = ContextCompat.getDrawable(
-                            requireContext(), R.drawable.ico_checked
-                        )
-                        btn_resend.visibility = View.GONE
-                    } else {
-                        btn_resend.visibility = View.VISIBLE
-                    }
-
-                    tv_email.setCompoundDrawablesWithIntrinsicBounds(null, null, img, null)
                     viewModel.loadImage(
                         viewModel.profileData?.avatarAttachmentId,
                         iv_photo,
@@ -183,18 +168,6 @@ class SettingFragment : BaseFragment() {
                             })
                     )
                 }
-                R.id.btn_email -> {
-                    navigateTo(
-                        NavigateItem.Destination(R.id.updateProfileFragment,
-                            viewModel.profileData?.let {
-                                UpdateProfileFragment.createBundle(
-                                    UpdateProfileFragment.TYPE_EMAIL,
-                                    it
-                                )
-                            })
-                    )
-                }
-                R.id.btn_resend -> viewModel.resendEmail()
                 R.id.btn_chang_pw -> navigateTo(NavigateItem.Destination(R.id.action_settingFragment_to_changePasswordFragment))
                 R.id.btn_gender -> {
                     navigateTo(
@@ -218,20 +191,18 @@ class SettingFragment : BaseFragment() {
                             })
                     )
                 }
-                R.id.btn_binding_invitation -> {
-                    showInvitationEditorDialog(requireContext())
-                }
+//                R.id.btn_binding_invitation -> {
+//                    showInvitationEditorDialog(requireContext())
+//                }
             }
         }.also {
             tv_back.setOnClickListener(it)
             btn_photo.setOnClickListener(it)
             btn_name.setOnClickListener(it)
-            btn_email.setOnClickListener(it)
-            btn_resend.setOnClickListener(it)
             btn_chang_pw.setOnClickListener(it)
             btn_gender.setOnClickListener(it)
             btn_birthday.setOnClickListener(it)
-            btn_binding_invitation.setOnClickListener(it)
+//            btn_binding_invitation.setOnClickListener(it)
         }
     }
 
@@ -269,21 +240,25 @@ class SettingFragment : BaseFragment() {
 
     private val onChoosePickerDialogListener = object : OnChoosePickerDialogListener {
         override fun onPickFromCamera() {
-            requestPermissions()
+            requestPermissions(PERMISSION_CAMERA_REQUEST_CODE)
         }
 
         override fun onPickFromAlbum() {
-            openAlbum()
+            requestPermissions(PERMISSION_EXTERNAL_REQUEST_CODE)
         }
     }
 
-    private fun requestPermissions() {
-        val requestList = getNotGrantedPermissions(cameraPermissions)
+    private fun requestPermissions(type: Int) {
+        val requestList = getNotGrantedPermissions(
+            if (type == PERMISSION_CAMERA_REQUEST_CODE) cameraPermissions
+            else externalPermissions
+        )
 
         if (requestList.size > 0) {
-            requestPermissions(requestList.toTypedArray(), PERMISSION_CAMERA_REQUEST_CODE)
+            requestPermissions(requestList.toTypedArray(), type)
         } else {
-            openCamera()
+            if (type == PERMISSION_CAMERA_REQUEST_CODE) openCamera()
+            else openAlbum()
         }
     }
 
@@ -296,6 +271,10 @@ class SettingFragment : BaseFragment() {
             && getNotGrantedPermissions(cameraPermissions).isEmpty()
         ) {
             openCamera()
+        } else if (requestCode == PERMISSION_EXTERNAL_REQUEST_CODE
+            && getNotGrantedPermissions(externalPermissions).isEmpty()
+        ) {
+            openAlbum()
         }
     }
 

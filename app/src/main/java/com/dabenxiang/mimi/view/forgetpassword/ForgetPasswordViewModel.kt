@@ -11,57 +11,53 @@ import com.dabenxiang.mimi.model.api.ApiResult.Companion.loading
 import com.dabenxiang.mimi.model.api.vo.ForgetPasswordRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.EditTextMutableLiveData
-import com.dabenxiang.mimi.widget.utility.GeneralUtils.isAccountValid
-import com.dabenxiang.mimi.widget.utility.GeneralUtils.isEmailValid
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
+import java.util.*
+import kotlin.concurrent.schedule
 
 class ForgetPasswordViewModel : BaseViewModel() {
-    val account = EditTextMutableLiveData()
-    val email = EditTextMutableLiveData()
 
-    private val _accountError = MutableLiveData<String>()
-    val accountError: LiveData<String> = _accountError
+    var changePrefixCount = 0
+    var timer: Timer? = null
 
-    private val _emailError = MutableLiveData<String>()
-    val emailError: LiveData<String> = _emailError
+    val mobile = EditTextMutableLiveData()
+
+    private val _mobileError = MutableLiveData<String>()
+    val mobileError: LiveData<String> = _mobileError
 
     private val _result = MutableLiveData<ApiResult<Nothing>>()
     val result: LiveData<ApiResult<Nothing>> = _result
 
-    fun doValidateAndSubmit() {
-        _accountError.value = isValidateAccount(account.value ?: "")
-        _emailError.value = isValidateEmail(email.value ?: "")
+    fun doValidateAndSubmit(callPrefix: String) {
+        _mobileError.value = isValidateMobile(mobile.value ?: "", callPrefix)
 
-        if ("" == _accountError.value && "" == _emailError.value) {
-            account.value?.let { it1 -> email.value?.let { it2 -> doReset(it1, it2) } }
+        if ("" == _mobileError.value) {
+            mobile.value?.let { it -> doReset(callPrefix + it) }
         }
     }
 
-    private fun isValidateAccount(account: String): String {
+    private fun isValidateMobile(mobile: String, callPrefix: String): String {
         return when {
-            TextUtils.isEmpty(account) -> app.getString(R.string.account_format_error_1)
-            !isAccountValid(account) -> app.getString(R.string.account_format_error_2)
+            TextUtils.isEmpty(mobile) -> app.getString(R.string.mobile_format_error_1)
+            GeneralUtils.isMobileValid(callPrefix, mobile) -> app.getString(R.string.mobile_format_error_2)
             else -> ""
         }
     }
 
-    private fun isValidateEmail(email: String): String {
-        return when {
-            TextUtils.isEmpty(email) -> app.getString(R.string.email_format_error_1)
-            !isEmailValid(email) -> app.getString(R.string.email_format_error_2)
-            email.length > 100 -> app.getString(R.string.email_format_error_3)
-            else -> ""
-        }
+    fun mobileNotFoundError() {
+        _mobileError.value = app.getString(R.string.mobile_format_error_2)
     }
 
-    private fun doReset(account: String, email: String) {
+    private fun doReset(account: String) {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository()
-                    .forgetPassword(ForgetPasswordRequest(account, email))
+                    .forgetPassword(ForgetPasswordRequest(account))
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }
@@ -72,6 +68,16 @@ class ForgetPasswordViewModel : BaseViewModel() {
                 .collect {
                     _result.value = it
                 }
+        }
+    }
+
+    fun startTimer() {
+        timer = Timer()
+        timer?.schedule(10000) {
+            changePrefixCount = 0
+            timer?.cancel()
+            timer = null
+            Timber.d("timer cancel")
         }
     }
 }

@@ -69,7 +69,7 @@ class CategoriesFragment : BaseFragment() {
 
     private val videoListAdapter by lazy {
         val isAdult = mainViewModel?.adultMode?.value ?: false
-        HomeVideoListAdapter(adapterListener, isAdult)
+        HomeVideoListAdapter(adapterListener)
     }
 
     private val adapterListener = object : HomeAdapter.EventListener {
@@ -109,7 +109,7 @@ class CategoriesFragment : BaseFragment() {
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
-    private val isAdult by lazy { mainViewModel?.adultMode?.value ?: false }
+    private val isAdult = true
     private val data by lazy { arguments?.getSerializable(KEY_DATA) as CategoriesItem }
 
     override fun setupFirstTime() {
@@ -123,100 +123,29 @@ class CategoriesFragment : BaseFragment() {
         (arguments?.getSerializable(KEY_DATA) as CategoriesItem?)?.also { data ->
             tv_title.text = data.title
 
-            cl_root.background =
-                if (isAdult) {
-                    R.color.adult_color_background
-                } else {
-                    R.color.normal_color_background
-                }.let { res ->
-                    ContextCompat.getDrawable(requireContext(), res)
-                }
+            cl_root.background = ContextCompat.getDrawable(requireContext(), R.color.normal_color_background)
 
-            tv_no_data.setTextColor(takeIf { isAdult }?.let {
-                requireActivity().getColorStateList(R.color.color_white_1)
-            } ?: run {
-                requireActivity().getColorStateList(R.color.color_black_2_50)
-            })
+            tv_no_data.setTextColor(requireActivity().getColorStateList(R.color.color_black_2_50))
 
-            layout_top.background =
-                if (isAdult) {
-                    R.color.adult_color_status_bar
-                } else {
-                    R.color.normal_color_status_bar
-                }.let { res ->
-                    ContextCompat.getDrawable(requireContext(), res)
-                }
+            layout_top.background = ContextCompat.getDrawable(requireContext(), R.color.normal_color_status_bar)
 
-            ib_back.setImageResource(
-                if (isAdult) {
-                    R.drawable.adult_btn_back
-                } else {
-                    R.drawable.normal_btn_back
-                }
-            )
+            ib_back.setImageResource(R.drawable.normal_btn_back)
 
-            iv_search.setImageResource(
-                if (isAdult) {
-                    R.drawable.adult_btn_search
-                } else {
-                    R.drawable.normal_btn_search
-                }
-            )
+            iv_search.setImageResource(R.drawable.normal_btn_search)
 
-            tv_title.setTextColor(
-                if (isAdult) {
-                    R.color.adult_color_text
-                } else {
-                    R.color.normal_color_text
-                }.let { res ->
-                    requireActivity().getColor(res)
-                }
-            )
+            tv_title.setTextColor(requireActivity().getColor(R.color.normal_color_text))
 
-            bar_collapsing_filter.setBackgroundColor(
-                if (isAdult) {
-                    R.color.color_black_3
-                } else {
-                    R.color.color_gray_12
-                }.let { res ->
-                    requireActivity().getColor(res)
-                }
-            )
+            bar_collapsing_filter.setBackgroundColor(requireActivity().getColor(R.color.color_gray_12))
 
-            bar_filter.setBackgroundColor(
-                if (isAdult) {
-                    R.color.color_black_3
-                } else {
-                    R.color.color_gray_12
-                }.let { res ->
-                    requireActivity().getColor(res)
-                }
-            )
+            bar_filter.setBackgroundColor(requireActivity().getColor(R.color.color_gray_12))
 
-            tv_collapsing_filter.setTextColor(
-                if (isAdult) {
-                    R.color.color_white_1
-                } else {
-                    R.color.color_black_1
-                }.let { res ->
-                    requireActivity().getColor(res)
-                }
-            )
+            tv_collapsing_filter.setTextColor(requireActivity().getColor(R.color.color_black_1))
 
-            recyclerview_content.layoutManager = GridLayoutManager(
-                requireContext(), when (isAdult) {
-                    true -> 2
-                    else -> 3
-                }
-            )
+            recyclerview_content.layoutManager = GridLayoutManager(requireContext(), 2)
             recyclerview_content.adapter = videoListAdapter
 
-            viewModel.getCategoryDetail(data.title, isAdult)
-            if (isAdult) {
-                viewModel.getVideoFilterList(null, null, null, isAdult)
-            } else {
-                viewModel.setupVideoList(data.categories, isAdult)
-            }
+            viewModel.getCategoryDetail(data.title, true)
+            viewModel.getVideoFilterList(null, null, null, true)
             progressHUD?.show()
         }
     }
@@ -532,8 +461,7 @@ class CategoriesFragment : BaseFragment() {
             tv.background =
                 ContextCompat.getDrawable(requireContext(), R.drawable.bg_red_1_radius_6)
         } ?: run {
-            tv.setTextColor(takeIf { isAdult }?.let { requireContext().getColor(R.color.color_white_1) }
-                ?: let { requireContext().getColor(R.color.normal_color_text) })
+            tv.setTextColor(requireContext().getColor(R.color.normal_color_text))
             tv.background = null
         }
     }

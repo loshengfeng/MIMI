@@ -145,46 +145,72 @@
                 android:visibility="gone" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_first"
+                android:id="@+id/rv_video"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/normal_color_background"
                 android:visibility="gone" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_second"
+                android:id="@+id/rv_follow"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/normal_color_background"
                 android:visibility="gone" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_third"
+                android:id="@+id/rv_clip"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/normal_color_background"
                 android:visibility="gone" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_fourth"
+                android:id="@+id/rv_picture"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/normal_color_background"
                 android:visibility="gone" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_fifth"
+                android:id="@+id/rv_text"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/normal_color_background"
                 android:visibility="gone" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_sixth"
+                android:id="@+id/rv_club"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/normal_color_background"
                 android:visibility="gone" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_invitevip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|bottom"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="16dp">
+
+                <ImageView
+                    android:id="@+id/iv_invitevip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ico_invitevip"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <ImageView
+                    android:id="@+id/iv_invitevip_close"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="61dp"
+                    android:src="@drawable/btn_close_circle_small_1_n"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </FrameLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

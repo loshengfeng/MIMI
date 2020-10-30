@@ -54,6 +54,7 @@ object GeneralUtils {
             App.applicationContext().contentResolver,
             Settings.Secure.ANDROID_ID
         )
+//        return "1234567890"
     }
 
     fun getHttpExceptionData(httpException: HttpException): HttpExceptionItem {
@@ -131,6 +132,14 @@ object GeneralUtils {
             "^[a-zA-Z0-9-`\\[\\]~!@#\$%^&*()_+\\-=;',./?<>{}|:\"\\\\]{8,20}+$",
             pwd
         )
+    }
+
+    fun isMobileValid(callPrefix: String, mobile: String): Boolean {
+        return if (callPrefix == "+86") {
+            return !checkPhoneNum(mobile)
+        } else {
+            mobile.length < 9
+        }
     }
 
     fun getScreenSize(activity: Activity): Pair<Int, Int> {
@@ -221,10 +230,14 @@ object GeneralUtils {
     }
 
     fun openWebView(context: Context, url: String) {
-        val intent = Intent(Intent.ACTION_VIEW);
-        val url = Uri.parse(url)
-        intent.data = url
-        context.startActivity(intent)
+        try {
+            val intent = Intent(Intent.ACTION_VIEW);
+            val url = Uri.parse(url)
+            intent.data = url
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
     }
 
     private fun getStackTrace(t: Throwable): String {
@@ -301,5 +314,12 @@ object GeneralUtils {
 
     fun getAmountFormat(amount: Float): String {
         return decimalFormat.format(amount)
+    }
+
+    private fun checkPhoneNum(num: String): Boolean{
+        val regExp = "^((13[0-9])|(15[^4])|(18[0,2,3,5-9])|(17[0-8])|(147))\\d{8}$"
+        val p = Pattern.compile(regExp)
+        val m = p.matcher(num)
+        return m.matches()
     }
 }

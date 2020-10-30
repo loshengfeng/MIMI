@@ -7,6 +7,7 @@ import com.dabenxiang.mimi.model.enums.TokenResult
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.pref.Pref
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
@@ -41,6 +42,7 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
         if (hasMemberToken) {
             when (accountManager.getMemberTokenResult()) {
                 TokenResult.EXPIRED -> doRefreshToken()
+                TokenResult.EMPTY -> logout()
             }
         } else {
             when (accountManager.getPublicTokenResult()) {
@@ -118,6 +120,8 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
             requestBuilder.addHeader(ApiRepository.AUTHORIZATION, auth)
         }
 
+        requestBuilder.addHeader(ApiRepository.X_DEVICE_ID, GeneralUtils.getAndroidID())
+
         return requestBuilder.build()
     }
 
@@ -139,7 +143,10 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
                 .collect {
                     when (it) {
                         is Empty -> Timber.d("Refresh token successful!")
-                        is Error -> Timber.e("Refresh token error: $it")
+                        is Error -> {
+                            Timber.e("Refresh token error: $it")
+                            logout()
+                        }
                     }
                 }
         }
@@ -150,10 +157,15 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
             accountManager.getPublicToken()
                 .collect {
                     when (it) {
-                        is Empty -> Timber.d("Get token successful!")
-                        is Error -> Timber.e("Get token error: $it")
+                        is Empty -> Timber.d("Get public token successful!")
+                        is Error -> Timber.e("Get public token error: $it")
                     }
                 }
         }
+    }
+
+    private fun logout() {
+        accountManager.logoutLocal()
+        getPublicToken()
     }
 }

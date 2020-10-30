@@ -27,6 +27,15 @@ class ClubDetailViewModel : BaseViewModel() {
     private var _followClubResult = MutableLiveData<ApiResult<Boolean>>()
     val followClubResult: LiveData<ApiResult<Boolean>> = _followClubResult
 
+    private var _updateCountHottest = MutableLiveData<Int>()
+    val updateCountHottest: LiveData<Int> = _updateCountHottest
+
+    private var _updateCountNewest = MutableLiveData<Int>()
+    val updateCountNewest: LiveData<Int> = _updateCountNewest
+
+    private var _updateCountVideo = MutableLiveData<Int>()
+    val updateCountVideo: LiveData<Int> = _updateCountVideo
+
     fun getMemberPosts(
         tag: String,
         orderBy: OrderBy,
@@ -42,6 +51,24 @@ class ClubDetailViewModel : BaseViewModel() {
         tag: String,
         orderBy: OrderBy
     ): LiveData<PagedList<MemberPostItem>> {
+        val pagingCallback = object : PagingCallback {
+            override fun onLoading() {
+                setShowProgress(true)
+            }
+
+            override fun onLoaded() {
+                setShowProgress(false)
+            }
+
+            override fun onCurrentItemCount(count: Long, isInitial: Boolean) {
+                if (isInitial) cleanRemovedPosList()
+                when (orderBy) {
+                    OrderBy.HOTTEST -> _updateCountHottest.value = count.toInt()
+                    OrderBy.NEWEST -> _updateCountNewest.value = count.toInt()
+                    OrderBy.VIDEO -> _updateCountVideo.value = count.toInt()
+                }
+            }
+        }
         val clubDetailPostDataSource =
             ClubDetailPostDataSource(
                 pagingCallback,
@@ -140,20 +167,6 @@ class ClubDetailViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _followClubResult.value = it }
-        }
-    }
-
-    private val pagingCallback = object : PagingCallback {
-        override fun onLoading() {
-            setShowProgress(true)
-        }
-
-        override fun onLoaded() {
-            setShowProgress(false)
-        }
-
-        override fun onTotalCount(count: Long, isInitial: Boolean) {
-            if(isInitial) cleanRemovedPosList()
         }
     }
 }

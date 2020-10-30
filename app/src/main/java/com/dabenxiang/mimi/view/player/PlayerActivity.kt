@@ -5,17 +5,15 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.content.res.ColorStateList
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.text.Html
 import android.text.TextUtils
 import android.view.*
-import android.view.View.VISIBLE
+import android.view.View.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearSnapHelper
@@ -24,6 +22,8 @@ import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.NAVIGATE_TO_ACTION
 import com.dabenxiang.mimi.NAVIGATE_TO_TOPUP_ACTION
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.NetworkCallback
+import com.dabenxiang.mimi.callback.NetworkCallbackListener
 import com.dabenxiang.mimi.extension.addKeyboardToggleListener
 import com.dabenxiang.mimi.extension.handleException
 import com.dabenxiang.mimi.extension.setBtnSolidColor
@@ -58,6 +58,7 @@ import kotlinx.android.synthetic.main.head_no_comment.view.*
 import kotlinx.android.synthetic.main.head_source.view.*
 import kotlinx.android.synthetic.main.head_video_info.view.*
 import kotlinx.android.synthetic.main.item_ad.view.*
+import kotlinx.android.synthetic.main.recharge_reminder.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -103,7 +104,7 @@ class PlayerActivity : BaseActivity() {
     private var reportDialog: ReportDialogFragment? = null
     private var isFirstInit = true
     private var isKeyboardShown = false
-    private var oldPlayerItem: PlayerItem = PlayerItem(-1, false)
+    private var oldPlayerItem: PlayerItem = PlayerItem(-1)
 
     private val sourceListAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
@@ -132,7 +133,7 @@ class PlayerActivity : BaseActivity() {
 //                startActivity(intent)
 //
 //                finish()
-                oldPlayerItem = PlayerItem(viewModel.videoId, obtainIsAdult())
+                oldPlayerItem = PlayerItem(viewModel.videoId)
                 reloadVideoInfo(item)
             }
         }, obtainIsAdult())
@@ -238,7 +239,7 @@ class PlayerActivity : BaseActivity() {
                 val bundle = MyPostFragment.createBundle(
                     userId, name,
                     isAdult = true,
-                    isAdultTheme = true
+                    isAdultTheme = false
                 )
                 bundle.putBoolean(KEY_IS_FROM_PLAYER, true)
                 navigateTo(
@@ -259,6 +260,15 @@ class PlayerActivity : BaseActivity() {
             }
         }
     }
+
+    private val networkCallbackListener = object : NetworkCallbackListener {
+        override fun onLost() {
+            Timber.d("network disconnect")
+            showCrashDialog(HttpErrorMsgType.CHECK_NETWORK)
+        }
+    }
+
+    private val networkCallback = NetworkCallback(networkCallbackListener)
 
     override fun getLayoutId(): Int {
         return R.layout.activity_player
@@ -281,21 +291,10 @@ class PlayerActivity : BaseActivity() {
 
         recycler_info.adapter = playerInfoAdapter
 
-        val backgroundColor = if (isAdult) {
-            getColor(R.color.adult_color_background)
-        } else {
-            getColor(R.color.normal_color_background)
-        }
+        val backgroundColor = getColor(R.color.normal_color_background)
         recycler_info.setBackgroundColor(backgroundColor)
 
-        val titleColor =
-            if (isAdult) {
-                R.color.adult_color_text
-            } else {
-                R.color.normal_color_text
-            }.let {
-                getColor(it)
-            }
+        val titleColor = getColor(R.color.normal_color_text)
 
         headVideoInfo.tv_title.setTextColor(titleColor)
         headSource.title_source.setTextColor(titleColor)
@@ -303,30 +302,12 @@ class PlayerActivity : BaseActivity() {
         headComment.title_comment.setTextColor(titleColor)
         headNoComment.title_no_comment.setTextColor(titleColor)
 
-        val subTitleColor =
-            if (isAdult) {
-                R.color.color_white_1_50
-            } else {
-                R.color.color_black_1_50
-            }.let {
-                getColor(it)
-            }
+        val subTitleColor = getColor(R.color.color_black_1_50)
+
         headVideoInfo.btn_show_introduction.setTextColor(subTitleColor)
         headVideoInfo.tv_introduction.setTextColor(subTitleColor)
         headVideoInfo.tv_info.setTextColor(subTitleColor)
-        headVideoInfo.tv_introduction.setBackgroundResource(
-            if (isAdult) {
-                R.drawable.bg_white_stroke_1_radius_2
-            } else {
-                R.drawable.bg_black_stroke_1_radius_2
-            }
-        )
-
-        val lineColor =
-            if (isAdult) getColor(R.color.color_white_1_10) else getColor(R.color.color_black_1_05)
-        headSource.line_source.setBackgroundColor(lineColor)
-        headComment.line_comment.setBackgroundColor(lineColor)
-        headComment.line_separate.setBackgroundColor(lineColor)
+        headVideoInfo.tv_introduction.setBackgroundResource(R.drawable.bg_black_stroke_1_radius_2)
 
         headVideoInfo.btn_show_introduction.setOnClickListener {
             viewModel.showIntroduction.setNot()
@@ -334,19 +315,8 @@ class PlayerActivity : BaseActivity() {
 
         viewModel.showIntroduction.observe(this, Observer { isShow ->
             val drawableRes =
-                if (isAdult) {
-                    if (isShow) {
-                        R.drawable.btn_arrowup_white_n
-                    } else {
-                        R.drawable.btn_arrowdown_white_n
-                    }
-                } else {
-                    if (isShow) {
-                        R.drawable.btn_arrowup_gray_n
-                    } else {
-                        R.drawable.btn_arrowdown_gray_n
-                    }
-                }
+                if (isShow) R.drawable.btn_arrowup_gray_n
+                else R.drawable.btn_arrowdown_gray_n
             headVideoInfo.tv_introduction.visibility = if (isShow) View.VISIBLE else View.GONE
             headVideoInfo.btn_show_introduction.setCompoundDrawablesWithIntrinsicBounds(
                 0,
@@ -356,77 +326,47 @@ class PlayerActivity : BaseActivity() {
             )
         })
 
-        bottom_func_bar.setBackgroundResource(
-            if (isAdult) {
-                R.drawable.bg_adult_top_line
-            } else {
-                R.drawable.bg_gray_2_top_line
-            }
-        )
+        bottom_func_bar.setBackgroundResource(R.drawable.bg_gray_2_top_line)
 
-        bottom_func_input.setBackgroundResource(
-            if (isAdult) {
-                R.drawable.bg_adult_top_line
-            } else {
-                R.drawable.bg_gray_2_top_line
-            }
-        )
+        bottom_func_input.setBackgroundResource(R.drawable.bg_gray_2_top_line)
 
 
         btn_write_comment.let {
             it.setTextColor(
-                getColor(
-                    if (isAdult) {
-                        R.color.color_white_1_30
-                    } else {
-                        R.color.color_gray_9
-                    }
-                )
+                getColor(R.color.color_gray_9)
             )
-            it.background = getDrawable(
-                if (isAdult) R.drawable.bg_black_1_30_radius_18
-                else R.drawable.bg_gray_1_30_radius_18
-            )
+            it.background = getDrawable(R.drawable.bg_gray_1_30_radius_18)
         }
 
         tv_comment.setCompoundDrawablesRelativeWithIntrinsicBounds(
-            if (isAdult) R.drawable.ico_messege_adult else R.drawable.ico_messege_adult_gray,
+            R.drawable.ico_messege_adult_gray,
             0,
             0,
             0
         )
         et_message.let {
             it.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                if (isAdult) R.drawable.ico_messege_adult else R.drawable.ico_messege_adult_gray,
+                R.drawable.ico_messege_adult_gray,
                 0,
                 0,
                 0
             )
             it.compoundDrawablePadding = 5
-            it.setBackgroundColor(getColor(if (isAdult) R.color.color_black_1 else R.color.color_gray_1))
-            it.setTextColor(getColor(if (isAdult) R.color.color_white_1 else R.color.color_black_1))
-            it.setHintTextColor(getColor(if (isAdult) R.color.color_gray_1 else R.color.color_gray_9))
+            it.setBackgroundColor(getColor(R.color.color_gray_1))
+            it.setTextColor(getColor(R.color.color_black_1))
+            it.setHintTextColor(getColor(R.color.color_gray_9))
         }
 
-        iv_bar.setImageResource(
-            if (isAdult) R.drawable.bg_black_1_30_radius_18
-            else R.drawable.bg_gray_1_30_radius_18
-        )
+        iv_bar.setImageResource(R.drawable.bg_gray_1_30_radius_18)
 
         tv_like.setTextColor(titleColor)
         iv_favorite.setTextColor(titleColor)
         tv_comment.setTextColor(titleColor)
 
-        iv_share.setImageResource(if (isAdult) R.drawable.btn_share_white_n else R.drawable.btn_share_gray_n)
-        iv_more.setImageResource(if (isAdult) R.drawable.btn_more_white_n else R.drawable.btn_more_gray_n)
+        iv_share.setImageResource(R.drawable.btn_share_gray_n)
+        iv_more.setImageResource(R.drawable.btn_more_gray_n)
 
-        tv_replay_name.setTextColor(if (obtainIsAdult()) {
-            R.color.color_white_1
-        } else {
-            R.color.color_black_1
-        }.let {
-            getColor(it)
-        })
+        tv_replay_name.setTextColor(getColor(R.color.color_black_1))
 
 
         viewModel.fastForwardTime.observe(this, Observer {
@@ -441,7 +381,7 @@ class PlayerActivity : BaseActivity() {
 
         viewModel.isLoadingActive.observe(this, Observer {
             if (it) {
-                progress_video.visibility = View.VISIBLE
+                progress_video.visibility = VISIBLE
             } else {
                 progress_video.visibility = View.GONE
             }
@@ -450,7 +390,7 @@ class PlayerActivity : BaseActivity() {
         viewModel.isPlaying.observe(this, Observer {
             iv_player.visibility = when (it) {
                 true -> View.GONE
-                false -> View.VISIBLE
+                false -> VISIBLE
             }
         })
 
@@ -469,7 +409,7 @@ class PlayerActivity : BaseActivity() {
             Timber.i("episodePosition =$it")
             if (it >= 0) {
                 episodeAdapter.setLastSelectedIndex(it)
-                viewModel.checkConsumeResult()
+                viewModel.getAdultStreamUrl()
             }
             scrollToBottom()
         })
@@ -483,7 +423,15 @@ class PlayerActivity : BaseActivity() {
                 is Loading -> progressHUD.show()
                 is Loaded -> progressHUD.dismiss()
                 is Empty -> loadVideo()
-                is Error -> onApiError(it.throwable)
+                is Error -> {
+                    when (it.throwable) {
+                        is PlayerViewModel.NotDeductedException -> {
+                            showRechargeReminder(true)
+                            scrollToBottom()
+                        }
+                        else -> onApiError(it.throwable)
+                    }
+                }
             }
         })
 
@@ -545,7 +493,7 @@ class PlayerActivity : BaseActivity() {
                 is Loaded -> progressHUD.dismiss()
                 is Success -> {
                     val result = it.result
-                    viewModel.category = result.categories?.get(0) ?: ""
+                    viewModel.category = if(result.categories.isNotEmpty()) result.categories.get(0) else ""
 
                     if (isFirstInit) {
                         isFirstInit = false
@@ -572,7 +520,7 @@ class PlayerActivity : BaseActivity() {
 
                         setupSourceList(viewModel.sourceList)
 
-                        val categoriesString = result.categories?.last()
+                        val categoriesString = if(result.categories.isNotEmpty()) result.categories.last() else ""
                         viewModel.setupGuessLikeList(categoriesString, isAdult)
                     }
 
@@ -588,16 +536,9 @@ class PlayerActivity : BaseActivity() {
 
                     if (result.commentCount == 0L) {
                         Timber.i(" apiVideoInfo result.commentCount == 0L")
-                        headNoComment.title_no_comment.visibility = View.VISIBLE
+                        headNoComment.title_no_comment.visibility = VISIBLE
                         headNoComment.title_no_comment.setTextColor(titleColor)
-                        val bgColor =
-                            if (isAdult) {
-                                R.color.color_white_1_10
-                            } else {
-                                R.color.color_black_1_10
-                            }.let { colorRes ->
-                                getColor(colorRes)
-                            }
+                        val bgColor = getColor(R.color.color_black_1_10)
                         headNoComment.title_no_comment.setBtnSolidColor(
                             bgColor,
                             bgColor,
@@ -643,11 +584,7 @@ class PlayerActivity : BaseActivity() {
         viewModel.likeVideo.observe(this, Observer {
             val res = when (it) {
                 true -> R.drawable.ico_nice_s
-                else ->
-                    when (isAdult) {
-                        true -> R.drawable.ico_nice
-                        else -> R.drawable.ico_nice_gray
-                    }
+                else -> R.drawable.ico_nice_gray
             }
 
             tv_like.setCompoundDrawablesRelativeWithIntrinsicBounds(res, 0, 0, 0)
@@ -660,11 +597,7 @@ class PlayerActivity : BaseActivity() {
         viewModel.favoriteVideo.observe(this, Observer {
             val res = when (it) {
                 true -> R.drawable.btn_favorite_white_s
-                else ->
-                    when (isAdult) {
-                        true -> R.drawable.btn_favorite_white_n
-                        else -> R.drawable.btn_favorite_n
-                    }
+                else -> R.drawable.btn_favorite_n
             }
 
             iv_favorite.setCompoundDrawablesRelativeWithIntrinsicBounds(res, 0, 0, 0)
@@ -679,18 +612,20 @@ class PlayerActivity : BaseActivity() {
         })
 
         viewModel.consumeResult.observe(this, Observer {
+            Timber.i("consumeResult isDeducted:${viewModel.isDeducted}")
+            Timber.i("consumeResult VideoConsumeResult:$it")
             consumeDialog?.dismiss()
             when (it) {
+                VideoConsumeResult.PAID_YET,
                 VideoConsumeResult.PAID -> {
+                    showRechargeReminder(false)
                     viewModel.getStreamUrl(obtainIsAdult())
                 }
-                VideoConsumeResult.PAID_YET -> {
-                    consumeDialog = showCostPointDialog()
-                }
                 VideoConsumeResult.POINT_NOT_ENOUGH -> {
-                    consumeDialog = showPointNotEnoughDialog()
+                    showRechargeReminder(true)
                 }
             }
+
             scrollToBottom()
         })
 
@@ -730,10 +665,8 @@ class PlayerActivity : BaseActivity() {
         })
 
         btn_full_screen.setOnClickListener {
-            viewModel.checkStatus {
-                viewModel.lockFullScreen = !viewModel.lockFullScreen
-                switchScreenOrientation()
-            }
+            viewModel.lockFullScreen = !viewModel.lockFullScreen
+            switchScreenOrientation()
         }
 
         orientationDetector =
@@ -910,6 +843,17 @@ class PlayerActivity : BaseActivity() {
             }
         })
 
+        viewModel.videoReport.observe(this, {
+            when (it) {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> {
+                    Timber.i("videoReported")
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
         //Detect key keyboard shown/hide
         this addKeyboardToggleListener { shown ->
             isKeyboardShown = shown
@@ -922,35 +866,55 @@ class PlayerActivity : BaseActivity() {
         viewModel.getAd(adWidth, adHeight)
 
         exo_play_pause.setOnClickListener {
-            viewModel.checkStatus {
-                Timber.d("exo_play_pause confirmed")
-                player?.also {
-                    it.playWhenReady.also { playing ->
-                        it.playWhenReady = !playing
-                        viewModel.setPlaying(!playing)
-                        if (!playing)
-                            exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
-                        else
-                            exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_play))
-                    }
+            Timber.d("exo_play_pause confirmed")
+            player?.also {
+                it.playWhenReady.also { playing ->
+                    it.playWhenReady = !playing
+                    viewModel.setPlaying(!playing)
+                    if (!playing)
+                        exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
+                    else
+                        exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_play))
                 }
             }
         }
 
         iv_player.setOnClickListener {
-            viewModel.checkStatus {
-                Timber.d("iv_player confirmed")
-                if (it.visibility == View.VISIBLE) {
-                    player?.playWhenReady = true
-                    viewModel.setPlaying(true)
-                    exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
-                }
+            if (it.visibility == VISIBLE) {
+                player?.playWhenReady = true
+                viewModel.setPlaying(true)
+                exo_play_pause.setImageDrawable(getDrawable(R.drawable.exo_icon_pause))
             }
         }
         recycler_info.setOnClickListener {
             Timber.i("RecyclerView=setOnClickListener")
         }
 
+        btn_vip.setOnClickListener {
+            Timber.i("btn_vip Click")
+            val bundle = Bundle()
+            navigateTo(
+                MainActivity::class.java,
+                R.id.navigation_topup,
+                bundle,
+                NAVIGATE_TO_TOPUP_ACTION
+            )
+        }
+
+        btn_promote.setOnClickListener {
+            val bundle = Bundle()
+            navigateTo(
+                MainActivity::class.java,
+                R.id.inviteVipFragment,
+                bundle
+            )
+        }
+    }
+
+    private fun showRechargeReminder(isShow: Boolean) {
+        Timber.i("showRechargeReminder")
+        player_view.visibility = if (isShow) INVISIBLE else VISIBLE
+        recharge_reminder.visibility = if (isShow) VISIBLE else GONE
     }
 
     private fun showMoreDialog(
@@ -1027,12 +991,12 @@ class PlayerActivity : BaseActivity() {
         Timber.i("commentEditorToggle enable:$enable")
         when (enable) {
             true -> {
-                bottom_func_input.visibility = View.VISIBLE
+                bottom_func_input.visibility = VISIBLE
                 bottom_func_bar.visibility = View.GONE
             }
             else -> {
                 bottom_func_input.visibility = View.GONE
-                bottom_func_bar.visibility = View.VISIBLE
+                bottom_func_bar.visibility = VISIBLE
             }
         }
 
@@ -1046,7 +1010,7 @@ class PlayerActivity : BaseActivity() {
                     tv_replay_name.visibility = View.GONE
                 } else {
                     tv_replay_name.text = "@$currentreplyName"
-                    tv_replay_name.visibility = View.VISIBLE
+                    tv_replay_name.visibility = VISIBLE
                 }
             }
 
@@ -1082,11 +1046,7 @@ class PlayerActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
 
-        if (!viewModel.isLogin() && (dialog == null || dialog?.isVisible == false)) {
-            openLoginDialog()
-        } else {
-            loadVideo()
-        }
+        loadVideo()
 
         //hideSystemUi()
 
@@ -1099,6 +1059,8 @@ class PlayerActivity : BaseActivity() {
             //if (it.canDetectOrientation())
             it.enable()
         }
+
+        registerNetworkCallback(App.applicationContext(), networkCallback)
     }
 
     override fun onPause() {
@@ -1114,6 +1076,8 @@ class PlayerActivity : BaseActivity() {
             player_view.onPause()
             releasePlayer()
         }
+
+        unregisterNetworkCallback(App.applicationContext(), networkCallback)
     }
 
     override fun onStop() {
@@ -1161,10 +1125,7 @@ class PlayerActivity : BaseActivity() {
     }
 
     private fun loadVideo(
-        playerItem: PlayerItem = PlayerItem(
-            -1,
-            false
-        )
+        playerItem: PlayerItem = PlayerItem(-1)
     ) {
         if (playerItem.videoId != -1L) {
             viewModel.videoId = playerItem.videoId
@@ -1195,10 +1156,8 @@ class PlayerActivity : BaseActivity() {
 //        viewModel.downloadM3U8(url)
 
         viewModel.getMediaSource(url, sourceFactory)?.also {
-            viewModel.checkStatus {
-                Timber.d("player ready confirmed")
-                player?.prepare(it, isReset, isReset)
-            }
+            Timber.d("player ready confirmed")
+            player?.prepare(it, isReset, isReset)
         }
     }
 
@@ -1225,7 +1184,7 @@ class PlayerActivity : BaseActivity() {
                     isMove = if (abs(dx) >= SWIPE_DISTANCE_UNIT || abs(dy) >= SWIPE_DISTANCE_UNIT) {
                         if (abs(dx) > abs(dy)) {
                             if (viewModel.isPlaying.value == true) {
-                                tv_forward_backward.visibility = View.VISIBLE
+                                tv_forward_backward.visibility = VISIBLE
                                 tv_sound_tune.visibility = View.GONE
                                 if (dx > 0)
                                     viewModel.setFastForwardTime((dx.toInt() / SWIPE_DISTANCE_UNIT) * JUMP_TIME)
@@ -1234,7 +1193,7 @@ class PlayerActivity : BaseActivity() {
                             }
                         } else {
                             tv_forward_backward.visibility = View.GONE
-                            tv_sound_tune.visibility = View.VISIBLE
+                            tv_sound_tune.visibility = VISIBLE
                             if (abs(dy) > SWIPE_SOUND_LEAST) {
                                 if (dy > 0)
                                     viewModel.setSoundLevel(player!!.volume - 0.1f)
@@ -1370,7 +1329,7 @@ class PlayerActivity : BaseActivity() {
                 ExoPlayer.STATE_BUFFERING -> "ExoPlayer.STATE_BUFFERING"
                 ExoPlayer.STATE_READY -> {
                     viewModel.activateLoading(false)
-                    player_view.visibility = View.VISIBLE
+                    player_view.visibility = VISIBLE
                     "ExoPlayer.STATE_READY"
                 }
 
@@ -1423,6 +1382,7 @@ class PlayerActivity : BaseActivity() {
                     //showErrorDialog("UNKNOWN")
                 }
             }
+            viewModel.sendVideoReport()
         }
     }
 
@@ -1457,7 +1417,7 @@ class PlayerActivity : BaseActivity() {
     }
 
     private fun obtainIsAdult(): Boolean {
-        return (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerItem?)?.isAdult ?: false
+        return true
     }
 
     private fun openLoginDialog() {
@@ -1575,25 +1535,7 @@ class PlayerActivity : BaseActivity() {
 
             val isAdult = obtainIsAdult()
 
-            chip.setTextColor(
-                if (isAdult) {
-                    R.color.color_white_1_50
-                } else {
-                    R.color.color_black_1_50
-                }.let { colorRes ->
-                    getColor(colorRes)
-                }
-            )
-
-            chip.chipBackgroundColor = ColorStateList.valueOf(
-                ContextCompat.getColor(
-                    this, if (isAdult) {
-                        R.color.adult_color_status_bar
-                    } else {
-                        R.color.color_black_1_10
-                    }
-                )
-            )
+            chip.setTextColor(getColor(R.color.color_black_1_50))
 
             chip.setOnClickListener(
                 View.OnClickListener {
@@ -1777,8 +1719,8 @@ class PlayerActivity : BaseActivity() {
             bottom_func_bar.visibility = View.GONE
             bottom_func_input.visibility = View.GONE
         } else {
-            recycler_info?.visibility = View.VISIBLE
-            bottom_func_bar?.visibility = View.VISIBLE
+            recycler_info?.visibility = VISIBLE
+            bottom_func_bar?.visibility = VISIBLE
             bottom_func_input.visibility = View.GONE
         }
     }
@@ -1814,7 +1756,7 @@ class PlayerActivity : BaseActivity() {
                     val bundle = Bundle().also { it.putBoolean(KEY_IS_FROM_PLAYER, true) }
                     navigateTo(
                         MainActivity::class.java,
-                        R.id.settingFragment,
+                        R.id.action_to_settingFragment,
                         bundle
                     )
                 }
@@ -1836,7 +1778,7 @@ class PlayerActivity : BaseActivity() {
                     bundle.putInt(LoginFragment.KEY_TYPE, LoginFragment.TYPE_REGISTER)
                     navigateTo(
                         MainActivity::class.java,
-                        R.id.loginFragment,
+                        R.id.action_to_loginFragment,
                         bundle
                     )
                 },
@@ -1845,7 +1787,7 @@ class PlayerActivity : BaseActivity() {
                     bundle.putInt(LoginFragment.KEY_TYPE, LoginFragment.TYPE_LOGIN)
                     navigateTo(
                         MainActivity::class.java,
-                        R.id.loginFragment,
+                        R.id.action_to_loginFragment,
                         bundle
                     )
                 },

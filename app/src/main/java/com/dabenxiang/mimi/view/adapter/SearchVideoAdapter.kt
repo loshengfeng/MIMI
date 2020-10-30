@@ -60,13 +60,9 @@ class SearchVideoAdapter(
             }
             else -> {
                 val layoutInflater = LayoutInflater.from(parent.context)
-                val viewId = when(isAdult) {
-                    true -> R.layout.item_favorite_normal
-                    else -> R.layout.item_general_normal
-                }
                 SearchVideoViewHolder(
                     layoutInflater.inflate(
-                        viewId,
+                        R.layout.item_favorite_normal,
                         parent,
                         false
                     ), listener

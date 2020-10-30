@@ -28,6 +28,7 @@ import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_clip_post.view.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import timber.log.Timber
 import java.util.*
 
 class MyPostClipPostHolder(
@@ -106,6 +107,7 @@ class MyPostClipPostHolder(
 
         tvLength.text = contentItem.shortVideo?.length
         contentItem.images?.also { images ->
+            Timber.i("images $images")
             if (!TextUtils.isEmpty(images[0].url)) {
                 Glide.with(ivPhoto.context)
                     .load(images[0].url).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
@@ -182,7 +184,7 @@ class MyPostClipPostHolder(
     fun updateFollow(item: MemberPostItem) {
         tvFollow.setText(if (item.isFollow) R.string.followed else R.string.follow)
         tvFollow.setBackgroundResource(if (item.isFollow) R.drawable.bg_white_1_stroke_radius_16 else R.drawable.bg_red_1_stroke_radius_16)
-        tvFollow.setTextColor(App.self.getColor(if (item.isFollow) R.color.color_white_1 else R.color.color_red_1))
+        tvFollow.setTextColor(App.self.getColor(if (item.isFollow) R.color.color_black_1_60 else R.color.color_red_1))
     }
 
     fun updateFavorite(item: MemberPostItem) {

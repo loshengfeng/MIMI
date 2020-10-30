@@ -11,16 +11,15 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_min="50dp" />
 
     <ImageView
         android:id="@+id/iv_selected"
-        android:layout_width="0dp"
-        android:layout_height="5dp"
-        android:paddingStart="5dp"
-        android:paddingEnd="5dp"
+        android:layout_width="30dp"
+        android:layout_height="4dp"
         android:src="@drawable/bg_tab_red_1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/tv_title"

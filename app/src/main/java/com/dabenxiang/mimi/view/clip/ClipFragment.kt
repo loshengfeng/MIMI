@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.clip
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import com.dabenxiang.mimi.NAVIGATE_TO_TOPUP_ACTION
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -18,6 +20,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.comment.CommentDialogFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import kotlinx.android.synthetic.main.fragment_clip.*
 import timber.log.Timber
@@ -49,6 +52,8 @@ class ClipFragment : BaseFragment() {
     private val memberPostItems: ArrayList<MemberPostItem> = arrayListOf()
     private var interactionListener: InteractionListener? = null
 
+    private var isShowComment = false
+
     override val bottomNavigationVisibility = View.GONE
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -58,12 +63,12 @@ class ClipFragment : BaseFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        (rv_third.adapter as ClipAdapter).releasePlayer()
+        (rv_clip.adapter as ClipAdapter).releasePlayer()
     }
 
     override fun onPause() {
         super.onPause()
-        (rv_third.adapter as ClipAdapter).pausePlayer()
+        (rv_clip.adapter as ClipAdapter).pausePlayer()
     }
 
     override fun getLayoutId(): Int {
@@ -83,7 +88,10 @@ class ClipFragment : BaseFragment() {
                     val result = it.result
                     clipMap[result.first] = result.third
                     Timber.d("clipResult notifyItemChanged: ${result.second}")
-                    rv_third.adapter?.notifyItemChanged(result.second)
+                    rv_clip.adapter?.notifyItemChanged(
+                        result.second,
+                        ClipAdapter.PAYLOAD_UPDATE_PLAYER
+                    )
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -93,7 +101,7 @@ class ClipFragment : BaseFragment() {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Success -> rv_third.adapter?.notifyItemChanged(
+                is Success -> rv_clip.adapter?.notifyItemChanged(
                     it.result,
                     ClipAdapter.PAYLOAD_UPDATE_UI
                 )
@@ -105,7 +113,7 @@ class ClipFragment : BaseFragment() {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Success -> rv_third.adapter?.notifyItemChanged(
+                is Success -> rv_clip.adapter?.notifyItemChanged(
                     it.result,
                     ClipAdapter.PAYLOAD_UPDATE_UI
                 )
@@ -118,10 +126,41 @@ class ClipFragment : BaseFragment() {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
                 is Success -> {
-                    rv_third.adapter?.notifyItemChanged(
+                    rv_clip.adapter?.notifyItemChanged(
                         it.result,
                         ClipAdapter.PAYLOAD_UPDATE_UI
                     )
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.postDetailResult.observe(viewLifecycleOwner, {
+            when (it) {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> {
+                    val position = it.result
+                    if (memberPostItems[position].deducted && isShowComment)
+                        showCommentDialog(memberPostItems[position])
+                    rv_clip.adapter?.notifyItemChanged(
+                        position,
+                        ClipAdapter.PAYLOAD_UPDATE_DEDUCTED
+                    )
+                }
+                is Error -> {
+                    progressHUD?.dismiss()
+                    onApiError(it.throwable)
+                }
+            }
+        })
+
+        viewModel.videoReport.observe(viewLifecycleOwner, {
+            when (it) {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Success -> {
+                    Timber.i("videoReported")
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -137,7 +176,7 @@ class ClipFragment : BaseFragment() {
 
         (arguments?.getSerializable(KEY_DATA) as ArrayList<MemberPostItem>).also { data ->
             memberPostItems.addAll(data)
-            rv_third.adapter = ClipAdapter(
+            rv_clip.adapter = ClipAdapter(
                 requireContext(),
                 memberPostItems,
                 clipMap,
@@ -149,39 +188,59 @@ class ClipFragment : BaseFragment() {
                     { item, pos, isFavorite -> onFavoriteClick(item, pos, isFavorite) },
                     { item, pos, isLike -> onLikeClick(item, pos, isLike) },
                     { item -> onCommentClick(item) },
-                    { onBackClick() })
+                    { onBackClick() },
+                    { id, error -> viewModel.sendVideoReport(id, error) },
+                    { onVipClick() },
+                    { onPromoteClick() }
+                )
             )
-            (rv_third.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-            PagerSnapHelper().attachToRecyclerView(rv_third)
-            rv_third.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+            (rv_clip.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+            PagerSnapHelper().attachToRecyclerView(rv_clip)
+            rv_clip.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)
                     when (newState) {
                         RecyclerView.SCROLL_STATE_IDLE -> {
                             val currentPos =
-                                (rv_third.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                                (rv_clip.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
                             Timber.d("SCROLL_STATE_IDLE position: $currentPos")
 
-                            val clipAdapter = rv_third.adapter as ClipAdapter
+                            val clipAdapter = rv_clip.adapter as ClipAdapter
                             val lastPosition = clipAdapter.getCurrentPos()
                             Timber.d("SCROLL_STATE_IDLE lastPosition: $lastPosition")
                             takeIf { currentPos >= 0 && currentPos != lastPosition }?.also {
                                 clipAdapter.releasePlayer()
                                 clipAdapter.updateCurrentPosition(currentPos)
                                 clipAdapter.notifyItemChanged(lastPosition)
-                                clipAdapter.notifyItemChanged(currentPos)
+//                                clipAdapter.notifyItemChanged(currentPos)
+                                viewModel.getPostDetail(memberPostItems[currentPos], currentPos)
                             } ?: clipAdapter.updateCurrentPosition(lastPosition)
                         }
                     }
                 }
             })
-            rv_third.scrollToPosition(position)
+            rv_clip.scrollToPosition(position)
 
-            (arguments?.getSerializable(KEY_SHOW_COMMENT) as Boolean).takeIf { it }?.also {
-                val item = data[position]
-                showCommentDialog(item)
-            }
+            isShowComment = arguments?.getSerializable(KEY_SHOW_COMMENT) as Boolean
+
+            viewModel.getPostDetail(memberPostItems[position], position)
         }
+    }
+
+    private fun onPromoteClick() {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_to_inviteVipFragment,
+                null
+            )
+        )
+    }
+
+    private fun onVipClick() {
+        val intent = Intent(requireContext(), MainActivity::class.java)
+        intent.action = NAVIGATE_TO_TOPUP_ACTION
+        startActivity(intent)
     }
 
     override fun onAttach(context: Context) {
@@ -251,7 +310,7 @@ class ClipFragment : BaseFragment() {
                 val index = memberPostItems.indexOf(item)
                 if (index >= 0) {
                     memberPostItems[index].commentCount = count
-                    rv_third.adapter?.notifyItemChanged(index, ClipAdapter.PAYLOAD_UPDATE_UI)
+                    rv_clip.adapter?.notifyItemChanged(index, ClipAdapter.PAYLOAD_UPDATE_UI)
                 }
             }
         }

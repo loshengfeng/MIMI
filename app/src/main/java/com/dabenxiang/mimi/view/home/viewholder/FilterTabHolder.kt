@@ -39,7 +39,6 @@ class FilterTabHolder(itemView: View, listener: FilterTabHolderListener, var isA
         when {
             isDisable -> R.color.color_gray_11
             isSelected -> R.color.color_white_1
-            isAdult -> R.color.adult_color_text
             else -> R.color.normal_color_text
         }.also {
             tvTitle.setTextColor(itemView.resources.getColor(it, null))

@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.view.search.post
 
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.Spanned
@@ -97,7 +96,7 @@ class SearchPostFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
 
-        useAdultTheme(true)
+        useAdultTheme(false)
 
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
@@ -342,10 +341,7 @@ class SearchPostFragment : BaseFragment() {
 
     private val videoAdapterListener = object : SearchVideoAdapter.EventListener {
         override fun onVideoClick(item: VideoItem) {
-            val playerData = PlayerItem(
-                    item.id ?: 0,
-                    item.isAdult
-            )
+            val playerData = PlayerItem(item.id ?: 0)
             val intent = Intent(requireContext(), PlayerActivity::class.java)
             intent.putExtras(PlayerActivity.createBundle(playerData))
             startActivityForResult(intent, SearchVideoFragment.REQUEST_LOGIN)
@@ -393,10 +389,7 @@ class SearchPostFragment : BaseFragment() {
 
                 FunctionType.MSG -> {
                     // 點擊評論，進入播放頁面滾動到最下面
-                    val playerData = PlayerItem(
-                            item.id ?: 0,
-                            item.isAdult
-                    )
+                    val playerData = PlayerItem(item.id ?: 0)
                     val intent = Intent(requireContext(), PlayerActivity::class.java)
                     intent.putExtras(PlayerActivity.createBundle(playerData, true))
                     startActivityForResult(intent, SearchVideoFragment.REQUEST_LOGIN)
@@ -699,10 +692,7 @@ class SearchPostFragment : BaseFragment() {
                 .inflate(R.layout.chip_item, chip_group_search_text, false) as Chip
             chip.text = text
             chip.ellipsize = TextUtils.TruncateAt.END
-            chip.setTextColor(requireContext().getColor(R.color.color_white_1_50))
-            chip.chipBackgroundColor = ColorStateList.valueOf(
-                ContextCompat.getColor(requireContext(), R.color.color_black_6)
-            )
+            chip.setTextColor(requireContext().getColor(R.color.color_black_1_50))
             chip.setOnClickListener {
                 edit_search.setText(text)
                 layout_search_history.visibility = View.GONE

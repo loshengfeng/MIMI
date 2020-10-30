@@ -68,7 +68,7 @@ class TextDetailFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        useAdultTheme(true)
+        useAdultTheme(false)
 
         memberPostItem =
             arguments?.getSerializable(PictureDetailFragment.KEY_DATA) as MemberPostItem
@@ -81,7 +81,7 @@ class TextDetailFragment : BaseFragment() {
 
         text_toolbar_title.text = getString(R.string.text_detail_title)
         toolbarContainer.toolbar.navigationIcon =
-            requireContext().getDrawable(R.drawable.btn_back_white_n)
+            requireContext().getDrawable(R.drawable.btn_back_black_n)
         toolbarContainer.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
@@ -100,7 +100,7 @@ class TextDetailFragment : BaseFragment() {
         if (memberPostItem!!.likeType == LikeType.LIKE) {
             iv_like.setImageResource(R.drawable.ico_nice_s)
         } else {
-            iv_like.setImageResource(R.drawable.ico_nice)
+            iv_like.setImageResource(R.drawable.ico_nice_gray)
         }
 
         tv_like_count.text = memberPostItem!!.likeCount.toString()
@@ -129,7 +129,7 @@ class TextDetailFragment : BaseFragment() {
                     if (item.likeType == LikeType.LIKE) {
                         iv_like.setImageResource(R.drawable.ico_nice_s)
                     } else {
-                        iv_like.setImageResource(R.drawable.ico_nice)
+                        iv_like.setImageResource(R.drawable.ico_nice_gray)
                     }
                     tv_like_count.text = item.likeCount.toString()
 
@@ -345,7 +345,7 @@ class TextDetailFragment : BaseFragment() {
             val bundle = MyPostFragment.createBundle(
                 userId, name,
                 isAdult = true,
-                isAdultTheme = true
+                isAdultTheme = false
             )
             navigateTo(NavigateItem.Destination(R.id.action_to_myPostFragment, bundle))
         }

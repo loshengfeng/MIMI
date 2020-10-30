@@ -1,13 +1,22 @@
 package com.dabenxiang.mimi.view.login
 
+import android.content.ClipboardManager
+import android.content.Context
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.text.InputFilter
+import android.text.InputFilter.LengthFilter
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
+import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import com.blankj.utilcode.util.ToastUtils
+import com.dabenxiang.mimi.MIMI_INVITE_CODE
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.ExceptionResult
@@ -17,14 +26,19 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
+import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.item_login.*
 import kotlinx.android.synthetic.main.item_register.*
+import timber.log.Timber
+
 
 class LoginFragment : BaseFragment() {
 
     private val viewModel: LoginViewModel by viewModels()
+    private var interactionListener: InteractionListener? = null
 
     companion object {
         const val KEY_TYPE = "TYPE"
@@ -45,11 +59,24 @@ class LoginFragment : BaseFragment() {
         initSettings()
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        try {
+            interactionListener = context as InteractionListener
+        } catch (e: ClassCastException) {
+            Timber.e("LoginFragment interaction listener can't cast")
+        }
+
+    }
+
     override fun onResume() {
         super.onResume()
         if (viewModel.isLogin()) {
             navigateTo(NavigateItem.Up)
         }
+
+        setCopyText()
     }
 
     override fun getLayoutId(): Int {
@@ -57,42 +84,36 @@ class LoginFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.friendlyNameError.observe(viewLifecycleOwner, Observer {
+        viewModel.accountError.observe(viewLifecycleOwner, Observer {
             if (it == "") {
-                edit_friendly_name.setBackgroundResource(R.drawable.edit_text_rectangle)
-                tv_friendly_name_error.visibility = View.INVISIBLE
+                edit_account.setBackgroundResource(R.drawable.edit_text_rectangle)
+                tv_account_error.visibility = View.INVISIBLE
             } else {
-                edit_friendly_name.setBackgroundResource(R.drawable.edit_text_error_rectangle)
-                tv_friendly_name_error.text = it
-                tv_friendly_name_error.visibility = View.VISIBLE
+                edit_account.setBackgroundResource(R.drawable.edit_text_error_rectangle)
+                tv_account_error.text = it
+                tv_account_error.visibility = View.VISIBLE
             }
         })
 
-        viewModel.emailError.observe(viewLifecycleOwner, Observer {
-            cb_email.visibility = View.VISIBLE
+        viewModel.mobileError.observe(viewLifecycleOwner, Observer {
             if (it == "") {
-                edit_email.setBackgroundResource(R.drawable.edit_text_rectangle)
-                tv_email_error.visibility = View.INVISIBLE
-                cb_email.isChecked = true
+                layout_mobile.setBackgroundResource(R.drawable.layout_rectangle)
+                tv_mobile_error.visibility = View.INVISIBLE
             } else {
-                edit_email.setBackgroundResource(R.drawable.edit_text_error_rectangle)
-                tv_email_error.text = it
-                tv_email_error.visibility = View.VISIBLE
-                cb_email.isChecked = false
+                layout_mobile.setBackgroundResource(R.drawable.layout_rectangle_error)
+                tv_mobile_error.text = it
+                tv_mobile_error.visibility = View.VISIBLE
             }
         })
 
-        viewModel.registerAccountError.observe(viewLifecycleOwner, Observer {
-            cb_register_account.visibility = View.VISIBLE
+        viewModel.validateCodeError.observe(viewLifecycleOwner, Observer {
             if (it == "") {
-                edit_register_account.setBackgroundResource(R.drawable.edit_text_rectangle)
-                tv_register_account_error.visibility = View.INVISIBLE
-                cb_register_account.isChecked = true
+                layout_verification_code.setBackgroundResource(R.drawable.layout_rectangle)
+                tv_validate_code_error.visibility = View.INVISIBLE
             } else {
-                edit_register_account.setBackgroundResource(R.drawable.edit_text_error_rectangle)
-                tv_register_account_error.text = it
-                tv_register_account_error.visibility = View.VISIBLE
-                cb_register_account.isChecked = false
+                layout_verification_code.setBackgroundResource(R.drawable.layout_rectangle_error)
+                tv_validate_code_error.text = it
+                tv_validate_code_error.visibility = View.VISIBLE
             }
         })
 
@@ -120,10 +141,10 @@ class LoginFragment : BaseFragment() {
 
         viewModel.loginAccountError.observe(viewLifecycleOwner, Observer {
             if (it == "") {
-                edit_login_account.setBackgroundResource(R.drawable.edit_text_rectangle)
+                layout_login.setBackgroundResource(R.drawable.layout_rectangle)
                 tv_login_account_error.visibility = View.INVISIBLE
             } else {
-                edit_login_account.setBackgroundResource(R.drawable.edit_text_error_rectangle)
+                layout_login.setBackgroundResource(R.drawable.layout_rectangle_error)
                 tv_login_account_error.text = it
                 tv_login_account_error.visibility = View.VISIBLE
             }
@@ -143,22 +164,11 @@ class LoginFragment : BaseFragment() {
         viewModel.registerResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Empty -> {
-                    GeneralDialog.newInstance(
-                        GeneralDialogData(
-                            titleRes = R.string.receive_mail,
-                            message = getString(R.string.desc_register),
-                            messageIcon = R.drawable.ico_default_photo,
-                            secondBtn = getString(R.string.btn_confirm),
-                            secondBlock = {
-                                viewModel.registerAccount.value?.let { it1 ->
-                                    viewModel.registerPw.value?.let { it2 ->
-                                        viewModel.doLogin(it1, it2)
-                                    }
-                                }
-                            }
-                        )
-                    ).setCancel(false)
-                        .show(requireActivity().supportFragmentManager)
+                    viewModel.mobile.value?.let { it1 ->
+                        viewModel.registerPw.value?.let { it2 ->
+                            viewModel.doLogin((tv_login_call_prefix.text.toString() + it1), it2)
+                        }
+                    }
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -171,21 +181,53 @@ class LoginFragment : BaseFragment() {
                 is Empty -> {
                     progressHUD?.dismiss()
                     mainViewModel?.startMQTT()
-                    GeneralDialog.newInstance(
-                        GeneralDialogData(
-                            titleIcon = R.drawable.img_login_success,
-                            titleRes = R.string.desc_success,
-                            message = viewModel.accountManager.getProfile().friendlyName,
-                            messageIcon = R.drawable.ico_default_photo,
-                            secondBtn = getString(R.string.btn_confirm),
-                            secondBlock = { navigateTo(NavigateItem.Up) },
-                            attachmentId = viewModel.accountManager.getProfile().avatarAttachmentId
-                        )
-                    ).setCancel(false).show(requireActivity().supportFragmentManager)
+                    navigateTo(NavigateItem.Up)
                 }
                 is Error -> onApiError(it.throwable)
             }
         })
+
+        viewModel.mobile.observe(viewLifecycleOwner, Observer {
+            if (it == null || viewModel.isValidateMobile(it, tv_call_prefix.text.toString()).isNotBlank()) {
+                tv_get_code.isEnabled = false
+                tv_get_code.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_black_1_30))
+            } else {
+                tv_get_code.isEnabled = true
+                tv_get_code.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_black_1))
+            }
+        })
+
+        viewModel.validateMessageResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Loading -> progressHUD?.show()
+                is Loaded -> progressHUD?.dismiss()
+                is Empty -> {
+                    countDownTimer.start()
+                    GeneralDialog.newInstance(
+                        GeneralDialogData(
+                            titleRes = R.string.login_yet,
+                            message = getString(R.string.send_msg),
+                            messageIcon = R.drawable.ico_default_photo,
+                            secondBtn = getString(R.string.btn_confirm),
+                            isMessageIcon = false
+                        )
+                    ).show(requireActivity().supportFragmentManager)
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+    }
+
+    private val countDownTimer =  object : CountDownTimer( 60000, 1000) {
+        override fun onFinish() {
+            tv_get_code?.isEnabled = true
+            tv_get_code?.text = getString(R.string.login_get_code)
+        }
+
+        override fun onTick(p0: Long) {
+            tv_get_code?.isEnabled = false
+            tv_get_code?.text = String.format(getString(R.string.send_code_count_down), p0 / 1000)
+        }
     }
 
     override fun setupListeners() {
@@ -211,12 +253,20 @@ class LoginFragment : BaseFragment() {
 
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
-                R.id.btnClose, R.id.btn_register_cancel, R.id.btn_login_cancel -> navigateTo(
+                R.id.btnClose -> navigateTo(
                     NavigateItem.Up
                 )
-                R.id.btn_register -> viewModel.doRegisterValidateAndSubmit()
+
+                R.id.btn_register_cancel, R.id.btn_login_cancel -> {
+                    interactionListener?.changeNavigationPosition(R.id.navigation_adult)
+                    navigateTo(NavigateItem.Up)
+                }
+
+                R.id.btn_register -> {
+                    viewModel.doRegisterValidateAndSubmit(tv_call_prefix.text.toString())
+                }
                 R.id.btn_forget -> navigateTo(NavigateItem.Destination(R.id.action_loginFragment_to_forgetPasswordFragment))
-                R.id.btn_login -> viewModel.doLoginValidateAndSubmit()
+                R.id.btn_login -> viewModel.doLoginValidateAndSubmit(tv_login_call_prefix.text.toString())
             }
         }.also {
             btnClose.setOnClickListener(it)
@@ -254,13 +304,56 @@ class LoginFragment : BaseFragment() {
         cb_keep_account.setOnCheckedChangeListener { _, isChecked ->
             viewModel.accountManager.keepAccount = isChecked
         }
+
+        tv_get_code.setOnClickListener {
+            viewModel.callValidateMessage(tv_call_prefix.text.toString())
+        }
+
+        tv_call_prefix.setOnClickListener {
+            viewModel.changePrefixCount++
+            if (viewModel.changePrefixCount == 10) {
+                viewModel.changePrefixCount = 0
+
+                if (tv_call_prefix.text == getString(R.string.login_mobile_call_prefix_taiwan)) {
+                    tv_call_prefix.text = getString(R.string.login_mobile_call_prefix_china)
+                    GeneralUtils.showToast(requireContext(), "Change to +86")
+                    edit_mobile.filters = arrayOf<InputFilter>(LengthFilter(11))
+                } else {
+                    tv_call_prefix.text = getString(R.string.login_mobile_call_prefix_taiwan)
+                    GeneralUtils.showToast(requireContext(), "Change to +886")
+                    edit_mobile.filters = arrayOf<InputFilter>(LengthFilter(9))
+                }
+            }
+
+            if (viewModel.timer == null) viewModel.startTimer()
+        }
+
+        tv_login_call_prefix.setOnClickListener {
+            viewModel.changePrefixCount++
+            if (viewModel.changePrefixCount == 10) {
+                viewModel.changePrefixCount = 0
+
+                if (tv_login_call_prefix.text == getString(R.string.login_mobile_call_prefix_taiwan)) {
+                    tv_login_call_prefix.text = getString(R.string.login_mobile_call_prefix_china)
+                    GeneralUtils.showToast(requireContext(), "Change to +86")
+                    edit_login_account.filters = arrayOf<InputFilter>(LengthFilter(11))
+                } else {
+                    tv_login_call_prefix.text = getString(R.string.login_mobile_call_prefix_taiwan)
+                    GeneralUtils.showToast(requireContext(), "Change to +886")
+                    edit_login_account.filters = arrayOf<InputFilter>(LengthFilter(9))
+                }
+            }
+
+            if (viewModel.timer == null) viewModel.startTimer()
+        }
     }
 
     override fun initSettings() {
         useAdultTheme(false)
-        viewModel.registerAccount.bindingEditText = edit_register_account
-        viewModel.email.bindingEditText = edit_email
-        viewModel.friendlyName.bindingEditText = edit_friendly_name
+        viewModel.mobile.bindingEditText = edit_mobile
+        viewModel.verificationCode.bindingEditText = edit_verification_code
+        viewModel.inviteCode.bindingEditText = edit_invite_code
+        viewModel.account.bindingEditText = edit_account
         viewModel.registerPw.bindingEditText = edit_register_pw
         viewModel.confirmPw.bindingEditText = edit_register_confirm_pw
         viewModel.loginAccount.bindingEditText = edit_login_account
@@ -276,25 +369,24 @@ class LoginFragment : BaseFragment() {
         viewModel.loginAccount.value = when (keepAccount) {
             true -> {
                 val profile = viewModel.accountManager.getProfile()
-                profile.account
+                if (profile.account.isBlank()) {
+                    ""
+                } else if (tv_login_call_prefix.text == "+86") {
+                    profile.account.substring(3, profile.account.length)
+                } else {
+                    profile.account.substring(4, profile.account.length)
+                }
             }
             false -> ""
         }
 
-        cb_register_account.isEnabled = false
-        cb_email.isEnabled = false
+        tv_get_code.isEnabled = false
     }
 
     override fun navigateTo(item: NavigateItem) {
         findNavController().also { navController ->
             when (item) {
-                NavigateItem.Up -> {
-                    when (navController.navigateUp()) {
-                        false -> when (val activity = requireActivity()) {
-                            is LoginActivity -> activity.finish()
-                        }
-                    }
-                }
+                NavigateItem.Up -> navController.navigateUp()
                 is NavigateItem.PopBackStack -> navController.popBackStack(
                     item.fragmentId,
                     item.inclusive
@@ -313,8 +405,7 @@ class LoginFragment : BaseFragment() {
     override fun handleHttpError(errorHandler: ExceptionResult.HttpError) {
         when (errorHandler.httpExceptionItem.errorItem.code) {
             LOGIN_400000 -> {
-                cb_email.isChecked = false
-                showErrorMessageDialog(getString(R.string.error_email_duplicate))
+                showErrorMessageDialog(getString(R.string.error_validation))
             }
             LOGIN_403001 -> showErrorMessageDialog(getString(R.string.error_username_or_password_incorrect))
             LOGIN_403002 -> showErrorMessageDialog(getString(R.string.error_account_disable))
@@ -331,9 +422,18 @@ class LoginFragment : BaseFragment() {
                 ).setCancel(false)
                     .show(requireActivity().supportFragmentManager)
             }
+            LOGIN_406000 -> {
+                viewModel.inviteCodeError(R.string.error_validation_code)
+            }
+            NOT_FOUND -> {
+                showErrorMessageDialog(getString(R.string.error_validation))
+//                viewModel.inviteCodeError()
+            }
             LOGIN_409000 -> {
-                cb_register_account.isChecked = false
-                showErrorMessageDialog(getString(R.string.error_account_duplicate))
+                countDownTimer.cancel()
+                countDownTimer.onFinish()
+                viewModel.onAccountExitError()
+                edit_verification_code.setText("")
             }
         }
     }
@@ -347,5 +447,19 @@ class LoginFragment : BaseFragment() {
                 secondBtn = getString(R.string.btn_confirm)
             )
         ).show(requireActivity().supportFragmentManager)
+    }
+
+    private fun setCopyText() {
+        val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipData = clipboard.primaryClip
+        val clipDataItem = clipData?.getItemAt(0)
+        val copyText = clipDataItem?.text.toString() ?: ""
+
+        if (copyText.contains(MIMI_INVITE_CODE)) {
+            val startIndex = copyText.lastIndexOf(MIMI_INVITE_CODE) + MIMI_INVITE_CODE.length
+
+            val inviteCode = copyText.substring(startIndex, copyText.length)
+            viewModel.inviteCode.value = inviteCode
+        }
     }
 }

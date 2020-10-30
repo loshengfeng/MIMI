@@ -27,6 +27,7 @@ import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager
 import com.dabenxiang.mimi.model.pref.Pref
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getExceptionDetail
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -147,7 +148,10 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
             val url = "${domainManager.getApiDomain()}/v1/Attachments/$id"
             val glideUrl = GlideUrl(
                 url,
-                LazyHeaders.Builder().addHeader(ApiRepository.AUTHORIZATION, auth).build()
+                LazyHeaders.Builder()
+                    .addHeader(ApiRepository.AUTHORIZATION, auth)
+                    .addHeader(ApiRepository.X_DEVICE_ID, GeneralUtils.getAndroidID())
+                    .build()
             )
             val options = RequestOptions()
                 .priority(Priority.NORMAL)

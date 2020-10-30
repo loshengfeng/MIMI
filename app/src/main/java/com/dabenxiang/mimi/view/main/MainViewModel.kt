@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.MQTT_HOST_URL
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.enums.NotifyType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager
 import com.dabenxiang.mimi.model.manager.mqtt.callback.ConnectCallback
@@ -17,6 +18,7 @@ import com.dabenxiang.mimi.model.manager.mqtt.callback.MessageListener
 import com.dabenxiang.mimi.model.manager.mqtt.callback.SubscribeCallback
 import com.dabenxiang.mimi.model.vo.CheckStatusItem
 import com.dabenxiang.mimi.model.vo.StatusItem
+import com.dabenxiang.mimi.model.vo.mqtt.DailyCheckInItem
 import com.dabenxiang.mimi.model.vo.mqtt.OrderItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.home.HomeViewModel
@@ -30,6 +32,7 @@ import kotlinx.coroutines.launch
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
 import org.eclipse.paho.client.mqttv3.IMqttToken
 import org.eclipse.paho.client.mqttv3.MqttMessage
+import org.json.JSONObject
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.File
@@ -66,6 +69,9 @@ class MainViewModel : BaseViewModel() {
 
     private val _orderItem = MutableLiveData<OrderItem>()
     val orderItem: LiveData<OrderItem> = _orderItem
+
+    private val _dailyCheckInItem = MutableLiveData<DailyCheckInItem>()
+    val dailyCheckInItem: LiveData<DailyCheckInItem> = _dailyCheckInItem
 
     private val _uploadPicItem = MutableLiveData<PicParameter>()
     val uploadPicItem: LiveData<PicParameter> = _uploadPicItem
@@ -264,8 +270,11 @@ class MainViewModel : BaseViewModel() {
     }
 
     fun startMQTT() {
-        mqttManager.init(MQTT_HOST_URL, clientId, extendedCallback)
-        mqttManager.connect(connectCallback)
+        if(!isMqttConnect) {
+            //test serverUrl use: tcp://172.x.x.x:1883
+            mqttManager.init(MQTT_HOST_URL, clientId, extendedCallback)
+            mqttManager.connect(connectCallback)
+        }
     }
 
     fun subscribeToTopic(topic: String) {
@@ -330,9 +339,24 @@ class MainViewModel : BaseViewModel() {
 
     private val messageListener = object : MessageListener {
         override fun onMsgReceive(message: MqttMessage) {
-            val data = gson.fromJson(String(message.payload), OrderItem::class.java)
-            Timber.d("Payload: ${String(message.payload)}")
-            _orderItem.postValue(data)
+            Timber.d("onMsgReceive: ${String(message.payload)}")
+            val data = JSONObject(String(message.payload))
+            val payload = data.optJSONObject("payload")
+            when (payload.optInt("type", 0)) {
+                NotifyType.DAILY_CHECK_IN.value -> {
+                    val data = gson.fromJson(String(message.payload), DailyCheckInItem::class.java)
+                    val profileItem = accountManager.getProfile()
+                    data.dailyCheckInPayLoadItem?.videoCount?.let { profileItem.videoCount = it }
+                    data.dailyCheckInPayLoadItem?.videoOnDemandCount?.let { profileItem.videoOnDemandCount = it }
+                    accountManager.setupProfile(profileItem)
+                    _dailyCheckInItem.postValue(data)
+                }
+                NotifyType.CREATE_ORDER.value,
+                NotifyType.TX_SUCCESS.value -> {
+                    val data = gson.fromJson(String(message.payload), OrderItem::class.java)
+                    _orderItem.postValue(data)
+                }
+            }
         }
     }
 
@@ -367,7 +391,7 @@ class MainViewModel : BaseViewModel() {
     fun postAttachment(pic: String, context: Context, type: String) {
         viewModelScope.launch(context = job) {
             flow {
-                val realPath =  when (type) {
+                val realPath = when (type) {
                     HomeViewModel.TYPE_VIDEO -> pic
                     HomeViewModel.TYPE_PIC -> pic
                     else -> UriUtils.getPath(context, Uri.parse(pic))

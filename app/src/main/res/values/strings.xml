@@ -39,9 +39,15 @@
     <string name="password_format_error_2">请填写8~20字的英文、数字或特殊符号，区分大小写</string>
     <string name="password_format_error_3">请填写确认密码</string>
     <string name="password_format_error_4">与密码不相符合，请确认</string>
+    <string name="mobile_format_error_1">请填写手机号</string>
+    <string name="mobile_format_error_2">请填写正确的手机号</string>
+    <string name="account_error_1">請填写名稱</string>
+    <string name="invalidate_code_error_1">请填写验证码</string>
     <string name="receive_mail">请收验证信</string>
+    <string name="send_msg">已发送简讯验证码到注册手机号上，请查收</string>
     <string name="desc_register">请至信箱查看验证信以完成账号注册</string>
     <string name="desc_email">已传送新密码至您的邮箱\n%s\n请至邮箱确认</string>
+    <string name="desc_mobile">已传送新密码至您的手机号\n%s\n请确认</string>
     <string name="desc_email_account_not_match">Email与账号不符，请确认</string>
     <string name="desc_success">登录成功</string>
     <string name="forget_password">忘记密码</string>
@@ -52,8 +58,10 @@
     <string name="error_username_or_password_incorrect">使用者名称或密码错误</string>
     <string name="error_account_disable">此帐户已停用</string>
     <string name="error_validation">驗證錯誤</string>
+    <string name="error_validation_code">驗證碼錯誤，請確認</string>
     <string name="error_email_duplicate">此Email已存在，請重新填寫</string>
-    <string name="error_account_duplicate">此賬號已存在，請重新填寫</string>
+    <string name="error_account_duplicate">此账号已存在，请重新填写</string>
+    <string name="error_mobile_duplicate">此手机已存在，请重新填写</string>
     <string name="error_first_login">第一次登入需重设密码</string>
     <string name="reset_pw_success">重设密码成功</string>
     <string name="verify_immediately">立即验证</string>
@@ -62,7 +70,7 @@
     <string name="error_email_not_confirmed_msg">Email 尚未验证，请先完成验证后登录</string>
 
     <!-- Top Up -->
-    <string name="topup_desc">蜜币购买</string>
+    <string name="topup_desc">购买 VIP</string>
     <string name="topup_total">总计</string>
     <string name="topup_next">下一步</string>
     <string name="topup_subtitle">会员尊享 每天无限观看</string>
@@ -73,6 +81,14 @@
     <string name="topup_pending_order_1">尚有</string>
     <string name="topup_pending_order_2">笔充值作业未完成，请稍后再试</string>
     <string name="topup_goto_top_up_manage">前往充值管理</string>
+
+    <!-- Home -->
+    <string name="home_tab_video">蜜蜜影视</string>
+    <string name="home_tab_follow">关注</string>
+    <string name="home_tab_clip">短视频</string>
+    <string name="home_tab_picture">图片</string>
+    <string name="home_tab_text">短文</string>
+    <string name="home_tab_club">圈子</string>
 
     <!-- Favorite -->
     <string name="favorite_title">我的收藏</string>
@@ -88,6 +104,7 @@
     <string name="favorite_delete_this_favorite">是否要清除此收藏</string>
 
     <!-- Personal -->
+    <string name="phone_num">手机号</string>
     <string name="personal_title">我的</string>
     <string name="personal_not_login_tips_1">还没登录吗?</string>
     <string name="personal_not_login_tips_2">赶紧登录观看更多内容</string>
@@ -142,7 +159,7 @@
     <string name="topup_proxy_chat">对话记录</string>
     <string name="topup_pay">支付金额(¥)</string>
     <string name="topup_order_id">充值订单编号</string>
-    <string name="topup_point">蜜币</string>
+    <string name="topup_point">方案</string>
     <string name="topup_create_time">訂單建立時間</string>
     <string name="topup_completion_time">充值完成時間</string>
     <string name="topup_check_info">查看打款资讯</string>
@@ -154,6 +171,8 @@
     <string name="topup_completed">交易成功</string>
     <string name="topup_canceled">Canceled</string>
     <string name="topup_failed">交易失败</string>
+<!--    <string name="topup_teaching"><a href="https://www.google.com/?hl=zh_tw">充值教学 ></a></string>-->
+    <string name="topup_teaching">充值教学 ></string>
     <string name="title_chat_history">对话记录</string>
     <string name="edit_hint_chat">留下评论</string>
     <string name="issue_report">问题回报</string>
@@ -170,14 +189,22 @@
     <string name="btn_login">登录</string>
     <string name="login_name">请填写名称</string>
     <string name="login_email">请填写Email</string>
+    <string name="login_mobile">请填写手机号</string>
     <string name="login_account">请填写帐号</string>
     <string name="login_pw">请填写密码</string>
-    <string name="login_confirm_pw">请填写确认密码</string>
+    <string name="login_verification_code">请填写验证码</string>
+    <string name="login_invite_code">请填写邀请码</string>
+    <string name="login_confirm_pw">请再次填写密码</string>
     <string name="login_desc">点选「注册」即表示您同意接受<font fgcolor="#ff4d4d">服务条款</font>及<font fgcolor="#ff4d4d">隐私权保护政策</font></string>
-    <string name="login_keep_account">记住帐号</string>
+    <string name="login_keep_account">记住我</string>
     <string name="login_forget">忘记密码?</string>
+    <string name="login_get_code">获取验证码</string>
     <string name="username_or_password_incorrect">使用者名称或密码错误</string>
-
+    <string name="send_code_count_down">%1$ds</string>
+    <string name="login_mobile_call_prefix_china">+86</string>
+    <string name="login_mobile_call_prefix_taiwan">+886</string>
+    <string name="vip_expiry_date">VIP 於 %s 到期</string>
+    
     <!-- Home -->
     <string name="follow_title">我的关注</string>
     <string name="follow_people">关注的人</string>
@@ -375,7 +402,7 @@
     <string name="order_detail_title">订单资讯</string>
     <string name="order_detail_product_name">商品名称</string>
     <string name="order_detail_total">小計</string>
-    <string name="order_detail_point">蜜币</string>
+    <string name="order_detail_content">VIP %s(%s)</string>
     <string name="order_detail_payment_bank">银行卡付款</string>
     <string name="order_detail_payment_ali">支付宝付款</string>
     <string name="order_detail_payment_wx">微信付款</string>
@@ -399,5 +426,28 @@
     <string name="filter_empty">无搜寻结果</string>
     <string name="copy_url">已将连结保存到剪贴簿</string>
     <string name="topup_default_time">-</string>
+
+    <!-- Invite Vip -->
+    <string name="invite_vip_reward_text">每成功推广 1 人, 增加 2 天 VIP, 无限叠加</string>
+    <string name="invite_vip_plus_text">+</string>
+    <string name="invite_vip_invite_code_text">邀请码</string>
+    <string name="invite_vip_invite_copy_btn">复制</string>
+    <string name="invite_vip_people_text">已推广人数</string>
+    <string name="invite_vip_days_text">累计 VIP 天数</string>
+    <string name="invite_vip_invite_copy_hint">已复制邀请码</string>
+    <string name="invite_vip_record_title">推广记录</string>
+    <string name="invite_vip_record_text_name">用户名称</string>
+    <string name="invite_vip_record_text_phone">手机号</string>
+    <string name="invite_vip_record_empty_record">目前尚无推广记录</string>
+
+    <!-- Order Result -->
+    <string name="recharge_reminder_message"><font fgcolor="#ffffff">免费观看次数已用完\n成功推广 1 人赠送</font> <font fgcolor='#FF4D4D'>2</font><font fgcolor="#ffffff">天 VIP\n可无限叠加，免费观看所有视频</font></string>
+    <string name="recharge_reminder_btn_vip">充值 VIP</string>
+    <string name="recharge_reminder_btn_promote">推广好友</string>
+
+    <!-- Check In -->
+    <string name="daily_check_in_success">签到成功</string>
+    <string name="daily_check_in">每日签到</string>
+    <string name="daily_check_in_hint">赠送秘密视频 %1$d 部、短视频 %2$d 部</string>
 
 </resources>

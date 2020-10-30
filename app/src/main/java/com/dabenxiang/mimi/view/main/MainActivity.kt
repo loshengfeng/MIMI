@@ -15,6 +15,8 @@ import androidx.navigation.NavDeepLinkBuilder
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.*
+import com.dabenxiang.mimi.callback.NetworkCallback
+import com.dabenxiang.mimi.callback.NetworkCallbackListener
 import com.dabenxiang.mimi.extension.setupWithNavController
 import com.dabenxiang.mimi.extension.switchTab
 import com.dabenxiang.mimi.model.api.ApiResult.*
@@ -27,8 +29,9 @@ import com.dabenxiang.mimi.view.base.BaseActivity
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
+import com.dabenxiang.mimi.view.dialog.dailycheckin.DailyCheckInDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
-import com.dabenxiang.mimi.view.home.HomeFragment
+import com.dabenxiang.mimi.view.home.AdultHomeFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
@@ -48,6 +51,15 @@ class MainActivity : BaseActivity(), InteractionListener {
     private val viewModel: MainViewModel by viewModels()
 
     private val badgeViewMap = mutableMapOf<BottomNavType, View>()
+
+    private val networkCallbackListener = object : NetworkCallbackListener {
+        override fun onLost() {
+            Timber.d("network disconnect")
+            showCheckNetworkDialog()
+        }
+    }
+
+    private val networkCallback = NetworkCallback(networkCallbackListener)
 
     override fun getLayoutId(): Int {
         return R.layout.activity_main
@@ -88,7 +100,24 @@ class MainActivity : BaseActivity(), InteractionListener {
             }
         })
 
+        viewModel.dailyCheckInItem.observe(this, Observer {
+            DailyCheckInDialogFragment.newInstance().show(
+                supportFragmentManager,
+                DailyCheckInDialogFragment::class.simpleName
+            )
+        })
+
         viewModel.getTotalUnread()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        registerNetworkCallback(App.applicationContext(), networkCallback)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterNetworkCallback(App.applicationContext(), networkCallback)
     }
 
     private fun addBadgeView(bottomNavType: BottomNavType) {
@@ -108,7 +137,6 @@ class MainActivity : BaseActivity(), InteractionListener {
         bottom_navigation.itemIconTintList = null
 
         val navGraphIds = listOf(
-            R.navigation.navigation_home,
             R.navigation.navigation_adult,
             R.navigation.navigation_topup,
             R.navigation.navigation_favorite,
@@ -142,20 +170,21 @@ class MainActivity : BaseActivity(), InteractionListener {
     }
 
     private fun setUiMode(isAdult: Boolean) {
-        if (isAdult) {
-            window?.statusBarColor = getColor(R.color.adult_color_status_bar)
-            bottom_navigation.setBackgroundColor(getColor(R.color.adult_color_status_bar))
-            bottom_navigation.itemTextColor =
-                resources.getColorStateList(R.color.bottom_nav_adult_text_selector, null)
-        } else {
+//        if (isAdult) {
+//            window?.statusBarColor = getColor(R.color.adult_color_status_bar)
+//            bottom_navigation.setBackgroundColor(getColor(R.color.adult_color_status_bar))
+//            bottom_navigation.itemTextColor =
+//                resources.getColorStateList(R.color.bottom_nav_adult_text_selector, null)
+//        } else {
             window?.statusBarColor = getColor(R.color.normal_color_status_bar)
-            bottom_navigation.setBackgroundColor(getColor(R.color.normal_color_status_bar))
+            bottom_navigation.background = getDrawable(R.drawable.bg_gray_2_top_line)
             bottom_navigation.itemTextColor =
                 resources.getColorStateList(R.color.bottom_nav_normal_text_selector, null)
-        }
+//        }
     }
 
     override fun changeNavigationPosition(index: Int) {
+        Timber.i("changeNavigationPosition")
         bottom_navigation.selectedItemId = index
     }
 
@@ -178,7 +207,7 @@ class MainActivity : BaseActivity(), InteractionListener {
             ).toString()
         // 判斷當前的頁面是停留在 homeFragment，顯示退出 app 訊息
         if (fragmentName.toLowerCase(Locale.getDefault()) ==
-            HomeFragment::class.java.simpleName.toLowerCase(Locale.getDefault())
+            AdultHomeFragment::class.java.simpleName.toLowerCase(Locale.getDefault())
         ) {
             if (!viewModel.needCloseApp) {
                 viewModel.startBackExitAppTimer()
@@ -197,8 +226,8 @@ class MainActivity : BaseActivity(), InteractionListener {
                 viewModel.isFromPlayer = false
                 deepLinkTo(
                     MainActivity::class.java,
-                    R.navigation.navigation_home,
-                    R.id.homeFragment,
+                    R.navigation.navigation_adult,
+                    R.id.adultHomeFragment,
                     null
                 )
             } else
@@ -258,7 +287,7 @@ class MainActivity : BaseActivity(), InteractionListener {
             if (dest != 0)
                 Navigation.findNavController(this, R.id.nav_host_fragment).navigate(dest, extras)
         } else if(NAVIGATE_TO_TOPUP_ACTION == intent?.action){
-            bottom_navigation switchTab 2
+            bottom_navigation switchTab 1
         }
     }
 
@@ -355,6 +384,17 @@ class MainActivity : BaseActivity(), InteractionListener {
                 closeBlock = {
                     Timber.d("close!")
                 }
+            )
+        ).show(supportFragmentManager)
+    }
+
+    fun showCheckNetworkDialog() {
+        GeneralDialog.newInstance(
+            GeneralDialogData(
+                titleRes = R.string.error_device_binding_title,
+                message = getString(R.string.server_error),
+                messageIcon = R.drawable.ico_default_photo,
+                secondBtn = getString(R.string.btn_close)
             )
         ).show(supportFragmentManager)
     }

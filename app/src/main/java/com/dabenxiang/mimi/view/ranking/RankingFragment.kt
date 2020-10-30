@@ -49,7 +49,7 @@ class RankingFragment : BaseFragment() {
             RankingFuncItem(
                 onVideoItemClick = {
                     val playerData =
-                        PlayerItem(it.id!!, true)
+                        PlayerItem(it.id ?: 0)
                     val intent = Intent(requireContext(), PlayerActivity::class.java)
                     intent.putExtras(PlayerActivity.createBundle(playerData))
                     startActivityForResult(intent, REQUEST_LOGIN)
@@ -111,7 +111,7 @@ class RankingFragment : BaseFragment() {
 
         text_toolbar_title.text = getString(R.string.text_ranking)
         toolbarContainer.toolbar.navigationIcon =
-            requireContext().getDrawable(R.drawable.btn_back_white_n)
+            requireContext().getDrawable(R.drawable.btn_back_black_n)
         toolbarContainer.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }

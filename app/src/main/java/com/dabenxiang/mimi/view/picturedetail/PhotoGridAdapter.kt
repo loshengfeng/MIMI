@@ -35,14 +35,18 @@ class PhotoGridAdapter(
         val imageItem = images[position]
 
         if (images.size > 3) {
+            val itemSize = (context.resources.displayMetrics.widthPixels - GeneralUtils.dpToPx(
+                context,
+                56
+            )) / 3
             val imgParams = holder.picture.layoutParams
-            imgParams.width = GeneralUtils.dpToPx(context, 102)
-            imgParams.height = GeneralUtils.dpToPx(context, 102)
+            imgParams.width = itemSize
+            imgParams.height = itemSize
             holder.picture.layoutParams = imgParams
 
             val cardParams = holder.cardView.layoutParams
-            cardParams.width = GeneralUtils.dpToPx(context, 102)
-            cardParams.height = GeneralUtils.dpToPx(context, 102)
+            cardParams.width = itemSize
+            cardParams.height = itemSize
             holder.cardView.layoutParams = cardParams
         }
         if (!TextUtils.isEmpty(imageItem.url)) {

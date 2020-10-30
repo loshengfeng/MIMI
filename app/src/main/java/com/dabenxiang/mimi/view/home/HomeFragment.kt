@@ -188,12 +188,12 @@ class HomeFragment : BaseFragment() {
         cl_no_data.visibility = View.GONE
 
         rv_home.visibility = View.GONE
-        rv_first.visibility = View.GONE
-        rv_second.visibility = View.GONE
-        rv_third.visibility = View.GONE
-        rv_fourth.visibility = View.GONE
-        rv_fifth.visibility = View.GONE
-        rv_sixth.visibility = View.GONE
+        rv_video.visibility = View.GONE
+        rv_follow.visibility = View.GONE
+        rv_clip.visibility = View.GONE
+        rv_picture.visibility = View.GONE
+        rv_text.visibility = View.GONE
+        rv_club.visibility = View.GONE
 
         btn_filter.visibility = View.VISIBLE
 
@@ -209,38 +209,38 @@ class HomeFragment : BaseFragment() {
                 }
             }
             1 -> {
-                rv_first.visibility = View.VISIBLE
-                takeIf { rv_first.adapter == null }?.also {
+                rv_video.visibility = View.VISIBLE
+                takeIf { rv_video.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_first.layoutManager = GridLayoutManager(requireContext(), 3)
-                    rv_first.adapter = movieListAdapter
+                    rv_video.layoutManager = GridLayoutManager(requireContext(), 3)
+                    rv_video.adapter = movieListAdapter
                     getData(position)
                 }
             }
             2 -> {
-                rv_second.visibility = View.VISIBLE
-                takeIf { rv_second.adapter == null }?.also {
+                rv_follow.visibility = View.VISIBLE
+                takeIf { rv_follow.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_second.layoutManager = GridLayoutManager(requireContext(), 3)
-                    rv_second.adapter = dramaListAdapter
+                    rv_follow.layoutManager = GridLayoutManager(requireContext(), 3)
+                    rv_follow.adapter = dramaListAdapter
                     getData(position)
                 }
             }
             3 -> {
-                rv_third.visibility = View.VISIBLE
-                takeIf { rv_third.adapter == null }?.also {
+                rv_clip.visibility = View.VISIBLE
+                takeIf { rv_clip.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_third.layoutManager = GridLayoutManager(requireContext(), 3)
-                    rv_third.adapter = varietyListAdapter
+                    rv_clip.layoutManager = GridLayoutManager(requireContext(), 3)
+                    rv_clip.adapter = varietyListAdapter
                     getData(position)
                 }
             }
             else -> {
-                rv_fourth.visibility = View.VISIBLE
-                takeIf { rv_fourth.adapter == null }?.also {
+                rv_picture.visibility = View.VISIBLE
+                takeIf { rv_picture.adapter == null }?.also {
                     refresh.isRefreshing = true
-                    rv_fourth.layoutManager = GridLayoutManager(requireContext(), 3)
-                    rv_fourth.adapter = animationListAdapter
+                    rv_picture.layoutManager = GridLayoutManager(requireContext(), 3)
+                    rv_picture.adapter = animationListAdapter
                     getData(position)
                 }
             }
@@ -307,19 +307,19 @@ class HomeFragment : BaseFragment() {
     }
 
     private val movieListAdapter by lazy {
-        HomeVideoListAdapter(adapterListener, false)
+        HomeVideoListAdapter(adapterListener)
     }
 
     private val dramaListAdapter by lazy {
-        HomeVideoListAdapter(adapterListener, false)
+        HomeVideoListAdapter(adapterListener)
     }
 
     private val varietyListAdapter by lazy {
-        HomeVideoListAdapter(adapterListener, false)
+        HomeVideoListAdapter(adapterListener)
     }
 
     private val animationListAdapter by lazy {
-        HomeVideoListAdapter(adapterListener, false)
+        HomeVideoListAdapter(adapterListener)
     }
 
     private val adapterListener = object : HomeAdapter.EventListener {
