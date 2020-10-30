@@ -347,9 +347,6 @@ dependencies {
     // Flurry
     implementation "com.flurry.android:analytics:$flurry_version"
 
-    // AndroidUtilCode
-    implementation "com.blankj:utilcodex:$utilcodex_version"
-
     // Conscrypt
     implementation "org.conscrypt:conscrypt-android:$conscrypt_version"
 
