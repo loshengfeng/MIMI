@@ -1,7 +1,7 @@
 package com.dabenxiang.mimi.view.orderresult
 
 import com.airbnb.epoxy.TypedEpoxyController
-import com.dabenxiang.mimi.model.vo.mqtt.OrderPayloadItem
+import com.dabenxiang.mimi.model.vo.mqtt.OrderPaymentInfoItem
 import com.dabenxiang.mimi.view.orderresult.itemview.*
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import java.text.SimpleDateFormat
@@ -10,9 +10,9 @@ import java.util.*
 class OrderResultEpoxyController(
     private val failedListener: OrderResultFailedItemView.OrderResultFailedListener,
     private val successListener: OrderResultSuccessItemView.OrderResultSuccessListener
-) : TypedEpoxyController<OrderPayloadItem>() {
+) : TypedEpoxyController<OrderPaymentInfoItem>() {
 
-    override fun buildModels(item: OrderPayloadItem?) {
+    override fun buildModels(item: OrderPaymentInfoItem?) {
         if (item == null) {
             addOrderResultWaitingItemView()
         } else {
@@ -37,7 +37,7 @@ class OrderResultEpoxyController(
         }
     }
 
-    private fun addOrderResultSuccessfulItemView(item: OrderPayloadItem) {
+    private fun addOrderResultSuccessfulItemView(item: OrderPaymentInfoItem) {
 
         val calendar = Calendar.getInstance()
         calendar.time = item.createTime ?: Date()

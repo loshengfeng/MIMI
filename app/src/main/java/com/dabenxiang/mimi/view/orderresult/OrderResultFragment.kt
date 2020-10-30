@@ -8,7 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.vo.mqtt.OrderPayloadItem
+import com.dabenxiang.mimi.model.vo.mqtt.OrderPaymentInfoItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.orderresult.itemview.OrderResultFailedItemView
@@ -64,7 +64,7 @@ class OrderResultFragment : BaseFragment() {
 
         if (arguments?.getBoolean(KEY_ERROR) == true) {
             setupStepUi(false)
-            epoxyController.setData(OrderPayloadItem(isSuccessful = false))
+            epoxyController.setData(OrderPaymentInfoItem())
         } else {
             startTimer()
             epoxyController.setData(null)
@@ -77,10 +77,10 @@ class OrderResultFragment : BaseFragment() {
 
     override fun setupObservers() {
         mainViewModel?.orderItem?.observe(viewLifecycleOwner, Observer {
-            val item = it.orderPayloadItem
-            setupStepUi(item?.isSuccessful)
+            val orderPaymentInfoItem = it.orderPayloadItem?.orderPaymentInfoItem
+            setupStepUi(orderPaymentInfoItem?.isSuccessful)
             stopTimer()
-            epoxyController.setData(item)
+            epoxyController.setData(orderPaymentInfoItem)
         })
     }
 
@@ -139,7 +139,7 @@ class OrderResultFragment : BaseFragment() {
 
     private fun startTimer() {
         val task = timerTask {
-            epoxyController.setData(OrderPayloadItem(isSuccessful = false))
+            epoxyController.setData(OrderPaymentInfoItem())
         }
         timer = Timer()
         timer.schedule(task, DELAY_TIME)
