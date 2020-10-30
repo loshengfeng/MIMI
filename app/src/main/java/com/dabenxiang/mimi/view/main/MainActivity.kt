@@ -15,6 +15,8 @@ import androidx.navigation.NavDeepLinkBuilder
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.*
+import com.dabenxiang.mimi.callback.NetworkCallback
+import com.dabenxiang.mimi.callback.NetworkCallbackListener
 import com.dabenxiang.mimi.extension.setupWithNavController
 import com.dabenxiang.mimi.extension.switchTab
 import com.dabenxiang.mimi.model.api.ApiResult.*
@@ -49,6 +51,15 @@ class MainActivity : BaseActivity(), InteractionListener {
     private val viewModel: MainViewModel by viewModels()
 
     private val badgeViewMap = mutableMapOf<BottomNavType, View>()
+
+    private val networkCallbackListener = object : NetworkCallbackListener {
+        override fun onLost() {
+            Timber.d("network disconnect")
+            showCheckNetworkDialog()
+        }
+    }
+
+    private val networkCallback = NetworkCallback(networkCallbackListener)
 
     override fun getLayoutId(): Int {
         return R.layout.activity_main
@@ -97,6 +108,16 @@ class MainActivity : BaseActivity(), InteractionListener {
         })
 
         viewModel.getTotalUnread()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        registerNetworkCallback(App.applicationContext(), networkCallback)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterNetworkCallback(App.applicationContext(), networkCallback)
     }
 
     private fun addBadgeView(bottomNavType: BottomNavType) {
@@ -363,6 +384,17 @@ class MainActivity : BaseActivity(), InteractionListener {
                 closeBlock = {
                     Timber.d("close!")
                 }
+            )
+        ).show(supportFragmentManager)
+    }
+
+    fun showCheckNetworkDialog() {
+        GeneralDialog.newInstance(
+            GeneralDialogData(
+                titleRes = R.string.error_device_binding_title,
+                message = getString(R.string.server_error),
+                messageIcon = R.drawable.ico_default_photo,
+                secondBtn = getString(R.string.btn_close)
             )
         ).show(supportFragmentManager)
     }
