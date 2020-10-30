@@ -1,10 +1,14 @@
 package com.dabenxiang.mimi.view.base
 
+import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Resources
+import android.net.ConnectivityManager
+import android.net.NetworkRequest
 import android.os.Bundle
 import android.util.DisplayMetrics
 import androidx.appcompat.app.AppCompatActivity
+import timber.log.Timber
 
 abstract class BaseActivity : AppCompatActivity() {
 
@@ -44,5 +48,19 @@ abstract class BaseActivity : AppCompatActivity() {
             resources
         }
         super.onConfigurationChanged(newConfig)
+    }
+
+    fun registerNetworkCallback(context: Context, networkCallback: ConnectivityManager.NetworkCallback) {
+        Timber.d("register network callback")
+        val connectivityManager: ConnectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val builder = NetworkRequest.Builder()
+        val request = builder.build()
+        connectivityManager.registerNetworkCallback(request, networkCallback)
+    }
+
+    fun unregisterNetworkCallback(context: Context, networkCallback: ConnectivityManager.NetworkCallback){
+        Timber.d("unregister network callback")
+        val connectivityManager: ConnectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        connectivityManager.unregisterNetworkCallback(networkCallback)
     }
 }

@@ -22,6 +22,8 @@ import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.NAVIGATE_TO_ACTION
 import com.dabenxiang.mimi.NAVIGATE_TO_TOPUP_ACTION
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.NetworkCallback
+import com.dabenxiang.mimi.callback.NetworkCallbackListener
 import com.dabenxiang.mimi.extension.addKeyboardToggleListener
 import com.dabenxiang.mimi.extension.handleException
 import com.dabenxiang.mimi.extension.setBtnSolidColor
@@ -258,6 +260,15 @@ class PlayerActivity : BaseActivity() {
             }
         }
     }
+
+    private val networkCallbackListener = object : NetworkCallbackListener {
+        override fun onLost() {
+            Timber.d("network disconnect")
+            showCrashDialog(HttpErrorMsgType.CHECK_NETWORK)
+        }
+    }
+
+    private val networkCallback = NetworkCallback(networkCallbackListener)
 
     override fun getLayoutId(): Int {
         return R.layout.activity_player
@@ -1048,6 +1059,8 @@ class PlayerActivity : BaseActivity() {
             //if (it.canDetectOrientation())
             it.enable()
         }
+
+        registerNetworkCallback(App.applicationContext(), networkCallback)
     }
 
     override fun onPause() {
@@ -1063,6 +1076,8 @@ class PlayerActivity : BaseActivity() {
             player_view.onPause()
             releasePlayer()
         }
+
+        unregisterNetworkCallback(App.applicationContext(), networkCallback)
     }
 
     override fun onStop() {
