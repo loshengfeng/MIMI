@@ -117,3 +117,8 @@
 -keep class com.bumptech.glide.load.data.ParcelFileDescriptorRewinder$InternalRewinder {
   *** rewind();
 }
+
+-keep class com.google.crypto.tink.** { *; }
+-keepclassmembers class * extends com.google.crypto.tink.shaded.protobuf.GeneratedMessageLite {
+  <fields>;
+}
