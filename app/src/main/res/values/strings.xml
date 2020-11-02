@@ -194,7 +194,7 @@
     <string name="login_pw">请填写密码</string>
     <string name="login_verification_code">请填写验证码</string>
     <string name="login_invite_code">请填写邀请码</string>
-    <string name="login_confirm_pw">请再次填写密码</string>
+    <string name="login_confirm_pw">请填写确认密码</string>
     <string name="login_desc">点选「注册」即表示您同意接受<font fgcolor="#ff4d4d">服务条款</font>及<font fgcolor="#ff4d4d">隐私权保护政策</font></string>
     <string name="login_keep_account">记住我</string>
     <string name="login_forget">忘记密码?</string>
@@ -440,7 +440,7 @@
     <string name="invite_vip_record_title">推广记录</string>
     <string name="invite_vip_record_text_name">用户名称</string>
     <string name="invite_vip_record_text_phone">手机号</string>
-    <string name="invite_vip_record_empty_record">目前尚无推广记录</string>
+    <string name="invite_vip_record_empty_record">亲，推广人可以获得免费VIP，你还在等什麽？</string>
 
     <!-- Order Result -->
     <string name="recharge_reminder_message"><font fgcolor="#ffffff">免费观看次数已用完\n成功推广 1 人赠送</font> <font fgcolor='#FF4D4D'>2</font><font fgcolor="#ffffff">天 VIP\n可无限叠加，免费观看所有视频</font></string>
