@@ -158,7 +158,10 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
                 .collect {
                     when (it) {
                         is Empty -> Timber.d("Get public token successful!")
-                        is Error -> Timber.e("Get public token error: $it")
+                        is Error -> {
+                            Timber.e("Get public token error: $it")
+                            logout()
+                        }
                     }
                 }
         }
