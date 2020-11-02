@@ -194,7 +194,7 @@
     <string name="login_pw">请填写密码</string>
     <string name="login_verification_code">请填写验证码</string>
     <string name="login_invite_code">请填写邀请码</string>
-    <string name="login_confirm_pw">请再次填写密码</string>
+    <string name="login_confirm_pw">请填写确认密码</string>
     <string name="login_desc">点选「注册」即表示您同意接受<font fgcolor="#ff4d4d">服务条款</font>及<font fgcolor="#ff4d4d">隐私权保护政策</font></string>
     <string name="login_keep_account">记住我</string>
     <string name="login_forget">忘记密码?</string>
@@ -204,8 +204,9 @@
     <string name="login_mobile_call_prefix_china">+86</string>
     <string name="login_mobile_call_prefix_taiwan">+886</string>
     <string name="vip_expiry_date">VIP 於 %s 到期</string>
+    <string name="no_data">尚无资料</string>
     
-    <!-- Home -->
+    <!-- Follow -->
     <string name="follow_title">我的关注</string>
     <string name="follow_people">关注的人</string>
     <string name="follow_circle">关注的圈子</string>
@@ -215,6 +216,7 @@
     <string name="follow_clean_member_dlg_msg">是否要清除所有关注的人</string>
     <string name="follow_clean_club_dlg_msg">是否要清除所有关注的圈子</string>
     <string name="follow_no_data">尚未有任何关注，快去关注一下吧！</string>
+
     <string name="text_more">更多</string>
     <string name="text_search">搜寻</string>
     <string name="text_follow">关注</string>
@@ -438,7 +440,7 @@
     <string name="invite_vip_record_title">推广记录</string>
     <string name="invite_vip_record_text_name">用户名称</string>
     <string name="invite_vip_record_text_phone">手机号</string>
-    <string name="invite_vip_record_empty_record">目前尚无推广记录</string>
+    <string name="invite_vip_record_empty_record">亲，推广人可以获得免费VIP，你还在等什麽？</string>
 
     <!-- Order Result -->
     <string name="recharge_reminder_message"><font fgcolor="#ffffff">免费观看次数已用完\n成功推广 1 人赠送</font> <font fgcolor='#FF4D4D'>2</font><font fgcolor="#ffffff">天 VIP\n可无限叠加，免费观看所有视频</font></string>
