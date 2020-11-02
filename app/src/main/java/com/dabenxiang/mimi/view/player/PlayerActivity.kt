@@ -945,7 +945,12 @@ class PlayerActivity : BaseActivity() {
                 GeneralUtils.showToast(App.applicationContext(), getString(R.string.report_error))
             } else {
                 when (item) {
-                    is MemberPostItem -> viewModel.sentReport(item.id, content)
+                    is MemberPostItem -> {
+                        if(item.type == PostType.VIDEO)
+                            viewModel.sendVideoReport(item.id, content)
+                        else
+                            viewModel.sentReport(item.id, content)
+                    }
                 }
             }
             reportDialog?.dismiss()
