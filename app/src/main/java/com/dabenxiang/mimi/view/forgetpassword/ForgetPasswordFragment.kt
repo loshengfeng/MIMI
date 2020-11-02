@@ -15,6 +15,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_forget_password.*
 
 class ForgetPasswordFragment : BaseFragment() {
@@ -86,11 +87,11 @@ class ForgetPasswordFragment : BaseFragment() {
 
                 if (tv_call_prefix.text == getString(R.string.login_mobile_call_prefix_taiwan)) {
                     tv_call_prefix.text = getString(R.string.login_mobile_call_prefix_china)
-                    ToastUtils.showShort("Change to +86")
+                    GeneralUtils.showToast(requireContext(), "Change to +86")
                     edit_mobile.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(11))
                 } else {
                     tv_call_prefix.text = getString(R.string.login_mobile_call_prefix_taiwan)
-                    ToastUtils.showShort("Change to +886")
+                    GeneralUtils.showToast(requireContext(), "Change to +886")
                     edit_mobile.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(9))
                 }
             }
@@ -109,14 +110,7 @@ class ForgetPasswordFragment : BaseFragment() {
 
         when (errorHandler.httpExceptionItem.errorItem.code) {
             NOT_FOUND -> {
-                GeneralDialog.newInstance(
-                    GeneralDialogData(
-                        titleRes = R.string.login_yet,
-                        message = getString(R.string.desc_email_account_not_match),
-                        messageIcon = R.drawable.ico_email,
-                        secondBtn = getString(R.string.btn_confirm)
-                    )
-                ).show(requireActivity().supportFragmentManager)
+                viewModel.mobileNotFoundError()
             }
         }
     }

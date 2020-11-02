@@ -9,6 +9,7 @@ import android.text.InputFilter.LengthFilter
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
+import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
@@ -25,15 +26,19 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
+import com.dabenxiang.mimi.view.listener.InteractionListener
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.item_login.*
 import kotlinx.android.synthetic.main.item_register.*
+import timber.log.Timber
 
 
 class LoginFragment : BaseFragment() {
 
     private val viewModel: LoginViewModel by viewModels()
+    private var interactionListener: InteractionListener? = null
 
     companion object {
         const val KEY_TYPE = "TYPE"
@@ -52,6 +57,17 @@ class LoginFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
         initSettings()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        try {
+            interactionListener = context as InteractionListener
+        } catch (e: ClassCastException) {
+            Timber.e("LoginFragment interaction listener can't cast")
+        }
+
     }
 
     override fun onResume() {
@@ -185,7 +201,18 @@ class LoginFragment : BaseFragment() {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Empty -> countDownTimer.start()
+                is Empty -> {
+                    countDownTimer.start()
+                    GeneralDialog.newInstance(
+                        GeneralDialogData(
+                            titleRes = R.string.login_yet,
+                            message = getString(R.string.send_msg),
+                            messageIcon = R.drawable.ico_default_photo,
+                            secondBtn = getString(R.string.btn_confirm),
+                            isMessageIcon = false
+                        )
+                    ).show(requireActivity().supportFragmentManager)
+                }
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -226,9 +253,15 @@ class LoginFragment : BaseFragment() {
 
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
-                R.id.btnClose, R.id.btn_register_cancel, R.id.btn_login_cancel -> navigateTo(
+                R.id.btnClose -> navigateTo(
                     NavigateItem.Up
                 )
+
+                R.id.btn_register_cancel, R.id.btn_login_cancel -> {
+                    interactionListener?.changeNavigationPosition(R.id.navigation_adult)
+                    navigateTo(NavigateItem.Up)
+                }
+
                 R.id.btn_register -> {
                     viewModel.doRegisterValidateAndSubmit(tv_call_prefix.text.toString())
                 }
@@ -283,11 +316,11 @@ class LoginFragment : BaseFragment() {
 
                 if (tv_call_prefix.text == getString(R.string.login_mobile_call_prefix_taiwan)) {
                     tv_call_prefix.text = getString(R.string.login_mobile_call_prefix_china)
-                    ToastUtils.showShort("Change to +86")
+                    GeneralUtils.showToast(requireContext(), "Change to +86")
                     edit_mobile.filters = arrayOf<InputFilter>(LengthFilter(11))
                 } else {
                     tv_call_prefix.text = getString(R.string.login_mobile_call_prefix_taiwan)
-                    ToastUtils.showShort("Change to +886")
+                    GeneralUtils.showToast(requireContext(), "Change to +886")
                     edit_mobile.filters = arrayOf<InputFilter>(LengthFilter(9))
                 }
             }
@@ -302,11 +335,11 @@ class LoginFragment : BaseFragment() {
 
                 if (tv_login_call_prefix.text == getString(R.string.login_mobile_call_prefix_taiwan)) {
                     tv_login_call_prefix.text = getString(R.string.login_mobile_call_prefix_china)
-                    ToastUtils.showShort("Change to +86")
+                    GeneralUtils.showToast(requireContext(), "Change to +86")
                     edit_login_account.filters = arrayOf<InputFilter>(LengthFilter(11))
                 } else {
                     tv_login_call_prefix.text = getString(R.string.login_mobile_call_prefix_taiwan)
-                    ToastUtils.showShort("Change to +886")
+                    GeneralUtils.showToast(requireContext(), "Change to +886")
                     edit_login_account.filters = arrayOf<InputFilter>(LengthFilter(9))
                 }
             }
@@ -353,13 +386,7 @@ class LoginFragment : BaseFragment() {
     override fun navigateTo(item: NavigateItem) {
         findNavController().also { navController ->
             when (item) {
-                NavigateItem.Up -> {
-                    when (navController.navigateUp()) {
-                        false -> when (val activity = requireActivity()) {
-                            is LoginActivity -> activity.finish()
-                        }
-                    }
-                }
+                NavigateItem.Up -> navController.navigateUp()
                 is NavigateItem.PopBackStack -> navController.popBackStack(
                     item.fragmentId,
                     item.inclusive
@@ -395,16 +422,18 @@ class LoginFragment : BaseFragment() {
                 ).setCancel(false)
                     .show(requireActivity().supportFragmentManager)
             }
+            LOGIN_406000 -> {
+                viewModel.inviteCodeError(R.string.error_validation_code)
+            }
             NOT_FOUND -> {
                 showErrorMessageDialog(getString(R.string.error_validation))
-                viewModel.inviteCodeError()
+//                viewModel.inviteCodeError()
             }
             LOGIN_409000 -> {
                 countDownTimer.cancel()
                 countDownTimer.onFinish()
                 viewModel.onAccountExitError()
                 edit_verification_code.setText("")
-                showErrorMessageDialog(getString(R.string.error_account_duplicate))
             }
         }
     }

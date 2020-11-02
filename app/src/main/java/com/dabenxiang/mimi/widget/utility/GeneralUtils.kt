@@ -136,6 +136,7 @@ object GeneralUtils {
 
     fun isMobileValid(callPrefix: String, mobile: String): Boolean {
         return if (callPrefix == "+86") {
+//            return !checkPhoneNum(mobile)
             mobile.length < 11
         } else {
             mobile.length < 9
@@ -314,5 +315,12 @@ object GeneralUtils {
 
     fun getAmountFormat(amount: Float): String {
         return decimalFormat.format(amount)
+    }
+
+    private fun checkPhoneNum(num: String): Boolean{
+        val regExp = "^((13[0-9])|(15[^4])|(18[0,2,3,5-9])|(17[0-8])|(147))\\d{8}$"
+        val p = Pattern.compile(regExp)
+        val m = p.matcher(num)
+        return m.matches()
     }
 }

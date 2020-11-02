@@ -71,13 +71,6 @@
             android:theme="@style/PlayerTheme"
             tools:ignore="LockedOrientationActivity" />
 
-        <activity
-            android:name=".view.login.LoginActivity"
-            android:configChanges="orientation"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-
         <activity android:name=".view.base.BaseActivity" />
 
         <service android:name="org.eclipse.paho.android.service.MqttService" />

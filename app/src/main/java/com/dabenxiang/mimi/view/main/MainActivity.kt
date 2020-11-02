@@ -184,6 +184,7 @@ class MainActivity : BaseActivity(), InteractionListener {
     }
 
     override fun changeNavigationPosition(index: Int) {
+        Timber.i("changeNavigationPosition")
         bottom_navigation.selectedItemId = index
     }
 

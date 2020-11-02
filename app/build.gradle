@@ -114,7 +114,7 @@ android {
             minifyEnabled true
             debuggable false
             shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-android-optimize.txt'
             signingConfig signingConfigs.release
         }
 
@@ -349,7 +349,7 @@ dependencies {
 
     // AndroidUtilCode
     implementation "com.blankj:utilcodex:$utilcodex_version"
-
+    
     // Conscrypt
     implementation "org.conscrypt:conscrypt-android:$conscrypt_version"
 

@@ -39,10 +39,12 @@
     <string name="password_format_error_2">请填写8~20字的英文、数字或特殊符号，区分大小写</string>
     <string name="password_format_error_3">请填写确认密码</string>
     <string name="password_format_error_4">与密码不相符合，请确认</string>
-    <string name="mobile_format_error_1">请填写电话</string>
+    <string name="mobile_format_error_1">请填写手机号</string>
+    <string name="mobile_format_error_2">请填写正确的手机号</string>
     <string name="account_error_1">請填写名稱</string>
     <string name="invalidate_code_error_1">请填写验证码</string>
     <string name="receive_mail">请收验证信</string>
+    <string name="send_msg">已发送简讯验证码到注册手机号上，请查收</string>
     <string name="desc_register">请至信箱查看验证信以完成账号注册</string>
     <string name="desc_email">已传送新密码至您的邮箱\n%s\n请至邮箱确认</string>
     <string name="desc_mobile">已传送新密码至您的手机号\n%s\n请确认</string>
@@ -56,8 +58,10 @@
     <string name="error_username_or_password_incorrect">使用者名称或密码错误</string>
     <string name="error_account_disable">此帐户已停用</string>
     <string name="error_validation">驗證錯誤</string>
+    <string name="error_validation_code">驗證碼錯誤，請確認</string>
     <string name="error_email_duplicate">此Email已存在，請重新填寫</string>
     <string name="error_account_duplicate">此账号已存在，请重新填写</string>
+    <string name="error_mobile_duplicate">此手机已存在，请重新填写</string>
     <string name="error_first_login">第一次登入需重设密码</string>
     <string name="reset_pw_success">重设密码成功</string>
     <string name="verify_immediately">立即验证</string>
@@ -192,7 +196,7 @@
     <string name="login_invite_code">请填写邀请码</string>
     <string name="login_confirm_pw">请再次填写密码</string>
     <string name="login_desc">点选「注册」即表示您同意接受<font fgcolor="#ff4d4d">服务条款</font>及<font fgcolor="#ff4d4d">隐私权保护政策</font></string>
-    <string name="login_keep_account">记住帐号</string>
+    <string name="login_keep_account">记住我</string>
     <string name="login_forget">忘记密码?</string>
     <string name="login_get_code">获取验证码</string>
     <string name="username_or_password_incorrect">使用者名称或密码错误</string>
