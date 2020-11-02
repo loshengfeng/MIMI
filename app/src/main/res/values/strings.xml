@@ -63,7 +63,7 @@
     <string name="error_account_duplicate">此账号已存在，请重新填写</string>
     <string name="error_mobile_duplicate">此手机已存在，请重新填写</string>
     <string name="error_first_login">第一次登入需重设密码</string>
-    <string name="reset_pw_success">重设密码成功</string>
+    <string name="reset_pw_success">重设密码</string>
     <string name="verify_immediately">立即验证</string>
     <string name="verify_later">稍后验证</string>
     <string name="error_email_not_confirmed_title">尚未验证</string>
