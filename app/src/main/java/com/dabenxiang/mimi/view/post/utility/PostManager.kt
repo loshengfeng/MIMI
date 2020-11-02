@@ -17,12 +17,10 @@ import android.widget.TextView
 import androidx.core.content.FileProvider
 import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.home.AdultHomeFragment
-import com.dabenxiang.mimi.view.home.HomeViewModel
 import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.REQUEST_VIDEO_CAPTURE
@@ -35,7 +33,6 @@ import com.vincent.videocompressor.VideoCompress
 import timber.log.Timber
 import java.io.File
 import java.util.*
-import kotlin.collections.ArrayList
 
 class PostManager {
     fun selectVideo(fragment: Fragment) {
@@ -183,7 +180,7 @@ class PostManager {
 
         if (viewModel != null) {
             memberPostItem.creatorId = viewModel.pref.profileItem.userId
-            memberPostItem.postFriendlyName = viewModel.pref.profileItem.account
+            memberPostItem.postFriendlyName = viewModel.pref.profileItem.friendlyName
             memberPostItem.avatarAttachmentId = viewModel.pref.profileItem.avatarAttachmentId
         }
 
