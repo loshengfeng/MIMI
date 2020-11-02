@@ -30,6 +30,7 @@ import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.PAGE
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import kotlinx.android.synthetic.main.fragment_my_post.*
+import kotlinx.android.synthetic.main.item_follow_no_data.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import timber.log.Timber
 
@@ -113,6 +114,7 @@ class MyPostFragment : BaseFragment() {
         tv_title.text = if (userId == USER_ID_ME) getString(R.string.personal_my_post) else userName
         tv_title.isSelected = isAdultTheme
         tv_back.isSelected = isAdultTheme
+        tv_text.text = getString(R.string.no_data)
         if (isAdultTheme) layout_refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
     }
 
@@ -175,6 +177,12 @@ class MyPostFragment : BaseFragment() {
         viewModel.cleanRemovedPosList.observe(viewLifecycleOwner, Observer {
             adapter.removedPosList.clear()
         })
+
+        viewModel.isNoData.observe(viewLifecycleOwner, Observer {
+            v_no_data.visibility =
+                if (it) View.VISIBLE
+                else View.GONE
+        })
     }
 
     private fun navigationToText(bundle: Bundle) {
@@ -224,7 +232,7 @@ class MyPostFragment : BaseFragment() {
     }
 
     private val attachmentListener = object : AttachmentListener {
-        override fun onGetAttachment(id: Long?, view:ImageView, type:LoadImageType) {
+        override fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType) {
             viewModel.loadImage(id, view, type)
         }
 

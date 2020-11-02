@@ -36,6 +36,9 @@ class MyPostViewModel : BaseViewModel() {
     private var _followResult = MutableLiveData<ApiResult<Nothing>>()
     val followResult: LiveData<ApiResult<Nothing>> = _followResult
 
+    private var _isNoData = MutableLiveData<Boolean>().also { it.value = false }
+    val isNoData: LiveData<Boolean> = _isNoData
+
     var totalCount: Int = 0
 
     companion object {
@@ -90,7 +93,10 @@ class MyPostViewModel : BaseViewModel() {
         override fun onCurrentItemCount(count: Long, isInitial: Boolean) {
             totalCount = if (isInitial) count.toInt()
             else totalCount.plus(count.toInt())
-            if(isInitial) cleanRemovedPosList()
+            if (isInitial) cleanRemovedPosList()
+            if (totalCount == 0) {
+                _isNoData.value = true
+            }
         }
     }
 
