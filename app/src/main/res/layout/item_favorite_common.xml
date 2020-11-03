@@ -46,6 +46,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
         android:drawableStart="@drawable/btn_share_gray_n"
+        android:visibility="gone"
         app:layout_constraintStart_toEndOf="@id/tv_msg"
         app:layout_constraintTop_toTopOf="parent" />
 
