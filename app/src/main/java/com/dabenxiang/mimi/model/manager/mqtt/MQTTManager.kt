@@ -18,7 +18,6 @@ class MQTTManager(val context: Context, private val pref: Pref) {
 
     private var client: MqttAndroidClient? = null
     private var options: MqttConnectOptions? = null
-    private var cacheMessage: HashSet<Int> = HashSet()
 
     fun init(serverUrl: String, clientId: String, extendedCallback: ExtendedCallback) {
         client = MqttAndroidClient(context, serverUrl, clientId)
@@ -28,8 +27,7 @@ class MQTTManager(val context: Context, private val pref: Pref) {
             }
 
             override fun messageArrived(topic: String, message: MqttMessage) {
-                if (!cacheMessage.contains(message.id)) {
-                    cacheMessage.add(message.id)
+                if(!message.isDuplicate) {
                     extendedCallback.onMessageArrived(topic, message)
                 }
             }
@@ -48,6 +46,7 @@ class MQTTManager(val context: Context, private val pref: Pref) {
         options?.userName = pref.profileItem.userId.toString()
         options?.isAutomaticReconnect = true
         options?.isCleanSession = false
+
     }
 
     fun connect(connectCallback: ConnectCallback) {
