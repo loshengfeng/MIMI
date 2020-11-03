@@ -431,13 +431,10 @@ class LoginFragment : BaseFragment() {
     override fun handleHttpError(errorHandler: ExceptionResult.HttpError) {
         when (errorHandler.httpExceptionItem.errorItem.code) {
             LOGIN_400000 -> {
-                val errMsg = errorHandler.httpExceptionItem.errorItem.message
-                if (errMsg == "invalid referrerCode") {
-                    viewModel.onInvitedCodeError(getString(R.string.invited_code_error_1))
-                } else if (errMsg == "code is not exists" || errMsg == "invalid code") {
-                    viewModel.validateCodeError(R.string.error_validation_code)
-                } else {
-                    showErrorMessageDialog(getString(R.string.error_validation))
+                when (errorHandler.httpExceptionItem.errorItem.message){
+                    "invalid referrerCode" -> viewModel.onInvitedCodeError(getString(R.string.invited_code_error_1))
+                    "code is not exists", "invalid code" -> viewModel.validateCodeError(R.string.error_validation_code)
+                    else -> showErrorMessageDialog(getString(R.string.error_validation))
                 }
             }
             LOGIN_403001 -> showErrorMessageDialog(getString(R.string.error_username_or_password_incorrect))

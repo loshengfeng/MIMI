@@ -58,13 +58,14 @@
     <string name="error_bad_request">参数错误</string>
     <string name="error_username_or_password_incorrect">使用者名称或密码错误</string>
     <string name="error_account_disable">此帐户已停用</string>
-    <string name="error_validation">驗證錯誤</string>
-    <string name="error_validation_code">驗證碼錯誤，請確認</string>
+    <string name="error_validation">验证錯誤</string>
+    <string name="error_validation_code">验证碼錯誤，請確認</string>
+    <string name="error_invite_code">邀请码无效，请确认</string>
     <string name="error_email_duplicate">此Email已存在，請重新填寫</string>
     <string name="error_account_duplicate">此账号已存在，请重新填写</string>
     <string name="error_mobile_duplicate">此手机已存在，请重新填写</string>
     <string name="error_first_login">第一次登入需重设密码</string>
-    <string name="reset_pw_success">重设密码成功</string>
+    <string name="reset_pw_success">重设密码</string>
     <string name="verify_immediately">立即验证</string>
     <string name="verify_later">稍后验证</string>
     <string name="error_email_not_confirmed_title">尚未验证</string>
