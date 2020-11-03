@@ -9,13 +9,11 @@ import android.text.InputFilter.LengthFilter
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
-import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import com.blankj.utilcode.util.ToastUtils
 import com.dabenxiang.mimi.MIMI_INVITE_CODE
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
@@ -188,12 +186,17 @@ class LoginFragment : BaseFragment() {
         })
 
         viewModel.mobile.observe(viewLifecycleOwner, Observer {
-            if (it == null || viewModel.isValidateMobile(it, tv_call_prefix.text.toString()).isNotBlank()) {
-                tv_get_code.isEnabled = false
-                tv_get_code.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_black_1_30))
-            } else {
-                tv_get_code.isEnabled = true
-                tv_get_code.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_black_1))
+            it?.let {
+                val callPrefix = tv_call_prefix.text.toString()
+                if (callPrefix == getString(R.string.login_mobile_call_prefix_taiwan) && it.length == 9) {
+                    validateMobile(it)
+                } else if (callPrefix == getString(R.string.login_mobile_call_prefix_china) && it.length == 11) {
+                    validateMobile(it)
+                } else {
+                    viewModel.onResetMobileError()
+                    tv_get_code.isEnabled = false
+                    tv_get_code.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_black_1_30))
+                }
             }
         })
 
@@ -216,6 +219,29 @@ class LoginFragment : BaseFragment() {
                 is Error -> onApiError(it.throwable)
             }
         })
+
+        viewModel.invitedCodeError.observe(viewLifecycleOwner, Observer {
+            if (it == "") {
+                edit_invite_code.setBackgroundResource(R.drawable.edit_text_rectangle)
+                tv_invite_code_error.visibility = View.INVISIBLE
+            } else {
+                edit_invite_code.setBackgroundResource(R.drawable.edit_text_error_rectangle)
+                tv_invite_code_error.text = it
+                tv_invite_code_error.visibility = View.VISIBLE
+            }
+        })
+    }
+
+    private fun validateMobile(mobile: String) {
+        val errMsg = viewModel.isValidateMobile(mobile, tv_call_prefix.text.toString())
+        if (errMsg.isNotBlank()) {
+            tv_get_code.isEnabled = false
+            tv_get_code.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_black_1_30))
+            viewModel.onMobileError(errMsg)
+        } else {
+            tv_get_code.isEnabled = true
+            tv_get_code.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_black_1))
+        }
     }
 
     private val countDownTimer =  object : CountDownTimer( 60000, 1000) {
@@ -405,7 +431,11 @@ class LoginFragment : BaseFragment() {
     override fun handleHttpError(errorHandler: ExceptionResult.HttpError) {
         when (errorHandler.httpExceptionItem.errorItem.code) {
             LOGIN_400000 -> {
-                showErrorMessageDialog(getString(R.string.error_validation))
+                when (errorHandler.httpExceptionItem.errorItem.message){
+                    "invalid referrerCode" -> viewModel.onInvitedCodeError(getString(R.string.invited_code_error_1))
+                    "code is not exists", "invalid code" -> viewModel.validateCodeError(R.string.error_validation_code)
+                    else -> showErrorMessageDialog(getString(R.string.error_validation))
+                }
             }
             LOGIN_403001 -> showErrorMessageDialog(getString(R.string.error_username_or_password_incorrect))
             LOGIN_403002 -> showErrorMessageDialog(getString(R.string.error_account_disable))
@@ -423,7 +453,7 @@ class LoginFragment : BaseFragment() {
                     .show(requireActivity().supportFragmentManager)
             }
             LOGIN_406000 -> {
-                viewModel.inviteCodeError(R.string.error_validation_code)
+                viewModel.validateCodeError(R.string.error_validation_code)
             }
             NOT_FOUND -> {
                 showErrorMessageDialog(getString(R.string.error_validation))
@@ -432,7 +462,7 @@ class LoginFragment : BaseFragment() {
             LOGIN_409000 -> {
                 countDownTimer.cancel()
                 countDownTimer.onFinish()
-                viewModel.onAccountExitError()
+                viewModel.onMobileError(getString(R.string.error_mobile_duplicate))
                 edit_verification_code.setText("")
             }
         }

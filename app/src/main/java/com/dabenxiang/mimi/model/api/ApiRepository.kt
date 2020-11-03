@@ -434,6 +434,14 @@ class ApiRepository(private val apiService: ApiService) {
         limit = limit
     )
 
+    /**
+     * 影片回報
+     */
+    suspend fun sendVideoReport(
+        body: ReportRequest
+    ) = apiService.sendVideoReport(
+        body
+    )
 
     /**********************************************************
      *
