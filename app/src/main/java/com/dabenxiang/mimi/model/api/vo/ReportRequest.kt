@@ -4,5 +4,8 @@ import com.google.gson.annotations.SerializedName
 
 data class ReportRequest(
     @SerializedName("content")
-    val content: String?
+    val content: String?,
+
+    @SerializedName("id")
+    val id: Long = 0
 )

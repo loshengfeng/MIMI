@@ -91,7 +91,7 @@ class SearchVideoViewModel : BaseViewModel() {
 
     fun getSearchList() {
         viewModelScope.launch {
-            getVideoPagingItems(isAdult).asFlow()
+            getVideoPagingItems(true).asFlow()
                 .collect {
                     _searchingListResult.value = it
                 }

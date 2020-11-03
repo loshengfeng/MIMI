@@ -798,6 +798,30 @@ class PlayerViewModel : BaseViewModel() {
         }
     }
 
+    /**
+     * 影片回報問題
+     */
+    fun sendVideoReport(id: Long, content: String) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository().sendVideoReport(
+                    ReportRequest(content, id)
+                )
+                if(!resp.isSuccessful) throw HttpException(resp)
+
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e->
+                    emit(ApiResult.error(e)) }
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect {
+                    _apiReportResult.value = SingleLiveEvent(it)
+                }
+        }
+    }
+
     fun clearStreamData() {
         _episodePosition.postValue(-1)
         _sourceListPosition.postValue(-1)
