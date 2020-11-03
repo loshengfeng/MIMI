@@ -420,7 +420,11 @@ class LoginFragment : BaseFragment() {
     override fun handleHttpError(errorHandler: ExceptionResult.HttpError) {
         when (errorHandler.httpExceptionItem.errorItem.code) {
             LOGIN_400000 -> {
-                showErrorMessageDialog(getString(R.string.error_validation))
+                when (errorHandler.httpExceptionItem.errorItem.message){
+                    "invalid referrerCode" -> showErrorMessageDialog(getString(R.string.error_invite_code))
+                    "code is not exists", "invalid code" -> showErrorMessageDialog(getString(R.string.error_validation_code))
+                    else -> showErrorMessageDialog(getString(R.string.error_validation))
+                }
             }
             LOGIN_403001 -> showErrorMessageDialog(getString(R.string.error_username_or_password_incorrect))
             LOGIN_403002 -> showErrorMessageDialog(getString(R.string.error_account_disable))
