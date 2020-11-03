@@ -24,7 +24,7 @@ class ProfileItem : Serializable{
 
     // 0:Female|1:Male default is Female
     @SerializedName("gender")
-    var gender = 0
+    var gender: Int? = null
 
     @SerializedName("birthday")
     var birthday: String? = null
@@ -36,10 +36,10 @@ class ProfileItem : Serializable{
     var emailConfirmed = false
 
     fun getGenderRes(): Int {
-        return if (gender == 0) {
-            R.string.text_gender_female
-        } else {
-            R.string.text_gender_male
+        return when(gender) {
+            0 -> R.string.text_gender_female
+            1 -> R.string.text_gender_male
+            else -> R.string.setting_choose
         }
     }
 }
