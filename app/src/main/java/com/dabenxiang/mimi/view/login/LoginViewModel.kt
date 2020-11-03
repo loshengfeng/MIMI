@@ -191,8 +191,12 @@ class LoginViewModel : BaseViewModel() {
         }
     }
 
-    fun onAccountExitError() {
-        _mobileError.value = app.getString(R.string.error_mobile_duplicate)
+    fun onMobileError(msg: String) {
+        _mobileError.value = msg
+    }
+
+    fun onResetMobileError() {
+        _mobileError.value = ""
     }
 
     fun startTimer() {
