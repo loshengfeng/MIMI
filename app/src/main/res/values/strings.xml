@@ -43,6 +43,7 @@
     <string name="mobile_format_error_2">请填写正确的手机号</string>
     <string name="account_error_1">請填写名稱</string>
     <string name="invalidate_code_error_1">请填写验证码</string>
+    <string name="invited_code_error_1">邀请码无效，请确认</string>
     <string name="receive_mail">请收验证信</string>
     <string name="send_msg">已发送简讯验证码到注册手机号上，请查收</string>
     <string name="desc_register">请至信箱查看验证信以完成账号注册</string>
@@ -381,6 +382,7 @@
     <string name="chat_content_file_download_finish">下载完成</string>
     <string name="chat_content_file_uploading">上傳中</string>
     <string name="chat_content_text_too_much">文字超過五百字</string>
+    <string name="chat_content_connect_error">连线异常，正在尝试重新连线...</string>
 
     <!--  Image Preview  -->
     <string name="image_preview_file_invlid">档案已失效</string>

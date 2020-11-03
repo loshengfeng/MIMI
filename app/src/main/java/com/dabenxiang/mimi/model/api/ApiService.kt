@@ -339,6 +339,11 @@ interface ApiService {
         @Query("limit") limit: String?
     ): Response<ApiBasePagingItem<List<PostStatisticsItem>>>
 
+    @POST("/v1/Members/Home/Videos/VideoStreamReport")
+    suspend fun sendVideoReport(
+        @Body body: ReportRequest
+    ): Response<Void>
+
 
     /**********************************************************
      *

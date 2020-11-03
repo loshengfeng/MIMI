@@ -66,6 +66,9 @@ class ChatContentViewModel : BaseViewModel() {
     private var _updateOrderChatStatusResult = MutableLiveData<ApiResult<Nothing>>()
     val updateOrderChatStatusResult: LiveData<ApiResult<Nothing>> = _updateOrderChatStatusResult
 
+    private var _mqttSendErrorResult = MutableLiveData<Boolean>()
+    val mqttSendErrorResult: LiveData<Boolean> = _mqttSendErrorResult
+
     var messageType: Int = ChatMessageType.TEXT.ordinal
     var isLoading: Boolean = false
     var chatId: Long = -1
@@ -376,11 +379,13 @@ class ChatContentViewModel : BaseViewModel() {
                 Timber.d("mqttCallback onSuccess")
                 if (isOnline) {
                     updateOrderChatStatus()
+                    _mqttSendErrorResult.postValue(false)
                 }
             }
 
             override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
                 Timber.e("mqttCallback onFailure: $exception")
+                _mqttSendErrorResult.postValue(true)
             }
         }
     }

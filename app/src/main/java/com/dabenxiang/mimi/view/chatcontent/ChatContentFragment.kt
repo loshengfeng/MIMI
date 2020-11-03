@@ -22,7 +22,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.ConnectionStateListener
 import com.dabenxiang.mimi.model.api.ApiResult.*
+import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.api.vo.ChatContentItem
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.enums.ChatMessageType
@@ -34,11 +36,15 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.preview.ImagePreviewDialogFragment
+import com.dabenxiang.mimi.widget.utility.ConnectionStateMonitor
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_chat_content.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.eclipse.paho.client.mqttv3.MqttMessage
 import timber.log.Timber
 import java.io.File
@@ -71,6 +77,8 @@ class ChatContentFragment : BaseFragment() {
     private val adapter by lazy { ChatContentAdapter(viewModel.pref, listener) }
     private var senderAvatarId = ""
     private val file: File = FileUtil.getAvatarFile()
+    private var connectMonitor: ConnectionStateMonitor? = null //監測網路切換狀態
+    private var needDisplayNetworkError:Boolean=false
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -92,6 +100,19 @@ class ChatContentFragment : BaseFragment() {
         arguments?.getBoolean(KEY_IS_ONLINE)?.also {
             viewModel.isOnline = it
         }
+        connectMonitor = ConnectionStateMonitor(requireContext(), object : ConnectionStateListener {
+            override fun connect() {
+                needDisplayNetworkError = false
+                showConnectError(false)
+            }
+
+            override fun disconnect() {
+                needDisplayNetworkError = true
+                showConnectError(true)
+            }
+
+        })
+        connectMonitor?.enable()
 
         arguments?.getSerializable(KEY_CHAT_LIST_ITEM)?.let { data ->
             data as ChatListItem
@@ -101,7 +122,7 @@ class ChatContentFragment : BaseFragment() {
                 viewModel.chatId = id
                 viewModel.getChatContent()
                 viewModel.setLastRead()
-                if (mainViewModel?.isMqttConnect == true) {
+                if (mainViewModel?.isMqttConnect == true ) {
                     mainViewModel?.subscribeToTopic(viewModel.getChatTopic())
                 }
             }
@@ -111,6 +132,7 @@ class ChatContentFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
         mainViewModel?.messageListenerMap?.put(viewModel.getChatTopic(), messageListener)
+        showConnectError(needDisplayNetworkError)
     }
 
     override fun onPause() {
@@ -214,7 +236,18 @@ class ChatContentFragment : BaseFragment() {
                 is Error -> onApiError(it.throwable)
             }
         })
+
+        viewModel.mqttSendErrorResult.observe(viewLifecycleOwner, Observer {
+            showConnectError(it)
+        })
     }
+
+    override fun onApiError(throwable: Throwable, onHttpErrorBlock: ((ExceptionResult.HttpError) -> Unit)?) {
+        super.onApiError(throwable, onHttpErrorBlock)
+
+        showConnectError(true)
+    }
+
 
     override fun setupListeners() {
         Timber.d("${ChatContentFragment::class.java.simpleName}_setupListeners")
@@ -411,5 +444,20 @@ class ChatContentFragment : BaseFragment() {
             source, 0, 0, source.width, source.height,
             matrix, true
         )
+    }
+
+    /**
+     * 顯示最上面的 NetWork Error
+     */
+    private fun showConnectError(b: Boolean) {
+        if (textView_connect_error == null) {
+            return
+        }
+        CoroutineScope(Dispatchers.Main).launch {
+            if (b)
+                textView_connect_error.visibility = View.VISIBLE
+            else
+                textView_connect_error.visibility = View.GONE
+        }
     }
 }
