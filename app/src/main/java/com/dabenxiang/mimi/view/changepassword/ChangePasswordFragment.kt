@@ -8,8 +8,12 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
+import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.dialog.GeneralDialog
+import com.dabenxiang.mimi.view.dialog.GeneralDialogData
+import com.dabenxiang.mimi.view.dialog.show
 import kotlinx.android.synthetic.main.fragment_change_password.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 
@@ -110,6 +114,17 @@ class ChangePasswordFragment : BaseFragment() {
             }
             edit_confirm.setSelection(edit_confirm.length())
         }
+    }
+
+    override fun handleHttpError(errorHandler: ExceptionResult.HttpError) {
+        GeneralDialog.newInstance(
+            GeneralDialogData(
+                titleRes = R.string.error_device_binding_title,
+                message = getString(R.string.setting_current_password_error_2),
+                messageIcon = R.drawable.ico_default_photo,
+                secondBtn = getString(R.string.btn_confirm)
+            )
+        ).show(requireActivity().supportFragmentManager)
     }
 
     override fun initSettings() {
