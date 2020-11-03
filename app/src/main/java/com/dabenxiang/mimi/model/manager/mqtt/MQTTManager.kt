@@ -18,6 +18,7 @@ class MQTTManager(val context: Context, private val pref: Pref) {
 
     private var client: MqttAndroidClient? = null
     private var options: MqttConnectOptions? = null
+    private var cacheMessage: HashSet<Int> = HashSet()
 
     fun init(serverUrl: String, clientId: String, extendedCallback: ExtendedCallback) {
         client = MqttAndroidClient(context, serverUrl, clientId)
@@ -27,7 +28,10 @@ class MQTTManager(val context: Context, private val pref: Pref) {
             }
 
             override fun messageArrived(topic: String, message: MqttMessage) {
-                extendedCallback.onMessageArrived(topic, message)
+                if (!cacheMessage.contains(message.id)) {
+                    cacheMessage.add(message.id)
+                    extendedCallback.onMessageArrived(topic, message)
+                }
             }
 
             override fun connectionLost(cause: Throwable) {

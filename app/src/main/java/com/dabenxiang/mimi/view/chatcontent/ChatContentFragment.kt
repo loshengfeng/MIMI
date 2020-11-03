@@ -79,6 +79,7 @@ class ChatContentFragment : BaseFragment() {
     private val file: File = FileUtil.getAvatarFile()
     private var connectMonitor: ConnectionStateMonitor? = null //監測網路切換狀態
     private var needDisplayNetworkError:Boolean=false
+    private var title = ""
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -103,12 +104,12 @@ class ChatContentFragment : BaseFragment() {
         connectMonitor = ConnectionStateMonitor(requireContext(), object : ConnectionStateListener {
             override fun connect() {
                 needDisplayNetworkError = false
-                showConnectError(false)
+                switchConnectErrorState(false)
             }
 
             override fun disconnect() {
                 needDisplayNetworkError = true
-                showConnectError(true)
+                switchConnectErrorState(true)
             }
 
         })
@@ -116,7 +117,8 @@ class ChatContentFragment : BaseFragment() {
 
         arguments?.getSerializable(KEY_CHAT_LIST_ITEM)?.let { data ->
             data as ChatListItem
-            text_toolbar_title.text = data.name
+            title = data.name.toString()
+            text_toolbar_title.text = title
             senderAvatarId = data.avatarAttachmentId.toString()
             data.id?.let { id ->
                 viewModel.chatId = id
@@ -132,7 +134,7 @@ class ChatContentFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
         mainViewModel?.messageListenerMap?.put(viewModel.getChatTopic(), messageListener)
-        showConnectError(needDisplayNetworkError)
+        switchConnectErrorState(needDisplayNetworkError)
     }
 
     override fun onPause() {
@@ -238,14 +240,14 @@ class ChatContentFragment : BaseFragment() {
         })
 
         viewModel.mqttSendErrorResult.observe(viewLifecycleOwner, Observer {
-            showConnectError(it)
+            switchConnectErrorState(it)
         })
     }
 
     override fun onApiError(throwable: Throwable, onHttpErrorBlock: ((ExceptionResult.HttpError) -> Unit)?) {
         super.onApiError(throwable, onHttpErrorBlock)
 
-        showConnectError(true)
+        switchConnectErrorState(true)
     }
 
 
@@ -449,15 +451,20 @@ class ChatContentFragment : BaseFragment() {
     /**
      * 顯示最上面的 NetWork Error
      */
-    private fun showConnectError(b: Boolean) {
-        if (textView_connect_error == null) {
+    private fun switchConnectErrorState(error: Boolean) {
+        if (text_toolbar_title == null) {
             return
         }
         CoroutineScope(Dispatchers.Main).launch {
-            if (b)
-                textView_connect_error.visibility = View.VISIBLE
-            else
-                textView_connect_error.visibility = View.GONE
+            if (error) {
+                text_toolbar_title.text = getString(R.string.chat_content_network_error_hint)
+                editChat.hint = getString(R.string.chat_content_network_error_title)
+                editChat.isEnabled = false
+            } else {
+                text_toolbar_title.text = title
+                editChat.hint = ""
+                editChat.isEnabled = true
+            }
         }
     }
 }
