@@ -44,7 +44,7 @@
             android:layout_width="0dp"
             android:layout_height="36dp"
             android:layout_weight="1"
-            android:background="@drawable/bg_white_1_65625_radius_18"
+            android:background="@drawable/bg_chat_edit_selector"
             android:gravity="center_vertical"
             android:inputType="text"
             android:paddingStart="18dp"
@@ -68,18 +68,4 @@
             android:background="@null"
             android:src="@drawable/btn_send" />
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/textView_connect_error"
-        android:layout_width="0dp"
-        android:layout_height="24dp"
-        android:background="@color/color_red_10"
-        android:gravity="center"
-        android:text="@string/chat_content_connect_error"
-        android:textColor="@color/color_white_1"
-        android:textSize="12sp"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
