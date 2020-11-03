@@ -219,6 +219,17 @@ class LoginFragment : BaseFragment() {
                 is Error -> onApiError(it.throwable)
             }
         })
+
+        viewModel.invitedCodeError.observe(viewLifecycleOwner, Observer {
+            if (it == "") {
+                edit_invite_code.setBackgroundResource(R.drawable.edit_text_rectangle)
+                tv_invite_code_error.visibility = View.INVISIBLE
+            } else {
+                edit_invite_code.setBackgroundResource(R.drawable.edit_text_error_rectangle)
+                tv_invite_code_error.text = it
+                tv_invite_code_error.visibility = View.VISIBLE
+            }
+        })
     }
 
     private fun validateMobile(mobile: String) {
@@ -421,8 +432,8 @@ class LoginFragment : BaseFragment() {
         when (errorHandler.httpExceptionItem.errorItem.code) {
             LOGIN_400000 -> {
                 when (errorHandler.httpExceptionItem.errorItem.message){
-                    "invalid referrerCode" -> showErrorMessageDialog(getString(R.string.error_invite_code))
-                    "code is not exists", "invalid code" -> showErrorMessageDialog(getString(R.string.error_validation_code))
+                    "invalid referrerCode" -> viewModel.onInvitedCodeError(getString(R.string.invited_code_error_1))
+                    "code is not exists", "invalid code" -> viewModel.validateCodeError(R.string.error_validation_code)
                     else -> showErrorMessageDialog(getString(R.string.error_validation))
                 }
             }
@@ -442,7 +453,7 @@ class LoginFragment : BaseFragment() {
                     .show(requireActivity().supportFragmentManager)
             }
             LOGIN_406000 -> {
-                viewModel.inviteCodeError(R.string.error_validation_code)
+                viewModel.validateCodeError(R.string.error_validation_code)
             }
             NOT_FOUND -> {
                 showErrorMessageDialog(getString(R.string.error_validation))
