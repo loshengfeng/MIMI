@@ -21,7 +21,8 @@
 
         <action
             android:id="@+id/action_playerFragment_to_searchVideoFragment"
-            app:destination="@id/searchVideoFragment"  />
+            app:destination="@id/searchVideoFragment"
+            app:popUpTo="@id/playerFragment"/>
 
         <action
             android:id="@+id/action_playerFragment_to_myPostFragment"
@@ -48,7 +49,8 @@
 
         <action
             android:id="@+id/action_searchVideoFragment_to_navigation_player"
-            app:destination="@id/playerFragment" />
+            app:destination="@id/playerFragment"
+            app:popUpTo="@+id/searchVideoFragment"/>
 
    </fragment>
 
