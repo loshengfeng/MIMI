@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.text.Html
-import android.text.method.LinkMovementMethod
 import android.view.View
 import android.widget.ImageView
 import androidx.activity.addCallback
@@ -21,7 +20,6 @@ import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderingPackageItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PaymentType
-
 import com.dabenxiang.mimi.view.adapter.TopUpAgentAdapter
 import com.dabenxiang.mimi.view.adapter.TopUpOnlinePayAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -31,10 +29,8 @@ import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.orderinfo.OrderInfoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_top_up.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
-
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
@@ -226,20 +222,6 @@ class TopUpFragment : BaseFragment() {
             }
         }
 
-        tl_type.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab) {
-                when (tab.position) {
-                    0 -> updateOrderPackages(PaymentType.BANK)
-                    1 -> updateOrderPackages(PaymentType.ALI)
-                    2 -> updateOrderPackages(PaymentType.WX)
-                }
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab) {}
-
-            override fun onTabReselected(tab: TabLayout.Tab) {}
-        })
-
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.btn_next -> {
@@ -329,8 +311,6 @@ class TopUpFragment : BaseFragment() {
 
         rv_proxy_pay.layoutManager = LinearLayoutManager(context)
         rv_proxy_pay.adapter = agentAdapter
-
-        tl_type.getTabAt(0)?.select()
 
         onlinePayAdapter.clearSelectItem()
         viewModel.getMe()
