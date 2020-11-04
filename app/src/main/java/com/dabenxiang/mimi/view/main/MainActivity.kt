@@ -229,15 +229,15 @@ class MainActivity : BaseActivity(), InteractionListener {
             || (fragmentName.toLowerCase(Locale.getDefault()) ==
                     SettingFragment::class.java.simpleName.toLowerCase(Locale.getDefault()))
         ) {
-            if (viewModel.isFromPlayer) {
-                viewModel.isFromPlayer = false
-                deepLinkTo(
-                    MainActivity::class.java,
-                    R.navigation.navigation_adult,
-                    R.id.adultHomeFragment,
-                    null
-                )
-            } else
+//            if (viewModel.isFromPlayer) {
+//                viewModel.isFromPlayer = false
+//                deepLinkTo(
+//                    MainActivity::class.java,
+//                    R.navigation.navigation_adult,
+//                    R.id.adultHomeFragment,
+//                    null
+//                )
+//            } else
                 super.onBackPressed()
         } else {
             super.onBackPressed()
