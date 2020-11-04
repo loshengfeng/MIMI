@@ -15,6 +15,8 @@ import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.observe
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearSnapHelper
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
@@ -761,7 +763,7 @@ class PlayerFragment : BaseFragment() {
             }
         })
 
-        viewModel.videoReport.observe(viewLifecycleOwner, {
+        viewModel.videoReport.observe(viewLifecycleOwner) {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
@@ -770,7 +772,7 @@ class PlayerFragment : BaseFragment() {
                 }
                 is Error -> onApiError(it.throwable)
             }
-        })
+        }
 
 
     }
@@ -908,7 +910,7 @@ class PlayerFragment : BaseFragment() {
 
         btn_vip.setOnClickListener {
             Timber.i("btn_vip Click")
-            navigateTo(NavigateItem.PopBackStack(R.id.adultHomeFragment, false))
+//            navigateTo(NavigateItem.PopBackStack(R.id.adultHomeFragment, false))
             mainViewModel?.switchTab?.value = 1
         }
 
@@ -1106,7 +1108,7 @@ class PlayerFragment : BaseFragment() {
         consumeDialog = null
         loadReplyCommentBlock = null
         loadCommentLikeBlock = null
-        viewModel.deleteCacheFile()
+//        viewModel.deleteCacheFile()
     }
 
     private fun setupPlayer() {
@@ -1511,11 +1513,11 @@ class PlayerFragment : BaseFragment() {
                         isAdult = obtainIsAdult()
                     )
                     bundle.putBoolean(KEY_IS_FROM_PLAYER, true)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_playerFragment_to_searchVideoFragment,
-                            bundle
-                        )
+
+                    //TODO
+                    findNavController().navigate(
+                        R.id.action_playerFragment_to_searchVideoFragment,
+                        bundle
                     )
                 }
             )
