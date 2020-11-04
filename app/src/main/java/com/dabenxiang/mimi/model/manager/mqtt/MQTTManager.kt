@@ -20,7 +20,7 @@ class MQTTManager(val context: Context, private val pref: Pref) {
     private var client: MqttAndroidClient? = null
     private var options: MqttConnectOptions? = null
 
-    val messageIdSet = hashSetOf<String>()
+    private val messageIdSet = hashSetOf<String>()
 
     fun init(serverUrl: String, clientId: String, extendedCallback: ExtendedCallback) {
         client = MqttAndroidClient(context, serverUrl, clientId)
