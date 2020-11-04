@@ -37,6 +37,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.*
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.main.MainActivity
+import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.*
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
@@ -280,6 +281,12 @@ class PlayerFragment : BaseFragment() {
     }
 
     private fun setupUI() {
+
+        if(recycler_info.parent != null ) {
+            Timber.i("recyclerInfo removeView")
+            playerInfoAdapter.removeAllHeaderView()
+        }
+
         val isAdult = obtainIsAdult()
 
         playerInfoAdapter.addHeaderView(adInfo)
@@ -292,6 +299,7 @@ class PlayerFragment : BaseFragment() {
             CommentLoadMoreView(isAdult, CommentViewType.VIDEO)
 
         recycler_info.adapter = playerInfoAdapter
+
 
         val backgroundColor = requireContext().getColor(R.color.normal_color_background)
         recycler_info.setBackgroundColor(backgroundColor)
@@ -315,7 +323,10 @@ class PlayerFragment : BaseFragment() {
         headSource.recyclerview_episode.adapter = episodeAdapter
 
         headGuessLike.recyclerview_guess_like.adapter = guessLikeAdapter
-        LinearSnapHelper().attachToRecyclerView(headGuessLike.recyclerview_guess_like)
+        
+         if(firstCreateView){
+            LinearSnapHelper().attachToRecyclerView(headGuessLike.recyclerview_guess_like)
+        }
 
         bottom_func_bar.setBackgroundResource(R.drawable.bg_gray_2_top_line)
         bottom_func_input.setBackgroundResource(R.drawable.bg_gray_2_top_line)
@@ -897,20 +908,17 @@ class PlayerFragment : BaseFragment() {
 
         btn_vip.setOnClickListener {
             Timber.i("btn_vip Click")
-            val bundle = Bundle()
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_to_topup,
-                    bundle
-                )
-            )
+            navigateTo(NavigateItem.PopBackStack(R.id.adultHomeFragment, false))
+            mainViewModel?.switchTab?.value = 1
         }
 
         btn_promote.setOnClickListener {
             val bundle = Bundle()
-            NavigateItem.Destination(
-                R.id.action_to_inviteVipFragment,
-                bundle
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_inviteVipFragment,
+                    bundle
+                )
             )
         }
     }

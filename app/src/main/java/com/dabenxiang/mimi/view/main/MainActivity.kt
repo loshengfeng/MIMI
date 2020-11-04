@@ -107,6 +107,13 @@ class MainActivity : BaseActivity(), InteractionListener {
             )
         })
 
+        viewModel.switchTab.observe(this, {
+            if(it >= 0) {
+
+                bottom_navigation.switchTab(it)
+            }
+        })
+
         viewModel.getTotalUnread()
     }
 
@@ -287,7 +294,7 @@ class MainActivity : BaseActivity(), InteractionListener {
             if (dest != 0)
                 Navigation.findNavController(this, R.id.nav_host_fragment).navigate(dest, extras)
         } else if(NAVIGATE_TO_TOPUP_ACTION == intent?.action){
-            bottom_navigation switchTab 1
+            bottom_navigation.switchTab(1)
         }
     }
 

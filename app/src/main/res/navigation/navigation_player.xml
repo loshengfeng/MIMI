@@ -37,7 +37,6 @@
 
         <action
             android:id="@+id/action_to_inviteVipFragment"
-            app:popUpToInclusive="true"
             app:destination="@id/inviteVipFragment" />
 
     </fragment>
