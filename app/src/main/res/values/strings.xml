@@ -125,7 +125,7 @@
     <string name="setting_email">Email</string>
     <string name="setting_account">帐号</string>
     <string name="setting_gender">性别</string>
-    <string name="setting_choose">请选择(预设)</string>
+    <string name="setting_choose">请选择</string>
     <string name="setting_birthday">生日</string>
     <string name="setting_birthday_title">修改生日</string>
     <string name="setting_type_birthday">请填写生日</string>

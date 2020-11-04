@@ -1069,6 +1069,7 @@ class PlayerActivity : BaseActivity() {
     }
 
     override fun onPause() {
+        Timber.d("player activity onPause")
         super.onPause()
 
         dialog?.dismiss()
@@ -1087,14 +1088,14 @@ class PlayerActivity : BaseActivity() {
 
     override fun onStop() {
         super.onStop()
-        if (Util.SDK_INT > 23) {
-            player_view.onPause()
-            releasePlayer()
-        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        if (Util.SDK_INT > 23) {
+            player_view.onPause()
+            releasePlayer()
+        }
         dialog = null
         consumeDialog = null
         loadReplyCommentBlock = null

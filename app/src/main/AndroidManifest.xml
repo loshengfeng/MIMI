@@ -48,7 +48,7 @@
             android:name=".view.main.MainActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
-            android:launchMode="singleInstance"
+            android:launchMode="singleTop"
             tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

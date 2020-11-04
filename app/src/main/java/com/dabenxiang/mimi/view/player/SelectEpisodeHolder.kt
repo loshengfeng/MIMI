@@ -24,7 +24,6 @@ class SelectEpisodeHolder(itemView: View, listener: IndexViewHolderListener, var
     fun setSelected(isSelected: Boolean) {
         when {
             isSelected -> R.color.color_white_1
-            isAdult -> R.color.color_white_1_50
             else -> R.color.color_black_1_50
         }.also {
             tvTitle.setTextColor(itemView.resources.getColor(it, null))
@@ -32,7 +31,6 @@ class SelectEpisodeHolder(itemView: View, listener: IndexViewHolderListener, var
 
         when {
             isSelected -> tvTitle.setBackgroundResource(R.drawable.bg_red_1_radius_6)
-            isAdult -> tvTitle.setBackgroundResource(R.drawable.bg_stroke_white_1_50_radius_6)
             else -> tvTitle.setBackgroundResource(R.drawable.bg_stroke_black_1_50_radius_6)
         }
     }

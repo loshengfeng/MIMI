@@ -6,6 +6,7 @@ import com.dabenxiang.mimi.model.manager.mqtt.callback.ExtendedCallback
 import com.dabenxiang.mimi.model.manager.mqtt.callback.SubscribeCallback
 import com.dabenxiang.mimi.model.pref.Pref
 import org.eclipse.paho.android.service.MqttAndroidClient
+import org.eclipse.paho.android.service.ParcelableMqttMessage
 import org.eclipse.paho.client.mqttv3.*
 import timber.log.Timber
 
@@ -19,6 +20,8 @@ class MQTTManager(val context: Context, private val pref: Pref) {
     private var client: MqttAndroidClient? = null
     private var options: MqttConnectOptions? = null
 
+    val messageIdSet = hashSetOf<String>()
+
     fun init(serverUrl: String, clientId: String, extendedCallback: ExtendedCallback) {
         client = MqttAndroidClient(context, serverUrl, clientId)
         client?.setCallback(object : MqttCallbackExtended {
@@ -27,7 +30,10 @@ class MQTTManager(val context: Context, private val pref: Pref) {
             }
 
             override fun messageArrived(topic: String, message: MqttMessage) {
-                if(!message.isDuplicate) {
+                val parcelableMqttMessage = message as ParcelableMqttMessage
+                val messageId = parcelableMqttMessage.messageId
+                if (!messageIdSet.contains(messageId)) {
+                    messageIdSet.add(messageId)
                     extendedCallback.onMessageArrived(topic, message)
                 }
             }
@@ -94,7 +100,11 @@ class MQTTManager(val context: Context, private val pref: Pref) {
         }
     }
 
-    fun publishMessage(publishTopic: String, publishMessage: String, callback: IMqttActionListener = defaultMqttCallback) {
+    fun publishMessage(
+        publishTopic: String,
+        publishMessage: String,
+        callback: IMqttActionListener = defaultMqttCallback
+    ) {
         val message = MqttMessage()
         message.payload = publishMessage.toByteArray()
         client?.publish(publishTopic, message, null, callback)
