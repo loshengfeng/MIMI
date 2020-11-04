@@ -1041,7 +1041,7 @@ class PlayerActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
-
+        Timber.i("onStart")
         if (Util.SDK_INT > 23) {
             setupPlayer()
             player_view.onResume()
@@ -1050,7 +1050,7 @@ class PlayerActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-
+        Timber.i("onResume")
         loadVideo()
 
         //hideSystemUi()
@@ -1087,10 +1087,13 @@ class PlayerActivity : BaseActivity() {
     }
 
     override fun onStop() {
+        Timber.i("onStop")
         super.onStop()
     }
 
     override fun onDestroy() {
+
+        Timber.i("onDestroy")
         super.onDestroy()
         if (Util.SDK_INT > 23) {
             player_view.onPause()
