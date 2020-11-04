@@ -496,7 +496,7 @@ class FavoriteFragment : BaseFragment() {
             )
         } else {
             useAdultTheme(false)
-            val bundle = ClipFragment.createBundle(viewModel.currentPostList, position, false)
+            val bundle = ClipFragment.createBundle(viewModel.currentPostList, position, true)
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_postFavoriteFragment_to_clipFragment,

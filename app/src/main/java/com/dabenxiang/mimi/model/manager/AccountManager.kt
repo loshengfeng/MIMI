@@ -6,6 +6,7 @@ import com.dabenxiang.mimi.model.api.vo.MeItem
 import com.dabenxiang.mimi.model.api.vo.SignInRequest
 import com.dabenxiang.mimi.model.api.vo.SingUpRequest
 import com.dabenxiang.mimi.model.enums.TokenResult
+import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager
 import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.model.vo.ProfileItem
 import com.dabenxiang.mimi.model.vo.TokenItem
@@ -15,7 +16,11 @@ import kotlinx.coroutines.flow.*
 import retrofit2.HttpException
 import java.util.*
 
-class AccountManager(private val pref: Pref, private val domainManager: DomainManager) {
+class AccountManager(
+    private val pref: Pref,
+    private val domainManager: DomainManager,
+    private val mqttManager: MQTTManager
+) {
 
     var keepAccount: Boolean
         get() = pref.keepAccount
@@ -166,9 +171,7 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
         flow {
             val result = domainManager.getApiRepository().signOut()
             if (!result.isSuccessful) throw HttpException(result)
-
             logoutLocal()
-
             emit(ApiResult.success(null))
         }
             .flowOn(Dispatchers.IO)
@@ -194,5 +197,6 @@ class AccountManager(private val pref: Pref, private val domainManager: DomainMa
         pref.clearMemberToken()
         pref.clearSearchHistory()
         if (!keepAccount) pref.clearProfile()
+        mqttManager.disconnect()
     }
 }
