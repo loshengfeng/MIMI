@@ -55,6 +55,10 @@ class MQTTManager(val context: Context, private val pref: Pref) {
 
     }
 
+    fun isMqttConnect() : Boolean{
+        return client?.isConnected != true
+    }
+
     fun connect(connectCallback: ConnectCallback) {
         client?.connect(options, null, object : IMqttActionListener {
             override fun onSuccess(asyncActionToken: IMqttToken) {
@@ -75,7 +79,8 @@ class MQTTManager(val context: Context, private val pref: Pref) {
     }
 
     fun disconnect() {
-        if (client != null) {
+        if (client?.isConnected == true) {
+            client?.setCallback(null)
             client?.disconnect()
         }
     }
