@@ -49,6 +49,15 @@
             android:text="@string/btn_login" />
     </com.google.android.material.tabs.TabLayout>
 
+    <View
+        android:id="@+id/secret_layout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/tl_type"
+        app:layout_constraintEnd_toEndOf="@+id/item_register"
+        app:layout_constraintStart_toEndOf="@+id/btnClose"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <include
         android:id="@+id/item_register"
         layout="@layout/item_register"

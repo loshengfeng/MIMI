@@ -43,7 +43,6 @@ class MainViewModel : BaseViewModel() {
 
     var needCloseApp = false // 判斷是否需要離開 app
     var isFromPlayer = false
-    var isMqttConnect = false
 
     val messageListenerMap = hashMapOf<String, MessageListener>()
 
@@ -270,8 +269,8 @@ class MainViewModel : BaseViewModel() {
     }
 
     fun startMQTT() {
-        if(!isMqttConnect) {
-            //test serverUrl use: tcp://172.x.x.x:1883
+        if (isMqttConnect()) {
+            // test serverUrl use: tcp://172.x.x.x:1883
             mqttManager.init(MQTT_HOST_URL, clientId, extendedCallback)
             mqttManager.connect(connectCallback)
         }
@@ -297,6 +296,10 @@ class MainViewModel : BaseViewModel() {
         mqttManager.publishMessage(topic, msg)
     }
 
+    fun isMqttConnect(): Boolean {
+        return mqttManager.isMqttConnect()
+    }
+
     fun getNotificationTopic(): String {
         val userId = accountManager.getProfile().userId
         return StringBuilder(MQTTManager.PREFIX_NOTIFICATION).append(userId).toString()
@@ -313,7 +316,7 @@ class MainViewModel : BaseViewModel() {
             messageListenerMap[topic]?.onMsgReceive(message)
         }
 
-        override fun onConnectionLost(cause: Throwable) {
+        override fun onConnectionLost(cause: Throwable?) {
             Timber.e("The Connection was lost: $cause")
         }
 
@@ -325,7 +328,6 @@ class MainViewModel : BaseViewModel() {
     private val connectCallback = object : ConnectCallback {
         override fun onSuccess(asyncActionToken: IMqttToken) {
             Timber.d("Connection onSuccess")
-            isMqttConnect = true
             val topic = getNotificationTopic()
             messageListenerMap[topic] = messageListener
             subscribeToTopic(topic)
@@ -333,7 +335,6 @@ class MainViewModel : BaseViewModel() {
 
         override fun onFailure(asyncActionToken: IMqttToken, exception: Throwable) {
             Timber.e("Connection onFailure: $exception")
-            isMqttConnect = false
         }
     }
 
@@ -347,7 +348,9 @@ class MainViewModel : BaseViewModel() {
                     val data = gson.fromJson(String(message.payload), DailyCheckInItem::class.java)
                     val profileItem = accountManager.getProfile()
                     data.dailyCheckInPayLoadItem?.videoCount?.let { profileItem.videoCount = it }
-                    data.dailyCheckInPayLoadItem?.videoOnDemandCount?.let { profileItem.videoOnDemandCount = it }
+                    data.dailyCheckInPayLoadItem?.videoOnDemandCount?.let {
+                        profileItem.videoOnDemandCount = it
+                    }
                     accountManager.setupProfile(profileItem)
                     _dailyCheckInItem.postValue(data)
                 }

@@ -12,8 +12,6 @@ import retrofit2.HttpException
 
 class PersonalViewModel : BaseViewModel() {
 
-    var byteArray: ByteArray? = null
-
     private val _meItem = MutableLiveData<ApiResult<MeItem>>()
     val meItem: LiveData<ApiResult<MeItem>> = _meItem
 
@@ -45,11 +43,12 @@ class PersonalViewModel : BaseViewModel() {
         viewModelScope.launch {
             accountManager.signOut().collect {
                 _apiSignOut.value = it
+                _meItem.value = null
             }
         }
     }
 
-    fun getUnread(){
+    fun getUnread() {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
@@ -57,24 +56,27 @@ class PersonalViewModel : BaseViewModel() {
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(result.body()?.content as Int))
             }
-                    .onStart { emit(ApiResult.loading()) }
-                    .catch { e -> emit(ApiResult.error(e)) }
-                    .onCompletion { emit(ApiResult.loaded()) }
-                    .collect { _unreadResult.value = it }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _unreadResult.value = it }
         }
     }
 
     private val _totalUnreadResult = MutableLiveData<ApiResult<Int>>()
     val totalUnreadResult: LiveData<ApiResult<Int>> = _totalUnreadResult
 
-    fun getTotalUnread(){
+    fun getTotalUnread() {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val chatUnreadResult = apiRepository.getUnread()
-                val chatUnread = if (!chatUnreadResult.isSuccessful) 0 else chatUnreadResult.body()?.content?: 0
+                val chatUnread =
+                    if (!chatUnreadResult.isSuccessful) 0 else chatUnreadResult.body()?.content ?: 0
                 val orderUnreadResult = apiRepository.getUnReadOrderCount()
-                val orderUnread = if (!orderUnreadResult.isSuccessful) 0 else orderUnreadResult.body()?.content?: 0
+                val orderUnread =
+                    if (!orderUnreadResult.isSuccessful) 0 else orderUnreadResult.body()?.content
+                        ?: 0
                 emit(ApiResult.success(chatUnread + orderUnread))
             }
                 .onStart { emit(ApiResult.loading()) }

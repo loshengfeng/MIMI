@@ -27,7 +27,10 @@ class LoginViewModel : BaseViewModel() {
     var type = TYPE_REGISTER
 
     var changePrefixCount = 0
+    var mobileValidCount = 0
     var timer: Timer? = null
+
+    var isNeedValidMobile = false
 
     val account = EditTextMutableLiveData()
     val registerPw = EditTextMutableLiveData()
@@ -135,7 +138,7 @@ class LoginViewModel : BaseViewModel() {
     fun isValidateMobile(mobile: String, callPrefix: String): String {
         return when {
             TextUtils.isEmpty(mobile) -> app.getString(R.string.mobile_format_error_1)
-            isMobileValid(callPrefix, mobile) -> app.getString(R.string.mobile_format_error_2)
+            isMobileValid(callPrefix, mobile, isNeedValidMobile) -> app.getString(R.string.mobile_format_error_2)
             else -> ""
         }
     }
