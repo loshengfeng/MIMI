@@ -20,7 +20,7 @@ class MQTTManager(val context: Context, private val pref: Pref) {
     private var client: MqttAndroidClient? = null
     private var options: MqttConnectOptions? = null
 
-    val messageIdSet = hashSetOf<String>()
+    private val messageIdSet = hashSetOf<String>()
 
     fun init(serverUrl: String, clientId: String, extendedCallback: ExtendedCallback) {
         client = MqttAndroidClient(context, serverUrl, clientId)
@@ -38,7 +38,7 @@ class MQTTManager(val context: Context, private val pref: Pref) {
                 }
             }
 
-            override fun connectionLost(cause: Throwable) {
+            override fun connectionLost(cause: Throwable?) {
                 extendedCallback.onConnectionLost(cause)
             }
 
@@ -53,6 +53,10 @@ class MQTTManager(val context: Context, private val pref: Pref) {
         options?.isAutomaticReconnect = true
         options?.isCleanSession = false
 
+    }
+
+    fun isMqttConnect() : Boolean{
+        return client?.isConnected != true
     }
 
     fun connect(connectCallback: ConnectCallback) {
@@ -75,7 +79,7 @@ class MQTTManager(val context: Context, private val pref: Pref) {
     }
 
     fun disconnect() {
-        if (client != null) {
+        if (client?.isConnected == true) {
             client?.disconnect()
         }
     }

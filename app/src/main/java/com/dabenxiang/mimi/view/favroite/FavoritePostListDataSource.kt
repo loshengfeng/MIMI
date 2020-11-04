@@ -34,11 +34,13 @@ class FavoritePostListDataSource constructor(
                 if (!result.isSuccessful) throw HttpException(result)
                 result.body()?.also { item ->
                     val postListItems = ArrayList<MemberPostItem>()
+                    val ids = ArrayList<Long>()
                     item.content?.forEach {
                         val memberPostItem = it.toMemberPostItem()
+                        ids.add(it.id)
                         postListItems.add(memberPostItem)
                     }
-
+                    pagingCallback.onTotalVideoId(ids,true)
                     pagingCallback.onReceiveResponse(postListItems)
 
                     val nextPageKey = when {
@@ -59,11 +61,6 @@ class FavoritePostListDataSource constructor(
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect { response ->
                     pagingCallback.onTotalCount(response.list.size)
-                    val ids = ArrayList<Long>()
-                    response.list.forEach {
-                        (it as MemberPostItem).id.let { it1 -> ids.add(it1) }
-                    }
-                    pagingCallback.onTotalVideoId(ids,true)
                     callback.onResult(response.list, null, response.nextKey)
                 }
         }
@@ -100,7 +97,7 @@ class FavoritePostListDataSource constructor(
                             list.forEach {
                                 val memberPostItem = it.toMemberPostItem()
                                 postListItems.add(memberPostItem)
-                                it.id.let { it1 -> ids.add(it1) }
+                                ids.add(it.id)
                             }
                             pagingCallback.onTotalVideoId(ids, false)
                             pagingCallback.onReceiveResponse(postListItems)

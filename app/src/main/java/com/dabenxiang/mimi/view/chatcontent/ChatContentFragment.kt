@@ -78,7 +78,7 @@ class ChatContentFragment : BaseFragment() {
     private var senderAvatarId = ""
     private val file: File = FileUtil.getAvatarFile()
     private var connectMonitor: ConnectionStateMonitor? = null //監測網路切換狀態
-    private var needDisplayNetworkError:Boolean=false
+    private var needDisplayNetworkError: Boolean = false
     private var title = ""
 
     override val bottomNavigationVisibility: Int
@@ -124,7 +124,7 @@ class ChatContentFragment : BaseFragment() {
                 viewModel.chatId = id
                 viewModel.getChatContent()
                 viewModel.setLastRead()
-                if (mainViewModel?.isMqttConnect == true ) {
+                if (mainViewModel?.isMqttConnect() == true) {
                     mainViewModel?.subscribeToTopic(viewModel.getChatTopic())
                 }
             }
@@ -244,7 +244,10 @@ class ChatContentFragment : BaseFragment() {
         })
     }
 
-    override fun onApiError(throwable: Throwable, onHttpErrorBlock: ((ExceptionResult.HttpError) -> Unit)?) {
+    override fun onApiError(
+        throwable: Throwable,
+        onHttpErrorBlock: ((ExceptionResult.HttpError) -> Unit)?
+    ) {
         super.onApiError(throwable, onHttpErrorBlock)
 
         switchConnectErrorState(true)
