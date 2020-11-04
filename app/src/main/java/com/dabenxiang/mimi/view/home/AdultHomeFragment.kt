@@ -909,7 +909,19 @@ class AdultHomeFragment : BaseFragment() {
                 else -> null
             }
             type?.let {
-                setTab(categoryTypeList.indexOf(it))
+                if(type == CategoryType.VIDEO_ON_DEMAND) {
+                    val category = mainViewModel?.adult?.categories?.get(0)
+                    category?.also {
+                        val bundle = CategoriesFragment.createBundle(it.name, it.name, category)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_homeFragment_to_categoriesFragment,
+                                bundle
+                            )
+                        )
+                    }
+                } else
+                    setTab(categoryTypeList.indexOf(it))
             }
         }
 
