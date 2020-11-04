@@ -316,7 +316,7 @@ class MainViewModel : BaseViewModel() {
             messageListenerMap[topic]?.onMsgReceive(message)
         }
 
-        override fun onConnectionLost(cause: Throwable) {
+        override fun onConnectionLost(cause: Throwable?) {
             Timber.e("The Connection was lost: $cause")
         }
 

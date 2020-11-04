@@ -38,7 +38,7 @@ class MQTTManager(val context: Context, private val pref: Pref) {
                 }
             }
 
-            override fun connectionLost(cause: Throwable) {
+            override fun connectionLost(cause: Throwable?) {
                 extendedCallback.onConnectionLost(cause)
             }
 
@@ -80,7 +80,6 @@ class MQTTManager(val context: Context, private val pref: Pref) {
 
     fun disconnect() {
         if (client?.isConnected == true) {
-            client?.setCallback(null)
             client?.disconnect()
         }
     }
