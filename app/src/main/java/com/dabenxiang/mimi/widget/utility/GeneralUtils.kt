@@ -134,10 +134,13 @@ object GeneralUtils {
         )
     }
 
-    fun isMobileValid(callPrefix: String, mobile: String): Boolean {
+    fun isMobileValid(callPrefix: String, mobile: String, validMobile: Boolean = false): Boolean {
         return if (callPrefix == "+86") {
-//            return !checkPhoneNum(mobile)
-            mobile.length < 11
+            if (validMobile) {
+                !checkPhoneNum(mobile)
+            } else {
+                mobile.length < 11
+            }
         } else {
             mobile.length < 9
         }
