@@ -70,7 +70,7 @@ abstract class BaseFragment : Fragment() {
     }
 
     open var mainViewModel: MainViewModel? = null
-    var progressHUD: KProgressHUD? = null
+    lateinit var progressHUD: KProgressHUD
 
     var mView: View? = null
     var firstCreateView = false
