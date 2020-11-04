@@ -345,7 +345,7 @@ class SearchPostFragment : BaseFragment() {
             val bundle = PlayerFragment.createBundle(playerData)
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_searchVideoFragment_to_navigation_player,
+                    R.id.action_searchPostFragment_to_navigation_player,
                     bundle
                 )
             )
@@ -397,7 +397,7 @@ class SearchPostFragment : BaseFragment() {
                     val bundle = PlayerFragment.createBundle(playerData)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_searchVideoFragment_to_navigation_player,
+                            R.id.action_searchPostFragment_to_navigation_player,
                             bundle
                         )
                     )

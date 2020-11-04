@@ -1086,24 +1086,15 @@ class PlayerFragment : BaseFragment() {
             it.disable()
         }
 
-        if ((Util.SDK_INT <= 23)) {
-            player_view.onPause()
-            releasePlayer()
-        }
+        player_view.onPause()
 
     }
 
-    override fun onStop() {
-        super.onStop()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if (Util.SDK_INT > 23) {
-            player_view.onPause()
-            releasePlayer()
-        }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        releasePlayer()
         dialog = null
+
         consumeDialog = null
         loadReplyCommentBlock = null
         loadCommentLikeBlock = null

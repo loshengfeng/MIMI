@@ -45,7 +45,13 @@
     <fragment
         android:id="@+id/searchVideoFragment"
         android:name="com.dabenxiang.mimi.view.search.video.SearchVideoFragment"
-        android:label="SearchVideoFragment" />
+        android:label="SearchVideoFragment" >
+
+        <action
+            android:id="@+id/action_searchVideoFragment_to_navigation_player"
+            app:destination="@id/playerFragment" />
+
+   </fragment>
 
     <fragment
         android:id="@+id/inviteVipFragment"

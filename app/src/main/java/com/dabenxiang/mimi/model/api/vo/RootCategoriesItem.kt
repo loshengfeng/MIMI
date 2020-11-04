@@ -11,7 +11,7 @@ data class RootCategoriesItem(
     val categories: List<CategoriesItem>?
 ): Serializable {
     fun getNormal() = categories?.get(0)
-    fun getAdult() = categories?.get(1)
+    fun getAdult() = categories?.get(0)
 }
 
 data class CategoriesItem(
