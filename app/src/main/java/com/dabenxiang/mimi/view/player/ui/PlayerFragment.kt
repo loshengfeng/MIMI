@@ -36,8 +36,6 @@ import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.*
 import com.dabenxiang.mimi.view.login.LoginFragment
-import com.dabenxiang.mimi.view.main.MainActivity
-import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.*
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
@@ -103,6 +101,7 @@ class PlayerFragment : BaseFragment() {
     private var isFirstInit = true
     private var isKeyboardShown = false
     private var oldPlayerItem: PlayerItem = PlayerItem(-1)
+    override var bottomNavigationVisibility = View.GONE
 
     private val sourceListAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
@@ -323,7 +322,7 @@ class PlayerFragment : BaseFragment() {
         headSource.recyclerview_episode.adapter = episodeAdapter
 
         headGuessLike.recyclerview_guess_like.adapter = guessLikeAdapter
-        
+
          if(firstCreateView){
             LinearSnapHelper().attachToRecyclerView(headGuessLike.recyclerview_guess_like)
         }
@@ -826,27 +825,6 @@ class PlayerFragment : BaseFragment() {
             }
         }
 
-        orientationDetector =
-            OrientationDetector(requireContext(), SensorManager.SENSOR_DELAY_NORMAL).also { detector ->
-                detector.setChangeListener(object : OrientationDetector.OnChangeListener {
-                    override fun onChanged(orientation: Int) {
-
-                        Timber.i("detector onChanged")
-                        viewModel.currentOrientation = orientation
-                        if (viewModel.lockFullScreen) {
-                            when (orientation) {
-                                ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE, ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE -> {
-                                    activity?.requestedOrientation = orientation
-                                }
-                            }
-                        } else {
-                            activity?.requestedOrientation = orientation
-                        }
-                        adjustPlayerSize()
-                    }
-                })
-            }
-
         tv_like.setOnClickListener {
             viewModel.checkStatus {
                 Timber.d("like confirmed")
@@ -921,6 +899,27 @@ class PlayerFragment : BaseFragment() {
                 )
             )
         }
+
+        orientationDetector =
+            OrientationDetector(requireActivity(), SensorManager.SENSOR_DELAY_NORMAL).also { detector ->
+                detector.setChangeListener(object : OrientationDetector.OnChangeListener {
+                    override fun onChanged(orientation: Int) {
+
+                        Timber.i("detector onChanged")
+                        viewModel.currentOrientation = orientation
+                        if (viewModel.lockFullScreen) {
+                            when (orientation) {
+                                ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE, ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE -> {
+                                    requireActivity().requestedOrientation = orientation
+                                }
+                            }
+                        } else {
+                            requireActivity().requestedOrientation = orientation
+                        }
+                        adjustPlayerSize()
+                    }
+                })
+            }
     }
 
     @SuppressLint("SetTextI18n")
@@ -1039,7 +1038,7 @@ class PlayerFragment : BaseFragment() {
             et_message.let {
                 it.requestFocusFromTouch()
                 val lManager: InputMethodManager =
-                    requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 lManager?.showSoftInput(it, 0)
             }
         }
@@ -1049,9 +1048,9 @@ class PlayerFragment : BaseFragment() {
     private fun commentEditorHide() {
         Timber.i("commentEditorHide")
         CoroutineScope(Dispatchers.Main).launch {
-            tv_replay_name.visibility = View.GONE
+            tv_replay_name?.visibility = View.GONE
             val lManager: InputMethodManager =
-                requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             lManager?.hideSoftInputFromWindow(et_message.windowToken, 0)
         }
     }
@@ -1095,11 +1094,13 @@ class PlayerFragment : BaseFragment() {
         }
 
         player_view.onPause()
+        releasePlayer()
 
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        player_view.onPause()
         releasePlayer()
         dialog = null
 
