@@ -96,8 +96,10 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view), KoinComponent 
 
     fun onUpdateByDeducted(item: MemberPostItem, clipFuncItem: ClipFuncItem, pos: Int){
         if (item.deducted) {
-            val isLike = item.likeType == LikeType.LIKE
-            tvLike.setOnClickListener { clipFuncItem.onLikeClick(item, pos, !isLike) }
+            tvLike.setOnClickListener {
+                val isLike = item.likeType == LikeType.LIKE
+                clipFuncItem.onLikeClick(item, pos, !isLike)
+            }
             tvFavorite.setOnClickListener {
                 clipFuncItem.onFavoriteClick(
                     item,
