@@ -35,7 +35,7 @@ import com.dabenxiang.mimi.view.home.AdultHomeFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.view.player.PlayerActivity
+import com.dabenxiang.mimi.view.player.ui.PlayerFragment.Companion.KEY_DEST_ID
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.view.setting.SettingFragment
 import com.dabenxiang.mimi.widget.utility.FileUtil.deleteExternalFile
@@ -283,7 +283,7 @@ class MainActivity : BaseActivity(), InteractionListener {
                 }
             }
         } else if (NAVIGATE_TO_ACTION == intent?.action) {
-            val dest = intent.getIntExtra(PlayerActivity.KEY_DEST_ID, 0)
+            val dest = intent.getIntExtra(KEY_DEST_ID, 0)
             if (dest != 0)
                 Navigation.findNavController(this, R.id.nav_host_fragment).navigate(dest, extras)
         } else if(NAVIGATE_TO_TOPUP_ACTION == intent?.action){

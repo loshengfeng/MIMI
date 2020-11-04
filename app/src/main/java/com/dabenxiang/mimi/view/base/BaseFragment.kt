@@ -37,7 +37,7 @@ import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
-import com.dabenxiang.mimi.view.player.PlayerActivity
+import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.MEMBER_REQUEST
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.PIC_URI
@@ -145,7 +145,7 @@ abstract class BaseFragment : Fragment() {
         setupListeners()
         setupObservers()
 
-        if (arguments?.getBoolean(PlayerActivity.KEY_IS_FROM_PLAYER) == true) {
+        if (arguments?.getBoolean(PlayerFragment.KEY_IS_FROM_PLAYER) == true) {
             mainViewModel?.isFromPlayer = true
         }
 

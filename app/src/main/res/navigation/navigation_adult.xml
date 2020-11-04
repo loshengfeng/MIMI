@@ -10,6 +10,7 @@
     <include app:graph="@navigation/navigation_login" />
     <include app:graph="@navigation/navigation_setting" />
     <include app:graph="@navigation/navigation_topup" />
+    <include app:graph="@navigation/navigation_player" />
 
     <fragment
         android:id="@+id/splashFragment"
@@ -95,6 +96,10 @@
         <action
             android:id="@+id/action_to_inviteVipFragment"
             app:destination="@id/inviteVipFragment" />
+
+        <action
+            android:id="@+id/action_adultHomeFragment_to_navigation_player"
+            app:destination="@id/navigation_player" />
     </fragment>
 
     <fragment
@@ -109,6 +114,10 @@
         <action
             android:id="@+id/action_categoriesFragment_to_loginFragment"
             app:destination="@id/navigation_login" />
+
+        <action
+            android:id="@+id/action_categoriesFragment_to_navigation_player"
+            app:destination="@id/navigation_player" />
 
     </fragment>
 
@@ -150,6 +159,9 @@
         <action
             android:id="@+id/action_searchPostFragment_to_postVideoFragment"
             app:destination="@id/postVideoFragment" />
+        <action
+            android:id="@+id/action_searchVideoFragment_to_navigation_player"
+            app:destination="@id/navigation_player" />
     </fragment>
 
     <fragment
@@ -316,7 +328,12 @@
         <action
             android:id="@+id/action_rankingFragment_to_loginFragment"
             app:destination="@id/navigation_login" />
+
+        <action
+            android:id="@+id/action_rankingFragment_to_navigation_player"
+            app:destination="@id/navigation_player" />
     </fragment>
+
     <fragment
         android:id="@+id/postViewerFragment"
         android:name="com.dabenxiang.mimi.view.post.viewer.PostViewerFragment"
@@ -328,6 +345,7 @@
             app:popUpTo="@+id/adultHomeFragment"
             app:popUpToInclusive="true" />
     </fragment>
+
     <fragment
         android:id="@+id/inviteVipFragment"
         android:name="com.dabenxiang.mimi.view.invitevip.InviteVipFragment"
@@ -339,6 +357,7 @@
             android:id="@+id/action_inviteVipFragment_to_navigation_login"
             app:destination="@id/navigation_login" />
     </fragment>
+
     <fragment
         android:id="@+id/inviteVipRecordFragment"
         android:name="com.dabenxiang.mimi.view.inviteviprecord.InviteVipRecordFragment"

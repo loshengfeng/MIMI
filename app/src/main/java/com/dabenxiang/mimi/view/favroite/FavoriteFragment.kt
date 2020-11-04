@@ -32,7 +32,7 @@ import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.view.player.PlayerActivity
+import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -293,9 +293,13 @@ class FavoriteFragment : BaseFragment() {
             when (item) {
                 is PlayItem -> {
                     val playerData = PlayerItem(item.videoId ?: 0)
-                    val intent = Intent(requireContext(), PlayerActivity::class.java)
-                    intent.putExtras(PlayerActivity.createBundle(playerData))
-                    startActivity(intent)
+                    val bundle = PlayerFragment.createBundle(playerData)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_postFavoriteFragment_to_navigation_player,
+                            bundle
+                        )
+                    )
                 }
                 is MemberPostItem -> {
                     position?.let { goShortVideoDetailPage(item, position) }
@@ -389,9 +393,13 @@ class FavoriteFragment : BaseFragment() {
                             } else {
                                 val playerData =
                                     PlayerItem(item.videoId)
-                                val intent = Intent(requireContext(), PlayerActivity::class.java)
-                                intent.putExtras(PlayerActivity.createBundle(playerData, true))
-                                startActivity(intent)
+                                val bundle = PlayerFragment.createBundle(playerData, true)
+                                navigateTo(
+                                    NavigateItem.Destination(
+                                        R.id.action_postFavoriteFragment_to_navigation_player,
+                                        bundle
+                                    )
+                                )
                             }
                         }
                         is MemberPostItem -> {

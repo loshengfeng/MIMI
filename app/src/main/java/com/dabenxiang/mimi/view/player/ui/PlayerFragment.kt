@@ -1,9 +1,7 @@
-package com.dabenxiang.mimi.view.player.fragment
+package com.dabenxiang.mimi.view.player.ui
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.hardware.SensorManager
 import android.os.Bundle
@@ -20,11 +18,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearSnapHelper
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
-import com.dabenxiang.mimi.NAVIGATE_TO_ACTION
 import com.dabenxiang.mimi.NAVIGATE_TO_TOPUP_ACTION
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.NetworkCallback
-import com.dabenxiang.mimi.callback.NetworkCallbackListener
 import com.dabenxiang.mimi.extension.addKeyboardToggleListener
 import com.dabenxiang.mimi.extension.handleException
 import com.dabenxiang.mimi.extension.setBtnSolidColor
@@ -52,7 +47,6 @@ import com.google.android.exoplayer2.analytics.AnalyticsListener
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.google.android.material.chip.Chip
-import com.kaopiz.kprogresshud.KProgressHUD
 import kotlinx.android.synthetic.main.activity_player.*
 import kotlinx.android.synthetic.main.custom_playback_control.*
 import kotlinx.android.synthetic.main.head_comment.view.*
@@ -136,10 +130,6 @@ class PlayerFragment : BaseFragment() {
             }
         }, obtainIsAdult())
     }
-
-//    private val progressHUD by lazy {
-//        KProgressHUD.create(activity).setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
-//    }
 
     private val adInfo by lazy {
         layoutInflater.inflate(R.layout.item_ad, recycler_info.parent as ViewGroup, false)
@@ -241,9 +231,10 @@ class PlayerFragment : BaseFragment() {
                 )
                 bundle.putBoolean(KEY_IS_FROM_PLAYER, true)
                 navigateTo(
-                    MainActivity::class.java,
-                    R.id.action_to_myPostFragment,
-                    bundle
+                    NavigateItem.Destination(
+                        R.id.action_playerFragment_to_myPostFragment,
+                        bundle
+                    )
                 )
             }
 
@@ -908,18 +899,17 @@ class PlayerFragment : BaseFragment() {
             Timber.i("btn_vip Click")
             val bundle = Bundle()
             navigateTo(
-                MainActivity::class.java,
-                R.id.navigation_topup,
-                bundle,
-                NAVIGATE_TO_TOPUP_ACTION
+                NavigateItem.Destination(
+                    R.id.action_to_topup,
+                    bundle
+                )
             )
         }
 
         btn_promote.setOnClickListener {
             val bundle = Bundle()
-            navigateTo(
-                MainActivity::class.java,
-                R.id.inviteVipFragment,
+            NavigateItem.Destination(
+                R.id.action_to_inviteVipFragment,
                 bundle
             )
         }
@@ -928,35 +918,6 @@ class PlayerFragment : BaseFragment() {
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//        var isFirstInit = true
-
-
-
-
-
-
-
-
-
-
-
-        //Detect key keyboard shown/hide
-
     }
 
     private fun showRechargeReminder(isShow: Boolean) {
@@ -1175,7 +1136,7 @@ class PlayerFragment : BaseFragment() {
             viewModel.getVideoInfo()
         } else if (viewModel.nextVideoUrl == null) {
             if (viewModel.apiVideoInfo.value == null) {
-                (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerItem?)?.also {
+                (arguments?.getSerializable(KEY_PLAYER_SRC) as PlayerItem?)?.also {
                     viewModel.videoId = it.videoId
                     viewModel.getVideoInfo()
                 }
@@ -1455,10 +1416,6 @@ class PlayerFragment : BaseFragment() {
         }
     }
 
-    private fun obtainVideoId(): Long {
-        return (intent.extras?.getSerializable(KEY_PLAYER_SRC) as PlayerItem?)?.videoId ?: 0
-    }
-
     private fun obtainIsAdult(): Boolean {
         return true
     }
@@ -1556,9 +1513,10 @@ class PlayerFragment : BaseFragment() {
                     )
                     bundle.putBoolean(KEY_IS_FROM_PLAYER, true)
                     navigateTo(
-                        MainActivity::class.java,
-                        R.id.searchVideoFragment,
-                        bundle
+                        NavigateItem.Destination(
+                            R.id.action_playerFragment_to_searchVideoFragment,
+                            bundle
+                        )
                     )
                 }
             )
@@ -1575,21 +1533,10 @@ class PlayerFragment : BaseFragment() {
                 if (errorHandler.throwable is UnknownHostException) {
                     showCrashDialog(HttpErrorMsgType.CHECK_NETWORK)
                 } else {
-                    GeneralUtils.showToast(this, errorHandler.throwable.toString())
+                    GeneralUtils.showToast(requireContext(), errorHandler.throwable.toString())
                 }
             }
         }
-    }
-
-    private fun handleHttpError(errorHandler: ExceptionResult.HttpError) {
-        GeneralDialog.newInstance(
-            GeneralDialogData(
-                titleRes = R.string.error_device_binding_title,
-                message = errorHandler.httpExceptionItem.errorItem.toString(),
-                messageIcon = R.drawable.ico_default_photo,
-                secondBtn = getString(R.string.btn_confirm)
-            )
-        ).show(requireActivity().supportFragmentManager)
     }
 
     private fun showCrashDialog(type: HttpErrorMsgType = HttpErrorMsgType.API_FAILED) {
@@ -1620,7 +1567,7 @@ class PlayerFragment : BaseFragment() {
      */
     private fun adjustPlayerSize() {
 
-        val screenSize = GeneralUtils.getScreenSize(requireActivity().)
+        val screenSize = GeneralUtils.getScreenSize(requireActivity())
         if (requireActivity().requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
             val params = player_view.layoutParams
             params.width = ViewGroup.LayoutParams.MATCH_PARENT
@@ -1631,10 +1578,6 @@ class PlayerFragment : BaseFragment() {
         } else {
             val params = player_view.layoutParams
             params.width = ViewGroup.LayoutParams.MATCH_PARENT
-//            params.height =
-//                min(screenSize.first, screenSize.second) - GeneralUtils.getStatusBarHeight(
-//                    baseContext
-//                )
             params.height = ViewGroup.LayoutParams.MATCH_PARENT
             player_view.layoutParams = params
             requireActivity().window.decorView.systemUiVisibility =
@@ -1677,7 +1620,8 @@ class PlayerFragment : BaseFragment() {
     }
 
     private fun scrollToBottom() {
-        if (intent.extras?.getBoolean(KEY_IS_COMMENT) == true) {
+
+        if (arguments?.getSerializable(KEY_IS_COMMENT) == true) {
 //            scrollView.fullScroll(View.FOCUS_DOWN)
         }
     }
@@ -1693,9 +1637,11 @@ class PlayerFragment : BaseFragment() {
                 secondBlock = {
                     val bundle = Bundle().also { it.putBoolean(KEY_IS_FROM_PLAYER, true) }
                     navigateTo(
-                        MainActivity::class.java,
-                        R.id.action_to_settingFragment,
-                        bundle
+                        NavigateItem.Destination(
+                            R.id.action_playerFragment_to_settingFragment,
+                            bundle
+                        )
+
                     )
                 }
             )
@@ -1715,18 +1661,20 @@ class PlayerFragment : BaseFragment() {
                     val bundle = Bundle()
                     bundle.putInt(LoginFragment.KEY_TYPE, LoginFragment.TYPE_REGISTER)
                     navigateTo(
-                        MainActivity::class.java,
-                        R.id.action_to_loginFragment,
-                        bundle
+                        NavigateItem.Destination(
+                            R.id.action_playerFragment_to_loginFragment,
+                            bundle
+                        )
                     )
                 },
                 secondBlock = {
                     val bundle = Bundle()
                     bundle.putInt(LoginFragment.KEY_TYPE, LoginFragment.TYPE_LOGIN)
                     navigateTo(
-                        MainActivity::class.java,
-                        R.id.action_to_loginFragment,
-                        bundle
+                        NavigateItem.Destination(
+                            R.id.action_playerFragment_to_loginFragment,
+                            bundle
+                        )
                     )
                 },
                 closeBlock = {

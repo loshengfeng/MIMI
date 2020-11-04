@@ -31,7 +31,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.home.HomeTemplate
 import com.dabenxiang.mimi.view.home.viewholder.*
-import com.dabenxiang.mimi.view.player.PlayerActivity
+import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_categories.*
@@ -74,9 +74,13 @@ class CategoriesFragment : BaseFragment() {
 
     private val adapterListener = object : HomeAdapter.EventListener {
         override fun onVideoClick(view: View, item: PlayerItem) {
-            val intent = Intent(requireContext(), PlayerActivity::class.java)
-            intent.putExtras(PlayerActivity.createBundle(item))
-            startActivityForResult(intent, REQUEST_LOGIN)
+            val bundle = PlayerFragment.createBundle(item)
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_categoriesFragment_to_navigation_player,
+                    bundle
+                )
+            )
         }
 
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {}
