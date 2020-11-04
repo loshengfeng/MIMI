@@ -100,6 +100,7 @@ class PersonalFragment : BaseFragment() {
                 is Empty -> {
                     item_is_Login.visibility = View.GONE
                     item_is_not_Login.visibility = View.VISIBLE
+                    tv_expiry_date.visibility =View.GONE
                 }
                 is Error -> {
                     when (it.throwable) {

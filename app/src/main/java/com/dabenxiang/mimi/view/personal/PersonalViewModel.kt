@@ -41,7 +41,10 @@ class PersonalViewModel : BaseViewModel() {
 
     fun signOut() {
         viewModelScope.launch {
-            accountManager.signOut().collect { _apiSignOut.value = it }
+            accountManager.signOut().collect {
+                _apiSignOut.value = it
+                _meItem.value = null
+            }
         }
     }
 

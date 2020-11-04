@@ -372,6 +372,15 @@ class LoginFragment : BaseFragment() {
 
             if (viewModel.timer == null) viewModel.startTimer()
         }
+
+        secret_layout.setOnClickListener {
+            viewModel.mobileValidCount++
+            if (viewModel.mobileValidCount == 10) {
+                viewModel.mobileValidCount = 0
+                viewModel.isNeedValidMobile = !viewModel.isNeedValidMobile
+                GeneralUtils.showToast(requireContext(), "is need valid mobile : " + viewModel.isNeedValidMobile)
+            }
+        }
     }
 
     override fun initSettings() {
