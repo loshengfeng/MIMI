@@ -34,10 +34,7 @@ import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.home.AdultHomeFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
-import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerFragment.Companion.KEY_DEST_ID
-import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
-import com.dabenxiang.mimi.view.setting.SettingFragment
 import com.dabenxiang.mimi.widget.utility.FileUtil.deleteExternalFile
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
@@ -93,7 +90,7 @@ class MainActivity : BaseActivity(), InteractionListener {
         })
 
         viewModel.totalUnreadResult.observe(this, Observer {
-            when(it) {
+            when (it) {
                 is Success -> {
                     refreshBottomNavigationBadge(it.result)
                 }
@@ -108,7 +105,7 @@ class MainActivity : BaseActivity(), InteractionListener {
         })
 
         viewModel.switchTab.observe(this, {
-            if(it >= 0) {
+            if (it >= 0) {
 
                 bottom_navigation.switchTab(it)
             }
@@ -183,10 +180,10 @@ class MainActivity : BaseActivity(), InteractionListener {
 //            bottom_navigation.itemTextColor =
 //                resources.getColorStateList(R.color.bottom_nav_adult_text_selector, null)
 //        } else {
-            window?.statusBarColor = getColor(R.color.normal_color_status_bar)
-            bottom_navigation.background = getDrawable(R.drawable.bg_gray_2_top_line)
-            bottom_navigation.itemTextColor =
-                resources.getColorStateList(R.color.bottom_nav_normal_text_selector, null)
+        window?.statusBarColor = getColor(R.color.normal_color_status_bar)
+        bottom_navigation.background = getDrawable(R.drawable.bg_gray_2_top_line)
+        bottom_navigation.itemTextColor =
+            resources.getColorStateList(R.color.bottom_nav_normal_text_selector, null)
 //        }
     }
 
@@ -222,23 +219,6 @@ class MainActivity : BaseActivity(), InteractionListener {
             } else {
                 finish()
             }
-        } else if ((fragmentName.toLowerCase(Locale.getDefault()) ==
-                    SearchVideoFragment::class.java.simpleName.toLowerCase(Locale.getDefault()))
-            || (fragmentName.toLowerCase(Locale.getDefault()) ==
-                    MyPostFragment::class.java.simpleName.toLowerCase(Locale.getDefault()))
-            || (fragmentName.toLowerCase(Locale.getDefault()) ==
-                    SettingFragment::class.java.simpleName.toLowerCase(Locale.getDefault()))
-        ) {
-//            if (viewModel.isFromPlayer) {
-//                viewModel.isFromPlayer = false
-//                deepLinkTo(
-//                    MainActivity::class.java,
-//                    R.navigation.navigation_adult,
-//                    R.id.adultHomeFragment,
-//                    null
-//                )
-//            } else
-                super.onBackPressed()
         } else {
             super.onBackPressed()
         }
@@ -293,7 +273,7 @@ class MainActivity : BaseActivity(), InteractionListener {
             val dest = intent.getIntExtra(KEY_DEST_ID, 0)
             if (dest != 0)
                 Navigation.findNavController(this, R.id.nav_host_fragment).navigate(dest, extras)
-        } else if(NAVIGATE_TO_TOPUP_ACTION == intent?.action){
+        } else if (NAVIGATE_TO_TOPUP_ACTION == intent?.action) {
             bottom_navigation.switchTab(1)
         }
     }
@@ -315,11 +295,16 @@ class MainActivity : BaseActivity(), InteractionListener {
     }
 
     private var reportDialog: ReportDialogFragment? = null
-    fun showReportDialog(item: BaseMemberPostItem, postItem: MemberPostItem? = null, isComment:Boolean? = false) {
+    fun showReportDialog(
+        item: BaseMemberPostItem,
+        postItem: MemberPostItem? = null,
+        isComment: Boolean? = false
+    ) {
         reportDialog =
-            ReportDialogFragment.newInstance(item, onReportDialogListener, postItem, isComment).also {
-                it.show(supportFragmentManager, ReportDialogFragment::class.java.simpleName)
-            }
+            ReportDialogFragment.newInstance(item, onReportDialogListener, postItem, isComment)
+                .also {
+                    it.show(supportFragmentManager, ReportDialogFragment::class.java.simpleName)
+                }
     }
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
