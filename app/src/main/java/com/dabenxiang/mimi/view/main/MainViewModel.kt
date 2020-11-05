@@ -272,7 +272,7 @@ class MainViewModel : BaseViewModel() {
     }
 
     fun startMQTT() {
-        if (isMqttConnect() == false) {
+        if (!isMqttConnect()) {
             // test serverUrl use: tcp://172.x.x.x:1883
             mqttManager.init(MQTT_HOST_URL, clientId, extendedCallback)
             mqttManager.connect(connectCallback)
@@ -299,7 +299,7 @@ class MainViewModel : BaseViewModel() {
         mqttManager.publishMessage(topic, msg)
     }
 
-    fun isMqttConnect(): Boolean? {
+    fun isMqttConnect(): Boolean {
         return mqttManager.isMqttConnect()
     }
 

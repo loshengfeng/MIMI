@@ -6,11 +6,9 @@ import com.dabenxiang.mimi.model.manager.mqtt.callback.ExtendedCallback
 import com.dabenxiang.mimi.model.manager.mqtt.callback.SubscribeCallback
 import com.dabenxiang.mimi.model.pref.Pref
 import org.eclipse.paho.android.service.MqttAndroidClient
-import org.eclipse.paho.android.service.MqttTraceHandler
 import org.eclipse.paho.android.service.ParcelableMqttMessage
 import org.eclipse.paho.client.mqttv3.*
 import timber.log.Timber
-import java.lang.Exception
 
 class MQTTManager(val context: Context, private val pref: Pref) {
 
@@ -58,14 +56,8 @@ class MQTTManager(val context: Context, private val pref: Pref) {
 
     }
 
-    fun isMqttConnect() : Boolean? {
-        return client.let {
-            if(it != null)
-                it.isConnected
-            else {
-                false
-            }
-        }
+    fun isMqttConnect(): Boolean {
+        return client?.isConnected ?: false
     }
 
     fun connect(connectCallback: ConnectCallback) {
@@ -123,7 +115,7 @@ class MQTTManager(val context: Context, private val pref: Pref) {
         client?.publish(publishTopic, message, null, callback)
         Timber.d("Message Published")
 
-        if (!client!!.isConnected) {
+        if (!isMqttConnect()) {
             Timber.d("${client?.bufferedMessageCount} messages in buffer.")
         }
     }
