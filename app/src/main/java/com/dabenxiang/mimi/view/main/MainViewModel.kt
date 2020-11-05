@@ -533,4 +533,15 @@ class MainViewModel : BaseViewModel() {
                 .collect { _totalUnreadResult.value = it }
         }
     }
+
+    fun deleteCacheFile(cacheFile:File) {
+        viewModelScope.launch {
+            cacheFile?.let {
+                it.listFiles().forEach {
+//                   Timber.d("deleteCacheFile chi: ${it}")
+                   it?.delete()
+                }
+            }
+        }
+    }
 }
