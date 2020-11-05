@@ -282,8 +282,6 @@ class PlayerFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupUI()
-        setupObservers()
-        setupListeners()
     }
 
     private fun setupUI() {
