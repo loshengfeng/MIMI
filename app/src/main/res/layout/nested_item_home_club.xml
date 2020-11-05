@@ -50,6 +50,8 @@
             android:layout_marginTop="10dp"
             android:textColor="@color/color_black_1"
             android:textSize="14sp"
+            android:maxLines="1"
+            android:ellipsize="end"
             app:layout_constraintEnd_toEndOf="@+id/guideline_follow"
             app:layout_constraintStart_toStartOf="@+id/guideline_club_name"
             app:layout_constraintTop_toTopOf="parent"
