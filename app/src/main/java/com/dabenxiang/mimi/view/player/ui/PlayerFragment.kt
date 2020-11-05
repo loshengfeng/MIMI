@@ -41,6 +41,7 @@ import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.*
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
+import com.dabenxiang.mimi.view.topup.TopUpFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.OrientationDetector
 import com.google.android.exoplayer2.*
@@ -103,7 +104,7 @@ class PlayerFragment : BaseFragment() {
     private var isFirstInit = true
     private var isKeyboardShown = false
     private var oldPlayerItem: PlayerItem = PlayerItem(-1)
-    override var bottomNavigationVisibility = View.GONE
+    override val bottomNavigationVisibility = View.GONE
 
     private val sourceListAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
@@ -267,14 +268,7 @@ class PlayerFragment : BaseFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        requireActivity().onBackPressedDispatcher.addCallback {
-            if (requireActivity().requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
-                navigateTo(NavigateItem.Up)
-            } else {
-                viewModel.lockFullScreen = !viewModel.lockFullScreen
-                switchScreenOrientation()
-            }
-        }
+
 
     }
 
@@ -285,7 +279,14 @@ class PlayerFragment : BaseFragment() {
     }
 
     private fun setupUI() {
-
+        requireActivity().onBackPressedDispatcher.addCallback {
+            if (requireActivity().requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+                navigateTo(NavigateItem.Up)
+            } else {
+                viewModel.lockFullScreen = !viewModel.lockFullScreen
+                switchScreenOrientation()
+            }
+        }
         if(recycler_info.parent != null ) {
             Timber.i("recyclerInfo removeView")
             playerInfoAdapter.removeAllHeaderView()
@@ -891,8 +892,9 @@ class PlayerFragment : BaseFragment() {
 
         btn_vip.setOnClickListener {
             Timber.i("btn_vip Click")
-//            navigateTo(NavigateItem.PopBackStack(R.id.adultHomeFragment, false))
-            mainViewModel?.switchTab?.value = 1
+            val bundle = TopUpFragment.createBundle(this::class.java.simpleName)
+            navigateTo(NavigateItem.Destination(R.id.action_to_topup, bundle))
+//            mainViewModel?.switchTab?.value = 1
         }
 
         btn_promote.setOnClickListener {
