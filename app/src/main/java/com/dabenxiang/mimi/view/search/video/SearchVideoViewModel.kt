@@ -26,7 +26,7 @@ class SearchVideoViewModel : BaseViewModel() {
     var category = ""
     var searchingTag = ""
     var searchingStr = ""
-    var isAdult = false
+//    var isAdult = false
 
     var adWidth = 0
     var adHeight = 0

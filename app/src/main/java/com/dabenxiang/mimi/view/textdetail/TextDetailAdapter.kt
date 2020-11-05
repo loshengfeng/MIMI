@@ -192,7 +192,6 @@ class TextDetailAdapter(
                 }
 
                 commentAdapter = CommentAdapter(
-                    true,
                     playerInfoListener,
                     CommentViewType.COMMON
                 ).apply {
@@ -200,7 +199,7 @@ class TextDetailAdapter(
                         isEnableLoadMore = true
                         isAutoLoadMore = true
                         isEnableLoadMoreIfNotFullPage = false
-                        loadMoreView = CommentLoadMoreView(true, CommentViewType.COMMON)
+                        loadMoreView = CommentLoadMoreView(CommentViewType.COMMON)
                     }
                 }
 
