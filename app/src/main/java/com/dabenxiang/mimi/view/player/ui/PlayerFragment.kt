@@ -1469,7 +1469,6 @@ class PlayerFragment : BaseFragment() {
         }
 
         episodeAdapter.submitList(result, -1)
-        viewModel.setStreamPosition(-1)
 
         scrollToBottom()
     }
