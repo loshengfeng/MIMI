@@ -17,11 +17,6 @@ import kotlinx.android.synthetic.main.fragment_invite_vip.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 
 class InviteVipFragment : BaseFragment() {
-    companion object {
-        private const val SHOW_COPY_HINT_TIME = 3500L
-        private const val SHOW_COPY_HINT_DURATION = 800L
-
-    }
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -57,17 +52,6 @@ class InviteVipFragment : BaseFragment() {
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
-
-        viewModel.showCopyHint.observe(viewLifecycleOwner, Observer {
-                if(it == true) {
-                    bt_invite_copy.isEnabled = false
-                    tv_invite_vip_copy_hint.visibility = View.VISIBLE
-                    tv_invite_vip_copy_hint?.animate()?.alpha(1.0f)?.setDuration(SHOW_COPY_HINT_DURATION)
-                } else {
-                    bt_invite_copy.isEnabled = true
-                    tv_invite_vip_copy_hint?.animate()?.alpha(0.0f)?.setDuration(SHOW_COPY_HINT_DURATION)
-                }
-        })
     }
 
     override fun setupListeners() {
@@ -82,7 +66,7 @@ class InviteVipFragment : BaseFragment() {
                 )
                 R.id.bt_invite_copy -> {
                     copyToClipboard(requireContext(), tv_invite_code.text.toString())
-                    viewModel.setShowCopyHint(SHOW_COPY_HINT_TIME)
+                    mainViewModel?.setShowPopHint(getString(R.string.invite_vip_invite_copy_hint))
                 }
                 R.id.tv_login -> navigateTo(
                     NavigateItem.Destination(

@@ -229,20 +229,6 @@
             app:layout_constraintTop_toBottomOf="@+id/tv_invite_vip_days"
             app:srcCompat="@drawable/ico_vip" />
 
-        <TextView
-            android:id="@+id/tv_invite_vip_copy_hint"
-            android:layout_width="140dp"
-            android:layout_height="40dp"
-            android:layout_marginBottom="17dp"
-            android:background="@drawable/bg_blue_1_radius_25_5"
-            android:gravity="center"
-            android:text="@string/invite_vip_invite_copy_hint"
-            android:textColor="@color/color_white_1"
-            android:animateLayoutChanges="true"
-            android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@+id/iv_invite_word"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout

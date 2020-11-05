@@ -26,6 +26,7 @@ import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.BottomNavType
 import com.dabenxiang.mimi.model.vo.StatusItem
 import com.dabenxiang.mimi.view.base.BaseActivity
+import com.dabenxiang.mimi.view.base.BaseViewModel.Companion.POP_HINT_ANIM_TIME
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
@@ -108,6 +109,16 @@ class MainActivity : BaseActivity(), InteractionListener {
             if (it >= 0) {
 
                 bottom_navigation.switchTab(it)
+            }
+        })
+
+        viewModel.showCopyHint.observe(this, {
+            if (it.isNotBlank()) {
+                tv_pop_hint.visibility = View.VISIBLE
+                tv_pop_hint.text = it
+                tv_pop_hint?.animate()?.alpha(1.0f)?.duration = POP_HINT_ANIM_TIME
+            } else {
+                tv_pop_hint?.animate()?.alpha(0.0f)?.duration = POP_HINT_ANIM_TIME
             }
         })
 
@@ -390,4 +401,5 @@ class MainActivity : BaseActivity(), InteractionListener {
             )
         ).show(supportFragmentManager)
     }
+
 }
