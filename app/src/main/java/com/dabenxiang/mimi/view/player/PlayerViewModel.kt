@@ -53,6 +53,7 @@ class PlayerViewModel : BaseViewModel() {
     var videoId: Long = 0L // 一開始用最外層的id, 點選影片之後用裡面的 source id
     var category: String = ""
     var episodeId: Long = -1L
+    var streamId: Long = 0L
     var isReported: Boolean = false
     var isCommentReport: Boolean = false
 
@@ -353,6 +354,8 @@ class PlayerViewModel : BaseViewModel() {
                     else
                         0
                 )!!
+                // report video not play need stream id
+                streamId = stream.id!!
 
                 val streamResp = apiRepository.getVideoM3u8Source(
                     stream.id!!,

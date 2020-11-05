@@ -827,7 +827,7 @@ class PlayerFragment : BaseFragment() {
 
         iv_more.setOnClickListener {
             Timber.i("viewModel.isReported ${viewModel.isReported}")
-            showMoreDialog(viewModel.episodeId, PostType.VIDEO, viewModel.isReported)
+            showMoreDialog(viewModel.streamId, PostType.VIDEO, viewModel.isReported)
         }
 
         requireActivity().addKeyboardToggleListener { shown ->
