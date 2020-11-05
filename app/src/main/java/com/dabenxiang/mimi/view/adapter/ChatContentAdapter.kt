@@ -27,6 +27,7 @@ class ChatContentAdapter(
 
     interface EventListener {
         fun onGetAttachment(id: Long?, view:ImageView, type:LoadImageType)
+        fun onGetAttachment(filePath: String, view:ImageView, type:LoadImageType)
         fun onImageClick(imageArray: ByteArray?)
         fun onVideoClick(item: ChatContentItem?, position: Int)
         fun getSenderAvatar(): String
