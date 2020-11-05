@@ -46,6 +46,7 @@ import java.io.File
 class PlayerViewModel : BaseViewModel() {
 
     companion object {
+        val SING_DOES_NOT_MATCH = 403
         var volume: Float = 1f
         const val StreamUrlFormat = "%s/v1/Player/%d/%d/%d?userId=%d&utcTime=%d&sign=%s"
     }
@@ -134,6 +135,9 @@ class PlayerViewModel : BaseViewModel() {
 
     private val _videoReport = MutableLiveData<ApiResult<Nothing>>()
     val videoReport: LiveData<ApiResult<Nothing>> = _videoReport
+
+    private val _showRechargeReminder = MutableLiveData(false)
+    val showRechargeReminder: LiveData<Boolean> = _showRechargeReminder
 
     fun updatedSelectedNewestComment(isNewest: Boolean) {
         _isSelectedNewestComment.value = isNewest
@@ -363,7 +367,9 @@ class PlayerViewModel : BaseViewModel() {
                     stream.utcTime,
                     stream.sign
                 )
-                if (!streamResp.isSuccessful) throw HttpException(streamResp)
+                if(streamResp.code() == SING_DOES_NOT_MATCH ) {
+                    _showRechargeReminder.postValue(true)
+                } else if (!streamResp.isSuccessful) throw HttpException(streamResp)
 //                deleteCacheFile()
                 if (TextUtils.isEmpty(streamResp.body()?.content?.streamUrl))
                     sendCrashReport(

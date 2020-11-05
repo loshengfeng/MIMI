@@ -755,7 +755,9 @@ class PlayerFragment : BaseFragment() {
             }
         }
 
-
+        viewModel.showRechargeReminder.observe(viewLifecycleOwner) {
+            showRechargeReminder(it)
+        }
     }
 
     override fun setupListeners() {
