@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.search.video
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableString
@@ -11,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
+import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
@@ -77,6 +79,7 @@ class SearchVideoFragment : BaseFragment() {
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
+
 
     override fun setupFirstTime() {
         super.setupFirstTime()
@@ -241,6 +244,12 @@ class SearchVideoFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+
+        requireActivity().onBackPressedDispatcher.addCallback(owner = viewLifecycleOwner, onBackPressed= {
+            Timber.i("SearchVideoFragment onBackPressedDispatcher")
+            navigateTo(NavigateItem.Up)
+        })
+
         ib_back.setOnClickListener {
             navigateTo(NavigateItem.Up)
         }

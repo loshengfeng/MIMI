@@ -258,15 +258,23 @@ class PlayerFragment : BaseFragment() {
         }
     }
 
+    override fun setupFirstTime() {
+        super.setupFirstTime()
+
+    }
+
     private fun setupUI() {
-        requireActivity().onBackPressedDispatcher.addCallback {
+
+        requireActivity().onBackPressedDispatcher.addCallback(owner = viewLifecycleOwner, onBackPressed= {
             if (requireActivity().requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+
                 navigateTo(NavigateItem.Up)
             } else {
                 viewModel.lockFullScreen = !viewModel.lockFullScreen
                 switchScreenOrientation()
             }
-        }
+        })
+
         if(recycler_info.parent != null ) {
             Timber.i("recyclerInfo removeView")
             playerInfoAdapter.removeAllHeaderView()
