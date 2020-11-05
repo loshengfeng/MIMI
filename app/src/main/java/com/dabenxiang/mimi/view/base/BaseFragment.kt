@@ -131,6 +131,7 @@ abstract class BaseFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         statusBarVisibility()
+        setUpStatusBarColor()
 
         progressHUD = KProgressHUD.create(context)
             .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
@@ -546,6 +547,12 @@ abstract class BaseFragment : Fragment() {
 
     open fun statusBarVisibility() {
         requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+    }
+
+    open fun setUpStatusBarColor() {
+        activity?.also {
+            (it as MainActivity).window.statusBarColor = requireContext().getColor(R.color.normal_color_status_bar)
+        }
     }
 
     open fun initSettings() {}
