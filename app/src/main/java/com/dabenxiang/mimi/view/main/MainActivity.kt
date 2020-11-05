@@ -35,7 +35,7 @@ import com.dabenxiang.mimi.view.home.AdultHomeFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.view.player.PlayerActivity
+import com.dabenxiang.mimi.view.player.ui.PlayerFragment.Companion.KEY_DEST_ID
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.view.setting.SettingFragment
 import com.dabenxiang.mimi.widget.utility.FileUtil.deleteExternalFile
@@ -105,6 +105,13 @@ class MainActivity : BaseActivity(), InteractionListener {
                 supportFragmentManager,
                 DailyCheckInDialogFragment::class.simpleName
             )
+        })
+
+        viewModel.switchTab.observe(this, {
+            if(it >= 0) {
+
+                bottom_navigation.switchTab(it)
+            }
         })
 
         viewModel.getTotalUnread()
@@ -222,15 +229,15 @@ class MainActivity : BaseActivity(), InteractionListener {
             || (fragmentName.toLowerCase(Locale.getDefault()) ==
                     SettingFragment::class.java.simpleName.toLowerCase(Locale.getDefault()))
         ) {
-            if (viewModel.isFromPlayer) {
-                viewModel.isFromPlayer = false
-                deepLinkTo(
-                    MainActivity::class.java,
-                    R.navigation.navigation_adult,
-                    R.id.adultHomeFragment,
-                    null
-                )
-            } else
+//            if (viewModel.isFromPlayer) {
+//                viewModel.isFromPlayer = false
+//                deepLinkTo(
+//                    MainActivity::class.java,
+//                    R.navigation.navigation_adult,
+//                    R.id.adultHomeFragment,
+//                    null
+//                )
+//            } else
                 super.onBackPressed()
         } else {
             super.onBackPressed()
@@ -283,11 +290,11 @@ class MainActivity : BaseActivity(), InteractionListener {
                 }
             }
         } else if (NAVIGATE_TO_ACTION == intent?.action) {
-            val dest = intent.getIntExtra(PlayerActivity.KEY_DEST_ID, 0)
+            val dest = intent.getIntExtra(KEY_DEST_ID, 0)
             if (dest != 0)
                 Navigation.findNavController(this, R.id.nav_host_fragment).navigate(dest, extras)
         } else if(NAVIGATE_TO_TOPUP_ACTION == intent?.action){
-            bottom_navigation switchTab 1
+            bottom_navigation.switchTab(1)
         }
     }
 

@@ -30,7 +30,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.ClubFuncItem
 import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
-import com.dabenxiang.mimi.view.player.PlayerActivity
+import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -338,9 +338,13 @@ class HomeFragment : BaseFragment() {
         }
 
         override fun onVideoClick(view: View, item: PlayerItem) {
-            val intent = Intent(requireContext(), PlayerActivity::class.java)
-            intent.putExtras(PlayerActivity.createBundle(item))
-            startActivityForResult(intent, REQUEST_LOGIN)
+            val bundle = PlayerFragment.createBundle(item)
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_adultHomeFragment_to_navigation_player,
+                    bundle
+                )
+            )
         }
 
         override fun onClipClick(view: View, item: List<MemberPostItem>, position: Int) {
