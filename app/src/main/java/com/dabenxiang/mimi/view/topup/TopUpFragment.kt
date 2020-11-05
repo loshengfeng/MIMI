@@ -203,7 +203,7 @@ class TopUpFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
-
+        val tag = arguments?.getString(TAG_FRAGMENT)?.takeIf { it.isNotBlank() } ?: ""
         requireActivity().onBackPressedDispatcher.addCallback(
             owner = viewLifecycleOwner,
             onBackPressed = {
