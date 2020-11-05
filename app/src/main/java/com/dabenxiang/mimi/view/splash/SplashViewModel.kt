@@ -19,6 +19,7 @@ import timber.log.Timber
 import tw.gov.president.manager.submanager.update.VersionManager
 import tw.gov.president.manager.submanager.update.callback.DownloadProgressCallback
 import tw.gov.president.manager.submanager.update.data.VersionStatus
+import java.io.File
 
 class SplashViewModel : BaseViewModel() {
 
@@ -95,4 +96,5 @@ class SplashViewModel : BaseViewModel() {
     fun setupRecordTimestamp() {
         versionManager.setupRecordTimestamp()
     }
+
 }

@@ -114,6 +114,7 @@ class SplashFragment : BaseFragment() {
             when (it) {
                 is Empty -> {
                     mainViewModel?.startMQTT()
+                    deleteCacheFile()
                     goToHomePage()
                 }
                 is Error -> {
@@ -201,5 +202,9 @@ class SplashFragment : BaseFragment() {
             }
             installApk(App.applicationContext(), path)
         }
+    }
+
+    private fun deleteCacheFile() {
+        mainViewModel?.deleteCacheFile(requireActivity().cacheDir)
     }
 }
