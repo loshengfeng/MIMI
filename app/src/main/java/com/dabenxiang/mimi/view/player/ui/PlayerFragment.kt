@@ -268,6 +268,7 @@ class PlayerFragment : BaseFragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         requireActivity().onBackPressedDispatcher.addCallback {
+            Timber.d("@@Player........")
             if (requireActivity().requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
                 navigateTo(NavigateItem.Up)
             } else {
@@ -275,7 +276,6 @@ class PlayerFragment : BaseFragment() {
                 switchScreenOrientation()
             }
         }
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -1633,7 +1633,7 @@ class PlayerFragment : BaseFragment() {
 //            scrollView.fullScroll(View.FOCUS_DOWN)
         }
     }
-    
+
     private fun showEmailConfirmDialog() {
         GeneralDialog.newInstance(
             GeneralDialogData(

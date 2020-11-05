@@ -380,7 +380,7 @@ class PlayerViewModel : BaseViewModel() {
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e ->
-                    Timber.e(e)
+//                    Timber.e(e)
                     emit(ApiResult.error(e))
                 }
                 .onStart { emit(ApiResult.loading()) }
