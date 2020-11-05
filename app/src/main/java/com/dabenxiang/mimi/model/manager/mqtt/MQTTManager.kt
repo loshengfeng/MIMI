@@ -6,9 +6,11 @@ import com.dabenxiang.mimi.model.manager.mqtt.callback.ExtendedCallback
 import com.dabenxiang.mimi.model.manager.mqtt.callback.SubscribeCallback
 import com.dabenxiang.mimi.model.pref.Pref
 import org.eclipse.paho.android.service.MqttAndroidClient
+import org.eclipse.paho.android.service.MqttTraceHandler
 import org.eclipse.paho.android.service.ParcelableMqttMessage
 import org.eclipse.paho.client.mqttv3.*
 import timber.log.Timber
+import java.lang.Exception
 
 class MQTTManager(val context: Context, private val pref: Pref) {
 
@@ -23,7 +25,7 @@ class MQTTManager(val context: Context, private val pref: Pref) {
     private val messageIdSet = hashSetOf<String>()
 
     fun init(serverUrl: String, clientId: String, extendedCallback: ExtendedCallback) {
-        client = MqttAndroidClient(context, serverUrl, clientId)
+        client = MqttAndroidClient(context, serverUrl, clientId, MqttAndroidClient.Ack.MANUAL_ACK)
         client?.setCallback(object : MqttCallbackExtended {
             override fun connectComplete(reconnect: Boolean, serverURI: String) {
                 extendedCallback.onConnectComplete(reconnect, serverURI)
@@ -32,6 +34,7 @@ class MQTTManager(val context: Context, private val pref: Pref) {
             override fun messageArrived(topic: String, message: MqttMessage) {
                 val parcelableMqttMessage = message as ParcelableMqttMessage
                 val messageId = parcelableMqttMessage.messageId
+                client?.acknowledgeMessage(messageId)
                 if (!messageIdSet.contains(messageId)) {
                     messageIdSet.add(messageId)
                     extendedCallback.onMessageArrived(topic, message)
@@ -55,8 +58,14 @@ class MQTTManager(val context: Context, private val pref: Pref) {
 
     }
 
-    fun isMqttConnect() : Boolean{
-        return client?.isConnected != true
+    fun isMqttConnect() : Boolean? {
+        return client.let {
+            if(it != null)
+                it.isConnected
+            else {
+                false
+            }
+        }
     }
 
     fun connect(connectCallback: ConnectCallback) {
