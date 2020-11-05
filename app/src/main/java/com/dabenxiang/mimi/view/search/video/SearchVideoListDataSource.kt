@@ -43,7 +43,7 @@ class SearchVideoListDataSource(
 
                 val result = domainManager.getApiRepository().searchHomeVideos(
                     q = name,
-                    isAdult = isAdult,
+                    isAdult = true,
                     offset = "0",
                     limit = PER_LIMIT,
                     tag = tag,
@@ -101,7 +101,7 @@ class SearchVideoListDataSource(
 
                 val result = domainManager.getApiRepository().searchHomeVideos(
                     q = name,
-                    isAdult = isAdult,
+                    isAdult = true,
                     offset = next.toString(),
                     limit = PER_LIMIT,
                     tag = tag,

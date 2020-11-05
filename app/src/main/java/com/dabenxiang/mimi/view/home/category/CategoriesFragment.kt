@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -35,7 +34,6 @@ import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_categories.*
-import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem as CategoriesData
 
@@ -199,7 +197,7 @@ class CategoriesFragment : BaseFragment() {
         }
 
         iv_search.setOnClickListener {
-            val bundle = SearchVideoFragment.createBundle(category = tv_title.text.toString())
+            val bundle = SearchVideoFragment.createBundle()
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_to_searchVideoFragment,
@@ -316,6 +314,7 @@ class CategoriesFragment : BaseFragment() {
                     updateFirstTab(index, false)
                     viewModel.updatedFilterPosition(index, position)
                     filterAdapterList[index]?.notifyDataSetChanged()
+                    filterAdapterList[index]?.updateLastSelected(position)
                 }
                 doOnTabSelected()
             }
