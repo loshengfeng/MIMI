@@ -44,7 +44,7 @@ import com.dabenxiang.mimi.view.club.MiMiLinearLayoutManager
 import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
-import com.dabenxiang.mimi.view.player.PlayerActivity
+import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
@@ -342,9 +342,13 @@ class SearchPostFragment : BaseFragment() {
     private val videoAdapterListener = object : SearchVideoAdapter.EventListener {
         override fun onVideoClick(item: VideoItem) {
             val playerData = PlayerItem(item.id ?: 0)
-            val intent = Intent(requireContext(), PlayerActivity::class.java)
-            intent.putExtras(PlayerActivity.createBundle(playerData))
-            startActivityForResult(intent, SearchVideoFragment.REQUEST_LOGIN)
+            val bundle = PlayerFragment.createBundle(playerData)
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_searchPostFragment_to_navigation_player,
+                    bundle
+                )
+            )
         }
 
         override fun onFunctionClick(type: FunctionType, view: View, item: VideoItem) {
@@ -390,9 +394,13 @@ class SearchPostFragment : BaseFragment() {
                 FunctionType.MSG -> {
                     // 點擊評論，進入播放頁面滾動到最下面
                     val playerData = PlayerItem(item.id ?: 0)
-                    val intent = Intent(requireContext(), PlayerActivity::class.java)
-                    intent.putExtras(PlayerActivity.createBundle(playerData, true))
-                    startActivityForResult(intent, SearchVideoFragment.REQUEST_LOGIN)
+                    val bundle = PlayerFragment.createBundle(playerData)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_searchPostFragment_to_navigation_player,
+                            bundle
+                        )
+                    )
                 }
 
                 FunctionType.MORE -> {

@@ -361,7 +361,7 @@ class PlayerViewModel : BaseViewModel() {
                     stream.sign
                 )
                 if (!streamResp.isSuccessful) throw HttpException(streamResp)
-                deleteCacheFile()
+//                deleteCacheFile()
                 if (TextUtils.isEmpty(streamResp.body()?.content?.streamUrl))
                     sendCrashReport(
                         "stream url is Empty, Video id ${streamResp.body()?.content?.id}, ".plus(

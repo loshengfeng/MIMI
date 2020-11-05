@@ -115,6 +115,8 @@ class MainViewModel : BaseViewModel() {
     private val _postArticleResult = MutableLiveData<ApiResult<Long>>()
     val postArticleResult: LiveData<ApiResult<Long>> = _postArticleResult
 
+    val switchTab= MutableLiveData<Int>().also { it.value = -1 }
+
     private var job = Job()
 
     fun setupNormalCategoriesItem(item: CategoriesItem?) {
