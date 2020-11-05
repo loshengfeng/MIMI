@@ -52,7 +52,7 @@ import com.dabenxiang.mimi.view.listener.OnLoginRequestDialogListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
-import com.dabenxiang.mimi.view.player.PlayerActivity
+import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.ADULT
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.BUNDLE_PIC_URI
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.PAGE
@@ -926,9 +926,13 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onVideoClick(view: View, item: PlayerItem) {
-            val intent = Intent(requireContext(), PlayerActivity::class.java)
-            intent.putExtras(PlayerActivity.createBundle(item))
-            startActivityForResult(intent, REQUEST_LOGIN)
+            val bundle = PlayerFragment.createBundle(item)
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_adultHomeFragment_to_navigation_player,
+                    bundle
+                )
+            )
         }
 
         override fun onClipClick(view: View, item: List<MemberPostItem>, position: Int) {

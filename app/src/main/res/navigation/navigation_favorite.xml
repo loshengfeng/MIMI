@@ -9,6 +9,7 @@
     <include app:graph="@navigation/navigation_my_post" />
     <include app:graph="@navigation/navigation_login" />
     <include app:graph="@navigation/navigation_topup" />
+    <include app:graph="@navigation/navigation_player" />
 
     <fragment
         android:id="@+id/inviteVipRecordFragment"
@@ -45,6 +46,10 @@
         <action
             android:id="@+id/action_postFavoriteFragment_to_loginFragment"
             app:destination="@id/navigation_login" />
+
+        <action
+            android:id="@+id/action_postFavoriteFragment_to_navigation_player"
+            app:destination="@id/navigation_player" />
     </fragment>
     <fragment
         android:id="@+id/searchVideoFragment"

@@ -361,7 +361,7 @@ class PlayerViewModel : BaseViewModel() {
                     stream.sign
                 )
                 if (!streamResp.isSuccessful) throw HttpException(streamResp)
-                deleteCacheFile()
+//                deleteCacheFile()
                 if (TextUtils.isEmpty(streamResp.body()?.content?.streamUrl))
                     sendCrashReport(
                         "stream url is Empty, Video id ${streamResp.body()?.content?.id}, ".plus(
@@ -793,6 +793,7 @@ class PlayerViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect {
+                    Timber.i("sentReport =$it")
                     _apiReportResult.value = SingleLiveEvent(it)
                 }
         }
@@ -817,6 +818,7 @@ class PlayerViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect {
+                    Timber.i("sentReport =$it")
                     _apiReportResult.value = SingleLiveEvent(it)
                 }
         }

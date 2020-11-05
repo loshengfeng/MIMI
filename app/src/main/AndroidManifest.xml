@@ -46,7 +46,7 @@
 
         <activity
             android:name=".view.main.MainActivity"
-            android:configChanges="orientation"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
             android:screenOrientation="portrait"
             android:launchMode="singleTop"
             tools:ignore="LockedOrientationActivity">
@@ -62,14 +62,14 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".view.player.PlayerActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
-            android:exported="true"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:theme="@style/PlayerTheme"
-            tools:ignore="LockedOrientationActivity" />
+<!--        <activity-->
+<!--            android:name=".view.player.PlayerActivity"-->
+<!--            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"-->
+<!--            android:exported="true"-->
+<!--            android:launchMode="singleTop"-->
+<!--            android:screenOrientation="portrait"-->
+<!--            android:theme="@style/PlayerTheme"-->
+<!--            tools:ignore="LockedOrientationActivity" />-->
 
         <activity android:name=".view.base.BaseActivity" />
 

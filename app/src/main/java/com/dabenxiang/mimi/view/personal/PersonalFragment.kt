@@ -65,11 +65,7 @@ class PersonalFragment : BaseFragment() {
     override fun setupObservers() {
         viewModel.meItem.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Loading -> progressHUD?.show()
-                is Loaded -> progressHUD?.dismiss()
                 is Success -> {
-                    progressHUD?.dismiss()
-
                     val meItem = it.result
                     tv_name.text = meItem.friendlyName.toString()
 
@@ -95,8 +91,6 @@ class PersonalFragment : BaseFragment() {
 
         viewModel.apiSignOut.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Loading -> progressHUD?.show()
-                is Loaded -> progressHUD?.dismiss()
                 is Empty -> {
                     item_is_Login.visibility = View.GONE
                     item_is_not_Login.visibility = View.VISIBLE

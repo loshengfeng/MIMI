@@ -32,8 +32,8 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.main.MainActivity
-import com.dabenxiang.mimi.view.player.PlayerActivity
-import com.dabenxiang.mimi.view.player.PlayerActivity.Companion.KEY_IS_FROM_PLAYER
+import com.dabenxiang.mimi.view.player.ui.PlayerFragment
+import com.dabenxiang.mimi.view.player.ui.PlayerFragment.Companion.KEY_IS_FROM_PLAYER
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_video.*
@@ -306,9 +306,13 @@ class SearchVideoFragment : BaseFragment() {
     private val adapterListener = object : SearchVideoAdapter.EventListener {
         override fun onVideoClick(item: VideoItem) {
             val playerData = PlayerItem(item.id ?: 0)
-            val intent = Intent(requireContext(), PlayerActivity::class.java)
-            intent.putExtras(PlayerActivity.createBundle(playerData))
-            startActivityForResult(intent, REQUEST_LOGIN)
+            val bundle = PlayerFragment.createBundle(playerData)
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_searchVideoFragment_to_navigation_player,
+                    bundle
+                )
+            )
         }
 
         override fun onFunctionClick(type: FunctionType, view: View, item: VideoItem) {
@@ -354,9 +358,13 @@ class SearchVideoFragment : BaseFragment() {
                 FunctionType.MSG -> {
                     // 點擊評論，進入播放頁面滾動到最下面
                     val playerData = PlayerItem(item.id ?: 0)
-                    val intent = Intent(requireContext(), PlayerActivity::class.java)
-                    intent.putExtras(PlayerActivity.createBundle(playerData, true))
-                    startActivityForResult(intent, REQUEST_LOGIN)
+                    val bundle = PlayerFragment.createBundle(playerData, true)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_searchVideoFragment_to_navigation_player,
+                            bundle
+                        )
+                    )
                 }
 
                 FunctionType.MORE -> {

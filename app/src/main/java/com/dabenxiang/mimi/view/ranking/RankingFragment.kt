@@ -21,7 +21,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
-import com.dabenxiang.mimi.view.player.PlayerActivity
+import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_picture_detail.toolbarContainer
 import kotlinx.android.synthetic.main.fragment_ranking.*
@@ -50,9 +50,13 @@ class RankingFragment : BaseFragment() {
                 onVideoItemClick = {
                     val playerData =
                         PlayerItem(it.id ?: 0)
-                    val intent = Intent(requireContext(), PlayerActivity::class.java)
-                    intent.putExtras(PlayerActivity.createBundle(playerData))
-                    startActivityForResult(intent, REQUEST_LOGIN)
+                    val bundle = PlayerFragment.createBundle(playerData)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_rankingFragment_to_navigation_player,
+                            bundle
+                        )
+                    )
                 },
                 getBitmap = { id, view -> viewModel.loadImage(id, view, LoadImageType.PICTURE_THUMBNAIL) }
             )
