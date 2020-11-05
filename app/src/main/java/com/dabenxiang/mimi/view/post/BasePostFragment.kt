@@ -115,6 +115,12 @@ open class BasePostFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            owner = viewLifecycleOwner,
+            onBackPressed = { handleBackEvent() }
+        )
+
         edt_hashtag.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 s?.let {
@@ -167,10 +173,6 @@ open class BasePostFragment : BaseFragment() {
         }
 
         tv_back.setOnClickListener {
-            handleBackEvent()
-        }
-
-        requireActivity().onBackPressedDispatcher.addCallback {
             handleBackEvent()
         }
 

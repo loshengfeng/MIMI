@@ -32,7 +32,7 @@ class InviteVipRecordFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
+
         text_toolbar_title.text = getString(R.string.invite_vip_record_title)
 
         toolbar.setBackgroundColor(requireContext().getColor(R.color.color_gray_2))
@@ -51,20 +51,18 @@ class InviteVipRecordFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-
         viewModel.onTotalCountResult.observe(viewLifecycleOwner, Observer {
             cl_no_data.visibility =
                 it.takeIf { it == 0L }?.let { View.VISIBLE } ?: let { View.GONE }
         })
-
     }
 
     override fun setupListeners() {
+
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
             viewModel.getInviteVipRecordList(inviteVipRecordAdapter)
         }
-
     }
 
     override fun setupFirstTime() {

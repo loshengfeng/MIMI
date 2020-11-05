@@ -34,9 +34,6 @@ class PaymentInfoFragment: BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback {
-            navigateTo(NavigateItem.Up)
-        }
         initSettings()
     }
 
@@ -91,7 +88,8 @@ class PaymentInfoFragment: BaseFragment() {
 
     override fun setupObservers() {}
 
-    override fun setupListeners() {}
+    override fun setupListeners() {
+    }
 
     private fun setupTimeout(text: String) {
         val builder = SpannableStringBuilder(text)

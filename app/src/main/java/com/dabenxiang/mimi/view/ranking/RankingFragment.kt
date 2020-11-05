@@ -111,8 +111,6 @@ class RankingFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
-
         text_toolbar_title.text = getString(R.string.text_ranking)
         toolbarContainer.toolbar.navigationIcon =
             requireContext().getDrawable(R.drawable.btn_back_black_n)
@@ -157,6 +155,11 @@ class RankingFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            owner = viewLifecycleOwner,
+            onBackPressed = { navigateTo(NavigateItem.Up) }
+        )
 
         tab_temporal_filter.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {

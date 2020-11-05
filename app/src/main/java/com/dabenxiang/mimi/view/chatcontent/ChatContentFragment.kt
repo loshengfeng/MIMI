@@ -87,11 +87,6 @@ class ChatContentFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireActivity().onBackPressedDispatcher.addCallback {
-            viewModel.setLastRead()
-            navigateTo(NavigateItem.Up)
-        }
-
         initSettings()
 
         arguments?.getLong(KEY_TRACE_LOG_ID)?.also {
@@ -255,7 +250,14 @@ class ChatContentFragment : BaseFragment() {
 
 
     override fun setupListeners() {
-        Timber.d("${ChatContentFragment::class.java.simpleName}_setupListeners")
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            owner = viewLifecycleOwner,
+            onBackPressed = {
+                viewModel.setLastRead()
+                navigateTo(NavigateItem.Up)
+            }
+        )
 
         btnSend.setOnClickListener {
             if (editChat.text.isNotEmpty()) {

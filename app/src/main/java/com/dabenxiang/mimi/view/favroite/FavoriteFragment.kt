@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.view.favroite
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -153,11 +152,6 @@ class FavoriteFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback {
-            interactionListener?.changeNavigationPosition(
-                R.id.navigation_adult
-            )
-        }
         useAdultTheme(false)
         initSettings()
         favoriteAdapter.notifyDataSetChanged()
@@ -191,6 +185,16 @@ class FavoriteFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            owner = viewLifecycleOwner,
+            onBackPressed = {
+                interactionListener?.changeNavigationPosition(
+                    R.id.navigation_adult
+                )
+            }
+        )
+
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.tv_clean -> {

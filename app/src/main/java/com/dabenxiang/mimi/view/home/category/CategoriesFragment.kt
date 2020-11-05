@@ -120,10 +120,6 @@ class CategoriesFragment : BaseFragment() {
     override fun setupFirstTime() {
         super.setupFirstTime()
 
-        requireActivity().onBackPressedDispatcher.addCallback {
-            Timber.i("CategoriesFragment onBackPressedDispatcher")
-            navigateTo(NavigateItem.Up) }
-
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
 
@@ -197,6 +193,7 @@ class CategoriesFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+
         ib_back.setOnClickListener {
             navigateTo(NavigateItem.Up)
         }

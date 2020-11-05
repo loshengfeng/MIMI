@@ -113,12 +113,6 @@ class AdultHomeFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         handleBackStackData()
-        requireActivity().onBackPressedDispatcher.addCallback {
-            interactionListener?.changeNavigationPosition(
-                R.id.navigation_adult
-            )
-        }
-
         useAdultTheme(false)
     }
 
@@ -312,7 +306,9 @@ class AdultHomeFragment : BaseFragment() {
                 if (type == categoryTypeList[lastPosition]) {
                     cl_no_data.visibility =
                         takeIf { totalCount > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
-                    if (type == CategoryType.CLUB) { clubMemberAdapter.totalCount = totalCount }
+                    if (type == CategoryType.CLUB) {
+                        clubMemberAdapter.totalCount = totalCount
+                    }
                     viewModel.clearLiveDataValue()
                 }
             }
@@ -356,9 +352,14 @@ class AdultHomeFragment : BaseFragment() {
         })
 
         viewModel.inviteVipShake.observe(this, Observer {
-            if(layout_invitevip.visibility != View.GONE){
-                if(it == true)
-                    iv_invitevip.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.anim_shake))
+            if (layout_invitevip.visibility != View.GONE) {
+                if (it == true)
+                    iv_invitevip.startAnimation(
+                        AnimationUtils.loadAnimation(
+                            requireContext(),
+                            R.anim.anim_shake
+                        )
+                    )
                 else
                     viewModel.startAnim(ANIMATE_INTERVAL)
             }
@@ -404,6 +405,14 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            owner = viewLifecycleOwner,
+            onBackPressed = {
+                interactionListener?.changeNavigationPosition(R.id.navigation_adult)
+            }
+        )
+
         refresh.setOnRefreshListener {
             viewModel.lastListIndex = 0
             refresh.isRefreshing = true
@@ -500,7 +509,8 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         btn_filter.setOnClickListener {
-            val category = mainViewModel?.adult?.categories?.find { it.name == getString(R.string.home_tab_video) }
+            val category =
+                mainViewModel?.adult?.categories?.find { it.name == getString(R.string.home_tab_video) }
             category?.also {
                 val bundle = CategoriesFragment.createBundle(it.name, it.name, category)
                 navigateTo(
@@ -656,8 +666,8 @@ class AdultHomeFragment : BaseFragment() {
 
     private fun getData(position: Int) {
         if (categoryTypeList.isEmpty()) {
-                mainViewModel?.getHomeCategories()
-                return
+            mainViewModel?.getHomeCategories()
+            return
         }
         when (categoryTypeList[position]) {
             CategoryType.HOME -> mainViewModel?.getHomeCategories()
@@ -909,8 +919,9 @@ class AdultHomeFragment : BaseFragment() {
                 else -> null
             }
             type?.let {
-                if(type == CategoryType.VIDEO_ON_DEMAND) {
-                    val category = mainViewModel?.adult?.categories?.find { it.name == getString(R.string.home_tab_video) }
+                if (type == CategoryType.VIDEO_ON_DEMAND) {
+                    val category =
+                        mainViewModel?.adult?.categories?.find { it.name == getString(R.string.home_tab_video) }
                     category?.also {
                         val bundle = CategoriesFragment.createBundle(it.name, it.name, category)
                         navigateTo(

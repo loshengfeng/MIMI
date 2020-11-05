@@ -74,8 +74,6 @@ class TextDetailFragment : BaseFragment() {
             arguments?.getSerializable(PictureDetailFragment.KEY_DATA) as MemberPostItem
         val position = arguments?.getInt(PictureDetailFragment.KEY_POSITION) ?: 0
 
-        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
-
         adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         adHeight = (adWidth * 0.142).toInt()
 

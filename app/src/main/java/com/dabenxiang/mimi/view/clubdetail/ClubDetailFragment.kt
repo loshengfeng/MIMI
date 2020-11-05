@@ -64,11 +64,6 @@ class ClubDetailFragment : BaseFragment() {
         return R.layout.fragment_club_detail
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
-    }
-
     override fun setupFirstTime() {
         super.setupFirstTime()
 
@@ -155,6 +150,7 @@ class ClubDetailFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+
         ib_back.setOnClickListener { findNavController().navigateUp() }
         tv_follow.setOnClickListener {
             checkStatus {

@@ -53,7 +53,6 @@ class LoginFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
         initSettings()
     }
 
@@ -257,6 +256,7 @@ class LoginFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+
         tl_type.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 viewModel.type = tab.position

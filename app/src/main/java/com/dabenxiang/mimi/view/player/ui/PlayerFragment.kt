@@ -242,10 +242,6 @@ class PlayerFragment : BaseFragment() {
         return R.layout.activity_player
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -254,28 +250,14 @@ class PlayerFragment : BaseFragment() {
 
     override fun setUpStatusBarColor() {
         activity?.also {
-            (it as MainActivity).window.statusBarColor = requireContext().getColor(R.color.adult_color_status_bar)
+            (it as MainActivity).window.statusBarColor =
+                requireContext().getColor(R.color.adult_color_status_bar)
         }
-    }
-
-    override fun setupFirstTime() {
-        super.setupFirstTime()
-
     }
 
     private fun setupUI() {
 
-        requireActivity().onBackPressedDispatcher.addCallback(owner = viewLifecycleOwner, onBackPressed= {
-            if (requireActivity().requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
-
-                navigateTo(NavigateItem.Up)
-            } else {
-                viewModel.lockFullScreen = !viewModel.lockFullScreen
-                switchScreenOrientation()
-            }
-        })
-
-        if(recycler_info.parent != null ) {
+        if (recycler_info.parent != null) {
             Timber.i("recyclerInfo removeView")
             playerInfoAdapter.removeAllHeaderView()
         }
@@ -311,7 +293,7 @@ class PlayerFragment : BaseFragment() {
 
         recyclerview_guess_like.adapter = guessLikeAdapter
 
-         if(firstCreateView){
+        if (firstCreateView) {
             LinearSnapHelper().attachToRecyclerView(recyclerview_guess_like)
         }
 
@@ -769,6 +751,18 @@ class PlayerFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+        requireActivity().onBackPressedDispatcher.addCallback(
+            owner = viewLifecycleOwner,
+            onBackPressed = {
+                if (requireActivity().requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+                    navigateTo(NavigateItem.Up)
+                } else {
+                    viewModel.lockFullScreen = !viewModel.lockFullScreen
+                    switchScreenOrientation()
+                }
+            }
+        )
+
         btn_show_introduction.setOnClickListener {
             viewModel.showIntroduction.setNot()
         }
@@ -890,7 +884,10 @@ class PlayerFragment : BaseFragment() {
         }
 
         orientationDetector =
-            OrientationDetector(requireActivity(), SensorManager.SENSOR_DELAY_NORMAL).also { detector ->
+            OrientationDetector(
+                requireActivity(),
+                SensorManager.SENSOR_DELAY_NORMAL
+            ).also { detector ->
                 detector.setChangeListener(object : OrientationDetector.OnChangeListener {
                     override fun onChanged(orientation: Int) {
 

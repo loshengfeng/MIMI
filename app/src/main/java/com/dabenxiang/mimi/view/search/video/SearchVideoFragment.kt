@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.view.search.video
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableString
@@ -234,8 +233,8 @@ class SearchVideoFragment : BaseFragment() {
 
         viewModel.favoriteResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Loading -> progressHUD?.show()
-                is Loaded -> progressHUD?.dismiss()
+                is Loading -> progressHUD.show()
+                is Loaded -> progressHUD.dismiss()
                 is Success -> videoListAdapter.notifyDataSetChanged()
                 is Error -> onApiError(it.throwable)
             }
@@ -244,12 +243,6 @@ class SearchVideoFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
-
-        requireActivity().onBackPressedDispatcher.addCallback(owner = viewLifecycleOwner, onBackPressed= {
-            Timber.i("SearchVideoFragment onBackPressedDispatcher")
-            navigateTo(NavigateItem.Up)
-        })
-
         ib_back.setOnClickListener {
             navigateTo(NavigateItem.Up)
         }

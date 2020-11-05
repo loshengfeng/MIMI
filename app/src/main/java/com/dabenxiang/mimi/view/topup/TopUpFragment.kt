@@ -79,12 +79,7 @@ class TopUpFragment : BaseFragment() {
         }
 
         Timber.e("TAG_FRAGMENT: $tag")
-        requireActivity().onBackPressedDispatcher.addCallback {
-            when(tag){
-                PlayerFragment::class.java.simpleName -> navigateTo(NavigateItem.Up)
-                else -> interactionListener?.changeNavigationPosition(R.id.navigation_adult)
-            }
-        }
+
         initSettings()
     }
 
@@ -221,6 +216,16 @@ class TopUpFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            owner = viewLifecycleOwner,
+            onBackPressed = {
+                when(tag){
+                    PlayerFragment::class.java.simpleName -> navigateTo(NavigateItem.Up)
+                    else -> interactionListener?.changeNavigationPosition(R.id.navigation_adult)
+                }
+            }
+        )
 
         tv_record_top_up.setOnClickListener {
             navigateTo(NavigateItem.Destination(R.id.action_topupFragment_to_orderFragment))
