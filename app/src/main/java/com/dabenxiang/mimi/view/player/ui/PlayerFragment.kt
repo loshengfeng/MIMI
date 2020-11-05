@@ -265,8 +265,8 @@ class PlayerFragment : BaseFragment() {
         return R.layout.activity_player
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
         requireActivity().onBackPressedDispatcher.addCallback {
             if (requireActivity().requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
                 navigateTo(NavigateItem.Up)
@@ -275,6 +275,11 @@ class PlayerFragment : BaseFragment() {
                 switchScreenOrientation()
             }
         }
+
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         setupUI()
         setupObservers()
@@ -981,6 +986,7 @@ class PlayerFragment : BaseFragment() {
         }
 
         override fun onCancel() {
+            Timber.i("reportDialog onCancel reportDialog=$reportDialog ")
             reportDialog?.dismiss()
         }
     }

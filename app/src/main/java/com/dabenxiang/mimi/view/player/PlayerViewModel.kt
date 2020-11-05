@@ -793,6 +793,7 @@ class PlayerViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect {
+                    Timber.i("sentReport =$it")
                     _apiReportResult.value = SingleLiveEvent(it)
                 }
         }
@@ -817,6 +818,7 @@ class PlayerViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect {
+                    Timber.i("sentReport =$it")
                     _apiReportResult.value = SingleLiveEvent(it)
                 }
         }
