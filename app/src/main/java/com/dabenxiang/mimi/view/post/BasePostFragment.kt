@@ -325,6 +325,7 @@ open class BasePostFragment : BaseFragment() {
                     for (tagItem in chipList) {
                         chipGroup.addView(tagItem)
                     }
+                    setTagCount()
                 }
             }
         } else {

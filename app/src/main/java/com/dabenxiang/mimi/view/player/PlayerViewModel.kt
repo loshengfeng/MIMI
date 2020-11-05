@@ -380,7 +380,7 @@ class PlayerViewModel : BaseViewModel() {
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e ->
-                    Timber.e(e)
+//                    Timber.e(e)
                     emit(ApiResult.error(e))
                 }
                 .onStart { emit(ApiResult.loading()) }
@@ -793,6 +793,7 @@ class PlayerViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect {
+                    Timber.i("sentReport =$it")
                     _apiReportResult.value = SingleLiveEvent(it)
                 }
         }
@@ -817,6 +818,7 @@ class PlayerViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect {
+                    Timber.i("sentReport =$it")
                     _apiReportResult.value = SingleLiveEvent(it)
                 }
         }
