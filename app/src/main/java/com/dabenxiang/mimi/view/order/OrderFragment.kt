@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -22,7 +21,6 @@ import com.dabenxiang.mimi.model.enums.OrderType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
-import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.paymentInfo.PaymentInfoFragment
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_order.*
@@ -66,17 +64,6 @@ class OrderFragment : BaseFragment() {
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
-
-    private var interactionListener: InteractionListener? = null
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        try {
-            interactionListener = context as InteractionListener
-        } catch (e: ClassCastException) {
-            Timber.e("OrderFragment interaction listener can't cast")
-        }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -233,7 +220,7 @@ class OrderFragment : BaseFragment() {
 
     private fun onTopUpClick() {
         findNavController().navigateUp()
-        interactionListener?.changeNavigationPosition(R.id.navigation_topup)
+        mainViewModel?.changeNavigationPosition?.value = R.id.navigation_topup
     }
 
     private fun onPaymentInfoClick(orderItem: OrderItem = OrderItem()) {

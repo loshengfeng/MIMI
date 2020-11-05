@@ -17,7 +17,6 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
-import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_LOGIN
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
@@ -33,17 +32,6 @@ import java.util.*
 class PersonalFragment : BaseFragment() {
 
     private val viewModel: PersonalViewModel by viewModels()
-    private var interactionListener: InteractionListener? = null
-
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        try {
-            interactionListener = context as InteractionListener
-        } catch (e: ClassCastException) {
-            Timber.e("PersonalFragment interaction listener can't cast")
-        }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -125,7 +113,7 @@ class PersonalFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     iv_new.visibility = if (it.result == 0) View.INVISIBLE else View.VISIBLE
-                    interactionListener?.refreshBottomNavigationBadge(it.result)
+                    mainViewModel?.refreshBottomNavigationBadge?.value = it.result
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -136,12 +124,14 @@ class PersonalFragment : BaseFragment() {
 
         requireActivity().onBackPressedDispatcher.addCallback(
             owner = viewLifecycleOwner,
-            onBackPressed = { interactionListener?.changeNavigationPosition(R.id.navigation_adult) }
+            onBackPressed = {
+                mainViewModel?.changeNavigationPosition?.value =R.id.navigation_adult
+            }
         )
 
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
-                R.id.tv_topup -> interactionListener?.changeNavigationPosition(R.id.navigation_topup)
+                R.id.tv_topup -> mainViewModel?.changeNavigationPosition?.value = R.id.navigation_topup
                 R.id.tv_follow -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
                 R.id.tv_topup_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_orderFragment))
                 R.id.tv_chat_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_chatHistoryFragment))
@@ -182,7 +172,6 @@ class PersonalFragment : BaseFragment() {
 
     override fun initSettings() {
         super.initSettings()
-        interactionListener?.setAdult(false)
 
         tv_version_is_login.text = BuildConfig.VERSION_NAME
         tv_version_is_not_login.text = BuildConfig.VERSION_NAME

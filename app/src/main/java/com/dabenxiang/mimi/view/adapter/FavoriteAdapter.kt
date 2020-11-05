@@ -102,7 +102,4 @@ class FavoriteAdapter(
         return isAdult
     }
 
-    fun setAdult(adult: Boolean = false) {
-        this.isAdult = adult
-    }
 }

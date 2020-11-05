@@ -19,7 +19,6 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.comment.CommentDialogFragment
-import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import kotlinx.android.synthetic.main.fragment_clip.*
@@ -50,7 +49,6 @@ class ClipFragment : BaseFragment() {
 
     private val clipMap: HashMap<String, File> = hashMapOf()
     private val memberPostItems: ArrayList<MemberPostItem> = arrayListOf()
-    private var interactionListener: InteractionListener? = null
 
     private var isShowComment = false
 
@@ -239,15 +237,6 @@ class ClipFragment : BaseFragment() {
         val intent = Intent(requireContext(), MainActivity::class.java)
         intent.action = NAVIGATE_TO_TOPUP_ACTION
         startActivity(intent)
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        try {
-            interactionListener = context as InteractionListener
-        } catch (e: ClassCastException) {
-            Timber.e("ClipFragment interaction listener can't cast")
-        }
     }
 
     private fun onBackClick() {

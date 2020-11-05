@@ -609,9 +609,9 @@ abstract class BaseFragment : Fragment() {
     }
 
     fun useAdultTheme(value: Boolean) {
-        activity?.also {
-            (it as MainActivity).setAdult(value)
-        }
+//        activity?.also {
+//            (it as MainActivity).setAdult(value)
+//        }
     }
 
     open fun onApiError(

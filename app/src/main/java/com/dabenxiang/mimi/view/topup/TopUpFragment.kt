@@ -27,7 +27,6 @@ import com.dabenxiang.mimi.view.adapter.TopUpOnlinePayAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
-import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.orderinfo.OrderInfoFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerFragment
@@ -47,8 +46,6 @@ class TopUpFragment : BaseFragment() {
     private val agentAdapter by lazy { TopUpAgentAdapter(agentListener) }
     private val onlinePayAdapter by lazy { TopUpOnlinePayAdapter(requireContext()) }
 
-    private var interactionListener: InteractionListener? = null
-
     private var orderPackageMap: HashMap<PaymentType, ArrayList<OrderingPackageItem>>? = null
 
     companion object{
@@ -57,15 +54,6 @@ class TopUpFragment : BaseFragment() {
             return Bundle().also {
                 it.putString(TAG_FRAGMENT, tagName)
             }
-        }
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        try {
-            interactionListener = context as InteractionListener
-        } catch (e: ClassCastException) {
-            Timber.e("TopUpFragment interaction listener can't cast")
         }
     }
 
@@ -143,7 +131,7 @@ class TopUpFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     if (!it.result) {
-                        interactionListener?.changeNavigationPosition(R.id.navigation_personal)
+                        mainViewModel?.changeNavigationPosition?.value = R.id.navigation_personal
                     } else {
                         initTopUp()
                     }
@@ -208,7 +196,7 @@ class TopUpFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     iv_new_badge.visibility = if (it.result == 0) View.INVISIBLE else View.VISIBLE
-                    interactionListener?.refreshBottomNavigationBadge(it.result)
+                    mainViewModel?.refreshBottomNavigationBadge?.value = it.result
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -222,7 +210,7 @@ class TopUpFragment : BaseFragment() {
             onBackPressed = {
                 when(tag){
                     PlayerFragment::class.java.simpleName -> navigateTo(NavigateItem.Up)
-                    else -> interactionListener?.changeNavigationPosition(R.id.navigation_adult)
+                    else -> mainViewModel?.changeNavigationPosition?.value = R.id.navigation_adult
                 }
             }
         )
