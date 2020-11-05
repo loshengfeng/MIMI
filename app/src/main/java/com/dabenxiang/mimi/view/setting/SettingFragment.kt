@@ -52,7 +52,6 @@ class SettingFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
         initSettings()
     }
 

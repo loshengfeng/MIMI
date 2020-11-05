@@ -74,8 +74,6 @@ class PictureDetailFragment : BaseFragment() {
         memberPostItem = arguments?.getSerializable(KEY_DATA) as MemberPostItem
         val position = arguments?.getInt(KEY_POSITION) ?: 0
 
-        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
-
         adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         adHeight = (adWidth * 0.142).toInt()
 
@@ -206,6 +204,7 @@ class PictureDetailFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+
         iv_bar.setOnClickListener {
             checkStatus {
                 layout_edit_bar.visibility = View.VISIBLE

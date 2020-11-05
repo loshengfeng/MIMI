@@ -85,6 +85,11 @@ class PostVideoFragment : BasePostFragment() {
     override fun setupListeners() {
         super.setupListeners()
 
+        requireActivity().onBackPressedDispatcher.addCallback(
+            owner = viewLifecycleOwner,
+            onBackPressed = { discardDialog() }
+        )
+
         tv_clean.setOnClickListener {
             if (checkFieldIsEmpty()) {
                 return@setOnClickListener
@@ -97,10 +102,6 @@ class PostVideoFragment : BasePostFragment() {
             }
 
             navigation()
-        }
-
-        requireActivity().onBackPressedDispatcher.addCallback {
-            discardDialog()
         }
 
         tv_back.setOnClickListener {

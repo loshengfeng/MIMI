@@ -20,9 +20,11 @@
         <action
             android:id="@+id/action_topupFragment_to_chatContentFragment"
             app:destination="@id/chatContentFragment" />
+
         <action
             android:id="@+id/action_to_loginFragment"
             app:destination="@id/navigation_login" />
+
     </fragment>
 
     <fragment

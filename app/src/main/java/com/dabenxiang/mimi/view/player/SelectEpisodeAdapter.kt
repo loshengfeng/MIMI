@@ -7,14 +7,13 @@ import com.dabenxiang.mimi.view.adapter.BaseTabAdapter
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 
 class SelectEpisodeAdapter(
-    private val listener: BaseIndexViewHolder.IndexViewHolderListener,
-    private val isAdult: Boolean
+    private val listener: BaseIndexViewHolder.IndexViewHolderListener
 ) :
     BaseTabAdapter<String, SelectEpisodeHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SelectEpisodeHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_episode, parent, false)
-        return SelectEpisodeHolder(view, listener, isAdult)
+        return SelectEpisodeHolder(view, listener)
     }
 
     override fun onBindViewHolder(holder: SelectEpisodeHolder, position: Int) {

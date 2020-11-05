@@ -55,10 +55,7 @@ class OrderInfoFragment : BaseFragment() {
             findNavController().navigateUp()
         }
 
-        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
-
-        orderingPackageItem =
-            arguments?.getSerializable(PictureDetailFragment.KEY_DATA) as OrderingPackageItem
+        orderingPackageItem = arguments?.getSerializable(PictureDetailFragment.KEY_DATA) as OrderingPackageItem
 
         val productName = getString(
             R.string.order_detail_content, orderingPackageItem.name,

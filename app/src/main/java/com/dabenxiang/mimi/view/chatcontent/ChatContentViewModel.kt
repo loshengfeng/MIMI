@@ -282,7 +282,8 @@ class ChatContentViewModel : BaseViewModel() {
                 }
 
                 // Step 2
-                genCacheData("", ext, "", uri.hashCode(), VideoDownloadStatusType.UPLOADING)
+                genCacheData("", ext, "", uri.hashCode(), VideoDownloadStatusType.UPLOADING, realPath
+                        ?: "")
 
                 flow {
                     Timber.d("Upload photo path : $realPath")
@@ -346,7 +347,8 @@ class ChatContentViewModel : BaseViewModel() {
         ext: String = "",
         sendTime: String = "",
         mediaHashcode: Int = 0,
-        downloadStatusType: VideoDownloadStatusType = VideoDownloadStatusType.NORMAL
+        downloadStatusType: VideoDownloadStatusType = VideoDownloadStatusType.NORMAL,
+        mediaPath: String = ""
     ) {
         val payload = ChatContentPayloadItem(
             messageType,
@@ -358,7 +360,8 @@ class ChatContentViewModel : BaseViewModel() {
             pref.profileItem.userId.toString(),
             payload = payload,
             mediaHashCode = mediaHashcode,
-            downloadStatus = downloadStatusType
+            downloadStatus = downloadStatusType,
+            cacheImagePath = mediaPath
         )
         _cachePushData.value = chatContentItem
     }

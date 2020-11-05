@@ -35,6 +35,7 @@ import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_categories.*
+import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem as CategoriesData
 
@@ -119,8 +120,6 @@ class CategoriesFragment : BaseFragment() {
     override fun setupFirstTime() {
         super.setupFirstTime()
 
-        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
-
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
 
@@ -194,6 +193,7 @@ class CategoriesFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+
         ib_back.setOnClickListener {
             navigateTo(NavigateItem.Up)
         }

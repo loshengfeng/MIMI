@@ -87,11 +87,6 @@ class ChatContentFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireActivity().onBackPressedDispatcher.addCallback {
-            viewModel.setLastRead()
-            navigateTo(NavigateItem.Up)
-        }
-
         initSettings()
 
         arguments?.getLong(KEY_TRACE_LOG_ID)?.also {
@@ -255,7 +250,14 @@ class ChatContentFragment : BaseFragment() {
 
 
     override fun setupListeners() {
-        Timber.d("${ChatContentFragment::class.java.simpleName}_setupListeners")
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            owner = viewLifecycleOwner,
+            onBackPressed = {
+                viewModel.setLastRead()
+                navigateTo(NavigateItem.Up)
+            }
+        )
 
         btnSend.setOnClickListener {
             if (editChat.text.isNotEmpty()) {
@@ -313,6 +315,10 @@ class ChatContentFragment : BaseFragment() {
     private val listener = object : ChatContentAdapter.EventListener {
         override fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType) {
             viewModel.loadImage(id, view, type)
+        }
+
+        override fun onGetAttachment(filePath: String, view: ImageView, type: LoadImageType) {
+            viewModel.loadImage(0, view, type, filePath)
         }
 
         override fun onImageClick(imageArray: ByteArray?) {

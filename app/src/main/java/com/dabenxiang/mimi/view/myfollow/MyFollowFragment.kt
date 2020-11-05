@@ -151,9 +151,6 @@ class MyFollowFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback {
-            navigateTo(NavigateItem.Up)
-        }
         useAdultTheme(false)
     }
 
@@ -178,6 +175,7 @@ class MyFollowFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+
         View.OnClickListener { btnView ->
             when (btnView.id) {
                 R.id.tv_back -> navigateTo(NavigateItem.Up)
