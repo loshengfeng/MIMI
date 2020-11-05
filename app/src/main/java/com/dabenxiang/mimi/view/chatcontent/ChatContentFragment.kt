@@ -315,6 +315,10 @@ class ChatContentFragment : BaseFragment() {
             viewModel.loadImage(id, view, type)
         }
 
+        override fun onGetAttachment(filePath: String, view: ImageView, type: LoadImageType) {
+            viewModel.loadImage(0, view, type, filePath)
+        }
+
         override fun onImageClick(imageArray: ByteArray?) {
             imagePreviewDialog = ImagePreviewDialogFragment.newInstance(imageArray, null).also {
                 it.show(
