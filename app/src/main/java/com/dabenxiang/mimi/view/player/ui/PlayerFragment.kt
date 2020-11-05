@@ -268,7 +268,6 @@ class PlayerFragment : BaseFragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         requireActivity().onBackPressedDispatcher.addCallback {
-            Timber.d("@@Player........")
             if (requireActivity().requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
                 navigateTo(NavigateItem.Up)
             } else {
