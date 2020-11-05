@@ -295,18 +295,18 @@ class CategoriesFragment : BaseFragment() {
             ) {
                 viewModel.updatedFilterPosition(index, position)
                 takeIf { index == 0 }?.also { //選擇第一欄
-                    if (isAdult) { //更新第二欄
-                        (arguments?.getSerializable(KEY_CATEGORY) as CategoriesData?)?.also { data ->
-                            val secondCategory = arrayListOf<String>()
-                            data.categories?.get(position)?.categories?.forEach { item ->
-                                secondCategory.add(item.name)
-                            }
-                            setupFilter(1, secondCategory)
+                    //更新第二欄
+                    (arguments?.getSerializable(KEY_CATEGORY) as CategoriesData?)?.also { data ->
+                        val secondCategory = arrayListOf<String>()
+                        data.categories?.get(position)?.categories?.forEach { item ->
+                            secondCategory.add(item.name)
                         }
-                        adjustContentRV(2)
+                        setupFilter(1, secondCategory)
                     }
+                    adjustContentRV(2)
                     updateFirstTab(index, false)
                     viewModel.updatedFilterPosition(index, position)
+                    filterAdapterList[0]?.updateLastSelected(position)
                     for (i in 1..2) { //更新其它欄至"全部"
                         updateFirstTab(i, true)
                         viewModel.updatedFilterPosition(i, null)
