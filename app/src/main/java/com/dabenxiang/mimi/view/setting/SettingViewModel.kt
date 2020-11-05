@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.AvatarRequest
 import com.dabenxiang.mimi.model.api.vo.EmailRequest
@@ -29,7 +28,6 @@ class SettingViewModel : BaseViewModel() {
     private val versionManager: VersionManager by inject()
 
     var bitmap: Bitmap? = null
-//    var byteArray: ByteArray? = null
 
     private val _profileItem = MutableLiveData<ApiResult<ProfileItem>>()
     val profileItem: LiveData<ApiResult<ProfileItem>> = _profileItem
@@ -104,12 +102,13 @@ class SettingViewModel : BaseViewModel() {
         }
     }
 
-    fun postAttachment() {
-        val fileName =
-            StringBuffer(accountManager.getProfile().friendlyName).append(".jpeg").toString()
-        val tempImagePath =
-            App.self.getExternalFilesDir(null)?.path.plus(StringBuffer("/").append(fileName))
+    fun getFileName(): String {
+        return StringBuffer(accountManager.getProfile().friendlyName)
+            .append(".jpeg")
+            .toString()
+    }
 
+    fun postAttachment(fileName: String, tempImagePath: String) {
         bitmap?.also {
             FileUtil.saveBitmapToJpegFile(it, it.width, it.height, destPath = tempImagePath)
         }
