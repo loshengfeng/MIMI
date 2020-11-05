@@ -2,10 +2,10 @@ package com.dabenxiang.mimi.view.setting
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.os.Environment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.AvatarRequest
 import com.dabenxiang.mimi.model.api.vo.EmailRequest
@@ -108,7 +108,7 @@ class SettingViewModel : BaseViewModel() {
         val fileName =
             StringBuffer(accountManager.getProfile().friendlyName).append(".jpeg").toString()
         val tempImagePath =
-            Environment.getExternalStorageDirectory().path.plus(StringBuffer("/").append(fileName))
+            App.self.getExternalFilesDir(null)?.path.plus(StringBuffer("/").append(fileName))
 
         bitmap?.also {
             FileUtil.saveBitmapToJpegFile(it, it.width, it.height, destPath = tempImagePath)
