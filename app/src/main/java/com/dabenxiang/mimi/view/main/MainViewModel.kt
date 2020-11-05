@@ -49,9 +49,6 @@ class MainViewModel : BaseViewModel() {
 
     private val clientId = GeneralUtils.getAndroidID()
 
-    private val _adultMode = MutableLiveData(false)
-    val adultMode: LiveData<Boolean> = _adultMode
-
     private val _categoriesData = MutableLiveData<ApiResult<ApiBaseItem<RootCategoriesItem>>>()
     val categoriesData: LiveData<ApiResult<ApiBaseItem<RootCategoriesItem>>> = _categoriesData
 
@@ -116,7 +113,9 @@ class MainViewModel : BaseViewModel() {
     private val _postArticleResult = MutableLiveData<ApiResult<Long>>()
     val postArticleResult: LiveData<ApiResult<Long>> = _postArticleResult
 
-    val switchTab= MutableLiveData<Int>().also { it.value = -1 }
+    val switchBottomTap = MutableLiveData<Int>()
+    val changeNavigationPosition = MutableLiveData<Int>()
+    val refreshBottomNavigationBadge = MutableLiveData<Int>()
 
     private var job = Job()
 
@@ -126,12 +125,6 @@ class MainViewModel : BaseViewModel() {
 
     fun setupAdultCategoriesItem(item: CategoriesItem?) {
         _adult = item
-    }
-
-    fun setAdultMode(isAdult: Boolean) {
-        if (_adultMode.value != isAdult) {
-            _adultMode.value = isAdult
-        }
     }
 
     fun getHomeCategories() {
@@ -538,6 +531,17 @@ class MainViewModel : BaseViewModel() {
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _totalUnreadResult.value = it }
+        }
+    }
+
+    fun deleteCacheFile(cacheFile:File) {
+        viewModelScope.launch {
+            cacheFile?.let {
+                it.listFiles().forEach {
+//                   Timber.d("deleteCacheFile chi: ${it}")
+                   it?.delete()
+                }
+            }
         }
     }
 }

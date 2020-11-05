@@ -11,13 +11,13 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.view.View
-import androidx.activity.addCallback
 import androidx.core.content.FileProvider
 import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
+import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
@@ -40,7 +40,6 @@ class SettingFragment : BaseFragment() {
     companion object {
         private const val REQUEST_CODE_CAMERA = 100
         private const val REQUEST_CODE_ALBUM = 200
-        private const val KEY_PHOTO = "PHOTO"
     }
 
     private val viewModel: SettingViewModel by viewModels()
@@ -62,8 +61,8 @@ class SettingFragment : BaseFragment() {
     override fun setupObservers() {
         viewModel.profileItem.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Loading -> progressHUD?.show()
-                is Loaded -> progressHUD?.dismiss()
+                is Loading -> progressHUD.show()
+                is Loaded -> progressHUD.dismiss()
                 is Success -> {
                     tv_name.text = viewModel.profileData?.friendlyName
                     tv_account.text = viewModel.profileData?.username
@@ -86,8 +85,8 @@ class SettingFragment : BaseFragment() {
 
         viewModel.resendResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Loading -> progressHUD?.show()
-                is Loaded -> progressHUD?.dismiss()
+                is Loading -> progressHUD.show()
+                is Loaded -> progressHUD.dismiss()
                 is Empty -> {
                     GeneralUtils.showToast(
                         requireContext(),
@@ -100,8 +99,8 @@ class SettingFragment : BaseFragment() {
 
         viewModel.updateResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Loading -> progressHUD?.show()
-                is Loaded -> progressHUD?.dismiss()
+                is Loading -> progressHUD.show()
+                is Loaded -> progressHUD.dismiss()
                 is Empty -> {
                     GeneralUtils.showToast(
                         requireContext(),
@@ -114,8 +113,8 @@ class SettingFragment : BaseFragment() {
 
         viewModel.postResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Loading -> progressHUD?.show()
-                is Loaded -> progressHUD?.dismiss()
+                is Loading -> progressHUD.show()
+                is Loaded -> progressHUD.dismiss()
                 is Success -> viewModel.putAvatar(it.result)
                 is Error -> onApiError(it.throwable)
             }
@@ -133,11 +132,9 @@ class SettingFragment : BaseFragment() {
         })
 
         viewModel.isBinding.observe(this.viewLifecycleOwner, Observer { success ->
-            GeneralUtils.showToast(
-                requireContext(), if (success)
-                    getString(R.string.setting_binding_success) else
-                    getString(R.string.setting_binding_failed)
-            )
+            val result = if (success) getString(R.string.setting_binding_success)
+            else getString(R.string.setting_binding_failed)
+            GeneralUtils.showToast(requireContext(), result)
         })
     }
 
@@ -206,8 +203,7 @@ class SettingFragment : BaseFragment() {
     }
 
     override fun initSettings() {
-        Glide.with(this).load(R.drawable.default_profile_picture)
-            .into(iv_photo)
+        Glide.with(this).load(R.drawable.default_profile_picture).into(iv_photo)
         useAdultTheme(false)
         viewModel.getProfile()
     }
@@ -233,7 +229,12 @@ class SettingFragment : BaseFragment() {
                 }
                 else -> null
             }
-            viewModel.bitmap?.also { viewModel.postAttachment() }
+            viewModel.bitmap?.also {
+                val fileName = viewModel.getFileName()
+                val tempImagePath = App.self.getExternalFilesDir(null)?.path
+                    .plus(StringBuffer("/").append(fileName))
+                viewModel.postAttachment(fileName, tempImagePath)
+            }
         }
     }
 

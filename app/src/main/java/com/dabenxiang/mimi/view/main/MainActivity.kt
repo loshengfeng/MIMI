@@ -33,7 +33,6 @@ import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.dialog.dailycheckin.DailyCheckInDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.home.AdultHomeFragment
-import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerFragment.Companion.KEY_DEST_ID
 import com.dabenxiang.mimi.widget.utility.FileUtil.deleteExternalFile
@@ -44,7 +43,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
 import java.util.*
 
-class MainActivity : BaseActivity(), InteractionListener {
+class MainActivity : BaseActivity(){
 
     private val viewModel: MainViewModel by viewModels()
 
@@ -105,11 +104,18 @@ class MainActivity : BaseActivity(), InteractionListener {
             )
         })
 
-        viewModel.switchTab.observe(this, {
+        viewModel.switchBottomTap.observe(this, {
             if (it >= 0) {
-
                 bottom_navigation.switchTab(it)
             }
+        })
+
+        viewModel.changeNavigationPosition.observe(this, {
+            changeNavigationPosition(it)
+        })
+
+        viewModel.refreshBottomNavigationBadge.observe(this, {
+            refreshBottomNavigationBadge(it)
         })
 
         viewModel.showPopHint.observe(this, {
@@ -170,13 +176,7 @@ class MainActivity : BaseActivity(), InteractionListener {
         )
 
         controller.observe(this, Observer {
-            val isAdult =
-                when (it.graph.id) {
-                    R.id.navigation_adult -> true
-                    else -> false
-                }
-            viewModel.setAdultMode(isAdult)
-            setUiMode(isAdult)
+            setUiMode()
         })
 
         for (type in BottomNavType.values()) {
@@ -184,31 +184,20 @@ class MainActivity : BaseActivity(), InteractionListener {
         }
     }
 
-    private fun setUiMode(isAdult: Boolean) {
-//        if (isAdult) {
-//            window?.statusBarColor = getColor(R.color.adult_color_status_bar)
-//            bottom_navigation.setBackgroundColor(getColor(R.color.adult_color_status_bar))
-//            bottom_navigation.itemTextColor =
-//                resources.getColorStateList(R.color.bottom_nav_adult_text_selector, null)
-//        } else {
+    private fun setUiMode() {
         window?.statusBarColor = getColor(R.color.normal_color_status_bar)
         bottom_navigation.background = getDrawable(R.drawable.bg_gray_2_top_line)
         bottom_navigation.itemTextColor =
             resources.getColorStateList(R.color.bottom_nav_normal_text_selector, null)
-//        }
     }
 
-    override fun changeNavigationPosition(index: Int) {
-        Timber.i("changeNavigationPosition")
+    private fun changeNavigationPosition(index: Int) {
+        Timber.i("changeNavigationPosition:index")
         bottom_navigation.selectedItemId = index
     }
 
-    override fun setAdult(isAdult: Boolean) {
-        viewModel.setAdultMode(isAdult)
-        setUiMode(isAdult)
-    }
-
-    override fun refreshBottomNavigationBadge(unreadCount: Int) {
+    private fun refreshBottomNavigationBadge(unreadCount: Int) {
+        Timber.i("refreshBottomNavigationBadge: $unreadCount")
         val visibility = takeIf { unreadCount > 0 }?.let { View.VISIBLE } ?: let { View.GONE }
         badgeViewMap[BottomNavType.TOPUP]?.visibility = visibility
         badgeViewMap[BottomNavType.PERSONAL]?.visibility = visibility

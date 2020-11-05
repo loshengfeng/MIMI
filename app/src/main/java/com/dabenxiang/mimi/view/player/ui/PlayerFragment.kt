@@ -241,7 +241,7 @@ class PlayerFragment : BaseFragment() {
     override fun setUpStatusBarColor() {
         activity?.also {
             (it as MainActivity).window.statusBarColor =
-                requireContext().getColor(R.color.adult_color_status_bar)
+                requireContext().getColor(R.color.color_black_1)
         }
     }
 
@@ -1437,7 +1437,6 @@ class PlayerFragment : BaseFragment() {
         }
 
         episodeAdapter.submitList(result, -1)
-        viewModel.setStreamPosition(-1)
 
         scrollToBottom()
     }

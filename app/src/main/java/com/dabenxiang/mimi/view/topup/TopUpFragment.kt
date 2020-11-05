@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.topup
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -10,7 +9,6 @@ import android.widget.ImageView
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.BuildConfig
@@ -21,13 +19,11 @@ import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderingPackageItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PaymentType
-import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.adapter.TopUpAgentAdapter
 import com.dabenxiang.mimi.view.adapter.TopUpOnlinePayAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
-import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.orderinfo.OrderInfoFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerFragment
@@ -39,15 +35,12 @@ import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 class TopUpFragment : BaseFragment() {
 
     private val viewModel: TopUpViewModel by viewModels()
 
     private val agentAdapter by lazy { TopUpAgentAdapter(agentListener) }
     private val onlinePayAdapter by lazy { TopUpOnlinePayAdapter(requireContext()) }
-
-    private var interactionListener: InteractionListener? = null
 
     private var orderPackageMap: HashMap<PaymentType, ArrayList<OrderingPackageItem>>? = null
 
@@ -57,15 +50,6 @@ class TopUpFragment : BaseFragment() {
             return Bundle().also {
                 it.putString(TAG_FRAGMENT, tagName)
             }
-        }
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        try {
-            interactionListener = context as InteractionListener
-        } catch (e: ClassCastException) {
-            Timber.e("TopUpFragment interaction listener can't cast")
         }
     }
 
@@ -143,7 +127,7 @@ class TopUpFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     if (!it.result) {
-                        interactionListener?.changeNavigationPosition(R.id.navigation_personal)
+                        mainViewModel?.changeNavigationPosition?.value = R.id.navigation_personal
                     } else {
                         initTopUp()
                     }
@@ -208,7 +192,7 @@ class TopUpFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     iv_new_badge.visibility = if (it.result == 0) View.INVISIBLE else View.VISIBLE
-                    interactionListener?.refreshBottomNavigationBadge(it.result)
+                    mainViewModel?.refreshBottomNavigationBadge?.value = it.result
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -216,13 +200,13 @@ class TopUpFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
-
+        val tag = arguments?.getString(TAG_FRAGMENT)?.takeIf { it.isNotBlank() } ?: ""
         requireActivity().onBackPressedDispatcher.addCallback(
             owner = viewLifecycleOwner,
             onBackPressed = {
                 when(tag){
                     PlayerFragment::class.java.simpleName -> navigateTo(NavigateItem.Up)
-                    else -> interactionListener?.changeNavigationPosition(R.id.navigation_adult)
+                    else -> mainViewModel?.changeNavigationPosition?.value = R.id.navigation_adult
                 }
             }
         )

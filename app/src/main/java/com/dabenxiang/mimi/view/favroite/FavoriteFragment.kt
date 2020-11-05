@@ -28,7 +28,6 @@ import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.dialog.show
-import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerFragment
@@ -38,7 +37,6 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_post_favorite.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import timber.log.Timber
 
 class FavoriteFragment : BaseFragment() {
 
@@ -56,8 +54,6 @@ class FavoriteFragment : BaseFragment() {
     private val viewModel: FavoriteViewModel by viewModels()
 
     private val favoriteAdapter by lazy { FavoriteAdapter(listener) }
-
-    private var interactionListener: InteractionListener? = null
 
     private val primaryAdapter by lazy {
         FavoriteTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
@@ -140,7 +136,7 @@ class FavoriteFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     if (!it.result) {
-                        interactionListener?.changeNavigationPosition(R.id.navigation_personal)
+                        mainViewModel?.changeNavigationPosition?.value = R.id.navigation_personal
                     } else {
                         initView()
                     }
@@ -189,9 +185,7 @@ class FavoriteFragment : BaseFragment() {
         requireActivity().onBackPressedDispatcher.addCallback(
             owner = viewLifecycleOwner,
             onBackPressed = {
-                interactionListener?.changeNavigationPosition(
-                    R.id.navigation_adult
-                )
+                mainViewModel?.changeNavigationPosition?.value = R.id.navigation_adult
             }
         )
 
@@ -261,11 +255,6 @@ class FavoriteFragment : BaseFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        try {
-            interactionListener = context as InteractionListener
-        } catch (e: ClassCastException) {
-            Timber.e("FavoriteFragment interaction listener can't cast")
-        }
     }
 
     private fun refreshUi(size: Int) {
@@ -407,7 +396,7 @@ class FavoriteFragment : BaseFragment() {
                             }
                         }
                         is MemberPostItem -> {
-                            position?.let { goShortVideoDetailPage(item, position) }
+                            position?.let { goShortVideoDetailPage(item, position, true) }
                         }
                     }
                 }
@@ -499,7 +488,8 @@ class FavoriteFragment : BaseFragment() {
      */
     private fun goShortVideoDetailPage(
         item: MemberPostItem,
-        position: Int
+        position: Int,
+        showComment: Boolean = false
     ) {
         if (item.tags == null || item.tags!!.first().isEmpty()) {
             GeneralUtils.showToast(
@@ -508,7 +498,7 @@ class FavoriteFragment : BaseFragment() {
             )
         } else {
             useAdultTheme(false)
-            val bundle = ClipFragment.createBundle(viewModel.currentPostList, position, true)
+            val bundle = ClipFragment.createBundle(viewModel.currentPostList, position, showComment)
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_postFavoriteFragment_to_clipFragment,

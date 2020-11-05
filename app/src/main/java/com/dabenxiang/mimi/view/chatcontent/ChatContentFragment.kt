@@ -298,16 +298,19 @@ class ChatContentFragment : BaseFragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == RESULT_OK) {
-            data?.let {
-                val uriImage = (if (it.data != null) {
+            val uriImage = data?.let {
+                (if (it.data != null) {
                     it.data
                 } else {
                     rotateImage(BitmapFactory.decodeFile(file.absolutePath))
                     Uri.fromFile(file)
-                }) ?: return
-
-                viewModel.postAttachment(uriImage, requireContext())
+                })
+            } ?: kotlin.run {
+                rotateImage(BitmapFactory.decodeFile(file.absolutePath))
+                Uri.fromFile(file)
             }
+
+            viewModel.postAttachment(uriImage, requireContext())
         }
         super.onActivityResult(requestCode, resultCode, data)
     }

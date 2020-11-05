@@ -9,7 +9,6 @@ import android.text.InputFilter.LengthFilter
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
-import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -24,19 +23,16 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
-import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.item_login.*
 import kotlinx.android.synthetic.main.item_register.*
-import timber.log.Timber
 
 
 class LoginFragment : BaseFragment() {
 
     private val viewModel: LoginViewModel by viewModels()
-    private var interactionListener: InteractionListener? = null
 
     companion object {
         const val KEY_TYPE = "TYPE"
@@ -54,17 +50,6 @@ class LoginFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initSettings()
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-
-        try {
-            interactionListener = context as InteractionListener
-        } catch (e: ClassCastException) {
-            Timber.e("LoginFragment interaction listener can't cast")
-        }
-
     }
 
     override fun onResume() {
@@ -284,7 +269,7 @@ class LoginFragment : BaseFragment() {
                 )
 
                 R.id.btn_register_cancel, R.id.btn_login_cancel -> {
-                    interactionListener?.changeNavigationPosition(R.id.navigation_adult)
+                    mainViewModel?.changeNavigationPosition?.value = R.id.navigation_adult
                     navigateTo(NavigateItem.Up)
                 }
 
@@ -496,7 +481,6 @@ class LoginFragment : BaseFragment() {
 
         if (copyText.contains(MIMI_INVITE_CODE)) {
             val startIndex = copyText.lastIndexOf(MIMI_INVITE_CODE) + MIMI_INVITE_CODE.length
-
             val inviteCode = copyText.substring(startIndex, copyText.length)
             viewModel.inviteCode.value = inviteCode
         }

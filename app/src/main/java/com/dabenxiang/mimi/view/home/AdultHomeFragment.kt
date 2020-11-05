@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.view.home
 
 import android.app.Activity.RESULT_OK
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -47,7 +46,6 @@ import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.OnChooseUploadMethodDi
 import com.dabenxiang.mimi.view.dialog.login_request.LoginRequestDialog
 import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
-import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.listener.OnLoginRequestDialogListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
@@ -87,8 +85,6 @@ class AdultHomeFragment : BaseFragment() {
     private val homeClipViewHolderMap = hashMapOf<Int, HomeClipViewHolder>()
     private val homePictureViewHolderMap = hashMapOf<Int, HomePictureViewHolder>()
     private val homeClubViewHolderMap = hashMapOf<Int, HomeClubViewHolder>()
-
-    private var interactionListener: InteractionListener? = null
 
     private var loginDialog: LoginRequestDialog? = null
 
@@ -409,7 +405,7 @@ class AdultHomeFragment : BaseFragment() {
         requireActivity().onBackPressedDispatcher.addCallback(
             owner = viewLifecycleOwner,
             onBackPressed = {
-                interactionListener?.changeNavigationPosition(R.id.navigation_adult)
+                mainViewModel?.changeNavigationPosition?.value = R.id.navigation_adult
             }
         )
 
@@ -464,36 +460,7 @@ class AdultHomeFragment : BaseFragment() {
         }
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        try {
-            interactionListener = context as InteractionListener
-        } catch (e: ClassCastException) {
-            Timber.e("AdultHomeFragment interaction listener can't cast")
-        }
-    }
-
     private fun setupUI() {
-//        layout_top.background = ContextCompat.getDrawable(
-//            requireContext(), R.color.adult_color_status_bar
-//        )
-//
-//        layout_search_bar.background = ContextCompat.getDrawable(
-//            requireContext(), R.color.adult_color_background
-//        )
-//
-//        iv_bg_search setBtnSolidColor requireActivity().getColor(R.color.adult_color_search_bar)
-//
-//        iv_search.setImageResource(R.drawable.adult_btn_search)
-//        tv_search.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
-//
-//        btn_filter.setTextColor(requireActivity().getColor(R.color.adult_color_search_text))
-//        btn_filter.setBtnSolidColor(
-//            requireActivity().getColor(R.color.color_white_1_30),
-//            requireActivity().getColor(R.color.color_red_1),
-//            resources.getDimension(R.dimen.dp_6)
-//        )
-
         iv_post.visibility = View.VISIBLE
         btn_filter.visibility = View.GONE
         btn_ranking.visibility = View.VISIBLE

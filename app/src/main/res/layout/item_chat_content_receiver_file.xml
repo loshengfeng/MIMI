@@ -58,6 +58,16 @@
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <ProgressBar
+        android:id="@+id/loading_upload"
+        android:layout_width="24dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="5dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/layout_content"
+        app:layout_constraintEnd_toStartOf="@id/layout_content"
+        app:layout_constraintTop_toTopOf="@id/layout_content" />
+
     <TextView
         android:id="@+id/txt_download_state"
         android:layout_width="wrap_content"

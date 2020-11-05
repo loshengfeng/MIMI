@@ -67,7 +67,6 @@ class CategoriesFragment : BaseFragment() {
     private var filterDataList: ArrayList<List<String>> = arrayListOf()
 
     private val videoListAdapter by lazy {
-        val isAdult = mainViewModel?.adultMode?.value ?: false
         HomeVideoListAdapter(adapterListener)
     }
 

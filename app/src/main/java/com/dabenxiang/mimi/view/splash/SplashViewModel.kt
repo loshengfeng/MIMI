@@ -95,4 +95,5 @@ class SplashViewModel : BaseViewModel() {
     fun setupRecordTimestamp() {
         versionManager.setupRecordTimestamp()
     }
+
 }
