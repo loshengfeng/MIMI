@@ -112,7 +112,7 @@ class MainActivity : BaseActivity(), InteractionListener {
             }
         })
 
-        viewModel.showCopyHint.observe(this, {
+        viewModel.showPopHint.observe(this, {
             if (it.isNotBlank()) {
                 tv_pop_hint.visibility = View.VISIBLE
                 tv_pop_hint.text = it

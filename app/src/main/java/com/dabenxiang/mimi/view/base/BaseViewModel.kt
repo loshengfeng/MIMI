@@ -61,8 +61,8 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     private val _showProgress by lazy { MutableLiveData<Boolean>() }
     val showProgress: LiveData<Boolean> get() = _showProgress
 
-    private val _showCopyHint = MutableLiveData<String>()
-    val showCopyHint: LiveData<String> = _showCopyHint
+    private val _showPopHint = MutableLiveData<String>()
+    val showPopHint: LiveData<String> = _showPopHint
 
     fun setShowProgress(show: Boolean) {
         _showProgress.value = show
@@ -70,9 +70,9 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
 
     fun setShowPopHint(text: String){
         viewModelScope.launch {
-            _showCopyHint.postValue(text)
+            _showPopHint.postValue(text)
             delay(POP_HINT_DURATION)
-            _showCopyHint.postValue("")
+            _showPopHint.postValue("")
         }
     }
 
