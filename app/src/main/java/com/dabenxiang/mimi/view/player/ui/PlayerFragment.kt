@@ -281,8 +281,6 @@ class PlayerFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupUI()
-        setupObservers()
-        setupListeners()
     }
 
     override fun setUpStatusBarColor() {
