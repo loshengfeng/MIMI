@@ -89,17 +89,73 @@
         app:layout_constraintStart_toStartOf="@id/player_view"
         app:layout_constraintTop_toTopOf="@id/player_view" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_info"
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:nestedScrollingEnabled="false"
-        android:orientation="vertical"
-        android:layout_gravity="fill_vertical"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toTopOf="@id/bottom_func_bar"
-        app:layout_constraintTop_toBottomOf="@+id/player_view"/>
+        app:layout_constraintTop_toBottomOf="@+id/player_view"
+        app:layout_constraintBottom_toTopOf="@id/bottom_func_bar" >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp">
+
+            <include
+                android:id="@+id/layout_ad"
+                layout="@layout/item_ad"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <include
+                android:id="@+id/layout_video_info"
+                layout="@layout/head_video_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/layout_ad"/>
+
+            <include
+                android:id="@+id/layout_source"
+                layout="@layout/head_source"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/layout_video_info"/>
+
+            <include
+                android:id="@+id/layout_guess_like"
+                layout="@layout/head_guess_like"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/layout_source"/>
+
+            <include
+                android:id="@+id/layout_comment"
+                layout="@layout/head_comment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/layout_guess_like"/>
+
+            <include
+                android:id="@+id/layout_no_comment"
+                layout="@layout/head_no_comment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/layout_comment"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:orientation="vertical"
+                android:layout_gravity="fill_vertical"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintTop_toBottomOf="@id/layout_no_comment"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_func_bar"

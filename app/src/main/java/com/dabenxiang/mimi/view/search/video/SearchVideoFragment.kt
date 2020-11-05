@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.search.video
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableString
@@ -79,10 +80,9 @@ class SearchVideoFragment : BaseFragment() {
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
+
     override fun setupFirstTime() {
         super.setupFirstTime()
-
-        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
 
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
@@ -244,10 +244,14 @@ class SearchVideoFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+
+        requireActivity().onBackPressedDispatcher.addCallback(owner = viewLifecycleOwner, onBackPressed= {
+            Timber.i("SearchVideoFragment onBackPressedDispatcher")
+            navigateTo(NavigateItem.Up)
+        })
+
         ib_back.setOnClickListener {
-            if (mainViewModel?.isFromPlayer == true)
-                activity?.onBackPressed()
-            else navigateTo(NavigateItem.Up)
+            navigateTo(NavigateItem.Up)
         }
 
         iv_clean.setOnClickListener {

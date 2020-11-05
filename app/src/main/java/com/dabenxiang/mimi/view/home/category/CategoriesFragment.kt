@@ -35,6 +35,7 @@ import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_categories.*
+import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem as CategoriesData
 
@@ -119,7 +120,9 @@ class CategoriesFragment : BaseFragment() {
     override fun setupFirstTime() {
         super.setupFirstTime()
 
-        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
+        requireActivity().onBackPressedDispatcher.addCallback {
+            Timber.i("CategoriesFragment onBackPressedDispatcher")
+            navigateTo(NavigateItem.Up) }
 
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
@@ -127,11 +130,13 @@ class CategoriesFragment : BaseFragment() {
         (arguments?.getSerializable(KEY_DATA) as CategoriesItem?)?.also { data ->
             tv_title.text = data.title
 
-            cl_root.background = ContextCompat.getDrawable(requireContext(), R.color.normal_color_background)
+            cl_root.background =
+                ContextCompat.getDrawable(requireContext(), R.color.normal_color_background)
 
             tv_no_data.setTextColor(requireActivity().getColorStateList(R.color.color_black_2_50))
 
-            layout_top.background = ContextCompat.getDrawable(requireContext(), R.color.normal_color_status_bar)
+            layout_top.background =
+                ContextCompat.getDrawable(requireContext(), R.color.normal_color_status_bar)
 
             ib_back.setImageResource(R.drawable.normal_btn_back)
 
@@ -219,10 +224,8 @@ class CategoriesFragment : BaseFragment() {
             }
             doOnTabSelected()
 
-            if (isAdult) { //第一欄按"全部" -> 清空第二欄
-                setupFilter(1, arrayListOf())
-                adjustContentRV(1)
-            }
+            setupFilter(1, arrayListOf())
+            adjustContentRV(1)
         }
 
         tv_all_1.setOnClickListener {

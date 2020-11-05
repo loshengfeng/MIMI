@@ -500,7 +500,7 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         btn_filter.setOnClickListener {
-            val category = mainViewModel?.adult?.categories?.get(0)
+            val category = mainViewModel?.adult?.categories?.find { it.name == getString(R.string.home_tab_video) }
             category?.also {
                 val bundle = CategoriesFragment.createBundle(it.name, it.name, category)
                 navigateTo(
@@ -910,7 +910,7 @@ class AdultHomeFragment : BaseFragment() {
             }
             type?.let {
                 if(type == CategoryType.VIDEO_ON_DEMAND) {
-                    val category = mainViewModel?.adult?.categories?.get(0)
+                    val category = mainViewModel?.adult?.categories?.find { it.name == getString(R.string.home_tab_video) }
                     category?.also {
                         val bundle = CategoriesFragment.createBundle(it.name, it.name, category)
                         navigateTo(

@@ -10,6 +10,7 @@ import android.widget.ImageView
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.BuildConfig
@@ -20,6 +21,7 @@ import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderingPackageItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PaymentType
+import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.adapter.TopUpAgentAdapter
 import com.dabenxiang.mimi.view.adapter.TopUpOnlinePayAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -28,7 +30,9 @@ import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
 import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.orderinfo.OrderInfoFragment
+import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_top_up.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import timber.log.Timber
@@ -47,6 +51,15 @@ class TopUpFragment : BaseFragment() {
 
     private var orderPackageMap: HashMap<PaymentType, ArrayList<OrderingPackageItem>>? = null
 
+    companion object{
+        const val TAG_FRAGMENT ="TAG_FRAGMENT"
+        fun createBundle(tagName: String?): Bundle {
+            return Bundle().also {
+                it.putString(TAG_FRAGMENT, tagName)
+            }
+        }
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         try {
@@ -58,8 +71,19 @@ class TopUpFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val tag = arguments?.getString(TAG_FRAGMENT)?.takeIf { it.isNotBlank() } ?: ""
+
+        requireActivity().bottom_navigation?.visibility  =  when(tag) {
+            PlayerFragment::class.java.simpleName -> View.GONE
+            else -> View.VISIBLE
+        }
+
+        Timber.e("TAG_FRAGMENT: $tag")
         requireActivity().onBackPressedDispatcher.addCallback {
-            interactionListener?.changeNavigationPosition(R.id.navigation_adult)
+            when(tag){
+                PlayerFragment::class.java.simpleName -> navigateTo(NavigateItem.Up)
+                else -> interactionListener?.changeNavigationPosition(R.id.navigation_adult)
+            }
         }
         initSettings()
     }

@@ -46,6 +46,7 @@ import java.io.File
 class PlayerViewModel : BaseViewModel() {
 
     companion object {
+        val SING_DOES_NOT_MATCH = 403
         var volume: Float = 1f
         const val StreamUrlFormat = "%s/v1/Player/%d/%d/%d?userId=%d&utcTime=%d&sign=%s"
     }
@@ -53,6 +54,7 @@ class PlayerViewModel : BaseViewModel() {
     var videoId: Long = 0L // 一開始用最外層的id, 點選影片之後用裡面的 source id
     var category: String = ""
     var episodeId: Long = -1L
+    var streamId: Long = 0L
     var isReported: Boolean = false
     var isCommentReport: Boolean = false
 
@@ -133,6 +135,9 @@ class PlayerViewModel : BaseViewModel() {
 
     private val _videoReport = MutableLiveData<ApiResult<Nothing>>()
     val videoReport: LiveData<ApiResult<Nothing>> = _videoReport
+
+    private val _showRechargeReminder = MutableLiveData(false)
+    val showRechargeReminder: LiveData<Boolean> = _showRechargeReminder
 
     fun updatedSelectedNewestComment(isNewest: Boolean) {
         _isSelectedNewestComment.value = isNewest
@@ -353,6 +358,8 @@ class PlayerViewModel : BaseViewModel() {
                     else
                         0
                 )!!
+                // report video not play need stream id
+                streamId = stream.id!!
 
                 val streamResp = apiRepository.getVideoM3u8Source(
                     stream.id!!,
@@ -360,7 +367,9 @@ class PlayerViewModel : BaseViewModel() {
                     stream.utcTime,
                     stream.sign
                 )
-                if (!streamResp.isSuccessful) throw HttpException(streamResp)
+                if(streamResp.code() == SING_DOES_NOT_MATCH ) {
+                    _showRechargeReminder.postValue(true)
+                } else if (!streamResp.isSuccessful) throw HttpException(streamResp)
 //                deleteCacheFile()
                 if (TextUtils.isEmpty(streamResp.body()?.content?.streamUrl))
                     sendCrashReport(
@@ -380,7 +389,7 @@ class PlayerViewModel : BaseViewModel() {
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e ->
-                    Timber.e(e)
+//                    Timber.e(e)
                     emit(ApiResult.error(e))
                 }
                 .onStart { emit(ApiResult.loading()) }
@@ -793,6 +802,7 @@ class PlayerViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect {
+                    Timber.i("sentReport =$it")
                     _apiReportResult.value = SingleLiveEvent(it)
                 }
         }
@@ -817,6 +827,7 @@ class PlayerViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect {
+                    Timber.i("sentReport =$it")
                     _apiReportResult.value = SingleLiveEvent(it)
                 }
         }
