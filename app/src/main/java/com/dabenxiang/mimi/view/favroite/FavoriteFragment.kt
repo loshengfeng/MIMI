@@ -397,7 +397,7 @@ class FavoriteFragment : BaseFragment() {
                             }
                         }
                         is MemberPostItem -> {
-                            position?.let { goShortVideoDetailPage(item, position) }
+                            position?.let { goShortVideoDetailPage(item, position, true) }
                         }
                     }
                 }
@@ -489,7 +489,8 @@ class FavoriteFragment : BaseFragment() {
      */
     private fun goShortVideoDetailPage(
         item: MemberPostItem,
-        position: Int
+        position: Int,
+        showComment: Boolean = false
     ) {
         if (item.tags == null || item.tags!!.first().isEmpty()) {
             GeneralUtils.showToast(
@@ -498,7 +499,7 @@ class FavoriteFragment : BaseFragment() {
             )
         } else {
             useAdultTheme(false)
-            val bundle = ClipFragment.createBundle(viewModel.currentPostList, position, true)
+            val bundle = ClipFragment.createBundle(viewModel.currentPostList, position, showComment)
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_postFavoriteFragment_to_clipFragment,
