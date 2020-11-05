@@ -20,7 +20,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearSnapHelper
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
-import com.dabenxiang.mimi.NAVIGATE_TO_TOPUP_ACTION
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.addKeyboardToggleListener
 import com.dabenxiang.mimi.extension.handleException
@@ -38,6 +37,7 @@ import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.*
 import com.dabenxiang.mimi.view.login.LoginFragment
+import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.*
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
@@ -284,6 +284,12 @@ class PlayerFragment : BaseFragment() {
         setupUI()
         setupObservers()
         setupListeners()
+    }
+
+    override fun setUpStatusBarColor() {
+        activity?.also {
+            (it as MainActivity).window.statusBarColor = requireContext().getColor(R.color.adult_color_status_bar)
+        }
     }
 
     private fun setupUI() {

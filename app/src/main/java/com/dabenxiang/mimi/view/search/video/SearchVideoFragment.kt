@@ -242,9 +242,7 @@ class SearchVideoFragment : BaseFragment() {
 
     override fun setupListeners() {
         ib_back.setOnClickListener {
-            if (mainViewModel?.isFromPlayer == true)
-                activity?.onBackPressed()
-            else navigateTo(NavigateItem.Up)
+            navigateTo(NavigateItem.Up)
         }
 
         iv_clean.setOnClickListener {
