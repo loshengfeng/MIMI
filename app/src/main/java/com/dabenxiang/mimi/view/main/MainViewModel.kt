@@ -23,6 +23,7 @@ import com.dabenxiang.mimi.model.vo.mqtt.OrderItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.home.HomeViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -46,7 +47,7 @@ class MainViewModel : BaseViewModel() {
 
     val messageListenerMap = hashMapOf<String, MessageListener>()
 
-    private val clientId = UUID.randomUUID().toString()
+    private val clientId = GeneralUtils.getAndroidID()
 
     private val _categoriesData = MutableLiveData<ApiResult<ApiBaseItem<RootCategoriesItem>>>()
     val categoriesData: LiveData<ApiResult<ApiBaseItem<RootCategoriesItem>>> = _categoriesData
@@ -264,7 +265,7 @@ class MainViewModel : BaseViewModel() {
     }
 
     fun startMQTT() {
-        if (isMqttConnect()) {
+        if (!isMqttConnect()) {
             // test serverUrl use: tcp://172.x.x.x:1883
             mqttManager.init(MQTT_HOST_URL, clientId, extendedCallback)
             mqttManager.connect(connectCallback)

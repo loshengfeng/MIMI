@@ -38,7 +38,6 @@ import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 class TopUpFragment : BaseFragment() {
 
     private val viewModel: TopUpViewModel by viewModels()

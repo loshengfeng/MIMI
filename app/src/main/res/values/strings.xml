@@ -274,6 +274,7 @@
     <!-- Follow -->
     <string name="follow">+关注</string>
     <string name="followed">已关注</string>
+    <string name="cancel_follow">取消关注</string>
 
     <!-- Post -->
     <string name="upload_video">上传视频</string>

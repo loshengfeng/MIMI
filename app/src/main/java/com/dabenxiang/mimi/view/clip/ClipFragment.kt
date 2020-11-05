@@ -98,10 +98,16 @@ class ClipFragment : BaseFragment() {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Success -> rv_clip.adapter?.notifyItemChanged(
-                    it.result,
-                    ClipAdapter.PAYLOAD_UPDATE_UI
-                )
+                is Success -> {
+                    rv_clip.adapter?.notifyItemChanged(
+                        it.result,
+                        ClipAdapter.PAYLOAD_UPDATE_UI
+                    )
+                    mainViewModel?.setShowPopHint(
+                        if (memberPostItems[it.result].isFollow) getString(R.string.followed)
+                        else getString(R.string.cancel_follow)
+                    )
+                }
                 is Error -> onApiError(it.throwable)
             }
         })
