@@ -49,14 +49,12 @@ class SearchVideoFragment : BaseFragment() {
         fun createBundle(
             title: String = "",
             tag: String = "",
-            category: String = "",
-            isAdult: Boolean = false
+            category: String = ""
         ): Bundle {
             val data = SearchingVideoItem()
             data.title = title
             data.tag = tag
             data.category = category
-            data.isAdult = isAdult
 
             return Bundle().also {
                 it.putSerializable(KEY_DATA, data)
@@ -69,7 +67,7 @@ class SearchVideoFragment : BaseFragment() {
     var moreDialog: MoreDialogFragment? = null
 
     private val videoListAdapter by lazy {
-        SearchVideoAdapter(requireContext(), adapterListener, viewModel.isAdult)
+        SearchVideoAdapter(requireContext(), adapterListener)
     }
 
     override fun getLayoutId(): Int {
@@ -86,13 +84,11 @@ class SearchVideoFragment : BaseFragment() {
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
 
-        viewModel.isAdult = mainViewModel?.adultMode?.value ?: false
-
         (arguments?.getSerializable(KEY_DATA) as SearchingVideoItem?)?.also { data ->
-            Timber.d("key data from args is title: ${data.title}, tag: ${data.tag} and isAdult: ${data.isAdult}")
-            if (arguments?.getBoolean(KEY_IS_FROM_PLAYER) == true) {
-                viewModel.isAdult = data.isAdult
-            }
+            Timber.d("key data from args is title: ${data.title}, tag: ${data.tag} ")
+//            if (arguments?.getBoolean(KEY_IS_FROM_PLAYER) == true) {
+//                viewModel.isAdult = data.isAdult
+//            }
 
             if (data.tag.isNotBlank()) {
                 viewModel.searchingTag = data.tag
@@ -110,100 +106,9 @@ class SearchVideoFragment : BaseFragment() {
                 layout_search_text.visibility = View.VISIBLE
             }
 
-//            iv_clear_search_text.background =
-//                if (viewModel.isAdult) {
-//                    ContextCompat.getDrawable(requireContext(), R.drawable.btn_trash_white_n)
-//                } else {
-//                    ContextCompat.getDrawable(requireContext(), R.drawable.btn_trash_n)
-//                }
-//
-//            txt_history_title.setTextColor(
-//                if (viewModel.isAdult) {
-//                    ContextCompat.getColor(requireContext(), android.R.color.white)
-//                } else {
-//                    ContextCompat.getColor(requireContext(), android.R.color.black)
-//                }
-//            )
-//
-//            tv_search_text.setTextColor(
-//                if (viewModel.isAdult) {
-//                    ContextCompat.getColor(requireContext(), android.R.color.white)
-//                } else {
-//                    ContextCompat.getColor(requireContext(), android.R.color.black)
-//                }
-//            )
-//
-//            layout_frame.background =
-//                if (viewModel.isAdult) {
-//                    R.color.adult_color_background
-//                } else {
-//                    R.color.normal_color_background
-//                }.let {
-//                    ContextCompat.getDrawable(requireContext(), it)
-//                }
-
             recyclerview_content.layoutManager = LinearLayoutManager(requireContext())
             recyclerview_content.adapter = videoListAdapter
 
-//            recyclerview_content.background =
-//                if (viewModel.isAdult) {
-//                    R.color.adult_color_background
-//                } else {
-//                    R.color.normal_color_background
-//                }.let {
-//                    ContextCompat.getDrawable(requireContext(), it)
-//                }
-//
-//            layout_top.background =
-//                if (viewModel.isAdult) {
-//                    R.color.adult_color_status_bar
-//                } else {
-//                    R.color.normal_color_status_bar
-//                }.let {
-//                    ContextCompat.getDrawable(requireContext(), it)
-//                }
-//
-//            ib_back.setImageResource(
-//                if (viewModel.isAdult) {
-//                    R.drawable.adult_btn_back
-//                } else {
-//                    R.drawable.normal_btn_back
-//                }
-//            )
-//
-//            iv_search_bar.setImageResource(
-//                if (viewModel.isAdult) {
-//                    R.drawable.bg_black_1_30_radius_18
-//                } else {
-//                    R.drawable.bg_white_1_65625_border_gray_11_radius_18
-//                }
-//            )
-//
-//            iv_search.setImageResource(
-//                if (viewModel.isAdult) {
-//                    R.drawable.adult_btn_search
-//                } else {
-//                    R.drawable.normal_btn_search
-//                }
-//            )
-//
-//            edit_search.setTextColor(
-//                if (viewModel.isAdult) {
-//                    R.color.adult_color_text
-//                } else {
-//                    R.color.normal_color_text
-//                }.let {
-//                    requireActivity().getColor(it)
-//                }
-//            )
-//
-//            iv_clean.setImageResource(
-//                if (viewModel.isAdult) {
-//                    R.drawable.btn_close_white
-//                } else {
-//                    R.drawable.btn_close_gray
-//                }
-//            )
         }
     }
 
@@ -455,19 +360,6 @@ class SearchVideoFragment : BaseFragment() {
                 .inflate(R.layout.chip_item, chip_group_search_text, false) as Chip
             chip.text = text
             chip.ellipsize = TextUtils.TruncateAt.END
-
-//            if (viewModel.isAdult) {
-//                chip.chipBackgroundColor = ColorStateList.valueOf(
-//                    ContextCompat.getColor(requireContext(), R.color.color_black_6)
-//                )
-//                chip.setTextColor(requireContext().getColor(R.color.color_white_1_50))
-//            } else {
-//                chip.chipBackgroundColor = ColorStateList.valueOf(
-//                    ContextCompat.getColor(requireContext(), R.color.color_black_1_10)
-//                )
-//                chip.setTextColor(requireContext().getColor(R.color.color_black_1_50))
-//            }
-
             chip.setOnClickListener {
                 edit_search.setText(text)
                 layout_search_history.visibility = View.GONE

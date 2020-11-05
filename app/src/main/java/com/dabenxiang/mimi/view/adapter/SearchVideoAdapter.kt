@@ -20,8 +20,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
 class SearchVideoAdapter(
     val context: Context,
-    private val listener: EventListener,
-    private val isAdult: Boolean = true
+    private val listener: EventListener
 ) : PagedListAdapter<VideoItem, RecyclerView.ViewHolder>(diffCallback) {
 
     companion object {

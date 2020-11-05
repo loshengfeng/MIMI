@@ -204,7 +204,6 @@ class PictureDetailAdapter(
                 }
 
                 commentAdapter = CommentAdapter(
-                    true,
                     playerInfoListener,
                     CommentViewType.COMMON
                 ).apply {
@@ -212,7 +211,7 @@ class PictureDetailAdapter(
                         isEnableLoadMore = true
                         isAutoLoadMore = true
                         isEnableLoadMoreIfNotFullPage = false
-                        loadMoreView = CommentLoadMoreView(true, CommentViewType.COMMON)
+                        loadMoreView = CommentLoadMoreView(CommentViewType.COMMON)
                     }
                 }
 

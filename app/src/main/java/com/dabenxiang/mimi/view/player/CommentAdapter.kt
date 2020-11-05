@@ -19,7 +19,7 @@ import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
-class CommentAdapter(isAdult: Boolean, listener: PlayerInfoListener, type: CommentViewType) :
+class CommentAdapter(listener: PlayerInfoListener, type: CommentViewType) :
     BaseNodeAdapter(), LoadMoreModule {
 
     companion object {
@@ -38,8 +38,8 @@ class CommentAdapter(isAdult: Boolean, listener: PlayerInfoListener, type: Comme
     }
 
     init {
-        addNodeProvider(RootCommentProvider(isAdult, listener, type))
-        addNodeProvider(NestedCommentProvider(isAdult, listener, type))
+        addNodeProvider(RootCommentProvider(listener, type))
+        addNodeProvider(NestedCommentProvider(listener, type))
     }
 
     override fun getItemType(data: List<BaseNode>, position: Int): Int {
@@ -52,10 +52,9 @@ class CommentAdapter(isAdult: Boolean, listener: PlayerInfoListener, type: Comme
 }
 
 class RootCommentProvider(
-    private val isAdult: Boolean,
     private val listener: CommentAdapter.PlayerInfoListener,
     private val type: CommentViewType
-) : BaseCommentProvider(isAdult, listener, type) {
+) : BaseCommentProvider(listener, type) {
 
     override val itemViewType: Int
         get() = 1
@@ -197,10 +196,9 @@ class RootCommentProvider(
 }
 
 class NestedCommentProvider(
-    isAdult: Boolean,
     val listener: CommentAdapter.PlayerInfoListener,
     type: CommentViewType
-) : BaseCommentProvider(isAdult, listener, type) {
+) : BaseCommentProvider(listener, type) {
     override val itemViewType: Int
         get() = 2
 
@@ -276,7 +274,6 @@ class NestedCommentProvider(
 }
 
 abstract class BaseCommentProvider(
-    private val isAdult: Boolean,
     private val listener: CommentAdapter.PlayerInfoListener,
     private val type: CommentViewType
 ) : BaseNodeProvider() {

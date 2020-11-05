@@ -112,7 +112,7 @@ class PlayerFragment : BaseFragment() {
                 Timber.i("TopTabAdapter onClickItemIndex")
                 viewModel.setSourceListPosition(index)
             }
-        }, obtainIsAdult())
+        })
     }
 
     private val episodeAdapter by lazy {
@@ -121,7 +121,7 @@ class PlayerFragment : BaseFragment() {
                 Timber.i("SelectEpisodeAdapter onClickItemIndex $index")
                 viewModel.setStreamPosition(index)
             }
-        }, obtainIsAdult())
+        })
     }
 
     private val guessLikeAdapter by lazy {
@@ -131,12 +131,12 @@ class PlayerFragment : BaseFragment() {
                 oldPlayerItem = PlayerItem(viewModel.videoId)
                 reloadVideoInfo(item)
             }
-        }, obtainIsAdult())
+        })
     }
 
     private val playerInfoAdapter by lazy {
         Timber.i("playerInfoAdapter")
-        CommentAdapter(obtainIsAdult(), object : CommentAdapter.PlayerInfoListener {
+        CommentAdapter(object : CommentAdapter.PlayerInfoListener {
             override fun sendComment(replyId: Long?, replyName: String?) {
                 viewModel.checkStatus {
                     Timber.i("playerInfoAdapter sendComment")
@@ -229,22 +229,12 @@ class PlayerFragment : BaseFragment() {
         }
     }
 
-//    private val networkCallbackListener = object : NetworkCallbackListener {
-//        override fun onLost() {
-//            Timber.d("network disconnect")
-//            showCrashDialog(HttpErrorMsgType.CHECK_NETWORK)
-//        }
-//    }
-//
-//    private val networkCallback = NetworkCallback(networkCallbackListener)
-
     override fun getLayoutId(): Int {
         return R.layout.activity_player
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupUI()
     }
 
@@ -262,10 +252,8 @@ class PlayerFragment : BaseFragment() {
             playerInfoAdapter.removeAllHeaderView()
         }
 
-        val isAdult = obtainIsAdult()
-
         playerInfoAdapter.loadMoreModule.loadMoreView =
-            CommentLoadMoreView(isAdult, CommentViewType.VIDEO)
+            CommentLoadMoreView(CommentViewType.VIDEO)
 
         recycler_info.adapter = playerInfoAdapter
 
@@ -610,7 +598,7 @@ class PlayerFragment : BaseFragment() {
                 VideoConsumeResult.PAID_YET,
                 VideoConsumeResult.PAID -> {
                     showRechargeReminder(false)
-                    viewModel.getStreamUrl(obtainIsAdult())
+                    viewModel.getAdultStreamUrl()
                 }
                 VideoConsumeResult.POINT_NOT_ENOUGH -> {
                     showRechargeReminder(true)
@@ -999,12 +987,12 @@ class PlayerFragment : BaseFragment() {
         Timber.i("commentEditorToggle enable:$enable")
         when (enable) {
             true -> {
-                bottom_func_input.visibility = VISIBLE
-                bottom_func_bar.visibility = View.GONE
+                bottom_func_input?.visibility = VISIBLE
+                bottom_func_bar?.visibility = View.GONE
             }
             else -> {
-                bottom_func_input.visibility = View.GONE
-                bottom_func_bar.visibility = VISIBLE
+                bottom_func_input?.visibility = View.GONE
+                bottom_func_bar?.visibility = VISIBLE
             }
         }
 
@@ -1403,10 +1391,6 @@ class PlayerFragment : BaseFragment() {
         }
     }
 
-    private fun obtainIsAdult(): Boolean {
-        return true
-    }
-
     private fun setupSourceList(list: List<Source>?) {
         if (list == null) {
             recyclerview_source_list.visibility = View.GONE
@@ -1439,29 +1423,16 @@ class PlayerFragment : BaseFragment() {
 
     private fun setupStream(list: List<VideoEpisode>) {
         val result = mutableListOf<String>()
-        // 成人取得Streaming邏輯不同
         Timber.i("setupStream =${list.size}")
-        if (obtainIsAdult()) {
-            if (list.size == 1) {
-                val videoStreams = list[0].videoStreams
-                if (videoStreams != null && videoStreams.isNotEmpty()) {
-                    for (item in videoStreams) {
-                        Timber.i("videoStreams =${item.id}")
-                        if (item.id != null) {
-                            result.add(item.streamName ?: "")
-                        }
+        if (list.size == 1) {
+            val videoStreams = list[0].videoStreams
+            if (videoStreams != null && videoStreams.isNotEmpty()) {
+                for (item in videoStreams) {
+                    Timber.i("videoStreams =${item.id}")
+                    if (item.id != null) {
+                        result.add(item.streamName ?: "")
                     }
                 }
-            }
-        } else {
-            for (item in list) {
-                if (item.id != null) {
-                    result.add(item.episode ?: "")
-                }
-            }
-            result.sort()
-            for (i in 0..(result.size - 1)) {
-                Timber.d("${result.get(i)}")
             }
         }
 
@@ -1488,25 +1459,18 @@ class PlayerFragment : BaseFragment() {
             ) as Chip
             chip.text = it
 
-            val isAdult = obtainIsAdult()
-
             chip.setTextColor(requireContext().getColor(R.color.color_black_1_50))
 
-            chip.setOnClickListener(
-                View.OnClickListener {
-                    val bundle = SearchVideoFragment.createBundle(
-                        tag = chip.text.toString(),
-                        isAdult = obtainIsAdult()
-                    )
-                    bundle.putBoolean(KEY_IS_FROM_PLAYER, true)
-
-                    //TODO
-                    findNavController().navigate(
-                        R.id.action_playerFragment_to_searchVideoFragment,
-                        bundle
-                    )
-                }
-            )
+            chip.setOnClickListener {
+                val bundle = SearchVideoFragment.createBundle(
+                    tag = chip.text.toString()
+                )
+                bundle.putBoolean(KEY_IS_FROM_PLAYER, true)
+                findNavController().navigate(
+                    R.id.action_playerFragment_to_searchVideoFragment,
+                    bundle
+                )
+            }
 
             reflow_group.addView(chip)
         }

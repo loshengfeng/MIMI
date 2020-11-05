@@ -16,8 +16,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.nested_item_home_statistics.view.*
 
 class GuessLikeAdapter(
-    private val listener: GuessLikeAdapterListener,
-    private val isAdult: Boolean
+    private val listener: GuessLikeAdapterListener
 ) :
     PagedListAdapter<BaseVideoItem, BaseViewHolder>(diffCallback) {
 
@@ -57,13 +56,8 @@ class GuessLikeAdapter(
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.nested_item_home_statistics, parent, false)
         val layoutParams = view.layout_card.layoutParams as ConstraintLayout.LayoutParams
-        if(isAdult) {
-            layoutParams.width = (((200.0 / 360.0)) * GeneralUtils.getWindowsWidth()).toInt()
-            layoutParams.height = (((113.0 / 640.0)) * GeneralUtils.getWindowsHeight()).toInt()
-        } else {
-            layoutParams.width = (((100.0 / 360.0)) * GeneralUtils.getWindowsWidth()).toInt()
-            layoutParams.height = (((144.0 / 640.0)) * GeneralUtils.getWindowsHeight()).toInt()
-        }
+        layoutParams.width = (((200.0 / 360.0)) * GeneralUtils.getWindowsWidth()).toInt()
+        layoutParams.height = (((113.0 / 640.0)) * GeneralUtils.getWindowsHeight()).toInt()
         return VideoViewHolder(
             view,
             videoViewHolderListener

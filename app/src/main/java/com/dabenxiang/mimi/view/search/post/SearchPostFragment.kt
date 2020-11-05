@@ -113,7 +113,7 @@ class SearchPostFragment : BaseFragment() {
             requireContext(), adultListener, mTag, memberPostFuncItem, true
         )
 
-        videoListAdapter = SearchVideoAdapter(requireContext(), videoAdapterListener, true)
+        videoListAdapter = SearchVideoAdapter(requireContext(), videoAdapterListener)
         recycler_search_result.layoutManager = LinearLayoutManager(requireContext())
 
         concatAdapter = ConcatAdapter(memberPostAdapter, videoListAdapter)

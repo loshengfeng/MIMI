@@ -720,7 +720,7 @@ class AdultHomeFragment : BaseFragment() {
             override fun onClickItemIndex(view: View, index: Int) {
                 setTab(index)
             }
-        }, false)
+        })
     }
 
     private val homeAdapter by lazy {

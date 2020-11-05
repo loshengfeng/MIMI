@@ -9,7 +9,7 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.enums.CommentViewType
 
-class CommentLoadMoreView(private val isAdult: Boolean, private val type: CommentViewType) :
+class CommentLoadMoreView(private val type: CommentViewType) :
     BaseLoadMoreView() {
 
     override fun getRootView(parent: ViewGroup): View {

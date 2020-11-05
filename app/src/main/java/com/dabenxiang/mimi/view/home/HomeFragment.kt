@@ -278,7 +278,7 @@ class HomeFragment : BaseFragment() {
             override fun onClickItemIndex(view: View, index: Int) {
                 setTab(index)
             }
-        }, false)
+        })
     }
 
     private fun setTab(index: Int) {
