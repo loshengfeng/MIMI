@@ -216,14 +216,13 @@ class MainActivity : BaseActivity(), InteractionListener {
 
     @SuppressLint("RestrictedApi")
     override fun onBackPressed() {
-        val fragmentName =
-            supportFragmentManager.fragments[0].findNavController().currentDestination?.displayName?.substringAfter(
-                "/"
-            ).toString()
-        // 判斷當前的頁面是停留在 homeFragment，顯示退出 app 訊息
-        if (fragmentName.toLowerCase(Locale.getDefault()) ==
+        val fragmentName = supportFragmentManager.fragments[0].findNavController()
+            .currentDestination?.displayName?.substringAfter("/").toString()
+
+        val adultHomeFragment =
             AdultHomeFragment::class.java.simpleName.toLowerCase(Locale.getDefault())
-        ) {
+        // 判斷當前的頁面是停留在 homeFragment，顯示退出 app 訊息
+        if (fragmentName.toLowerCase(Locale.getDefault()) == adultHomeFragment) {
             if (!viewModel.needCloseApp) {
                 viewModel.startBackExitAppTimer()
                 GeneralUtils.showToast(this, getString(R.string.press_again_exit))
@@ -237,7 +236,7 @@ class MainActivity : BaseActivity(), InteractionListener {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        Timber.d("onNewIntent intent$intent")
+        Timber.d("onNewIntent intent: $intent")
         // this is for Package Installer activity callback method
         val extras = intent?.extras
         if (PACKAGE_INSTALLED_ACTION.equals(intent?.action)) {

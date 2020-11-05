@@ -41,6 +41,7 @@ import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.*
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
+import com.dabenxiang.mimi.view.topup.TopUpFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.OrientationDetector
 import com.google.android.exoplayer2.*
@@ -50,12 +51,12 @@ import com.google.android.exoplayer2.util.Util
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.activity_player.*
 import kotlinx.android.synthetic.main.custom_playback_control.*
-import kotlinx.android.synthetic.main.head_comment.view.*
-import kotlinx.android.synthetic.main.head_guess_like.view.*
-import kotlinx.android.synthetic.main.head_no_comment.view.*
-import kotlinx.android.synthetic.main.head_source.view.*
-import kotlinx.android.synthetic.main.head_video_info.view.*
-import kotlinx.android.synthetic.main.item_ad.view.*
+import kotlinx.android.synthetic.main.head_comment.*
+import kotlinx.android.synthetic.main.head_guess_like.*
+import kotlinx.android.synthetic.main.head_no_comment.*
+import kotlinx.android.synthetic.main.head_source.*
+import kotlinx.android.synthetic.main.head_video_info.*
+import kotlinx.android.synthetic.main.item_ad.*
 import kotlinx.android.synthetic.main.recharge_reminder.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -103,7 +104,7 @@ class PlayerFragment : BaseFragment() {
     private var isFirstInit = true
     private var isKeyboardShown = false
     private var oldPlayerItem: PlayerItem = PlayerItem(-1)
-    override var bottomNavigationVisibility = View.GONE
+    override val bottomNavigationVisibility = View.GONE
 
     private val sourceListAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
@@ -111,7 +112,7 @@ class PlayerFragment : BaseFragment() {
                 Timber.i("TopTabAdapter onClickItemIndex")
                 viewModel.setSourceListPosition(index)
             }
-        }, obtainIsAdult())
+        })
     }
 
     private val episodeAdapter by lazy {
@@ -120,7 +121,7 @@ class PlayerFragment : BaseFragment() {
                 Timber.i("SelectEpisodeAdapter onClickItemIndex $index")
                 viewModel.setStreamPosition(index)
             }
-        }, obtainIsAdult())
+        })
     }
 
     private val guessLikeAdapter by lazy {
@@ -130,36 +131,12 @@ class PlayerFragment : BaseFragment() {
                 oldPlayerItem = PlayerItem(viewModel.videoId)
                 reloadVideoInfo(item)
             }
-        }, obtainIsAdult())
-    }
-
-    private val adInfo by lazy {
-        layoutInflater.inflate(R.layout.item_ad, recycler_info.parent as ViewGroup, false)
-    }
-
-    private val headVideoInfo by lazy {
-        layoutInflater.inflate(R.layout.head_video_info, recycler_info.parent as ViewGroup, false)
-    }
-
-    private val headSource by lazy {
-        layoutInflater.inflate(R.layout.head_source, recycler_info.parent as ViewGroup, false)
-    }
-
-    private val headGuessLike by lazy {
-        layoutInflater.inflate(R.layout.head_guess_like, recycler_info.parent as ViewGroup, false)
-    }
-
-    private val headComment by lazy {
-        layoutInflater.inflate(R.layout.head_comment, recycler_info.parent as ViewGroup, false)
-    }
-
-    private val headNoComment by lazy {
-        layoutInflater.inflate(R.layout.head_no_comment, recycler_info.parent as ViewGroup, false)
+        })
     }
 
     private val playerInfoAdapter by lazy {
         Timber.i("playerInfoAdapter")
-        CommentAdapter(obtainIsAdult(), object : CommentAdapter.PlayerInfoListener {
+        CommentAdapter(object : CommentAdapter.PlayerInfoListener {
             override fun sendComment(replyId: Long?, replyName: String?) {
                 viewModel.checkStatus {
                     Timber.i("playerInfoAdapter sendComment")
@@ -252,63 +229,31 @@ class PlayerFragment : BaseFragment() {
         }
     }
 
-//    private val networkCallbackListener = object : NetworkCallbackListener {
-//        override fun onLost() {
-//            Timber.d("network disconnect")
-//            showCrashDialog(HttpErrorMsgType.CHECK_NETWORK)
-//        }
-//    }
-//
-//    private val networkCallback = NetworkCallback(networkCallbackListener)
-
     override fun getLayoutId(): Int {
         return R.layout.activity_player
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        requireActivity().onBackPressedDispatcher.addCallback {
-            if (requireActivity().requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
-                navigateTo(NavigateItem.Up)
-            } else {
-                viewModel.lockFullScreen = !viewModel.lockFullScreen
-                switchScreenOrientation()
-            }
-        }
-
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupUI()
-        setupObservers()
-        setupListeners()
     }
 
     override fun setUpStatusBarColor() {
         activity?.also {
-            (it as MainActivity).window.statusBarColor = requireContext().getColor(R.color.adult_color_status_bar)
+            (it as MainActivity).window.statusBarColor =
+                requireContext().getColor(R.color.adult_color_status_bar)
         }
     }
 
     private fun setupUI() {
 
-        if(recycler_info.parent != null ) {
+        if (recycler_info.parent != null) {
             Timber.i("recyclerInfo removeView")
             playerInfoAdapter.removeAllHeaderView()
         }
 
-        val isAdult = obtainIsAdult()
-
-        playerInfoAdapter.addHeaderView(adInfo)
-        playerInfoAdapter.addHeaderView(headVideoInfo)
-        playerInfoAdapter.addHeaderView(headSource)
-        playerInfoAdapter.addHeaderView(headGuessLike)
-        playerInfoAdapter.addHeaderView(headComment)
-        playerInfoAdapter.addHeaderView(headNoComment)
         playerInfoAdapter.loadMoreModule.loadMoreView =
-            CommentLoadMoreView(isAdult, CommentViewType.VIDEO)
+            CommentLoadMoreView(CommentViewType.VIDEO)
 
         recycler_info.adapter = playerInfoAdapter
 
@@ -318,26 +263,26 @@ class PlayerFragment : BaseFragment() {
 
         val titleColor = requireContext().getColor(R.color.normal_color_text)
 
-        headVideoInfo.tv_title.setTextColor(titleColor)
-        headSource.title_source.setTextColor(titleColor)
-        headGuessLike.title_guess_like.setTextColor(titleColor)
-        headComment.title_comment.setTextColor(titleColor)
-        headNoComment.title_no_comment.setTextColor(titleColor)
+        tv_title.setTextColor(titleColor)
+        title_source.setTextColor(titleColor)
+        title_guess_like.setTextColor(titleColor)
+        title_comment.setTextColor(titleColor)
+        title_no_comment.setTextColor(titleColor)
 
         val subTitleColor = requireContext().getColor(R.color.color_black_1_50)
 
-        headVideoInfo.btn_show_introduction.setTextColor(subTitleColor)
-        headVideoInfo.tv_introduction.setTextColor(subTitleColor)
-        headVideoInfo.tv_info.setTextColor(subTitleColor)
-        headVideoInfo.tv_introduction.setBackgroundResource(R.drawable.bg_black_stroke_1_radius_2)
+        btn_show_introduction.setTextColor(subTitleColor)
+        tv_introduction.setTextColor(subTitleColor)
+        tv_info.setTextColor(subTitleColor)
+        tv_introduction.setBackgroundResource(R.drawable.bg_black_stroke_1_radius_2)
 
-        headSource.recyclerview_source_list.adapter = sourceListAdapter
-        headSource.recyclerview_episode.adapter = episodeAdapter
+        recyclerview_source_list.adapter = sourceListAdapter
+        recyclerview_episode.adapter = episodeAdapter
 
-        headGuessLike.recyclerview_guess_like.adapter = guessLikeAdapter
+        recyclerview_guess_like.adapter = guessLikeAdapter
 
-         if(firstCreateView){
-            LinearSnapHelper().attachToRecyclerView(headGuessLike.recyclerview_guess_like)
+        if (firstCreateView) {
+            LinearSnapHelper().attachToRecyclerView(recyclerview_guess_like)
         }
 
         bottom_func_bar.setBackgroundResource(R.drawable.bg_gray_2_top_line)
@@ -391,8 +336,8 @@ class PlayerFragment : BaseFragment() {
             val drawableRes =
                 if (isShow) R.drawable.btn_arrowup_gray_n
                 else R.drawable.btn_arrowdown_gray_n
-            headVideoInfo.tv_introduction.visibility = if (isShow) View.VISIBLE else View.GONE
-            headVideoInfo.btn_show_introduction.setCompoundDrawablesWithIntrinsicBounds(
+            tv_introduction.visibility = if (isShow) View.VISIBLE else View.GONE
+            btn_show_introduction.setCompoundDrawablesWithIntrinsicBounds(
                 0,
                 0,
                 drawableRes,
@@ -446,7 +391,9 @@ class PlayerFragment : BaseFragment() {
         })
 
         viewModel.isPageCallback.observe(viewLifecycleOwner, Observer {
-            scrollToBottom()
+            if (arguments?.getSerializable(KEY_IS_COMMENT) == true) {
+                CoroutineScope(Dispatchers.Main).launch { scrollToCommentArea() }
+            }
         })
 
         viewModel.apiStreamResult.observe(viewLifecycleOwner, Observer {
@@ -474,7 +421,7 @@ class PlayerFragment : BaseFragment() {
                     is Empty -> {
                         currentReplyId = null
                         currentreplyName = null
-                        headNoComment.title_no_comment.visibility = View.GONE
+                        title_no_comment.visibility = View.GONE
                         viewModel.commentCount.value = viewModel.commentCount.value?.plus(1)
 
                         viewModel.setupCommentDataSource(playerInfoAdapter)
@@ -523,21 +470,22 @@ class PlayerFragment : BaseFragment() {
                 is Loaded -> progressHUD?.dismiss()
                 is Success -> {
                     val result = it.result
-                    viewModel.category = if(result.categories.isNotEmpty()) result.categories.get(0) else ""
+                    viewModel.category =
+                        if (result.categories.isNotEmpty()) result.categories.get(0) else ""
 
                     if (isFirstInit) {
                         isFirstInit = false
-                        headVideoInfo.tv_title.text = result.title
+                        tv_title.text = result.title
 
                         if (!result.description.isNullOrBlank())
-                            headVideoInfo.tv_introduction.text =
+                            tv_introduction.text =
                                 Html.fromHtml(result.description, Html.FROM_HTML_MODE_COMPACT)
 
                         val dateString = result.updateTime?.let { date ->
                             SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(date)
                         }
 
-                        headVideoInfo.tv_info.text = String.format(
+                        tv_info.text = String.format(
                             getString(R.string.player_info_format),
                             dateString ?: "",
                             result.country
@@ -550,7 +498,8 @@ class PlayerFragment : BaseFragment() {
 
                         setupSourceList(viewModel.sourceList)
 
-                        val categoriesString = if(result.categories.isNotEmpty()) result.categories.last() else ""
+                        val categoriesString =
+                            if (result.categories.isNotEmpty()) result.categories.last() else ""
                         viewModel.setupGuessLikeList(categoriesString, true)
                     }
 
@@ -566,16 +515,16 @@ class PlayerFragment : BaseFragment() {
 
                     if (result.commentCount == 0L) {
                         Timber.i(" apiVideoInfo result.commentCount == 0L")
-                        headNoComment.title_no_comment.visibility = VISIBLE
-                        headNoComment.title_no_comment.setTextColor(requireContext().getColor(R.color.normal_color_text))
+                        title_no_comment.visibility = VISIBLE
+                        title_no_comment.setTextColor(requireContext().getColor(R.color.normal_color_text))
                         val bgColor = requireContext().getColor(R.color.color_black_1_10)
-                        headNoComment.title_no_comment.setBtnSolidColor(
+                        title_no_comment.setBtnSolidColor(
                             bgColor,
                             bgColor,
                             resources.getDimension(R.dimen.dp_10)
                         )
                     } else {
-                        headNoComment.title_no_comment.visibility = View.GONE
+                        title_no_comment.visibility = View.GONE
 
                         lifecycleScope.launchWhenResumed {
                             viewModel.setupCommentDataSource(playerInfoAdapter)
@@ -589,22 +538,22 @@ class PlayerFragment : BaseFragment() {
 
         viewModel.isSelectedNewestComment.observe(viewLifecycleOwner, Observer {
             if (it) {
-                headComment.tv_newest.setTextColor(requireContext().getColor(R.color.color_red_1))
-                headComment.tv_hottest.setTextColor(requireContext().getColor(R.color.color_black_1_50))
+                tv_newest.setTextColor(requireContext().getColor(R.color.color_red_1))
+                tv_hottest.setTextColor(requireContext().getColor(R.color.color_black_1_50))
             } else {
-                headComment.tv_newest.setTextColor(requireContext().getColor(R.color.color_black_1_50))
-                headComment.tv_hottest.setTextColor(requireContext().getColor(R.color.color_red_1))
+                tv_newest.setTextColor(requireContext().getColor(R.color.color_black_1_50))
+                tv_hottest.setTextColor(requireContext().getColor(R.color.color_red_1))
             }
         })
 
-        headComment.tv_newest.setOnClickListener {
+        tv_newest.setOnClickListener {
             viewModel.updatedSelectedNewestComment(true)
             lifecycleScope.launch {
                 viewModel.setupCommentDataSource(playerInfoAdapter)
             }
         }
 
-        headComment.tv_hottest.setOnClickListener {
+        tv_hottest.setOnClickListener {
             viewModel.updatedSelectedNewestComment(false)
             lifecycleScope.launch {
                 viewModel.setupCommentDataSource(playerInfoAdapter)
@@ -649,7 +598,7 @@ class PlayerFragment : BaseFragment() {
                 VideoConsumeResult.PAID_YET,
                 VideoConsumeResult.PAID -> {
                     showRechargeReminder(false)
-                    viewModel.getStreamUrl(obtainIsAdult())
+                    viewModel.getAdultStreamUrl()
                 }
                 VideoConsumeResult.POINT_NOT_ENOUGH -> {
                     showRechargeReminder(true)
@@ -682,8 +631,8 @@ class PlayerFragment : BaseFragment() {
         })
 
         viewModel.recyclerViewGuessLikeVisible.observe(viewLifecycleOwner, Observer {
-            headGuessLike.title_guess_like.visibility = it
-            headGuessLike.recyclerview_guess_like.visibility = it
+            title_guess_like.visibility = it
+            recyclerview_guess_like.visibility = it
 
             scrollToBottom()
         })
@@ -746,9 +695,9 @@ class PlayerFragment : BaseFragment() {
                 is Success -> {
                     Glide.with(this)
                         .load(it.result.href)
-                        .into(adInfo.iv_ad)
+                        .into(iv_ad)
 
-                    adInfo.iv_ad.setOnClickListener { view ->
+                    iv_ad.setOnClickListener { view ->
                         GeneralUtils.openWebView(requireContext(), it.result.target)
                     }
                 }
@@ -784,11 +733,25 @@ class PlayerFragment : BaseFragment() {
             }
         }
 
-
+        viewModel.showRechargeReminder.observe(viewLifecycleOwner) {
+            showRechargeReminder(it)
+        }
     }
 
     override fun setupListeners() {
-        headVideoInfo.btn_show_introduction.setOnClickListener {
+        requireActivity().onBackPressedDispatcher.addCallback(
+            owner = viewLifecycleOwner,
+            onBackPressed = {
+                if (requireActivity().requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+                    navigateTo(NavigateItem.Up)
+                } else {
+                    viewModel.lockFullScreen = !viewModel.lockFullScreen
+                    switchScreenOrientation()
+                }
+            }
+        )
+
+        btn_show_introduction.setOnClickListener {
             viewModel.showIntroduction.setNot()
         }
 
@@ -808,13 +771,7 @@ class PlayerFragment : BaseFragment() {
         }
 
         tv_comment.setOnClickListener {
-            viewModel.checkStatus {
-                Timber.d("onCommentClick confirmed")
-                currentReplyId = null
-                currentreplyName = null
-                commentEditorOpen()
-                commentEditorToggle(true)
-            }
+            scrollToCommentArea()
         }
 
         btn_send.setOnClickListener {
@@ -862,7 +819,7 @@ class PlayerFragment : BaseFragment() {
 
         iv_more.setOnClickListener {
             Timber.i("viewModel.isReported ${viewModel.isReported}")
-            showMoreDialog(viewModel.episodeId, PostType.VIDEO, viewModel.isReported)
+            showMoreDialog(viewModel.streamId, PostType.VIDEO, viewModel.isReported)
         }
 
         requireActivity().addKeyboardToggleListener { shown ->
@@ -899,8 +856,9 @@ class PlayerFragment : BaseFragment() {
 
         btn_vip.setOnClickListener {
             Timber.i("btn_vip Click")
-//            navigateTo(NavigateItem.PopBackStack(R.id.adultHomeFragment, false))
-            mainViewModel?.switchTab?.value = 1
+            val bundle = TopUpFragment.createBundle(this::class.java.simpleName)
+            navigateTo(NavigateItem.Destination(R.id.action_to_topup, bundle))
+//            mainViewModel?.switchTab?.value = 1
         }
 
         btn_promote.setOnClickListener {
@@ -914,7 +872,10 @@ class PlayerFragment : BaseFragment() {
         }
 
         orientationDetector =
-            OrientationDetector(requireActivity(), SensorManager.SENSOR_DELAY_NORMAL).also { detector ->
+            OrientationDetector(
+                requireActivity(),
+                SensorManager.SENSOR_DELAY_NORMAL
+            ).also { detector ->
                 detector.setChangeListener(object : OrientationDetector.OnChangeListener {
                     override fun onChanged(orientation: Int) {
 
@@ -975,7 +936,7 @@ class PlayerFragment : BaseFragment() {
             } else {
                 when (item) {
                     is MemberPostItem -> {
-                        if(item.type == PostType.VIDEO)
+                        if (item.type == PostType.VIDEO)
                             viewModel.sendVideoReport(item.id, content)
                         else
                             viewModel.sentReport(item.id, content)
@@ -1026,12 +987,12 @@ class PlayerFragment : BaseFragment() {
         Timber.i("commentEditorToggle enable:$enable")
         when (enable) {
             true -> {
-                bottom_func_input.visibility = VISIBLE
-                bottom_func_bar.visibility = View.GONE
+                bottom_func_input?.visibility = VISIBLE
+                bottom_func_bar?.visibility = View.GONE
             }
             else -> {
-                bottom_func_input.visibility = View.GONE
-                bottom_func_bar.visibility = VISIBLE
+                bottom_func_input?.visibility = View.GONE
+                bottom_func_bar?.visibility = VISIBLE
             }
         }
 
@@ -1430,20 +1391,16 @@ class PlayerFragment : BaseFragment() {
         }
     }
 
-    private fun obtainIsAdult(): Boolean {
-        return true
-    }
-
     private fun setupSourceList(list: List<Source>?) {
         if (list == null) {
-            headSource.recyclerview_source_list.visibility = View.GONE
+            recyclerview_source_list.visibility = View.GONE
         } else {
             val size = list.size
             if (size == 0) {
-                headSource.recyclerview_source_list.visibility = View.GONE
+                recyclerview_source_list.visibility = View.GONE
             } else {
                 if (size == 1) {
-                    headSource.recyclerview_source_list.visibility = View.GONE
+                    recyclerview_source_list.visibility = View.GONE
                 }
 
                 val result = mutableListOf<String>()
@@ -1466,29 +1423,16 @@ class PlayerFragment : BaseFragment() {
 
     private fun setupStream(list: List<VideoEpisode>) {
         val result = mutableListOf<String>()
-        // 成人取得Streaming邏輯不同
         Timber.i("setupStream =${list.size}")
-        if (obtainIsAdult()) {
-            if (list.size == 1) {
-                val videoStreams = list[0].videoStreams
-                if (videoStreams != null && videoStreams.isNotEmpty()) {
-                    for (item in videoStreams) {
-                        Timber.i("videoStreams =${item.id}")
-                        if (item.id != null) {
-                            result.add(item.streamName ?: "")
-                        }
+        if (list.size == 1) {
+            val videoStreams = list[0].videoStreams
+            if (videoStreams != null && videoStreams.isNotEmpty()) {
+                for (item in videoStreams) {
+                    Timber.i("videoStreams =${item.id}")
+                    if (item.id != null) {
+                        result.add(item.streamName ?: "")
                     }
                 }
-            }
-        } else {
-            for (item in list) {
-                if (item.id != null) {
-                    result.add(item.episode ?: "")
-                }
-            }
-            result.sort()
-            for (i in 0..(result.size - 1)) {
-                Timber.d("${result.get(i)}")
             }
         }
 
@@ -1499,7 +1443,7 @@ class PlayerFragment : BaseFragment() {
     }
 
     private fun setupChipGroup(list: List<String>?) {
-        headVideoInfo.reflow_group.removeAllViews()
+        reflow_group.removeAllViews()
 
         if (list == null) {
             return
@@ -1510,32 +1454,25 @@ class PlayerFragment : BaseFragment() {
         }.forEach {
             val chip = layoutInflater.inflate(
                 R.layout.chip_item,
-                headVideoInfo.reflow_group,
+                reflow_group,
                 false
             ) as Chip
             chip.text = it
 
-            val isAdult = obtainIsAdult()
-
             chip.setTextColor(requireContext().getColor(R.color.color_black_1_50))
 
-            chip.setOnClickListener(
-                View.OnClickListener {
-                    val bundle = SearchVideoFragment.createBundle(
-                        tag = chip.text.toString(),
-                        isAdult = obtainIsAdult()
-                    )
-                    bundle.putBoolean(KEY_IS_FROM_PLAYER, true)
+            chip.setOnClickListener {
+                val bundle = SearchVideoFragment.createBundle(
+                    tag = chip.text.toString()
+                )
+                bundle.putBoolean(KEY_IS_FROM_PLAYER, true)
+                findNavController().navigate(
+                    R.id.action_playerFragment_to_searchVideoFragment,
+                    bundle
+                )
+            }
 
-                    //TODO
-                    findNavController().navigate(
-                        R.id.action_playerFragment_to_searchVideoFragment,
-                        bundle
-                    )
-                }
-            )
-
-            headVideoInfo.reflow_group.addView(chip)
+            reflow_group.addView(chip)
         }
     }
 
@@ -1634,12 +1571,16 @@ class PlayerFragment : BaseFragment() {
     }
 
     private fun scrollToBottom() {
-
         if (arguments?.getSerializable(KEY_IS_COMMENT) == true) {
 //            scrollView.fullScroll(View.FOCUS_DOWN)
         }
     }
-    
+
+    private fun scrollToCommentArea() {
+        val scrollTo: Int = layout_comment.top
+        nestedScrollView.smoothScrollTo(0, scrollTo)
+    }
+
     private fun showEmailConfirmDialog() {
         GeneralDialog.newInstance(
             GeneralDialogData(

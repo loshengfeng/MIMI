@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.base
 
 import android.app.Application
 import android.net.Uri
+import android.text.TextUtils
 import android.widget.ImageView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -147,7 +148,7 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
         _cleanRemovedPosList.value = null
     }
 
-    fun loadImage(id: Long?, view: ImageView, type: LoadImageType) {
+    fun loadImage(id: Long? = 0, view: ImageView, type: LoadImageType, filePath: String = "") {
         val defaultResId = when (type) {
             LoadImageType.AVATAR -> R.drawable.default_profile_picture
             LoadImageType.AVATAR_CS -> R.drawable.icon_cs_photo
@@ -156,20 +157,25 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
             LoadImageType.CLUB -> R.drawable.ico_group
             LoadImageType.CHAT_CONTENT -> R.drawable.bg_gray_6_radius_16
         }
-        if (id == null || id == 0L) {
+        if ((id == null || id == 0L)&&TextUtils.isEmpty(filePath)) {
             Glide.with(view.context).load(defaultResId).into(view)
         } else {
             val accessToken =
                 if (accountManager.isLogin()) pref.memberToken.accessToken else pref.publicToken.accessToken
             val auth = StringBuilder(ApiRepository.BEARER).append(accessToken).toString()
-            val url = "${domainManager.getApiDomain()}/v1/Attachments/$id"
-            val glideUrl = GlideUrl(
-                url,
-                LazyHeaders.Builder()
-                    .addHeader(ApiRepository.AUTHORIZATION, auth)
-                    .addHeader(ApiRepository.X_DEVICE_ID, GeneralUtils.getAndroidID())
-                    .build()
-            )
+            var glideUrl:GlideUrl?=null
+
+            if (TextUtils.isEmpty(filePath)) {
+                val url = "${domainManager.getApiDomain()}/v1/Attachments/$id"
+                glideUrl = GlideUrl(
+                        url,
+                        LazyHeaders.Builder()
+                                .addHeader(ApiRepository.AUTHORIZATION, auth)
+                                .addHeader(ApiRepository.X_DEVICE_ID, GeneralUtils.getAndroidID())
+                                .build()
+                )
+            }
+
             val options = RequestOptions()
                 .priority(Priority.NORMAL)
                 .placeholder(defaultResId)
@@ -189,7 +195,7 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
                     options.transform(CenterCrop(), RoundedCorners(16))
                 }
             }
-            Glide.with(view.context).load(glideUrl)
+            Glide.with(view.context).load(glideUrl ?: filePath)
                 .apply(options)
                 .into(view)
         }

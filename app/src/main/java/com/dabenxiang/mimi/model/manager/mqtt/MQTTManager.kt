@@ -23,7 +23,7 @@ class MQTTManager(val context: Context, private val pref: Pref) {
     private val messageIdSet = hashSetOf<String>()
 
     fun init(serverUrl: String, clientId: String, extendedCallback: ExtendedCallback) {
-        client = MqttAndroidClient(context, serverUrl, clientId)
+        client = MqttAndroidClient(context, serverUrl, clientId, MqttAndroidClient.Ack.MANUAL_ACK)
         client?.setCallback(object : MqttCallbackExtended {
             override fun connectComplete(reconnect: Boolean, serverURI: String) {
                 extendedCallback.onConnectComplete(reconnect, serverURI)
@@ -32,6 +32,7 @@ class MQTTManager(val context: Context, private val pref: Pref) {
             override fun messageArrived(topic: String, message: MqttMessage) {
                 val parcelableMqttMessage = message as ParcelableMqttMessage
                 val messageId = parcelableMqttMessage.messageId
+                client?.acknowledgeMessage(messageId)
                 if (!messageIdSet.contains(messageId)) {
                     messageIdSet.add(messageId)
                     extendedCallback.onMessageArrived(topic, message)
@@ -55,8 +56,8 @@ class MQTTManager(val context: Context, private val pref: Pref) {
 
     }
 
-    fun isMqttConnect() : Boolean{
-        return client?.isConnected != true
+    fun isMqttConnect(): Boolean {
+        return client?.isConnected ?: false
     }
 
     fun connect(connectCallback: ConnectCallback) {
@@ -114,7 +115,7 @@ class MQTTManager(val context: Context, private val pref: Pref) {
         client?.publish(publishTopic, message, null, callback)
         Timber.d("Message Published")
 
-        if (!client!!.isConnected) {
+        if (!isMqttConnect()) {
             Timber.d("${client?.bufferedMessageCount} messages in buffer.")
         }
     }

@@ -29,7 +29,6 @@ class InviteVipFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
         initSettings()
     }
 
@@ -55,6 +54,7 @@ class InviteVipFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.iv_invite_vip_back, R.id.iv_not_login_back -> findNavController().navigateUp()

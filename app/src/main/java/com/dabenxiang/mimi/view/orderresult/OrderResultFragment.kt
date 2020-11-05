@@ -42,8 +42,6 @@ class OrderResultFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireActivity().onBackPressedDispatcher.addCallback(this) { }
-
         tv_step1.background = ContextCompat.getDrawable(
             requireContext(), R.drawable.bg_blue_1_oval
         )
@@ -85,7 +83,7 @@ class OrderResultFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
-
+        requireActivity().onBackPressedDispatcher.addCallback(this) { }
     }
 
     private val failedListener = object : OrderResultFailedItemView.OrderResultFailedListener {

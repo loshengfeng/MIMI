@@ -133,7 +133,6 @@ class HomeFragment : BaseFragment() {
     }
 
     override fun setupFirstTime() {
-        requireActivity().onBackPressedDispatcher.addCallback { backToDesktop() }
         recyclerview_tab.adapter = tabAdapter
         setupRecyclerByPosition(0)
 
@@ -151,6 +150,7 @@ class HomeFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+
         refresh.setOnRefreshListener {
             refresh.isRefreshing = true
             getData(lastTabPosition)
@@ -278,7 +278,7 @@ class HomeFragment : BaseFragment() {
             override fun onClickItemIndex(view: View, index: Int) {
                 setTab(index)
             }
-        }, false)
+        })
     }
 
     private fun setTab(index: Int) {

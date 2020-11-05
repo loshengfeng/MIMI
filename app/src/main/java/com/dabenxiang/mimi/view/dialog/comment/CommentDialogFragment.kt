@@ -68,7 +68,7 @@ class CommentDialogFragment : BaseDialogFragment() {
     }
 
     private val playerInfoAdapter by lazy {
-        CommentAdapter(true, object : CommentAdapter.PlayerInfoListener {
+        CommentAdapter(object : CommentAdapter.PlayerInfoListener {
             override fun sendComment(replyId: Long?, replyName: String?) {
                 GeneralUtils.showKeyboard(requireContext())
                 et_message.requestFocus()
@@ -152,7 +152,7 @@ class CommentDialogFragment : BaseDialogFragment() {
                 isEnableLoadMore = true
                 isAutoLoadMore = true
                 isEnableLoadMoreIfNotFullPage = false
-                loadMoreView = CommentLoadMoreView(true, CommentViewType.CLIP)
+                loadMoreView = CommentLoadMoreView(CommentViewType.CLIP)
             }
         }
     }

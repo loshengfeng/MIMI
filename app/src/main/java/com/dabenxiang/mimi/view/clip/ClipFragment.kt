@@ -58,7 +58,6 @@ class ClipFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
     }
 
     override fun onDestroyView() {
@@ -174,7 +173,6 @@ class ClipFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
-
     }
 
     override fun initSettings() {

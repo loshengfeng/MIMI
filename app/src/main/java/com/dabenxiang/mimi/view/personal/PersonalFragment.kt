@@ -47,9 +47,6 @@ class PersonalFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback {
-            interactionListener?.changeNavigationPosition(R.id.navigation_adult)
-        }
         initSettings()
     }
 
@@ -136,6 +133,12 @@ class PersonalFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            owner = viewLifecycleOwner,
+            onBackPressed = { interactionListener?.changeNavigationPosition(R.id.navigation_adult) }
+        )
+
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.tv_topup -> interactionListener?.changeNavigationPosition(R.id.navigation_topup)
