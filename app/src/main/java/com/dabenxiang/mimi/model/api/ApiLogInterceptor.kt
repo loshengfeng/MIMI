@@ -26,7 +26,7 @@ class ApiLogInterceptor : Interceptor, KoinComponent {
     private val utf8 = Charset.forName("UTF-8")
 
     private fun push(data: LogApiItem) {
-        SendLogManager.v(PROJECT_NAME, "", "ab_test_2", Gson().toJson(data))
+        SendLogManager.v(PROJECT_NAME, Gson().toJson(data))
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {
