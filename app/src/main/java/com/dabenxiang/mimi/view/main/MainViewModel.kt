@@ -536,11 +536,8 @@ class MainViewModel : BaseViewModel() {
 
     fun deleteCacheFile(cacheFile:File) {
         viewModelScope.launch {
-            cacheFile?.let {
-                it.listFiles().forEach {
-//                   Timber.d("deleteCacheFile chi: ${it}")
-                   it?.delete()
-                }
+            cacheFile.listFiles()?.forEach {file->
+                file?.delete()
             }
         }
     }
