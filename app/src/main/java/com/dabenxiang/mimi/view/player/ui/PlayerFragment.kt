@@ -49,7 +49,7 @@ import com.google.android.exoplayer2.analytics.AnalyticsListener
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.google.android.material.chip.Chip
-import kotlinx.android.synthetic.main.activity_player.*
+import kotlinx.android.synthetic.main.fragment_player.*
 import kotlinx.android.synthetic.main.custom_playback_control.*
 import kotlinx.android.synthetic.main.head_comment.*
 import kotlinx.android.synthetic.main.head_guess_like.*
@@ -230,7 +230,7 @@ class PlayerFragment : BaseFragment() {
     }
 
     override fun getLayoutId(): Int {
-        return R.layout.activity_player
+        return R.layout.fragment_player
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -1500,10 +1500,10 @@ class PlayerFragment : BaseFragment() {
             player_view.layoutParams = params
             requireActivity().window.decorView.systemUiVisibility =
                 View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-            var windowParams = requireActivity().window.attributes
-            windowParams.flags =
-                windowParams.flags or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-            requireActivity().window.attributes = windowParams
+//            var windowParams = requireActivity().window.attributes
+//            windowParams.flags =
+//                windowParams.flags or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+//            requireActivity().window.attributes = windowParams
             fullScreenUISet(true)
         }
     }
