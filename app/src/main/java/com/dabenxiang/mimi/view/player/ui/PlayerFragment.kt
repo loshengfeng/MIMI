@@ -1084,7 +1084,7 @@ class PlayerFragment : BaseFragment() {
                 player.volume = PlayerViewModel.volume
                 player.addListener(playbackStateListener)
                 player.addAnalyticsListener(playerAnalyticsListener)
-
+                viewModel.setPlaying(true)
                 initTouchListener()
             }
         }
@@ -1245,6 +1245,7 @@ class PlayerFragment : BaseFragment() {
     }
 
     private fun rewind(rewindMs: Int) {
+        Timber.i("fastForward rewind=$rewindMs")
         player?.takeIf { it.isCurrentWindowSeekable && rewindMs > 0 }?.apply {
             viewModel.setRewindTime(rewindMs)
             seekTo(currentWindowIndex,
@@ -1254,6 +1255,7 @@ class PlayerFragment : BaseFragment() {
     }
 
     private fun fastForward(fastForwardMs: Int) {
+        Timber.i("fastForward fastForwardMs=$fastForwardMs")
         player?.takeIf { it.isCurrentWindowSeekable && fastForwardMs > 0 }?.apply {
             viewModel.setFastForwardTime(fastForwardMs)
             seekTo(currentWindowIndex, currentPosition + fastForwardMs)
