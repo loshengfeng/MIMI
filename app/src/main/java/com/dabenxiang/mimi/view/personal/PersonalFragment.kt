@@ -1,5 +1,7 @@
 package com.dabenxiang.mimi.view.personal
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
@@ -11,6 +13,7 @@ import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.enums.LoadImageType
+import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
@@ -24,8 +27,10 @@ import kotlinx.android.synthetic.main.fragment_personal.*
 import kotlinx.android.synthetic.main.item_personal_is_login.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import retrofit2.HttpException
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 class PersonalFragment : BaseFragment() {
 
@@ -52,9 +57,10 @@ class PersonalFragment : BaseFragment() {
                     val meItem = it.result
                     tv_name.text = meItem.friendlyName.toString()
 
-                    meItem.expiryDate?.let {date ->
-                        tv_expiry_date.visibility =View.VISIBLE
-                        tv_expiry_date.text = getString(R.string.vip_expiry_date,
+                    meItem.expiryDate?.let { date ->
+                        tv_expiry_date.visibility = View.VISIBLE
+                        tv_expiry_date.text = getString(
+                            R.string.vip_expiry_date,
                             SimpleDateFormat(
                                 "yyyy-MM-dd",
                                 Locale.getDefault()
@@ -77,7 +83,7 @@ class PersonalFragment : BaseFragment() {
                 is Empty -> {
                     item_is_Login.visibility = View.GONE
                     item_is_not_Login.visibility = View.VISIBLE
-                    tv_expiry_date.visibility =View.GONE
+                    tv_expiry_date.visibility = View.GONE
                 }
                 is Error -> {
                     when (it.throwable) {
@@ -123,13 +129,14 @@ class PersonalFragment : BaseFragment() {
         requireActivity().onBackPressedDispatcher.addCallback(
             owner = viewLifecycleOwner,
             onBackPressed = {
-                mainViewModel?.changeNavigationPosition?.value =R.id.navigation_adult
+                mainViewModel?.changeNavigationPosition?.value = R.id.navigation_adult
             }
         )
 
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
-                R.id.tv_topup -> mainViewModel?.changeNavigationPosition?.value = R.id.navigation_topup
+                R.id.tv_topup -> mainViewModel?.changeNavigationPosition?.value =
+                    R.id.navigation_topup
                 R.id.tv_follow -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
                 R.id.tv_topup_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_orderFragment))
                 R.id.tv_chat_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_chatHistoryFragment))
@@ -137,6 +144,11 @@ class PersonalFragment : BaseFragment() {
                 R.id.tv_setting -> navigateTo(
                     NavigateItem.Destination(R.id.action_to_settingFragment)
                 )
+                R.id.tv_old_driver -> {
+                    val intent = Intent(Intent.ACTION_VIEW)
+                    intent.data = Uri.parse(viewModel.getOldDriverUrl())
+                    startActivity(intent)
+                }
                 R.id.tv_logout -> {
                     Glide.with(this).clear(iv_photo)
                     Glide.with(this).load(R.drawable.default_profile_picture).into(iv_photo)
@@ -162,6 +174,7 @@ class PersonalFragment : BaseFragment() {
             tv_chat_history.setOnClickListener(it)
             tv_my_post.setOnClickListener(it)
             tv_setting.setOnClickListener(it)
+            tv_old_driver.setOnClickListener(it)
             tv_logout.setOnClickListener(it)
             tv_login.setOnClickListener(it)
             tv_register.setOnClickListener(it)
