@@ -19,7 +19,8 @@
         android:id="@+id/recyclerview_picture"
         android:layout_width="match_parent"
         android:layout_height="203dp"
-        android:layout_marginStart="15dp"
+        android:paddingStart="15dp"
+        android:clipToPadding="false"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
