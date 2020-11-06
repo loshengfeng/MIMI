@@ -32,6 +32,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getExceptionDetail
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
@@ -45,6 +46,11 @@ import java.util.*
 
 abstract class BaseViewModel : ViewModel(), KoinComponent {
 
+    companion object {
+        const val POP_HINT_DURATION = 1000L
+        const val POP_HINT_ANIM_TIME = 500L
+    }
+
     val app: Application by inject()
     val gson: Gson by inject()
     val pref: Pref by inject()
@@ -55,8 +61,19 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     private val _showProgress by lazy { MutableLiveData<Boolean>() }
     val showProgress: LiveData<Boolean> get() = _showProgress
 
+    private val _showPopHint = MutableLiveData<String>()
+    val showPopHint: LiveData<String> = _showPopHint
+
     fun setShowProgress(show: Boolean) {
         _showProgress.value = show
+    }
+
+    fun setShowPopHint(text: String){
+        viewModelScope.launch {
+            _showPopHint.postValue(text)
+            delay(POP_HINT_DURATION)
+            _showPopHint.postValue("")
+        }
     }
 
     fun processException(exceptionResult: ExceptionResult) {

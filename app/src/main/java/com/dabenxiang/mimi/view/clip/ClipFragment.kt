@@ -1,10 +1,8 @@
 package com.dabenxiang.mimi.view.clip
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
@@ -19,7 +17,6 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.comment.CommentDialogFragment
-import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import kotlinx.android.synthetic.main.fragment_clip.*
@@ -50,7 +47,6 @@ class ClipFragment : BaseFragment() {
 
     private val clipMap: HashMap<String, File> = hashMapOf()
     private val memberPostItems: ArrayList<MemberPostItem> = arrayListOf()
-    private var interactionListener: InteractionListener? = null
 
     private var isShowComment = false
 
@@ -58,7 +54,6 @@ class ClipFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback { navigateTo(NavigateItem.Up) }
     }
 
     override fun onDestroyView() {
@@ -101,10 +96,16 @@ class ClipFragment : BaseFragment() {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
-                is Success -> rv_clip.adapter?.notifyItemChanged(
-                    it.result,
-                    ClipAdapter.PAYLOAD_UPDATE_UI
-                )
+                is Success -> {
+                    rv_clip.adapter?.notifyItemChanged(
+                        it.result,
+                        ClipAdapter.PAYLOAD_UPDATE_UI
+                    )
+                    mainViewModel?.setShowPopHint(
+                        if (memberPostItems[it.result].isFollow) getString(R.string.followed)
+                        else getString(R.string.cancel_follow)
+                    )
+                }
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -168,7 +169,6 @@ class ClipFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
-
     }
 
     override fun initSettings() {
@@ -241,15 +241,6 @@ class ClipFragment : BaseFragment() {
         val intent = Intent(requireContext(), MainActivity::class.java)
         intent.action = NAVIGATE_TO_TOPUP_ACTION
         startActivity(intent)
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        try {
-            interactionListener = context as InteractionListener
-        } catch (e: ClassCastException) {
-            Timber.e("ClipFragment interaction listener can't cast")
-        }
     }
 
     private fun onBackClick() {

@@ -86,9 +86,6 @@ class MyPostFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         useAdultTheme(false)
-        requireActivity().onBackPressedDispatcher.addCallback {
-            navigateTo(NavigateItem.Up)
-        }
     }
 
     override fun initSettings() {
@@ -213,6 +210,7 @@ class MyPostFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+
         View.OnClickListener { btnView ->
             when (btnView.id) {
                 R.id.tv_back -> {

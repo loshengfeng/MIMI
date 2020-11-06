@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -35,7 +34,6 @@ import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_categories.*
-import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import com.dabenxiang.mimi.model.api.vo.CategoriesItem as CategoriesData
 
@@ -69,7 +67,6 @@ class CategoriesFragment : BaseFragment() {
     private var filterDataList: ArrayList<List<String>> = arrayListOf()
 
     private val videoListAdapter by lazy {
-        val isAdult = mainViewModel?.adultMode?.value ?: false
         HomeVideoListAdapter(adapterListener)
     }
 
@@ -119,10 +116,6 @@ class CategoriesFragment : BaseFragment() {
 
     override fun setupFirstTime() {
         super.setupFirstTime()
-
-        requireActivity().onBackPressedDispatcher.addCallback {
-            Timber.i("CategoriesFragment onBackPressedDispatcher")
-            navigateTo(NavigateItem.Up) }
 
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
@@ -197,12 +190,13 @@ class CategoriesFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+
         ib_back.setOnClickListener {
             navigateTo(NavigateItem.Up)
         }
 
         iv_search.setOnClickListener {
-            val bundle = SearchVideoFragment.createBundle(category = tv_title.text.toString())
+            val bundle = SearchVideoFragment.createBundle()
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_to_searchVideoFragment,
@@ -298,18 +292,18 @@ class CategoriesFragment : BaseFragment() {
             ) {
                 viewModel.updatedFilterPosition(index, position)
                 takeIf { index == 0 }?.also { //選擇第一欄
-                    if (isAdult) { //更新第二欄
-                        (arguments?.getSerializable(KEY_CATEGORY) as CategoriesData?)?.also { data ->
-                            val secondCategory = arrayListOf<String>()
-                            data.categories?.get(position)?.categories?.forEach { item ->
-                                secondCategory.add(item.name)
-                            }
-                            setupFilter(1, secondCategory)
+                    //更新第二欄
+                    (arguments?.getSerializable(KEY_CATEGORY) as CategoriesData?)?.also { data ->
+                        val secondCategory = arrayListOf<String>()
+                        data.categories?.get(position)?.categories?.forEach { item ->
+                            secondCategory.add(item.name)
                         }
-                        adjustContentRV(2)
+                        setupFilter(1, secondCategory)
                     }
+                    adjustContentRV(2)
                     updateFirstTab(index, false)
                     viewModel.updatedFilterPosition(index, position)
+                    filterAdapterList[0]?.updateLastSelected(position)
                     for (i in 1..2) { //更新其它欄至"全部"
                         updateFirstTab(i, true)
                         viewModel.updatedFilterPosition(i, null)
@@ -319,6 +313,7 @@ class CategoriesFragment : BaseFragment() {
                     updateFirstTab(index, false)
                     viewModel.updatedFilterPosition(index, position)
                     filterAdapterList[index]?.notifyDataSetChanged()
+                    filterAdapterList[index]?.updateLastSelected(position)
                 }
                 doOnTabSelected()
             }

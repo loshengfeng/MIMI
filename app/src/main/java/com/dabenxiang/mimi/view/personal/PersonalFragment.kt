@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.personal
 
-import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
@@ -17,7 +16,6 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
-import com.dabenxiang.mimi.view.listener.InteractionListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_LOGIN
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
@@ -26,30 +24,15 @@ import kotlinx.android.synthetic.main.fragment_personal.*
 import kotlinx.android.synthetic.main.item_personal_is_login.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import retrofit2.HttpException
-import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
 class PersonalFragment : BaseFragment() {
 
     private val viewModel: PersonalViewModel by viewModels()
-    private var interactionListener: InteractionListener? = null
-
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        try {
-            interactionListener = context as InteractionListener
-        } catch (e: ClassCastException) {
-            Timber.e("PersonalFragment interaction listener can't cast")
-        }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback {
-            interactionListener?.changeNavigationPosition(R.id.navigation_adult)
-        }
         initSettings()
     }
 
@@ -128,7 +111,7 @@ class PersonalFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     iv_new.visibility = if (it.result == 0) View.INVISIBLE else View.VISIBLE
-                    interactionListener?.refreshBottomNavigationBadge(it.result)
+                    mainViewModel?.refreshBottomNavigationBadge?.value = it.result
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -136,9 +119,17 @@ class PersonalFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            owner = viewLifecycleOwner,
+            onBackPressed = {
+                mainViewModel?.changeNavigationPosition?.value =R.id.navigation_adult
+            }
+        )
+
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
-                R.id.tv_topup -> interactionListener?.changeNavigationPosition(R.id.navigation_topup)
+                R.id.tv_topup -> mainViewModel?.changeNavigationPosition?.value = R.id.navigation_topup
                 R.id.tv_follow -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
                 R.id.tv_topup_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_orderFragment))
                 R.id.tv_chat_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_chatHistoryFragment))
@@ -179,7 +170,6 @@ class PersonalFragment : BaseFragment() {
 
     override fun initSettings() {
         super.initSettings()
-        interactionListener?.setAdult(false)
 
         tv_version_is_login.text = BuildConfig.VERSION_NAME
         tv_version_is_not_login.text = BuildConfig.VERSION_NAME

@@ -67,6 +67,11 @@ class EditVideoFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
+        requireActivity().onBackPressedDispatcher.addCallback(
+            owner = viewLifecycleOwner,
+            onBackPressed = { discardDialog() }
+        )
+
         tv_back.setOnClickListener {
             discardDialog()
         }
@@ -90,10 +95,6 @@ class EditVideoFragment : BaseFragment() {
                 viewPager!!.currentItem = tab!!.position
             }
         })
-
-        requireActivity().onBackPressedDispatcher.addCallback(this) {
-            discardDialog()
-        }
     }
 
     private fun discardDialog() {
