@@ -85,4 +85,8 @@ class PersonalViewModel : BaseViewModel() {
                 .collect { _totalUnreadResult.value = it }
         }
     }
+
+    fun getOldDriverUrl(): String {
+        return domainManager.getOldDriverUrl()
+    }
 }
