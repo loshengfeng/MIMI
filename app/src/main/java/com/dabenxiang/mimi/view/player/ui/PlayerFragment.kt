@@ -104,7 +104,7 @@ class PlayerFragment : BaseFragment() {
     private var isFirstInit = true
     private var isKeyboardShown = false
     private var oldPlayerItem: PlayerItem = PlayerItem(-1)
-    override val bottomNavigationVisibility = View.GONE
+    override val bottomNavigationVisibility = GONE
 
     private val sourceListAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
@@ -142,8 +142,8 @@ class PlayerFragment : BaseFragment() {
                     Timber.i("playerInfoAdapter sendComment")
                     currentReplyId = null
                     currentreplyName = null
-                    if (replyId != null) {
-                        currentReplyId = replyId
+                    replyId?.let {
+                        currentReplyId = it
                         currentreplyName = replyName
                         commentEditorOpen()
                     }
@@ -162,8 +162,8 @@ class PlayerFragment : BaseFragment() {
                 Timber.i("playerInfoAdapter replyComment")
                 currentReplyId = null
                 currentreplyName = null
-                if (replyId != null) {
-                    currentReplyId = replyId
+                replyId?.let {
+                    currentReplyId = it
                     currentreplyName = replyName
                     commentEditorOpen()
                 }
@@ -246,8 +246,7 @@ class PlayerFragment : BaseFragment() {
     }
 
     private fun setupUI() {
-
-        if (recycler_info.parent != null) {
+        recycler_info.parent?.let {
             Timber.i("recyclerInfo removeView")
             playerInfoAdapter.removeAllHeaderView()
         }
@@ -336,7 +335,7 @@ class PlayerFragment : BaseFragment() {
             val drawableRes =
                 if (isShow) R.drawable.btn_arrowup_gray_n
                 else R.drawable.btn_arrowdown_gray_n
-            tv_introduction.visibility = if (isShow) View.VISIBLE else View.GONE
+            tv_introduction.visibility = if (isShow) View.VISIBLE else GONE
             btn_show_introduction.setCompoundDrawablesWithIntrinsicBounds(
                 0,
                 0,
@@ -359,13 +358,13 @@ class PlayerFragment : BaseFragment() {
             if (it) {
                 progress_video.visibility = VISIBLE
             } else {
-                progress_video.visibility = View.GONE
+                progress_video.visibility = GONE
             }
         })
 
         viewModel.isPlaying.observe(viewLifecycleOwner, Observer {
             iv_player.visibility = when (it) {
-                true -> View.GONE
+                true -> GONE
                 false -> VISIBLE
             }
         })
@@ -398,8 +397,8 @@ class PlayerFragment : BaseFragment() {
 
         viewModel.apiStreamResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Loading -> progressHUD?.show()
-                is Loaded -> progressHUD?.dismiss()
+                is Loading -> progressHUD.show()
+                is Loaded -> progressHUD.dismiss()
                 is Empty -> loadVideo()
                 is Error -> {
                     when (it.throwable) {
@@ -416,12 +415,12 @@ class PlayerFragment : BaseFragment() {
         viewModel.apiPostCommentResult.observe(viewLifecycleOwner, Observer { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
-                    is Loading -> progressHUD?.show()
-                    is Loaded -> progressHUD?.dismiss()
+                    is Loading -> progressHUD.show()
+                    is Loaded -> progressHUD.dismiss()
                     is Empty -> {
                         currentReplyId = null
                         currentreplyName = null
-                        title_no_comment.visibility = View.GONE
+                        title_no_comment.visibility = GONE
                         viewModel.commentCount.value = viewModel.commentCount.value?.plus(1)
 
                         viewModel.setupCommentDataSource(playerInfoAdapter)
@@ -439,8 +438,8 @@ class PlayerFragment : BaseFragment() {
         viewModel.apiCommentLikeResult.observe(viewLifecycleOwner, Observer { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
-                    is Loading -> progressHUD?.show()
-                    is Loaded -> progressHUD?.dismiss()
+                    is Loading -> progressHUD.show()
+                    is Loaded -> progressHUD.dismiss()
                     is Empty -> {
                         loadCommentLikeBlock = loadCommentLikeBlock?.let {
                             it()
@@ -456,8 +455,8 @@ class PlayerFragment : BaseFragment() {
         viewModel.apiDeleteCommentLikeResult.observe(viewLifecycleOwner, Observer { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
-                    is Loading -> progressHUD?.show()
-                    is Loaded -> progressHUD?.dismiss()
+                    is Loading -> progressHUD.show()
+                    is Loaded -> progressHUD.dismiss()
                     is Empty -> loadCommentLikeBlock?.also { it() }
                     is Error -> onApiError(it.throwable)
                 }
@@ -466,71 +465,9 @@ class PlayerFragment : BaseFragment() {
 
         viewModel.apiVideoInfo.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Loading -> progressHUD?.show()
-                is Loaded -> progressHUD?.dismiss()
-                is Success -> {
-                    val result = it.result
-                    viewModel.category =
-                        if (result.categories.isNotEmpty()) result.categories.get(0) else ""
-
-                    if (isFirstInit) {
-                        isFirstInit = false
-                        tv_title.text = result.title
-
-                        if (!result.description.isNullOrBlank())
-                            tv_introduction.text =
-                                Html.fromHtml(result.description, Html.FROM_HTML_MODE_COMPACT)
-
-                        val dateString = result.updateTime?.let { date ->
-                            SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(date)
-                        }
-
-                        tv_info.text = String.format(
-                            getString(R.string.player_info_format),
-                            dateString ?: "",
-                            result.country
-                        )
-
-                        viewModel.sourceList = result.sources
-
-                        if (result.tags != null)
-                            setupChipGroup(result.tags as List<String>)
-
-                        setupSourceList(viewModel.sourceList)
-
-                        val categoriesString =
-                            if (result.categories.isNotEmpty()) result.categories.last() else ""
-                        viewModel.setupGuessLikeList(categoriesString, true)
-                    }
-
-                    viewModel.likeVideo.value = result.like
-                    viewModel.likeVideoCount.value = result.likeCount
-                    viewModel.favoriteVideo.value = result.favorite
-                    viewModel.favoriteVideoCount.value = result.favoriteCount
-                    viewModel.commentCount.value = result.commentCount
-
-                    viewModel.isDeducted = result.deducted ?: false
-                    viewModel.costPoint = result.point ?: 0L
-                    viewModel.availablePoint = result.availablePoint ?: 0L
-
-                    if (result.commentCount == 0L) {
-                        Timber.i(" apiVideoInfo result.commentCount == 0L")
-                        title_no_comment.visibility = VISIBLE
-                        title_no_comment.setTextColor(requireContext().getColor(R.color.normal_color_text))
-                        val bgColor = requireContext().getColor(R.color.color_black_1_10)
-                        title_no_comment.setBtnSolidColor(
-                            bgColor,
-                            bgColor,
-                            resources.getDimension(R.dimen.dp_10)
-                        )
-                    } else {
-                        title_no_comment.visibility = View.GONE
-
-                        lifecycleScope.launchWhenResumed {
-                            viewModel.setupCommentDataSource(playerInfoAdapter)
-                        }
-                    }
-                }
+                is Loading -> progressHUD.show()
+                is Loaded -> progressHUD.dismiss()
+                is Success -> setUpVideoInfo(it.result)
                 is Error -> onApiError(it.throwable)
             }
             scrollToBottom()
@@ -545,20 +482,6 @@ class PlayerFragment : BaseFragment() {
                 tv_hottest.setTextColor(requireContext().getColor(R.color.color_red_1))
             }
         })
-
-        tv_newest.setOnClickListener {
-            viewModel.updatedSelectedNewestComment(true)
-            lifecycleScope.launch {
-                viewModel.setupCommentDataSource(playerInfoAdapter)
-            }
-        }
-
-        tv_hottest.setOnClickListener {
-            viewModel.updatedSelectedNewestComment(false)
-            lifecycleScope.launch {
-                viewModel.setupCommentDataSource(playerInfoAdapter)
-            }
-        }
 
         viewModel.likeVideo.observe(viewLifecycleOwner, Observer {
             val res = when (it) {
@@ -611,10 +534,10 @@ class PlayerFragment : BaseFragment() {
         viewModel.apiLoadReplyCommentResult.observe(viewLifecycleOwner, Observer { event ->
             event.getContentIfNotHandled()?.also { apiResult ->
                 when (apiResult) {
-                    is Loading -> progressHUD?.show()
+                    is Loading -> progressHUD.show()
                     is Loaded -> {
                         loadReplyCommentBlock = null
-                        progressHUD?.dismiss()
+                        progressHUD.dismiss()
                     }
                     is Empty -> {
                         loadReplyCommentBlock?.also {
@@ -640,9 +563,9 @@ class PlayerFragment : BaseFragment() {
         viewModel.apiAddFavoriteResult.observe(viewLifecycleOwner, Observer { event ->
             event?.getContentIfNotHandled()?.also { apiResult ->
                 when (apiResult) {
-                    is Loading -> progressHUD?.show()
+                    is Loading -> progressHUD.show()
                     is Loaded -> {
-                        progressHUD?.dismiss()
+                        progressHUD.dismiss()
                         viewModel.favoriteVideo.value = !(viewModel.favoriteVideo.value ?: false)
                         viewModel.favoriteVideoCount.value =
                             if (viewModel.favoriteVideo.value == true) viewModel.favoriteVideoCount.value?.plus(
@@ -657,9 +580,9 @@ class PlayerFragment : BaseFragment() {
         viewModel.apiAddLikeResult.observe(viewLifecycleOwner, Observer { event ->
             event?.getContentIfNotHandled()?.also { apiResult ->
                 when (apiResult) {
-                    is Loading -> progressHUD?.show()
+                    is Loading -> progressHUD.show()
                     is Loaded -> {
-                        progressHUD?.dismiss()
+                        progressHUD.dismiss()
                         viewModel.likeVideo.value = !(viewModel.likeVideo.value ?: false)
                         viewModel.likeVideoCount.value =
                             if (viewModel.likeVideo.value == true) viewModel.likeVideoCount.value?.plus(
@@ -674,8 +597,8 @@ class PlayerFragment : BaseFragment() {
         viewModel.apiReportResult.observe(viewLifecycleOwner, Observer { event ->
             event?.getContentIfNotHandled()?.also { apiResult ->
                 when (apiResult) {
-                    is Loading -> progressHUD?.show()
-                    is Loaded -> progressHUD?.dismiss()
+                    is Loading -> progressHUD.show()
+                    is Loaded -> progressHUD.dismiss()
                     is Empty -> {
                         if (!viewModel.isCommentReport) {
                             viewModel.isReported = true
@@ -724,17 +647,78 @@ class PlayerFragment : BaseFragment() {
 
         viewModel.videoReport.observe(viewLifecycleOwner) {
             when (it) {
-                is Loading -> progressHUD?.show()
-                is Loaded -> progressHUD?.dismiss()
-                is Success -> {
-                    Timber.i("videoReported")
-                }
+                is Loading -> progressHUD.show()
+                is Loaded -> progressHUD.dismiss()
+                is Success -> Timber.i("videoReported")
                 is Error -> onApiError(it.throwable)
             }
         }
 
         viewModel.showRechargeReminder.observe(viewLifecycleOwner) {
             showRechargeReminder(it)
+        }
+    }
+
+    private fun setUpVideoInfo(videoItem: VideoItem) {
+        viewModel.category =
+            if (videoItem.categories.isNotEmpty()) videoItem.categories[0] else ""
+
+        if (isFirstInit) {
+            isFirstInit = false
+            tv_title.text = videoItem.title
+
+            if (!videoItem.description.isNullOrBlank())
+                tv_introduction.text =
+                    Html.fromHtml(videoItem.description, Html.FROM_HTML_MODE_COMPACT)
+
+            val dateString = videoItem.updateTime?.let { date ->
+                SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(date)
+            }
+
+            tv_info.text = String.format(
+                getString(R.string.player_info_format),
+                dateString ?: "",
+                videoItem.country
+            )
+
+            viewModel.sourceList = videoItem.sources
+
+            if (videoItem.tags != null)
+                setupChipGroup(videoItem.tags as List<String>)
+
+            setupSourceList(viewModel.sourceList)
+
+            val categoriesString =
+                if (videoItem.categories.isNotEmpty()) videoItem.categories.last() else ""
+            viewModel.setupGuessLikeList(categoriesString, true)
+        }
+
+        viewModel.likeVideo.value = videoItem.like
+        viewModel.likeVideoCount.value = videoItem.likeCount
+        viewModel.favoriteVideo.value = videoItem.favorite
+        viewModel.favoriteVideoCount.value = videoItem.favoriteCount
+        viewModel.commentCount.value = videoItem.commentCount
+
+        viewModel.isDeducted = videoItem.deducted ?: false
+        viewModel.costPoint = videoItem.point ?: 0L
+        viewModel.availablePoint = videoItem.availablePoint ?: 0L
+
+        if (videoItem.commentCount == 0L) {
+            Timber.i(" apiVideoInfo result.commentCount == 0L")
+            title_no_comment.visibility = VISIBLE
+            title_no_comment.setTextColor(requireContext().getColor(R.color.normal_color_text))
+            val bgColor = requireContext().getColor(R.color.color_black_1_10)
+            title_no_comment.setBtnSolidColor(
+                bgColor,
+                bgColor,
+                resources.getDimension(R.dimen.dp_10)
+            )
+        } else {
+            title_no_comment.visibility = GONE
+
+            lifecycleScope.launchWhenResumed {
+                viewModel.setupCommentDataSource(playerInfoAdapter)
+            }
         }
     }
 
@@ -821,6 +805,21 @@ class PlayerFragment : BaseFragment() {
             Timber.i("viewModel.isReported ${viewModel.isReported}")
             showMoreDialog(viewModel.streamId, PostType.VIDEO, viewModel.isReported)
         }
+
+        tv_newest.setOnClickListener {
+            viewModel.updatedSelectedNewestComment(true)
+            lifecycleScope.launch {
+                viewModel.setupCommentDataSource(playerInfoAdapter)
+            }
+        }
+
+        tv_hottest.setOnClickListener {
+            viewModel.updatedSelectedNewestComment(false)
+            lifecycleScope.launch {
+                viewModel.setupCommentDataSource(playerInfoAdapter)
+            }
+        }
+
 
         requireActivity().addKeyboardToggleListener { shown ->
             isKeyboardShown = shown
@@ -988,10 +987,10 @@ class PlayerFragment : BaseFragment() {
         when (enable) {
             true -> {
                 bottom_func_input?.visibility = VISIBLE
-                bottom_func_bar?.visibility = View.GONE
+                bottom_func_bar?.visibility = GONE
             }
             else -> {
-                bottom_func_input?.visibility = View.GONE
+                bottom_func_input?.visibility = GONE
                 bottom_func_bar?.visibility = VISIBLE
             }
         }
@@ -1003,7 +1002,7 @@ class PlayerFragment : BaseFragment() {
 
             tv_replay_name.let {
                 if (currentreplyName == null) {
-                    tv_replay_name.visibility = View.GONE
+                    tv_replay_name.visibility = GONE
                 } else {
                     tv_replay_name.text = "@$currentreplyName"
                     tv_replay_name.visibility = VISIBLE
@@ -1023,20 +1022,17 @@ class PlayerFragment : BaseFragment() {
     private fun commentEditorHide() {
         Timber.i("commentEditorHide")
         CoroutineScope(Dispatchers.Main).launch {
-            tv_replay_name?.visibility = View.GONE
-            val lManager: InputMethodManager =
-                requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            lManager?.hideSoftInputFromWindow(et_message.windowToken, 0)
+            tv_replay_name?.visibility = GONE
+            (activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)?.apply {
+                hideSoftInputFromWindow(et_message.windowToken, 0)
+            }
         }
     }
 
     override fun onStart() {
         super.onStart()
-
-        if (Util.SDK_INT > 23) {
-            setupPlayer()
-            player_view.onResume()
-        }
+        setupPlayer()
+        player_view.onResume()
     }
 
     override fun onResume() {
@@ -1044,17 +1040,12 @@ class PlayerFragment : BaseFragment() {
 
         loadVideo()
 
-        //hideSystemUi()
-
-        if ((Util.SDK_INT <= 23 || player == null)) {
+        if (player == null) {
             setupPlayer()
             player_view.onResume()
         }
 
-        orientationDetector?.also {
-            //if (it.canDetectOrientation())
-            it.enable()
-        }
+        orientationDetector?.apply { enable() }
 
     }
 
@@ -1063,11 +1054,7 @@ class PlayerFragment : BaseFragment() {
         super.onPause()
 
         dialog?.dismiss()
-
-        orientationDetector?.also {
-            it.disable()
-        }
-
+        orientationDetector?.apply {disable()}
         player_view.onPause()
         releasePlayer()
 
@@ -1164,14 +1151,14 @@ class PlayerFragment : BaseFragment() {
                         if (abs(dx) > abs(dy)) {
                             if (viewModel.isPlaying.value == true) {
                                 tv_forward_backward.visibility = VISIBLE
-                                tv_sound_tune.visibility = View.GONE
+                                tv_sound_tune.visibility = GONE
                                 if (dx > 0)
                                     viewModel.setFastForwardTime((dx.toInt() / SWIPE_DISTANCE_UNIT) * JUMP_TIME)
                                 else
                                     viewModel.setRewindTime(abs((dx.toInt() / SWIPE_DISTANCE_UNIT) * JUMP_TIME))
                             }
                         } else {
-                            tv_forward_backward.visibility = View.GONE
+                            tv_forward_backward.visibility = GONE
                             tv_sound_tune.visibility = VISIBLE
                             if (abs(dy) > SWIPE_SOUND_LEAST) {
                                 if (dy > 0)
@@ -1211,17 +1198,11 @@ class PlayerFragment : BaseFragment() {
                         }
                         true
                     } else {
-                        //                        player?.also {
-                        //                            it.playWhenReady.also { playing ->
-                        //                                it.playWhenReady = !playing
-                        //                                viewModel.setPlaying(!playing)
-                        //                            }
-                        //                        }
                         false
                     }
 
-                    tv_forward_backward.visibility = View.GONE
-                    tv_sound_tune.visibility = View.GONE
+                    tv_forward_backward.visibility = GONE
+                    tv_sound_tune.visibility = GONE
                 }
                 else -> {
 
@@ -1263,42 +1244,29 @@ class PlayerFragment : BaseFragment() {
         player = null
     }
 
-    private fun hideSystemUi() {
-        player_view.systemUiVisibility = (View.SYSTEM_UI_FLAG_LOW_PROFILE
-                or View.SYSTEM_UI_FLAG_FULLSCREEN
-                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
-    }
-
     private fun rewind(rewindMs: Int) {
-        if (player != null && player!!.isCurrentWindowSeekable && rewindMs > 0) {
+        player?.takeIf { it.isCurrentWindowSeekable && rewindMs > 0 }?.apply {
             viewModel.setRewindTime(rewindMs)
-            val newPos =
-                if (player!!.currentPosition - rewindMs > 0) player!!.currentPosition - rewindMs else 0
-            player!!.seekTo(player!!.currentWindowIndex, newPos)
+            seekTo(currentWindowIndex,
+                if (currentPosition > rewindMs) currentPosition - rewindMs else 0)
         }
+
     }
 
     private fun fastForward(fastForwardMs: Int) {
-        if (player != null && player!!.isCurrentWindowSeekable && fastForwardMs > 0) {
+        player?.takeIf { it.isCurrentWindowSeekable && fastForwardMs > 0 }?.apply {
             viewModel.setFastForwardTime(fastForwardMs)
-            player!!.seekTo(player!!.currentWindowIndex, player!!.currentPosition + fastForwardMs)
+            seekTo(currentWindowIndex, currentPosition + fastForwardMs)
         }
     }
 
 
     private fun soundUp() {
-        player?.also {
-            it.volume = it.volume + 0.1f
-        }
+        player?.apply { volume += 0.1f}
     }
 
     private fun soundDown() {
-        player?.also {
-            it.volume = it.volume - 0.1f
-        }
+        player?.apply {volume -= 0.1f}
     }
 
     private val playbackStateListener = object : Player.EventListener {
@@ -1393,14 +1361,14 @@ class PlayerFragment : BaseFragment() {
 
     private fun setupSourceList(list: List<Source>?) {
         if (list == null) {
-            recyclerview_source_list.visibility = View.GONE
+            recyclerview_source_list.visibility = GONE
         } else {
             val size = list.size
             if (size == 0) {
-                recyclerview_source_list.visibility = View.GONE
+                recyclerview_source_list.visibility = GONE
             } else {
                 if (size == 1) {
-                    recyclerview_source_list.visibility = View.GONE
+                    recyclerview_source_list.visibility = GONE
                 }
 
                 val result = mutableListOf<String>()
@@ -1559,13 +1527,13 @@ class PlayerFragment : BaseFragment() {
     private fun fullScreenUISet(isFullScreen: Boolean) {
         if (isFullScreen) {
             commentEditorHide()
-            recycler_info.visibility = View.GONE
-            bottom_func_bar.visibility = View.GONE
-            bottom_func_input.visibility = View.GONE
+            recycler_info.visibility = GONE
+            bottom_func_bar.visibility = GONE
+            bottom_func_input.visibility = GONE
         } else {
             recycler_info?.visibility = VISIBLE
             bottom_func_bar?.visibility = VISIBLE
-            bottom_func_input.visibility = View.GONE
+            bottom_func_input.visibility = GONE
         }
     }
 

@@ -109,6 +109,10 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
         }
     }
 
+    fun getOldDriverUrl(): String {
+        return getWebDomain() + "/chat"
+    }
+
     fun getDomain(): String {
         return when {
             currentDomainIndex < domainList.size -> domainList[currentDomainIndex]
