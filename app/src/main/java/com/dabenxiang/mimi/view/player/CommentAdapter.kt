@@ -16,6 +16,7 @@ import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.yulichswift.roundedview.widget.RoundedTextView
 import timber.log.Timber
+import java.lang.StringBuilder
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -279,6 +280,7 @@ abstract class BaseCommentProvider(
 ) : BaseNodeProvider() {
 
     protected fun dataConvert(holder: BaseViewHolder, data: MembersPostCommentItem) {
+
         holder.getView<View>(R.id.line_Top).apply {
             when (type) {
                 CommentViewType.VIDEO -> {
@@ -335,7 +337,10 @@ abstract class BaseCommentProvider(
         holder.setText(R.id.tv_name, data.postName)
         holder.setTextColorRes(R.id.tv_name, getTextColor())
         holder.setTextColorRes(R.id.tv_date, getTextColor())
-        holder.setText(R.id.tv_message, data.content)
+
+        holder.setText(R.id.tv_message, if(data.postName.isNotBlank()) "@${data.postName} ${data.content}"
+        else data.content)
+
         holder.setTextColorRes(R.id.tv_message, getMessageTextColor())
         holder.setTextColorRes(R.id.tv_like, getMessageTextColor())
         holder.setTextColorRes(R.id.tv_unlike, getMessageTextColor())
