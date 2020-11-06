@@ -232,6 +232,28 @@
             app:layout_constraintTop_toBottomOf="@id/tv_my_post" />
 
         <TextView
+            android:id="@+id/tv_old_driver"
+            style="@style/personalStyle"
+            android:gravity="center_vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:text="@string/personal_old_driver"
+            app:drawableEndCompat="@drawable/btn_arrow_black_n"
+            app:drawableStartCompat="@drawable/btn_potato"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_setting" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="@color/color_black_1_05"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_setting" />
+
+        <TextView
             android:id="@+id/tv_logout"
             android:layout_width="0dp"
             android:layout_height="50dp"
@@ -244,7 +266,7 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_setting" />
+            app:layout_constraintTop_toBottomOf="@id/tv_old_driver" />
 
         <TextView
             android:id="@+id/tv_version_is_login"

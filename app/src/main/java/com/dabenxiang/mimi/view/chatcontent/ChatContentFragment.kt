@@ -76,7 +76,7 @@ class ChatContentFragment : BaseFragment() {
 
     private val adapter by lazy { ChatContentAdapter(viewModel.pref, listener) }
     private var senderAvatarId = ""
-    private val file: File = FileUtil.getAvatarFile()
+    private var file: File = FileUtil.getAvatarFile()
     private var connectMonitor: ConnectionStateMonitor? = null //監測網路切換狀態
     private var needDisplayNetworkError: Boolean = false
     private var title = ""
@@ -160,6 +160,8 @@ class ChatContentFragment : BaseFragment() {
             true
         )
         recyclerContent.adapter = adapter
+
+        file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
     }
 
     override fun setupObservers() {
@@ -214,6 +216,7 @@ class ChatContentFragment : BaseFragment() {
 
         viewModel.cachePushData.observe(viewLifecycleOwner, Observer {
             adapter.insertItem(it)
+            file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
         })
 
         viewModel.updatePushData.observe(viewLifecycleOwner, Observer {
