@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.topup
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -44,6 +45,8 @@ class TopUpFragment : BaseFragment() {
 
     private var orderPackageMap: HashMap<PaymentType, ArrayList<OrderingPackageItem>>? = null
 
+    private var lastCheckedId: Int = -1
+
     companion object{
         const val TAG_FRAGMENT ="TAG_FRAGMENT"
         fun createBundle(tagName: String?): Bundle {
@@ -51,6 +54,17 @@ class TopUpFragment : BaseFragment() {
                 it.putString(TAG_FRAGMENT, tagName)
             }
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        viewModel.agentListIsEmpty.observe(this, Observer {
+            if (it) {
+                tv_proxy_empty.visibility = View.VISIBLE
+            } else {
+                tv_proxy_empty.visibility = View.GONE
+            }
+        })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -180,19 +194,36 @@ class TopUpFragment : BaseFragment() {
             agentAdapter.submitList(it)
         })
 
-        viewModel.agentListIsEmpty.observe(viewLifecycleOwner, Observer {
-            if (it) {
-                tv_proxy_empty.visibility = View.VISIBLE
-            } else {
-                tv_proxy_empty.visibility = View.GONE
-            }
-        })
-
         viewModel.totalUnreadResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
                     iv_new_badge.visibility = if (it.result == 0) View.INVISIBLE else View.VISIBLE
                     mainViewModel?.refreshBottomNavigationBadge?.value = it.result
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.packageStatusResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Success -> {
+                    if(it.result.onlinePayDisabled){
+                        if(it.result.agentPayDisabled){
+                            rg_type.visibility = View.GONE
+                            rg_type.check(-1)
+                        } else {
+                            rg_type.visibility = View.GONE
+                            rg_type.check(R.id.rb_proxy_pay)
+                        }
+                    } else {
+                        if(it.result.agentPayDisabled){
+                            rg_type.visibility = View.GONE
+                            rg_type.check(R.id.rb_online_pay)
+                        } else {
+                            rg_type.visibility = View.VISIBLE
+                            rg_type.check(lastCheckedId)
+                        }
+                    }
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -225,12 +256,20 @@ class TopUpFragment : BaseFragment() {
                     layout_online_pay.visibility = View.VISIBLE
                     rv_proxy_pay.visibility = View.GONE
                     tv_proxy_empty.visibility = View.GONE
+                    viewModel.getOrderingPackage()
+                    lastCheckedId = R.id.rb_online_pay
                 }
                 R.id.rb_proxy_pay -> {
                     layout_online_pay.visibility = View.GONE
                     rv_proxy_pay.visibility = View.VISIBLE
                     tv_proxy_empty.visibility = View.VISIBLE
                     viewModel.getProxyPayList()
+                    lastCheckedId = R.id.rb_proxy_pay
+                }
+                -1 -> {
+                    layout_online_pay.visibility = View.GONE
+                    rv_proxy_pay.visibility = View.GONE
+                    tv_proxy_empty.visibility = View.GONE
                 }
             }
         }
@@ -269,7 +308,8 @@ class TopUpFragment : BaseFragment() {
     }
 
     override fun initSettings() {
-        rg_type.check(R.id.rb_online_pay)
+        if(lastCheckedId == -1)
+            rg_type.check(R.id.rb_online_pay)
 
         when (viewModel.isLogin()) {
             true -> {
@@ -312,7 +352,6 @@ class TopUpFragment : BaseFragment() {
                 val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                 startActivity(browserIntent)
             }
-
         }
 
         val userItem = viewModel.getUserData()
@@ -327,7 +366,7 @@ class TopUpFragment : BaseFragment() {
 
         onlinePayAdapter.clearSelectItem()
         viewModel.getMe()
-        viewModel.getOrderingPackage()
+        viewModel.getPackageStatus()
     }
 
     private val agentListener = object : TopUpAgentAdapter.EventListener {

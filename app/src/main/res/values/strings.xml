@@ -77,7 +77,7 @@
     <string name="topup_next">下一步</string>
     <string name="topup_subtitle">会员尊享 每天无限观看</string>
     <string name="topup_proxy_title_name">火热代理</string>
-    <string name="topup_online_empty">所有在现均在忙碌中，请稍後再试。</string>
+    <string name="topup_online_empty">所有在线均在忙碌中，请稍後再试。</string>
     <string name="topup_proxy_empty">所有代理均在忙碌中，请稍後再试。</string>
     <string name="topup_select_error">请选择在线支付方案</string>
     <string name="topup_pending_order_1">尚有</string>

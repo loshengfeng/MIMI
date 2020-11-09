@@ -43,6 +43,11 @@ class TopUpViewModel : BaseViewModel() {
     private val _isEmailConfirmed by lazy { MutableLiveData<ApiResult<Boolean>>() }
     val isEmailConfirmed: LiveData<ApiResult<Boolean>> get() = _isEmailConfirmed
 
+    private val _packageStatusResult =
+        MutableLiveData<ApiResult<PackageStatusItem>>()
+    val packageStatusResult: LiveData<ApiResult<PackageStatusItem>> =
+        _packageStatusResult
+
     fun getProxyPayList() {
         viewModelScope.launch {
             val dataSrc = TopUpProxyPayListDataSource(
@@ -93,6 +98,21 @@ class TopUpViewModel : BaseViewModel() {
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _orderPackageResult.value = it }
+        }
+    }
+
+    fun getPackageStatus() {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getPackageStatus()
+                if (!result.isSuccessful) throw HttpException(result)
+                val packageStatusItem = result.body()?.content
+                emit(ApiResult.success(packageStatusItem))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _packageStatusResult.value = it }
         }
     }
 

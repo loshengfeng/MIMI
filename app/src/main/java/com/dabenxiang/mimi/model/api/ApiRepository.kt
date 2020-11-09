@@ -765,6 +765,10 @@ class ApiRepository(private val apiService: ApiService) {
         return apiService.getOrderingPackageByPaymentType(paymentType.value)
     }
 
+    suspend fun getPackageStatus(): Response<ApiBaseItem<PackageStatusItem>> {
+        return apiService.getPackageStatus()
+    }
+
     /**
      * 建立訂單
      */

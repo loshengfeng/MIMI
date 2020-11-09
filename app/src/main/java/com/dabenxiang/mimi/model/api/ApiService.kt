@@ -608,6 +608,10 @@ interface ApiService {
         @Query("paymentType") paymentType: Int
     ): Response<ApiBaseItem<ArrayList<OrderingPackageItem>>>
 
+
+    @GET("/v1/Ordering/PackageStatus")
+    suspend fun getPackageStatus(): Response<ApiBaseItem<PackageStatusItem>>
+
     /**********************************************************
      *
      *                  Create Order
