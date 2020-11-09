@@ -159,7 +159,6 @@
             android:linksClickable="true"
             android:text="@string/topup_teaching"
             android:textColor="@color/color_blue_2"
-            app:layout_constraintBottom_toTopOf="@id/rg_type"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_subtitle" />
@@ -171,6 +170,7 @@
             android:layout_marginTop="20dp"
             android:background="@drawable/bg_checkbox_2"
             android:orientation="horizontal"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_teaching">
@@ -201,6 +201,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="30dp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
