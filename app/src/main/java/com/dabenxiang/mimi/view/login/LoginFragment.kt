@@ -148,7 +148,7 @@ class LoginFragment : BaseFragment() {
                 is Empty -> {
                     viewModel.mobile.value?.let { it1 ->
                         viewModel.registerPw.value?.let { it2 ->
-                            viewModel.doLogin((tv_login_call_prefix.text.toString() + it1), it2)
+                            viewModel.doLogin((tv_call_prefix.text.toString() + it1), it2)
                         }
                     }
                 }

@@ -1,28 +1,29 @@
 package com.dabenxiang.mimi.di
 
-import android.content.Context
 import com.dabenxiang.mimi.API_HOST_URL
 import com.dabenxiang.mimi.BuildConfig
+import com.dabenxiang.mimi.model.api.ApiLogInterceptor
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiService
 import com.dabenxiang.mimi.model.api.AuthInterceptor
 import com.dabenxiang.mimi.model.pref.Pref
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.gson.Gson
-import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 val apiModule = module {
     single { provideAuthInterceptor(get()) }
     single { provideHttpLoggingInterceptor() }
-    single { provideOkHttpClient(get(), get()) }
+    single { provideOkHttpClient(get(), get(), get()) }
     single { provideApiService(get()) }
     single { provideApiRepository(get()) }
+    single { provideApiLogInterceptor() }
 }
 
 fun provideAuthInterceptor(pref: Pref): AuthInterceptor {
@@ -30,7 +31,12 @@ fun provideAuthInterceptor(pref: Pref): AuthInterceptor {
 }
 
 fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
-    val httpLoggingInterceptor = HttpLoggingInterceptor()
+    val httpLoggingInterceptor = HttpLoggingInterceptor(object : HttpLoggingInterceptor.Logger {
+        override fun log(message: String) {
+            if (!message.contains("�")) Timber.d(message)
+            else Timber.d("base64 image")
+        }
+    })
     httpLoggingInterceptor.level = when (BuildConfig.DEBUG) {
         true -> HttpLoggingInterceptor.Level.BODY
         else -> HttpLoggingInterceptor.Level.NONE
@@ -40,13 +46,15 @@ fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
 
 fun provideOkHttpClient(
     authInterceptor: AuthInterceptor,
-    httpLoggingInterceptor: HttpLoggingInterceptor
+    httpLoggingInterceptor: HttpLoggingInterceptor,
+    apiLogInterceptor: ApiLogInterceptor
 ): OkHttpClient {
     val builder = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(60, TimeUnit.SECONDS)
         .writeTimeout(60, TimeUnit.SECONDS)
         .addInterceptor(authInterceptor)
+        .addInterceptor(apiLogInterceptor)
         .addInterceptor(httpLoggingInterceptor)
 
     if (BuildConfig.DEBUG) {
@@ -68,3 +76,8 @@ fun provideApiService(okHttpClient: OkHttpClient): ApiService {
 fun provideApiRepository(apiService: ApiService): ApiRepository {
     return ApiRepository(apiService)
 }
+
+fun provideApiLogInterceptor(): ApiLogInterceptor {
+    return ApiLogInterceptor()
+}
+
