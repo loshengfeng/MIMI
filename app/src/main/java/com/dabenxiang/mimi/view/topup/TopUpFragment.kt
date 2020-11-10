@@ -263,12 +263,16 @@ class TopUpFragment : BaseFragment() {
                     rv_proxy_pay.visibility = View.GONE
                     tv_proxy_empty.visibility = View.GONE
                     lastCheckedId = R.id.rb_online_pay
+                    if(rg_type.visibility == View.VISIBLE)
+                        viewModel.getOrderingPackage()
                 }
                 R.id.rb_proxy_pay -> {
                     layout_online_pay.visibility = View.GONE
                     rv_proxy_pay.visibility = View.VISIBLE
                     tv_proxy_empty.visibility = View.VISIBLE
                     lastCheckedId = R.id.rb_proxy_pay
+                    if(rg_type.visibility == View.VISIBLE)
+                        viewModel.getProxyPayList()
                 }
                 -1 -> {
                     layout_online_pay.visibility = View.GONE
