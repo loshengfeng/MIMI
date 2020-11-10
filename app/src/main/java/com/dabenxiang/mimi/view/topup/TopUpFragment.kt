@@ -214,14 +214,20 @@ class TopUpFragment : BaseFragment() {
                         } else {
                             rg_type.visibility = View.GONE
                             rg_type.check(R.id.rb_proxy_pay)
+                            viewModel.getProxyPayList()
                         }
                     } else {
                         if(it.result.agentPayDisabled){
                             rg_type.visibility = View.GONE
                             rg_type.check(R.id.rb_online_pay)
+                            viewModel.getOrderingPackage()
                         } else {
                             rg_type.visibility = View.VISIBLE
                             rg_type.check(lastCheckedId)
+                            if(lastCheckedId == R.id.rb_online_pay)
+                                viewModel.getOrderingPackage()
+                            else
+                                viewModel.getProxyPayList()
                         }
                     }
                 }
@@ -256,14 +262,12 @@ class TopUpFragment : BaseFragment() {
                     layout_online_pay.visibility = View.VISIBLE
                     rv_proxy_pay.visibility = View.GONE
                     tv_proxy_empty.visibility = View.GONE
-                    viewModel.getOrderingPackage()
                     lastCheckedId = R.id.rb_online_pay
                 }
                 R.id.rb_proxy_pay -> {
                     layout_online_pay.visibility = View.GONE
                     rv_proxy_pay.visibility = View.VISIBLE
                     tv_proxy_empty.visibility = View.VISIBLE
-                    viewModel.getProxyPayList()
                     lastCheckedId = R.id.rb_proxy_pay
                 }
                 -1 -> {
