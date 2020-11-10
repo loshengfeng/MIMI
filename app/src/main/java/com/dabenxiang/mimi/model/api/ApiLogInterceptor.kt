@@ -8,6 +8,7 @@ import okhttp3.Headers
 import okhttp3.Interceptor
 import okhttp3.Response
 import okio.Buffer
+import org.json.JSONObject
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
@@ -96,7 +97,11 @@ class ApiLogInterceptor : Interceptor, KoinComponent {
                 return response
             }
             if (contentLength != 0L) {
-                logData.responseBody = buffer.clone().readString(charset)
+                try {
+                    logData.responseBody = "${JSONObject(buffer.clone().readString(charset))}"
+                } catch (e: Exception) {
+                    logData.responseBody = buffer.clone().readString(charset)
+                }
             }
         }
         push(logData)
