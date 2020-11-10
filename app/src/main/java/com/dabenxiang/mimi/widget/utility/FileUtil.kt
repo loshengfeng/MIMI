@@ -1,15 +1,24 @@
 package com.dabenxiang.mimi.widget.utility
 
+import android.annotation.SuppressLint
+import android.content.ContentUris
+import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.graphics.Bitmap
+import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.os.StatFs
+import android.provider.MediaStore
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import com.dabenxiang.mimi.App
 import timber.log.Timber
 import tw.gov.president.manager.submanager.update.APKDownloaderManager
-import java.io.BufferedOutputStream
-import java.io.File
-import java.io.FileOutputStream
+import java.io.*
+import java.nio.charset.StandardCharsets
+
 
 object FileUtil {
 
@@ -103,7 +112,7 @@ object FileUtil {
         if (!dir.exists()) {
             dir.mkdirs()
         }
-        return File(dir,"/avatar.jpg")
+        return File(dir, "/avatar.jpg")
     }
 
     fun getTakePhoto(fileName: String): File {
@@ -122,6 +131,152 @@ object FileUtil {
         File(context.getExternalFilesDir(APKDownloaderManager.TYPE_APK)?.absolutePath).let {
             while (it.listFiles().iterator().hasNext()) {
                 it.listFiles().iterator().next().delete()
+            }
+        }
+    }
+
+    fun createSecreteFile(context: Context): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ) {
+            writeSecreteFileByMediaStore(context)
+        } else {
+            writeSecreteFile(context)
+        }
+    }
+
+    fun isSecreteFileExist(context: Context): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ) {
+            readSecreteFileByMediaStore(context)
+        } else {
+            readSecreteFile(context)
+        }
+    }
+
+    private fun writeSecreteFile(
+        context: Context,
+        fileName: String = "topSecrete.txt",
+        content: String = "This is top secret."
+    ): Boolean {
+        return try {
+            val root = File(Environment.getExternalStorageDirectory(), "/Documents/mimi")
+            if (!root.exists()) {
+                root.mkdirs()
+            }
+            val gpxfile = File(root, fileName)
+            val writer = FileWriter(gpxfile)
+            writer.append(content)
+            writer.flush()
+            writer.close()
+            Toast.makeText(context, "File created successfully", Toast.LENGTH_SHORT).show()
+            true
+        } catch (e: IOException) {
+            Toast.makeText(context, "Fail to create file: $e", Toast.LENGTH_SHORT).show()
+            false
+        }
+    }
+
+    private fun readSecreteFile(
+        context: Context,
+        fileName: String = "topSecrete.txt"
+    ):  Boolean {
+        return try {
+            val file = File(Environment.getExternalStorageDirectory(), "/Documents/mimi/$fileName")
+            val exist = file.exists()
+            if (exist) {
+                Toast.makeText(context, "$fileName found", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, "Fail to read file", Toast.LENGTH_SHORT).show()
+            }
+            exist
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Toast.makeText(context, "Fail to read file", Toast.LENGTH_SHORT).show()
+            false
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun writeSecreteFileByMediaStore(
+        context: Context,
+        fileName: String = "topSecrete",
+        content: String = "This is top secret."
+    ): Boolean {
+        return try {
+            val values = ContentValues()
+            values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName) //file name
+            values.put(
+                MediaStore.MediaColumns.MIME_TYPE,
+                "text/plain"
+            ) //file extension, will automatically add to file
+            values.put(
+                MediaStore.MediaColumns.RELATIVE_PATH,
+                Environment.DIRECTORY_DOCUMENTS + "/mimi/"
+            )
+            //end "/" is not mandatory
+            val uri: Uri = context.contentResolver.insert(
+                MediaStore.Files.getContentUri("external"),
+                values
+            ) ?: Uri.EMPTY //important!
+            val outputStream: OutputStream? = context.contentResolver.openOutputStream(uri)
+            outputStream?.write(content.toByteArray())
+            outputStream?.close()
+            Toast.makeText(context, "File created successfully", Toast.LENGTH_SHORT).show()
+            true
+        } catch (e: IOException) {
+            Toast.makeText(context, "Fail to create file", Toast.LENGTH_SHORT).show()
+            false
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    fun readSecreteFileByMediaStore(context: Context, targetName: String = "topSecrete.txt"): Boolean {
+        val contentUri = MediaStore.Files.getContentUri("external")
+
+        val selection = MediaStore.MediaColumns.RELATIVE_PATH + "=?"
+
+        val selectionArgs = arrayOf(Environment.DIRECTORY_DOCUMENTS + "/mimi/")
+
+        val cursor: Cursor? =
+            context.contentResolver.query(contentUri, null, selection, selectionArgs, null)
+
+        var uri: Uri? = null
+
+        return if (cursor?.count == 0) {
+            Toast.makeText(
+                context, "No file found in \"" + Environment.DIRECTORY_DOCUMENTS + "/mimi/\"",
+                Toast.LENGTH_LONG
+            ).show()
+            false
+        } else {
+            cursor?.run {
+                while (this.moveToNext()) {
+                    val fileName: String =
+                        this.getString(this.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME))
+                    if (fileName == targetName) {
+                        val id: Long =
+                            this.getLong(this.getColumnIndex(MediaStore.MediaColumns._ID))
+                        uri = ContentUris.withAppendedId(contentUri, id)
+                        break
+                    }
+                }
+            }
+
+            if (uri == null) {
+                Toast.makeText(context, "\"$targetName\" not found", Toast.LENGTH_SHORT).show()
+                false
+            } else {
+                try {
+                    val inputStream: InputStream? = context.contentResolver.openInputStream(uri ?: Uri.EMPTY)
+                    val size = inputStream?.available() ?: 0
+                    val bytes = ByteArray(size)
+                    inputStream?.read(bytes)
+                    inputStream?.close()
+                    val jsonString = String(bytes, StandardCharsets.UTF_8)
+                    Toast.makeText(context, "\"$targetName\" found: $jsonString", Toast.LENGTH_SHORT).show()
+                    true
+                } catch (e: IOException) {
+                    Toast.makeText(context, "Fail to read file", Toast.LENGTH_SHORT).show()
+                    false
+                }
             }
         }
     }

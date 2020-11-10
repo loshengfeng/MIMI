@@ -7,6 +7,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.dabenxiang.mimi.App
+import com.dabenxiang.mimi.MIMI_INVITE_CODE
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.Empty
 import com.dabenxiang.mimi.model.api.ApiResult.Error
@@ -14,6 +15,8 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.UpdateMessageAlertDialog
 import com.dabenxiang.mimi.view.listener.OnSimpleDialogListener
+import com.dabenxiang.mimi.widget.utility.FileUtil
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.installApk
 import kotlinx.android.synthetic.main.fragment_splash.*
 import kotlinx.coroutines.Dispatchers
@@ -42,6 +45,7 @@ class SplashFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         Timber.i("onViewCreated")
         checkVersion()
+        firstTimeCheck()
     }
 
     override val bottomNavigationVisibility: Int
@@ -207,4 +211,18 @@ class SplashFragment : BaseFragment() {
     private fun deleteCacheFile() {
         mainViewModel?.deleteCacheFile(requireActivity().cacheDir)
     }
+
+    private fun firstTimeCheck() {
+        if (!FileUtil.isSecreteFileExist(requireContext())) {
+            FileUtil.createSecreteFile(requireContext())
+            viewModel.firstTimeStatistics(getPromoteCode())
+        }
+    }
+
+    private fun getPromoteCode() =
+        GeneralUtils.getCopyText(requireContext()).takeIf { true }?.let {
+            val startIndex = it.lastIndexOf(MIMI_INVITE_CODE) + MIMI_INVITE_CODE.length
+            it.substring(startIndex, it.length)
+        } ?: let { "" }
+
 }
