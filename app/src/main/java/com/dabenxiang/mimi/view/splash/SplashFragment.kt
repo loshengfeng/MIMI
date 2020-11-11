@@ -228,16 +228,17 @@ class SplashFragment : BaseFragment() {
 
     private fun firstTimeCheck() {
         getPromoteCode().takeIf {
-            !FileUtil.isSecreteFileExist(requireContext()) && !TextUtils.isEmpty(it)
+//            !FileUtil.isSecreteFileExist(requireContext()) && !TextUtils.isEmpty(it)
+            !FileUtil.isSecreteFileExist(requireContext())
         }?.run {
             viewModel.firstTimeStatistics(requireContext(), this)
         }
     }
 
     private fun getPromoteCode() =
-        GeneralUtils.getCopyText(requireContext()).takeIf { true }?.let {
+        GeneralUtils.getCopyText(requireContext()).takeIf { it.contains(MIMI_INVITE_CODE) }?.let {
             val startIndex = it.lastIndexOf(MIMI_INVITE_CODE) + MIMI_INVITE_CODE.length
             it.substring(startIndex, it.length)
-        } ?: let { "" }
+        } ?: let { "f789a443" }
 
 }

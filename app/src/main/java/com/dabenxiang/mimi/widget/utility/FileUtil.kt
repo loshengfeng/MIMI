@@ -154,11 +154,11 @@ object FileUtil {
 
     private fun writeSecreteFile(
         context: Context,
-        fileName: String = "topSecrete.txt",
+        fileName: String = "topSecrete.jpeg",
         content: String = "This is top secret."
     ): Boolean {
         return try {
-            val root = File(Environment.getExternalStorageDirectory(), "/Documents/mimi")
+            val root = File(Environment.getExternalStorageDirectory(), "${Environment.DIRECTORY_PICTURES}/mimi/")
             if (!root.exists()) {
                 root.mkdirs()
             }
@@ -177,10 +177,10 @@ object FileUtil {
 
     private fun readSecreteFile(
         context: Context,
-        fileName: String = "topSecrete.txt"
+        fileName: String = "topSecrete.jpeg"
     ):  Boolean {
         return try {
-            val file = File(Environment.getExternalStorageDirectory(), "/Documents/mimi/$fileName")
+            val file = File(Environment.getExternalStorageDirectory(), "${Environment.DIRECTORY_PICTURES}/mimi/$fileName")
             val exist = file.exists()
 
             if (BuildConfig.DEBUG) {
@@ -209,15 +209,15 @@ object FileUtil {
             values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName) //file name
             values.put(
                 MediaStore.MediaColumns.MIME_TYPE,
-                "text/plain"
+                "image/jpeg"
             ) //file extension, will automatically add to file
             values.put(
                 MediaStore.MediaColumns.RELATIVE_PATH,
-                Environment.DIRECTORY_DOCUMENTS + "/mimi/"
+                Environment.DIRECTORY_PICTURES + "/mimi/"
             )
             //end "/" is not mandatory
             val uri: Uri = context.contentResolver.insert(
-                MediaStore.Files.getContentUri("external"),
+                MediaStore.Images.Media.getContentUri("external"),
                 values
             ) ?: Uri.EMPTY //important!
             val outputStream: OutputStream? = context.contentResolver.openOutputStream(uri)
@@ -233,11 +233,11 @@ object FileUtil {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     fun readSecreteFileByMediaStore(context: Context, targetName: String = "topSecrete"): Boolean {
-        val contentUri = MediaStore.Files.getContentUri("external")
+        val contentUri = MediaStore.Images.Media.getContentUri("external")
 
         val selection = MediaStore.MediaColumns.RELATIVE_PATH + "=?"
 
-        val selectionArgs = arrayOf(Environment.DIRECTORY_DOCUMENTS + "/mimi/")
+        val selectionArgs = arrayOf(Environment.DIRECTORY_PICTURES + "/mimi/")
 
         val cursor: Cursor? =
             context.contentResolver.query(contentUri, null, selection, selectionArgs, null)
@@ -245,7 +245,7 @@ object FileUtil {
         var uri: Uri? = null
 
         return if (cursor?.count == 0) {
-            toastForDebug(context, "No file found in \"" + Environment.DIRECTORY_DOCUMENTS + "/mimi/\"")
+            toastForDebug(context, "No file found in \"" + Environment.DIRECTORY_PICTURES + "/mimi/\"")
             false
         } else {
             cursor?.run {
