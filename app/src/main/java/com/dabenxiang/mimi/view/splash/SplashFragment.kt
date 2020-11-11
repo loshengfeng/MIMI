@@ -239,6 +239,6 @@ class SplashFragment : BaseFragment() {
         GeneralUtils.getCopyText(requireContext()).takeIf { it.contains(MIMI_INVITE_CODE) }?.let {
             val startIndex = it.lastIndexOf(MIMI_INVITE_CODE) + MIMI_INVITE_CODE.length
             it.substring(startIndex, it.length)
-        } ?: let { "f789a443" }
+        } ?: let { "" }
 
 }
