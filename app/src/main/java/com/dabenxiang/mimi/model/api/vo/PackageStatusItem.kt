@@ -7,5 +7,8 @@ data class PackageStatusItem(
     val agentPayDisabled: Boolean,
 
     @SerializedName("onlinePayDisabled")
-    val onlinePayDisabled: Boolean
+    val onlinePayDisabled: Boolean,
+
+    @SerializedName("paymentTypes")
+    val paymentTypes: ArrayList<PaymentTypeItem> = arrayListOf()
 )
