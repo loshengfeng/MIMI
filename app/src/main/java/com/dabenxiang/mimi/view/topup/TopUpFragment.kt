@@ -2,12 +2,14 @@ package com.dabenxiang.mimi.view.topup
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.text.Html
 import android.view.View
 import android.widget.ImageView
 import androidx.activity.addCallback
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
@@ -18,6 +20,7 @@ import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.AgentItem
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderingPackageItem
+import com.dabenxiang.mimi.model.api.vo.PaymentTypeItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.view.adapter.TopUpAgentAdapter
@@ -29,6 +32,7 @@ import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.orderinfo.OrderInfoFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_top_up.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
@@ -46,6 +50,11 @@ class TopUpFragment : BaseFragment() {
     private var orderPackageMap: HashMap<PaymentType, ArrayList<OrderingPackageItem>>? = null
 
     private var lastCheckedId: Int = -1
+
+    private var aliTab: TabLayout.Tab? = null
+    private var wxTab: TabLayout.Tab? = null
+    private var bankTab: TabLayout.Tab? = null
+    private var views: ArrayList<ConstraintLayout>? = null
 
     companion object{
         const val TAG_FRAGMENT ="TAG_FRAGMENT"
@@ -155,7 +164,8 @@ class TopUpFragment : BaseFragment() {
                 is Loaded -> tv_proxy_empty.visibility = View.GONE
                 is Success -> {
                     orderPackageMap = it.result
-                    updateOrderPackages(PaymentType.BANK)
+                    if(views?.contains(iv_bank) == true)
+                        updateOrderPackages(PaymentType.BANK)
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -229,6 +239,58 @@ class TopUpFragment : BaseFragment() {
                             else
                                 viewModel.getProxyPayList()
                         }
+
+                        //array for test
+//                        val paymentTypes: ArrayList<PaymentTypeItem> = arrayListOf()
+//                        paymentTypes.add(PaymentTypeItem("Alipay", false))
+//                        paymentTypes.add(PaymentTypeItem("WeChat", false))
+//                        paymentTypes.add(PaymentTypeItem("UnionPay", false))
+//                        for(type in paymentTypes){
+
+                        for(type in it.result.paymentTypes){
+                            when(type.name){
+                                "Alipay" -> {
+                                    if(type.disabled == true && aliTab != null) {
+                                        tl_type.removeTab(aliTab!!)
+                                        views?.remove(iv_ali)
+                                    }
+                                }
+                                "WeChat" -> {
+                                    if(type.disabled == true && wxTab != null) {
+                                        tl_type.removeTab(wxTab!!)
+                                        views?.remove(iv_wx)
+                                    }
+                                }
+                                "UnionPay" -> {
+                                    if(type.disabled == true && bankTab != null) {
+                                        tl_type.removeTab(bankTab!!)
+                                        views?.remove(iv_bank)
+                                    }
+                                }
+                            }
+                        }
+
+                        if(views?.size!! > 0)
+                            for(view in views!!)
+                                view.visibility = View.VISIBLE
+
+                        when (views?.size){
+                            3 -> {
+                                divide_line_bank.visibility = View.VISIBLE
+                                divide_line_ali.visibility = View.VISIBLE
+                            }
+                            2 -> {
+                                if(views?.contains(iv_bank) == true)
+                                    divide_line_bank.visibility = View.VISIBLE
+                                else if(views?.contains(iv_ali) == true)
+                                    divide_line_ali.visibility = View.VISIBLE
+                            }
+                            1 -> {
+                                tl_type.setSelectedTabIndicatorColor(Color.TRANSPARENT)
+                            }
+                        }
+
+                        tl_type.getTabAt(0)?.select()
                     }
                 }
                 is Error -> onApiError(it.throwable)
@@ -281,6 +343,20 @@ class TopUpFragment : BaseFragment() {
                 }
             }
         }
+
+        tl_type.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                when (tab) {
+                    bankTab -> updateOrderPackages(PaymentType.BANK)
+                    aliTab -> updateOrderPackages(PaymentType.ALI)
+                    wxTab -> updateOrderPackages(PaymentType.WX)
+                }
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab) {}
+
+            override fun onTabReselected(tab: TabLayout.Tab) {}
+        })
 
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
@@ -335,6 +411,10 @@ class TopUpFragment : BaseFragment() {
     }
 
     private fun initTopUp() {
+        bankTab = tl_type.getTabAt(0)
+        aliTab = tl_type.getTabAt(1)
+        wxTab = tl_type.getTabAt(2)
+        views = arrayListOf(iv_bank, iv_ali, iv_wx)
         tv_record_top_up.visibility = View.VISIBLE
 
         item_is_Login.visibility = View.VISIBLE
