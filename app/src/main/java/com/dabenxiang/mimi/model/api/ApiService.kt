@@ -693,12 +693,4 @@ interface ApiService {
         @Query("limit") limit: String
     ): Response<ApiBasePagingItem<ArrayList<ReferrerHistoryItem>>>
 
-
-    /**********************************************************
-     *
-     *                  Business 統計接口
-     *
-     ***********************************************************/
-    @POST("/v1/Business/Statistics")
-    suspend fun statistics(@Body request: StatisticsRequest): Response<ApiBaseItem<Void>>
 }

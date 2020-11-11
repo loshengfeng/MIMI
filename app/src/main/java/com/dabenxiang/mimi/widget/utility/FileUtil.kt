@@ -14,6 +14,7 @@ import android.provider.MediaStore
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.dabenxiang.mimi.App
+import com.dabenxiang.mimi.BuildConfig
 import timber.log.Timber
 import tw.gov.president.manager.submanager.update.APKDownloaderManager
 import java.io.*
@@ -166,10 +167,10 @@ object FileUtil {
             writer.append(content)
             writer.flush()
             writer.close()
-            Toast.makeText(context, "File created successfully", Toast.LENGTH_SHORT).show()
+            toastForDebug(context, "File created successfully")
             true
         } catch (e: IOException) {
-            Toast.makeText(context, "Fail to create file: $e", Toast.LENGTH_SHORT).show()
+            toastForDebug(context, "Fail to create file: $e")
             false
         }
     }
@@ -181,15 +182,18 @@ object FileUtil {
         return try {
             val file = File(Environment.getExternalStorageDirectory(), "/Documents/mimi/$fileName")
             val exist = file.exists()
-            if (exist) {
-                Toast.makeText(context, "$fileName found", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(context, "Fail to read file", Toast.LENGTH_SHORT).show()
+
+            if (BuildConfig.DEBUG) {
+                if (exist) {
+                    toastForDebug(context, "$fileName found")
+                } else {
+                    toastForDebug(context, "Fail to read file")
+                }
             }
             exist
         } catch (e: IOException) {
             e.printStackTrace()
-            Toast.makeText(context, "Fail to read file", Toast.LENGTH_SHORT).show()
+            toastForDebug(context, "Fail to read file")
             false
         }
     }
@@ -219,16 +223,16 @@ object FileUtil {
             val outputStream: OutputStream? = context.contentResolver.openOutputStream(uri)
             outputStream?.write(content.toByteArray())
             outputStream?.close()
-            Toast.makeText(context, "File created successfully", Toast.LENGTH_SHORT).show()
+            toastForDebug(context, "File created successfully")
             true
         } catch (e: IOException) {
-            Toast.makeText(context, "Fail to create file", Toast.LENGTH_SHORT).show()
+            toastForDebug(context, "Fail to create file")
             false
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    fun readSecreteFileByMediaStore(context: Context, targetName: String = "topSecrete.txt"): Boolean {
+    fun readSecreteFileByMediaStore(context: Context, targetName: String = "topSecrete"): Boolean {
         val contentUri = MediaStore.Files.getContentUri("external")
 
         val selection = MediaStore.MediaColumns.RELATIVE_PATH + "=?"
@@ -241,17 +245,16 @@ object FileUtil {
         var uri: Uri? = null
 
         return if (cursor?.count == 0) {
-            Toast.makeText(
-                context, "No file found in \"" + Environment.DIRECTORY_DOCUMENTS + "/mimi/\"",
-                Toast.LENGTH_LONG
-            ).show()
+            toastForDebug(context, "No file found in \"" + Environment.DIRECTORY_DOCUMENTS + "/mimi/\"")
             false
         } else {
             cursor?.run {
+                Timber.d("@@Count: ${this.count}")
                 while (this.moveToNext()) {
                     val fileName: String =
                         this.getString(this.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME))
-                    if (fileName == targetName) {
+                    Timber.d("@@fileName: $fileName")
+                    if (fileName.contains(targetName)) {
                         val id: Long =
                             this.getLong(this.getColumnIndex(MediaStore.MediaColumns._ID))
                         uri = ContentUris.withAppendedId(contentUri, id)
@@ -271,13 +274,19 @@ object FileUtil {
                     inputStream?.read(bytes)
                     inputStream?.close()
                     val jsonString = String(bytes, StandardCharsets.UTF_8)
-                    Toast.makeText(context, "\"$targetName\" found: $jsonString", Toast.LENGTH_SHORT).show()
+                    toastForDebug(context, "\"$targetName\" found: $jsonString")
                     true
                 } catch (e: IOException) {
-                    Toast.makeText(context, "Fail to read file", Toast.LENGTH_SHORT).show()
+                    toastForDebug(context, "Fail to read file")
                     false
                 }
             }
+        }
+    }
+
+    private fun toastForDebug(context: Context, msg: String) {
+        if (BuildConfig.DEBUG) {
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
         }
     }
 }

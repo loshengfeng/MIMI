@@ -850,10 +850,5 @@ class ApiRepository(private val apiService: ApiService) {
      */
     suspend fun getGuestInfo(
     ) = apiService.getGuestInfo()
-
-    /**
-     * 統計接口
-     */
-    suspend fun statistics(request: StatisticsRequest) = apiService.statistics(request)
 }
 

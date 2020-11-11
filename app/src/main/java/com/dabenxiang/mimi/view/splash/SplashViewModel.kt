@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.splash
 
+import android.content.Context
 import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,6 +9,7 @@ import com.dabenxiang.mimi.APK_NAME
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.StatisticsRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.widget.utility.FileUtil
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -95,17 +97,17 @@ class SplashViewModel : BaseViewModel() {
         }
     }
 
-    fun firstTimeStatistics(promoteCode: String) {
+    fun firstTimeStatistics(context: Context, promoteCode: String) {
         viewModelScope.launch {
             flow {
                 val request = StatisticsRequest(code = promoteCode)
-                val resp = domainManager.getApiRepository().statistics(request)
+                val resp = domainManager.getAdRepository().statistics(request)
                 if (!resp.isSuccessful) throw HttpException(resp)
                 emit(ApiResult.success(null))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> Timber.e("firstTimeStatistics error: $e") }
-                .collect { Timber.d("firstTimeStatistics success!") }
+                .collect { FileUtil.createSecreteFile(context) }
         }
     }
 
