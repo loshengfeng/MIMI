@@ -228,40 +228,100 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <View
-                    android:id="@+id/layout_title_background"
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tl_type"
                     android:layout_width="match_parent"
-                    android:layout_height="43dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginTop="1dp"
-                    android:layout_marginEnd="1dp"
-                    android:background="@drawable/bg_gray_16_radius_4"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageView
-                    android:id="@+id/iv_bank"
-                    android:layout_width="70dp"
-                    android:layout_height="24dp"
-                    android:contentDescription="@null"
-                    android:src="@drawable/ico_bank"
+                    android:layout_height="0dp"
+                    android:background="@drawable/bg_gray_10_stroke_1"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="@+id/layout_title_background"/>
+                    app:tabGravity="fill"
+                    app:tabIndicatorColor="@color/color_red_1"
+                    app:tabIndicatorFullWidth="true"
+                    app:tabIndicatorGravity="top"
+                    app:tabIndicatorHeight="2dp"
+                    app:tabMode="fixed"
+                    app:tabSelectedTextColor="@color/color_black_1"
+                    app:tabTextAppearance="@style/login_tab_item_text"
+                    app:tabTextColor="@color/color_black_1_50">
+
+                    <com.google.android.material.tabs.TabItem
+                        android:id="@+id/ti_bank"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <com.google.android.material.tabs.TabItem
+                        android:id="@+id/ti_ali"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <com.google.android.material.tabs.TabItem
+                        android:id="@+id/ti_wx_pay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </com.google.android.material.tabs.TabLayout>
+
+                <ImageView
+                    android:id="@+id/iv_bank"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:contentDescription="@null"
+                    android:paddingStart="22dp"
+                    android:paddingEnd="22dp"
+                    android:src="@drawable/ico_bank"
+                    app:layout_constraintBottom_toBottomOf="@id/tl_type"
+                    app:layout_constraintEnd_toStartOf="@id/iv_ali"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintHorizontal_weight="1"
+                    app:layout_constraintStart_toStartOf="@id/tl_type"
+                    app:layout_constraintTop_toTopOf="@id/tl_type" />
 
                 <View
-                    android:id="@+id/layout_title_underline"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginTop="1dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_width="1dp"
+                    android:layout_height="0dp"
                     android:background="@color/color_gray_10"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/layout_title_background" />
+                    app:layout_constraintBottom_toBottomOf="@id/iv_ali"
+                    app:layout_constraintStart_toStartOf="@id/iv_ali"
+                    app:layout_constraintTop_toTopOf="@id/iv_ali" />
+
+                <ImageView
+                    android:id="@+id/iv_ali"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:contentDescription="@null"
+                    android:paddingStart="22dp"
+                    android:paddingEnd="22dp"
+                    android:src="@drawable/ico_alipay"
+                    app:layout_constraintBottom_toBottomOf="@id/tl_type"
+                    app:layout_constraintEnd_toStartOf="@id/iv_wx"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintHorizontal_weight="1"
+                    app:layout_constraintStart_toEndOf="@id/iv_bank"
+                    app:layout_constraintTop_toTopOf="@id/tl_type" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="0dp"
+                    android:background="@color/color_gray_10"
+                    app:layout_constraintBottom_toBottomOf="@id/iv_ali"
+                    app:layout_constraintEnd_toEndOf="@id/iv_ali"
+                    app:layout_constraintTop_toTopOf="@id/iv_ali" />
+
+                <ImageView
+                    android:id="@+id/iv_wx"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:contentDescription="@null"
+                    android:paddingStart="22dp"
+                    android:paddingEnd="22dp"
+                    android:src="@drawable/ico_wechat_pay"
+                    app:layout_constraintBottom_toBottomOf="@id/tl_type"
+                    app:layout_constraintEnd_toEndOf="@id/tl_type"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintHorizontal_weight="1"
+                    app:layout_constraintStart_toEndOf="@id/iv_ali"
+                    app:layout_constraintTop_toTopOf="@id/tl_type" />
 
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -272,7 +332,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/layout_title_underline" />
+                    app:layout_constraintTop_toBottomOf="@id/tl_type" />
 
                 <TextView
                     android:id="@+id/tv_online_empty"
@@ -284,7 +344,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/layout_title_underline" />
+                    app:layout_constraintTop_toBottomOf="@id/tl_type" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -29,6 +29,7 @@ import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.orderinfo.OrderInfoFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_top_up.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
@@ -282,6 +283,20 @@ class TopUpFragment : BaseFragment() {
             }
         }
 
+        tl_type.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                when (tab.position) {
+                    0 -> updateOrderPackages(PaymentType.BANK)
+                    1 -> updateOrderPackages(PaymentType.ALI)
+                    2 -> updateOrderPackages(PaymentType.WX)
+                }
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab) {}
+
+            override fun onTabReselected(tab: TabLayout.Tab) {}
+        })
+
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
                 R.id.btn_next -> {
@@ -371,6 +386,8 @@ class TopUpFragment : BaseFragment() {
 
         rv_proxy_pay.layoutManager = LinearLayoutManager(context)
         rv_proxy_pay.adapter = agentAdapter
+
+        tl_type.getTabAt(0)?.select()
 
         onlinePayAdapter.clearSelectItem()
         viewModel.getMe()
