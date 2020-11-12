@@ -13,8 +13,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_payment_info.*
-import kotlinx.android.synthetic.main.item_order_result_successful.*
-import timber.log.Timber
+import kotlinx.android.synthetic.main.item_order_result_bank_successful.*
 import java.text.SimpleDateFormat
 import java.util.*
 

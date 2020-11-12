@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.model.vo.mqtt
 
-import com.dabenxiang.mimi.model.enums.PaymentType
 import com.google.gson.annotations.SerializedName
 import java.util.*
 
@@ -8,6 +7,9 @@ data class OrderPayloadItem(
 
     @SerializedName("orderId")
     val orderId: String = "",
+
+    @SerializedName("isSuccessful")
+    val isSuccessful: Boolean = false,
 
     @SerializedName("accountName")
     val accountName: String = "",
@@ -27,19 +29,16 @@ data class OrderPayloadItem(
     @SerializedName("bankBranchCity")
     val bankBranchCity: String = "",
 
-    @SerializedName("BankBranchProvince")
+    @SerializedName("bankBranchProvince")
     val bankBranchProvince: String = "",
 
     @SerializedName("amount")
     val amount: Float = 0f,
 
-    @SerializedName("CreateTime")
+    @SerializedName("createTime")
     val createTime: Date? = null,
 
-    @SerializedName("isSuccessful")
-    val isSuccessful: Boolean = false,
-
     @SerializedName("paymentType")
-    val paymentType: PaymentType = PaymentType.BANK
+    val paymentType: Int = 4
 
 ) : PayloadItem()

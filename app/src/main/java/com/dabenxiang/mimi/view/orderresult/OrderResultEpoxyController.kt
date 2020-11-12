@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.orderresult
 
 import com.airbnb.epoxy.TypedEpoxyController
+import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.model.vo.mqtt.OrderPayloadItem
 import com.dabenxiang.mimi.view.orderresult.itemview.*
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -9,7 +10,7 @@ import java.util.*
 
 class OrderResultEpoxyController(
     private val failedListener: OrderResultFailedItemView.OrderResultFailedListener,
-    private val successListener: OrderResultSuccessItemView.OrderResultSuccessListener
+    private val bankSuccessListener: OrderResultSuccessListener
 ) : TypedEpoxyController<OrderPayloadItem>() {
 
     override fun buildModels(item: OrderPayloadItem?) {
@@ -63,15 +64,28 @@ class OrderResultEpoxyController(
             .append(item.bankBranchName)
             .toString()
 
-        orderResultSuccessItemView {
-            id("order_result_success")
-            setupTimeout(timeout)
-            setupName(item.accountName)
-            setupBank(bank)
-            setupCity(city)
-            setupAccount(item.accountNumber)
-            setupAmount(GeneralUtils.getAmountFormat(item.amount))
-            setupClickListener(successListener)
+        when (item.paymentType) {
+            PaymentType.BANK.value -> {
+                orderResultBankSuccessItemView {
+                    id("order_result_bank_success")
+                    setupTimeout(timeout)
+                    setupName(item.accountName)
+                    setupBank(bank)
+                    setupCity(city)
+                    setupAccount(item.accountNumber)
+                    setupAmount(GeneralUtils.getAmountFormat(item.amount))
+                    setupClickListener(bankSuccessListener)
+                }
+            }
+            else -> {
+                orderResultAliSuccessItemView {
+                    id("order_result_ali_success")
+                    setupTimeout(timeout)
+                    setupAccount(item.accountNumber)
+                    setupAmount(GeneralUtils.getAmountFormat(item.amount))
+                    setupClickListener(bankSuccessListener)
+                }
+            }
         }
     }
 }
