@@ -250,20 +250,23 @@ class TopUpFragment : BaseFragment() {
                         for(type in it.result.paymentTypes){
                             when(type.name){
                                 "Alipay" -> {
-                                    if(type.disabled == true && aliTab != null) {
-                                        tl_type.removeTab(aliTab!!)
+                                    if(type.disabled == true) {
+                                        if(aliTab != null)
+                                            tl_type.removeTab(aliTab!!)
                                         views?.remove(iv_ali)
                                     }
                                 }
                                 "WeChat" -> {
-                                    if(type.disabled == true && wxTab != null) {
-                                        tl_type.removeTab(wxTab!!)
+                                    if(type.disabled == true) {
+                                        if(wxTab != null)
+                                            tl_type.removeTab(wxTab!!)
                                         views?.remove(iv_wx)
                                     }
                                 }
                                 "UnionPay" -> {
-                                    if(type.disabled == true && bankTab != null) {
-                                        tl_type.removeTab(bankTab!!)
+                                    if(type.disabled == true) {
+                                        if(bankTab != null)
+                                            tl_type.removeTab(bankTab!!)
                                         views?.remove(iv_bank)
                                     }
                                 }
