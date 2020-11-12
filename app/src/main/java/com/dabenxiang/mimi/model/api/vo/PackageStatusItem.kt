@@ -10,5 +10,8 @@ data class PackageStatusItem(
     val onlinePayDisabled: Boolean,
 
     @SerializedName("paymentTypes")
-    val paymentTypes: ArrayList<PaymentTypeItem> = arrayListOf()
+    val paymentTypes: ArrayList<PaymentTypeItem> = arrayListOf(),
+
+    @SerializedName("kbcPaymentTypes")
+    val kbcPaymentTypes: ArrayList<PaymentTypeItem> = arrayListOf()
 )
