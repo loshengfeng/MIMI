@@ -51,6 +51,8 @@ class TopUpFragment : BaseFragment() {
 
     private var lastCheckedId: Int = -1
 
+    private var lastTabIndex: Int = 0
+
     private var views: ArrayList<ConstraintLayout> = arrayListOf()
 
     companion object{
@@ -161,8 +163,10 @@ class TopUpFragment : BaseFragment() {
                 is Loaded -> tv_proxy_empty.visibility = View.GONE
                 is Success -> {
                     orderPackageMap = it.result
-                    if(views.contains(iv_bank))
+                    if(views.contains(iv_bank) && lastTabIndex == 0){
                         updateOrderPackages(PaymentType.BANK)
+                    }
+                    tl_type.getTabAt(lastTabIndex)?.select()
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -287,7 +291,7 @@ class TopUpFragment : BaseFragment() {
                             }
                         }
 
-                        tl_type.getTabAt(0)?.select()
+                        tl_type.getTabAt(lastTabIndex)?.select()
                     }
                 }
                 is Error -> onApiError(it.throwable)
@@ -343,6 +347,7 @@ class TopUpFragment : BaseFragment() {
 
         tl_type.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
+                lastTabIndex = tab.position
                 when (tab.tag) {
                     "UnionPay" -> updateOrderPackages(PaymentType.BANK)
                     "Alipay" -> updateOrderPackages(PaymentType.ALI)
