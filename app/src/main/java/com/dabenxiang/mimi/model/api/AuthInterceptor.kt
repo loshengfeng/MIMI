@@ -115,12 +115,13 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
             else -> pref.publicToken.accessToken
         }
 
-        if (!url.toString().contains("/v1/Business/Ads")) {
+        if (!url.toString().contains("/v1/Business")) {
             val auth = StringBuilder(ApiRepository.BEARER).append(accessToken).toString()
             requestBuilder.addHeader(ApiRepository.AUTHORIZATION, auth)
         }
 
         requestBuilder.addHeader(ApiRepository.X_DEVICE_ID, GeneralUtils.getAndroidID())
+        requestBuilder.addHeader(ApiRepository.X_REQUESTED_FROM, "Android")
 
         return requestBuilder.build()
     }

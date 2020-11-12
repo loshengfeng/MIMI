@@ -1,20 +1,25 @@
 package com.dabenxiang.mimi.view.splash
 
+import android.content.Context
 import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.APK_NAME
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.StatisticsRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.widget.utility.FileUtil
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import org.koin.core.inject
+import retrofit2.HttpException
 import timber.log.Timber
 import tw.gov.president.manager.submanager.update.VersionManager
 import tw.gov.president.manager.submanager.update.callback.DownloadProgressCallback
@@ -89,6 +94,20 @@ class SplashViewModel : BaseViewModel() {
                 versionManager.updateApp(APK_NAME, progressCallback)
                 emit(null)
             }.flowOn(Dispatchers.IO).collect { Timber.d("Update!") }
+        }
+    }
+
+    fun firstTimeStatistics(context: Context, promoteCode: String) {
+        viewModelScope.launch {
+            flow {
+                val request = StatisticsRequest(code = promoteCode)
+                val resp = domainManager.getAdRepository().statistics(request)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> Timber.e("firstTimeStatistics error: $e") }
+                .collect { FileUtil.createSecreteFile(context) }
         }
     }
 

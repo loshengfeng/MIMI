@@ -6,6 +6,7 @@ import com.dabenxiang.mimi.model.enums.OrderType
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.StatisticsType
+import com.dabenxiang.mimi.view.home.HomeTemplate
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -22,6 +23,7 @@ class ApiRepository(private val apiService: ApiService) {
         const val BEARER = "Bearer "
         const val FILE = "file"
         const val MEDIA_TYPE_IMAGE = "image/*"
+        const val X_REQUESTED_FROM = "X-Requested-From"
         fun isRefreshTokenFailed(code: String?): Boolean {
             return code == TOKEN_NOT_FOUND
         }

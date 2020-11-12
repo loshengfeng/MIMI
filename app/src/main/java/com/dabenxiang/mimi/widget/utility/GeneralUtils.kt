@@ -326,4 +326,11 @@ object GeneralUtils {
         val m = p.matcher(num)
         return m.matches()
     }
+
+    fun getCopyText(context: Context): String {
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipData = clipboard.primaryClip
+        val clipDataItem = clipData?.getItemAt(0)
+        return clipDataItem?.text.toString()
+    }
 }

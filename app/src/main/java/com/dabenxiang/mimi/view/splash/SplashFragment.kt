@@ -2,11 +2,13 @@ package com.dabenxiang.mimi.view.splash
 
 import android.content.Context
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.dabenxiang.mimi.App
+import com.dabenxiang.mimi.MIMI_INVITE_CODE
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.Empty
 import com.dabenxiang.mimi.model.api.ApiResult.Error
@@ -14,6 +16,8 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.UpdateMessageAlertDialog
 import com.dabenxiang.mimi.view.listener.OnSimpleDialogListener
+import com.dabenxiang.mimi.widget.utility.FileUtil
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.installApk
 import kotlinx.android.synthetic.main.fragment_splash.*
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +45,16 @@ class SplashFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Timber.i("onViewCreated")
-        checkVersion()
+        val requestList = getNotGrantedPermissions(externalPermissions)
+        if (requestList.size > 0) {
+            requestPermissions(
+                requestList.toTypedArray(),
+                PERMISSION_EXTERNAL_REQUEST_CODE
+            )
+        } else {
+            firstTimeCheck()
+            checkVersion()
+        }
     }
 
     override val bottomNavigationVisibility: Int
@@ -100,9 +113,14 @@ class SplashFragment : BaseFragment() {
         Timber.i("onRequestPermissionsResult")
         if (requestCode == PERMISSION_EXTERNAL_REQUEST_CODE
             && getNotGrantedPermissions(externalPermissions).isEmpty()
-            && mainViewModel?.isVersionChecked == true) {
+        ) {
             Timber.i("onRequestPermissionsResult check ok")
-            viewModel.updateApp(progressCallback)
+            firstTimeCheck()
+            if (mainViewModel?.isVersionChecked == true) {
+                viewModel.updateApp(progressCallback)
+            } else {
+                checkVersion()
+            }
         } else {
             checkVersion()
         }
@@ -137,18 +155,18 @@ class SplashFragment : BaseFragment() {
     }
 
     private fun checkVersion() {
-        mainViewModel?.isVersionChecked =false
+        mainViewModel?.isVersionChecked = false
         viewModel.checkVersion()
         planned_speed.setText(R.string.check_version)
     }
 
-    private fun updateDialog(context: Context, isForceUpdate:Boolean = false) {
+    private fun updateDialog(context: Context, isForceUpdate: Boolean = false) {
         Timber.d("updateDialog")
         UpdateMessageAlertDialog(
             context,
             R.string.updated_version_title,
             R.string.update_immediately,
-            if(isForceUpdate) R.string.btn_close else R.string.remind_later,
+            if (isForceUpdate) R.string.btn_close else R.string.remind_later,
             object : OnSimpleDialogListener {
                 override fun onConfirm() {
                     val requestList = getNotGrantedPermissions(externalPermissions)
@@ -165,9 +183,9 @@ class SplashFragment : BaseFragment() {
                 }
 
                 override fun onCancel() {
-                    if(isForceUpdate){
+                    if (isForceUpdate) {
                         activity?.finish()
-                    }else{
+                    } else {
                         viewModel.setupRecordTimestamp()
                         initSettings()
                         mainViewModel?.isVersionChecked = true
@@ -207,4 +225,20 @@ class SplashFragment : BaseFragment() {
     private fun deleteCacheFile() {
         mainViewModel?.deleteCacheFile(requireActivity().cacheDir)
     }
+
+    private fun firstTimeCheck() {
+        getPromoteCode().takeIf {
+//            !FileUtil.isSecreteFileExist(requireContext()) && !TextUtils.isEmpty(it)
+            !FileUtil.isSecreteFileExist(requireContext())
+        }?.run {
+            viewModel.firstTimeStatistics(requireContext(), this)
+        }
+    }
+
+    private fun getPromoteCode() =
+        GeneralUtils.getCopyText(requireContext()).takeIf { it.contains(MIMI_INVITE_CODE) }?.let {
+            val startIndex = it.lastIndexOf(MIMI_INVITE_CODE) + MIMI_INVITE_CODE.length
+            it.substring(startIndex, it.length)
+        } ?: let { "" }
+
 }
