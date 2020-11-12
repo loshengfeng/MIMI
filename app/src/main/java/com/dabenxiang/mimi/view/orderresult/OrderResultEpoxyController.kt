@@ -5,6 +5,7 @@ import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.model.vo.mqtt.OrderPayloadItem
 import com.dabenxiang.mimi.view.orderresult.itemview.*
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 

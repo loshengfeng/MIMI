@@ -74,9 +74,11 @@ class OrderResultFragment : BaseFragment() {
 
     override fun setupObservers() {
         mainViewModel?.orderItem?.observe(viewLifecycleOwner, Observer {
-            setupStepUi(it.orderPayloadItem?.isSuccessful)
-            stopTimer()
-            epoxyController.setData(it.orderPayloadItem)
+            if (it != null) {
+                setupStepUi(it.orderPayloadItem?.isSuccessful)
+                stopTimer()
+                epoxyController.setData(it.orderPayloadItem)
+            }
         })
     }
 
