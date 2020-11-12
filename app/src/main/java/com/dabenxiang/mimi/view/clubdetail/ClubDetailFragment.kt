@@ -82,7 +82,7 @@ class ClubDetailFragment : BaseFragment() {
         val bitmap = LruCacheUtils.getLruCache(memberClubItem.avatarAttachmentId.toString())
         bitmap?.also { Glide.with(requireContext()).load(it).circleCrop().into(iv_avatar) }
 
-        viewPager.isUserInputEnabled = false
+        viewPager.isUserInputEnabled = true
 
         viewPager.offscreenPageLimit = 3
 
