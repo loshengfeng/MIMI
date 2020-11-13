@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.adapter.viewHolder
 
 import android.text.TextUtils
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
