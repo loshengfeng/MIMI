@@ -109,6 +109,20 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
         }
     }
 
+    fun getMqttDomain(): String {
+        return when {
+            BuildConfig.BUILD_TYPE.contains(BUILDTYPE_DEV) -> {
+                BuildConfig.MQTT_HOST
+            }
+            BuildConfig.BUILD_TYPE.contains(BUILDTYPE_SIT) -> {
+                BuildConfig.MQTT_HOST
+            }
+            else -> {
+                StringBuilder("wss://mqtt.").append(getDomain()).toString()
+            }
+        }
+    }
+
     fun getOldDriverUrl(): String {
         return getWebDomain() + "/chat"
     }
