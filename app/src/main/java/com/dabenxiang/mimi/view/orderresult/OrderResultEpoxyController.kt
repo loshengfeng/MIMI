@@ -20,7 +20,7 @@ class OrderResultEpoxyController(
         if (item == null) {
             addOrderResultWaitingItemView()
         } else {
-            if (!item.isSuccessful) {
+            if (item.isSuccessful) {
                 addOrderResultSuccessfulItemView(item)
             } else {
                 addOrderResultFailedItemView()

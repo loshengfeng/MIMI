@@ -16,7 +16,6 @@ import com.dabenxiang.mimi.view.chathistory.ChatHistoryListFactory
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import timber.log.Timber
 
 class OrderViewModel : BaseViewModel() {
 
@@ -29,8 +28,10 @@ class OrderViewModel : BaseViewModel() {
     private val _unreadOrderResult = MutableLiveData<ApiResult<Int>>()
     val unreadOrderResult: LiveData<ApiResult<Int>> = _unreadOrderResult
 
-    private val _createOrderChatResult = MutableLiveData<ApiResult<Triple<CreateOrderChatItem, ChatListItem, OrderItem>>>()
-    val createOrderChatResult: LiveData<ApiResult<Triple<CreateOrderChatItem, ChatListItem, OrderItem>>> = _createOrderChatResult
+    private val _createOrderChatResult =
+        MutableLiveData<ApiResult<Triple<CreateOrderChatItem, ChatListItem, OrderItem>>>()
+    val createOrderChatResult: LiveData<ApiResult<Triple<CreateOrderChatItem, ChatListItem, OrderItem>>> =
+        _createOrderChatResult
 
     var unreadCount = 0
     var unreadOrderCount = 0
@@ -46,17 +47,22 @@ class OrderViewModel : BaseViewModel() {
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect {
-                    when(it) {
+                    when (it) {
                         is ApiResult.Success -> _balanceResult.postValue(it.result)
                     }
                 }
         }
     }
 
-    fun getOrderByPaging2(type: OrderType?, update: ((PagedList<OrderItem>) -> Unit), updateNoData: ((Int) -> Unit)) {
+    fun getOrderByPaging2(
+        type: OrderType?,
+        update: ((PagedList<OrderItem>) -> Unit),
+        updateNoData: ((Int) -> Unit)
+    ) {
         viewModelScope.launch {
-            val dataSrc =
-                OrderListDataSource(viewModelScope, domainManager, pagingCallback, type, updateNoData)
+            val dataSrc = OrderListDataSource(
+                viewModelScope, domainManager, pagingCallback, type, updateNoData
+            )
             dataSrc.isInvalid
             val factory = OrderListFactory(dataSrc)
             val config = PagedList.Config.Builder()
@@ -115,7 +121,10 @@ class OrderViewModel : BaseViewModel() {
         return LivePagedListBuilder(factory, config).build()
     }
 
-    fun getChatList(updateList: ((PagedList<ChatListItem>) -> Unit), updateNoData: ((Int) -> Unit)) {
+    fun getChatList(
+        updateList: ((PagedList<ChatListItem>) -> Unit),
+        updateNoData: ((Int) -> Unit)
+    ) {
         viewModelScope.launch {
             getChatHistoryPagingItems().asFlow()
                 .collect {
@@ -124,7 +133,7 @@ class OrderViewModel : BaseViewModel() {
         }
     }
 
-    fun getUnread(){
+    fun getUnread() {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
@@ -154,12 +163,17 @@ class OrderViewModel : BaseViewModel() {
         }
     }
 
-    fun createOrderChat(chatListItem: ChatListItem, orderItem: OrderItem, updateChatId: ((CreateOrderChatItem) -> Unit)) {
+    fun createOrderChat(
+        chatListItem: ChatListItem,
+        orderItem: OrderItem,
+        updateChatId: ((CreateOrderChatItem) -> Unit)
+    ) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().createOrderChat(CreateChatRequest(orderItem.id))
+                val result = domainManager.getApiRepository()
+                    .createOrderChat(CreateChatRequest(orderItem.id))
                 if (!result.isSuccessful) throw HttpException(result)
-                val createOrderChatItem = result.body()?.content?: CreateOrderChatItem()
+                val createOrderChatItem = result.body()?.content ?: CreateOrderChatItem()
                 updateChatId(createOrderChatItem)
                 emit(ApiResult.success(Triple(createOrderChatItem, chatListItem, orderItem)))
             }
