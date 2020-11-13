@@ -80,8 +80,7 @@ class OrderResultEpoxyController(
                     setupClickListener(successListener)
                 }
             }
-            // TODO: 須邀更換動態支付寶或微信的URL
-            else -> successListener.onAliWxConfirm("https://flutter.dev/")
+            else -> successListener.onAliWxConfirm(item.paymentUrl)
         }
     }
 }
