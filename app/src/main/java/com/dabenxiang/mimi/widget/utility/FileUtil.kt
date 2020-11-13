@@ -249,11 +249,9 @@ object FileUtil {
             false
         } else {
             cursor?.run {
-                Timber.d("@@Count: ${this.count}")
                 while (this.moveToNext()) {
                     val fileName: String =
                         this.getString(this.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME))
-                    Timber.d("@@fileName: $fileName")
                     if (fileName.contains(targetName)) {
                         val id: Long =
                             this.getLong(this.getColumnIndex(MediaStore.MediaColumns._ID))

@@ -7,8 +7,10 @@ import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiService
 import com.dabenxiang.mimi.model.api.AuthInterceptor
 import com.dabenxiang.mimi.model.pref.Pref
+import com.dabenxiang.mimi.widget.factory.EnumTypeAdapterFactory
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.dsl.module
@@ -65,8 +67,9 @@ fun provideOkHttpClient(
 }
 
 fun provideApiService(okHttpClient: OkHttpClient): ApiService {
+    val gson = GsonBuilder().registerTypeAdapterFactory(EnumTypeAdapterFactory()).create()
     return Retrofit.Builder()
-        .addConverterFactory(GsonConverterFactory.create(Gson()))
+        .addConverterFactory(GsonConverterFactory.create(gson))
         .client(okHttpClient)
         .baseUrl(API_HOST_URL)
         .build()

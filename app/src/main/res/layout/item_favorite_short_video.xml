@@ -160,7 +160,7 @@
         app:layout_constraintStart_toStartOf="@id/layout_card"
         tools:text="00:13:31" />
 
-    <HorizontalScrollView
+    <com.dabenxiang.mimi.view.customview.NestedHorizontalScrollView
         android:id="@+id/reflow_group_scroll"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -182,7 +182,7 @@
             app:singleLine="true"
             app:singleSelection="true" />
 
-    </HorizontalScrollView>
+    </com.dabenxiang.mimi.view.customview.NestedHorizontalScrollView>
 
     <include
         android:id="@+id/item_function"

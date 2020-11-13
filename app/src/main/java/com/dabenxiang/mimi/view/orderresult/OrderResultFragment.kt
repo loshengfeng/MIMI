@@ -8,11 +8,10 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.vo.mqtt.OrderPaymentInfoItem
+import com.dabenxiang.mimi.model.vo.mqtt.OrderPayloadItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.orderresult.itemview.OrderResultFailedItemView
-import com.dabenxiang.mimi.view.orderresult.itemview.OrderResultSuccessItemView
 import kotlinx.android.synthetic.main.fragment_order_result.*
 import java.util.*
 import kotlin.concurrent.timerTask
@@ -62,7 +61,7 @@ class OrderResultFragment : BaseFragment() {
 
         if (arguments?.getBoolean(KEY_ERROR) == true) {
             setupStepUi(false)
-            epoxyController.setData(OrderPaymentInfoItem())
+            epoxyController.setData(OrderPayloadItem())
         } else {
             startTimer()
             epoxyController.setData(null)
@@ -75,10 +74,11 @@ class OrderResultFragment : BaseFragment() {
 
     override fun setupObservers() {
         mainViewModel?.orderItem?.observe(viewLifecycleOwner, Observer {
-            val orderPaymentInfoItem = it.orderPayloadItem?.orderPaymentInfoItem
-            setupStepUi(orderPaymentInfoItem?.isSuccessful)
-            stopTimer()
-            epoxyController.setData(orderPaymentInfoItem)
+            if (it != null) {
+                setupStepUi(it.orderPayloadItem?.isSuccessful)
+                stopTimer()
+                epoxyController.setData(it.orderPayloadItem)
+            }
         })
     }
 
@@ -92,7 +92,7 @@ class OrderResultFragment : BaseFragment() {
         }
     }
 
-    private val successListener = object : OrderResultSuccessItemView.OrderResultSuccessListener {
+    private val successListener = object : OrderResultSuccessListener {
         override fun onConfirm() {
             navigateTo(NavigateItem.Destination(R.id.action_orderResultFragment_to_orderFragment))
         }
@@ -137,7 +137,7 @@ class OrderResultFragment : BaseFragment() {
 
     private fun startTimer() {
         val task = timerTask {
-            epoxyController.setData(OrderPaymentInfoItem())
+            epoxyController.setData(OrderPayloadItem())
         }
         timer = Timer()
         timer.schedule(task, DELAY_TIME)

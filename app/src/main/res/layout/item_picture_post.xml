@@ -81,7 +81,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_title">
 
-        <androidx.recyclerview.widget.RecyclerView
+        <com.dabenxiang.mimi.view.customview.NestedRecyclerView
             android:id="@+id/recycler_picture"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -109,7 +109,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <HorizontalScrollView
+    <com.dabenxiang.mimi.view.customview.NestedHorizontalScrollView
         android:id="@+id/sv_hip_group_tag"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -127,7 +127,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="parent" />
-    </HorizontalScrollView>
+    </com.dabenxiang.mimi.view.customview.NestedHorizontalScrollView>
 
 
     <ImageView

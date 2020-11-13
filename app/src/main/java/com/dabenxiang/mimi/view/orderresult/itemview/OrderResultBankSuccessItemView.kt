@@ -11,13 +11,14 @@ import com.airbnb.epoxy.CallbackProp
 import com.airbnb.epoxy.ModelProp
 import com.airbnb.epoxy.ModelView
 import com.dabenxiang.mimi.R
-import kotlinx.android.synthetic.main.item_order_result_successful.view.*
+import com.dabenxiang.mimi.view.orderresult.OrderResultSuccessListener
+import kotlinx.android.synthetic.main.item_order_result_bank_successful.view.*
 
 @ModelView(autoLayout = ModelView.Size.MATCH_WIDTH_MATCH_HEIGHT)
-class OrderResultSuccessItemView(context: Context) : ConstraintLayout(context) {
+class OrderResultBankSuccessItemView(context: Context) : ConstraintLayout(context) {
 
     init {
-        View.inflate(context, R.layout.item_order_result_successful, this)
+        View.inflate(context, R.layout.item_order_result_bank_successful, this)
     }
 
     @ModelProp
@@ -69,11 +70,6 @@ class OrderResultSuccessItemView(context: Context) : ConstraintLayout(context) {
         tv_close.setOnClickListener {
             listener?.onClose()
         }
-    }
-
-    interface OrderResultSuccessListener {
-        fun onConfirm()
-        fun onClose()
     }
 
 }

@@ -20,7 +20,6 @@ import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.AgentItem
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderingPackageItem
-import com.dabenxiang.mimi.model.api.vo.PaymentTypeItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.view.adapter.TopUpAgentAdapter
@@ -55,8 +54,8 @@ class TopUpFragment : BaseFragment() {
 
     private var views: ArrayList<ConstraintLayout> = arrayListOf()
 
-    companion object{
-        const val TAG_FRAGMENT ="TAG_FRAGMENT"
+    companion object {
+        const val TAG_FRAGMENT = "TAG_FRAGMENT"
         fun createBundle(tagName: String?): Bundle {
             return Bundle().also {
                 it.putString(TAG_FRAGMENT, tagName)
@@ -79,7 +78,7 @@ class TopUpFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         val tag = arguments?.getString(TAG_FRAGMENT)?.takeIf { it.isNotBlank() } ?: ""
 
-        requireActivity().bottom_navigation?.visibility  =  when(tag) {
+        requireActivity().bottom_navigation?.visibility = when (tag) {
             PlayerFragment::class.java.simpleName -> View.GONE
             else -> View.VISIBLE
         }
@@ -163,7 +162,7 @@ class TopUpFragment : BaseFragment() {
                 is Loaded -> tv_proxy_empty.visibility = View.GONE
                 is Success -> {
                     orderPackageMap = it.result
-                    if(views.contains(iv_bank) && lastTabIndex == 0){
+                    if (views.contains(iv_bank) && lastTabIndex == 0) {
                         updateOrderPackages(PaymentType.BANK)
                     }
                     tl_type.getTabAt(lastTabIndex)?.select()
@@ -218,8 +217,8 @@ class TopUpFragment : BaseFragment() {
         viewModel.packageStatusResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-                    if(it.result.onlinePayDisabled){
-                        if(it.result.agentPayDisabled){
+                    if (it.result.onlinePayDisabled) {
+                        if (it.result.agentPayDisabled) {
                             rg_type.visibility = View.GONE
                             rg_type.check(-1)
                         } else {
@@ -228,14 +227,14 @@ class TopUpFragment : BaseFragment() {
                             viewModel.getProxyPayList()
                         }
                     } else {
-                        if(it.result.agentPayDisabled){
+                        if (it.result.agentPayDisabled) {
                             rg_type.visibility = View.GONE
                             rg_type.check(R.id.rb_online_pay)
                             viewModel.getOrderingPackage()
                         } else {
                             rg_type.visibility = View.VISIBLE
                             rg_type.check(lastCheckedId)
-                            if(lastCheckedId == R.id.rb_online_pay)
+                            if (lastCheckedId == R.id.rb_online_pay)
                                 viewModel.getOrderingPackage()
                             else
                                 viewModel.getProxyPayList()
@@ -248,42 +247,42 @@ class TopUpFragment : BaseFragment() {
 //                        paymentTypes.add(PaymentTypeItem("UnionPay", false))
 //                        for(type in paymentTypes){
 
-                        for(type in it.result.paymentTypes){
-                            when(type.name){
+                        for (type in it.result.paymentTypes) {
+                            when (type.name) {
                                 "Alipay" -> {
-                                    if(type.disabled == false)
+                                    if (type.disabled == false)
                                         views.add(iv_ali)
                                 }
                                 "WeChat" -> {
-                                    if(type.disabled == false)
+                                    if (type.disabled == false)
                                         views.add(iv_wx)
                                 }
                                 "UnionPay" -> {
-                                    if(type.disabled == false)
+                                    if (type.disabled == false)
                                         views.add(iv_bank)
                                 }
                             }
                         }
 
-                        if(views.contains(iv_bank))
+                        if (views.contains(iv_bank))
                             tl_type.addTab(tl_type.newTab().setTag("UnionPay"))
-                        if(views.contains(iv_ali))
+                        if (views.contains(iv_ali))
                             tl_type.addTab(tl_type.newTab().setTag("Alipay"))
-                        if(views.contains(iv_wx))
+                        if (views.contains(iv_wx))
                             tl_type.addTab(tl_type.newTab().setTag("WeChat"))
 
-                        for(view in views)
+                        for (view in views)
                             view.visibility = View.VISIBLE
 
-                        when (views.size){
+                        when (views.size) {
                             3 -> {
                                 divide_line_bank.visibility = View.VISIBLE
                                 divide_line_ali.visibility = View.VISIBLE
                             }
                             2 -> {
-                                if(views.contains(iv_bank))
+                                if (views.contains(iv_bank))
                                     divide_line_bank.visibility = View.VISIBLE
-                                else if(views.contains(iv_ali))
+                                else if (views.contains(iv_ali))
                                     divide_line_ali.visibility = View.VISIBLE
                             }
                             1 -> {
@@ -304,7 +303,7 @@ class TopUpFragment : BaseFragment() {
         requireActivity().onBackPressedDispatcher.addCallback(
             owner = viewLifecycleOwner,
             onBackPressed = {
-                when(tag){
+                when (tag) {
                     PlayerFragment::class.java.simpleName -> navigateTo(NavigateItem.Up)
                     else -> mainViewModel?.changeNavigationPosition?.value = R.id.navigation_adult
                 }
@@ -326,7 +325,7 @@ class TopUpFragment : BaseFragment() {
                     rv_proxy_pay.visibility = View.GONE
                     tv_proxy_empty.visibility = View.GONE
                     lastCheckedId = R.id.rb_online_pay
-                    if(rg_type.visibility == View.VISIBLE)
+                    if (rg_type.visibility == View.VISIBLE)
                         viewModel.getOrderingPackage()
                 }
                 R.id.rb_proxy_pay -> {
@@ -334,7 +333,7 @@ class TopUpFragment : BaseFragment() {
                     rv_proxy_pay.visibility = View.VISIBLE
                     tv_proxy_empty.visibility = View.VISIBLE
                     lastCheckedId = R.id.rb_proxy_pay
-                    if(rg_type.visibility == View.VISIBLE)
+                    if (rg_type.visibility == View.VISIBLE)
                         viewModel.getProxyPayList()
                 }
                 -1 -> {
@@ -394,8 +393,11 @@ class TopUpFragment : BaseFragment() {
     }
 
     override fun initSettings() {
-        if(lastCheckedId == -1)
+        if (lastCheckedId == -1) {
             rg_type.check(R.id.rb_online_pay)
+        }
+
+        mainViewModel?.clearOrderItem()
 
         when (viewModel.isLogin()) {
             true -> {
@@ -436,7 +438,9 @@ class TopUpFragment : BaseFragment() {
                 opened directly. So use Intent to open the web page
             */
             viewModel.domainManager.getDomain().takeIf { it.isNotBlank() }?.let {
-                val url = StringBuilder("https://storage.").append(it).append("/mimi/manual-app.pdf").toString()
+                val url =
+                    StringBuilder("https://storage.").append(it).append("/mimi/manual-app.pdf")
+                        .toString()
                 Timber.i("teaching url=$url")
                 val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                 startActivity(browserIntent)

@@ -64,7 +64,7 @@ class MainViewModel : BaseViewModel() {
     private val _postReportResult = MutableLiveData<ApiResult<Nothing>>()
     val postReportResult: LiveData<ApiResult<Nothing>> = _postReportResult
 
-    private val _orderItem = MutableLiveData<OrderItem>()
+    private var _orderItem = MutableLiveData<OrderItem>().also { it.postValue(null) }
     val orderItem: LiveData<OrderItem> = _orderItem
 
     private val _dailyCheckInItem = MutableLiveData<DailyCheckInItem>()
@@ -336,7 +336,7 @@ class MainViewModel : BaseViewModel() {
 
     private val messageListener = object : MessageListener {
         override fun onMsgReceive(message: MqttMessage) {
-            Timber.d("onMsgReceive: ${String(message.payload)}")
+            Timber.d("@@Dave onMsgReceive: ${String(message.payload)}")
             val data = JSONObject(String(message.payload))
             val payload = data.optJSONObject("payload")
             when (payload.optInt("type", 0)) {
@@ -534,11 +534,15 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
-    fun deleteCacheFile(cacheFile:File) {
+    fun deleteCacheFile(cacheFile: File) {
         viewModelScope.launch {
-            cacheFile.listFiles()?.forEach {file->
+            cacheFile.listFiles()?.forEach { file ->
                 file?.delete()
             }
         }
+    }
+
+    fun clearOrderItem() {
+        _orderItem.postValue(null)
     }
 }
