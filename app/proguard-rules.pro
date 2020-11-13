@@ -122,3 +122,38 @@
 -keepclassmembers class * extends com.google.crypto.tink.shaded.protobuf.GeneratedMessageLite {
   <fields>;
 }
+
+# BaseManager
+-keep class tw.gov.president.manager.data.** {*;}
+-keep class tw.gov.president.manager.BaseDomainManager.** {*;}
+
+# DeviceInfoProvider
+-keep class tw.gov.president.provider.device.info.** {*;}
+-keep class tw.gov.president.provider.device.di.** {*;}
+
+# Device
+-keep class tw.gov.president.general.data.info.** {*;}
+-keep class tw.gov.president.general.data.info.device.** {*;}
+-keep class tw.gov.president.general.data.info.request.** {*;}
+
+# LogManager
+-keep class tw.gov.president.manager.submanager.logmoniter.** {*;}
+-keep class tw.gov.president.manager.submanager.logmoniter.di.** {*;}
+-keep class tw.gov.president.manager.submanager.logmoniter.api.** {*;}
+
+# LogLevel
+-keep class tw.gov.president.general.data.loglevel.** {*;}
+
+# UpdateManager
+-keep class tw.gov.president.manager.submanager.update.** {*;}
+-keep class tw.gov.president.manager.submanager.update.di.** {*;}
+-keep class tw.gov.president.manager.submanager.update.data.** {*;}
+-keep class tw.gov.president.manager.submanager.update.callback.** {*;}
+-keep class tw.gov.president.manager.submanager.update.api.** {*;}
+-keep class tw.gov.president.manager.submanager.update.worker.** {*;}
+
+# ApiResult
+-keep class tw.gov.president.utils.general.utils.api.result.** {*;}
+
+-keep class go.** {*;}
+-keep class libs.** {*;}
