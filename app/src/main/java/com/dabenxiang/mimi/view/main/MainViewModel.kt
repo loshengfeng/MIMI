@@ -6,7 +6,6 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.dabenxiang.mimi.MQTT_HOST_URL
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.NotifyType
@@ -267,7 +266,7 @@ class MainViewModel : BaseViewModel() {
     fun startMQTT() {
         if (!isMqttConnect()) {
             // test serverUrl use: tcp://172.x.x.x:1883
-            mqttManager.init(MQTT_HOST_URL, clientId, extendedCallback)
+            mqttManager.init(domainManager.getMqttDomain(), clientId, extendedCallback)
             mqttManager.connect(connectCallback)
         }
     }
