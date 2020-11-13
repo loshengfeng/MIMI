@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.clubdetail
 
+import android.view.MotionEvent
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.paging.PagedList

@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.player
 
 import android.graphics.Bitmap
+import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -338,7 +339,7 @@ abstract class BaseCommentProvider(
         holder.setTextColorRes(R.id.tv_name, getTextColor())
         holder.setTextColorRes(R.id.tv_date, getTextColor())
 
-        holder.setText(R.id.tv_message, if(data.postName.isNotBlank()) "@${data.postName} ${data.content}"
+        holder.setText(R.id.tv_message, if(!TextUtils.isEmpty(data.postName)) "@${data.postName} ${data.content}"
         else data.content)
 
         holder.setTextColorRes(R.id.tv_message, getMessageTextColor())

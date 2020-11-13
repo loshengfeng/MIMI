@@ -82,7 +82,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_title"
         tools:text="名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称名称" />
 
-    <HorizontalScrollView
+    <com.dabenxiang.mimi.view.customview.NestedHorizontalScrollView
         android:id="@+id/hsv_tags"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -100,7 +100,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="parent" />
-    </HorizontalScrollView>
+    </com.dabenxiang.mimi.view.customview.NestedHorizontalScrollView>
 
     <View
         android:id="@+id/v_separator"

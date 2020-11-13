@@ -57,7 +57,7 @@
         app:layout_constraintStart_toStartOf="@id/tv_title"
         app:layout_constraintTop_toBottomOf="@id/tv_introduction" />
 
-    <HorizontalScrollView
+    <com.dabenxiang.mimi.view.customview.NestedHorizontalScrollView
         android:id="@+id/reflow_group_scroll"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -78,6 +78,6 @@
             app:selectionRequired="true"
             app:singleLine="true"
             app:singleSelection="true" />
-    </HorizontalScrollView>
+    </com.dabenxiang.mimi.view.customview.NestedHorizontalScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
