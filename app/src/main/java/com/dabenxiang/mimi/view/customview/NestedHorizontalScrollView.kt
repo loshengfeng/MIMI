@@ -5,7 +5,6 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.widget.HorizontalScrollView
-import timber.log.Timber
 
 class NestedHorizontalScrollView @JvmOverloads constructor(
     context: Context,
@@ -14,15 +13,15 @@ class NestedHorizontalScrollView @JvmOverloads constructor(
 ) : HorizontalScrollView(context, attrs, defStyleAttr) {
 
     override fun onInterceptTouchEvent(e: MotionEvent?): Boolean {
-        when(e?.action) {
-            MotionEvent.ACTION_DOWN -> {
-                parent.requestDisallowInterceptTouchEvent(false)
-            }
-            MotionEvent.ACTION_MOVE -> {
-                Timber.d("@@canScroll: ${canScroll()}")
-                parent.requestDisallowInterceptTouchEvent(canScroll())
-            }
-        }
+//        when(e?.action) {
+//            MotionEvent.ACTION_DOWN -> {
+//                parent.requestDisallowInterceptTouchEvent(false)
+//            }
+//            MotionEvent.ACTION_MOVE -> {
+//                parent.requestDisallowInterceptTouchEvent(canScroll())
+//            }
+//        }
+        parent.requestDisallowInterceptTouchEvent(false)
         return super.onInterceptTouchEvent(e)
     }
 
