@@ -20,6 +20,7 @@ import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.AgentItem
 import com.dabenxiang.mimi.model.api.vo.ChatListItem
 import com.dabenxiang.mimi.model.api.vo.OrderingPackageItem
+import com.dabenxiang.mimi.model.api.vo.PaymentTypeItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.view.adapter.TopUpAgentAdapter
@@ -240,14 +241,15 @@ class TopUpFragment : BaseFragment() {
                                 viewModel.getProxyPayList()
                         }
 
-                        //array for test
-//                        val paymentTypes: ArrayList<PaymentTypeItem> = arrayListOf()
-//                        paymentTypes.add(PaymentTypeItem("Alipay", false))
-//                        paymentTypes.add(PaymentTypeItem("WeChat", false))
-//                        paymentTypes.add(PaymentTypeItem("UnionPay", false))
-//                        for(type in paymentTypes){
+                        var paymentTypes: ArrayList<PaymentTypeItem> = it.result.paymentTypes
+                        if(paymentTypes == null){
+                            paymentTypes = arrayListOf()
+                            paymentTypes.add(PaymentTypeItem("Alipay", true))
+                            paymentTypes.add(PaymentTypeItem("WeChat", true))
+                            paymentTypes.add(PaymentTypeItem("UnionPay", false))
+                        }
 
-                        for (type in it.result.paymentTypes) {
+                        for(type in paymentTypes){
                             when (type.name) {
                                 "Alipay" -> {
                                     if (type.disabled == false)
