@@ -3,22 +3,24 @@ package com.dabenxiang.mimi.view.orderresult
 import com.airbnb.epoxy.TypedEpoxyController
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.model.vo.mqtt.OrderPayloadItem
-import com.dabenxiang.mimi.view.orderresult.itemview.*
+import com.dabenxiang.mimi.view.orderresult.itemview.OrderResultFailedItemView
+import com.dabenxiang.mimi.view.orderresult.itemview.orderResultBankSuccessItemView
+import com.dabenxiang.mimi.view.orderresult.itemview.orderResultFailedItemView
+import com.dabenxiang.mimi.view.orderresult.itemview.orderResultWaitingItemView
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
 class OrderResultEpoxyController(
     private val failedListener: OrderResultFailedItemView.OrderResultFailedListener,
-    private val bankSuccessListener: OrderResultSuccessListener
+    private val successListener: OrderResultSuccessListener
 ) : TypedEpoxyController<OrderPayloadItem>() {
 
     override fun buildModels(item: OrderPayloadItem?) {
         if (item == null) {
             addOrderResultWaitingItemView()
         } else {
-            if (item.isSuccessful) {
+            if (!item.isSuccessful) {
                 addOrderResultSuccessfulItemView(item)
             } else {
                 addOrderResultFailedItemView()
@@ -75,18 +77,11 @@ class OrderResultEpoxyController(
                     setupCity(city)
                     setupAccount(item.accountNumber)
                     setupAmount(GeneralUtils.getAmountFormat(item.amount))
-                    setupClickListener(bankSuccessListener)
+                    setupClickListener(successListener)
                 }
             }
-            else -> {
-                orderResultAliSuccessItemView {
-                    id("order_result_ali_success")
-                    setupTimeout(timeout)
-                    setupAccount(item.accountNumber)
-                    setupAmount(GeneralUtils.getAmountFormat(item.amount))
-                    setupClickListener(bankSuccessListener)
-                }
-            }
+            // TODO: 須邀更換動態支付寶或微信的URL
+            else -> successListener.onAliWxConfirm("https://flutter.dev/")
         }
     }
 }

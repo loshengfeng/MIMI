@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.orderresult
 
 interface OrderResultSuccessListener {
-    fun onConfirm()
+    fun onBankConfirm()
     fun onClose()
+    fun onAliWxConfirm(url: String)
 }

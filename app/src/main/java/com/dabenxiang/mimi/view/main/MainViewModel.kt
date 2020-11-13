@@ -336,7 +336,7 @@ class MainViewModel : BaseViewModel() {
 
     private val messageListener = object : MessageListener {
         override fun onMsgReceive(message: MqttMessage) {
-            Timber.d("@@Dave onMsgReceive: ${String(message.payload)}")
+            Timber.d("onMsgReceive: ${String(message.payload)}")
             val data = JSONObject(String(message.payload))
             val payload = data.optJSONObject("payload")
             when (payload.optInt("type", 0)) {

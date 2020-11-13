@@ -12,6 +12,7 @@ import com.dabenxiang.mimi.model.vo.mqtt.OrderPayloadItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.orderresult.itemview.OrderResultFailedItemView
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_order_result.*
 import java.util.*
 import kotlin.concurrent.timerTask
@@ -93,12 +94,17 @@ class OrderResultFragment : BaseFragment() {
     }
 
     private val successListener = object : OrderResultSuccessListener {
-        override fun onConfirm() {
+        override fun onBankConfirm() {
             navigateTo(NavigateItem.Destination(R.id.action_orderResultFragment_to_orderFragment))
         }
 
         override fun onClose() {
             navigateTo(NavigateItem.Destination(R.id.action_orderResultFragment_to_topupFragment))
+        }
+
+        override fun onAliWxConfirm(url: String) {
+            navigateTo(NavigateItem.Destination(R.id.action_orderResultFragment_to_orderFragment))
+            GeneralUtils.openWebView(requireContext(), url)
         }
     }
 

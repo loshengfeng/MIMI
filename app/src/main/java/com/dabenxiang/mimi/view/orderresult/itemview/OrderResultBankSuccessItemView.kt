@@ -65,7 +65,7 @@ class OrderResultBankSuccessItemView(context: Context) : ConstraintLayout(contex
     @CallbackProp
     fun setupClickListener(listener: OrderResultSuccessListener?) {
         tv_submit.setOnClickListener {
-            listener?.onConfirm()
+            listener?.onBankConfirm()
         }
         tv_close.setOnClickListener {
             listener?.onClose()

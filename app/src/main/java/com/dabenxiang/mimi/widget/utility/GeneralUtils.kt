@@ -235,9 +235,8 @@ object GeneralUtils {
 
     fun openWebView(context: Context, url: String) {
         try {
-            val intent = Intent(Intent.ACTION_VIEW);
-            val url = Uri.parse(url)
-            intent.data = url
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = Uri.parse(url)
             context.startActivity(intent)
         } catch (e: Exception) {
             Timber.e(e)
@@ -320,7 +319,7 @@ object GeneralUtils {
         return decimalFormat.format(amount)
     }
 
-    private fun checkPhoneNum(num: String): Boolean{
+    private fun checkPhoneNum(num: String): Boolean {
         val regExp = "^((13[0-9])|(15[^4])|(18[0,2,3,5-9])|(17[0-8])|(147))\\d{8}$"
         val p = Pattern.compile(regExp)
         val m = p.matcher(num)
