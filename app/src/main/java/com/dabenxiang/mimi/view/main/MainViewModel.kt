@@ -307,7 +307,7 @@ class MainViewModel : BaseViewModel() {
 
         override fun onMessageArrived(topic: String, message: MqttMessage) {
             Timber.d("Incoming topic: $topic")
-            Timber.d("@@Incoming message: ${String(message.payload)}")
+            Timber.d("Incoming message: ${String(message.payload)}")
             messageListenerMap[topic]?.onMsgReceive(message)
         }
 

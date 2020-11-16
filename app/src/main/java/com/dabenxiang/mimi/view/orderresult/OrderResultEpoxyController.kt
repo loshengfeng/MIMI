@@ -70,7 +70,18 @@ class OrderResultEpoxyController(
 
         when (item.paymentType) {
             PaymentType.BANK.value -> {
-                if (!TextUtils.isEmpty(item.paymentUrl)) {
+                if (TextUtils.isEmpty(item.paymentUrl)) {
+                    orderResultDetailSuccessItemView {
+                        id("order_result_detail_success")
+                        setupTimeout(timeout)
+                        setupName(item.accountName)
+                        setupBank(bank)
+                        setupCity(city)
+                        setupAccount(item.accountNumber)
+                        setupAmount(GeneralUtils.getAmountFormat(item.amount))
+                        setupClickListener(successListener)
+                    }
+                } else {
                     orderResultUrlSuccessItemView {
                         id("order_result_url_bank_success")
                         setupTimeout(timeout)
@@ -82,17 +93,6 @@ class OrderResultEpoxyController(
                         setupPaymentCountdownVisibility(item.isCountdownVisible)
                         setupAmount(GeneralUtils.getAmountFormat(item.amount))
                         setupPaymentListener(item.paymentUrl)
-                        setupClickListener(successListener)
-                    }
-                } else {
-                    orderResultDetailSuccessItemView {
-                        id("order_result_detail_success")
-                        setupTimeout(timeout)
-                        setupName(item.accountName)
-                        setupBank(bank)
-                        setupCity(city)
-                        setupAccount(item.accountNumber)
-                        setupAmount(GeneralUtils.getAmountFormat(item.amount))
                         setupClickListener(successListener)
                     }
                 }
@@ -127,20 +127,6 @@ class OrderResultEpoxyController(
                     setupClickListener(successListener)
                 }
             }
-        }
-
-        orderResultUrlSuccessItemView {
-            id("order_result_url_wx_success")
-            setupTimeout(timeout)
-            setupPaymentImg(R.drawable.ico_wechat_pay_160_px)
-            setupPaymentCountdown(item.countdown)
-            setupPaymentCountdownColor(R.color.color_green_2)
-            setupPaymentCountdownBackground(R.drawable.bg_green_1_radius_6)
-            setupPaymentGoBackground(R.drawable.bg_green_2_radius_6)
-            setupPaymentCountdownVisibility(item.isCountdownVisible)
-            setupAmount(GeneralUtils.getAmountFormat(item.amount))
-            setupPaymentListener(item.paymentUrl)
-            setupClickListener(successListener)
         }
     }
 }
