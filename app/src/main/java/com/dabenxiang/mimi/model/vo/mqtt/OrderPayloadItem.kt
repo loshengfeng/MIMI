@@ -44,6 +44,8 @@ data class OrderPayloadItem(
     @SerializedName("paymentUrl")
     val paymentUrl: String = "",
 
-    var countdown: Int = 5
+    var countdown: Int = 5,
+
+    var isCountdownVisible: Boolean = true
 
 ) : PayloadItem()

@@ -68,6 +68,14 @@ class OrderResultUrlSuccessItemView(context: Context) : ConstraintLayout(context
     }
 
     @ModelProp
+    fun setupPaymentCountdownVisibility(isVisible: Boolean) {
+        tv_payment_countdown.visibility = when {
+            isVisible -> View.VISIBLE
+            else -> View.GONE
+        }
+    }
+
+    @ModelProp
     fun setupPaymentGoBackground(background: Int) {
         tv_payment_go.setBackgroundResource(background)
     }

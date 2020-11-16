@@ -14,7 +14,6 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.orderresult.itemview.OrderResultFailedItemView
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_order_result.*
-import timber.log.Timber
 import java.util.*
 import kotlin.concurrent.timerTask
 
@@ -168,12 +167,18 @@ class OrderResultFragment : BaseFragment() {
     private fun startCountdownTimer(item: OrderPayloadItem?) {
         countdownTimer = object : CountDownTimer(5000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                item?.countdown = (millisUntilFinished / 1000).toInt()
-                epoxyController.setData(item)
+                item?.also {
+                    it.countdown = (millisUntilFinished / 1000).toInt()
+                    epoxyController.setData(it)
+                }
             }
 
             override fun onFinish() {
-                Timber.d("@@startCountdownTimer onFinish")
+                item?.also {
+                    it.isCountdownVisible = false
+                    epoxyController.setData(it)
+                    successListener.onOpenWebView(it.paymentUrl)
+                }
             }
         }
         countdownTimer?.start()
