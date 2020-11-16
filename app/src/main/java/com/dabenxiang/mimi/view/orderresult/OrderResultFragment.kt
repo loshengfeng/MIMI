@@ -33,7 +33,7 @@ class OrderResultFragment : BaseFragment() {
     private lateinit var timer: Timer
 
     private val epoxyController by lazy {
-        OrderResultEpoxyController(failedListener, successListener)
+        OrderResultEpoxyController(requireContext(), failedListener, successListener)
     }
 
     override val bottomNavigationVisibility: Int
@@ -94,7 +94,7 @@ class OrderResultFragment : BaseFragment() {
     }
 
     private val successListener = object : OrderResultSuccessListener {
-        override fun onBankConfirm() {
+        override fun onConfirm() {
             navigateTo(NavigateItem.Destination(R.id.action_orderResultFragment_to_orderFragment))
         }
 
@@ -102,8 +102,7 @@ class OrderResultFragment : BaseFragment() {
             navigateTo(NavigateItem.Destination(R.id.action_orderResultFragment_to_topupFragment))
         }
 
-        override fun onAliWxConfirm(url: String) {
-            navigateTo(NavigateItem.Destination(R.id.action_orderResultFragment_to_orderFragment))
+        override fun onOpenWebView(url: String) {
             GeneralUtils.openWebView(requireContext(), url)
         }
     }

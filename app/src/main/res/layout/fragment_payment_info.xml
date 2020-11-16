@@ -33,7 +33,7 @@
 
     <include
         android:id="@+id/layout_order_info"
-        layout="@layout/item_order_result_bank_successful"
+        layout="@layout/item_order_result_detail_successful"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:paddingTop="30dp"

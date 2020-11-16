@@ -427,6 +427,8 @@
     <string name="order_result_create_order_busy">系统忙碌中，请至充值管理确认订单是否\n建立成功，若未成功请稍后再试</string>
     <string name="order_result_create_order_confirm">确定</string>
     <string name="order_result_create_order_account">收款帐户资讯</string>
+    <string name="order_result_payment_type">支付方式</string>
+    <string name="order_result_payment_go">立即前往</string>
     <string name="order_result_create_order_amount">应付金额(¥)</string>
     <string name="order_result_create_order_close">关闭</string>
     <string name="order_result_create_order_submit">前往充值管理</string>

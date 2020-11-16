@@ -24,6 +24,7 @@
     <color name="color_invite_vip_copy_bg">#32597ef7</color>
     <color name="color_invite_vip_text">#597ef7</color>
 
+
     <color name="adult_color_card_background">@color/color_black_1_20</color>
 
     <color name="color_white_1">#ffffff</color>
@@ -36,8 +37,6 @@
     <color name="color_white_1_65625">#a8ffffff</color>
     <color name="color_white_2">#4cffffff</color>
     <color name="color_khaki_2">#908b6d</color>
-    <color name="color_green_1">#75c71d</color>
-    <color name="color_green_4">#00b5a9</color>
     <color name="color_black_1">#000000</color>
     <color name="color_black_1_02">#05000000</color>
     <color name="color_black_1_05">#0d000000</color>
@@ -58,6 +57,8 @@
     <color name="color_black_6">#1e233a</color>
     <color name="color_black_7">#02000000</color>
     <color name="color_black_8">#0c000000</color>
+    <color name="color_black_9">#1914193a</color>
+    <color name="color_black_10">#282828</color>
     <color name="color_red_1">#ff4d4d</color>
     <color name="color_red_2">#e57c7c</color>
     <color name="color_red_3">#ed5063</color>
@@ -90,6 +91,13 @@
 
     <color name="color_blue_1">#3d4d9b</color>
     <color name="color_blue_2">#597ef7</color>
+    <color name="color_blue_3">#00a1e9</color>
+    <color name="color_blue_4">#1900a1e9</color>
+
+    <color name="color_green_1">#75c71d</color>
+    <color name="color_green_2">#37b34a</color>
+    <color name="color_green_3">#1937b34a</color>
+    <color name="color_green_4">#00b5a9</color>
 
     <color name="clip_comment_bg">#b3f7f7f7</color>
     <color name="light_blue_400">#FF29B6F6</color>

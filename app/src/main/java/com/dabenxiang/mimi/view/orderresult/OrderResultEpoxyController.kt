@@ -1,17 +1,18 @@
 package com.dabenxiang.mimi.view.orderresult
 
+import android.content.Context
+import android.text.TextUtils
 import com.airbnb.epoxy.TypedEpoxyController
+import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.model.vo.mqtt.OrderPayloadItem
-import com.dabenxiang.mimi.view.orderresult.itemview.OrderResultFailedItemView
-import com.dabenxiang.mimi.view.orderresult.itemview.orderResultBankSuccessItemView
-import com.dabenxiang.mimi.view.orderresult.itemview.orderResultFailedItemView
-import com.dabenxiang.mimi.view.orderresult.itemview.orderResultWaitingItemView
+import com.dabenxiang.mimi.view.orderresult.itemview.*
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import java.text.SimpleDateFormat
 import java.util.*
 
 class OrderResultEpoxyController(
+    val context: Context,
     private val failedListener: OrderResultFailedItemView.OrderResultFailedListener,
     private val successListener: OrderResultSuccessListener
 ) : TypedEpoxyController<OrderPayloadItem>() {
@@ -69,18 +70,54 @@ class OrderResultEpoxyController(
 
         when (item.paymentType) {
             PaymentType.BANK.value -> {
-                orderResultBankSuccessItemView {
-                    id("order_result_bank_success")
-                    setupTimeout(timeout)
-                    setupName(item.accountName)
-                    setupBank(bank)
-                    setupCity(city)
-                    setupAccount(item.accountNumber)
-                    setupAmount(GeneralUtils.getAmountFormat(item.amount))
-                    setupClickListener(successListener)
+                if (TextUtils.isEmpty(item.paymentUrl)) {
+                    orderResultUrlSuccessItemView {
+                        id("order_result_url_bank_success")
+                        setupTimeout(timeout)
+                        setupAmount(GeneralUtils.getAmountFormat(item.amount))
+                        setupPaymentImg(R.drawable.ico_bank_160_px)
+                        setupPaymentCountdown("将引导您至支付页面  5S…")
+                        setupPaymentCountdownColor(R.color.color_black_1)
+                        setupPaymentCountdownBackground(R.drawable.bg_black_1_radius_6)
+                        setupPaymentGoBackground(R.drawable.bg_black_2_radius_6)
+                    }
+                } else {
+                    orderResultDetailSuccessItemView {
+                        id("order_result_detail_success")
+                        setupTimeout(timeout)
+                        setupName(item.accountName)
+                        setupBank(bank)
+                        setupCity(city)
+                        setupAccount(item.accountNumber)
+                        setupAmount(GeneralUtils.getAmountFormat(item.amount))
+                        setupClickListener(successListener)
+                    }
                 }
             }
-            else -> successListener.onAliWxConfirm(item.paymentUrl)
+            PaymentType.ALI.value -> {
+                orderResultUrlSuccessItemView {
+                    id("order_result_url_ali_success")
+                    setupTimeout(timeout)
+                    setupAmount(GeneralUtils.getAmountFormat(item.amount))
+                    setupPaymentImg(R.drawable.ico_alipay_160_px)
+                    setupPaymentCountdown("将引导您至支付页面  5S…")
+                    setupPaymentCountdownColor(R.color.color_blue_3)
+                    setupPaymentCountdownBackground(R.drawable.bg_blue_1_radius_6)
+                    setupPaymentGoBackground(R.drawable.bg_blue_2_radius_6)
+                }
+            }
+            PaymentType.WX.value -> {
+                orderResultUrlSuccessItemView {
+                    id("order_result_url_wx_success")
+                    setupTimeout(timeout)
+                    setupAmount(GeneralUtils.getAmountFormat(item.amount))
+                    setupPaymentImg(R.drawable.ico_wechat_pay_160_px)
+                    setupPaymentCountdown("将引导您至支付页面  5S…")
+                    setupPaymentCountdownColor(R.color.color_green_2)
+                    setupPaymentCountdownBackground(R.drawable.bg_green_1_radius_6)
+                    setupPaymentGoBackground(R.drawable.bg_green_2_radius_6)
+                }
+            }
         }
     }
 }

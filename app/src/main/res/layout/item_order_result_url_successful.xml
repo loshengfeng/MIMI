@@ -41,26 +41,19 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.1515" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_order_info_bottom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.598" />
+    <!--    <androidx.constraintlayout.widget.Guideline-->
+    <!--        android:id="@+id/guideline_button_top"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:orientation="horizontal"-->
+    <!--        app:layout_constraintGuide_percent="0.674" />-->
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_button_top"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.674" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_button_bottom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.736" />
+    <!--    <androidx.constraintlayout.widget.Guideline-->
+    <!--        android:id="@+id/guideline_button_bottom"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:orientation="horizontal"-->
+    <!--        app:layout_constraintGuide_percent="0.736" />-->
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_button_close_start"
@@ -115,12 +108,11 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/cv_order_info"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="319dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         app:cardCornerRadius="4dp"
         app:cardElevation="0dp"
-        app:layout_constraintBottom_toBottomOf="@+id/guideline_order_info_bottom"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline_order_info_top">
@@ -131,13 +123,6 @@
             android:background="@drawable/bg_gray_1_stroke_radius_4">
 
             <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline_account_bottom"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.1694" />
-
-            <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline_account_start"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -145,81 +130,97 @@
                 app:layout_constraintGuide_percent="0.0625" />
 
             <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline_amount_top"
+                android:id="@+id/guideline_payment_start"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.635" />
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.1718" />
 
             <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline_amount_bottom"
+                android:id="@+id/guideline_payment_end"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.805" />
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline_account_value_top"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.2118" />
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline_amount_value_top"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.8474" />
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.8281" />
 
             <TextView
                 android:id="@+id/tv_order_account_title"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="40dp"
+                android:layout_marginBottom="24dp"
                 android:background="@color/color_black_1_02"
                 android:gravity="center_vertical"
                 android:paddingStart="16sp"
-                android:text="@string/order_result_create_order_account"
+                android:text="@string/order_result_payment_type"
                 android:textColor="@color/color_black_1_50"
                 android:textSize="14sp"
-                app:layout_constraintBottom_toBottomOf="@+id/guideline_account_bottom"
-                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/tv_account"
+            <ImageView
+                android:id="@+id/iv_payment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textColor="@color/color_black_1"
-                android:textSize="14sp"
-                app:layout_constraintLeft_toLeftOf="@+id/guideline_account_start"
-                app:layout_constraintTop_toBottomOf="@+id/guideline_account_value_top"
-                tools:text="1234567890123456" />
+                android:layout_marginTop="24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_order_account_title"
+                tools:src="@drawable/ico_alipay_160_px" />
+
+            <TextView
+                android:id="@+id/tv_payment_countdown"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center_horizontal"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:textSize="16sp"
+                app:layout_constraintLeft_toLeftOf="@id/guideline_payment_start"
+                app:layout_constraintRight_toRightOf="@id/guideline_payment_end"
+                app:layout_constraintTop_toBottomOf="@+id/iv_payment"
+                tools:text="将引导您至支付页面  5S…" />
+
+            <TextView
+                android:id="@+id/tv_payment_go"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center_horizontal"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:text="@string/order_result_payment_go"
+                android:textColor="@color/color_white_1"
+                android:textSize="16sp"
+                app:layout_constraintLeft_toLeftOf="@id/guideline_payment_start"
+                app:layout_constraintRight_toRightOf="@id/guideline_payment_end"
+                app:layout_constraintTop_toBottomOf="@+id/tv_payment_countdown" />
 
             <TextView
                 android:id="@+id/tv_order_amount_title"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="24dp"
                 android:background="@color/color_black_1_02"
                 android:gravity="center_vertical"
                 android:paddingStart="16sp"
                 android:text="@string/order_result_create_order_amount"
                 android:textColor="@color/color_black_1_50"
                 android:textSize="14sp"
-                app:layout_constraintBottom_toBottomOf="@+id/guideline_amount_bottom"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/guideline_amount_top" />
+                app:layout_constraintTop_toBottomOf="@+id/tv_payment_go" />
+
 
             <TextView
                 android:id="@+id/tv_amount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="10dp"
                 android:textColor="@color/color_black_1"
                 android:textSize="14sp"
                 app:layout_constraintLeft_toLeftOf="@+id/guideline_account_start"
-                app:layout_constraintTop_toBottomOf="@+id/guideline_amount_value_top"
+                app:layout_constraintTop_toBottomOf="@+id/tv_order_amount_title"
                 tools:text="100.00" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -229,29 +230,29 @@
     <TextView
         android:id="@+id/tv_close"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="33dp"
+        android:layout_marginTop="40dp"
         android:background="@drawable/bg_red_1_stroke_1_radius_8"
         android:gravity="center"
         android:text="@string/order_result_create_order_close"
         android:textColor="@color/color_red_1"
         android:textSize="15sp"
-        app:layout_constraintBottom_toBottomOf="@+id/guideline_button_bottom"
         app:layout_constraintLeft_toLeftOf="@+id/guideline_button_close_start"
         app:layout_constraintRight_toRightOf="@+id/guideline_button_close_end"
-        app:layout_constraintTop_toTopOf="@+id/guideline_button_top" />
+        app:layout_constraintTop_toBottomOf="@+id/cv_order_info" />
 
     <TextView
         android:id="@+id/tv_submit"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="33dp"
+        android:layout_marginTop="40dp"
         android:background="@drawable/bg_red_1_radius_6"
         android:gravity="center"
         android:text="@string/order_result_create_order_submit"
         android:textColor="@color/color_white_1"
         android:textSize="15sp"
-        app:layout_constraintBottom_toBottomOf="@+id/guideline_button_bottom"
         app:layout_constraintLeft_toLeftOf="@+id/guideline_button_submit_start"
         app:layout_constraintRight_toRightOf="@+id/guideline_button_submit_end"
-        app:layout_constraintTop_toTopOf="@+id/guideline_button_top" />
+        app:layout_constraintTop_toBottomOf="@+id/cv_order_info" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

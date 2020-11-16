@@ -5,7 +5,6 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.view.View
-import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.OrderItem
@@ -13,7 +12,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_payment_info.*
-import kotlinx.android.synthetic.main.item_order_result_bank_successful.*
+import kotlinx.android.synthetic.main.item_order_result_detail_successful.*
 import java.text.SimpleDateFormat
 import java.util.*
 
