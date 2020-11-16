@@ -14,6 +14,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.orderresult.itemview.OrderResultFailedItemView
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_order_result.*
+import timber.log.Timber
 import java.util.*
 import kotlin.concurrent.timerTask
 
@@ -62,10 +63,10 @@ class OrderResultFragment : BaseFragment() {
 
         if (arguments?.getBoolean(KEY_ERROR) == true) {
             setupStepUi(false)
-            epoxyController.setData(OrderPayloadItem())
+            epoxyController.setData(OrderPayloadItem(), 0)
         } else {
             startTimer()
-            epoxyController.setData(null)
+            epoxyController.setData(null, 5)
         }
     }
 
@@ -78,7 +79,7 @@ class OrderResultFragment : BaseFragment() {
             if (it != null) {
                 setupStepUi(it.orderPayloadItem?.isSuccessful)
                 stopTimer()
-                epoxyController.setData(it.orderPayloadItem)
+                epoxyController.setData(it.orderPayloadItem, 0)
             }
         })
     }
@@ -142,7 +143,7 @@ class OrderResultFragment : BaseFragment() {
 
     private fun startTimer() {
         val task = timerTask {
-            epoxyController.setData(OrderPayloadItem())
+            epoxyController.setData(OrderPayloadItem(), 5)
         }
         timer = Timer()
         timer.schedule(task, DELAY_TIME)

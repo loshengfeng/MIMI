@@ -21,6 +21,8 @@ class OrderResultUrlSuccessItemView(context: Context) : ConstraintLayout(context
         View.inflate(context, R.layout.item_order_result_url_successful, this)
     }
 
+    var orderResultSuccessListener: OrderResultSuccessListener? = null
+
     @ModelProp
     fun setupTimeout(text: String) {
         val builder = SpannableStringBuilder(text)
@@ -48,8 +50,11 @@ class OrderResultUrlSuccessItemView(context: Context) : ConstraintLayout(context
     }
 
     @ModelProp
-    fun setupPaymentCountdown(text: String) {
-        tv_payment_countdown.text = text
+    fun setupPaymentCountdown(second: Int) {
+        tv_payment_countdown.text = String.format(
+            context.getString(R.string.order_result_payment_guide),
+            second
+        )
     }
 
     @ModelProp
@@ -67,9 +72,14 @@ class OrderResultUrlSuccessItemView(context: Context) : ConstraintLayout(context
         tv_payment_go.setBackgroundResource(background)
     }
 
+    @ModelProp
+    fun setupPaymentListener(url: String) {
+        tv_payment_go.setOnClickListener { orderResultSuccessListener?.onOpenWebView(url) }
+    }
+
     @CallbackProp
     fun setupClickListener(listener: OrderResultSuccessListener?) {
-//        tv_payment_go.setOnClickListener { listener?.onOpenWebView() }
+        orderResultSuccessListener = listener
         tv_submit.setOnClickListener { listener?.onConfirm() }
         tv_close.setOnClickListener { listener?.onClose() }
     }
