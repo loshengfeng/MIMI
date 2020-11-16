@@ -2,7 +2,7 @@ package com.dabenxiang.mimi.view.orderresult
 
 import android.content.Context
 import android.text.TextUtils
-import com.airbnb.epoxy.Typed2EpoxyController
+import com.airbnb.epoxy.TypedEpoxyController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.model.vo.mqtt.OrderPayloadItem
@@ -15,14 +15,14 @@ class OrderResultEpoxyController(
     val context: Context,
     private val failedListener: OrderResultFailedItemView.OrderResultFailedListener,
     private val successListener: OrderResultSuccessListener
-) : Typed2EpoxyController<OrderPayloadItem, Int>() {
+) : TypedEpoxyController<OrderPayloadItem>() {
 
-    override fun buildModels(item: OrderPayloadItem?, second: Int) {
+    override fun buildModels(item: OrderPayloadItem?) {
         if (item == null) {
             addOrderResultWaitingItemView()
         } else {
             if (item.isSuccessful) {
-                addOrderResultSuccessfulItemView(item, second)
+                addOrderResultSuccessfulItemView(item)
             } else {
                 addOrderResultFailedItemView()
             }
@@ -42,7 +42,7 @@ class OrderResultEpoxyController(
         }
     }
 
-    private fun addOrderResultSuccessfulItemView(item: OrderPayloadItem, second: Int) {
+    private fun addOrderResultSuccessfulItemView(item: OrderPayloadItem) {
 
         val calendar = Calendar.getInstance()
         calendar.time = item.createTime ?: Date()
@@ -75,7 +75,7 @@ class OrderResultEpoxyController(
                         id("order_result_url_bank_success")
                         setupTimeout(timeout)
                         setupPaymentImg(R.drawable.ico_bank_160_px)
-                        setupPaymentCountdown(second)
+                        setupPaymentCountdown(item.countdown)
                         setupPaymentCountdownColor(R.color.color_black_1)
                         setupPaymentCountdownBackground(R.drawable.bg_black_1_radius_6)
                         setupPaymentGoBackground(R.drawable.bg_black_2_radius_6)
@@ -101,7 +101,7 @@ class OrderResultEpoxyController(
                     id("order_result_url_ali_success")
                     setupTimeout(timeout)
                     setupPaymentImg(R.drawable.ico_alipay_160_px)
-                    setupPaymentCountdown(second)
+                    setupPaymentCountdown(item.countdown)
                     setupPaymentCountdownColor(R.color.color_blue_3)
                     setupPaymentCountdownBackground(R.drawable.bg_blue_1_radius_6)
                     setupPaymentGoBackground(R.drawable.bg_blue_2_radius_6)
@@ -115,7 +115,7 @@ class OrderResultEpoxyController(
                     id("order_result_url_wx_success")
                     setupTimeout(timeout)
                     setupPaymentImg(R.drawable.ico_wechat_pay_160_px)
-                    setupPaymentCountdown(second)
+                    setupPaymentCountdown(item.countdown)
                     setupPaymentCountdownColor(R.color.color_green_2)
                     setupPaymentCountdownBackground(R.drawable.bg_green_1_radius_6)
                     setupPaymentGoBackground(R.drawable.bg_green_2_radius_6)
@@ -124,6 +124,19 @@ class OrderResultEpoxyController(
                     setupClickListener(successListener)
                 }
             }
+        }
+
+        orderResultUrlSuccessItemView {
+            id("order_result_url_wx_success")
+            setupTimeout(timeout)
+            setupPaymentImg(R.drawable.ico_wechat_pay_160_px)
+            setupPaymentCountdown(item.countdown)
+            setupPaymentCountdownColor(R.color.color_green_2)
+            setupPaymentCountdownBackground(R.drawable.bg_green_1_radius_6)
+            setupPaymentGoBackground(R.drawable.bg_green_2_radius_6)
+            setupAmount(GeneralUtils.getAmountFormat(item.amount))
+            setupPaymentListener(item.paymentUrl)
+            setupClickListener(successListener)
         }
     }
 }

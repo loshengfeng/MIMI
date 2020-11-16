@@ -1,11 +1,11 @@
 package com.dabenxiang.mimi.view.orderresult
 
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.view.View
 import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.vo.mqtt.OrderPayloadItem
@@ -22,7 +22,7 @@ class OrderResultFragment : BaseFragment() {
 
     companion object {
         private const val KEY_ERROR = "error"
-        private const val DELAY_TIME = 60000L
+        private const val DELAY_TOP_UP_TIME = 60000L
 
         fun createBundle(isError: Boolean): Bundle {
             return Bundle().also { it.putBoolean(KEY_ERROR, isError) }
@@ -31,7 +31,8 @@ class OrderResultFragment : BaseFragment() {
 
     private val viewModel: OrderResultViewModel by viewModels()
 
-    private lateinit var timer: Timer
+    private var topUpTimer: Timer? = null
+    private var countdownTimer: CountDownTimer? = null
 
     private val epoxyController by lazy {
         OrderResultEpoxyController(requireContext(), failedListener, successListener)
@@ -63,10 +64,10 @@ class OrderResultFragment : BaseFragment() {
 
         if (arguments?.getBoolean(KEY_ERROR) == true) {
             setupStepUi(false)
-            epoxyController.setData(OrderPayloadItem(), 0)
+            epoxyController.setData(OrderPayloadItem())
         } else {
-            startTimer()
-            epoxyController.setData(null, 5)
+            startTopUpTimer()
+            epoxyController.setData(null)
         }
     }
 
@@ -75,17 +76,28 @@ class OrderResultFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        mainViewModel?.orderItem?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.orderItem?.observe(viewLifecycleOwner, {
             if (it != null) {
                 setupStepUi(it.orderPayloadItem?.isSuccessful)
-                stopTimer()
-                epoxyController.setData(it.orderPayloadItem, 0)
+                stopTopUpTimer()
+
+                if (viewModel.isOpenPaymentWebView(it.orderPayloadItem)) {
+                    startCountdownTimer(it.orderPayloadItem)
+                } else {
+                    epoxyController.setData(it.orderPayloadItem)
+                }
             }
         })
     }
 
     override fun setupListeners() {
         requireActivity().onBackPressedDispatcher.addCallback(this) { }
+    }
+
+    override fun onDestroyView() {
+        stopTopUpTimer()
+        stopCountdownTimer()
+        super.onDestroyView()
     }
 
     private val failedListener = object : OrderResultFailedItemView.OrderResultFailedListener {
@@ -141,15 +153,34 @@ class OrderResultFragment : BaseFragment() {
         }
     }
 
-    private fun startTimer() {
+    private fun startTopUpTimer() {
         val task = timerTask {
-            epoxyController.setData(OrderPayloadItem(), 5)
+            epoxyController.setData(OrderPayloadItem())
         }
-        timer = Timer()
-        timer.schedule(task, DELAY_TIME)
+        topUpTimer = Timer()
+        topUpTimer?.schedule(task, DELAY_TOP_UP_TIME)
     }
 
-    private fun stopTimer() {
-        timer.cancel()
+    private fun stopTopUpTimer() {
+        topUpTimer?.cancel()
     }
+
+    private fun startCountdownTimer(item: OrderPayloadItem?) {
+        countdownTimer = object : CountDownTimer(5000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                item?.countdown = (millisUntilFinished / 1000).toInt()
+                epoxyController.setData(item)
+            }
+
+            override fun onFinish() {
+                Timber.d("@@startCountdownTimer onFinish")
+            }
+        }
+        countdownTimer?.start()
+    }
+
+    private fun stopCountdownTimer() {
+        countdownTimer?.cancel()
+    }
+
 }
