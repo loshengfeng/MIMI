@@ -70,7 +70,7 @@ class OrderResultEpoxyController(
 
         when (item.paymentType) {
             PaymentType.BANK.value -> {
-                if (TextUtils.isEmpty(item.paymentUrl)) {
+                if (!TextUtils.isEmpty(item.paymentUrl)) {
                     orderResultUrlSuccessItemView {
                         id("order_result_url_bank_success")
                         setupTimeout(timeout)
