@@ -15,10 +15,6 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_payment_info.*
 import kotlinx.android.synthetic.main.item_order_result_detail_successful.*
-import kotlinx.android.synthetic.main.item_order_result_detail_successful.tv_amount
-import kotlinx.android.synthetic.main.item_order_result_detail_successful.tv_close
-import kotlinx.android.synthetic.main.item_order_result_detail_successful.tv_submit
-import kotlinx.android.synthetic.main.item_order_result_detail_successful.tv_timeout
 import kotlinx.android.synthetic.main.item_order_result_url_successful.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -43,14 +39,8 @@ class PaymentInfoFragment : BaseFragment() {
     }
 
     override fun initSettings() {
-
-        tv_close.visibility = View.GONE
-        tv_submit.visibility = View.GONE
-
         arguments?.getSerializable(KEY_ORDER_ITEM)?.also { orderItem ->
             orderItem as OrderItem
-
-            setupTimeoutUi(orderItem)
 
             if (TextUtils.isEmpty(orderItem.paymentInfos[0].paymentUrl)) {
                 layout_order_detail.visibility = View.VISIBLE
@@ -77,23 +67,10 @@ class PaymentInfoFragment : BaseFragment() {
     override fun setupListeners() {
     }
 
-    private fun setupTimeoutUi(orderItem: OrderItem) {
-        val calendar = Calendar.getInstance()
-        calendar.time = orderItem.createTime ?: Date()
-        calendar.add(Calendar.HOUR_OF_DAY, 1)
-        val sdf = SimpleDateFormat("YYYY-MM-dd HH:mm", Locale.getDefault())
-        val time = sdf.format(calendar.time)
-
-        val timeout = StringBuilder("请于 ")
-            .append(time)
-            .append(" 前完成打款动作，避免订单超时")
-            .toString()
-
-        setupTimeout(timeout)
-    }
-
     private fun setupPaymentDetailUi(orderItem: OrderItem) {
         val paymentInfoItem = orderItem.paymentInfos[0]
+
+        tv_timeout.text = getTimeout(orderItem)
 
         val bank = StringBuilder(paymentInfoItem.bankName)
             .append("(")
@@ -113,14 +90,19 @@ class PaymentInfoFragment : BaseFragment() {
         tv_city.text = city
         tv_account.text = paymentInfoItem.accountNumber
         tv_amount.text = GeneralUtils.getAmountFormat(orderItem.sellingPrice)
+
+        tv_close.visibility = View.GONE
+        tv_submit.visibility = View.GONE
     }
 
     private fun setupPaymentUrlUi(orderItem: OrderItem) {
         val paymentInfoItem = orderItem.paymentInfos[0]
 
+        url_tv_timeout.text = getTimeout(orderItem)
+
         tv_payment_countdown.visibility = View.GONE
 
-        tv_amount.text = GeneralUtils.getAmountFormat(orderItem.sellingPrice)
+        url_tv_amount.text = GeneralUtils.getAmountFormat(orderItem.sellingPrice)
 
         when (paymentInfoItem.paymentType) {
             PaymentType.BANK -> {
@@ -140,16 +122,30 @@ class PaymentInfoFragment : BaseFragment() {
         tv_payment_go.setOnClickListener {
             GeneralUtils.openWebView(requireContext(), paymentInfoItem.paymentUrl)
         }
+
+        url_tv_close.visibility = View.GONE
+        url_tv_submit.visibility = View.GONE
     }
 
-    private fun setupTimeout(text: String) {
-        val builder = SpannableStringBuilder(text)
+    private fun getTimeout(orderItem: OrderItem): SpannableStringBuilder {
+        val calendar = Calendar.getInstance()
+        calendar.time = orderItem.createTime ?: Date()
+        calendar.add(Calendar.HOUR_OF_DAY, 1)
+        val sdf = SimpleDateFormat("YYYY-MM-dd HH:mm", Locale.getDefault())
+        val time = sdf.format(calendar.time)
+
+        val timeout = StringBuilder("请于 ")
+            .append(time)
+            .append(" 前完成打款动作，避免订单超时")
+            .toString()
+
+        val builder = SpannableStringBuilder(timeout)
         builder.setSpan(
             ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.color_red_1)),
             builder.indexOf("于") + 1,
             builder.lastIndexOf("前") - 1,
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
         )
-        tv_timeout.text = builder
+        return builder
     }
 }

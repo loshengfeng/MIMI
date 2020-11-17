@@ -36,12 +36,12 @@ class OrderResultUrlSuccessItemView(context: Context) : ConstraintLayout(context
             builder.lastIndexOf("前") - 1,
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
         )
-        tv_timeout.text = builder
+        url_tv_timeout.text = builder
     }
 
     @ModelProp
     fun setupAmount(text: String) {
-        tv_amount.text = text
+        url_tv_amount.text = text
     }
 
     @ModelProp
@@ -88,7 +88,7 @@ class OrderResultUrlSuccessItemView(context: Context) : ConstraintLayout(context
     @CallbackProp
     fun setupClickListener(listener: OrderResultSuccessListener?) {
         orderResultSuccessListener = listener
-        tv_submit.setOnClickListener { listener?.onConfirm() }
-        tv_close.setOnClickListener { listener?.onClose() }
+        url_tv_submit.setOnClickListener { listener?.onConfirm() }
+        url_tv_close.setOnClickListener { listener?.onClose() }
     }
 }
