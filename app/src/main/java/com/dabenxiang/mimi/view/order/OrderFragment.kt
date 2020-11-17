@@ -234,9 +234,5 @@ class OrderFragment : BaseFragment() {
         viewModel.getUnread()
         viewModel.getBalanceItem()
     }
-
-    infix fun <T, Q, R> ((T) -> Q).pipe(anotherFun: (Q) -> R): (T) -> R {
-        return { x: T -> anotherFun(this(x)) }
-    }
 }
 

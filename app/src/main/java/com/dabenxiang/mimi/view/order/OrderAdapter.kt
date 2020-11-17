@@ -9,7 +9,6 @@ import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.OrderViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 
-//class OrderAdapter: PagingDataAdapter<OrderItem, BaseViewHolder>(COMPARATOR) {
 class OrderAdapter(private val orderFuncItem: OrderFuncItem?) :
     PagedListAdapter<OrderItem, BaseViewHolder>(COMPARATOR) {
     companion object {
