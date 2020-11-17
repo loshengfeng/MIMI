@@ -11,7 +11,6 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.vo.mqtt.OrderPayloadItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.orderresult.itemview.OrderResultFailedItemView
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_order_result.*
 import java.util.*
@@ -32,10 +31,7 @@ class OrderResultFragment : BaseFragment() {
 
     private var topUpTimer: Timer? = null
     private var countdownTimer: CountDownTimer? = null
-
-    private val epoxyController by lazy {
-        OrderResultEpoxyController(requireContext(), failedListener, successListener)
-    }
+    private var epoxyController: OrderResultEpoxyController? = null
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -58,15 +54,19 @@ class OrderResultFragment : BaseFragment() {
         tv_step1.text = "1"
         tv_step2.text = "2"
 
+        epoxyController = OrderResultEpoxyController(
+            requireContext(), failedListener, successListener
+        )
+
         recycler_order_result.layoutManager = LinearLayoutManager(requireContext())
-        recycler_order_result.adapter = epoxyController.adapter
+        recycler_order_result.adapter = epoxyController?.adapter
 
         if (arguments?.getBoolean(KEY_ERROR) == true) {
             setupStepUi(false)
-            epoxyController.setData(OrderPayloadItem())
+            epoxyController?.setData(OrderPayloadItem())
         } else {
             startTopUpTimer()
-            epoxyController.setData(null)
+            epoxyController?.setData(null)
         }
     }
 
@@ -83,7 +83,7 @@ class OrderResultFragment : BaseFragment() {
                 if (viewModel.isOpenPaymentWebView(it.orderPayloadItem)) {
                     startCountdownTimer(it.orderPayloadItem)
                 } else {
-                    epoxyController.setData(it.orderPayloadItem)
+                    epoxyController?.setData(it.orderPayloadItem)
                 }
             }
         })
@@ -99,7 +99,7 @@ class OrderResultFragment : BaseFragment() {
         super.onDestroyView()
     }
 
-    private val failedListener = object : OrderResultFailedItemView.OrderResultFailedListener {
+    private val failedListener = object : OrderResultFailedListener {
         override fun onConfirm() {
             navigateTo(NavigateItem.Destination(R.id.action_orderResultFragment_to_topupFragment))
         }
@@ -114,8 +114,13 @@ class OrderResultFragment : BaseFragment() {
             navigateTo(NavigateItem.Destination(R.id.action_orderResultFragment_to_topupFragment))
         }
 
-        override fun onOpenWebView(url: String) {
-            GeneralUtils.openWebView(requireContext(), url)
+        override fun onOpenPaymentWebView(item: OrderPayloadItem?) {
+            item?.also {
+                stopCountdownTimer()
+                it.isCountdownVisible = false
+                epoxyController?.setData(it)
+                GeneralUtils.openWebView(requireContext(), it.paymentUrl)
+            }
         }
     }
 
@@ -154,7 +159,7 @@ class OrderResultFragment : BaseFragment() {
 
     private fun startTopUpTimer() {
         val task = timerTask {
-            epoxyController.setData(OrderPayloadItem())
+            epoxyController?.setData(OrderPayloadItem())
         }
         topUpTimer = Timer()
         topUpTimer?.schedule(task, DELAY_TOP_UP_TIME)
@@ -169,16 +174,12 @@ class OrderResultFragment : BaseFragment() {
             override fun onTick(millisUntilFinished: Long) {
                 item?.also {
                     it.countdown = (millisUntilFinished / 1000).toInt() + 1
-                    epoxyController.setData(it)
+                    epoxyController?.setData(it)
                 }
             }
 
             override fun onFinish() {
-                item?.also {
-                    it.isCountdownVisible = false
-                    epoxyController.setData(it)
-                    successListener.onOpenWebView(it.paymentUrl)
-                }
+                successListener.onOpenPaymentWebView(item)
             }
         }
         countdownTimer?.start()

@@ -6,14 +6,17 @@ import com.airbnb.epoxy.TypedEpoxyController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.model.vo.mqtt.OrderPayloadItem
-import com.dabenxiang.mimi.view.orderresult.itemview.*
+import com.dabenxiang.mimi.view.orderresult.itemview.orderResultDetailSuccessItemView
+import com.dabenxiang.mimi.view.orderresult.itemview.orderResultFailedItemView
+import com.dabenxiang.mimi.view.orderresult.itemview.orderResultUrlSuccessItemView
+import com.dabenxiang.mimi.view.orderresult.itemview.orderResultWaitingItemView
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import java.text.SimpleDateFormat
 import java.util.*
 
 class OrderResultEpoxyController(
     val context: Context,
-    private val failedListener: OrderResultFailedItemView.OrderResultFailedListener,
+    private val failedListener: OrderResultFailedListener,
     private val successListener: OrderResultSuccessListener
 ) : TypedEpoxyController<OrderPayloadItem>() {
 
@@ -92,7 +95,7 @@ class OrderResultEpoxyController(
                         setupPaymentGoBackground(R.drawable.bg_black_2_radius_6)
                         setupPaymentCountdownVisibility(item.isCountdownVisible)
                         setupAmount(GeneralUtils.getAmountFormat(item.amount))
-                        setupPaymentListener(item.paymentUrl)
+                        setupPaymentPageListener(item)
                         setupClickListener(successListener)
                     }
                 }
@@ -108,7 +111,7 @@ class OrderResultEpoxyController(
                     setupPaymentGoBackground(R.drawable.bg_blue_2_radius_6)
                     setupPaymentCountdownVisibility(item.isCountdownVisible)
                     setupAmount(GeneralUtils.getAmountFormat(item.amount))
-                    setupPaymentListener(item.paymentUrl)
+                    setupPaymentPageListener(item)
                     setupClickListener(successListener)
                 }
             }
@@ -123,7 +126,7 @@ class OrderResultEpoxyController(
                     setupPaymentGoBackground(R.drawable.bg_green_2_radius_6)
                     setupPaymentCountdownVisibility(item.isCountdownVisible)
                     setupAmount(GeneralUtils.getAmountFormat(item.amount))
-                    setupPaymentListener(item.paymentUrl)
+                    setupPaymentPageListener(item)
                     setupClickListener(successListener)
                 }
             }

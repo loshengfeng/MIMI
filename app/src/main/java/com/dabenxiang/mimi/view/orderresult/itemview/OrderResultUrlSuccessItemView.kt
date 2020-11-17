@@ -11,6 +11,7 @@ import com.airbnb.epoxy.CallbackProp
 import com.airbnb.epoxy.ModelProp
 import com.airbnb.epoxy.ModelView
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.vo.mqtt.OrderPayloadItem
 import com.dabenxiang.mimi.view.orderresult.OrderResultSuccessListener
 import kotlinx.android.synthetic.main.item_order_result_url_successful.view.*
 
@@ -81,8 +82,8 @@ class OrderResultUrlSuccessItemView(context: Context) : ConstraintLayout(context
     }
 
     @ModelProp
-    fun setupPaymentListener(url: String) {
-        tv_payment_go.setOnClickListener { orderResultSuccessListener?.onOpenWebView(url) }
+    fun setupPaymentPageListener(item: OrderPayloadItem?) {
+        tv_payment_go.setOnClickListener { orderResultSuccessListener?.onOpenPaymentWebView(item) }
     }
 
     @CallbackProp
