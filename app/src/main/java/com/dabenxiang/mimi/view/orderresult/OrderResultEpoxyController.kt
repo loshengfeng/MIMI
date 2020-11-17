@@ -95,7 +95,7 @@ class OrderResultEpoxyController(
                         setupPaymentGoBackground(R.drawable.bg_black_2_radius_6)
                         setupPaymentCountdownVisibility(item.isCountdownVisible)
                         setupAmount(GeneralUtils.getAmountFormat(item.amount))
-                        setupPaymentPageListener(item)
+                        setupPaymentPageListener(item.paymentUrl)
                         setupClickListener(successListener)
                     }
                 }
@@ -111,7 +111,7 @@ class OrderResultEpoxyController(
                     setupPaymentGoBackground(R.drawable.bg_blue_2_radius_6)
                     setupPaymentCountdownVisibility(item.isCountdownVisible)
                     setupAmount(GeneralUtils.getAmountFormat(item.amount))
-                    setupPaymentPageListener(item)
+                    setupPaymentPageListener(item.paymentUrl)
                     setupClickListener(successListener)
                 }
             }
@@ -126,7 +126,7 @@ class OrderResultEpoxyController(
                     setupPaymentGoBackground(R.drawable.bg_green_2_radius_6)
                     setupPaymentCountdownVisibility(item.isCountdownVisible)
                     setupAmount(GeneralUtils.getAmountFormat(item.amount))
-                    setupPaymentPageListener(item)
+                    setupPaymentPageListener(item.paymentUrl)
                     setupClickListener(successListener)
                 }
             }
