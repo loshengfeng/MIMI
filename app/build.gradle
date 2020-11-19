@@ -8,6 +8,8 @@ apply from: 'https://gitlab.silkrode.com.tw/Neo/common_gradle/raw/master/utils_i
 apply from: 'https://gitlab.silkrode.com.tw/Neo/common_gradle/raw/master/version.gradle'
 apply from: './config_buildtypes.gradle'
 apply from: './config_product_flavors.gradle'
+apply plugin: 'com.dabenxiang.deploy'
+
 android {
     // Ref : https://developer.android.com/studio/projects/install-ndk#apply-specific-version
     ndkVersion "21.3.6528147"  //TODO  define NDK version  now not use local.properties
@@ -84,6 +86,25 @@ android {
         variant.outputs.each { output ->
             output.versionNameOverride = version.versionName
             output.versionCodeOverride = version.versionCode.toInteger()
+        }
+    }
+
+    deploy {
+        type = 1 /** 1: GO, 2: C# **/
+        apkUpgradeType = 1 /** 1: 不強更, 2: 強更至上一版, 3: 強更至最新版 **/
+        serviceAccountId = "for-deploy-apk@deployapk-1602571937321.iam.gserviceaccount.com"
+        credentialPath = this.project.projectDir.absolutePath + "/credential/deployapk-1602571937321-a59632391db8.p12"
+        applicationVariants.all { variant ->
+            def full_buildTypename = variant.buildType.name.toString()
+            def flavor = variant.productFlavors[0]
+            def flavorName = variant.flavorName
+            def buildType = full_buildTypename.split("_")[0]
+            if (full_buildTypename.contains("debug") || full_buildTypename.contains("dev")) return
+
+            // 設定 uploadHosts
+            this.project.ext.uploadHosts.put(flavorName + buildType, flavor.ext.GAM_API_HOST[buildType])
+            // 設定 driveFolderIds
+            this.project.ext.driveFolderIds.put(flavorName + buildType, flavor.ext.DRIVE_FOLDER_ID[buildType])
         }
     }
 
