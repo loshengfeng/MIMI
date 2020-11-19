@@ -129,7 +129,7 @@ class PersonalFragment : BaseFragment() {
         requireActivity().onBackPressedDispatcher.addCallback(
             owner = viewLifecycleOwner,
             onBackPressed = {
-                mainViewModel?.changeNavigationPosition?.value = R.id.navigation_adult
+                mainViewModel?.changeNavigationPosition?.value = R.id.navigation_mimi
             }
         )
 

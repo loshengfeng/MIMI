@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/navigation_home"
+    android:id="@+id/navigation_mimi"
     app:startDestination="@id/splashFragment">
 
     <include app:graph="@navigation/navigation_login" />
@@ -14,15 +14,15 @@
 
         <action
             android:id="@+id/action_splashFragment_to_homeFragment"
-            app:destination="@id/homeFragment"
-            app:popUpTo="@id/homeFragment"
+            app:destination="@id/mimiFragment"
+            app:popUpTo="@id/mimiFragment"
             app:popUpToInclusive="true" />
 
     </fragment>
 
     <fragment
-        android:id="@+id/homeFragment"
-        android:name="com.dabenxiang.mimi.view.mimi_home.HomeFragment"
+        android:id="@+id/mimiFragment"
+        android:name="com.dabenxiang.mimi.view.mimi_home.MiMiFragment"
         tools:layout="@layout/fragment_mimi_home">
 
     </fragment>

@@ -307,7 +307,7 @@ class TopUpFragment : BaseFragment() {
             onBackPressed = {
                 when (tag) {
                     PlayerFragment::class.java.simpleName -> navigateTo(NavigateItem.Up)
-                    else -> mainViewModel?.changeNavigationPosition?.value = R.id.navigation_adult
+                    else -> mainViewModel?.changeNavigationPosition?.value = R.id.navigation_mimi
                 }
             }
         )

@@ -172,6 +172,8 @@ class ClipFragment : BaseFragment() {
     }
 
     override fun initSettings() {
+        //TODO
+        return
         val position = arguments?.getInt(KEY_POSITION) ?: 0
 
         (arguments?.getSerializable(KEY_DATA) as ArrayList<MemberPostItem>).also { data ->

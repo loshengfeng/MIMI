@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/navigation_home"
+        android:id="@+id/navigation_mimi"
         android:enabled="true"
         android:icon="@drawable/btn_home"
         android:title="@string/nav_home" />
     <item
         android:id="@+id/navigation_clip"
         android:enabled="true"
-        android:icon="@drawable/btn_micoin"
+        android:icon="@drawable/btn_cams"
         android:title="@string/nav_clip"/>
     <item
         android:id="@+id/navigation_club"
         android:enabled="true"
-        android:icon="@drawable/btn_favorite"
+        android:icon="@drawable/btn_club"
         android:title="@string/nav_club" />
     <item
         android:id="@+id/navigation_personal"

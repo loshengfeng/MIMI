@@ -267,7 +267,7 @@ class MainViewModel : BaseViewModel() {
         if (!isMqttConnect()) {
             // test serverUrl use: tcp://172.x.x.x:1883
             mqttManager.init(domainManager.getMqttDomain(), clientId, extendedCallback)
-            mqttManager.connect(connectCallback)
+//            mqttManager.connect(connectCallback)
         }
     }
 

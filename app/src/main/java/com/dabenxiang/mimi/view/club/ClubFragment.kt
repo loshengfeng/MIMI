@@ -14,11 +14,11 @@ class ClubFragment : BaseFragment() {
 
     override fun getLayoutId() = R.layout.fragment_club
     override fun setupObservers() {
-        TODO("Not yet implemented")
+
     }
 
     override fun setupListeners() {
-        TODO("Not yet implemented")
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

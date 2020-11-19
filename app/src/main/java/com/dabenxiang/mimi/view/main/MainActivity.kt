@@ -159,7 +159,7 @@ class MainActivity : BaseActivity(){
         bottom_navigation.itemIconTintList = null
 
         val navGraphIds = listOf(
-            R.navigation.navigation_home,
+            R.navigation.navigation_mimi,
             R.navigation.navigation_clip,
             R.navigation.navigation_club,
             R.navigation.navigation_personal
@@ -209,19 +209,19 @@ class MainActivity : BaseActivity(){
         val fragmentName = supportFragmentManager.fragments[0].findNavController()
             .currentDestination?.displayName?.substringAfter("/").toString()
 
-        val adultHomeFragment =
-            AdultHomeFragment::class.java.simpleName.toLowerCase(Locale.getDefault())
-        // 判斷當前的頁面是停留在 homeFragment，顯示退出 app 訊息
-        if (fragmentName.toLowerCase(Locale.getDefault()) == adultHomeFragment) {
-            if (!viewModel.needCloseApp) {
-                viewModel.startBackExitAppTimer()
-                GeneralUtils.showToast(this, getString(R.string.press_again_exit))
-            } else {
-                finish()
-            }
-        } else {
-            super.onBackPressed()
-        }
+//        val adultHomeFragment =
+//            AdultHomeFragment::class.java.simpleName.toLowerCase(Locale.getDefault())
+//        // 判斷當前的頁面是停留在 homeFragment，顯示退出 app 訊息
+//        if (fragmentName.toLowerCase(Locale.getDefault()) == adultHomeFragment) {
+//            if (!viewModel.needCloseApp) {
+//                viewModel.startBackExitAppTimer()
+//                GeneralUtils.showToast(this, getString(R.string.press_again_exit))
+//            } else {
+//                finish()
+//            }
+//        } else {
+//            super.onBackPressed()
+//        }
     }
 
     override fun onNewIntent(intent: Intent?) {
