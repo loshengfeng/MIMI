@@ -6,19 +6,9 @@ apply plugin: "androidx.navigation.safeargs.kotlin"
 apply from: 'https://gitlab.silkrode.com.tw/Neo/common_gradle/raw/master/utils_info_android_builder.gradle'
 apply from: 'https://gitlab.silkrode.com.tw/Neo/common_gradle/raw/master/utils_info_ip.gradle'
 apply from: 'https://gitlab.silkrode.com.tw/Neo/common_gradle/raw/master/version.gradle'
-android {
-    signingConfigs {
-        release {
-            storeFile file("./keystore/release.keystore")
-            storePassword "android"
-            keyAlias "androiddebugkey"
-            keyPassword "android"
-        }
-        debug {
-            storeFile file("./keystore/debug.keystore")
-        }
-    }
+apply from: './config_buildtypes.gradle'
 
+android {
     compileSdkVersion 30
     buildToolsVersion "30.0.1"
 
@@ -49,7 +39,6 @@ android {
         disable 'MissingDefaultResource'
     }
 
-
     def version = this.ext.default_version()
     defaultConfig {
         applicationId "com.dabenxiang.mimi"
@@ -71,44 +60,6 @@ android {
 //        testInstrumentationRunner "com.dabenxiang.mimi.KoinTestRunner"
     }
 
-    buildTypes {
-        debug {
-            matchingFallbacks = ['release', 'debug']
-            getIsDefault().set(true)
-            zipAlignEnabled false
-            minifyEnabled false
-            debuggable true
-            shrinkResources false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.debug
-        }
-        release {
-            matchingFallbacks = ['release', 'debug']
-            zipAlignEnabled true
-            minifyEnabled true
-            debuggable false
-            shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-android-optimize.txt'
-            signingConfig signingConfigs.release
-        }
-
-        prod_debug.initWith(buildTypes.debug)
-        sit_debug.initWith(buildTypes.debug)
-        dev_debug.initWith(buildTypes.debug)
-
-        prod_release.initWith(buildTypes.release)
-        sit_release.initWith(buildTypes.release)
-        dev_release.initWith(buildTypes.release)
-
-        prod_debug {}
-        prod_release {}
-
-        sit_debug {}
-        sit_release {}
-
-        dev_debug {}
-        dev_release {}
-    }
 
     flavorDimensions "normal"
     productFlavors {
@@ -326,7 +277,7 @@ dependencies {
 
     // AndroidUtilCode
     implementation "com.blankj:utilcodex:$utilcodex_version"
-    
+
     // Conscrypt
     implementation "org.conscrypt:conscrypt-android:$conscrypt_version"
 
