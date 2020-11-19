@@ -3,7 +3,8 @@ package com.dabenxiang.mimi.widget.utility
 import android.content.Context
 import android.net.*
 import com.dabenxiang.mimi.callback.ConnectionStateListener
-import org.koin.core.KoinComponent
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import timber.log.Timber
 
 

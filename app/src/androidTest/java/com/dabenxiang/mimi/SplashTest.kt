@@ -2,6 +2,7 @@ package com.dabenxiang.mimi
 
 import android.content.Context
 import android.content.res.Resources
+import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions
@@ -27,20 +28,17 @@ import org.koin.dsl.module
  * See [testing documentation](http://d.android.com/tools/testing).
  */
 @RunWith(AndroidJUnit4ClassRunner::class)
-class ExampleInstrumentedTest {
-
-    private val fragmentViewModel: SplashViewModel = mockk(relaxed = true)
-    private val fragment = SplashFragment()
+class SplashTest {
 
     @get: Rule
     val rule = ActivityScenarioRule<MainActivity>(MainActivity::class.java)
 
-    @get:Rule
-    val fragmentRule = createRule(fragment, module {
-        single(override = true) {
-            fragmentViewModel
-        }
-    })
+//    @get:Rule
+//    val fragmentRule = createRule(fragment, module {
+//        single(override = true) {
+//            fragmentViewModel
+//        }
+//    })
 
 
     @Test
@@ -53,9 +51,12 @@ class ExampleInstrumentedTest {
 
         }
 
-        verify {
+//        val scenario = launchFragmentInContainer<SplashFragment>()
 
-        }
+//        Espresso.onView(withId(R.id.planned_speed)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+//        verify {
+//            fragmentViewModel.checkVersion()
+//        }
 
 //        Espresso.onView(withId(R.id.action_ad
 //                .perform(ViewActions.click())

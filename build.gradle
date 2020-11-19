@@ -20,7 +20,7 @@ buildscript {
     ext.okhttp_version = '4.7.2'
     ext.okhttp_interceptor_version = '4.7.2'
     ext.retrofit_version = '2.9.0'
-    ext.koin_version = '2.0.1'
+    ext.koin_version = '2.2.1'
     ext.glide_version = '4.11.0'
     ext.glide_transformations_version = '4.1.0'
     ext.circle_image_view_version = '3.1.0'
@@ -33,6 +33,7 @@ buildscript {
     ext.espresso_version = '3.2.0'
     ext.google_service_version = '4.3.3'
     ext.mokk_version = '1.10.0'
+    ext.mockito_inline = '3.6.0'
     ext.android_test_version = '1.2.0'
     ext.android_test_ext_version = '1.1.1'
     ext.websocket_version = '1.5.1'
@@ -50,18 +51,21 @@ buildscript {
     ext.exoplayer_version = '2.11.7'
     ext.rounded_views_version = '1.3.0'
     ext.base_recycler_view_adapter_helper_version = '3.0.4'
-    ext.cks_log_version = '0.0.7'
-    ext.cks_update_version = '0.0.7'
-    ext.cks_manager = '0.0.7'
+    ext.cks_log_version = '0.0.8'
+    ext.cks_update_version = '0.0.8'
+    ext.cks_manager = '0.0.8'
     ext.cks_utils = '0.0.1'
-    ext.cks_provider = '0.0.1'
+    ext.cks_utils_general = '0.0.4'
+    ext.cks_utils_loglevel = '0.0.6'
+    ext.cks_utils_gson_factory = '0.0.4'
+    ext.cks_provider = '0.0.3'
     ext.application_provider_version = '1.0.5'
     ext.work_version = '2.4.0'
     ext.conscrypt_version = '2.2.1'
     ext.epoxy_version = '3.11.0'
-    ext.video_ffmpeg = '0.3.3'
-    ext.video_editor = '0.0.5'
-    ext.video_compressor = '0.0.1'
+    ext.video_ffmpeg = '0.3.4'
+    ext.video_editor = '0.0.6'
+    ext.video_compressor = '0.0.2'
     ext.zxing_core_version = '3.3.0'
     ext.zxing_android_embedded_version = '4.0.0'
     repositories {
@@ -84,14 +88,24 @@ allprojects {
     repositories {
         google()
         jcenter()
+
+//        maven { url "https://raw.githubusercontent.com/Android-Mainli/Maven/master" }
+
+
+        maven {
+            url "http://nexus.silkrode.in:8081/repository/android/"
+        }
         maven { url 'https://jitpack.io' }
-        maven { url "https://raw.githubusercontent.com/Android-Mainli/Maven/master" }
         maven { url 'https://dl.bintray.com/cks/Utils' }
-        maven { url 'https://dl.bintray.com/cks/Manager' }
-        maven { url 'https://dl.bintray.com/cks/Provider' }
+//        maven { url 'https://dl.bintray.com/cks/Manager' }
+//        maven { url 'https://dl.bintray.com/cks/Provider' }
 
         maven { url 'https://dl.bintray.com/cks/FFMPEG' }
         maven { url 'https://dl.bintray.com/cks/VideoTools' }
+        maven {
+            name = "Github"
+            url = uri("https://raw.githubusercontent.com/CKS-ROC/mavenrepository/master")
+        }
     }
 }
 
