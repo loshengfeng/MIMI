@@ -16,11 +16,11 @@
     <string name="press_again_exit">再按一次离开 APP</string>
 
     <!-- Nav Button -->
-    <string name="nav_home">一般影视</string>
-    <string name="nav_adult">成人影视</string>
-    <string name="nav_topup">充值</string>
-    <string name="nav_favorite">收藏</string>
+    <string name="nav_home">首页</string>
+    <string name="nav_clip">小视频</string>
+    <string name="nav_club">社区</string>
     <string name="nav_personal">我的</string>
+
 
     <!-- Categories -->
     <string name="home">首页</string>
@@ -111,6 +111,7 @@
     <string name="personal_not_login_tips_1">还没登录吗?</string>
     <string name="personal_not_login_tips_2">赶紧登录观看更多内容</string>
     <string name="personal_not_login_tips_3">若尚未成为会员，赶紧注册体验更多内容</string>
+    <string name="personal_topup_page">充值</string>
     <string name="personal_topup">充值去 ></string>
     <string name="personal_follow">我的关注</string>
     <string name="personal_order">充值管理</string>

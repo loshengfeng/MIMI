@@ -12,7 +12,7 @@
         android:layout_height="56dp"
         android:background="@color/color_gray_2"
         android:gravity="center"
-        android:text="@string/nav_topup"
+        android:text="@string/personal_topup_page"
         android:textColor="@color/color_black_1"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"

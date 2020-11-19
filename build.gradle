@@ -109,22 +109,6 @@ allprojects {
     }
 }
 
-//subprojects {
-//   if (it.name =="video-editor"){
-//       //FIXME add  project only itself library repo
-//       repositories {
-//           maven { url 'https://dl.bintray.com/cks/FFMPEG' }
-//       }
-//   }
-//    if (it.name =="app"){
-//        //FIXME add  project only itself library repo
-//        repositories {
-//            maven { url 'https://dl.bintray.com/cks/VideoTools' }
-//            maven { url 'https://dl.bintray.com/cks/FFMPEG' }
-//        }
-//    }
-//}
-
 task clean(type: Delete) {
     delete rootProject.buildDir
 }

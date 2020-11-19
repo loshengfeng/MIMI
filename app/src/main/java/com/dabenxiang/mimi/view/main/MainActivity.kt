@@ -46,8 +46,7 @@ import java.util.*
 
 class MainActivity : BaseActivity(){
 
-//    private val viewModel: MainViewModel by viewModels()
-    private val viewModel: MainViewModel by viewModel()
+    private val viewModel: MainViewModel by viewModels()
 
     private val badgeViewMap = mutableMapOf<BottomNavType, View>()
 
@@ -160,9 +159,9 @@ class MainActivity : BaseActivity(){
         bottom_navigation.itemIconTintList = null
 
         val navGraphIds = listOf(
-            R.navigation.navigation_adult,
-            R.navigation.navigation_topup,
-            R.navigation.navigation_favorite,
+            R.navigation.navigation_home,
+            R.navigation.navigation_clip,
+            R.navigation.navigation_club,
             R.navigation.navigation_personal
         )
 

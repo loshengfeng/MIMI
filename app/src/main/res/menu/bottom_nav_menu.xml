@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/navigation_adult"
+        android:id="@+id/navigation_home"
         android:enabled="true"
-        android:icon="@drawable/btn_adult_movies"
-        android:title="@string/nav_adult" />
+        android:icon="@drawable/btn_home"
+        android:title="@string/nav_home" />
     <item
-        android:id="@+id/navigation_topup"
+        android:id="@+id/navigation_clip"
         android:enabled="true"
         android:icon="@drawable/btn_micoin"
-        android:title="@string/nav_topup"/>
+        android:title="@string/nav_clip"/>
     <item
-        android:id="@+id/navigation_favorite"
+        android:id="@+id/navigation_club"
         android:enabled="true"
         android:icon="@drawable/btn_favorite"
-        android:title="@string/nav_favorite" />
+        android:title="@string/nav_club" />
     <item
         android:id="@+id/navigation_personal"
         android:enabled="true"

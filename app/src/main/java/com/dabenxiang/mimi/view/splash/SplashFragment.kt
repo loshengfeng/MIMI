@@ -32,8 +32,7 @@ import tw.gov.president.manager.submanager.update.data.VersionStatus
 
 class SplashFragment : BaseFragment() {
 
-//    private val viewModel: SplashViewModel by viewModels()
-    private val viewModel: SplashViewModel by viewModel()
+    private val viewModel: SplashViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

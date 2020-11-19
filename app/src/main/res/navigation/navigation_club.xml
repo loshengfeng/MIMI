@@ -2,8 +2,8 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/navigation_home"
-    app:startDestination="@id/splashFragment">
+    android:id="@+id/navigation_clubFragment"
+    app:startDestination="@id/clubFragment">
 
     <include app:graph="@navigation/navigation_login" />
 
@@ -21,10 +21,9 @@
     </fragment>
 
     <fragment
-        android:id="@+id/homeFragment"
-        android:name="com.dabenxiang.mimi.view.mimi_home.HomeFragment"
-        tools:layout="@layout/fragment_mimi_home">
-
+        android:id="@+id/clubFragment"
+        android:name="com.dabenxiang.mimi.view.club.ClubFragment"
+        tools:layout="@layout/fragment_club">
     </fragment>
 
 </navigation>

@@ -31,7 +31,7 @@ class SplashViewModel : BaseViewModel() {
     private val _autoLoginResult = MutableLiveData<ApiResult<Nothing>>()
     val autoLoginResult: LiveData<ApiResult<Nothing>> = _autoLoginResult
 
-//    private val _versionStatus = MutableLiveData<VersionStatus>()
+    private val _versionStatus = MutableLiveData<VersionStatus>()
     val versionStatus: LiveData<VersionStatus> = _versionStatus
 
     private val _apiError: MutableLiveData<Boolean> = MutableLiveData()
