@@ -5,7 +5,7 @@ apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 apply from: 'https://gitlab.silkrode.com.tw/Neo/common_gradle/raw/master/utils_info_android_builder.gradle'
 apply from: 'https://gitlab.silkrode.com.tw/Neo/common_gradle/raw/master/utils_info_ip.gradle'
-
+apply from: 'https://gitlab.silkrode.com.tw/Neo/common_gradle/raw/master/version.gradle'
 android {
     signingConfigs {
         release {
@@ -50,7 +50,7 @@ android {
     }
 
 
-    Version version = readVersion()
+    def version = this.ext.default_version()
     defaultConfig {
         applicationId "com.dabenxiang.mimi"
         minSdkVersion 24
@@ -384,32 +384,6 @@ dependencies {
     implementation "com.google.zxing:core:$zxing_core_version"
 }
 
-class Version {
-    def versionCode
-    def versionName
-}
-
-Version readVersion() {
-    readVersion('version.properties')
-}
-
-Version readVersion(String version_properties_path) {
-    Properties defaultVersionProps = new Properties()
-    def pfile = file(version_properties_path)
-    if (!pfile.exists()) {
-        pfile = file('version.properties')
-    }
-    defaultVersionProps.load(new FileInputStream(pfile))
-    def defaultBuildVersionCode = defaultVersionProps['VERSION_CODE']
-    def hotfix = defaultVersionProps['VERSION_NAME_HOTFIX']
-    def defaultBuildVersionName
-    if (hotfix != "0") {
-        defaultBuildVersionName = defaultVersionProps['VERSION_NAME_PREFIX'] + "." + defaultVersionProps['VERSION_NAME_BUILD'] + "." + hotfix
-    } else {
-        defaultBuildVersionName = defaultVersionProps['VERSION_NAME_PREFIX'] + "." + defaultVersionProps['VERSION_NAME_BUILD']
-    }
-    return new Version(versionCode: defaultBuildVersionCode, versionName: defaultBuildVersionName)
-}
 
 def getAPI_Host(String buildtype) {
     def path = "http://api.vsense.dev-121.silkrode.io"
@@ -453,55 +427,4 @@ def getMQTT_Host(String buildtype) {
             break
     }
     return path
-}
-
-task increaseVersion {
-    group "version Tasks"
-    doLast {
-        increaseVersion()
-    }
-}
-
-task increaseHotfixVersion {
-    group "version Tasks"
-    doLast {
-        increaseHotfixVersion()
-    }
-}
-
-def increaseVersion() {
-    increaseVersion('version.properties')
-}
-
-def increaseVersion(String version_properties_path) {
-    Properties versionProps = new Properties()
-    def file = file(version_properties_path)
-    versionProps.load(new FileInputStream(file))
-    def hotfix = versionProps['VERSION_NAME_HOTFIX'].toInteger()
-    def nextCode = versionProps['VERSION_CODE'].toInteger() - hotfix + 10
-    versionProps['VERSION_CODE'] = nextCode.toString()
-    def nextBuild = versionProps['VERSION_NAME_BUILD'].toInteger() + 1
-    versionProps['VERSION_NAME_BUILD'] = nextBuild.toString()
-    hotfix = 0
-    versionProps['VERSION_NAME_HOTFIX'] = hotfix.toString()
-    versionProps.store(file.newWriter(), null)
-    def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD']
-    println "Increase $buildVersionName"
-}
-
-def increaseHotfixVersion() {
-    increaseHotfixVersion('version.properties')
-}
-
-def increaseHotfixVersion(String version_properties_path) {
-    Properties versionProps = new Properties()
-    def file = file(version_properties_path)
-    versionProps.load(new FileInputStream(file))
-    def nextCode = versionProps['VERSION_CODE'].toInteger() + 1
-    versionProps['VERSION_CODE'] = nextCode.toString()
-    def hotfix = versionProps['VERSION_NAME_HOTFIX'].toInteger() + 1
-    versionProps['VERSION_NAME_HOTFIX'] = hotfix.toString()
-    versionProps.store(file.newWriter(), null)
-    def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD'] + "." + versionProps['VERSION_NAME_HOTFIX']
-    println "Increase $buildVersionName"
 }
