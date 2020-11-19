@@ -95,6 +95,8 @@ android {
         ndk {
             abiFilters "armeabi-v7a", "arm64-v8a", "x86"
         }
+
+//        testInstrumentationRunner "com.dabenxiang.mimi.KoinTestRunner"
     }
 
     buildTypes {
@@ -259,14 +261,16 @@ dependencies {
     // Koin
     implementation "org.koin:koin-core:$koin_version"
     implementation "org.koin:koin-core-ext:$koin_version"
-    implementation "org.koin:koin-java:$koin_version"
+//    implementation "org.koin:koin-java:$koin_version"
     implementation "org.koin:koin-android:$koin_version"
     implementation "org.koin:koin-android-scope:$koin_version"
     implementation "org.koin:koin-android-viewmodel:$koin_version"
     implementation "org.koin:koin-android-ext:$koin_version"
+    implementation "org.koin:koin-androidx-fragment:$koin_version"
     implementation "org.koin:koin-androidx-scope:$koin_version"
     implementation "org.koin:koin-androidx-viewmodel:$koin_version"
     implementation "org.koin:koin-androidx-ext:$koin_version"
+    implementation "org.koin:koin-androidx-compose:$koin_version"
 
     // Paging
     implementation "androidx.paging:paging-runtime:$paging_version"
@@ -360,10 +364,11 @@ dependencies {
     implementation "org.cks.utils:logmanager:$cks_log_version"
     implementation "org.cks.utils:utils_device:$cks_utils"
     implementation "org.cks.utils:utils_api_result:$cks_utils"
-    implementation "org.cks.utils:utils_general:$cks_utils"
-    implementation "org.cks.utils:utils_loglevel:$cks_utils"
-    implementation "org.cks.utils:utils_gson_factory:$cks_utils"
+    implementation "org.cks.utils:utils_general:$cks_utils_general"
+    implementation "org.cks.utils:utils_loglevel:$cks_utils_loglevel"
+    implementation "org.cks.utils:utils_gson_factory:$cks_utils_gson_factory"
     implementation "org.cks.utils:updatemanager:$cks_update_version"
+
 
     // Domain GoLib
     implementation project(path: ':domain_libs')
@@ -378,12 +383,22 @@ dependencies {
     // Test
     testImplementation "io.mockk:mockk:$mokk_version"
     testImplementation "junit:junit:$junit_version"
-    testImplementation "org.koin:koin-test:$koin_version"
+
     testImplementation "androidx.room:room-testing:$room_version"
     testImplementation "androidx.paging:paging-common:$paging_version"
     testImplementation "androidx.arch.core:core-testing:$core_testing"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
     testImplementation "com.squareup.okhttp3:mockwebserver:$mock_webserver_version"
+
+    //koin test
+    testImplementation "org.koin:koin-test:$koin_version"
+    testImplementation "org.mockito:mockito-inline:$mockito_inline"
+    testImplementation "org.mockito:mockito-core:$mockito_inline"
+    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
+    testImplementation 'android.arch.core:core-testing:2.1.0'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.2'
+
+    debugImplementation "androidx.fragment:fragment-testing:$fragment_ktx_version"
     androidTestImplementation "androidx.test:runner:$runner_version"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
     androidTestImplementation "io.mockk:mockk-android:$mokk_version"

@@ -9,8 +9,8 @@ import okhttp3.Interceptor
 import okhttp3.Response
 import okio.Buffer
 import org.json.JSONObject
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
 import java.io.EOFException
 import java.nio.charset.Charset

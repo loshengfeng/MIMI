@@ -5,6 +5,7 @@ import android.util.Log
 import com.dabenxiang.mimi.di.apiModule
 import com.dabenxiang.mimi.di.appModule
 import com.dabenxiang.mimi.di.managerModule
+import com.dabenxiang.mimi.di.viewModelModule
 import com.dabenxiang.mimi.widget.log.DebugLogTree
 import com.facebook.stetho.Stetho
 import com.flurry.android.FlurryAgent
@@ -47,7 +48,8 @@ class App : Application() {
         val module = listOf(
             appModule,
             apiModule,
-            managerModule
+            managerModule,
+            viewModelModule
         )
 
         startKoin {
@@ -58,8 +60,6 @@ class App : Application() {
 
         val configData = ConfigData(
             BuildConfig.API_HOST,
-//            BuildConfig.FLAVOR,
-            BuildConfig.BUILD_TYPE,
             BuildConfig.BUILD_TYPE,
             BuildConfig.DEBUG,
             BuildConfig.APPLICATION_ID,

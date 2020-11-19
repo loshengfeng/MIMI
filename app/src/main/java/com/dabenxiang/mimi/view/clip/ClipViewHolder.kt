@@ -19,8 +19,8 @@ import com.google.android.exoplayer2.ui.PlayerView
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_clip.view.*
 import kotlinx.android.synthetic.main.recharge_reminder.view.*
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view), KoinComponent {
 

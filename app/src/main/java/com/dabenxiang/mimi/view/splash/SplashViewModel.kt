@@ -18,7 +18,8 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import retrofit2.HttpException
 import timber.log.Timber
 import tw.gov.president.manager.submanager.update.VersionManager
@@ -30,7 +31,7 @@ class SplashViewModel : BaseViewModel() {
     private val _autoLoginResult = MutableLiveData<ApiResult<Nothing>>()
     val autoLoginResult: LiveData<ApiResult<Nothing>> = _autoLoginResult
 
-    private val _versionStatus = MutableLiveData<VersionStatus>()
+//    private val _versionStatus = MutableLiveData<VersionStatus>()
     val versionStatus: LiveData<VersionStatus> = _versionStatus
 
     private val _apiError: MutableLiveData<Boolean> = MutableLiveData()
@@ -76,7 +77,7 @@ class SplashViewModel : BaseViewModel() {
                 emit(versionStatus)
             }.flowOn(Dispatchers.IO).collect {
                 Timber.i("checkVersion = $it")
-                _versionStatus.value = it
+                _versionStatus.value =it
             }
         }
     }
