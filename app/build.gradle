@@ -3,32 +3,10 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
+apply from: 'https://gitlab.silkrode.com.tw/Neo/common_gradle/raw/master/utils_info_android_builder.gradle'
 
-def android_builder_version = "3.5.3"
-def android_builder_main_version = 3
 
 android {
-    this.rootProject.buildscript.configurations.classpath
-            .resolvedConfiguration
-            .firstLevelModuleDependencies.
-            each {
-                def name = it.name
-                if (name.contains('com.android.tools.build:gradle')) {
-                    def moduleVersion = it.moduleVersion
-                    if (moduleVersion.contains("-")) {
-                        def versionArray = moduleVersion.split("-")
-                        version = versionArray[0]
-                        alpha = versionArray[1]
-                    } else {
-                        version = moduleVersion
-                        android_builder_version = moduleVersion
-                        println "Android Builder Version : " + android_builder_version
-                    }
-                }
-            }
-    android_builder_main_version = Integer.parseInt(android_builder_version.split("\\.")[0])
-    println "Android Builder Main Version : " + android_builder_main_version
-
     signingConfigs {
         release {
             storeFile file("./keystore/release.keystore")
@@ -51,8 +29,16 @@ android {
         }
     }
 
-    buildFeatures {
-        dataBinding false
+    if (ext.android_builder_main_version < 4) {
+        dataBinding {
+            enabled = true
+        }
+    } else {
+        buildFeatures {
+            dataBinding true
+            // for view binding:
+            // viewBinding true
+        }
     }
 
     androidExtensions {
