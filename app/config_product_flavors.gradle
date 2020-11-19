@@ -1,0 +1,16 @@
+android {
+    flavorDimensions "normal"
+    productFlavors {
+        mimi {
+            dimension = "normal"
+            getIsDefault().set(true)
+            ext {
+                mqtt = [sit: "wss://mqtt.ymmsp.com:443", dev: "ws://10.1.1.121:8083", prod: "ws://10.1.1.121:8083"]
+            }
+        }
+    }
+
+    productFlavors.all { flavor ->
+        println "ProductFlavors Show flavor name " + flavor.name
+    }
+}

@@ -7,7 +7,7 @@ apply from: 'https://gitlab.silkrode.com.tw/Neo/common_gradle/raw/master/utils_i
 apply from: 'https://gitlab.silkrode.com.tw/Neo/common_gradle/raw/master/utils_info_ip.gradle'
 apply from: 'https://gitlab.silkrode.com.tw/Neo/common_gradle/raw/master/version.gradle'
 apply from: './config_buildtypes.gradle'
-
+apply from: './config_product_flavors.gradle'
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.1"
@@ -58,22 +58,6 @@ android {
         }
 
 //        testInstrumentationRunner "com.dabenxiang.mimi.KoinTestRunner"
-    }
-
-
-    flavorDimensions "normal"
-    productFlavors {
-        mimi {
-            dimension = "normal"
-            getIsDefault().set(true)
-            ext {
-                mqtt = [sit: "wss://mqtt.ymmsp.com:443", dev: "ws://10.1.1.121:8083", prod: "ws://10.1.1.121:8083"]
-            }
-        }
-    }
-
-    productFlavors.all { flavor ->
-        println "ProductFlavors Show flavor name " + flavor.name
     }
 
     applicationVariants.all { variant ->
