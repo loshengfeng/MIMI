@@ -9,6 +9,8 @@ apply from: 'https://gitlab.silkrode.com.tw/Neo/common_gradle/raw/master/version
 apply from: './config_buildtypes.gradle'
 apply from: './config_product_flavors.gradle'
 android {
+    // Ref : https://developer.android.com/studio/projects/install-ndk#apply-specific-version
+    ndkVersion "21.3.6528147"  //TODO  define NDK version  now not use local.properties
     compileSdkVersion 30
     buildToolsVersion "30.0.1"
 
