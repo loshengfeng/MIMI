@@ -50,7 +50,7 @@ class ClipFragment : BaseFragment() {
 
     private var isShowComment = false
 
-    override val bottomNavigationVisibility = View.GONE
+    override val bottomNavigationVisibility = View.VISIBLE
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
