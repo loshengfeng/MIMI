@@ -462,4 +462,9 @@
     <string name="daily_check_in">每日签到</string>
     <string name="daily_check_in_hint">赠送秘密视频 %1$d 部、短视频 %2$d 部</string>
 
+
+    <!-- Actress -->
+    <string name="actress_hot_actresses">人气女优</string>
+    <string name="actress_all_actresses">全部女优</string>
+
 </resources>
