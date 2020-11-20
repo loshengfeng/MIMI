@@ -84,9 +84,8 @@ android {
 //        def flavor_version = this.ext.default_version(flavorName)
         println "Show " + flavorName + " current flavor_version versionName " + version.versionName
         println "Show " + flavorName + " current _version versionCode :   " + version.versionCode
-        variant.buildConfigField "String", "API_HOST", "\"${getAPI_Host(buildtype)}\""
-        variant.buildConfigField "String", "AD_API_HOST", "\"${getAD_API_Host(buildtype)}\""
-//        variant.buildConfigField "String", "MQTT_HOST", "\"${getMQTT_Host(buildtype)}\""
+        variant.buildConfigField "String", "API_HOST", "\"${flavor.ext.API_HOST[buildtype]}\""
+        variant.buildConfigField "String", "AD_API_HOST", "\"${flavor.ext.AD_API_HOST[buildtype]}\""
         variant.buildConfigField "String", "MQTT_HOST", "\"${flavor.ext.mqtt[buildtype]}\""
 
         variant.outputs.each { output ->
@@ -108,7 +107,7 @@ android {
             if (full_buildTypename.contains("debug") || full_buildTypename.contains("dev")) return
 
             // 設定 uploadHosts
-            this.project.ext.uploadHosts.put(flavorName + buildType, flavor.ext.GAM_API_HOST[buildType])
+            this.project.ext.uploadHosts.put(flavorName + buildType, flavor.ext.API_HOST[buildType])
             // 設定 driveFolderIds
             this.project.ext.driveFolderIds.put(flavorName + buildType, flavor.ext.DRIVE_FOLDER_ID[buildType])
         }
@@ -346,49 +345,4 @@ dependencies {
     // QrCode
     implementation "com.journeyapps:zxing-android-embedded:$zxing_android_embedded_version"
     implementation "com.google.zxing:core:$zxing_core_version"
-}
-
-
-def getAPI_Host(String buildtype) {
-    def path = "http://api.vsense.dev-121.silkrode.io"
-    switch (buildtype) {
-        case "sit":
-            path = "http://api.vsense.dev-121.silkrode.io"
-            break
-        case "dev":
-            path = "http://api.vsense.dev-121.silkrode.io"
-            break
-        case "prod":
-        default:
-            break
-    }
-    return path
-}
-
-def getAD_API_Host(String buildtype) {
-    def path = "http://api.promotion.dev-121.silkrode.io"
-    switch (buildtype) {
-        case "sit":
-        case "dev":
-        case "prod":
-        default:
-            break
-    }
-    return path
-}
-
-def getMQTT_Host(String buildtype) {
-    def path = "ws://10.1.1.121:8083"
-    switch (buildtype) {
-        case "sit":
-            path = "wss://mqtt.ymmsp.com:443"
-            break
-        case "dev":
-            path = "ws://10.1.1.121:8083"
-            break
-        case "prod":
-        default:
-            break
-    }
-    return path
 }

@@ -5,7 +5,10 @@ android {
             dimension = "normal"
             getIsDefault().set(true)
             ext {
+                API_HOST = [sit: "http://api.vsense.dev-121.silkrode.io", dev: "http://api.vsense.dev-121.silkrode.io", prod: "http://api.vsense.dev-121.silkrode.io"]
+                AD_API_HOST = [sit: "http://api.promotion.dev-121.silkrode.io", dev: "http://api.promotion.dev-121.silkrode.io", prod: "http://api.promotion.dev-121.silkrode.io"]
                 mqtt = [sit: "wss://mqtt.ymmsp.com:443", dev: "ws://10.1.1.121:8083", prod: "ws://10.1.1.121:8083"]
+                DRIVE_FOLDER_ID = [sit: "", dev: "", prod: ""]
             }
         }
     }
