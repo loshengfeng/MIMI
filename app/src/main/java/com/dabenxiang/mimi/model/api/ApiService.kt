@@ -702,5 +702,5 @@ interface ApiService {
      *
      ***********************************************************/
     @GET("/v1/Members/Home/Menu")
-    suspend fun getMenu(): Response<ApiBaseItem<ArrayList<MenuItem>>>
+    suspend fun getMenu(): Response<ApiBaseItem<List<MenuItem>>>
 }

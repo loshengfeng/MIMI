@@ -14,21 +14,21 @@ import retrofit2.HttpException
 
 class MiMiViewModel : BaseViewModel() {
 
-    private val _menusItems = MutableLiveData<ApiResult<ArrayList<MenusItem>>>()
-    val menusItems: LiveData<ApiResult<ArrayList<MenusItem>>> = _menusItems
+    private val _menusItems = MutableLiveData<ApiResult<List<MenusItem>>>()
+    val menusItems: LiveData<ApiResult<List<MenusItem>>> = _menusItems
 
     fun getMenu() {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getMenu()
                 if (!result.isSuccessful) throw HttpException(result)
-                val menusItem = result.body()?.content?.get(0)?.menus
-                emit(ApiResult.success(menusItem))
+                val menuItems = result.body()?.content?.get(0)?.menus
+                val sortedMenuItems = menuItems?.sortedBy { item -> item.sorting }
+                emit(ApiResult.success(sortedMenuItems))
             }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _menusItems.value = it }
         }
     }
-
 
 }

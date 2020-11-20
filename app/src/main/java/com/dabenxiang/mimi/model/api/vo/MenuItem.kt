@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.model.api.vo
 
+import com.dabenxiang.mimi.model.enums.LayoutType
 import com.google.gson.annotations.SerializedName
 
 data class MenuItem(
@@ -16,7 +17,7 @@ data class MenuItem(
     val category: String = "",
 
     @SerializedName("menus")
-    val menus: ArrayList<MenusItem> = arrayListOf()
+    val menus: List<MenusItem> = arrayListOf()
 )
 
 data class MenusItem(
@@ -24,7 +25,7 @@ data class MenusItem(
     val name: String = "",
 
     @SerializedName("type")
-    val type: Int = 0,
+    val type: LayoutType = LayoutType.GENERAL,
 
     @SerializedName("sorting")
     val sorting: Int = 0,
