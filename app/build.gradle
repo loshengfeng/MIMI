@@ -108,9 +108,9 @@ android {
             if (full_buildTypename.contains("debug") || full_buildTypename.contains("dev")) return
 
             // 設定 uploadHosts
-//            this.project.ext.uploadHosts.put(flavorName + buildType, flavor.ext.GAM_API_HOST[buildType])
-//            // 設定 driveFolderIds
-//            this.project.ext.driveFolderIds.put(flavorName + buildType, flavor.ext.DRIVE_FOLDER_ID[buildType])
+            this.project.ext.uploadHosts.put(flavorName + buildType, flavor.ext.GAM_API_HOST[buildType])
+            // 設定 driveFolderIds
+            this.project.ext.driveFolderIds.put(flavorName + buildType, flavor.ext.DRIVE_FOLDER_ID[buildType])
         }
     }
 
