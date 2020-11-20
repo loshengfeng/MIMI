@@ -163,9 +163,11 @@ interface ApiService {
     ): Response<Void>
 
     @GET("/v1/Members/VideoReport")
-    suspend fun getMemberVideoReport(@Query("videoId") videoId: Long,
-                                     @Query("type") type: Int,
-                                     @Query("unhealthy") unhealthy:Boolean): Response<Void>
+    suspend fun getMemberVideoReport(
+        @Query("videoId") videoId: Long,
+        @Query("type") type: Int,
+        @Query("unhealthy") unhealthy: Boolean
+    ): Response<Void>
 
     /**********************************************************
      *
@@ -693,4 +695,12 @@ interface ApiService {
         @Query("limit") limit: String
     ): Response<ApiBasePagingItem<ArrayList<ReferrerHistoryItem>>>
 
+
+    /**********************************************************
+     *
+     *                   Members/Home/Menu
+     *
+     ***********************************************************/
+    @GET("/v1/Members/Home/Menu")
+    suspend fun getMenu(): Response<ApiBaseItem<List<MenuItem>>>
 }

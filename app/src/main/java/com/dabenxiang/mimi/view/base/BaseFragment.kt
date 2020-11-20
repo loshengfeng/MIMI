@@ -75,11 +75,6 @@ abstract class BaseFragment : Fragment() {
     var mView: View? = null
     var firstCreateView = false
 
-//    val locationPermissions = arrayOf(
-//        Manifest.permission.ACCESS_COARSE_LOCATION,
-//        Manifest.permission.ACCESS_FINE_LOCATION
-//    )
-
     val externalPermissions = arrayOf(
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -192,7 +187,11 @@ abstract class BaseFragment : Fragment() {
                             uploadPhoto()
                         } else {
                             val pic = uploadPicUri[uploadCurrentPicPosition]
-                            mainViewModel?.postAttachment(pic.uri, requireContext(), HomeViewModel.TYPE_PIC)
+                            mainViewModel?.postAttachment(
+                                pic.uri,
+                                requireContext(),
+                                HomeViewModel.TYPE_PIC
+                            )
                         }
                     } else {
                         uploadPicList[uploadCurrentPicPosition].id = it.result.toString()
@@ -213,7 +212,8 @@ abstract class BaseFragment : Fragment() {
                             mainViewModel?.postPic(postId!!, postMemberRequest, content)
                         } else {
                             val pic = uploadPicList[uploadCurrentPicPosition]
-                            mainViewModel?.postAttachment(pic.url, requireContext(),
+                            mainViewModel?.postAttachment(
+                                pic.url, requireContext(),
                                 MyPostFragment.TYPE_PIC
                             )
                         }
@@ -363,7 +363,7 @@ abstract class BaseFragment : Fragment() {
         })
     }
 
-    private  fun deleteTempFile() {
+    private fun deleteTempFile() {
         try {
             val picPath = UriUtils.getPath(requireContext(), Uri.parse(uploadVideoList[0].picUrl))
 
@@ -433,7 +433,8 @@ abstract class BaseFragment : Fragment() {
 
                     val memberRequest = it.getParcelable<PostMemberRequest>(MEMBER_REQUEST)
 
-                    deleteVideoItem = it.getParcelableArrayList(BasePostFragment.DELETE_ATTACHMENT)!!
+                    deleteVideoItem =
+                        it.getParcelableArrayList(BasePostFragment.DELETE_ATTACHMENT)!!
                     uploadVideoList = it.getParcelableArrayList(BasePostFragment.VIDEO_DATA)!!
                     postId = it.getLong(BasePostFragment.POST_ID, 0)
 
@@ -450,7 +451,10 @@ abstract class BaseFragment : Fragment() {
         }
     }
 
-    private fun newImagePost(picUriList: ArrayList<PostAttachmentItem>, memberRequest: PostMemberRequest) {
+    private fun newImagePost(
+        picUriList: ArrayList<PostAttachmentItem>,
+        memberRequest: PostMemberRequest
+    ) {
         uploadPicUri.addAll(picUriList)
         val pic = uploadPicUri[uploadCurrentPicPosition]
         mainViewModel?.postAttachment(pic.uri, requireContext(), HomeViewModel.TYPE_PIC)
@@ -459,7 +463,11 @@ abstract class BaseFragment : Fragment() {
         memberPostItem.tags = memberRequest.tags
     }
 
-    private fun updateImagePost(bundle: Bundle, data: Serializable, picUriList: ArrayList<PostAttachmentItem>) {
+    private fun updateImagePost(
+        bundle: Bundle,
+        data: Serializable,
+        picUriList: ArrayList<PostAttachmentItem>
+    ) {
         deletePicList = bundle.getStringArrayList(BasePostFragment.DELETE_ATTACHMENT)!!
         memberPostItem = data as MemberPostItem
         postId = bundle.getLong(BasePostFragment.POST_ID)
@@ -501,7 +509,8 @@ abstract class BaseFragment : Fragment() {
         postMemberRequest = memberRequest
         memberPostItem.title = memberRequest.title
         memberPostItem.tags = memberRequest.tags
-        mainViewModel?.postAttachment(uploadVideoList[0].picUrl, requireContext(),
+        mainViewModel?.postAttachment(
+            uploadVideoList[0].picUrl, requireContext(),
             HomeViewModel.TYPE_COVER
         )
     }
@@ -551,7 +560,8 @@ abstract class BaseFragment : Fragment() {
 
     open fun setUpStatusBarColor() {
         activity?.also {
-            (it as MainActivity).window.statusBarColor = requireContext().getColor(R.color.normal_color_status_bar)
+            (it as MainActivity).window.statusBarColor =
+                requireContext().getColor(R.color.normal_color_status_bar)
         }
     }
 
@@ -828,7 +838,11 @@ abstract class BaseFragment : Fragment() {
         )
     }
 
-    fun onMoreClick(item: MemberPostItem, items: ArrayList<MemberPostItem>, onEdit: (BaseMemberPostItem) -> Unit){
+    fun onMoreClick(
+        item: MemberPostItem,
+        items: ArrayList<MemberPostItem>,
+        onEdit: (BaseMemberPostItem) -> Unit
+    ) {
         val isMe = mainViewModel?.accountManager?.getProfile()?.userId == item.creatorId
         if (isMe) {
             showMeMoreDialog(item, items, onEdit)
@@ -867,19 +881,24 @@ abstract class BaseFragment : Fragment() {
             }
         }
         meMoreDialog = MyPostMoreDialogFragment.newInstance(item, onMeMoreDialogListener)
-                .also {
-                    it.show(
-                        requireActivity().supportFragmentManager,
-                        MoreDialogFragment::class.java.simpleName
-                    )
-                }
+            .also {
+                it.show(
+                    requireActivity().supportFragmentManager,
+                    MoreDialogFragment::class.java.simpleName
+                )
+            }
     }
 
-    private fun showMoreDialog(item: MemberPostItem){
+    private fun showMoreDialog(item: MemberPostItem) {
         val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-            override fun onProblemReport(item: BaseMemberPostItem, isComment:Boolean) {
+            override fun onProblemReport(item: BaseMemberPostItem, isComment: Boolean) {
                 moreDialog?.dismiss()
-                checkStatus { (requireActivity() as MainActivity).showReportDialog(item, isComment = isComment) }
+                checkStatus {
+                    (requireActivity() as MainActivity).showReportDialog(
+                        item,
+                        isComment = isComment
+                    )
+                }
             }
 
             override fun onCancel() {
