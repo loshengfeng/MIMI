@@ -9,14 +9,13 @@
         <item name="android:windowLightStatusBar">true</item>
     </style>
 
-    <style name="PlayerTheme" parent="Theme.AppCompat.NoActionBar">
-    </style>
+    <style name="PlayerTheme" parent="Theme.AppCompat.NoActionBar"></style>
 
     <style name="CircularProgress" parent="Theme.AppCompat.Light">
         <item name="colorAccent">@color/color_red_1</item>
     </style>
 
-    <style name="login_edit_text" >
+    <style name="login_edit_text">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">42dp</item>
         <item name="android:layout_marginTop">20dp</item>
@@ -25,7 +24,7 @@
         <item name="android:background">@drawable/edit_text_rectangle</item>
     </style>
 
-    <style name="login_layout" >
+    <style name="login_layout">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">42dp</item>
         <item name="android:layout_marginTop">20dp</item>
@@ -134,4 +133,8 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
     <style name="Theme.Drinks.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
     <style name="Theme.Drinks.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    
+    <style name="TabLayoutTextStyle">
+        <item name="android:textSize">18sp</item>
+    </style>
 </resources>
