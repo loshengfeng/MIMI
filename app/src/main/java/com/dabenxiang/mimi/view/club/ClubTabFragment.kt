@@ -8,6 +8,7 @@ import androidx.fragment.app.viewModels
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.club.adapter.ClubTabAdapter
+import com.dabenxiang.mimi.view.club.topic.TopicTabAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_tab_club.*
 
@@ -32,19 +33,15 @@ class ClubTabFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (activity as AppCompatActivity).apply {
-            this.setSupportActionBar(toolbar)
-
-        }
-        toolbar_title.text = getString(R.string.nav_club)
-
         club_view_pager.adapter = ClubTabAdapter(this)
         TabLayoutMediator(club_tabs, club_view_pager) { tab, position ->
             tab.text = getTabTitle(position)
         }.attach()
 
+        val topicTabAdapter = TopicTabAdapter()
+        topic_tabs.adapter = topicTabAdapter
+        topicTabAdapter.setTestData()
     }
-
 
     private fun getTabTitle(position: Int): String? {
         return when (position) {
@@ -59,3 +56,5 @@ class ClubTabFragment : BaseFragment() {
     }
 
 }
+
+

@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.search.post
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.Spanned
@@ -10,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
-import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
@@ -46,7 +44,6 @@ import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
-import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
@@ -261,7 +258,7 @@ class SearchPostFragment : BaseFragment() {
         }
 
         iv_clean.setOnClickListener {
-            edit_search.setText("")
+            search_bar.setText("")
         }
 
         iv_clear_search_text.setOnClickListener {
@@ -273,7 +270,7 @@ class SearchPostFragment : BaseFragment() {
             search()
         }
 
-        edit_search.setOnEditorActionListener { v, actionId, event ->
+        search_bar.setOnEditorActionListener { v, actionId, event ->
             when (actionId) {
                 EditorInfo.IME_ACTION_SEARCH -> {
                     search()
@@ -283,7 +280,7 @@ class SearchPostFragment : BaseFragment() {
             }
         }
 
-        edit_search.addTextChangedListener {
+        search_bar.addTextChangedListener {
             if (it.toString() == "" && !TextUtils.isEmpty(mTag)) {
                 layout_search_history.visibility = View.GONE
                 layout_search_text.visibility = View.VISIBLE
@@ -300,7 +297,7 @@ class SearchPostFragment : BaseFragment() {
 
     private fun search() {
         GeneralUtils.hideKeyboard(requireActivity())
-        if (viewModel.isSearchTextEmpty(edit_search.text.toString())) {
+        if (viewModel.isSearchTextEmpty(search_bar.text.toString())) {
             GeneralUtils.showToast(
                 requireContext(),
                 getString(R.string.search_input_empty_toast)
@@ -311,26 +308,26 @@ class SearchPostFragment : BaseFragment() {
         layout_search_text.visibility = View.VISIBLE
         updateTag("")
 
-        viewModel.updateSearchHistory(edit_search.text.toString())
+        viewModel.updateSearchHistory(search_bar.text.toString())
 
         if (isClub) {
-            viewModel.getClubs(edit_search.text.toString())
+            viewModel.getClubs(search_bar.text.toString())
             progressHUD?.show()
         } else {
             when (currentPostType) {
-                PostType.VIDEO_ON_DEMAND -> viewModel.getSearchVideoList("", edit_search.text.toString())
+                PostType.VIDEO_ON_DEMAND -> viewModel.getSearchVideoList("", search_bar.text.toString())
                 PostType.HYBRID -> {
-                    viewModel.getSearchVideoList("", edit_search.text.toString())
+                    viewModel.getSearchVideoList("", search_bar.text.toString())
                     viewModel.getSearchPostsByKeyword(
                             currentPostType,
-                            edit_search.text.toString(),
+                            search_bar.text.toString(),
                             isPostFollow
                     )
                 }
                 else -> {
                     viewModel.getSearchPostsByKeyword(
                             currentPostType,
-                            edit_search.text.toString(),
+                            search_bar.text.toString(),
                             isPostFollow
                     )
                 }
@@ -664,16 +661,16 @@ class SearchPostFragment : BaseFragment() {
 
     private fun updateTag(tag: String) {
         if (TextUtils.isEmpty(tag)) {
-            searchText = edit_search.text.toString()
+            searchText = search_bar.text.toString()
             mTag = tag
-            searchKeyword = edit_search.text.toString()
+            searchKeyword = search_bar.text.toString()
             (concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).setupTag(tag)
         } else {
             searchText = ""
             mTag = tag
             searchKeyword = tag
             (concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).setupTag(tag)
-            edit_search.setText("")
+            search_bar.setText("")
         }
     }
 
@@ -701,30 +698,30 @@ class SearchPostFragment : BaseFragment() {
             chip.ellipsize = TextUtils.TruncateAt.END
             chip.setTextColor(requireContext().getColor(R.color.color_black_1_50))
             chip.setOnClickListener {
-                edit_search.setText(text)
+                search_bar.setText(text)
                 layout_search_history.visibility = View.GONE
                 layout_search_text.visibility = View.VISIBLE
                 updateTag("")
                 if (isClub) {
-                    viewModel.getClubs(edit_search.text.toString())
+                    viewModel.getClubs(search_bar.text.toString())
                     progressHUD?.show()
                 } else {
                     when (currentPostType) {
                         PostType.VIDEO_ON_DEMAND -> {
-                            viewModel.getSearchVideoList("", edit_search.text.toString())
+                            viewModel.getSearchVideoList("", search_bar.text.toString())
                         }
                         PostType.HYBRID -> {
-                            viewModel.getSearchVideoList("", edit_search.text.toString())
+                            viewModel.getSearchVideoList("", search_bar.text.toString())
                             viewModel.getSearchPostsByKeyword(
                                     currentPostType,
-                                    edit_search.text.toString(),
+                                    search_bar.text.toString(),
                                     isPostFollow
                             )
                         }
                         else -> {
                             viewModel.getSearchPostsByKeyword(
                                     currentPostType,
-                                    edit_search.text.toString(),
+                                    search_bar.text.toString(),
                                     isPostFollow
                             )
                         }
