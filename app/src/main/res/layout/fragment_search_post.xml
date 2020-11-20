@@ -38,7 +38,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
-            android:id="@+id/edit_search"
+            android:id="@+id/search_bar"
             android:layout_width="0dp"
             android:layout_height="28dp"
             android:layout_marginStart="6dp"

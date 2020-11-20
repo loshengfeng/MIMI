@@ -99,6 +99,9 @@
     <string name="club_tab_clip">短视频</string>
     <string name="club_tab_picture">图片</string>
     <string name="club_tab_novel">小說</string>
+    <string name="club_search_hint">搜寻 ”该分类” 内容</string>
+    <string name="club_topic_title">热门主题</string>
+
 
     <!-- Favorite -->
     <string name="favorite_title">我的收藏</string>
