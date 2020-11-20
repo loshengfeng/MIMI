@@ -6,12 +6,10 @@ import com.dabenxiang.mimi.model.enums.OrderType
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.StatisticsType
-import com.dabenxiang.mimi.view.home.HomeTemplate
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
-import retrofit2.http.Query
 import java.io.File
 
 class ApiRepository(private val apiService: ApiService) {
@@ -240,7 +238,7 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun getMemberVideoReport(
         videoId: Long,
         type: Int,
-        unhealthy:Boolean =true
+        unhealthy: Boolean = true
     ) = apiService.getMemberVideoReport(videoId, type, unhealthy)
 
     /**********************************************************
@@ -848,7 +846,14 @@ class ApiRepository(private val apiService: ApiService) {
     /**
      * 取得訪客資訊
      */
-    suspend fun getGuestInfo(
-    ) = apiService.getGuestInfo()
+    suspend fun getGuestInfo() = apiService.getGuestInfo()
+
+    /**********************************************************
+     *
+     *                   Members/Home/Menu
+     *
+     ***********************************************************/
+    suspend fun getMenu() = apiService.getMenu()
+
 }
 
