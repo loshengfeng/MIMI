@@ -68,7 +68,7 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
         _showProgress.value = show
     }
 
-    fun setShowPopHint(text: String){
+    fun setShowPopHint(text: String) {
         viewModelScope.launch {
             _showPopHint.postValue(text)
             delay(POP_HINT_DURATION)
@@ -157,22 +157,22 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
             LoadImageType.CLUB -> R.drawable.ico_group
             LoadImageType.CHAT_CONTENT -> R.drawable.bg_gray_6_radius_16
         }
-        if ((id == null || id == 0L)&&TextUtils.isEmpty(filePath)) {
+        if ((id == null || id == 0L) && TextUtils.isEmpty(filePath)) {
             Glide.with(view.context).load(defaultResId).into(view)
         } else {
             val accessToken =
                 if (accountManager.isLogin()) pref.memberToken.accessToken else pref.publicToken.accessToken
             val auth = StringBuilder(ApiRepository.BEARER).append(accessToken).toString()
-            var glideUrl:GlideUrl?=null
+            var glideUrl: GlideUrl? = null
 
             if (TextUtils.isEmpty(filePath)) {
                 val url = "${domainManager.getApiDomain()}/v1/Attachments/$id"
                 glideUrl = GlideUrl(
-                        url,
-                        LazyHeaders.Builder()
-                                .addHeader(ApiRepository.AUTHORIZATION, auth)
-                                .addHeader(ApiRepository.X_DEVICE_ID, GeneralUtils.getAndroidID())
-                                .build()
+                    url,
+                    LazyHeaders.Builder()
+                        .addHeader(ApiRepository.AUTHORIZATION, auth)
+                        .addHeader(ApiRepository.X_DEVICE_ID, GeneralUtils.getAndroidID())
+                        .build()
                 )
             }
 

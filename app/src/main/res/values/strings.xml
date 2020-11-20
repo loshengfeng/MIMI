@@ -223,6 +223,7 @@
 
     <string name="text_more">更多</string>
     <string name="text_search">搜寻</string>
+    <string name="text_search_classification">搜寻 ”该分类” 内容</string>
     <string name="text_follow">关注</string>
     <string name="text_post">帖子</string>
     <string name="text_ranking">排行榜</string>

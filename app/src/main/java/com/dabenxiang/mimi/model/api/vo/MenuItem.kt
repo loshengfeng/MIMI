@@ -13,14 +13,11 @@ data class MenuItem(
     @SerializedName("sorting")
     val sorting: Int = 0,
 
-    @SerializedName("category")
-    val category: String = "",
-
     @SerializedName("menus")
-    val menus: List<MenusItem> = arrayListOf()
+    val menus: List<SecondMenusItem> = arrayListOf()
 )
 
-data class MenusItem(
+data class SecondMenusItem(
     @SerializedName("name")
     val name: String = "",
 
@@ -30,6 +27,18 @@ data class MenusItem(
     @SerializedName("sorting")
     val sorting: Int = 0,
 
-    @SerializedName("category")
-    val category: String = ""
+    @SerializedName("menus")
+    val menus: List<ThirdMenusItem>? = null
 )
+
+data class ThirdMenusItem(
+    @SerializedName("name")
+    val name: String = "",
+
+    @SerializedName("type")
+    val type: Int = 0,
+
+    @SerializedName("sorting")
+    val sorting: Int = 0
+)
+

@@ -86,7 +86,7 @@ class HeaderViewHolder(
 
 class HomeBannerViewHolder(itemView: View, listener: HomeAdapter.EventListener, isAdult: Boolean) :
     HomeViewHolder<HomeTemplate.Banner>(itemView, listener, isAdult) {
-    private val ivPoster: ImageView = itemView.iv_poster
+//    private val ivPoster: ImageView = itemView.iv_poster
 
     override fun updated() {
         data?.also {
@@ -95,12 +95,12 @@ class HomeBannerViewHolder(itemView: View, listener: HomeAdapter.EventListener, 
     }
 
     fun updateItem(item: AdItem) {
-        Glide.with(itemView.context)
-            .load(item.href)
-            .into(ivPoster)
-        ivPoster.setOnClickListener { view ->
-            GeneralUtils.openWebView(view.context, item.target)
-        }
+//        Glide.with(itemView.context)
+//            .load(item.href)
+//            .into(ivPoster)
+//        ivPoster.setOnClickListener { view ->
+//            GeneralUtils.openWebView(view.context, item.target)
+//        }
     }
 }
 
