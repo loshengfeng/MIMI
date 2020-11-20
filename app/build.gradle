@@ -10,6 +10,12 @@ apply from: './config_buildtypes.gradle'
 apply from: './config_product_flavors.gradle'
 apply plugin: 'com.dabenxiang.deploy'
 
+ext {
+    // for deploy plugin usage: uploadHosts, driveFolderIds
+    uploadHosts = new HashMap<String, String>()
+    driveFolderIds = new HashMap<String, String>()
+}
+
 android {
     // Ref : https://developer.android.com/studio/projects/install-ndk#apply-specific-version
     ndkVersion "21.3.6528147"  //TODO  define NDK version  now not use local.properties
@@ -102,9 +108,9 @@ android {
             if (full_buildTypename.contains("debug") || full_buildTypename.contains("dev")) return
 
             // 設定 uploadHosts
-            this.project.ext.uploadHosts.put(flavorName + buildType, flavor.ext.GAM_API_HOST[buildType])
-            // 設定 driveFolderIds
-            this.project.ext.driveFolderIds.put(flavorName + buildType, flavor.ext.DRIVE_FOLDER_ID[buildType])
+//            this.project.ext.uploadHosts.put(flavorName + buildType, flavor.ext.GAM_API_HOST[buildType])
+//            // 設定 driveFolderIds
+//            this.project.ext.driveFolderIds.put(flavorName + buildType, flavor.ext.DRIVE_FOLDER_ID[buildType])
         }
     }
 
