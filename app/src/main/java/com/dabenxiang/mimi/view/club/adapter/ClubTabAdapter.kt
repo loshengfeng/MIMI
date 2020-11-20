@@ -8,7 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
-import com.dabenxiang.mimi.view.club.follow.FollowFragment
+import com.dabenxiang.mimi.view.club.follow.ClubPostFollowFragment
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_CLIP
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_FOLLOW
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_LATEST
@@ -22,7 +22,7 @@ class ClubTabAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
     private val tabFragmentsCreators: Map<Int, () -> Fragment> = mapOf(
             
-            TAB_FOLLOW to { FollowFragment() },
+            TAB_FOLLOW to { ClubPostFollowFragment() },
 
             TAB_RECOMMEND to {
                 PageTestFragment.create(

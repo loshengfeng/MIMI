@@ -38,9 +38,6 @@ class HomeViewModel : BaseViewModel() {
         const val TYPE_VIDEO = "type_video"
     }
 
-    var adWidth = 0
-    var adHeight = 0
-
     var lastListIndex = 0 // 垂直recycler view 跳出後的最後一筆資料
     var lastPosition = 0
 

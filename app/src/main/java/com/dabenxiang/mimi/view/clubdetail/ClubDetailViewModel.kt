@@ -21,9 +21,6 @@ import retrofit2.HttpException
 
 class ClubDetailViewModel : BaseViewModel() {
 
-    var adWidth = 0
-    var adHeight = 0
-
     private var _followClubResult = MutableLiveData<ApiResult<Boolean>>()
     val followClubResult: LiveData<ApiResult<Boolean>> = _followClubResult
 
