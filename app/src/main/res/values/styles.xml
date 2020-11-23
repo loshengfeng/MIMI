@@ -131,11 +131,6 @@
         <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-    <style name="Theme.Drinks.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-    <style name="Theme.Drinks.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
     <style name="TabLayoutTextStyle">
         <item name="android:textSize">18sp</item>
     </style>

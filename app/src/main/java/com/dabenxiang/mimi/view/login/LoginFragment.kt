@@ -28,7 +28,7 @@ import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.item_login.*
 import kotlinx.android.synthetic.main.item_register.*
-
+import timber.log.Timber
 
 class LoginFragment : BaseFragment() {
 
@@ -161,6 +161,7 @@ class LoginFragment : BaseFragment() {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
                 is Empty -> {
+                    Timber.i("loginResult $it")
                     progressHUD?.dismiss()
                     mainViewModel?.startMQTT()
                     navigateTo(NavigateItem.Up)
@@ -264,9 +265,7 @@ class LoginFragment : BaseFragment() {
 
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
-                R.id.btnClose -> navigateTo(
-                    NavigateItem.Up
-                )
+                R.id.btnClose -> navigateTo(NavigateItem.Up)
 
                 R.id.btn_register_cancel, R.id.btn_login_cancel -> {
                     mainViewModel?.changeNavigationPosition?.value = R.id.navigation_mimi
