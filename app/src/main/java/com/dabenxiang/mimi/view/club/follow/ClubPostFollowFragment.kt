@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 
 class ClubPostFollowFragment : BaseFragment() {
 
-    private val viewModel: ClubFollowViewMClubodel by viewModels()
+    private val viewModel: ClubFollowViewModel by viewModels()
     private val adapter by lazy {
         ClubPostFollowAdapter(requireActivity(), postListener, "", memberPostFuncItem)
     }
