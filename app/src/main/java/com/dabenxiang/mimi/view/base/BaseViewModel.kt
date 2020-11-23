@@ -160,8 +160,11 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
         if ((id == null || id == 0L) && TextUtils.isEmpty(filePath)) {
             Glide.with(view.context).load(defaultResId).into(view)
         } else {
-            val accessToken =
-                if (accountManager.isLogin()) pref.memberToken.accessToken else pref.publicToken.accessToken
+            val accessToken = if (accountManager.isLogin()) {
+                pref.memberToken.accessToken
+            } else {
+                pref.publicToken.accessToken
+            }
             val auth = StringBuilder(ApiRepository.BEARER).append(accessToken).toString()
             var glideUrl: GlideUrl? = null
 

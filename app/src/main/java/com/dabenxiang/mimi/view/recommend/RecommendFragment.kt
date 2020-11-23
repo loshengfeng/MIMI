@@ -8,7 +8,9 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.CategoryBanner
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.to.aboomy.pager2banner.IndicatorView
 import kotlinx.android.synthetic.main.fragment_recommend.*
 
@@ -46,8 +48,22 @@ class RecommendFragment : BaseFragment() {
 
         banner.also {
             it.setIndicator(indicator)
-            it.adapter = BannerAdapter(requireContext(), categoryBanners)
+            it.adapter = BannerAdapter(categoryBanners, bannerFuncItem)
         }
     }
+
+    private val bannerFuncItem by lazy {
+        BannerFuncItem(
+            { banner -> GeneralUtils.openWebView(requireContext(), banner.url) },
+            { id, imageView ->
+                viewModel.loadImage(
+                    id,
+                    imageView,
+                    LoadImageType.PICTURE_THUMBNAIL
+                )
+            }
+        )
+    }
+
 
 }
