@@ -6,7 +6,6 @@
     app:startDestination="@id/splashFragment">
 
     <include app:graph="@navigation/navigation_login" />
-    <include app:graph="@navigation/navigation_ranking" />
 
     <fragment
         android:id="@+id/splashFragment"
@@ -24,8 +23,14 @@
         android:name="com.dabenxiang.mimi.view.mimi_home.MiMiFragment"
         tools:layout="@layout/fragment_mimi_home">
         <action
-            android:id="@+id/action_mimiFragment_to_rankingGraph"
-            app:destination="@id/navigation_ranking" />
+            android:id="@+id/action_mimiFragment_to_rankingFragment"
+            app:destination="@id/rankingFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/rankingFragment"
+        android:name="com.dabenxiang.mimi.view.ranking.RankingFragment"
+        android:label="RankingFragment"
+        tools:layout="@layout/fragment_ranking" />
 
 </navigation>

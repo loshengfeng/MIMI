@@ -48,7 +48,7 @@ class RecommendFragment : BaseFragment() {
             val bundle = RankingFragment.createBundle()
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_mimiFragment_to_rankingGraph,
+                    R.id.action_mimiFragment_to_rankingFragment,
                     bundle
                 )
             )
