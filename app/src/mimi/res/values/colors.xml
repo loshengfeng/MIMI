@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--personal -->
+    <color name="bg_layout_top_personal">@drawable/bg_layout_top_mimi</color>
+    <color name="bg_layout_vip_personal">@drawable/bg_layout_vip_mimi</color>
+    <color name="bg_layout_every_day_personal">@drawable/bg_layout_every_day_mimi</color>
+    <color name="title_personal">@color/color_white_1</color>
+</resources>

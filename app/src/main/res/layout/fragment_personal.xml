@@ -7,15 +7,17 @@
     android:layout_height="wrap_content"
     android:fitsSystemWindows="true">
 
+<!--    FIXME android:layout_height="match_parent !!!-->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScroll"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@color/color_gray_2"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -38,14 +40,18 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <Button
+                <TextView
                     android:id="@+id/vippromote_now"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/invite_now"
+                    android:layout_width="100dp"
+                    android:layout_height="33dp"
+                    android:gravity="center"
+                    android:textColor="@color/color_white_1"
+                    android:background="@color/bg_vip_unlogin_personal"
+                    android:textSize="14sp"
                     app:layout_constraintEnd_toEndOf="@+id/bg_vippromote"
                     app:layout_constraintStart_toStartOf="@+id/bg_vippromote"
-                    app:layout_constraintTop_toBottomOf="@+id/vippromote_bottom" />
+                    app:layout_constraintTop_toBottomOf="@+id/vippromote_bottom"
+                    android:text="@string/invite_now"/>
 
                 <ImageView
                     android:id="@+id/vippromote_bottom"
@@ -73,10 +79,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="600dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/ad_vippromote">
+                android:layout_height="wrap_content">
 
                 <include
                     android:id="@+id/item_is_Login"
@@ -94,9 +97,10 @@
                     android:paddingStart="20dp"
                     android:paddingEnd="20dp"
                     android:text="@string/personal_old_driver"
-                    app:layout_goneMarginTop="20dp"
+                    app:layout_goneMarginTop="10dp"
                     app:drawableEndCompat="@drawable/btn_arrow_black_n"
                     app:drawableStartCompat="@drawable/btn_potato"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/item_is_Login" />
 
@@ -154,8 +158,6 @@
 <!--                    app:layout_constraintTop_toBottomOf="@id/tv_chat_history" />-->
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
-
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
@@ -210,7 +212,7 @@
                 android:layout_height="0dp"
                 android:layout_marginLeft="4dp"
                 android:layout_marginRight="92dp"
-                android:gravity="center"
+                android:gravity="center|left"
                 android:textColor="@color/title_personal"
                 android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="@+id/avatar"
@@ -321,7 +323,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_every_day"
         android:layout_width="160dp"
-        android:layout_height="76dp"
+        android:layout_height="84dp"
         android:layout_marginLeft="16dp"
         android:background="@color/bg_layout_every_day_personal"
         android:elevation="4dp"
@@ -335,11 +337,11 @@
             android:layout_marginLeft="14dp"
             android:layout_marginTop="8dp"
             android:gravity="center_vertical"
-            android:textColor="@color/color_black_1"
+            android:textColor="@color/color_white_1"
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="@string/personal_follow" />
+            android:text="@string/personal_follow" />
 
         <TextView
             android:id="@+id/video_long"
@@ -348,11 +350,11 @@
             android:layout_marginLeft="28dp"
             android:layout_marginBottom="10dp"
             android:gravity="center_vertical"
-            android:textColor="@color/color_black_1"
+            android:textColor="@color/color_white_1"
             android:textSize="10sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            tools:text="嘗試頻" />
+            android:text="@string/every_day_length" />
 
 
         <TextView
@@ -361,7 +363,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
             android:gravity="center_vertical"
-            android:textColor="@color/color_black_1"
+            android:textColor="@color/color_white_1"
             android:textSize="14sp"
             app:layout_constraintBottom_toTopOf="@+id/video_long"
             app:layout_constraintEnd_toEndOf="@+id/video_long"
@@ -375,11 +377,11 @@
             android:layout_marginRight="28dp"
             android:layout_marginBottom="10dp"
             android:gravity="center_vertical"
-            android:textColor="@color/color_black_1"
+            android:textColor="@color/color_white_1"
             android:textSize="10sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            tools:text="嘗試頻" />
+            android:text="@string/every_day_short"/>
 
         <TextView
             android:id="@+id/video_short_count"
@@ -387,7 +389,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
             android:gravity="center_vertical"
-            android:textColor="@color/color_black_1"
+            android:textColor="@color/color_white_1"
             android:textSize="14sp"
             app:layout_constraintBottom_toTopOf="@+id/video_short"
             app:layout_constraintEnd_toEndOf="@+id/video_short"
@@ -398,10 +400,11 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_vip_unlimit"
         android:layout_width="160dp"
-        android:layout_height="76dp"
+        android:layout_height="84dp"
         android:layout_marginRight="16dp"
         android:background="@color/bg_layout_vip_personal"
         android:elevation="4dp"
+        android:visibility="invisible"
         app:layout_anchor="@id/appbar_layout"
         app:layout_anchorGravity="bottom|end">
 
@@ -413,13 +416,13 @@
             android:layout_marginTop="8dp"
             android:layout_marginRight="4dp"
             android:gravity="center_vertical"
-            android:textColor="@color/color_black_1"
+            android:textColor="@color/color_white_1"
             android:textSize="14sp"
-            app:drawableEndCompat="@drawable/btn_arrow_black_n"
+            app:drawableEndCompat="@drawable/ico_next_disable"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="@string/personal_follow" />
+            android:text="@string/vip_hint" />
 
         <TextView
             android:id="@+id/tv_expiry_date"
@@ -427,11 +430,55 @@
             android:layout_height="22dp"
             android:layout_marginTop="14dp"
             android:gravity="center"
-            android:textColor="@color/color_black_1"
+            android:textColor="@color/color_white_1"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="@+id/vip_unlimit"
             app:layout_constraintStart_toStartOf="@+id/vip_unlimit"
             app:layout_constraintTop_toBottomOf="@+id/vip_unlimit"
             tools:text="嘗試頻" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_vip_unlimit_unlogin"
+        android:layout_width="160dp"
+        android:layout_height="84dp"
+        android:layout_marginRight="16dp"
+        android:background="@color/bg_layout_vip_unlogin_personal"
+        android:elevation="4dp"
+        app:layout_anchor="@id/appbar_layout"
+        app:layout_anchorGravity="bottom|end">
+
+        <TextView
+            android:id="@+id/vip_unlimit_unlogin"
+            android:layout_width="0dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="14dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="4dp"
+            android:gravity="center_vertical"
+            android:textColor="@color/color_white_1"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:text="@string/vip_hint" />
+
+        <TextView
+            android:id="@+id/vip_buy"
+            android:layout_width="100dp"
+            android:layout_height="33dp"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="6dp"
+            android:layout_marginBottom="6dp"
+            android:gravity="center"
+            android:textColor="@color/color_white_1"
+            android:background="@color/bg_vip_unlogin_personal"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/vip_unlimit_unlogin"
+            android:text="@string/buy_vip" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

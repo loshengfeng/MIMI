@@ -224,6 +224,7 @@
     <string name="login_mobile_call_prefix_taiwan">+886</string>
     <string name="vip_expiry_date">VIP 於 %s 到期</string>
     <string name="no_data">尚无资料</string>
+    <string name="identity">游客</string>
     
     <!-- Follow -->
     <string name="follow_title">我的关注</string>
@@ -283,7 +284,6 @@
     <!-- Text Detail -->
     <string name="text">短文</string>
     <string name="text_detail_title">短文详情</string>
-
     <!-- Club -->
     <string name="picture">图片</string>
     <string name="video">视频</string>
@@ -304,11 +304,12 @@
     <!-- every day -->
     <string name="every_day_count">每日观看次数</string>
     <string name="every_day_length">長視頻</string>
-    <string name="every_day_short">短視頻</string>
+    <string name="every_day_short">@string/short_video</string>
     <string name="every_day_video_count_unlimit">无限</string>
     <!-- vip -->
     <string name="vip_hint">VIP享无限观影</string>
     <string name="deadline_vip">%s 过期</string>
+    <string name="buy_vip">购买VIP</string>
 
     <!-- Post -->
     <string name="upload_video">上传视频</string>

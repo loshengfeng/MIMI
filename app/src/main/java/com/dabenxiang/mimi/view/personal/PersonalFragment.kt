@@ -61,6 +61,7 @@ class PersonalFragment : BaseFragment() {
         val behavior = appbar_layout.behavior as AppBarLayout.Behavior?
         if (viewModel.isLogin()) {
             item_is_Login.visibility = View.VISIBLE
+            tv_logout.visibility = View.VISIBLE
             viewModel.getMe()
             behavior!!.setDragCallback(object : DragCallback() {
                 override fun canDrag(appBarLayout: AppBarLayout): Boolean {
@@ -69,6 +70,7 @@ class PersonalFragment : BaseFragment() {
             })
         } else {
             item_is_Login.visibility = View.GONE
+            tv_logout.visibility = View.GONE
             behavior!!.setDragCallback(object : DragCallback() {
                 override fun canDrag(appBarLayout: AppBarLayout): Boolean {
                     return false
