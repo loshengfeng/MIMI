@@ -9,7 +9,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ReferrerHistoryItem
 import com.dabenxiang.mimi.view.base.BaseFragment
-import kotlinx.android.synthetic.main.fragment_actress.*
+import kotlinx.android.synthetic.main.fragment_actor.*
 import timber.log.Timber
 
 class ActorFragment : BaseFragment() {
@@ -29,7 +29,7 @@ class ActorFragment : BaseFragment() {
     }
 
     override fun getLayoutId(): Int {
-        return R.layout.fragment_actress
+        return R.layout.fragment_actor
     }
 
     override fun setupFirstTime() {
