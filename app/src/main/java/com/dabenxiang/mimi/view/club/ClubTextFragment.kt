@@ -95,7 +95,10 @@ class ClubTextFragment : BaseFragment() {
         }
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
-
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_clubTabFragment_to_clubTextDetailFragment)
+            )
         }
 
         override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
