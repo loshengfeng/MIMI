@@ -51,6 +51,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/tv_filter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_gray_1_radius_6"
@@ -67,6 +68,7 @@
         app:layout_constraintTop_toTopOf="@+id/tv_search" />
 
     <ImageView
+        android:id="@+id/iv_rank"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
