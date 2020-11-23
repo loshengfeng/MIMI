@@ -5,9 +5,9 @@ import android.view.View
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
 
-class ClubTextFragment : BaseFragment() {
+class ClubPicFragment : BaseFragment() {
 
-    override fun getLayoutId() = R.layout.fragment_club_text
+    override fun getLayoutId() = R.layout.fragment_club_pic
 
     override fun setupObservers() {
     }
