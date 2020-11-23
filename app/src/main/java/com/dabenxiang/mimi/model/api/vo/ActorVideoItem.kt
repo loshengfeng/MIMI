@@ -6,7 +6,7 @@ import java.io.Serializable
 data class ActorVideoItem(
 
     @SerializedName("id")
-    val id: Int = 0,
+    val id: Long = 0L,
 
     @SerializedName("title")
     val title: String = "",

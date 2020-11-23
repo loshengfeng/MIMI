@@ -6,12 +6,12 @@ import java.io.Serializable
 data class ActorCategoriesItem(
 
     @SerializedName("id")
-    val id: Int = 0,
+    val id: Long = 0L,
 
     @SerializedName("name")
     val name: String = "",
 
     @SerializedName("attachmentId")
-    val attachmentId: Int = 0
+    val attachmentId: Long = 0L
 
     ) : Serializable

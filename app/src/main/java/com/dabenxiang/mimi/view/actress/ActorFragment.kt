@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ReferrerHistoryItem
@@ -33,7 +34,9 @@ class ActorFragment : BaseFragment() {
 
     override fun setupFirstTime() {
         super.setupFirstTime()
+        rv_hot_actresses.layoutManager = LinearLayoutManager(context)
         rv_hot_actresses.adapter = actorVideosAdapter
+        rv_all_actresses.layoutManager = LinearLayoutManager(context)
         rv_all_actresses.adapter = actorVideosAdapter
     }
 

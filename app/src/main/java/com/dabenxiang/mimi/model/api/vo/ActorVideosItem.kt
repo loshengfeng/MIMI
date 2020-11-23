@@ -7,19 +7,19 @@ import java.util.ArrayList
 data class ActorVideosItem(
 
     @SerializedName("id")
-    val id: Int = 0,
+    val id: Long = 0L,
 
     @SerializedName("name")
     val name: String = "",
 
     @SerializedName("attachmentId")
-    val attachmentId: Int = 0,
+    val attachmentId: Long = 0L,
 
     @SerializedName("totalVideo")
-    val totalVideo: Int = 0,
+    val totalVideo: Long = 0L,
 
     @SerializedName("totalClick")
-    val totalClick: Int = 0,
+    val totalClick: Long = 0L,
 
     @SerializedName("videos")
     val videos: ArrayList<ActorVideoItem> = arrayListOf()

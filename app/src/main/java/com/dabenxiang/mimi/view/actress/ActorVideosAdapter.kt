@@ -10,8 +10,8 @@ import com.dabenxiang.mimi.model.api.vo.OrderingPackageItem
 import com.dabenxiang.mimi.model.api.vo.ReferrerHistoryItem
 
 class ActorVideosAdapter(
-    private val context: Context,
-    private val listener: EventListener
+    val context: Context,
+    val listener: EventListener
 ) : RecyclerView.Adapter<ActorVideosViewHolder>() {
 
     private var selectItem: OrderingPackageItem? = null
@@ -24,7 +24,7 @@ class ActorVideosAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ActorVideosViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_topup_online_pay, parent, false)
+            .inflate(R.layout.item_actor_videos, parent, false)
         return ActorVideosViewHolder(view)
     }
 
@@ -34,6 +34,9 @@ class ActorVideosAdapter(
 
     override fun onBindViewHolder(holder: ActorVideosViewHolder, position: Int) {
         val item = actorVideosItems?.get(position)
+        holder.name.text = item?.name
+        holder.totalClick.text = item?.totalClick?.toString()
+        holder.totalVideo.text = item?.totalVideo?.toString()
     }
 
     fun setupData(data: ArrayList<ActorVideosItem>) {
