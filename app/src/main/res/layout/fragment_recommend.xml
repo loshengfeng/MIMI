@@ -10,7 +10,28 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.8638" />
+        app:layout_constraintGuide_percent="0.6194" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_filter_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.6472" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_filter_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.85" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_ranking_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.8916" />
 
     <TextView
         android:id="@+id/tv_search"
@@ -29,6 +50,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_gray_1_radius_6"
+        android:gravity="center_vertical"
+        android:paddingStart="6dp"
+        android:paddingTop="5dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="5dp"
+        android:text="@string/all"
+        app:drawableStartCompat="@drawable/ico_filter"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_search"
+        app:layout_constraintLeft_toLeftOf="@+id/gl_filter_start"
+        app:layout_constraintRight_toRightOf="@+id/gl_filter_end"
+        app:layout_constraintTop_toTopOf="@+id/tv_search" />
+
     <ImageView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -36,7 +73,7 @@
         android:src="@drawable/btn_ranking_white_1_n"
         app:layout_constraintBottom_toBottomOf="@+id/tv_search"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintLeft_toRightOf="@+id/tv_search"
+        app:layout_constraintLeft_toRightOf="@+id/gl_ranking_start"
         app:layout_constraintTop_toTopOf="@id/tv_search" />
 
     <com.to.aboomy.pager2banner.Banner

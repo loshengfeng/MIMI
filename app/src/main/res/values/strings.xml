@@ -24,6 +24,7 @@
 
     <!-- Categories -->
     <string name="home">首页</string>
+    <string name="all">全部</string>
 
     <!-- Login -->
     <string name="friendly_name_format_error_1">请填写中文、英文或数字或特殊符号</string>

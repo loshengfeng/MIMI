@@ -65,5 +65,4 @@ class RecommendFragment : BaseFragment() {
         )
     }
 
-
 }
