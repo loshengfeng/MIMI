@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.actress
+package com.dabenxiang.mimi.view.actor
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -6,20 +6,18 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ActorVideosItem
-import com.dabenxiang.mimi.model.api.vo.OrderingPackageItem
-import com.dabenxiang.mimi.model.api.vo.ReferrerHistoryItem
 
 class ActorVideosAdapter(
     val context: Context,
     val listener: EventListener
 ) : RecyclerView.Adapter<ActorVideosViewHolder>() {
 
-    private var selectItem: OrderingPackageItem? = null
+    private var selectItem: ActorVideosItem? = null
 
     private var actorVideosItems: ArrayList<ActorVideosItem>? = null
 
     interface EventListener {
-        fun onClickListener(item: ReferrerHistoryItem, position: Int)
+        fun onClickListener(item: ActorVideosItem, position: Int)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ActorVideosViewHolder {
@@ -47,7 +45,7 @@ class ActorVideosAdapter(
         selectItem = null
     }
 
-    fun getSelectItem(): OrderingPackageItem? {
+    fun getSelectItem(): ActorVideosItem? {
         return selectItem
     }
 }

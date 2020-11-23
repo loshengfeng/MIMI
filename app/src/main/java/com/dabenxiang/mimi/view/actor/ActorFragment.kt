@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.actress
+package com.dabenxiang.mimi.view.actor
 
 import android.os.Bundle
 import android.view.View
@@ -7,16 +7,24 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.ReferrerHistoryItem
+import com.dabenxiang.mimi.model.api.vo.ActorCategoriesItem
+import com.dabenxiang.mimi.model.api.vo.ActorVideosItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import kotlinx.android.synthetic.main.fragment_actor.*
 import timber.log.Timber
 
 class ActorFragment : BaseFragment() {
 
-    private val actorVideosAdapter by lazy { ActorVideosAdapter(requireContext(), actorListener) }
-    private val actorListener = object : ActorVideosAdapter.EventListener {
-        override fun onClickListener(item: ReferrerHistoryItem, position: Int){
+    private val actorVideosAdapter by lazy { ActorVideosAdapter(requireContext(), actorVideosListener) }
+    private val actorVideosListener = object : ActorVideosAdapter.EventListener {
+        override fun onClickListener(item: ActorVideosItem, position: Int){
+            Timber.d("onDetail")
+        }
+    }
+
+    private val actorCategoriesAdapter by lazy { ActorCategoriesAdapter(requireContext(), actorCategoriesListener) }
+    private val actorCategoriesListener = object : ActorCategoriesAdapter.EventListener {
+        override fun onClickListener(item: ActorCategoriesItem, position: Int){
             Timber.d("onDetail")
         }
     }
@@ -37,7 +45,7 @@ class ActorFragment : BaseFragment() {
         rv_hot_actresses.layoutManager = LinearLayoutManager(context)
         rv_hot_actresses.adapter = actorVideosAdapter
         rv_all_actresses.layoutManager = LinearLayoutManager(context)
-        rv_all_actresses.adapter = actorVideosAdapter
+        rv_all_actresses.adapter = actorCategoriesAdapter
     }
 
     override fun initSettings() {
@@ -47,14 +55,18 @@ class ActorFragment : BaseFragment() {
 
     override fun setupObservers() {
         viewModel.actorVideosResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
+            when (it.first) {
                 is ApiResult.Loaded -> ""
                 is ApiResult.Success -> {
-                    val actorVideos = it.result
+                    val actorVideos = (it.first as ApiResult.Success).result
                     actorVideosAdapter.setupData(actorVideos)
                     actorVideosAdapter.notifyDataSetChanged()
+                    val actorCategories = (it.second as ApiResult.Success).result
+                    actorCategoriesAdapter.setupData(actorCategories)
+                    actorCategoriesAdapter.notifyDataSetChanged()
+
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is ApiResult.Error -> onApiError((it.first as ApiResult.Error<ArrayList<ActorCategoriesItem>>).throwable)
             }
         })
 

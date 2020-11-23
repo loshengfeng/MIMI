@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.actress
+package com.dabenxiang.mimi.view.actor
 
 import android.view.View
 import android.widget.TextView
