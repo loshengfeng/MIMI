@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club
+package com.dabenxiang.mimi.view.club.picture
 
 import android.os.Bundle
 import android.view.View
@@ -16,19 +16,20 @@ import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.club.ClubTabViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import kotlinx.android.synthetic.main.fragment_club_text.*
 
-class ClubTextFragment : BaseFragment() {
+class ClubPicFragment : BaseFragment() {
 
-    private val viewModel: ClubViewModel by viewModels()
+    private val viewModel: ClubPicViewModel by viewModels()
 
-    override fun getLayoutId() = R.layout.fragment_club_text
+    override fun getLayoutId() = R.layout.fragment_club_pic
 
     override fun setupObservers() {
-        viewModel.textPostItemListResult.observe(this, Observer {
-            textPostPagedAdapter.submitList(it)
+        viewModel.picturePostItemListResult.observe(this, Observer {
+            picturePostPagedAdapter.submitList(it)
         })
     }
 
@@ -38,11 +39,11 @@ class ClubTextFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = textPostPagedAdapter
-        viewModel.getTextPosts()
+        recyclerView.adapter = picturePostPagedAdapter
+        viewModel.getPicturePosts()
     }
 
-    private val textPostPagedAdapter by lazy {
+    private val picturePostPagedAdapter by lazy {
         MemberPostPagedAdapter(requireActivity(), adultListener, "", memberPostFuncItem)
     }
 
@@ -97,7 +98,7 @@ class ClubTextFragment : BaseFragment() {
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_clubTabFragment_to_clubTextDetailFragment)
+                    R.id.action_clubTabFragment_to_clubPicDetailFragment)
             )
         }
 
@@ -144,5 +145,4 @@ class ClubTextFragment : BaseFragment() {
             { id, view, type -> viewModel.loadImage(id, view, type) }
         )
     }
-
 }
