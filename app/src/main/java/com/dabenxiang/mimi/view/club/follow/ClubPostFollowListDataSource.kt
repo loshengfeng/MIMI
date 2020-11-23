@@ -1,16 +1,14 @@
 package com.dabenxiang.mimi.view.club.follow
 
 import androidx.paging.PagingSource
-import com.dabenxiang.mimi.callback.MyFollowPagingCallback
-import com.dabenxiang.mimi.model.api.vo.AdItem
+import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.DomainManager
 import retrofit2.HttpException
 
 class ClubPostFollowListDataSource constructor(
     private val domainManager: DomainManager,
-    private val pagingCallback: MyFollowPagingCallback
+    private val pagingCallback: PagingCallback
 ) : PagingSource<Long, MemberPostItem>() {
 
     companion object {

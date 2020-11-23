@@ -6,6 +6,7 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.dabenxiang.mimi.callback.MyFollowPagingCallback
+import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.CategoryType
@@ -27,7 +28,6 @@ class ClubFollowViewModel : BaseViewModel() {
     private val _clubCount = MutableLiveData<Int>()
     val clubCount: LiveData<Int> = _clubCount
 
-    private val _clubIdList = ArrayList<Long>()
 
     fun getPostItemList(): Flow<PagingData<MemberPostItem>> {
         return Pager(
@@ -35,7 +35,7 @@ class ClubFollowViewModel : BaseViewModel() {
                 pagingSourceFactory = {
                     ClubPostFollowListDataSource(
                             domainManager,
-                            clubPagingCallback
+                            pagingCallback
                     )
                 }
         )
@@ -56,15 +56,11 @@ class ClubFollowViewModel : BaseViewModel() {
 
     }
 
-    private val clubPagingCallback = object : MyFollowPagingCallback {
+    private val pagingCallback = object : PagingCallback {
         override fun onTotalCount(count: Long) {
             _clubCount.postValue(count.toInt())
         }
 
-        override fun onIdList(list: ArrayList<Long>, isInitial: Boolean) {
-            if (isInitial) _clubIdList.clear()
-            _clubIdList.addAll(list)
-        }
     }
 
 }
