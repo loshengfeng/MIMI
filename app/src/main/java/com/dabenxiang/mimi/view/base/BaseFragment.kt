@@ -548,11 +548,11 @@ abstract class BaseFragment : Fragment() {
 
     abstract fun getLayoutId(): Int
 
-    abstract fun setupObservers()
+    open fun setupObservers(){}
 
-    abstract fun setupListeners()
+    open fun setupListeners(){}
 
-    open fun setupFirstTime() {}
+    open fun setupFirstTime(){}
 
     open fun statusBarVisibility() {
         requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)

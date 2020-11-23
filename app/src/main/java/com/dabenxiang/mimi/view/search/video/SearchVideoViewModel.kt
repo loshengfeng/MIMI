@@ -28,9 +28,6 @@ class SearchVideoViewModel : BaseViewModel() {
     var searchingStr = ""
 //    var isAdult = false
 
-    var adWidth = 0
-    var adHeight = 0
-
     var currentItem: VideoItem? = null
 
     private val _searchTextLiveData = EditTextMutableLiveData()
