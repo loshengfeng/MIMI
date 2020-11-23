@@ -10,9 +10,7 @@ import retrofit2.HttpException
 
 class ClubPostFollowListDataSource constructor(
     private val domainManager: DomainManager,
-    private val pagingCallback: MyFollowPagingCallback,
-    private val adWidth: Int,
-    private val adHeight: Int
+    private val pagingCallback: MyFollowPagingCallback
 ) : PagingSource<Long, MemberPostItem>() {
 
     companion object {
@@ -23,7 +21,7 @@ class ClubPostFollowListDataSource constructor(
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, MemberPostItem> {
         val offset = params.key ?: 0
         return try {
-            val adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content ?: AdItem()
+//            val adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content ?: AdItem()
 
             val result =
                 domainManager.getApiRepository().getPostFollow(offset.toInt(), PER_LIMIT.toInt())
@@ -31,7 +29,7 @@ class ClubPostFollowListDataSource constructor(
 
             val body = result.body()
             val memberPostItems = body?.content
-            memberPostItems?.add(0, MemberPostItem(type = PostType.AD, adItem = adItem))
+//            memberPostItems?.add(0, MemberPostItem(type = PostType.AD, adItem = adItem))
 
             val hasNext = hasNextPage(
                 result.body()?.paging?.count ?: 0,
