@@ -20,7 +20,7 @@ android {
     // Ref : https://developer.android.com/studio/projects/install-ndk#apply-specific-version
     ndkVersion "21.3.6528147"  //TODO  define NDK version  now not use local.properties
     compileSdkVersion 30
-    buildToolsVersion "30.0.1"
+    buildToolsVersion "30.0.2"
 
     kapt {
         correctErrorTypes = true
@@ -66,8 +66,13 @@ android {
         ndk {
             abiFilters "armeabi-v7a", "arm64-v8a", "x86"
         }
-
 //        testInstrumentationRunner "com.dabenxiang.mimi.KoinTestRunner"
+    }
+
+    sourceSets {
+        main {
+            java.srcDirs('src/main/java')
+        }
     }
 
     applicationVariants.all { variant ->
@@ -158,6 +163,7 @@ dependencies {
     implementation "com.google.android.material:material:$material_version"
     implementation "androidx.activity:activity-ktx:$activity_ktx_version"
     implementation "androidx.fragment:fragment-ktx:$fragment_ktx_version"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:1.1.0"
 
     // Kotlin Coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
@@ -294,7 +300,7 @@ dependencies {
     implementation "org.conscrypt:conscrypt-android:$conscrypt_version"
 
     // CKS
-    implementation("org.cks.utils:BaseManager:$cks_manager")
+    implementation "org.cks.utils:BaseManager:$cks_manager"
     implementation "org.cks.utils:DeviceInfoProvider:$cks_provider"
     implementation "org.cks.utils:logmanager:$cks_log_version"
     implementation "org.cks.utils:utils_device:$cks_utils"
