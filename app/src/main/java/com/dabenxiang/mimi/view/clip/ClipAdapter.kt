@@ -175,6 +175,13 @@ class ClipAdapter(
             }
         } ?: run {
             holder.onBind(item, clipFuncItem, position)
+
+            processClip(
+                holder.playerView,
+                contentItem?.shortVideo?.id.toString(),
+                contentItem?.shortVideo?.url.toString(),
+                position
+            )
         }
     }
 
@@ -182,7 +189,7 @@ class ClipAdapter(
     }
 
     private fun processClip(playerView: PlayerView, id: String, url: String, position: Int) {
-        Timber.d("processClip position:$position")
+        Timber.d("processClip position:$position, id:$id, url:$url")
         val item = getItem(position) ?: MemberPostItem()
         playingId = id
         var contentItem: MediaContentItem? = null
@@ -295,7 +302,7 @@ class ClipAdapter(
                     //showErrorDialog("UNKNOWN")
                 }
             }
-            playingId?.takeIf { it.isNotEmpty() }?.also {id->
+            playingId.takeIf { it.isNotEmpty() }?.also { id->
                 clipFuncItem.onPlayerError(id, error.message ?: "error: UNKNOWN")
             }
 
