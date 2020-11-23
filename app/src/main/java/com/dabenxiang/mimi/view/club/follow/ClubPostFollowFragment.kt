@@ -40,7 +40,7 @@ class ClubPostFollowFragment : BaseFragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        viewModel.clubCount.observe(this, Observer {
+        viewModel.clubCount.observe(this, {
             if(it <=0) {
                 id_empty_group.visibility =View.VISIBLE
                 recycler_view.visibility = View.INVISIBLE

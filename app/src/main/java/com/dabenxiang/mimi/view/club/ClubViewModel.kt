@@ -7,12 +7,38 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.dabenxiang.mimi.callback.MyFollowPagingCallback
-import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
+import com.dabenxiang.mimi.callback.PagingCallback
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.myfollow.ClubFollowListDataSource
+import com.dabenxiang.mimi.view.club.topic.TopicListDataSource
 import kotlinx.coroutines.flow.Flow
+import timber.log.Timber
 
 class ClubViewModel : BaseViewModel() {
+
+    private val _clubCount = MutableLiveData<Int>()
+    val clubCount: LiveData<Int> = _clubCount
+
+    fun getClubItemList(): Flow<PagingData<MemberClubItem>> {
+        Timber.i("ClubTabFragment getClubItemList")
+        return Pager(
+            config = PagingConfig(pageSize = TopicListDataSource.PER_LIMIT.toInt()),
+            pagingSourceFactory = {
+                TopicListDataSource(
+                    domainManager,
+                    pagingCallback
+                )
+            }
+        )
+            .flow
+            .cachedIn(viewModelScope)
+    }
+
+    private val pagingCallback = object : PagingCallback {
+        override fun onTotalCount(count: Long) {
+            _clubCount.postValue(count.toInt())
+        }
+
+    }
 
 }
