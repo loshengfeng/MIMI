@@ -18,6 +18,7 @@ import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_PICTURE
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_RECOMMEND
 import com.dabenxiang.mimi.view.club.ClubTextFragment
 import com.dabenxiang.mimi.view.club.ClubViewModel
+import com.dabenxiang.mimi.view.club.latest.ClubLatestFragment
 import kotlinx.android.synthetic.main.fragment_tab_test.*
 
 class ClubTabAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
@@ -31,8 +32,7 @@ class ClubTabAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
                         fragment.getString(R.string.club_tab_recommend))
             },
             TAB_LATEST to {
-                PageTestFragment.create(
-                        fragment.getString(R.string.club_tab_latest))
+                ClubLatestFragment()
             },
             TAB_CLIP to {
                 PageTestFragment.create(

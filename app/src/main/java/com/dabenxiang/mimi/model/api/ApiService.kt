@@ -331,7 +331,7 @@ interface ApiService {
         @Query("isAdult") isAdult: Boolean,
         @Query("offset") offset: Int,
         @Query("limit") limit: Int
-    ): Response<ApiBasePagingItem<List<StatisticsItem>>>
+    ): Response<ApiBasePagingItem<ArrayList<StatisticsItem>>>
 
     @GET("/v1/Members/Home/Videos/PostStatistics")
     suspend fun getRankingList(
