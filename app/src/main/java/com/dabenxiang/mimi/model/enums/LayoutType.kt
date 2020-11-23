@@ -10,5 +10,5 @@ enum class LayoutType {
     GENERAL,
 
     @SerializedName("3")
-    ACTRESS
+    ACTOR
 }

@@ -2,35 +2,25 @@ package com.dabenxiang.mimi.view.actress
 
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
-import androidx.paging.PagingData
+import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ReferrerHistoryItem
-import com.dabenxiang.mimi.view.adapter.ClubFollowAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
-import com.dabenxiang.mimi.view.inviteviprecord.InviteVipRecordAdapter
-import com.dabenxiang.mimi.view.myfollow.MyFollowFragment
 import kotlinx.android.synthetic.main.fragment_actress.*
-import kotlinx.android.synthetic.main.fragment_invite_vip_record.*
-import kotlinx.android.synthetic.main.fragment_my_follow.*
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class ActressFragment : BaseFragment() {
+class ActorFragment : BaseFragment() {
 
-    private val actressAdapter by lazy { ActressAdapter(actressListener) }
-    private val actressListener = object : ActressAdapter.EventListener {
+    private val actorVideosAdapter by lazy { ActorVideosAdapter(requireContext(), actorListener) }
+    private val actorListener = object : ActorVideosAdapter.EventListener {
         override fun onClickListener(item: ReferrerHistoryItem, position: Int){
             Timber.d("onDetail")
         }
     }
 
-    private val viewModel: ActressViewModel by viewModels()
+    private val viewModel: ActorViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -43,15 +33,27 @@ class ActressFragment : BaseFragment() {
 
     override fun setupFirstTime() {
         super.setupFirstTime()
-        rv_hot_actresses.adapter = actressAdapter
-        rv_all_actresses.adapter = actressAdapter
+        rv_hot_actresses.adapter = actorVideosAdapter
+        rv_all_actresses.adapter = actorVideosAdapter
     }
 
     override fun initSettings() {
         super.initSettings()
+        viewModel.getActorList()
     }
 
     override fun setupObservers() {
+        viewModel.actorVideosResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Loaded -> ""
+                is ApiResult.Success -> {
+                    val actorVideos = it.result
+                    actorVideosAdapter.setupData(actorVideos)
+                    actorVideosAdapter.notifyDataSetChanged()
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
 
     }
 
