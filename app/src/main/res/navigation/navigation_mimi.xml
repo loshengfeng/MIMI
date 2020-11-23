@@ -23,7 +23,7 @@
     <fragment
         android:id="@+id/actressFragment"
         android:name="com.dabenxiang.mimi.view.actress.ActressFragment"
-        tools:layout="@layout/fragment_mimi_home">
+        tools:layout="@layout/fragment_actress">
 
     </fragment>
 
