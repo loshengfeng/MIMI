@@ -33,7 +33,6 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view), KoinComponent 
     var ivAdd: ImageView = view.iv_close
     var ibReplay: ImageButton = view.ib_replay
     var ibPlay: ImageButton = view.ib_play
-    var ibBack: ImageButton = view.ib_back
     var tvTitle: TextView = view.tv_title
     var tvName: TextView = view.tv_name
     var tvFavorite: TextView = view.iv_favorite
@@ -76,8 +75,6 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view), KoinComponent 
                 )
             }
         }
-
-        ibBack.setOnClickListener { clipFuncItem.onBackClick() }
 
         val likeRes = if (item.likeType == LikeType.LIKE) {
             R.drawable.ico_nice_forvideo_s

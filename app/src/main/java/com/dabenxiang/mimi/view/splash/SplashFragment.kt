@@ -151,7 +151,7 @@ class SplashFragment : BaseFragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             delay(1000)
             withContext(Dispatchers.Main) {
-                navigateTo(NavigateItem.Destination(R.id.action_splashFragment_to_homeFragment))
+                navigateTo(NavigateItem.Destination(R.id.action_splashFragment_to_mimiFragment))
             }
         }
     }

@@ -34,6 +34,7 @@ class ClubTabFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         club_view_pager.adapter = ClubTabAdapter(this)
+        club_view_pager.isSaveEnabled =false
         TabLayoutMediator(club_tabs, club_view_pager) { tab, position ->
             tab.text = getTabTitle(position)
         }.attach()

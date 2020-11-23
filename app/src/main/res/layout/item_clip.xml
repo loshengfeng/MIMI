@@ -148,8 +148,8 @@
 
     <TextView
         android:id="@+id/tv_name"
-        android:layout_width="56dp"
-        android:layout_height="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="90dp"
         android:textColor="@color/color_white_1"
         android:textSize="14sp"
@@ -191,18 +191,5 @@
         app:layout_constraintRight_toRightOf="@+id/player_view"
         app:layout_constraintTop_toTopOf="@+id/player_view"
         app:layout_constraintBottom_toBottomOf="@+id/player_view"/>
-
-    <ImageButton
-        android:id="@+id/ib_back"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="40dp"
-        android:background="@null"
-        android:scaleType="center"
-        android:src="@drawable/btn_back_white_n"
-        android:contentDescription="@null"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

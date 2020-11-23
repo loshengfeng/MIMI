@@ -31,7 +31,7 @@ class ClipAdapter(
     private val context: Context,
     private val clipMap: HashMap<String, File> = hashMapOf(),
     private var currentPosition: Int = 0,
-    private val clipFuncItem: ClipFuncItem = ClipFuncItem()
+    private var clipFuncItem: ClipFuncItem = ClipFuncItem()
 ) : PagingDataAdapter<MemberPostItem, ClipViewHolder>(DIFF_CALLBACK) {
 
     companion object {
@@ -71,6 +71,10 @@ class ClipAdapter(
                 false
             )
         )
+    }
+
+    fun setClipFuncItem(clipFuncItem: ClipFuncItem) {
+        this.clipFuncItem = clipFuncItem
     }
 
     fun updateCurrentPosition(position: Int) {

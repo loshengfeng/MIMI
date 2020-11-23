@@ -50,10 +50,10 @@ class ClipPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
         adapter
     }
 
-
     fun onBind(position: Int, clipFuncItem: ClipFuncItem) {
         if (rv_clip.adapter == null || rv_clip.tag != position) {
             rv_clip.tag = position
+            clipAdapter.setClipFuncItem(clipFuncItem)
             rv_clip.adapter = clipAdapter
             (rv_clip.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             PagerSnapHelper().attachToRecyclerView(rv_clip)

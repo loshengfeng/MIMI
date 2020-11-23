@@ -11,6 +11,22 @@
         android:id="@+id/clubTabFragment"
         android:name="com.dabenxiang.mimi.view.club.ClubTabFragment"
         tools:layout="@layout/fragment_tab_club">
+        <action
+            android:id="@+id/action_clubTabFragment_to_clubTextDetailFragment"
+            app:destination="@id/clubTextDetailFragment" />
+        <action
+            android:id="@+id/action_clubTabFragment_to_clubPicDetailFragment"
+            app:destination="@id/clubPicDetailFragment" />
     </fragment>
 
+    <fragment
+        android:id="@+id/clubTextDetailFragment"
+        android:name="com.dabenxiang.mimi.view.club.ClubTextDetailFragment"
+        tools:layout="@layout/fragment_club_text_detail">
+    </fragment>
+
+    <fragment
+        android:id="@+id/clubPicDetailFragment"
+        android:name="com.dabenxiang.mimi.view.club.ClubPicDetailFragment"
+        tools:layout="@layout/fragment_club_pic_detail" />
 </navigation>

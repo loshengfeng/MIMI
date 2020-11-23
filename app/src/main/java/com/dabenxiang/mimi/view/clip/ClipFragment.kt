@@ -87,27 +87,12 @@ class ClipFragment : BaseFragment() {
 
     override val bottomNavigationVisibility = View.VISIBLE
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        Timber.d("@@onDestroyView")
-//        (rv_clip.adapter as ClipAdapter).releasePlayer()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        Timber.d("@@onPause")
-//        (rv_clip.adapter as ClipAdapter).pausePlayer()
-    }
-
     override fun getLayoutId(): Int {
         return R.layout.fragment_clip
     }
 
     override fun setupFirstTime() {
         initSettings()
-        setObservers()
-        progressHUD.show()
-        viewModel.getClipPosts()
     }
 
     private fun setObservers() {
@@ -218,35 +203,9 @@ class ClipFragment : BaseFragment() {
     override fun initSettings() {
         viewPager.adapter = clipPagerAdapter
         TabLayoutMediator(tl_type, viewPager) { tab, position ->
-            tab.text = ClubDetailFragment.tabTitle[position]
+            tab.text = tabTitle[position]
             viewPager.setCurrentItem(tab.position, true)
         }.attach()
-    }
-
-    private fun setupClips(data: List<MemberPostItem> = arrayListOf(), position: Int = 0) {
-//        memberPostItems.addAll(data)
-//        rv_clip.adapter = ClipAdapter(
-//            requireContext(),
-//            clipMap,
-//            position,
-//            ClipFuncItem(
-//                { id, pos -> getClip(id, pos) },
-//                { id, view, type -> viewModel.loadImage(id, view, type) },
-//                { item, pos, isFollow -> onFollowClick(item, pos, isFollow) },
-//                { item, pos, isFavorite -> onFavoriteClick(item, pos, isFavorite) },
-//                { item, pos, isLike -> onLikeClick(item, pos, isLike) },
-//                { item -> onCommentClick(item) },
-//                { onBackClick() },
-//                { id, error -> viewModel.sendVideoReport(id, error) },
-//                { onVipClick() },
-//                { onPromoteClick() },
-//                { update -> getClips(update) }
-//            )
-//        )
-//
-//        rv_clip.scrollToPosition(position)
-
-//        viewModel.getPostDetail(memberPostItems[position], position)
     }
 
     private fun onPromoteClick() {

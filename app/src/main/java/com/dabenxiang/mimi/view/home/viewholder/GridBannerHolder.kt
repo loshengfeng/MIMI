@@ -11,15 +11,15 @@ import kotlinx.android.synthetic.main.item_banner.view.*
 class GridBannerHolder(itemView: View, onClickListener: IndexViewHolderListener) :
     BaseIndexViewHolder<BaseVideoItem.Banner>(itemView, onClickListener) {
 
-    private val ivPoster: ImageView = itemView.iv_poster
+//    private val ivPoster: ImageView = itemView.iv_poster
 
     override fun updated(model: BaseVideoItem.Banner?) {
-        Glide.with(itemView.context)
-            .load(model?.adItem?.href)
-            .into(ivPoster)
-
-        ivPoster.setOnClickListener { view ->
-            GeneralUtils.openWebView(view.context, model?.adItem?.target ?: "")
-        }
+//        Glide.with(itemView.context)
+//            .load(model?.adItem?.href)
+//            .into(ivPoster)
+//
+//        ivPoster.setOnClickListener { view ->
+//            GeneralUtils.openWebView(view.context, model?.adItem?.target ?: "")
+//        }
     }
 }
