@@ -23,18 +23,10 @@ import timber.log.Timber
 
 class ActressFragment : BaseFragment() {
 
-    private val clubFollowAdapter by lazy { ClubFollowAdapter(clubFollowListener) }
-    private val clubFollowListener = object : ClubFollowAdapter.EventListener {
-        override fun onDetail(item: ClubFollowItem) {
+    private val actressAdapter by lazy { ActressAdapter(actressListener) }
+    private val actressListener = object : ActressAdapter.EventListener {
+        override fun onClickListener(item: ReferrerHistoryItem, position: Int){
             Timber.d("onDetail")
-        }
-
-        override fun onGetAttachment(id: Long, view: ImageView) {
-            Timber.d("onGetAttachment")
-        }
-
-        override fun onCancelFollow(clubId: Long, position: Int) {
-            Timber.d("onCancelFollow")
         }
     }
 
@@ -51,13 +43,12 @@ class ActressFragment : BaseFragment() {
 
     override fun setupFirstTime() {
         super.setupFirstTime()
-        rv_hot_actresses.adapter = clubFollowAdapter
-        rv_all_actresses.adapter = clubFollowAdapter
+        rv_hot_actresses.adapter = actressAdapter
+        rv_all_actresses.adapter = actressAdapter
     }
 
     override fun initSettings() {
         super.initSettings()
-        getData()
     }
 
     override fun setupObservers() {
@@ -66,18 +57,6 @@ class ActressFragment : BaseFragment() {
 
     override fun setupListeners() {
 
-    }
-
-    private var job: Job? = null
-    private fun getData() {
-        job?.cancel()
-        job = lifecycleScope.launch {
-            clubFollowAdapter.submitData(PagingData.empty())
-            viewModel.getClubList()
-                .collectLatest {
-                    clubFollowAdapter.submitData(it)
-                }
-        }
     }
 
 }

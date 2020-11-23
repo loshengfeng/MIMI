@@ -445,6 +445,21 @@ class ApiRepository(private val apiService: ApiService) {
 
     /**********************************************************
      *
+     *                   Members/Home/Actors
+     *
+     ***********************************************************/
+    /**
+     * 取得女優頁面
+     */
+    suspend fun getActors() = apiService.getActors()
+
+    /**
+     * 取得女優分頁資料
+     */
+    suspend fun getActorsList() = apiService.getActorsList()
+
+    /**********************************************************
+     *
      *                  Me
      *
      ***********************************************************/
