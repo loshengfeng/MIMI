@@ -18,10 +18,28 @@ data class MenuItem(
     val sorting: Int = 0,
 
     @SerializedName("menus")
-    val menus: List<SubMenuItem> = arrayListOf()
+    val menus: List<SecondMenuItem> = arrayListOf()
 )
 
-data class SubMenuItem(
+data class SecondMenuItem(
+
+    @SerializedName("id")
+    val id: Long = 0,
+
+    @SerializedName("name")
+    val name: String = "",
+
+    @SerializedName("type")
+    val type: LayoutType = LayoutType.GENERAL,
+
+    @SerializedName("sorting")
+    val sorting: Int = 0,
+
+    @SerializedName("menus")
+    val menus: List<ThirdMenuItem> = arrayListOf()
+)
+
+data class ThirdMenuItem(
 
     @SerializedName("id")
     val id: Long = 0,

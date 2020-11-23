@@ -8,6 +8,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.CategoryBanner
+import com.dabenxiang.mimi.model.api.vo.ThirdMenuItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
@@ -16,9 +17,15 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.to.aboomy.pager2banner.IndicatorView
 import kotlinx.android.synthetic.main.fragment_recommend.*
 
-class RecommendFragment : BaseFragment() {
+class RecommendFragment(
+    private val thirdMenuItems: List<ThirdMenuItem>
+) : BaseFragment() {
 
     private val viewModel: RecommendViewModel by viewModels()
+
+    private val recommendContentAdapter by lazy {
+        RecommendContentAdapter(thirdMenuItems)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +60,8 @@ class RecommendFragment : BaseFragment() {
                 )
             )
         }
+
+        rv_recommend.adapter = recommendContentAdapter
     }
 
     override fun getLayoutId(): Int {
