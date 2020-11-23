@@ -16,7 +16,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:listitem="@layout/item_follow_club"
+        tools:listitem="@layout/item_clip_post"
         tools:itemCount="15">
 
     </androidx.recyclerview.widget.RecyclerView>

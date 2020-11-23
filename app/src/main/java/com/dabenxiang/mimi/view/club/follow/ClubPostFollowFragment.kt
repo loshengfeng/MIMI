@@ -12,6 +12,7 @@ import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_follow.*
@@ -19,10 +20,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import org.koin.core.component.inject
+import timber.log.Timber
+
 
 class ClubPostFollowFragment : BaseFragment() {
 
     private val viewModel: ClubFollowViewModel by viewModels()
+    private val accountManager: AccountManager by inject()
     private val adapter by lazy {
         ClubPostFollowAdapter(requireActivity(), postListener, "", memberPostFuncItem)
     }
@@ -44,7 +50,14 @@ class ClubPostFollowFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recycler_view.adapter = adapter
-        getData()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Timber.i("onResume isLogin:${accountManager.isLogin()}")
+        if(accountManager.isLogin()) {
+            getData()
+        }
     }
 
     private val memberPostFuncItem by lazy {
@@ -101,6 +114,7 @@ class ClubPostFollowFragment : BaseFragment() {
     }
 
     private fun getData() {
+        Timber.i("getData")
         CoroutineScope(Dispatchers.IO).launch {
             adapter.submitData(PagingData.empty())
             viewModel.getPostItemList()
