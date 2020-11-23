@@ -8,10 +8,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ThirdMenuItem
 import kotlinx.android.synthetic.main.item_recommend.view.*
-import timber.log.Timber
 
 class RecommendContentAdapter(
-    private val thirdMenuItems: List<ThirdMenuItem>
+    private val thirdMenuItems: List<ThirdMenuItem>,
+    private val recommendFuncItem: RecommendFuncItem
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -26,8 +26,10 @@ class RecommendContentAdapter(
         val item = thirdMenuItems[position]
 
         holder.titleText.text = item.name
-        holder.moreText.setOnClickListener { Timber.d("@@More......") }
-        holder.recommendContentRecycler.adapter = RecommendVideoAdapter(item.videos)
+        holder.moreText.setOnClickListener { recommendFuncItem.onMoreClick() }
+        holder.recommendContentRecycler.adapter = RecommendVideoAdapter(
+            item.videos, recommendFuncItem
+        )
 
         if (item.videos.isEmpty()) {
             holder.titleText.visibility = View.GONE

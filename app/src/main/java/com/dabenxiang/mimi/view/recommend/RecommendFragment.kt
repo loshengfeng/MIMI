@@ -16,6 +16,7 @@ import com.dabenxiang.mimi.view.ranking.RankingFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.to.aboomy.pager2banner.IndicatorView
 import kotlinx.android.synthetic.main.fragment_recommend.*
+import timber.log.Timber
 
 class RecommendFragment(
     private val thirdMenuItems: List<ThirdMenuItem>
@@ -24,7 +25,7 @@ class RecommendFragment(
     private val viewModel: RecommendViewModel by viewModels()
 
     private val recommendContentAdapter by lazy {
-        RecommendContentAdapter(thirdMenuItems)
+        RecommendContentAdapter(thirdMenuItems, recommendFuncItem)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,14 +83,14 @@ class RecommendFragment(
     private val bannerFuncItem by lazy {
         BannerFuncItem(
             { banner -> GeneralUtils.openWebView(requireContext(), banner.url) },
-            { id, imageView ->
-                viewModel.loadImage(
-                    id,
-                    imageView,
-                    LoadImageType.PICTURE_THUMBNAIL
-                )
-            }
+            { id, imageView -> viewModel.loadImage(id, imageView, LoadImageType.PICTURE_THUMBNAIL) }
         )
     }
 
+    private val recommendFuncItem by lazy {
+        RecommendFuncItem(
+            { videoItem -> Timber.d("VideoItem Id: ${videoItem.id}") },
+            { Timber.d("OnMore Click...") }
+        )
+    }
 }
