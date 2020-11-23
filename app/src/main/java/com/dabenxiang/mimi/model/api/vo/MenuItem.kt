@@ -4,6 +4,10 @@ import com.dabenxiang.mimi.model.enums.LayoutType
 import com.google.gson.annotations.SerializedName
 
 data class MenuItem(
+
+    @SerializedName("id")
+    val id: Long = 0,
+
     @SerializedName("name")
     val name: String = "",
 
@@ -13,14 +17,15 @@ data class MenuItem(
     @SerializedName("sorting")
     val sorting: Int = 0,
 
-    @SerializedName("category")
-    val category: String = "",
-
     @SerializedName("menus")
-    val menus: List<MenusItem> = arrayListOf()
+    val menus: List<SubMenuItem> = arrayListOf()
 )
 
-data class MenusItem(
+data class SubMenuItem(
+
+    @SerializedName("id")
+    val id: Long = 0,
+
     @SerializedName("name")
     val name: String = "",
 
@@ -31,5 +36,21 @@ data class MenusItem(
     val sorting: Int = 0,
 
     @SerializedName("category")
-    val category: String = ""
+    val category: String = "",
+
+    @SerializedName("videos")
+    val videos: List<RecommendVideoItem> = arrayListOf(),
 )
+
+data class RecommendVideoItem(
+
+    @SerializedName("id")
+    val id: Long = 0,
+
+    @SerializedName("title")
+    val title: String = "",
+
+    @SerializedName("cover")
+    val cover: String = ""
+)
+

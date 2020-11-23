@@ -854,6 +854,5 @@ class ApiRepository(private val apiService: ApiService) {
      *
      ***********************************************************/
     suspend fun getMenu() = apiService.getMenu()
-
 }
 
