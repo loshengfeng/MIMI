@@ -58,6 +58,9 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     val domainManager: DomainManager by inject()
     val mqttManager: MQTTManager by inject()
 
+    var adWidth = 0
+    var adHeight = 0
+
     private val _showProgress by lazy { MutableLiveData<Boolean>() }
     val showProgress: LiveData<Boolean> get() = _showProgress
 

@@ -15,6 +15,8 @@
         <item name="colorAccent">@color/color_red_1</item>
     </style>
 
+
+
     <style name="login_edit_text">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">42dp</item>
@@ -94,6 +96,12 @@
         <item name="android:textColor">@color/color_red_1</item>
     </style>
 
+    <style name="club_tab_item_type_text" parent="Base.Widget.Design.TabLayout">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/color_black_1</item>
+    </style>
+
     <style name="uploadDialogButtonStyle">
         <item name="android:background">@null</item>
         <item name="android:textColor">@color/color_black_1</item>
@@ -123,8 +131,12 @@
         <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
     </style>
 
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="Theme.Drinks.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="Theme.Drinks.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
     <style name="TabLayoutTextStyle">
         <item name="android:textSize">18sp</item>
     </style>
-
 </resources>

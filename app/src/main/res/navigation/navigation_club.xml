@@ -3,14 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation_club"
-    app:startDestination="@id/clubFragment">
+    app:startDestination="@id/clubTabFragment">
 
     <include app:graph="@navigation/navigation_login" />
 
     <fragment
-        android:id="@+id/clubFragment"
-        android:name="com.dabenxiang.mimi.view.club.ClubFragment"
-        tools:layout="@layout/fragment_club">
+        android:id="@+id/clubTabFragment"
+        android:name="com.dabenxiang.mimi.view.club.ClubTabFragment"
+        tools:layout="@layout/fragment_tab_club">
     </fragment>
 
 </navigation>

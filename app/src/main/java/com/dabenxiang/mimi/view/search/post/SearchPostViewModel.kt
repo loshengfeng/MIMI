@@ -62,9 +62,6 @@ class SearchPostViewModel : BaseViewModel() {
     private val _favoriteVideoResult = MutableLiveData<ApiResult<Long>>()
     val favoriteVideoResult: LiveData<ApiResult<Long>> = _favoriteVideoResult
 
-    var adWidth = 0
-    var adHeight = 0
-
     var currentVideoItem: VideoItem? = null
 
     fun followPost(item: MemberPostItem, position: Int, isFollow: Boolean) {

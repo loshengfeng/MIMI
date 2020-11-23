@@ -58,12 +58,17 @@ class ClipFragment : BaseFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        (rv_clip.adapter as ClipAdapter).releasePlayer()
+        rv_clip?.adapter?.let {adapter->
+            (adapter as ClipAdapter)?.pausePlayer()
+        }
     }
 
     override fun onPause() {
         super.onPause()
-        (rv_clip.adapter as ClipAdapter).pausePlayer()
+        rv_clip?.adapter?.let {adapter->
+            (adapter as ClipAdapter)?.pausePlayer()
+        }
+
     }
 
     override fun getLayoutId(): Int {
