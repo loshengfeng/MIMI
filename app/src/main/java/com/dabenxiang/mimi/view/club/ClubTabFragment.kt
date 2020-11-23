@@ -30,7 +30,7 @@ class ClubTabFragment : BaseFragment() {
         const val TAB_NOVEL = 5
     }
 
-    private val viewModel: ClubViewModel by viewModels()
+    private val viewModel: ClubTabViewModel by viewModels()
 
     private val topicListAdapter by lazy {
         TopicListAdapter(object : TopicItemListener {

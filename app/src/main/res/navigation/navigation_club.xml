@@ -21,12 +21,12 @@
 
     <fragment
         android:id="@+id/clubTextDetailFragment"
-        android:name="com.dabenxiang.mimi.view.club.ClubTextDetailFragment"
+        android:name="com.dabenxiang.mimi.view.club.post.ClubTextDetailFragment"
         tools:layout="@layout/fragment_club_text_detail">
     </fragment>
 
     <fragment
         android:id="@+id/clubPicDetailFragment"
-        android:name="com.dabenxiang.mimi.view.club.ClubPicDetailFragment"
+        android:name="com.dabenxiang.mimi.view.club.post.ClubPicDetailFragment"
         tools:layout="@layout/fragment_club_pic_detail" />
 </navigation>

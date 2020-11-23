@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.picture
+package com.dabenxiang.mimi.view.club.post
 
 import android.os.Bundle
 import android.view.View
@@ -16,14 +16,13 @@ import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
-import com.dabenxiang.mimi.view.club.ClubTabViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import kotlinx.android.synthetic.main.fragment_club_text.*
 
 class ClubPicFragment : BaseFragment() {
 
-    private val viewModel: ClubPicViewModel by viewModels()
+    private val viewModel: ClubPostViewModel by viewModels()
 
     override fun getLayoutId() = R.layout.fragment_club_pic
 

@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.text
+package com.dabenxiang.mimi.view.club.post
 
 import android.os.Bundle
 import android.view.View
@@ -22,7 +22,7 @@ import kotlinx.android.synthetic.main.fragment_club_text.*
 
 class ClubTextFragment : BaseFragment() {
 
-    private val viewModel: ClubTextViewModel by viewModels()
+    private val viewModel: ClubPostViewModel by viewModels()
 
     override fun getLayoutId() = R.layout.fragment_club_text
 

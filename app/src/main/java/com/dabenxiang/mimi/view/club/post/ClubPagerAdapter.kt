@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.adapter
+package com.dabenxiang.mimi.view.club.post
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

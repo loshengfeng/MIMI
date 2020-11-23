@@ -1,10 +1,9 @@
-package com.dabenxiang.mimi.view.club.picture
+package com.dabenxiang.mimi.view.club.post
 
 import android.os.Bundle
 import android.view.View
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
-import com.dabenxiang.mimi.view.club.adapter.ClubPagerAdapter
 import kotlinx.android.synthetic.main.fragment_order.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 
