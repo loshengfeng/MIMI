@@ -6,7 +6,7 @@ import androidx.fragment.app.viewModels
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.model.api.ApiResult.Success
-import com.dabenxiang.mimi.model.api.vo.SubMenuItem
+import com.dabenxiang.mimi.model.api.vo.SecondMenuItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_mimi_home.*
@@ -34,7 +34,7 @@ class MiMiFragment : BaseFragment() {
 
     override fun getLayoutId() = R.layout.fragment_mimi_home
 
-    private fun setupUi(menusItems: List<SubMenuItem>) {
+    private fun setupUi(menusItems: List<SecondMenuItem>) {
         viewpager.isSaveEnabled = false
         viewpager.adapter = MiMiViewPagerAdapter(this, menusItems)
         TabLayoutMediator(layout_tab, viewpager) { tab, position ->

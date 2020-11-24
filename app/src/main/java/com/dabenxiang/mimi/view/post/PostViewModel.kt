@@ -22,7 +22,8 @@ class PostViewModel: BaseViewModel() {
     fun getClub(tag: String) {
         viewModelScope.launch {
             flow {
-                val resp = domainManager.getApiRepository().getMembersClub(tag)
+                val resp = domainManager.
+                getApiRepository().getMembersClub(tag, null, null)
                 if (!resp.isSuccessful) throw HttpException(resp)
                 emit(ApiResult.success(resp.body()?.content))
             }
