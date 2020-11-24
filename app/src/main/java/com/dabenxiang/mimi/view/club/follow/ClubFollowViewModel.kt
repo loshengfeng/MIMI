@@ -33,6 +33,8 @@ class ClubFollowViewModel : BaseViewModel() {
                 }
         )
                 .flow
+                .onStart {  setShowProgress(true) }
+                .onCompletion { setShowProgress(false) }
                 .cachedIn(viewModelScope)
     }
 
@@ -50,6 +52,7 @@ class ClubFollowViewModel : BaseViewModel() {
     }
 
     private val pagingCallback = object : PagingCallback {
+
         override fun onTotalCount(count: Long) {
             _clubCount.postValue(count.toInt())
         }
