@@ -213,7 +213,7 @@ class MainActivity : BaseActivity(){
         //Navigation item
         bottom_navigation.itemTextColor =
             resources.getColorStateList(
-                if (isNavTransparent) R.color.bottom_nav_adult_text_selector else R.color.bottom_nav_normal_text_selector,
+                if (isNavTransparent) R.color.bottom_nav_clip_text_selector else R.color.bottom_nav_normal_text_selector,
                 null
             )
 
