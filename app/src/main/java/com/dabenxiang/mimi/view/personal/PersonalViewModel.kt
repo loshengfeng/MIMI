@@ -1,14 +1,17 @@
 package com.dabenxiang.mimi.view.personal
 
+import android.provider.SyncStateContract.Helpers.update
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MeItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
 class PersonalViewModel : BaseViewModel() {
 
@@ -21,21 +24,39 @@ class PersonalViewModel : BaseViewModel() {
     private val _unreadResult = MutableLiveData<ApiResult<Int>>()
     val unreadResult: LiveData<ApiResult<Int>> = _unreadResult
 
-    fun getMe() {
+    fun getPostDetail() {
         viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository().getMe()
-                if (!result.isSuccessful) throw HttpException(result)
-                val meItem = result.body()?.content
-                meItem?.let {
-                    accountManager.setupProfile(it)
+            if (isLogin()) {
+                flow {
+                    val result = domainManager.getApiRepository().getMe()
+                    if (!result.isSuccessful) throw HttpException(result)
+                    val meItem = result.body()?.content
+                    meItem?.let {
+                        accountManager.setupProfile(it)
+                    }
+                    emit(ApiResult.success(meItem))
                 }
-                emit(ApiResult.success(meItem))
+                    .onStart { emit(ApiResult.loading()) }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .collect { _meItem.value = it }
+            } else {
+                flow {
+                    val result = domainManager.getApiRepository().getGuestInfo()
+                    if (!result.isSuccessful) throw HttpException(result)
+                    val deducted = result.body()?.content?.videoCount ?: 0
+                    Timber.e("Show videoCount : " + result.body()?.content?.videoCount)
+                    Timber.e("Show videoOnDemandCount : " + result.body()?.content?.videoOnDemandCount)
+                    emit(deducted)
+                }
+                    .flowOn(Dispatchers.IO)
+                    .catch { e ->
+                        e.printStackTrace()
+//                    update(position, false)
+                    }.collect {
+//                        update(position, it)
+                    }
             }
-                .onStart { emit(ApiResult.loading()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .collect { _meItem.value = it }
         }
     }
 
@@ -67,23 +88,23 @@ class PersonalViewModel : BaseViewModel() {
     val totalUnreadResult: LiveData<ApiResult<Int>> = _totalUnreadResult
 
     fun getTotalUnread() {
-        viewModelScope.launch {
-            flow {
-                val apiRepository = domainManager.getApiRepository()
-                val chatUnreadResult = apiRepository.getUnread()
-                val chatUnread =
-                    if (!chatUnreadResult.isSuccessful) 0 else chatUnreadResult.body()?.content ?: 0
-                val orderUnreadResult = apiRepository.getUnReadOrderCount()
-                val orderUnread =
-                    if (!orderUnreadResult.isSuccessful) 0 else orderUnreadResult.body()?.content
-                        ?: 0
-                emit(ApiResult.success(chatUnread + orderUnread))
-            }
-                .onStart { emit(ApiResult.loading()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .collect { _totalUnreadResult.value = it }
-        }
+//        viewModelScope.launch {
+//            flow {
+//                val apiRepository = domainManager.getApiRepository()
+//                val chatUnreadResult = apiRepository.getUnread()
+//                val chatUnread =
+//                    if (!chatUnreadResult.isSuccessful) 0 else chatUnreadResult.body()?.content ?: 0
+//                val orderUnreadResult = apiRepository.getUnReadOrderCount()
+//                val orderUnread =
+//                    if (!orderUnreadResult.isSuccessful) 0 else orderUnreadResult.body()?.content
+//                        ?: 0
+//                emit(ApiResult.success(chatUnread + orderUnread))
+//            }
+//                .onStart { emit(ApiResult.loading()) }
+//                .catch { e -> emit(ApiResult.error(e)) }
+//                .onCompletion { emit(ApiResult.loaded()) }
+//                .collect { _totalUnreadResult.value = it }
+//        }
     }
 
     fun getOldDriverUrl(): String {

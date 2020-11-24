@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
-import androidx.core.view.ViewCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -20,6 +19,7 @@ import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.login.LoginFragment
+import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_LOGIN
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.appbar.AppBarLayout
@@ -27,6 +27,7 @@ import com.google.android.material.appbar.AppBarLayout.Behavior.DragCallback
 import kotlinx.android.synthetic.main.fragment_personal.*
 import kotlinx.android.synthetic.main.item_personal_is_login.*
 import retrofit2.HttpException
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -54,13 +55,16 @@ class PersonalFragment : BaseFragment() {
     override fun initSettings() {
         super.initSettings()
         tv_version.text = BuildConfig.VERSION_NAME
+        Glide.with(this).clear(avatar)
+        viewModel.getPostDetail()
       //FIXME
         //            ViewCompat.setNestedScrollingEnabled(nestedScroll, true)
         val behavior = appbar_layout.behavior as AppBarLayout.Behavior?
+
         if (viewModel.isLogin()) {
             item_is_Login.visibility = View.VISIBLE
             tv_logout.visibility = View.VISIBLE
-            viewModel.getMe()
+            viewModel.getPostDetail()
             behavior!!.setDragCallback(object : DragCallback() {
                 override fun canDrag(appBarLayout: AppBarLayout): Boolean {
                     return true
@@ -78,7 +82,7 @@ class PersonalFragment : BaseFragment() {
                     return false
                 }
             })
-            Glide.with(this).clear(avatar)
+
             Glide.with(this).load(R.drawable.default_profile_picture).into(avatar)
         }
     }
@@ -188,12 +192,23 @@ class PersonalFragment : BaseFragment() {
 //                        LoginFragment.createBundle(TYPE_LOGIN)
 //                    )
                 }
-//                R.id.tv_login -> navigateTo(
-//                    NavigateItem.Destination(
-//                        R.id.action_personalFragment_to_loginFragment,
-//                        LoginFragment.createBundle(TYPE_LOGIN)
-//                    )
-//                )
+                R.id.vippromote_now -> {
+                    if (viewModel.isLogin()){
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_to_inviteVipFragment,
+                                null
+                            )
+                        )
+                    }else{
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_personalFragment_to_loginFragment,
+                                LoginFragment.createBundle(TYPE_LOGIN)
+                            )
+                        )
+                    }
+                }
                 R.id.tv_register -> navigateTo(
                     NavigateItem.Destination(
                         R.id.action_personalFragment_to_loginFragment,
@@ -210,6 +225,7 @@ class PersonalFragment : BaseFragment() {
             setting.setOnClickListener(it)
             tv_old_driver.setOnClickListener(it)
             tv_logout.setOnClickListener(it)
+            vippromote_now.setOnClickListener(it)
 //            tv_login.setOnClickListener(it)
 //            tv_register.setOnClickListener(it)
         }
