@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club
+package com.dabenxiang.mimi.view.club.post
 
 import android.os.Bundle
 import android.view.View
@@ -20,15 +20,15 @@ import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import kotlinx.android.synthetic.main.fragment_club_text.*
 
-class ClubPicFragment : BaseFragment() {
+class ClubTextFragment : BaseFragment() {
 
-    private val viewModel: ClubViewModel by viewModels()
+    private val viewModel: ClubPostViewModel by viewModels()
 
-    override fun getLayoutId() = R.layout.fragment_club_pic
+    override fun getLayoutId() = R.layout.fragment_club_text
 
     override fun setupObservers() {
-        viewModel.picturePostItemListResult.observe(this, Observer {
-            picturePostPagedAdapter.submitList(it)
+        viewModel.textPostItemListResult.observe(this, Observer {
+            textPostPagedAdapter.submitList(it)
         })
     }
 
@@ -38,11 +38,11 @@ class ClubPicFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = picturePostPagedAdapter
-        viewModel.getPicturePosts()
+        recyclerView.adapter = textPostPagedAdapter
+        viewModel.getTextPosts()
     }
 
-    private val picturePostPagedAdapter by lazy {
+    private val textPostPagedAdapter by lazy {
         MemberPostPagedAdapter(requireActivity(), adultListener, "", memberPostFuncItem)
     }
 
@@ -97,7 +97,7 @@ class ClubPicFragment : BaseFragment() {
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_clubTabFragment_to_clubPicDetailFragment)
+                    R.id.action_clubTabFragment_to_clubTextDetailFragment)
             )
         }
 
@@ -144,4 +144,5 @@ class ClubPicFragment : BaseFragment() {
             { id, view, type -> viewModel.loadImage(id, view, type) }
         )
     }
+
 }

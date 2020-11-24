@@ -243,7 +243,9 @@ interface ApiService {
      ***********************************************************/
     @GET("/v1/Members/Club")
     suspend fun getMembersClub(
-        @Query("tag") tag: String
+        @Query("tag") tag: String,
+        @Query("offset") offset: Int?,
+        @Query("limit") limit: Int?
     ): Response<ApiBasePagingItem<ArrayList<MemberClubItem>>>
 
     @GET("/v1/Members/Club/{id}")

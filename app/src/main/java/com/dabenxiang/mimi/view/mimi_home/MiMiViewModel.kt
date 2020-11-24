@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.SubMenuItem
+import com.dabenxiang.mimi.model.api.vo.SecondMenuItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
@@ -14,8 +14,8 @@ import retrofit2.HttpException
 
 class MiMiViewModel : BaseViewModel() {
 
-    private val _menusItems = MutableLiveData<ApiResult<List<SubMenuItem>>>()
-    val menusItems: LiveData<ApiResult<List<SubMenuItem>>> = _menusItems
+    private val _menusItems = MutableLiveData<ApiResult<List<SecondMenuItem>>>()
+    val menusItems: LiveData<ApiResult<List<SecondMenuItem>>> = _menusItems
 
     fun getMenu() {
         viewModelScope.launch {
