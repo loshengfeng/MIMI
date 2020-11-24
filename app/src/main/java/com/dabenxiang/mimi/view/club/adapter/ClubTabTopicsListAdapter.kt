@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.topic
+package com.dabenxiang.mimi.view.club.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,11 +7,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.PostItem
-import com.dabenxiang.mimi.view.club.follow.ClubPostFollowAdapter
 import kotlinx.android.synthetic.main.item_topic_tab.view.*
 
 class TopicListAdapter(private val listener: TopicItemListener)
@@ -42,8 +38,11 @@ class TopicListAdapter(private val listener: TopicItemListener)
     }
 
     override fun onBindViewHolder(holder: TopicViewHolder, position: Int) {
-        getItem(position)?.let {
-            holder.topic_title.text = it.title
+        getItem(position)?.let {item->
+            holder.topic_title.text = item.title
+            holder.itemView.setOnClickListener {
+                listener.itemClicked(item, position)
+            }
         }
     }
 
@@ -63,5 +62,5 @@ class TopicListAdapter(private val listener: TopicItemListener)
 }
 
 interface TopicItemListener {
-    fun itemClicked(drink: MemberClubItem, position: Int)
+    fun itemClicked(item: MemberClubItem, position: Int)
 }

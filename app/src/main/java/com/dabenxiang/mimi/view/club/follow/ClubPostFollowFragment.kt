@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.paging.PagingData
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
@@ -17,7 +16,7 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import kotlinx.android.synthetic.main.fragment_follow.*
+import kotlinx.android.synthetic.main.fragment_club_follow.*
 import kotlinx.android.synthetic.main.item_ad.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -35,7 +34,7 @@ class ClubPostFollowFragment : BaseFragment() {
         ClubPostFollowAdapter(requireActivity(), postListener, "", memberPostFuncItem)
     }
 
-    override fun getLayoutId() = R.layout.fragment_follow
+    override fun getLayoutId() = R.layout.fragment_club_follow
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

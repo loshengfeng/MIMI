@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.clubdetail
+package com.dabenxiang.mimi.view.club.topic
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
-class ClubDetailViewModel : BaseViewModel() {
+class TopicDetailViewModel : BaseViewModel() {
 
     private var _followClubResult = MutableLiveData<ApiResult<Boolean>>()
     val followClubResult: LiveData<ApiResult<Boolean>> = _followClubResult
@@ -67,7 +67,7 @@ class ClubDetailViewModel : BaseViewModel() {
             }
         }
         val clubDetailPostDataSource =
-            ClubDetailPostDataSource(
+                TopicDetailPostDataSource(
                 pagingCallback,
                 viewModelScope,
                 domainManager,
@@ -76,7 +76,7 @@ class ClubDetailViewModel : BaseViewModel() {
                 adWidth,
                 adHeight
             )
-        val clubDetailPostFactory = ClubDetailPostFactory(clubDetailPostDataSource)
+        val clubDetailPostFactory = TopicDetailPostFactory(clubDetailPostDataSource)
         val config = PagedList.Config.Builder()
             .setPrefetchDistance(4)
             .build()

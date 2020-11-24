@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.clubdetail
+package com.dabenxiang.mimi.view.club.topic
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,15 +7,15 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter
 
-class ClubPagerAdapter(
-    private val clubDetailFuncItem: ClubDetailFuncItem,
-    private val adultListener: AdultListener
-) : RecyclerView.Adapter<ClubPagerViewHolder>() {
+class TopicPagerAdapter(
+        private val clubDetailFuncItem: TopicDetailFuncItem,
+        private val adultListener: AdultListener
+) : RecyclerView.Adapter<TopicPagerViewHolder>() {
 
     private val adapterList = arrayListOf<MemberPostPagedAdapter>()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClubPagerViewHolder {
-        return ClubPagerViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TopicPagerViewHolder {
+        return TopicPagerViewHolder(
             LayoutInflater.from(parent.context).inflate(R.layout.item_club_pager, parent, false)
         )
     }
@@ -24,7 +24,7 @@ class ClubPagerAdapter(
         return 3
     }
 
-    override fun onBindViewHolder(holder: ClubPagerViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: TopicPagerViewHolder, position: Int) {
         val adapter = holder.onBind(position, clubDetailFuncItem, adultListener)
         adapter?.let { adapterList.add(position, adapter) }
     }
