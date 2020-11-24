@@ -103,7 +103,6 @@
     <string name="club_search_hint">搜寻 ”该分类” 内容</string>
     <string name="club_topic_title">热门主题</string>
 
-
     <!-- Favorite -->
     <string name="favorite_title">我的收藏</string>
     <string name="favorite_clean">清除所有收藏</string>
@@ -474,5 +473,8 @@
     <string name="daily_check_in_success">签到成功</string>
     <string name="daily_check_in">每日签到</string>
     <string name="daily_check_in_hint">赠送秘密视频 %1$d 部、短视频 %2$d 部</string>
+
+    <!-- Recommend -->
+    <string name="recommend_today">今日精选</string>
 
 </resources>
