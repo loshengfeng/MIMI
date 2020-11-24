@@ -60,7 +60,6 @@ class AccountManager(
 
     fun getMemberTokenResult(): TokenResult {
         val tokenData = pref.memberToken
-        Timber.i("getMemberTokenResult tokenData:$tokenData")
         return when {
             tokenData.expiresTimestamp == 0L -> TokenResult.EMPTY
             tokenData.accessToken.isEmpty() -> TokenResult.EMPTY
