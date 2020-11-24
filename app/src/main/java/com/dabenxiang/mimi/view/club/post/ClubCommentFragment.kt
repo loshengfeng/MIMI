@@ -4,9 +4,11 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.OnItemClickListener
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.CommentType
@@ -19,7 +21,7 @@ import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
-import com.dabenxiang.mimi.view.textdetail.TextDetailAdapter
+import com.dabenxiang.mimi.view.textdetail.ClubCommentAdapter
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_text_detail.*
 import kotlinx.android.synthetic.main.fragment_text_detail.*
@@ -33,17 +35,20 @@ class ClubCommentFragment : BaseFragment() {
 
     private var memberPostItem: MemberPostItem? = null
 
-    private var textDetailAdapter: TextDetailAdapter? = null
+    private var textDetailAdapter: ClubCommentAdapter? = null
     private var commentAdapter: CommentAdapter? = null
+
+    private var adWidth = 0
+    private var adHeight = 0
 
     companion object {
         const val KEY_DATA = "data"
-        fun createBundle(item: MemberPostItem): ClubTextDetailFragment {
+        fun createBundle(item: MemberPostItem): ClubCommentFragment {
             val bundle = Bundle().also {
                 it.putSerializable(KEY_DATA, item)
             }
 
-            val fragment = ClubTextDetailFragment()
+            val fragment = ClubCommentFragment()
             fragment.arguments = bundle
             return fragment
         }
@@ -52,6 +57,15 @@ class ClubCommentFragment : BaseFragment() {
     override fun getLayoutId() = R.layout.fragment_club_comment
 
     override fun setupObservers() {
+        mainViewModel?.getAdResult?.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    textDetailAdapter?.setupAdItem(it.result)
+                    textDetailAdapter?.notifyItemChanged(0)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -60,11 +74,13 @@ class ClubCommentFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
+        adHeight = (adWidth * 0.142).toInt()
 
         memberPostItem = arguments?.get(ClubTextDetailFragment.KEY_DATA) as MemberPostItem
         viewModel.getPostDetail(memberPostItem!!)
 
-        textDetailAdapter = TextDetailAdapter(
+        textDetailAdapter = ClubCommentAdapter(
             requireContext(),
             memberPostItem!!,
             onTextDetailListener,
@@ -73,9 +89,11 @@ class ClubCommentFragment : BaseFragment() {
 
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = textDetailAdapter
+
+        mainViewModel?.getAd(adWidth, adHeight)
     }
 
-    private val onTextDetailListener = object : TextDetailAdapter.OnTextDetailListener {
+    private val onTextDetailListener = object : ClubCommentAdapter.OnTextDetailListener {
         override fun onGetAttachment(id: Long?, view: ImageView) {
             viewModel.loadImage(id, view, LoadImageType.AVATAR)
         }
@@ -166,10 +184,10 @@ class ClubCommentFragment : BaseFragment() {
 
     private val onItemClickListener = object : OnItemClickListener {
         override fun onItemClick() {
-            GeneralUtils.hideKeyboard(requireActivity())
-            layout_bar.visibility = View.VISIBLE
-            layout_edit_bar.visibility = View.INVISIBLE
-            et_message.setText("")
+//            GeneralUtils.hideKeyboard(requireActivity())
+//            layout_bar.visibility = View.VISIBLE
+//            layout_edit_bar.visibility = View.INVISIBLE
+//            et_message.setText("")
         }
     }
 }
