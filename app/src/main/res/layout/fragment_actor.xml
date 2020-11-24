@@ -22,7 +22,10 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="25dp"
-                android:text="@string/actress_hot_actresses" />
+                android:paddingStart="20dp"
+                android:text="@string/actress_hot_actresses"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_hot_actresses"
@@ -32,12 +35,17 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="25dp"
-                android:text="@string/actress_all_actresses" />
+                android:paddingStart="20dp"
+                android:text="@string/actress_all_actresses"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_all_actresses"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

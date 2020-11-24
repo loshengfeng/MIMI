@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ActorCategoriesItem
 import com.dabenxiang.mimi.model.api.vo.ActorVideosItem
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import kotlinx.android.synthetic.main.fragment_actor.*
 import timber.log.Timber
@@ -22,11 +24,16 @@ class ActorFragment : BaseFragment() {
         }
     }
 
-    private val actorCategoriesAdapter by lazy { ActorCategoriesAdapter(requireContext(), actorCategoriesListener) }
-    private val actorCategoriesListener = object : ActorCategoriesAdapter.EventListener {
-        override fun onClickListener(item: ActorCategoriesItem, position: Int){
-            Timber.d("onDetail")
-        }
+    private val actorCategoriesAdapter by lazy {
+        ActorCategoriesAdapter(requireContext(),
+            ActorCategoriesFuncItem(
+                getActorAvatarAttachment =  { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR_CS) },
+                onClickListener = { actorCategoriesItem, position -> onClickListener(actorCategoriesItem, position) }
+            )
+        ) }
+
+    private fun onClickListener(item: ActorCategoriesItem, position: Int){
+            Timber.d("actorCategoriesItem onDetail: ${item.name}")
     }
 
     private val viewModel: ActorViewModel by viewModels()
@@ -44,7 +51,7 @@ class ActorFragment : BaseFragment() {
         super.setupFirstTime()
         rv_hot_actresses.layoutManager = LinearLayoutManager(context)
         rv_hot_actresses.adapter = actorVideosAdapter
-        rv_all_actresses.layoutManager = LinearLayoutManager(context)
+        rv_all_actresses.layoutManager = GridLayoutManager(context, 4)
         rv_all_actresses.adapter = actorCategoriesAdapter
     }
 
