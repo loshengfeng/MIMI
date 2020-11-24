@@ -11,4 +11,5 @@ class ActorVideosViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
     val totalClick: TextView = itemView.tv_total_click
     val totalVideo: TextView = itemView.tv_total_video
     val ivAvatar: ImageView = itemView.iv_avatar
+    val actressesVideos: RecyclerView = itemView.rv_actresses_videos
 }

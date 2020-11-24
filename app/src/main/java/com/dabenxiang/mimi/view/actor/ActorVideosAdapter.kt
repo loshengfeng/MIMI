@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.actor
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ActorVideosItem
@@ -16,9 +17,12 @@ class ActorVideosAdapter(
 
     private var actorVideosItems: ArrayList<ActorVideosItem>? = null
 
-    interface EventListener {
-        fun onClickListener(item: ActorVideosItem, position: Int)
-    }
+    private val actorVideoAdapter by lazy {
+        ActorVideoAdapter(context,
+            ActorVideoFuncItem(
+                onVideoClickListener = { actorVideoItem, position -> actorVideosFuncItem.onVideoClickListener(actorVideoItem, position) }
+            )
+        ) }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ActorVideosViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -35,6 +39,10 @@ class ActorVideosAdapter(
         holder.name.text = item?.name
         holder.totalClick.text = item?.totalClick?.toString() + context.getString(R.string.actor_hot_unit)
         holder.totalVideo.text = item?.totalVideo?.toString() + context.getString(R.string.actor_videos_unit)
+        holder.actressesVideos.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        holder.actressesVideos.adapter = actorVideoAdapter
+        if(item?.videos != null)
+            actorVideoAdapter.setupData(item.videos)
         actorVideosFuncItem.getActorAvatarAttachment.invoke(item?.attachmentId,holder.ivAvatar)
     }
 

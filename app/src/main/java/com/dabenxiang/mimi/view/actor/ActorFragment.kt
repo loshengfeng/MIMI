@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ActorCategoriesItem
-import com.dabenxiang.mimi.model.api.vo.ActorVideosItem
+import com.dabenxiang.mimi.model.api.vo.ActorVideoItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import kotlinx.android.synthetic.main.fragment_actor.*
@@ -21,12 +21,12 @@ class ActorFragment : BaseFragment() {
         ActorVideosAdapter(requireContext(),
             ActorVideosFuncItem(
                 getActorAvatarAttachment =  { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR_CS) },
-                onClickListener = { actorVideosItem, position -> onClickListener(actorVideosItem, position) }
+                onVideoClickListener = { actorVideoItem, position -> onVideoClickListener(actorVideoItem, position) }
             )
         ) }
 
-    private fun onClickListener(item: ActorVideosItem, position: Int){
-        Timber.d("actorVideosItem onDetail: ${item.name}")
+    private fun onVideoClickListener(item: ActorVideoItem, position: Int){
+        Timber.d("Video: ${item.title}")
     }
 
     private val actorCategoriesAdapter by lazy {
@@ -38,7 +38,7 @@ class ActorFragment : BaseFragment() {
         ) }
 
     private fun onCategoriesClickListener(item: ActorCategoriesItem, position: Int){
-            Timber.d("actorCategoriesItem onDetail: ${item.name}")
+            Timber.d("Actor: ${item.name}")
     }
 
     private val viewModel: ActorViewModel by viewModels()
