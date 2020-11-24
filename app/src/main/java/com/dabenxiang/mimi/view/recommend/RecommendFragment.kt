@@ -88,7 +88,7 @@ class RecommendFragment(
             { thirdMenuItem ->
                 // TODO: 跳至播放頁面
                 when (thirdMenuItem.name) {
-                    "今日精选" -> navToRanking()
+                    getString(R.string.recommend_today) -> navToRanking()
                     else -> {
                         // TODO: 跳至分類頁面
                     }

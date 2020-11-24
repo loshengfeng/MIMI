@@ -6,8 +6,8 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -28,11 +28,10 @@ import java.io.File
 
 class ClipAdapter(
     private val context: Context,
-    private val memberPostItems: ArrayList<MemberPostItem>,
-    private val clipMap: HashMap<String, File>,
-    private var currentPosition: Int,
-    private val clipFuncItem: ClipFuncItem
-) : ListAdapter<MemberPostItem, ClipViewHolder>(DIFF_CALLBACK) {
+    private val clipMap: HashMap<String, File> = hashMapOf(),
+    private var currentPosition: Int = 0,
+    private var clipFuncItem: ClipFuncItem = ClipFuncItem()
+) : PagingDataAdapter<MemberPostItem, ClipViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         private val DIFF_CALLBACK =
@@ -63,10 +62,6 @@ class ClipAdapter(
     private var exoPlayer: SimpleExoPlayer? = null
     private var lastWindowIndex = 0
 
-    override fun getItemCount(): Int {
-        return memberPostItems.count()
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClipViewHolder {
         return ClipViewHolder(
             LayoutInflater.from(parent.context).inflate(
@@ -75,6 +70,14 @@ class ClipAdapter(
                 false
             )
         )
+    }
+
+    fun setClipFuncItem(clipFuncItem: ClipFuncItem) {
+        this.clipFuncItem = clipFuncItem
+    }
+
+    fun getMemberPostItem(position: Int): MemberPostItem? {
+        return getItem(position)
     }
 
     fun updateCurrentPosition(position: Int) {
@@ -107,7 +110,7 @@ class ClipAdapter(
         payloads: MutableList<Any>
     ) {
         Timber.d("onBindViewHolder position:$position, currentPosition: $currentPosition, payloads: $payloads")
-        val item = memberPostItems[position]
+        val item = getItem(position) ?: MemberPostItem()
 
         var contentItem: MediaContentItem? = null
         try {
@@ -132,12 +135,12 @@ class ClipAdapter(
                             holder.progress.visibility = View.GONE
                         }
 
-                        holder.ibReplay.setOnClickListener {
+                        holder.ibReplay.setOnClickListener { view ->
                             exoPlayer?.also { player ->
                                 player.seekTo(0)
                                 player.playWhenReady = true
                             }
-                            it.visibility = View.GONE
+                            view.visibility = View.GONE
                         }
 
                         holder.playerView.setOnClickListener {
@@ -182,8 +185,8 @@ class ClipAdapter(
     }
 
     private fun processClip(playerView: PlayerView, id: String, url: String, position: Int) {
-        Timber.d("processClip position:$position")
-        val item = memberPostItems[position]
+        Timber.d("processClip position:$position, id:$id, url:$url")
+        val item = getItem(position) ?: MemberPostItem()
         playingId = id
         var contentItem: MediaContentItem? = null
         try {
@@ -295,7 +298,7 @@ class ClipAdapter(
                     //showErrorDialog("UNKNOWN")
                 }
             }
-            playingId?.takeIf { it.isNotEmpty() }?.also {id->
+            playingId.takeIf { it.isNotEmpty() }?.also { id->
                 clipFuncItem.onPlayerError(id, error.message ?: "error: UNKNOWN")
             }
 
