@@ -32,15 +32,14 @@ import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.dialog.dailycheckin.DailyCheckInDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
-import com.dabenxiang.mimi.view.home.AdultHomeFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
+import com.dabenxiang.mimi.view.mimi_home.MiMiFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerFragment.Companion.KEY_DEST_ID
 import com.dabenxiang.mimi.widget.utility.FileUtil.deleteExternalFile
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import kotlinx.android.synthetic.main.activity_main.*
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 import java.util.*
 
@@ -209,19 +208,19 @@ class MainActivity : BaseActivity(){
         val fragmentName = supportFragmentManager.fragments[0].findNavController()
             .currentDestination?.displayName?.substringAfter("/").toString()
 
-//        val adultHomeFragment =
-//            AdultHomeFragment::class.java.simpleName.toLowerCase(Locale.getDefault())
+        val mimiFragment =
+            MiMiFragment::class.java.simpleName.toLowerCase(Locale.getDefault())
 //        // 判斷當前的頁面是停留在 homeFragment，顯示退出 app 訊息
-//        if (fragmentName.toLowerCase(Locale.getDefault()) == adultHomeFragment) {
-//            if (!viewModel.needCloseApp) {
-//                viewModel.startBackExitAppTimer()
-//                GeneralUtils.showToast(this, getString(R.string.press_again_exit))
-//            } else {
-//                finish()
-//            }
-//        } else {
-//            super.onBackPressed()
-//        }
+        if (fragmentName.toLowerCase(Locale.getDefault()) == mimiFragment) {
+            if (!viewModel.needCloseApp) {
+                viewModel.startBackExitAppTimer()
+                GeneralUtils.showToast(this, getString(R.string.press_again_exit))
+            } else {
+                finish()
+            }
+        } else {
+            super.onBackPressed()
+        }
     }
 
     override fun onNewIntent(intent: Intent?) {

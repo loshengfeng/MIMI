@@ -10,6 +10,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
+import timber.log.Timber
 import java.io.File
 
 class ApiRepository(private val apiService: ApiService) {
@@ -307,10 +308,14 @@ class ApiRepository(private val apiService: ApiService) {
      *                  Members/Club
      *
      ***********************************************************/
+
     suspend fun getMembersClub(
-        tag: String
+        tag: String,
+        offset: Int?,
+        limit: Int?
     ): Response<ApiBasePagingItem<ArrayList<MemberClubItem>>> {
-        return apiService.getMembersClub(tag)
+        Timber.i("ClubTabFragment getMembersClub")
+        return apiService.getMembersClub(tag, offset, limit)
     }
 
     suspend fun getMembersClub(

@@ -22,10 +22,10 @@ class BannerAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         holder as BannerViewHolder
         val banner = banners[position]
-        holder.bannerImg.setOnClickListener {
+        holder.bannerImage.setOnClickListener {
             bannerFuncItem.onItemClick(banner)
         }
-        bannerFuncItem.getBitmap(banner.id, holder.bannerImg)
+        bannerFuncItem.getBitmap(banner.id, holder.bannerImage)
     }
 
     override fun getItemCount(): Int {
@@ -33,7 +33,7 @@ class BannerAdapter(
     }
 
     class BannerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var bannerImg: ImageView = itemView.iv_banner
+        var bannerImage: ImageView = itemView.iv_banner
     }
 
 }

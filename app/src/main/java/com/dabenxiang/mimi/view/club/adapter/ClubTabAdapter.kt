@@ -8,14 +8,16 @@ import androidx.fragment.app.viewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
-import com.dabenxiang.mimi.view.club.follow.ClubPostFollowFragment
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_CLIP
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_FOLLOW
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_LATEST
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_NOVEL
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_PICTURE
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_RECOMMEND
-import com.dabenxiang.mimi.view.club.ClubViewModel
+import com.dabenxiang.mimi.view.club.ClubTabViewModel
+import com.dabenxiang.mimi.view.club.follow.ClubPostFollowFragment
+import com.dabenxiang.mimi.view.club.post.ClubPicFragment
+import com.dabenxiang.mimi.view.club.post.ClubTextFragment
 import kotlinx.android.synthetic.main.fragment_tab_test.*
 
 class ClubTabAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
@@ -36,14 +38,8 @@ class ClubTabAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
                 PageTestFragment.create(
                         fragment.getString(R.string.club_tab_clip))
             },
-            TAB_PICTURE to {
-                PageTestFragment.create(
-                        fragment.getString(R.string.club_tab_picture))
-            },
-            TAB_NOVEL to {
-                PageTestFragment.create(
-                        fragment.getString(R.string.club_tab_novel))
-            }
+            TAB_PICTURE to { ClubPicFragment() },
+            TAB_NOVEL to { ClubTextFragment() }
     )
 
     override fun getItemCount() = tabFragmentsCreators.size
@@ -67,7 +63,7 @@ class PageTestFragment : BaseFragment() {
                 }
     }
 
-    private val viewModel: ClubViewModel by viewModels()
+    private val viewModel: ClubTabViewModel by viewModels()
 
     override fun getLayoutId() = R.layout.fragment_tab_test
     override fun setupObservers() {}
