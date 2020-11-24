@@ -9,6 +9,8 @@ import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.getScreenSize
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.pxToDp
 import kotlinx.android.synthetic.main.fragment_general_video.*
 
 class GeneralVideoFragment : BaseFragment() {
@@ -18,8 +20,8 @@ class GeneralVideoFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        val adHeight = (adWidth * 0.142).toInt()
+        val adWidth = pxToDp(requireContext(), getScreenSize(requireActivity()).first)
+        val adHeight = (adWidth / 7)
 
         mainViewModel?.getAdResult?.observe(this, {
             when (it) {
