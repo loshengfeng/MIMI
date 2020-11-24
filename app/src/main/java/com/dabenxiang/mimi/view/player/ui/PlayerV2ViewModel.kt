@@ -56,6 +56,8 @@ class PlayerV2ViewModel: BaseViewModel() {
     private val _videoStreamingUrl = MutableLiveData<String>()
     val videoStreamingUrl: LiveData<String> = _videoStreamingUrl
 
+    val showIntroduction = MutableLiveData(false)
+
     var videoContentId : Long = -1
     var currentWindow: Int = 0
     var playbackPosition: Long = 0

@@ -6,7 +6,11 @@ import android.hardware.SensorManager
 import android.os.Bundle
 import android.view.*
 import android.view.inputmethod.InputMethodManager
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
+import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.VideoEpisodeItem
@@ -21,6 +25,7 @@ import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.analytics.AnalyticsListener
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
+import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_v2_player.*
 import kotlinx.android.synthetic.main.fragment_v2_player.player_view
 import kotlinx.android.synthetic.main.fragment_v2_player.tv_forward_backward
@@ -48,7 +53,7 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
         }
     }
 
-    private val viewModel = PlayerV2ViewModel()
+    private val viewModel: PlayerV2ViewModel by activityViewModels()
 
     private var player: SimpleExoPlayer? = null
     private var orientationDetector: OrientationDetector? = null
@@ -62,7 +67,6 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
             when (it) {
                 is ApiResult.Loading -> progressHUD.show()
                 is ApiResult.Success -> {
-                    // TODO init view pager
                     parsingVideoContent(it.result)
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
@@ -97,7 +101,6 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
         }
 
         viewModel.videoStreamingUrl.observe(viewLifecycleOwner) {
-            Timber.d("111 video streaming url is $it")
             setupPlayUrl(it, true)
         }
 
@@ -133,12 +136,23 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
             }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return super.onCreateView(inflater, container, savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        player_pager.adapter = object : FragmentStateAdapter(this) {
+            override fun getItemCount(): Int {
+                return 1
+            }
+
+            override fun createFragment(position: Int): Fragment {
+                return PlayerDescriptionFragment()
+            }
+
+        }
+
+        TabLayoutMediator(tabs, player_pager) { tab, position ->
+            tab.text = "1234"
+        }.attach()
     }
 
     override fun onStart() {
