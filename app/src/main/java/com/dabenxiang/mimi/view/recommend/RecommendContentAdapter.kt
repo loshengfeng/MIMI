@@ -26,7 +26,7 @@ class RecommendContentAdapter(
         val item = thirdMenuItems[position]
 
         holder.titleText.text = item.name
-        holder.moreText.setOnClickListener { recommendFuncItem.onMoreClick() }
+        holder.moreText.setOnClickListener { recommendFuncItem.onMoreClick(item) }
         holder.recommendContentRecycler.adapter = RecommendVideoAdapter(
             item.videos, recommendFuncItem
         )

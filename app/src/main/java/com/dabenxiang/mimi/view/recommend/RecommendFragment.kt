@@ -90,7 +90,7 @@ class RecommendFragment(
     private val recommendFuncItem by lazy {
         RecommendFuncItem(
             { videoItem -> Timber.d("VideoItem Id: ${videoItem.id}") },
-            { Timber.d("OnMore Click...") }
+            { thirdMenuItem -> Timber.d("OnMore Click Category: ${thirdMenuItem.category}") }
         )
     }
 }
