@@ -4,11 +4,9 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.OnItemClickListener
-import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.CommentType
@@ -26,7 +24,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_text_detail.*
 import kotlinx.android.synthetic.main.fragment_text_detail.*
 
-class ClubTextDetailFragment : BaseFragment() {
+class ClubCommentFragment : BaseFragment() {
 
     private val viewModel: ClubTextDetailViewModel by viewModels()
 
@@ -51,18 +49,9 @@ class ClubTextDetailFragment : BaseFragment() {
         }
     }
 
-    override fun getLayoutId() = R.layout.fragment_club_text_detail
+    override fun getLayoutId() = R.layout.fragment_club_comment
 
     override fun setupObservers() {
-        viewModel.postDetailResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is ApiResult.Success -> {
-                    val item = it.result.content
-                    textDetailAdapter?.updateContent(item!!)
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
-        })
     }
 
     override fun setupListeners() {
@@ -72,7 +61,7 @@ class ClubTextDetailFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        memberPostItem = arguments?.get(KEY_DATA) as MemberPostItem
+        memberPostItem = arguments?.get(ClubTextDetailFragment.KEY_DATA) as MemberPostItem
         viewModel.getPostDetail(memberPostItem!!)
 
         textDetailAdapter = TextDetailAdapter(

@@ -21,8 +21,8 @@
 
     <fragment
         android:id="@+id/clubTextDetailFragment"
-        android:name="com.dabenxiang.mimi.view.club.post.ClubTextDetailFragment"
-        tools:layout="@layout/fragment_club_text_detail">
+        android:name="com.dabenxiang.mimi.view.club.post.ClubTextFragment"
+        tools:layout="@layout/fragment_club_text">
     </fragment>
 
     <fragment
