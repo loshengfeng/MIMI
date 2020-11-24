@@ -52,15 +52,7 @@ class RecommendFragment(
             // TODO: 跳至分類頁面
         }
 
-        iv_rank.setOnClickListener {
-            val bundle = RankingFragment.createBundle()
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_mimiFragment_to_rankingFragment,
-                    bundle
-                )
-            )
-        }
+        iv_rank.setOnClickListener { navToRanking() }
 
         rv_recommend.adapter = recommendContentAdapter
     }
@@ -89,8 +81,30 @@ class RecommendFragment(
 
     private val recommendFuncItem by lazy {
         RecommendFuncItem(
-            { videoItem -> Timber.d("VideoItem Id: ${videoItem.id}") },
-            { thirdMenuItem -> Timber.d("OnMore Click Category: ${thirdMenuItem.category}") }
+            { videoItem ->
+                // TODO: 跳至播放頁面
+                Timber.d("VideoItem Id: ${videoItem.id}")
+            },
+            { thirdMenuItem ->
+                // TODO: 跳至播放頁面
+                when (thirdMenuItem.name) {
+                    "今日精选" -> navToRanking()
+                    else -> {
+                        // TODO: 跳至分類頁面
+                    }
+                }
+                Timber.d("OnMore Click Category: ${thirdMenuItem.category}")
+            }
+        )
+    }
+
+    private fun navToRanking() {
+        val bundle = RankingFragment.createBundle()
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_mimiFragment_to_rankingFragment,
+                bundle
+            )
         )
     }
 }
