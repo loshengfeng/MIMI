@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.CombinedLoadStates
+import androidx.paging.LoadState
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.Error
@@ -59,6 +61,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         tv_search.setOnClickListener {
             // TODO: 跳至搜尋頁面
         }
@@ -67,6 +70,11 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
             // TODO: 跳至分類頁面
         }
 
+        layout_refresh.setOnRefreshListener {
+            generalVideoAdapter.refresh()
+        }
+
+        generalVideoAdapter.addLoadStateListener(loadStateListener)
         rv_video.adapter = generalVideoAdapter
     }
 
@@ -77,6 +85,20 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
     private val onItemClick: (VideoByCategoryItem) -> Unit = {
         // TODO: 跳至播放頁面
         Timber.d("VideoItem Id: ${it.id}")
+    }
+
+    private val loadStateListener = { loadStatus: CombinedLoadStates ->
+        when (loadStatus.refresh) {
+            is LoadState.Error -> {
+                Timber.e("Refresh Error:${(loadStatus.refresh as LoadState.Error).error.localizedMessage}")
+            }
+            is LoadState.Loading -> {
+                layout_refresh.isRefreshing = true
+            }
+            is LoadState.NotLoading -> {
+                layout_refresh.isRefreshing = false
+            }
+        }
     }
 
 }
