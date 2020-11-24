@@ -81,7 +81,7 @@ class RankingFragment : BaseFragment() {
                             )
                             navigateTo(
                                 NavigateItem.Destination(
-                                    R.id.action_rankingFragment_to_clipFragment,
+                                    R.id.action_rankingFragment_to_navigation_clip,
                                     bundle
                                 )
                             )

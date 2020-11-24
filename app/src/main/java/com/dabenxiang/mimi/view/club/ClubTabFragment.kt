@@ -3,14 +3,21 @@ package com.dabenxiang.mimi.view.club
 import android.content.Context
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
+import androidx.paging.PagingData
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.club.adapter.ClubTabAdapter
-import com.dabenxiang.mimi.view.club.topic.TopicTabAdapter
+import com.dabenxiang.mimi.view.club.topic.TopicItemListener
+import com.dabenxiang.mimi.view.club.topic.TopicListAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_tab_club.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class ClubTabFragment : BaseFragment() {
 
@@ -23,12 +30,27 @@ class ClubTabFragment : BaseFragment() {
         const val TAB_NOVEL = 5
     }
 
+    private val viewModel: ClubTabViewModel by viewModels()
+
+    private val topicListAdapter by lazy {
+        TopicListAdapter(object : TopicItemListener {
+            override fun itemClicked(drink: MemberClubItem, position: Int) {
+                    //TODO
+            }
+
+        })
+    }
+
     override fun getLayoutId() = R.layout.fragment_tab_club
     override fun setupObservers() {}
     override fun setupListeners() {}
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+
+        viewModel.clubCount.observe(this, {
+            topic_group.visibility = if(it <=0) View.GONE else View.VISIBLE
+        })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -39,9 +61,14 @@ class ClubTabFragment : BaseFragment() {
             tab.text = getTabTitle(position)
         }.attach()
 
-        val topicTabAdapter = TopicTabAdapter()
-        topic_tabs.adapter = topicTabAdapter
-        topicTabAdapter.setTestData()
+        topic_tabs.adapter = topicListAdapter
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Timber.i("ClubTabFragment onResume")
+        getClubItemList()
     }
 
     private fun getTabTitle(position: Int): String? {
@@ -53,6 +80,17 @@ class ClubTabFragment : BaseFragment() {
             TAB_PICTURE -> getString(R.string.club_tab_picture)
             TAB_NOVEL -> getString(R.string.club_tab_novel)
             else -> null
+        }
+    }
+
+    private fun getClubItemList() {
+        Timber.i("getClubItemList")
+        CoroutineScope(Dispatchers.IO).launch {
+            topicListAdapter.submitData(PagingData.empty())
+            viewModel.getClubItemList()
+                .collectLatest {
+                    topicListAdapter.submitData(it)
+                }
         }
     }
 

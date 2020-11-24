@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.follow
+package com.dabenxiang.mimi.view.club.latest
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -11,18 +11,19 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
-class ClubPostFollowAdapter(
+class ClubLatestAdapter(
         val context: Context,
         private val adultListener: AdultListener,
         private var mTag: String = "",
         private val memberPostFuncItem: MemberPostFuncItem = MemberPostFuncItem(),
         private val isClipList: Boolean = false
-) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
+) : PagingDataAdapter<StatisticsItem, RecyclerView.ViewHolder>(diffCallback) {
     companion object {
         const val PAYLOAD_UPDATE_LIKE = 0
         const val PAYLOAD_UPDATE_FOLLOW = 1
@@ -32,15 +33,15 @@ class ClubPostFollowAdapter(
         const val VIEW_TYPE_AD = 3
         const val VIEW_TYPE_DELETED = 4
 
-        private val diffCallback = object : DiffUtil.ItemCallback<MemberPostItem>() {
+        private val diffCallback = object : DiffUtil.ItemCallback<StatisticsItem>() {
             override fun areItemsTheSame(
-                    oldItem: MemberPostItem,
-                    newItem: MemberPostItem
+                    oldItem: StatisticsItem,
+                    newItem: StatisticsItem
             ): Boolean = oldItem.id == newItem.id
 
             override fun areContentsTheSame(
-                    oldItem: MemberPostItem,
-                    newItem: MemberPostItem
+                    oldItem: StatisticsItem,
+                    newItem: StatisticsItem
             ): Boolean = oldItem == newItem
         }
     }
@@ -57,7 +58,7 @@ class ClubPostFollowAdapter(
             when (item?.type) {
                 PostType.VIDEO -> VIEW_TYPE_CLIP
                 PostType.IMAGE -> VIEW_TYPE_PICTURE
-//                PostType.AD -> VIEW_TYPE_AD
+                PostType.AD -> VIEW_TYPE_AD
                 else -> VIEW_TYPE_TEXT
             }
         }
@@ -65,12 +66,12 @@ class ClubPostFollowAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (viewType) {
-//            VIEW_TYPE_AD -> {
-//                AdHolder(
-//                        LayoutInflater.from(parent.context)
-//                                .inflate(R.layout.item_ad, parent, false)
-//                )
-//            }
+            VIEW_TYPE_AD -> {
+                AdHolder(
+                        LayoutInflater.from(parent.context)
+                                .inflate(R.layout.item_ad, parent, false)
+                )
+            }
             VIEW_TYPE_CLIP -> {
                 ClipPostHolder(
                         LayoutInflater.from(parent.context)
@@ -109,44 +110,44 @@ class ClubPostFollowAdapter(
                     GeneralUtils.openWebView(context, item?.adItem?.target ?: "")
                 }
             }
-            is ClipPostHolder -> {
-                item?.also {
-                    holder.onBind(
-                            item,
-                            null,
-                            position,
-                            adultListener,
-                            mTag,
-                            memberPostFuncItem,
-                            isClipList
-                    )
-                }
-            }
-            is PicturePostHolder -> {
-                item?.also {
-                    holder.pictureRecycler.tag = position
-                    holder.onBind(
-                            item,
-                            null,
-                            position,
-                            adultListener,
-                            mTag,
-                            memberPostFuncItem
-                    )
-                }
-            }
-            is TextPostHolder -> {
-                item?.also {
-                    holder.onBind(
-                            it,
-                            null,
-                            position,
-                            adultListener,
-                            mTag,
-                            memberPostFuncItem
-                    )
-                }
-            }
+//            is ClipPostHolder -> {
+//                item?.also {
+//                    holder.onBind(
+//                            item,
+//                            null,
+//                            position,
+//                            adultListener,
+//                            mTag,
+//                            memberPostFuncItem,
+//                            isClipList
+//                    )
+//                }
+//            }
+//            is PicturePostHolder -> {
+//                item?.also {
+//                    holder.pictureRecycler.tag = position
+//                    holder.onBind(
+//                            item,
+//                            null,
+//                            position,
+//                            adultListener,
+//                            mTag,
+//                            memberPostFuncItem
+//                    )
+//                }
+//            }
+//            is TextPostHolder -> {
+//                item?.also {
+//                    holder.onBind(
+//                            it,
+//                            null,
+//                            position,
+//                            adultListener,
+//                            mTag,
+//                            memberPostFuncItem
+//                    )
+//                }
+//            }
         }
     }
 

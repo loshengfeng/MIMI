@@ -50,8 +50,8 @@ class HomeViewModel : BaseViewModel() {
         _carouselResult
 
     private var _videosResult =
-        MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<StatisticsItem>>>>>()
-    val videosResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<List<StatisticsItem>>>>> =
+        MutableLiveData<Pair<Int, ApiResult<ApiBasePagingItem<ArrayList<StatisticsItem>>>>>()
+    val videosResult: LiveData<Pair<Int, ApiResult<ApiBasePagingItem<ArrayList<StatisticsItem>>>>> =
         _videosResult
 
     private var _clipsResult =

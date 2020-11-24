@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club
+package com.dabenxiang.mimi.view.club.post
 
 import android.os.Bundle
 import android.view.View
