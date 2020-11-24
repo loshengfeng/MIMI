@@ -5,8 +5,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ThirdMenuItem
+import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.item_recommend.view.*
 
 class RecommendContentAdapter(
@@ -14,29 +17,59 @@ class RecommendContentAdapter(
     private val recommendFuncItem: RecommendFuncItem
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    companion object {
+        const val VIEW_TYPE_AD = 0
+        const val VIEW_TYPE_VIDEO = 1
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val mView = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_recommend, parent, false)
-        return RecommendViewHolder(mView)
+        return when (viewType) {
+            VIEW_TYPE_AD -> {
+                val mView = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.item_ad, parent, false)
+                AdHolder(mView)
+            }
+            else -> {
+                val mView = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.item_recommend, parent, false)
+                RecommendViewHolder(mView)
+            }
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        val item = thirdMenuItems[position]
+        return if (item.adItem != null) VIEW_TYPE_AD
+        else VIEW_TYPE_VIDEO
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        holder as RecommendViewHolder
-
         val item = thirdMenuItems[position]
+        when (holder) {
+            is AdHolder -> {
+                Glide.with(holder.adImg.context)
+                    .load(item.adItem?.href)
+                    .into(holder.adImg)
 
-        holder.titleText.text = item.name
-        holder.moreText.setOnClickListener { recommendFuncItem.onMoreClick(item) }
-        holder.recommendContentRecycler.adapter = RecommendVideoAdapter(
-            item.videos, recommendFuncItem
-        )
+                holder.adImg.setOnClickListener {
+                    GeneralUtils.openWebView(holder.adImg.context, item.adItem?.target ?: "")
+                }
+            }
+            is RecommendViewHolder -> {
+                holder.titleText.text = item.name
+                holder.moreText.setOnClickListener { recommendFuncItem.onMoreClick(item) }
+                holder.recommendContentRecycler.adapter = RecommendVideoAdapter(
+                    item.videos, recommendFuncItem
+                )
 
-        if (item.videos.isEmpty()) {
-            holder.titleText.visibility = View.GONE
-            holder.moreText.visibility = View.GONE
-        } else {
-            holder.titleText.visibility = View.VISIBLE
-            holder.moreText.visibility = View.VISIBLE
+//                if (item.videos.isEmpty()) {
+//                    holder.titleText.visibility = View.GONE
+//                    holder.moreText.visibility = View.GONE
+//                } else {
+//                    holder.titleText.visibility = View.VISIBLE
+//                    holder.moreText.visibility = View.VISIBLE
+//                }
+            }
         }
     }
 
