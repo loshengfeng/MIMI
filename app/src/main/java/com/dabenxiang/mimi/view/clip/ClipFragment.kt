@@ -65,19 +65,21 @@ class ClipFragment : BaseFragment() {
     private val viewModel: ClipViewModel by viewModels()
 
     private val clipPagerAdapter by lazy {
-        ClipPagerAdapter(ClipFuncItem(
-            { id, pos -> getClip(id, pos) },
-            { id, view, type -> viewModel.loadImage(id, view, type) },
-            { item, pos, isFollow -> onFollowClick(item, pos, isFollow) },
-            { item, pos, isFavorite -> onFavoriteClick(item, pos, isFavorite) },
-            { item, pos, isLike -> onLikeClick(item, pos, isLike) },
-            { item -> onCommentClick(item) },
-            { onBackClick() },
-            { id, error -> viewModel.sendVideoReport(id, error) },
-            { onVipClick() },
-            { onPromoteClick() },
-            { update -> getClips(update) }
-        ))
+        ClipPagerAdapter(
+            ClipFuncItem(
+                { id, pos -> getClip(id, pos) },
+                { id, view, type -> viewModel.loadImage(id, view, type) },
+                { item, pos, isFollow -> onFollowClick(item, pos, isFollow) },
+                { item, pos, isFavorite -> onFavoriteClick(item, pos, isFavorite) },
+                { item, pos, isLike -> onLikeClick(item, pos, isLike) },
+                { item -> onCommentClick(item) },
+                { onBackClick() },
+                { id, error -> viewModel.sendVideoReport(id, error) },
+                { onVipClick() },
+                { onPromoteClick() },
+                { update -> getClips(update) },
+                { item, pos, update -> getPostDetail(item, pos, update) }
+            ))
     }
 
     private val clipMap: HashMap<String, File> = hashMapOf()
@@ -267,6 +269,10 @@ class ClipFragment : BaseFragment() {
                 update(it, this)
             }
         }
+    }
+
+    private fun getPostDetail(item: MemberPostItem, position: Int, update: (Int, Boolean) -> Unit) {
+        viewModel.getPostDetail(item, position, update)
     }
 
     private fun showCommentDialog(item: MemberPostItem) {

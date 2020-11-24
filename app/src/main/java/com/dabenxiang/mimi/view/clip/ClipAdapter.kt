@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -77,12 +76,12 @@ class ClipAdapter(
         this.clipFuncItem = clipFuncItem
     }
 
-    fun updateCurrentPosition(position: Int) {
-        currentPosition = position
+    fun getMemberPostItem(position: Int): MemberPostItem? {
+        return getItem(position)
     }
 
-    fun getCurrentPos(): Int {
-        return currentPosition
+    fun updateCurrentPosition(position: Int) {
+        currentPosition = position
     }
 
     fun releasePlayer() {
@@ -132,12 +131,12 @@ class ClipAdapter(
                             holder.progress.visibility = View.GONE
                         }
 
-                        holder.ibReplay.setOnClickListener {
+                        holder.ibReplay.setOnClickListener { view ->
                             exoPlayer?.also { player ->
                                 player.seekTo(0)
                                 player.playWhenReady = true
                             }
-                            it.visibility = View.GONE
+                            view.visibility = View.GONE
                         }
 
                         holder.playerView.setOnClickListener {
@@ -175,21 +174,6 @@ class ClipAdapter(
             }
         } ?: run {
             holder.onBind(item, clipFuncItem, position)
-
-            takeIf { currentPosition == position }?.also {
-                currentViewHolder = holder
-                holder.progress.visibility = View.VISIBLE
-            } ?: run {
-                holder.ivCover.visibility = View.VISIBLE
-                holder.progress.visibility = View.GONE
-            }
-
-            processClip(
-                holder.playerView,
-                contentItem?.shortVideo?.id.toString(),
-                contentItem?.shortVideo?.url.toString(),
-                position
-            )
         }
     }
 
@@ -242,7 +226,6 @@ class ClipAdapter(
         val sourceFactory = DefaultDataSourceFactory(context, agent)
         getMediaSource(uri, sourceFactory)?.also { mediaSource ->
             playerView.player?.also {
-                Timber.d("@@prepare")
                 playerView.tag = uri
                 (it as SimpleExoPlayer).prepare(mediaSource, true, true)
             }

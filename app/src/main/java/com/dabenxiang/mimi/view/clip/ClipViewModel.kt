@@ -92,7 +92,7 @@ class ClipViewModel : BaseViewModel() {
         }
     }
 
-    fun getPostDetail(item: MemberPostItem, position: Int) {
+    fun getPostDetail(item: MemberPostItem, position: Int, update: (Int, Boolean) -> Unit) {
         viewModelScope.launch {
             flow {
                 /** for debug **/
@@ -101,14 +101,15 @@ class ClipViewModel : BaseViewModel() {
                 /**-----------**/
                 val result = domainManager.getApiRepository().getMemberPostDetail(item.id)
                 if (!result.isSuccessful) throw HttpException(result)
-                result.body()?.content?.deducted?.let { item.deducted = it }
-                emit(ApiResult.success(position))
+                val deducted = result.body()?.content?.deducted ?: false
+                emit(deducted)
             }
                 .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _postDetailResult.value = it }
+                .catch { e ->
+                    e.printStackTrace()
+                    update(position, false)
+                }
+                .collect { update(position, it) }
         }
     }
 

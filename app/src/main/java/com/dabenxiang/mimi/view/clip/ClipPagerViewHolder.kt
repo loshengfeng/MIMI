@@ -9,19 +9,17 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.view.order.OrderAdapter
 import kotlinx.android.synthetic.main.item_clip_pager.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class ClipPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
-    private val rv_clip = itemView.rv_clip
+    private val rvClip = itemView.rv_clip
 
     private val clipAdapter by lazy {
-        val adapter = ClipAdapter(rv_clip.context)
+        val adapter = ClipAdapter(rvClip.context)
         val loadStateListener = { loadStatus: CombinedLoadStates ->
             when (loadStatus.refresh) {
                 is LoadState.Error -> {
@@ -51,31 +49,30 @@ class ClipPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
     }
 
     fun onBind(position: Int, clipFuncItem: ClipFuncItem) {
-        if (rv_clip.adapter == null || rv_clip.tag != position) {
-            rv_clip.tag = position
+        if (rvClip.adapter == null || rvClip.tag != position) {
+            rvClip.tag = position
             clipAdapter.setClipFuncItem(clipFuncItem)
-            rv_clip.adapter = clipAdapter
-            (rv_clip.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-            PagerSnapHelper().attachToRecyclerView(rv_clip)
-            rv_clip.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            rvClip.adapter = clipAdapter
+            (rvClip.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+            PagerSnapHelper().attachToRecyclerView(rvClip)
+            rvClip.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)
                     when (newState) {
                         RecyclerView.SCROLL_STATE_IDLE -> {
-                            val currentPos =
-                                (rv_clip.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-                            Timber.d("SCROLL_STATE_IDLE position: $currentPos")
-
-                            val clipAdapter = rv_clip.adapter as ClipAdapter
-                            val lastPosition = clipAdapter.getCurrentPos()
-                            Timber.d("SCROLL_STATE_IDLE lastPosition: $lastPosition")
-                            takeIf { currentPos >= 0 && currentPos != lastPosition }?.also {
+                            val lastPos = clipAdapter.getCurrentPos()
+                            val currentPos = (rvClip.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                            Timber.d("SCROLL_STATE_IDLE lastPosition: $lastPos, currentPos:$currentPos")
+                            takeIf { currentPos >= 0 && currentPos != lastPos }?.run {
+                                clipAdapter.pausePlayer()
                                 clipAdapter.releasePlayer()
                                 clipAdapter.updateCurrentPosition(currentPos)
-                                clipAdapter.notifyItemChanged(lastPosition)
-//                            clipAdapter.notifyItemChanged(currentPos)
-//                            viewModel.getPostDetail(memberPostItems[currentPos], currentPos)
-                            } ?: clipAdapter.updateCurrentPosition(lastPosition)
+                                clipAdapter.notifyItemChanged(lastPos)
+                                clipAdapter.getMemberPostItem(currentPos)?.run {
+                                    clipFuncItem.getPostDetail(this, currentPos, ::updateAfterGetDeducted)
+                                }
+                                clipAdapter.notifyItemChanged(currentPos, ClipAdapter.PAYLOAD_UPDATE_DEDUCTED)
+                            } ?: clipAdapter.updateCurrentPosition(lastPos)
                         }
                     }
                 }
@@ -86,7 +83,12 @@ class ClipPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
 
     private fun setupClips(data: PagingData<MemberPostItem>, coroutineScope: CoroutineScope) {
         coroutineScope.launch {
-            (rv_clip.adapter as ClipAdapter).submitData(data)
+            (rvClip.adapter as ClipAdapter).submitData(data)
         }
+    }
+
+    private fun updateAfterGetDeducted(currentPos: Int, deducted: Boolean) {
+        clipAdapter.getMemberPostItem(currentPos)?.run { this.deducted = deducted }
+        clipAdapter.notifyItemChanged(currentPos, ClipAdapter.PAYLOAD_UPDATE_DEDUCTED)
     }
 }
