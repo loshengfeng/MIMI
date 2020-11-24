@@ -126,7 +126,7 @@ class EditVideoFragment : BaseFragment() {
         } else if (page == BasePostFragment.SEARCH) {
             Navigation.findNavController(requireView()).popBackStack(R.id.searchPostFragment, false)
         } else if (page == BasePostFragment.CLUB) {
-            Navigation.findNavController(requireView()).popBackStack(R.id.clubDetailFragment, false)
+            Navigation.findNavController(requireView()).popBackStack(R.id.topicDetailFragment, false)
         } else {
             Navigation.findNavController(requireView()).popBackStack(R.id.adultHomeFragment, false)
         }

@@ -130,7 +130,7 @@ class PostPicFragment : BasePostFragment() {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
             bundle.putSerializable(SearchPostFragment.KEY_DATA, searchPostItem)
-            findNavController().navigate(R.id.action_postPicFragment_to_clubDetailFragment, bundle)
+            findNavController().navigate(R.id.action_postPicFragment_to_topicDetailFragment, bundle)
         } else {
             findNavController().navigate(R.id.action_postPicFragment_to_adultHomeFragment, bundle)
         }

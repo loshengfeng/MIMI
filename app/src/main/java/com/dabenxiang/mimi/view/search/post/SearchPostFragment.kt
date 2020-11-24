@@ -39,7 +39,7 @@ import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.club.ClubFuncItem
 import com.dabenxiang.mimi.view.club.ClubMemberAdapter
 import com.dabenxiang.mimi.view.club.MiMiLinearLayoutManager
-import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
+import com.dabenxiang.mimi.view.club.topic.TopicDetailFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerFragment
@@ -683,8 +683,8 @@ class SearchPostFragment : BaseFragment() {
     }
 
     private fun onItemClick(item: MemberClubItem) {
-        val bundle = ClubDetailFragment.createBundle(item)
-        findNavController().navigate(R.id.action_searchPostFragment_to_clubDetailFragment, bundle)
+        val bundle = TopicDetailFragment.createBundle(item)
+        findNavController().navigate(R.id.action_searchPostFragment_to_topicDetailFragment, bundle)
     }
 
 

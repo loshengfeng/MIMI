@@ -6,6 +6,7 @@
     app:startDestination="@id/clubTabFragment">
 
     <include app:graph="@navigation/navigation_login" />
+    <include app:graph="@navigation/navigation_club_topic" />
 
     <fragment
         android:id="@+id/clubTabFragment"
@@ -17,12 +18,15 @@
         <action
             android:id="@+id/action_clubTabFragment_to_clubPicDetailFragment"
             app:destination="@id/clubPicDetailFragment" />
+        <action
+            android:id="@+id/action_clubTabFragment_to_topicDetailFragment"
+            app:destination="@id/navigation_club_topic" />
     </fragment>
 
     <fragment
         android:id="@+id/clubTextDetailFragment"
-        android:name="com.dabenxiang.mimi.view.club.post.ClubTextDetailFragment"
-        tools:layout="@layout/fragment_club_text_detail">
+        android:name="com.dabenxiang.mimi.view.club.post.ClubTextFragment"
+        tools:layout="@layout/fragment_club_text">
     </fragment>
 
     <fragment

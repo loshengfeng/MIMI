@@ -10,7 +10,7 @@ import androidx.paging.cachedIn
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.club.topic.TopicListDataSource
+import com.dabenxiang.mimi.view.club.adapter.ClubTabTopicsListDataSource
 import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
 
@@ -21,9 +21,9 @@ class ClubTabViewModel : BaseViewModel() {
     fun getClubItemList(): Flow<PagingData<MemberClubItem>> {
         Timber.i("ClubTabFragment getClubItemList")
         return Pager(
-            config = PagingConfig(pageSize = TopicListDataSource.PER_LIMIT.toInt()),
+            config = PagingConfig(pageSize = ClubTabTopicsListDataSource.PER_LIMIT.toInt()),
             pagingSourceFactory = {
-                TopicListDataSource(
+                ClubTabTopicsListDataSource(
                     domainManager,
                     pagingCallback
                 )

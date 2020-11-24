@@ -16,7 +16,9 @@ import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_LATEST
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_NOVEL
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_PICTURE
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_RECOMMEND
-import com.dabenxiang.mimi.view.club.post.ClubTextFragment
+import com.dabenxiang.mimi.view.club.post.ClubPostTextFragment
+import com.dabenxiang.mimi.view.club.latest.ClubLatestFragment
+
 import com.dabenxiang.mimi.view.club.ClubTabViewModel
 import kotlinx.android.synthetic.main.fragment_tab_test.*
 
@@ -31,15 +33,14 @@ class ClubTabAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
                         fragment.getString(R.string.club_tab_recommend))
             },
             TAB_LATEST to {
-                PageTestFragment.create(
-                        fragment.getString(R.string.club_tab_latest))
+                ClubLatestFragment()
             },
             TAB_CLIP to {
                 PageTestFragment.create(
                         fragment.getString(R.string.club_tab_clip))
             },
             TAB_PICTURE to { ClubPicFragment() },
-            TAB_NOVEL to { ClubTextFragment() }
+            TAB_NOVEL to { ClubPostTextFragment() }
     )
 
     override fun getItemCount() = tabFragmentsCreators.size
