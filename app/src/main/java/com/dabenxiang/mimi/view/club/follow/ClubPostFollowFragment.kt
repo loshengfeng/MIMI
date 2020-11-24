@@ -15,8 +15,14 @@ import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
+import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_follow.*
+import kotlinx.android.synthetic.main.fragment_club_follow.layout_refresh
+import kotlinx.android.synthetic.main.fragment_my_post.*
 import kotlinx.android.synthetic.main.item_ad.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,6 +45,10 @@ class ClubPostFollowFragment : BaseFragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
+        viewModel.showProgress.observe(this, {
+            layout_refresh.isRefreshing = it
+        })
+
         viewModel.clubCount.observe(this, {
             if(it <=0) {
                 id_empty_group.visibility =View.VISIBLE
@@ -47,6 +57,7 @@ class ClubPostFollowFragment : BaseFragment() {
                 id_empty_group.visibility =View.GONE
                 recycler_view.visibility = View.VISIBLE
             }
+            layout_refresh.isRefreshing = false
         })
 
         viewModel.adResult.observe(this, {
@@ -81,6 +92,10 @@ class ClubPostFollowFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recycler_view.adapter = adapter
+        layout_refresh.setOnRefreshListener {
+            layout_refresh.isRefreshing = false
+            getData()
+        }
     }
 
     override fun onResume() {
@@ -117,22 +132,22 @@ class ClubPostFollowFragment : BaseFragment() {
         }
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            when (adultTabType) {
-                AdultTabType.PICTURE -> {
+//            when (adultTabType) {
+//                AdultTabType.PICTURE -> {
 //                    val bundle = PictureDetailFragment.createBundle(item, 0)
 //                    navigationToPicture(bundle)
-                }
-                AdultTabType.TEXT -> {
+//                }
+//                AdultTabType.TEXT -> {
 //                    val bundle = TextDetailFragment.createBundle(item, 0)
 //                    navigationToText(bundle)
-                }
-                AdultTabType.CLIP -> {
+//                }
+//                AdultTabType.CLIP -> {
 //                    val bundle = ClipFragment.createBundle(arrayListOf(item), 0)
 //                    navigationToClip(bundle)
-                }
-                else -> {
-                }
-            }
+//                }
+//                else -> {
+//                }
+//            }
         }
 
         override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {}
@@ -154,6 +169,33 @@ class ClubPostFollowFragment : BaseFragment() {
                         adapter.submitData(it)
                     }
         }
+    }
+
+    private fun navigationToText(bundle: Bundle) {
+        navigateTo(
+                NavigateItem.Destination(
+                        R.id.action_myPostFragment_to_textDetailFragment,
+                        bundle
+                )
+        )
+    }
+
+    private fun navigationToPicture(bundle: Bundle) {
+        navigateTo(
+                NavigateItem.Destination(
+                        R.id.action_myPostFragment_to_pictureDetailFragment,
+                        bundle
+                )
+        )
+    }
+
+    private fun navigationToClip(bundle: Bundle) {
+        navigateTo(
+                NavigateItem.Destination(
+                        R.id.action_myPostFragment_to_clipFragment,
+                        bundle
+                )
+        )
     }
 
 }

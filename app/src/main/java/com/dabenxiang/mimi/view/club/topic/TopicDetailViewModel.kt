@@ -18,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
 class TopicDetailViewModel : BaseViewModel() {
 
@@ -91,6 +92,7 @@ class TopicDetailViewModel : BaseViewModel() {
     ) {
         viewModelScope.launch {
             flow {
+                Timber.i("followMember memberPostItem=$item")
                 val apiRepository = domainManager.getApiRepository()
                 val result = when {
                     isFollow -> apiRepository.followPost(item.creatorId)
