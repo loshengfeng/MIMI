@@ -38,8 +38,11 @@ class TopicListAdapter(private val listener: TopicItemListener)
     }
 
     override fun onBindViewHolder(holder: TopicViewHolder, position: Int) {
-        getItem(position)?.let {
-            holder.topic_title.text = it.title
+        getItem(position)?.let {item->
+            holder.topic_title.text = item.title
+            holder.itemView.setOnClickListener {
+                listener.itemClicked(item, position)
+            }
         }
     }
 
@@ -59,5 +62,5 @@ class TopicListAdapter(private val listener: TopicItemListener)
 }
 
 interface TopicItemListener {
-    fun itemClicked(drink: MemberClubItem, position: Int)
+    fun itemClicked(item: MemberClubItem, position: Int)
 }
