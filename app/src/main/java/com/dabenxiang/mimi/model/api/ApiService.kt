@@ -301,6 +301,9 @@ interface ApiService {
     @GET("/v1/Members/Home/Categories")
     suspend fun fetchHomeCategories(): Response<ApiBaseItem<RootCategoriesItem>>
 
+    @GET("/v1/Members/Home/Categories")
+    suspend fun fetchHomeCategories(parentId: Long): Response<ApiBaseItem<RootCategoriesItem>>
+
     /**********************************************************
      *
      *                  Members/Home/Videos

@@ -377,6 +377,10 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得影片類別清單
      */
     suspend fun fetchHomeCategories() = apiService.fetchHomeCategories()
+    /**
+     * 取得影片次類別清單
+     */
+    suspend fun fetchSecondaryCategories() = apiService.fetchHomeCategories(202)
 
     /**********************************************************
      *
