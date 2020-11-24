@@ -6,7 +6,7 @@
     android:background="@color/normal_color_background">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.Guideline
@@ -56,8 +56,8 @@
 
         <TextView
             android:id="@+id/tv_filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:background="@drawable/bg_gray_1_radius_6"
             android:gravity="center_vertical"
             android:paddingStart="6dp"
@@ -67,8 +67,8 @@
             android:text="@string/all"
             app:drawableStartCompat="@drawable/ico_filter"
             app:layout_constraintBottom_toBottomOf="@+id/tv_search"
-            app:layout_constraintLeft_toLeftOf="@+id/gl_filter_start"
-            app:layout_constraintRight_toRightOf="@+id/gl_filter_end"
+            app:layout_constraintStart_toStartOf="@+id/gl_filter_start"
+            app:layout_constraintEnd_toEndOf="@+id/gl_filter_end"
             app:layout_constraintTop_toTopOf="@+id/tv_search" />
 
         <ImageView

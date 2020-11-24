@@ -4,4 +4,6 @@ import com.dabenxiang.mimi.view.base.BaseViewModel
 
 class GeneralVideoViewModel : BaseViewModel() {
 
+
+
 }
