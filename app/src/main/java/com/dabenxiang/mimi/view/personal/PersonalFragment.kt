@@ -38,15 +38,13 @@ class PersonalFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initSettings()
-
         appbar_layout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
             var newalpha = 255f + verticalOffset
             newalpha = if (newalpha < 0) 0f else newalpha
             layout_every_day.setAlpha(newalpha)
             layout_vip_unlimit.setAlpha(newalpha)
+            layout_vip_unlimit_unlogin.setAlpha(newalpha)
         })
-
-
     }
 
     override fun getLayoutId(): Int {
@@ -71,11 +69,17 @@ class PersonalFragment : BaseFragment() {
         } else {
             item_is_Login.visibility = View.GONE
             tv_logout.visibility = View.GONE
+            id_personal.text=getString(R.string.identity)
+            like_count.text="0"
+            fans_count.text="0"
+            follow_count.text="0"
             behavior!!.setDragCallback(object : DragCallback() {
                 override fun canDrag(appBarLayout: AppBarLayout): Boolean {
                     return false
                 }
             })
+            Glide.with(this).clear(avatar)
+            Glide.with(this).load(R.drawable.default_profile_picture).into(avatar)
         }
     }
 
@@ -152,7 +156,6 @@ class PersonalFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
-
         requireActivity().onBackPressedDispatcher.addCallback(
             owner = viewLifecycleOwner,
             onBackPressed = {
