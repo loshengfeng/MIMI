@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.clip
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
@@ -76,8 +77,20 @@ class ClipFragment : BaseFragment() {
 
     override val bottomNavigationVisibility = View.VISIBLE
 
+    override val isNavTransparent: Boolean = true
+
     override fun getLayoutId(): Int {
         return R.layout.fragment_clip
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        requireActivity().window.run {
+            this.statusBarColor = ContextCompat.getColor(
+                requireContext(),
+                R.color.color_black_1
+            )
+        }
     }
 
     override fun setupFirstTime() {

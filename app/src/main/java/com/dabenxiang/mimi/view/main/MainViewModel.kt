@@ -99,6 +99,9 @@ class MainViewModel : BaseViewModel() {
     private val _totalUnreadResult = MutableLiveData<ApiResult<Int>>()
     val totalUnreadResult: LiveData<ApiResult<Int>> = _totalUnreadResult
 
+    private val _isNavTransparent = MutableLiveData<Boolean>()
+    val isNavTransparent: LiveData<Boolean> = _isNavTransparent
+
     private var _normal: CategoriesItem? = null
     val normal
         get() = _normal
@@ -543,5 +546,9 @@ class MainViewModel : BaseViewModel() {
 
     fun clearOrderItem() {
         _orderItem.postValue(null)
+    }
+
+    fun setNavTransparent(isNavTransparent: Boolean = false) {
+        _isNavTransparent.value = isNavTransparent
     }
 }
