@@ -1,3 +1,5 @@
+package com.dabenxiang.mimi.view.clip
+
 import androidx.paging.PagingSource
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
