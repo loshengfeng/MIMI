@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.textdetail
+package com.dabenxiang.mimi.view.club.post
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -14,15 +14,11 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.api.vo.TextContentItem
 import com.dabenxiang.mimi.model.enums.CommentType
-import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailAdapter
-import com.dabenxiang.mimi.view.picturedetail.viewholder.CommentContentViewHolder
-import com.dabenxiang.mimi.view.picturedetail.viewholder.CommentTitleViewHolder
 import com.dabenxiang.mimi.view.player.CommentAdapter
-import com.dabenxiang.mimi.view.player.CommentLoadMoreView
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.view.textdetail.viewholder.TextDetailViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -33,7 +29,7 @@ import org.koin.core.component.inject
 import timber.log.Timber
 import java.util.*
 
-class TextDetailAdapter(
+class ClubTextDetailAdapter(
     val context: Context,
     private val memberPostItem: MemberPostItem,
     private val onTextDetailListener: OnTextDetailListener,
@@ -43,8 +39,6 @@ class TextDetailAdapter(
 
     companion object {
         const val VIEW_TYPE_TEXT_DETAIL = 0
-        const val VIEW_TYPE_COMMENT_TITLE = 1
-        const val VIEW_TYPE_COMMENT_DATA = 2
         const val VIEW_TYPE_AD = 3
     }
 
@@ -66,15 +60,11 @@ class TextDetailAdapter(
                     .inflate(R.layout.item_club_text_detail, parent, false)
                 TextDetailViewHolder(mView)
             }
-            VIEW_TYPE_COMMENT_TITLE -> {
-                mView = LayoutInflater.from(context)
-                    .inflate(R.layout.item_comment_title, parent, false)
-                CommentTitleViewHolder(mView)
-            }
+
             else -> {
                 mView = LayoutInflater.from(context)
-                    .inflate(R.layout.item_comment_content, parent, false)
-                CommentContentViewHolder(mView)
+                    .inflate(R.layout.item_club_text_detail, parent, false)
+                TextDetailViewHolder(mView)
             }
         }
 
@@ -89,13 +79,12 @@ class TextDetailAdapter(
         return when (position) {
             0 -> PictureDetailAdapter.VIEW_TYPE_AD
             1 -> VIEW_TYPE_TEXT_DETAIL
-            2 -> VIEW_TYPE_COMMENT_TITLE
-            else -> VIEW_TYPE_COMMENT_DATA
+            else -> VIEW_TYPE_TEXT_DETAIL
         }
     }
 
     override fun getItemCount(): Int {
-        return 4
+        return 2
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -170,41 +159,6 @@ class TextDetailAdapter(
                         memberPostItem.postFriendlyName
                     )
                 }
-            }
-            is CommentTitleViewHolder -> {
-                holder.newestComment.setOnClickListener {
-                    holder.newestComment.setTextColor(context.getColor(R.color.color_red_1))
-                    holder.topComment.setTextColor(context.getColor(R.color.color_black_1_30))
-                    updateCommandItem(CommentType.NEWEST)
-                }
-
-                holder.topComment.setOnClickListener {
-                    holder.topComment.setTextColor(context.getColor(R.color.color_red_1))
-                    holder.newestComment.setTextColor(context.getColor(R.color.color_black_1_30))
-                    updateCommandItem(CommentType.TOP)
-                }
-            }
-            is CommentContentViewHolder -> {
-                holder.noCommentLayout.visibility = if (memberPostItem.commentCount > 0) {
-                    View.INVISIBLE
-                } else {
-                    View.VISIBLE
-                }
-
-                commentAdapter = CommentAdapter(
-                    playerInfoListener,
-                    CommentViewType.COMMON
-                ).apply {
-                    loadMoreModule.apply {
-                        isEnableLoadMore = true
-                        isAutoLoadMore = true
-                        isEnableLoadMoreIfNotFullPage = false
-                        loadMoreView = CommentLoadMoreView(CommentViewType.COMMON)
-                    }
-                }
-
-                holder.commentRecycler.adapter = commentAdapter
-                updateCommandItem(CommentType.NEWEST)
             }
         }
     }
