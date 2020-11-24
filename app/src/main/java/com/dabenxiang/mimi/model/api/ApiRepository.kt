@@ -2,10 +2,7 @@ package com.dabenxiang.mimi.model.api
 
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.api.vo.error.TOKEN_NOT_FOUND
-import com.dabenxiang.mimi.model.enums.OrderType
-import com.dabenxiang.mimi.model.enums.PaymentType
-import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.model.enums.StatisticsType
+import com.dabenxiang.mimi.model.enums.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -411,15 +408,23 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得熱門影片
      */
     suspend fun statisticsHomeVideos(
-        statisticsType: StatisticsType = StatisticsType.MONTH,
-        category: String? = null,
-        isAdult: Boolean,
+        startTime: String = "2018-12-01T10:00:05Z",
+        endTime: String = "2020-11-24T10:00:05Z",
+        orderByType: StatisticsOrderType = StatisticsOrderType.HOTEST,
+        category: String? = "",
+        tags: String? = "",
+        isAdult: Boolean = false,
+        isRandom: Boolean = false,
         offset: Int,
         limit: Int
     ) = apiService.statisticsHomeVideos(
-        statisticsType = statisticsType.value,
+        startTime = startTime,
+        endTime = endTime,
+        orderByType = orderByType.value,
         category = category,
+        tags = tags,
         isAdult = isAdult,
+        isRandom = isRandom,
         offset = offset,
         limit = limit
     )

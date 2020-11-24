@@ -1,75 +1,39 @@
-package com.dabenxiang.mimi.view.club.follow
+package com.dabenxiang.mimi.view.club.latest
 
 import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.paging.PagingData
-import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
-import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.club.ClubTabFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import kotlinx.android.synthetic.main.fragment_club_follow.*
-import kotlinx.android.synthetic.main.item_ad.view.*
+import kotlinx.android.synthetic.main.fragment_club_latest.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
-import timber.log.Timber
 
+class ClubLatestFragment : BaseFragment() {
 
-class ClubPostFollowFragment : BaseFragment() {
-
-    private val viewModel: ClubFollowViewModel by viewModels()
-    private val accountManager: AccountManager by inject()
+    private val viewModel: ClubLatestModel by viewModels()
     private val adapter by lazy {
-        ClubPostFollowAdapter(requireActivity(), postListener, "", memberPostFuncItem)
+        ClubLatestAdapter(requireActivity(), postListener, "", memberPostFuncItem)
     }
 
-    override fun getLayoutId() = R.layout.fragment_club_follow
+    override fun getLayoutId() = R.layout.fragment_club_latest
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        viewModel.clubCount.observe(this, {
-            if(it <=0) {
-                id_empty_group.visibility =View.VISIBLE
-                recycler_view.visibility = View.INVISIBLE
-            }else {
-                id_empty_group.visibility =View.GONE
-                recycler_view.visibility = View.VISIBLE
-            }
-        })
-
-        viewModel.adResult.observe(this, {
-            when (it) {
-                is ApiResult.Success -> {
-                    it.result?.let { item ->
-                        Glide.with(context).load(item.href).into(layout_ad.iv_ad)
-                        layout_ad.iv_ad.setOnClickListener {
-                            GeneralUtils.openWebView(context, item.target ?: "")
-                        }
-                    }
-                }
-                is ApiResult.Error -> {
-                    layout_ad.visibility =View.GONE
-                    onApiError(it.throwable)
-                }
-
-                else -> {
-                    layout_ad.visibility =View.GONE
-                    onApiError(Exception("Unknown Error!"))
-                }
-            }
-
+        viewModel.clubCount.observe(this, Observer {
 
         })
 
@@ -81,14 +45,7 @@ class ClubPostFollowFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recycler_view.adapter = adapter
-    }
-
-    override fun onResume() {
-        super.onResume()
-        Timber.i("onResume isLogin:${accountManager.isLogin()}")
-        if(accountManager.isLogin()) {
-            getData()
-        }
+        getData()
     }
 
     private val memberPostFuncItem by lazy {
@@ -145,11 +102,9 @@ class ClubPostFollowFragment : BaseFragment() {
     }
 
     private fun getData() {
-        Timber.i("getData")
         CoroutineScope(Dispatchers.IO).launch {
-            viewModel.getAd()
             adapter.submitData(PagingData.empty())
-            viewModel.getPostItemList()
+            viewModel.getPostItemList(ClubTabFragment.TAB_LATEST)
                     .collectLatest {
                         adapter.submitData(it)
                     }

@@ -3,13 +3,54 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/color_black_1"
     android:keepScreenOn="true">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_clip"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:stateListAnimator="@null"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/color_black_1"/>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tl_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:background="@color/transparent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:tabGravity="center"
+        app:tabIndicatorColor="@color/color_red_1"
+        app:tabIndicatorFullWidth="false"
+        app:tabIndicatorHeight="4dp"
+        app:tabMode="fixed"
+        app:tabSelectedTextColor="@color/color_white_1"
+        app:tabTextAppearance="@style/favorite_tab_item_text"
+        app:tabTextColor="@color/color_white_1_60">
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/ti_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:text="@string/clip_newest"
+            tools:text="最新"/>
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/ti_online_pay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:text="@string/clip_top_hit"
+            tools:text="热门" />
+
+    </com.google.android.material.tabs.TabLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

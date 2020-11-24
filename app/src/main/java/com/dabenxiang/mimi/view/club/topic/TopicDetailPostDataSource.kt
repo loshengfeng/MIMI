@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.clubdetail
+package com.dabenxiang.mimi.view.club.topic
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
-class ClubDetailPostDataSource(
+class TopicDetailPostDataSource(
     private val pagingCallback: PagingCallback,
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,

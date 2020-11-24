@@ -2,19 +2,12 @@ package com.dabenxiang.mimi.view.club.follow
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
-import com.dabenxiang.mimi.callback.MyFollowPagingCallback
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
-import com.dabenxiang.mimi.model.enums.CategoryType
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.home.HomeViewModel
-import com.dabenxiang.mimi.view.home.postfollow.PostFollowDataSource
-import com.dabenxiang.mimi.view.home.postfollow.PostFollowFactory
-import com.dabenxiang.mimi.view.myfollow.ClubFollowListDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

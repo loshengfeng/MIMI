@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.model.api
 
 import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -328,12 +329,16 @@ interface ApiService {
 
     @GET("/v1/Members/Home/Videos/Statistics")
     suspend fun statisticsHomeVideos(
-        @Query("statisticsType") statisticsType: Int?,
+        @Query("startTime") startTime: String?,
+        @Query("endTime") endTime: String?,
+        @Query("orderByType") orderByType: Int?,
         @Query("category") category: String?,
+        @Query("tags") tags: String?,
         @Query("isAdult") isAdult: Boolean,
+        @Query("isRandom") isRandom: Boolean,
         @Query("offset") offset: Int,
         @Query("limit") limit: Int
-    ): Response<ApiBasePagingItem<List<StatisticsItem>>>
+    ): Response<ApiBasePagingItem<ArrayList<StatisticsItem>>>
 
     @GET("/v1/Members/Home/Videos/PostStatistics")
     suspend fun getRankingList(
