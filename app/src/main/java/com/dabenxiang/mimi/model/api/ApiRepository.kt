@@ -860,9 +860,20 @@ class ApiRepository(private val apiService: ApiService) {
 
     /**********************************************************
      *
-     *                   Members/Home/Menu
+     *                  Members/Home/Menu
      *
      ***********************************************************/
     suspend fun getMenu() = apiService.getMenu()
+
+    /**********************************************************
+     *
+     *          Members/Home/Videos/SearchWithCategory
+     *
+     ***********************************************************/
+    suspend fun getVideoByCategory(
+        category: String,
+        offset: String,
+        limit: String
+    ) = apiService.getVideoByCategory(category, offset, limit)
 }
 
