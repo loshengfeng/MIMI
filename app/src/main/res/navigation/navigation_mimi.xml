@@ -25,6 +25,9 @@
         <action
             android:id="@+id/action_mimiFragment_to_rankingFragment"
             app:destination="@id/rankingFragment" />
+        <action
+            android:id="@+id/action_mimiFragment_to_categoriesFragment"
+            app:destination="@id/mimiCategoriesFragment" />
     </fragment>
 
     <fragment
@@ -32,5 +35,25 @@
         android:name="com.dabenxiang.mimi.view.ranking.RankingFragment"
         android:label="RankingFragment"
         tools:layout="@layout/fragment_ranking" />
+
+    <fragment
+        android:id="@+id/mimiCategoriesFragment"
+        android:name="com.dabenxiang.mimi.view.home.category.MimiCategoriesFragment"
+        android:label="MimiCategoriesFragment"
+        tools:layout="@layout/fragment_mimi_categories">
+
+        <action
+            android:id="@+id/action_to_searchVideoFragment"
+            app:destination="@id/searchVideoFragment" />
+
+        <action
+            android:id="@+id/action_categoriesFragment_to_loginFragment"
+            app:destination="@id/navigation_login" />
+
+        <action
+            android:id="@+id/action_categoriesFragment_to_navigation_player"
+            app:destination="@id/navigation_player" />
+
+    </fragment>
 
 </navigation>
