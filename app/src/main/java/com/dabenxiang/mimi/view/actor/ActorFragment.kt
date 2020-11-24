@@ -17,22 +17,27 @@ import timber.log.Timber
 
 class ActorFragment : BaseFragment() {
 
-    private val actorVideosAdapter by lazy { ActorVideosAdapter(requireContext(), actorVideosListener) }
-    private val actorVideosListener = object : ActorVideosAdapter.EventListener {
-        override fun onClickListener(item: ActorVideosItem, position: Int){
-            Timber.d("onDetail")
-        }
+    private val actorVideosAdapter by lazy {
+        ActorVideosAdapter(requireContext(),
+            ActorVideosFuncItem(
+                getActorAvatarAttachment =  { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR_CS) },
+                onClickListener = { actorVideosItem, position -> onClickListener(actorVideosItem, position) }
+            )
+        ) }
+
+    private fun onClickListener(item: ActorVideosItem, position: Int){
+        Timber.d("actorVideosItem onDetail: ${item.name}")
     }
 
     private val actorCategoriesAdapter by lazy {
         ActorCategoriesAdapter(requireContext(),
             ActorCategoriesFuncItem(
                 getActorAvatarAttachment =  { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR_CS) },
-                onClickListener = { actorCategoriesItem, position -> onClickListener(actorCategoriesItem, position) }
+                onClickListener = { actorCategoriesItem, position -> onCategoriesClickListener(actorCategoriesItem, position) }
             )
         ) }
 
-    private fun onClickListener(item: ActorCategoriesItem, position: Int){
+    private fun onCategoriesClickListener(item: ActorCategoriesItem, position: Int){
             Timber.d("actorCategoriesItem onDetail: ${item.name}")
     }
 

@@ -464,7 +464,9 @@
 
 
     <!-- Actor -->
-    <string name="actress_hot_actresses">人气女优</string>
-    <string name="actress_all_actresses">全部女优</string>
+    <string name="actor_hot_actresses">人气女优</string>
+    <string name="actor_all_actresses">全部女优</string>
+    <string name="actor_hot_unit">人气</string>
+    <string name="actor_videos_unit">部影片</string>
 
 </resources>

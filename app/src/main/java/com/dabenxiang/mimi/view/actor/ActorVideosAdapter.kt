@@ -9,7 +9,7 @@ import com.dabenxiang.mimi.model.api.vo.ActorVideosItem
 
 class ActorVideosAdapter(
     val context: Context,
-    val listener: EventListener
+    val actorVideosFuncItem: ActorVideosFuncItem
 ) : RecyclerView.Adapter<ActorVideosViewHolder>() {
 
     private var selectItem: ActorVideosItem? = null
@@ -33,8 +33,9 @@ class ActorVideosAdapter(
     override fun onBindViewHolder(holder: ActorVideosViewHolder, position: Int) {
         val item = actorVideosItems?.get(position)
         holder.name.text = item?.name
-        holder.totalClick.text = item?.totalClick?.toString()
-        holder.totalVideo.text = item?.totalVideo?.toString()
+        holder.totalClick.text = item?.totalClick?.toString() + context.getString(R.string.actor_hot_unit)
+        holder.totalVideo.text = item?.totalVideo?.toString() + context.getString(R.string.actor_videos_unit)
+        actorVideosFuncItem.getActorAvatarAttachment.invoke(item?.attachmentId,holder.ivAvatar)
     }
 
     fun setupData(data: ArrayList<ActorVideosItem>) {
