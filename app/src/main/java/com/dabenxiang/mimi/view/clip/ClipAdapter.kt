@@ -84,6 +84,10 @@ class ClipAdapter(
         currentPosition = position
     }
 
+    fun getCurrentPos(): Int {
+        return currentPosition
+    }
+
     fun releasePlayer() {
         exoPlayer?.also { player ->
             player.playWhenReady = false
