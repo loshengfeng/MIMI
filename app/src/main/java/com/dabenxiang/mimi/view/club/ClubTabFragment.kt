@@ -9,8 +9,8 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.club.adapter.ClubTabAdapter
-import com.dabenxiang.mimi.view.club.topic.TopicItemListener
-import com.dabenxiang.mimi.view.club.topic.TopicListAdapter
+import com.dabenxiang.mimi.view.club.adapter.TopicItemListener
+import com.dabenxiang.mimi.view.club.adapter.TopicListAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_tab_club.*
 import kotlinx.coroutines.CoroutineScope
