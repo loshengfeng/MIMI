@@ -132,22 +132,37 @@ class ClubPostFollowFragment : BaseFragment() {
         }
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
-//            when (adultTabType) {
-//                AdultTabType.PICTURE -> {
-//                    val bundle = PictureDetailFragment.createBundle(item, 0)
-//                    navigationToPicture(bundle)
-//                }
-//                AdultTabType.TEXT -> {
-//                    val bundle = TextDetailFragment.createBundle(item, 0)
-//                    navigationToText(bundle)
-//                }
-//                AdultTabType.CLIP -> {
-//                    val bundle = ClipFragment.createBundle(arrayListOf(item), 0)
-//                    navigationToClip(bundle)
-//                }
-//                else -> {
-//                }
-//            }
+            when (adultTabType) {
+                AdultTabType.PICTURE -> {
+                    val bundle = PictureDetailFragment.createBundle(item, 0)
+                    navigateTo(
+                            NavigateItem.Destination(
+                                    R.id.action_clubTabFragment_to_clubPicDetailFragment,
+                                    bundle
+                            )
+                    )
+                }
+                AdultTabType.TEXT -> {
+                    val bundle = TextDetailFragment.createBundle(item, 0)
+                    navigateTo(
+                            NavigateItem.Destination(
+                                    R.id.action_clubTabFragment_to_clubTextDetailFragment,
+                                    bundle
+                            )
+                    )
+                }
+                AdultTabType.CLIP -> {
+                    val bundle = ClipFragment.createBundle(arrayListOf(item), 0)
+//                    navigateTo(
+//                            NavigateItem.Destination(
+//                                    R.id.action_myPostFragment_to_clipFragment,
+//                                    bundle
+//                            )
+//                    )
+                }
+                else -> {
+                }
+            }
         }
 
         override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {}
@@ -170,32 +185,4 @@ class ClubPostFollowFragment : BaseFragment() {
                     }
         }
     }
-
-    private fun navigationToText(bundle: Bundle) {
-        navigateTo(
-                NavigateItem.Destination(
-                        R.id.action_myPostFragment_to_textDetailFragment,
-                        bundle
-                )
-        )
-    }
-
-    private fun navigationToPicture(bundle: Bundle) {
-        navigateTo(
-                NavigateItem.Destination(
-                        R.id.action_myPostFragment_to_pictureDetailFragment,
-                        bundle
-                )
-        )
-    }
-
-    private fun navigationToClip(bundle: Bundle) {
-        navigateTo(
-                NavigateItem.Destination(
-                        R.id.action_myPostFragment_to_clipFragment,
-                        bundle
-                )
-        )
-    }
-
 }
