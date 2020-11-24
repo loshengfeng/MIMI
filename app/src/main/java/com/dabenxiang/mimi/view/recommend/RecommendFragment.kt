@@ -8,6 +8,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.CategoryBanner
+import com.dabenxiang.mimi.model.api.vo.ThirdMenuItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
@@ -15,10 +16,17 @@ import com.dabenxiang.mimi.view.ranking.RankingFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.to.aboomy.pager2banner.IndicatorView
 import kotlinx.android.synthetic.main.fragment_recommend.*
+import timber.log.Timber
 
-class RecommendFragment : BaseFragment() {
+class RecommendFragment(
+    private val thirdMenuItems: List<ThirdMenuItem>
+) : BaseFragment() {
 
     private val viewModel: RecommendViewModel by viewModels()
+
+    private val recommendContentAdapter by lazy {
+        RecommendContentAdapter(thirdMenuItems, recommendFuncItem)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +61,8 @@ class RecommendFragment : BaseFragment() {
                 )
             )
         }
+
+        rv_recommend.adapter = recommendContentAdapter
     }
 
     override fun getLayoutId(): Int {
@@ -73,14 +83,14 @@ class RecommendFragment : BaseFragment() {
     private val bannerFuncItem by lazy {
         BannerFuncItem(
             { banner -> GeneralUtils.openWebView(requireContext(), banner.url) },
-            { id, imageView ->
-                viewModel.loadImage(
-                    id,
-                    imageView,
-                    LoadImageType.PICTURE_THUMBNAIL
-                )
-            }
+            { id, imageView -> viewModel.loadImage(id, imageView, LoadImageType.PICTURE_THUMBNAIL) }
         )
     }
 
+    private val recommendFuncItem by lazy {
+        RecommendFuncItem(
+            { videoItem -> Timber.d("VideoItem Id: ${videoItem.id}") },
+            { thirdMenuItem -> Timber.d("OnMore Click Category: ${thirdMenuItem.category}") }
+        )
+    }
 }
