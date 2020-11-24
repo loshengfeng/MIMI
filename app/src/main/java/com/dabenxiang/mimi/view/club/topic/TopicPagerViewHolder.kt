@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import kotlinx.android.synthetic.main.item_club_pager.view.*
+import timber.log.Timber
 
 class TopicPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
     private val swipeRefreshLayout: SwipeRefreshLayout = itemView.swipeRefreshLayout
@@ -60,6 +61,7 @@ class TopicPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
     }
 
     private fun onFollowClick(memberPostItem: MemberPostItem, isFollow: Boolean) {
+        Timber.i("memberPostItem:$memberPostItem ")
         onParentFollowClick(
             memberPostItem,
             (rvPost.adapter as MemberPostPagedAdapter).currentList ?: arrayListOf(),

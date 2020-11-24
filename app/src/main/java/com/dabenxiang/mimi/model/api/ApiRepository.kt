@@ -224,6 +224,7 @@ class ApiRepository(private val apiService: ApiService) {
     ) = apiService.resendEmail(body)
 
     suspend fun followPost(userId: Long): Response<Void> {
+        Timber.i("userId=$userId")
         return apiService.followPost(userId)
     }
 

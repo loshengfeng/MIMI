@@ -191,12 +191,6 @@ class MainActivity : BaseActivity(){
     private fun setUiMode(isNavTransparent: Boolean = false) {
         window?.statusBarColor = getColor(R.color.normal_color_status_bar)
 
-        //Navigation background
-        bottom_navigation.background = ContextCompat.getDrawable(
-            this,
-            if (isNavTransparent) R.drawable.bg_transparent_nav else R.drawable.bg_gray_2_top_line
-        )
-
         //FragmentContainerView constraint
         ConstraintSet().run {
             this.clone(cl_root)
@@ -210,21 +204,42 @@ class MainActivity : BaseActivity(){
             this.applyTo(cl_root)
         }
 
-        //Navigation item
+        //Status bar text. (Background is modified at ClipFragment)
+        window.run {
+            this.decorView.systemUiVisibility =
+                if (isNavTransparent) 0 else View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        }
+
+        //Navigation background
+        bottom_navigation.background = ContextCompat.getDrawable(
+            this,
+            if (isNavTransparent) R.drawable.bg_transparent_nav else R.drawable.bg_gray_2_top_line
+        )
+
+
+        //Navigation item text
         bottom_navigation.itemTextColor =
             resources.getColorStateList(
                 if (isNavTransparent) R.color.bottom_nav_clip_text_selector else R.color.bottom_nav_normal_text_selector,
                 null
             )
 
-        //Status bar
-        window.run {
-            this.statusBarColor = ContextCompat.getColor(
-                this@MainActivity,
-                if (isNavTransparent) R.color.color_black_1 else R.color.color_white_1
+        //Navigation item icon
+        bottom_navigation.menu.findItem(R.id.navigation_mimi).run {
+            this.setIcon(
+                ContextCompat.getDrawable(
+                    this@MainActivity,
+                    if (isNavTransparent) R.drawable.ico_home_white_n else R.drawable.btn_home
+                )
             )
-            this.decorView.systemUiVisibility =
-                if (isNavTransparent) 0 else View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        }
+        bottom_navigation.menu.findItem(R.id.navigation_club).run {
+            this.setIcon(
+                ContextCompat.getDrawable(
+                    this@MainActivity,
+                    if (isNavTransparent) R.drawable.ico_community_white_n else R.drawable.btn_club
+                )
+            )
         }
     }
 
