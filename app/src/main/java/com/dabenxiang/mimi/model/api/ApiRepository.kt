@@ -20,11 +20,10 @@ class ApiRepository(private val apiService: ApiService) {
         const val FILE = "file"
         const val MEDIA_TYPE_IMAGE = "image/*"
         const val X_REQUESTED_FROM = "X-Requested-From"
+        const val NETWORK_PAGE_SIZE = 20
         fun isRefreshTokenFailed(code: String?): Boolean {
             return code == TOKEN_NOT_FOUND
         }
-
-        const val NETWORK_PAGE_SIZE = 20
     }
 
     /**********************************************************
@@ -875,6 +874,8 @@ class ApiRepository(private val apiService: ApiService) {
         category: String,
         offset: String,
         limit: String
-    ) = apiService.getVideoByCategory(category, offset, limit)
+    ) = apiService.getVideoByCategory(
+        true, category, offset, limit
+    )
 }
 

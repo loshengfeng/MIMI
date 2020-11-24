@@ -22,7 +22,7 @@ class MiMiViewPagerAdapter(
         return when (item.type) {
             LayoutType.RECOMMEND -> RecommendFragment(item.menus)
             LayoutType.ACTRESS -> RecommendFragment(item.menus)
-            else -> GeneralVideoFragment()
+            else -> GeneralVideoFragment(item.category)
         }
     }
 }

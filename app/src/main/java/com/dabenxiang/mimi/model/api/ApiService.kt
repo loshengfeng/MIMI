@@ -718,9 +718,10 @@ interface ApiService {
      ***********************************************************/
     @GET("/v1/Members/Home/Videos/SearchWithCategory")
     suspend fun getVideoByCategory(
+        @Query("isAdult") isAdult: Boolean,
         @Query("category") category: String,
         @Query("offset") offset: String,
         @Query("limit") limit: String
-    ): Response<ApiBasePagingItem<VideoByCategoryItem>>
+    ): Response<ApiBasePagingItem<ArrayList<VideoByCategoryItem>>>
 
 }
