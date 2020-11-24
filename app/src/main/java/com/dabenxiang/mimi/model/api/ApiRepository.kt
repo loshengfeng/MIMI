@@ -224,6 +224,7 @@ class ApiRepository(private val apiService: ApiService) {
     ) = apiService.resendEmail(body)
 
     suspend fun followPost(userId: Long): Response<Void> {
+        Timber.i("userId=$userId")
         return apiService.followPost(userId)
     }
 
@@ -860,9 +861,20 @@ class ApiRepository(private val apiService: ApiService) {
 
     /**********************************************************
      *
-     *                   Members/Home/Menu
+     *                  Members/Home/Menu
      *
      ***********************************************************/
     suspend fun getMenu() = apiService.getMenu()
+
+    /**********************************************************
+     *
+     *          Members/Home/Videos/SearchWithCategory
+     *
+     ***********************************************************/
+    suspend fun getVideoByCategory(
+        category: String,
+        offset: String,
+        limit: String
+    ) = apiService.getVideoByCategory(category, offset, limit)
 }
 

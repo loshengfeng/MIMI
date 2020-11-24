@@ -1,8 +1,7 @@
-package com.dabenxiang.mimi.view.clubdetail
+package com.dabenxiang.mimi.view.club.topic
 
 import android.os.Bundle
 import android.view.View
-import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -33,9 +32,10 @@ import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.fragment_club_detail.*
+import kotlinx.android.synthetic.main.fragment_club_topic.*
+import timber.log.Timber
 
-class ClubDetailFragment : BaseFragment() {
+class TopicDetailFragment : BaseFragment() {
 
     companion object {
         const val KEY_DATA = "data"
@@ -55,7 +55,7 @@ class ClubDetailFragment : BaseFragment() {
         )
     }
 
-    private val viewModel: ClubDetailViewModel by viewModels()
+    private val viewModel: TopicDetailViewModel by viewModels()
 
     private val memberClubItem by lazy { arguments?.getSerializable(KEY_DATA) as MemberClubItem }
 
@@ -63,7 +63,7 @@ class ClubDetailFragment : BaseFragment() {
         get() = View.GONE
 
     override fun getLayoutId(): Int {
-        return R.layout.fragment_club_detail
+        return R.layout.fragment_club_topic
     }
 
     override fun setupFirstTime() {
@@ -91,8 +91,8 @@ class ClubDetailFragment : BaseFragment() {
         viewPager.offscreenPageLimit = 3
 
         viewPager.adapter =
-            ClubPagerAdapter(
-                ClubDetailFuncItem({ orderBy, funUpdateList, funUpdateCount ->
+            TopicPagerAdapter(
+                TopicDetailFuncItem({ orderBy, funUpdateList, funUpdateCount ->
                     getPost(
                         orderBy,
                         funUpdateList,
@@ -126,7 +126,7 @@ class ClubDetailFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     val adapter =
-                        (viewPager.adapter as ClubPagerAdapter).getListAdapter(tabLayout.selectedTabPosition)
+                        (viewPager.adapter as TopicPagerAdapter).getListAdapter(tabLayout.selectedTabPosition)
                     adapter.removedPosList.add(it.result)
                     adapter.notifyItemChanged(it.result)
                 }
@@ -136,7 +136,7 @@ class ClubDetailFragment : BaseFragment() {
 
         viewModel.cleanRemovedPosList.observe(viewLifecycleOwner, Observer {
             val adapter =
-                (viewPager.adapter as ClubPagerAdapter).getListAdapter(tabLayout.selectedTabPosition)
+                (viewPager.adapter as TopicPagerAdapter).getListAdapter(tabLayout.selectedTabPosition)
             adapter.removedPosList.clear()
         })
 
@@ -195,7 +195,7 @@ class ClubDetailFragment : BaseFragment() {
                         val bundle = PictureDetailFragment.createBundle(item, 1)
                         navigateTo(
                             NavigateItem.Destination(
-                                R.id.action_clubDetailFragment_to_pictureDetailFragment,
+                                R.id.action_topicDetailFragment_to_pictureDetailFragment,
                                 bundle
                             )
                         )
@@ -204,7 +204,7 @@ class ClubDetailFragment : BaseFragment() {
                         val bundle = TextDetailFragment.createBundle(item, 1)
                         navigateTo(
                             NavigateItem.Destination(
-                                R.id.action_clubDetailFragment_to_textDetailFragment,
+                                R.id.action_topicDetailFragment_to_textDetailFragment,
                                 bundle
                             )
                         )
@@ -213,7 +213,7 @@ class ClubDetailFragment : BaseFragment() {
                         val bundle = ClipFragment.createBundle(arrayListOf(item), 0, true)
                         navigateTo(
                             NavigateItem.Destination(
-                                R.id.action_clubDetailFragment_to_clipFragment,
+                                R.id.action_topicDetailFragment_to_clipFragment,
                                 bundle
                             )
                         )
@@ -238,19 +238,19 @@ class ClubDetailFragment : BaseFragment() {
                     when (item.type) {
                         PostType.TEXT -> {
                             findNavController().navigate(
-                                R.id.action_clubDetailFragment_to_postArticleFragment,
+                                R.id.action_topicDetailFragment_to_postArticleFragment,
                                 bundle
                             )
                         }
                         PostType.IMAGE -> {
                             findNavController().navigate(
-                                R.id.action_clubDetailFragment_to_postPicFragment,
+                                R.id.action_topicDetailFragment_to_postPicFragment,
                                 bundle
                             )
                         }
                         PostType.VIDEO -> {
                             findNavController().navigate(
-                                R.id.action_clubDetailFragment_to_postVideoFragment,
+                                R.id.action_topicDetailFragment_to_postVideoFragment,
                                 bundle
                             )
                         }
@@ -267,7 +267,7 @@ class ClubDetailFragment : BaseFragment() {
                     val bundle = PictureDetailFragment.createBundle(item, 0)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_clubDetailFragment_to_pictureDetailFragment,
+                            R.id.action_topicDetailFragment_to_pictureDetailFragment,
                             bundle
                         )
                     )
@@ -276,7 +276,7 @@ class ClubDetailFragment : BaseFragment() {
                     val bundle = TextDetailFragment.createBundle(item, 0)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_clubDetailFragment_to_textDetailFragment,
+                            R.id.action_topicDetailFragment_to_textDetailFragment,
                             bundle
                         )
                     )
@@ -285,7 +285,7 @@ class ClubDetailFragment : BaseFragment() {
                     val bundle = ClipFragment.createBundle(arrayListOf(item), 0)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_clubDetailFragment_to_clipFragment,
+                            R.id.action_topicDetailFragment_to_clipFragment,
                             bundle
                         )
                     )
@@ -299,7 +299,7 @@ class ClubDetailFragment : BaseFragment() {
             val bundle = ClipFragment.createBundle(ArrayList(item), position)
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_clubDetailFragment_to_clipFragment,
+                    R.id.action_topicDetailFragment_to_clipFragment,
                     bundle
                 )
             )
@@ -310,7 +310,7 @@ class ClubDetailFragment : BaseFragment() {
                 val bundle = ClipFragment.createBundle(ArrayList(item), position)
                 navigateTo(
                     NavigateItem.Destination(
-                        R.id.action_clubDetailFragment_to_clipFragment,
+                        R.id.action_topicDetailFragment_to_clipFragment,
                         bundle
                     )
                 )
@@ -322,7 +322,7 @@ class ClubDetailFragment : BaseFragment() {
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_clubDetailFragment_to_searchPostFragment,
+                    R.id.action_topicDetailFragment_to_searchPostFragment,
                     bundle
                 )
             )
@@ -336,7 +336,7 @@ class ClubDetailFragment : BaseFragment() {
             )
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_clubDetailFragment_to_myPostFragment,
+                    R.id.action_topicDetailFragment_to_myPostFragment,
                     bundle
                 )
             )

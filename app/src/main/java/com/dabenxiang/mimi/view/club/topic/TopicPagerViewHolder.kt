@@ -1,6 +1,5 @@
-package com.dabenxiang.mimi.view.clubdetail
+package com.dabenxiang.mimi.view.club.topic
 
-import android.view.MotionEvent
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.paging.PagedList
@@ -14,8 +13,9 @@ import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import kotlinx.android.synthetic.main.item_club_pager.view.*
+import timber.log.Timber
 
-class ClubPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
+class TopicPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
     private val swipeRefreshLayout: SwipeRefreshLayout = itemView.swipeRefreshLayout
     private val rvPost: RecyclerView = itemView.rv_post
     private val clNoData: ConstraintLayout = itemView.cl_no_data
@@ -23,9 +23,9 @@ class ClubPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
         { _, _, _, _ -> }
 
     fun onBind(
-        position: Int,
-        clubDetailFuncItem: ClubDetailFuncItem,
-        adultListener: AdultListener
+            position: Int,
+            clubDetailFuncItem: TopicDetailFuncItem,
+            adultListener: AdultListener
     ): MemberPostPagedAdapter? {
         onParentFollowClick = clubDetailFuncItem.onFollowClick
 
@@ -61,6 +61,7 @@ class ClubPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
     }
 
     private fun onFollowClick(memberPostItem: MemberPostItem, isFollow: Boolean) {
+        Timber.i("memberPostItem:$memberPostItem ")
         onParentFollowClick(
             memberPostItem,
             (rvPost.adapter as MemberPostPagedAdapter).currentList ?: arrayListOf(),

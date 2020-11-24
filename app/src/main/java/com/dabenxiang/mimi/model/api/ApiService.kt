@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.model.api
 
 import com.dabenxiang.mimi.model.api.vo.*
-import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -710,4 +709,18 @@ interface ApiService {
      ***********************************************************/
     @GET("/v1/Members/Home/Menu")
     suspend fun getMenu(): Response<ApiBaseItem<List<MenuItem>>>
+
+
+    /**********************************************************
+     *
+     *                   Members/Home/Videos/SearchWithCategory
+     *
+     ***********************************************************/
+    @GET("/v1/Members/Home/Videos/SearchWithCategory")
+    suspend fun getVideoByCategory(
+        @Query("category") category: String,
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ): Response<ApiBasePagingItem<VideoByCategoryItem>>
+
 }

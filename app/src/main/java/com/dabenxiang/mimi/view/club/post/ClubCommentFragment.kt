@@ -21,10 +21,12 @@ import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
+import com.dabenxiang.mimi.view.textdetail.ClubCommentAdapter
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_text_detail.*
+import kotlinx.android.synthetic.main.fragment_text_detail.*
 
-class ClubTextDetailFragment : BaseFragment() {
+class ClubCommentFragment : BaseFragment() {
 
     private val viewModel: ClubTextDetailViewModel by viewModels()
 
@@ -33,37 +35,28 @@ class ClubTextDetailFragment : BaseFragment() {
 
     private var memberPostItem: MemberPostItem? = null
 
-    private var textDetailAdapter: ClubTextDetailAdapter? = null
+    private var textDetailAdapter: ClubCommentAdapter? = null
+    private var commentAdapter: CommentAdapter? = null
 
     private var adWidth = 0
     private var adHeight = 0
 
     companion object {
         const val KEY_DATA = "data"
-        fun createBundle(item: MemberPostItem): ClubTextDetailFragment {
+        fun createBundle(item: MemberPostItem): ClubCommentFragment {
             val bundle = Bundle().also {
                 it.putSerializable(KEY_DATA, item)
             }
 
-            val fragment = ClubTextDetailFragment()
+            val fragment = ClubCommentFragment()
             fragment.arguments = bundle
             return fragment
         }
     }
 
-    override fun getLayoutId() = R.layout.fragment_club_text_detail
+    override fun getLayoutId() = R.layout.fragment_club_comment
 
     override fun setupObservers() {
-        viewModel.postDetailResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is ApiResult.Success -> {
-                    val item = it.result.content
-                    textDetailAdapter?.updateContent(item!!)
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
-        })
-
         mainViewModel?.getAdResult?.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Success -> {
@@ -81,13 +74,13 @@ class ClubTextDetailFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         adHeight = (adWidth * 0.142).toInt()
 
-        memberPostItem = arguments?.get(KEY_DATA) as MemberPostItem
+        memberPostItem = arguments?.get(ClubTextDetailFragment.KEY_DATA) as MemberPostItem
+        viewModel.getPostDetail(memberPostItem!!)
 
-        textDetailAdapter = ClubTextDetailAdapter(
+        textDetailAdapter = ClubCommentAdapter(
             requireContext(),
             memberPostItem!!,
             onTextDetailListener,
@@ -97,11 +90,10 @@ class ClubTextDetailFragment : BaseFragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = textDetailAdapter
 
-        viewModel.getPostDetail(memberPostItem!!)
         mainViewModel?.getAd(adWidth, adHeight)
     }
 
-    private val onTextDetailListener = object : ClubTextDetailAdapter.OnTextDetailListener {
+    private val onTextDetailListener = object : ClubCommentAdapter.OnTextDetailListener {
         override fun onGetAttachment(id: Long?, view: ImageView) {
             viewModel.loadImage(id, view, LoadImageType.AVATAR)
         }
@@ -111,6 +103,12 @@ class ClubTextDetailFragment : BaseFragment() {
         }
 
         override fun onGetCommandInfo(adapter: CommentAdapter, type: CommentType) {
+            commentAdapter = adapter
+            viewModel.getCommentInfo(
+                memberPostItem!!.id,
+                type,
+                commentAdapter!!
+            )
         }
 
         override fun onGetReplyCommand(parentNode: RootCommentNode, succeededBlock: () -> Unit) {
@@ -134,20 +132,20 @@ class ClubTextDetailFragment : BaseFragment() {
         }
 
         override fun onReplyComment(replyId: Long?, replyName: String?) {
-//            checkStatus {
-//                takeUnless { replyId == null }?.also {
-//                    layout_bar.visibility = View.INVISIBLE
-//                    layout_edit_bar.visibility = View.VISIBLE
-//
-//                    GeneralUtils.showKeyboard(requireContext())
-//                    et_message.requestFocus()
-//                    et_message.tag = replyId
-//                    tv_replay_name.text = replyName.takeIf { it != null }?.let {
-//                        tv_replay_name.visibility = View.VISIBLE
-//                        String.format(requireContext().getString(R.string.clip_username), it)
-//                    } ?: run { "" }
-//                }
-//            }
+            checkStatus {
+                takeUnless { replyId == null }?.also {
+                    layout_bar.visibility = View.INVISIBLE
+                    layout_edit_bar.visibility = View.VISIBLE
+
+                    GeneralUtils.showKeyboard(requireContext())
+                    et_message.requestFocus()
+                    et_message.tag = replyId
+                    tv_replay_name.text = replyName.takeIf { it != null }?.let {
+                        tv_replay_name.visibility = View.VISIBLE
+                        String.format(requireContext().getString(R.string.clip_username), it)
+                    } ?: run { "" }
+                }
+            }
         }
 
         override fun onMoreClick(item: MembersPostCommentItem) {
@@ -186,7 +184,7 @@ class ClubTextDetailFragment : BaseFragment() {
 
     private val onItemClickListener = object : OnItemClickListener {
         override fun onItemClick() {
-            GeneralUtils.hideKeyboard(requireActivity())
+//            GeneralUtils.hideKeyboard(requireActivity())
 //            layout_bar.visibility = View.VISIBLE
 //            layout_edit_bar.visibility = View.INVISIBLE
 //            et_message.setText("")
