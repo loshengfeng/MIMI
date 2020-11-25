@@ -10,6 +10,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.navigation.NavDeepLinkBuilder
 import androidx.navigation.Navigation
@@ -32,15 +34,14 @@ import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.dialog.dailycheckin.DailyCheckInDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
-import com.dabenxiang.mimi.view.home.AdultHomeFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
+import com.dabenxiang.mimi.view.mimi_home.MiMiFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerFragment.Companion.KEY_DEST_ID
 import com.dabenxiang.mimi.widget.utility.FileUtil.deleteExternalFile
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import kotlinx.android.synthetic.main.activity_main.*
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 import java.util.*
 
@@ -129,6 +130,8 @@ class MainActivity : BaseActivity(){
             }
         })
 
+        viewModel.isNavTransparent.observe(this, { setUiMode(it) })
+
         viewModel.getTotalUnread()
     }
 
@@ -185,11 +188,60 @@ class MainActivity : BaseActivity(){
         }
     }
 
-    private fun setUiMode() {
+    private fun setUiMode(isNavTransparent: Boolean = false) {
+        Timber.d("@@setUiMode: $isNavTransparent")
         window?.statusBarColor = getColor(R.color.normal_color_status_bar)
-        bottom_navigation.background = getDrawable(R.drawable.bg_gray_2_top_line)
+
+        //FragmentContainerView constraint
+        ConstraintSet().run {
+            this.clone(cl_root)
+            this.clear(R.id.nav_host_fragment, ConstraintSet.BOTTOM)
+            this.connect(
+                R.id.nav_host_fragment,
+                ConstraintSet.BOTTOM,
+                R.id.bottom_navigation,
+                if (isNavTransparent) ConstraintSet.BOTTOM else ConstraintSet.TOP
+            )
+            this.applyTo(cl_root)
+        }
+
+        //Status bar text. (Background is modified at ClipFragment)
+        window.run {
+            this.decorView.systemUiVisibility =
+                if (isNavTransparent) 0 else View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        }
+
+        //Navigation background
+        bottom_navigation.background = ContextCompat.getDrawable(
+            this,
+            if (isNavTransparent) R.drawable.bg_transparent_nav else R.drawable.bg_gray_2_top_line
+        )
+
+
+        //Navigation item text
         bottom_navigation.itemTextColor =
-            resources.getColorStateList(R.color.bottom_nav_normal_text_selector, null)
+            resources.getColorStateList(
+                if (isNavTransparent) R.color.bottom_nav_clip_text_selector else R.color.bottom_nav_normal_text_selector,
+                null
+            )
+
+        //Navigation item icon
+        bottom_navigation.menu.findItem(R.id.navigation_mimi).run {
+            this.setIcon(
+                ContextCompat.getDrawable(
+                    this@MainActivity,
+                    if (isNavTransparent) R.drawable.ico_home_white_n else R.drawable.btn_home
+                )
+            )
+        }
+        bottom_navigation.menu.findItem(R.id.navigation_club).run {
+            this.setIcon(
+                ContextCompat.getDrawable(
+                    this@MainActivity,
+                    if (isNavTransparent) R.drawable.ico_community_white_n else R.drawable.btn_club
+                )
+            )
+        }
     }
 
     private fun changeNavigationPosition(index: Int) {
@@ -209,19 +261,19 @@ class MainActivity : BaseActivity(){
         val fragmentName = supportFragmentManager.fragments[0].findNavController()
             .currentDestination?.displayName?.substringAfter("/").toString()
 
-//        val adultHomeFragment =
-//            AdultHomeFragment::class.java.simpleName.toLowerCase(Locale.getDefault())
+        val mimiFragment =
+            MiMiFragment::class.java.simpleName.toLowerCase(Locale.getDefault())
 //        // 判斷當前的頁面是停留在 homeFragment，顯示退出 app 訊息
-//        if (fragmentName.toLowerCase(Locale.getDefault()) == adultHomeFragment) {
-//            if (!viewModel.needCloseApp) {
-//                viewModel.startBackExitAppTimer()
-//                GeneralUtils.showToast(this, getString(R.string.press_again_exit))
-//            } else {
-//                finish()
-//            }
-//        } else {
-//            super.onBackPressed()
-//        }
+        if (fragmentName.toLowerCase(Locale.getDefault()) == mimiFragment) {
+            if (!viewModel.needCloseApp) {
+                viewModel.startBackExitAppTimer()
+                GeneralUtils.showToast(this, getString(R.string.press_again_exit))
+            } else {
+                finish()
+            }
+        } else {
+            super.onBackPressed()
+        }
     }
 
     override fun onNewIntent(intent: Intent?) {

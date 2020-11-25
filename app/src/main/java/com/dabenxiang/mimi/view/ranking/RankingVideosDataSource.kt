@@ -33,7 +33,6 @@ class RankingVideosDataSource constructor(
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().statisticsHomeVideos(
-                    statisticsType=statisticsType,
                     isAdult = true,
                     offset = 0,
                     limit = PER_LIMIT_LONG.toInt()
@@ -72,7 +71,6 @@ class RankingVideosDataSource constructor(
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().statisticsHomeVideos(
-                    statisticsType=statisticsType,
                     isAdult = true,
                     offset = 0,
                     limit = PER_LIMIT_LONG.toInt()

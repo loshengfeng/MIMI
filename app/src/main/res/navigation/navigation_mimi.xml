@@ -6,25 +6,40 @@
     app:startDestination="@id/splashFragment">
 
     <include app:graph="@navigation/navigation_login" />
+    <include app:graph="@navigation/navigation_player" />
+    <include app:graph="@navigation/navigation_clip" />
 
     <fragment
         android:id="@+id/splashFragment"
         android:name="com.dabenxiang.mimi.view.splash.SplashFragment"
         tools:layout="@layout/fragment_splash">
-
         <action
-            android:id="@+id/action_splashFragment_to_homeFragment"
-            app:destination="@id/actorFragment"
-            app:popUpTo="@id/actorFragment"
+            android:id="@+id/action_splashFragment_to_mimiFragment"
+            app:destination="@id/mimiFragment"
+            app:popUpTo="@id/mimiFragment"
             app:popUpToInclusive="true" />
-
     </fragment>
 
     <fragment
-        android:id="@+id/actorFragment"
-        android:name="com.dabenxiang.mimi.view.actor.ActorFragment"
-        tools:layout="@layout/fragment_actor">
+        android:id="@+id/mimiFragment"
+        android:name="com.dabenxiang.mimi.view.mimi_home.MiMiFragment"
+        tools:layout="@layout/fragment_mimi_home">
+        <action
+            android:id="@+id/action_mimiFragment_to_rankingFragment"
+            app:destination="@id/rankingFragment" />
+    </fragment>
 
+    <fragment
+        android:id="@+id/rankingFragment"
+        android:name="com.dabenxiang.mimi.view.ranking.RankingFragment"
+        android:label="RankingFragment"
+        tools:layout="@layout/fragment_ranking" >
+        <action
+            android:id="@+id/action_rankingFragment_to_navigation_player"
+            app:destination="@id/navigation_player" />
+        <action
+            android:id="@+id/action_rankingFragment_to_navigation_clip"
+            app:destination="@id/navigation_clip" />
     </fragment>
 
 </navigation>

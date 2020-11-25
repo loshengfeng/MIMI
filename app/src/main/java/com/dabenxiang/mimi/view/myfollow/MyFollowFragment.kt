@@ -3,7 +3,6 @@ package com.dabenxiang.mimi.view.myfollow
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
-import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -18,7 +17,7 @@ import com.dabenxiang.mimi.view.adapter.ClubFollowAdapter
 import com.dabenxiang.mimi.view.adapter.MemberFollowAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
+import com.dabenxiang.mimi.view.club.topic.TopicDetailFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
@@ -95,10 +94,10 @@ class MyFollowFragment : BaseFragment() {
         viewModel.clubDetail.observe(this, Observer {
             when (it) {
                 is Success -> {
-                    val bundle = ClubDetailFragment.createBundle(it.result)
+                    val bundle = TopicDetailFragment.createBundle(it.result)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_myFollowFragment_to_clubDetailFragment,
+                            R.id.action_myFollowFragment_to_topicDetailFragment,
                             bundle
                         )
                     )

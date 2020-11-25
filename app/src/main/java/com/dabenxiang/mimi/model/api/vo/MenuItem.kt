@@ -4,6 +4,10 @@ import com.dabenxiang.mimi.model.enums.LayoutType
 import com.google.gson.annotations.SerializedName
 
 data class MenuItem(
+
+    @SerializedName("id")
+    val id: Long = 0,
+
     @SerializedName("name")
     val name: String = "",
 
@@ -13,14 +17,18 @@ data class MenuItem(
     @SerializedName("sorting")
     val sorting: Int = 0,
 
-    @SerializedName("category")
-    val category: String = "",
-
     @SerializedName("menus")
-    val menus: List<MenusItem> = arrayListOf()
+    val menus: List<SecondMenuItem> = arrayListOf()
 )
 
-data class MenusItem(
+data class SecondMenuItem(
+
+    @SerializedName("id")
+    val id: Long = 0,
+
+    @SerializedName("parentId")
+    val parentId: Long = 0,
+
     @SerializedName("name")
     val name: String = "",
 
@@ -31,5 +39,59 @@ data class MenusItem(
     val sorting: Int = 0,
 
     @SerializedName("category")
-    val category: String = ""
+    val category: String = "",
+
+    @SerializedName("menus")
+    var menus: ArrayList<ThirdMenuItem> = arrayListOf()
 )
+
+data class ThirdMenuItem(
+
+    @SerializedName("id")
+    val id: Long = 0,
+
+    @SerializedName("parentId")
+    val parentId: Long = 0,
+
+    @SerializedName("name")
+    val name: String = "",
+
+    @SerializedName("type")
+    val type: LayoutType = LayoutType.GENERAL,
+
+    @SerializedName("sorting")
+    val sorting: Int = 0,
+
+    @SerializedName("category")
+    val category: String = "",
+
+    @SerializedName("isAdult")
+    val isAdult: Boolean = false,
+
+    @SerializedName("startTime")
+    val startTime: String = "",
+
+    @SerializedName("endTime")
+    val endTime: String = "",
+
+    @SerializedName("orderByType")
+    val orderByType: Int = 0,
+
+    @SerializedName("videos")
+    val videos: List<RecommendVideoItem> = arrayListOf(),
+
+    val adItem: AdItem? = null
+)
+
+data class RecommendVideoItem(
+
+    @SerializedName("id")
+    val id: Long = 0,
+
+    @SerializedName("title")
+    val title: String = "",
+
+    @SerializedName("cover")
+    val cover: String = ""
+)
+

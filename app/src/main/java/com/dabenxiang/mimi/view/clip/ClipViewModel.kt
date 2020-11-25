@@ -2,14 +2,21 @@ package com.dabenxiang.mimi.view.clip
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import androidx.paging.*
 import com.blankj.utilcode.util.FileIOUtils
+import com.dabenxiang.mimi.callback.PagingCallback
+import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.CategoryType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.home.memberpost.MemberPostDataSource
+import com.dabenxiang.mimi.view.home.memberpost.MemberPostFactory
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -36,6 +43,9 @@ class ClipViewModel : BaseViewModel() {
 
     private val _videoReport = MutableLiveData<ApiResult<Nothing>>()
     val videoReport: LiveData<ApiResult<Nothing>> = _videoReport
+
+    private val _clipPostItemListResult = MutableLiveData<PagedList<MemberPostItem>>()
+    val clipPostItemListResult: LiveData<PagedList<MemberPostItem>> = _clipPostItemListResult
 
     fun getClip(id: String, pos: Int) {
         viewModelScope.launch {
@@ -79,7 +89,7 @@ class ClipViewModel : BaseViewModel() {
         }
     }
 
-    fun getPostDetail(item: MemberPostItem, position: Int) {
+    fun getPostDetail(item: MemberPostItem, position: Int, update: (Int, Boolean) -> Unit) {
         viewModelScope.launch {
             flow {
                 /** for debug **/
@@ -88,14 +98,15 @@ class ClipViewModel : BaseViewModel() {
                 /**-----------**/
                 val result = domainManager.getApiRepository().getMemberPostDetail(item.id)
                 if (!result.isSuccessful) throw HttpException(result)
-                result.body()?.content?.deducted?.let { item.deducted = it }
-                emit(ApiResult.success(position))
+                val deducted = result.body()?.content?.deducted ?: false
+                emit(deducted)
             }
                 .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _postDetailResult.value = it }
+                .catch { e ->
+                    e.printStackTrace()
+                    update(position, false)
+                }
+                .collect { update(position, it) }
         }
     }
 
@@ -144,11 +155,12 @@ class ClipViewModel : BaseViewModel() {
         }
     }
 
-    fun sendVideoReport(id: String, error: String){
+    fun sendVideoReport(id: String, error: String) {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getMemberVideoReport(
-                    videoId= id.toLong(), type = PostType.VIDEO.value)
+                    videoId = id.toLong(), type = PostType.VIDEO.value
+                )
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }
@@ -157,5 +169,63 @@ class ClipViewModel : BaseViewModel() {
                 .collect { _videoReport.value = it }
         }
 
+    }
+
+    fun getClips(): Flow<PagingData<MemberPostItem>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = ApiRepository.NETWORK_PAGE_SIZE,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { ClipPagingSource(domainManager) }
+        ).flow.cachedIn(viewModelScope)
+    }
+
+    fun getClipPosts() {
+        viewModelScope.launch {
+            getMemberPostPagingItems(PostType.VIDEO).asFlow()
+                .collect { _clipPostItemListResult.value = it }
+        }
+    }
+
+    private fun getMemberPostPagingItems(postType: PostType): LiveData<PagedList<MemberPostItem>> {
+        val pictureDataSource =
+            MemberPostDataSource(
+                HomePagingCallBack(CategoryType.valueOf(postType.name)),
+                viewModelScope,
+                domainManager,
+                postType,
+                0,
+                0
+            )
+        val pictureFactory = MemberPostFactory(pictureDataSource)
+        val config = PagedList.Config.Builder()
+            .setPrefetchDistance(4)
+            .build()
+        return LivePagedListBuilder(pictureFactory, config).build()
+    }
+
+    inner class HomePagingCallBack(private val type: CategoryType) : PagingCallback {
+        override fun onLoading() {
+            setShowProgress(true)
+        }
+
+        override fun onLoaded() {
+            setShowProgress(false)
+        }
+
+        override fun onThrowable(throwable: Throwable) {
+
+        }
+
+        override fun onTotalCount(count: Long) {
+//            _totalCountResult.postValue(Pair(type, count.toInt()))
+        }
+
+        override fun onCurrentItemCount(count: Long, isInitial: Boolean) {
+//            totalCount = if (isInitial) count.toInt()
+//            else totalCount.plus(count.toInt())
+//            if (isInitial) cleanRemovedPosList()
+        }
     }
 }

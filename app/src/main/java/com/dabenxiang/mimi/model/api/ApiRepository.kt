@@ -2,14 +2,12 @@ package com.dabenxiang.mimi.model.api
 
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.api.vo.error.TOKEN_NOT_FOUND
-import com.dabenxiang.mimi.model.enums.OrderType
-import com.dabenxiang.mimi.model.enums.PaymentType
-import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.model.enums.StatisticsType
+import com.dabenxiang.mimi.model.enums.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
+import timber.log.Timber
 import java.io.File
 
 class ApiRepository(private val apiService: ApiService) {
@@ -22,11 +20,10 @@ class ApiRepository(private val apiService: ApiService) {
         const val FILE = "file"
         const val MEDIA_TYPE_IMAGE = "image/*"
         const val X_REQUESTED_FROM = "X-Requested-From"
+        const val NETWORK_PAGE_SIZE = 20
         fun isRefreshTokenFailed(code: String?): Boolean {
             return code == TOKEN_NOT_FOUND
         }
-
-        const val NETWORK_PAGE_SIZE = 20
     }
 
     /**********************************************************
@@ -226,6 +223,7 @@ class ApiRepository(private val apiService: ApiService) {
     ) = apiService.resendEmail(body)
 
     suspend fun followPost(userId: Long): Response<Void> {
+        Timber.i("userId=$userId")
         return apiService.followPost(userId)
     }
 
@@ -246,6 +244,15 @@ class ApiRepository(private val apiService: ApiService) {
      *                  Members/Post
      *
      ***********************************************************/
+    suspend fun getMembersPost(
+            type: PostType,
+            orderBy: OrderBy,
+            offset: Int,
+            limit: Int
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
+        return apiService.getMembersPost(type.value, offset, limit, orderBy = orderBy.value)
+    }
+
     suspend fun getMembersPost(
         type: PostType,
         offset: Int,
@@ -307,10 +314,14 @@ class ApiRepository(private val apiService: ApiService) {
      *                  Members/Club
      *
      ***********************************************************/
+
     suspend fun getMembersClub(
-        tag: String
+        tag: String,
+        offset: Int?,
+        limit: Int?
     ): Response<ApiBasePagingItem<ArrayList<MemberClubItem>>> {
-        return apiService.getMembersClub(tag)
+        Timber.i("ClubTabFragment getMembersClub")
+        return apiService.getMembersClub(tag, offset, limit)
     }
 
     suspend fun getMembersClub(
@@ -406,15 +417,23 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得熱門影片
      */
     suspend fun statisticsHomeVideos(
-        statisticsType: StatisticsType = StatisticsType.MONTH,
-        category: String? = null,
-        isAdult: Boolean,
+        startTime: String = "2018-12-01T10:00:05Z",
+        endTime: String = "2020-11-24T10:00:05Z",
+        orderByType: StatisticsOrderType = StatisticsOrderType.HOTEST,
+        category: String? = "",
+        tags: String? = "",
+        isAdult: Boolean = false,
+        isRandom: Boolean = false,
         offset: Int,
         limit: Int
     ) = apiService.statisticsHomeVideos(
-        statisticsType = statisticsType.value,
+        startTime = startTime,
+        endTime = endTime,
+        orderByType = orderByType.value,
         category = category,
+        tags = tags,
         isAdult = isAdult,
+        isRandom = isRandom,
         offset = offset,
         limit = limit
     )
@@ -868,10 +887,22 @@ class ApiRepository(private val apiService: ApiService) {
 
     /**********************************************************
      *
-     *                   Members/Home/Menu
+     *                  Members/Home/Menu
      *
      ***********************************************************/
     suspend fun getMenu() = apiService.getMenu()
 
+    /**********************************************************
+     *
+     *          Members/Home/Videos/SearchWithCategory
+     *
+     ***********************************************************/
+    suspend fun getVideoByCategory(
+        category: String,
+        offset: String,
+        limit: String
+    ) = apiService.getVideoByCategory(
+        true, category, offset, limit
+    )
 }
 

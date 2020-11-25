@@ -243,7 +243,9 @@ interface ApiService {
      ***********************************************************/
     @GET("/v1/Members/Club")
     suspend fun getMembersClub(
-        @Query("tag") tag: String
+        @Query("tag") tag: String,
+        @Query("offset") offset: Int?,
+        @Query("limit") limit: Int?
     ): Response<ApiBasePagingItem<ArrayList<MemberClubItem>>>
 
     @GET("/v1/Members/Club/{id}")
@@ -326,12 +328,16 @@ interface ApiService {
 
     @GET("/v1/Members/Home/Videos/Statistics")
     suspend fun statisticsHomeVideos(
-        @Query("statisticsType") statisticsType: Int?,
+        @Query("startTime") startTime: String?,
+        @Query("endTime") endTime: String?,
+        @Query("orderByType") orderByType: Int?,
         @Query("category") category: String?,
+        @Query("tags") tags: String?,
         @Query("isAdult") isAdult: Boolean,
+        @Query("isRandom") isRandom: Boolean,
         @Query("offset") offset: Int,
         @Query("limit") limit: Int
-    ): Response<ApiBasePagingItem<List<StatisticsItem>>>
+    ): Response<ApiBasePagingItem<ArrayList<StatisticsItem>>>
 
     @GET("/v1/Members/Home/Videos/PostStatistics")
     suspend fun getRankingList(
@@ -717,4 +723,19 @@ interface ApiService {
      ***********************************************************/
     @GET("/v1/Members/Home/Menu")
     suspend fun getMenu(): Response<ApiBaseItem<List<MenuItem>>>
+
+
+    /**********************************************************
+     *
+     *                   Members/Home/Videos/SearchWithCategory
+     *
+     ***********************************************************/
+    @GET("/v1/Members/Home/Videos/SearchWithCategory")
+    suspend fun getVideoByCategory(
+        @Query("isAdult") isAdult: Boolean,
+        @Query("category") category: String,
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ): Response<ApiBasePagingItem<ArrayList<VideoByCategoryItem>>>
+
 }

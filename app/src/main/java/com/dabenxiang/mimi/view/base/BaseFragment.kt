@@ -34,6 +34,7 @@ import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.home.HomeViewModel
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.main.MainViewModel
+import com.dabenxiang.mimi.view.mimi_home.MiMiFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
@@ -58,6 +59,8 @@ import timber.log.Timber
 import java.io.File
 import java.io.Serializable
 import java.net.UnknownHostException
+import java.util.*
+import kotlin.collections.ArrayList
 
 abstract class BaseFragment : Fragment() {
 
@@ -125,6 +128,7 @@ abstract class BaseFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        mainViewModel?.setNavTransparent(isNavTransparent)
         statusBarVisibility()
         setUpStatusBarColor()
 
@@ -548,9 +552,9 @@ abstract class BaseFragment : Fragment() {
 
     abstract fun getLayoutId(): Int
 
-    abstract fun setupObservers()
+    open fun setupObservers() {}
 
-    abstract fun setupListeners()
+    open fun setupListeners() {}
 
     open fun setupFirstTime() {}
 
@@ -568,6 +572,8 @@ abstract class BaseFragment : Fragment() {
     open fun initSettings() {}
 
     open val bottomNavigationVisibility: Int = View.VISIBLE
+
+    open val isNavTransparent: Boolean = false
 
     open fun navigateTo(item: NavigateItem) {
         lifecycleScope.launch {

@@ -11,7 +11,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
-import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
@@ -33,7 +32,6 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.player.ui.PlayerFragment
-import com.dabenxiang.mimi.view.player.ui.PlayerFragment.Companion.KEY_IS_FROM_PLAYER
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_video.*
@@ -113,7 +111,7 @@ class SearchVideoFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.searchTextLiveData.bindingEditText = edit_search
+        viewModel.searchTextLiveData.bindingEditText = search_bar
 
         viewModel.searchTextLiveData.observe(viewLifecycleOwner, Observer {
 
@@ -165,7 +163,7 @@ class SearchVideoFragment : BaseFragment() {
             viewModel.clearSearchHistory()
         }
 
-        edit_search.addTextChangedListener {
+        search_bar.addTextChangedListener {
             if (it.toString() == "" && !TextUtils.isEmpty(viewModel.searchingTag)) {
                 layout_search_history.visibility = View.GONE
                 layout_search_text.visibility = View.VISIBLE
@@ -177,7 +175,7 @@ class SearchVideoFragment : BaseFragment() {
             }
         }
 
-        edit_search.setOnEditorActionListener { v, actionId, event ->
+        search_bar.setOnEditorActionListener { v, actionId, event ->
             when (actionId) {
                 EditorInfo.IME_ACTION_SEARCH -> {
                     searchText()
@@ -189,11 +187,11 @@ class SearchVideoFragment : BaseFragment() {
     }
 
     private fun searchText() {
-        if (edit_search.text.isNotBlank()) {
+        if (search_bar.text.isNotBlank()) {
             layout_search_history.visibility = View.GONE
             layout_search_text.visibility = View.VISIBLE
             viewModel.searchingTag = ""
-            viewModel.searchingStr = edit_search.text.toString()
+            viewModel.searchingStr = search_bar.text.toString()
             viewModel.getSearchList()
             viewModel.updateSearchHistory(viewModel.searchingStr)
             GeneralUtils.hideKeyboard(requireActivity())
@@ -361,7 +359,7 @@ class SearchVideoFragment : BaseFragment() {
             chip.text = text
             chip.ellipsize = TextUtils.TruncateAt.END
             chip.setOnClickListener {
-                edit_search.setText(text)
+                search_bar.setText(text)
                 layout_search_history.visibility = View.GONE
                 layout_search_text.visibility = View.VISIBLE
                 viewModel.searchingStr = text
