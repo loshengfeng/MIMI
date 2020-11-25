@@ -189,7 +189,7 @@ class MainActivity : BaseActivity(){
     }
 
     private fun setUiMode(isNavTransparent: Boolean = false) {
-        Timber.d("@@setUiMode: $isNavTransparent")
+        Timber.d("setUiMode: $isNavTransparent")
         window?.statusBarColor = getColor(R.color.normal_color_status_bar)
 
         //FragmentContainerView constraint
