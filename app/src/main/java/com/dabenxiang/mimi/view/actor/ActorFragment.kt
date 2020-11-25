@@ -54,9 +54,7 @@ class ActorFragment : BaseFragment() {
 
     override fun setupFirstTime() {
         super.setupFirstTime()
-        rv_hot_actresses.layoutManager = LinearLayoutManager(context)
         rv_hot_actresses.adapter = actorVideosAdapter
-        rv_all_actresses.layoutManager = GridLayoutManager(context, 4)
         rv_all_actresses.adapter = actorCategoriesAdapter
     }
 

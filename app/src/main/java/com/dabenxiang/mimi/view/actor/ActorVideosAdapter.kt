@@ -39,7 +39,6 @@ class ActorVideosAdapter(
         holder.name.text = item?.name
         holder.totalClick.text = item?.totalClick?.toString() + context.getString(R.string.actor_hot_unit)
         holder.totalVideo.text = item?.totalVideo?.toString() + context.getString(R.string.actor_videos_unit)
-        holder.actressesVideos.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         holder.actressesVideos.adapter = actorVideoAdapter
         if(item?.videos != null)
             actorVideoAdapter.setupData(item.videos)
