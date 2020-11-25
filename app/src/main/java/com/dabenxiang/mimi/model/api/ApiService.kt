@@ -302,7 +302,7 @@ interface ApiService {
     suspend fun fetchHomeCategories(): Response<ApiBaseItem<RootCategoriesItem>>
 
     @GET("/v1/Members/Home/Categories")
-    suspend fun fetchHomeCategories(parentId: Long): Response<ApiBaseItem<RootCategoriesItem>>
+    suspend fun fetchHomeCategories(@Query("parentId") parentId: Int): Response<ApiBaseItem<ArrayList<CategoriesItem>>>
 
     /**********************************************************
      *
@@ -331,9 +331,9 @@ interface ApiService {
 
     @GET("/v1/Members/Home/Videos/Statistics")
     suspend fun statisticsHomeVideos(
-        @Query("statisticsType") statisticsType: Int?,
+        @Query("orderByType") orderByType: Int?,
         @Query("category") category: String?,
-        @Query("isAdult") isAdult: Boolean,
+        @Query("isAdult") isAdult: Boolean?= true,
         @Query("offset") offset: Int,
         @Query("limit") limit: Int
     ): Response<ApiBasePagingItem<List<StatisticsItem>>>

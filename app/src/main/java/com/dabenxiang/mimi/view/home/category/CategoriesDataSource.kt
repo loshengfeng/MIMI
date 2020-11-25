@@ -2,11 +2,11 @@ package com.dabenxiang.mimi.view.home.category
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.AdItem
-import com.dabenxiang.mimi.model.api.vo.Category
+import com.dabenxiang.mimi.model.enums.OrderBy
+import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
-import com.dabenxiang.mimi.model.vo.searchItemToVideoItem
+import com.dabenxiang.mimi.model.vo.statisticsItemToVideoItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -14,24 +14,23 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
 class CategoriesDataSource(
-    private val isAdult: Boolean,
     private val category: String?,
-    private val country: String?,
-    private val years: String?,
+    private val orderByType: OrderBy,
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
     private val pagingCallback: PagingCallback,
     private val adWidth: Int,
-    private val adHeight: Int,
-    private val tag: String = ""
+    private val adHeight: Int
 ) : PageKeyedDataSource<Long, BaseVideoItem>() {
 
     companion object {
-        const val PER_LIMIT = "20"
-        val PER_LIMIT_LONG = PER_LIMIT.toLong()
+        const val PER_LIMIT = 20
     }
 
-    private data class LoadResult(val list: List<BaseVideoItem>, val category: Category?, val nextKey: Long?)
+    private data class LoadResult(
+        val list: List<BaseVideoItem>,
+        val nextKey: Long?
+    )
 
     override fun loadInitial(
         params: LoadInitialParams<Long>,
@@ -44,46 +43,34 @@ class CategoriesDataSource(
                 val adItem = adResult.body()?.content ?: AdItem()
                 returnList.add(BaseVideoItem.Banner(adItem))
 
-                val result = domainManager.getApiRepository().searchHomeVideos(
-                    isAdult = isAdult,
+                val result = domainManager.getApiRepository().statisticsHomeVideos(
                     category = category,
-                    country = country,
-                    years = years,
-                    offset = "0",
-                    limit = PER_LIMIT,
-                    tag = tag
+                    orderByType = orderByType,
+                    offset = 0,
+                    limit = PER_LIMIT
                 )
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()
-                val videos = item?.content?.videos
-                if (videos.isNullOrEmpty()) {
-                    pagingCallback.onTotalCount(0)
-                } else {
-                    pagingCallback.onTotalCount(videos.size.toLong())
-                    returnList.addAll(videos.searchItemToVideoItem(isAdult))
-                }
+                val videos = item?.content
+                pagingCallback.onTotalCount(item?.paging?.count?: 0)
+                videos?.statisticsItemToVideoItem()?.let { returnList.addAll(it) }
                 val nextPageKey = when {
                     hasNextPage(
                         item?.paging?.count ?: 0,
                         item?.paging?.offset ?: 0,
                         videos?.size ?: 0
-                    ) -> PER_LIMIT_LONG
+                    ) -> PER_LIMIT.toLong()
                     else -> null
                 }
-                emit(
-                    LoadResult(
-                        returnList,
-                        item?.content?.category,
-                        nextPageKey
-                    )
-                )
+                emit(LoadResult(returnList, nextPageKey))
             }
                 .flowOn(Dispatchers.IO)
+                .onStart { pagingCallback.onLoading() }
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect {
-                    pagingCallback.onGetCategory(it.category)
-                    callback.onResult(it.list, null, it.nextKey) }
+                    callback.onResult(it.list, null, it.nextKey)
+                }
         }
     }
 
@@ -96,33 +83,27 @@ class CategoriesDataSource(
             flow {
                 val returnList = mutableListOf<BaseVideoItem>()
 
-                val result = domainManager.getApiRepository().searchHomeVideos(
-                    isAdult = isAdult,
+                val result = domainManager.getApiRepository().statisticsHomeVideos(
                     category = category,
-                    country = country,
-                    years = years,
-                    offset = next.toString(),
-                    limit = PER_LIMIT,
-                    tag = tag
+                    orderByType = orderByType,
+                    offset = next,
+                    limit = PER_LIMIT
                 )
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()
-                val videos = item?.content?.videos
-                if (videos != null) {
-                    returnList.addAll(videos.searchItemToVideoItem(isAdult))
-                }
+                val videos = item?.content
+                videos?.statisticsItemToVideoItem()?.let { returnList.addAll(it) }
                 val nextPageKey = when {
                     hasNextPage(
                         item?.paging?.count ?: 0,
                         item?.paging?.offset ?: 0,
                         videos?.size ?: 0
-                    ) -> next + PER_LIMIT_LONG
+                    ) -> next + PER_LIMIT
                     else -> null
                 }
                 emit(
                     LoadResult(
                         returnList,
-                        null,
                         nextPageKey
                     )
                 )
@@ -130,7 +111,6 @@ class CategoriesDataSource(
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> pagingCallback.onThrowable(e) }
-                .onCompletion { pagingCallback.onLoaded() }
                 .collect { callback.onResult(it.list, it.nextKey) }
         }
     }
@@ -144,7 +124,7 @@ class CategoriesDataSource(
 
     private fun hasNextPage(total: Long, offset: Long, currentSize: Int): Boolean {
         return when {
-            currentSize < PER_LIMIT_LONG -> false
+            currentSize < PER_LIMIT -> false
             offset >= total -> false
             else -> true
         }

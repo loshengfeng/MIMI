@@ -28,8 +28,8 @@ import com.dabenxiang.mimi.model.enums.CategoryType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.*
+import com.dabenxiang.mimi.view.adapter.CategoryVideoListAdapter
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
-import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter
 import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter.Companion.PAYLOAD_UPDATE_FOLLOW
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
@@ -44,7 +44,6 @@ import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.OnChooseUploadMethodDialogListener
 import com.dabenxiang.mimi.view.dialog.login_request.LoginRequestDialog
-import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.listener.OnLoginRequestDialogListener
 import com.dabenxiang.mimi.view.login.LoginFragment
@@ -222,7 +221,7 @@ class AdultHomeFragment : BaseFragment() {
                     val viewHolder = homeStatisticsViewHolderMap[it.first]
                     val statistics = statisticsMap[it.first]
                     val videoHolderItems =
-                        response.result.content?.statisticsItemToVideoItem(statistics!!.isAdult)
+                        response.result.content?.statisticsItemToVideoItem()
                     viewHolder?.submitList(videoHolderItems)
                 }
                 is Error -> onApiError(response.throwable)
@@ -479,13 +478,13 @@ class AdultHomeFragment : BaseFragment() {
             val category =
                 mainViewModel?.adult?.categories?.find { it.name == getString(R.string.home_tab_video) }
             category?.also {
-                val bundle = CategoriesFragment.createBundle(it.name, it.name, category)
-                navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_homeFragment_to_categoriesFragment,
-                        bundle
-                    )
-                )
+//                val bundle = CategoriesFragment.createBundle(it.name, it.name, category)
+//                navigateTo(
+//                    NavigateItem.Destination(
+//                        R.id.action_homeFragment_to_categoriesFragment,
+//                        bundle
+//                    )
+//                )
             }
         }
 
@@ -741,7 +740,7 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val videoListAdapter by lazy {
-        HomeVideoListAdapter(adapterListener)
+        CategoryVideoListAdapter(adapterListener)
     }
 
     private val adultListener = object : AdultListener {
@@ -890,13 +889,13 @@ class AdultHomeFragment : BaseFragment() {
                     val category =
                         mainViewModel?.adult?.categories?.find { it.name == getString(R.string.home_tab_video) }
                     category?.also {
-                        val bundle = CategoriesFragment.createBundle(it.name, it.name, category)
-                        navigateTo(
-                            NavigateItem.Destination(
-                                R.id.action_homeFragment_to_categoriesFragment,
-                                bundle
-                            )
-                        )
+//                        val bundle = CategoriesFragment.createBundle(it.name, it.name, category)
+//                        navigateTo(
+//                            NavigateItem.Destination(
+//                                R.id.action_homeFragment_to_categoriesFragment,
+//                                bundle
+//                            )
+//                        )
                     }
                 } else
                     setTab(categoryTypeList.indexOf(it))

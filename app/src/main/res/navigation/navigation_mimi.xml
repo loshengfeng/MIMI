@@ -29,7 +29,7 @@
             app:destination="@id/rankingFragment" />
         <action
             android:id="@+id/action_mimiFragment_to_categoriesFragment"
-            app:destination="@id/mimiCategoriesFragment" />
+            app:destination="@id/categoriesFragment" />
     </fragment>
 
     <fragment
@@ -46,10 +46,10 @@
     </fragment>
 
     <fragment
-        android:id="@+id/mimiCategoriesFragment"
-        android:name="com.dabenxiang.mimi.view.home.category.MimiCategoriesFragment"
-        android:label="MimiCategoriesFragment"
-        tools:layout="@layout/fragment_mimi_categories">
+        android:id="@+id/categoriesFragment"
+        android:name="com.dabenxiang.mimi.view.home.category.CategoriesFragment"
+        android:label="CategoriesFragment"
+        tools:layout="@layout/fragment_categories">
 
         <action
             android:id="@+id/action_to_searchVideoFragment"
