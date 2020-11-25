@@ -16,9 +16,12 @@ import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_PICTURE
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_RECOMMEND
 import com.dabenxiang.mimi.view.club.ClubTabViewModel
 import com.dabenxiang.mimi.view.club.follow.ClubPostFollowFragment
+import com.dabenxiang.mimi.view.club.latest.ClubLatestFragment
 import com.dabenxiang.mimi.view.club.post.ClubPicFragment
-import com.dabenxiang.mimi.view.club.post.ClubTextFragment
+import com.dabenxiang.mimi.view.club.post.ClubPostTextFragment
+import com.dabenxiang.mimi.view.club.recommend.ClubRecommendFragment
 import kotlinx.android.synthetic.main.fragment_tab_test.*
+import timber.log.Timber
 
 class ClubTabAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
@@ -27,19 +30,17 @@ class ClubTabAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
             TAB_FOLLOW to { ClubPostFollowFragment() },
 
             TAB_RECOMMEND to {
-                PageTestFragment.create(
-                        fragment.getString(R.string.club_tab_recommend))
+                ClubRecommendFragment()
             },
             TAB_LATEST to {
-                PageTestFragment.create(
-                        fragment.getString(R.string.club_tab_latest))
+                ClubLatestFragment()
             },
             TAB_CLIP to {
                 PageTestFragment.create(
                         fragment.getString(R.string.club_tab_clip))
             },
             TAB_PICTURE to { ClubPicFragment() },
-            TAB_NOVEL to { ClubTextFragment() }
+            TAB_NOVEL to { ClubPostTextFragment() }
     )
 
     override fun getItemCount() = tabFragmentsCreators.size
@@ -71,10 +72,14 @@ class PageTestFragment : BaseFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        Timber.i("PageTestFragment ${arguments?.getString(KEY_PAGE_NAME, "")
+        } onAttach")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Timber.i("PageTestFragment ${arguments?.getString(KEY_PAGE_NAME, "")
+        } onViewCreated")
         tab_name.text = arguments?.getString(KEY_PAGE_NAME, "")
     }
 }

@@ -7,7 +7,7 @@ enum class LayoutType {
     RECOMMEND,
 
     @SerializedName("2")
-    ACTRESS,
+    ACTOR,
 
     @SerializedName("3")
     GENERAL

@@ -20,11 +20,10 @@ class ApiRepository(private val apiService: ApiService) {
         const val FILE = "file"
         const val MEDIA_TYPE_IMAGE = "image/*"
         const val X_REQUESTED_FROM = "X-Requested-From"
+        const val NETWORK_PAGE_SIZE = 20
         fun isRefreshTokenFailed(code: String?): Boolean {
             return code == TOKEN_NOT_FOUND
         }
-
-        const val NETWORK_PAGE_SIZE = 20
     }
 
     /**********************************************************
@@ -224,6 +223,7 @@ class ApiRepository(private val apiService: ApiService) {
     ) = apiService.resendEmail(body)
 
     suspend fun followPost(userId: Long): Response<Void> {
+        Timber.i("userId=$userId")
         return apiService.followPost(userId)
     }
 
@@ -244,6 +244,15 @@ class ApiRepository(private val apiService: ApiService) {
      *                  Members/Post
      *
      ***********************************************************/
+    suspend fun getMembersPost(
+            type: PostType,
+            orderBy: OrderBy,
+            offset: Int,
+            limit: Int
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
+        return apiService.getMembersPost(type.value, offset, limit, orderBy = orderBy.value)
+    }
+
     suspend fun getMembersPost(
         type: PostType,
         offset: Int,
@@ -412,31 +421,24 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得熱門影片
      */
     suspend fun statisticsHomeVideos(
-        statisticsType: StatisticsType = StatisticsType.MONTH,
-        category: String? = null,
-        isAdult: Boolean,
+        startTime: String = "2018-12-01T10:00:05Z",
+        endTime: String = "2020-11-24T10:00:05Z",
+        orderByType: StatisticsOrderType = StatisticsOrderType.HOTTEST,
+        category: String? = "",
+        tags: String? = "",
+        isAdult: Boolean = true,
+        isRandom: Boolean = false,
         offset: Int,
         limit: Int
     ) = apiService.statisticsHomeVideos(
-        orderByType = statisticsType.value,
-        category = category,
-        isAdult = isAdult,
-        offset = offset,
-        limit = limit
-    )
-
-    /**
-     * 取得熱門影片
-     */
-    suspend fun statisticsHomeVideos(
-        orderByType: OrderBy,
-        category: String? = null,
-        offset: Long,
-        limit: Int
-    ) = apiService.statisticsHomeVideos(
+        startTime = startTime,
+        endTime = endTime,
         orderByType = orderByType.value,
         category = category,
-        offset = offset.toInt(),
+        tags = tags,
+        isAdult = isAdult,
+        isRandom = isRandom,
+        offset = offset,
         limit = limit
     )
 
@@ -463,6 +465,24 @@ class ApiRepository(private val apiService: ApiService) {
     ) = apiService.sendVideoReport(
         body
     )
+
+    /**********************************************************
+     *
+     *                   Members/Home/Actors
+     *
+     ***********************************************************/
+    /**
+     * 取得女優頁面
+     */
+    suspend fun getActors() = apiService.getActors()
+
+    /**
+     * 取得女優分頁資料
+     */
+    suspend fun getActorsList(
+        offset: String,
+        limit: String
+    ) = apiService.getActorsList(offset, limit)
 
     /**********************************************************
      *
@@ -871,9 +891,22 @@ class ApiRepository(private val apiService: ApiService) {
 
     /**********************************************************
      *
-     *                   Members/Home/Menu
+     *                  Members/Home/Menu
      *
      ***********************************************************/
     suspend fun getMenu() = apiService.getMenu()
+
+    /**********************************************************
+     *
+     *          Members/Home/Videos/SearchWithCategory
+     *
+     ***********************************************************/
+    suspend fun getVideoByCategory(
+        category: String,
+        offset: String,
+        limit: String
+    ) = apiService.getVideoByCategory(
+        true, category, offset, limit
+    )
 }
 

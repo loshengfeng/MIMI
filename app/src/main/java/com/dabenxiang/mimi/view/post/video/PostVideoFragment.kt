@@ -152,7 +152,7 @@ class PostVideoFragment : BasePostFragment() {
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
             bundle.putSerializable(SearchPostFragment.KEY_DATA, searchPostItem)
             findNavController().navigate(
-                R.id.action_postVideoFragment_to_clubDetailFragment,
+                R.id.action_postVideoFragment_to_topicDetailFragment,
                 bundle
             )
         } else {
@@ -317,7 +317,7 @@ class PostVideoFragment : BasePostFragment() {
         } else if (isEdit && page == SEARCH) {
             Navigation.findNavController(requireView()).popBackStack(R.id.searchPostFragment, false)
         } else if (isEdit && page == CLUB) {
-            Navigation.findNavController(requireView()).popBackStack(R.id.clubDetailFragment, false)
+            Navigation.findNavController(requireView()).popBackStack(R.id.topicDetailFragment, false)
         } else {
             Navigation.findNavController(requireView()).popBackStack(R.id.adultHomeFragment, false)
         }

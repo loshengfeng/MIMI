@@ -8,14 +8,15 @@ import androidx.paging.PagingData
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.adapter.ClubTabAdapter
-import com.dabenxiang.mimi.view.club.topic.TopicItemListener
-import com.dabenxiang.mimi.view.club.topic.TopicListAdapter
+import com.dabenxiang.mimi.view.club.adapter.TopicItemListener
+import com.dabenxiang.mimi.view.club.adapter.TopicListAdapter
+import com.dabenxiang.mimi.view.club.topic.TopicDetailFragment
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_tab_club.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -34,8 +35,14 @@ class ClubTabFragment : BaseFragment() {
 
     private val topicListAdapter by lazy {
         TopicListAdapter(object : TopicItemListener {
-            override fun itemClicked(drink: MemberClubItem, position: Int) {
-                    //TODO
+            override fun itemClicked(clubItem: MemberClubItem, position: Int) {
+                val bundle = TopicDetailFragment.createBundle(clubItem)
+                navigateTo(
+                        NavigateItem.Destination(
+                                R.id.action_clubTabFragment_to_topicDetailFragment,
+                                bundle
+                        )
+                )
             }
 
         })

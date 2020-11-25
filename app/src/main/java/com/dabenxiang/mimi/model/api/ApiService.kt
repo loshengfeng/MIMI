@@ -274,7 +274,8 @@ interface ApiService {
         @Query("orderBy") orderBy: Int = 1,
         @Query("isAdult") isAdult: Boolean = true,
         @Query("isFullContent") isFullContent: Boolean = false,
-        @Query("status") status: Int = 1
+        @Query("status") status: Int = 1,
+        @Query("type") type: Int =7
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     @POST("/v1/Members/Club/{clubId}/Follow")
@@ -331,12 +332,16 @@ interface ApiService {
 
     @GET("/v1/Members/Home/Videos/Statistics")
     suspend fun statisticsHomeVideos(
+        @Query("startTime") startTime: String?,
+        @Query("endTime") endTime: String?,
         @Query("orderByType") orderByType: Int?,
         @Query("category") category: String?,
-        @Query("isAdult") isAdult: Boolean?= true,
+        @Query("tags") tags: String?,
+        @Query("isAdult") isAdult: Boolean,
+        @Query("isRandom") isRandom: Boolean,
         @Query("offset") offset: Int,
         @Query("limit") limit: Int
-    ): Response<ApiBasePagingItem<List<StatisticsItem>>>
+    ): Response<ApiBasePagingItem<ArrayList<StatisticsItem>>>
 
     @GET("/v1/Members/Home/Videos/PostStatistics")
     suspend fun getRankingList(
@@ -350,6 +355,20 @@ interface ApiService {
     suspend fun sendVideoReport(
         @Body body: ReportRequest
     ): Response<Void>
+
+    /**********************************************************
+     *
+     *                  Members/Home/Actors
+     *
+     ***********************************************************/
+    @GET("/v1/Members/Home/Actors")
+    suspend fun getActors(): Response<ApiBaseItem<ActorsItem>>
+
+    @GET("/v1/Members/Home/Actors/ActorsList")
+    suspend fun getActorsList(
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ): Response<ApiBaseItem<ActorsItem>>
 
 
     /**********************************************************
@@ -708,4 +727,19 @@ interface ApiService {
      ***********************************************************/
     @GET("/v1/Members/Home/Menu")
     suspend fun getMenu(): Response<ApiBaseItem<List<MenuItem>>>
+
+
+    /**********************************************************
+     *
+     *                   Members/Home/Videos/SearchWithCategory
+     *
+     ***********************************************************/
+    @GET("/v1/Members/Home/Videos/SearchWithCategory")
+    suspend fun getVideoByCategory(
+        @Query("isAdult") isAdult: Boolean,
+        @Query("category") category: String,
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ): Response<ApiBasePagingItem<ArrayList<VideoByCategoryItem>>>
+
 }

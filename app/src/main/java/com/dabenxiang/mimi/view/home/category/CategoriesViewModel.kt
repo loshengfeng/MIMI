@@ -8,7 +8,7 @@ import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.enums.OrderBy
+import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.home.video.VideoDataSource
@@ -35,7 +35,7 @@ class CategoriesViewModel : BaseViewModel() {
         viewModelScope.launch {
             val dataSrc =
                 CategoriesDataSource(
-                    orderByType = if (sorting == 0) OrderBy.NEWEST else OrderBy.HOTTEST,
+                    orderByType = if (sorting == 0) StatisticsOrderType.LATEST else StatisticsOrderType.HOTTEST,
                     category = category,
                     viewModelScope = viewModelScope,
                     domainManager = domainManager,
@@ -68,9 +68,7 @@ class CategoriesViewModel : BaseViewModel() {
                 .flowOn(Dispatchers.IO)
                 .onStart { setShowProgress(true) }
                 .onCompletion { setShowProgress(false) }
-                .catch { e -> //emit(ApiResult.error(e))
-                    e.printStackTrace()
-                     }
+                .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _getCategoryResult.value = it }
         }
     }

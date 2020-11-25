@@ -14,7 +14,6 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import retrofit2.HttpException
-import timber.log.Timber
 import java.util.*
 
 class AccountManager(
@@ -60,7 +59,6 @@ class AccountManager(
 
     fun getMemberTokenResult(): TokenResult {
         val tokenData = pref.memberToken
-        Timber.i("getMemberTokenResult tokenData:$tokenData")
         return when {
             tokenData.expiresTimestamp == 0L -> TokenResult.EMPTY
             tokenData.accessToken.isEmpty() -> TokenResult.EMPTY

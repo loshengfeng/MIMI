@@ -125,6 +125,7 @@ abstract class BaseFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        mainViewModel?.setNavTransparent(isNavTransparent)
         statusBarVisibility()
         setUpStatusBarColor()
 
@@ -548,11 +549,11 @@ abstract class BaseFragment : Fragment() {
 
     abstract fun getLayoutId(): Int
 
-    open fun setupObservers(){}
+    open fun setupObservers() {}
 
-    open fun setupListeners(){}
+    open fun setupListeners() {}
 
-    open fun setupFirstTime(){}
+    open fun setupFirstTime() {}
 
     open fun statusBarVisibility() {
         requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
@@ -568,6 +569,8 @@ abstract class BaseFragment : Fragment() {
     open fun initSettings() {}
 
     open val bottomNavigationVisibility: Int = View.VISIBLE
+
+    open val isNavTransparent: Boolean = false
 
     open fun navigateTo(item: NavigateItem) {
         lifecycleScope.launch {

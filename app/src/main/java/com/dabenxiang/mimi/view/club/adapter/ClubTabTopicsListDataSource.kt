@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.topic
+package com.dabenxiang.mimi.view.club.adapter
 
 import androidx.paging.PagingSource
 import com.dabenxiang.mimi.callback.PagingCallback
@@ -6,7 +6,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.manager.DomainManager
 import retrofit2.HttpException
 
-class TopicListDataSource constructor(
+class ClubTabTopicsListDataSource constructor(
     private val domainManager: DomainManager,
     private val pagingCallback: PagingCallback
 ) : PagingSource<Long, MemberClubItem>() {

@@ -13,10 +13,7 @@ import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
@@ -40,6 +37,8 @@ class ClubFollowViewModel : BaseViewModel() {
                 }
         )
                 .flow
+                .onStart {  setShowProgress(true) }
+                .onCompletion { setShowProgress(false) }
                 .cachedIn(viewModelScope)
     }
 
@@ -57,6 +56,7 @@ class ClubFollowViewModel : BaseViewModel() {
     }
 
     private val pagingCallback = object : PagingCallback {
+
         override fun onTotalCount(count: Long) {
             _clubCount.postValue(count.toInt())
         }

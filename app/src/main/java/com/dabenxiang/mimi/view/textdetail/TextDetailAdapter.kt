@@ -63,7 +63,7 @@ class TextDetailAdapter(
             }
             VIEW_TYPE_TEXT_DETAIL -> {
                 mView = LayoutInflater.from(context)
-                    .inflate(R.layout.item_text_detail, parent, false)
+                    .inflate(R.layout.item_club_text_detail, parent, false)
                 TextDetailViewHolder(mView)
             }
             VIEW_TYPE_COMMENT_TITLE -> {

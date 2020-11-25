@@ -2,9 +2,9 @@ package com.dabenxiang.mimi.view.ranking
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.model.enums.StatisticsType
+import com.dabenxiang.mimi.model.manager.DomainManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -33,7 +33,6 @@ class RankingVideosDataSource constructor(
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().statisticsHomeVideos(
-                    statisticsType=statisticsType,
                     isAdult = true,
                     offset = 0,
                     limit = PER_LIMIT_LONG.toInt()
@@ -72,7 +71,6 @@ class RankingVideosDataSource constructor(
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().statisticsHomeVideos(
-                    statisticsType=statisticsType,
                     isAdult = true,
                     offset = 0,
                     limit = PER_LIMIT_LONG.toInt()

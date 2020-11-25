@@ -12,6 +12,9 @@ enum class PostType(val value: Int) {
     @SerializedName("4")
     VIDEO(4),
 
+    @SerializedName("7")
+    TEXT_IMAGE_VIDEO(7),
+
     @SerializedName("8")
     VIDEO_ON_DEMAND(8),
 

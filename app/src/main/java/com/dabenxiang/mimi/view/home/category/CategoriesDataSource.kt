@@ -3,7 +3,7 @@ package com.dabenxiang.mimi.view.home.category
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.vo.AdItem
-import com.dabenxiang.mimi.model.enums.OrderBy
+import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.model.vo.statisticsItemToVideoItem
@@ -15,13 +15,13 @@ import retrofit2.HttpException
 
 class CategoriesDataSource(
     private val category: String?,
-    private val orderByType: OrderBy,
+    private val orderByType: StatisticsOrderType,
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
     private val pagingCallback: PagingCallback,
     private val adWidth: Int,
     private val adHeight: Int
-) : PageKeyedDataSource<Long, BaseVideoItem>() {
+) : PageKeyedDataSource<Int, BaseVideoItem>() {
 
     companion object {
         const val PER_LIMIT = 20
@@ -29,12 +29,12 @@ class CategoriesDataSource(
 
     private data class LoadResult(
         val list: List<BaseVideoItem>,
-        val nextKey: Long?
+        val nextKey: Int?
     )
 
     override fun loadInitial(
-        params: LoadInitialParams<Long>,
-        callback: LoadInitialCallback<Long, BaseVideoItem>
+        params: LoadInitialParams<Int>,
+        callback: LoadInitialCallback<Int, BaseVideoItem>
     ) {
         viewModelScope.launch {
             flow {
@@ -59,7 +59,7 @@ class CategoriesDataSource(
                         item?.paging?.count ?: 0,
                         item?.paging?.offset ?: 0,
                         videos?.size ?: 0
-                    ) -> PER_LIMIT.toLong()
+                    ) -> PER_LIMIT
                     else -> null
                 }
                 emit(LoadResult(returnList, nextPageKey))
@@ -75,8 +75,8 @@ class CategoriesDataSource(
     }
 
     override fun loadAfter(
-        params: LoadParams<Long>,
-        callback: LoadCallback<Long, BaseVideoItem>
+        params: LoadParams<Int>,
+        callback: LoadCallback<Int, BaseVideoItem>
     ) {
         val next = params.key
         viewModelScope.launch {
@@ -115,11 +115,7 @@ class CategoriesDataSource(
         }
     }
 
-    override fun loadBefore(
-        params: LoadParams<Long>,
-        callback: LoadCallback<Long, BaseVideoItem>
-    ) {
-
+    override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, BaseVideoItem>) {
     }
 
     private fun hasNextPage(total: Long, offset: Long, currentSize: Int): Boolean {

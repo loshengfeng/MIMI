@@ -38,8 +38,11 @@ data class SecondMenuItem(
     @SerializedName("sorting")
     val sorting: Int = 0,
 
+    @SerializedName("category")
+    val category: String = "",
+
     @SerializedName("menus")
-    val menus: List<ThirdMenuItem> = arrayListOf()
+    var menus: ArrayList<ThirdMenuItem> = arrayListOf()
 )
 
 data class ThirdMenuItem(
@@ -76,6 +79,8 @@ data class ThirdMenuItem(
 
     @SerializedName("videos")
     val videos: List<RecommendVideoItem> = arrayListOf(),
+
+    val adItem: AdItem? = null
 )
 
 data class RecommendVideoItem(

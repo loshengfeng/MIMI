@@ -15,8 +15,12 @@ import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
+import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import kotlinx.android.synthetic.main.fragment_follow.*
+import kotlinx.android.synthetic.main.fragment_club_follow.*
 import kotlinx.android.synthetic.main.item_ad.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,10 +38,14 @@ class ClubPostFollowFragment : BaseFragment() {
         ClubPostFollowAdapter(requireActivity(), postListener, "", memberPostFuncItem)
     }
 
-    override fun getLayoutId() = R.layout.fragment_follow
+    override fun getLayoutId() = R.layout.fragment_club_follow
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        Timber.i("ClubPostFollowFragment onAttach")
+        viewModel.showProgress.observe(this, {
+            layout_refresh.isRefreshing = it
+        })
 
         viewModel.clubCount.observe(this, {
             if(it <=0) {
@@ -47,6 +55,7 @@ class ClubPostFollowFragment : BaseFragment() {
                 id_empty_group.visibility =View.GONE
                 recycler_view.visibility = View.VISIBLE
             }
+            layout_refresh.isRefreshing = false
         })
 
         viewModel.adResult.observe(this, {
@@ -81,6 +90,10 @@ class ClubPostFollowFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recycler_view.adapter = adapter
+        layout_refresh.setOnRefreshListener {
+            layout_refresh.isRefreshing = false
+            getData()
+        }
     }
 
     override fun onResume() {
@@ -119,16 +132,31 @@ class ClubPostFollowFragment : BaseFragment() {
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
             when (adultTabType) {
                 AdultTabType.PICTURE -> {
-//                    val bundle = PictureDetailFragment.createBundle(item, 0)
-//                    navigationToPicture(bundle)
+                    val bundle = PictureDetailFragment.createBundle(item, 0)
+                    navigateTo(
+                            NavigateItem.Destination(
+                                    R.id.action_clubTabFragment_to_clubPicDetailFragment,
+                                    bundle
+                            )
+                    )
                 }
                 AdultTabType.TEXT -> {
-//                    val bundle = TextDetailFragment.createBundle(item, 0)
-//                    navigationToText(bundle)
+                    val bundle = TextDetailFragment.createBundle(item, 0)
+                    navigateTo(
+                            NavigateItem.Destination(
+                                    R.id.action_clubTabFragment_to_clubTextDetailFragment,
+                                    bundle
+                            )
+                    )
                 }
                 AdultTabType.CLIP -> {
-//                    val bundle = ClipFragment.createBundle(arrayListOf(item), 0)
-//                    navigationToClip(bundle)
+                    val bundle = ClipFragment.createBundle(arrayListOf(item), 0)
+//                    navigateTo(
+//                            NavigateItem.Destination(
+//                                    R.id.action_myPostFragment_to_clipFragment,
+//                                    bundle
+//                            )
+//                    )
                 }
                 else -> {
                 }
@@ -155,5 +183,4 @@ class ClubPostFollowFragment : BaseFragment() {
                     }
         }
     }
-
 }
