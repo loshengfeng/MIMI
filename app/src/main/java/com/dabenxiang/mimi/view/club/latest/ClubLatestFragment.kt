@@ -99,7 +99,7 @@ class ClubLatestFragment : BaseFragment() {
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
                     NavigateItem.Destination(
-                            R.id.action_myPostFragment_to_searchPostFragment,
+                            R.id.action_clubTabFragment_to_searchPostFragment,
                             bundle
                     )
             )
