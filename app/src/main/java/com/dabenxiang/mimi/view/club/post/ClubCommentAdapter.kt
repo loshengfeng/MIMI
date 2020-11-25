@@ -178,7 +178,6 @@ class ClubCommentAdapter(
 
     interface OnTextDetailListener {
         fun onGetAttachment(id: Long?, view: ImageView)
-        fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean)
         fun onGetCommandInfo(adapter: CommentAdapter, type: CommentType)
         fun onGetReplyCommand(parentNode: RootCommentNode, succeededBlock: () -> Unit)
         fun onCommandLike(commentId: Long?, isLike: Boolean, succeededBlock: () -> Unit)

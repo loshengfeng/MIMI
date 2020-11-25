@@ -1,17 +1,18 @@
 package com.dabenxiang.mimi.view.club.post
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.dabenxiang.mimi.event.SingleLiveEvent
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.ApiBaseItem
-import com.dabenxiang.mimi.model.api.vo.LikeRequest
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.CommentDataSource
+import com.dabenxiang.mimi.view.player.NestedCommentNode
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -34,6 +35,19 @@ class ClubTextDetailViewModel: BaseViewModel() {
 
     private var _followPostResult = MutableLiveData<ApiResult<Int>>()
     val followPostResult: LiveData<ApiResult<Int>> = _followPostResult
+
+    private val _replyCommentResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
+    val replyCommentResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _replyCommentResult
+
+    private val _commentLikeResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
+    val commentLikeResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _commentLikeResult
+
+    private val _commentDeleteLikeResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
+    val commentDeleteLikeResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> =
+        _commentDeleteLikeResult
+
+    private val _postCommentResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
+    val postCommentResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _postCommentResult
 
     fun getPostDetail(item: MemberPostItem) {
         viewModelScope.launch {
@@ -58,7 +72,10 @@ class ClubTextDetailViewModel: BaseViewModel() {
             dataSrc.loadMore().also { load ->
                 withContext(Dispatchers.Main) {
                     load.content?.let { list ->
-                        val finalList = list.map { item -> RootCommentNode(item) }
+                        val finalList = list.map { item ->
+                            Log.d("arvin", "item : " + item)
+                            RootCommentNode(item)
+                        }
                         adapter.setList(finalList)
                     }
                 }
@@ -199,6 +216,107 @@ class ClubTextDetailViewModel: BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _followPostResult.value = it }
+        }
+    }
+
+    fun getReplyComment(parentNode: RootCommentNode, item: MemberPostItem) {
+        viewModelScope.launch {
+            flow {
+                var isFirst = true
+                var total = 0L
+                var offset = 0L
+                var currentSize = 0
+                while (isFirst || replyCommentHasNextPage(total, offset, currentSize)) {
+                    isFirst = false
+                    currentSize = 0
+
+                    val apiRepository = domainManager.getApiRepository()
+                    val response = apiRepository.getMembersPostComment(
+                        postId = item.id,
+                        parentId = parentNode.data.id,
+                        sorting = 1,
+                        offset = "0",
+                        limit = "50"
+                    )
+                    if (!response.isSuccessful) throw HttpException(response)
+
+                    parentNode.nestedCommentList.clear()
+                    response.body()?.content?.map {
+                        NestedCommentNode(parentNode, it)
+                    }?.also {
+                        parentNode.nestedCommentList.addAll(it)
+                        val pagingItem = response.body()?.paging
+                        total = pagingItem?.count ?: 0L
+                        offset = pagingItem?.offset ?: 0L
+                        currentSize = it.size
+                    }
+
+                    if (currentSize == 0) {
+                        break
+                    }
+                }
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _replyCommentResult.value = SingleLiveEvent(it) }
+        }
+    }
+
+    fun postCommentLike(commentId: Long, type: LikeType, item: MemberPostItem) {
+        viewModelScope.launch {
+            flow {
+                val request = PostLikeRequest(type.value)
+                val apiRepository = domainManager.getApiRepository()
+                val resp = apiRepository.postMembersPostCommentLike(item.id, commentId, request)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _commentLikeResult.value = SingleLiveEvent(it) }
+        }
+    }
+
+    fun deleteCommentLike(commentId: Long, item: MemberPostItem) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val resp = apiRepository.deleteMembersPostCommentLike(item.id, commentId)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _commentDeleteLikeResult.value = SingleLiveEvent(it) }
+        }
+    }
+
+    fun postComment(postId: Long, replyId: Long?, comment: String) {
+        viewModelScope.launch {
+            flow {
+                val request = PostCommentRequest(replyId, comment)
+                val resp = domainManager.getApiRepository().postMembersPostComment(postId, request)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _postCommentResult.value = SingleLiveEvent(it) }
+        }
+    }
+
+    private fun replyCommentHasNextPage(total: Long, offset: Long, currentSize: Int): Boolean {
+        return when {
+            currentSize < 50 -> false
+            offset >= total -> false
+            else -> true
         }
     }
 }
