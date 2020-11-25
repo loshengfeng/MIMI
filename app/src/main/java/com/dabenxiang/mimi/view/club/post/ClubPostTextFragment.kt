@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.club.post
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
@@ -19,6 +20,7 @@ import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import kotlinx.android.synthetic.main.fragment_club_post_text.*
+import timber.log.Timber
 
 class ClubPostTextFragment : BaseFragment() {
 
@@ -30,6 +32,11 @@ class ClubPostTextFragment : BaseFragment() {
         viewModel.textPostItemListResult.observe(this, Observer {
             textPostPagedAdapter.submitList(it)
         })
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        Timber.i("ClubPostTextFragment onAttach")
     }
 
     override fun setupListeners() {

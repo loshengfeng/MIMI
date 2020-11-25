@@ -40,6 +40,10 @@ class ClubLatestFragment : BaseFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        Timber.i("ClubLatestFragment onAttach")
+        viewModel.clubCount.observe(this, Observer {
+
+        })
 
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
