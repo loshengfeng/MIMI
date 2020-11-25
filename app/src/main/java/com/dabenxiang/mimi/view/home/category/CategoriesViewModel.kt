@@ -8,64 +8,42 @@ import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.Category
-import com.dabenxiang.mimi.model.api.vo.VideoSearchItem
+import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.home.video.VideoDataSource
-import com.dabenxiang.mimi.view.home.video.VideoFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import timber.log.Timber
 
 class CategoriesViewModel : BaseViewModel() {
 
     private val _videoList = MutableLiveData<PagedList<BaseVideoItem>>()
     val videoList: LiveData<PagedList<BaseVideoItem>> = _videoList
 
-    private val _filterList = MutableLiveData<PagedList<BaseVideoItem>>()
-    val filterList: LiveData<PagedList<BaseVideoItem>> = _filterList
-
-    private val _filterCategoryResult = MutableLiveData<Category>()
-    val filterCategoryResult: LiveData<Category> = _filterCategoryResult
-
-    private val _getCategoryDetailResult = MutableLiveData<ApiResult<VideoSearchItem>>()
-    val getCategoryDetailResult: LiveData<ApiResult<VideoSearchItem>> = _getCategoryDetailResult
+    private val _getCategoryResult = MutableLiveData<ApiResult<ArrayList<String>>>()
+    val getCategoryResult: LiveData<ApiResult<ArrayList<String>>> = _getCategoryResult
 
     private val _onTotalCountResult = MutableLiveData<Long>()
     val onTotalCountResult: LiveData<Long> = _onTotalCountResult
 
-    private val filterPositionDataList by lazy {
-        val map = mutableMapOf<Int, MutableLiveData<Int?>>()
-        repeat(3) {
-            map[it] = MutableLiveData()
-        }
-        return@lazy map
-    }
-
-    fun filterPositionData(index: Int): LiveData<Int?>? = filterPositionDataList[index]
-
-    fun updatedFilterPosition(index: Int, position: Int?) {
-        filterPositionDataList[index]?.value = position
-    }
-
-    fun setupVideoList(category: String?, isAdult: Boolean) {
+    fun getVideoFilterList(
+        category: String?,
+        sorting: Int
+    ) {
         viewModelScope.launch {
             val dataSrc =
-                VideoDataSource(
-                    isAdult,
-                    category,
-                    viewModelScope,
-                    domainManager,
-                    pagingCallback,
-                    adWidth,
-                    adHeight,
-                        false
+                CategoriesDataSource(
+                    orderByType = if (sorting == 0) StatisticsOrderType.LATEST else StatisticsOrderType.HOTTEST,
+                    category = category,
+                    viewModelScope = viewModelScope,
+                    domainManager = domainManager,
+                    pagingCallback = pagingCallback,
+                    adWidth = adWidth,
+                    adHeight = adHeight
                 )
-            val factory =
-                VideoFactory(dataSrc)
+            val factory = CategoriesFactory(dataSrc)
             val config = PagedList.Config.Builder()
                 .setPageSize(VideoDataSource.PER_LIMIT.toInt())
                 .build()
@@ -76,50 +54,22 @@ class CategoriesViewModel : BaseViewModel() {
         }
     }
 
-    fun getVideoFilterList(category: String?, country: String?, years: String?, isAdult: Boolean, tag: String = "") {
-        viewModelScope.launch {
-            val dataSrc =
-                CategoriesDataSource(
-                    isAdult = isAdult,
-                    category = category,
-                    country = country,
-                    years = years,
-                    viewModelScope = viewModelScope,
-                    domainManager = domainManager,
-                    pagingCallback = pagingCallback,
-                    adWidth = adWidth,
-                    adHeight = adHeight,
-                    tag = tag
-                )
-            val factory =
-                CategoriesFactory(dataSrc)
-            val config = PagedList.Config.Builder()
-                .setPageSize(VideoDataSource.PER_LIMIT.toInt())
-                .build()
-
-            LivePagedListBuilder(factory, config).build().asFlow().collect {
-                _filterList.postValue(it)
-            }
-        }
-    }
-
-    fun getCategoryDetail(category: String, isAdult: Boolean) {
+    fun getCategory() {
         viewModelScope.launch {
             flow {
-                val resp = domainManager.getApiRepository().searchHomeVideos(
-                    category = category,
-                    isAdult = isAdult,
-                    offset = "0",
-                    limit = "1"
-                )
+                val resp = domainManager.getApiRepository().fetchCategories()
                 if (!resp.isSuccessful) throw HttpException(resp)
-                emit(ApiResult.success(resp.body()?.content))
+                val categories = arrayListOf<String>()
+                resp.body()?.content?.get(0)?.categories?.forEach {
+                    categories.add(it.name)
+                }
+                emit(ApiResult.success(categories))
             }
                 .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
+                .onStart { setShowProgress(true) }
+                .onCompletion { setShowProgress(false) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _getCategoryDetailResult.value = it }
+                .collect { _getCategoryResult.value = it }
         }
     }
 
@@ -137,10 +87,6 @@ class CategoriesViewModel : BaseViewModel() {
 
         override fun onTotalCount(count: Long) {
             _onTotalCountResult.postValue(count)
-        }
-
-        override fun onGetCategory(category: Category?) {
-            category?.also { _filterCategoryResult.value = it }
         }
     }
 }

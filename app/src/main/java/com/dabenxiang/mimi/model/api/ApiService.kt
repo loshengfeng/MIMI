@@ -302,6 +302,9 @@ interface ApiService {
     @GET("/v1/Members/Home/Categories")
     suspend fun fetchHomeCategories(): Response<ApiBaseItem<RootCategoriesItem>>
 
+    @GET("/v1/Members/Home/Categories")
+    suspend fun fetchHomeCategories(@Query("parentId") parentId: Int): Response<ApiBaseItem<ArrayList<CategoriesItem>>>
+
     /**********************************************************
      *
      *                  Members/Home/Videos
@@ -352,6 +355,20 @@ interface ApiService {
     suspend fun sendVideoReport(
         @Body body: ReportRequest
     ): Response<Void>
+
+    /**********************************************************
+     *
+     *                  Members/Home/Actors
+     *
+     ***********************************************************/
+    @GET("/v1/Members/Home/Actors")
+    suspend fun getActors(): Response<ApiBaseItem<ActorsItem>>
+
+    @GET("/v1/Members/Home/Actors/ActorsList")
+    suspend fun getActorsList(
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ): Response<ApiBaseItem<ActorsItem>>
 
 
     /**********************************************************

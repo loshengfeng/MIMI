@@ -4,10 +4,9 @@ import android.view.View
 import android.widget.TextView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
-import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import kotlinx.android.synthetic.main.item_filter.view.*
 
-class FilterTabHolder(itemView: View, listener: FilterTabHolderListener, var isAdult: Boolean) :
+class FilterTabHolder(itemView: View, listener: FilterTabHolderListener) :
     BaseIndexViewHolder<String>(itemView, object : IndexViewHolderListener {
         override fun onClickItemIndex(view: View, index: Int) {}
     }) {
@@ -26,7 +25,7 @@ class FilterTabHolder(itemView: View, listener: FilterTabHolderListener, var isA
     }
 
     override fun updated(model: String?) {
-        if (model == CategoriesFragment.TEXT_ALL && index == 0) {
+        if (model == itemView.context.getString(R.string.all) && index == 0) {
             tvTitle.visibility = View.GONE
         } else {
             tvTitle.visibility = View.VISIBLE

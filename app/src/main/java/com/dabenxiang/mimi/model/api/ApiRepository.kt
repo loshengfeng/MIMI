@@ -383,6 +383,10 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得影片類別清單
      */
     suspend fun fetchHomeCategories() = apiService.fetchHomeCategories()
+    /**
+     * 取得影片次類別清單
+     */
+    suspend fun fetchCategories() = apiService.fetchHomeCategories(202)
 
     /**********************************************************
      *
@@ -419,10 +423,10 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun statisticsHomeVideos(
         startTime: String = "2018-12-01T10:00:05Z",
         endTime: String = "2020-11-24T10:00:05Z",
-        orderByType: StatisticsOrderType = StatisticsOrderType.HOTEST,
+        orderByType: StatisticsOrderType = StatisticsOrderType.HOTTEST,
         category: String? = "",
         tags: String? = "",
-        isAdult: Boolean = false,
+        isAdult: Boolean = true,
         isRandom: Boolean = false,
         offset: Int,
         limit: Int
@@ -461,6 +465,24 @@ class ApiRepository(private val apiService: ApiService) {
     ) = apiService.sendVideoReport(
         body
     )
+
+    /**********************************************************
+     *
+     *                   Members/Home/Actors
+     *
+     ***********************************************************/
+    /**
+     * 取得女優頁面
+     */
+    suspend fun getActors() = apiService.getActors()
+
+    /**
+     * 取得女優分頁資料
+     */
+    suspend fun getActorsList(
+        offset: String,
+        limit: String
+    ) = apiService.getActorsList(offset, limit)
 
     /**********************************************************
      *
