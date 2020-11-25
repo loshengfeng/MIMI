@@ -10,6 +10,7 @@ import androidx.paging.PagedList
 import com.dabenxiang.mimi.callback.MyFollowPagingCallback
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LikeType
@@ -21,6 +22,9 @@ import retrofit2.HttpException
 import timber.log.Timber
 
 class ClubRecommendViewModel : BaseViewModel() {
+
+    private val _adResult = MutableLiveData<ApiResult<AdItem>>()
+    val adResult: LiveData<ApiResult<AdItem>> = _adResult
 
     private val _clubCount = MutableLiveData<Int>()
     val clubCount: LiveData<Int> = _clubCount
@@ -36,9 +40,6 @@ class ClubRecommendViewModel : BaseViewModel() {
 
     private var _favoriteResult = MutableLiveData<ApiResult<Int>>()
     val favoriteResult: LiveData<ApiResult<Int>> = _favoriteResult
-
-    private var _isNoData = MutableLiveData<Boolean>().also { it.value = false }
-    val isNoData: LiveData<Boolean> = _isNoData
 
     private val _clubIdList = ArrayList<Long>()
 
@@ -71,6 +72,19 @@ class ClubRecommendViewModel : BaseViewModel() {
         return LivePagedListBuilder(dataSourceFactory, config).build()
     }
 
+    fun getAd() {
+        viewModelScope.launch {
+            flow {
+                val adResult = domainManager.getAdRepository().getAD(adWidth, adHeight)
+                if (!adResult.isSuccessful) throw HttpException(adResult)
+                emit(ApiResult.success(adResult.body()?.content))
+            }
+                    .flowOn(Dispatchers.IO)
+                    .collect { _adResult.value = it}
+        }
+
+    }
+
     private val pagingCallback = object : PagingCallback {
         override fun onLoading() {
             setShowProgress(true)
@@ -82,15 +96,11 @@ class ClubRecommendViewModel : BaseViewModel() {
 
         override fun onThrowable(throwable: Throwable) {
             Timber.e(throwable)
+            _clubCount.postValue(0)
         }
 
         override fun onCurrentItemCount(count: Long, isInitial: Boolean) {
-            totalCount = if (isInitial) count.toInt()
-            else totalCount.plus(count.toInt())
-            if (isInitial) cleanRemovedPosList()
-            if (totalCount == 0) {
-                _isNoData.value = true
-            }
+            _clubCount.postValue(count.toInt())
         }
     }
 

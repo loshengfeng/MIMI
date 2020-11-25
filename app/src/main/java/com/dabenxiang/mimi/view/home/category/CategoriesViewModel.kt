@@ -35,7 +35,7 @@ class CategoriesViewModel : BaseViewModel() {
         viewModelScope.launch {
             val dataSrc =
                 CategoriesDataSource(
-                    orderByType = if (sorting == 0) StatisticsOrderType.LATEST else StatisticsOrderType.HOTTEST,
+                    orderByType = sorting,
                     category = category,
                     viewModelScope = viewModelScope,
                     domainManager = domainManager,

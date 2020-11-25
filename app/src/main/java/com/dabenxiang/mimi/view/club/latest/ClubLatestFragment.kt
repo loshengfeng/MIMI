@@ -7,6 +7,7 @@ import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
@@ -18,7 +19,6 @@ import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
-import com.dabenxiang.mimi.view.adapter.MyPostPagedAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
@@ -27,6 +27,10 @@ import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_latest.*
+import kotlinx.android.synthetic.main.fragment_club_latest.id_empty_group
+import kotlinx.android.synthetic.main.fragment_club_latest.layout_refresh
+import kotlinx.android.synthetic.main.fragment_club_latest.recycler_view
+import kotlinx.android.synthetic.main.item_ad.view.*
 import timber.log.Timber
 
 class ClubLatestFragment : BaseFragment() {
@@ -40,10 +44,6 @@ class ClubLatestFragment : BaseFragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         Timber.i("ClubLatestFragment onAttach")
-        viewModel.clubCount.observe(this, Observer {
-
-        })
-
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
 
@@ -99,7 +99,7 @@ class ClubLatestFragment : BaseFragment() {
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
                     NavigateItem.Destination(
-                            R.id.action_myPostFragment_to_searchPostFragment,
+                            R.id.action_clubTabFragment_to_searchPostFragment,
                             bundle
                     )
             )
@@ -109,11 +109,24 @@ class ClubLatestFragment : BaseFragment() {
             when (adultTabType) {
                 AdultTabType.PICTURE -> {
                     val bundle = PictureDetailFragment.createBundle(item, 0)
-//                    navigationToPicture(bundle)
+                    navigateTo(
+                            NavigateItem.Destination(
+                                    R.id.action_clubTabFragment_to_clubPicDetailFragment,
+                                    bundle
+                            )
+                    )
                 }
                 AdultTabType.TEXT -> {
                     val bundle = TextDetailFragment.createBundle(item, 0)
-//                    navigationToText(bundle)
+                    navigateTo(
+                            NavigateItem.Destination(
+                                    R.id.action_clubTabFragment_to_clubTextDetailFragment,
+                                    bundle
+                            )
+                    )
+                }
+                AdultTabType.CLIP -> {
+                    //todo 跳轉到短視頻內頁
                 }
             }
         }
@@ -154,6 +167,11 @@ class ClubLatestFragment : BaseFragment() {
     }
 
     override fun initSettings() {
+        layout_refresh.setOnRefreshListener {
+            layout_refresh.isRefreshing = false
+            getData()
+        }
+
         adapter = ClubLatestAdapter(requireContext(),
                 false,
                 postListener,
@@ -165,12 +183,47 @@ class ClubLatestFragment : BaseFragment() {
 
     override fun setupFirstTime() {
         initSettings()
-        viewModel.getPostItemList()
+        getData()
     }
 
     override fun setupObservers() {
-        viewModel.clubCount.observe(viewLifecycleOwner, Observer {
+        viewModel.adResult.observe(this, {
+            when (it) {
+                is ApiResult.Success -> {
+                    it.result?.let { item ->
+                        Glide.with(requireContext()).load(item.href).into(layout_ad.iv_ad)
+                        layout_ad.iv_ad.setOnClickListener {
+                            GeneralUtils.openWebView(requireContext(), item.target ?: "")
+                        }
+                    }
+                }
+                is ApiResult.Error -> {
+                    layout_ad.visibility =View.GONE
+                    onApiError(it.throwable)
+                }
 
+                else -> {
+                    layout_ad.visibility =View.GONE
+                    onApiError(Exception("Unknown Error!"))
+                }
+            }
+
+
+        })
+
+        viewModel.showProgress.observe(this, {
+            layout_refresh.isRefreshing = it
+        })
+
+        viewModel.clubCount.observe(this, Observer {
+            if (it <= 0) {
+                id_empty_group.visibility = View.VISIBLE
+                recycler_view.visibility = View.INVISIBLE
+            } else {
+                id_empty_group.visibility = View.GONE
+                recycler_view.visibility = View.VISIBLE
+            }
+            layout_refresh.isRefreshing = false
         })
 
         viewModel.postItemListResult.observe(viewLifecycleOwner, Observer {
@@ -183,7 +236,7 @@ class ClubLatestFragment : BaseFragment() {
                     adapter?.notifyItemRangeChanged(
                             0,
                             viewModel.totalCount,
-                            MyPostPagedAdapter.PAYLOAD_UPDATE_FOLLOW
+                            ClubLatestAdapter.PAYLOAD_UPDATE_FOLLOW
                     )
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
@@ -195,7 +248,7 @@ class ClubLatestFragment : BaseFragment() {
                 is ApiResult.Success -> {
                     adapter?.notifyItemChanged(
                             it.result,
-                            MyPostPagedAdapter.PAYLOAD_UPDATE_LIKE
+                            ClubLatestAdapter.PAYLOAD_UPDATE_LIKE
                     )
                 }
                 is ApiResult.Error -> Timber.e(it.throwable)
@@ -207,12 +260,17 @@ class ClubLatestFragment : BaseFragment() {
                 is ApiResult.Success -> {
                     adapter?.notifyItemChanged(
                             it.result,
-                            MyPostPagedAdapter.PAYLOAD_UPDATE_FAVORITE
+                            ClubLatestAdapter.PAYLOAD_UPDATE_FAVORITE
                     )
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
+    }
+
+    private fun getData(){
+        viewModel.getAd()
+        viewModel.getPostItemList()
     }
 
     private fun followMember(

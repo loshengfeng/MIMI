@@ -29,6 +29,7 @@ class RecommendContentAdapter(
                     .inflate(R.layout.item_ad, parent, false)
                 AdHolder(mView)
             }
+
             else -> {
                 val mView = LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_recommend, parent, false)
