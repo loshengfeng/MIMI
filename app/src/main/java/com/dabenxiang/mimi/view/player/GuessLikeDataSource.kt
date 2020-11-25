@@ -42,7 +42,7 @@ class GuessLikeDataSource(
                 val result = apiRepository.statisticsHomeVideos(
                     "",
                     "",
-                    StatisticsOrderType.HOTEST,
+                    StatisticsOrderType.HOTTEST,
                     category,
                     "",
                     true,
@@ -55,7 +55,7 @@ class GuessLikeDataSource(
                 val item = result.body()
                 val videos = item?.content
                 if (videos != null) {
-                    returnList.addAll(videos.statisticsItemToVideoItem(isAdult))
+                    returnList.addAll(videos.statisticsItemToVideoItem())
                 }
 
                 val nextPageKey = when {
@@ -87,7 +87,7 @@ class GuessLikeDataSource(
                 val result = apiRepository.statisticsHomeVideos(
                     "",
                     "",
-                    StatisticsOrderType.HOTEST,
+                    StatisticsOrderType.HOTTEST,
                     category,
                     "",
                     true,
@@ -110,7 +110,7 @@ class GuessLikeDataSource(
 
                         emit(
                             EmitResult(
-                                list.statisticsItemToVideoItem(isAdult),
+                                list.statisticsItemToVideoItem(),
                                 nextPageKey
                             )
                         )

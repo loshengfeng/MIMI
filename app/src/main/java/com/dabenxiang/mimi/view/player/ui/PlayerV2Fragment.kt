@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.player.ui
 import android.content.pm.ActivityInfo
 import android.hardware.SensorManager
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.Surface
 import android.view.View
 import android.view.ViewGroup
@@ -11,12 +12,20 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.extension.handleException
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.ExceptionResult
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoEpisodeItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.api.vo.VideoM3u8Source
+import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.club.post.ClubCommentFragment
+import com.dabenxiang.mimi.view.dialog.GeneralDialog
+import com.dabenxiang.mimi.view.dialog.GeneralDialogData
+import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.player.PlayerViewModel
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.OrientationDetector
@@ -25,11 +34,20 @@ import com.google.android.exoplayer2.analytics.AnalyticsListener
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.android.synthetic.main.custom_playback_control.*
+import kotlinx.android.synthetic.main.fragment_player.*
 import kotlinx.android.synthetic.main.fragment_v2_player.*
+import kotlinx.android.synthetic.main.fragment_v2_player.iv_player
+import kotlinx.android.synthetic.main.fragment_v2_player.player_view
+import kotlinx.android.synthetic.main.fragment_v2_player.recharge_reminder
+import kotlinx.android.synthetic.main.fragment_v2_player.tv_forward_backward
+import kotlinx.android.synthetic.main.fragment_v2_player.tv_sound_tune
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.net.UnknownHostException
+import kotlin.math.abs
 
 class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener {
 
@@ -105,8 +123,10 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
         }
 
         viewModel.videoStreamingUrl.observe(viewLifecycleOwner) {
-            if(!it.isNullOrEmpty())
-                setupPlayUrl(it, true)
+            if(!it.isNullOrEmpty()) {
+                setupPlayUrl(it, (viewModel.m3u8SourceUrl != it) )
+                viewModel.m3u8SourceUrl = it
+            }
         }
 
         viewModel.showRechargeReminder.observe(viewLifecycleOwner) {
@@ -139,6 +159,28 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
                     }
                 })
             }
+
+        exo_play_pause.setOnClickListener {
+            Timber.d("exo_play_pause confirmed")
+            player?.also {
+                it.playWhenReady.also { playing ->
+                    it.playWhenReady = !playing
+                    viewModel.setPlaying(!playing)
+                    if (!playing)
+                        exo_play_pause.setImageDrawable(requireContext().getDrawable(R.drawable.exo_icon_pause))
+                    else
+                        exo_play_pause.setImageDrawable(requireContext().getDrawable(R.drawable.exo_icon_play))
+                }
+            }
+        }
+
+        iv_player.setOnClickListener {
+            if (it.visibility == View.VISIBLE) {
+                player?.playWhenReady = true
+                viewModel.setPlaying(true)
+                exo_play_pause.setImageDrawable(requireContext().getDrawable(R.drawable.exo_icon_pause))
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -146,17 +188,30 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
 
         player_pager.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount(): Int {
-                return 1
+                return 2
             }
 
             override fun createFragment(position: Int): Fragment {
-                return PlayerDescriptionFragment()
+                when(position) {
+                    0 -> {
+                        return PlayerDescriptionFragment()
+                    }
+                    else -> {
+                        val memberPostItem = MemberPostItem()
+                        memberPostItem.id = viewModel.videoContentId
+                        return ClubCommentFragment.createBundle(memberPostItem)
+                    }
+                }
             }
 
         }
 
         TabLayoutMediator(tabs, player_pager) { tab, position ->
-            tab.text = "视频简介"
+            when(position) {
+                0 -> tab.text = "视频简介"
+                1 -> tab.text = "评论"
+            }
+
         }.attach()
     }
 
@@ -177,6 +232,22 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
         }
 
         orientationDetector?.apply { enable() }
+    }
+
+    override fun onPause() {
+        Timber.d("player activity onPause")
+        super.onPause()
+
+        orientationDetector?.apply {disable()}
+        player_view.onPause()
+        releasePlayer()
+
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        player_view.onPause()
+        releasePlayer()
     }
 
     override fun onDestroy() {
@@ -240,7 +311,7 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
                 player.volume = PlayerViewModel.volume
                 player.addListener(this)
                 player.addAnalyticsListener(this)
-//                viewModel.setPlaying(true)
+                viewModel.setPlaying(true)
                 initTouchListener()
             }
         }
@@ -320,7 +391,7 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
                 //showErrorDialog("UNKNOWN")
             }
         }
-//        viewModel.sendVideoReport()
+        viewModel.sendVideoReport()
     }
 
     /**
@@ -360,7 +431,7 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
         var originX = 0f
         var originY = 0f
         var isMove = false
-       /* player_view?.setOnTouchListener { _, event ->
+        player_view?.setOnTouchListener { _, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     //Timber.d("ACTION_DOWN")
@@ -382,18 +453,18 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
                                 tv_forward_backward.visibility = View.VISIBLE
                                 tv_sound_tune.visibility = View.GONE
                                 if (dx > 0)
-//                                    viewModel.setFastForwardTime((dx.toInt() / SWIPE_DISTANCE_UNIT) * JUMP_TIME)
+                                    viewModel.setFastForwardTime((dx.toInt() / SWIPE_DISTANCE_UNIT) * JUMP_TIME)
                                 else
-//                                    viewModel.setRewindTime(abs((dx.toInt() / SWIPE_DISTANCE_UNIT) * JUMP_TIME))
+                                    viewModel.setRewindTime(abs((dx.toInt() / SWIPE_DISTANCE_UNIT) * JUMP_TIME))
                             }
                         } else {
                             tv_forward_backward.visibility = View.GONE
                             tv_sound_tune.visibility = View.VISIBLE
                             if (abs(dy) > PlayerV2Fragment.SWIPE_SOUND_LEAST) {
                                 if (dy > 0)
-//                                    viewModel.setSoundLevel(player!!.volume - 0.1f)
+                                    viewModel.setSoundLevel(player!!.volume - 0.1f)
                                 else
-//                                    viewModel.setSoundLevel(player!!.volume + 0.1f)
+                                    viewModel.setSoundLevel(player!!.volume + 0.1f)
                             }
                         }
                         true
@@ -409,12 +480,12 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
                                 if (dx > 0) {
                                     val fastForwardMs =
                                         (dx.toInt() / SWIPE_DISTANCE_UNIT) * JUMP_TIME
-//                                    fastForward(fastForwardMs)
+                                    fastForward(fastForwardMs)
 
                                 } else {
                                     val rewindMs =
                                         abs((dx.toInt() / SWIPE_DISTANCE_UNIT) * JUMP_TIME)
-//                                    rewind(rewindMs)
+                                    rewind(rewindMs)
                                 }
                             }
                         } else {
@@ -438,7 +509,25 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
                 }
             }
             isMove
-        }*/
+        }
+    }
+
+    private fun rewind(rewindMs: Int) {
+        Timber.i("fastForward rewind=$rewindMs")
+        player?.takeIf { it.isCurrentWindowSeekable && rewindMs > 0 }?.apply {
+            viewModel.setRewindTime(rewindMs)
+            seekTo(currentWindowIndex,
+                if (currentPosition > rewindMs) currentPosition - rewindMs else 0)
+        }
+
+    }
+
+    private fun fastForward(fastForwardMs: Int) {
+        Timber.i("fastForward fastForwardMs=$fastForwardMs")
+        player?.takeIf { it.isCurrentWindowSeekable && fastForwardMs > 0 }?.apply {
+            viewModel.setFastForwardTime(fastForwardMs)
+            seekTo(currentWindowIndex, currentPosition + fastForwardMs)
+        }
     }
 
     private fun soundUp() {
@@ -494,5 +583,44 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
 //            bottom_func_bar?.visibility = View.VISIBLE
 //            bottom_func_input.visibility = View.GONE
         }
+    }
+
+    private fun onApiError(throwable: Throwable) {
+        when (val errorHandler = throwable.handleException { e -> viewModel.processException(e) }) {
+            is ExceptionResult.RefreshTokenExpired -> viewModel.logoutLocal()
+            is ExceptionResult.HttpError -> handleHttpError(errorHandler)
+            is ExceptionResult.Crash -> {
+                if (errorHandler.throwable is UnknownHostException) {
+                    showCrashDialog(HttpErrorMsgType.CHECK_NETWORK)
+                } else {
+                    GeneralUtils.showToast(requireContext(), errorHandler.throwable.toString())
+                }
+            }
+        }
+    }
+
+    private fun showCrashDialog(type: HttpErrorMsgType = HttpErrorMsgType.API_FAILED) {
+        GeneralDialog.newInstance(
+            GeneralDialogData(
+                titleRes = R.string.error_device_binding_title,
+                message = when (type) {
+                    HttpErrorMsgType.API_FAILED -> getString(R.string.api_failed_msg)
+                    HttpErrorMsgType.CHECK_NETWORK -> getString(R.string.server_error)
+                },
+                messageIcon = R.drawable.ico_default_photo,
+                secondBtn = getString(R.string.btn_close)
+            )
+        ).show(requireActivity().supportFragmentManager)
+    }
+
+    private fun releasePlayer() {
+        player?.also { player ->
+            viewModel.playbackPosition = player.currentPosition
+            viewModel.currentWindow = player.currentWindowIndex
+            viewModel.setPlaying(player.playWhenReady)
+            player.removeListener(this)
+            player.release()
+        }
+        player = null
     }
 }

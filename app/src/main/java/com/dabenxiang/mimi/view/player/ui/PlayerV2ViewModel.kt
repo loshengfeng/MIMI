@@ -14,6 +14,7 @@ import com.dabenxiang.mimi.callback.GuessLikePagingCallBack
 import com.dabenxiang.mimi.extension.downloadFile
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.player.GuessLikeDataSource
 import com.dabenxiang.mimi.view.player.GuessLikeFactory
@@ -58,11 +59,20 @@ class PlayerV2ViewModel: BaseViewModel() {
     private val _videoStreamingUrl = MutableLiveData<String>()
     val videoStreamingUrl: LiveData<String> = _videoStreamingUrl
 
-    private val _selectSourcesPosition = MutableLiveData<Int>().also { it.value = -1 }
+    private val _selectSourcesPosition = MutableLiveData<Int>().also { it.value = 0 }
     val selectSourcesPosition: LiveData<Int> = _selectSourcesPosition
 
     private val _selectEpisodePosition = MutableLiveData<Int>()
     val selectEpisodePosition: LiveData<Int> = _selectEpisodePosition
+
+    private val _videoReport = MutableLiveData<ApiResult<Nothing>>()
+    val videoReport: LiveData<ApiResult<Nothing>> = _videoReport
+
+    private val _fastForwardTime = MutableLiveData<Int>()
+    val fastForwardTime: LiveData<Int> = _fastForwardTime
+
+    private val _soundLevel = MutableLiveData<Float>()
+    val soundLevel: LiveData<Float> = _soundLevel
 
     val showIntroduction = MutableLiveData(false)
 
@@ -71,6 +81,19 @@ class PlayerV2ViewModel: BaseViewModel() {
     var playbackPosition: Long = 0
     var lockFullScreen = false
     var currentOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    var m3u8SourceUrl: String = ""
+
+    fun setFastForwardTime(time: Int) {
+        _fastForwardTime.value = time
+    }
+
+    fun setRewindTime(time: Int) {
+        _fastForwardTime.value = -time
+    }
+
+    fun setSoundLevel(level: Float) {
+        _soundLevel.value = if (level > 1) 1f else if (level < 0) 0f else level
+    }
 
     inner class NotDeductedException : Exception()
 
@@ -108,7 +131,7 @@ class PlayerV2ViewModel: BaseViewModel() {
                 if(!isDeducted) {
                     throw NotDeductedException()
                 }
-                val videoSource = videoItem.sources?.get(0)
+                val videoSource = videoItem.sources?.get(selectSourcesPosition.value!!)
                 val videoEpisode = videoSource?.videoEpisodes?.get(0)
                 val episodeResp = domainManager.getApiRepository().getVideoEpisode(videoContentId, videoEpisode?.id!!)
                 if (!episodeResp.isSuccessful) throw HttpException(episodeResp)
@@ -133,7 +156,7 @@ class PlayerV2ViewModel: BaseViewModel() {
     fun parsingEpisodeContent(videoEpisodeItem: VideoEpisodeItem) {
         viewModelScope.launch {
             flow {
-                val videoStreamSourceId = videoEpisodeItem.videoStreams?.get(0)!!
+                val videoStreamSourceId = videoEpisodeItem.videoStreams?.get(selectEpisodePosition.value ?: 0)!!
                 val streamResp = domainManager.getApiRepository().getVideoM3u8Source(
                     videoStreamSourceId.id!!,
                     accountManager.getProfile().userId,
@@ -250,6 +273,24 @@ class PlayerV2ViewModel: BaseViewModel() {
         if (position != _selectEpisodePosition.value) {
             _selectEpisodePosition.postValue(position)
         }
+    }
+
+    fun sendVideoReport(){
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getMemberVideoReport(
+                    videoId= videoContentId, type = PostType.VIDEO_ON_DEMAND.value)
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _videoReport.value = it }
+        }
+    }
+
+    fun setPlaying(playing: Boolean) {
+        _isPlaying.value = playing
     }
 
     fun clearLiveData() {

@@ -10,7 +10,6 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setNot
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.model.api.vo.VideoEpisodeItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
@@ -19,7 +18,6 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.player.GuessLikeVideoAdapter
 import com.dabenxiang.mimi.view.player.GuessLikeVideoAdapter.OnGarbageItemClick
-import com.dabenxiang.mimi.view.player.PlayerViewModel
 import com.dabenxiang.mimi.view.player.SelectEpisodeAdapter
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -132,6 +130,20 @@ class PlayerDescriptionFragment : BaseFragment() {
         descriptionViewModel.videoList.observe(viewLifecycleOwner) {
             guessLikeAdapter.submitList(it)
         }
+
+        viewModel.selectSourcesPosition.observe(viewLifecycleOwner) {
+            sourceListAdapter.setLastSelectedIndex(it)
+            Timber.w("Select source index $it")
+            episodeAdapter.setLastSelectedIndex(0)
+        }
+
+        viewModel.selectEpisodePosition.observe(viewLifecycleOwner) {
+            Timber.w("Select index is $it and old index is ${episodeAdapter.getSelectedPosition()}")
+            if(it != episodeAdapter.getSelectedPosition()) {
+                episodeAdapter.setLastSelectedIndex(it)
+                viewModel.getVideoContent()
+            }
+        }
     }
 
     override fun setupListeners() {
@@ -204,7 +216,7 @@ class PlayerDescriptionFragment : BaseFragment() {
                 }
             }
         }
-        episodeAdapter.submitList(result, 0)
+        episodeAdapter.submitList(result, viewModel.selectEpisodePosition.value)
     }
 
     private fun setupChipGroup(list: List<String>?) {
