@@ -10,8 +10,10 @@ import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.CategoryBanner
 import com.dabenxiang.mimi.model.api.vo.ThirdMenuItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
+import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.ranking.RankingFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.to.aboomy.pager2banner.IndicatorView
@@ -49,7 +51,7 @@ class RecommendFragment(
         }
 
         tv_filter.setOnClickListener {
-            // TODO: 跳至分類頁面
+            navToCategory()
         }
 
         iv_rank.setOnClickListener { navToRanking() }
@@ -89,9 +91,7 @@ class RecommendFragment(
                 // TODO: 跳至播放頁面
                 when (thirdMenuItem.name) {
                     getString(R.string.recommend_today) -> navToRanking()
-                    else -> {
-                        // TODO: 跳至分類頁面
-                    }
+                    else -> navToCategory(thirdMenuItem.category, thirdMenuItem.orderByType)
                 }
                 Timber.d("OnMore Click Category: ${thirdMenuItem.category}")
             }
@@ -103,6 +103,16 @@ class RecommendFragment(
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_mimiFragment_to_rankingFragment,
+                bundle
+            )
+        )
+    }
+
+    private fun navToCategory(category: String = "", orderByType: Int = OrderBy.NEWEST.value) {
+        val bundle = CategoriesFragment.createBundle(category, orderByType)
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_mimiFragment_to_categoriesFragment,
                 bundle
             )
         )

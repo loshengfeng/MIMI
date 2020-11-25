@@ -34,11 +34,20 @@ class GeneralVideoAdapter(
             ): Boolean =
                 oldItem == newItem
         }
+        const val VIEW_TYPE_NETWORK = 0
+        const val VIEW_TYPE_VIDEO = 1
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return when (position) {
+            itemCount -> VIEW_TYPE_NETWORK
+            else -> VIEW_TYPE_VIDEO
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val mView =
-            LayoutInflater.from(parent.context).inflate(R.layout.item_general_video, parent, false)
+        val mView = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_general_video, parent, false)
         return GeneralVideoViewHolder(mView)
     }
 

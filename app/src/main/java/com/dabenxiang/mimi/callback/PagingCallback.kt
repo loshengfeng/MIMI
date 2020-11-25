@@ -1,7 +1,5 @@
 package com.dabenxiang.mimi.callback
 
-import com.dabenxiang.mimi.model.api.vo.Category
-
 interface PagingCallback {
     fun onLoading() {}
     fun onLoaded() {}
@@ -9,6 +7,5 @@ interface PagingCallback {
     fun onThrowable(throwable: Throwable) {}
     fun onTotalCount(count: Long) {}
     fun onCurrentItemCount(count: Long, isInitial: Boolean) {}
-    fun onGetCategory(category: Category?) {}
     fun onGetAny(obj: Any?) {}
 }

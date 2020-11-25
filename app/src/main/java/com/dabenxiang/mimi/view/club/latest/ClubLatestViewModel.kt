@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.recommend
+package com.dabenxiang.mimi.view.club.latest
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
 
-class ClubRecommendViewModel : BaseViewModel() {
+class ClubLatestViewModel : BaseViewModel() {
 
     private val _clubCount = MutableLiveData<Int>()
     val clubCount: LiveData<Int> = _clubCount
@@ -55,7 +55,7 @@ class ClubRecommendViewModel : BaseViewModel() {
     private fun getRecommendPostPagingItems(): LiveData<PagedList<MemberPostItem>> {
         val dataSourceFactory = object : DataSource.Factory<Int, MemberPostItem>() {
             override fun create(): DataSource<Int, MemberPostItem> {
-                return ClubRecommendListDataSource(
+                return ClubLatestListDataSource(
                         domainManager,
                         pagingCallback,
                         viewModelScope,

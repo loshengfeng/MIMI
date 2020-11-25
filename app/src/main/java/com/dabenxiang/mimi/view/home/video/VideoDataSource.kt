@@ -2,8 +2,8 @@ package com.dabenxiang.mimi.view.home.video
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.AdItem
+import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.model.vo.searchItemToVideoItem
 import com.dabenxiang.mimi.model.vo.simpleVideoItemToVideoItem
@@ -78,7 +78,7 @@ class VideoDataSource(
                         val item = result.body()
                         val videos = item?.content
                         if (videos != null) {
-                            returnList.addAll(videos.statisticsItemToVideoItem(isAdult))
+                            returnList.addAll(videos.statisticsItemToVideoItem())
                         }
 
                         nextPageKey = when {
