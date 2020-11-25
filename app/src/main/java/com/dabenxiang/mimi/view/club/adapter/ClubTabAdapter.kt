@@ -3,8 +3,11 @@ package com.dabenxiang.mimi.view.club.adapter
 import android.content.Context
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.NonNull
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -23,10 +26,13 @@ import com.dabenxiang.mimi.view.club.recommend.ClubRecommendFragment
 import kotlinx.android.synthetic.main.fragment_tab_test.*
 import timber.log.Timber
 
-class ClubTabAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+class ClubTabAdapter(
+        context: Context,
+        fragmentManager: FragmentManager,
+        lifecycle: Lifecycle) : FragmentStateAdapter(fragmentManager, lifecycle) {
 
     private val tabFragmentsCreators: Map<Int, () -> Fragment> = mapOf(
-            
+
             TAB_FOLLOW to { ClubPostFollowFragment() },
 
             TAB_RECOMMEND to {
@@ -37,7 +43,7 @@ class ClubTabAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
             },
             TAB_CLIP to {
                 PageTestFragment.create(
-                        fragment.getString(R.string.club_tab_clip))
+                        context.getString(R.string.club_tab_clip))
             },
             TAB_PICTURE to { ClubPicFragment() },
             TAB_NOVEL to { ClubPostTextFragment() }
@@ -53,6 +59,7 @@ class ClubTabAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
 //Test tab Fragments
 private const val KEY_PAGE_NAME = "KEY_PAGE_NAME"
+
 class PageTestFragment : BaseFragment() {
 
     companion object {
@@ -72,13 +79,15 @@ class PageTestFragment : BaseFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        Timber.i("PageTestFragment ${arguments?.getString(KEY_PAGE_NAME, "")
+        Timber.i("PageTestFragment ${
+            arguments?.getString(KEY_PAGE_NAME, "")
         } onAttach")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Timber.i("PageTestFragment ${arguments?.getString(KEY_PAGE_NAME, "")
+        Timber.i("PageTestFragment ${
+            arguments?.getString(KEY_PAGE_NAME, "")
         } onViewCreated")
         tab_name.text = arguments?.getString(KEY_PAGE_NAME, "")
     }
