@@ -245,6 +245,15 @@ class ApiRepository(private val apiService: ApiService) {
      *
      ***********************************************************/
     suspend fun getMembersPost(
+            type: PostType,
+            orderBy: OrderBy,
+            offset: Int,
+            limit: Int
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
+        return apiService.getMembersPost(type.value, offset, limit, orderBy = orderBy.value)
+    }
+
+    suspend fun getMembersPost(
         type: PostType,
         offset: Int,
         limit: Int

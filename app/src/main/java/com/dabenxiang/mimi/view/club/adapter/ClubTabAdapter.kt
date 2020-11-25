@@ -20,6 +20,7 @@ import com.dabenxiang.mimi.view.club.post.ClubPostTextFragment
 import com.dabenxiang.mimi.view.club.latest.ClubLatestFragment
 
 import com.dabenxiang.mimi.view.club.ClubTabViewModel
+import com.dabenxiang.mimi.view.club.recommend.ClubRecommendFragment
 import kotlinx.android.synthetic.main.fragment_tab_test.*
 
 class ClubTabAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
@@ -29,8 +30,7 @@ class ClubTabAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
             TAB_FOLLOW to { ClubPostFollowFragment() },
 
             TAB_RECOMMEND to {
-                PageTestFragment.create(
-                        fragment.getString(R.string.club_tab_recommend))
+                ClubRecommendFragment()
             },
             TAB_LATEST to {
                 ClubLatestFragment()
