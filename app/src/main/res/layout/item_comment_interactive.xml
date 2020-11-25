@@ -89,7 +89,7 @@
         app:layout_constraintEnd_toEndOf="@+id/imgFavorite"
         app:layout_constraintStart_toStartOf="@+id/imgFavorite"
         app:layout_constraintTop_toTopOf="@+id/text2"
-        android:text="收藏" />
+        android:text="@string/club_favorite" />
 
     <TextView
         android:id="@+id/text4"
@@ -99,7 +99,7 @@
         app:layout_constraintEnd_toEndOf="@+id/imgShare"
         app:layout_constraintStart_toStartOf="@+id/imgShare"
         app:layout_constraintTop_toTopOf="@+id/txtFavorite"
-        tools:text="分享" />
+        android:text="@string/club_share" />
 
     <TextView
         android:id="@+id/text5"
@@ -109,6 +109,6 @@
         app:layout_constraintEnd_toEndOf="@+id/imgReport"
         app:layout_constraintStart_toStartOf="@+id/imgReport"
         app:layout_constraintTop_toTopOf="@+id/text4"
-        tools:text="回报" />
+        android:text="@string/club_report" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -102,6 +102,13 @@ class ClubTextDetailAdapter(
                 )
                 holder.title.text = memberPostItem.title
                 holder.desc.text = contentItem.text
+                holder.txtLikeCount.text = String.format(context.getString(R.string.club_like_count), memberPostItem.likeCount)
+
+                if (memberPostItem.likeType == LikeType.LIKE) {
+                    holder.imgLike.setImageResource(R.drawable.ico_nice_s)
+                } else {
+                    holder.imgLike.setImageResource(R.drawable.ico_nice_gray)
+                }
 
                 onTextDetailListener.onGetAttachment(
                     memberPostItem.avatarAttachmentId,
@@ -186,7 +193,7 @@ class ClubTextDetailAdapter(
         } else {
             holder.imgLike.setImageResource(R.drawable.ico_nice_gray)
         }
-        holder.txtLikeCount.text = count.toString()
+        holder.txtLikeCount.text = String.format(context.getString(R.string.club_like_count), count)
     }
 
     private fun updateFavorite(isFavorite: Boolean, count: Int, holder: TextDetailViewHolder) {
