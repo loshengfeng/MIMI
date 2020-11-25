@@ -52,13 +52,6 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         })
 
         mainViewModel?.getAd(adWidth, adHeight)
-
-        lifecycleScope.launch {
-            viewModel.getVideoByCategory(category)
-                .collectLatest {
-                    generalVideoAdapter.submitData(it)
-                }
-        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -78,6 +71,13 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
 
         generalVideoAdapter.addLoadStateListener(loadStateListener)
         rv_video.adapter = generalVideoAdapter
+
+        lifecycleScope.launch {
+            viewModel.getVideoByCategory(category)
+                .collectLatest {
+                    generalVideoAdapter.submitData(it)
+                }
+        }
     }
 
     override fun getLayoutId(): Int {
