@@ -37,7 +37,7 @@
         android:paddingStart="14dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHeight_min="163dp"
+        app:layout_constraintHeight_min="563dp"
         app:layout_constraintTop_toBottomOf="@id/title_guess_like" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/layout_card"
@@ -28,9 +29,14 @@
         android:id="@+id/video_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:singleLine="true"
+        android:ellipsize="marquee"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/layout_card"
-        app:layout_constraintTop_toTopOf="@+id/layout_card" />
+        app:layout_constraintTop_toTopOf="@+id/layout_card"
+        tools:text="恵みのGカップ女神级美人妻が来院！！新婚ホヤホヤ绝賛子作り计画中のまさしく欲しがりBODYは変态施术师の大好物なんです！！鉄壁の贞操観念も执拗にエロテク交えた鼠径部マッサージで无事に完堕ちでなし崩し性交で子作りを応援！？" />
 
     <com.dabenxiang.mimi.view.customview.NestedHorizontalScrollView
         android:id="@+id/reflow_group_scroll"
@@ -38,6 +44,7 @@
         android:layout_height="wrap_content"
         android:scrollbars="none"
         android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/layout_card"
         app:layout_constraintTop_toBottomOf="@id/video_title">
@@ -46,8 +53,6 @@
             android:id="@+id/tag_group"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="20dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="parent"
