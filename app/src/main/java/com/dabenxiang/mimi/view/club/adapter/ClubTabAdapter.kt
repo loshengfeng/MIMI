@@ -8,18 +8,17 @@ import androidx.fragment.app.viewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
-import com.dabenxiang.mimi.view.club.post.ClubPicFragment
-import com.dabenxiang.mimi.view.club.follow.ClubPostFollowFragment
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_CLIP
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_FOLLOW
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_LATEST
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_NOVEL
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_PICTURE
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_RECOMMEND
-import com.dabenxiang.mimi.view.club.post.ClubPostTextFragment
-import com.dabenxiang.mimi.view.club.latest.ClubLatestFragment
-
 import com.dabenxiang.mimi.view.club.ClubTabViewModel
+import com.dabenxiang.mimi.view.club.follow.ClubPostFollowFragment
+import com.dabenxiang.mimi.view.club.latest.ClubLatestFragment
+import com.dabenxiang.mimi.view.club.post.ClubPicFragment
+import com.dabenxiang.mimi.view.club.post.ClubPostTextFragment
 import com.dabenxiang.mimi.view.club.recommend.ClubRecommendFragment
 import kotlinx.android.synthetic.main.fragment_tab_test.*
 import timber.log.Timber

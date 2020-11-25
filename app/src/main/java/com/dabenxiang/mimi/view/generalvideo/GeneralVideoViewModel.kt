@@ -8,6 +8,7 @@ import androidx.paging.cachedIn
 import com.dabenxiang.mimi.model.api.ApiRepository.Companion.NETWORK_PAGE_SIZE
 import com.dabenxiang.mimi.model.api.vo.VideoByCategoryItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.generalvideo.paging.VideoPagingSource
 import kotlinx.coroutines.flow.Flow
 
 class GeneralVideoViewModel : BaseViewModel() {
@@ -18,5 +19,4 @@ class GeneralVideoViewModel : BaseViewModel() {
             pagingSourceFactory = { VideoPagingSource(domainManager, category) }
         ).flow.cachedIn(viewModelScope)
     }
-
 }

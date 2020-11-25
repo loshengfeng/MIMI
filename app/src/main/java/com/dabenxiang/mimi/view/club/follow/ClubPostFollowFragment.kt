@@ -21,8 +21,6 @@ import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_follow.*
-import kotlinx.android.synthetic.main.fragment_club_follow.layout_refresh
-import kotlinx.android.synthetic.main.fragment_my_post.*
 import kotlinx.android.synthetic.main.item_ad.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
