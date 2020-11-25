@@ -122,17 +122,17 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
             }
         }
 
-//        when (loadStatus.append) {
-//            is LoadState.Error -> {
-//                Timber.e("Append Error:${(loadStatus.append as LoadState.Error).error.localizedMessage}")
-//            }
-//            is LoadState.Loading -> {
-//                Timber.d("Append Loading endOfPaginationReached:${(loadStatus.append as LoadState.Loading).endOfPaginationReached}")
-//            }
-//            is LoadState.NotLoading -> {
-//                Timber.d("Append NotLoading endOfPaginationReached:${(loadStatus.append as LoadState.NotLoading).endOfPaginationReached}")
-//            }
-//        }
+        when (loadStatus.append) {
+            is LoadState.Error -> {
+                Timber.e("Append Error:${(loadStatus.append as LoadState.Error).error.localizedMessage}")
+            }
+            is LoadState.Loading -> {
+                Timber.d("Append Loading endOfPaginationReached:${(loadStatus.append as LoadState.Loading).endOfPaginationReached}")
+            }
+            is LoadState.NotLoading -> {
+                Timber.d("Append NotLoading endOfPaginationReached:${(loadStatus.append as LoadState.NotLoading).endOfPaginationReached}")
+            }
+        }
     }
 
     private val gridLayoutSpanSizeLookup =
