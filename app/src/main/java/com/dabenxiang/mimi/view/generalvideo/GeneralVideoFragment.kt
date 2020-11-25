@@ -31,7 +31,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Timber.d("Category: $category")
+        Timber.d("@@Category: $category")
 
         val adWidth = pxToDp(requireContext(), getScreenSize(requireActivity()).first)
         val adHeight = (adWidth / 7)
@@ -75,6 +75,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         lifecycleScope.launch {
             viewModel.getVideoByCategory(category)
                 .collectLatest {
+                    layout_refresh.isRefreshing = false
                     generalVideoAdapter.submitData(it)
                 }
         }
@@ -92,13 +93,17 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
     private val loadStateListener = { loadStatus: CombinedLoadStates ->
         when (loadStatus.refresh) {
             is LoadState.Error -> {
-                Timber.e("Refresh Error:${(loadStatus.refresh as LoadState.Error).error.localizedMessage}")
+                Timber.e("Refresh Error: ${(loadStatus.refresh as LoadState.Error).error.localizedMessage}")
             }
             is LoadState.Loading -> {
-                layout_refresh.isRefreshing = true
+                if (layout_refresh != null) {
+                    layout_refresh.isRefreshing = true
+                }
             }
             is LoadState.NotLoading -> {
-                layout_refresh.isRefreshing = false
+                if (layout_refresh != null) {
+                    layout_refresh.isRefreshing = false
+                }
             }
         }
     }
