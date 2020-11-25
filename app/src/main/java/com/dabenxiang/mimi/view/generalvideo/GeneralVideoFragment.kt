@@ -31,31 +31,33 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Timber.d("@@Category: $category")
+//        Timber.d("1@@Category: $category")
 
         val adWidth = pxToDp(requireContext(), getScreenSize(requireActivity()).first)
         val adHeight = (adWidth / 7)
 
-        mainViewModel?.getAdResult?.observe(this, {
-            when (it) {
-                is Success -> {
-                    Glide.with(requireContext())
-                        .load(it.result.href)
-                        .into(iv_ad)
-                    iv_ad.setOnClickListener { _ ->
-                        GeneralUtils.openWebView(requireContext(), it.result.target)
-                    }
-                }
-                is Error -> onApiError(it.throwable)
-            }
-
-        })
-
-        mainViewModel?.getAd(adWidth, adHeight)
+//        mainViewModel?.getAdResult?.observe(this, {
+//            when (it) {
+//                is Success -> {
+//                    Glide.with(requireContext())
+//                        .load(it.result.href)
+//                        .into(iv_ad)
+//                    iv_ad.setOnClickListener { _ ->
+//                        GeneralUtils.openWebView(requireContext(), it.result.target)
+//                    }
+//                }
+//                is Error -> onApiError(it.throwable)
+//            }
+//
+//        })
+//
+//        mainViewModel?.getAd(adWidth, adHeight)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        Timber.d("2@@Category: $category")
 
         tv_search.setOnClickListener {
             // TODO: 跳至搜尋頁面
