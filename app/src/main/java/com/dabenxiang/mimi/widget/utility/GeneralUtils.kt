@@ -199,6 +199,11 @@ object GeneralUtils {
         return (dp.toFloat() * density).roundToInt()
     }
 
+    fun pxToDp(context: Context, px: Int): Int {
+        val density = context.resources.displayMetrics.density
+        return (px.toFloat() / density).roundToInt()
+    }
+
     fun hideKeyboard(activity: Activity) {
         val view = activity.currentFocus
         if (view != null) {

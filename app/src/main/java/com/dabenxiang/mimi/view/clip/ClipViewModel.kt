@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.clip
 
-import ClipPagingSource
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
@@ -12,14 +11,12 @@ import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.OrderItem
 import com.dabenxiang.mimi.model.enums.CategoryType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.home.memberpost.MemberPostDataSource
 import com.dabenxiang.mimi.view.home.memberpost.MemberPostFactory
-import com.dabenxiang.mimi.view.order.OrderPagingSource
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -158,11 +155,12 @@ class ClipViewModel : BaseViewModel() {
         }
     }
 
-    fun sendVideoReport(id: String, error: String){
+    fun sendVideoReport(id: String, error: String) {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getMemberVideoReport(
-                    videoId= id.toLong(), type = PostType.VIDEO.value)
+                    videoId = id.toLong(), type = PostType.VIDEO.value
+                )
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }
@@ -175,7 +173,10 @@ class ClipViewModel : BaseViewModel() {
 
     fun getClips(): Flow<PagingData<MemberPostItem>> {
         return Pager(
-            config = PagingConfig(pageSize = ApiRepository.NETWORK_PAGE_SIZE, enablePlaceholders = false),
+            config = PagingConfig(
+                pageSize = ApiRepository.NETWORK_PAGE_SIZE,
+                enablePlaceholders = false
+            ),
             pagingSourceFactory = { ClipPagingSource(domainManager) }
         ).flow.cachedIn(viewModelScope)
     }
