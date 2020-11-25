@@ -39,9 +39,7 @@ class RecommendVideoAdapter(
             .into(holder.videoImage)
 
         holder.videoTitleText.text = video.title
-        holder.videoLayout.setOnClickListener {
-            recommendFuncItem.onItemClick(video)
-        }
+        holder.videoLayout.setOnClickListener { recommendFuncItem.onItemClick(video) }
     }
 
     override fun getItemCount(): Int {

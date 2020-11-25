@@ -33,6 +33,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_club_topic.*
+import timber.log.Timber
 
 class TopicDetailFragment : BaseFragment() {
 

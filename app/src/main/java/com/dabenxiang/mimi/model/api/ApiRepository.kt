@@ -20,11 +20,10 @@ class ApiRepository(private val apiService: ApiService) {
         const val FILE = "file"
         const val MEDIA_TYPE_IMAGE = "image/*"
         const val X_REQUESTED_FROM = "X-Requested-From"
+        const val NETWORK_PAGE_SIZE = 20
         fun isRefreshTokenFailed(code: String?): Boolean {
             return code == TOKEN_NOT_FOUND
         }
-
-        const val NETWORK_PAGE_SIZE = 20
     }
 
     /**********************************************************
@@ -224,6 +223,7 @@ class ApiRepository(private val apiService: ApiService) {
     ) = apiService.resendEmail(body)
 
     suspend fun followPost(userId: Long): Response<Void> {
+        Timber.i("userId=$userId")
         return apiService.followPost(userId)
     }
 
@@ -869,9 +869,22 @@ class ApiRepository(private val apiService: ApiService) {
 
     /**********************************************************
      *
-     *                   Members/Home/Menu
+     *                  Members/Home/Menu
      *
      ***********************************************************/
     suspend fun getMenu() = apiService.getMenu()
+
+    /**********************************************************
+     *
+     *          Members/Home/Videos/SearchWithCategory
+     *
+     ***********************************************************/
+    suspend fun getVideoByCategory(
+        category: String,
+        offset: String,
+        limit: String
+    ) = apiService.getVideoByCategory(
+        true, category, offset, limit
+    )
 }
 

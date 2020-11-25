@@ -1,36 +1,38 @@
-package com.dabenxiang.mimi.view.clip
+package com.dabenxiang.mimi.view.generalvideo
 
 import androidx.paging.PagingSource
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.api.vo.VideoByCategoryItem
 import com.dabenxiang.mimi.model.manager.DomainManager
-import com.dabenxiang.mimi.view.home.memberpost.MemberPostDataSource
 import retrofit2.HttpException
 
-class ClipPagingSource(
-    private val domainManager: DomainManager
-) : PagingSource<Long, MemberPostItem>() {
-    override suspend fun load(params: LoadParams<Long>): LoadResult<Long, MemberPostItem> {
+class VideoPagingSource(
+    private val domainManager: DomainManager,
+    private val category: String
+) : PagingSource<Long, VideoByCategoryItem>() {
+
+    override suspend fun load(params: LoadParams<Long>): LoadResult<Long, VideoByCategoryItem> {
         return try {
             val offset = params.key ?: 0L
-            val result = domainManager.getApiRepository().getMembersPost(
-                PostType.VIDEO, 0, MemberPostDataSource.PER_LIMIT
-            )
+
+            val result = domainManager.getApiRepository()
+                .getVideoByCategory(category, offset.toString(), params.loadSize.toString())
             if (!result.isSuccessful) throw HttpException(result)
-            val item = result.body()
-            val memberPostItems = item?.content
+
+            val body = result.body()
+            val items = body?.content
+
             val nextOffset = when {
                 hasNextPage(
-                    item?.paging?.count ?: 0,
-                    item?.paging?.offset ?: 0,
-                    memberPostItems?.size ?: 0,
+                    body?.paging?.count ?: 0,
+                    body?.paging?.offset ?: 0,
+                    items?.size ?: 0,
                     params.loadSize
                 ) -> offset + params.loadSize
                 else -> null
             }
 
             LoadResult.Page(
-                data = memberPostItems ?: arrayListOf(),
+                data = items ?: arrayListOf(),
                 prevKey = if (offset == 0L) null else offset - params.loadSize.toLong(),
                 nextKey = nextOffset
             )

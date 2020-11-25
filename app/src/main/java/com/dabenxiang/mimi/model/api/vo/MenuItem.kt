@@ -38,6 +38,9 @@ data class SecondMenuItem(
     @SerializedName("sorting")
     val sorting: Int = 0,
 
+    @SerializedName("category")
+    val category: String = "",
+
     @SerializedName("menus")
     var menus: ArrayList<ThirdMenuItem> = arrayListOf()
 )
