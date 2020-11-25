@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
-import java.util.ArrayList
+import java.util.*
 
 class ClubTextDetailViewModel: BaseViewModel() {
 

@@ -491,4 +491,8 @@
     <!-- Recommend -->
     <string name="recommend_today">今日精选</string>
 
+    <!-- Category -->
+    <string name="category_newest">最新</string>
+    <string name="category_top_hit">热门</string>
+
 </resources>

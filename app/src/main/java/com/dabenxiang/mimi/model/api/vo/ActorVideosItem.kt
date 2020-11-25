@@ -2,7 +2,7 @@ package com.dabenxiang.mimi.model.api.vo
 
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
-import java.util.ArrayList
+import java.util.*
 
 data class ActorVideosItem(
 
