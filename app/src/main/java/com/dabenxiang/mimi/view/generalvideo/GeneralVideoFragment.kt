@@ -31,6 +31,8 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        Timber.d("Category: $category")
+
         val adWidth = pxToDp(requireContext(), getScreenSize(requireActivity()).first)
         val adHeight = (adWidth / 7)
 
