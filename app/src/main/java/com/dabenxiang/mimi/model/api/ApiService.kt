@@ -353,6 +353,20 @@ interface ApiService {
         @Body body: ReportRequest
     ): Response<Void>
 
+    /**********************************************************
+     *
+     *                  Members/Home/Actors
+     *
+     ***********************************************************/
+    @GET("/v1/Members/Home/Actors")
+    suspend fun getActors(): Response<ApiBaseItem<ActorsItem>>
+
+    @GET("/v1/Members/Home/Actors/ActorsList")
+    suspend fun getActorsList(
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ): Response<ApiBaseItem<ActorsItem>>
+
 
     /**********************************************************
      *
