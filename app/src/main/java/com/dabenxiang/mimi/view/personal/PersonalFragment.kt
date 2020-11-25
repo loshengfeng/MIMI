@@ -21,6 +21,8 @@ import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_LOGIN
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
+import com.dabenxiang.mimi.view.orderresult.OrderResultFragment
+import com.dabenxiang.mimi.view.topup.TopUpFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.Behavior.DragCallback
@@ -57,32 +59,32 @@ class PersonalFragment : BaseFragment() {
         tv_version.text = BuildConfig.VERSION_NAME
         Glide.with(this).clear(avatar)
         viewModel.getPostDetail()
-      //FIXME
+        //FIXME
         //            ViewCompat.setNestedScrollingEnabled(nestedScroll, true)
         val behavior = appbar_layout.behavior as AppBarLayout.Behavior?
-
+        layout_vip_unlimit.visibility = View.INVISIBLE
+        layout_vip_unlimit_unlogin.visibility = View.INVISIBLE
         if (viewModel.isLogin()) {
             item_is_Login.visibility = View.VISIBLE
             tv_logout.visibility = View.VISIBLE
-            viewModel.getPostDetail()
             behavior!!.setDragCallback(object : DragCallback() {
                 override fun canDrag(appBarLayout: AppBarLayout): Boolean {
                     return true
                 }
             })
         } else {
+            layout_vip_unlimit_unlogin.visibility = View.VISIBLE
             item_is_Login.visibility = View.GONE
             tv_logout.visibility = View.GONE
-            id_personal.text=getString(R.string.identity)
-            like_count.text="0"
-            fans_count.text="0"
-            follow_count.text="0"
+            id_personal.text = getString(R.string.identity)
+            like_count.text = "0"
+            fans_count.text = "0"
+            follow_count.text = "0"
             behavior!!.setDragCallback(object : DragCallback() {
                 override fun canDrag(appBarLayout: AppBarLayout): Boolean {
                     return false
                 }
             })
-
             Glide.with(this).load(R.drawable.default_profile_picture).into(avatar)
         }
     }
@@ -93,17 +95,21 @@ class PersonalFragment : BaseFragment() {
                 is Success -> {
                     val meItem = it.result
                     id_personal.text = meItem.friendlyName.toString()
-
-                    meItem.expiryDate?.let { date ->
-                        tv_expiry_date.visibility = View.VISIBLE
-                        tv_expiry_date.text = getString(
-                            R.string.vip_expiry_date,
-                            SimpleDateFormat(
-                                "yyyy-MM-dd",
-                                Locale.getDefault()
-                            ).format(date)
-                        )
+                    if (meItem.expiryDate==null){
+                        layout_vip_unlimit_unlogin.visibility = View.VISIBLE
+                    }else{
+                        meItem.expiryDate?.let { date ->
+                            layout_vip_unlimit.visibility = View.INVISIBLE
+                            tv_expiry_date.text = getString(
+                                R.string.vip_expiry_date,
+                                SimpleDateFormat(
+                                    "yyyy-MM-dd",
+                                    Locale.getDefault()
+                                ).format(date)
+                            )
+                        }
                     }
+
 
 //                    //TODO: 目前先不判斷是否有驗證過
 ////                    takeUnless { meItem.isEmailConfirmed == true }?.run {
@@ -193,14 +199,14 @@ class PersonalFragment : BaseFragment() {
 //                    )
                 }
                 R.id.vippromote_now -> {
-                    if (viewModel.isLogin()){
+                    if (viewModel.isLogin()) {
                         navigateTo(
                             NavigateItem.Destination(
                                 R.id.action_to_inviteVipFragment,
                                 null
                             )
                         )
-                    }else{
+                    } else {
                         navigateTo(
                             NavigateItem.Destination(
                                 R.id.action_personalFragment_to_loginFragment,
@@ -215,9 +221,27 @@ class PersonalFragment : BaseFragment() {
                         LoginFragment.createBundle(TYPE_REGISTER)
                     )
                 )
+                R.id.layout_vip_unlimit_unlogin -> {
+                    if (viewModel.isLogin()) {
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_to_topupFragment,
+                                TopUpFragment.createBundle(this::class.java.simpleName)
+                            )
+                        )
+                    } else {
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_personalFragment_to_loginFragment,
+                                LoginFragment.createBundle(TYPE_LOGIN)
+                            )
+                        )
+                    }
+                }
             }
         }.also {
 //            tv_topup.setOnClickListener(it)
+            layout_vip_unlimit_unlogin.setOnClickListener(it)
             tv_follow.setOnClickListener(it)
 //            tv_topup_history.setOnClickListener(it)
 //            tv_chat_history.setOnClickListener(it)
@@ -226,7 +250,6 @@ class PersonalFragment : BaseFragment() {
             tv_old_driver.setOnClickListener(it)
             tv_logout.setOnClickListener(it)
             vippromote_now.setOnClickListener(it)
-//            tv_login.setOnClickListener(it)
 //            tv_register.setOnClickListener(it)
         }
     }

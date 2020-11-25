@@ -9,6 +9,7 @@
     <include app:graph="@navigation/navigation_club_topic" />
     <include app:graph="@navigation/navigation_my_post" />
     <include app:graph="@navigation/navigation_setting" />
+    <include app:graph="@navigation/navigation_topup" />
 
     <fragment
         android:id="@+id/personalFragment"
@@ -37,6 +38,10 @@
         <action
             android:id="@+id/action_to_settingFragment"
             app:destination="@id/navigation_setting" />
+
+        <action
+            android:id="@+id/action_to_topupFragment"
+            app:destination="@id/navigation_topup" />
     </fragment>
 
     <fragment

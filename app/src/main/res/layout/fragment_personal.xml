@@ -341,7 +341,7 @@
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:text="@string/personal_follow" />
+            android:text="@string/every_day_count" />
 
         <TextView
             android:id="@+id/video_long"
