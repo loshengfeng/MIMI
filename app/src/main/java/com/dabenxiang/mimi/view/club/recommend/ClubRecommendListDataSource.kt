@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.latest
+package com.dabenxiang.mimi.view.club.recommend
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
-class ClubLatestListDataSource(
+class ClubRecommendListDataSource(
         private val domainManager: DomainManager,
         private val pagingCallback: PagingCallback,
         private val viewModelScope: CoroutineScope,
@@ -32,7 +32,7 @@ class ClubLatestListDataSource(
                 val adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content
                         ?: AdItem()
 
-                val result = domainManager.getApiRepository().getMembersPost(PostType.TEXT_IMAGE_VIDEO, OrderBy.NEWEST,
+                val result = domainManager.getApiRepository().getMembersPost(PostType.TEXT_IMAGE_VIDEO, OrderBy.HOTTEST,
                         0, PER_LIMIT
                 )
 

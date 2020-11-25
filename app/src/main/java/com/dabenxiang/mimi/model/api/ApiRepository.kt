@@ -20,11 +20,10 @@ class ApiRepository(private val apiService: ApiService) {
         const val FILE = "file"
         const val MEDIA_TYPE_IMAGE = "image/*"
         const val X_REQUESTED_FROM = "X-Requested-From"
+        const val NETWORK_PAGE_SIZE = 20
         fun isRefreshTokenFailed(code: String?): Boolean {
             return code == TOKEN_NOT_FOUND
         }
-
-        const val NETWORK_PAGE_SIZE = 20
     }
 
     /**********************************************************
@@ -246,6 +245,15 @@ class ApiRepository(private val apiService: ApiService) {
      *
      ***********************************************************/
     suspend fun getMembersPost(
+            type: PostType,
+            orderBy: OrderBy,
+            offset: Int,
+            limit: Int
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
+        return apiService.getMembersPost(type.value, offset, limit, orderBy = orderBy.value)
+    }
+
+    suspend fun getMembersPost(
         type: PostType,
         offset: Int,
         limit: Int
@@ -453,6 +461,24 @@ class ApiRepository(private val apiService: ApiService) {
     ) = apiService.sendVideoReport(
         body
     )
+
+    /**********************************************************
+     *
+     *                   Members/Home/Actors
+     *
+     ***********************************************************/
+    /**
+     * 取得女優頁面
+     */
+    suspend fun getActors() = apiService.getActors()
+
+    /**
+     * 取得女優分頁資料
+     */
+    suspend fun getActorsList(
+        offset: String,
+        limit: String
+    ) = apiService.getActorsList(offset, limit)
 
     /**********************************************************
      *
@@ -875,6 +901,8 @@ class ApiRepository(private val apiService: ApiService) {
         category: String,
         offset: String,
         limit: String
-    ) = apiService.getVideoByCategory(category, offset, limit)
+    ) = apiService.getVideoByCategory(
+        true, category, offset, limit
+    )
 }
 

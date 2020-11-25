@@ -44,7 +44,7 @@ class ClubPostFollowFragment : BaseFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-
+        Timber.i("ClubPostFollowFragment onAttach")
         viewModel.showProgress.observe(this, {
             layout_refresh.isRefreshing = it
         })

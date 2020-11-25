@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.latest
+package com.dabenxiang.mimi.view.club.recommend
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -16,7 +16,7 @@ import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
-class ClubLatestAdapter(
+class ClubRecommendAdapter(
         val context: Context,
         private val isAdultTheme: Boolean,
         private val myPostListener: MyPostListener,
@@ -28,7 +28,6 @@ class ClubLatestAdapter(
         const val PAYLOAD_UPDATE_LIKE = 0
         const val PAYLOAD_UPDATE_FAVORITE = 1
         const val PAYLOAD_UPDATE_FOLLOW = 2
-
         const val VIEW_TYPE_CLIP = 0
         const val VIEW_TYPE_PICTURE = 1
         const val VIEW_TYPE_TEXT = 2

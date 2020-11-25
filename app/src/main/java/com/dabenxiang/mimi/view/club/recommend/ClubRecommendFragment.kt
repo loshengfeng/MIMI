@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.latest
+package com.dabenxiang.mimi.view.club.recommend
 
 import android.content.Context
 import android.os.Bundle
@@ -23,27 +23,25 @@ import com.dabenxiang.mimi.view.adapter.MyPostPagedAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
+import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_latest.*
 import timber.log.Timber
 
-class ClubLatestFragment : BaseFragment() {
+class ClubRecommendFragment : BaseFragment() {
 
-    private val viewModel: ClubLatestViewModel by viewModels()
-    private var adapter: ClubLatestAdapter? = null
+    private val viewModel: ClubRecommendViewModel by viewModels()
+    private var adapter: ClubRecommendAdapter? = null
 
 
     override fun getLayoutId() = R.layout.fragment_club_latest
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        Timber.i("ClubLatestFragment onAttach")
-        viewModel.clubCount.observe(this, Observer {
-
-        })
 
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
@@ -76,6 +74,40 @@ class ClubLatestFragment : BaseFragment() {
     private val postListener = object : MyPostListener {
         override fun onMoreClick(item: MemberPostItem) {
             onMoreClick(item, ArrayList(adapter?.currentList as List<MemberPostItem>), onEdit = {
+                it as MemberPostItem
+                when (item.type) {
+                    PostType.TEXT -> {
+                        val bundle = Bundle()
+                        item.id
+                        bundle.putBoolean(MyPostFragment.EDIT, true)
+                        bundle.putString(BasePostFragment.PAGE, BasePostFragment.MY_POST)
+                        bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+                        findNavController().navigate(
+                                R.id.action_myPostFragment_to_postArticleFragment,
+                                bundle
+                        )
+                    }
+                    PostType.IMAGE -> {
+                        val bundle = Bundle()
+                        bundle.putBoolean(MyPostFragment.EDIT, true)
+                        bundle.putString(BasePostFragment.PAGE, BasePostFragment.MY_POST)
+                        bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+                        findNavController().navigate(
+                                R.id.action_myPostFragment_to_postPicFragment,
+                                bundle
+                        )
+                    }
+                    PostType.VIDEO -> {
+                        val bundle = Bundle()
+                        bundle.putBoolean(MyPostFragment.EDIT, true)
+                        bundle.putString(BasePostFragment.PAGE, BasePostFragment.MY_POST)
+                        bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+                        findNavController().navigate(
+                                R.id.action_myPostFragment_to_postVideoFragment,
+                                bundle
+                        )
+                    }
+                }
             })
         }
 
@@ -155,7 +187,7 @@ class ClubLatestFragment : BaseFragment() {
     }
 
     override fun initSettings() {
-        adapter = ClubLatestAdapter(requireContext(),
+        adapter = ClubRecommendAdapter(requireContext(),
                 false,
                 postListener,
                 attachmentListener,

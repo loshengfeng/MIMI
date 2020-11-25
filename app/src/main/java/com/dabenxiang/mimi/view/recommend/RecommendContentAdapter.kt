@@ -61,14 +61,6 @@ class RecommendContentAdapter(
                 holder.recommendContentRecycler.adapter = RecommendVideoAdapter(
                     item.videos, recommendFuncItem
                 )
-
-//                if (item.videos.isEmpty()) {
-//                    holder.titleText.visibility = View.GONE
-//                    holder.moreText.visibility = View.GONE
-//                } else {
-//                    holder.titleText.visibility = View.VISIBLE
-//                    holder.moreText.visibility = View.VISIBLE
-//                }
             }
         }
     }
