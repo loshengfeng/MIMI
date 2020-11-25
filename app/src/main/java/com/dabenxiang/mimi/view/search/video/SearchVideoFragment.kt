@@ -45,12 +45,10 @@ class SearchVideoFragment : BaseFragment() {
         const val KEY_DATA = "data"
 
         fun createBundle(
-            title: String = "",
             tag: String = "",
             category: String = ""
         ): Bundle {
             val data = SearchingVideoItem()
-            data.title = title
             data.tag = tag
             data.category = category
 
@@ -83,17 +81,12 @@ class SearchVideoFragment : BaseFragment() {
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
 
         (arguments?.getSerializable(KEY_DATA) as SearchingVideoItem?)?.also { data ->
-            Timber.d("key data from args is title: ${data.title}, tag: ${data.tag} ")
-//            if (arguments?.getBoolean(KEY_IS_FROM_PLAYER) == true) {
-//                viewModel.isAdult = data.isAdult
-//            }
 
+            viewModel.searchingTag = data.tag
+            viewModel.category = data.category
             if (data.tag.isNotBlank()) {
-                viewModel.searchingTag = data.tag
                 viewModel.getSearchList()
             }
-
-            viewModel.category = data.category
 
             if (TextUtils.isEmpty(viewModel.searchingTag) && TextUtils.isEmpty(viewModel.searchingStr)) {
                 layout_search_history.visibility = View.VISIBLE
@@ -111,6 +104,11 @@ class SearchVideoFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
+        viewModel.showProgress.observe(this, Observer { showProgress ->
+            if (showProgress) progressHUD.show()
+            else progressHUD.dismiss()
+        })
+
         viewModel.searchTextLiveData.bindingEditText = search_bar
 
         viewModel.searchTextLiveData.observe(viewLifecycleOwner, Observer {

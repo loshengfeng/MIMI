@@ -15,7 +15,7 @@ import retrofit2.HttpException
 
 class CategoriesDataSource(
     private val category: String?,
-    private val orderByType: StatisticsOrderType,
+    private val orderByType: Int,
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
     private val pagingCallback: PagingCallback,

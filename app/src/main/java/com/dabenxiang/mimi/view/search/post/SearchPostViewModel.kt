@@ -274,7 +274,6 @@ class SearchPostViewModel : BaseViewModel() {
                     viewModelScope,
                     domainManager,
                     pagingCallback,
-                    isAdult,
                     "",
                     searchingTag,
                     searchingStr,
