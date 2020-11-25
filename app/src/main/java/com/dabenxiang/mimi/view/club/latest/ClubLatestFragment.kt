@@ -20,6 +20,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class ClubLatestFragment : BaseFragment() {
 
@@ -32,7 +33,7 @@ class ClubLatestFragment : BaseFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-
+        Timber.i("ClubLatestFragment onAttach")
         viewModel.clubCount.observe(this, Observer {
 
         })
