@@ -15,7 +15,7 @@ import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.OrderBy
+import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.vo.CarouselHolderItem
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.adapter.CategoryVideoListAdapter
@@ -25,7 +25,6 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.home.HomeTemplate
 import com.dabenxiang.mimi.view.home.viewholder.*
-import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_categories.*
@@ -50,11 +49,10 @@ class CategoriesFragment : BaseFragment() {
 
     private val viewModel: CategoriesViewModel by viewModels()
 
-    private var initOrderBy = OrderBy.NEWEST.value
-    private var initCategory = ""
+    private var orderByType = StatisticsOrderType.LATEST.value
+    private var category = ""
     private var lstFilterRV: List<RecyclerView> = listOf()
     private var lstFilterText: ArrayList<List<String>> = arrayListOf()
-    private var lstFilterIndex: ArrayList<Int?> = arrayListOf(0, null)
 
     private val videoListAdapter by lazy {
         CategoryVideoListAdapter(adapterListener)
@@ -62,13 +60,7 @@ class CategoriesFragment : BaseFragment() {
 
     private val adapterListener = object : HomeAdapter.EventListener {
         override fun onVideoClick(view: View, item: PlayerItem) {
-            val bundle = PlayerFragment.createBundle(item)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_categoriesFragment_to_navigation_player,
-                    bundle
-                )
-            )
+            // TODO: 跳至播放頁面
         }
 
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {}
@@ -105,21 +97,14 @@ class CategoriesFragment : BaseFragment() {
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
 
-        initCategory = arguments?.getString(KEY_CATEGORY) ?: ""
-        initOrderBy = arguments?.getInt(KEY_ORDER_BY) ?: OrderBy.NEWEST.value
-        setupTitle(initCategory)
+        category = arguments?.getString(KEY_CATEGORY) ?: ""
+        orderByType = arguments?.getInt(KEY_ORDER_BY) ?: StatisticsOrderType.LATEST.value
+        setupTitle()
 
         recyclerview_content.layoutManager = GridLayoutManager(requireContext(), 2)
         recyclerview_content.adapter = videoListAdapter
-    }
 
-    override fun setupObservers() {
         lstFilterRV = listOf(rl_filter_0, rl_filter_1)
-
-        viewModel.showProgress.observe(this, Observer { showProgress ->
-            if (showProgress) progressHUD.show()
-            else progressHUD.dismiss()
-        })
 
         viewModel.getCategoryResult.observe(this, Observer {
             when (it) {
@@ -143,6 +128,15 @@ class CategoriesFragment : BaseFragment() {
             }
         })
 
+        viewModel.getCategory()
+    }
+
+    override fun setupObservers() {
+        viewModel.showProgress.observe(this, Observer { showProgress ->
+            if (showProgress) progressHUD.show()
+            else progressHUD.dismiss()
+        })
+
         viewModel.videoList.observe(viewLifecycleOwner, Observer { data ->
             videoListAdapter.submitList(data)
         })
@@ -151,8 +145,6 @@ class CategoriesFragment : BaseFragment() {
             cl_no_data.visibility =
                 it.takeIf { it == 0L }?.let { View.VISIBLE } ?: let { View.GONE }
         })
-
-        viewModel.getCategory()
     }
 
     override fun setupListeners() {
@@ -162,7 +154,7 @@ class CategoriesFragment : BaseFragment() {
         }
 
         iv_search.setOnClickListener {
-            val bundle = SearchVideoFragment.createBundle()
+            val bundle = SearchVideoFragment.createBundle(category = category)
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_to_searchVideoFragment,
@@ -178,7 +170,7 @@ class CategoriesFragment : BaseFragment() {
 
         tv_all_1.setOnClickListener {
             updateFirstTab(true)
-            lstFilterIndex[CATEGORY] = null
+            category = ""
             (lstFilterRV[CATEGORY].adapter as FilterTabAdapter).updateLastSelected(null)
             setupTitle()
             setupCollapsingText()
@@ -205,13 +197,16 @@ class CategoriesFragment : BaseFragment() {
                 keyword: String
             ) {
                 if (index == CATEGORY) {
+                    category = keyword
                     updateFirstTab(false)
-                    setupTitle(keyword)
+                    setupTitle()
+                } else {
+                    orderByType = if (position == 0) StatisticsOrderType.LATEST.value
+                    else StatisticsOrderType.HOTTEST.value
                 }
                 val adapter = lstFilterRV[index].adapter as FilterTabAdapter
                 adapter.notifyDataSetChanged()
                 adapter.updateLastSelected(position)
-                lstFilterIndex[index] = position
 
                 setupCollapsingText()
                 getVideos()
@@ -219,35 +214,30 @@ class CategoriesFragment : BaseFragment() {
         })
         val initSelectIndex =
             when {
-                index == SORT && initOrderBy == OrderBy.NEWEST.value -> 0
-                index == SORT && initOrderBy == OrderBy.HOTTEST.value -> 1
-                index == CATEGORY && lstFilterText[CATEGORY].contains(initCategory) ->
-                    lstFilterText[CATEGORY].indexOf(initCategory)
+                index == SORT && orderByType == StatisticsOrderType.LATEST.value -> 0
+                index == SORT && orderByType == StatisticsOrderType.HOTTEST.value -> 1
+                index == CATEGORY && lstFilterText[CATEGORY].contains(category) ->
+                    lstFilterText[CATEGORY].indexOf(category)
                 else -> null
             }
         adapter.submitList(list, initSelectIndex)
         updateFirstTab(initSelectIndex == null)
 
         lstFilterRV[index].adapter = adapter
-        lstFilterIndex[index] = initSelectIndex
     }
 
     private fun getVideos() {
-        val sortingIndex = lstFilterIndex[SORT]!!
-        val categoryIndex = lstFilterIndex[CATEGORY]
-        val category = if (categoryIndex == null) null
-        else lstFilterText[CATEGORY][categoryIndex]
-        viewModel.getVideoFilterList(category, sortingIndex)
+        viewModel.getVideoFilterList(category, orderByType)
     }
 
     @SuppressLint("SetTextI18n")
     private fun setupCollapsingText() {
-        val sortingIndex = lstFilterIndex[SORT]!!
-        val categoryIndex = lstFilterIndex[CATEGORY]
-        val textSorting = lstFilterText[SORT][sortingIndex]
+        val textSorting =
+            if (orderByType == StatisticsOrderType.LATEST.value) getString(R.string.category_newest)
+            else getString(R.string.category_top_hit)
         val textCategory =
-            if (categoryIndex == null) getString(R.string.all)
-            else lstFilterText[CATEGORY][categoryIndex]
+            if (category.isBlank()) getString(R.string.all)
+            else category
         tv_collapsing_filter.text = "$textSorting, $textCategory"
     }
 
@@ -354,9 +344,9 @@ class CategoriesFragment : BaseFragment() {
         )
     }
 
-    private fun setupTitle(category: String = "") {
+    private fun setupTitle() {
         tv_title.text =
-            if (category.isBlank()) getString(R.string.home_tab_video)
-            else category
+                if (category.isBlank()) getString(R.string.home_tab_video)
+                else category
     }
 }

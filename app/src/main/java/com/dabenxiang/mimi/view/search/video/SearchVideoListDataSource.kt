@@ -17,12 +17,11 @@ class SearchVideoListDataSource(
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
     private val pagingCallback: SearchPagingCallback,
-    private val isAdult: Boolean = false,
     private val category: String = "",
     private val tag: String = "",
-    private val name: String = "",
-    private val adHeight: Int,
-    private val adWidth: Int
+    private val keyword: String = "",
+    private val adWidth: Int,
+    private val adHeight: Int
 ) : PageKeyedDataSource<Long, VideoItem>() {
 
     companion object {
@@ -42,8 +41,7 @@ class SearchVideoListDataSource(
                 val adItem = adRepository.getAD(adWidth, adHeight).body()?.content ?: AdItem()
 
                 val result = domainManager.getApiRepository().searchHomeVideos(
-                    q = name,
-                    isAdult = true,
+                    q = keyword,
                     offset = "0",
                     limit = PER_LIMIT,
                     tag = tag,
@@ -75,6 +73,7 @@ class SearchVideoListDataSource(
                 emit(Pair(LoadResult(list, nextPageKey), totalCount))
             }
                 .flowOn(Dispatchers.IO)
+                .onStart { pagingCallback.onLoading() }
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect {
@@ -100,8 +99,7 @@ class SearchVideoListDataSource(
                 val adItem = adRepository.getAD(adWidth, adHeight).body()?.content ?: AdItem()
 
                 val result = domainManager.getApiRepository().searchHomeVideos(
-                    q = name,
-                    isAdult = true,
+                    q = keyword,
                     offset = next.toString(),
                     limit = PER_LIMIT,
                     tag = tag,
@@ -133,6 +131,7 @@ class SearchVideoListDataSource(
                 emit(Pair(list, nextPageKey))
             }
                 .flowOn(Dispatchers.IO)
+                .onStart { pagingCallback.onLoading() }
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect {
@@ -152,9 +151,9 @@ class SearchVideoListDataSource(
 
     private fun adjustData(list: List<VideoItem>) {
         list.forEach { videoItem ->
-            videoItem.isAdult = isAdult
+            videoItem.isAdult = true
             videoItem.searchingTag = tag
-            videoItem.searchingStr = name
+            videoItem.searchingStr = keyword
         }
     }
 }
