@@ -173,7 +173,7 @@
             android:text="0"
             android:textSize="50sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageView9"
+            app:layout_constraintStart_toEndOf="@+id/imgShare"
             tools:text="50" />
 
         <TextView
@@ -196,7 +196,7 @@
             android:layout_marginStart="4dp"
             android:text="@string/invite_vip_people_text"
             android:textColor="@color/color_black_1_40"
-            app:layout_constraintStart_toEndOf="@+id/imageView9"
+            app:layout_constraintStart_toEndOf="@+id/imgShare"
             app:layout_constraintTop_toBottomOf="@+id/tv_invite_vip_people" />
 
         <TextView
@@ -210,7 +210,7 @@
             app:layout_constraintTop_toBottomOf="@+id/tv_invite_vip_days" />
 
         <ImageView
-            android:id="@+id/imageView9"
+            android:id="@+id/imgShare"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="58dp"

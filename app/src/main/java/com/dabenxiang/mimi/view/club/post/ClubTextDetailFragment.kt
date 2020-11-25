@@ -7,19 +7,18 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.OnItemClickListener
+import com.dabenxiang.mimi.callback.ClubPostFuncItem
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
-import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
+import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.view.player.CommentAdapter
-import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_text_detail.*
@@ -34,6 +33,8 @@ class ClubTextDetailFragment : BaseFragment() {
     private var memberPostItem: MemberPostItem? = null
 
     private var textDetailAdapter: ClubTextDetailAdapter? = null
+
+    var moreDialog: MoreDialogFragment? = null
 
     private var adWidth = 0
     private var adHeight = 0
@@ -73,6 +74,13 @@ class ClubTextDetailFragment : BaseFragment() {
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
+
+        viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Success -> textDetailAdapter?.notifyItemChanged(it.result)
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -91,7 +99,8 @@ class ClubTextDetailFragment : BaseFragment() {
             requireContext(),
             memberPostItem!!,
             onTextDetailListener,
-            onItemClickListener
+            null,
+            clubPostFuncItem
         )
 
         recyclerView.layoutManager = LinearLayoutManager(context)
@@ -107,56 +116,16 @@ class ClubTextDetailFragment : BaseFragment() {
         }
 
         override fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
-//            checkStatus { viewModel.followPost(item, position, isFollow) }
+            checkStatus { viewModel.followPost(item, position, isFollow) }
         }
 
-        override fun onGetCommandInfo(adapter: CommentAdapter, type: CommentType) {
-        }
-
-        override fun onGetReplyCommand(parentNode: RootCommentNode, succeededBlock: () -> Unit) {
-//            replyCommentBlock = succeededBlock
-//            viewModel.getReplyComment(parentNode, memberPostItem!!)
-        }
-
-        override fun onCommandLike(commentId: Long?, isLike: Boolean, succeededBlock: () -> Unit) {
-//            checkStatus {
-//                commentLikeBlock = succeededBlock
-//                val type = if (isLike) LikeType.LIKE else LikeType.DISLIKE
-//                viewModel.postCommentLike(commentId!!, type, memberPostItem!!)
-//            }
-        }
-
-        override fun onCommandDislike(commentId: Long?, succeededBlock: () -> Unit) {
-//            checkStatus {
-//                commentLikeBlock = succeededBlock
-//                viewModel.deleteCommentLike(commentId!!, memberPostItem!!)
-//            }
-        }
-
-        override fun onReplyComment(replyId: Long?, replyName: String?) {
-//            checkStatus {
-//                takeUnless { replyId == null }?.also {
-//                    layout_bar.visibility = View.INVISIBLE
-//                    layout_edit_bar.visibility = View.VISIBLE
-//
-//                    GeneralUtils.showKeyboard(requireContext())
-//                    et_message.requestFocus()
-//                    et_message.tag = replyId
-//                    tv_replay_name.text = replyName.takeIf { it != null }?.let {
-//                        tv_replay_name.visibility = View.VISIBLE
-//                        String.format(requireContext().getString(R.string.clip_username), it)
-//                    } ?: run { "" }
-//                }
-//            }
-        }
-
-        override fun onMoreClick(item: MembersPostCommentItem) {
-//            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener, true).also {
-//                it.show(
-//                    requireActivity().supportFragmentManager,
-//                    MoreDialogFragment::class.java.simpleName
-//                )
-//            }
+        override fun onMoreClick(item: MemberPostItem) {
+            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener, true).also {
+                it.show(
+                    requireActivity().supportFragmentManager,
+                    MoreDialogFragment::class.java.simpleName
+                )
+            }
         }
 
         override fun onChipClick(type: PostType, tag: String) {
@@ -164,7 +133,7 @@ class ClubTextDetailFragment : BaseFragment() {
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_textDetailFragment_to_searchPostFragment,
+                    R.id.action_clubTextDetailFragment_to_searchPostFragment,
                     bundle
                 )
             )
@@ -180,16 +149,59 @@ class ClubTextDetailFragment : BaseFragment() {
                 isAdult = true,
                 isAdultTheme = false
             )
-            navigateTo(NavigateItem.Destination(R.id.action_to_myPostFragment, bundle))
+            navigateTo(NavigateItem.Destination(R.id.action_clubTextDetailFragment_to_myPostFragment, bundle))
         }
     }
 
-    private val onItemClickListener = object : OnItemClickListener {
-        override fun onItemClick() {
-            GeneralUtils.hideKeyboard(requireActivity())
-//            layout_bar.visibility = View.VISIBLE
-//            layout_edit_bar.visibility = View.INVISIBLE
-//            et_message.setText("")
+    private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
+        override fun onProblemReport(item: BaseMemberPostItem, isComment:Boolean) {
+            moreDialog?.dismiss()
+            checkStatus {
+                (requireActivity() as MainActivity).showReportDialog(
+                    item,
+                    memberPostItem,
+                    isComment
+                )
+            }
         }
+
+        override fun onCancel() {
+            moreDialog?.dismiss()
+        }
+    }
+
+    private fun followMember(
+        memberPostItem: MemberPostItem,
+        items: List<MemberPostItem>,
+        isFollow: Boolean,
+        update: (Boolean) -> Unit
+    ) {
+        checkStatus { viewModel.followMember(memberPostItem, ArrayList(items), isFollow, update) }
+    }
+
+    private fun favoritePost(
+        memberPostItem: MemberPostItem,
+        isFavorite: Boolean,
+        update: (Boolean, Int) -> Unit
+    ) {
+        checkStatus { viewModel.favoritePost(memberPostItem, isFavorite, update) }
+    }
+
+    private fun likePost(
+        memberPostItem: MemberPostItem,
+        isLike: Boolean,
+        update: (Boolean, Int) -> Unit
+    ) {
+        checkStatus { viewModel.likePost(memberPostItem, isLike, update) }
+    }
+
+    private val clubPostFuncItem by lazy {
+        ClubPostFuncItem(
+            {},
+            { id, view, type -> viewModel.loadImage(id, view, type) },
+            { item, items, isFollow, func -> followMember(item, items, isFollow, func) },
+            { item, isLike, func -> likePost(item, isLike, func) },
+            { item, isFavorite, func -> favoritePost(item, isFavorite, func) }
+        )
     }
 }

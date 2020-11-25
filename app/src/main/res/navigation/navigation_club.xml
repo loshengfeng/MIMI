@@ -7,6 +7,7 @@
 
     <include app:graph="@navigation/navigation_login" />
     <include app:graph="@navigation/navigation_club_topic" />
+    <include app:graph="@navigation/navigation_my_post" />
 
     <fragment
         android:id="@+id/clubTabFragment"
@@ -21,16 +22,33 @@
         <action
             android:id="@+id/action_clubTabFragment_to_topicDetailFragment"
             app:destination="@id/navigation_club_topic" />
+        <action
+            android:id="@+id/action_clubTabFragment_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
     </fragment>
 
     <fragment
         android:id="@+id/clubTextDetailFragment"
         android:name="com.dabenxiang.mimi.view.club.post.ClubTextFragment"
         tools:layout="@layout/fragment_club_text">
+        <action
+            android:id="@+id/action_clubTextDetailFragment_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_clubTextDetailFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/clubPicDetailFragment"
         android:name="com.dabenxiang.mimi.view.club.post.ClubPicDetailFragment"
         tools:layout="@layout/fragment_club_pic_detail" />
+        <action
+            android:id="@+id/action_clubPicDetailFragment_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+
+    <fragment
+        android:id="@+id/searchPostFragment"
+        android:name="com.dabenxiang.mimi.view.search.post.SearchPostFragment"
+        tools:layout="@layout/fragment_search_post" />
 </navigation>
