@@ -42,7 +42,7 @@ class GuessLikeDataSource(
                 val result = apiRepository.statisticsHomeVideos(
                     "",
                     "",
-                    StatisticsOrderType.HOTTEST,
+                    StatisticsOrderType.HOTTEST.value,
                     category,
                     "",
                     true,
@@ -87,7 +87,7 @@ class GuessLikeDataSource(
                 val result = apiRepository.statisticsHomeVideos(
                     "",
                     "",
-                    StatisticsOrderType.HOTTEST,
+                    StatisticsOrderType.HOTTEST.value,
                     category,
                     "",
                     true,

@@ -48,6 +48,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.net.UnknownHostException
 import kotlin.math.abs
+import kotlin.math.round
 
 class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener {
 
@@ -131,6 +132,16 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
 
         viewModel.showRechargeReminder.observe(viewLifecycleOwner) {
             showRechargeReminder(it)
+        }
+
+        viewModel.fastForwardTime.observe(viewLifecycleOwner) {
+            tv_forward_backward.text = "${if (it > 0) "+" else ""}${it / 1000}秒"
+        }
+
+        viewModel.soundLevel.observe(viewLifecycleOwner) {
+            //Timber.d("sound level: $it")
+            val soundLevel = round(it * 10) * 10
+            tv_sound_tune.text = "音量${soundLevel.toInt()}%"
         }
     }
 

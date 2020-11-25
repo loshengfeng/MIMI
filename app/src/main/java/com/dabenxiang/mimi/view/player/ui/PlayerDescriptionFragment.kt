@@ -59,11 +59,12 @@ class PlayerDescriptionFragment : BaseFragment() {
         GuessLikeVideoAdapter(object : OnGarbageItemClick {
 
             override fun onStatisticsDetail(baseVideoItem: BaseVideoItem) {
-
+                viewModel.videoContentId = (baseVideoItem as BaseVideoItem.Video).id!!
+                viewModel.getVideoContent()
             }
 
             override fun onTagClick(tag: String) {
-
+                searchVideo(tag)
             }
 
         })
@@ -239,17 +240,21 @@ class PlayerDescriptionFragment : BaseFragment() {
             chip.setTextColor(requireContext().getColor(R.color.color_black_1_50))
 
             chip.setOnClickListener {
-                val bundle = SearchVideoFragment.createBundle(
-                    tag = chip.text.toString()
-                )
-                bundle.putBoolean(PlayerFragment.KEY_IS_FROM_PLAYER, true)
-                findNavController().navigate(
-                    R.id.action_playerFragment_to_searchVideoFragment,
-                    bundle
-                )
+                searchVideo(chip.text.toString())
             }
 
             tag_group.addView(chip)
         }
+    }
+
+    private fun searchVideo(tag: String) {
+        val bundle = SearchVideoFragment.createBundle(
+            tag = tag
+        )
+        bundle.putBoolean(PlayerFragment.KEY_IS_FROM_PLAYER, true)
+        findNavController().navigate(
+            R.id.action_playerFragment_to_searchVideoFragment,
+            bundle
+        )
     }
 }
