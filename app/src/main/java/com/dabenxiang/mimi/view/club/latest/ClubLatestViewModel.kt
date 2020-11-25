@@ -19,6 +19,9 @@ import timber.log.Timber
 
 class ClubLatestViewModel : BaseViewModel() {
 
+    private val _adResult = MutableLiveData<ApiResult<AdItem>>()
+    val adResult: LiveData<ApiResult<AdItem>> = _adResult
+
     private val _clubCount = MutableLiveData<Int>()
     val clubCount: LiveData<Int> = _clubCount
 
@@ -33,9 +36,6 @@ class ClubLatestViewModel : BaseViewModel() {
 
     private var _favoriteResult = MutableLiveData<ApiResult<Int>>()
     val favoriteResult: LiveData<ApiResult<Int>> = _favoriteResult
-
-    private var _isNoData = MutableLiveData<Boolean>().also { it.value = false }
-    val isNoData: LiveData<Boolean> = _isNoData
 
     private val _clubIdList = ArrayList<Long>()
 
@@ -68,6 +68,19 @@ class ClubLatestViewModel : BaseViewModel() {
         return LivePagedListBuilder(dataSourceFactory, config).build()
     }
 
+    fun getAd() {
+        viewModelScope.launch {
+            flow {
+                val adResult = domainManager.getAdRepository().getAD(adWidth, adHeight)
+                if (!adResult.isSuccessful) throw HttpException(adResult)
+                emit(ApiResult.success(adResult.body()?.content))
+            }
+                    .flowOn(Dispatchers.IO)
+                    .collect { _adResult.value = it}
+        }
+
+    }
+
     private val pagingCallback = object : PagingCallback {
         override fun onLoading() {
             setShowProgress(true)
@@ -79,26 +92,11 @@ class ClubLatestViewModel : BaseViewModel() {
 
         override fun onThrowable(throwable: Throwable) {
             Timber.e(throwable)
+            _clubCount.postValue(0)
         }
 
         override fun onCurrentItemCount(count: Long, isInitial: Boolean) {
-            totalCount = if (isInitial) count.toInt()
-            else totalCount.plus(count.toInt())
-            if (isInitial) cleanRemovedPosList()
-            if (totalCount == 0) {
-                _isNoData.value = true
-            }
-        }
-    }
-
-    private val clubPagingCallback = object : MyFollowPagingCallback {
-        override fun onTotalCount(count: Long) {
             _clubCount.postValue(count.toInt())
-        }
-
-        override fun onIdList(list: ArrayList<Long>, isInitial: Boolean) {
-            if (isInitial) _clubIdList.clear()
-            _clubIdList.addAll(list)
         }
     }
 
