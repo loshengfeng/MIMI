@@ -10,5 +10,7 @@ data class VideoByCategoryItem(
     val title: String = "",
 
     @SerializedName("cover")
-    val cover: String = ""
+    val cover: String = "",
+
+    val adItem: AdItem? = null
 )
