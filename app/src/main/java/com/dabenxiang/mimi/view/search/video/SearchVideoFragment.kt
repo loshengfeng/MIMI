@@ -85,6 +85,7 @@ class SearchVideoFragment : BaseFragment() {
             viewModel.searchingTag = data.tag
             viewModel.category = data.category
             if (data.tag.isNotBlank()) {
+                layout_search_history.visibility = View.GONE
                 viewModel.getSearchList()
             }
 
@@ -121,6 +122,7 @@ class SearchVideoFragment : BaseFragment() {
 
         viewModel.searchingTotalCount.observe(viewLifecycleOwner, Observer { count ->
             tv_search_text.text = genResultText(count)
+            layout_search_text.visibility = View.VISIBLE
         })
 
         viewModel.likeResult.observe(viewLifecycleOwner, Observer {
@@ -187,7 +189,6 @@ class SearchVideoFragment : BaseFragment() {
     private fun searchText() {
         if (search_bar.text.isNotBlank()) {
             layout_search_history.visibility = View.GONE
-            layout_search_text.visibility = View.VISIBLE
             viewModel.searchingTag = ""
             viewModel.searchingStr = search_bar.text.toString()
             viewModel.getSearchList()
@@ -292,6 +293,7 @@ class SearchVideoFragment : BaseFragment() {
         }
 
         override fun onChipClick(text: String) {
+            layout_search_text.visibility = View.GONE
             viewModel.searchingTag = text
             viewModel.searchingStr = ""
             viewModel.getSearchList()
@@ -359,7 +361,6 @@ class SearchVideoFragment : BaseFragment() {
             chip.setOnClickListener {
                 search_bar.setText(text)
                 layout_search_history.visibility = View.GONE
-                layout_search_text.visibility = View.VISIBLE
                 viewModel.searchingStr = text
                 viewModel.searchingTag = ""
                 viewModel.getSearchList()
