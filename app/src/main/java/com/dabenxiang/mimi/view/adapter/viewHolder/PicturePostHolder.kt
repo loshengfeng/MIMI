@@ -162,6 +162,8 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
             likeImage.setImageResource(R.drawable.ico_nice_gray)
         }
 
+        // New Adjust: Follow is hidden when it is on the list page, and the follow function is only available on the detailed page
+        follow.visibility =  View.GONE
         follow.setOnClickListener {
             itemList?.also {
                 memberPostFuncItem.onFollowClick(item, itemList, !item.isFollow) { isFollow ->

@@ -18,8 +18,8 @@ class ClubFollowViewModel : BaseViewModel() {
     private val _adResult = MutableLiveData<ApiResult<AdItem>>()
     val adResult: LiveData<ApiResult<AdItem>> = _adResult
 
-    private val _clubCount = MutableLiveData<Int>()
-    val clubCount: LiveData<Int> = _clubCount
+    private val _postCount = MutableLiveData<Int>()
+    val postCount: LiveData<Int> = _postCount
 
 
     fun getPostItemList(): Flow<PagingData<MemberPostItem>> {
@@ -54,7 +54,7 @@ class ClubFollowViewModel : BaseViewModel() {
     private val pagingCallback = object : PagingCallback {
 
         override fun onTotalCount(count: Long) {
-            _clubCount.postValue(count.toInt())
+            _postCount.postValue(count.toInt())
         }
 
     }

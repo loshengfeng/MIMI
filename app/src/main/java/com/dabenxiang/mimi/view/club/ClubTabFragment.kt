@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.club
 import android.content.Context
 import android.os.Bundle
 import android.view.View
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.paging.PagingData
 import com.dabenxiang.mimi.R
@@ -70,6 +71,10 @@ class ClubTabFragment : BaseFragment() {
         }.attach()
 
         topic_tabs.adapter = topicListAdapter
+
+        search_bar.addTextChangedListener {
+            //TODO search
+        }
 
     }
 

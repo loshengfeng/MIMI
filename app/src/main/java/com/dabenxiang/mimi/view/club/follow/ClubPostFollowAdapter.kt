@@ -57,7 +57,6 @@ class ClubPostFollowAdapter(
             when (item?.type) {
                 PostType.VIDEO -> VIEW_TYPE_CLIP
                 PostType.IMAGE -> VIEW_TYPE_PICTURE
-//                PostType.AD -> VIEW_TYPE_AD
                 else -> VIEW_TYPE_TEXT
             }
         }
@@ -65,12 +64,6 @@ class ClubPostFollowAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (viewType) {
-//            VIEW_TYPE_AD -> {
-//                AdHolder(
-//                        LayoutInflater.from(parent.context)
-//                                .inflate(R.layout.item_ad, parent, false)
-//                )
-//            }
             VIEW_TYPE_CLIP -> {
                 ClipPostHolder(
                         LayoutInflater.from(parent.context)

@@ -22,7 +22,6 @@ import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_follow.*
 import kotlinx.android.synthetic.main.fragment_club_follow.layout_refresh
-import kotlinx.android.synthetic.main.fragment_my_post.*
 import kotlinx.android.synthetic.main.item_ad.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -49,7 +48,7 @@ class ClubPostFollowFragment : BaseFragment() {
             layout_refresh.isRefreshing = it
         })
 
-        viewModel.clubCount.observe(this, {
+        viewModel.postCount.observe(this, {
             if(it <=0) {
                 id_empty_group.visibility =View.VISIBLE
                 recycler_view.visibility = View.INVISIBLE
@@ -101,7 +100,7 @@ class ClubPostFollowFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
         Timber.i("onResume isLogin:${accountManager.isLogin()}")
-        if(accountManager.isLogin()) {
+        if(accountManager.isLogin() && viewModel.postCount.value?: 0 <= 0) {
             getData()
         }
     }
