@@ -225,7 +225,7 @@
     <string name="vip_expiry_date">VIP 於 %s 到期</string>
     <string name="no_data">尚无资料</string>
     <string name="identity">游客</string>
-    
+
     <!-- Follow -->
     <string name="follow_title">我的关注</string>
     <string name="follow_people">关注的人</string>
@@ -298,6 +298,8 @@
     <string name="like">喜欢</string>
     <!-- fans -->
     <string name="fans">粉丝</string>
+    <string name="total_count_fans">全部粉丝%s人</string>
+    <string name="title_fans">我的粉丝</string>
     <!-- fans -->
     <string name="exchange">兑换激活码</string>
 

@@ -44,18 +44,16 @@ class PersonalViewModel : BaseViewModel() {
                 flow {
                     val result = domainManager.getApiRepository().getGuestInfo()
                     if (!result.isSuccessful) throw HttpException(result)
-                    val deducted = result.body()?.content?.videoCount ?: 0
-                    Timber.e("Show videoCount : " + result.body()?.content?.videoCount)
-                    Timber.e("Show videoOnDemandCount : " + result.body()?.content?.videoOnDemandCount)
-                    emit(deducted)
-                }
-                    .flowOn(Dispatchers.IO)
-                    .catch { e ->
-                        e.printStackTrace()
-//                    update(position, false)
-                    }.collect {
-//                        update(position, it)
+                    val meItem = result.body()?.content
+                    meItem?.let {
+                        accountManager.setupProfile(it)
                     }
+                    emit(ApiResult.success(meItem))
+                }
+                    .onStart { emit(ApiResult.loading()) }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .collect { _meItem.value = it }
             }
         }
     }

@@ -42,6 +42,14 @@
         <action
             android:id="@+id/action_to_topupFragment"
             app:destination="@id/navigation_topup" />
+
+        <action
+            android:id="@+id/action_to_fanslistFragment"
+            app:destination="@id/fansListFragment" />
+
+<!--        <action-->
+<!--            android:id="@+id/action_to_likelistFragment"-->
+<!--            app:destination="@id/likesListFragment" />-->
     </fragment>
 
     <fragment
@@ -87,5 +95,15 @@
         android:id="@+id/paymentInfoFragment"
         android:name="com.dabenxiang.mimi.view.paymentInfo.PaymentInfoFragment"
         android:label="PaymentInfoFragment" />
+
+    <fragment
+        android:id="@+id/fansListFragment"
+        android:name="com.dabenxiang.mimi.view.fans.FansListFragment"
+        android:label="FansListFragment" />
+
+<!--    <fragment-->
+<!--        android:id="@+id/fansListFragment"-->
+<!--        android:name="com.dabenxiang.mimi.view.fans.FansListFragment"-->
+<!--        android:label="FansListFragment" />-->
 
 </navigation>

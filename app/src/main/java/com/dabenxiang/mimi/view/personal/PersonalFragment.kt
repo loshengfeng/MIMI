@@ -94,10 +94,22 @@ class PersonalFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     val meItem = it.result
-                    id_personal.text = meItem.friendlyName.toString()
-                    if (meItem.expiryDate==null){
+                    meItem.friendlyName?.let {
+                        id_personal.text = it
+                    }
+                    meItem.videoCount?.let { count ->
+                        meItem.videoCountLimit?.let { countlimit ->
+                            video_long_count.text = count.toString() + "/" + countlimit.toString()
+                        }
+                    }
+                    meItem.videoOnDemandCount?.let { count ->
+                        meItem.videoOnDemandCountLimit?.let { countlimit ->
+                            video_short_count.text = count.toString() + "/" + countlimit.toString()
+                        }
+                    }
+                    if (meItem.expiryDate == null) {
                         layout_vip_unlimit_unlogin.visibility = View.VISIBLE
-                    }else{
+                    } else {
                         meItem.expiryDate?.let { date ->
                             layout_vip_unlimit.visibility = View.INVISIBLE
                             tv_expiry_date.text = getString(
@@ -109,8 +121,6 @@ class PersonalFragment : BaseFragment() {
                             )
                         }
                     }
-
-
 //                    //TODO: 目前先不判斷是否有驗證過
 ////                    takeUnless { meItem.isEmailConfirmed == true }?.run {
 ////                        (requireActivity() as MainActivity).showEmailConfirmDialog()
@@ -177,7 +187,11 @@ class PersonalFragment : BaseFragment() {
             when (buttonView.id) {
                 R.id.tv_topup -> mainViewModel?.changeNavigationPosition?.value =
                     R.id.navigation_topup
+
                 R.id.tv_follow -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
+                R.id.follow_count -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
+                R.id.follow -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
+
                 R.id.tv_topup_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_orderFragment))
 //                R.id.tv_chat_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_chatHistoryFragment))
                 R.id.tv_my_post -> findNavController().navigate(R.id.action_personalFragment_to_myPostFragment)
@@ -193,10 +207,6 @@ class PersonalFragment : BaseFragment() {
                     Glide.with(this).clear(avatar)
                     Glide.with(this).load(R.drawable.default_profile_picture).into(avatar)
                     viewModel.signOut()
-//                    NavigateItem.Destination(
-//                        R.id.action_personalFragment_to_loginFragment,
-//                        LoginFragment.createBundle(TYPE_LOGIN)
-//                    )
                 }
                 R.id.vippromote_now -> {
                     if (viewModel.isLogin()) {
@@ -238,11 +248,17 @@ class PersonalFragment : BaseFragment() {
                         )
                     }
                 }
+
+                R.id.fans_count -> navigateTo(NavigateItem.Destination(R.id.action_to_fanslistFragment))
+                R.id.fans -> navigateTo(NavigateItem.Destination(R.id.action_to_fanslistFragment))
+
+                R.id.like_count -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_orderFragment))
+                R.id.like -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_orderFragment))
             }
         }.also {
 //            tv_topup.setOnClickListener(it)
             layout_vip_unlimit_unlogin.setOnClickListener(it)
-            tv_follow.setOnClickListener(it)
+
 //            tv_topup_history.setOnClickListener(it)
 //            tv_chat_history.setOnClickListener(it)
             tv_my_post.setOnClickListener(it)
@@ -251,6 +267,16 @@ class PersonalFragment : BaseFragment() {
             tv_logout.setOnClickListener(it)
             vippromote_now.setOnClickListener(it)
 //            tv_register.setOnClickListener(it)
+
+            like_count.setOnClickListener(it)
+            like.setOnClickListener(it)
+
+            fans_count.setOnClickListener(it)
+            fans.setOnClickListener(it)
+
+            tv_follow.setOnClickListener(it)
+            follow_count.setOnClickListener(it)
+            follow.setOnClickListener(it)
         }
     }
 
