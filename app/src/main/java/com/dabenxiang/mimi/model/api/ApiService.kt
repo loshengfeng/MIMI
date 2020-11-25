@@ -302,6 +302,9 @@ interface ApiService {
     @GET("/v1/Members/Home/Categories")
     suspend fun fetchHomeCategories(): Response<ApiBaseItem<RootCategoriesItem>>
 
+    @GET("/v1/Members/Home/Categories")
+    suspend fun fetchHomeCategories(@Query("parentId") parentId: Int): Response<ApiBaseItem<ArrayList<CategoriesItem>>>
+
     /**********************************************************
      *
      *                  Members/Home/Videos

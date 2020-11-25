@@ -79,10 +79,8 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="20dp"
-                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/iv_ad"
-                app:spanCount="2" />
+                app:layout_constraintTop_toBottomOf="@+id/iv_ad" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -35,14 +35,14 @@ fun List<VideoItem>.searchItemToVideoItem(isAdult: Boolean): List<BaseVideoItem.
     return result
 }
 
-fun List<StatisticsItem>.statisticsItemToVideoItem(isAdult: Boolean): List<BaseVideoItem.Video> {
+fun List<StatisticsItem>.statisticsItemToVideoItem(): List<BaseVideoItem.Video> {
     val result = mutableListOf<BaseVideoItem.Video>()
     forEach { item ->
         val holderItem = BaseVideoItem.Video(
             id = item.id,
             title = item.title,
             imgUrl = item.cover,
-            isAdult = isAdult,
+            isAdult = true,
             resolution = "",
             info = "",
             tags = (item.tags as List<String>)

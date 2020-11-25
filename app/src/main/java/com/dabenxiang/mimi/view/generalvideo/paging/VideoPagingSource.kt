@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.generalvideo
+package com.dabenxiang.mimi.view.generalvideo.paging
 
 import androidx.paging.PagingSource
 import com.dabenxiang.mimi.model.api.vo.VideoByCategoryItem
