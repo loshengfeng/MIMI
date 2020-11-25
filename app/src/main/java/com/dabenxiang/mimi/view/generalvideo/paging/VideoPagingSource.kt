@@ -1,13 +1,16 @@
 package com.dabenxiang.mimi.view.generalvideo.paging
 
 import androidx.paging.PagingSource
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.VideoByCategoryItem
 import com.dabenxiang.mimi.model.manager.DomainManager
 import retrofit2.HttpException
 
 class VideoPagingSource(
     private val domainManager: DomainManager,
-    private val category: String
+    private val category: String,
+    private val adWidth: Int,
+    private val adHeight: Int,
 ) : PagingSource<Long, VideoByCategoryItem>() {
 
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, VideoByCategoryItem> {
@@ -18,8 +21,12 @@ class VideoPagingSource(
                 .getVideoByCategory(category, offset.toString(), params.loadSize.toString())
             if (!result.isSuccessful) throw HttpException(result)
 
+            val adItem = domainManager.getAdRepository()
+                .getAD(adWidth, adHeight).body()?.content ?: AdItem()
+
             val body = result.body()
             val items = body?.content
+            items?.add(0, VideoByCategoryItem(adItem = adItem))
 
             val nextOffset = when {
                 hasNextPage(
