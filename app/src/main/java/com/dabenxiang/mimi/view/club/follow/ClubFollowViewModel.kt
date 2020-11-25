@@ -44,7 +44,10 @@ class ClubFollowViewModel : BaseViewModel() {
                 pagingSourceFactory = {
                     ClubPostFollowListDataSource(
                             domainManager,
-                            pagingCallback
+                            pagingCallback,
+                            adWidth,
+                            adHeight
+
                     )
                 }
         )

@@ -174,10 +174,10 @@ class ClubPostFollowFragment : BaseFragment() {
 
     private fun loginPageToggle(isLogin:Boolean) {
         if(isLogin){
-            item_is_not_login.visibility = View.GONE
+            id_not_login_group.visibility = View.GONE
             layout_refresh.visibility = View.VISIBLE
         }else{
-            item_is_not_login.visibility = View.VISIBLE
+            id_not_login_group.visibility = View.VISIBLE
             layout_refresh.visibility = View.INVISIBLE
         }
     }

@@ -69,9 +69,9 @@ class ClubTabFragment : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view =  inflater.inflate(getLayoutId(), container, false)
-        view.club_view_pager.adapter = ClubTabAdapter(requireContext(), requireActivity().supportFragmentManager,
-                lifecycle)
-        tabLayoutMediator = TabLayoutMediator( view.club_tabs,  view.club_view_pager) { tab, position ->
+        view.club_view_pager.adapter =
+                ClubTabAdapter(requireContext(), childFragmentManager, lifecycle)
+        tabLayoutMediator = TabLayoutMediator(view.club_tabs,  view.club_view_pager) { tab, position ->
             tab.text = getTabTitle(position)
         }
         tabLayoutMediator.attach()
