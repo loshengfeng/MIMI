@@ -41,7 +41,7 @@ class ClubRecommendViewModel : BaseViewModel() {
 
     var totalCount: Int = 0
 
-    fun getPostItemList(){
+    fun getPostItemList() {
         viewModelScope.launch {
             getRecommendPostPagingItems()
                     .asFlow()
@@ -181,7 +181,8 @@ class ClubRecommendViewModel : BaseViewModel() {
                 }
                 if (!result.isSuccessful) throw HttpException(result)
                 items.forEach { item ->
-                    item.isFollow = isFollow
+                    if (items[position].creatorId == item.creatorId)
+                        item.isFollow = isFollow
                 }
                 emit(ApiResult.success(null))
             }
