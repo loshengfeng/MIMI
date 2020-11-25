@@ -31,18 +31,33 @@
                 app:layout_constraintTop_toBottomOf="@id/layout_ad"/>
 
             <include
+                android:id="@+id/layout_video_interactive"
+                layout="@layout/item_comment_interactive"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/layout_video_info"/>
+
+
+            <include
                 android:id="@+id/layout_source"
                 layout="@layout/head_source"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/layout_video_info"/>
+                app:layout_constraintTop_toBottomOf="@id/layout_video_interactive"/>
+
+            <include
+                android:id="@+id/layout_video_tag"
+                layout="@layout/item_video_tag"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/layout_source"/>
 
             <include
                 android:id="@+id/layout_guess_like"
                 layout="@layout/head_guess_like"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/layout_source"/>
+                app:layout_constraintTop_toBottomOf="@id/layout_video_tag"/>
 
 
             <androidx.recyclerview.widget.RecyclerView

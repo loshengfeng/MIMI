@@ -1,14 +1,13 @@
 package com.dabenxiang.mimi.view.player.ui
 
-import android.content.Context
 import android.content.pm.ActivityInfo
 import android.hardware.SensorManager
 import android.os.Bundle
-import android.view.*
-import android.view.inputmethod.InputMethodManager
+import android.view.Surface
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.dabenxiang.mimi.R
@@ -27,14 +26,10 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_v2_player.*
-import kotlinx.android.synthetic.main.fragment_v2_player.player_view
-import kotlinx.android.synthetic.main.fragment_v2_player.tv_forward_backward
-import kotlinx.android.synthetic.main.fragment_v2_player.tv_sound_tune
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import kotlin.math.abs
 
 class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener {
 
@@ -82,7 +77,16 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
                 is ApiResult.Success -> {
                     parsingEpisodeContent(it.result)
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is ApiResult.Error -> {
+                    when (it.throwable) {
+                        is PlayerV2ViewModel.NotDeductedException -> {
+                            showRechargeReminder(true)
+                            if(progressHUD.isShowing)
+                                progressHUD.dismiss()
+                        }
+                        else -> onApiError(it.throwable)
+                    }
+                }
             }
         }
 
@@ -101,7 +105,8 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
         }
 
         viewModel.videoStreamingUrl.observe(viewLifecycleOwner) {
-            setupPlayUrl(it, true)
+            if(!it.isNullOrEmpty())
+                setupPlayUrl(it, true)
         }
 
         viewModel.showRechargeReminder.observe(viewLifecycleOwner) {
@@ -151,7 +156,7 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
         }
 
         TabLayoutMediator(tabs, player_pager) { tab, position ->
-            tab.text = "1234"
+            tab.text = "视频简介"
         }.attach()
     }
 
@@ -172,7 +177,11 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
         }
 
         orientationDetector?.apply { enable() }
+    }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.clearLiveData()
     }
 
     private fun showRechargeReminder(isShow: Boolean) {

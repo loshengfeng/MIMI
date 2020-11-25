@@ -3,17 +3,20 @@ package com.dabenxiang.mimi.view.player.ui
 import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.text.TextUtils
+import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import androidx.paging.LivePagedListBuilder
+import androidx.paging.PagedList
+import com.dabenxiang.mimi.callback.GuessLikePagingCallBack
 import com.dabenxiang.mimi.extension.downloadFile
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.DownloadResult
-import com.dabenxiang.mimi.model.api.vo.VideoEpisodeItem
-import com.dabenxiang.mimi.model.api.vo.VideoItem
-import com.dabenxiang.mimi.model.api.vo.VideoM3u8Source
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.player.PlayerViewModel
+import com.dabenxiang.mimi.view.player.GuessLikeDataSource
+import com.dabenxiang.mimi.view.player.GuessLikeFactory
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
 import com.google.android.exoplayer2.source.MediaSource
@@ -32,7 +35,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import timber.log.Timber
-import kotlin.Throws
 
 class PlayerV2ViewModel: BaseViewModel() {
 
@@ -55,6 +57,12 @@ class PlayerV2ViewModel: BaseViewModel() {
 
     private val _videoStreamingUrl = MutableLiveData<String>()
     val videoStreamingUrl: LiveData<String> = _videoStreamingUrl
+
+    private val _selectSourcesPosition = MutableLiveData<Int>().also { it.value = -1 }
+    val selectSourcesPosition: LiveData<Int> = _selectSourcesPosition
+
+    private val _selectEpisodePosition = MutableLiveData<Int>()
+    val selectEpisodePosition: LiveData<Int> = _selectEpisodePosition
 
     val showIntroduction = MutableLiveData(false)
 
@@ -230,6 +238,27 @@ class PlayerV2ViewModel: BaseViewModel() {
             }
             else -> null
         }
+    }
+
+    fun selectSourcesIndex(position: Int) {
+        if (position != _selectSourcesPosition.value) {
+            _selectSourcesPosition.postValue(position)
+        }
+    }
+
+    fun selectStreamSourceIndex(position: Int) {
+        if (position != _selectEpisodePosition.value) {
+            _selectEpisodePosition.postValue(position)
+        }
+    }
+
+    fun clearLiveData() {
+        _videoContentSource.value = null
+        _episodeContentSource.value = null
+        _m3u8ContentSource.value = null
+        _selectSourcesPosition.value = 0
+        _selectEpisodePosition.value = 0
+        _videoStreamingUrl.value = null
     }
 
 }
