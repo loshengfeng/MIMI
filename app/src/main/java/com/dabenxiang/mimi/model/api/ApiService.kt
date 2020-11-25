@@ -275,7 +275,8 @@ interface ApiService {
         @Query("orderBy") orderBy: Int = 1,
         @Query("isAdult") isAdult: Boolean = true,
         @Query("isFullContent") isFullContent: Boolean = false,
-        @Query("status") status: Int = 1
+        @Query("status") status: Int = 1,
+        @Query("type") type: Int =7
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     @POST("/v1/Members/Club/{clubId}/Follow")
