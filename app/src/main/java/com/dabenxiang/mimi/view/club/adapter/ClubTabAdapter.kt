@@ -74,7 +74,7 @@ class PageTestFragment : BaseFragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         Timber.i("PageTestFragment ${arguments?.getString(KEY_PAGE_NAME, "")
-        } ≈")
+        } onAttach")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
