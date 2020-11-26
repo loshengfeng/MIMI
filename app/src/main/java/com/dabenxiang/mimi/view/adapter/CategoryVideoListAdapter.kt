@@ -18,7 +18,8 @@ import com.dabenxiang.mimi.view.home.viewholder.VideoViewHolder
 import kotlinx.android.synthetic.main.layout_item_video.view.*
 
 class CategoryVideoListAdapter(
-    private val nestedListener: HomeAdapter.EventListener) : PagedListAdapter<BaseVideoItem, BaseViewHolder>(diffCallback) {
+    private val nestedListener: HomeAdapter.EventListener
+) : PagedListAdapter<BaseVideoItem, BaseViewHolder>(diffCallback) {
 
     companion object {
         val diffCallback = object : DiffUtil.ItemCallback<BaseVideoItem>() {
