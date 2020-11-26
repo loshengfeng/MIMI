@@ -80,19 +80,19 @@ class ClubRecommendAdapter(
             VIEW_TYPE_CLIP -> {
                 MyPostClipPostHolder(
                         LayoutInflater.from(parent.context)
-                                .inflate(R.layout.item_clip_post, parent, false), isAdultTheme
+                                .inflate(R.layout.item_clip_post, parent, false)
                 )
             }
             VIEW_TYPE_PICTURE -> {
                 MyPostPicturePostHolder(
                         LayoutInflater.from(parent.context)
-                                .inflate(R.layout.item_picture_post, parent, false), isAdultTheme
+                                .inflate(R.layout.item_picture_post, parent, false)
                 )
             }
             VIEW_TYPE_TEXT -> {
                 MyPostTextPostHolder(
                         LayoutInflater.from(parent.context)
-                                .inflate(R.layout.item_text_post, parent, false), isAdultTheme
+                                .inflate(R.layout.item_text_post, parent, false)
                 )
             }
             else -> {
