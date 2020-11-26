@@ -249,11 +249,12 @@ class PersonalFragment : BaseFragment() {
                     }
                 }
 
+
                 R.id.fans_count -> navigateTo(NavigateItem.Destination(R.id.action_to_fanslistFragment))
                 R.id.fans -> navigateTo(NavigateItem.Destination(R.id.action_to_fanslistFragment))
 
-                R.id.like_count -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_orderFragment))
-                R.id.like -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_orderFragment))
+                R.id.like_count -> navigateTo(NavigateItem.Destination(R.id.action_to_likelistFragment))
+                R.id.like -> navigateTo(NavigateItem.Destination(R.id.action_to_likelistFragment))
             }
         }.also {
 //            tv_topup.setOnClickListener(it)

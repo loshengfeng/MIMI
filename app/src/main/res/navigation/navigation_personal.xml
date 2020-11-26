@@ -47,9 +47,9 @@
             android:id="@+id/action_to_fanslistFragment"
             app:destination="@id/fansListFragment" />
 
-<!--        <action-->
-<!--            android:id="@+id/action_to_likelistFragment"-->
-<!--            app:destination="@id/likesListFragment" />-->
+        <action
+            android:id="@+id/action_to_likelistFragment"
+            app:destination="@id/likesListFragment" />
     </fragment>
 
     <fragment
@@ -101,9 +101,9 @@
         android:name="com.dabenxiang.mimi.view.fans.FansListFragment"
         android:label="FansListFragment" />
 
-<!--    <fragment-->
-<!--        android:id="@+id/fansListFragment"-->
-<!--        android:name="com.dabenxiang.mimi.view.fans.FansListFragment"-->
-<!--        android:label="FansListFragment" />-->
+    <fragment
+        android:id="@+id/likesListFragment"
+        android:name="com.dabenxiang.mimi.view.like.LikeFragment"
+        android:label="LikeFragment" />
 
 </navigation>
