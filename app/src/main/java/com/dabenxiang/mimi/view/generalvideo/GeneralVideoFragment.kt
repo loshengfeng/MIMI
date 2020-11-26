@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.generalvideo
 
-import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -37,10 +36,6 @@ class GeneralVideoFragment(val category: String, val orderByType: Int) : BaseFra
         super.setupFirstTime()
         viewModel.adWidth = pxToDp(requireContext(), getScreenSize(requireActivity()).first)
         viewModel.adHeight = (viewModel.adWidth / 7)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
 
         tv_search.setOnClickListener {
             navToSearch()
@@ -50,9 +45,9 @@ class GeneralVideoFragment(val category: String, val orderByType: Int) : BaseFra
             navToCategory()
         }
 
-//        layout_refresh.setOnRefreshListener {
-//            generalVideoAdapter.refresh()
-//        }
+        layout_refresh.setOnRefreshListener {
+            generalVideoAdapter.refresh()
+        }
 
         generalVideoAdapter.addLoadStateListener(loadStateListener)
 
@@ -70,7 +65,6 @@ class GeneralVideoFragment(val category: String, val orderByType: Int) : BaseFra
         lifecycleScope.launch {
             viewModel.getVideoByCategory(category, orderByType)
                 .collectLatest {
-                    layout_refresh.isRefreshing = false
                     generalVideoAdapter.submitData(it)
                 }
         }
@@ -88,22 +82,38 @@ class GeneralVideoFragment(val category: String, val orderByType: Int) : BaseFra
         when (loadStatus.refresh) {
             is LoadState.Error -> {
                 Timber.e("Refresh Error: ${(loadStatus.refresh as LoadState.Error).error.localizedMessage}")
+                onApiError((loadStatus.refresh as LoadState.Error).error)
+
+                layout_empty_data?.run { this.visibility = View.VISIBLE }
+                tv_empty_data?.run { this.text = getString(R.string.error_video) }
+
+                rv_video?.run { this.visibility = View.INVISIBLE }
+                layout_refresh?.run { this.isRefreshing = false }
             }
             is LoadState.Loading -> {
-                if (layout_refresh != null) {
-                    layout_refresh.isRefreshing = true
-                }
+                layout_empty_data?.run { this.visibility = View.VISIBLE }
+                tv_empty_data?.run { this.text = getString(R.string.load_video) }
+                rv_video?.run { this.visibility = View.INVISIBLE }
+                layout_refresh?.run { this.isRefreshing = true }
             }
             is LoadState.NotLoading -> {
-                if (layout_refresh != null) {
-                    layout_refresh.isRefreshing = false
+                if (generalVideoAdapter.isDataEmpty()) {
+                    layout_empty_data?.run { this.visibility = View.VISIBLE }
+                    tv_empty_data?.run { this.text = getString(R.string.empty_video) }
+                    rv_video?.run { this.visibility = View.INVISIBLE }
+                } else {
+                    layout_empty_data?.run { this.visibility = View.INVISIBLE }
+                    rv_video?.run { this.visibility = View.VISIBLE }
                 }
+
+                layout_refresh?.run { this.isRefreshing = false }
             }
         }
 
         when (loadStatus.append) {
             is LoadState.Error -> {
                 Timber.e("Append Error:${(loadStatus.append as LoadState.Error).error.localizedMessage}")
+                onApiError((loadStatus.refresh as LoadState.Error).error)
             }
             is LoadState.Loading -> {
                 Timber.d("Append Loading endOfPaginationReached:${(loadStatus.append as LoadState.Loading).endOfPaginationReached}")
