@@ -23,9 +23,6 @@ class CategoriesViewModel : BaseViewModel() {
     private val _getCategoryResult = MutableLiveData<ApiResult<ArrayList<String>>>()
     val getCategoryResult: LiveData<ApiResult<ArrayList<String>>> = _getCategoryResult
 
-    private val _onTotalCountResult = MutableLiveData<Long>()
-    val onTotalCountResult: LiveData<Long> = _onTotalCountResult
-
     fun getVideo(
         category: String?,
         orderByType: Int

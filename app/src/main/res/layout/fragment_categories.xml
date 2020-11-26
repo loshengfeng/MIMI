@@ -20,41 +20,39 @@
             android:layout_height="match_parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/cl_no_data"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:visibility="gone"
+                android:id="@+id/layout_empty_data"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/recyclerview_content">
+                app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
-                    android:id="@+id/iv_no_data"
+                    android:id="@+id/iv_empty_data"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/img_page_empty"
-                    android:contentDescription="@null"
-                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                    android:src="@drawable/img_page_empty"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
 
                 <TextView
-                    android:id="@+id/tv_no_data"
+                    android:id="@+id/tv_empty_data"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/filter_empty"
-                    android:textColor="@color/color_black_2_50"
+                    android:text="@string/empty_video"
+                    android:textColor="@color/color_black_1"
                     android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/iv_empty_data"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/iv_no_data" />
+                    app:layout_constraintStart_toStartOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerview_content"
+                android:id="@+id/rv_video"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:background="@color/color_white_1"
