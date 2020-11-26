@@ -49,10 +49,10 @@
         android:clipToPadding="false"
         android:paddingTop="150dp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layout_top"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:spanCount="2" />
 
     <LinearLayout
@@ -72,8 +72,8 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:clipToPadding="false"
-            android:orientation="horizontal"
             android:gravity="center"
+            android:orientation="horizontal"
             android:paddingStart="20dp">
 
             <androidx.recyclerview.widget.RecyclerView
@@ -91,8 +91,8 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:clipToPadding="false"
-            android:orientation="horizontal"
             android:gravity="center"
+            android:orientation="horizontal"
             android:paddingStart="20dp">
 
             <TextView
@@ -103,8 +103,8 @@
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
                 android:text="@string/topup_all"
-                android:visibility="gone"
                 android:textColor="@color/normal_color_text"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -186,8 +186,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
-            android:padding="10dp"
             android:background="@null"
+            android:padding="10dp"
             android:src="@drawable/normal_btn_search"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

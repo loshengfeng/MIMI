@@ -104,7 +104,7 @@
 
 <!--    <fragment-->
 <!--        android:id="@+id/categoriesFragment"-->
-<!--        android:name="com.dabenxiang.mimi.view.home.category.CategoriesFragment"-->
+<!--        android:name="com.dabenxiang.mimi.view.category.CategoriesFragment"-->
 <!--        tools:layout="@layout/fragment_categories">-->
 
 <!--        <action-->
