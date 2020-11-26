@@ -9,9 +9,15 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.VideoByCategoryItem
+import com.dabenxiang.mimi.model.enums.StatisticsOrderType
+import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.generalvideo.GeneralVideoAdapter.Companion.VIEW_TYPE_VIDEO
 import com.dabenxiang.mimi.view.generalvideo.paging.VideoLoadStateAdapter
+import com.dabenxiang.mimi.view.category.CategoriesFragment
+import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
+import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getScreenSize
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.pxToDp
 import kotlinx.android.synthetic.main.fragment_general_video.*
@@ -38,11 +44,11 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         tv_search.setOnClickListener {
-            // TODO: 跳至搜尋頁面
+            navToSearch()
         }
 
         tv_filter.setOnClickListener {
-            // TODO: 跳至分類頁面
+            navToCategory()
         }
 
         layout_refresh.setOnRefreshListener {
@@ -76,8 +82,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
     }
 
     private val onItemClick: (VideoByCategoryItem) -> Unit = {
-        // TODO: 跳至播放頁面
-        Timber.d("VideoItem Id: ${it.id}")
+        navToPlayer(PlayerItem(it.id))
     }
 
     private val loadStateListener = { loadStatus: CombinedLoadStates ->
@@ -119,4 +124,36 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
                 }
             }
         }
+
+    private fun navToCategory(
+        orderByType: Int = StatisticsOrderType.LATEST.value
+    ) {
+        val bundle = CategoriesFragment.createBundle(category, orderByType)
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_to_categoriesFragment,
+                bundle
+            )
+        )
+    }
+
+    private fun navToSearch() {
+        val bundle = SearchVideoFragment.createBundle(category = category)
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_to_searchVideoFragment,
+                bundle
+            )
+        )
+    }
+
+    private fun navToPlayer(item: PlayerItem){
+        val bundle = PlayerV2Fragment.createBundle(item)
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_to_navigation_player,
+                bundle
+            )
+        )
+    }
 }
