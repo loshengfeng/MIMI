@@ -11,6 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
 
 class ClubRecommendListDataSource(
@@ -23,14 +24,15 @@ class ClubRecommendListDataSource(
 
     companion object {
         const val PER_LIMIT = 10
+        private const val AD_GAP: Int = 3
     }
 
 
     override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, MemberPostItem>) {
         viewModelScope.launch {
             flow {
-//                val adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content
-//                        ?: AdItem()
+                val adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content
+                        ?: AdItem()
 
                 val result = domainManager.getApiRepository().getMembersPost(PostType.TEXT_IMAGE_VIDEO, OrderBy.HOTTEST,
                         0, PER_LIMIT
@@ -39,7 +41,10 @@ class ClubRecommendListDataSource(
                 if (!result.isSuccessful) throw HttpException(result)
                 val body = result.body()
                 val postItem = body?.content
-//                postItem?.add(0, MemberPostItem(type = PostType.AD, adItem = adItem))
+                postItem?.forEachWithIndex { i, memberPostItem ->
+                    if (i % AD_GAP == 0)
+                        postItem.add(i, MemberPostItem(type = PostType.AD, adItem = adItem))
+                }
 
                 val nextPageKey = when {
                     hasNextPage(
