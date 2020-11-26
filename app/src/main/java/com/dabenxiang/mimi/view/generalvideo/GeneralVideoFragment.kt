@@ -64,7 +64,6 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         lifecycleScope.launch {
             viewModel.getVideoByCategory(category)
                 .collectLatest {
-                    layout_refresh.isRefreshing = false
                     generalVideoAdapter.submitData(it)
                 }
         }
@@ -83,13 +82,34 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         when (loadStatus.refresh) {
             is LoadState.Error -> {
                 Timber.e("Refresh Error: ${(loadStatus.refresh as LoadState.Error).error.localizedMessage}")
+                onApiError((loadStatus.refresh as LoadState.Error).error)
+
+                layout_empty_data.visibility = View.VISIBLE
+                tv_empty_data.text = getString(R.string.error_video)
+                rv_video.visibility = View.INVISIBLE
+                if (layout_refresh != null) {
+                    layout_refresh.isRefreshing = false
+                }
             }
             is LoadState.Loading -> {
+                layout_empty_data.visibility = View.VISIBLE
+                tv_empty_data.text = getString(R.string.load_video)
+                rv_video.visibility = View.INVISIBLE
+
                 if (layout_refresh != null) {
                     layout_refresh.isRefreshing = true
                 }
             }
             is LoadState.NotLoading -> {
+                if (generalVideoAdapter.isDataEmpty()) {
+                    layout_empty_data.visibility = View.VISIBLE
+                    tv_empty_data.text = getString(R.string.empty_video)
+                    rv_video.visibility = View.INVISIBLE
+                } else {
+                    layout_empty_data.visibility = View.INVISIBLE
+                    rv_video.visibility = View.VISIBLE
+                }
+
                 if (layout_refresh != null) {
                     layout_refresh.isRefreshing = false
                 }
@@ -99,6 +119,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         when (loadStatus.append) {
             is LoadState.Error -> {
                 Timber.e("Append Error:${(loadStatus.append as LoadState.Error).error.localizedMessage}")
+                onApiError((loadStatus.refresh as LoadState.Error).error)
             }
             is LoadState.Loading -> {
                 Timber.d("Append Loading endOfPaginationReached:${(loadStatus.append as LoadState.Loading).endOfPaginationReached}")
