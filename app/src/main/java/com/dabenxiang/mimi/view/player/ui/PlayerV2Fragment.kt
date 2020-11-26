@@ -227,7 +227,7 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
                     else -> {
                         val memberPostItem = MemberPostItem()
                         memberPostItem.id = viewModel.videoContentId
-                        return ClubCommentFragment.createBundle(memberPostItem)
+                        return ClubCommentFragment.createBundle(memberPostItem, true)
                     }
                 }
             }
