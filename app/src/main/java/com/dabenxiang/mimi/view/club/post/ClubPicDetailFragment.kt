@@ -7,13 +7,10 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.ClubPostFuncItem
-import com.dabenxiang.mimi.callback.OnItemClickListener
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.ImageItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
-import com.dabenxiang.mimi.model.enums.CommentType
-import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
@@ -23,16 +20,9 @@ import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.fullpicture.FullPictureFragment
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.view.picturedetail.PhotoGridAdapter
-import com.dabenxiang.mimi.view.picturedetail.PictureDetailAdapter
-import com.dabenxiang.mimi.view.player.CommentAdapter
-import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_text_detail.*
-import kotlinx.android.synthetic.main.fragment_order.*
-import kotlinx.android.synthetic.main.fragment_picture_detail.*
-import kotlinx.android.synthetic.main.item_setting_bar.*
 
 class ClubPicDetailFragment : BaseFragment() {
 
@@ -43,7 +33,7 @@ class ClubPicDetailFragment : BaseFragment() {
 
     private var memberPostItem: MemberPostItem? = null
 
-    private var pictureDetailAdapter: PictureDetailAdapter? = null
+    private var pictureDetailAdapter: ClubPicDetailAdapter? = null
 
     var moreDialog: MoreDialogFragment? = null
 
@@ -78,14 +68,15 @@ class ClubPicDetailFragment : BaseFragment() {
         adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         adHeight = (adWidth * 0.142).toInt()
 
-        memberPostItem = arguments?.get(ClubPicDetailFragment.KEY_DATA) as MemberPostItem
+        memberPostItem = arguments?.get(KEY_DATA) as MemberPostItem
 
-        pictureDetailAdapter = PictureDetailAdapter(
+        pictureDetailAdapter = ClubPicDetailAdapter(
             requireContext(),
             memberPostItem!!,
             onPictureDetailListener,
             onPhotoGridItemClickListener,
-            onItemClickListener
+            null,
+            clubPostFuncItem
         )
 
         recyclerView.layoutManager = LinearLayoutManager(context)
@@ -190,7 +181,7 @@ class ClubPicDetailFragment : BaseFragment() {
         )
     }
 
-    private val onPictureDetailListener = object : PictureDetailAdapter.OnPictureDetailListener {
+    private val onPictureDetailListener = object : ClubPicDetailAdapter.OnPictureDetailListener {
         override fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType) {
             viewModel.loadImage(id, view, type)
         }
@@ -199,60 +190,7 @@ class ClubPicDetailFragment : BaseFragment() {
             checkStatus { viewModel.followPost(item, position, isFollow)}
         }
 
-        override fun onGetCommandInfo(adapter: CommentAdapter, type: CommentType) {
-//            commentAdapter = adapter
-//            viewModel.getCommentInfo(
-//                memberPostItem!!.id,
-//                type,
-//                commentAdapter!!
-//            )
-        }
-
-        override fun onGetReplyCommand(
-            parentNode: RootCommentNode,
-            succeededBlock: () -> Unit
-        ) {
-//            replyCommentBlock = succeededBlock
-//            viewModel.getReplyComment(parentNode, memberPostItem!!)
-        }
-
-        override fun onCommandLike(
-            commentId: Long?,
-            isLike: Boolean,
-            succeededBlock: () -> Unit
-        ) {
-            checkStatus {
-//                commentLikeBlock = succeededBlock
-//                val type = if (isLike) LikeType.LIKE else LikeType.DISLIKE
-//                viewModel.postCommentLike(commentId!!, type, memberPostItem!!)
-            }
-        }
-
-        override fun onCommandDislike(commentId: Long?, succeededBlock: () -> Unit) {
-            checkStatus {
-//                commentLikeBlock = succeededBlock
-//                viewModel.deleteCommentLike(commentId!!, memberPostItem!!)
-            }
-        }
-
-        override fun onReplyComment(replyId: Long?, replyName: String?) {
-            checkStatus {
-                takeUnless { replyId == null }?.also {
-                    layout_bar.visibility = View.INVISIBLE
-                    layout_edit_bar.visibility = View.VISIBLE
-
-                    GeneralUtils.showKeyboard(requireContext())
-                    et_message.requestFocus()
-                    et_message.tag = replyId
-                    tv_replay_name.text = replyName.takeIf { it != null }?.let {
-                        tv_replay_name.visibility = View.VISIBLE
-                        String.format(requireContext().getString(R.string.clip_username), it)
-                    } ?: run { "" }
-                }
-            }
-        }
-
-        override fun onMoreClick(item: MembersPostCommentItem) {
+        override fun onMoreClick(item: MemberPostItem) {
             moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener, true).also {
                 it.show(
                     requireActivity().supportFragmentManager,
@@ -266,7 +204,7 @@ class ClubPicDetailFragment : BaseFragment() {
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_pictureDetailFragment_to_searchPostFragment,
+                    R.id.action_clubPicFragment_to_searchPostFragment,
                     bundle
                 )
             )
@@ -282,29 +220,19 @@ class ClubPicDetailFragment : BaseFragment() {
                 isAdult = true,
                 isAdultTheme = false
             )
-            navigateTo(NavigateItem.Destination(R.id.action_to_myPostFragment, bundle))
+            navigateTo(NavigateItem.Destination(R.id.action_clubPicFragment_to_myPostFragment, bundle))
         }
     }
 
-    private val onPhotoGridItemClickListener = object : PhotoGridAdapter.OnItemClickListener {
+    private val onPhotoGridItemClickListener = object : ClubPhotoGridAdapter.OnItemClickListener {
         override fun onItemClick(position: Int, imageItems: ArrayList<ImageItem>) {
             val bundle = FullPictureFragment.createBundle(position, imageItems)
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_pictureDetailFragment_to_pictureFragment,
+                    R.id.action_clubPicFragment_to_pictureFragment,
                     bundle
                 )
             )
         }
     }
-
-    private val onItemClickListener = object : OnItemClickListener {
-        override fun onItemClick() {
-//            GeneralUtils.hideKeyboard(requireActivity())
-//            layout_bar.visibility = View.VISIBLE
-//            layout_edit_bar.visibility = View.INVISIBLE
-//            et_message.setText("")
-        }
-    }
-
 }

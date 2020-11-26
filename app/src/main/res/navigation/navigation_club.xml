@@ -45,18 +45,25 @@
     <fragment
         android:id="@+id/clubPicFragment"
         android:name="com.dabenxiang.mimi.view.club.post.ClubPicFragment"
-        tools:layout="@layout/fragment_club_pic_detail" />
-
-    <fragment
-        android:id="@+id/clubPicDetailFragment"
-        android:name="com.dabenxiang.mimi.view.club.post.ClubPicDetailFragment"
-        tools:layout="@layout/fragment_club_pic_detail" />
+        tools:layout="@layout/fragment_club_pic" >
         <action
-            android:id="@+id/action_clubPicDetailFragment_to_myPostFragment"
+            android:id="@+id/action_clubPicFragment_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_clubPicFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_clubPicFragment_to_pictureFragment"
+            app:destination="@id/pictureFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/searchPostFragment"
         android:name="com.dabenxiang.mimi.view.search.post.SearchPostFragment"
         tools:layout="@layout/fragment_search_post" />
+
+    <fragment
+        android:id="@+id/pictureFragment"
+        android:name="com.dabenxiang.mimi.view.fullpicture.FullPictureFragment"
+        tools:layout="@layout/fragment_full_picture" />
 </navigation>
