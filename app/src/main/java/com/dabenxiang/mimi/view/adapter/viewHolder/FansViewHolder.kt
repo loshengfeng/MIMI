@@ -26,23 +26,7 @@ class FansViewHolder(
     private val btnChatHistory: ConstraintLayout = itemView.findViewById(R.id.btnChatHistory) as ConstraintLayout
 
     override fun updated(position: Int) {
-        if (data?.lastReadTime == null || data?.lastMessageTime == null || data?.lastReadTime!!.after(data?.lastMessageTime!!)) {
-            btnChatHistory.setBackgroundResource(R.drawable.btn_chat_history)
-            imgIsNew.visibility = View.INVISIBLE
-        } else {
-            btnChatHistory.setBackgroundResource(R.drawable.btn_chat_history_new)
-            imgIsNew.visibility = View.VISIBLE
-        }
 
-        btnChatHistory.setOnClickListener {
-            data?.let { data -> listener.onClickListener(data, position) }
-        }
-
-        listener.onGetAttachment(data?.avatarAttachmentId, imgChatPhoto)
-
-        textName.text = data?.name
-        textContent.text = data?.message.toString()
-        textDate.text = data?.lastMessageTime?.let { date -> SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(date) }
     }
 
     override fun updated() {
