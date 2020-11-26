@@ -71,10 +71,8 @@ class ClubRecommendFragment : BaseFragment() {
     }
 
     private val postListener = object : MyPostListener {
-        override fun onMoreClick(item: MemberPostItem) {
-            onMoreClick(item, ArrayList(adapter?.currentList as List<MemberPostItem>), onEdit = {
-                it as MemberPostItem
-            })
+        override fun onMoreClick(item: MemberPostItem, position: Int) {
+            onMoreClick(item, position) { it as MemberPostItem }
         }
 
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {

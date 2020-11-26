@@ -28,8 +28,7 @@ import timber.log.Timber
 import java.util.*
 
 class MyPostTextPostHolder(
-    itemView: View,
-    private val isAdultTheme: Boolean
+    itemView: View
 ) : BaseViewHolder(itemView),KoinComponent {
 
     private val accountManager: AccountManager by inject()
@@ -116,7 +115,7 @@ class MyPostTextPostHolder(
         }
 
         ivMore.setOnClickListener {
-            myPostListener.onMoreClick(item)
+            myPostListener.onMoreClick(item, position)
         }
 
         updateLike(item)
