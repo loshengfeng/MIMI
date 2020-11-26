@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
@@ -47,7 +48,7 @@ class ClubTextFragment : BaseFragment() {
 
         tv_title.text = getString(R.string.home_tab_text)
 
-        viewPager.adapter = ClubPostPagerAdapter(this, memberPostItem!!)
+        viewPager.adapter = ClubPostPagerAdapter(this, memberPostItem!!, AdultTabType.TEXT)
 
         val title: ArrayList<String> = arrayListOf(getString(R.string.text_detail_title), getString(R.string.comment))
 
