@@ -85,6 +85,9 @@ class MyPostTextPostHolder(
         }
 
         attachmentListener.onGetAttachment(item.avatarAttachmentId, imgAvatar, LoadImageType.AVATAR)
+        imgAvatar.setOnClickListener {
+            myPostListener.onAvatarClick(item.creatorId,item.postFriendlyName)
+        }
 
         tagChipGroup.removeAllViews()
         item.tags?.forEach {

@@ -619,12 +619,13 @@ class SearchPostFragment : BaseFragment() {
             }
             val mappingPosition = position - (position / 3)
             val bundle = ClipFragment.createBundle(ArrayList(memberPostItemList), mappingPosition)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_searchPostFragment_to_clipFragment,
-                    bundle
-                )
-            )
+            //todo 轉跳到新的 clip detial
+//            navigateTo(
+//                NavigateItem.Destination(
+//                    R.id.action_searchPostFragment_to_clipFragment,
+//                    bundle
+//                )
+//            )
         }
 
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {

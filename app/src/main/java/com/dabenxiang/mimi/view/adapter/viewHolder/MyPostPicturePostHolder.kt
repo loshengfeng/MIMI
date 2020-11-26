@@ -83,6 +83,9 @@ class MyPostPicturePostHolder(
         tvFollow.visibility = if(accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
 
         attachmentListener.onGetAttachment(item.avatarAttachmentId, imgAvatar, LoadImageType.AVATAR)
+        imgAvatar.setOnClickListener {
+            myPostListener.onAvatarClick(item.creatorId,item.postFriendlyName)
+        }
 
         tagChipGroup.removeAllViews()
         item.tags?.forEach {

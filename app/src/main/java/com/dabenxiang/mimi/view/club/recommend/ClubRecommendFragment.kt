@@ -24,6 +24,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
@@ -81,7 +82,7 @@ class ClubRecommendFragment : BaseFragment() {
 
     private val attachmentListener = object : AttachmentListener {
         override fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType) {
-//            viewModel.loadImage(id, view, type)
+            viewModel.loadImage(id, view, type)
         }
 
         override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
@@ -122,6 +123,20 @@ class ClubRecommendFragment : BaseFragment() {
             )
         }
 
+        override fun onAvatarClick(userId: Long, name: String) {
+            val bundle = MyPostFragment.createBundle(
+                    userId, name,
+                    isAdult = true,
+                    isAdultTheme = true
+            )
+            navigateTo(
+                    NavigateItem.Destination(
+                            R.id.action_to_myPostFragment,
+                            bundle
+                    )
+            )
+        }
+
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
             when (adultTabType) {
                 AdultTabType.PICTURE -> {
@@ -149,6 +164,7 @@ class ClubRecommendFragment : BaseFragment() {
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
+            // todo Go to comment in detail
             checkStatus {
                 when (adultTabType) {
                     AdultTabType.PICTURE -> {

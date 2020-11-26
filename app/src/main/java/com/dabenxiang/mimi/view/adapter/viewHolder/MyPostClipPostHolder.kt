@@ -84,6 +84,9 @@ class MyPostClipPostHolder(
             if (accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
 
         attachmentListener.onGetAttachment(item.avatarAttachmentId, ivAvatar, LoadImageType.AVATAR)
+        ivAvatar.setOnClickListener {
+            myPostListener.onAvatarClick(item.creatorId,item.postFriendlyName)
+        }
 
         tagChipGroup.removeAllViews()
         item.tags?.forEach {
