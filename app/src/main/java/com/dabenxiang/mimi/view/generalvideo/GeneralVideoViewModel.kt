@@ -6,17 +6,17 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.dabenxiang.mimi.model.api.ApiRepository.Companion.NETWORK_PAGE_SIZE
-import com.dabenxiang.mimi.model.api.vo.VideoByCategoryItem
+import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.generalvideo.paging.VideoPagingSource
 import kotlinx.coroutines.flow.Flow
 
 class GeneralVideoViewModel : BaseViewModel() {
 
-    fun getVideoByCategory(category: String): Flow<PagingData<VideoByCategoryItem>> {
+    fun getVideoByCategory(category: String): Flow<PagingData<StatisticsItem>> {
         return Pager(
             config = PagingConfig(pageSize = NETWORK_PAGE_SIZE, enablePlaceholders = false),
-            pagingSourceFactory = { VideoPagingSource(domainManager, category) }
+            pagingSourceFactory = { VideoPagingSource(domainManager, category, adWidth, adHeight) }
         ).flow.cachedIn(viewModelScope)
     }
-
 }

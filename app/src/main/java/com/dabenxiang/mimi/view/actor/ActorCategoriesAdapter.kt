@@ -4,13 +4,8 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.model.GlideUrl
-import com.bumptech.glide.load.model.LazyHeaders
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.vo.ActorCategoriesItem
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
 class ActorCategoriesAdapter(
     val context: Context,

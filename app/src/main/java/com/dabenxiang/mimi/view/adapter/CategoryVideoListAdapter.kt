@@ -13,14 +13,12 @@ import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.view.home.viewholder.GridBannerHolder
+import com.dabenxiang.mimi.view.home.viewholder.GridAdHolder
 import com.dabenxiang.mimi.view.home.viewholder.VideoViewHolder
 import kotlinx.android.synthetic.main.layout_item_video.view.*
 
-class HomeVideoListAdapter(
+class CategoryVideoListAdapter(
     private val nestedListener: HomeAdapter.EventListener) : PagedListAdapter<BaseVideoItem, BaseViewHolder>(diffCallback) {
-
-    private val isAdult: Boolean =true
 
     companion object {
         val diffCallback = object : DiffUtil.ItemCallback<BaseVideoItem>() {
@@ -36,7 +34,7 @@ class HomeVideoListAdapter(
             }
         }
 
-        private const val BANNER = 0
+        private const val AD = 0
         private const val VIDEO = 1
     }
 
@@ -52,8 +50,8 @@ class HomeVideoListAdapter(
             }
             else -> {
                 val view =
-                    LayoutInflater.from(parent.context).inflate(R.layout.item_banner, parent, false)
-                GridBannerHolder(view, videoViewHolderListener)
+                    LayoutInflater.from(parent.context).inflate(R.layout.item_ad, parent, false)
+                GridAdHolder(view, videoViewHolderListener)
             }
         }
     }
@@ -65,7 +63,7 @@ class HomeVideoListAdapter(
                     (holder as VideoViewHolder).bind(it, position)
                 }
                 is BaseVideoItem.Banner -> {
-                    (holder as GridBannerHolder).bind(it, position)
+                    (holder as GridAdHolder).bind(it, position)
                 }
             }
         }
@@ -74,7 +72,7 @@ class HomeVideoListAdapter(
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
             is BaseVideoItem.Video -> VIDEO
-            else -> BANNER
+            else -> AD
         }
     }
 
@@ -84,7 +82,7 @@ class HomeVideoListAdapter(
             object : GridLayoutManager.SpanSizeLookup() {
                 override fun getSpanSize(position: Int): Int {
                     return when (getItemViewType(position)) {
-                        BANNER -> 2
+                        AD -> 2
                         else -> 1
                     }
                 }

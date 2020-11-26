@@ -10,11 +10,12 @@ import androidx.paging.cachedIn
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.club.adapter.ClubTabTopicsListDataSource
+import com.dabenxiang.mimi.view.club.member.ClubTabTopicsListDataSource
 import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
 
 class ClubTabViewModel : BaseViewModel() {
+
     private val _clubCount = MutableLiveData<Int>()
     val clubCount: LiveData<Int> = _clubCount
 

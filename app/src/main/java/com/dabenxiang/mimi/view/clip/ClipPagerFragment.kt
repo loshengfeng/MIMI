@@ -29,6 +29,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
 
+
 class ClipPagerFragment : BaseFragment() {
     private val viewModel: ClipViewModel by viewModels()
 
@@ -58,11 +59,17 @@ class ClipPagerFragment : BaseFragment() {
                 }
                 is LoadState.Loading -> {
                     Timber.d("refresh Loading endOfPaginationReached:${(loadStatus.refresh as LoadState.Loading).endOfPaginationReached}")
+                    progressHUD.show()
                 }
                 is LoadState.NotLoading -> {
                     Timber.d("refresh NotLoading endOfPaginationReached:${(loadStatus.refresh as LoadState.NotLoading).endOfPaginationReached}")
+                    progressHUD.dismiss()
+                    takeIf { adapter.itemCount > 0 }?.let { adapter.getMemberPostItem(0) }?.run {
+                        clipFuncItem.getPostDetail(this, 0, ::updateAfterGetDeducted)
+                    }
                 }
             }
+
             when (loadStatus.append) {
                 is LoadState.Error -> {
                     Timber.e("append Error:${(loadStatus.append as LoadState.Error).error.localizedMessage}")
@@ -79,6 +86,39 @@ class ClipPagerFragment : BaseFragment() {
         adapter
     }
 
+    private val onScrollListener by lazy {
+        object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                when (newState) {
+                    RecyclerView.SCROLL_STATE_IDLE -> {
+                        val lastPos = clipAdapter.getCurrentPos()
+                        val currentPos =
+                            (rv_clip.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                        Timber.d("SCROLL_STATE_IDLE lastPosition: $lastPos, currentPos:$currentPos")
+                        takeIf { currentPos >= 0 && currentPos != lastPos }?.run {
+                            clipAdapter.pausePlayer()
+                            clipAdapter.releasePlayer()
+                            clipAdapter.updateCurrentPosition(currentPos)
+                            clipAdapter.notifyItemChanged(lastPos)
+                            clipAdapter.getMemberPostItem(currentPos)?.run {
+                                clipFuncItem.getPostDetail(
+                                    this,
+                                    currentPos,
+                                    ::updateAfterGetDeducted
+                                )
+                            }
+                            clipAdapter.notifyItemChanged(
+                                currentPos,
+                                ClipAdapter.PAYLOAD_UPDATE_DEDUCTED
+                            )
+                        } ?: clipAdapter.updateCurrentPosition(lastPos)
+                    }
+                }
+            }
+        }
+    }
+
 
     private val clipMap: HashMap<String, File> = hashMapOf()
     private val memberPostItems: ArrayList<MemberPostItem> = arrayListOf()
@@ -89,19 +129,16 @@ class ClipPagerFragment : BaseFragment() {
     }
 
     override val isNavTransparent: Boolean = true
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        requireActivity().window.run {
-            this.statusBarColor = ContextCompat.getColor(
-                requireContext(),
-                R.color.color_black_1
-            )
-        }
-    }
+    override val isStatusBarDark: Boolean = true
 
     override fun onPause() {
         super.onPause()
+        clipAdapter.pausePlayer()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        clipAdapter.releasePlayer()
     }
 
     override fun setupFirstTime() {
@@ -110,28 +147,7 @@ class ClipPagerFragment : BaseFragment() {
             rv_clip.adapter = clipAdapter
             (rv_clip.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             PagerSnapHelper().attachToRecyclerView(rv_clip)
-            rv_clip.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    super.onScrollStateChanged(recyclerView, newState)
-                    when (newState) {
-                        RecyclerView.SCROLL_STATE_IDLE -> {
-                            val lastPos = clipAdapter.getCurrentPos()
-                            val currentPos = (rv_clip.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-                            Timber.d("SCROLL_STATE_IDLE lastPosition: $lastPos, currentPos:$currentPos")
-                            takeIf { currentPos >= 0 && currentPos != lastPos }?.run {
-                                clipAdapter.pausePlayer()
-                                clipAdapter.releasePlayer()
-                                clipAdapter.updateCurrentPosition(currentPos)
-                                clipAdapter.notifyItemChanged(lastPos)
-                                clipAdapter.getMemberPostItem(currentPos)?.run {
-                                    clipFuncItem.getPostDetail(this, currentPos, ::updateAfterGetDeducted)
-                                }
-                                clipAdapter.notifyItemChanged(currentPos, ClipAdapter.PAYLOAD_UPDATE_DEDUCTED)
-                            } ?: clipAdapter.updateCurrentPosition(lastPos)
-                        }
-                    }
-                }
-            })
+            rv_clip.addOnScrollListener(onScrollListener)
             clipFuncItem.getClips(::setupClips)
         }
     }
@@ -143,6 +159,7 @@ class ClipPagerFragment : BaseFragment() {
     }
 
     private fun updateAfterGetDeducted(currentPos: Int, deducted: Boolean) {
+        Timber.d("updateAfterGetDeducted: $currentPos, $deducted")
         clipAdapter.getMemberPostItem(currentPos)?.run { this.deducted = deducted }
         clipAdapter.notifyItemChanged(currentPos, ClipAdapter.PAYLOAD_UPDATE_DEDUCTED)
     }

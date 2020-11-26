@@ -6,13 +6,12 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
-import com.bumptech.glide.Glide
+import androidx.recyclerview.widget.GridLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult.Error
-import com.dabenxiang.mimi.model.api.ApiResult.Success
-import com.dabenxiang.mimi.model.api.vo.VideoByCategoryItem
+import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.view.base.BaseFragment
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.view.generalvideo.GeneralVideoAdapter.Companion.VIEW_TYPE_VIDEO
+import com.dabenxiang.mimi.view.generalvideo.paging.VideoLoadStateAdapter
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getScreenSize
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.pxToDp
 import kotlinx.android.synthetic.main.fragment_general_video.*
@@ -28,30 +27,10 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         GeneralVideoAdapter(onItemClick)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        Timber.d("@@Category: $category")
-
-        val adWidth = pxToDp(requireContext(), getScreenSize(requireActivity()).first)
-        val adHeight = (adWidth / 7)
-
-        mainViewModel?.getAdResult?.observe(this, {
-            when (it) {
-                is Success -> {
-                    Glide.with(requireContext())
-                        .load(it.result.href)
-                        .into(iv_ad)
-                    iv_ad.setOnClickListener { _ ->
-                        GeneralUtils.openWebView(requireContext(), it.result.target)
-                    }
-                }
-                is Error -> onApiError(it.throwable)
-            }
-
-        })
-
-        mainViewModel?.getAd(adWidth, adHeight)
+    override fun setupFirstTime() {
+        super.setupFirstTime()
+        viewModel.adWidth = pxToDp(requireContext(), getScreenSize(requireActivity()).first)
+        viewModel.adHeight = (viewModel.adWidth / 7)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -70,7 +49,17 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         }
 
         generalVideoAdapter.addLoadStateListener(loadStateListener)
-        rv_video.adapter = generalVideoAdapter
+
+        val loadStateAdapter = VideoLoadStateAdapter(generalVideoAdapter)
+
+        val gridLayoutManager = GridLayoutManager(requireContext(), 2)
+            .also { it.spanSizeLookup = gridLayoutSpanSizeLookup }
+
+        rv_video.also {
+            it.layoutManager = gridLayoutManager
+            it.setHasFixedSize(true)
+            it.adapter = generalVideoAdapter.withLoadStateFooter(loadStateAdapter)
+        }
 
         lifecycleScope.launch {
             viewModel.getVideoByCategory(category)
@@ -85,7 +74,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         return R.layout.fragment_general_video
     }
 
-    private val onItemClick: (VideoByCategoryItem) -> Unit = {
+    private val onItemClick: (StatisticsItem) -> Unit = {
         // TODO: 跳至播放頁面
         Timber.d("VideoItem Id: ${it.id}")
     }
@@ -106,6 +95,27 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
                 }
             }
         }
+
+        when (loadStatus.append) {
+            is LoadState.Error -> {
+                Timber.e("Append Error:${(loadStatus.append as LoadState.Error).error.localizedMessage}")
+            }
+            is LoadState.Loading -> {
+                Timber.d("Append Loading endOfPaginationReached:${(loadStatus.append as LoadState.Loading).endOfPaginationReached}")
+            }
+            is LoadState.NotLoading -> {
+                Timber.d("Append NotLoading endOfPaginationReached:${(loadStatus.append as LoadState.NotLoading).endOfPaginationReached}")
+            }
+        }
     }
 
+    private val gridLayoutSpanSizeLookup =
+        object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return when (generalVideoAdapter.getItemViewType(position)) {
+                    VIEW_TYPE_VIDEO -> 1
+                    else -> 2
+                }
+            }
+        }
 }

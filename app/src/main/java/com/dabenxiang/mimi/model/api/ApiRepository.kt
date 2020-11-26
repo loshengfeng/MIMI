@@ -245,10 +245,10 @@ class ApiRepository(private val apiService: ApiService) {
      *
      ***********************************************************/
     suspend fun getMembersPost(
-            type: PostType,
-            orderBy: OrderBy,
-            offset: Int,
-            limit: Int
+        type: PostType,
+        orderBy: OrderBy,
+        offset: Int,
+        limit: Int
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
         return apiService.getMembersPost(type.value, offset, limit, orderBy = orderBy.value)
     }
@@ -384,6 +384,11 @@ class ApiRepository(private val apiService: ApiService) {
      */
     suspend fun fetchHomeCategories() = apiService.fetchHomeCategories()
 
+    /**
+     * 取得影片次類別清單
+     */
+    suspend fun fetchCategories() = apiService.fetchHomeCategories(202)
+
     /**********************************************************
      *
      *                   Members/Home/Videos
@@ -397,11 +402,20 @@ class ApiRepository(private val apiService: ApiService) {
         q: String? = null,
         country: String? = null,
         years: String? = null,
-        isAdult: Boolean,
+        isAdult: Boolean = true,
         offset: String,
         limit: String,
         tag: String = ""
     ) = apiService.searchHomeVideos(category, q, country, years, isAdult, offset, limit, tag)
+
+    /**
+     * 取得小视频影片(需Client Credentials|需登入帳號)
+     */
+    suspend fun searchShortVideo(
+        q: String? = null,
+        offset: String,
+        limit: String
+    ) = apiService.searchShortVideo(q, offset, limit)
 
     /**
      * 取得類別影片
@@ -419,17 +433,17 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun statisticsHomeVideos(
         startTime: String = "2018-12-01T10:00:05Z",
         endTime: String = "2020-11-24T10:00:05Z",
-        orderByType: StatisticsOrderType = StatisticsOrderType.HOTEST,
+        orderByType: Int = StatisticsOrderType.HOTTEST.value,
         category: String? = "",
         tags: String? = "",
-        isAdult: Boolean = false,
+        isAdult: Boolean = true,
         isRandom: Boolean = false,
         offset: Int,
         limit: Int
     ) = apiService.statisticsHomeVideos(
         startTime = startTime,
         endTime = endTime,
-        orderByType = orderByType.value,
+        orderByType = orderByType,
         category = category,
         tags = tags,
         isAdult = isAdult,
@@ -891,18 +905,5 @@ class ApiRepository(private val apiService: ApiService) {
      *
      ***********************************************************/
     suspend fun getMenu() = apiService.getMenu()
-
-    /**********************************************************
-     *
-     *          Members/Home/Videos/SearchWithCategory
-     *
-     ***********************************************************/
-    suspend fun getVideoByCategory(
-        category: String,
-        offset: String,
-        limit: String
-    ) = apiService.getVideoByCategory(
-        true, category, offset, limit
-    )
 }
 

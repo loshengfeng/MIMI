@@ -102,6 +102,10 @@
     <string name="club_tab_novel">小說</string>
     <string name="club_search_hint">搜寻 ”该分类” 内容</string>
     <string name="club_topic_title">热门主题</string>
+    <string name="club_favorite">收藏</string>
+    <string name="club_share">分享</string>
+    <string name="club_report">回报</string>
+    <string name="club_like_count">赞%1$d</string>
 
     <!-- Favorite -->
     <string name="favorite_title">我的收藏</string>
@@ -487,5 +491,9 @@
 
     <!-- Recommend -->
     <string name="recommend_today">今日精选</string>
+
+    <!-- Category -->
+    <string name="category_newest">最新</string>
+    <string name="category_top_hit">热门</string>
 
 </resources>

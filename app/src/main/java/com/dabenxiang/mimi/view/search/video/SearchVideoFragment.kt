@@ -45,12 +45,10 @@ class SearchVideoFragment : BaseFragment() {
         const val KEY_DATA = "data"
 
         fun createBundle(
-            title: String = "",
             tag: String = "",
             category: String = ""
         ): Bundle {
             val data = SearchingVideoItem()
-            data.title = title
             data.tag = tag
             data.category = category
 
@@ -83,17 +81,13 @@ class SearchVideoFragment : BaseFragment() {
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
 
         (arguments?.getSerializable(KEY_DATA) as SearchingVideoItem?)?.also { data ->
-            Timber.d("key data from args is title: ${data.title}, tag: ${data.tag} ")
-//            if (arguments?.getBoolean(KEY_IS_FROM_PLAYER) == true) {
-//                viewModel.isAdult = data.isAdult
-//            }
 
+            viewModel.searchingTag = data.tag
+            viewModel.category = data.category
             if (data.tag.isNotBlank()) {
-                viewModel.searchingTag = data.tag
+                layout_search_history.visibility = View.GONE
                 viewModel.getSearchList()
             }
-
-            viewModel.category = data.category
 
             if (TextUtils.isEmpty(viewModel.searchingTag) && TextUtils.isEmpty(viewModel.searchingStr)) {
                 layout_search_history.visibility = View.VISIBLE
@@ -111,6 +105,11 @@ class SearchVideoFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
+        viewModel.showProgress.observe(this, Observer { showProgress ->
+            if (showProgress) progressHUD.show()
+            else progressHUD.dismiss()
+        })
+
         viewModel.searchTextLiveData.bindingEditText = search_bar
 
         viewModel.searchTextLiveData.observe(viewLifecycleOwner, Observer {
@@ -123,6 +122,7 @@ class SearchVideoFragment : BaseFragment() {
 
         viewModel.searchingTotalCount.observe(viewLifecycleOwner, Observer { count ->
             tv_search_text.text = genResultText(count)
+            layout_search_text.visibility = View.VISIBLE
         })
 
         viewModel.likeResult.observe(viewLifecycleOwner, Observer {
@@ -189,7 +189,6 @@ class SearchVideoFragment : BaseFragment() {
     private fun searchText() {
         if (search_bar.text.isNotBlank()) {
             layout_search_history.visibility = View.GONE
-            layout_search_text.visibility = View.VISIBLE
             viewModel.searchingTag = ""
             viewModel.searchingStr = search_bar.text.toString()
             viewModel.getSearchList()
@@ -294,6 +293,7 @@ class SearchVideoFragment : BaseFragment() {
         }
 
         override fun onChipClick(text: String) {
+            layout_search_text.visibility = View.GONE
             viewModel.searchingTag = text
             viewModel.searchingStr = ""
             viewModel.getSearchList()
@@ -361,7 +361,6 @@ class SearchVideoFragment : BaseFragment() {
             chip.setOnClickListener {
                 search_bar.setText(text)
                 layout_search_history.visibility = View.GONE
-                layout_search_text.visibility = View.VISIBLE
                 viewModel.searchingStr = text
                 viewModel.searchingTag = ""
                 viewModel.getSearchList()

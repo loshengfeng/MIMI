@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
-import androidx.paging.PagingData
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
@@ -17,17 +16,13 @@ import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_follow.*
-import kotlinx.android.synthetic.main.fragment_club_follow.layout_refresh
-import kotlinx.android.synthetic.main.fragment_my_post.*
 import kotlinx.android.synthetic.main.item_ad.view.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
+import kotlinx.android.synthetic.main.item_club_is_not_login.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
@@ -44,17 +39,17 @@ class ClubPostFollowFragment : BaseFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-
+        Timber.i("ClubPostFollowFragment onAttach")
         viewModel.showProgress.observe(this, {
             layout_refresh.isRefreshing = it
         })
 
-        viewModel.clubCount.observe(this, {
-            if(it <=0) {
-                id_empty_group.visibility =View.VISIBLE
+        viewModel.postCount.observe(this, {
+            if (it == 0) {
+                id_empty_group.visibility = View.VISIBLE
                 recycler_view.visibility = View.INVISIBLE
-            }else {
-                id_empty_group.visibility =View.GONE
+            } else {
+                id_empty_group.visibility = View.GONE
                 recycler_view.visibility = View.VISIBLE
             }
             layout_refresh.isRefreshing = false
@@ -71,47 +66,67 @@ class ClubPostFollowFragment : BaseFragment() {
                     }
                 }
                 is ApiResult.Error -> {
-                    layout_ad.visibility =View.GONE
+                    layout_ad.visibility = View.GONE
                     onApiError(it.throwable)
                 }
 
                 else -> {
-                    layout_ad.visibility =View.GONE
+                    layout_ad.visibility = View.GONE
                     onApiError(Exception("Unknown Error!"))
                 }
             }
-
-
         })
+
+
 
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recycler_view.adapter = adapter
+
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
-            getData()
+            viewModel.getData(adapter)
+        }
+
+        tv_register.setOnClickListener {
+            navigateTo(
+                    NavigateItem.Destination(
+                            R.id.action_to_loginFragment,
+                            LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                    )
+            )
+        }
+
+        tv_login.setOnClickListener {
+            navigateTo(
+                    NavigateItem.Destination(
+                            R.id.action_to_loginFragment,
+                            LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                    )
+            )
         }
     }
 
     override fun onResume() {
         super.onResume()
         Timber.i("onResume isLogin:${accountManager.isLogin()}")
-        if(accountManager.isLogin()) {
-            getData()
+        loginPageToggle(accountManager.isLogin())
+        if (accountManager.isLogin() && viewModel.postCount.value ?: -1 <= 0) {
+            viewModel.getData(adapter)
         }
+        viewModel.getAd()
     }
 
     private val memberPostFuncItem by lazy {
         MemberPostFuncItem(
                 {},
-                { id, view, type ->  },
-                { item, items, isFollow, func ->  },
-                { item, isLike, func ->  },
+                { id, view, type -> },
+                { item, items, isFollow, func -> },
+                { item, isLike, func -> },
                 { item, isFavorite, func -> }
         )
     }
@@ -132,12 +147,17 @@ class ClubPostFollowFragment : BaseFragment() {
         }
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
+            if (!accountManager.isLogin()) {
+                loginPageToggle(false)
+                return
+            }
+
             when (adultTabType) {
                 AdultTabType.PICTURE -> {
                     val bundle = PictureDetailFragment.createBundle(item, 0)
                     navigateTo(
                             NavigateItem.Destination(
-                                    R.id.action_clubTabFragment_to_clubPicDetailFragment,
+                                    R.id.action_clubTabFragment_to_clubPicFragment,
                                     bundle
                             )
                     )
@@ -146,7 +166,7 @@ class ClubPostFollowFragment : BaseFragment() {
                     val bundle = TextDetailFragment.createBundle(item, 0)
                     navigateTo(
                             NavigateItem.Destination(
-                                    R.id.action_clubTabFragment_to_clubTextDetailFragment,
+                                    R.id.action_clubTabFragment_to_clubTextFragment,
                                     bundle
                             )
                     )
@@ -174,15 +194,13 @@ class ClubPostFollowFragment : BaseFragment() {
         override fun onAvatarClick(userId: Long, name: String) {}
     }
 
-    private fun getData() {
-        Timber.i("getData")
-        CoroutineScope(Dispatchers.IO).launch {
-            viewModel.getAd()
-            adapter.submitData(PagingData.empty())
-            viewModel.getPostItemList()
-                    .collectLatest {
-                        adapter.submitData(it)
-                    }
+    private fun loginPageToggle(isLogin: Boolean) {
+        if (isLogin) {
+            id_not_login_group.visibility = View.GONE
+            layout_refresh.visibility = View.VISIBLE
+        } else {
+            id_not_login_group.visibility = View.VISIBLE
+            layout_refresh.visibility = View.INVISIBLE
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club
+package com.dabenxiang.mimi.view.club.member
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.PostItem
+import com.dabenxiang.mimi.view.club.adapter.ClubFuncItem
 
 class ClubMemberPostAdapter(
     val context: Context,

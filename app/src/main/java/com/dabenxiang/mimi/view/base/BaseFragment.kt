@@ -34,7 +34,6 @@ import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.home.HomeViewModel
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.main.MainViewModel
-import com.dabenxiang.mimi.view.mimi_home.MiMiFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
@@ -59,8 +58,6 @@ import timber.log.Timber
 import java.io.File
 import java.io.Serializable
 import java.net.UnknownHostException
-import java.util.*
-import kotlin.collections.ArrayList
 
 abstract class BaseFragment : Fragment() {
 
@@ -129,8 +126,8 @@ abstract class BaseFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         mainViewModel?.setNavTransparent(isNavTransparent)
+        mainViewModel?.setStatusBarMode(isStatusBarDark)
         statusBarVisibility()
-        setUpStatusBarColor()
 
         progressHUD = KProgressHUD.create(context)
             .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
@@ -574,6 +571,7 @@ abstract class BaseFragment : Fragment() {
     open val bottomNavigationVisibility: Int = View.VISIBLE
 
     open val isNavTransparent: Boolean = false
+    open val isStatusBarDark: Boolean = false
 
     open fun navigateTo(item: NavigateItem) {
         lifecycleScope.launch {

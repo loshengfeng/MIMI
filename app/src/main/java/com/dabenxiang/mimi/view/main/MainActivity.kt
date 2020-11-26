@@ -131,6 +131,7 @@ class MainActivity : BaseActivity(){
         })
 
         viewModel.isNavTransparent.observe(this, { setUiMode(it) })
+        viewModel.isStatusBardDark.observe(this, { setupStatusBar(it) })
 
         viewModel.getTotalUnread()
     }
@@ -180,6 +181,7 @@ class MainActivity : BaseActivity(){
         )
 
         controller.observe(this, Observer {
+            setupStatusBar()
             setUiMode()
         })
 
@@ -188,9 +190,16 @@ class MainActivity : BaseActivity(){
         }
     }
 
+    private fun setupStatusBar(isDarkMode: Boolean = false) {
+        window.run {
+            this.statusBarColor = getColor(if(isDarkMode) R.color.color_black_1 else  R.color.normal_color_status_bar)
+            this.decorView.systemUiVisibility =
+                if (isDarkMode) 0 else View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        }
+    }
+
     private fun setUiMode(isNavTransparent: Boolean = false) {
-        Timber.d("@@setUiMode: $isNavTransparent")
-        window?.statusBarColor = getColor(R.color.normal_color_status_bar)
+        Timber.d("setUiMode: $isNavTransparent")
 
         //FragmentContainerView constraint
         ConstraintSet().run {
@@ -203,12 +212,6 @@ class MainActivity : BaseActivity(){
                 if (isNavTransparent) ConstraintSet.BOTTOM else ConstraintSet.TOP
             )
             this.applyTo(cl_root)
-        }
-
-        //Status bar text. (Background is modified at ClipFragment)
-        window.run {
-            this.decorView.systemUiVisibility =
-                if (isNavTransparent) 0 else View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
 
         //Navigation background

@@ -15,16 +15,13 @@ import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.CommentType
-import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
 import com.dabenxiang.mimi.view.picturedetail.viewholder.CommentContentViewHolder
-import com.dabenxiang.mimi.view.picturedetail.viewholder.CommentTitleViewHolder
 import com.dabenxiang.mimi.view.picturedetail.viewholder.PictureDetailViewHolder
 import com.dabenxiang.mimi.view.player.CommentAdapter
-import com.dabenxiang.mimi.view.player.CommentLoadMoreView
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
@@ -44,8 +41,6 @@ class PictureDetailAdapter(
 
     companion object {
         const val VIEW_TYPE_PICTURE_DETAIL = 0
-        const val VIEW_TYPE_COMMENT_TITLE = 1
-        const val VIEW_TYPE_COMMENT_DATA = 2
         const val VIEW_TYPE_AD = 3
     }
 
@@ -68,11 +63,6 @@ class PictureDetailAdapter(
                     .inflate(R.layout.item_picture_detail, parent, false)
                 PictureDetailViewHolder(mView)
             }
-            VIEW_TYPE_COMMENT_TITLE -> {
-                mView = LayoutInflater.from(context)
-                    .inflate(R.layout.item_comment_title, parent, false)
-                CommentTitleViewHolder(mView)
-            }
             else -> {
                 mView = LayoutInflater.from(context)
                     .inflate(R.layout.item_comment_content, parent, false)
@@ -91,13 +81,12 @@ class PictureDetailAdapter(
         return when (position) {
             0 -> VIEW_TYPE_AD
             1 -> VIEW_TYPE_PICTURE_DETAIL
-            2 -> VIEW_TYPE_COMMENT_TITLE
-            else -> VIEW_TYPE_COMMENT_DATA
+            else -> VIEW_TYPE_PICTURE_DETAIL
         }
     }
 
     override fun getItemCount(): Int {
-        return 4
+        return 2
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -181,42 +170,6 @@ class PictureDetailAdapter(
                     )
                 }
 
-            }
-            is CommentTitleViewHolder -> {
-                holder.newestComment.setOnClickListener {
-                    holder.newestComment.setTextColor(context.getColor(R.color.color_red_1))
-                    holder.topComment.setTextColor(context.getColor(R.color.color_black_1_30))
-                    updateCommandItem(CommentType.NEWEST)
-                }
-
-                holder.topComment.setOnClickListener {
-                    holder.topComment.setTextColor(context.getColor(R.color.color_red_1))
-                    holder.newestComment.setTextColor(context.getColor(R.color.color_black_1_30))
-                    updateCommandItem(CommentType.TOP)
-                }
-            }
-            is CommentContentViewHolder -> {
-
-                holder.noCommentLayout.visibility = if (memberPostItem.commentCount > 0) {
-                    View.INVISIBLE
-                } else {
-                    View.VISIBLE
-                }
-
-                commentAdapter = CommentAdapter(
-                    playerInfoListener,
-                    CommentViewType.COMMON
-                ).apply {
-                    loadMoreModule.apply {
-                        isEnableLoadMore = true
-                        isAutoLoadMore = true
-                        isEnableLoadMoreIfNotFullPage = false
-                        loadMoreView = CommentLoadMoreView(CommentViewType.COMMON)
-                    }
-                }
-
-                holder.commentRecycler.adapter = commentAdapter
-                updateCommandItem(CommentType.NEWEST)
             }
         }
     }

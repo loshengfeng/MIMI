@@ -8,18 +8,15 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.OnItemClickListener
+import com.dabenxiang.mimi.callback.ClubPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.api.vo.TextContentItem
-import com.dabenxiang.mimi.model.enums.CommentType
+import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailAdapter
-import com.dabenxiang.mimi.view.player.CommentAdapter
-import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.view.textdetail.viewholder.TextDetailViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
@@ -33,9 +30,9 @@ class ClubTextDetailAdapter(
     val context: Context,
     private val memberPostItem: MemberPostItem,
     private val onTextDetailListener: OnTextDetailListener,
-    private val onItemClickListener: OnItemClickListener,
-    private var mAdItem: AdItem? = null
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), KoinComponent {
+    private var mAdItem: AdItem? = null,
+    private val clubPostFuncItem: ClubPostFuncItem = ClubPostFuncItem()
+    ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), KoinComponent {
 
     companion object {
         const val VIEW_TYPE_TEXT_DETAIL = 0
@@ -43,8 +40,6 @@ class ClubTextDetailAdapter(
     }
 
     private val accountManager: AccountManager by inject()
-
-    private var commentAdapter: CommentAdapter? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val mView: View
@@ -66,10 +61,6 @@ class ClubTextDetailAdapter(
                     .inflate(R.layout.item_club_text_detail, parent, false)
                 TextDetailViewHolder(mView)
             }
-        }
-
-        mView.setOnClickListener {
-            onItemClickListener.onItemClick()
         }
 
         return holder
@@ -111,6 +102,13 @@ class ClubTextDetailAdapter(
                 )
                 holder.title.text = memberPostItem.title
                 holder.desc.text = contentItem.text
+                holder.txtLikeCount.text = String.format(context.getString(R.string.club_like_count), memberPostItem.likeCount)
+
+                if (memberPostItem.likeType == LikeType.LIKE) {
+                    holder.imgLike.setImageResource(R.drawable.ico_nice_s)
+                } else {
+                    holder.imgLike.setImageResource(R.drawable.ico_nice_gray)
+                }
 
                 onTextDetailListener.onGetAttachment(
                     memberPostItem.avatarAttachmentId,
@@ -159,6 +157,23 @@ class ClubTextDetailAdapter(
                         memberPostItem.postFriendlyName
                     )
                 }
+
+                holder.imgLike.setOnClickListener {
+                    val isLike = memberPostItem.likeType == LikeType.LIKE
+                    clubPostFuncItem.onLikeClick(memberPostItem, !isLike) { like, count -> updateLike(like, count, holder) }
+                }
+                holder.imgDislike.setOnClickListener {  }
+                holder.imgFavorite.setOnClickListener {
+                    val isFavorite = memberPostItem.isFavorite
+                    clubPostFuncItem.onFavoriteClick(memberPostItem, !isFavorite) { favorite, count ->
+                        updateFavorite(favorite, count, holder)
+                    }
+                }
+                holder.imgReport.setOnClickListener {
+                    onTextDetailListener.onMoreClick(memberPostItem!!)
+                }
+                holder.imgShare.setOnClickListener {
+                }
             }
         }
     }
@@ -172,57 +187,27 @@ class ClubTextDetailAdapter(
         mAdItem = item
     }
 
-    private fun updateCommandItem(type: CommentType) {
-        onTextDetailListener.onGetCommandInfo(commentAdapter!!, type)
+    private fun updateLike(isLike: Boolean, count: Int, holder: TextDetailViewHolder) {
+        if (isLike) {
+            holder.imgLike.setImageResource(R.drawable.ico_nice_s)
+        } else {
+            holder.imgLike.setImageResource(R.drawable.ico_nice_gray)
+        }
+        holder.txtLikeCount.text = String.format(context.getString(R.string.club_like_count), count)
     }
 
-    private val playerInfoListener = object : CommentAdapter.PlayerInfoListener {
-        override fun sendComment(replyId: Long?, replyName: String?) {
-            onTextDetailListener.onReplyComment(replyId, replyName)
-        }
-
-        override fun expandReply(parentNode: RootCommentNode, succeededBlock: () -> Unit) {
-            onTextDetailListener.onGetReplyCommand(parentNode, succeededBlock)
-        }
-
-        override fun replyComment(replyId: Long?, replyName: String?) {
-            onTextDetailListener.onReplyComment(replyId, replyName)
-        }
-
-        override fun setCommentLikeType(
-            replyId: Long?,
-            isLike: Boolean,
-            succeededBlock: () -> Unit
-        ) {
-            onTextDetailListener.onCommandLike(replyId, isLike, succeededBlock)
-        }
-
-        override fun removeCommentLikeType(replyId: Long?, succeededBlock: () -> Unit) {
-            onTextDetailListener.onCommandDislike(replyId, succeededBlock)
-        }
-
-        override fun onMoreClick(item: MembersPostCommentItem) {
-            onTextDetailListener.onMoreClick(item)
-        }
-
-        override fun onAvatarClick(userId: Long, name: String) {
-            onTextDetailListener.onAvatarClick(userId, name)
-        }
-
-        override fun loadAvatar(id: Long?, view: ImageView) {
-            onTextDetailListener.onGetAttachment(id, view)
+    private fun updateFavorite(isFavorite: Boolean, count: Int, holder: TextDetailViewHolder) {
+        if (isFavorite) {
+            holder.imgFavorite.setImageResource(R.drawable.btn_favorite_white_s)
+        } else {
+            holder.imgFavorite.setImageResource(R.drawable.btn_favorite_n)
         }
     }
 
     interface OnTextDetailListener {
         fun onGetAttachment(id: Long?, view: ImageView)
         fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean)
-        fun onGetCommandInfo(adapter: CommentAdapter, type: CommentType)
-        fun onGetReplyCommand(parentNode: RootCommentNode, succeededBlock: () -> Unit)
-        fun onCommandLike(commentId: Long?, isLike: Boolean, succeededBlock: () -> Unit)
-        fun onCommandDislike(commentId: Long?, succeededBlock: () -> Unit)
-        fun onReplyComment(replyId: Long?, replyName: String?)
-        fun onMoreClick(item: MembersPostCommentItem)
+        fun onMoreClick(item: MemberPostItem)
         fun onChipClick(type: PostType, tag: String)
         fun onOpenWebView(url: String)
         fun onAvatarClick(userId: Long, name: String)

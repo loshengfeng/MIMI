@@ -1,7 +1,7 @@
 package com.dabenxiang.mimi.view.actor
 
 import android.widget.ImageView
-import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.api.vo.ActorVideoItem
 
 class ActorVideosFuncItem(
     val getActorAvatarAttachment: ((Long?, ImageView) -> Unit) = { _, _ -> },

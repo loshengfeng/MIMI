@@ -30,6 +30,9 @@
         <action
             android:id="@+id/action_mimiFragment_to_actorVideosFragment"
             app:destination="@id/actorVideosFragment" />
+        <action
+            android:id="@+id/action_mimiFragment_to_categoriesFragment"
+            app:destination="@id/categoriesFragment" />
     </fragment>
 
     <fragment
@@ -48,5 +51,44 @@
         android:id="@+id/actorVideosFragment"
         android:name="com.dabenxiang.mimi.view.actorvideos.ActorVideosFragment"
         android:label="ActorVideosFragment" />
+
+    <fragment
+        android:id="@+id/categoriesFragment"
+        android:name="com.dabenxiang.mimi.view.home.category.CategoriesFragment"
+        android:label="CategoriesFragment"
+        tools:layout="@layout/fragment_categories">
+
+        <action
+            android:id="@+id/action_to_searchVideoFragment"
+            app:destination="@id/searchVideoFragment" />
+
+        <action
+            android:id="@+id/action_categoriesFragment_to_loginFragment"
+            app:destination="@id/navigation_login" />
+
+        <action
+            android:id="@+id/action_categoriesFragment_to_navigation_player"
+            app:destination="@id/navigation_player" />
+
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/searchVideoFragment"
+        android:name="com.dabenxiang.mimi.view.search.video.SearchVideoFragment"
+        tools:layout="@layout/fragment_search_video">
+        <action
+            android:id="@+id/action_to_settingFragment"
+            app:destination="@id/navigation_setting" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_inviteVipFragment"
+            app:destination="@id/inviteVipFragment" />
+        <action
+            android:id="@+id/action_searchVideoFragment_to_navigation_player"
+            app:destination="@id/navigation_player" />
+    </fragment>
 
 </navigation>

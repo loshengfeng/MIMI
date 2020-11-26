@@ -11,6 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
 
 class ClubRecommendListDataSource(
@@ -23,6 +24,7 @@ class ClubRecommendListDataSource(
 
     companion object {
         const val PER_LIMIT = 10
+        private const val AD_GAP: Int = 3
     }
 
 
@@ -39,7 +41,10 @@ class ClubRecommendListDataSource(
                 if (!result.isSuccessful) throw HttpException(result)
                 val body = result.body()
                 val postItem = body?.content
-                postItem?.add(0, MemberPostItem(type = PostType.AD, adItem = adItem))
+                postItem?.forEachWithIndex { i, memberPostItem ->
+                    if (i % AD_GAP == 0)
+                        postItem.add(i, MemberPostItem(type = PostType.AD, adItem = adItem))
+                }
 
                 val nextPageKey = when {
                     hasNextPage(
@@ -106,41 +111,4 @@ class ClubRecommendListDataSource(
     }
 
     private data class InitResult(val list: List<MemberPostItem>, val nextKey: Int?)
-
-//    override suspend fun loadInitial(params: LoadParams<Long>): LoadResult<Long, MemberPostItem> {
-//        val offset = params.key ?: 0
-//        return try {
-//            val adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content ?: AdItem()
-//
-//            val result = domainManager.getApiRepository().getMembersPost(PostType.ALL, OrderBy.HOTTEST,
-//                    0, ClubLatestListDataSource.PER_LIMIT.toInt()
-//            )
-//            if (!result.isSuccessful) throw HttpException(result)
-//
-//            val body = result.body()
-//            val memberPostItems = body?.content
-//            memberPostItems?.add(0, MemberPostItem(type = PostType.AD, adItem = adItem))
-//
-//            val hasNext = hasNextPage(
-//                result.body()?.paging?.count ?: 0,
-//                result.body()?.paging?.offset ?: 0,
-//                    memberPostItems?.size ?: 0
-//            )
-//            val nextKey = if (hasNext) offset + PER_LIMIT_LONG else null
-//            if (offset == 0L) pagingCallback.onTotalCount(result.body()?.paging?.count ?: 0)
-//            pagingCallback.onTotalCount(body?.paging?.count ?: 0)
-//            LoadResult.Page(memberPostItems ?: listOf(), null, nextKey)
-//        } catch (e: Exception) {
-//            LoadResult.Error(e)
-//        }
-//    }
-//
-//    private fun hasNextPage(total: Long, offset: Long, currentSize: Int): Boolean {
-//        return when {
-//            currentSize < PER_LIMIT_LONG -> false
-//            offset >= total -> false
-//            else -> true
-//        }
-//    }
-
 }

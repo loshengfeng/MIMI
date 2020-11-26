@@ -3,8 +3,9 @@ package com.dabenxiang.mimi.view.player
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.GuessLikePagingCallBack
 import com.dabenxiang.mimi.model.api.ApiRepository
+import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
-import com.dabenxiang.mimi.model.vo.simpleVideoItemToVideoItem
+import com.dabenxiang.mimi.model.vo.statisticsItemToVideoItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -34,16 +35,27 @@ class GuessLikeDataSource(
             flow {
                 val returnList = mutableListOf<BaseVideoItem>()
 
-                val result = apiRepository.searchWithCategory(
-                    category, isAdult, "0",
-                    PER_LIMIT
+//                val result = apiRepository.searchWithCategory(
+//                    category, isAdult, "0",
+//                    PER_LIMIT
+//                )
+                val result = apiRepository.statisticsHomeVideos(
+                    "",
+                    "",
+                    StatisticsOrderType.HOTTEST.value,
+                    category,
+                    "",
+                    true,
+                    true,
+                    0,
+                    PER_LIMIT.toInt()
                 )
                 if (!result.isSuccessful) throw HttpException(result)
 
                 val item = result.body()
                 val videos = item?.content
                 if (videos != null) {
-                    returnList.addAll(videos.simpleVideoItemToVideoItem(isAdult))
+                    returnList.addAll(videos.statisticsItemToVideoItem())
                 }
 
                 val nextPageKey = when {
@@ -72,9 +84,16 @@ class GuessLikeDataSource(
         val next = params.key
         viewModelScope.launch {
             flow {
-                val result = apiRepository.searchWithCategory(
-                    category, isAdult, next.toString(),
-                    PER_LIMIT
+                val result = apiRepository.statisticsHomeVideos(
+                    "",
+                    "",
+                    StatisticsOrderType.HOTTEST.value,
+                    category,
+                    "",
+                    true,
+                    true,
+                    next.toInt(),
+                    PER_LIMIT.toInt()
                 )
                 if (!result.isSuccessful) throw HttpException(result)
 
@@ -91,7 +110,7 @@ class GuessLikeDataSource(
 
                         emit(
                             EmitResult(
-                                list.simpleVideoItemToVideoItem(isAdult),
+                                list.statisticsItemToVideoItem(),
                                 nextPageKey
                             )
                         )
