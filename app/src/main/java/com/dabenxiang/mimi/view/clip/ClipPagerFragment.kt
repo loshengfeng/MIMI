@@ -129,16 +129,7 @@ class ClipPagerFragment : BaseFragment() {
     }
 
     override val isNavTransparent: Boolean = true
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        requireActivity().window.run {
-            this.statusBarColor = ContextCompat.getColor(
-                requireContext(),
-                R.color.color_black_1
-            )
-        }
-    }
+    override val isStatusBarDark: Boolean = true
 
     override fun onPause() {
         super.onPause()

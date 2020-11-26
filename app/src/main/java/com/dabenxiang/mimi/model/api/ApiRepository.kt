@@ -408,6 +408,15 @@ class ApiRepository(private val apiService: ApiService) {
     ) = apiService.searchHomeVideos(category, q, country, years, isAdult, offset, limit, tag)
 
     /**
+     * 取得小视频影片(需Client Credentials|需登入帳號)
+     */
+    suspend fun searchShortVideo(
+        q: String? = null,
+        offset: String,
+        limit: String
+    ) = apiService.searchShortVideo(q, offset, limit)
+
+    /**
      * 取得類別影片
      */
     suspend fun searchWithCategory(

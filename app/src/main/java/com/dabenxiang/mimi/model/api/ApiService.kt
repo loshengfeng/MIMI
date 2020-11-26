@@ -322,6 +322,13 @@ interface ApiService {
         @Query("tag") tag: String?
     ): Response<ApiBasePagingItem<VideoSearchItem>>
 
+    @GET("/v1/Members/Home/Videos/SearchShortVideo")
+    suspend fun searchShortVideo(
+        @Query("q") q: String?,
+        @Query("offset") offset: String?,
+        @Query("limit") limit: String?,
+    ): Response<ApiBasePagingItem<VideoSearchItem>>
+
     @GET("/v1/Members/Home/Videos/SearchWithCategory")
     suspend fun searchWithCategory(
         @Query("category") category: String?,
