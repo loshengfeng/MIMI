@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.home.category
+package com.dabenxiang.mimi.view.category
 
 import androidx.paging.DataSource
 import com.dabenxiang.mimi.model.vo.BaseVideoItem

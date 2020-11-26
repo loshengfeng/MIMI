@@ -13,7 +13,7 @@ import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.home.category.CategoriesFragment
+import com.dabenxiang.mimi.view.category.CategoriesFragment
 import com.dabenxiang.mimi.view.ranking.RankingFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.to.aboomy.pager2banner.IndicatorView
