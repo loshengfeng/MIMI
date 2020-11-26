@@ -506,7 +506,7 @@ class SearchPostFragment : BaseFragment() {
                         val bundle = PictureDetailFragment.createBundle(item, 1)
                         navigateTo(
                             NavigateItem.Destination(
-                                R.id.action_searchPostFragment_to_pictureDetailFragment,
+                                R.id.action_searchPostFragment_to_clubPicFragment,
                                 bundle
                             )
                         )
@@ -515,7 +515,7 @@ class SearchPostFragment : BaseFragment() {
                         val bundle = TextDetailFragment.createBundle(item, 1)
                         navigateTo(
                             NavigateItem.Destination(
-                                R.id.action_searchPostFragment_to_textDetailFragment,
+                                R.id.action_searchPostFragment_to_clubTextFragment,
                                 bundle
                             )
                         )
@@ -581,7 +581,7 @@ class SearchPostFragment : BaseFragment() {
                     val bundle = PictureDetailFragment.createBundle(item, 0)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_searchPostFragment_to_pictureDetailFragment,
+                            R.id.action_searchPostFragment_to_clubPicFragment,
                             bundle
                         )
                     )
@@ -590,19 +590,20 @@ class SearchPostFragment : BaseFragment() {
                     val bundle = TextDetailFragment.createBundle(item, 0)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_searchPostFragment_to_textDetailFragment,
+                            R.id.action_searchPostFragment_to_clubTextFragment,
                             bundle
                         )
                     )
                 }
                 AdultTabType.CLIP -> {
+                    // todo 更換新的 clip detail page
                     val bundle = ClipFragment.createBundle(arrayListOf(item), 0)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_searchPostFragment_to_clipFragment,
-                            bundle
-                        )
-                    )
+//                    navigateTo(
+//                        NavigateItem.Destination(
+//                            R.id.action_searchPostFragment_to_clipFragment,
+//                            bundle
+//                        )
+//                    )
                 }
                 else -> {
                 }
