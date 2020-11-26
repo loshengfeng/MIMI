@@ -28,8 +28,6 @@ import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_categories.*
-import kotlinx.android.synthetic.main.fragment_categories.layout_refresh
-import kotlinx.android.synthetic.main.fragment_general_video.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -347,12 +345,12 @@ class CategoriesFragment : BaseFragment() {
     }
 
     private fun adjustContentRV(notEmptyCount: Int) {
-//        layout_refresh.setPadding(
-//            0,
-//            GeneralUtils.dpToPx(requireContext(), 50) * notEmptyCount,
-//            0,
-//            0
-//        )
+        recyclerview_content.setPadding(
+            0,
+            GeneralUtils.dpToPx(requireContext(), 50) * notEmptyCount,
+            0,
+            0
+        )
     }
 
     private fun setupTitle() {
