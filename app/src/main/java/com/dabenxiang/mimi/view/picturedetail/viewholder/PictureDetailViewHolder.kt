@@ -6,6 +6,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.google.android.material.chip.ChipGroup
+import kotlinx.android.synthetic.main.item_comment_interactive.view.*
 import kotlinx.android.synthetic.main.item_picture_detail.view.*
 
 class PictureDetailViewHolder(itemView: View) : BaseViewHolder(itemView) {
@@ -17,4 +18,11 @@ class PictureDetailViewHolder(itemView: View) : BaseViewHolder(itemView) {
     val follow: TextView = itemView.tv_follow
     val photoGrid: RecyclerView = itemView.recycler_photo
     val tagChipGroup: ChipGroup = itemView.chip_group_tag
+    val imgLike: ImageView = itemView.imgLike
+    val imgDislike: ImageView = itemView.imgDislike
+    val imgShare: ImageView = itemView.imgShare
+    val imgReport: ImageView = itemView.imgReport
+    val imgFavorite: ImageView = itemView.imgFavorite
+    val txtLikeCount: TextView = itemView.txtLikeCount
+    val txtFavorite: TextView = itemView.txtFavorite
 }

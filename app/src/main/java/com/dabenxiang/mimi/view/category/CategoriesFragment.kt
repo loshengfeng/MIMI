@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.home.category
+package com.dabenxiang.mimi.view.category
 
 import android.animation.Animator
 import android.animation.ObjectAnimator
@@ -25,6 +25,8 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.home.HomeTemplate
 import com.dabenxiang.mimi.view.home.viewholder.*
+import com.dabenxiang.mimi.view.player.ui.PlayerFragment
+import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_categories.*
@@ -32,8 +34,6 @@ import kotlinx.android.synthetic.main.fragment_categories.*
 class CategoriesFragment : BaseFragment() {
 
     companion object {
-        private const val REQUEST_LOGIN = 1000
-
         const val KEY_ORDER_BY = "orderByType"
         const val KEY_CATEGORY = "category"
         const val SORT = 0
@@ -60,7 +60,7 @@ class CategoriesFragment : BaseFragment() {
 
     private val adapterListener = object : HomeAdapter.EventListener {
         override fun onVideoClick(view: View, item: PlayerItem) {
-            // TODO: 跳至播放頁面
+            navToPlayer(item)
         }
 
         override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {}
@@ -154,13 +154,7 @@ class CategoriesFragment : BaseFragment() {
         }
 
         iv_search.setOnClickListener {
-            val bundle = SearchVideoFragment.createBundle(category = category)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_to_searchVideoFragment,
-                    bundle
-                )
-            )
+            navToSearch()
         }
 
         bar_collapsing_filter.setOnClickListener {
@@ -320,21 +314,6 @@ class CategoriesFragment : BaseFragment() {
         }
     }
 
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//
-//        if (resultCode == Activity.RESULT_OK) {
-//            when (requestCode) {
-//                REQUEST_LOGIN -> {
-//                    findNavController().navigate(
-//                        R.id.action_categoriesFragment_to_loginFragment,
-//                        data?.extras
-//                    )
-//                }
-//            }
-//        }
-//    }
-
     private fun adjustContentRV(notEmptyCount: Int) {
         recyclerview_content.setPadding(
             0,
@@ -346,7 +325,27 @@ class CategoriesFragment : BaseFragment() {
 
     private fun setupTitle() {
         tv_title.text =
-                if (category.isBlank()) getString(R.string.home_tab_video)
-                else category
+            if (category.isBlank()) getString(R.string.home_tab_video)
+            else category
+    }
+
+    private fun navToSearch() {
+        val bundle = SearchVideoFragment.createBundle(category = category)
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_to_searchVideoFragment,
+                bundle
+            )
+        )
+    }
+
+    private fun navToPlayer(item: PlayerItem){
+        val bundle = PlayerV2Fragment.createBundle(item)
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_to_navigation_player,
+                bundle
+            )
+        )
     }
 }
