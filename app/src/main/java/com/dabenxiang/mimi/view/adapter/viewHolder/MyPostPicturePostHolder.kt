@@ -35,8 +35,7 @@ import org.koin.core.component.inject
 import java.util.*
 
 class MyPostPicturePostHolder(
-    itemView: View,
-    private val isAdultTheme: Boolean
+    itemView: View
 ) : BaseViewHolder(itemView),KoinComponent {
 
     private val accountManager: AccountManager by inject()
@@ -67,15 +66,15 @@ class MyPostPicturePostHolder(
     ) {
         val isMe = accountManager.getProfile().userId == item.creatorId
 
-        picturePostItemLayout.setBackgroundColor(App.self.getColor(if (isAdultTheme) R.color.color_black_4 else R.color.color_white_1))
-        tvName.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1 else R.color.color_black_1))
-        tvTime.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1_50 else R.color.color_black_1_50))
-        tvTitle.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1 else R.color.color_black_1))
-        tvLikeCount.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1 else R.color.color_black_1))
-        tvCommentCount.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1 else R.color.color_black_1))
-        ivComment.setImageResource(if (isAdultTheme) R.drawable.ico_messege_adult else R.drawable.ico_messege_adult_gray)
-        ivMore.setImageResource(if (isAdultTheme) R.drawable.btn_more_white_n else R.drawable.btn_more_gray_n)
-        vSeparator.setBackgroundColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1_30 else R.color.color_black_1_05))
+        picturePostItemLayout.setBackgroundColor(App.self.getColor(R.color.color_white_1))
+        tvName.setTextColor(App.self.getColor(R.color.color_black_1))
+        tvTime.setTextColor(App.self.getColor(R.color.color_black_1_50))
+        tvTitle.setTextColor(App.self.getColor(R.color.color_black_1))
+        tvLikeCount.setTextColor(App.self.getColor(R.color.color_black_1))
+        tvCommentCount.setTextColor(App.self.getColor(R.color.color_black_1))
+        ivComment.setImageResource(R.drawable.ico_messege_adult_gray)
+        ivMore.setImageResource(R.drawable.btn_more_gray_n)
+        vSeparator.setBackgroundColor(App.self.getColor(R.color.color_black_1_05))
 
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
@@ -83,17 +82,20 @@ class MyPostPicturePostHolder(
         tvFollow.visibility = if(accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
 
         attachmentListener.onGetAttachment(item.avatarAttachmentId, imgAvatar, LoadImageType.AVATAR)
+        imgAvatar.setOnClickListener {
+            myPostListener.onAvatarClick(item.creatorId,item.postFriendlyName)
+        }
 
         tagChipGroup.removeAllViews()
         item.tags?.forEach {
             val chip = LayoutInflater.from(tagChipGroup.context)
                 .inflate(R.layout.chip_item, tagChipGroup, false) as Chip
             chip.text = it
-            chip.setTextColor(tagChipGroup.context.getColor(if (isAdultTheme) R.color.color_white_1_50 else R.color.color_black_1_50))
+            chip.setTextColor(tagChipGroup.context.getColor(R.color.color_black_1_50))
             chip.chipBackgroundColor = ColorStateList.valueOf(
                 ContextCompat.getColor(
                     tagChipGroup.context,
-                    if (isAdultTheme) R.color.color_black_6 else R.color.color_black_1_05
+                    R.color.color_black_1_05
                 )
             )
             chip.setOnClickListener { view ->
@@ -144,7 +146,7 @@ class MyPostPicturePostHolder(
         }
 
         ivMore.setOnClickListener {
-            myPostListener.onMoreClick(item)
+            myPostListener.onMoreClick(item, position)
         }
 
         updateLike(item)
@@ -176,7 +178,7 @@ class MyPostPicturePostHolder(
         if (item.likeType == LikeType.LIKE) {
             ivLike.setImageResource(R.drawable.ico_nice_s)
         } else {
-            ivLike.setImageResource(if (isAdultTheme) R.drawable.ico_nice else R.drawable.ico_nice_gray)
+            ivLike.setImageResource(R.drawable.ico_nice_gray)
         }
     }
 

@@ -132,15 +132,13 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
 
     fun deletePost(
         item: MemberPostItem,
-        items: ArrayList<MemberPostItem>
+        position:Int
     ) {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val result = apiRepository.deleteMyPost(item.id)
                 if (!result.isSuccessful) throw HttpException(result)
-                val position = items.indexOf(item)
-                items.remove(item)
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
