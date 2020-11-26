@@ -100,6 +100,11 @@ abstract class BasePlayerFragment: BaseFragment(), AnalyticsListener, Player.Eve
         super.onDestroyView()
         player_view.onPause()
         releasePlayer()
+
+        if(requireActivity().requestedOrientation != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+            playerViewModel.lockFullScreen = !playerViewModel.lockFullScreen
+            switchScreenOrientation()
+        }
     }
 
     override fun setupObservers() {
