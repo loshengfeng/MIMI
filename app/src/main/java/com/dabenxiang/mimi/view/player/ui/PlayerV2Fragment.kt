@@ -68,6 +68,8 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
     private var player: SimpleExoPlayer? = null
     private var orientationDetector: OrientationDetector? = null
 
+    override val isStatusBarDark: Boolean = true
+
     override fun getLayoutId(): Int {
         return R.layout.fragment_v2_player
     }
@@ -239,8 +241,6 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
             }
 
         }.attach()
-
-        setUpStatusBarColor()
     }
 
     override fun onStart() {
