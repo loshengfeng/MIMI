@@ -18,6 +18,7 @@
         android:id="@+id/actor_profile"
         android:layout_width="match_parent"
         android:layout_height="80dp"
+        android:background="@color/color_black_1_05"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"

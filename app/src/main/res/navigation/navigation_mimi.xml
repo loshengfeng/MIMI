@@ -27,6 +27,9 @@
         <action
             android:id="@+id/action_mimiFragment_to_rankingFragment"
             app:destination="@id/rankingFragment" />
+        <action
+            android:id="@+id/action_mimiFragment_to_actorVideosFragment"
+            app:destination="@id/actorVideosFragment" />
     </fragment>
 
     <fragment
@@ -41,5 +44,9 @@
             android:id="@+id/action_rankingFragment_to_navigation_clip"
             app:destination="@id/navigation_clip" />
     </fragment>
+    <fragment
+        android:id="@+id/actorVideosFragment"
+        android:name="com.dabenxiang.mimi.view.actorvideos.ActorVideosFragment"
+        android:label="ActorVideosFragment" />
 
 </navigation>

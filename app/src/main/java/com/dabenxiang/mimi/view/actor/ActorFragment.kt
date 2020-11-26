@@ -4,14 +4,15 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ActorCategoriesItem
 import com.dabenxiang.mimi.model.api.vo.ActorVideoItem
+import com.dabenxiang.mimi.model.api.vo.ActorVideosItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
+import com.dabenxiang.mimi.view.actorvideos.ActorVideosFragment
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.base.NavigateItem
 import kotlinx.android.synthetic.main.fragment_actor.*
 import timber.log.Timber
 
@@ -21,12 +22,17 @@ class ActorFragment : BaseFragment() {
         ActorVideosAdapter(requireContext(),
             ActorVideosFuncItem(
                 getActorAvatarAttachment =  { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR_CS) },
-                onVideoClickListener = { actorVideoItem, position -> onVideoClickListener(actorVideoItem, position) }
+                onVideoClickListener = { actorVideoItem, position -> onVideoClickListener(actorVideoItem, position) },
+                onActorClickListener = { actorVideosItem, position -> onActorClickListener(actorVideosItem, position) }
             )
         ) }
 
     private fun onVideoClickListener(item: ActorVideoItem, position: Int){
         Timber.d("Video: ${item.title}")
+    }
+
+    private fun onActorClickListener(item: ActorVideosItem, position: Int){
+        navToActorVideosFragment(item)
     }
 
     private val actorCategoriesAdapter by lazy {
@@ -86,4 +92,13 @@ class ActorFragment : BaseFragment() {
 
     }
 
+    private fun navToActorVideosFragment(item: ActorVideosItem) {
+        val bundle = ActorVideosFragment.createBundle(item)
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_mimiFragment_to_actorVideosFragment,
+                bundle
+            )
+        )
+    }
 }
