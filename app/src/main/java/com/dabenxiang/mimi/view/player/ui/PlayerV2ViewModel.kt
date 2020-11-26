@@ -1,32 +1,17 @@
 package com.dabenxiang.mimi.view.player.ui
 
-import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.text.TextUtils
-import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import androidx.paging.LivePagedListBuilder
-import androidx.paging.PagedList
-import com.dabenxiang.mimi.callback.GuessLikePagingCallBack
 import com.dabenxiang.mimi.extension.downloadFile
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.*
-import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.api.vo.DownloadResult
+import com.dabenxiang.mimi.model.api.vo.VideoEpisodeItem
+import com.dabenxiang.mimi.model.api.vo.VideoItem
+import com.dabenxiang.mimi.model.api.vo.VideoM3u8Source
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.player.GuessLikeDataSource
-import com.dabenxiang.mimi.view.player.GuessLikeFactory
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
-import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.source.dash.DashMediaSource
-import com.google.android.exoplayer2.source.hls.HlsMediaSource
-import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
-import com.google.android.exoplayer2.util.Util
 import com.google.gson.Gson
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
@@ -41,9 +26,6 @@ class PlayerV2ViewModel: BaseViewModel() {
 
     private val VIDEO_CUCUMBER: String = "cucumber"
 
-    private val _isPlaying = MutableLiveData<Boolean>()
-    val isPlaying: LiveData<Boolean> = _isPlaying
-
     private val _videoContentSource = MutableLiveData<ApiResult<VideoItem>>()
     val videoContentSource: LiveData<ApiResult<VideoItem>> = _videoContentSource
 
@@ -52,9 +34,6 @@ class PlayerV2ViewModel: BaseViewModel() {
 
     private val _m3u8ContentSource = MutableLiveData<ApiResult<VideoM3u8Source>>()
     val m3u8ContentSource: LiveData<ApiResult<VideoM3u8Source>> = _m3u8ContentSource
-
-    private val _showRechargeReminder = MutableLiveData(false)
-    val showRechargeReminder: LiveData<Boolean> = _showRechargeReminder
 
     private val _videoStreamingUrl = MutableLiveData<String>()
     val videoStreamingUrl: LiveData<String> = _videoStreamingUrl
@@ -65,35 +44,12 @@ class PlayerV2ViewModel: BaseViewModel() {
     private val _selectEpisodePosition = MutableLiveData<Int>()
     val selectEpisodePosition: LiveData<Int> = _selectEpisodePosition
 
-    private val _videoReport = MutableLiveData<ApiResult<Nothing>>()
-    val videoReport: LiveData<ApiResult<Nothing>> = _videoReport
-
-    private val _fastForwardTime = MutableLiveData<Int>()
-    val fastForwardTime: LiveData<Int> = _fastForwardTime
-
-    private val _soundLevel = MutableLiveData<Float>()
-    val soundLevel: LiveData<Float> = _soundLevel
-
     val showIntroduction = MutableLiveData(false)
 
     var videoContentId : Long = -1
-    var currentWindow: Int = 0
-    var playbackPosition: Long = 0
-    var lockFullScreen = false
-    var currentOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     var m3u8SourceUrl: String = ""
 
-    fun setFastForwardTime(time: Int) {
-        _fastForwardTime.value = time
-    }
 
-    fun setRewindTime(time: Int) {
-        _fastForwardTime.value = -time
-    }
-
-    fun setSoundLevel(level: Float) {
-        _soundLevel.value = if (level > 1) 1f else if (level < 0) 0f else level
-    }
 
     inner class NotDeductedException : Exception()
 
@@ -231,38 +187,6 @@ class PlayerV2ViewModel: BaseViewModel() {
             }
     }
 
-    fun getMediaSource(uriString: String, sourceFactory: DefaultDataSourceFactory): MediaSource? {
-        val uri = Uri.parse(uriString)
-
-        val sourceType = Util.inferContentType(uri)
-        //Timber.d("#sourceType: $sourceType")
-
-        return when (sourceType) {
-            C.TYPE_DASH ->
-                DashMediaSource.Factory(sourceFactory)
-                    .createMediaSource(uri)
-            C.TYPE_HLS ->
-                HlsMediaSource.Factory(sourceFactory)
-                    .createMediaSource(uri)
-            C.TYPE_SS ->
-                SsMediaSource.Factory(sourceFactory)
-                    .createMediaSource(uri)
-            C.TYPE_OTHER -> {
-                when {
-                    uriString.startsWith("rtmp://") ->
-                        ProgressiveMediaSource.Factory(RtmpDataSourceFactory())
-                            .createMediaSource(uri)
-                    uriString.contains("m3u8") -> HlsMediaSource.Factory(sourceFactory)
-                        .createMediaSource(uri)
-                    else ->
-                        ProgressiveMediaSource.Factory(sourceFactory)
-                            .createMediaSource(uri)
-                }
-            }
-            else -> null
-        }
-    }
-
     fun selectSourcesIndex(position: Int) {
         if (position != _selectSourcesPosition.value) {
             _selectSourcesPosition.postValue(position)
@@ -273,24 +197,6 @@ class PlayerV2ViewModel: BaseViewModel() {
         if (position != _selectEpisodePosition.value) {
             _selectEpisodePosition.postValue(position)
         }
-    }
-
-    fun sendVideoReport(){
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository().getMemberVideoReport(
-                    videoId= videoContentId, type = PostType.VIDEO_ON_DEMAND.value)
-                if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(null))
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _videoReport.value = it }
-        }
-    }
-
-    fun setPlaying(playing: Boolean) {
-        _isPlaying.value = playing
     }
 
     fun clearLiveData() {

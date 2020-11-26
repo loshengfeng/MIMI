@@ -24,6 +24,7 @@
         android:id="@+id/exo_play_pause"
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:scaleType="centerInside"
         android:src="@drawable/exo_icon_pause"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/exo_play_pause_end_guideline"
