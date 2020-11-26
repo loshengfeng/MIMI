@@ -15,7 +15,6 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.view.club.recommend.ClubRecommendAdapter
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
 class ClubPostFollowAdapter(
@@ -61,25 +60,25 @@ class ClubPostFollowAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (viewType) {
-            ClubRecommendAdapter.VIEW_TYPE_AD -> {
+            VIEW_TYPE_AD -> {
                 AdHolder(
                         LayoutInflater.from(parent.context)
                                 .inflate(R.layout.item_ad, parent, false)
                 )
             }
-            ClubRecommendAdapter.VIEW_TYPE_CLIP -> {
+            VIEW_TYPE_CLIP -> {
                 MyPostClipPostHolder(
                         LayoutInflater.from(parent.context)
                                 .inflate(R.layout.item_clip_post, parent, false)
                 )
             }
-            ClubRecommendAdapter.VIEW_TYPE_PICTURE -> {
+            VIEW_TYPE_PICTURE -> {
                 MyPostPicturePostHolder(
                         LayoutInflater.from(parent.context)
                                 .inflate(R.layout.item_picture_post, parent, false)
                 )
             }
-            ClubRecommendAdapter.VIEW_TYPE_TEXT -> {
+            VIEW_TYPE_TEXT -> {
                 MyPostTextPostHolder(
                         LayoutInflater.from(parent.context)
                                 .inflate(R.layout.item_text_post, parent, false)
