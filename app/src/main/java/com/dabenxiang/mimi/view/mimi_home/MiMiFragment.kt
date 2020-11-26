@@ -15,8 +15,6 @@ class MiMiFragment : BaseFragment() {
 
     private val viewModel: MiMiViewModel by viewModels()
 
-    private var viewPagerAdapter: MiMiViewPagerAdapter? = null
-
     override fun setupFirstTime() {
         super.setupFirstTime()
 
@@ -37,8 +35,7 @@ class MiMiFragment : BaseFragment() {
 
     private fun setupUi(menusItems: List<SecondMenuItem>) {
         viewpager.isSaveEnabled = false
-        viewPagerAdapter = MiMiViewPagerAdapter(childFragmentManager, lifecycle, menusItems)
-        viewpager.adapter = viewPagerAdapter
+        viewpager.adapter = MiMiViewPagerAdapter(childFragmentManager, lifecycle, menusItems)
         TabLayoutMediator(layout_tab, viewpager) { tab, position ->
             tab.text = menusItems[position].name
         }.attach()
