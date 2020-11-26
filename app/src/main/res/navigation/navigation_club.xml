@@ -14,11 +14,11 @@
         android:name="com.dabenxiang.mimi.view.club.ClubTabFragment"
         tools:layout="@layout/fragment_tab_club">
         <action
-            android:id="@+id/action_clubTabFragment_to_clubTextDetailFragment"
-            app:destination="@id/clubTextDetailFragment" />
+            android:id="@+id/action_clubTabFragment_to_clubTextFragment"
+            app:destination="@id/clubTextFragment" />
         <action
-            android:id="@+id/action_clubTabFragment_to_clubPicDetailFragment"
-            app:destination="@id/clubPicDetailFragment" />
+            android:id="@+id/action_clubTabFragment_to_clubPicFragment"
+            app:destination="@id/clubPicFragment" />
         <action
             android:id="@+id/action_clubTabFragment_to_topicDetailFragment"
             app:destination="@id/navigation_club_topic" />
@@ -31,7 +31,7 @@
     </fragment>
 
     <fragment
-        android:id="@+id/clubTextDetailFragment"
+        android:id="@+id/clubTextFragment"
         android:name="com.dabenxiang.mimi.view.club.post.ClubTextFragment"
         tools:layout="@layout/fragment_club_text">
         <action
@@ -41,6 +41,11 @@
             android:id="@+id/action_clubTextDetailFragment_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/clubPicFragment"
+        android:name="com.dabenxiang.mimi.view.club.post.ClubPicFragment"
+        tools:layout="@layout/fragment_club_pic_detail" />
 
     <fragment
         android:id="@+id/clubPicDetailFragment"

@@ -19,24 +19,24 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
-import kotlinx.android.synthetic.main.fragment_club_post_text.*
+import kotlinx.android.synthetic.main.fragment_club_post_pic.*
 import timber.log.Timber
 
-class ClubPostTextFragment : BaseFragment() {
+class ClubPostPicFragment : BaseFragment() {
 
     private val viewModel: ClubPostViewModel by viewModels()
 
-    override fun getLayoutId() = R.layout.fragment_club_post_text
+    override fun getLayoutId() = R.layout.fragment_club_post_pic
 
     override fun setupObservers() {
-        viewModel.textPostItemListResult.observe(this, Observer {
-            textPostPagedAdapter.submitList(it)
+        viewModel.picturePostItemListResult.observe(this, Observer {
+            picturePostPagedAdapter.submitList(it)
         })
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        Timber.i("ClubPostTextFragment onAttach")
+        Timber.i("ClubPicFragment onAttach")
     }
 
     override fun setupListeners() {
@@ -45,11 +45,11 @@ class ClubPostTextFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = textPostPagedAdapter
-        viewModel.getTextPosts()
+        recyclerView.adapter = picturePostPagedAdapter
+        viewModel.getPicturePosts()
     }
 
-    private val textPostPagedAdapter by lazy {
+    private val picturePostPagedAdapter by lazy {
         MemberPostPagedAdapter(requireActivity(), adultListener, "", memberPostFuncItem)
     }
 
@@ -102,10 +102,12 @@ class ClubPostTextFragment : BaseFragment() {
         }
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            val bundle = ClubTextFragment.createBundle(item)
+            val bundle = ClubPicFragment.createBundle(item)
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_clubTabFragment_to_clubTextFragment, bundle)
+                    R.id.action_clubTabFragment_to_clubPicFragment,
+                    bundle
+                )
             )
         }
 
@@ -142,7 +144,7 @@ class ClubPostTextFragment : BaseFragment() {
                 isAdult = true,
                 isAdultTheme = true
             )
-            navigateTo(NavigateItem.Destination(R.id.action_clubTabFragment_to_myPostFragment, bundle))
+            navigateTo(NavigateItem.Destination(R.id.action_to_myPostFragment, bundle))
         }
     }
 
@@ -152,5 +154,4 @@ class ClubPostTextFragment : BaseFragment() {
             { id, view, type -> viewModel.loadImage(id, view, type) }
         )
     }
-
 }
