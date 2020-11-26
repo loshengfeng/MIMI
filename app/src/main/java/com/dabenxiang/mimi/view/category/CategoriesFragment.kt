@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
@@ -29,10 +30,6 @@ import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
 import kotlinx.android.synthetic.main.fragment_categories.*
-import kotlinx.android.synthetic.main.fragment_categories.layout_empty_data
-import kotlinx.android.synthetic.main.fragment_categories.layout_refresh
-import kotlinx.android.synthetic.main.fragment_categories.rv_video
-import kotlinx.android.synthetic.main.fragment_categories.tv_empty_data
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -79,7 +76,6 @@ class CategoriesFragment : BaseFragment() {
 
                 layout_empty_data?.run { this.visibility = View.VISIBLE }
                 tv_empty_data?.run { this.text = getString(R.string.error_video) }
-
                 rv_video?.run { this.visibility = View.INVISIBLE }
                 layout_refresh?.run { this.isRefreshing = false }
             }
@@ -268,6 +264,7 @@ class CategoriesFragment : BaseFragment() {
     }
 
     private fun getVideos() {
+        videoListAdapter.submitData(lifecycle, PagingData.empty())
         lifecycleScope.launch {
             viewModel.getVideo(category, orderByType)
                 .collectLatest {
