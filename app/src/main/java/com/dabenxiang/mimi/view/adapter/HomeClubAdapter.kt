@@ -8,7 +8,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.view.club.ClubFuncItem
+import com.dabenxiang.mimi.view.club.adapter.ClubFuncItem
 import com.dabenxiang.mimi.view.home.viewholder.ClubViewHolder
 
 class HomeClubAdapter(

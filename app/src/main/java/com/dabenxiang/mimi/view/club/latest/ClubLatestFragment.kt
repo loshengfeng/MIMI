@@ -111,7 +111,7 @@ class ClubLatestFragment : BaseFragment() {
                     val bundle = PictureDetailFragment.createBundle(item, 0)
                     navigateTo(
                             NavigateItem.Destination(
-                                    R.id.action_clubTabFragment_to_clubPicDetailFragment,
+                                    R.id.action_clubTabFragment_to_clubPicFragment,
                                     bundle
                             )
                     )
@@ -120,7 +120,7 @@ class ClubLatestFragment : BaseFragment() {
                     val bundle = TextDetailFragment.createBundle(item, 0)
                     navigateTo(
                             NavigateItem.Destination(
-                                    R.id.action_clubTabFragment_to_clubTextDetailFragment,
+                                    R.id.action_clubTabFragment_to_clubTextFragment,
                                     bundle
                             )
                     )

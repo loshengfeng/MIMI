@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club
+package com.dabenxiang.mimi.view.club.member
 
 import android.content.Context
 import androidx.recyclerview.widget.LinearLayoutManager
