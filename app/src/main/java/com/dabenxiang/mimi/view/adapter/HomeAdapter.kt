@@ -15,7 +15,7 @@ import com.dabenxiang.mimi.model.enums.HomeItemType
 import com.dabenxiang.mimi.model.vo.CarouselHolderItem
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.view.club.ClubFuncItem
+import com.dabenxiang.mimi.view.club.adapter.ClubFuncItem
 import com.dabenxiang.mimi.view.home.HomeTemplate
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.widget.utility.GeneralUtils

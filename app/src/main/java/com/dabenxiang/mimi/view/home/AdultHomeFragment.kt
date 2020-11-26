@@ -37,9 +37,9 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
-import com.dabenxiang.mimi.view.club.ClubFuncItem
-import com.dabenxiang.mimi.view.club.ClubMemberAdapter
-import com.dabenxiang.mimi.view.club.MiMiLinearLayoutManager
+import com.dabenxiang.mimi.view.club.adapter.ClubFuncItem
+import com.dabenxiang.mimi.view.club.member.ClubMemberAdapter
+import com.dabenxiang.mimi.view.club.member.MiMiLinearLayoutManager
 import com.dabenxiang.mimi.view.club.topic.TopicDetailFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.OnChooseUploadMethodDialogListener

@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.adapter
+package com.dabenxiang.mimi.view.club.member
 
 import androidx.paging.PagingSource
 import com.dabenxiang.mimi.callback.PagingCallback

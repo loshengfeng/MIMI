@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club
+package com.dabenxiang.mimi.view.club.adapter
 
 import android.widget.ImageView
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem

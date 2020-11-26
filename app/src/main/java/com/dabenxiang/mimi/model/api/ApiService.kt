@@ -275,7 +275,7 @@ interface ApiService {
         @Query("isAdult") isAdult: Boolean = true,
         @Query("isFullContent") isFullContent: Boolean = false,
         @Query("status") status: Int = 1,
-        @Query("type") type: Int =7
+        @Query("type") type: Int = 7
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     @POST("/v1/Members/Club/{clubId}/Follow")
@@ -320,6 +320,13 @@ interface ApiService {
         @Query("offset") offset: String?,
         @Query("limit") limit: String?,
         @Query("tag") tag: String?
+    ): Response<ApiBasePagingItem<VideoSearchItem>>
+
+    @GET("/v1/Members/Home/Videos/SearchShortVideo")
+    suspend fun searchShortVideo(
+        @Query("q") q: String?,
+        @Query("offset") offset: String?,
+        @Query("limit") limit: String?,
     ): Response<ApiBasePagingItem<VideoSearchItem>>
 
     @GET("/v1/Members/Home/Videos/SearchWithCategory")
@@ -727,19 +734,4 @@ interface ApiService {
      ***********************************************************/
     @GET("/v1/Members/Home/Menu")
     suspend fun getMenu(): Response<ApiBaseItem<List<MenuItem>>>
-
-
-    /**********************************************************
-     *
-     *                   Members/Home/Videos/SearchWithCategory
-     *
-     ***********************************************************/
-    @GET("/v1/Members/Home/Videos/SearchWithCategory")
-    suspend fun getVideoByCategory(
-        @Query("isAdult") isAdult: Boolean,
-        @Query("category") category: String,
-        @Query("offset") offset: String,
-        @Query("limit") limit: String
-    ): Response<ApiBasePagingItem<ArrayList<VideoByCategoryItem>>>
-
 }
