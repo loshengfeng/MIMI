@@ -119,15 +119,18 @@ class MyPostClipPostHolder(
             }
         }
 
-        if (isMe) {
-            tvFollow.visibility = View.GONE
-        } else {
-            tvFollow.visibility = View.VISIBLE
-            updateFollow(item)
-            tvFollow.setOnClickListener {
-                itemList?.also { myPostListener.onFollowClick(it, position, !item.isFollow) }
-            }
-        }
+//        if (isMe) {
+//            tvFollow.visibility = View.GONE
+//        } else {
+//            tvFollow.visibility = View.VISIBLE
+//            updateFollow(item)
+//            tvFollow.setOnClickListener {
+//                itemList?.also { myPostListener.onFollowClick(it, position, !item.isFollow) }
+//            }
+//        }
+
+        tvFollow.visibility =  View.GONE
+
         ivMore.setOnClickListener {
             myPostListener.onMoreClick(item, position)
         }

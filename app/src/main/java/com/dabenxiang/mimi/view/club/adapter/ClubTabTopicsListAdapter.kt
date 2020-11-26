@@ -8,14 +8,10 @@ import android.widget.TextView
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_topic_tab.view.*
-import timber.log.Timber
 
 class TopicListAdapter(private val listener: TopicItemListener)
     : PagingDataAdapter<MemberClubItem, TopicListAdapter.TopicViewHolder>(diffCallback) {
@@ -34,9 +30,9 @@ class TopicListAdapter(private val listener: TopicItemListener)
           }
       }
 
-    inner class TopicViewHolder(itemview: View): RecyclerView.ViewHolder(itemview) {
-        val topicTitle: TextView = itemview.topic_title
-        val topicBg: ImageView = itemview.topic_bg
+    inner class TopicViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+        val topicTitle: TextView = itemView.topic_title
+        val topicBg: ImageView = itemView.topic_bg
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TopicViewHolder {

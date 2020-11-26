@@ -82,6 +82,33 @@ class ClubPostFollowFragment : BaseFragment() {
             }
         })
 
+        viewModel.likePostResult.observe(this, {
+            when (it) {
+                is ApiResult.Success -> {
+                    it.result?.let { position ->
+                        adapter.notifyItemChanged(position)
+                    }
+                }
+
+                else -> {
+                    onApiError(Exception("Unknown Error!"))
+                }
+            }
+        })
+
+        viewModel.favoriteResult.observe(this, {
+            when (it) {
+                is ApiResult.Success -> {
+                    it.result?.let { position ->
+                        adapter.notifyItemChanged(position)
+                    }
+                }
+                else -> {
+                    onApiError(Exception("Unknown Error!"))
+                }
+            }
+        })
+
         mainViewModel?.deletePostResult?.observe(this,  {
             when (it) {
                 is ApiResult.Success -> {
