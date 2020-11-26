@@ -6,7 +6,6 @@ import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
@@ -19,21 +18,30 @@ import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import kotlinx.android.synthetic.main.fragment_club_recommend.*
+import kotlinx.android.synthetic.main.fragment_club_latest.*
+import kotlinx.android.synthetic.main.fragment_club_recommend.id_empty_group
+import kotlinx.android.synthetic.main.fragment_club_recommend.layout_ad
+import kotlinx.android.synthetic.main.fragment_club_recommend.layout_refresh
+import kotlinx.android.synthetic.main.fragment_club_recommend.recycler_view
 import kotlinx.android.synthetic.main.item_ad.view.*
+import kotlinx.android.synthetic.main.item_club_is_not_login.*
+import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 class ClubRecommendFragment : BaseFragment() {
 
     private val viewModel: ClubRecommendViewModel by viewModels()
+    private val accountManager: AccountManager by inject()
     private var adapter: ClubRecommendAdapter? = null
 
 
@@ -49,6 +57,16 @@ class ClubRecommendFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Timber.i("onResume isLogin:${accountManager.isLogin()}")
+        loginPageToggle(accountManager.isLogin())
+        if (accountManager.isLogin() && viewModel.clubCount.value ?: -1 <= 0) {
+            getData()
+        }
+        viewModel.getAd()
     }
 
     private val memberPostFuncItem by lazy {
@@ -166,6 +184,15 @@ class ClubRecommendFragment : BaseFragment() {
     }
 
     override fun initSettings() {
+        tv_login.setOnClickListener {
+            navigateTo(
+                    NavigateItem.Destination(
+                            R.id.action_to_loginFragment,
+                            LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                    )
+            )
+        }
+
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
             getData()
@@ -182,7 +209,6 @@ class ClubRecommendFragment : BaseFragment() {
 
     override fun setupFirstTime() {
         initSettings()
-        getData()
     }
 
     override fun setupObservers() {
@@ -279,5 +305,15 @@ class ClubRecommendFragment : BaseFragment() {
             update: (Boolean) -> Unit
     ) {
         checkStatus { viewModel.followMember(memberPostItem, ArrayList(items), isFollow, update) }
+    }
+
+    private fun loginPageToggle(isLogin: Boolean) {
+        if (isLogin) {
+            id_not_login_group.visibility = View.GONE
+            layout_refresh.visibility = View.VISIBLE
+        } else {
+            id_not_login_group.visibility = View.VISIBLE
+            layout_refresh.visibility = View.INVISIBLE
+        }
     }
 }

@@ -18,24 +18,30 @@ import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import kotlinx.android.synthetic.main.fragment_club_latest.*
 import kotlinx.android.synthetic.main.fragment_club_latest.id_empty_group
+import kotlinx.android.synthetic.main.fragment_club_latest.id_not_login_group
+import kotlinx.android.synthetic.main.fragment_club_latest.layout_ad
 import kotlinx.android.synthetic.main.fragment_club_latest.layout_refresh
 import kotlinx.android.synthetic.main.fragment_club_latest.recycler_view
 import kotlinx.android.synthetic.main.item_ad.view.*
+import kotlinx.android.synthetic.main.item_club_is_not_login.*
+import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 class ClubLatestFragment : BaseFragment() {
 
     private val viewModel: ClubLatestViewModel by viewModels()
+    private val accountManager: AccountManager by inject()
     private var adapter: ClubLatestAdapter? = null
 
 
@@ -51,6 +57,16 @@ class ClubLatestFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Timber.i("onResume isLogin:${accountManager.isLogin()}")
+        loginPageToggle(accountManager.isLogin())
+        if (accountManager.isLogin() && viewModel.clubCount.value ?: -1 <= 0) {
+            getData()
+        }
+        viewModel.getAd()
     }
 
     private val memberPostFuncItem by lazy {
@@ -167,6 +183,15 @@ class ClubLatestFragment : BaseFragment() {
     }
 
     override fun initSettings() {
+        tv_login.setOnClickListener {
+            navigateTo(
+                    NavigateItem.Destination(
+                            R.id.action_to_loginFragment,
+                            LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                    )
+            )
+        }
+
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
             getData()
@@ -183,7 +208,6 @@ class ClubLatestFragment : BaseFragment() {
 
     override fun setupFirstTime() {
         initSettings()
-        getData()
     }
 
     override fun setupObservers() {
@@ -198,12 +222,12 @@ class ClubLatestFragment : BaseFragment() {
                     }
                 }
                 is ApiResult.Error -> {
-                    layout_ad.visibility =View.GONE
+                    layout_ad.visibility = View.GONE
                     onApiError(it.throwable)
                 }
 
                 else -> {
-                    layout_ad.visibility =View.GONE
+                    layout_ad.visibility = View.GONE
                     onApiError(Exception("Unknown Error!"))
                 }
             }
@@ -268,8 +292,7 @@ class ClubLatestFragment : BaseFragment() {
         })
     }
 
-    private fun getData(){
-//        viewModel.getAd()
+    private fun getData() {
         viewModel.getPostItemList()
     }
 
@@ -280,5 +303,15 @@ class ClubLatestFragment : BaseFragment() {
             update: (Boolean) -> Unit
     ) {
         checkStatus { viewModel.followMember(memberPostItem, ArrayList(items), isFollow, update) }
+    }
+
+    private fun loginPageToggle(isLogin: Boolean) {
+        if (isLogin) {
+            id_not_login_group.visibility = View.GONE
+            layout_refresh.visibility = View.VISIBLE
+        } else {
+            id_not_login_group.visibility = View.VISIBLE
+            layout_refresh.visibility = View.INVISIBLE
+        }
     }
 }
