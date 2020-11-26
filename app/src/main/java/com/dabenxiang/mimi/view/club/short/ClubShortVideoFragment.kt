@@ -59,18 +59,5 @@ class ClubShortVideoFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        memberPostItem =
-//            arguments?.getSerializable(PictureDetailFragment.KEY_DATA) as MemberPostItem
-//
-//        tv_title.text = getString(R.string.home_tab_text)
-//
-//        viewPager.adapter = ClubShortVideoAdapter(this, memberPostItem!!)
-//
-//        val title: ArrayList<String> =
-//            arrayListOf(getString(R.string.text_detail_title), getString(R.string.comment))
-//
-//        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-//            tab.text = title[position]
-//        }.attach()
     }
 }
