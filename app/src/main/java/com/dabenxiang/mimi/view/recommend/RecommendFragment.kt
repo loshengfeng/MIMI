@@ -10,7 +10,7 @@ import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.CategoryBanner
 import com.dabenxiang.mimi.model.api.vo.ThirdMenuItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
-import com.dabenxiang.mimi.model.enums.OrderBy
+import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.home.category.CategoriesFragment
@@ -108,7 +108,10 @@ class RecommendFragment(
         )
     }
 
-    private fun navToCategory(category: String = "", orderByType: Int = OrderBy.NEWEST.value) {
+    private fun navToCategory(
+        category: String = "",
+        orderByType: Int = StatisticsOrderType.LATEST.value
+    ) {
         val bundle = CategoriesFragment.createBundle(category, orderByType)
         navigateTo(
             NavigateItem.Destination(

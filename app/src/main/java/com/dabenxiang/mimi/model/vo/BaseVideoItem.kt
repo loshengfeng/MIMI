@@ -13,7 +13,8 @@ sealed class BaseVideoItem {
         val resolution: String?,
         val info: String?,
         val imgUrl: String?,
-        val isAdult: Boolean
+        val isAdult: Boolean,
+        val tags: List<String>?
     ) : BaseVideoItem()
 }
 
@@ -26,7 +27,8 @@ fun List<VideoItem>.searchItemToVideoItem(isAdult: Boolean): List<BaseVideoItem.
             imgUrl = item.cover,
             isAdult = isAdult,
             resolution = "",
-            info = ""
+            info = "",
+            tags = item.tags as List<String>
         )
         result.add(holderItem)
     }
@@ -42,7 +44,8 @@ fun List<StatisticsItem>.statisticsItemToVideoItem(): List<BaseVideoItem.Video> 
             imgUrl = item.cover,
             isAdult = true,
             resolution = "",
-            info = ""
+            info = "",
+            tags = (item.tags as List<String>)
         )
         result.add(holderItem)
     }
@@ -58,7 +61,8 @@ fun List<SimpleVideoItem>.simpleVideoItemToVideoItem(isAdult: Boolean): List<Bas
             imgUrl = item.cover,
             isAdult = isAdult,
             resolution = "",
-            info = ""
+            info = "",
+            tags = ArrayList<String>()
         )
         result.add(holderItem)
     }

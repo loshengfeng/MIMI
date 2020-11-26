@@ -23,6 +23,9 @@ data class StatisticsItem(
     @SerializedName("years")
     val years: Int? = 0,
 
+    @SerializedName("tags")
+    val tags: Any? = null,
+
     val type: PostType? = null,
 
     val adItem: AdItem? = null

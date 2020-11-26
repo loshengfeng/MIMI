@@ -16,7 +16,7 @@ class GeneralVideoViewModel : BaseViewModel() {
     fun getVideoByCategory(category: String): Flow<PagingData<VideoByCategoryItem>> {
         return Pager(
             config = PagingConfig(pageSize = NETWORK_PAGE_SIZE, enablePlaceholders = false),
-            pagingSourceFactory = { VideoPagingSource(domainManager, category) }
+            pagingSourceFactory = { VideoPagingSource(domainManager, category, adWidth, adHeight) }
         ).flow.cachedIn(viewModelScope)
     }
 }

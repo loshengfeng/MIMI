@@ -401,7 +401,7 @@ class ApiRepository(private val apiService: ApiService) {
         q: String? = null,
         country: String? = null,
         years: String? = null,
-        isAdult: Boolean,
+        isAdult: Boolean = true,
         offset: String,
         limit: String,
         tag: String = ""
@@ -423,7 +423,7 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun statisticsHomeVideos(
         startTime: String = "2018-12-01T10:00:05Z",
         endTime: String = "2020-11-24T10:00:05Z",
-        orderByType: StatisticsOrderType = StatisticsOrderType.HOTTEST,
+        orderByType: Int = StatisticsOrderType.HOTTEST.value,
         category: String? = "",
         tags: String? = "",
         isAdult: Boolean = true,
@@ -433,7 +433,7 @@ class ApiRepository(private val apiService: ApiService) {
     ) = apiService.statisticsHomeVideos(
         startTime = startTime,
         endTime = endTime,
-        orderByType = orderByType.value,
+        orderByType = orderByType,
         category = category,
         tags = tags,
         isAdult = isAdult,

@@ -26,7 +26,6 @@ class SearchVideoViewModel : BaseViewModel() {
     var category = ""
     var searchingTag = ""
     var searchingStr = ""
-//    var isAdult = false
 
     var currentItem: VideoItem? = null
 
@@ -45,13 +44,12 @@ class SearchVideoViewModel : BaseViewModel() {
     private val _favoriteResult = MutableLiveData<ApiResult<Long>>()
     val favoriteResult: LiveData<ApiResult<Long>> = _favoriteResult
 
-    private fun getVideoPagingItems(isAdult: Boolean): LiveData<PagedList<VideoItem>> {
+    private fun getVideoPagingItems(): LiveData<PagedList<VideoItem>> {
         val searchVideoDataSource =
             SearchVideoListDataSource(
                 viewModelScope,
                 domainManager,
                 pagingCallback,
-                isAdult,
                 category,
                 searchingTag,
                 searchingStr,
@@ -88,7 +86,7 @@ class SearchVideoViewModel : BaseViewModel() {
 
     fun getSearchList() {
         viewModelScope.launch {
-            getVideoPagingItems(true).asFlow()
+            getVideoPagingItems().asFlow()
                 .collect {
                     _searchingListResult.value = it
                 }

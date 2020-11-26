@@ -2,13 +2,17 @@ package com.dabenxiang.mimi.view.club.follow
 
 import androidx.paging.PagingSource
 import com.dabenxiang.mimi.callback.PagingCallback
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.DomainManager
 import retrofit2.HttpException
 
 class ClubPostFollowListDataSource constructor(
     private val domainManager: DomainManager,
-    private val pagingCallback: PagingCallback
+    private val pagingCallback: PagingCallback,
+    private val adWidth: Int,
+    private val adHeight: Int
 ) : PagingSource<Long, MemberPostItem>() {
 
     companion object {
@@ -19,12 +23,17 @@ class ClubPostFollowListDataSource constructor(
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, MemberPostItem> {
         val offset = params.key ?: 0
         return try {
+
+            val adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content ?: AdItem()
+
             val result =
                 domainManager.getApiRepository().getPostFollow(offset.toInt(), PER_LIMIT.toInt())
             if (!result.isSuccessful) throw HttpException(result)
 
             val body = result.body()
             val memberPostItems = body?.content
+            memberPostItems?.add(0, MemberPostItem(type = PostType.AD, adItem = adItem))
+
             val hasNext = hasNextPage(
                 result.body()?.paging?.count ?: 0,
                 result.body()?.paging?.offset ?: 0,

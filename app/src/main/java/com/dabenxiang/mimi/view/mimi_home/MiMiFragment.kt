@@ -17,6 +17,8 @@ class MiMiFragment : BaseFragment() {
 
     private val viewModel: MiMiViewModel by viewModels()
 
+    private var viewPagerAdapter: MiMiViewPagerAdapter? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -37,11 +39,21 @@ class MiMiFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
     }
 
+    override fun onPause() {
+        viewpager.adapter = null
+        super.onPause()
+    }
+
+    override fun onResume() {
+        viewpager.adapter = viewPagerAdapter
+        super.onResume()
+    }
+
     override fun getLayoutId() = R.layout.fragment_mimi_home
 
     private fun setupUi(menusItems: List<SecondMenuItem>) {
-        viewpager.isSaveEnabled = false
-        viewpager.adapter = MiMiViewPagerAdapter(this, menusItems)
+        viewPagerAdapter = MiMiViewPagerAdapter(childFragmentManager, lifecycle, menusItems)
+        viewpager.adapter = viewPagerAdapter
         TabLayoutMediator(layout_tab, viewpager) { tab, position ->
             tab.text = menusItems[position].name
         }.attach()

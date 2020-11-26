@@ -12,19 +12,31 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
 class ClubFollowViewModel : BaseViewModel() {
 
     private val _adResult = MutableLiveData<ApiResult<AdItem>>()
     val adResult: LiveData<ApiResult<AdItem>> = _adResult
 
-    private val _clubCount = MutableLiveData<Int>()
-    val clubCount: LiveData<Int> = _clubCount
+    private val _postCount = MutableLiveData<Int>()
+    val postCount: LiveData<Int> = _postCount
 
+    fun getData(adapter: ClubPostFollowAdapter) {
+        Timber.i("getData")
+        CoroutineScope(Dispatchers.IO).launch {
+            adapter.submitData(PagingData.empty())
+            getPostItemList()
+                    .collectLatest {
+                        adapter.submitData(it)
+                    }
+        }
+    }
 
     fun getPostItemList(): Flow<PagingData<MemberPostItem>> {
         return Pager(
@@ -32,7 +44,10 @@ class ClubFollowViewModel : BaseViewModel() {
                 pagingSourceFactory = {
                     ClubPostFollowListDataSource(
                             domainManager,
-                            pagingCallback
+                            pagingCallback,
+                            adWidth,
+                            adHeight
+
                     )
                 }
         )
@@ -58,7 +73,7 @@ class ClubFollowViewModel : BaseViewModel() {
     private val pagingCallback = object : PagingCallback {
 
         override fun onTotalCount(count: Long) {
-            _clubCount.postValue(count.toInt())
+            _postCount.postValue(count.toInt())
         }
 
     }
