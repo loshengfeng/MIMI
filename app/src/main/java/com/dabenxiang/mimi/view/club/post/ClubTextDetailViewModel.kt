@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.club.post
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -73,7 +72,6 @@ class ClubTextDetailViewModel: BaseViewModel() {
                 withContext(Dispatchers.Main) {
                     load.content?.let { list ->
                         val finalList = list.map { item ->
-                            Log.d("arvin", "item : " + item)
                             RootCommentNode(item)
                         }
                         adapter.setList(finalList)

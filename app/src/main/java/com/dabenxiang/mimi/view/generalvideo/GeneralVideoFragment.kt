@@ -84,35 +84,29 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
                 Timber.e("Refresh Error: ${(loadStatus.refresh as LoadState.Error).error.localizedMessage}")
                 onApiError((loadStatus.refresh as LoadState.Error).error)
 
-                layout_empty_data.visibility = View.VISIBLE
-                tv_empty_data.text = getString(R.string.error_video)
-                rv_video.visibility = View.INVISIBLE
-                if (layout_refresh != null) {
-                    layout_refresh.isRefreshing = false
-                }
+                layout_empty_data?.run { this.visibility = View.VISIBLE }
+                tv_empty_data?.run { this.text = getString(R.string.error_video) }
+
+                rv_video?.run { this.visibility = View.INVISIBLE }
+                layout_refresh?.run { this.isRefreshing = false }
             }
             is LoadState.Loading -> {
-                layout_empty_data.visibility = View.VISIBLE
-                tv_empty_data.text = getString(R.string.load_video)
-                rv_video.visibility = View.INVISIBLE
-
-                if (layout_refresh != null) {
-                    layout_refresh.isRefreshing = true
-                }
+                layout_empty_data?.run { this.visibility = View.VISIBLE }
+                tv_empty_data?.run { this.text = getString(R.string.load_video) }
+                rv_video?.run { this.visibility = View.INVISIBLE }
+                layout_refresh?.run { this.isRefreshing = true }
             }
             is LoadState.NotLoading -> {
                 if (generalVideoAdapter.isDataEmpty()) {
-                    layout_empty_data.visibility = View.VISIBLE
-                    tv_empty_data.text = getString(R.string.empty_video)
-                    rv_video.visibility = View.INVISIBLE
+                    layout_empty_data?.run { this.visibility = View.VISIBLE }
+                    tv_empty_data?.run { this.text = getString(R.string.empty_video) }
+                    rv_video?.run { this.visibility = View.INVISIBLE }
                 } else {
-                    layout_empty_data.visibility = View.INVISIBLE
-                    rv_video.visibility = View.VISIBLE
+                    layout_empty_data?.run { this.visibility = View.INVISIBLE }
+                    rv_video?.run { this.visibility = View.VISIBLE }
                 }
 
-                if (layout_refresh != null) {
-                    layout_refresh.isRefreshing = false
-                }
+                layout_refresh?.run { this.isRefreshing = false }
             }
         }
 
