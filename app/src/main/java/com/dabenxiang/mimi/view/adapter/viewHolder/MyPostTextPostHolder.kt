@@ -103,16 +103,17 @@ class MyPostTextPostHolder(
             tagChipGroup.addView(chip)
         }
 
-        if (isMe) {
-            tvFollow.visibility = View.GONE
-        } else {
-            tvFollow.visibility = View.VISIBLE
-            tvFollow.setOnClickListener {
-                itemList?.also { myPostListener.onFollowClick(itemList, position, !item.isFollow) }
-                item.isFollow = !item.isFollow
-            }
-            updateFollow(item)
-        }
+//        if (isMe) {
+//            tvFollow.visibility = View.GONE
+//        } else {
+//            tvFollow.visibility = View.VISIBLE
+//            tvFollow.setOnClickListener {
+//                itemList?.also { myPostListener.onFollowClick(itemList, position, !item.isFollow) }
+//                item.isFollow = !item.isFollow
+//            }
+//            updateFollow(item)
+//        }
+        tvFollow.visibility =  View.GONE
 
         ivMore.setOnClickListener {
             myPostListener.onMoreClick(item, position)
