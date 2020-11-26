@@ -31,20 +31,16 @@ class ActorFragment : BaseFragment() {
         Timber.d("Video: ${item.title}")
     }
 
-    private fun onActorClickListener(item: ActorVideosItem, position: Int){
-        navToActorVideosFragment(item)
-    }
-
     private val actorCategoriesAdapter by lazy {
         ActorCategoriesAdapter(requireContext(),
             ActorCategoriesFuncItem(
                 getActorAvatarAttachment =  { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR_CS) },
-                onClickListener = { actorCategoriesItem, position -> onCategoriesClickListener(actorCategoriesItem, position) }
+                onActorClickListener = { id, position -> onActorClickListener(id, position) }
             )
         ) }
 
-    private fun onCategoriesClickListener(item: ActorCategoriesItem, position: Int){
-            Timber.d("Actor: ${item.name}")
+    private fun onActorClickListener(id: Long, position: Int){
+        navToActorVideosFragment(id)
     }
 
     private val viewModel: ActorViewModel by viewModels()
@@ -92,8 +88,8 @@ class ActorFragment : BaseFragment() {
 
     }
 
-    private fun navToActorVideosFragment(item: ActorVideosItem) {
-        val bundle = ActorVideosFragment.createBundle(item)
+    private fun navToActorVideosFragment(id: Long) {
+        val bundle = ActorVideosFragment.createBundle(id)
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_mimiFragment_to_actorVideosFragment,

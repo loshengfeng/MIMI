@@ -2,10 +2,9 @@ package com.dabenxiang.mimi.view.actor
 
 import android.widget.ImageView
 import com.dabenxiang.mimi.model.api.vo.ActorVideoItem
-import com.dabenxiang.mimi.model.api.vo.ActorVideosItem
 
 class ActorVideosFuncItem(
     val getActorAvatarAttachment: ((Long?, ImageView) -> Unit) = { _, _ -> },
     val onVideoClickListener: ((ActorVideoItem, Int) -> Unit) = { _, _ -> },
-    val onActorClickListener: ((ActorVideosItem, Int) -> Unit) = { _, _ -> },
+    val onActorClickListener: ((Long, Int) -> Unit) = { _, _ -> },
 )

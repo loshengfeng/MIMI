@@ -35,16 +35,19 @@ class ActorVideosAdapter(
 
     override fun onBindViewHolder(holder: ActorVideosViewHolder, position: Int) {
         val item = actorVideosItems?.get(position)?: ActorVideosItem()
-        holder.name.text = item.name
+        holder.name.run {
+            text = item.name
+            setOnClickListener { actorVideosFuncItem.onActorClickListener(item.id, position) }
+        }
         holder.totalClick.text = item.totalClick?.toString() + context.getString(R.string.actor_hot_unit)
         holder.totalVideo.run {
             text = item.totalVideo?.toString() + context.getString(R.string.actor_videos_unit)
-            setOnClickListener { actorVideosFuncItem.onActorClickListener(item, position) }
+            setOnClickListener { actorVideosFuncItem.onActorClickListener(item.id, position) }
         }
         holder.actressesVideos.adapter = actorVideoAdapter
         actorVideoAdapter.setupData(item.videos)
         actorVideosFuncItem.getActorAvatarAttachment.invoke(item?.attachmentId,holder.ivAvatar)
-        holder.ivAvatar.setOnClickListener { actorVideosFuncItem.onActorClickListener(item, position) }
+        holder.ivAvatar.setOnClickListener { actorVideosFuncItem.onActorClickListener(item.id, position) }
     }
 
     fun setupData(data: ArrayList<ActorVideosItem>) {
