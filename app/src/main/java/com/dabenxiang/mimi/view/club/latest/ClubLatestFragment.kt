@@ -24,6 +24,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
@@ -89,9 +90,8 @@ class ClubLatestFragment : BaseFragment() {
     }
 
     private val postListener = object : MyPostListener {
-        override fun onMoreClick(item: MemberPostItem) {
-            onMoreClick(item, ArrayList(adapter?.currentList as List<MemberPostItem>), onEdit = {
-            })
+        override fun onMoreClick(item: MemberPostItem, position: Int) {
+            onMoreClick(item, position) {}
         }
 
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
@@ -148,6 +148,7 @@ class ClubLatestFragment : BaseFragment() {
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
+            // todo Go to comment in detail
             checkStatus {
                 when (adultTabType) {
                     AdultTabType.PICTURE -> {
@@ -179,6 +180,20 @@ class ClubLatestFragment : BaseFragment() {
                 isFollow: Boolean
         ) {
             checkStatus { viewModel.followPost(ArrayList(items), position, isFollow) }
+        }
+
+        override fun onAvatarClick(userId: Long, name: String) {
+            val bundle = MyPostFragment.createBundle(
+                    userId, name,
+                    isAdult = true,
+                    isAdultTheme = true
+            )
+            navigateTo(
+                    NavigateItem.Destination(
+                            R.id.action_to_myPostFragment,
+                            bundle
+                    )
+            )
         }
     }
 

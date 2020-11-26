@@ -28,8 +28,7 @@ import timber.log.Timber
 import java.util.*
 
 class MyPostTextPostHolder(
-    itemView: View,
-    private val isAdultTheme: Boolean
+    itemView: View
 ) : BaseViewHolder(itemView),KoinComponent {
 
     private val accountManager: AccountManager by inject()
@@ -85,6 +84,9 @@ class MyPostTextPostHolder(
         }
 
         attachmentListener.onGetAttachment(item.avatarAttachmentId, imgAvatar, LoadImageType.AVATAR)
+        imgAvatar.setOnClickListener {
+            myPostListener.onAvatarClick(item.creatorId,item.postFriendlyName)
+        }
 
         tagChipGroup.removeAllViews()
         item.tags?.forEach {
@@ -116,7 +118,7 @@ class MyPostTextPostHolder(
         }
 
         ivMore.setOnClickListener {
-            myPostListener.onMoreClick(item)
+            myPostListener.onMoreClick(item, position)
         }
 
         updateLike(item)

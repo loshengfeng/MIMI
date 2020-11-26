@@ -98,7 +98,7 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
         }
 
         moreImage.setOnClickListener {
-            itemList?.also { adultListener.onMoreClick(item, it) }
+            adultListener.onMoreClick(item, position)
         }
 
         textPostItemLayout.setOnClickListener {

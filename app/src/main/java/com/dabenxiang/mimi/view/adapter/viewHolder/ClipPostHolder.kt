@@ -120,7 +120,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
         }
 
         moreImage.setOnClickListener {
-            itemList?.also { adultListener.onMoreClick(item, it) }
+            adultListener.onMoreClick(item, position)
         }
 
         ivPhoto.setOnClickListener {
