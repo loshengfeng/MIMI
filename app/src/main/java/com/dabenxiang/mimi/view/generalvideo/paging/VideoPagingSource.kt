@@ -2,7 +2,8 @@ package com.dabenxiang.mimi.view.generalvideo.paging
 
 import androidx.paging.PagingSource
 import com.dabenxiang.mimi.model.api.vo.AdItem
-import com.dabenxiang.mimi.model.api.vo.VideoByCategoryItem
+import com.dabenxiang.mimi.model.api.vo.StatisticsItem
+import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.manager.DomainManager
 import retrofit2.HttpException
 
@@ -11,14 +12,21 @@ class VideoPagingSource(
     private val category: String,
     private val adWidth: Int,
     private val adHeight: Int,
-) : PagingSource<Long, VideoByCategoryItem>() {
+) : PagingSource<Long, StatisticsItem>() {
 
-    override suspend fun load(params: LoadParams<Long>): LoadResult<Long, VideoByCategoryItem> {
+    override suspend fun load(params: LoadParams<Long>): LoadResult<Long, StatisticsItem> {
         return try {
             val offset = params.key ?: 0L
 
             val result = domainManager.getApiRepository()
-                .getVideoByCategory(category, offset.toString(), params.loadSize.toString())
+                .statisticsHomeVideos(
+                    startTime = "",
+                    endTime = "",
+                    orderByType = StatisticsOrderType.LATEST.value,
+                    category = category,
+                    offset = offset.toString().toInt(),
+                    limit = params.loadSize
+                )
             if (!result.isSuccessful) throw HttpException(result)
 
             val adItem = domainManager.getAdRepository()
@@ -26,7 +34,7 @@ class VideoPagingSource(
 
             val body = result.body()
             val items = body?.content
-            items?.add(0, VideoByCategoryItem(adItem = adItem))
+            items?.add(0, StatisticsItem(adItem = adItem))
 
             val nextOffset = when {
                 hasNextPage(

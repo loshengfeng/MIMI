@@ -55,7 +55,11 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         title.text = item.title
-        follow.visibility = if(accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
+
+        // New Adjust: Follow is hidden when it is on the list page, and the follow function is only available on the detailed page
+//        follow.visibility =
+//            if (accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
+        follow.visibility =  View.GONE
 
         // FIXME: item.content json 資料格式有問題
         try {

@@ -2,7 +2,10 @@ package com.dabenxiang.mimi.view.club
 
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.paging.PagingData
 import com.dabenxiang.mimi.R
@@ -15,6 +18,7 @@ import com.dabenxiang.mimi.view.club.adapter.TopicListAdapter
 import com.dabenxiang.mimi.view.club.topic.TopicDetailFragment
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_tab_club.*
+import kotlinx.android.synthetic.main.fragment_tab_club.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -32,6 +36,7 @@ class ClubTabFragment : BaseFragment() {
         const val TAB_NOVEL = 5
     }
 
+    private lateinit var tabLayoutMediator: TabLayoutMediator
     private val viewModel: ClubTabViewModel by viewModels()
 
     private val topicListAdapter by lazy {
@@ -49,6 +54,7 @@ class ClubTabFragment : BaseFragment() {
         })
     }
 
+
     override fun getLayoutId() = R.layout.fragment_tab_club
     override fun setupObservers() {}
     override fun setupListeners() {}
@@ -57,19 +63,27 @@ class ClubTabFragment : BaseFragment() {
         super.onAttach(context)
 
         viewModel.clubCount.observe(this, {
-            topic_group.visibility = if(it <=0) View.GONE else View.VISIBLE
+            topic_group.visibility = if (it <= 0) View.GONE else View.VISIBLE
         })
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val view =  inflater.inflate(getLayoutId(), container, false)
+        view.club_view_pager.adapter =
+                ClubTabAdapter(requireContext(), childFragmentManager, lifecycle)
+        tabLayoutMediator = TabLayoutMediator(view.club_tabs,  view.club_view_pager) { tab, position ->
+            tab.text = getTabTitle(position)
+        }
+        tabLayoutMediator.attach()
+        view.topic_tabs.adapter = topicListAdapter
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        club_view_pager.adapter = ClubTabAdapter(this)
-        club_view_pager.isSaveEnabled =false
-        TabLayoutMediator(club_tabs, club_view_pager) { tab, position ->
-            tab.text = getTabTitle(position)
-        }.attach()
-
-        topic_tabs.adapter = topicListAdapter
+        search_bar.addTextChangedListener {
+            //TODO search
+        }
 
     }
 
@@ -77,6 +91,12 @@ class ClubTabFragment : BaseFragment() {
         super.onResume()
         Timber.i("ClubTabFragment onResume")
         getClubItemList()
+    }
+    
+    override fun onDestroy() {
+        super.onDestroy()
+        Timber.i("ClubTabFragment onDestroy")
+        tabLayoutMediator.detach()
     }
 
     private fun getTabTitle(position: Int): String? {

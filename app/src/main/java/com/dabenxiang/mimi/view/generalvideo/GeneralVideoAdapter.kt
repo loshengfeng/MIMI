@@ -13,26 +13,26 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.VideoByCategoryItem
+import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.item_general_video.view.*
 
 class GeneralVideoAdapter(
-    val onItemClick: (VideoByCategoryItem) -> Unit
-) : PagingDataAdapter<VideoByCategoryItem, RecyclerView.ViewHolder>(COMPARATOR) {
+    val onItemClick: (StatisticsItem) -> Unit
+) : PagingDataAdapter<StatisticsItem, RecyclerView.ViewHolder>(COMPARATOR) {
 
     companion object {
-        private val COMPARATOR = object : DiffUtil.ItemCallback<VideoByCategoryItem>() {
+        private val COMPARATOR = object : DiffUtil.ItemCallback<StatisticsItem>() {
             override fun areItemsTheSame(
-                oldItem: VideoByCategoryItem,
-                newItem: VideoByCategoryItem
+                oldItem: StatisticsItem,
+                newItem: StatisticsItem
             ): Boolean =
                 oldItem.id == newItem.id
 
             override fun areContentsTheSame(
-                oldItem: VideoByCategoryItem,
-                newItem: VideoByCategoryItem
+                oldItem: StatisticsItem,
+                newItem: StatisticsItem
             ): Boolean =
                 oldItem == newItem
         }
@@ -66,7 +66,7 @@ class GeneralVideoAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val item = getItem(position) ?: VideoByCategoryItem()
+        val item = getItem(position) ?: StatisticsItem()
         when (holder) {
             is AdHolder -> {
                 Glide.with(holder.adImg.context)

@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club
+package com.dabenxiang.mimi.view.club.member
 
 import android.text.TextUtils
 import android.view.View
@@ -10,6 +10,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.PostItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.view.club.adapter.ClubFuncItem
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_club_member_post.view.*
 

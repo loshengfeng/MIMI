@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.picturedetail
+package com.dabenxiang.mimi.view.club.post
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -14,15 +14,11 @@ import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
-import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
-import com.dabenxiang.mimi.view.picturedetail.viewholder.CommentContentViewHolder
 import com.dabenxiang.mimi.view.picturedetail.viewholder.PictureDetailViewHolder
-import com.dabenxiang.mimi.view.player.CommentAdapter
-import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
@@ -30,7 +26,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.*
 
-class PictureDetailAdapter(
+class ClubPicDetailAdapter(
     val context: Context,
     private val memberPostItem: MemberPostItem,
     private val onPictureDetailListener: OnPictureDetailListener,
@@ -41,13 +37,13 @@ class PictureDetailAdapter(
 
     companion object {
         const val VIEW_TYPE_PICTURE_DETAIL = 0
+
         const val VIEW_TYPE_AD = 3
     }
 
     private val accountManager: AccountManager by inject()
 
     private var photoGridAdapter: PhotoGridAdapter? = null
-    private var commentAdapter: CommentAdapter? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val mView: View
@@ -65,8 +61,8 @@ class PictureDetailAdapter(
             }
             else -> {
                 mView = LayoutInflater.from(context)
-                    .inflate(R.layout.item_comment_content, parent, false)
-                CommentContentViewHolder(mView)
+                    .inflate(R.layout.item_picture_detail, parent, false)
+                PictureDetailViewHolder(mView)
             }
         }
 
@@ -182,56 +178,9 @@ class PictureDetailAdapter(
         mAdItem = item
     }
 
-    private fun updateCommandItem(type: CommentType) {
-        onPictureDetailListener.onGetCommandInfo(commentAdapter!!, type)
-    }
-
-    private val playerInfoListener = object : CommentAdapter.PlayerInfoListener {
-        override fun sendComment(replyId: Long?, replyName: String?) {
-            onPictureDetailListener.onReplyComment(replyId, replyName)
-        }
-
-        override fun expandReply(parentNode: RootCommentNode, succeededBlock: () -> Unit) {
-            onPictureDetailListener.onGetReplyCommand(parentNode, succeededBlock)
-        }
-
-        override fun replyComment(replyId: Long?, replyName: String?) {
-            onPictureDetailListener.onReplyComment(replyId, replyName)
-        }
-
-        override fun setCommentLikeType(
-            replyId: Long?,
-            isLike: Boolean,
-            succeededBlock: () -> Unit
-        ) {
-            onPictureDetailListener.onCommandLike(replyId, isLike, succeededBlock)
-        }
-
-        override fun removeCommentLikeType(replyId: Long?, succeededBlock: () -> Unit) {
-            onPictureDetailListener.onCommandDislike(replyId, succeededBlock)
-        }
-
-        override fun onMoreClick(item: MembersPostCommentItem) {
-            onPictureDetailListener.onMoreClick(item)
-        }
-
-        override fun onAvatarClick(userId: Long, name: String) {
-            onPictureDetailListener.onAvatarClick(userId, name)
-        }
-
-        override fun loadAvatar(id: Long?, view: ImageView) {
-            onPictureDetailListener.onGetAttachment(id, view, LoadImageType.AVATAR)
-        }
-    }
-
     interface OnPictureDetailListener {
         fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType)
         fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean)
-        fun onGetCommandInfo(adapter: CommentAdapter, type: CommentType)
-        fun onGetReplyCommand(parentNode: RootCommentNode, succeededBlock: () -> Unit)
-        fun onCommandLike(commentId: Long?, isLike: Boolean, succeededBlock: () -> Unit)
-        fun onCommandDislike(commentId: Long?, succeededBlock: () -> Unit)
-        fun onReplyComment(replyId: Long?, replyName: String?)
         fun onMoreClick(item: MembersPostCommentItem)
         fun onChipClick(type: PostType, tag: String)
         fun onOpenWebView(url: String)
