@@ -3,12 +3,19 @@ package com.dabenxiang.mimi.view.club.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
+import com.dabenxiang.mimi.model.enums.LoadImageType
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.item_topic_tab.view.*
+import timber.log.Timber
 
 class TopicListAdapter(private val listener: TopicItemListener)
     : PagingDataAdapter<MemberClubItem, TopicListAdapter.TopicViewHolder>(diffCallback) {
@@ -28,7 +35,8 @@ class TopicListAdapter(private val listener: TopicItemListener)
       }
 
     inner class TopicViewHolder(itemview: View): RecyclerView.ViewHolder(itemview) {
-        val topic_title = itemview.topic_title
+        val topicTitle: TextView = itemview.topic_title
+        val topicBg: ImageView = itemview.topic_bg
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TopicViewHolder {
@@ -39,28 +47,17 @@ class TopicListAdapter(private val listener: TopicItemListener)
 
     override fun onBindViewHolder(holder: TopicViewHolder, position: Int) {
         getItem(position)?.let {item->
-            holder.topic_title.text = item.title
+            holder.topicTitle.text = item.title
             holder.itemView.setOnClickListener {
                 listener.itemClicked(item, position)
             }
+
+            listener.getAttachment(item.avatarAttachmentId, holder.topicBg, LoadImageType.CLUB_TOPIC)
         }
     }
-
-//    fun setTestData(){
-//        val datas =  listOf<MemberClubItem>(
-//            MemberClubItem(title= "Topic 1"),
-//            MemberClubItem(title= "Topic 2"),
-//            MemberClubItem(title= "Topic 3"),
-//            MemberClubItem(title= "Topic 4"),
-//            MemberClubItem(title= "Topic 5"),
-//            MemberClubItem(title= "Topic 6")
-//        )
-//        submitData(datas)
-//    }
-
-
 }
 
 interface TopicItemListener {
     fun itemClicked(item: MemberClubItem, position: Int)
+    fun getAttachment(id: Long?, view: ImageView, type: LoadImageType)
 }

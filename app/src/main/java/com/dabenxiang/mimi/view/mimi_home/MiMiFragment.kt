@@ -35,7 +35,7 @@ class MiMiFragment : BaseFragment() {
 
     private fun setupUi(menusItems: List<SecondMenuItem>) {
         viewpager.isSaveEnabled = false
-        viewpager.adapter = MiMiViewPagerAdapter(childFragmentManager, lifecycle, menusItems)
+        viewpager.adapter = MiMiViewPagerAdapter(this, menusItems)
         TabLayoutMediator(layout_tab, viewpager) { tab, position ->
             tab.text = menusItems[position].name
         }.attach()

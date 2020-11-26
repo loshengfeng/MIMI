@@ -14,6 +14,7 @@ import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.CenterInside
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
@@ -31,6 +32,7 @@ import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getExceptionDetail
 import com.google.gson.Gson
+import jp.wasabeef.glide.transformations.BlurTransformation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
@@ -159,6 +161,7 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
             LoadImageType.PICTURE_FULL -> R.drawable.img_nopic_03
             LoadImageType.CLUB -> R.drawable.ico_group
             LoadImageType.CHAT_CONTENT -> R.drawable.bg_gray_6_radius_16
+            LoadImageType.CLUB_TOPIC ->  R.drawable.bg_topic_tab
         }
         if ((id == null || id == 0L) && TextUtils.isEmpty(filePath)) {
             Glide.with(view.context).load(defaultResId).into(view)
@@ -199,6 +202,10 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
                 }
                 LoadImageType.CHAT_CONTENT -> {
                     options.transform(CenterCrop(), RoundedCorners(16))
+                }
+
+                LoadImageType.CLUB_TOPIC-> {
+                    options.transform(CenterInside(), RoundedCorners(15))
                 }
             }
             Glide.with(view.context).load(glideUrl ?: filePath)

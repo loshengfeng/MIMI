@@ -6,5 +6,6 @@ enum class LoadImageType {
     PICTURE_FULL,
     PICTURE_THUMBNAIL,
     CHAT_CONTENT,
-    CLUB
+    CLUB,
+    CLUB_TOPIC
 }

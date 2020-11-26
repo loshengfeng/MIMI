@@ -6,6 +6,6 @@
     <dimen name="dp_24">24dp</dimen>
     <dimen name="margin_bottom_8">8dp</dimen>
     <dimen name="margin_top_75">75dp</dimen>
-    <dimen name="app_bar_height">56dp</dimen>
+    <dimen name="app_bar_height">55dp</dimen>
     <dimen name="search_bar_height">66dp</dimen>
 </resources>
