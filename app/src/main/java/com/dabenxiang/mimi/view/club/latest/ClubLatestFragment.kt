@@ -269,7 +269,7 @@ class ClubLatestFragment : BaseFragment() {
     }
 
     private fun getData(){
-        viewModel.getAd()
+//        viewModel.getAd()
         viewModel.getPostItemList()
     }
 
