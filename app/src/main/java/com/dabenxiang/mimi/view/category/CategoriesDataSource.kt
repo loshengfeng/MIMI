@@ -1,9 +1,8 @@
-package com.dabenxiang.mimi.view.home.category
+package com.dabenxiang.mimi.view.category
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.vo.AdItem
-import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.model.vo.statisticsItemToVideoItem
