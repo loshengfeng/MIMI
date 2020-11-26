@@ -48,5 +48,14 @@ data class MeItem(
 
     @SerializedName("isDailyCheckIn")
     val isDailyCheckIn: Boolean,
+
+    @SerializedName("follows")
+    val follows: Int? = null,
+
+    @SerializedName("likes")
+    val likes: Int? = null,
+
+    @SerializedName("fans")
+    val fans: Int? = null,
 )
 

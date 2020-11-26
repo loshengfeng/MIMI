@@ -107,6 +107,15 @@ class PersonalFragment : BaseFragment() {
                             video_short_count.text = count.toString() + "/" + countlimit.toString()
                         }
                     }
+                    meItem.likes?.let { it ->
+                        like_count.text = it.toString()
+                    }
+                    meItem.fans?.let { it ->
+                        fans_count.text = it.toString()
+                    }
+                    meItem.follows?.let { it ->
+                        follow_count.text = it.toString()
+                    }
                     if (meItem.expiryDate == null) {
                         layout_vip_unlimit_unlogin.visibility = View.VISIBLE
                     } else {
