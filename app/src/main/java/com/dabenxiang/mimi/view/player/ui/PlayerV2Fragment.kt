@@ -22,11 +22,14 @@ import com.dabenxiang.mimi.model.api.vo.VideoM3u8Source
 import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.post.ClubCommentFragment
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
+import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.player.PlayerViewModel
+import com.dabenxiang.mimi.view.topup.TopUpFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.OrientationDetector
 import com.google.android.exoplayer2.*
@@ -34,17 +37,10 @@ import com.google.android.exoplayer2.analytics.AnalyticsListener
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.custom_playback_control.*
-import kotlinx.android.synthetic.main.fragment_player.*
 import kotlinx.android.synthetic.main.fragment_v2_player.*
-import kotlinx.android.synthetic.main.fragment_v2_player.iv_player
-import kotlinx.android.synthetic.main.fragment_v2_player.player_view
-import kotlinx.android.synthetic.main.fragment_v2_player.recharge_reminder
-import kotlinx.android.synthetic.main.fragment_v2_player.tv_forward_backward
-import kotlinx.android.synthetic.main.fragment_v2_player.tv_sound_tune
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.android.synthetic.main.recharge_reminder.*
 import timber.log.Timber
 import java.net.UnknownHostException
 import kotlin.math.abs
@@ -146,7 +142,6 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
     }
 
     override fun setupListeners() {
-
         orientationDetector =
             OrientationDetector(
                 requireActivity(),
@@ -192,6 +187,26 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
                 exo_play_pause.setImageDrawable(requireContext().getDrawable(R.drawable.exo_icon_pause))
             }
         }
+
+        btn_full_screen.setOnClickListener {
+            viewModel.lockFullScreen = !viewModel.lockFullScreen
+            switchScreenOrientation()
+        }
+
+        btn_vip.setOnClickListener {
+            val bundle = TopUpFragment.createBundle(this::class.java.simpleName)
+            navigateTo(NavigateItem.Destination(R.id.action_to_topup, bundle))
+        }
+
+        btn_promote.setOnClickListener {
+            val bundle = Bundle()
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_inviteVipFragment,
+                    bundle
+                )
+            )
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -224,6 +239,8 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
             }
 
         }.attach()
+
+        setUpStatusBarColor()
     }
 
     override fun onStart() {
@@ -252,7 +269,6 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
         orientationDetector?.apply {disable()}
         player_view.onPause()
         releasePlayer()
-
     }
 
     override fun onDestroyView() {
@@ -553,15 +569,12 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
      * 調整 player 的寬與高
      */
     private fun adjustPlayerSize() {
-
-        val screenSize = GeneralUtils.getScreenSize(requireActivity())
         if (requireActivity().requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
             val params = player_view.layoutParams
             params.width = ViewGroup.LayoutParams.MATCH_PARENT
             params.height = 0
             player_view.layoutParams = params
-            requireActivity().window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
-            fullScreenUISet(false)
+            activity?.bottom_navigation?.visibility = View.VISIBLE
         } else {
             val params = player_view.layoutParams
             params.width = ViewGroup.LayoutParams.MATCH_PARENT
@@ -569,31 +582,24 @@ class PlayerV2Fragment: BaseFragment(), AnalyticsListener, Player.EventListener 
             player_view.layoutParams = params
             requireActivity().window.decorView.systemUiVisibility =
                 View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-            fullScreenUISet(true)
+            activity?.bottom_navigation?.visibility = View.GONE
         }
     }
 
-    private fun commentEditorHide() {
-        Timber.i("commentEditorHide")
-        CoroutineScope(Dispatchers.Main).launch {
-//            tv_replay_name?.visibility = View.GONE
-//            (activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)?.apply {
-//                hideSoftInputFromWindow(et_message.windowToken, 0)
-//            }
-        }
-    }
-
-    private fun fullScreenUISet(isFullScreen: Boolean) {
-        if (isFullScreen) {
-            commentEditorHide()
-//            recycler_info.visibility = View.GONE
-//            bottom_func_bar.visibility = View.GONE
-//            bottom_func_input.visibility = View.GONE
-        } else {
-//            recycler_info?.visibility = View.VISIBLE
-//            bottom_func_bar?.visibility = View.VISIBLE
-//            bottom_func_input.visibility = View.GONE
-        }
+    /**
+     * 切換螢幕方向
+     */
+    private fun switchScreenOrientation() {
+        requireActivity().requestedOrientation =
+            if (viewModel.lockFullScreen) {
+                when (viewModel.currentOrientation) {
+                    ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE, ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE -> viewModel.currentOrientation
+                    else -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                }
+            } else {
+                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            }
+        adjustPlayerSize()
     }
 
     private fun onApiError(throwable: Throwable) {
