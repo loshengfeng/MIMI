@@ -34,8 +34,8 @@ class RecommendFragment(
         RecommendContentAdapter(thirdMenuItems, recommendFuncItem)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun setupFirstTime() {
+        super.setupFirstTime()
 
         viewModel.bannerItems.observe(this, {
             when (it) {

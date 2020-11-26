@@ -1,10 +1,11 @@
-package com.dabenxiang.mimi.view.club
+package com.dabenxiang.mimi.view.club.member
 
 import android.view.View
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.view.club.adapter.ClubFuncItem
 import kotlinx.android.synthetic.main.item_club_member.view.*
 
 /**

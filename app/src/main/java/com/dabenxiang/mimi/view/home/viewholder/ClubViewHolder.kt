@@ -9,7 +9,7 @@ import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
-import com.dabenxiang.mimi.view.club.ClubFuncItem
+import com.dabenxiang.mimi.view.club.adapter.ClubFuncItem
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.nested_item_home_club.view.*
 

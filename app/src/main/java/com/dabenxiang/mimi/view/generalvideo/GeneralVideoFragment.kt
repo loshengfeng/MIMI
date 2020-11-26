@@ -8,14 +8,14 @@ import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.VideoByCategoryItem
+import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.category.CategoriesFragment
 import com.dabenxiang.mimi.view.generalvideo.GeneralVideoAdapter.Companion.VIEW_TYPE_VIDEO
 import com.dabenxiang.mimi.view.generalvideo.paging.VideoLoadStateAdapter
-import com.dabenxiang.mimi.view.category.CategoriesFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getScreenSize
@@ -33,9 +33,8 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         GeneralVideoAdapter(onItemClick)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
+    override fun setupFirstTime() {
+        super.setupFirstTime()
         viewModel.adWidth = pxToDp(requireContext(), getScreenSize(requireActivity()).first)
         viewModel.adHeight = (viewModel.adWidth / 7)
     }
@@ -81,7 +80,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         return R.layout.fragment_general_video
     }
 
-    private val onItemClick: (VideoByCategoryItem) -> Unit = {
+    private val onItemClick: (StatisticsItem) -> Unit = {
         navToPlayer(PlayerItem(it.id))
     }
 
@@ -147,7 +146,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         )
     }
 
-    private fun navToPlayer(item: PlayerItem){
+    private fun navToPlayer(item: PlayerItem) {
         val bundle = PlayerV2Fragment.createBundle(item)
         navigateTo(
             NavigateItem.Destination(

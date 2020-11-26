@@ -245,10 +245,10 @@ class ApiRepository(private val apiService: ApiService) {
      *
      ***********************************************************/
     suspend fun getMembersPost(
-            type: PostType,
-            orderBy: OrderBy,
-            offset: Int,
-            limit: Int
+        type: PostType,
+        orderBy: OrderBy,
+        offset: Int,
+        limit: Int
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
         return apiService.getMembersPost(type.value, offset, limit, orderBy = orderBy.value)
     }
@@ -383,6 +383,7 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得影片類別清單
      */
     suspend fun fetchHomeCategories() = apiService.fetchHomeCategories()
+
     /**
      * 取得影片次類別清單
      */
@@ -895,18 +896,5 @@ class ApiRepository(private val apiService: ApiService) {
      *
      ***********************************************************/
     suspend fun getMenu() = apiService.getMenu()
-
-    /**********************************************************
-     *
-     *          Members/Home/Videos/SearchWithCategory
-     *
-     ***********************************************************/
-    suspend fun getVideoByCategory(
-        category: String,
-        offset: String,
-        limit: String
-    ) = apiService.getVideoByCategory(
-        true, category, offset, limit
-    )
 }
 
