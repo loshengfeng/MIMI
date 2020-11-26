@@ -28,7 +28,7 @@ import com.dabenxiang.mimi.model.enums.CategoryType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.*
-import com.dabenxiang.mimi.view.adapter.CategoryVideoListAdapter
+import com.dabenxiang.mimi.view.category.CategoryVideoListAdapter
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter
 import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter.Companion.PAYLOAD_UPDATE_FOLLOW

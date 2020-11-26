@@ -42,7 +42,11 @@ data class SecondMenuItem(
     val category: String = "",
 
     @SerializedName("menus")
-    var menus: ArrayList<ThirdMenuItem> = arrayListOf()
+    var menus: ArrayList<ThirdMenuItem> = arrayListOf(),
+
+    @SerializedName("orderByType")
+    val orderByType: Int = 0
+
 )
 
 data class ThirdMenuItem(

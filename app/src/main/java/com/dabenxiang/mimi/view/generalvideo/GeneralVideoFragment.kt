@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class GeneralVideoFragment(val category: String) : BaseFragment() {
+class GeneralVideoFragment(val category: String, val orderByType: Int) : BaseFragment() {
 
     private val viewModel: GeneralVideoViewModel by viewModels()
 
@@ -50,9 +50,9 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
             navToCategory()
         }
 
-        layout_refresh.setOnRefreshListener {
-            generalVideoAdapter.refresh()
-        }
+//        layout_refresh.setOnRefreshListener {
+//            generalVideoAdapter.refresh()
+//        }
 
         generalVideoAdapter.addLoadStateListener(loadStateListener)
 
@@ -68,7 +68,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         }
 
         lifecycleScope.launch {
-            viewModel.getVideoByCategory(category)
+            viewModel.getVideoByCategory(category, orderByType)
                 .collectLatest {
                     layout_refresh.isRefreshing = false
                     generalVideoAdapter.submitData(it)
