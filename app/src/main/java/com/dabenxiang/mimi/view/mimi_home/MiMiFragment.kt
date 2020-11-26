@@ -34,6 +34,7 @@ class MiMiFragment : BaseFragment() {
     override fun getLayoutId() = R.layout.fragment_mimi_home
 
     private fun setupUi(menusItems: List<SecondMenuItem>) {
+        viewpager.offscreenPageLimit = menusItems.size
         viewpager.isSaveEnabled = false
         viewpager.adapter = MiMiViewPagerAdapter(this, menusItems)
         TabLayoutMediator(layout_tab, viewpager) { tab, position ->
