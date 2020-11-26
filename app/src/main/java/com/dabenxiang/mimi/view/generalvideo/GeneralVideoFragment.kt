@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.generalvideo
 
-import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -37,10 +36,6 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         super.setupFirstTime()
         viewModel.adWidth = pxToDp(requireContext(), getScreenSize(requireActivity()).first)
         viewModel.adHeight = (viewModel.adWidth / 7)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
 
         tv_search.setOnClickListener {
             navToSearch()
