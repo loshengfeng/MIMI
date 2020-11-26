@@ -102,6 +102,9 @@ class MainViewModel : BaseViewModel() {
     private val _isNavTransparent = MutableLiveData<Boolean>()
     val isNavTransparent: LiveData<Boolean> = _isNavTransparent
 
+    private val _isStatusBardDark = MutableLiveData<Boolean>()
+    val isStatusBardDark: LiveData<Boolean> = _isStatusBardDark
+
     private var _normal: CategoriesItem? = null
     val normal
         get() = _normal
@@ -550,5 +553,9 @@ class MainViewModel : BaseViewModel() {
 
     fun setNavTransparent(isNavTransparent: Boolean = false) {
         _isNavTransparent.value = isNavTransparent
+    }
+
+    fun setStatusBarMode(isDark: Boolean = false) {
+        _isStatusBardDark.value = isDark
     }
 }

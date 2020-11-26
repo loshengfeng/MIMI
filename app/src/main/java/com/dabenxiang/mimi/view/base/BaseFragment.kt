@@ -126,8 +126,8 @@ abstract class BaseFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         mainViewModel?.setNavTransparent(isNavTransparent)
+        mainViewModel?.setStatusBarMode(isStatusBarDark)
         statusBarVisibility()
-        setUpStatusBarColor()
 
         progressHUD = KProgressHUD.create(context)
             .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
@@ -571,6 +571,7 @@ abstract class BaseFragment : Fragment() {
     open val bottomNavigationVisibility: Int = View.VISIBLE
 
     open val isNavTransparent: Boolean = false
+    open val isStatusBarDark: Boolean = false
 
     open fun navigateTo(item: NavigateItem) {
         lifecycleScope.launch {
