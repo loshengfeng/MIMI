@@ -3,7 +3,6 @@ package com.dabenxiang.mimi.view.club.adapter
 import android.content.Context
 import android.os.Bundle
 import android.view.View
-import androidx.annotation.NonNull
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
