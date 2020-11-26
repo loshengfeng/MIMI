@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.DiffUtil
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.view.player.PlayerViewModel
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
@@ -28,24 +29,23 @@ import java.io.File
 
 class ClipAdapter(
     private val context: Context,
-    private val clipMap: HashMap<String, File> = hashMapOf(),
     private var currentPosition: Int = 0,
     private var clipFuncItem: ClipFuncItem = ClipFuncItem()
-) : PagingDataAdapter<MemberPostItem, ClipViewHolder>(DIFF_CALLBACK) {
+) : PagingDataAdapter<VideoItem, ClipViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         private val DIFF_CALLBACK =
-            object : DiffUtil.ItemCallback<MemberPostItem>() {
+            object : DiffUtil.ItemCallback<VideoItem>() {
                 override fun areItemsTheSame(
-                    oldItem: MemberPostItem,
-                    newItem: MemberPostItem
+                    oldItem: VideoItem,
+                    newItem: VideoItem
                 ): Boolean {
                     return oldItem.id == newItem.id
                 }
 
                 override fun areContentsTheSame(
-                    oldItem: MemberPostItem,
-                    newItem: MemberPostItem
+                    oldItem: VideoItem,
+                    newItem: VideoItem
                 ): Boolean {
                     return oldItem == newItem
                 }
@@ -76,7 +76,7 @@ class ClipAdapter(
         this.clipFuncItem = clipFuncItem
     }
 
-    fun getMemberPostItem(position: Int): MemberPostItem? {
+    fun getMemberPostItem(position: Int): VideoItem? {
         return getItem(position)
     }
 
@@ -110,70 +110,62 @@ class ClipAdapter(
         payloads: MutableList<Any>
     ) {
         Timber.d("onBindViewHolder position:$position, currentPosition: $currentPosition, payloads: $payloads")
-        val item = getItem(position) ?: MemberPostItem()
-
-        var contentItem: MediaContentItem? = null
-        try {
-            contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        val item = getItem(position) ?: VideoItem()
 
         payloads.takeIf { it.isNotEmpty() }?.also {
             when (it[0] as Int) {
                 PAYLOAD_UPDATE_UI -> {
                     holder.onBind(item, clipFuncItem, position)
                 }
-                PAYLOAD_UPDATE_DEDUCTED -> {
-                    holder.onUpdateByDeducted(item, clipFuncItem, position)
-                    if (item.deducted) {
-                        takeIf { currentPosition == position }?.also {
-                            currentViewHolder = holder
-                            holder.progress.visibility = View.VISIBLE
-                        } ?: run {
-                            holder.ivCover.visibility = View.VISIBLE
-                            holder.progress.visibility = View.GONE
-                        }
-
-                        holder.ibReplay.setOnClickListener { view ->
-                            exoPlayer?.also { player ->
-                                player.seekTo(0)
-                                player.playWhenReady = true
-                            }
-                            view.visibility = View.GONE
-                        }
-
-                        holder.playerView.setOnClickListener {
-                            takeIf { exoPlayer?.isPlaying ?: false }?.also {
-                                exoPlayer?.playWhenReady = false
-                                holder.ibPlay.visibility = View.VISIBLE
-                            } ?: run {
-                                exoPlayer?.playWhenReady = true
-                                holder.ibPlay.visibility = View.GONE
-                            }
-                        }
-
-                        holder.ibPlay.setOnClickListener {
-                            takeUnless { exoPlayer?.isPlaying ?: true }?.also {
-                                exoPlayer?.playWhenReady = true
-                                holder.ibPlay.visibility = View.GONE
-                            }
-                        }
-                        processClip(
-                            holder.playerView,
-                            contentItem?.shortVideo?.id.toString(),
-                            contentItem?.shortVideo?.url.toString(),
-                            position
-                        )
-                    }
-                }
+//                PAYLOAD_UPDATE_DEDUCTED -> {
+//                    holder.onUpdateByDeducted(item, clipFuncItem, position)
+//                    if (item.deducted) {
+//                        takeIf { currentPosition == position }?.also {
+//                            currentViewHolder = holder
+//                            holder.progress.visibility = View.VISIBLE
+//                        } ?: run {
+//                            holder.ivCover.visibility = View.VISIBLE
+//                            holder.progress.visibility = View.GONE
+//                        }
+//
+//                        holder.ibReplay.setOnClickListener { view ->
+//                            exoPlayer?.also { player ->
+//                                player.seekTo(0)
+//                                player.playWhenReady = true
+//                            }
+//                            view.visibility = View.GONE
+//                        }
+//
+//                        holder.playerView.setOnClickListener {
+//                            takeIf { exoPlayer?.isPlaying ?: false }?.also {
+//                                exoPlayer?.playWhenReady = false
+//                                holder.ibPlay.visibility = View.VISIBLE
+//                            } ?: run {
+//                                exoPlayer?.playWhenReady = true
+//                                holder.ibPlay.visibility = View.GONE
+//                            }
+//                        }
+//
+//                        holder.ibPlay.setOnClickListener {
+//                            takeUnless { exoPlayer?.isPlaying ?: true }?.also {
+//                                exoPlayer?.playWhenReady = true
+//                                holder.ibPlay.visibility = View.GONE
+//                            }
+//                        }
+//                        processClip(
+//                            holder.playerView,
+//                            contentItem?.shortVideo?.id.toString(),
+//                            contentItem?.shortVideo?.url.toString(),
+//                            position
+//                        )
+//                    }
+//                }
                 PAYLOAD_UPDATE_PLAYER -> {
-                    processClip(
-                        holder.playerView,
-                        contentItem?.shortVideo?.id.toString(),
-                        contentItem?.shortVideo?.url.toString(),
-                        position
-                    )
+//                    processClip(
+//                        holder.playerView,
+//                        contentItem?.shortVideo?.url.toString(),
+//                        position
+//                    )
                 }
             }
         } ?: run {
@@ -184,36 +176,9 @@ class ClipAdapter(
     override fun onBindViewHolder(holder: ClipViewHolder, position: Int) {
     }
 
-    private fun processClip(playerView: PlayerView, id: String, url: String, position: Int) {
-        Timber.d("processClip position:$position, id:$id, url:$url")
-        val item = getItem(position) ?: MemberPostItem()
-        playingId = id
-        var contentItem: MediaContentItem? = null
-        try {
-            contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        if (TextUtils.isEmpty(url)) {
-            if (clipMap.containsKey(id)) {
-                takeIf { currentPosition == position }?.also {
-                    setupPlayer(
-                        playerView,
-                        clipMap[id]?.toURI().toString()
-                    )
-                }
-            } else {
-                clipFuncItem.getClip(id, position)
-            }
-        } else {
-            takeIf { currentPosition == position }?.also {
-                setupPlayer(
-                    playerView,
-                    contentItem?.shortVideo?.url.toString()
-                )
-            }
-        }
+    private fun processClip(playerView: PlayerView, url: String, position: Int) {
+        Timber.d("processClip position:$position, url:$url")
+        takeIf { currentPosition == position }?.also { setupPlayer(playerView, url) }
     }
 
     private fun setupPlayer(playerView: PlayerView, uri: String) {

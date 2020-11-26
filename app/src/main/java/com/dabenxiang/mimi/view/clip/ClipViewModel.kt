@@ -11,6 +11,7 @@ import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.CategoryType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
@@ -71,32 +72,32 @@ class ClipViewModel : BaseViewModel() {
         }
     }
 
-    fun followPost(item: MemberPostItem, position: Int, isFollow: Boolean) {
-        viewModelScope.launch {
-            flow {
-                val apiRepository = domainManager.getApiRepository()
-                val result = when {
-                    isFollow -> apiRepository.followPost(item.creatorId)
-                    else -> apiRepository.cancelFollowPost(item.creatorId)
-                }
-                if (!result.isSuccessful) throw HttpException(result)
-                item.isFollow = isFollow
-                emit(ApiResult.success(position))
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _followResult.value = it }
-        }
+    fun followPost(item: VideoItem, position: Int, isFollow: Boolean) {
+//        viewModelScope.launch {
+//            flow {
+//                val apiRepository = domainManager.getApiRepository()
+//                val result = when {
+//                    isFollow -> apiRepository.followPost(item.creatorId)
+//                    else -> apiRepository.cancelFollowPost(item.creatorId)
+//                }
+//                if (!result.isSuccessful) throw HttpException(result)
+//                item.isFollow = isFollow
+//                emit(ApiResult.success(position))
+//            }
+//                .flowOn(Dispatchers.IO)
+//                .catch { e -> emit(ApiResult.error(e)) }
+//                .collect { _followResult.value = it }
+//        }
     }
 
-    fun getPostDetail(item: MemberPostItem, position: Int, update: (Int, Boolean) -> Unit) {
+    fun getPostDetail(item: VideoItem, position: Int, update: (Int, Boolean) -> Unit) {
         viewModelScope.launch {
             flow {
                 /** for debug **/
                 if (isLogin()) domainManager.getApiRepository().getMe()
                 else domainManager.getApiRepository().getGuestInfo()
                 /**-----------**/
-                val result = domainManager.getApiRepository().getMemberPostDetail(item.id)
+                val result = domainManager.getApiRepository().getMemberPostDetail(item.id ?: 0)
                 if (!result.isSuccessful) throw HttpException(result)
                 val deducted = result.body()?.content?.deducted ?: false
                 emit(deducted)
@@ -110,17 +111,19 @@ class ClipViewModel : BaseViewModel() {
         }
     }
 
-    fun favoritePost(item: MemberPostItem, position: Int, isFavorite: Boolean) {
+    fun favoritePost(item: VideoItem, position: Int, isFavorite: Boolean) {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val result = when {
-                    isFavorite -> apiRepository.addFavorite(item.id)
-                    else -> apiRepository.deleteFavorite(item.id)
+                    isFavorite -> apiRepository.addFavorite(item.id ?: 0)
+                    else -> apiRepository.deleteFavorite(item.id ?: 0)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
-                item.isFavorite = isFavorite
-                if (isFavorite) item.favoriteCount++ else item.favoriteCount--
+                item.favorite = isFavorite
+                item.favoriteCount?.let {
+                    if (isFavorite) it + 1 else it - 1
+                }
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
@@ -129,7 +132,7 @@ class ClipViewModel : BaseViewModel() {
         }
     }
 
-    fun likePost(item: MemberPostItem, position: Int, isLike: Boolean) {
+    fun likePost(item: VideoItem, position: Int, isLike: Boolean) {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
@@ -138,13 +141,15 @@ class ClipViewModel : BaseViewModel() {
                     else -> LikeType.DISLIKE
                 }
                 val request = LikeRequest(likeType)
-                val result = apiRepository.like(item.id, request)
+                val result = apiRepository.like(item.id ?: 0, request)
                 if (!result.isSuccessful) throw HttpException(result)
 
-                item.likeType = likeType
-                item.likeCount = when (item.likeType) {
-                    LikeType.LIKE -> item.likeCount + 1
-                    else -> item.likeCount - 1
+                item.like = isLike
+                item.likeCount?.let {
+                    when (isLike) {
+                        true-> it + 1
+                        else -> it - 1
+                    }
                 }
 
                 emit(ApiResult.success(position))
@@ -171,7 +176,7 @@ class ClipViewModel : BaseViewModel() {
 
     }
 
-    fun getClips(): Flow<PagingData<MemberPostItem>> {
+    fun getClips(): Flow<PagingData<VideoItem>> {
         return Pager(
             config = PagingConfig(
                 pageSize = ApiRepository.NETWORK_PAGE_SIZE,

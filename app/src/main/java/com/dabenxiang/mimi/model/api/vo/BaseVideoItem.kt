@@ -63,6 +63,9 @@ data class VideoItem(
     @SerializedName("years")
     val years: Long? = 0,
 
+    @SerializedName("videoEpisodes")
+    val videoEpisodes: List<VideoEpisode>? = arrayListOf(),
+
     var isAdult: Boolean = false,
     var searchingTag: String = "", // 搜尋的 TAG
     var searchingStr: String = "", // 搜尋的 Name

@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.dabenxiang.mimi.NAVIGATE_TO_TOPUP_ACTION
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.comment.CommentDialogFragment
@@ -152,7 +153,7 @@ class ClipPagerFragment : BaseFragment() {
         }
     }
 
-    private fun setupClips(data: PagingData<MemberPostItem>, coroutineScope: CoroutineScope) {
+    private fun setupClips(data: PagingData<VideoItem>, coroutineScope: CoroutineScope) {
         coroutineScope.launch {
             (rv_clip.adapter as ClipAdapter).submitData(data)
         }
@@ -160,7 +161,7 @@ class ClipPagerFragment : BaseFragment() {
 
     private fun updateAfterGetDeducted(currentPos: Int, deducted: Boolean) {
         Timber.d("updateAfterGetDeducted: $currentPos, $deducted")
-        clipAdapter.getMemberPostItem(currentPos)?.run { this.deducted = deducted }
+//        clipAdapter.getMemberPostItem(currentPos)?.run { this.deducted = deducted }
         clipAdapter.notifyItemChanged(currentPos, ClipAdapter.PAYLOAD_UPDATE_DEDUCTED)
     }
 
@@ -291,35 +292,35 @@ class ClipPagerFragment : BaseFragment() {
         viewModel.getClip(id, pos)
     }
 
-    private fun onFollowClick(item: MemberPostItem, pos: Int, isFollow: Boolean) {
+    private fun onFollowClick(item: VideoItem, pos: Int, isFollow: Boolean) {
         checkStatus {
             Timber.d("onFollowClick, item:$item, pos:$pos, isFollow:$isFollow")
             viewModel.followPost(item, pos, isFollow)
         }
     }
 
-    private fun onFavoriteClick(item: MemberPostItem, pos: Int, isFavorite: Boolean) {
+    private fun onFavoriteClick(item: VideoItem, pos: Int, isFavorite: Boolean) {
         checkStatus {
             Timber.d("onFavoriteClick,  item:$item, pos:$pos, isFavorite:$isFavorite")
             viewModel.favoritePost(item, pos, isFavorite)
         }
     }
 
-    private fun onLikeClick(item: MemberPostItem, pos: Int, isLike: Boolean) {
+    private fun onLikeClick(item: VideoItem, pos: Int, isLike: Boolean) {
         checkStatus {
             Timber.d("onLikeClick, item:$item, pos:$pos, isLike:$isLike")
             viewModel.likePost(item, pos, isLike)
         }
     }
 
-    private fun onCommentClick(item: MemberPostItem) {
+    private fun onCommentClick(item: VideoItem) {
         checkStatus {
             Timber.d("onCommentClick, item:$item")
             showCommentDialog(item)
         }
     }
 
-    private fun getClips(update: ((PagingData<MemberPostItem>, CoroutineScope) -> Unit)) {
+    private fun getClips(update: ((PagingData<VideoItem>, CoroutineScope) -> Unit)) {
         lifecycleScope.launch {
             viewModel.getClips().collectLatest {
                 update(it, this)
@@ -327,11 +328,11 @@ class ClipPagerFragment : BaseFragment() {
         }
     }
 
-    private fun getPostDetail(item: MemberPostItem, position: Int, update: (Int, Boolean) -> Unit) {
+    private fun getPostDetail(item: VideoItem, position: Int, update: (Int, Boolean) -> Unit) {
         viewModel.getPostDetail(item, position, update)
     }
 
-    private fun showCommentDialog(item: MemberPostItem) {
+    private fun showCommentDialog(item: VideoItem) {
         val listener = object : CommentDialogFragment.CommentListener {
             override fun onAvatarClick(userId: Long, name: String) {
                 val bundle = MyPostFragment.createBundle(
@@ -355,12 +356,12 @@ class ClipPagerFragment : BaseFragment() {
                 }
             }
         }
-        CommentDialogFragment.newInstance(item, listener).also {
-            it.isCancelable = true
-            it.show(
-                requireActivity().supportFragmentManager,
-                CommentDialogFragment::class.java.simpleName
-            )
-        }
+//        CommentDialogFragment.newInstance(item, listener).also {
+//            it.isCancelable = true
+//            it.show(
+//                requireActivity().supportFragmentManager,
+//                CommentDialogFragment::class.java.simpleName
+//            )
+//        }
     }
 }
