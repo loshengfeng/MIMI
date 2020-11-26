@@ -9,16 +9,19 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.ClubPostFuncItem
 import com.dabenxiang.mimi.callback.OnItemClickListener
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
+import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
 import com.dabenxiang.mimi.view.picturedetail.viewholder.PictureDetailViewHolder
+import com.dabenxiang.mimi.view.textdetail.viewholder.TextDetailViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
@@ -30,9 +33,9 @@ class ClubPicDetailAdapter(
     val context: Context,
     private val memberPostItem: MemberPostItem,
     private val onPictureDetailListener: OnPictureDetailListener,
-    private val onPhotoGridItemClickListener: PhotoGridAdapter.OnItemClickListener,
-    private val onItemClickListener: OnItemClickListener,
-    private var mAdItem: AdItem? = null
+    private val onPhotoGridItemClickListener: ClubPhotoGridAdapter.OnItemClickListener,
+    private var mAdItem: AdItem? = null,
+    private val clubPostFuncItem: ClubPostFuncItem = ClubPostFuncItem()
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), KoinComponent {
 
     companion object {
@@ -43,7 +46,7 @@ class ClubPicDetailAdapter(
 
     private val accountManager: AccountManager by inject()
 
-    private var photoGridAdapter: PhotoGridAdapter? = null
+    private var photoGridAdapter: ClubPhotoGridAdapter? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val mView: View
@@ -56,7 +59,7 @@ class ClubPicDetailAdapter(
             }
             VIEW_TYPE_PICTURE_DETAIL -> {
                 mView = LayoutInflater.from(context)
-                    .inflate(R.layout.item_picture_detail, parent, false)
+                    .inflate(R.layout.item_club_picture_detail, parent, false)
                 PictureDetailViewHolder(mView)
             }
             else -> {
@@ -64,10 +67,6 @@ class ClubPicDetailAdapter(
                     .inflate(R.layout.item_picture_detail, parent, false)
                 PictureDetailViewHolder(mView)
             }
-        }
-
-        mView.setOnClickListener {
-            onItemClickListener.onItemClick()
         }
 
         return holder
@@ -103,6 +102,13 @@ class ClubPicDetailAdapter(
                 holder.posterTime.text =
                     GeneralUtils.getTimeDiff(memberPostItem.creationDate, Date())
                 holder.title.text = memberPostItem.title
+                holder.txtLikeCount.text = String.format(context.getString(R.string.club_like_count), memberPostItem.likeCount)
+
+                if (memberPostItem.likeType == LikeType.LIKE) {
+                    holder.imgLike.setImageResource(R.drawable.ico_nice_s)
+                } else {
+                    holder.imgLike.setImageResource(R.drawable.ico_nice_gray)
+                }
 
                 onPictureDetailListener.onGetAttachment(
                     memberPostItem.avatarAttachmentId,
@@ -136,7 +142,7 @@ class ClubPicDetailAdapter(
                     2 -> GridLayoutManager(context, 2)
                     else -> GridLayoutManager(context, 3)
                 }
-                photoGridAdapter = PhotoGridAdapter(
+                photoGridAdapter = ClubPhotoGridAdapter(
                     context,
                     contentItem.images ?: arrayListOf(),
                     onPictureDetailListener,
@@ -166,6 +172,23 @@ class ClubPicDetailAdapter(
                     )
                 }
 
+                holder.imgLike.setOnClickListener {
+                    val isLike = memberPostItem.likeType == LikeType.LIKE
+                    clubPostFuncItem.onLikeClick(memberPostItem, !isLike) { like, count -> updateLike(like, count, holder) }
+                }
+                holder.imgDislike.setOnClickListener {  }
+                holder.imgFavorite.setOnClickListener {
+                    val isFavorite = memberPostItem.isFavorite
+                    clubPostFuncItem.onFavoriteClick(memberPostItem, !isFavorite) { favorite, count ->
+                        updateFavorite(favorite, count, holder)
+                    }
+                }
+                holder.imgReport.setOnClickListener {
+                    onPictureDetailListener.onMoreClick(memberPostItem!!)
+                }
+                holder.imgShare.setOnClickListener {
+                }
+
             }
         }
     }
@@ -178,10 +201,27 @@ class ClubPicDetailAdapter(
         mAdItem = item
     }
 
+    private fun updateLike(isLike: Boolean, count: Int, holder: PictureDetailViewHolder) {
+        if (isLike) {
+            holder.imgLike.setImageResource(R.drawable.ico_nice_s)
+        } else {
+            holder.imgLike.setImageResource(R.drawable.ico_nice_gray)
+        }
+        holder.txtLikeCount.text = String.format(context.getString(R.string.club_like_count), count)
+    }
+
+    private fun updateFavorite(isFavorite: Boolean, count: Int, holder: PictureDetailViewHolder) {
+        if (isFavorite) {
+            holder.imgFavorite.setImageResource(R.drawable.btn_favorite_white_s)
+        } else {
+            holder.imgFavorite.setImageResource(R.drawable.btn_favorite_n)
+        }
+    }
+
     interface OnPictureDetailListener {
         fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType)
         fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean)
-        fun onMoreClick(item: MembersPostCommentItem)
+        fun onMoreClick(item: MemberPostItem)
         fun onChipClick(type: PostType, tag: String)
         fun onOpenWebView(url: String)
         fun onAvatarClick(userId: Long, name: String)
