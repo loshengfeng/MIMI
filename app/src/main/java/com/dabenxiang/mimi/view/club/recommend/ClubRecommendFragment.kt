@@ -27,7 +27,7 @@ import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import kotlinx.android.synthetic.main.fragment_club_latest.*
+import kotlinx.android.synthetic.main.fragment_club_recommend.*
 import kotlinx.android.synthetic.main.item_ad.view.*
 import timber.log.Timber
 
@@ -37,7 +37,7 @@ class ClubRecommendFragment : BaseFragment() {
     private var adapter: ClubRecommendAdapter? = null
 
 
-    override fun getLayoutId() = R.layout.fragment_club_latest
+    override fun getLayoutId() = R.layout.fragment_club_recommend
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -63,7 +63,7 @@ class ClubRecommendFragment : BaseFragment() {
 
     private val attachmentListener = object : AttachmentListener {
         override fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType) {
-            viewModel.loadImage(id, view, type)
+//            viewModel.loadImage(id, view, type)
         }
 
         override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
@@ -268,7 +268,7 @@ class ClubRecommendFragment : BaseFragment() {
     }
 
     private fun getData(){
-        viewModel.getAd()
+//        viewModel.getAd()
         viewModel.getPostItemList()
     }
 
