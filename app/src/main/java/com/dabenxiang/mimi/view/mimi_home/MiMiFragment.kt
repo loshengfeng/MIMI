@@ -1,7 +1,5 @@
 package com.dabenxiang.mimi.view.mimi_home
 
-import android.os.Bundle
-import android.view.View
 import androidx.fragment.app.viewModels
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.Error
@@ -19,8 +17,8 @@ class MiMiFragment : BaseFragment() {
 
     private var viewPagerAdapter: MiMiViewPagerAdapter? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun setupFirstTime() {
+        super.setupFirstTime()
 
         viewModel.adWidth = pxToDp(requireContext(), getScreenSize(requireActivity()).first)
         viewModel.adHeight = (viewModel.adWidth / 7)
@@ -35,23 +33,10 @@ class MiMiFragment : BaseFragment() {
         viewModel.getMenu()
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-    }
-
-    override fun onPause() {
-        viewpager.adapter = null
-        super.onPause()
-    }
-
-    override fun onResume() {
-        viewpager.adapter = viewPagerAdapter
-        super.onResume()
-    }
-
     override fun getLayoutId() = R.layout.fragment_mimi_home
 
     private fun setupUi(menusItems: List<SecondMenuItem>) {
+        viewpager.isSaveEnabled = false
         viewPagerAdapter = MiMiViewPagerAdapter(childFragmentManager, lifecycle, menusItems)
         viewpager.adapter = viewPagerAdapter
         TabLayoutMediator(layout_tab, viewpager) { tab, position ->

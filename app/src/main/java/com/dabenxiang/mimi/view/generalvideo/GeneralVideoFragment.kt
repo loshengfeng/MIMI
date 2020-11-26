@@ -27,9 +27,8 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         GeneralVideoAdapter(onItemClick)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
+    override fun setupFirstTime() {
+        super.setupFirstTime()
         viewModel.adWidth = pxToDp(requireContext(), getScreenSize(requireActivity()).first)
         viewModel.adHeight = (viewModel.adWidth / 7)
     }
