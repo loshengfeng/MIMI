@@ -239,8 +239,8 @@ class MyPostFragment : BaseFragment() {
     }
 
     private val myPostListener = object : MyPostListener {
-        override fun onMoreClick(item: MemberPostItem) {
-            onMoreClick(item, ArrayList(adapter.currentList as List<MemberPostItem>), onEdit = {
+        override fun onMoreClick(item: MemberPostItem, position: Int) {
+            onMoreClick(item, position) {
                 it as MemberPostItem
                 when (item.type) {
                     PostType.TEXT -> {
@@ -250,8 +250,8 @@ class MyPostFragment : BaseFragment() {
                         bundle.putString(PAGE, MY_POST)
                         bundle.putSerializable(MEMBER_DATA, item)
                         findNavController().navigate(
-                            R.id.action_myPostFragment_to_postArticleFragment,
-                            bundle
+                                R.id.action_myPostFragment_to_postArticleFragment,
+                                bundle
                         )
                     }
                     PostType.IMAGE -> {
@@ -260,8 +260,8 @@ class MyPostFragment : BaseFragment() {
                         bundle.putString(PAGE, MY_POST)
                         bundle.putSerializable(MEMBER_DATA, item)
                         findNavController().navigate(
-                            R.id.action_myPostFragment_to_postPicFragment,
-                            bundle
+                                R.id.action_myPostFragment_to_postPicFragment,
+                                bundle
                         )
                     }
                     PostType.VIDEO -> {
@@ -270,12 +270,12 @@ class MyPostFragment : BaseFragment() {
                         bundle.putString(PAGE, MY_POST)
                         bundle.putSerializable(MEMBER_DATA, item)
                         findNavController().navigate(
-                            R.id.action_myPostFragment_to_postVideoFragment,
-                            bundle
+                                R.id.action_myPostFragment_to_postVideoFragment,
+                                bundle
                         )
                     }
                 }
-            })
+            }
         }
 
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
