@@ -3,24 +3,47 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
-apply from: 'https://gitlab.silkrode.com.tw/Neo/common_gradle/raw/master/utils_info_android_builder.gradle'
-apply from: 'https://gitlab.silkrode.com.tw/Neo/common_gradle/raw/master/utils_info_ip.gradle'
-apply from: 'https://gitlab.silkrode.com.tw/Neo/common_gradle/raw/master/version.gradle'
-apply from: './config_buildtypes.gradle'
-apply from: './config_product_flavors.gradle'
-apply plugin: 'com.dabenxiang.deploy'
 
-ext {
-    // for deploy plugin usage: uploadHosts, driveFolderIds
-    uploadHosts = new HashMap<String, String>()
-    driveFolderIds = new HashMap<String, String>()
-}
+def android_builder_version = "3.5.3"
+def android_builder_main_version = 3
 
 android {
-    // Ref : https://developer.android.com/studio/projects/install-ndk#apply-specific-version
-    ndkVersion "22.0.6917172"  //TODO  define NDK version  now not use local.properties
+    this.rootProject.buildscript.configurations.classpath
+            .resolvedConfiguration
+            .firstLevelModuleDependencies.
+            each {
+                def name = it.name
+                if (name.contains('com.android.tools.build:gradle')) {
+                    def moduleVersion = it.moduleVersion
+                    if (moduleVersion.contains("-")) {
+                        def versionArray = moduleVersion.split("-")
+                        version = versionArray[0]
+                        alpha = versionArray[1]
+                    } else {
+                        version = moduleVersion
+                        android_builder_version = moduleVersion
+                        println "Android Builder Version : " + android_builder_version
+                    }
+                }
+            }
+    android_builder_main_version = Integer.parseInt(android_builder_version.split("\\.")[0])
+    println "Android Builder Main Version : " + android_builder_main_version
+
+    signingConfigs {
+        release {
+            storeFile file("./keystore/release.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
+        debug {
+            storeFile file("./keystore/debug.keystore")
+        }
+    }
+
+    ndkVersion "21.3.6528147"
     compileSdkVersion 30
-    buildToolsVersion "30.0.2"
+    buildToolsVersion "30.0.1"
 
     kapt {
         correctErrorTypes = true
@@ -29,16 +52,8 @@ android {
         }
     }
 
-    if (ext.android_builder_main_version < 4) {
-        dataBinding {
-            enabled = true
-        }
-    } else {
-        buildFeatures {
-            dataBinding true
-            // for view binding:
-            // viewBinding true
-        }
+    buildFeatures {
+        dataBinding false
     }
 
     androidExtensions {
@@ -49,7 +64,22 @@ android {
         disable 'MissingDefaultResource'
     }
 
-    def version = this.ext.default_version()
+    def getLocalIPv4 = { ->
+        def ip4s = []
+        NetworkInterface.getNetworkInterfaces().findAll {
+            it.isUp() && !it.isLoopback() && !it.isPointToPoint() && !it.isVirtual() && !it.getName().startsWith("br-")
+        }.each {
+            it.getInetAddresses()
+                    .findAll { !it.isLoopbackAddress() && it instanceof Inet4Address }
+                    .each { ip4s << it }
+        }
+        int index = 0
+        if (ip4s.size() == 0) index = 0 else index = ip4s.size() - 1
+        String ip = ip4s[index].toString()
+        return ip.substring(ip.indexOf('/') + 1, ip.length())
+    }
+
+    Version version = readVersion()
     defaultConfig {
         applicationId "com.dabenxiang.mimi"
         minSdkVersion 24
@@ -60,19 +90,68 @@ android {
         buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
         buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
         buildConfigField "String", "WEB_HOST", '"https://sit-video-web.ymmsp.com"'
-        buildConfigField "String", "LOCAL_SOCKET_HOST", "\"${this.ext.local_host_ipv4()}\""
+        buildConfigField "String", "LOCAL_SOCKET_HOST", "\"${getLocalIPv4()}\""
         buildConfigField "int", "LOCAL_SOCKET_PORT", "8080"
         archivesBaseName = "$applicationName-v$versionName"
         ndk {
             abiFilters "armeabi-v7a", "arm64-v8a", "x86"
         }
+
 //        testInstrumentationRunner "com.dabenxiang.mimi.KoinTestRunner"
     }
 
-    sourceSets {
-        main {
-            java.srcDirs('src/main/java')
+    buildTypes {
+        debug {
+            matchingFallbacks = ['release', 'debug']
+            getIsDefault().set(true)
+            zipAlignEnabled false
+            minifyEnabled false
+            debuggable true
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
         }
+        release {
+            matchingFallbacks = ['release', 'debug']
+            zipAlignEnabled true
+            minifyEnabled true
+            debuggable false
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-android-optimize.txt'
+            signingConfig signingConfigs.release
+        }
+
+        prod_debug.initWith(buildTypes.debug)
+        sit_debug.initWith(buildTypes.debug)
+        dev_debug.initWith(buildTypes.debug)
+
+        prod_release.initWith(buildTypes.release)
+        sit_release.initWith(buildTypes.release)
+        dev_release.initWith(buildTypes.release)
+
+        prod_debug {}
+        prod_release {}
+
+        sit_debug {}
+        sit_release {}
+
+        dev_debug {}
+        dev_release {}
+    }
+
+    flavorDimensions "normal"
+    productFlavors {
+        mimi {
+            dimension = "normal"
+            getIsDefault().set(true)
+            ext {
+                mqtt = [sit: "wss://mqtt.ymmsp.com:443", dev: "ws://10.1.1.121:8083", prod: "ws://10.1.1.121:8083"]
+            }
+        }
+    }
+
+    productFlavors.all { flavor ->
+        println "ProductFlavors Show flavor name " + flavor.name
     }
 
     applicationVariants.all { variant ->
@@ -89,32 +168,14 @@ android {
 //        def flavor_version = this.ext.default_version(flavorName)
         println "Show " + flavorName + " current flavor_version versionName " + version.versionName
         println "Show " + flavorName + " current _version versionCode :   " + version.versionCode
-        variant.buildConfigField "String", "API_HOST", "\"${flavor.ext.API_HOST[buildtype]}\""
-        variant.buildConfigField "String", "AD_API_HOST", "\"${flavor.ext.AD_API_HOST[buildtype]}\""
+        variant.buildConfigField "String", "API_HOST", "\"${getAPI_Host(buildtype)}\""
+        variant.buildConfigField "String", "AD_API_HOST", "\"${getAD_API_Host(buildtype)}\""
+//        variant.buildConfigField "String", "MQTT_HOST", "\"${getMQTT_Host(buildtype)}\""
         variant.buildConfigField "String", "MQTT_HOST", "\"${flavor.ext.mqtt[buildtype]}\""
 
         variant.outputs.each { output ->
             output.versionNameOverride = version.versionName
             output.versionCodeOverride = version.versionCode.toInteger()
-        }
-    }
-
-    deploy {
-        type = 1 /** 1: GO, 2: C# **/
-        apkUpgradeType = 1 /** 1: 不強更, 2: 強更至上一版, 3: 強更至最新版 **/
-        serviceAccountId = "for-deploy-apk@deployapk-1602571937321.iam.gserviceaccount.com"
-        credentialPath = this.project.projectDir.absolutePath + "/credential/deployapk-1602571937321-a59632391db8.p12"
-        applicationVariants.all { variant ->
-            def full_buildTypename = variant.buildType.name.toString()
-            def flavor = variant.productFlavors[0]
-            def flavorName = variant.flavorName
-            def buildType = full_buildTypename.split("_")[0]
-            if (full_buildTypename.contains("debug") || full_buildTypename.contains("dev")) return
-
-            // 設定 uploadHosts
-            this.project.ext.uploadHosts.put(flavorName + buildType, flavor.ext.API_HOST[buildType])
-            // 設定 driveFolderIds
-            this.project.ext.driveFolderIds.put(flavorName + buildType, flavor.ext.DRIVE_FOLDER_ID[buildType])
         }
     }
 
@@ -163,7 +224,6 @@ dependencies {
     implementation "com.google.android.material:material:$material_version"
     implementation "androidx.activity:activity-ktx:$activity_ktx_version"
     implementation "androidx.fragment:fragment-ktx:$fragment_ktx_version"
-    implementation "androidx.coordinatorlayout:coordinatorlayout:1.1.0"
 
     // Kotlin Coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
@@ -300,7 +360,7 @@ dependencies {
     implementation "org.conscrypt:conscrypt-android:$conscrypt_version"
 
     // CKS
-    implementation "org.cks.utils:BaseManager:$cks_manager"
+    implementation("org.cks.utils:BaseManager:$cks_manager")
     implementation "org.cks.utils:DeviceInfoProvider:$cks_provider"
     implementation "org.cks.utils:logmanager:$cks_log_version"
     implementation "org.cks.utils:utils_device:$cks_utils"
@@ -351,4 +411,126 @@ dependencies {
     // QrCode
     implementation "com.journeyapps:zxing-android-embedded:$zxing_android_embedded_version"
     implementation "com.google.zxing:core:$zxing_core_version"
+}
+
+class Version {
+    def versionCode
+    def versionName
+}
+
+Version readVersion() {
+    readVersion('version.properties')
+}
+
+Version readVersion(String version_properties_path) {
+    Properties defaultVersionProps = new Properties()
+    def pfile = file(version_properties_path)
+    if (!pfile.exists()) {
+        pfile = file('version.properties')
+    }
+    defaultVersionProps.load(new FileInputStream(pfile))
+    def defaultBuildVersionCode = defaultVersionProps['VERSION_CODE']
+    def hotfix = defaultVersionProps['VERSION_NAME_HOTFIX']
+    def defaultBuildVersionName
+    if (hotfix != "0") {
+        defaultBuildVersionName = defaultVersionProps['VERSION_NAME_PREFIX'] + "." + defaultVersionProps['VERSION_NAME_BUILD'] + "." + hotfix
+    } else {
+        defaultBuildVersionName = defaultVersionProps['VERSION_NAME_PREFIX'] + "." + defaultVersionProps['VERSION_NAME_BUILD']
+    }
+    return new Version(versionCode: defaultBuildVersionCode, versionName: defaultBuildVersionName)
+}
+
+def getAPI_Host(String buildtype) {
+    def path = "http://api.vsense.dev-121.silkrode.io"
+    switch (buildtype) {
+        case "sit":
+            path = "http://api.vsense.dev-121.silkrode.io"
+            break
+        case "dev":
+            path = "http://api.vsense.dev-121.silkrode.io"
+            break
+        case "prod":
+        default:
+            break
+    }
+    return path
+}
+
+def getAD_API_Host(String buildtype) {
+    def path = "http://api.promotion.dev-121.silkrode.io"
+    switch (buildtype) {
+        case "sit":
+        case "dev":
+        case "prod":
+        default:
+            break
+    }
+    return path
+}
+
+def getMQTT_Host(String buildtype) {
+    def path = "ws://10.1.1.121:8083"
+    switch (buildtype) {
+        case "sit":
+            path = "wss://mqtt.ymmsp.com:443"
+            break
+        case "dev":
+            path = "ws://10.1.1.121:8083"
+            break
+        case "prod":
+        default:
+            break
+    }
+    return path
+}
+
+task increaseVersion {
+    group "version Tasks"
+    doLast {
+        increaseVersion()
+    }
+}
+
+task increaseHotfixVersion {
+    group "version Tasks"
+    doLast {
+        increaseHotfixVersion()
+    }
+}
+
+def increaseVersion() {
+    increaseVersion('version.properties')
+}
+
+def increaseVersion(String version_properties_path) {
+    Properties versionProps = new Properties()
+    def file = file(version_properties_path)
+    versionProps.load(new FileInputStream(file))
+    def hotfix = versionProps['VERSION_NAME_HOTFIX'].toInteger()
+    def nextCode = versionProps['VERSION_CODE'].toInteger() - hotfix + 10
+    versionProps['VERSION_CODE'] = nextCode.toString()
+    def nextBuild = versionProps['VERSION_NAME_BUILD'].toInteger() + 1
+    versionProps['VERSION_NAME_BUILD'] = nextBuild.toString()
+    hotfix = 0
+    versionProps['VERSION_NAME_HOTFIX'] = hotfix.toString()
+    versionProps.store(file.newWriter(), null)
+    def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD']
+    println "Increase $buildVersionName"
+}
+
+def increaseHotfixVersion() {
+    increaseHotfixVersion('version.properties')
+}
+
+def increaseHotfixVersion(String version_properties_path) {
+    Properties versionProps = new Properties()
+    def file = file(version_properties_path)
+    versionProps.load(new FileInputStream(file))
+    def nextCode = versionProps['VERSION_CODE'].toInteger() + 1
+    versionProps['VERSION_CODE'] = nextCode.toString()
+    def hotfix = versionProps['VERSION_NAME_HOTFIX'].toInteger() + 1
+    versionProps['VERSION_NAME_HOTFIX'] = hotfix.toString()
+    versionProps.store(file.newWriter(), null)
+    def buildVersionName = versionProps['VERSION_NAME_PREFIX'] + "." + versionProps['VERSION_NAME_BUILD'] + "." + versionProps['VERSION_NAME_HOTFIX']
+    println "Increase $buildVersionName"
 }
