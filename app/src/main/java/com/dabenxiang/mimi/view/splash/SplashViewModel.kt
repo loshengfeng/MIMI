@@ -46,7 +46,6 @@ class SplashViewModel : BaseViewModel() {
         _apiError.postValue(true)
     }
 
-
     fun autoLogin() {
         if (accountManager.hasMemberToken()) {
             viewModelScope.launch {
@@ -107,6 +106,7 @@ class SplashViewModel : BaseViewModel() {
                 emit(ApiResult.success(null))
             }
                 .flowOn(Dispatchers.IO)
+//            (SplashViewModel.kt:110): [main Thread] firstTimeStatistics error: retrofit2.HttpException: HTTP 400 Bad Request
                 .catch { e -> Timber.e("firstTimeStatistics error: $e") }
                 .collect { FileUtil.createSecreteFile(context) }
         }
@@ -115,5 +115,4 @@ class SplashViewModel : BaseViewModel() {
     fun setupRecordTimestamp() {
         versionManager.setupRecordTimestamp()
     }
-
 }

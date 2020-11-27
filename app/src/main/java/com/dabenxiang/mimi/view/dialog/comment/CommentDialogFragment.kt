@@ -27,14 +27,14 @@ import kotlinx.android.synthetic.main.fragment_dialog_comment.*
 class CommentDialogFragment : BaseDialogFragment() {
 
     private val viewModel: CommentDialogViewModel by viewModels()
-    private var data: MemberPostItem? = null
+    private var data: VideoItem? = null
 
     companion object {
         private const val KEY_DATA = "KEY_DATA"
         private var commentListener: CommentListener? = null
 
         fun newInstance(
-            item: MemberPostItem,
+            item: VideoItem,
             listener: CommentListener
         ): CommentDialogFragment {
             val fragment = CommentDialogFragment()
@@ -59,7 +59,7 @@ class CommentDialogFragment : BaseDialogFragment() {
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem, isComment: Boolean) {
             moreDialog?.dismiss()
-            (requireActivity() as MainActivity).showReportDialog(item, data, isComment)
+//            (requireActivity() as MainActivity).showReportDialog(item, data, isComment)
         }
 
         override fun onCancel() {
@@ -173,7 +173,7 @@ class CommentDialogFragment : BaseDialogFragment() {
             .transform(BlurTransformation(15, 5))
             .into(iv_blur)
 
-        (arguments?.getSerializable(KEY_DATA) as MemberPostItem).also { memberPostItem ->
+        (arguments?.getSerializable(KEY_DATA) as VideoItem).also { memberPostItem ->
             data = memberPostItem
             tv_comment_count.text = String.format(
                 requireContext().getString(R.string.clip_comment_count),
@@ -182,10 +182,10 @@ class CommentDialogFragment : BaseDialogFragment() {
 
             rv_comment.adapter = playerInfoAdapter
             lifecycleScope.launchWhenResumed {
-                viewModel.setupCommentDataSource(memberPostItem.id, playerInfoAdapter)
+                viewModel.setupCommentDataSource(memberPostItem.id ?: 0, playerInfoAdapter)
             }
 
-            takeIf { memberPostItem.commentCount == 0 }?.also {
+            takeIf { memberPostItem.commentCount == 0L }?.also {
                 tv_no_data.visibility = View.VISIBLE
             }
         }
@@ -202,7 +202,8 @@ class CommentDialogFragment : BaseDialogFragment() {
                     Pair(id, comment)
                 }?.also { (id, comment) ->
                     val replyId = et_message.tag?.let { rid -> rid as Long }
-                    viewModel.postComment(id, PostCommentRequest(replyId, comment))
+                    val replyName = tv_replay_name.text.toString()
+                    viewModel.postComment(id, PostCommentRequest(replyId, "$replyName $comment"))
                 }
             }
         }
@@ -245,9 +246,9 @@ class CommentDialogFragment : BaseDialogFragment() {
                         )
 
                         data?.also { memberPostItem ->
-                            viewModel.setupCommentDataSource(memberPostItem.id, playerInfoAdapter)
+                            viewModel.setupCommentDataSource(memberPostItem.id ?: 0, playerInfoAdapter)
                         }
-                        commentListener?.onUpdateCommentCount(data?.commentCount ?: 0)
+                        commentListener?.onUpdateCommentCount(data?.commentCount?.toInt() ?: 0)
                     }
                     is Error -> onApiError(it.throwable)
                 }

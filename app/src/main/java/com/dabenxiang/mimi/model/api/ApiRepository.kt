@@ -413,9 +413,10 @@ class ApiRepository(private val apiService: ApiService) {
      */
     suspend fun searchShortVideo(
         q: String? = null,
+        orderByType: StatisticsOrderType = StatisticsOrderType.LATEST,
         offset: String,
         limit: String
-    ) = apiService.searchShortVideo(q, offset, limit)
+    ) = apiService.searchShortVideo(q, orderByType.value, offset, limit)
 
     /**
      * 取得類別影片
@@ -693,6 +694,13 @@ class ApiRepository(private val apiService: ApiService) {
         postId: Long,
         body: LikeRequest
     ) = apiService.like(postId, body)
+
+    /**
+     * 帖子移除喜歡/不喜歡
+     */
+    suspend fun deleteLike(
+        postId: Long
+    ) = apiService.deleteLike(postId)
 
     /**
      * 帖子問題回報

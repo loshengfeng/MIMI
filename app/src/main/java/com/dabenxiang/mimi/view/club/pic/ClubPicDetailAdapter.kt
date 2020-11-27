@@ -1,45 +1,49 @@
-package com.dabenxiang.mimi.view.club.post
+package com.dabenxiang.mimi.view.club.pic
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.ClubPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.AdItem
+import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.TextContentItem
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
-import com.dabenxiang.mimi.view.picturedetail.PictureDetailAdapter
-import com.dabenxiang.mimi.view.textdetail.viewholder.TextDetailViewHolder
+import com.dabenxiang.mimi.view.picturedetail.viewholder.PictureDetailViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import timber.log.Timber
 import java.util.*
 
-class ClubTextDetailAdapter(
+class ClubPicDetailAdapter(
     val context: Context,
     private val memberPostItem: MemberPostItem,
-    private val onTextDetailListener: OnTextDetailListener,
+    private val onPictureDetailListener: OnPictureDetailListener,
+    private val onPhotoGridItemClickListener: ClubPhotoGridAdapter.OnItemClickListener,
     private var mAdItem: AdItem? = null,
     private val clubPostFuncItem: ClubPostFuncItem = ClubPostFuncItem()
-    ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), KoinComponent {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), KoinComponent {
 
     companion object {
-        const val VIEW_TYPE_TEXT_DETAIL = 0
+        const val VIEW_TYPE_PICTURE_DETAIL = 0
+
         const val VIEW_TYPE_AD = 3
     }
 
     private val accountManager: AccountManager by inject()
+
+    private var photoGridAdapter: ClubPhotoGridAdapter? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val mView: View
@@ -50,16 +54,15 @@ class ClubTextDetailAdapter(
                     .inflate(R.layout.item_ad, parent, false)
                 AdHolder(mView)
             }
-            VIEW_TYPE_TEXT_DETAIL -> {
+            VIEW_TYPE_PICTURE_DETAIL -> {
                 mView = LayoutInflater.from(context)
-                    .inflate(R.layout.item_club_text_detail, parent, false)
-                TextDetailViewHolder(mView)
+                    .inflate(R.layout.item_club_picture_detail, parent, false)
+                PictureDetailViewHolder(mView)
             }
-
             else -> {
                 mView = LayoutInflater.from(context)
-                    .inflate(R.layout.item_club_text_detail, parent, false)
-                TextDetailViewHolder(mView)
+                    .inflate(R.layout.item_picture_detail, parent, false)
+                PictureDetailViewHolder(mView)
             }
         }
 
@@ -68,9 +71,9 @@ class ClubTextDetailAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return when (position) {
-            0 -> PictureDetailAdapter.VIEW_TYPE_AD
-            1 -> VIEW_TYPE_TEXT_DETAIL
-            else -> VIEW_TYPE_TEXT_DETAIL
+            0 -> VIEW_TYPE_AD
+            1 -> VIEW_TYPE_PICTURE_DETAIL
+            else -> VIEW_TYPE_PICTURE_DETAIL
         }
     }
 
@@ -84,41 +87,43 @@ class ClubTextDetailAdapter(
                 mAdItem?.also { item ->
                     Glide.with(context).load(item.href).into(holder.adImg)
                     holder.adImg.setOnClickListener {
-                        onTextDetailListener.onOpenWebView(item.target)
+                        onPictureDetailListener.onOpenWebView(item.target)
                     }
                 }
             }
-            is TextDetailViewHolder -> {
-                val contentItem = try {
-                    Gson().fromJson(memberPostItem.content, TextContentItem::class.java)
-                } catch (e: Exception) {
-                    Timber.e(e)
-                    TextContentItem()
-                }
+            is PictureDetailViewHolder -> {
+                val contentItem =
+                    Gson().fromJson(memberPostItem.content, MediaContentItem::class.java)
 
                 holder.posterName.text = memberPostItem.postFriendlyName
-                holder.posterTime.text = GeneralUtils.getTimeDiff(
-                    memberPostItem.creationDate, Date()
-                )
+                holder.posterTime.text =
+                    GeneralUtils.getTimeDiff(memberPostItem.creationDate, Date())
                 holder.title.text = memberPostItem.title
-                holder.desc.text = contentItem.text
                 holder.txtLikeCount.text = String.format(context.getString(R.string.club_like_count), memberPostItem.likeCount)
+                holder.txtDisLikeCount.text = String.format(context.getString(R.string.club_dislike_count), memberPostItem.dislikeCount)
 
                 if (memberPostItem.likeType == LikeType.LIKE) {
                     holder.imgLike.setImageResource(R.drawable.ico_nice_s)
                 } else {
-                    holder.imgLike.setImageResource(R.drawable.ico_nice_gray)
+                    holder.imgLike.setImageResource(R.drawable.ico_nice)
+                }
+
+                if (memberPostItem.likeType == LikeType.DISLIKE) {
+                    holder.imgDislike.setImageResource(R.drawable.ico_bad_s)
+                } else {
+                    holder.imgDislike.setImageResource(R.drawable.ico_bad)
                 }
 
                 if (memberPostItem.isFavorite) {
                     holder.imgFavorite.setImageResource(R.drawable.btn_favorite_white_s)
                 } else {
-                    holder.imgFavorite.setImageResource(R.drawable.btn_favorite_n)
+                    holder.imgFavorite.setImageResource(R.drawable.btn_favorite_white_n)
                 }
 
-                onTextDetailListener.onGetAttachment(
+                onPictureDetailListener.onGetAttachment(
                     memberPostItem.avatarAttachmentId,
-                    holder.avatarImg
+                    holder.avatarImg,
+                    LoadImageType.AVATAR
                 )
 
                 if (accountManager.getProfile().userId != memberPostItem.creatorId) {
@@ -136,21 +141,35 @@ class ClubTextDetailAdapter(
                         holder.follow.setTextColor(context.getColor(R.color.color_red_1))
                     }
                     holder.follow.setOnClickListener {
-                        onTextDetailListener.onFollowClick(memberPostItem, position, !isFollow)
+                        onPictureDetailListener.onFollowClick(memberPostItem, position, !isFollow)
                     }
                 } else {
                     holder.follow.visibility = View.GONE
                 }
+
+                holder.photoGrid.layoutManager = when (contentItem.images?.size) {
+                    1 -> GridLayoutManager(context, 1)
+                    2 -> GridLayoutManager(context, 2)
+                    else -> GridLayoutManager(context, 3)
+                }
+                photoGridAdapter =
+                    ClubPhotoGridAdapter(
+                        context,
+                        contentItem.images ?: arrayListOf(),
+                        onPictureDetailListener,
+                        onPhotoGridItemClickListener
+                    )
+                holder.photoGrid.adapter = photoGridAdapter
 
                 holder.tagChipGroup.removeAllViews()
                 memberPostItem.tags?.forEach {
                     val chip = LayoutInflater.from(holder.tagChipGroup.context)
                         .inflate(R.layout.chip_item, holder.tagChipGroup, false) as Chip
                     chip.text = it
-                    chip.setTextColor(context.getColor(R.color.color_black_1_50))
+                    chip.setTextColor(context.getColor(R.color.color_black_1_60))
                     chip.setOnClickListener { view ->
-                        onTextDetailListener.onChipClick(
-                            PostType.TEXT,
+                        onPictureDetailListener.onChipClick(
+                            PostType.IMAGE,
                             (view as Chip).text.toString()
                         )
                     }
@@ -158,17 +177,20 @@ class ClubTextDetailAdapter(
                 }
 
                 holder.avatarImg.setOnClickListener {
-                    onTextDetailListener.onAvatarClick(
+                    onPictureDetailListener.onAvatarClick(
                         memberPostItem.creatorId,
                         memberPostItem.postFriendlyName
                     )
                 }
 
                 holder.imgLike.setOnClickListener {
-                    val isLike = memberPostItem.likeType == LikeType.LIKE
-                    clubPostFuncItem.onLikeClick(memberPostItem, !isLike) { like, count -> updateLike(like, count, holder) }
+                    val isLike = memberPostItem.likeType != null
+                    clubPostFuncItem.onLikeClick(memberPostItem, !isLike, LikeType.LIKE, memberPostItem.likeType) { like, item -> updateLike(like, item, holder) }
                 }
-                holder.imgDislike.setOnClickListener {  }
+                holder.imgDislike.setOnClickListener {
+                    val isLike = memberPostItem.likeType != null
+                    clubPostFuncItem.onLikeClick(memberPostItem, !isLike, LikeType.DISLIKE, memberPostItem.likeType) { like, item -> updateLike(like, item, holder) }
+                }
                 holder.imgFavorite.setOnClickListener {
                     val isFavorite = memberPostItem.isFavorite
                     clubPostFuncItem.onFavoriteClick(memberPostItem, !isFavorite) { favorite, count ->
@@ -176,42 +198,48 @@ class ClubTextDetailAdapter(
                     }
                 }
                 holder.imgReport.setOnClickListener {
-                    onTextDetailListener.onMoreClick(memberPostItem!!)
+                    onPictureDetailListener.onMoreClick(memberPostItem!!)
                 }
                 holder.imgShare.setOnClickListener {
                 }
+
             }
         }
     }
 
-    fun updateContent(item: MemberPostItem) {
-        memberPostItem.content = item.content
-        notifyItemChanged(VIEW_TYPE_TEXT_DETAIL)
+    fun updatePhotoGridItem(position: Int) {
+        photoGridAdapter?.notifyItemChanged(position)
     }
 
     fun setupAdItem(item: AdItem) {
         mAdItem = item
     }
 
-    private fun updateLike(isLike: Boolean, count: Int, holder: TextDetailViewHolder) {
-        if (isLike) {
+    private fun updateLike(isLike: Boolean, item: MemberPostItem, holder: PictureDetailViewHolder) {
+        if (isLike && item.likeType == LikeType.LIKE) {
             holder.imgLike.setImageResource(R.drawable.ico_nice_s)
+            holder.imgDislike.setImageResource(R.drawable.ico_bad)
+        } else if (isLike && item.likeType == LikeType.DISLIKE) {
+            holder.imgDislike.setImageResource(R.drawable.ico_bad_s)
+            holder.imgLike.setImageResource(R.drawable.ico_nice)
         } else {
-            holder.imgLike.setImageResource(R.drawable.ico_nice_gray)
+            holder.imgLike.setImageResource(R.drawable.ico_nice)
+            holder.imgDislike.setImageResource(R.drawable.ico_bad)
         }
-        holder.txtLikeCount.text = String.format(context.getString(R.string.club_like_count), count)
+        holder.txtLikeCount.text = String.format(context.getString(R.string.club_like_count), item.likeCount)
+        holder.txtDisLikeCount.text = String.format(context.getString(R.string.club_dislike_count), item.dislikeCount)
     }
 
-    private fun updateFavorite(isFavorite: Boolean, count: Int, holder: TextDetailViewHolder) {
+    private fun updateFavorite(isFavorite: Boolean, count: Int, holder: PictureDetailViewHolder) {
         if (isFavorite) {
             holder.imgFavorite.setImageResource(R.drawable.btn_favorite_white_s)
         } else {
-            holder.imgFavorite.setImageResource(R.drawable.btn_favorite_n)
+            holder.imgFavorite.setImageResource(R.drawable.btn_favorite_white_n)
         }
     }
 
-    interface OnTextDetailListener {
-        fun onGetAttachment(id: Long?, view: ImageView)
+    interface OnPictureDetailListener {
+        fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType)
         fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean)
         fun onMoreClick(item: MemberPostItem)
         fun onChipClick(type: PostType, tag: String)

@@ -349,6 +349,10 @@ class MyPostFragment : BaseFragment() {
         ) {
             checkStatus { viewModel.followPost(ArrayList(items), position, isFollow) }
         }
+
+        override fun onAvatarClick(userId: Long, name: String) {
+
+        }
     }
 
     private val memberPostFuncItem by lazy {

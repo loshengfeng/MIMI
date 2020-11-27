@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.model.api.vo
 
 import com.dabenxiang.mimi.model.enums.PostType
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 import java.util.*
 
 data class VideoItem(
@@ -13,7 +14,7 @@ data class VideoItem(
     val categories: List<String> = arrayListOf(),
 
     @SerializedName("commentCount")
-    val commentCount: Long = 0,
+    var commentCount: Long = 0,
 
     @SerializedName("country")
     val country: String = "",
@@ -63,13 +64,16 @@ data class VideoItem(
     @SerializedName("years")
     val years: Long? = 0,
 
+    @SerializedName("videoEpisodes")
+    val videoEpisodes: List<VideoEpisode>? = arrayListOf(),
+
     var isAdult: Boolean = false,
     var searchingTag: String = "", // 搜尋的 TAG
     var searchingStr: String = "", // 搜尋的 Name
 
     var type: PostType? = null,
     val adItem: AdItem? = null
-)
+): Serializable
 
 data class Source(
     @SerializedName("name")
@@ -101,7 +105,13 @@ data class VideoStream(
     val id: Long? = 0,
 
     @SerializedName("streamName")
-    val streamName: String? = ""
+    val streamName: String? = "",
+
+    @SerializedName("sign")
+    val sign: String? = "",
+
+    @SerializedName("utcTime")
+    val utcTime: Long? = 0
 )
 
 data class VideoM3u8Source(

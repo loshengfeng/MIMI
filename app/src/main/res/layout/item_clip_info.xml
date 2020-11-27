@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/clip_icon_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.05" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/clip_icon_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.16" />
+
+    <ImageView
+        android:id="@+id/clip_icon"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintStart_toStartOf="@+id/clip_icon_start"
+        app:layout_constraintEnd_toEndOf="@+id/clip_icon_end"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/clip_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="Text1231231231View"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:textSize="14sp"
+        android:textColor="@color/color_black_1"
+        app:layout_constraintEnd_toStartOf="@+id/tv_follow"
+        app:layout_constraintStart_toEndOf="@+id/clip_icon"
+        app:layout_constraintTop_toTopOf="@+id/clip_icon"
+        tools:text="名称名称名称名称名称名称名称名称"/>
+
+    <TextView
+        android:id="@+id/tv_follow"
+        android:layout_width="54dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/bg_red_1_stroke_radius_16"
+        android:gravity="center"
+        android:textColor="@color/color_red_1"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@+id/clip_icon"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/clip_icon"
+        tools:text="+关注" />
+
+    <TextView
+        android:id="@+id/clip_update_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:textSize="10sp"
+        android:textColor="@color/color_black_1_20"
+        android:text="TextView"
+        app:layout_constraintStart_toStartOf="@+id/clip_name"
+        app:layout_constraintTop_toBottomOf="@+id/clip_name"
+        tools:text="1小时前"/>
+
+    <TextView
+        android:id="@+id/clip_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:text="TextView"
+        android:maxLength="60"
+        android:textSize="14sp"
+        android:textColor="@color/color_black_1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/clip_icon"
+        tools:text="名称名称名称名称名称名称名称名称" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

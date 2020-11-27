@@ -8,10 +8,10 @@ import android.os.Bundle
 import android.text.Html
 import android.view.View
 import android.widget.ImageView
-import androidx.activity.addCallback
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.BuildConfig
@@ -30,10 +30,8 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.orderinfo.OrderInfoFragment
-import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_top_up.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import timber.log.Timber
@@ -54,6 +52,9 @@ class TopUpFragment : BaseFragment() {
     private var lastTabIndex: Int = 0
 
     private var views: ArrayList<ConstraintLayout> = arrayListOf()
+
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
 
     companion object {
         const val TAG_FRAGMENT = "TAG_FRAGMENT"
@@ -78,11 +79,6 @@ class TopUpFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val tag = arguments?.getString(TAG_FRAGMENT)?.takeIf { it.isNotBlank() } ?: ""
-
-        requireActivity().bottom_navigation?.visibility = when (tag) {
-            PlayerFragment::class.java.simpleName -> View.GONE
-            else -> View.VISIBLE
-        }
 
         Timber.e("TAG_FRAGMENT: $tag")
 
@@ -301,16 +297,7 @@ class TopUpFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
-        val tag = arguments?.getString(TAG_FRAGMENT)?.takeIf { it.isNotBlank() } ?: ""
-        requireActivity().onBackPressedDispatcher.addCallback(
-            owner = viewLifecycleOwner,
-            onBackPressed = {
-                when (tag) {
-                    PlayerFragment::class.java.simpleName -> navigateTo(NavigateItem.Up)
-                    else -> mainViewModel?.changeNavigationPosition?.value = R.id.navigation_mimi
-                }
-            }
-        )
+        tv_back.setOnClickListener { findNavController().navigateUp() }
 
         tv_record_top_up.setOnClickListener {
             navigateTo(NavigateItem.Destination(R.id.action_topupFragment_to_orderFragment))

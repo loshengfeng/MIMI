@@ -218,7 +218,7 @@ class OrderFragment : BaseFragment() {
 
     private fun onTopUpClick() {
         findNavController().navigateUp()
-        mainViewModel?.changeNavigationPosition?.value = R.id.navigation_topup
+//        mainViewModel?.changeNavigationPosition?.value = R.id.navigation_topup
     }
 
     private fun onPaymentInfoClick(orderItem: OrderItem = OrderItem()) {
