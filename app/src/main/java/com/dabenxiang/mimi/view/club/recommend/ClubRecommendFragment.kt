@@ -129,7 +129,7 @@ class ClubRecommendFragment : BaseFragment() {
             )
             navigateTo(
                     NavigateItem.Destination(
-                            R.id.action_to_myPostFragment,
+                            R.id.action_clubTabFragment_to_myPostFragment,
                             bundle
                     )
             )
