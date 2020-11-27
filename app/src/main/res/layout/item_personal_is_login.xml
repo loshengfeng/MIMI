@@ -1,287 +1,121 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/color_white_1"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/color_gray_2">
+    android:layout_height="wrap_content">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/layout_config"
-        android:layout_width="0dp"
-        android:layout_height="86dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="15dp"
-        android:background="@drawable/bg_personal_config"
+    <TextView
+        android:id="@+id/tv_follow"
+        style="@style/personalStyle"
+        android:gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:text="@string/personal_follow"
+        android:textColor="@color/color_black_1"
+        android:textSize="14sp"
+        app:drawableEndCompat="@drawable/btn_arrow_black_n"
+        app:drawableStartCompat="@drawable/btn_favorite_n"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="MissingConstraints">
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/gl_topup_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.6777" />
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="@id/tv_follow"
+        app:layout_constraintStart_toStartOf="@id/tv_follow"
+        app:layout_constraintTop_toBottomOf="@id/tv_follow" />
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/gl_topup_end"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.908" />
-
-        <ImageView
-            android:id="@+id/iv_photo"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginStart="18dp"
-            android:contentDescription="@null"
-            android:src="@drawable/default_profile_picture"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tv_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="5dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:textColor="@color/color_white_1"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toTopOf="@+id/tv_expiry_date"
-            app:layout_constraintEnd_toEndOf="@+id/gl_topup_start"
-            app:layout_constraintStart_toEndOf="@id/iv_photo"
-            app:layout_constraintTop_toTopOf="@id/iv_photo"
-            app:layout_goneMarginTop="20dp"
-            tools:text="好大一棵洋梨" />
-
-        <TextView
-            android:id="@+id/tv_expiry_date"
-            android:layout_width="wrap_content"
-            android:layout_height="20dp"
-            android:layout_marginTop="5dp"
-            android:gravity="center"
-            android:textColor="@color/color_white_1"
-            android:textSize="12sp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/iv_photo"
-            app:layout_constraintStart_toStartOf="@+id/tv_name"
-            app:layout_constraintTop_toBottomOf="@id/tv_name"
-            tools:text="VIP 於 2020-02-10 到期" />
-
-        <TextView
-            android:id="@+id/tv_topup"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_white_radius_6"
-            android:gravity="center_vertical|center_horizontal"
-            android:paddingTop="@dimen/_6sdp"
-            android:paddingBottom="@dimen/_6sdp"
-            android:text="@string/personal_topup"
-            android:textColor="@color/color_red_6"
-            android:textSize="15sp"
-            app:layout_constraintBottom_toBottomOf="@id/iv_photo"
-            app:layout_constraintEnd_toEndOf="@id/gl_topup_end"
-            app:layout_constraintStart_toStartOf="@+id/gl_topup_start"
-            app:layout_constraintTop_toTopOf="@+id/iv_photo" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="21dp"
-        android:background="@color/color_gray_2"
+    <TextView
+        android:id="@+id/tv_topup_history"
+        style="@style/personalStyle"
+        android:gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:text="@string/personal_order"
+        app:drawableEndCompat="@drawable/btn_arrow_black_n"
+        app:drawableStartCompat="@drawable/btn_note_n"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layout_config">
+        app:layout_constraintTop_toBottomOf="@id/tv_follow" />
 
-        <TextView
-            android:id="@+id/tv_follow"
-            style="@style/personalStyle"
-            android:gravity="center_vertical"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:text="@string/personal_follow"
-            app:drawableEndCompat="@drawable/btn_arrow_black_n"
-            app:drawableStartCompat="@drawable/ico_love"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_topup_history" />
 
-        <TextView
-            android:id="@+id/tv_topup_history"
-            style="@style/personalStyle"
-            android:gravity="center_vertical"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:text="@string/personal_order"
-            app:drawableEndCompat="@drawable/btn_arrow_black_n"
-            app:drawableStartCompat="@drawable/btn_note_n"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_follow" />
+    <ImageView
+        android:id="@+id/iv_new"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="46dp"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_topup_history"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_follow" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:background="@color/color_black_1_05"
-            app:layout_constraintEnd_toEndOf="@id/tv_follow"
-            app:layout_constraintStart_toStartOf="@id/tv_follow"
-            app:layout_constraintTop_toBottomOf="@id/tv_follow" />
+    <TextView
+        android:id="@+id/tv_new"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginRight="46dp"
+        android:gravity="center"
+        android:text="N"
+        android:textColor="@color/color_white_1"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_topup_history"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_follow" />
 
-        <ImageView
-            android:id="@+id/iv_new"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="46dp"
-            android:contentDescription="@null"
-            android:src="@drawable/ico_new"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@id/tv_topup_history"
-            app:layout_constraintEnd_toEndOf="@id/tv_topup_history"
-            app:layout_constraintTop_toTopOf="@id/tv_topup_history" />
+    <TextView
+        android:id="@+id/tv_my_post"
+        style="@style/personalStyle"
+        android:gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:text="@string/personal_my_post"
+        app:drawableEndCompat="@drawable/btn_arrow_black_n"
+        app:drawableStartCompat="@drawable/ico_myposts"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_topup_history" />
+<!--               app:layout_constraintTop_toBottomOf="@id/tv_chat_history"-->
 
-        <TextView
-            android:id="@+id/tv_chat_history"
-            style="@style/personalStyle"
-            android:gravity="center_vertical"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:text="@string/personal_chat_history"
-            android:visibility="gone"
-            app:drawableEndCompat="@drawable/btn_arrow_black_n"
-            app:drawableStartCompat="@drawable/ico_messenger_gray"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_topup_history" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_my_post" />
 
-        <TextView
-            android:id="@+id/tv_new"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:layout_marginEnd="46dp"
-            android:background="@drawable/ico_new"
-            android:gravity="center"
-            android:text="N"
-            android:textColor="@color/color_white_1"
-            android:textSize="10sp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@id/tv_chat_history"
-            app:layout_constraintEnd_toEndOf="@id/tv_chat_history"
-            app:layout_constraintTop_toTopOf="@id/tv_chat_history" />
+    <TextView
+        android:id="@+id/tv_exchange"
+        style="@style/personalStyle"
+        android:gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:text="@string/exchange"
+        app:drawableEndCompat="@drawable/btn_arrow_black_n"
+        app:drawableStartCompat="@drawable/ico_myposts"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_my_post" />
 
-        <TextView
-            android:id="@+id/tv_my_post"
-            style="@style/personalStyle"
-            android:gravity="center_vertical"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:text="@string/personal_my_post"
-            app:drawableEndCompat="@drawable/btn_arrow_black_n"
-            app:drawableStartCompat="@drawable/ico_myposts"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_chat_history" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:background="@color/color_black_1_05"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_topup_history" />
-
-        <View
-            android:id="@+id/v_line_chat"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:background="@color/color_black_1_05"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_chat_history" />
-
-        <TextView
-            android:id="@+id/tv_setting"
-            style="@style/personalStyle"
-            android:gravity="center_vertical"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:text="@string/personal_setting"
-            app:drawableEndCompat="@drawable/btn_arrow_black_n"
-            app:drawableStartCompat="@drawable/ico_setting"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_my_post" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:background="@color/color_black_1_05"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_my_post" />
-
-        <TextView
-            android:id="@+id/tv_old_driver"
-            style="@style/personalStyle"
-            android:gravity="center_vertical"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:text="@string/personal_old_driver"
-            app:drawableEndCompat="@drawable/btn_arrow_black_n"
-            app:drawableStartCompat="@drawable/btn_potato"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_setting" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:background="@color/color_black_1_05"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_setting" />
-
-        <TextView
-            android:id="@+id/tv_logout"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="19dp"
-            android:background="@color/color_white_1"
-            android:gravity="center"
-            android:text="@string/btn_logout"
-            android:textColor="@color/color_red_1"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_old_driver" />
-
-        <TextView
-            android:id="@+id/tv_version_is_login"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:gravity="center"
-            android:textColor="@color/color_black_1_30"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_logout"
-            tools:text="v1.0.0" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_exchange" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

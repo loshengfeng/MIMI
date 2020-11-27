@@ -22,6 +22,7 @@ import com.dabenxiang.mimi.view.club.latest.ClubLatestFragment
 import com.dabenxiang.mimi.view.club.pic.ClubPostPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubPostTextFragment
 import com.dabenxiang.mimi.view.club.recommend.ClubRecommendFragment
+import com.dabenxiang.mimi.view.club.short.ClubShortVideoFragment
 import kotlinx.android.synthetic.main.fragment_tab_test.*
 import timber.log.Timber
 
@@ -41,8 +42,7 @@ class ClubTabAdapter(
                 ClubLatestFragment()
             },
             TAB_CLIP to {
-                PageTestFragment.create(
-                        context.getString(R.string.club_tab_clip))
+                ClubShortVideoFragment()
             },
             TAB_PICTURE to { ClubPostPicFragment() },
             TAB_NOVEL to { ClubPostTextFragment() }
@@ -52,42 +52,5 @@ class ClubTabAdapter(
 
     override fun createFragment(position: Int): Fragment {
         return tabFragmentsCreators[position]?.invoke() ?: throw IndexOutOfBoundsException()
-    }
-}
-
-
-//Test tab Fragments
-private const val KEY_PAGE_NAME = "KEY_PAGE_NAME"
-
-class PageTestFragment : BaseFragment() {
-
-    companion object {
-        fun create(name: String) =
-                PageTestFragment().apply {
-                    arguments = Bundle(1).apply {
-                        putString(KEY_PAGE_NAME, name)
-                    }
-                }
-    }
-
-    private val viewModel: ClubTabViewModel by viewModels()
-
-    override fun getLayoutId() = R.layout.fragment_tab_test
-    override fun setupObservers() {}
-    override fun setupListeners() {}
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        Timber.i("PageTestFragment ${
-            arguments?.getString(KEY_PAGE_NAME, "")
-        } onAttach")
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        Timber.i("PageTestFragment ${
-            arguments?.getString(KEY_PAGE_NAME, "")
-        } onViewCreated")
-        tab_name.text = arguments?.getString(KEY_PAGE_NAME, "")
     }
 }
