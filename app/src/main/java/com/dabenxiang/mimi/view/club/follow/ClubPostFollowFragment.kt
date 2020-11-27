@@ -128,6 +128,7 @@ class ClubPostFollowFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         recycler_view.adapter = adapter
 
         layout_refresh.setOnRefreshListener {

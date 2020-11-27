@@ -61,7 +61,6 @@ class ClipAdapter(
     private var isOverdue: Boolean = false
 
     fun setM3U8Result(url: String, errorCode: Int) {
-        Timber.d("@@@errorCode: $errorCode")
         m3u8Url = url
         isOverdue = errorCode == ERROR_CODE_ACCOUNT_OVERDUE
     }
@@ -130,6 +129,7 @@ class ClipAdapter(
                     holder.onBind(item)
                 }
                 PAYLOAD_UPDATE_AFTER_M3U8 -> {
+                    holder.progress.visibility = View.GONE
                     holder.updateAfterM3U8(item, clipFuncItem, position, isOverdue)
                     if (!isOverdue) {
                         takeIf { currentPosition == position }?.also {
@@ -170,6 +170,7 @@ class ClipAdapter(
             }
         } ?: run {
             holder.onBind(item)
+            holder.progress.visibility = View.VISIBLE
         }
     }
 
