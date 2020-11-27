@@ -155,9 +155,10 @@ class ClubShortVideoFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        Timber.i("onResume isLogin:${accountManager.isLogin()}")
-        loginPageToggle(accountManager.isLogin())
-        if (accountManager.isLogin() && viewModel.postCount.value ?: -1 <= 0) {
+        //According to specs, this page does not need to log in currently
+        loginPageToggle(true)
+
+        if (viewModel.postCount.value ?: -1 <= 0) {
             viewModel.getData(adapter)
         }
         viewModel.getAd()

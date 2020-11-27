@@ -24,8 +24,6 @@ import timber.log.Timber
 
 class ClubFollowViewModel : ClubViewModel() {
 
-
-
     private val _postCount = MutableLiveData<Int>()
     val postCount: LiveData<Int> = _postCount
 
