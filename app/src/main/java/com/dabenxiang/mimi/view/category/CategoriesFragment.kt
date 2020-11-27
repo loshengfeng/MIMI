@@ -132,41 +132,6 @@ class CategoriesFragment : BaseFragment() {
         orderByType = arguments?.getInt(KEY_ORDER_BY) ?: StatisticsOrderType.LATEST.value
         setupTitle()
 
-        lstFilterRV = listOf(rl_filter_0, rl_filter_1)
-
-        viewModel.showProgress.observe(this, Observer { showProgress ->
-            if (showProgress) progressHUD.show()
-            else progressHUD.dismiss()
-        })
-
-        viewModel.getCategoryResult.observe(this, Observer {
-            when (it) {
-                is Success -> {
-                    tv_all_1.visibility = View.VISIBLE
-                    setupFilter(
-                        SORT,
-                        arrayListOf(
-                            getString(R.string.category_newest),
-                            getString(R.string.category_top_hit)
-                        )
-                    )
-                    setupFilter(CATEGORY, it.result)
-                    setupCollapsingText()
-                    adjustContentRV(2)
-                    getVideos()
-                }
-                is Error -> onApiError(it.throwable)
-                else -> {
-                }
-            }
-        })
-
-        viewModel.getCategory()
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
         layout_refresh.setOnRefreshListener {
             videoListAdapter.refresh()
         }
@@ -213,6 +178,37 @@ class CategoriesFragment : BaseFragment() {
                 )
             )
         }
+
+        lstFilterRV = listOf(rl_filter_0, rl_filter_1)
+
+        viewModel.showProgress.observe(this, Observer { showProgress ->
+            if (showProgress) progressHUD.show()
+            else progressHUD.dismiss()
+        })
+
+        viewModel.getCategoryResult.observe(this, Observer {
+            when (it) {
+                is Success -> {
+                    tv_all_1.visibility = View.VISIBLE
+                    setupFilter(
+                        SORT,
+                        arrayListOf(
+                            getString(R.string.category_newest),
+                            getString(R.string.category_top_hit)
+                        )
+                    )
+                    setupFilter(CATEGORY, it.result)
+                    setupCollapsingText()
+                    adjustContentRV(2)
+                    getVideos()
+                }
+                is Error -> onApiError(it.throwable)
+                else -> {
+                }
+            }
+        })
+
+        viewModel.getCategory()
     }
 
     override fun onResume() {
@@ -374,7 +370,7 @@ class CategoriesFragment : BaseFragment() {
     }
 
     private fun setupTitle() {
-        tv_title.text =
+        tv_category_title.text =
             if (category.isBlank()) getString(R.string.home_tab_video)
             else category
     }
