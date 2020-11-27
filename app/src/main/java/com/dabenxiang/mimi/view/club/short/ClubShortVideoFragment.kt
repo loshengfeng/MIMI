@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.post
+package com.dabenxiang.mimi.view.club.short
 
 import android.content.Context
 import android.os.Bundle
@@ -6,13 +6,9 @@ import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.AttachmentListener
-import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -21,44 +17,24 @@ import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
-import com.dabenxiang.mimi.model.vo.SearchPostItem
-import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
-import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
-import com.dabenxiang.mimi.view.club.ClubShortVideoViewModel
-import com.dabenxiang.mimi.view.club.recommend.ClubRecommendAdapter
-import com.dabenxiang.mimi.view.club.recommend.ClubRecommendViewModel
-import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
-import com.dabenxiang.mimi.view.post.BasePostFragment
-import com.dabenxiang.mimi.view.search.post.SearchPostFragment
-import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.flurry.sdk.it
-import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.fragment_club_post_text.*
 import kotlinx.android.synthetic.main.fragment_club_short.*
-import kotlinx.android.synthetic.main.fragment_club_text.*
-import kotlinx.android.synthetic.main.fragment_order.*
-import kotlinx.android.synthetic.main.fragment_order.viewPager
+import kotlinx.android.synthetic.main.fragment_club_short.id_empty_group
+import kotlinx.android.synthetic.main.fragment_club_short.id_not_login_group
+import kotlinx.android.synthetic.main.fragment_club_short.layout_ad
+import kotlinx.android.synthetic.main.fragment_club_short.layout_refresh
 import kotlinx.android.synthetic.main.item_ad.view.*
-import kotlinx.android.synthetic.main.item_setting_bar.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 class ClubShortVideoFragment : BaseFragment() {
     private val viewModel: ClubShortVideoViewModel by viewModels()
     private val accountManager: AccountManager by inject()
-    private var adapter: ClubShortVideoAdapter? = null
-    private val memberPostFuncItem by lazy {
-        MemberPostFuncItem(
-            {},
-            { id, view, type -> },
-            { item, items, isFollow, func -> followMember(item, items, isFollow, func) },
-            { item, isLike, func -> },
-            { item, isFavorite, func -> }
-        )
+
+    private val adapter: ClubShortVideoAdapter by lazy {
+        ClubShortVideoAdapter(requireContext(), postListener, attachmentListener)
     }
 
     override fun getLayoutId() = R.layout.fragment_club_short
@@ -72,92 +48,11 @@ class ClubShortVideoFragment : BaseFragment() {
         }
     }
 
-    private val attachmentListener = object : AttachmentListener {
-        override fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType) {
-            viewModel.loadImage(id, view, type)
-        }
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
+        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
 
-        override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
-        }
-    }
-
-    private val postListener = object : MyPostListener {
-
-        override fun onMoreClick(item: MemberPostItem, position: Int) {
-//            onMoreClick(item, ArrayList(adapter?.currentList as List<MemberPostItem>), onEdit = {
-//                it as MemberPostItem
-//            })
-        }
-
-        override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
-//            checkStatus { viewModel.likePost(item, position, isLike) }
-        }
-
-        override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {
-            checkStatus {
-                val bundle = ClipFragment.createBundle(ArrayList(mutableListOf(item[position])), 0)
-//                navigationToVideo(bundle)
-            }
-        }
-
-        override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
-            val bundle = ClipFragment.createBundle(ArrayList(mutableListOf(item[position])), 0)
-//            navigationToVideo(bundle)
-        }
-
-        override fun onChipClick(type: PostType, tag: String) {
-            val item = SearchPostItem(type, tag)
-            val bundle = SearchPostFragment.createBundle(item)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_clubTabFragment_to_searchPostFragment,
-                    bundle
-                )
-            )
-        }
-
-        override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            when (adultTabType) {
-
-            }
-        }
-
-        override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            checkStatus {
-                when (adultTabType) {
-                    AdultTabType.PICTURE -> {
-                        val bundle = PictureDetailFragment.createBundle(item, 1)
-//                        navigationToPicture(bundle)
-                    }
-                    AdultTabType.TEXT -> {
-                        val bundle = TextDetailFragment.createBundle(item, 1)
-//                        navigationToText(bundle)
-                    }
-                }
-            }
-        }
-
-        override fun onFavoriteClick(
-            item: MemberPostItem,
-            position: Int,
-            isFavorite: Boolean,
-            type: AttachmentType
-        ) {
-            checkStatus {
-                viewModel.favoritePost(item, position, isFavorite)
-            }
-        }
-
-        override fun onFollowClick(
-            items: List<MemberPostItem>,
-            position: Int,
-            isFollow: Boolean
-        ) {
-            checkStatus { viewModel.followPost(ArrayList(items), position, isFollow) }
-        }
-    }
-
-    override fun setupObservers() {
         viewModel.adResult.observe(this, {
             when (it) {
                 is ApiResult.Success -> {
@@ -184,8 +79,9 @@ class ClubShortVideoFragment : BaseFragment() {
             layout_refresh.isRefreshing = it
         })
 
-        viewModel.clubCount.observe(this, Observer {
-            if (it <= 0) {
+        viewModel.postCount.observe(this, {
+            Timber.i("postCount= $it")
+            if (it == 0) {
                 id_empty_group.visibility = View.VISIBLE
                 list_short.visibility = View.INVISIBLE
             } else {
@@ -195,41 +91,37 @@ class ClubShortVideoFragment : BaseFragment() {
             layout_refresh.isRefreshing = false
         })
 
-        viewModel.postItemListResult.observe(viewLifecycleOwner, Observer {
-            adapter?.submitList(it)
-        })
-
-        viewModel.followResult.observe(viewLifecycleOwner, Observer {
+        viewModel.followResult.observe(this, Observer {
             when (it) {
                 is ApiResult.Empty -> {
                     adapter?.notifyItemRangeChanged(
-                        0,
-                        viewModel.totalCount,
-                        ClubShortVideoAdapter.PAYLOAD_UPDATE_FOLLOW
+                            0,
+                            viewModel.totalCount,
+                            ClubShortVideoAdapter.PAYLOAD_UPDATE_FOLLOW
                     )
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
 
-        viewModel.likePostResult.observe(viewLifecycleOwner, Observer {
+        viewModel.likePostResult.observe(this, Observer {
             when (it) {
                 is ApiResult.Success -> {
                     adapter?.notifyItemChanged(
-                        it.result,
-                        ClubShortVideoAdapter.PAYLOAD_UPDATE_LIKE
+                            it.result,
+                            ClubShortVideoAdapter.PAYLOAD_UPDATE_LIKE
                     )
                 }
                 is ApiResult.Error -> Timber.e(it.throwable)
             }
         })
 
-        viewModel.favoriteResult.observe(viewLifecycleOwner, Observer {
+        viewModel.favoriteResult.observe(this, Observer {
             when (it) {
                 is ApiResult.Success -> {
                     adapter?.notifyItemChanged(
-                        it.result,
-                        ClubShortVideoAdapter.PAYLOAD_UPDATE_FAVORITE
+                            it.result,
+                            ClubShortVideoAdapter.PAYLOAD_UPDATE_FAVORITE
                     )
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
@@ -237,48 +129,18 @@ class ClubShortVideoFragment : BaseFragment() {
         })
     }
 
-    override fun setupListeners() {
-//        tv_back.setOnClickListener {
-//            navigateTo(NavigateItem.Up)
-//        }
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        list_short.adapter = adapter
+
+        layout_refresh.setOnRefreshListener {
+            layout_refresh.isRefreshing = false
+            viewModel.getData(adapter)
+        }
     }
 
     override fun initSettings() {
-        layout_refresh.setOnRefreshListener {
-            layout_refresh.isRefreshing = false
-            getData()
-        }
-        adapter = ClubShortVideoAdapter(requireContext(),
-            false,
-            postListener,
-            attachmentListener,
-            memberPostFuncItem)
-        list_short.adapter = adapter
-    }
 
-    private fun getData(){
-        viewModel.getPostItemList()
-    }
-
-    private fun followMember(
-        memberPostItem: MemberPostItem,
-        items: List<MemberPostItem>,
-        isFollow: Boolean,
-        update: (Boolean) -> Unit
-    ) {
-        checkStatus {
-            viewModel.followMember(memberPostItem, ArrayList(items), isFollow, update)
-        }
     }
 
     private fun loginPageToggle(isLogin: Boolean) {
@@ -295,9 +157,72 @@ class ClubShortVideoFragment : BaseFragment() {
         super.onResume()
         Timber.i("onResume isLogin:${accountManager.isLogin()}")
         loginPageToggle(accountManager.isLogin())
-        if (accountManager.isLogin() ) {
-            getData()
+        if (accountManager.isLogin() && viewModel.postCount.value ?: -1 <= 0) {
+            viewModel.getData(adapter)
         }
         viewModel.getAd()
+    }
+
+
+    private val attachmentListener = object : AttachmentListener {
+        override fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType) {
+            viewModel.loadImage(id, view, type)
+        }
+
+        override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
+        }
+    }
+
+    private val postListener = object : MyPostListener {
+
+        override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
+            checkStatus { viewModel.likePost(item, position, isLike) }
+        }
+
+        override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
+        }
+
+        override fun onFavoriteClick(item: MemberPostItem, position: Int, isFavorite: Boolean, type: AttachmentType) {
+            checkStatus {
+                viewModel.favoritePost(item, position, isFavorite)
+            }
+        }
+
+        override fun onFollowClick(items: List<MemberPostItem>, position: Int, isFollow: Boolean) {
+
+        }
+
+        override fun onMoreClick(item: MemberPostItem, position: Int) {
+            onMoreClick(item, position) {
+                it as MemberPostItem
+            }
+        }
+
+        override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
+            if (!accountManager.isLogin()) {
+                loginPageToggle(false)
+                return
+            }
+
+            when (adultTabType) {
+                AdultTabType.CLIP -> {
+                    val bundle = ClipFragment.createBundle(arrayListOf(item), 0)
+//                    navigateTo(
+//                            NavigateItem.Destination(
+//                                    R.id.action_myPostFragment_to_clipFragment,
+//                                    bundle
+//                            )
+//                    )
+                }
+                else -> {
+                }
+            }
+        }
+
+        override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {}
+
+        override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {}
+
+        override fun onChipClick(type: PostType, tag: String) {}
     }
 }

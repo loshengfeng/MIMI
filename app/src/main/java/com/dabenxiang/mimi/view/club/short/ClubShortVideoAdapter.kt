@@ -1,16 +1,15 @@
-package com.dabenxiang.mimi.view.club.post
+package com.dabenxiang.mimi.view.club.short
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
+
 import androidx.recyclerview.widget.DiffUtil
-import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
-import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
@@ -21,11 +20,9 @@ import timber.log.Timber
 
 class ClubShortVideoAdapter(
     val context: Context,
-    private val isAdultTheme: Boolean,
     private val myPostListener: MyPostListener,
-    private val attachmentListener: AttachmentListener,
-    private val memberPostFuncItem: MemberPostFuncItem
-) : PagedListAdapter<MemberPostItem, BaseViewHolder>(diffCallback) {
+    private val attachmentListener: AttachmentListener
+)  : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
 
     companion object {
         const val PAYLOAD_UPDATE_LIKE = 0
@@ -52,15 +49,13 @@ class ClubShortVideoAdapter(
         }
     }
 
-    val viewHolderMap = hashMapOf<Int, BaseViewHolder>()
-
     var removedPosList = ArrayList<Int>()
 
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
-        Timber.e("Show  item {$item}")
         return when (item?.type) {
             PostType.AD -> VIEW_TYPE_AD
+            PostType.VIDEO ->VIEW_TYPE_CLIP
             else -> VIEW_TYPE_CLIP
         }
     }
@@ -74,9 +69,9 @@ class ClubShortVideoAdapter(
                 )
             }
             VIEW_TYPE_CLIP -> {
-                ShortVideoHolder(
+                MyPostClipPostHolder(
                     LayoutInflater.from(parent.context)
-                        .inflate(R.layout.item_club_short, parent, false)
+                        .inflate(R.layout.item_clip_post, parent, false)
                 )
             }
             else -> {
@@ -88,12 +83,7 @@ class ClubShortVideoAdapter(
         }
     }
 
-    override fun onBindViewHolder(
-        holder: BaseViewHolder,
-        position: Int,
-        payloads: MutableList<Any>
-    ) {
-        viewHolderMap[position] = holder
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
         item?.also {
             when (holder) {
@@ -103,34 +93,15 @@ class ClubShortVideoAdapter(
                         GeneralUtils.openWebView(context, item.adItem?.target ?: "")
                     }
                 }
-//                is ShortVideoHolder -> {
-//                    payloads.takeIf { it.isNotEmpty() }?.also {
-//                        when (it[0] as Int) {
-//                            PAYLOAD_UPDATE_LIKE -> holder.updateLike(item)
-//                            PAYLOAD_UPDATE_FAVORITE -> holder.updateFavorite(item)
-//                            PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item)
-//                        }
-//                    } ?: run {
-//                        holder.onBind(
-//                            it,
-//                            currentList,
-//                            position,
-//                            myPostListener,
-//                            attachmentListener
-//                        )
-//                    }
-//                }
-            }
-        }
-    }
-
-    override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
-    }
-
-    fun updateInternalItem(holder: BaseViewHolder) {
-        when (holder) {
-            is ShortVideoHolder -> {
-
+                is MyPostClipPostHolder -> {
+                    holder.onBind(
+                        it,
+                        null,
+                        position,
+                        myPostListener,
+                        attachmentListener
+                    )
+                }
             }
         }
     }

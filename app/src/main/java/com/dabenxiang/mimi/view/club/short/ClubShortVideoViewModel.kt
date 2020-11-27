@@ -1,27 +1,17 @@
-package com.dabenxiang.mimi.view.club
+package com.dabenxiang.mimi.view.club.short
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import androidx.paging.DataSource
-import androidx.paging.LivePagedListBuilder
-import androidx.paging.PagedList
-import com.dabenxiang.mimi.callback.MyFollowPagingCallback
+import androidx.paging.*
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.CategoryType
 import com.dabenxiang.mimi.model.enums.LikeType
-import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.club.latest.ClubLatestListDataSource
-import com.dabenxiang.mimi.view.club.recommend.ClubRecommendListDataSource
-import com.dabenxiang.mimi.view.club.short.ClubShortListDataSource
-import com.dabenxiang.mimi.view.home.memberpost.MemberPostDataSource
-import com.dabenxiang.mimi.view.home.memberpost.MemberPostFactory
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -33,11 +23,8 @@ class ClubShortVideoViewModel : BaseViewModel() {
     private val _adResult = MutableLiveData<ApiResult<AdItem>>()
     val adResult: LiveData<ApiResult<AdItem>> = _adResult
 
-    private val _clubCount = MutableLiveData<Int>()
-    val clubCount: LiveData<Int> = _clubCount
-
-    private val _postItemListResult = MutableLiveData<PagedList<MemberPostItem>>()
-    val postItemListResult: LiveData<PagedList<MemberPostItem>> = _postItemListResult
+    private val _postCount = MutableLiveData<Int>()
+    val postCount: LiveData<Int> = _postCount
 
     private val _followResult = MutableLiveData<ApiResult<Nothing>>()
     val followResult: LiveData<ApiResult<Nothing>> = _followResult
@@ -50,39 +37,36 @@ class ClubShortVideoViewModel : BaseViewModel() {
 
     var totalCount: Int = 0
 
-    fun getPostItemList() {
-        viewModelScope.launch {
-            getRecommendPostPagingItems()
-                .asFlow()
-                .collect {
-                    Timber.e("Show ii : "+it)
-                    _postItemListResult.value = it
+    fun getData(adapter: ClubShortVideoAdapter) {
+        Timber.i("getData")
+        CoroutineScope(Dispatchers.IO).launch {
+            adapter.submitData(PagingData.empty())
+            getPostItemList()
+                .collectLatest {
+                    adapter.submitData(it)
                 }
         }
     }
 
-    private fun getRecommendPostPagingItems(): LiveData<PagedList<MemberPostItem>> {
-        val dataSourceFactory = object : DataSource.Factory<Int, MemberPostItem>() {
-            override fun create(): DataSource<Int, MemberPostItem> {
-                return ClubShortListDataSource(
+    fun getPostItemList(): Flow<PagingData<MemberPostItem>> {
+        return Pager(
+            config = PagingConfig(pageSize = ClubShortListDataSource.PER_LIMIT),
+            pagingSourceFactory = {
+                ClubShortListDataSource(
                     domainManager,
                     pagingCallback,
-                    viewModelScope,
                     adWidth,
                     adHeight
+
                 )
             }
-        }
-
-        val config = PagedList.Config.Builder()
-            .setPrefetchDistance(4)
-            .build()
-        return LivePagedListBuilder(dataSourceFactory, config).build()
+        )
+            .flow
+            .onStart {  setShowProgress(true) }
+            .onCompletion { setShowProgress(false) }
+            .cachedIn(viewModelScope)
     }
 
-
-    //    retrofit2.HttpException: HTTP 500 Internal Server Error
-//    at com.dabenxiang.mimi.view.club.ClubShortVideoViewModel$getAd$1$1.invokeSuspend(ClubShortVideoViewModel.kt:85)
     fun getAd() {
         viewModelScope.launch {
             flow {
@@ -96,22 +80,10 @@ class ClubShortVideoViewModel : BaseViewModel() {
     }
 
     private val pagingCallback = object : PagingCallback {
-        override fun onLoading() {
-            setShowProgress(true)
+        override fun onTotalCount(count: Long) {
+            _postCount.postValue(count.toInt())
         }
 
-        override fun onLoaded() {
-            setShowProgress(false)
-        }
-
-        override fun onThrowable(throwable: Throwable) {
-            Timber.e(throwable)
-            _clubCount.postValue(0)
-        }
-
-        override fun onCurrentItemCount(count: Long, isInitial: Boolean) {
-            _clubCount.postValue(count.toInt())
-        }
     }
 
     fun followMember(
