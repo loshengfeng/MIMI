@@ -16,5 +16,6 @@ data class ClipFuncItem(
     val onVipClick: (() -> Unit) = {},
     val onPromoteClick: (() -> Unit) = {},
     val getClips: (((PagingData<VideoItem>, CoroutineScope) -> Unit)) -> Unit = { _ -> },
-    val getM3U8: (VideoItem, Int,  (Int, String, Int) -> Unit) -> Unit = { _, _, _ -> }
+    val getM3U8: (VideoItem, Int,  (Int, String, Int) -> Unit) -> Unit = { _, _, _ -> },
+    val scrollToNext: ((Int) -> Unit) = { _ -> },
 )

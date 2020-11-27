@@ -215,6 +215,7 @@ class ClipAdapter(
                     "ExoPlayer.STATE_READY"
                 }
                 ExoPlayer.STATE_ENDED -> {
+                    clipFuncItem.scrollToNext(currentPosition + 1)
                     currentViewHolder?.ibReplay?.visibility = View.VISIBLE
                     "ExoPlayer.STATE_ENDED"
                 }
