@@ -59,7 +59,9 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
                 is LoadState.NotLoading -> {
                     Timber.d("refresh NotLoading endOfPaginationReached:${(loadStatus.refresh as LoadState.NotLoading).endOfPaginationReached}")
                     progressHUD.dismiss()
-                    takeIf { adapter.itemCount > 0 }?.let { adapter.getVideoItem(0) }?.run {
+                    takeIf { this@ClipPagerFragment.isVisible && adapter.itemCount > 0 }?.let {
+                        adapter.getVideoItem(0)
+                    }?.run {
                         clipFuncItem.getM3U8(this, 0, ::updateAfterM3U8)
                     }
                 }
