@@ -3,14 +3,18 @@ package com.dabenxiang.mimi.view.club.follow
 import android.content.Context
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AdultListener
+import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
+import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
+import com.dabenxiang.mimi.model.enums.AttachmentType
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -31,8 +35,9 @@ class ClubPostFollowFragment : BaseFragment() {
 
     private val viewModel: ClubFollowViewModel by viewModels()
     private val accountManager: AccountManager by inject()
-    private val adapter by lazy {
-        ClubPostFollowAdapter(requireActivity(), postListener, "", memberPostFuncItem)
+
+    private val adapter: ClubPostFollowAdapter by lazy {
+        ClubPostFollowAdapter(requireActivity(), postListener,  memberPostFuncItem, attachmentListener)
     }
 
     override fun getLayoutId() = R.layout.fragment_club_follow
@@ -77,6 +82,42 @@ class ClubPostFollowFragment : BaseFragment() {
             }
         })
 
+        viewModel.likePostResult.observe(this, {
+            when (it) {
+                is ApiResult.Success -> {
+                    it.result?.let { position ->
+                        adapter.notifyItemChanged(position)
+                    }
+                }
+
+                else -> {
+                    onApiError(Exception("Unknown Error!"))
+                }
+            }
+        })
+
+        viewModel.favoriteResult.observe(this, {
+            when (it) {
+                is ApiResult.Success -> {
+                    it.result?.let { position ->
+                        adapter.notifyItemChanged(position)
+                    }
+                }
+                else -> {
+                    onApiError(Exception("Unknown Error!"))
+                }
+            }
+        })
+
+        mainViewModel?.deletePostResult?.observe(this,  {
+            when (it) {
+                is ApiResult.Success -> {
+                    adapter.removedPosList.add(it.result)
+                    adapter.notifyItemChanged(it.result)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
 
 
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
@@ -109,6 +150,7 @@ class ClubPostFollowFragment : BaseFragment() {
                     )
             )
         }
+
     }
 
     override fun onResume() {
@@ -131,19 +173,29 @@ class ClubPostFollowFragment : BaseFragment() {
         )
     }
 
-    private val postListener = object : AdultListener {
-        override fun onFollowPostClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
-            //replace by closure
-        }
+    private val postListener = object : MyPostListener {
 
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
-            //replace by closure
+            checkStatus { viewModel.likePost(item, position, isLike) }
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
         }
 
-        override fun onMoreClick(item: MemberPostItem, items: List<MemberPostItem>) {
+        override fun onFavoriteClick(item: MemberPostItem, position: Int, isFavorite: Boolean, type: AttachmentType) {
+            checkStatus {
+                viewModel.favoritePost(item, position, isFavorite)
+            }
+        }
+
+        override fun onFollowClick(items: List<MemberPostItem>, position: Int, isFollow: Boolean) {
+
+        }
+
+        override fun onMoreClick(item: MemberPostItem, position: Int) {
+            onMoreClick(item, position) {
+                it as MemberPostItem
+            }
         }
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
@@ -190,8 +242,15 @@ class ClubPostFollowFragment : BaseFragment() {
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {}
 
         override fun onChipClick(type: PostType, tag: String) {}
+    }
 
-        override fun onAvatarClick(userId: Long, name: String) {}
+    private val attachmentListener = object : AttachmentListener {
+        override fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType) {
+            viewModel.loadImage(id, view, type)
+        }
+
+        override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
+        }
     }
 
     private fun loginPageToggle(isLogin: Boolean) {

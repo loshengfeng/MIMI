@@ -151,12 +151,34 @@
         tools:text="99" />
 
     <ImageView
+        android:id="@+id/iv_favorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:src="@drawable/btn_favorite_n"
+        app:layout_constraintLeft_toRightOf="@+id/tv_like_count"
+        app:layout_constraintTop_toBottomOf="@+id/sv_hip_group_tag" />
+
+    <TextView
+        android:id="@+id/tv_favorite_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="3dp"
+        android:textColor="@color/color_black_1"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_favorite"
+        app:layout_constraintLeft_toRightOf="@+id/iv_favorite"
+        app:layout_constraintTop_toTopOf="@+id/iv_favorite"
+        tools:text="99" />
+
+
+    <ImageView
         android:id="@+id/iv_comment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="33dp"
         android:src="@drawable/ico_messege_adult_gray"
-        app:layout_constraintLeft_toRightOf="@+id/tv_like_count"
+        app:layout_constraintLeft_toRightOf="@+id/tv_favorite_count"
         app:layout_constraintTop_toBottomOf="@+id/sv_hip_group_tag" />
 
     <TextView

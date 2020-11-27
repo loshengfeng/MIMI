@@ -110,6 +110,12 @@ class ClubTextDetailAdapter(
                     holder.imgLike.setImageResource(R.drawable.ico_nice_gray)
                 }
 
+                if (memberPostItem.isFavorite) {
+                    holder.imgFavorite.setImageResource(R.drawable.btn_favorite_white_s)
+                } else {
+                    holder.imgFavorite.setImageResource(R.drawable.btn_favorite_n)
+                }
+
                 onTextDetailListener.onGetAttachment(
                     memberPostItem.avatarAttachmentId,
                     holder.avatarImg

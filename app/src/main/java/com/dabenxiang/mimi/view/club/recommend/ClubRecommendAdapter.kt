@@ -80,19 +80,19 @@ class ClubRecommendAdapter(
             VIEW_TYPE_CLIP -> {
                 MyPostClipPostHolder(
                         LayoutInflater.from(parent.context)
-                                .inflate(R.layout.item_clip_post, parent, false), isAdultTheme
+                                .inflate(R.layout.item_clip_post, parent, false)
                 )
             }
             VIEW_TYPE_PICTURE -> {
                 MyPostPicturePostHolder(
                         LayoutInflater.from(parent.context)
-                                .inflate(R.layout.item_picture_post, parent, false), isAdultTheme
+                                .inflate(R.layout.item_picture_post, parent, false)
                 )
             }
             VIEW_TYPE_TEXT -> {
                 MyPostTextPostHolder(
                         LayoutInflater.from(parent.context)
-                                .inflate(R.layout.item_text_post, parent, false), isAdultTheme
+                                .inflate(R.layout.item_text_post, parent, false)
                 )
             }
             else -> {
@@ -141,6 +141,7 @@ class ClubRecommendAdapter(
                         when (it[0] as Int) {
                             PAYLOAD_UPDATE_LIKE -> holder.updateLike(item)
                             PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item)
+                            PAYLOAD_UPDATE_FAVORITE -> holder.updateFavorite(item)
                         }
                     } ?: run {
                         holder.pictureRecycler.tag = position
@@ -159,6 +160,7 @@ class ClubRecommendAdapter(
                         when (it[0] as Int) {
                             PAYLOAD_UPDATE_LIKE -> holder.updateLike(item)
                             PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item)
+                            PAYLOAD_UPDATE_FAVORITE -> holder.updateFavorite(item)
                         }
                     } ?: run {
                         holder.onBind(it, currentList, position, myPostListener, attachmentListener)

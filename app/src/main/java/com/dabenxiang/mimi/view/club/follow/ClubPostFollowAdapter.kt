@@ -8,8 +8,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AdultListener
+import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
+import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
@@ -18,19 +19,16 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
 class ClubPostFollowAdapter(
         val context: Context,
-        private val adultListener: AdultListener,
-        private var mTag: String = "",
+        private val myPostListener: MyPostListener,
         private val memberPostFuncItem: MemberPostFuncItem = MemberPostFuncItem(),
-        private val isClipList: Boolean = false
+        private val attachmentListener: AttachmentListener
 ) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
     companion object {
-        const val PAYLOAD_UPDATE_LIKE = 0
-        const val PAYLOAD_UPDATE_FOLLOW = 1
         const val VIEW_TYPE_CLIP = 0
         const val VIEW_TYPE_PICTURE = 1
         const val VIEW_TYPE_TEXT = 2
-        const val VIEW_TYPE_AD = 3
-        const val VIEW_TYPE_DELETED = 4
+        const val VIEW_TYPE_DELETED = 3
+        const val VIEW_TYPE_AD = 4
 
         private val diffCallback = object : DiffUtil.ItemCallback<MemberPostItem>() {
             override fun areItemsTheSame(
@@ -44,9 +42,6 @@ class ClubPostFollowAdapter(
             ): Boolean = oldItem == newItem
         }
     }
-
-    val viewHolderMap = hashMapOf<Int, RecyclerView.ViewHolder>()
-
     var removedPosList = ArrayList<Int>()
 
     override fun getItemViewType(position: Int): Int {
@@ -72,19 +67,19 @@ class ClubPostFollowAdapter(
                 )
             }
             VIEW_TYPE_CLIP -> {
-                ClipPostHolder(
+                MyPostClipPostHolder(
                         LayoutInflater.from(parent.context)
                                 .inflate(R.layout.item_clip_post, parent, false)
                 )
             }
             VIEW_TYPE_PICTURE -> {
-                PicturePostHolder(
+                MyPostPicturePostHolder(
                         LayoutInflater.from(parent.context)
                                 .inflate(R.layout.item_picture_post, parent, false)
                 )
             }
             VIEW_TYPE_TEXT -> {
-                TextPostHolder(
+                MyPostTextPostHolder(
                         LayoutInflater.from(parent.context)
                                 .inflate(R.layout.item_text_post, parent, false)
                 )
@@ -99,68 +94,40 @@ class ClubPostFollowAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-
-        viewHolderMap[position] = holder
         val item = getItem(position)
-        when (holder) {
-            is AdHolder -> {
-                Glide.with(context).load(item?.adItem?.href).into(holder.adImg)
-                holder.adImg.setOnClickListener {
-                    GeneralUtils.openWebView(context, item?.adItem?.target ?: "")
+        item?.also {
+            when (holder) {
+                is AdHolder->{
+                    Glide.with(context).load(item.adItem?.href).into(holder.adImg)
+                    holder.adImg.setOnClickListener {
+                        GeneralUtils.openWebView(context, item.adItem?.target ?: "")
+                    }
                 }
-            }
-            is ClipPostHolder -> {
-                item?.also {
-                    holder.onBind(
-                            item,
-                            null,
-                            position,
-                            adultListener,
-                            mTag,
-                            memberPostFuncItem,
-                            isClipList
-                    )
-                }
-            }
-            is PicturePostHolder -> {
-                item?.also {
-                    holder.pictureRecycler.tag = position
-                    holder.onBind(
-                            item,
-                            null,
-                            position,
-                            adultListener,
-                            mTag,
-                            memberPostFuncItem
-                    )
-                }
-            }
-            is TextPostHolder -> {
-                item?.also {
+                is MyPostClipPostHolder -> {
                     holder.onBind(
                             it,
                             null,
                             position,
-                            adultListener,
-                            mTag,
+                            myPostListener,
+                            attachmentListener
+                    )
+                }
+                is MyPostPicturePostHolder -> {
+                    holder.pictureRecycler.tag = position
+                    holder.onBind(
+                            it,
+                            null,
+                            position,
+                            myPostListener,
+                            attachmentListener,
                             memberPostFuncItem
                     )
                 }
+                is MyPostTextPostHolder -> {
+                    holder.onBind(it, null, position, myPostListener, attachmentListener)
+                }
             }
         }
-    }
-
-
-    fun updateInternalItem(holder: RecyclerView.ViewHolder) {
-        when (holder) {
-            is PicturePostHolder -> {
-                holder.pictureRecycler.adapter?.notifyDataSetChanged()
-            }
-        }
-    }
-
-    fun setupTag(tag: String) {
-        mTag = tag
     }
 
 }

@@ -9,7 +9,8 @@ import retrofit2.HttpException
 
 class VideoPagingSource(
     private val domainManager: DomainManager,
-    private val category: String,
+    private val category: String?,
+    private val orderByType: Int = StatisticsOrderType.LATEST.value,
     private val adWidth: Int,
     private val adHeight: Int,
 ) : PagingSource<Long, StatisticsItem>() {
@@ -22,7 +23,7 @@ class VideoPagingSource(
                 .statisticsHomeVideos(
                     startTime = "",
                     endTime = "",
-                    orderByType = StatisticsOrderType.LATEST.value,
+                    orderByType = orderByType,
                     category = category,
                     offset = offset.toString().toInt(),
                     limit = params.loadSize

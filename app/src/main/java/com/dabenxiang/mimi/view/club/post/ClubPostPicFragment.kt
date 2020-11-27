@@ -66,39 +66,37 @@ class ClubPostPicFragment : BaseFragment() {
 
         }
 
-        override fun onMoreClick(item: MemberPostItem, items: List<MemberPostItem>) {
+        override fun onMoreClick(item: MemberPostItem, position: Int) {
             onMoreClick(
-                item,
-                ArrayList(items),
-                onEdit = {
-                    val bundle = Bundle()
-                    bundle.putBoolean(MyPostFragment.EDIT, true)
-                    bundle.putString(BasePostFragment.PAGE, BasePostFragment.ADULT)
-                    bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+                item, position
+            ) {
+                val bundle = Bundle()
+                bundle.putBoolean(MyPostFragment.EDIT, true)
+                bundle.putString(BasePostFragment.PAGE, BasePostFragment.ADULT)
+                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
 
-                    it as MemberPostItem
-                    when (item.type) {
-                        PostType.TEXT -> {
-                            findNavController().navigate(
+                it as MemberPostItem
+                when (item.type) {
+                    PostType.TEXT -> {
+                        findNavController().navigate(
                                 R.id.action_adultHomeFragment_to_postArticleFragment,
                                 bundle
-                            )
-                        }
-                        PostType.IMAGE -> {
-                            findNavController().navigate(
+                        )
+                    }
+                    PostType.IMAGE -> {
+                        findNavController().navigate(
                                 R.id.action_adultHomeFragment_to_postPicFragment,
                                 bundle
-                            )
-                        }
-                        PostType.VIDEO -> {
-                            findNavController().navigate(
+                        )
+                    }
+                    PostType.VIDEO -> {
+                        findNavController().navigate(
                                 R.id.action_adultHomeFragment_to_postVideoFragment,
                                 bundle
-                            )
-                        }
+                        )
                     }
                 }
-            )
+            }
         }
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
@@ -145,6 +143,9 @@ class ClubPostPicFragment : BaseFragment() {
                 isAdultTheme = true
             )
             navigateTo(NavigateItem.Destination(R.id.action_to_myPostFragment, bundle))
+        }
+
+        override fun onFavoriteClick(item: MemberPostItem, position: Int, isFavorite: Boolean) {
         }
     }
 

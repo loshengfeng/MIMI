@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.generalvideo
 
-import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -14,10 +13,12 @@ import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.category.CategoriesFragment
+import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
 import com.dabenxiang.mimi.view.generalvideo.GeneralVideoAdapter.Companion.VIEW_TYPE_VIDEO
 import com.dabenxiang.mimi.view.generalvideo.paging.VideoLoadStateAdapter
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getScreenSize
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.pxToDp
 import kotlinx.android.synthetic.main.fragment_general_video.*
@@ -25,7 +26,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class GeneralVideoFragment(val category: String) : BaseFragment() {
+class GeneralVideoFragment(val category: String, val orderByType: Int) : BaseFragment() {
 
     private val viewModel: GeneralVideoViewModel by viewModels()
 
@@ -37,10 +38,6 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         super.setupFirstTime()
         viewModel.adWidth = pxToDp(requireContext(), getScreenSize(requireActivity()).first)
         viewModel.adHeight = (viewModel.adWidth / 7)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
 
         tv_search.setOnClickListener {
             navToSearch()
@@ -65,10 +62,18 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
             it.layoutManager = gridLayoutManager
             it.setHasFixedSize(true)
             it.adapter = generalVideoAdapter.withLoadStateFooter(loadStateAdapter)
+            it.addItemDecoration(
+                GridSpaceItemDecoration(
+                    2,
+                    GeneralUtils.dpToPx(requireContext(), 10),
+                    GeneralUtils.dpToPx(requireContext(), 20),
+                    true
+                )
+            )
         }
 
         lifecycleScope.launch {
-            viewModel.getVideoByCategory(category)
+            viewModel.getVideoByCategory(category, orderByType)
                 .collectLatest {
                     generalVideoAdapter.submitData(it)
                 }
@@ -89,35 +94,29 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
                 Timber.e("Refresh Error: ${(loadStatus.refresh as LoadState.Error).error.localizedMessage}")
                 onApiError((loadStatus.refresh as LoadState.Error).error)
 
-                layout_empty_data.visibility = View.VISIBLE
-                tv_empty_data.text = getString(R.string.error_video)
-                rv_video.visibility = View.INVISIBLE
-                if (layout_refresh != null) {
-                    layout_refresh.isRefreshing = false
-                }
+                layout_empty_data?.run { this.visibility = View.VISIBLE }
+                tv_empty_data?.run { this.text = getString(R.string.error_video) }
+
+                rv_video?.run { this.visibility = View.INVISIBLE }
+                layout_refresh?.run { this.isRefreshing = false }
             }
             is LoadState.Loading -> {
-                layout_empty_data.visibility = View.VISIBLE
-                tv_empty_data.text = getString(R.string.load_video)
-                rv_video.visibility = View.INVISIBLE
-
-                if (layout_refresh != null) {
-                    layout_refresh.isRefreshing = true
-                }
+                layout_empty_data?.run { this.visibility = View.VISIBLE }
+                tv_empty_data?.run { this.text = getString(R.string.load_video) }
+                rv_video?.run { this.visibility = View.INVISIBLE }
+                layout_refresh?.run { this.isRefreshing = true }
             }
             is LoadState.NotLoading -> {
                 if (generalVideoAdapter.isDataEmpty()) {
-                    layout_empty_data.visibility = View.VISIBLE
-                    tv_empty_data.text = getString(R.string.empty_video)
-                    rv_video.visibility = View.INVISIBLE
+                    layout_empty_data?.run { this.visibility = View.VISIBLE }
+                    tv_empty_data?.run { this.text = getString(R.string.empty_video) }
+                    rv_video?.run { this.visibility = View.INVISIBLE }
                 } else {
-                    layout_empty_data.visibility = View.INVISIBLE
-                    rv_video.visibility = View.VISIBLE
+                    layout_empty_data?.run { this.visibility = View.INVISIBLE }
+                    rv_video?.run { this.visibility = View.VISIBLE }
                 }
 
-                if (layout_refresh != null) {
-                    layout_refresh.isRefreshing = false
-                }
+                layout_refresh?.run { this.isRefreshing = false }
             }
         }
 
