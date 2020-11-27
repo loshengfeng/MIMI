@@ -18,7 +18,9 @@ import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_short.*
 import kotlinx.android.synthetic.main.fragment_club_short.id_empty_group
@@ -208,26 +210,28 @@ class ClubShortVideoFragment : BaseFragment() {
                 loginPageToggle(false)
                 return
             }
-
+            Timber.d("onItemClick")
             when (adultTabType) {
                 AdultTabType.CLIP -> {
-                    val bundle = ClipFragment.createBundle(arrayListOf(item), 0)
-//                    navigateTo(
-//                            NavigateItem.Destination(
-//                                    R.id.action_myPostFragment_to_clipFragment,
-//                                    bundle
-//                            )
-//                    )
+                    val bundle = ClipPlayerFragment.createBundle(item.id)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_clubTabFragment_to_clipPlayerFragment,
+                            bundle
+                        )
+                    )
                 }
                 else -> {
                 }
             }
         }
 
-        override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {}
+        override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
+            Timber.d("onClipItemClick")
+        }
 
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {}
 
-        override fun onChipClick(type: PostType, tag: String) {}
+        override fun onChipClick(type: PostType, tag: String) {Timber.d("onChipClick")}
     }
 }
