@@ -10,21 +10,6 @@
     <include app:graph="@navigation/navigation_topup" />
 
     <fragment
-        android:id="@+id/inviteVipRecordFragment"
-        android:name="com.dabenxiang.mimi.view.inviteviprecord.InviteVipRecordFragment"
-        android:label="InviteVipRecordFragment" />
-    <fragment
-        android:id="@+id/inviteVipFragment"
-        android:name="com.dabenxiang.mimi.view.invitevip.InviteVipFragment"
-        android:label="InviteVipFragment">
-        <action
-            android:id="@+id/action_inviteVipFragment_to_inviteVipRecordFragment"
-            app:destination="@id/inviteVipRecordFragment" />
-        <action
-            android:id="@+id/action_inviteVipFragment_to_navigation_login"
-            app:destination="@id/navigation_login" />
-    </fragment>
-    <fragment
         android:id="@+id/topicDetailFragment"
         android:name="com.dabenxiang.mimi.view.club.topic.TopicDetailFragment"
         android:label="TopicDetailFragment"
@@ -33,11 +18,11 @@
             android:id="@+id/action_topicDetailFragment_to_clipFragment"
             app:destination="@id/clipFragment" />
         <action
-            android:id="@+id/action_topicDetailFragment_to_pictureDetailFragment"
-            app:destination="@id/pictureDetailFragment" />
+            android:id="@+id/action_topicDetailFragment_to_clubPicFragment"
+            app:destination="@id/clubPicFragment" />
         <action
-            android:id="@+id/action_topicDetailFragment_to_textDetailFragment"
-            app:destination="@id/textDetailFragment" />
+            android:id="@+id/action_topicDetailFragment_to_clubTextFragment"
+            app:destination="@id/clubTextFragment" />
         <action
             android:id="@+id/action_topicDetailFragment_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
@@ -59,6 +44,50 @@
         <action
             android:id="@+id/action_topicDetailFragment_to_postVideoFragment"
             app:destination="@id/postVideoFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/clubPicFragment"
+        android:name="com.dabenxiang.mimi.view.club.post.ClubPicFragment"
+        tools:layout="@layout/fragment_club_pic" >
+        <action
+            android:id="@+id/action_clubPicFragment_to_myPostFragment"
+            app:destination="@id/myPostFragment" />
+        <action
+            android:id="@+id/action_clubPicFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_clubPicFragment_to_pictureFragment"
+            app:destination="@id/pictureFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/clubTextFragment"
+        android:name="com.dabenxiang.mimi.view.club.post.ClubTextFragment"
+        tools:layout="@layout/fragment_club_text">
+        <action
+            android:id="@+id/action_clubTextDetailFragment_to_myPostFragment"
+            app:destination="@id/myPostFragment" />
+        <action
+            android:id="@+id/action_clubTextDetailFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/inviteVipRecordFragment"
+        android:name="com.dabenxiang.mimi.view.inviteviprecord.InviteVipRecordFragment"
+        android:label="InviteVipRecordFragment" />
+
+    <fragment
+        android:id="@+id/inviteVipFragment"
+        android:name="com.dabenxiang.mimi.view.invitevip.InviteVipFragment"
+        android:label="InviteVipFragment">
+        <action
+            android:id="@+id/action_inviteVipFragment_to_inviteVipRecordFragment"
+            app:destination="@id/inviteVipRecordFragment" />
+        <action
+            android:id="@+id/action_inviteVipFragment_to_navigation_login"
+            app:destination="@id/navigation_login" />
     </fragment>
 
     <fragment

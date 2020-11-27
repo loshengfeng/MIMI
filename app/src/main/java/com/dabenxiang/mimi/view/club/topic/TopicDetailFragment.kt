@@ -194,7 +194,7 @@ class TopicDetailFragment : BaseFragment() {
                         val bundle = PictureDetailFragment.createBundle(item, 1)
                         navigateTo(
                             NavigateItem.Destination(
-                                R.id.action_topicDetailFragment_to_pictureDetailFragment,
+                                R.id.action_topicDetailFragment_to_clubPicFragment,
                                 bundle
                             )
                         )
@@ -203,7 +203,7 @@ class TopicDetailFragment : BaseFragment() {
                         val bundle = TextDetailFragment.createBundle(item, 1)
                         navigateTo(
                             NavigateItem.Destination(
-                                R.id.action_topicDetailFragment_to_textDetailFragment,
+                                R.id.action_topicDetailFragment_to_clubTextFragment,
                                 bundle
                             )
                         )
@@ -234,18 +234,19 @@ class TopicDetailFragment : BaseFragment() {
                 when (item.type) {
                     PostType.TEXT -> {
                         findNavController().navigate(
-                                R.id.action_topicDetailFragment_to_postArticleFragment,
+                                R.id.action_topicDetailFragment_to_clubTextFragment,
                                 bundle
                         )
                     }
                     PostType.IMAGE -> {
                         findNavController().navigate(
-                                R.id.action_topicDetailFragment_to_postPicFragment,
+                                R.id.action_topicDetailFragment_to_clubPicFragment,
                                 bundle
                         )
                     }
                     PostType.VIDEO -> {
                         findNavController().navigate(
+                                //TODO
                                 R.id.action_topicDetailFragment_to_postVideoFragment,
                                 bundle
                         )
@@ -262,7 +263,7 @@ class TopicDetailFragment : BaseFragment() {
                     val bundle = PictureDetailFragment.createBundle(item, 0)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_topicDetailFragment_to_pictureDetailFragment,
+                            R.id.action_topicDetailFragment_to_clubPicFragment,
                             bundle
                         )
                     )
@@ -271,7 +272,7 @@ class TopicDetailFragment : BaseFragment() {
                     val bundle = TextDetailFragment.createBundle(item, 0)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_topicDetailFragment_to_textDetailFragment,
+                            R.id.action_topicDetailFragment_to_clubTextFragment,
                             bundle
                         )
                     )
