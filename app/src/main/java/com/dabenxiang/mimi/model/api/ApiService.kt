@@ -378,6 +378,12 @@ interface ApiService {
     ): Response<ApiBaseItem<ActorsItem>>
 
 
+    @GET("/v1/Members/Home/Actors/ActorsList/{id}")
+    suspend fun getActorsList(
+        @Path("id") id: Long
+    ): Response<ApiBaseItem<ActorVideosItem>>
+
+
     /**********************************************************
      *
      *                  Members/Me

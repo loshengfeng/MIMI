@@ -30,7 +30,6 @@ import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
 import kotlinx.android.synthetic.main.fragment_categories.*
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -260,14 +259,7 @@ class CategoriesFragment : BaseFragment() {
     }
 
     private fun getVideos() {
-        videoListAdapter.submitData(lifecycle, PagingData.empty())
-        lifecycleScope.launch {
-            viewModel.getVideo(category, orderByType)
-                .collectLatest {
-                    layout_refresh.isRefreshing = false
-                    videoListAdapter.submitData(it)
-                }
-        }
+        viewModel.getVideoFilterList(category, orderByType)
     }
 
     @SuppressLint("SetTextI18n")
@@ -385,7 +377,7 @@ class CategoriesFragment : BaseFragment() {
         )
     }
 
-    private fun navToPlayer(item: PlayerItem) {
+    private fun navToPlayer(item: PlayerItem){
         val bundle = PlayerV2Fragment.createBundle(item)
         navigateTo(
             NavigateItem.Destination(
