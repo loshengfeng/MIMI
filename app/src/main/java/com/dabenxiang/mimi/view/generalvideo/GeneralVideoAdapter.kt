@@ -97,4 +97,6 @@ class GeneralVideoAdapter(
         val videoTitleText: TextView = itemView.tv_title
         val videoLayout: ConstraintLayout = itemView.layout_video
     }
+
+    fun isDataEmpty() = itemCount == 0
 }

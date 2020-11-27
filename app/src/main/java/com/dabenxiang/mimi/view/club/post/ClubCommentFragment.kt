@@ -56,9 +56,11 @@ class ClubCommentFragment : BaseFragment() {
 
     companion object {
         const val KEY_DATA = "data"
-        fun createBundle(item: MemberPostItem): ClubCommentFragment {
+        const val KEY_IS_DARK_MODE = "is_dark_mode"
+        fun createBundle(item: MemberPostItem, isDarkMode: Boolean = false): ClubCommentFragment {
             val bundle = Bundle().also {
                 it.putSerializable(KEY_DATA, item)
+                it.putBoolean(KEY_IS_DARK_MODE, isDarkMode)
             }
 
             val fragment = ClubCommentFragment()
@@ -156,7 +158,9 @@ class ClubCommentFragment : BaseFragment() {
         adHeight = (adWidth * 0.142).toInt()
 
         memberPostItem = arguments?.get(ClubTextDetailFragment.KEY_DATA) as MemberPostItem
+        val isDarkMode = arguments?.getBoolean(KEY_IS_DARK_MODE)
         viewModel.getPostDetail(memberPostItem!!)
+        mainViewModel?.setStatusBarMode(isDarkMode!!)
 
         textDetailAdapter = ClubCommentAdapter(
             requireContext(),

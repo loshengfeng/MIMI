@@ -16,6 +16,8 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.generalvideo.GeneralVideoAdapter
 import com.dabenxiang.mimi.view.generalvideo.paging.VideoLoadStateAdapter
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
 import kotlinx.android.synthetic.main.fragment_club_recommend.*
 import kotlinx.android.synthetic.main.fragment_general_video.*
 import kotlinx.android.synthetic.main.fragment_general_video.layout_refresh
@@ -84,6 +86,14 @@ class ActorVideosFragment : BaseFragment() {
             it.layoutManager = gridLayoutManager
             it.setHasFixedSize(true)
             it.adapter = generalVideoAdapter.withLoadStateFooter(loadStateAdapter)
+            it.addItemDecoration(
+                GridSpaceItemDecoration(
+                    2,
+                    GeneralUtils.dpToPx(requireContext(), 10),
+                    GeneralUtils.dpToPx(requireContext(), 20),
+                    true
+                )
+            )
         }
 
         layout_refresh.setOnRefreshListener {

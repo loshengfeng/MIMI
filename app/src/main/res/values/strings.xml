@@ -496,4 +496,7 @@
     <string name="category_newest">最新</string>
     <string name="category_top_hit">热门</string>
 
+    <string name="empty_video">目前尚无影片</string>
+    <string name="load_video">影片载入中...</string>
+    <string name="error_video">影片载入失敗</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.adapter
+package com.dabenxiang.mimi.view.category
 
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.model.vo.PlayerItem
+import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.home.viewholder.GridAdHolder
@@ -18,7 +19,8 @@ import com.dabenxiang.mimi.view.home.viewholder.VideoViewHolder
 import kotlinx.android.synthetic.main.layout_item_video.view.*
 
 class CategoryVideoListAdapter(
-    private val nestedListener: HomeAdapter.EventListener) : PagedListAdapter<BaseVideoItem, BaseViewHolder>(diffCallback) {
+    private val nestedListener: HomeAdapter.EventListener
+) : PagedListAdapter<BaseVideoItem, BaseViewHolder>(diffCallback) {
 
     companion object {
         val diffCallback = object : DiffUtil.ItemCallback<BaseVideoItem>() {

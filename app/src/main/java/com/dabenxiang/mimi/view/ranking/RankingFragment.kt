@@ -49,7 +49,7 @@ class RankingFragment : BaseFragment() {
             RankingFuncItem(
                 onVideoItemClick = {
                     val playerData =
-                        PlayerItem(it.id ?: 0)
+                        PlayerItem(it.id)
                     val bundle = PlayerV2Fragment.createBundle(playerData)
                     navigateTo(
                         NavigateItem.Destination(
@@ -92,7 +92,7 @@ class RankingFragment : BaseFragment() {
                             )
                             navigateTo(
                                 NavigateItem.Destination(
-                                    R.id.action_rankingFragment_to_pictureDetailFragment,
+                                    R.id.action_rankingFragment_to_navigation_picture,
                                     bundle
                                 )
                             )

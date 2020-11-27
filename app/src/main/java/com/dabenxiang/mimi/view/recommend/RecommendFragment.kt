@@ -11,10 +11,13 @@ import com.dabenxiang.mimi.model.api.vo.CategoryBanner
 import com.dabenxiang.mimi.model.api.vo.ThirdMenuItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.StatisticsOrderType
+import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.category.CategoriesFragment
+import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.ranking.RankingFragment
+import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.to.aboomy.pager2banner.IndicatorView
 import kotlinx.android.synthetic.main.fragment_recommend.*
@@ -47,7 +50,7 @@ class RecommendFragment(
         super.onViewCreated(view, savedInstanceState)
 
         tv_search.setOnClickListener {
-            // TODO: 跳至搜尋頁面
+            navToSearch()
         }
 
         tv_filter.setOnClickListener {
@@ -84,8 +87,7 @@ class RecommendFragment(
     private val recommendFuncItem by lazy {
         RecommendFuncItem(
             { videoItem ->
-                // TODO: 跳至播放頁面
-                Timber.d("VideoItem Id: ${videoItem.id}")
+                navToPlayer(PlayerItem(videoItem.id))
             },
             { thirdMenuItem ->
                 // TODO: 跳至播放頁面
@@ -115,7 +117,27 @@ class RecommendFragment(
         val bundle = CategoriesFragment.createBundle(category, orderByType)
         navigateTo(
             NavigateItem.Destination(
-                R.id.action_mimiFragment_to_categoriesFragment,
+                R.id.action_to_categoriesFragment,
+                bundle
+            )
+        )
+    }
+
+    private fun navToSearch() {
+        val bundle = SearchVideoFragment.createBundle()
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_to_searchVideoFragment,
+                bundle
+            )
+        )
+    }
+
+    private fun navToPlayer(item: PlayerItem){
+        val bundle = PlayerV2Fragment.createBundle(item)
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_to_navigation_player,
                 bundle
             )
         )

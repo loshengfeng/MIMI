@@ -8,6 +8,7 @@
     <include app:graph="@navigation/navigation_login" />
     <include app:graph="@navigation/navigation_player" />
     <include app:graph="@navigation/navigation_clip" />
+    <include app:graph="@navigation/navigation_picture" />
 
     <fragment
         android:id="@+id/splashFragment"
@@ -31,8 +32,17 @@
             android:id="@+id/action_mimiFragment_to_actorVideosFragment"
             app:destination="@id/actorVideosFragment" />
         <action
-            android:id="@+id/action_mimiFragment_to_categoriesFragment"
+            android:id="@+id/action_to_categoriesFragment"
             app:destination="@id/categoriesFragment" />
+
+        <action
+            android:id="@+id/action_to_searchVideoFragment"
+            app:destination="@id/searchVideoFragment" />
+
+        <action
+            android:id="@+id/action_to_navigation_player"
+            app:destination="@id/navigation_player" />
+
     </fragment>
 
     <fragment
@@ -46,6 +56,11 @@
         <action
             android:id="@+id/action_rankingFragment_to_navigation_clip"
             app:destination="@id/navigation_clip" />
+
+        <action
+            android:id="@+id/action_rankingFragment_to_navigation_picture"
+            app:destination="@id/navigation_picture" />
+
     </fragment>
     <fragment
         android:id="@+id/actorVideosFragment"
@@ -63,11 +78,7 @@
             app:destination="@id/searchVideoFragment" />
 
         <action
-            android:id="@+id/action_categoriesFragment_to_loginFragment"
-            app:destination="@id/navigation_login" />
-
-        <action
-            android:id="@+id/action_categoriesFragment_to_navigation_player"
+            android:id="@+id/action_to_navigation_player"
             app:destination="@id/navigation_player" />
 
     </fragment>

@@ -63,7 +63,14 @@
     <fragment
         android:id="@+id/searchPostFragment"
         android:name="com.dabenxiang.mimi.view.search.post.SearchPostFragment"
-        tools:layout="@layout/fragment_search_post" />
+        tools:layout="@layout/fragment_search_post" >
+        <action
+            android:id="@+id/action_searchPostFragment_to_clubPicFragment"
+            app:destination="@id/clubPicFragment" />
+        <action
+            android:id="@+id/action_searchPostFragment_to_clubTextFragment"
+            app:destination="@id/clubTextFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/pictureFragment"

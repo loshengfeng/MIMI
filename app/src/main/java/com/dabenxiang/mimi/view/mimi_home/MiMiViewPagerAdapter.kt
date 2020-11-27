@@ -11,10 +11,9 @@ import com.dabenxiang.mimi.view.generalvideo.GeneralVideoFragment
 import com.dabenxiang.mimi.view.recommend.RecommendFragment
 
 class MiMiViewPagerAdapter(
-    fragmentManager: FragmentManager,
-    lifecycle: Lifecycle,
+    private val fragment: Fragment,
     private val secondMenuItems: List<SecondMenuItem>
-) : FragmentStateAdapter(fragmentManager, lifecycle) {
+) : FragmentStateAdapter(fragment) {
 
     override fun getItemCount(): Int {
         return secondMenuItems.size
@@ -25,7 +24,7 @@ class MiMiViewPagerAdapter(
         return when (item.type) {
             LayoutType.RECOMMEND -> RecommendFragment(item.menus)
             LayoutType.ACTOR -> ActorFragment()
-            else -> GeneralVideoFragment(item.category)
+            else -> GeneralVideoFragment(item.category, item.orderByType)
         }
     }
 }

@@ -5,11 +5,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.paging.PagingData
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.adapter.ClubTabAdapter
@@ -21,6 +23,7 @@ import kotlinx.android.synthetic.main.fragment_tab_club.*
 import kotlinx.android.synthetic.main.fragment_tab_club.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -51,6 +54,10 @@ class ClubTabFragment : BaseFragment() {
                 )
             }
 
+            override fun getAttachment(id: Long?, view: ImageView, type: LoadImageType) {
+                viewModel.loadImage(id, view, type)
+            }
+
         })
     }
 
@@ -65,6 +72,11 @@ class ClubTabFragment : BaseFragment() {
         viewModel.clubCount.observe(this, {
             topic_group.visibility = if (it <= 0) View.GONE else View.VISIBLE
         })
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        getClubItemList()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -90,7 +102,7 @@ class ClubTabFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
         Timber.i("ClubTabFragment onResume")
-        getClubItemList()
+
     }
     
     override fun onDestroy() {
@@ -114,6 +126,7 @@ class ClubTabFragment : BaseFragment() {
     private fun getClubItemList() {
         Timber.i("getClubItemList")
         CoroutineScope(Dispatchers.IO).launch {
+            delay(100)
             topicListAdapter.submitData(PagingData.empty())
             viewModel.getClubItemList()
                 .collectLatest {

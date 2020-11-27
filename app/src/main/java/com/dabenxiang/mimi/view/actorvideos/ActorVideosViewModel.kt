@@ -11,6 +11,7 @@ import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ActorVideosItem
 import com.dabenxiang.mimi.model.api.vo.StatisticsItem
+import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.generalvideo.paging.VideoPagingSource
 import kotlinx.coroutines.flow.*
@@ -18,6 +19,8 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
 class ActorVideosViewModel : BaseViewModel() {
+    private var orderByType = StatisticsOrderType.LATEST.value
+
     private val _actorVideosByIdResult = MutableLiveData<ApiResult<ActorVideosItem>>()
     val actorVideosByIdResult: LiveData<ApiResult<ActorVideosItem>> = _actorVideosByIdResult
 
@@ -39,7 +42,7 @@ class ActorVideosViewModel : BaseViewModel() {
     fun getVideoByCategory(category: String): Flow<PagingData<StatisticsItem>> {
         return Pager(
             config = PagingConfig(pageSize = ApiRepository.NETWORK_PAGE_SIZE, enablePlaceholders = false),
-            pagingSourceFactory = { VideoPagingSource(domainManager, category, adWidth, adHeight) }
+            pagingSourceFactory = { VideoPagingSource(domainManager, category,orderByType, 0, 0) }
         ).flow.cachedIn(viewModelScope)
     }
 }

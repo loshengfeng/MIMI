@@ -14,6 +14,7 @@ import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.CenterInside
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
@@ -42,7 +43,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import retrofit2.HttpException
 import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
-import java.util.*
 
 abstract class BaseViewModel : ViewModel(), KoinComponent {
 
@@ -130,15 +130,13 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
 
     fun deletePost(
         item: MemberPostItem,
-        items: ArrayList<MemberPostItem>
+        position:Int
     ) {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val result = apiRepository.deleteMyPost(item.id)
                 if (!result.isSuccessful) throw HttpException(result)
-                val position = items.indexOf(item)
-                items.remove(item)
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
@@ -159,6 +157,7 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
             LoadImageType.PICTURE_FULL -> R.drawable.img_nopic_03
             LoadImageType.CLUB -> R.drawable.ico_group
             LoadImageType.CHAT_CONTENT -> R.drawable.bg_gray_6_radius_16
+            LoadImageType.CLUB_TOPIC ->  R.drawable.bg_topic_tab
         }
         if ((id == null || id == 0L) && TextUtils.isEmpty(filePath)) {
             Glide.with(view.context).load(defaultResId).into(view)
@@ -199,6 +198,10 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
                 }
                 LoadImageType.CHAT_CONTENT -> {
                     options.transform(CenterCrop(), RoundedCorners(16))
+                }
+
+                LoadImageType.CLUB_TOPIC-> {
+                    options.transform(CenterInside(), RoundedCorners(15))
                 }
             }
             Glide.with(view.context).load(glideUrl ?: filePath)
