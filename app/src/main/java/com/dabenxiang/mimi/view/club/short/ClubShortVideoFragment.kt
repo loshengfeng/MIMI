@@ -33,6 +33,7 @@ import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.flurry.sdk.it
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_club_latest.*
 import kotlinx.android.synthetic.main.fragment_club_latest.id_empty_group
@@ -86,10 +87,11 @@ class ClubShortVideoFragment : BaseFragment() {
     }
 
     private val postListener = object : MyPostListener {
-        override fun onMoreClick(item: MemberPostItem) {
-            onMoreClick(item, ArrayList(adapter?.currentList as List<MemberPostItem>), onEdit = {
-                it as MemberPostItem
-            })
+
+        override fun onMoreClick(item: MemberPostItem, position: Int) {
+//            onMoreClick(item, ArrayList(adapter?.currentList as List<MemberPostItem>), onEdit = {
+//                it as MemberPostItem
+//            })
         }
 
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
@@ -123,21 +125,21 @@ class ClubShortVideoFragment : BaseFragment() {
             when (adultTabType) {
                 AdultTabType.PICTURE -> {
                     val bundle = PictureDetailFragment.createBundle(item, 0)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_clubTabFragment_to_clubPicDetailFragment,
-                            bundle
-                        )
-                    )
+//                    navigateTo(
+//                        NavigateItem.Destination(
+//                            R.id.action_clubTabFragment_to_clubPicDetailFragment,
+//                            bundle
+//                        )
+//                    )
                 }
                 AdultTabType.TEXT -> {
                     val bundle = TextDetailFragment.createBundle(item, 0)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_clubTabFragment_to_clubTextDetailFragment,
-                            bundle
-                        )
-                    )
+//                    navigateTo(
+//                        NavigateItem.Destination(
+//                            R.id.action_clubTabFragment_to_clubTextDetailFragment,
+//                            bundle
+//                        )
+//                    )
                 }
                 AdultTabType.CLIP -> {
                     //todo 跳轉到短視頻內頁
