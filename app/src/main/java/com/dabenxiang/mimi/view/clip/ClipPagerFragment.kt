@@ -91,7 +91,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
                     RecyclerView.SCROLL_STATE_IDLE -> {
                         val lastPos = clipAdapter.getCurrentPos()
                         val currentPos =
-                            (rv_clip.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                            (rv_clip.layoutManager as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
                         Timber.d("SCROLL_STATE_IDLE lastPosition: $lastPos, currentPos:$currentPos")
                         takeIf { currentPos >= 0 && currentPos != lastPos }?.run {
                             clipAdapter.pausePlayer()
