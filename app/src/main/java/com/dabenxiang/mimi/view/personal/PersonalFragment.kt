@@ -18,6 +18,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
+import com.dabenxiang.mimi.view.invitevip.InviteVipFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_LOGIN
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
@@ -222,7 +223,7 @@ class PersonalFragment : BaseFragment() {
                         navigateTo(
                             NavigateItem.Destination(
                                 R.id.action_to_inviteVipFragment,
-                                null
+                               null
                             )
                         )
                     } else {
@@ -266,17 +267,12 @@ class PersonalFragment : BaseFragment() {
                 R.id.like -> navigateTo(NavigateItem.Destination(R.id.action_to_likelistFragment))
             }
         }.also {
-//            tv_topup.setOnClickListener(it)
             layout_vip_unlimit_unlogin.setOnClickListener(it)
-
-//            tv_topup_history.setOnClickListener(it)
-//            tv_chat_history.setOnClickListener(it)
             tv_my_post.setOnClickListener(it)
             setting.setOnClickListener(it)
             tv_old_driver.setOnClickListener(it)
             tv_logout.setOnClickListener(it)
             vippromote_now.setOnClickListener(it)
-//            tv_register.setOnClickListener(it)
 
             like_count.setOnClickListener(it)
             like.setOnClickListener(it)
