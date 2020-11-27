@@ -205,7 +205,7 @@ class ClubShortVideoFragment : BaseFragment() {
                     adapter?.notifyItemRangeChanged(
                         0,
                         viewModel.totalCount,
-                        ClubRecommendAdapter.PAYLOAD_UPDATE_FOLLOW
+                        ClubShortVideoAdapter.PAYLOAD_UPDATE_FOLLOW
                     )
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
@@ -217,7 +217,7 @@ class ClubShortVideoFragment : BaseFragment() {
                 is ApiResult.Success -> {
                     adapter?.notifyItemChanged(
                         it.result,
-                        ClubRecommendAdapter.PAYLOAD_UPDATE_LIKE
+                        ClubShortVideoAdapter.PAYLOAD_UPDATE_LIKE
                     )
                 }
                 is ApiResult.Error -> Timber.e(it.throwable)
@@ -229,7 +229,7 @@ class ClubShortVideoFragment : BaseFragment() {
                 is ApiResult.Success -> {
                     adapter?.notifyItemChanged(
                         it.result,
-                        ClubRecommendAdapter.PAYLOAD_UPDATE_FAVORITE
+                        ClubShortVideoAdapter.PAYLOAD_UPDATE_FAVORITE
                     )
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
@@ -295,7 +295,7 @@ class ClubShortVideoFragment : BaseFragment() {
         super.onResume()
         Timber.i("onResume isLogin:${accountManager.isLogin()}")
         loginPageToggle(accountManager.isLogin())
-        if (accountManager.isLogin() && viewModel.clubCount.value ?: -1 <= 0) {
+        if (accountManager.isLogin() ) {
             getData()
         }
         viewModel.getAd()

@@ -17,6 +17,7 @@ import com.dabenxiang.mimi.model.enums.CategoryType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.club.latest.ClubLatestListDataSource
 import com.dabenxiang.mimi.view.club.recommend.ClubRecommendListDataSource
 import com.dabenxiang.mimi.view.club.short.ClubShortListDataSource
 import com.dabenxiang.mimi.view.home.memberpost.MemberPostDataSource
@@ -47,15 +48,16 @@ class ClubShortVideoViewModel : BaseViewModel() {
     private var _favoriteResult = MutableLiveData<ApiResult<Int>>()
     val favoriteResult: LiveData<ApiResult<Int>> = _favoriteResult
 
-    private val _clubIdList = ArrayList<Long>()
-
     var totalCount: Int = 0
 
     fun getPostItemList() {
         viewModelScope.launch {
             getRecommendPostPagingItems()
                 .asFlow()
-                .collect { _postItemListResult.value = it }
+                .collect {
+                    Timber.e("Show ii : "+it)
+                    _postItemListResult.value = it
+                }
         }
     }
 
@@ -78,18 +80,19 @@ class ClubShortVideoViewModel : BaseViewModel() {
         return LivePagedListBuilder(dataSourceFactory, config).build()
     }
 
-//    retrofit2.HttpException: HTTP 500 Internal Server Error
+
+    //    retrofit2.HttpException: HTTP 500 Internal Server Error
 //    at com.dabenxiang.mimi.view.club.ClubShortVideoViewModel$getAd$1$1.invokeSuspend(ClubShortVideoViewModel.kt:85)
     fun getAd() {
-//        viewModelScope.launch {
-//            flow {
-//                val adResult = domainManager.getAdRepository().getAD(adWidth, adHeight)
-//                if (!adResult.isSuccessful) throw HttpException(adResult)
-//                emit(ApiResult.success(adResult.body()?.content))
-//            }
-//                .flowOn(Dispatchers.IO)
-//                .collect { _adResult.value = it}
-//        }
+        viewModelScope.launch {
+            flow {
+                val adResult = domainManager.getAdRepository().getAD(adWidth, adHeight)
+                if (!adResult.isSuccessful) throw HttpException(adResult)
+                emit(ApiResult.success(adResult.body()?.content))
+            }
+                .flowOn(Dispatchers.IO)
+                .collect { _adResult.value = it}
+        }
     }
 
     private val pagingCallback = object : PagingCallback {

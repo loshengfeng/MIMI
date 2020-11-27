@@ -33,7 +33,7 @@ class ClubShortListDataSource(
                 val adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content
                         ?: AdItem()
 
-                val result = domainManager.getApiRepository().getMembersPost(PostType.TEXT_IMAGE_VIDEO, OrderBy.NEWEST,
+                val result = domainManager.getApiRepository().getMembersPost(PostType.VIDEO, OrderBy.NEWEST,
                         0, PER_LIMIT
                 )
 
@@ -74,7 +74,7 @@ class ClubShortListDataSource(
         val next = params.key
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().getMembersPost(PostType.TEXT_IMAGE_VIDEO, OrderBy.HOTTEST, offset = next.toInt(), limit = PER_LIMIT)
+                val result = domainManager.getApiRepository().getMembersPost(PostType.VIDEO, OrderBy.HOTTEST, offset = next.toInt(), limit = PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(result)
             }
