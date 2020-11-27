@@ -41,8 +41,8 @@
             app:destination="@id/navigation_setting" />
 
         <action
-            android:id="@+id/action_to_topupFragment"
-            app:destination="@id/navigation_topup" />
+            android:id="@+id/action_personalFragment_to_topupFragment"
+            app:destination="@id/topUpFragment" />
 
         <action
             android:id="@+id/action_to_fanslistFragment"
@@ -115,5 +115,10 @@
         android:id="@+id/inviteVipFragment"
         android:name="com.dabenxiang.mimi.view.invitevip.InviteVipFragment"
         android:label="InviteVipFragment" />
+    <fragment
+        android:id="@+id/topUpFragment"
+        android:name="com.dabenxiang.mimi.view.topup.TopUpFragment"
+        android:label="TopUpFragment" />
+
 
 </navigation>
