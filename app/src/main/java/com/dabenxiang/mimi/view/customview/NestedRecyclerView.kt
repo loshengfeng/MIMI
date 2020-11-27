@@ -25,7 +25,7 @@ class NestedRecyclerView @JvmOverloads constructor(
         val x = e?.x?.toInt() ?: 0
         val y = e?.y?.toInt() ?: 0
         val itemCount = adapter?.itemCount ?: 0
-        val position = (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+        val position = (layoutManager as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
         when(e?.action) {
             MotionEvent.ACTION_DOWN -> {
                 parent.requestDisallowInterceptTouchEvent(true)
