@@ -12,10 +12,12 @@ import com.dabenxiang.mimi.model.api.vo.ActorCategoriesItem
 import com.dabenxiang.mimi.model.api.vo.ActorVideosItem
 import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
+import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.generalvideo.GeneralVideoAdapter
 import com.dabenxiang.mimi.view.generalvideo.paging.VideoLoadStateAdapter
+import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
 import kotlinx.android.synthetic.main.fragment_club_recommend.*
@@ -48,8 +50,7 @@ class ActorVideosFragment : BaseFragment() {
     }
 
     private val onItemClick: (StatisticsItem) -> Unit = {
-        // TODO: 跳至播放頁面
-        Timber.d("VideoItem Id: ${it.id}")
+        navToPlayer(PlayerItem(it.id))
     }
 
     private val viewModel: ActorVideosViewModel by viewModels()
@@ -153,4 +154,13 @@ class ActorVideosFragment : BaseFragment() {
         }
     }
 
+    private fun navToPlayer(item: PlayerItem){
+        val bundle = PlayerV2Fragment.createBundle(item)
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_to_navigation_player,
+                bundle
+            )
+        )
+    }
 }

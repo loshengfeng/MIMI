@@ -10,9 +10,11 @@ import com.dabenxiang.mimi.model.api.vo.ActorCategoriesItem
 import com.dabenxiang.mimi.model.api.vo.ActorVideoItem
 import com.dabenxiang.mimi.model.api.vo.ActorVideosItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
+import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.actorvideos.ActorVideosFragment
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import kotlinx.android.synthetic.main.fragment_actor.*
 import timber.log.Timber
 
@@ -28,7 +30,7 @@ class ActorFragment : BaseFragment() {
         ) }
 
     private fun onVideoClickListener(item: ActorVideoItem, position: Int){
-        Timber.d("Video: ${item.title}")
+        navToPlayer(PlayerItem(item.id))
     }
 
     private val actorCategoriesAdapter by lazy {
@@ -93,6 +95,16 @@ class ActorFragment : BaseFragment() {
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_mimiFragment_to_actorVideosFragment,
+                bundle
+            )
+        )
+    }
+
+    private fun navToPlayer(item: PlayerItem){
+        val bundle = PlayerV2Fragment.createBundle(item)
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_to_navigation_player,
                 bundle
             )
         )

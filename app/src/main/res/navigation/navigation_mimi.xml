@@ -65,7 +65,11 @@
     <fragment
         android:id="@+id/actorVideosFragment"
         android:name="com.dabenxiang.mimi.view.actorvideos.ActorVideosFragment"
-        android:label="ActorVideosFragment" />
+        android:label="ActorVideosFragment" >
+        <action
+            android:id="@+id/action_to_navigation_player"
+            app:destination="@id/navigation_player" />
+    </fragment>
 
     <fragment
         android:id="@+id/categoriesFragment"
