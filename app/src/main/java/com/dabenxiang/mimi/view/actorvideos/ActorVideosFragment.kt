@@ -20,6 +20,7 @@ import com.dabenxiang.mimi.view.generalvideo.paging.VideoLoadStateAdapter
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
+import kotlinx.android.synthetic.main.fragment_actor_videos.*
 import kotlinx.android.synthetic.main.fragment_general_video.layout_empty_data
 import kotlinx.android.synthetic.main.fragment_general_video.layout_refresh
 import kotlinx.android.synthetic.main.fragment_general_video.rv_video
@@ -108,9 +109,11 @@ class ActorVideosFragment : BaseFragment() {
                 is ApiResult.Success -> {
                     val item = it.result
                     tv_name.text = item.name
+                    tv_actor_title_name.text = item.name
                     tv_total_click.text = item.totalClick.toString() + getString(R.string.actor_hot_unit)
                     tv_total_video.text = item.totalVideo.toString() + getString(R.string.actor_videos_unit)
                     viewModel.loadImage(item.attachmentId, iv_avatar, LoadImageType.AVATAR_CS)
+                    viewModel.loadImage(item.attachmentId, iv_actor_title_avatar, LoadImageType.AVATAR_CS)
                     actorName = item.name
                     getVideoData(actorName)
                 }
@@ -133,6 +136,10 @@ class ActorVideosFragment : BaseFragment() {
         }
 
         tv_back.setOnClickListener {
+            navigateTo(NavigateItem.Up)
+        }
+
+        tv_actor_title_back.setOnClickListener {
             navigateTo(NavigateItem.Up)
         }
     }
