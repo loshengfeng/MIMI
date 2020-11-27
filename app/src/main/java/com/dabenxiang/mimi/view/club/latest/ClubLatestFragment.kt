@@ -207,6 +207,15 @@ class ClubLatestFragment : BaseFragment() {
             )
         }
 
+        tv_register.setOnClickListener {
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_loginFragment,
+                    LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                )
+            )
+        }
+
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
             getData()

@@ -219,6 +219,24 @@ class ClubRecommendFragment : BaseFragment() {
                 memberPostFuncItem)
         recycler_view.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         recycler_view.adapter = adapter
+
+        tv_login.setOnClickListener {
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_loginFragment,
+                    LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                )
+            )
+        }
+
+        tv_register.setOnClickListener {
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_loginFragment,
+                    LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                )
+            )
+        }
     }
 
     override fun setupFirstTime() {
