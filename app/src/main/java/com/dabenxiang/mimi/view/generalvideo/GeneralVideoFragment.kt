@@ -13,10 +13,12 @@ import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.category.CategoriesFragment
+import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
 import com.dabenxiang.mimi.view.generalvideo.GeneralVideoAdapter.Companion.VIEW_TYPE_VIDEO
 import com.dabenxiang.mimi.view.generalvideo.paging.VideoLoadStateAdapter
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getScreenSize
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.pxToDp
 import kotlinx.android.synthetic.main.fragment_general_video.*
@@ -24,7 +26,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class GeneralVideoFragment(val category: String) : BaseFragment() {
+class GeneralVideoFragment(val category: String, val orderByType: Int) : BaseFragment() {
 
     private val viewModel: GeneralVideoViewModel by viewModels()
 
@@ -60,10 +62,18 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
             it.layoutManager = gridLayoutManager
             it.setHasFixedSize(true)
             it.adapter = generalVideoAdapter.withLoadStateFooter(loadStateAdapter)
+            it.addItemDecoration(
+                GridSpaceItemDecoration(
+                    2,
+                    GeneralUtils.dpToPx(requireContext(), 10),
+                    GeneralUtils.dpToPx(requireContext(), 20),
+                    true
+                )
+            )
         }
 
         lifecycleScope.launch {
-            viewModel.getVideoByCategory(category)
+            viewModel.getVideoByCategory(category, orderByType)
                 .collectLatest {
                     generalVideoAdapter.submitData(it)
                 }

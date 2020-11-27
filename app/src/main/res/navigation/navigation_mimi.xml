@@ -8,6 +8,7 @@
     <include app:graph="@navigation/navigation_login" />
     <include app:graph="@navigation/navigation_player" />
     <include app:graph="@navigation/navigation_clip" />
+    <include app:graph="@navigation/navigation_picture" />
 
     <fragment
         android:id="@+id/splashFragment"
@@ -52,6 +53,11 @@
         <action
             android:id="@+id/action_rankingFragment_to_navigation_clip"
             app:destination="@id/navigation_clip" />
+
+        <action
+            android:id="@+id/action_rankingFragment_to_navigation_picture"
+            app:destination="@id/navigation_picture" />
+
     </fragment>
 
     <fragment
