@@ -535,43 +535,40 @@ class SearchPostFragment : BaseFragment() {
             }
         }
 
-        override fun onMoreClick(item: MemberPostItem, items:List<MemberPostItem>) {
+        override fun onMoreClick(item: MemberPostItem, position: Int) {
             val searchPostItem = arguments?.getSerializable(KEY_DATA) as SearchPostItem
 
             memberPostAdapter?.also {
-                onMoreClick(
-                    item,
-                    ArrayList(items),
-                    onEdit = {
-                        val bundle = Bundle()
-                        bundle.putBoolean(MyPostFragment.EDIT, true)
-                        bundle.putString(BasePostFragment.PAGE, BasePostFragment.SEARCH)
-                        bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
-                        bundle.putSerializable(KEY_DATA, searchPostItem)
+                onMoreClick(item, position
+                ) {
+                    val bundle = Bundle()
+                    bundle.putBoolean(MyPostFragment.EDIT, true)
+                    bundle.putString(BasePostFragment.PAGE, BasePostFragment.SEARCH)
+                    bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+                    bundle.putSerializable(KEY_DATA, searchPostItem)
 
-                        it as MemberPostItem
-                        when (item.type) {
-                            PostType.TEXT -> {
-                                findNavController().navigate(
+                    it as MemberPostItem
+                    when (item.type) {
+                        PostType.TEXT -> {
+                            findNavController().navigate(
                                     R.id.action_searchPostFragment_to_postArticleFragment,
                                     bundle
-                                )
-                            }
-                            PostType.IMAGE -> {
-                                findNavController().navigate(
+                            )
+                        }
+                        PostType.IMAGE -> {
+                            findNavController().navigate(
                                     R.id.action_searchPostFragment_to_postPicFragment,
                                     bundle
-                                )
-                            }
-                            PostType.VIDEO -> {
-                                findNavController().navigate(
+                            )
+                        }
+                        PostType.VIDEO -> {
+                            findNavController().navigate(
                                     R.id.action_searchPostFragment_to_postVideoFragment,
                                     bundle
-                                )
-                            }
+                            )
                         }
                     }
-                )
+                }
             }
         }
 
@@ -619,12 +616,13 @@ class SearchPostFragment : BaseFragment() {
             }
             val mappingPosition = position - (position / 3)
             val bundle = ClipFragment.createBundle(ArrayList(memberPostItemList), mappingPosition)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_searchPostFragment_to_clipFragment,
-                    bundle
-                )
-            )
+            //todo 轉跳到新的 clip detial
+//            navigateTo(
+//                NavigateItem.Destination(
+//                    R.id.action_searchPostFragment_to_clipFragment,
+//                    bundle
+//                )
+//            )
         }
 
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {
@@ -657,6 +655,10 @@ class SearchPostFragment : BaseFragment() {
                     bundle
                 )
             )
+        }
+
+        override fun onFavoriteClick(item: MemberPostItem, position: Int, isFavorite: Boolean) {
+
         }
     }
 

@@ -8,6 +8,7 @@
     <include app:graph="@navigation/navigation_login" />
     <include app:graph="@navigation/navigation_player" />
     <include app:graph="@navigation/navigation_clip" />
+    <include app:graph="@navigation/navigation_picture" />
 
     <fragment
         android:id="@+id/splashFragment"
@@ -27,6 +28,9 @@
         <action
             android:id="@+id/action_mimiFragment_to_rankingFragment"
             app:destination="@id/rankingFragment" />
+        <action
+            android:id="@+id/action_mimiFragment_to_actorVideosFragment"
+            app:destination="@id/actorVideosFragment" />
         <action
             android:id="@+id/action_to_categoriesFragment"
             app:destination="@id/categoriesFragment" />
@@ -52,6 +56,19 @@
         <action
             android:id="@+id/action_rankingFragment_to_navigation_clip"
             app:destination="@id/navigation_clip" />
+
+        <action
+            android:id="@+id/action_rankingFragment_to_navigation_picture"
+            app:destination="@id/navigation_picture" />
+
+    </fragment>
+    <fragment
+        android:id="@+id/actorVideosFragment"
+        android:name="com.dabenxiang.mimi.view.actorvideos.ActorVideosFragment"
+        android:label="ActorVideosFragment" >
+        <action
+            android:id="@+id/action_to_navigation_player"
+            app:destination="@id/navigation_player" />
     </fragment>
 
     <fragment

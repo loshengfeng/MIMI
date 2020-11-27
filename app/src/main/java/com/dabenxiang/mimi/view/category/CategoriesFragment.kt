@@ -8,28 +8,30 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.CombinedLoadStates
+import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.model.api.ApiResult.Success
-import com.dabenxiang.mimi.model.api.vo.MemberClubItem
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.model.enums.StatisticsOrderType
-import com.dabenxiang.mimi.model.vo.CarouselHolderItem
 import com.dabenxiang.mimi.model.vo.PlayerItem
-import com.dabenxiang.mimi.view.adapter.CategoryVideoListAdapter
 import com.dabenxiang.mimi.view.adapter.FilterTabAdapter
-import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.home.HomeTemplate
-import com.dabenxiang.mimi.view.home.viewholder.*
-import com.dabenxiang.mimi.view.player.ui.PlayerFragment
+import com.dabenxiang.mimi.view.generalvideo.GeneralVideoAdapter
+import com.dabenxiang.mimi.view.generalvideo.paging.VideoLoadStateAdapter
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
 import kotlinx.android.synthetic.main.fragment_categories.*
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class CategoriesFragment : BaseFragment() {
 
@@ -54,42 +56,70 @@ class CategoriesFragment : BaseFragment() {
     private var lstFilterRV: List<RecyclerView> = listOf()
     private var lstFilterText: ArrayList<List<String>> = arrayListOf()
 
-    private val videoListAdapter by lazy {
-        CategoryVideoListAdapter(adapterListener)
-    }
+    private val videoListAdapter by lazy { GeneralVideoAdapter(onItemClick) }
 
-    private val adapterListener = object : HomeAdapter.EventListener {
-        override fun onVideoClick(view: View, item: PlayerItem) {
-            navToPlayer(item)
-        }
-
-        override fun onHeaderItemClick(view: View, item: HomeTemplate.Header) {}
-        override fun onClipClick(view: View, item: List<MemberPostItem>, position: Int) {}
-        override fun onPictureClick(view: View, item: MemberPostItem) {}
-        override fun onClubClick(view: View, item: MemberClubItem) {}
-        override fun onLoadBannerViewHolder(vh: HomeBannerViewHolder) {}
-        override fun onLoadClipViewHolder(vh: HomeClipViewHolder) {}
-        override fun onLoadPictureViewHolder(vh: HomePictureViewHolder) {}
-        override fun onLoadClubViewHolder(vh: HomeClubViewHolder) {}
-        override fun onClickBanner(item: CarouselHolderItem) {}
-
-        override fun onLoadStatisticsViewHolder(
-            vh: HomeStatisticsViewHolder,
-            src: HomeTemplate.Statistics
-        ) {
-        }
-
-        override fun onLoadCarouselViewHolder(
-            vh: HomeCarouselViewHolder,
-            src: HomeTemplate.Carousel
-        ) {
-        }
+    private val onItemClick: (StatisticsItem) -> Unit = {
+        navToPlayer(PlayerItem(it.id))
     }
 
     override fun getLayoutId() = R.layout.fragment_categories
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
+
+    private val loadStateListener = { loadStatus: CombinedLoadStates ->
+        when (loadStatus.refresh) {
+            is LoadState.Error -> {
+                Timber.e("Refresh Error: ${(loadStatus.refresh as LoadState.Error).error.localizedMessage}")
+                onApiError((loadStatus.refresh as LoadState.Error).error)
+
+                layout_empty_data?.run { this.visibility = View.VISIBLE }
+                tv_empty_data?.run { this.text = getString(R.string.error_video) }
+                rv_video?.run { this.visibility = View.INVISIBLE }
+                layout_refresh?.run { this.isRefreshing = false }
+            }
+            is LoadState.Loading -> {
+                layout_empty_data?.run { this.visibility = View.VISIBLE }
+                tv_empty_data?.run { this.text = getString(R.string.load_video) }
+                rv_video?.run { this.visibility = View.INVISIBLE }
+                layout_refresh?.run { this.isRefreshing = true }
+            }
+            is LoadState.NotLoading -> {
+                if (videoListAdapter.isDataEmpty()) {
+                    layout_empty_data?.run { this.visibility = View.VISIBLE }
+                    tv_empty_data?.run { this.text = getString(R.string.empty_video) }
+                    rv_video?.run { this.visibility = View.INVISIBLE }
+                } else {
+                    layout_empty_data?.run { this.visibility = View.INVISIBLE }
+                    rv_video?.run { this.visibility = View.VISIBLE }
+                }
+
+                layout_refresh?.run { this.isRefreshing = false }
+            }
+        }
+
+        when (loadStatus.append) {
+            is LoadState.Error -> {
+                Timber.e("Append Error:${(loadStatus.append as LoadState.Error).error.localizedMessage}")
+            }
+            is LoadState.Loading -> {
+                Timber.d("Append Loading endOfPaginationReached:${(loadStatus.append as LoadState.Loading).endOfPaginationReached}")
+            }
+            is LoadState.NotLoading -> {
+                Timber.d("Append NotLoading endOfPaginationReached:${(loadStatus.append as LoadState.NotLoading).endOfPaginationReached}")
+            }
+        }
+    }
+
+    private val gridLayoutSpanSizeLookup =
+        object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return when (videoListAdapter.getItemViewType(position)) {
+                    GeneralVideoAdapter.VIEW_TYPE_VIDEO -> 1
+                    else -> 2
+                }
+            }
+        }
 
     override fun setupFirstTime() {
         super.setupFirstTime()
@@ -101,10 +131,59 @@ class CategoriesFragment : BaseFragment() {
         orderByType = arguments?.getInt(KEY_ORDER_BY) ?: StatisticsOrderType.LATEST.value
         setupTitle()
 
-        recyclerview_content.layoutManager = GridLayoutManager(requireContext(), 2)
-        recyclerview_content.adapter = videoListAdapter
+        layout_refresh.setOnRefreshListener {
+            videoListAdapter.refresh()
+        }
+
+        ib_back.setOnClickListener {
+            navigateTo(NavigateItem.Up)
+        }
+
+        iv_search.setOnClickListener {
+            navToSearch()
+        }
+
+        bar_collapsing_filter.setOnClickListener {
+            bar_filter.translationY = 0f
+            setCollapsingFilterBar(View.GONE)
+        }
+
+        tv_all_1.setOnClickListener {
+            updateFirstTab(true)
+            category = ""
+            (lstFilterRV[CATEGORY].adapter as FilterTabAdapter).updateLastSelected(null)
+            setupTitle()
+            setupCollapsingText()
+            getVideos()
+        }
+
+        videoListAdapter.addLoadStateListener(loadStateListener)
+
+        val loadStateAdapter = VideoLoadStateAdapter(videoListAdapter)
+
+        val gridLayoutManager = GridLayoutManager(requireContext(), 2)
+            .also { it.spanSizeLookup = gridLayoutSpanSizeLookup }
+
+        rv_video.also {
+            it.layoutManager = gridLayoutManager
+            it.setHasFixedSize(true)
+            it.adapter = videoListAdapter.withLoadStateFooter(loadStateAdapter)
+            it.addItemDecoration(
+                GridSpaceItemDecoration(
+                    2,
+                    GeneralUtils.dpToPx(requireContext(), 10),
+                    GeneralUtils.dpToPx(requireContext(), 20),
+                    true
+                )
+            )
+        }
 
         lstFilterRV = listOf(rl_filter_0, rl_filter_1)
+
+        viewModel.showProgress.observe(this, Observer { showProgress ->
+            if (showProgress) progressHUD.show()
+            else progressHUD.dismiss()
+        })
 
         viewModel.getCategoryResult.observe(this, Observer {
             when (it) {
@@ -131,55 +210,14 @@ class CategoriesFragment : BaseFragment() {
         viewModel.getCategory()
     }
 
-    override fun setupObservers() {
-        viewModel.showProgress.observe(this, Observer { showProgress ->
-            if (showProgress) progressHUD.show()
-            else progressHUD.dismiss()
-        })
-
-        viewModel.videoList.observe(viewLifecycleOwner, Observer { data ->
-            videoListAdapter.submitList(data)
-        })
-
-        viewModel.onTotalCountResult.observe(viewLifecycleOwner, Observer {
-            cl_no_data.visibility =
-                it.takeIf { it == 0L }?.let { View.VISIBLE } ?: let { View.GONE }
-        })
-    }
-
-    override fun setupListeners() {
-
-        ib_back.setOnClickListener {
-            navigateTo(NavigateItem.Up)
-        }
-
-        iv_search.setOnClickListener {
-            navToSearch()
-        }
-
-        bar_collapsing_filter.setOnClickListener {
-            bar_filter.translationY = 0f
-            setCollapsingFilterBar(View.GONE)
-        }
-
-        tv_all_1.setOnClickListener {
-            updateFirstTab(true)
-            category = ""
-            (lstFilterRV[CATEGORY].adapter as FilterTabAdapter).updateLastSelected(null)
-            setupTitle()
-            setupCollapsingText()
-            getVideos()
-        }
-    }
-
     override fun onResume() {
         super.onResume()
-        recyclerview_content.addOnScrollListener(onScrollListener)
+        rv_video.addOnScrollListener(onScrollListener)
     }
 
     override fun onPause() {
         super.onPause()
-        recyclerview_content.removeOnScrollListener(onScrollListener)
+        rv_video.removeOnScrollListener(onScrollListener)
     }
 
     private fun setupFilter(index: Int, list: List<String>) {
@@ -315,7 +353,7 @@ class CategoriesFragment : BaseFragment() {
     }
 
     private fun adjustContentRV(notEmptyCount: Int) {
-        recyclerview_content.setPadding(
+        rv_video.setPadding(
             0,
             GeneralUtils.dpToPx(requireContext(), 50) * notEmptyCount,
             0,
@@ -324,7 +362,7 @@ class CategoriesFragment : BaseFragment() {
     }
 
     private fun setupTitle() {
-        tv_title.text =
+        tv_category_title.text =
             if (category.isBlank()) getString(R.string.home_tab_video)
             else category
     }

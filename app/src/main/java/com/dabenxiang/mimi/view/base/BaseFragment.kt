@@ -844,12 +844,12 @@ abstract class BaseFragment : Fragment() {
 
     fun onMoreClick(
         item: MemberPostItem,
-        items: ArrayList<MemberPostItem>,
+        position: Int,
         onEdit: (BaseMemberPostItem) -> Unit
     ) {
         val isMe = mainViewModel?.accountManager?.getProfile()?.userId == item.creatorId
         if (isMe) {
-            showMeMoreDialog(item, items, onEdit)
+            showMeMoreDialog(item, position, onEdit)
         } else {
             showMoreDialog(item)
         }
@@ -858,7 +858,7 @@ abstract class BaseFragment : Fragment() {
     private var meMoreDialog: MyPostMoreDialogFragment? = null
     private fun showMeMoreDialog(
         item: MemberPostItem,
-        items: ArrayList<MemberPostItem>,
+        position: Int,
         onEdit: (BaseMemberPostItem) -> Unit
     ) {
         val onMeMoreDialogListener = object : OnMeMoreDialogListener {
@@ -872,7 +872,7 @@ abstract class BaseFragment : Fragment() {
                         titleRes = R.string.is_post_delete,
                         messageIcon = R.drawable.ico_default_photo,
                         secondBtn = getString(R.string.btn_confirm),
-                        secondBlock = { mainViewModel?.deletePost(item as MemberPostItem, items) },
+                        secondBlock = { mainViewModel?.deletePost(item as MemberPostItem, position) },
                         firstBtn = getString(R.string.cancel),
                         isMessageIcon = false
                     )

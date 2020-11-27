@@ -122,7 +122,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
         }
 
         moreImage.setOnClickListener {
-            itemList?.also { adultListener.onMoreClick(item, it) }
+            adultListener.onMoreClick(item, position)
         }
 
         picturePostItemLayout.setOnClickListener {

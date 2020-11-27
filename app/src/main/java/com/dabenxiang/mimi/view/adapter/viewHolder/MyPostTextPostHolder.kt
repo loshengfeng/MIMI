@@ -11,25 +11,36 @@ import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.TextContentItem
-import com.dabenxiang.mimi.model.enums.AdultTabType
-import com.dabenxiang.mimi.model.enums.LikeType
-import com.dabenxiang.mimi.model.enums.LoadImageType
-import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.enums.*
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.item_clip_post.view.*
 import kotlinx.android.synthetic.main.item_text_post.view.*
+import kotlinx.android.synthetic.main.item_text_post.view.chip_group_tag
+import kotlinx.android.synthetic.main.item_text_post.view.img_avatar
+import kotlinx.android.synthetic.main.item_text_post.view.iv_comment
+import kotlinx.android.synthetic.main.item_text_post.view.iv_favorite
+import kotlinx.android.synthetic.main.item_text_post.view.iv_like
+import kotlinx.android.synthetic.main.item_text_post.view.iv_more
+import kotlinx.android.synthetic.main.item_text_post.view.tv_comment_count
+import kotlinx.android.synthetic.main.item_text_post.view.tv_favorite_count
+import kotlinx.android.synthetic.main.item_text_post.view.tv_follow
+import kotlinx.android.synthetic.main.item_text_post.view.tv_like_count
+import kotlinx.android.synthetic.main.item_text_post.view.tv_name
+import kotlinx.android.synthetic.main.item_text_post.view.tv_time
+import kotlinx.android.synthetic.main.item_text_post.view.tv_title
+import kotlinx.android.synthetic.main.item_text_post.view.v_separator
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
 import java.util.*
 
 class MyPostTextPostHolder(
-    itemView: View,
-    private val isAdultTheme: Boolean
+    itemView: View
 ) : BaseViewHolder(itemView),KoinComponent {
 
     private val accountManager: AccountManager by inject()
@@ -49,6 +60,8 @@ class MyPostTextPostHolder(
     private val tvFollow: TextView = itemView.tv_follow
     private val vSeparator: View = itemView.v_separator
     private val textLayout: ConstraintLayout = itemView.layout_text
+    private val ivFavorite: ImageView = itemView.iv_favorite
+    private val tvFavoriteCount: TextView = itemView.tv_favorite_count
 
     fun onBind(
         item: MemberPostItem,
@@ -85,6 +98,9 @@ class MyPostTextPostHolder(
         }
 
         attachmentListener.onGetAttachment(item.avatarAttachmentId, imgAvatar, LoadImageType.AVATAR)
+        imgAvatar.setOnClickListener {
+            myPostListener.onAvatarClick(item.creatorId,item.postFriendlyName)
+        }
 
         tagChipGroup.removeAllViews()
         item.tags?.forEach {
@@ -104,19 +120,35 @@ class MyPostTextPostHolder(
             tagChipGroup.addView(chip)
         }
 
-        if (isMe) {
-            tvFollow.visibility = View.GONE
-        } else {
-            tvFollow.visibility = View.VISIBLE
-            tvFollow.setOnClickListener {
-                itemList?.also { myPostListener.onFollowClick(itemList, position, !item.isFollow) }
-                item.isFollow = !item.isFollow
-            }
-            updateFollow(item)
+//        if (isMe) {
+//            tvFollow.visibility = View.GONE
+//        } else {
+//            tvFollow.visibility = View.VISIBLE
+//            tvFollow.setOnClickListener {
+//                itemList?.also { myPostListener.onFollowClick(itemList, position, !item.isFollow) }
+//                item.isFollow = !item.isFollow
+//            }
+//            updateFollow(item)
+//        }
+        tvFollow.visibility =  View.GONE
+
+        updateFavorite(item)
+        val onFavoriteClickListener = View.OnClickListener {
+            item.isFavorite = !item.isFavorite
+            item.favoriteCount =
+                    if (item.isFavorite) item.favoriteCount + 1 else item.favoriteCount - 1
+            myPostListener.onFavoriteClick(
+                    item,
+                    position,
+                    item.isFavorite,
+                    AttachmentType.ADULT_HOME_CLIP
+            )
         }
+        ivFavorite.setOnClickListener(onFavoriteClickListener)
+        tvFavoriteCount.setOnClickListener(onFavoriteClickListener)
 
         ivMore.setOnClickListener {
-            myPostListener.onMoreClick(item)
+            myPostListener.onMoreClick(item, position)
         }
 
         updateLike(item)
@@ -155,6 +187,16 @@ class MyPostTextPostHolder(
         tvFollow.setText(if (item.isFollow) R.string.followed else R.string.follow)
         tvFollow.setBackgroundResource(if (item.isFollow) R.drawable.bg_white_1_stroke_radius_16 else R.drawable.bg_red_1_stroke_radius_16)
         tvFollow.setTextColor(App.self.getColor(if (item.isFollow) R.color.color_black_1_60 else R.color.color_red_1))
+    }
+
+    fun updateFavorite(item: MemberPostItem) {
+        tvFavoriteCount.text = item.favoriteCount.toString()
+
+        if (item.isFavorite) {
+            ivFavorite.setImageResource(R.drawable.btn_favorite_white_s)
+        } else {
+            ivFavorite.setImageResource(R.drawable.btn_favorite_n)
+        }
     }
 
 }

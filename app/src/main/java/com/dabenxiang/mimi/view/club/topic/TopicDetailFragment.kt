@@ -194,7 +194,7 @@ class TopicDetailFragment : BaseFragment() {
                         val bundle = PictureDetailFragment.createBundle(item, 1)
                         navigateTo(
                             NavigateItem.Destination(
-                                R.id.action_topicDetailFragment_to_pictureDetailFragment,
+                                R.id.action_topicDetailFragment_to_clubPicFragment,
                                 bundle
                             )
                         )
@@ -203,7 +203,7 @@ class TopicDetailFragment : BaseFragment() {
                         val bundle = TextDetailFragment.createBundle(item, 1)
                         navigateTo(
                             NavigateItem.Destination(
-                                R.id.action_topicDetailFragment_to_textDetailFragment,
+                                R.id.action_topicDetailFragment_to_clubTextFragment,
                                 bundle
                             )
                         )
@@ -223,41 +223,38 @@ class TopicDetailFragment : BaseFragment() {
             }
         }
 
-        override fun onMoreClick(item: MemberPostItem, items: List<MemberPostItem>) {
-            onMoreClick(
-                item,
-                ArrayList(items),
-                onEdit = {
-                    val bundle = Bundle()
-                    bundle.putBoolean(MyPostFragment.EDIT, true)
-                    bundle.putString(BasePostFragment.PAGE, BasePostFragment.ADULT)
-                    bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+        override fun onMoreClick(item: MemberPostItem, position: Int) {
+            onMoreClick(item, position) {
+                val bundle = Bundle()
+                bundle.putBoolean(MyPostFragment.EDIT, true)
+                bundle.putString(BasePostFragment.PAGE, BasePostFragment.ADULT)
+                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
 
-                    it as MemberPostItem
-                    when (item.type) {
-                        PostType.TEXT -> {
-                            findNavController().navigate(
-                                R.id.action_topicDetailFragment_to_postArticleFragment,
+                it as MemberPostItem
+                when (item.type) {
+                    PostType.TEXT -> {
+                        findNavController().navigate(
+                                R.id.action_topicDetailFragment_to_clubTextFragment,
                                 bundle
-                            )
-                        }
-                        PostType.IMAGE -> {
-                            findNavController().navigate(
-                                R.id.action_topicDetailFragment_to_postPicFragment,
+                        )
+                    }
+                    PostType.IMAGE -> {
+                        findNavController().navigate(
+                                R.id.action_topicDetailFragment_to_clubPicFragment,
                                 bundle
-                            )
-                        }
-                        PostType.VIDEO -> {
-                            findNavController().navigate(
+                        )
+                    }
+                    PostType.VIDEO -> {
+                        findNavController().navigate(
+                                //TODO
                                 R.id.action_topicDetailFragment_to_postVideoFragment,
                                 bundle
-                            )
-                        }
-                        else -> {
-                        }
+                        )
+                    }
+                    else -> {
                     }
                 }
-            )
+            }
         }
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
@@ -266,7 +263,7 @@ class TopicDetailFragment : BaseFragment() {
                     val bundle = PictureDetailFragment.createBundle(item, 0)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_topicDetailFragment_to_pictureDetailFragment,
+                            R.id.action_topicDetailFragment_to_clubPicFragment,
                             bundle
                         )
                     )
@@ -275,7 +272,7 @@ class TopicDetailFragment : BaseFragment() {
                     val bundle = TextDetailFragment.createBundle(item, 0)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_topicDetailFragment_to_textDetailFragment,
+                            R.id.action_topicDetailFragment_to_clubTextFragment,
                             bundle
                         )
                     )
@@ -339,6 +336,10 @@ class TopicDetailFragment : BaseFragment() {
                     bundle
                 )
             )
+        }
+
+        override fun onFavoriteClick(item: MemberPostItem, position: Int, isFavorite: Boolean) {
+
         }
     }
 

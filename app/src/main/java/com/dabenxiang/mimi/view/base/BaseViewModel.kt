@@ -32,7 +32,6 @@ import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getExceptionDetail
 import com.google.gson.Gson
-import jp.wasabeef.glide.transformations.BlurTransformation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
@@ -44,7 +43,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import retrofit2.HttpException
 import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
-import java.util.*
 
 abstract class BaseViewModel : ViewModel(), KoinComponent {
 
@@ -132,15 +130,13 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
 
     fun deletePost(
         item: MemberPostItem,
-        items: ArrayList<MemberPostItem>
+        position:Int
     ) {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val result = apiRepository.deleteMyPost(item.id)
                 if (!result.isSuccessful) throw HttpException(result)
-                val position = items.indexOf(item)
-                items.remove(item)
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)

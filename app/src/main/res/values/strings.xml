@@ -484,6 +484,7 @@
     <string name="actor_all_actresses">全部女优</string>
     <string name="actor_hot_unit">人气</string>
     <string name="actor_videos_unit">部影片</string>
+    <string name="actor_videos_title">女优作品</string>
 
     <!-- Clip -->
     <string name="clip_newest">最新</string>
