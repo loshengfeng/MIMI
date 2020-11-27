@@ -15,10 +15,7 @@ import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.AttachmentType
-import com.dabenxiang.mimi.model.enums.LikeType
-import com.dabenxiang.mimi.model.enums.LoadImageType
-import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.enums.*
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -168,7 +165,8 @@ class MyPostClipPostHolder(
         tvCommentCount.setOnClickListener(onCommentClickListener)
 
         layoutClip.setOnClickListener {
-            itemList?.also { myPostListener.onClipItemClick(it, position) }
+            myPostListener.onItemClick(item, AdultTabType.CLIP)
+//            itemList?.also { myPostListener.onClipItemClick(it, position) }
         }
 
     }
