@@ -25,10 +25,11 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     var tvComment: TextView = view.tv_comment
     var progress: ProgressBar = view.progress_video
     var reminder: View = view.recharge_reminder
-    var reminder_btn_vip: View = view.btn_vip
-    var reminder_btn_promote: View = view.btn_promote
+    private var btnVip: View = view.btn_vip
+    private var btnPromote: View = view.btn_promote
 
-    fun onBind(item: VideoItem, clipFuncItem: ClipFuncItem, pos: Int) {
+    fun onBind(item: VideoItem) {
+        reminder.visibility = View.GONE
         ibReplay.visibility = View.GONE
         ibPlay.visibility = View.GONE
         tvTitle.text = item.title
@@ -43,35 +44,35 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             ?: let { R.drawable.ico_nice_forvideo }
         tvLike.setCompoundDrawablesRelativeWithIntrinsicBounds(0, likeRes, 0, 0)
 
-        val favoriteRes = takeIf { item.like == true }?.let { R.drawable.btn_favorite_forvideo_s }
+        val favoriteRes = takeIf { item.favorite == true }?.let { R.drawable.btn_favorite_forvideo_s }
             ?: let { R.drawable.btn_favorite_forvideo_n }
         tvFavorite.setCompoundDrawablesRelativeWithIntrinsicBounds(0, favoriteRes, 0, 0)
     }
 
-    fun onUpdateByDeducted(item: VideoItem, clipFuncItem: ClipFuncItem, pos: Int){
-//        if (item.deducted) {
-//            tvLike.setOnClickListener {
-//                clipFuncItem.onLikeClick(item, pos, item.like != true)
-//            }
-//            tvFavorite.setOnClickListener {
-//                clipFuncItem.onFavoriteClick(
-//                    item,
-//                    pos,
-//                    item.favorite != true
-//                )
-//            }
-//            tvComment.setOnClickListener { clipFuncItem.onCommentClick(item) }
-//
-//            reminder.visibility = View.GONE
-//        } else {
-//            reminder_btn_vip.setOnClickListener {
-//                clipFuncItem.onVipClick()
-//            }
-//            reminder_btn_promote.setOnClickListener {
-//                clipFuncItem.onPromoteClick()
-//            }
-//            reminder.visibility = View.VISIBLE
-//            progress.visibility = View.GONE
-//        }
+    fun updateAfterM3U8(item: VideoItem, clipFuncItem: ClipFuncItem, pos: Int, isOverdue: Boolean) {
+        if (isOverdue) {
+            btnVip.setOnClickListener {
+                clipFuncItem.onVipClick()
+            }
+            btnPromote.setOnClickListener {
+                clipFuncItem.onPromoteClick()
+            }
+            reminder.visibility = View.VISIBLE
+            progress.visibility = View.GONE
+        } else {
+            tvLike.setOnClickListener {
+                clipFuncItem.onLikeClick(item, pos, item.like != true)
+            }
+            tvFavorite.setOnClickListener {
+                clipFuncItem.onFavoriteClick(
+                    item,
+                    pos,
+                    item.favorite != true
+                )
+            }
+            tvComment.setOnClickListener { clipFuncItem.onCommentClick(item) }
+
+            reminder.visibility = View.GONE
+        }
     }
 }

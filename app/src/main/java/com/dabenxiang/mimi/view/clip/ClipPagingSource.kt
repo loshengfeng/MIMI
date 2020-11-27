@@ -5,13 +5,15 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.api.vo.VideoSearchItem
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.view.home.memberpost.MemberPostDataSource
 import retrofit2.HttpException
 
 class ClipPagingSource(
-    private val domainManager: DomainManager
+    private val domainManager: DomainManager,
+    private val orderByType: StatisticsOrderType
 ) : PagingSource<Long, VideoItem>() {
     companion object {
         const val PER_LIMIT = 20
@@ -20,7 +22,11 @@ class ClipPagingSource(
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, VideoItem> {
         return try {
             val offset = params.key ?: 0L
-            val result = domainManager.getApiRepository().searchShortVideo(offset = 0.toString(), limit = PER_LIMIT.toString())
+            val result = domainManager.getApiRepository().searchShortVideo(
+                orderByType = orderByType,
+                offset = 0.toString(),
+                limit = PER_LIMIT.toString()
+            )
             if (!result.isSuccessful) throw HttpException(result)
             val item = result.body()
             val videos = item?.content?.videos

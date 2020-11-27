@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import kotlinx.android.synthetic.main.item_clip_pager.view.*
@@ -69,10 +68,9 @@ class ClipPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
                                 clipAdapter.releasePlayer()
                                 clipAdapter.updateCurrentPosition(currentPos)
                                 clipAdapter.notifyItemChanged(lastPos)
-                                clipAdapter.getMemberPostItem(currentPos)?.run {
-                                    clipFuncItem.getPostDetail(this, currentPos, ::updateAfterGetDeducted)
-                                }
-                                clipAdapter.notifyItemChanged(currentPos, ClipAdapter.PAYLOAD_UPDATE_DEDUCTED)
+//                                clipAdapter.getVideoItem(currentPos)?.run {
+//                                    clipFuncItem.getPostDetail(this, currentPos, ::updateAfterGetDeducted)
+//                                }
                             } ?: clipAdapter.updateCurrentPosition(lastPos)
                         }
                     }
@@ -90,6 +88,6 @@ class ClipPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
 
     private fun updateAfterGetDeducted(currentPos: Int, deducted: Boolean) {
 //        clipAdapter.getMemberPostItem(currentPos)?.run { this.deducted = deducted }
-        clipAdapter.notifyItemChanged(currentPos, ClipAdapter.PAYLOAD_UPDATE_DEDUCTED)
+//        clipAdapter.notifyItemChanged(currentPos, ClipAdapter.PAYLOAD_UPDATE_DEDUCTED)
     }
 }

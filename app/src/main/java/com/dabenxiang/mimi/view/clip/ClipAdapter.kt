@@ -2,15 +2,12 @@ package com.dabenxiang.mimi.view.clip
 
 import android.content.Context
 import android.net.Uri
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.MediaContentItem
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.view.player.PlayerViewModel
 import com.google.android.exoplayer2.*
@@ -23,9 +20,7 @@ import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
-import com.google.gson.Gson
 import timber.log.Timber
-import java.io.File
 
 class ClipAdapter(
     private val context: Context,
@@ -51,8 +46,7 @@ class ClipAdapter(
                 }
             }
         const val PAYLOAD_UPDATE_UI = 0
-        const val PAYLOAD_UPDATE_DEDUCTED = 1
-        const val PAYLOAD_UPDATE_PLAYER = 2
+        const val PAYLOAD_UPDATE_AFTER_M3U8 = 1
 
         var playingId: String = ""
     }
@@ -61,6 +55,14 @@ class ClipAdapter(
 
     private var exoPlayer: SimpleExoPlayer? = null
     private var lastWindowIndex = 0
+    private var m3u8Url: String? = null
+    private var isOverdue: Boolean = false
+
+    fun setM3U8Result(url: String, errorCode: Int) {
+        Timber.d("@@@errorCode: $errorCode")
+        m3u8Url = url
+        isOverdue = errorCode == 402
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClipViewHolder {
         return ClipViewHolder(
@@ -76,7 +78,7 @@ class ClipAdapter(
         this.clipFuncItem = clipFuncItem
     }
 
-    fun getMemberPostItem(position: Int): VideoItem? {
+    fun getVideoItem(position: Int): VideoItem? {
         return getItem(position)
     }
 
@@ -115,70 +117,58 @@ class ClipAdapter(
         payloads.takeIf { it.isNotEmpty() }?.also {
             when (it[0] as Int) {
                 PAYLOAD_UPDATE_UI -> {
-                    holder.onBind(item, clipFuncItem, position)
+                    holder.onBind(item)
                 }
-//                PAYLOAD_UPDATE_DEDUCTED -> {
-//                    holder.onUpdateByDeducted(item, clipFuncItem, position)
-//                    if (item.deducted) {
-//                        takeIf { currentPosition == position }?.also {
-//                            currentViewHolder = holder
-//                            holder.progress.visibility = View.VISIBLE
-//                        } ?: run {
-//                            holder.ivCover.visibility = View.VISIBLE
-//                            holder.progress.visibility = View.GONE
-//                        }
-//
-//                        holder.ibReplay.setOnClickListener { view ->
-//                            exoPlayer?.also { player ->
-//                                player.seekTo(0)
-//                                player.playWhenReady = true
-//                            }
-//                            view.visibility = View.GONE
-//                        }
-//
-//                        holder.playerView.setOnClickListener {
-//                            takeIf { exoPlayer?.isPlaying ?: false }?.also {
-//                                exoPlayer?.playWhenReady = false
-//                                holder.ibPlay.visibility = View.VISIBLE
-//                            } ?: run {
-//                                exoPlayer?.playWhenReady = true
-//                                holder.ibPlay.visibility = View.GONE
-//                            }
-//                        }
-//
-//                        holder.ibPlay.setOnClickListener {
-//                            takeUnless { exoPlayer?.isPlaying ?: true }?.also {
-//                                exoPlayer?.playWhenReady = true
-//                                holder.ibPlay.visibility = View.GONE
-//                            }
-//                        }
-//                        processClip(
-//                            holder.playerView,
-//                            contentItem?.shortVideo?.id.toString(),
-//                            contentItem?.shortVideo?.url.toString(),
-//                            position
-//                        )
-//                    }
-//                }
-                PAYLOAD_UPDATE_PLAYER -> {
-//                    processClip(
-//                        holder.playerView,
-//                        contentItem?.shortVideo?.url.toString(),
-//                        position
-//                    )
+                PAYLOAD_UPDATE_AFTER_M3U8 -> {
+                    holder.updateAfterM3U8(item, clipFuncItem, position, isOverdue)
+                    if (!isOverdue) {
+                        takeIf { currentPosition == position }?.also {
+                            currentViewHolder = holder
+                            holder.progress.visibility = View.VISIBLE
+                        } ?: run {
+                            holder.ivCover.visibility = View.VISIBLE
+                            holder.progress.visibility = View.GONE
+                        }
+
+                        holder.ibReplay.setOnClickListener { view ->
+                            exoPlayer?.also { player ->
+                                player.seekTo(0)
+                                player.playWhenReady = true
+                            }
+                            view.visibility = View.GONE
+                        }
+
+                        holder.playerView.setOnClickListener {
+                            takeIf { exoPlayer?.isPlaying ?: false }?.also {
+                                exoPlayer?.playWhenReady = false
+                                holder.ibPlay.visibility = View.VISIBLE
+                            } ?: run {
+                                exoPlayer?.playWhenReady = true
+                                holder.ibPlay.visibility = View.GONE
+                            }
+                        }
+
+                        holder.ibPlay.setOnClickListener {
+                            takeUnless { exoPlayer?.isPlaying ?: true }?.also {
+                                exoPlayer?.playWhenReady = true
+                                holder.ibPlay.visibility = View.GONE
+                            }
+                        }
+                        processClip(holder.playerView, m3u8Url, position)
+                    }
                 }
             }
         } ?: run {
-            holder.onBind(item, clipFuncItem, position)
+            holder.onBind(item)
         }
     }
 
     override fun onBindViewHolder(holder: ClipViewHolder, position: Int) {
     }
 
-    private fun processClip(playerView: PlayerView, url: String, position: Int) {
+    private fun processClip(playerView: PlayerView, url: String?, position: Int) {
         Timber.d("processClip position:$position, url:$url")
-        takeIf { currentPosition == position }?.also { setupPlayer(playerView, url) }
+        url?.takeIf { currentPosition == position }?.run { setupPlayer(playerView, this) }
     }
 
     private fun setupPlayer(playerView: PlayerView, uri: String) {
@@ -205,7 +195,10 @@ class ClipAdapter(
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
             val stateString: String = when (playbackState) {
                 ExoPlayer.STATE_IDLE -> "ExoPlayer.STATE_IDLE"
-                ExoPlayer.STATE_BUFFERING -> "ExoPlayer.STATE_BUFFERING"
+                ExoPlayer.STATE_BUFFERING -> {
+                    currentViewHolder?.progress?.visibility = View.VISIBLE
+                    "ExoPlayer.STATE_BUFFERING"
+                }
                 ExoPlayer.STATE_READY -> {
                     currentViewHolder?.progress?.visibility = View.GONE
                     currentViewHolder?.ivCover?.visibility = View.GONE

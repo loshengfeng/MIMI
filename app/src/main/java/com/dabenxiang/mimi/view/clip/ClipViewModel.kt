@@ -2,33 +2,27 @@ package com.dabenxiang.mimi.view.clip
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import androidx.paging.*
-import com.blankj.utilcode.util.FileIOUtils
-import com.dabenxiang.mimi.callback.PagingCallback
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.PlayListRequest
 import com.dabenxiang.mimi.model.api.vo.VideoItem
-import com.dabenxiang.mimi.model.enums.CategoryType
+import com.dabenxiang.mimi.model.api.vo.VideoStream
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.home.memberpost.MemberPostDataSource
-import com.dabenxiang.mimi.view.home.memberpost.MemberPostFactory
-import com.dabenxiang.mimi.widget.utility.FileUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import java.io.File
 
 class ClipViewModel : BaseViewModel() {
-
-    private var _clipResult = MutableLiveData<ApiResult<Triple<String, Int, File>>>()
-    val clipResult: LiveData<ApiResult<Triple<String, Int, File>>> = _clipResult
 
     private var _followResult = MutableLiveData<ApiResult<Int>>()
     val followResult: LiveData<ApiResult<Int>> = _followResult
@@ -39,96 +33,22 @@ class ClipViewModel : BaseViewModel() {
     private var _likePostResult = MutableLiveData<ApiResult<Int>>()
     val likePostResult: LiveData<ApiResult<Int>> = _likePostResult
 
-    private var _postDetailResult = MutableLiveData<ApiResult<Int>>()
-    val postDetailResult: LiveData<ApiResult<Int>> = _postDetailResult
-
-    private val _videoReport = MutableLiveData<ApiResult<Nothing>>()
-    val videoReport: LiveData<ApiResult<Nothing>> = _videoReport
-
-    private val _clipPostItemListResult = MutableLiveData<PagedList<MemberPostItem>>()
-    val clipPostItemListResult: LiveData<PagedList<MemberPostItem>> = _clipPostItemListResult
-
-    fun getClip(id: String, pos: Int) {
+    fun getM3U8(item: VideoItem, position: Int, update: (Int, String, Int) -> Unit) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().getAttachment(id)
+                val videoStreamItem = item.videoEpisodes?.get(0)?.videoStreams?.get(0)?: VideoStream()
+                val result = domainManager.getApiRepository().getVideoM3u8Source(videoStreamItem.id?:0, accountManager.getProfile().userId, videoStreamItem.utcTime, videoStreamItem.sign)
                 if (!result.isSuccessful) throw HttpException(result)
-                val byteStream = result.body()?.byteStream()
-                val filename = result.headers()["content-disposition"]
-                    ?.split("; ")
-                    ?.takeIf { it.size >= 2 }
-                    ?.run { this[1].split("=") }
-                    ?.takeIf { it.size >= 2 }
-                    ?.run { this[1] }
-                    ?: "$id.mov"
-                val file = FileUtil.getClipFile(filename)
-                FileIOUtils.writeFileFromIS(file, byteStream)
-
-                emit(ApiResult.success(Triple(id, pos, file)))
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _clipResult.value = it }
-        }
-    }
-
-    fun followPost(item: VideoItem, position: Int, isFollow: Boolean) {
-//        viewModelScope.launch {
-//            flow {
-//                val apiRepository = domainManager.getApiRepository()
-//                val result = when {
-//                    isFollow -> apiRepository.followPost(item.creatorId)
-//                    else -> apiRepository.cancelFollowPost(item.creatorId)
-//                }
-//                if (!result.isSuccessful) throw HttpException(result)
-//                item.isFollow = isFollow
-//                emit(ApiResult.success(position))
-//            }
-//                .flowOn(Dispatchers.IO)
-//                .catch { e -> emit(ApiResult.error(e)) }
-//                .collect { _followResult.value = it }
-//        }
-    }
-
-    fun getPostDetail(item: VideoItem, position: Int, update: (Int, Boolean) -> Unit) {
-        viewModelScope.launch {
-            flow {
-                /** for debug **/
-                if (isLogin()) domainManager.getApiRepository().getMe()
-                else domainManager.getApiRepository().getGuestInfo()
-                /**-----------**/
-                val result = domainManager.getApiRepository().getMemberPostDetail(item.id ?: 0)
-                if (!result.isSuccessful) throw HttpException(result)
-                val deducted = result.body()?.content?.deducted ?: false
-                emit(deducted)
+                val url = result.body()?.content?.streamUrl ?: ""
+                emit(url)
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e ->
                     e.printStackTrace()
-                    update(position, false)
+                    val errorCode = if (e is HttpException) e.code() else -1
+                    update(position, "", errorCode)
                 }
-                .collect { update(position, it) }
-        }
-    }
-
-    fun favoritePost(item: VideoItem, position: Int, isFavorite: Boolean) {
-        viewModelScope.launch {
-            flow {
-                val apiRepository = domainManager.getApiRepository()
-                val result = when {
-                    isFavorite -> apiRepository.addFavorite(item.id ?: 0)
-                    else -> apiRepository.deleteFavorite(item.id ?: 0)
-                }
-                if (!result.isSuccessful) throw HttpException(result)
-                item.favorite = isFavorite
-                item.favoriteCount?.let {
-                    if (isFavorite) it + 1 else it - 1
-                }
-                emit(ApiResult.success(position))
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _favoriteResult.value = it }
+                .collect { update(position, it, -1) }
         }
     }
 
@@ -145,12 +65,7 @@ class ClipViewModel : BaseViewModel() {
                 if (!result.isSuccessful) throw HttpException(result)
 
                 item.like = isLike
-                item.likeCount?.let {
-                    when (isLike) {
-                        true-> it + 1
-                        else -> it - 1
-                    }
-                }
+                item.likeCount = item.likeCount?.let { if (isLike) it + 1 else it - 1 }
 
                 emit(ApiResult.success(position))
             }
@@ -171,66 +86,40 @@ class ClipViewModel : BaseViewModel() {
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _videoReport.value = it }
+                .collect()
         }
-
     }
 
-    fun getClips(): Flow<PagingData<VideoItem>> {
+    /**
+     * 加入收藏與解除收藏
+     */
+    fun modifyFavorite(item: VideoItem, position: Int, isFavorite: Boolean) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val resp = when {
+                    isFavorite -> apiRepository.postMePlaylist(PlayListRequest(item.id, 1))
+                    else -> apiRepository.deleteMePlaylist(item.id.toString())
+                }
+                if (!resp.isSuccessful) throw HttpException(resp)
+                item.favorite = isFavorite
+                item.favoriteCount = item.favoriteCount?.let { if (isFavorite) it + 1 else it - 1 }
+                emit(ApiResult.success(position))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _favoriteResult.value = it }
+        }
+    }
+
+    fun getClips(orderByType: StatisticsOrderType): Flow<PagingData<VideoItem>> {
         return Pager(
             config = PagingConfig(
                 pageSize = ApiRepository.NETWORK_PAGE_SIZE,
                 enablePlaceholders = false
             ),
-            pagingSourceFactory = { ClipPagingSource(domainManager) }
+            pagingSourceFactory = { ClipPagingSource(domainManager, orderByType) }
         ).flow.cachedIn(viewModelScope)
     }
 
-    fun getClipPosts() {
-        viewModelScope.launch {
-            getMemberPostPagingItems(PostType.VIDEO).asFlow()
-                .collect { _clipPostItemListResult.value = it }
-        }
-    }
-
-    private fun getMemberPostPagingItems(postType: PostType): LiveData<PagedList<MemberPostItem>> {
-        val pictureDataSource =
-            MemberPostDataSource(
-                HomePagingCallBack(CategoryType.valueOf(postType.name)),
-                viewModelScope,
-                domainManager,
-                postType,
-                0,
-                0
-            )
-        val pictureFactory = MemberPostFactory(pictureDataSource)
-        val config = PagedList.Config.Builder()
-            .setPrefetchDistance(4)
-            .build()
-        return LivePagedListBuilder(pictureFactory, config).build()
-    }
-
-    inner class HomePagingCallBack(private val type: CategoryType) : PagingCallback {
-        override fun onLoading() {
-            setShowProgress(true)
-        }
-
-        override fun onLoaded() {
-            setShowProgress(false)
-        }
-
-        override fun onThrowable(throwable: Throwable) {
-
-        }
-
-        override fun onTotalCount(count: Long) {
-//            _totalCountResult.postValue(Pair(type, count.toInt()))
-        }
-
-        override fun onCurrentItemCount(count: Long, isInitial: Boolean) {
-//            totalCount = if (isInitial) count.toInt()
-//            else totalCount.plus(count.toInt())
-//            if (isInitial) cleanRemovedPosList()
-        }
-    }
 }
