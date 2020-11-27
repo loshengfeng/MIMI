@@ -1,12 +1,8 @@
 package com.dabenxiang.mimi.view.clip
 
 import android.content.Intent
-import android.os.Bundle
-import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.Navigation
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
 import androidx.paging.PagingData
@@ -16,7 +12,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.dabenxiang.mimi.NAVIGATE_TO_TOPUP_ACTION
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.ApiResult.*
+import com.dabenxiang.mimi.model.api.vo.VideoItem
+import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.comment.CommentDialogFragment
@@ -27,26 +25,22 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.File
 
 
-class ClipPagerFragment : BaseFragment() {
+class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFragment() {
     private val viewModel: ClipViewModel by viewModels()
 
     private val clipFuncItem by lazy {
         ClipFuncItem(
-            { id, pos -> getClip(id, pos) },
             { id, view, type -> viewModel.loadImage(id, view, type) },
-            { item, pos, isFollow -> onFollowClick(item, pos, isFollow) },
             { item, pos, isFavorite -> onFavoriteClick(item, pos, isFavorite) },
             { item, pos, isLike -> onLikeClick(item, pos, isLike) },
             { item -> onCommentClick(item) },
-            { onBackClick() },
             { id, error -> viewModel.sendVideoReport(id, error) },
             { onVipClick() },
             { onPromoteClick() },
             { update -> getClips(update) },
-            { item, pos, update -> getPostDetail(item, pos, update) }
+            { item, pos, update -> getM3U8(item, pos, update) }
         )
     }
 
@@ -64,8 +58,8 @@ class ClipPagerFragment : BaseFragment() {
                 is LoadState.NotLoading -> {
                     Timber.d("refresh NotLoading endOfPaginationReached:${(loadStatus.refresh as LoadState.NotLoading).endOfPaginationReached}")
                     progressHUD.dismiss()
-                    takeIf { adapter.itemCount > 0 }?.let { adapter.getMemberPostItem(0) }?.run {
-                        clipFuncItem.getPostDetail(this, 0, ::updateAfterGetDeducted)
+                    takeIf { adapter.itemCount > 0 }?.let { adapter.getVideoItem(0) }?.run {
+                        clipFuncItem.getM3U8(this, 0, ::updateAfterM3U8)
                     }
                 }
             }
@@ -101,17 +95,9 @@ class ClipPagerFragment : BaseFragment() {
                             clipAdapter.releasePlayer()
                             clipAdapter.updateCurrentPosition(currentPos)
                             clipAdapter.notifyItemChanged(lastPos)
-                            clipAdapter.getMemberPostItem(currentPos)?.run {
-                                clipFuncItem.getPostDetail(
-                                    this,
-                                    currentPos,
-                                    ::updateAfterGetDeducted
-                                )
+                            clipAdapter.getVideoItem(currentPos)?.run {
+                                clipFuncItem.getM3U8(this, currentPos, ::updateAfterM3U8)
                             }
-                            clipAdapter.notifyItemChanged(
-                                currentPos,
-                                ClipAdapter.PAYLOAD_UPDATE_DEDUCTED
-                            )
                         } ?: clipAdapter.updateCurrentPosition(lastPos)
                     }
                 }
@@ -119,11 +105,6 @@ class ClipPagerFragment : BaseFragment() {
         }
     }
 
-
-    private val clipMap: HashMap<String, File> = hashMapOf()
-    private val memberPostItems: ArrayList<MemberPostItem> = arrayListOf()
-
-    private var isShowComment = false
     override fun getLayoutId(): Int {
         return R.layout.item_clip_pager
     }
@@ -152,118 +133,43 @@ class ClipPagerFragment : BaseFragment() {
         }
     }
 
-    private fun setupClips(data: PagingData<MemberPostItem>, coroutineScope: CoroutineScope) {
+    private fun setupClips(data: PagingData<VideoItem>, coroutineScope: CoroutineScope) {
         coroutineScope.launch {
             (rv_clip.adapter as ClipAdapter).submitData(data)
         }
     }
 
-    private fun updateAfterGetDeducted(currentPos: Int, deducted: Boolean) {
-        Timber.d("updateAfterGetDeducted: $currentPos, $deducted")
-        clipAdapter.getMemberPostItem(currentPos)?.run { this.deducted = deducted }
-        clipAdapter.notifyItemChanged(currentPos, ClipAdapter.PAYLOAD_UPDATE_DEDUCTED)
+    private fun updateAfterM3U8(currentPos: Int, url: String, errorCode: Int) {
+        clipAdapter.setM3U8Result(url, errorCode)
+        clipAdapter.notifyItemChanged(currentPos, ClipAdapter.PAYLOAD_UPDATE_AFTER_M3U8)
     }
 
-    private fun setObservers() {
-//        viewModel.clipResult.observe(viewLifecycleOwner, Observer {
-//            when (it) {
-//                is Loading -> progressHUD.show()
-//                is Loaded -> progressHUD.dismiss()
-//                is Success -> {
-//                    val result = it.result
-//                    clipMap[result.first] = result.third
-//                    Timber.d("clipResult notifyItemChanged: ${result.second}")
-//                    rv_clip.adapter?.notifyItemChanged(
-//                        result.second,
-//                        ClipAdapter.PAYLOAD_UPDATE_PLAYER
-//                    )
-//                }
-//                is Error -> onApiError(it.throwable)
-//            }
-//        })
-//
-//        viewModel.followResult.observe(viewLifecycleOwner, Observer {
-//            when (it) {
-//                is Loading -> progressHUD?.show()
-//                is Loaded -> progressHUD?.dismiss()
-//                is Success -> {
-//                    rv_clip.adapter?.notifyItemChanged(
-//                        it.result,
-//                        ClipAdapter.PAYLOAD_UPDATE_UI
-//                    )
-//                    mainViewModel?.setShowPopHint(
-//                        if (memberPostItems[it.result].isFollow) getString(R.string.followed)
-//                        else getString(R.string.cancel_follow)
-//                    )
-//                }
-//                is Error -> onApiError(it.throwable)
-//            }
-//        })
-//
-//        viewModel.favoriteResult.observe(viewLifecycleOwner, Observer {
-//            when (it) {
-//                is Loading -> progressHUD?.show()
-//                is Loaded -> progressHUD?.dismiss()
-//                is Success -> rv_clip.adapter?.notifyItemChanged(
-//                    it.result,
-//                    ClipAdapter.PAYLOAD_UPDATE_UI
-//                )
-//                is Error -> onApiError(it.throwable)
-//            }
-//        })
-//
-//        viewModel.likePostResult.observe(viewLifecycleOwner, Observer {
-//            when (it) {
-//                is Loading -> progressHUD?.show()
-//                is Loaded -> progressHUD?.dismiss()
-//                is Success -> {
-//                    rv_clip.adapter?.notifyItemChanged(
-//                        it.result,
-//                        ClipAdapter.PAYLOAD_UPDATE_UI
-//                    )
-//                }
-//                is Error -> onApiError(it.throwable)
-//            }
-//        })
-//
-//        viewModel.postDetailResult.observe(viewLifecycleOwner, {
-//            when (it) {
-//                is Loading -> progressHUD?.show()
-//                is Loaded -> progressHUD?.dismiss()
-//                is Success -> {
-//                    val position = it.result
-//                    if (memberPostItems[position].deducted && isShowComment)
-//                        showCommentDialog(memberPostItems[position])
-//                    rv_clip.adapter?.notifyItemChanged(
-//                        position,
-//                        ClipAdapter.PAYLOAD_UPDATE_DEDUCTED
-//                    )
-//                }
-//                is Error -> {
-//                    progressHUD?.dismiss()
-//                    onApiError(it.throwable)
-//                }
-//            }
-//        })
-//
-//        viewModel.videoReport.observe(viewLifecycleOwner, {
-//            when (it) {
-//                is Loading -> progressHUD?.show()
-//                is Loaded -> progressHUD?.dismiss()
-//                is Success -> {
-//                    Timber.i("videoReported")
-//                }
-//                is Error -> onApiError(it.throwable)
-//            }
-//        })
-//
-//        viewModel.clipPostItemListResult.observe(this, {
-//            progressHUD.dismiss()
-//            Timber.d("@@size: ${it.size}")
-//            it.takeIf { list -> list.size > 0 }?.run {
-//                setupClips(this.toList().subList(1, this.size))
-//            }
-//        })
+    override fun setupObservers() {
+        viewModel.favoriteResult.observe(viewLifecycleOwner, {
+            when (it) {
+                is Loading -> progressHUD.show()
+                is Loaded -> progressHUD.dismiss()
+                is Success -> rv_clip.adapter?.notifyItemChanged(
+                    it.result,
+                    ClipAdapter.PAYLOAD_UPDATE_UI
+                )
+                is Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.likePostResult.observe(viewLifecycleOwner, {
+            when (it) {
+                is Loading -> progressHUD.show()
+                is Loaded -> progressHUD.dismiss()
+                is Success -> {
+                    rv_clip.adapter?.notifyItemChanged(
+                        it.result,
+                        ClipAdapter.PAYLOAD_UPDATE_UI
+                    )
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     private fun onPromoteClick() {
@@ -281,57 +187,40 @@ class ClipPagerFragment : BaseFragment() {
         startActivity(intent)
     }
 
-    private fun onBackClick() {
-        Timber.d("onBackClick")
-        Navigation.findNavController(requireView()).navigateUp()
-    }
-
-    private fun getClip(id: String, pos: Int) {
-        Timber.d("getClip, id: $id, position: $pos")
-        viewModel.getClip(id, pos)
-    }
-
-    private fun onFollowClick(item: MemberPostItem, pos: Int, isFollow: Boolean) {
-        checkStatus {
-            Timber.d("onFollowClick, item:$item, pos:$pos, isFollow:$isFollow")
-            viewModel.followPost(item, pos, isFollow)
-        }
-    }
-
-    private fun onFavoriteClick(item: MemberPostItem, pos: Int, isFavorite: Boolean) {
+    private fun onFavoriteClick(item: VideoItem, pos: Int, isFavorite: Boolean) {
         checkStatus {
             Timber.d("onFavoriteClick,  item:$item, pos:$pos, isFavorite:$isFavorite")
-            viewModel.favoritePost(item, pos, isFavorite)
+            viewModel.modifyFavorite(item, pos, isFavorite)
         }
     }
 
-    private fun onLikeClick(item: MemberPostItem, pos: Int, isLike: Boolean) {
+    private fun onLikeClick(item: VideoItem, pos: Int, isLike: Boolean) {
         checkStatus {
             Timber.d("onLikeClick, item:$item, pos:$pos, isLike:$isLike")
             viewModel.likePost(item, pos, isLike)
         }
     }
 
-    private fun onCommentClick(item: MemberPostItem) {
+    private fun onCommentClick(item: VideoItem) {
         checkStatus {
             Timber.d("onCommentClick, item:$item")
             showCommentDialog(item)
         }
     }
 
-    private fun getClips(update: ((PagingData<MemberPostItem>, CoroutineScope) -> Unit)) {
+    private fun getClips(update: ((PagingData<VideoItem>, CoroutineScope) -> Unit)) {
         lifecycleScope.launch {
-            viewModel.getClips().collectLatest {
+            viewModel.getClips(orderByType).collectLatest {
                 update(it, this)
             }
         }
     }
 
-    private fun getPostDetail(item: MemberPostItem, position: Int, update: (Int, Boolean) -> Unit) {
-        viewModel.getPostDetail(item, position, update)
+    private fun getM3U8(item: VideoItem, position: Int, update: (Int, String, Int) -> Unit) {
+        viewModel.getM3U8(item, position, update)
     }
 
-    private fun showCommentDialog(item: MemberPostItem) {
+    private fun showCommentDialog(item: VideoItem) {
         val listener = object : CommentDialogFragment.CommentListener {
             override fun onAvatarClick(userId: Long, name: String) {
                 val bundle = MyPostFragment.createBundle(
@@ -348,10 +237,10 @@ class ClipPagerFragment : BaseFragment() {
             }
 
             override fun onUpdateCommentCount(count: Int) {
-                val index = memberPostItems.indexOf(item)
-                if (index >= 0) {
-                    memberPostItems[index].commentCount = count
-//                    rv_clip.adapter?.notifyItemChanged(index, ClipAdapter.PAYLOAD_UPDATE_UI)
+                val currentPos = clipAdapter.getCurrentPos()
+                if (currentPos >= 0) {
+                    clipAdapter.getVideoItem(currentPos)?.commentCount = count.toLong()
+                    rv_clip.adapter?.notifyItemChanged(currentPos, ClipAdapter.PAYLOAD_UPDATE_UI)
                 }
             }
         }
