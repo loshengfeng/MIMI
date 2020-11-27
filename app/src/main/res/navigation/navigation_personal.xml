@@ -9,6 +9,8 @@
     <include app:graph="@navigation/navigation_club_topic" />
     <include app:graph="@navigation/navigation_my_post" />
     <include app:graph="@navigation/navigation_setting" />
+    <include app:graph="@navigation/navigation_topup" />
+    <include app:graph="@navigation/navigation_topup" />
 
     <fragment
         android:id="@+id/personalFragment"
@@ -37,6 +39,22 @@
         <action
             android:id="@+id/action_to_settingFragment"
             app:destination="@id/navigation_setting" />
+
+        <action
+            android:id="@+id/action_personalFragment_to_topupFragment"
+            app:destination="@id/topUpFragment" />
+
+        <action
+            android:id="@+id/action_to_fanslistFragment"
+            app:destination="@id/fansListFragment" />
+
+        <action
+            android:id="@+id/action_to_likelistFragment"
+            app:destination="@id/likesListFragment" />
+
+        <action
+            android:id="@+id/action_to_inviteVipFragment"
+            app:destination="@id/inviteVipFragment" />
     </fragment>
 
     <fragment
@@ -82,5 +100,25 @@
         android:id="@+id/paymentInfoFragment"
         android:name="com.dabenxiang.mimi.view.paymentInfo.PaymentInfoFragment"
         android:label="PaymentInfoFragment" />
+
+    <fragment
+        android:id="@+id/fansListFragment"
+        android:name="com.dabenxiang.mimi.view.fans.FansListFragment"
+        android:label="FansListFragment" />
+
+    <fragment
+        android:id="@+id/likesListFragment"
+        android:name="com.dabenxiang.mimi.view.like.LikeFragment"
+        android:label="LikeFragment" />
+
+    <fragment
+        android:id="@+id/inviteVipFragment"
+        android:name="com.dabenxiang.mimi.view.invitevip.InviteVipFragment"
+        android:label="InviteVipFragment" />
+    <fragment
+        android:id="@+id/topUpFragment"
+        android:name="com.dabenxiang.mimi.view.topup.TopUpFragment"
+        android:label="TopUpFragment" />
+
 
 </navigation>
