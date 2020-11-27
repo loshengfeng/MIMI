@@ -21,5 +21,5 @@ interface MyPostListener {
     )
 
     fun onFollowClick(items: List<MemberPostItem>, position: Int, isFollow: Boolean)
-    fun onAvatarClick(userId: Long, name: String){}
+    fun onAvatarClick(userId: Long, name: String)
 }
