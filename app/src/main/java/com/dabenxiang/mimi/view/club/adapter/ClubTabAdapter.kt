@@ -21,6 +21,7 @@ import com.dabenxiang.mimi.view.club.follow.ClubPostFollowFragment
 import com.dabenxiang.mimi.view.club.latest.ClubLatestFragment
 import com.dabenxiang.mimi.view.club.post.ClubPostPicFragment
 import com.dabenxiang.mimi.view.club.post.ClubPostTextFragment
+import com.dabenxiang.mimi.view.club.post.ClubShortVideoFragment
 import com.dabenxiang.mimi.view.club.recommend.ClubRecommendFragment
 import kotlinx.android.synthetic.main.fragment_tab_test.*
 import timber.log.Timber
@@ -41,8 +42,7 @@ class ClubTabAdapter(
                 ClubLatestFragment()
             },
             TAB_CLIP to {
-                PageTestFragment.create(
-                        context.getString(R.string.club_tab_clip))
+                ClubShortVideoFragment()
             },
             TAB_PICTURE to { ClubPostPicFragment() },
             TAB_NOVEL to { ClubPostTextFragment() }

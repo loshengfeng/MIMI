@@ -118,27 +118,7 @@ class ClubShortVideoFragment : BaseFragment() {
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
             when (adultTabType) {
-                AdultTabType.PICTURE -> {
-                    val bundle = PictureDetailFragment.createBundle(item, 0)
-//                    navigateTo(
-//                        NavigateItem.Destination(
-//                            R.id.action_clubTabFragment_to_clubPicDetailFragment,
-//                            bundle
-//                        )
-//                    )
-                }
-                AdultTabType.TEXT -> {
-                    val bundle = TextDetailFragment.createBundle(item, 0)
-//                    navigateTo(
-//                        NavigateItem.Destination(
-//                            R.id.action_clubTabFragment_to_clubTextDetailFragment,
-//                            bundle
-//                        )
-//                    )
-                }
-                AdultTabType.CLIP -> {
-                    //todo 跳轉到短視頻內頁
-                }
+
             }
         }
 
@@ -265,8 +245,8 @@ class ClubShortVideoFragment : BaseFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-//        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-//        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
+        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
+        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
