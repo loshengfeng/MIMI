@@ -203,6 +203,7 @@ class ClubShortVideoFragment : BaseFragment() {
         }
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
+            Timber.i("onItemClick:$item")
             if (!accountManager.isLogin()) {
                 loginPageToggle(false)
                 return
