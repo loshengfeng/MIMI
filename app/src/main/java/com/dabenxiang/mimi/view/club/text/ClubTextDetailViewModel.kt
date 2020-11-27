@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.post
+package com.dabenxiang.mimi.view.club.text
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

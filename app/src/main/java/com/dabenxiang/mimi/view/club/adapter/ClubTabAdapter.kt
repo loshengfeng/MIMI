@@ -19,8 +19,8 @@ import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_RECOMMEND
 import com.dabenxiang.mimi.view.club.ClubTabViewModel
 import com.dabenxiang.mimi.view.club.follow.ClubPostFollowFragment
 import com.dabenxiang.mimi.view.club.latest.ClubLatestFragment
-import com.dabenxiang.mimi.view.club.post.ClubPostPicFragment
-import com.dabenxiang.mimi.view.club.post.ClubPostTextFragment
+import com.dabenxiang.mimi.view.club.pic.ClubPostPicFragment
+import com.dabenxiang.mimi.view.club.text.ClubPostTextFragment
 import com.dabenxiang.mimi.view.club.recommend.ClubRecommendFragment
 import kotlinx.android.synthetic.main.fragment_tab_test.*
 import timber.log.Timber

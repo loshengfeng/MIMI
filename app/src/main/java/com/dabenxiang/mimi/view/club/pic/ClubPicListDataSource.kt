@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.post
+package com.dabenxiang.mimi.view.club.pic
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
 
-class ClubTextListDataSource(
+class ClubPicListDataSource(
         private val domainManager: DomainManager,
         private val pagingCallback: PagingCallback,
         private val viewModelScope: CoroutineScope,
@@ -34,8 +34,9 @@ class ClubTextListDataSource(
                 val adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content
                         ?: AdItem()
 
-                val result = domainManager.getApiRepository().getMembersPost(PostType.TEXT, OrderBy.NEWEST,
-                        0, PER_LIMIT
+                val result = domainManager.getApiRepository().getMembersPost(PostType.IMAGE, OrderBy.NEWEST,
+                        0,
+                    PER_LIMIT
                 )
 
                 if (!result.isSuccessful) throw HttpException(result)
@@ -54,7 +55,12 @@ class ClubTextListDataSource(
                     ) -> PER_LIMIT
                     else -> null
                 }
-                emit(InitResult(postItem ?: arrayListOf(), nextPageKey))
+                emit(
+                    InitResult(
+                        postItem ?: arrayListOf(),
+                        nextPageKey
+                    )
+                )
             }
                     .flowOn(Dispatchers.IO)
                     .onStart { pagingCallback.onLoading() }
@@ -75,7 +81,7 @@ class ClubTextListDataSource(
         val next = params.key
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().getMembersPost(PostType.TEXT, OrderBy.HOTTEST, offset = next.toInt(), limit = PER_LIMIT)
+                val result = domainManager.getApiRepository().getMembersPost(PostType.IMAGE, OrderBy.HOTTEST, offset = next.toInt(), limit = PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(result)
             }

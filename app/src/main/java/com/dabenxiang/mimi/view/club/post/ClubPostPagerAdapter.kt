@@ -4,6 +4,8 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
+import com.dabenxiang.mimi.view.club.pic.ClubPicDetailFragment
+import com.dabenxiang.mimi.view.club.text.ClubTextDetailFragment
 
 class ClubPostPagerAdapter(f: Fragment, val data: MemberPostItem, val type: AdultTabType): FragmentStateAdapter(f) {
 
