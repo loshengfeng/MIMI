@@ -8,7 +8,6 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ActorCategoriesItem
 import com.dabenxiang.mimi.model.api.vo.ActorVideoItem
-import com.dabenxiang.mimi.model.api.vo.ActorVideosItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.actorvideos.ActorVideosFragment
@@ -18,8 +17,6 @@ import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import kotlinx.android.synthetic.main.fragment_actor.*
 import kotlinx.android.synthetic.main.fragment_actor.tv_search
-import kotlinx.android.synthetic.main.fragment_general_video.*
-import timber.log.Timber
 
 class ActorFragment : BaseFragment() {
 
@@ -74,7 +71,8 @@ class ActorFragment : BaseFragment() {
     override fun setupObservers() {
         viewModel.actorVideosResult.observe(viewLifecycleOwner, Observer {
             when (it.first) {
-                is ApiResult.Loaded -> ""
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Loaded -> progressHUD?.dismiss()
                 is ApiResult.Success -> {
                     val actorVideos = (it.first as ApiResult.Success).result
                     actorVideosAdapter.setupData(actorVideos)
