@@ -1,10 +1,12 @@
 package com.dabenxiang.mimi.view.player.ui
 
+import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.throttleFirst
@@ -17,6 +19,7 @@ import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
+import kotlinx.android.synthetic.main.item_ad.*
 import kotlinx.android.synthetic.main.item_clip_info.*
 import kotlinx.android.synthetic.main.item_video_tag.*
 import kotlinx.coroutines.GlobalScope
@@ -32,13 +35,33 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
 
     private val clipViewModel = ClipPlayerDescriptionViewModel()
 
+    override val isStatusBarDark: Boolean = true
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        getAdContent()
+    }
+
     override fun setupObservers() {
         super.setupObservers()
         viewModel.memberPostContentSource.observe(viewLifecycleOwner) {
             when (it) {
-                is ApiResult.Loading -> progressHUD.show()
                 is ApiResult.Success -> {
                     parsingPostContent(it.result)
+                }
+            }
+        }
+
+        clipViewModel.getAdResult.observe(viewLifecycleOwner) {
+            when (it) {
+                is ApiResult.Success -> {
+                    Glide.with(this)
+                        .load(it.result.href)
+                        .into(iv_ad)
+
+                    iv_ad.setOnClickListener { view ->
+                        GeneralUtils.openWebView(requireContext(), it.result.target)
+                    }
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
@@ -160,5 +183,12 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
             R.id.action_playerFragment_to_searchVideoFragment,
             bundle
         )
+    }
+
+    private fun getAdContent() {
+        // for ui init
+        val adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
+        val adHeight = (adWidth * 0.142).toInt()
+        clipViewModel.getAd(adWidth, adHeight)
     }
 }

@@ -52,6 +52,7 @@ class ClipPlayerFragment: BasePlayerFragment() {
         viewModel.memberPostContentSource.observe(viewLifecycleOwner) {
             when (it) {
                 is ApiResult.Loading -> progressHUD.show()
+                is ApiResult.Loaded -> progressHUD.dismiss()
                 is ApiResult.Success -> {
                     parsingPostContent(it.result)
                 }
