@@ -49,6 +49,7 @@ class ClubPicFragment : BaseFragment() {
         tv_title.text = getString(R.string.home_tab_picture)
 
         viewPager.adapter = ClubPostPagerAdapter(this, memberPostItem!!, AdultTabType.PICTURE)
+        viewPager.isSaveEnabled = false
 
         val title: ArrayList<String> = arrayListOf(getString(R.string.picture_detail_title), getString(R.string.comment))
 
