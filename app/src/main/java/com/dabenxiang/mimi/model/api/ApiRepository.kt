@@ -413,9 +413,10 @@ class ApiRepository(private val apiService: ApiService) {
      */
     suspend fun searchShortVideo(
         q: String? = null,
+        orderByType: StatisticsOrderType = StatisticsOrderType.LATEST,
         offset: String,
         limit: String
-    ) = apiService.searchShortVideo(q, offset, limit)
+    ) = apiService.searchShortVideo(q, orderByType.value, offset, limit)
 
     /**
      * 取得類別影片
