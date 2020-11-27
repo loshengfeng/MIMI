@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.text.Html
 import android.view.View
 import android.widget.ImageView
-import androidx.activity.addCallback
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -54,6 +53,9 @@ class TopUpFragment : BaseFragment() {
     private var lastTabIndex: Int = 0
 
     private var views: ArrayList<ConstraintLayout> = arrayListOf()
+
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
 
     companion object {
         const val TAG_FRAGMENT = "TAG_FRAGMENT"
@@ -301,17 +303,6 @@ class TopUpFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
-        val tag = arguments?.getString(TAG_FRAGMENT)?.takeIf { it.isNotBlank() } ?: ""
-        requireActivity().onBackPressedDispatcher.addCallback(
-            owner = viewLifecycleOwner,
-            onBackPressed = {
-                when (tag) {
-                    PlayerFragment::class.java.simpleName -> navigateTo(NavigateItem.Up)
-                    else -> mainViewModel?.changeNavigationPosition?.value = R.id.navigation_mimi
-                }
-            }
-        )
-
         tv_record_top_up.setOnClickListener {
             navigateTo(NavigateItem.Destination(R.id.action_topupFragment_to_orderFragment))
         }
