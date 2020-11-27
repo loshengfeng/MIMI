@@ -20,11 +20,13 @@ import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.club.ClubShortVideoViewModel
 import com.dabenxiang.mimi.view.club.recommend.ClubRecommendAdapter
 import com.dabenxiang.mimi.view.club.recommend.ClubRecommendViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
@@ -35,11 +37,6 @@ import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.flurry.sdk.it
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.fragment_club_latest.*
-import kotlinx.android.synthetic.main.fragment_club_latest.id_empty_group
-import kotlinx.android.synthetic.main.fragment_club_latest.layout_ad
-import kotlinx.android.synthetic.main.fragment_club_latest.layout_refresh
-import kotlinx.android.synthetic.main.fragment_club_latest.recycler_view
 import kotlinx.android.synthetic.main.fragment_club_post_text.*
 import kotlinx.android.synthetic.main.fragment_club_short.*
 import kotlinx.android.synthetic.main.fragment_club_text.*
@@ -47,26 +44,13 @@ import kotlinx.android.synthetic.main.fragment_order.*
 import kotlinx.android.synthetic.main.fragment_order.viewPager
 import kotlinx.android.synthetic.main.item_ad.view.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 class ClubShortVideoFragment : BaseFragment() {
     private val viewModel: ClubShortVideoViewModel by viewModels()
+    private val accountManager: AccountManager by inject()
     private var adapter: ClubShortVideoAdapter? = null
-    override fun getLayoutId() = R.layout.fragment_club_short
-    override val bottomNavigationVisibility: Int
-        get() = View.GONE
-
-    private var memberPostItem: MemberPostItem? = null
-
-    companion object {
-        const val KEY_DATA = "data"
-        fun createBundle(item: MemberPostItem): Bundle {
-            return Bundle().also {
-                it.putSerializable(KEY_DATA, item)
-            }
-        }
-    }
-
     private val memberPostFuncItem by lazy {
         MemberPostFuncItem(
             {},
@@ -75,6 +59,17 @@ class ClubShortVideoFragment : BaseFragment() {
             { item, isLike, func -> },
             { item, isFavorite, func -> }
         )
+    }
+
+    override fun getLayoutId() = R.layout.fragment_club_short
+
+    companion object {
+        const val KEY_DATA = "data"
+        fun createBundle(item: MemberPostItem): Bundle {
+            return Bundle().also {
+                it.putSerializable(KEY_DATA, item)
+            }
+        }
     }
 
     private val attachmentListener = object : AttachmentListener {
@@ -212,10 +207,10 @@ class ClubShortVideoFragment : BaseFragment() {
         viewModel.clubCount.observe(this, Observer {
             if (it <= 0) {
                 id_empty_group.visibility = View.VISIBLE
-                recycler_view.visibility = View.INVISIBLE
+                list_short.visibility = View.INVISIBLE
             } else {
                 id_empty_group.visibility = View.GONE
-                recycler_view.visibility = View.VISIBLE
+                list_short.visibility = View.VISIBLE
             }
             layout_refresh.isRefreshing = false
         })
@@ -292,7 +287,6 @@ class ClubShortVideoFragment : BaseFragment() {
     }
 
     private fun getData(){
-        viewModel.getAd()
         viewModel.getPostItemList()
     }
 
@@ -305,5 +299,25 @@ class ClubShortVideoFragment : BaseFragment() {
         checkStatus {
             viewModel.followMember(memberPostItem, ArrayList(items), isFollow, update)
         }
+    }
+
+    private fun loginPageToggle(isLogin: Boolean) {
+        if (isLogin) {
+            id_not_login_group.visibility = View.GONE
+            layout_refresh.visibility = View.VISIBLE
+        } else {
+            id_not_login_group.visibility = View.VISIBLE
+            layout_refresh.visibility = View.INVISIBLE
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Timber.i("onResume isLogin:${accountManager.isLogin()}")
+        loginPageToggle(accountManager.isLogin())
+        if (accountManager.isLogin() && viewModel.clubCount.value ?: -1 <= 0) {
+            getData()
+        }
+        viewModel.getAd()
     }
 }

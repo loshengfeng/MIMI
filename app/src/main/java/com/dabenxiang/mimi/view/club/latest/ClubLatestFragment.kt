@@ -246,8 +246,6 @@ class ClubLatestFragment : BaseFragment() {
                     onApiError(Exception("Unknown Error!"))
                 }
             }
-
-
         })
 
         viewModel.showProgress.observe(this, {

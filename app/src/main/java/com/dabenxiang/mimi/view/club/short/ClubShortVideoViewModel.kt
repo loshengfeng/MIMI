@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.post
+package com.dabenxiang.mimi.view.club
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -18,6 +18,7 @@ import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.club.recommend.ClubRecommendListDataSource
+import com.dabenxiang.mimi.view.club.short.ClubShortListDataSource
 import com.dabenxiang.mimi.view.home.memberpost.MemberPostDataSource
 import com.dabenxiang.mimi.view.home.memberpost.MemberPostFactory
 import kotlinx.coroutines.Dispatchers
@@ -61,7 +62,7 @@ class ClubShortVideoViewModel : BaseViewModel() {
     private fun getRecommendPostPagingItems(): LiveData<PagedList<MemberPostItem>> {
         val dataSourceFactory = object : DataSource.Factory<Int, MemberPostItem>() {
             override fun create(): DataSource<Int, MemberPostItem> {
-                return ClubRecommendListDataSource(
+                return ClubShortListDataSource(
                     domainManager,
                     pagingCallback,
                     viewModelScope,
@@ -77,17 +78,18 @@ class ClubShortVideoViewModel : BaseViewModel() {
         return LivePagedListBuilder(dataSourceFactory, config).build()
     }
 
+//    retrofit2.HttpException: HTTP 500 Internal Server Error
+//    at com.dabenxiang.mimi.view.club.ClubShortVideoViewModel$getAd$1$1.invokeSuspend(ClubShortVideoViewModel.kt:85)
     fun getAd() {
-        viewModelScope.launch {
-            flow {
-                val adResult = domainManager.getAdRepository().getAD(adWidth, adHeight)
-                if (!adResult.isSuccessful) throw HttpException(adResult)
-                emit(ApiResult.success(adResult.body()?.content))
-            }
-                .flowOn(Dispatchers.IO)
-                .collect { _adResult.value = it}
-        }
-
+//        viewModelScope.launch {
+//            flow {
+//                val adResult = domainManager.getAdRepository().getAD(adWidth, adHeight)
+//                if (!adResult.isSuccessful) throw HttpException(adResult)
+//                emit(ApiResult.success(adResult.body()?.content))
+//            }
+//                .flowOn(Dispatchers.IO)
+//                .collect { _adResult.value = it}
+//        }
     }
 
     private val pagingCallback = object : PagingCallback {
@@ -106,17 +108,6 @@ class ClubShortVideoViewModel : BaseViewModel() {
 
         override fun onCurrentItemCount(count: Long, isInitial: Boolean) {
             _clubCount.postValue(count.toInt())
-        }
-    }
-
-    private val clubPagingCallback = object : MyFollowPagingCallback {
-        override fun onTotalCount(count: Long) {
-            _clubCount.postValue(count.toInt())
-        }
-
-        override fun onIdList(list: ArrayList<Long>, isInitial: Boolean) {
-            if (isInitial) _clubIdList.clear()
-            _clubIdList.addAll(list)
         }
     }
 

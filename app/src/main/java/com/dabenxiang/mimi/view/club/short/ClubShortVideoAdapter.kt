@@ -18,17 +18,19 @@ import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
-class ClubShortVideoAdapter(val context: Context,
-                            private val isAdultTheme: Boolean,
-                            private val myPostListener: MyPostListener,
-                            private val attachmentListener: AttachmentListener,
-                            private val memberPostFuncItem: MemberPostFuncItem
+class ClubShortVideoAdapter(
+    val context: Context,
+    private val isAdultTheme: Boolean,
+    private val myPostListener: MyPostListener,
+    private val attachmentListener: AttachmentListener,
+    private val memberPostFuncItem: MemberPostFuncItem
 ) : PagedListAdapter<MemberPostItem, BaseViewHolder>(diffCallback) {
 
     companion object {
         const val PAYLOAD_UPDATE_LIKE = 0
         const val PAYLOAD_UPDATE_FAVORITE = 1
         const val PAYLOAD_UPDATE_FOLLOW = 2
+
         const val VIEW_TYPE_CLIP = 0
         const val VIEW_TYPE_PICTURE = 1
         const val VIEW_TYPE_TEXT = 2
@@ -114,7 +116,7 @@ class ClubShortVideoAdapter(val context: Context,
         val item = getItem(position)
         item?.also {
             when (holder) {
-                is AdHolder ->{
+                is AdHolder->{
                     Glide.with(context).load(item.adItem?.href).into(holder.adImg)
                     holder.adImg.setOnClickListener {
                         GeneralUtils.openWebView(context, item.adItem?.target ?: "")

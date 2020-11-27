@@ -39,14 +39,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/img_page_empty" />
 
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/id_empty_group"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        tools:visibility="visible"
-        app:constraint_referenced_ids="img_page_empty, text_page_empty" />
-
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/layout_refresh"
         android:layout_width="match_parent"
@@ -67,5 +59,30 @@
             tools:itemCount="4"
             tools:listitem="@layout/item_club_short"/>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <include
+        android:id="@+id/item_is_not_login"
+        layout="@layout/item_club_is_not_login"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/img_page_empty" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/id_empty_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="img_page_empty, text_page_empty, layout_ad" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/id_not_login_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="item_is_not_login, layout_ad" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
