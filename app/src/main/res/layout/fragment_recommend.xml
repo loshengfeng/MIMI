@@ -44,6 +44,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/bg_gray_1_radius_18"
+            android:drawablePadding="10dp"
             android:gravity="center_vertical"
             android:hint="@string/text_search_classification"
             android:paddingStart="10dp"
@@ -67,8 +68,8 @@
             android:text="@string/all"
             app:drawableStartCompat="@drawable/ico_filter"
             app:layout_constraintBottom_toBottomOf="@+id/tv_search"
-            app:layout_constraintStart_toStartOf="@+id/gl_filter_start"
             app:layout_constraintEnd_toEndOf="@+id/gl_filter_end"
+            app:layout_constraintStart_toStartOf="@+id/gl_filter_start"
             app:layout_constraintTop_toTopOf="@+id/tv_search" />
 
         <ImageView

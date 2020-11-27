@@ -260,8 +260,8 @@ class CategoriesFragment : BaseFragment() {
     }
 
     private fun getVideos() {
-        videoListAdapter.submitData(lifecycle, PagingData.empty())
         lifecycleScope.launch {
+            videoListAdapter.submitData(PagingData.empty())
             viewModel.getVideo(category, orderByType)
                 .collectLatest {
                     layout_refresh.isRefreshing = false
@@ -363,7 +363,7 @@ class CategoriesFragment : BaseFragment() {
     private fun adjustContentRV(notEmptyCount: Int) {
         rv_video.setPadding(
             0,
-            GeneralUtils.dpToPx(requireContext(), 50) * notEmptyCount,
+            GeneralUtils.dpToPx(requireContext(), 50) * notEmptyCount + GeneralUtils.dpToPx(requireContext(), 15),
             0,
             0
         )
