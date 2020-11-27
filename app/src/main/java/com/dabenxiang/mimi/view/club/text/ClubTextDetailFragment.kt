@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.post
+package com.dabenxiang.mimi.view.club.text
 
 import android.os.Bundle
 import android.view.View
@@ -47,7 +47,8 @@ class ClubTextDetailFragment : BaseFragment() {
                 it.putSerializable(KEY_DATA, item)
             }
 
-            val fragment = ClubTextDetailFragment()
+            val fragment =
+                ClubTextDetailFragment()
             fragment.arguments = bundle
             return fragment
         }
@@ -96,13 +97,14 @@ class ClubTextDetailFragment : BaseFragment() {
 
         memberPostItem = arguments?.get(KEY_DATA) as MemberPostItem
 
-        textDetailAdapter = ClubTextDetailAdapter(
-            requireContext(),
-            memberPostItem!!,
-            onTextDetailListener,
-            null,
-            clubPostFuncItem
-        )
+        textDetailAdapter =
+            ClubTextDetailAdapter(
+                requireContext(),
+                memberPostItem!!,
+                onTextDetailListener,
+                null,
+                clubPostFuncItem
+            )
 
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = textDetailAdapter

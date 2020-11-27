@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.post
+package com.dabenxiang.mimi.view.club.pic
 
 import android.os.Bundle
 import android.view.View
@@ -10,13 +10,14 @@ import com.dabenxiang.mimi.callback.ClubPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.ImageItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.club.text.ClubTextDetailAdapter
+import com.dabenxiang.mimi.view.club.text.ClubTextDetailViewModel
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.fullpicture.FullPictureFragment
 import com.dabenxiang.mimi.view.main.MainActivity
@@ -48,7 +49,8 @@ class ClubPicDetailFragment : BaseFragment() {
                 it.putSerializable(KEY_DATA, item)
             }
 
-            val fragment = ClubPicDetailFragment()
+            val fragment =
+                ClubPicDetailFragment()
             fragment.arguments = bundle
             return fragment
         }
@@ -71,14 +73,15 @@ class ClubPicDetailFragment : BaseFragment() {
 
         memberPostItem = arguments?.get(KEY_DATA) as MemberPostItem
 
-        pictureDetailAdapter = ClubPicDetailAdapter(
-            requireContext(),
-            memberPostItem!!,
-            onPictureDetailListener,
-            onPhotoGridItemClickListener,
-            null,
-            clubPostFuncItem
-        )
+        pictureDetailAdapter =
+            ClubPicDetailAdapter(
+                requireContext(),
+                memberPostItem!!,
+                onPictureDetailListener,
+                onPhotoGridItemClickListener,
+                null,
+                clubPostFuncItem
+            )
 
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = pictureDetailAdapter
@@ -87,7 +90,8 @@ class ClubPicDetailFragment : BaseFragment() {
         mainViewModel?.getAd(adWidth, adHeight)
     }
 
-    private val onTextDetailListener = object : ClubTextDetailAdapter.OnTextDetailListener {
+    private val onTextDetailListener = object :
+        ClubTextDetailAdapter.OnTextDetailListener {
         override fun onGetAttachment(id: Long?, view: ImageView) {
             viewModel.loadImage(id, view, LoadImageType.AVATAR)
         }
