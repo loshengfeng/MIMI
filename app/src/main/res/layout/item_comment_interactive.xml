@@ -72,7 +72,7 @@
         tools:text="赞99" />
 
     <TextView
-        android:id="@+id/text2"
+        android:id="@+id/txtDisLikeCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="12sp"
@@ -88,7 +88,7 @@
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="@+id/imgFavorite"
         app:layout_constraintStart_toStartOf="@+id/imgFavorite"
-        app:layout_constraintTop_toTopOf="@+id/text2"
+        app:layout_constraintTop_toTopOf="@+id/txtDisLikeCount"
         android:text="@string/club_favorite" />
 
     <TextView

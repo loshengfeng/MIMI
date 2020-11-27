@@ -103,11 +103,18 @@ class ClubTextDetailAdapter(
                 holder.title.text = memberPostItem.title
                 holder.desc.text = contentItem.text
                 holder.txtLikeCount.text = String.format(context.getString(R.string.club_like_count), memberPostItem.likeCount)
+                holder.txtDisLikeCount.text = String.format(context.getString(R.string.club_dislike_count), memberPostItem.dislikeCount)
 
                 if (memberPostItem.likeType == LikeType.LIKE) {
                     holder.imgLike.setImageResource(R.drawable.ico_nice_s)
                 } else {
-                    holder.imgLike.setImageResource(R.drawable.ico_nice_gray)
+                    holder.imgLike.setImageResource(R.drawable.ico_nice)
+                }
+
+                if (memberPostItem.likeType == LikeType.DISLIKE) {
+                    holder.imgDislike.setImageResource(R.drawable.ico_bad_s)
+                } else {
+                    holder.imgDislike.setImageResource(R.drawable.ico_bad)
                 }
 
                 if (memberPostItem.isFavorite) {
@@ -165,10 +172,13 @@ class ClubTextDetailAdapter(
                 }
 
                 holder.imgLike.setOnClickListener {
-                    val isLike = memberPostItem.likeType == LikeType.LIKE
-                    clubPostFuncItem.onLikeClick(memberPostItem, !isLike) { like, count -> updateLike(like, count, holder) }
+                    val isLike = memberPostItem.likeType != null
+                    clubPostFuncItem.onLikeClick(memberPostItem, !isLike, LikeType.LIKE, memberPostItem.likeType) { like, item -> updateLike(like, item, holder) }
                 }
-                holder.imgDislike.setOnClickListener {  }
+                holder.imgDislike.setOnClickListener {
+                    val isLike = memberPostItem.likeType != null
+                    clubPostFuncItem.onLikeClick(memberPostItem, !isLike, LikeType.DISLIKE, memberPostItem.likeType) { like, item -> updateLike(like, item, holder) }
+                }
                 holder.imgFavorite.setOnClickListener {
                     val isFavorite = memberPostItem.isFavorite
                     clubPostFuncItem.onFavoriteClick(memberPostItem, !isFavorite) { favorite, count ->
@@ -193,13 +203,19 @@ class ClubTextDetailAdapter(
         mAdItem = item
     }
 
-    private fun updateLike(isLike: Boolean, count: Int, holder: TextDetailViewHolder) {
-        if (isLike) {
+    private fun updateLike(isLike: Boolean, item: MemberPostItem, holder: TextDetailViewHolder) {
+        if (isLike && item.likeType == LikeType.LIKE) {
             holder.imgLike.setImageResource(R.drawable.ico_nice_s)
+            holder.imgDislike.setImageResource(R.drawable.ico_bad)
+        } else if (isLike && item.likeType == LikeType.DISLIKE) {
+            holder.imgDislike.setImageResource(R.drawable.ico_bad_s)
+            holder.imgLike.setImageResource(R.drawable.ico_nice)
         } else {
-            holder.imgLike.setImageResource(R.drawable.ico_nice_gray)
+            holder.imgLike.setImageResource(R.drawable.ico_nice)
+            holder.imgDislike.setImageResource(R.drawable.ico_bad)
         }
-        holder.txtLikeCount.text = String.format(context.getString(R.string.club_like_count), count)
+        holder.txtLikeCount.text = String.format(context.getString(R.string.club_like_count), item.likeCount)
+        holder.txtDisLikeCount.text = String.format(context.getString(R.string.club_dislike_count), item.dislikeCount)
     }
 
     private fun updateFavorite(isFavorite: Boolean, count: Int, holder: TextDetailViewHolder) {

@@ -10,18 +10,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.ClubPostFuncItem
-import com.dabenxiang.mimi.callback.OnItemClickListener
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
 import com.dabenxiang.mimi.view.picturedetail.viewholder.PictureDetailViewHolder
-import com.dabenxiang.mimi.view.textdetail.viewholder.TextDetailViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
@@ -103,17 +100,24 @@ class ClubPicDetailAdapter(
                     GeneralUtils.getTimeDiff(memberPostItem.creationDate, Date())
                 holder.title.text = memberPostItem.title
                 holder.txtLikeCount.text = String.format(context.getString(R.string.club_like_count), memberPostItem.likeCount)
+                holder.txtDisLikeCount.text = String.format(context.getString(R.string.club_dislike_count), memberPostItem.dislikeCount)
 
                 if (memberPostItem.likeType == LikeType.LIKE) {
                     holder.imgLike.setImageResource(R.drawable.ico_nice_s)
                 } else {
-                    holder.imgLike.setImageResource(R.drawable.ico_nice_gray)
+                    holder.imgLike.setImageResource(R.drawable.ico_nice)
+                }
+
+                if (memberPostItem.likeType == LikeType.DISLIKE) {
+                    holder.imgDislike.setImageResource(R.drawable.ico_bad_s)
+                } else {
+                    holder.imgDislike.setImageResource(R.drawable.ico_bad)
                 }
 
                 if (memberPostItem.isFavorite) {
                     holder.imgFavorite.setImageResource(R.drawable.btn_favorite_white_s)
                 } else {
-                    holder.imgFavorite.setImageResource(R.drawable.btn_favorite_n)
+                    holder.imgFavorite.setImageResource(R.drawable.btn_favorite_white_n)
                 }
 
                 onPictureDetailListener.onGetAttachment(
@@ -179,10 +183,13 @@ class ClubPicDetailAdapter(
                 }
 
                 holder.imgLike.setOnClickListener {
-                    val isLike = memberPostItem.likeType == LikeType.LIKE
-                    clubPostFuncItem.onLikeClick(memberPostItem, !isLike) { like, count -> updateLike(like, count, holder) }
+                    val isLike = memberPostItem.likeType != null
+                    clubPostFuncItem.onLikeClick(memberPostItem, !isLike, LikeType.LIKE, memberPostItem.likeType) { like, item -> updateLike(like, item, holder) }
                 }
-                holder.imgDislike.setOnClickListener {  }
+                holder.imgDislike.setOnClickListener {
+                    val isLike = memberPostItem.likeType != null
+                    clubPostFuncItem.onLikeClick(memberPostItem, !isLike, LikeType.DISLIKE, memberPostItem.likeType) { like, item -> updateLike(like, item, holder) }
+                }
                 holder.imgFavorite.setOnClickListener {
                     val isFavorite = memberPostItem.isFavorite
                     clubPostFuncItem.onFavoriteClick(memberPostItem, !isFavorite) { favorite, count ->
@@ -207,20 +214,26 @@ class ClubPicDetailAdapter(
         mAdItem = item
     }
 
-    private fun updateLike(isLike: Boolean, count: Int, holder: PictureDetailViewHolder) {
-        if (isLike) {
+    private fun updateLike(isLike: Boolean, item: MemberPostItem, holder: PictureDetailViewHolder) {
+        if (isLike && item.likeType == LikeType.LIKE) {
             holder.imgLike.setImageResource(R.drawable.ico_nice_s)
+            holder.imgDislike.setImageResource(R.drawable.ico_bad)
+        } else if (isLike && item.likeType == LikeType.DISLIKE) {
+            holder.imgDislike.setImageResource(R.drawable.ico_bad_s)
+            holder.imgLike.setImageResource(R.drawable.ico_nice)
         } else {
-            holder.imgLike.setImageResource(R.drawable.ico_nice_gray)
+            holder.imgLike.setImageResource(R.drawable.ico_nice)
+            holder.imgDislike.setImageResource(R.drawable.ico_bad)
         }
-        holder.txtLikeCount.text = String.format(context.getString(R.string.club_like_count), count)
+        holder.txtLikeCount.text = String.format(context.getString(R.string.club_like_count), item.likeCount)
+        holder.txtDisLikeCount.text = String.format(context.getString(R.string.club_dislike_count), item.dislikeCount)
     }
 
     private fun updateFavorite(isFavorite: Boolean, count: Int, holder: PictureDetailViewHolder) {
         if (isFavorite) {
             holder.imgFavorite.setImageResource(R.drawable.btn_favorite_white_s)
         } else {
-            holder.imgFavorite.setImageResource(R.drawable.btn_favorite_n)
+            holder.imgFavorite.setImageResource(R.drawable.btn_favorite_white_n)
         }
     }
 

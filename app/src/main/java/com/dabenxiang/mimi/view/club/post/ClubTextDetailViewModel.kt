@@ -133,25 +133,56 @@ class ClubTextDetailViewModel: BaseViewModel() {
         }
     }
 
-    fun likePost(item: MemberPostItem, isLike: Boolean, update: (Boolean, Int) -> Unit) {
+    fun likePost(item: MemberPostItem, isLike: Boolean, type: LikeType, originType: LikeType?, update: (Boolean, MemberPostItem) -> Unit) {
         viewModelScope.launch {
+            var like = isLike
             flow {
                 val apiRepository = domainManager.getApiRepository()
-                val likeType = when {
-                    isLike -> LikeType.LIKE
-                    else -> LikeType.DISLIKE
-                }
-                val request = LikeRequest(likeType)
-                val result = apiRepository.like(item.id, request)
-                if (!result.isSuccessful) throw HttpException(result)
+                if (isLike) {
+                    val request = LikeRequest(type)
+                    val result = apiRepository.like(item.id, request)
+                    if (!result.isSuccessful) throw HttpException(result)
+                    item.likeType = type
 
-                item.likeType = likeType
-                item.likeCount = when (item.likeType) {
-                    LikeType.LIKE -> item.likeCount + 1
-                    else -> item.likeCount - 1
-                }
+                    if (type == LikeType.LIKE) {
+                        item.likeCount += 1
+                    } else {
+                        item.dislikeCount += 1
+                    }
+                    emit(ApiResult.success(item))
+                } else {
+                    if (originType == type) {
+                        val result = apiRepository.deleteLike(item.id)
+                        if (!result.isSuccessful) throw HttpException(result)
 
-                emit(ApiResult.success(item.likeCount))
+                        item.likeType = null
+
+                        if (type == LikeType.LIKE) {
+                            item.likeCount -= 1
+                        } else {
+                            item.dislikeCount -= 1
+                        }
+                    } else if (originType == LikeType.LIKE) {
+                        val request = LikeRequest(LikeType.DISLIKE)
+                        val result = apiRepository.like(item.id, request)
+                        if (!result.isSuccessful) throw HttpException(result)
+
+                        like = true
+                        item.likeType = LikeType.DISLIKE
+                        item.likeCount -= 1
+                        item.dislikeCount += 1
+                    } else if (originType == LikeType.DISLIKE) {
+                        val request = LikeRequest(LikeType.DISLIKE)
+                        val result = apiRepository.like(item.id, request)
+                        if (!result.isSuccessful) throw HttpException(result)
+
+                        like = true
+                        item.likeType = LikeType.LIKE
+                        item.likeCount += 1
+                        item.dislikeCount -=1
+                    }
+                    emit(ApiResult.success(item))
+                }
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
@@ -160,13 +191,49 @@ class ClubTextDetailViewModel: BaseViewModel() {
                 .collect {
                     when (it) {
                         is ApiResult.Success -> {
-                            update(isLike, it.result)
+                            update(like, it.result)
 //                            getAllOtherPosts(lastPosition)
                         }
                     }
                 }
         }
     }
+
+//    fun likePost(item: MemberPostItem, isLike: Boolean, update: (Boolean, Int) -> Unit) {
+//        Log.d("arvin", "isLike : " + isLike)
+//        viewModelScope.launch {
+//            flow {
+//                val apiRepository = domainManager.getApiRepository()
+//                val likeType = when {
+//                    isLike -> LikeType.LIKE
+//                    else -> LikeType.DISLIKE
+//                }
+//                val request = LikeRequest(likeType)
+//                val result = apiRepository.like(item.id, request)
+//                if (!result.isSuccessful) throw HttpException(result)
+//
+////                item.likeType = likeType
+//                item.likeCount = when (item.likeType) {
+//                    LikeType.LIKE -> item.likeCount + 1
+//                    else -> item.likeCount - 1
+//                }
+//
+//                emit(ApiResult.success(item.likeCount))
+//            }
+//                .flowOn(Dispatchers.IO)
+//                .onStart { emit(ApiResult.loading()) }
+//                .onCompletion { emit(ApiResult.loaded()) }
+//                .catch { e -> emit(ApiResult.error(e)) }
+//                .collect {
+//                    when (it) {
+//                        is ApiResult.Success -> {
+//                            update(isLike, it.result)
+////                            getAllOtherPosts(lastPosition)
+//                        }
+//                    }
+//                }
+//        }
+//    }
 
     fun followMember(
         item: MemberPostItem,

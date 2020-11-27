@@ -688,6 +688,13 @@ class ApiRepository(private val apiService: ApiService) {
     ) = apiService.like(postId, body)
 
     /**
+     * 帖子移除喜歡/不喜歡
+     */
+    suspend fun deleteLike(
+        postId: Long
+    ) = apiService.deleteLike(postId)
+
+    /**
      * 帖子問題回報
      */
     suspend fun sendPostReport(

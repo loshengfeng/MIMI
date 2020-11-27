@@ -515,6 +515,11 @@ interface ApiService {
         @Body body: LikeRequest
     ): Response<Void>
 
+    @DELETE("/v1/Members/Post/{postId}/Like")
+    suspend fun deleteLike(
+        @Path("postId") postId: Long
+    ): Response<Void>
+
     @POST("/v1/Members/Post/{postId}/PostReport")
     suspend fun sendPostReport(
         @Path("postId") postId: Long,

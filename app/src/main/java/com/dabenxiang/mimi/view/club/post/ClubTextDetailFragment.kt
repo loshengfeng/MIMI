@@ -11,6 +11,7 @@ import com.dabenxiang.mimi.callback.ClubPostFuncItem
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
@@ -190,9 +191,11 @@ class ClubTextDetailFragment : BaseFragment() {
     private fun likePost(
         memberPostItem: MemberPostItem,
         isLike: Boolean,
-        update: (Boolean, Int) -> Unit
+        type: LikeType,
+        originType: LikeType?,
+        update: (Boolean, MemberPostItem) -> Unit
     ) {
-        checkStatus { viewModel.likePost(memberPostItem, isLike, update) }
+        checkStatus { viewModel.likePost(memberPostItem, isLike, type, originType, update) }
     }
 
     private val clubPostFuncItem by lazy {
@@ -200,7 +203,7 @@ class ClubTextDetailFragment : BaseFragment() {
             {},
             { id, view, type -> viewModel.loadImage(id, view, type) },
             { item, items, isFollow, func -> followMember(item, items, isFollow, func) },
-            { item, isLike, func -> likePost(item, isLike, func) },
+            { item, isLike, type, originType, func -> likePost(item, isLike, type, originType, func) },
             { item, isFavorite, func -> favoritePost(item, isFavorite, func) }
         )
     }

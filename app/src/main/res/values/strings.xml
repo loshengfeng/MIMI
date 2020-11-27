@@ -106,6 +106,7 @@
     <string name="club_share">分享</string>
     <string name="club_report">回报</string>
     <string name="club_like_count">赞%1$d</string>
+    <string name="club_dislike_count">踩%1$d</string>
 
     <!-- Favorite -->
     <string name="favorite_title">我的收藏</string>
