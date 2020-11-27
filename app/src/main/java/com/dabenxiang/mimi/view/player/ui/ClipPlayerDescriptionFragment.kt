@@ -12,6 +12,8 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
@@ -49,9 +51,38 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
             GlobalScope.launch {
                 flow {
                     clipViewModel.followPost(viewModel.videoContentId)
-                    (it as TextView).text.let { text ->
-                        updataFollow(text != getText(R.string.follow))
-                    }
+                    updataFollow((it as TextView).text != getText(R.string.follow))
+                    emit(null)
+                }
+                    .throttleFirst(500)
+            }
+        }
+
+        clip_icon.setOnClickListener {
+            GlobalScope.launch {
+                flow {
+                    clipViewModel.followPost(viewModel.videoContentId)
+                    updataFollow(tv_follow.text != getText(R.string.follow))
+                    emit(null)
+                }
+                    .throttleFirst(500)
+            }
+        }
+
+        clip_name.setOnClickListener {
+            GlobalScope.launch {
+                flow {
+                    val bundle = MyPostFragment.createBundle(
+                        viewModel.accountManager.getProfile().userId, (it as TextView).text.toString(),
+                        isAdult = true,
+                        isAdultTheme = true
+                    )
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_to_myPostFragment,
+                            bundle
+                        )
+                    )
                     emit(null)
                 }
                     .throttleFirst(500)
@@ -72,7 +103,17 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
         clip_update_time.text = GeneralUtils.getTimeDiff(postItem.creationDate, Date())
 
         clip_title.setTextColor(App.self.getColor(R.color.color_black_1))
-        clip_title.text = postItem.title
+        val adjustmentFormat = postItem.title.let {
+            val builder = StringBuilder().append(it)
+            if(it.length > 20) {
+                for (i in 0..it.length) {
+                    if( (i / 10) == 0) builder.append("/n")
+                    builder.append(it[i])
+                }
+            }
+            builder.toString()
+        }
+        clip_title.text = adjustmentFormat
 
         setupChipGroup(postItem.tags)
     }
