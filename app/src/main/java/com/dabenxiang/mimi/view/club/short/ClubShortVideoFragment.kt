@@ -192,6 +192,10 @@ class ClubShortVideoFragment : BaseFragment() {
 
         }
 
+        override fun onAvatarClick(userId: Long, name: String) {
+            TODO("Not yet implemented")
+        }
+
         override fun onMoreClick(item: MemberPostItem, position: Int) {
             onMoreClick(item, position) {
                 it as MemberPostItem
