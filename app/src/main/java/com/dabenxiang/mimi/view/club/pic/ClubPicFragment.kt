@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.post
+package com.dabenxiang.mimi.view.club.pic
 
 import android.os.Bundle
 import android.view.View
@@ -7,13 +7,14 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.club.post.ClubPostPagerAdapter
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_club_text.*
 import kotlinx.android.synthetic.main.fragment_order.viewPager
 import kotlinx.android.synthetic.main.item_setting_bar.*
 
-class ClubTextFragment : BaseFragment() {
+class ClubPicFragment : BaseFragment() {
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -29,7 +30,7 @@ class ClubTextFragment : BaseFragment() {
         }
     }
 
-    override fun getLayoutId() = R.layout.fragment_club_text
+    override fun getLayoutId() = R.layout.fragment_club_pic
 
     override fun setupObservers() {
 
@@ -46,12 +47,17 @@ class ClubTextFragment : BaseFragment() {
 
         memberPostItem = arguments?.getSerializable(PictureDetailFragment.KEY_DATA) as MemberPostItem
 
-        tv_title.text = getString(R.string.home_tab_text)
+        tv_title.text = getString(R.string.home_tab_picture)
 
-        viewPager.adapter = ClubPostPagerAdapter(this, memberPostItem!!, AdultTabType.TEXT)
+        viewPager.adapter =
+            ClubPostPagerAdapter(
+                this,
+                memberPostItem!!,
+                AdultTabType.PICTURE
+            )
         viewPager.isSaveEnabled = false
 
-        val title: ArrayList<String> = arrayListOf(getString(R.string.text_detail_title), getString(R.string.comment))
+        val title: ArrayList<String> = arrayListOf(getString(R.string.picture_detail_title), getString(R.string.comment))
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = title[position]

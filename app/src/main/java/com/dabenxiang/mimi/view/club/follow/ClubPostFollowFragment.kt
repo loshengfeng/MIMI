@@ -17,11 +17,14 @@ import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
+import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
+import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_follow.*
@@ -29,7 +32,6 @@ import kotlinx.android.synthetic.main.item_ad.view.*
 import kotlinx.android.synthetic.main.item_club_is_not_login.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
-
 
 class ClubPostFollowFragment : BaseFragment() {
 
@@ -180,6 +182,28 @@ class ClubPostFollowFragment : BaseFragment() {
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
+            checkStatus {
+                when (adultTabType) {
+                    AdultTabType.PICTURE -> {
+                        val bundle = PictureDetailFragment.createBundle(item, 1)
+                        navigateTo(
+                                NavigateItem.Destination(
+                                        R.id.action_clubTabFragment_to_clubPicFragment,
+                                        bundle
+                                )
+                        )
+                    }
+                    AdultTabType.TEXT -> {
+                        val bundle = TextDetailFragment.createBundle(item, 1)
+                       navigateTo(
+                            NavigateItem.Destination(
+                                    R.id.action_clubTabFragment_to_clubTextFragment,
+                                    bundle
+                            )
+                    )
+                    }
+                }
+            }
         }
 
         override fun onFavoriteClick(item: MemberPostItem, position: Int, isFavorite: Boolean, type: AttachmentType) {
@@ -241,7 +265,30 @@ class ClubPostFollowFragment : BaseFragment() {
 
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {}
 
-        override fun onChipClick(type: PostType, tag: String) {}
+        override fun onChipClick(type: PostType, tag: String) {
+            val item = SearchPostItem(type, tag)
+            val bundle = SearchPostFragment.createBundle(item)
+            navigateTo(
+                    NavigateItem.Destination(
+                            R.id.action_clubTabFragment_to_searchPostFragment,
+                            bundle
+                    )
+            )
+        }
+
+        override fun onAvatarClick(userId: Long, name: String) {
+            val bundle = MyPostFragment.createBundle(
+                    userId, name,
+                    isAdult = true,
+                    isAdultTheme = true
+            )
+            navigateTo(
+                    NavigateItem.Destination(
+                            R.id.action_clubTabFragment_to_myPostFragment,
+                            bundle
+                    )
+            )
+        }
     }
 
     private val attachmentListener = object : AttachmentListener {

@@ -2,15 +2,13 @@ package com.dabenxiang.mimi.view.clip
 
 import android.content.Context
 import android.net.Uri
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.MediaContentItem
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.view.player.PlayerViewModel
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
@@ -22,37 +20,35 @@ import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
-import com.google.gson.Gson
 import timber.log.Timber
-import java.io.File
 
 class ClipAdapter(
     private val context: Context,
-    private val clipMap: HashMap<String, File> = hashMapOf(),
     private var currentPosition: Int = 0,
     private var clipFuncItem: ClipFuncItem = ClipFuncItem()
-) : PagingDataAdapter<MemberPostItem, ClipViewHolder>(DIFF_CALLBACK) {
+) : PagingDataAdapter<VideoItem, ClipViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         private val DIFF_CALLBACK =
-            object : DiffUtil.ItemCallback<MemberPostItem>() {
+            object : DiffUtil.ItemCallback<VideoItem>() {
                 override fun areItemsTheSame(
-                    oldItem: MemberPostItem,
-                    newItem: MemberPostItem
+                    oldItem: VideoItem,
+                    newItem: VideoItem
                 ): Boolean {
                     return oldItem.id == newItem.id
                 }
 
                 override fun areContentsTheSame(
-                    oldItem: MemberPostItem,
-                    newItem: MemberPostItem
+                    oldItem: VideoItem,
+                    newItem: VideoItem
                 ): Boolean {
                     return oldItem == newItem
                 }
             }
         const val PAYLOAD_UPDATE_UI = 0
-        const val PAYLOAD_UPDATE_DEDUCTED = 1
-        const val PAYLOAD_UPDATE_PLAYER = 2
+        const val PAYLOAD_UPDATE_AFTER_M3U8 = 1
+        const val PAYLOAD_UPDATE_SCROLL_AWAY = 2
+        const val ERROR_CODE_ACCOUNT_OVERDUE = 402
 
         var playingId: String = ""
     }
@@ -61,6 +57,14 @@ class ClipAdapter(
 
     private var exoPlayer: SimpleExoPlayer? = null
     private var lastWindowIndex = 0
+    private var m3u8Url: String? = null
+    private var isOverdue: Boolean = false
+
+    fun setM3U8Result(url: String, errorCode: Int) {
+        Timber.d("@@@errorCode: $errorCode")
+        m3u8Url = url
+        isOverdue = errorCode == ERROR_CODE_ACCOUNT_OVERDUE
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClipViewHolder {
         return ClipViewHolder(
@@ -76,7 +80,7 @@ class ClipAdapter(
         this.clipFuncItem = clipFuncItem
     }
 
-    fun getMemberPostItem(position: Int): MemberPostItem? {
+    fun getVideoItem(position: Int): VideoItem? {
         return getItem(position)
     }
 
@@ -89,6 +93,10 @@ class ClipAdapter(
     }
 
     fun releasePlayer() {
+        currentViewHolder?.also {
+            it.playerView.hideController()
+            it.ivCover.visibility = View.VISIBLE
+        }
         exoPlayer?.also { player ->
             player.playWhenReady = false
             player.removeListener(playbackStateListener)
@@ -110,23 +118,20 @@ class ClipAdapter(
         payloads: MutableList<Any>
     ) {
         Timber.d("onBindViewHolder position:$position, currentPosition: $currentPosition, payloads: $payloads")
-        val item = getItem(position) ?: MemberPostItem()
-
-        var contentItem: MediaContentItem? = null
-        try {
-            contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        val item = getItem(position) ?: VideoItem()
 
         payloads.takeIf { it.isNotEmpty() }?.also {
             when (it[0] as Int) {
                 PAYLOAD_UPDATE_UI -> {
-                    holder.onBind(item, clipFuncItem, position)
+                    holder.onBind(item)
                 }
-                PAYLOAD_UPDATE_DEDUCTED -> {
-                    holder.onUpdateByDeducted(item, clipFuncItem, position)
-                    if (item.deducted) {
+                PAYLOAD_UPDATE_SCROLL_AWAY -> {
+                    holder.ivCover.visibility = View.VISIBLE
+                    holder.onBind(item)
+                }
+                PAYLOAD_UPDATE_AFTER_M3U8 -> {
+                    holder.updateAfterM3U8(item, clipFuncItem, position, isOverdue)
+                    if (!isOverdue) {
                         takeIf { currentPosition == position }?.also {
                             currentViewHolder = holder
                             holder.progress.visibility = View.VISIBLE
@@ -159,61 +164,21 @@ class ClipAdapter(
                                 holder.ibPlay.visibility = View.GONE
                             }
                         }
-                        processClip(
-                            holder.playerView,
-                            contentItem?.shortVideo?.id.toString(),
-                            contentItem?.shortVideo?.url.toString(),
-                            position
-                        )
+                        processClip(holder.playerView, m3u8Url, position)
                     }
-                }
-                PAYLOAD_UPDATE_PLAYER -> {
-                    processClip(
-                        holder.playerView,
-                        contentItem?.shortVideo?.id.toString(),
-                        contentItem?.shortVideo?.url.toString(),
-                        position
-                    )
                 }
             }
         } ?: run {
-            holder.onBind(item, clipFuncItem, position)
+            holder.onBind(item)
         }
     }
 
     override fun onBindViewHolder(holder: ClipViewHolder, position: Int) {
     }
 
-    private fun processClip(playerView: PlayerView, id: String, url: String, position: Int) {
-        Timber.d("processClip position:$position, id:$id, url:$url")
-        val item = getItem(position) ?: MemberPostItem()
-        playingId = id
-        var contentItem: MediaContentItem? = null
-        try {
-            contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        if (TextUtils.isEmpty(url)) {
-            if (clipMap.containsKey(id)) {
-                takeIf { currentPosition == position }?.also {
-                    setupPlayer(
-                        playerView,
-                        clipMap[id]?.toURI().toString()
-                    )
-                }
-            } else {
-                clipFuncItem.getClip(id, position)
-            }
-        } else {
-            takeIf { currentPosition == position }?.also {
-                setupPlayer(
-                    playerView,
-                    contentItem?.shortVideo?.url.toString()
-                )
-            }
-        }
+    private fun processClip(playerView: PlayerView, url: String?, position: Int) {
+        Timber.d("processClip position:$position, url:$url")
+        url?.takeIf { currentPosition == position }?.run { setupPlayer(playerView, this) }
     }
 
     private fun setupPlayer(playerView: PlayerView, uri: String) {
@@ -240,13 +205,17 @@ class ClipAdapter(
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
             val stateString: String = when (playbackState) {
                 ExoPlayer.STATE_IDLE -> "ExoPlayer.STATE_IDLE"
-                ExoPlayer.STATE_BUFFERING -> "ExoPlayer.STATE_BUFFERING"
+                ExoPlayer.STATE_BUFFERING -> {
+                    currentViewHolder?.progress?.visibility = View.VISIBLE
+                    "ExoPlayer.STATE_BUFFERING"
+                }
                 ExoPlayer.STATE_READY -> {
                     currentViewHolder?.progress?.visibility = View.GONE
                     currentViewHolder?.ivCover?.visibility = View.GONE
                     "ExoPlayer.STATE_READY"
                 }
                 ExoPlayer.STATE_ENDED -> {
+                    clipFuncItem.scrollToNext(currentPosition + 1)
                     currentViewHolder?.ibReplay?.visibility = View.VISIBLE
                     "ExoPlayer.STATE_ENDED"
                 }

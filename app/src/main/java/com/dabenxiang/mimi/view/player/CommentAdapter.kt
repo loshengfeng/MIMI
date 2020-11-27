@@ -339,8 +339,7 @@ abstract class BaseCommentProvider(
         holder.setTextColorRes(R.id.tv_name, getTextColor())
         holder.setTextColorRes(R.id.tv_date, getTextColor())
 
-        holder.setText(R.id.tv_message, if(!TextUtils.isEmpty(data.postName)) "@${data.postName} ${data.content}"
-        else data.content)
+        holder.setText(R.id.tv_message, data.content)
 
         holder.setTextColorRes(R.id.tv_message, getMessageTextColor())
         holder.setTextColorRes(R.id.tv_like, getMessageTextColor())
