@@ -47,6 +47,8 @@ class ClipAdapter(
             }
         const val PAYLOAD_UPDATE_UI = 0
         const val PAYLOAD_UPDATE_AFTER_M3U8 = 1
+        const val PAYLOAD_UPDATE_SCROLL_AWAY = 2
+        const val ERROR_CODE_ACCOUNT_OVERDUE = 402
 
         var playingId: String = ""
     }
@@ -61,7 +63,7 @@ class ClipAdapter(
     fun setM3U8Result(url: String, errorCode: Int) {
         Timber.d("@@@errorCode: $errorCode")
         m3u8Url = url
-        isOverdue = errorCode == 402
+        isOverdue = errorCode == ERROR_CODE_ACCOUNT_OVERDUE
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClipViewHolder {
@@ -91,6 +93,10 @@ class ClipAdapter(
     }
 
     fun releasePlayer() {
+        currentViewHolder?.also {
+            it.playerView.hideController()
+            it.ivCover.visibility = View.VISIBLE
+        }
         exoPlayer?.also { player ->
             player.playWhenReady = false
             player.removeListener(playbackStateListener)
@@ -117,6 +123,10 @@ class ClipAdapter(
         payloads.takeIf { it.isNotEmpty() }?.also {
             when (it[0] as Int) {
                 PAYLOAD_UPDATE_UI -> {
+                    holder.onBind(item)
+                }
+                PAYLOAD_UPDATE_SCROLL_AWAY -> {
+                    holder.ivCover.visibility = View.VISIBLE
                     holder.onBind(item)
                 }
                 PAYLOAD_UPDATE_AFTER_M3U8 -> {
