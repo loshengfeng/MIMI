@@ -218,45 +218,23 @@ class ClubPostTextFragment : BaseFragment() {
         }
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            when (adultTabType) {
-                AdultTabType.PICTURE -> {
-                    val bundle = ClubPicFragment.createBundle(item)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_clubTabFragment_to_clubPicFragment,
-                            bundle
-                        )
-                    )
-                }
-                AdultTabType.TEXT -> {
-                    val bundle = TextDetailFragment.createBundle(item, 0)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_clubTabFragment_to_clubTextFragment,
-                            bundle
-                        )
-                    )
-                }
-                AdultTabType.CLIP -> {
-                    //todo 跳轉到短視頻內頁
-                }
-            }
+            val bundle = ClubTextFragment.createBundle(item)
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_clubTabFragment_to_clubTextFragment,
+                    bundle
+                )
+            )
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            // todo Go to comment in detail
-            checkStatus {
-                when (adultTabType) {
-                    AdultTabType.PICTURE -> {
-                        val bundle = PictureDetailFragment.createBundle(item, 1)
-//                        navigationToPicture(bundle)
-                    }
-                    AdultTabType.TEXT -> {
-                        val bundle = TextDetailFragment.createBundle(item, 1)
-//                        navigationToText(bundle)
-                    }
-                }
-            }
+            val bundle = TextDetailFragment.createBundle(item, 1)
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_clubTabFragment_to_clubTextFragment,
+                    bundle
+                )
+            )
         }
 
         override fun onFavoriteClick(
@@ -286,7 +264,7 @@ class ClubPostTextFragment : BaseFragment() {
             )
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_to_myPostFragment,
+                    R.id.action_clubTabFragment_to_myPostFragment,
                     bundle
                 )
             )

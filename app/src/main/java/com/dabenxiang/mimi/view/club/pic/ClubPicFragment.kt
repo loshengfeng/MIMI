@@ -23,9 +23,11 @@ class ClubPicFragment : BaseFragment() {
 
     companion object {
         const val KEY_DATA = "data"
-        fun createBundle(item: MemberPostItem): Bundle {
+        const val KEY_POSITION = "position"
+        fun createBundle(item: MemberPostItem, position: Int = 0): Bundle {
             return Bundle().also {
                 it.putSerializable(KEY_DATA, item)
+                it.putSerializable(KEY_POSITION, position)
             }
         }
     }
@@ -62,5 +64,8 @@ class ClubPicFragment : BaseFragment() {
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = title[position]
         }.attach()
+
+        val position = arguments?.getInt(KEY_POSITION, 0)
+        viewPager.currentItem = position!!
     }
 }
