@@ -40,7 +40,8 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
             { onVipClick() },
             { onPromoteClick() },
             { update -> getClips(update) },
-            { item, pos, update -> getM3U8(item, pos, update) }
+            { item, pos, update -> getM3U8(item, pos, update) },
+            { pos -> scrollToNext(pos) }
         )
     }
 
@@ -98,7 +99,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
                             clipAdapter.getVideoItem(currentPos)?.run {
                                 clipFuncItem.getM3U8(this, currentPos, ::updateAfterM3U8)
                             }
-                        } ?: clipAdapter.updateCurrentPosition(lastPos)
+                        }
                     }
                 }
             }
@@ -218,6 +219,10 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
 
     private fun getM3U8(item: VideoItem, position: Int, update: (Int, String, Int) -> Unit) {
         viewModel.getM3U8(item, position, update)
+    }
+
+    private fun scrollToNext(nextPosition: Int) {
+        rv_clip.smoothScrollToPosition(nextPosition)
     }
 
     private fun showCommentDialog(item: VideoItem) {
