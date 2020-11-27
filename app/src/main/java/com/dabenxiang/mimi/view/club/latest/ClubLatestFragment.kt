@@ -23,6 +23,8 @@ import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
+import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
@@ -124,21 +126,21 @@ class ClubLatestFragment : BaseFragment() {
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
             when (adultTabType) {
                 AdultTabType.PICTURE -> {
-                    val bundle = PictureDetailFragment.createBundle(item, 0)
+                    val bundle = ClubPicFragment.createBundle(item)
                     navigateTo(
-                            NavigateItem.Destination(
-                                    R.id.action_clubTabFragment_to_clubPicFragment,
-                                    bundle
-                            )
+                        NavigateItem.Destination(
+                            R.id.action_clubTabFragment_to_clubPicFragment,
+                            bundle
+                        )
                     )
                 }
                 AdultTabType.TEXT -> {
-                    val bundle = TextDetailFragment.createBundle(item, 0)
+                    val bundle = ClubTextFragment.createBundle(item)
                     navigateTo(
-                            NavigateItem.Destination(
-                                    R.id.action_clubTabFragment_to_clubTextFragment,
-                                    bundle
-                            )
+                        NavigateItem.Destination(
+                            R.id.action_clubTabFragment_to_clubTextFragment,
+                            bundle
+                        )
                     )
                 }
                 AdultTabType.CLIP -> {
@@ -148,16 +150,25 @@ class ClubLatestFragment : BaseFragment() {
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            // todo Go to comment in detail
             checkStatus {
                 when (adultTabType) {
                     AdultTabType.PICTURE -> {
-                        val bundle = PictureDetailFragment.createBundle(item, 1)
-//                        navigationToPicture(bundle)
+                        val bundle = ClubPicFragment.createBundle(item, 1)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_clubTabFragment_to_clubPicFragment,
+                                bundle
+                            )
+                        )
                     }
                     AdultTabType.TEXT -> {
-                        val bundle = TextDetailFragment.createBundle(item, 1)
-//                        navigationToText(bundle)
+                        val bundle = ClubTextFragment.createBundle(item, 1)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_clubTabFragment_to_clubTextFragment,
+                                bundle
+                            )
+                        )
                     }
                 }
             }
@@ -190,7 +201,7 @@ class ClubLatestFragment : BaseFragment() {
             )
             navigateTo(
                     NavigateItem.Destination(
-                            R.id.action_to_myPostFragment,
+                            R.id.action_clubTabFragment_to_myPostFragment,
                             bundle
                     )
             )
@@ -204,6 +215,15 @@ class ClubLatestFragment : BaseFragment() {
                             R.id.action_to_loginFragment,
                             LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
                     )
+            )
+        }
+
+        tv_register.setOnClickListener {
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_loginFragment,
+                    LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                )
             )
         }
 
@@ -246,8 +266,6 @@ class ClubLatestFragment : BaseFragment() {
                     onApiError(Exception("Unknown Error!"))
                 }
             }
-
-
         })
 
         viewModel.showProgress.observe(this, {
