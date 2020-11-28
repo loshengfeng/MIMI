@@ -65,8 +65,9 @@ class ClubLatestFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
         Timber.i("onResume isLogin:${accountManager.isLogin()}")
-        loginPageToggle(accountManager.isLogin())
-        if (accountManager.isLogin() && viewModel.clubCount.value ?: -1 <= 0) {
+        //According to specs, this page does not need to log in currently
+        loginPageToggle(true)
+        if (viewModel.clubCount.value ?: -1 <= 0) {
             getData()
         }
         viewModel.getAd()

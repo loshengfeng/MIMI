@@ -81,8 +81,7 @@ class ClubTabFragment : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view =  inflater.inflate(getLayoutId(), container, false)
-        view.club_view_pager.adapter =
-                ClubTabAdapter(requireContext(), childFragmentManager, lifecycle)
+        view.club_view_pager.adapter = ClubTabAdapter(childFragmentManager, lifecycle)
         view.club_view_pager.offscreenPageLimit =7
         tabLayoutMediator = TabLayoutMediator(view.club_tabs,  view.club_view_pager) { tab, position ->
             tab.text = getTabTitle(position)

@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.clip
 
-import android.content.Intent
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.CombinedLoadStates
@@ -10,7 +9,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
-import com.dabenxiang.mimi.NAVIGATE_TO_TOPUP_ACTION
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.VideoItem
@@ -18,7 +16,6 @@ import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.comment.CommentDialogFragment
-import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import kotlinx.android.synthetic.main.item_clip_pager.*
 import kotlinx.coroutines.CoroutineScope
@@ -157,6 +154,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
                     ClipAdapter.PAYLOAD_UPDATE_UI
                 )
                 is Error -> onApiError(it.throwable)
+                else -> {}
             }
         })
 
@@ -171,23 +169,17 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
                     )
                 }
                 is Error -> onApiError(it.throwable)
+                else -> {}
             }
         })
     }
 
     private fun onPromoteClick() {
-        navigateTo(
-            NavigateItem.Destination(
-                R.id.action_to_inviteVipFragment,
-                null
-            )
-        )
+        navigateTo(NavigateItem.Destination(R.id.action_to_inviteVipFragment))
     }
 
     private fun onVipClick() {
-        val intent = Intent(requireContext(), MainActivity::class.java)
-        intent.action = NAVIGATE_TO_TOPUP_ACTION
-        startActivity(intent)
+        navigateTo(NavigateItem.Destination(R.id.action_to_topup))
     }
 
     private fun onFavoriteClick(item: VideoItem, pos: Int, isFavorite: Boolean) {
