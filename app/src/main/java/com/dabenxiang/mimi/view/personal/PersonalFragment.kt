@@ -56,14 +56,15 @@ class PersonalFragment : BaseFragment() {
         super.initSettings()
         tv_version.text = BuildConfig.VERSION_NAME
         Glide.with(this).clear(avatar)
+        layout_vip_unlimit.visibility = View.INVISIBLE
+        layout_vip_unlimit_unlogin.visibility = View.INVISIBLE
         viewModel.getPostDetail()
         //FIXME
         //            ViewCompat.setNestedScrollingEnabled(nestedScroll, true)
         val behavior = appbar_layout.behavior as AppBarLayout.Behavior?
-        layout_vip_unlimit.visibility = View.INVISIBLE
-        layout_vip_unlimit_unlogin.visibility = View.INVISIBLE
         if (viewModel.isLogin()) {
             item_is_Login.visibility = View.VISIBLE
+            layout_vip_unlimit.visibility = View.VISIBLE
             tv_logout.visibility = View.VISIBLE
             behavior!!.setDragCallback(object : DragCallback() {
                 override fun canDrag(appBarLayout: AppBarLayout): Boolean {
@@ -98,6 +99,8 @@ class PersonalFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     val meItem = it.result
+                    layout_vip_unlimit.visibility = View.VISIBLE
+                    layout_vip_unlimit_unlogin.visibility = View.INVISIBLE
                     meItem.friendlyName?.let {
                         id_personal.text = it
                     }
@@ -120,11 +123,11 @@ class PersonalFragment : BaseFragment() {
                     meItem.follows?.let { it ->
                         follow_count.text = it.toString()
                     }
+
                     if (meItem.expiryDate == null) {
                         layout_vip_unlimit_unlogin.visibility = View.VISIBLE
                     } else {
                         meItem.expiryDate?.let { date ->
-                            layout_vip_unlimit.visibility = View.INVISIBLE
                             tv_expiry_date.text = getString(
                                 R.string.vip_expiry_date,
                                 SimpleDateFormat(

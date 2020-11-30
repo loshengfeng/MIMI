@@ -12,12 +12,12 @@
         android:id="@+id/layout_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/color_gray_2"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="@color/color_gray_2">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -362,7 +362,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
-
         <TextView
             android:id="@+id/video_long_count"
             android:layout_width="wrap_content"
@@ -411,6 +410,7 @@
         android:background="@color/bg_layout_vip_personal"
         android:elevation="8dp"
         android:visibility="invisible"
+        tools:visibility="visible"
         app:layout_anchor="@id/appbar_layout"
         app:layout_anchorGravity="bottom|end">
 
@@ -451,6 +451,8 @@
         android:layout_marginRight="16dp"
         android:background="@color/bg_layout_vip_unlogin_personal"
         android:elevation="8dp"
+        android:visibility="visible"
+        tools:visibility="invisible"
         app:layout_anchor="@id/appbar_layout"
         app:layout_anchorGravity="bottom|end">
 
