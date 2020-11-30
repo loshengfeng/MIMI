@@ -1,0 +1,66 @@
+android {
+    signingConfigs {
+        release {
+            storeFile file("./keystore/release.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
+        debug {
+            storeFile file("./keystore/debug.keystore")
+        }
+    }
+
+    buildTypes {
+        debug {
+            matchingFallbacks = ['release', 'debug']
+            getIsDefault().set(true)
+            zipAlignEnabled false
+            minifyEnabled false
+            debuggable true
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
+        }
+        release {
+            matchingFallbacks = ['release', 'debug']
+            zipAlignEnabled true
+            minifyEnabled true
+            debuggable false
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-android-optimize.txt'
+            signingConfig signingConfigs.release
+        }
+
+        prod_debug.initWith(buildTypes.debug)
+        sit_debug.initWith(buildTypes.debug)
+        dev_debug.initWith(buildTypes.debug)
+
+        prod_release.initWith(buildTypes.release)
+        sit_release.initWith(buildTypes.release)
+        dev_release.initWith(buildTypes.release)
+
+        prod_debug {}
+        prod_release {}
+
+        sit_debug {}
+        sit_release {}
+
+        dev_debug {}
+        dev_release {}
+    }
+
+    variantFilter { variant ->
+        def flavorName = variant.name
+        def buildTypename = variant.buildType.name.toString()
+        println "variantFilter Show flavor is " + flavorName + " with buildTypename : " + buildTypename
+//         println "variantFilter Show buildTypename !!  " + buildTypename//
+        def isDev = buildTypename.contains("dev")
+        //below ignore release or debug buildtype
+        if (buildTypename.equals('release') || buildTypename.equals('debug')) {
+//            println "Show match  buildtype "+variant.buildType.name
+            println "variantFilter flavor : " + flavorName + " with default buildType : " + buildTypename + " ignore"
+            variant.setIgnore(true)
+        }
+    }
+}

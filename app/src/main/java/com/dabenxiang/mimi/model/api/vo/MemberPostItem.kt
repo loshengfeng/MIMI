@@ -33,10 +33,10 @@ data class MemberPostItem(
     var likeCount: Int = 0,
 
     @SerializedName("dislikeCount")
-    val dislikeCount: Int = 0,
+    var dislikeCount: Int = 0,
 
     @SerializedName("likeType")
-    var likeType: LikeType = LikeType.DISLIKE,
+    var likeType: LikeType? = null,
 
     @SerializedName("favoriteCount")
     var favoriteCount: Int = 0,

@@ -141,6 +141,7 @@ class ClubRecommendAdapter(
                         when (it[0] as Int) {
                             PAYLOAD_UPDATE_LIKE -> holder.updateLike(item)
                             PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item)
+                            PAYLOAD_UPDATE_FAVORITE -> holder.updateFavorite(item)
                         }
                     } ?: run {
                         holder.pictureRecycler.tag = position
@@ -159,6 +160,7 @@ class ClubRecommendAdapter(
                         when (it[0] as Int) {
                             PAYLOAD_UPDATE_LIKE -> holder.updateLike(item)
                             PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item)
+                            PAYLOAD_UPDATE_FAVORITE -> holder.updateFavorite(item)
                         }
                     } ?: run {
                         holder.onBind(it, currentList, position, myPostListener, attachmentListener)

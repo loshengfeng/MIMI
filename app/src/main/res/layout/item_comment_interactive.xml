@@ -55,6 +55,7 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:background="@drawable/btn_share_gray_n2"
+        android:visibility="gone"
         app:layout_constraintEnd_toStartOf="@+id/imgReport"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/imgFavorite"
@@ -72,7 +73,7 @@
         tools:text="赞99" />
 
     <TextView
-        android:id="@+id/text2"
+        android:id="@+id/txtDisLikeCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="12sp"
@@ -88,7 +89,7 @@
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="@+id/imgFavorite"
         app:layout_constraintStart_toStartOf="@+id/imgFavorite"
-        app:layout_constraintTop_toTopOf="@+id/text2"
+        app:layout_constraintTop_toTopOf="@+id/txtDisLikeCount"
         android:text="@string/club_favorite" />
 
     <TextView
@@ -96,6 +97,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="12sp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@+id/imgShare"
         app:layout_constraintStart_toStartOf="@+id/imgShare"
         app:layout_constraintTop_toTopOf="@+id/txtFavorite"

@@ -1,30 +1,30 @@
-package com.dabenxiang.mimi.view.club.post
+package com.dabenxiang.mimi.view.club.text
 
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.ClubPostFuncItem
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
-import com.dabenxiang.mimi.model.api.vo.ImageItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
+import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
-import com.dabenxiang.mimi.view.fullpicture.FullPictureFragment
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_text_detail.*
 
-class ClubPicDetailFragment : BaseFragment() {
+class ClubTextDetailFragment : BaseFragment() {
 
     private val viewModel: ClubTextDetailViewModel by viewModels()
 
@@ -33,7 +33,7 @@ class ClubPicDetailFragment : BaseFragment() {
 
     private var memberPostItem: MemberPostItem? = null
 
-    private var pictureDetailAdapter: ClubPicDetailAdapter? = null
+    private var textDetailAdapter: ClubTextDetailAdapter? = null
 
     var moreDialog: MoreDialogFragment? = null
 
@@ -42,20 +42,47 @@ class ClubPicDetailFragment : BaseFragment() {
 
     companion object {
         const val KEY_DATA = "data"
-        fun createBundle(item: MemberPostItem): ClubPicDetailFragment {
+        fun createBundle(item: MemberPostItem): ClubTextDetailFragment {
             val bundle = Bundle().also {
                 it.putSerializable(KEY_DATA, item)
             }
 
-            val fragment = ClubPicDetailFragment()
+            val fragment =
+                ClubTextDetailFragment()
             fragment.arguments = bundle
             return fragment
         }
     }
 
-    override fun getLayoutId() = R.layout.fragment_club_pic_detail
+    override fun getLayoutId() = R.layout.fragment_club_text_detail
 
     override fun setupObservers() {
+        viewModel.postDetailResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    val item = it.result.content
+                    textDetailAdapter?.updateContent(item!!)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        mainViewModel?.getAdResult?.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    textDetailAdapter?.setupAdItem(it.result)
+                    textDetailAdapter?.notifyItemChanged(0)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Success -> textDetailAdapter?.notifyItemChanged(it.result)
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -70,17 +97,17 @@ class ClubPicDetailFragment : BaseFragment() {
 
         memberPostItem = arguments?.get(KEY_DATA) as MemberPostItem
 
-        pictureDetailAdapter = ClubPicDetailAdapter(
-            requireContext(),
-            memberPostItem!!,
-            onPictureDetailListener,
-            onPhotoGridItemClickListener,
-            null,
-            clubPostFuncItem
-        )
+        textDetailAdapter =
+            ClubTextDetailAdapter(
+                requireContext(),
+                memberPostItem!!,
+                onTextDetailListener,
+                null,
+                clubPostFuncItem
+            )
 
         recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = pictureDetailAdapter
+        recyclerView.adapter = textDetailAdapter
 
         viewModel.getPostDetail(memberPostItem!!)
         mainViewModel?.getAd(adWidth, adHeight)
@@ -166,9 +193,11 @@ class ClubPicDetailFragment : BaseFragment() {
     private fun likePost(
         memberPostItem: MemberPostItem,
         isLike: Boolean,
-        update: (Boolean, Int) -> Unit
+        type: LikeType,
+        originType: LikeType?,
+        update: (Boolean, MemberPostItem) -> Unit
     ) {
-        checkStatus { viewModel.likePost(memberPostItem, isLike, update) }
+        checkStatus { viewModel.likePost(memberPostItem, isLike, type, originType, update) }
     }
 
     private val clubPostFuncItem by lazy {
@@ -176,63 +205,8 @@ class ClubPicDetailFragment : BaseFragment() {
             {},
             { id, view, type -> viewModel.loadImage(id, view, type) },
             { item, items, isFollow, func -> followMember(item, items, isFollow, func) },
-            { item, isLike, func -> likePost(item, isLike, func) },
+            { item, isLike, type, originType, func -> likePost(item, isLike, type, originType, func) },
             { item, isFavorite, func -> favoritePost(item, isFavorite, func) }
         )
-    }
-
-    private val onPictureDetailListener = object : ClubPicDetailAdapter.OnPictureDetailListener {
-        override fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType) {
-            viewModel.loadImage(id, view, type)
-        }
-
-        override fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
-            checkStatus { viewModel.followPost(item, position, isFollow)}
-        }
-
-        override fun onMoreClick(item: MemberPostItem) {
-            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener, true).also {
-                it.show(
-                    requireActivity().supportFragmentManager,
-                    MoreDialogFragment::class.java.simpleName
-                )
-            }
-        }
-
-        override fun onChipClick(type: PostType, tag: String) {
-            val item = SearchPostItem(type = type, tag = tag)
-            val bundle = SearchPostFragment.createBundle(item)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_clubPicFragment_to_searchPostFragment,
-                    bundle
-                )
-            )
-        }
-
-        override fun onOpenWebView(url: String) {
-            GeneralUtils.openWebView(requireContext(), url)
-        }
-
-        override fun onAvatarClick(userId: Long, name: String) {
-            val bundle = MyPostFragment.createBundle(
-                userId, name,
-                isAdult = true,
-                isAdultTheme = false
-            )
-            navigateTo(NavigateItem.Destination(R.id.action_clubPicFragment_to_myPostFragment, bundle))
-        }
-    }
-
-    private val onPhotoGridItemClickListener = object : ClubPhotoGridAdapter.OnItemClickListener {
-        override fun onItemClick(position: Int, imageItems: ArrayList<ImageItem>) {
-            val bundle = FullPictureFragment.createBundle(position, imageItems)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_clubPicFragment_to_pictureFragment,
-                    bundle
-                )
-            )
-        }
     }
 }

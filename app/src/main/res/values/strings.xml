@@ -106,6 +106,7 @@
     <string name="club_share">分享</string>
     <string name="club_report">回报</string>
     <string name="club_like_count">赞%1$d</string>
+    <string name="club_dislike_count">踩%1$d</string>
 
     <!-- Favorite -->
     <string name="favorite_title">我的收藏</string>
@@ -224,7 +225,8 @@
     <string name="login_mobile_call_prefix_taiwan">+886</string>
     <string name="vip_expiry_date">VIP 於 %s 到期</string>
     <string name="no_data">尚无资料</string>
-    
+    <string name="identity">游客</string>
+
     <!-- Follow -->
     <string name="follow_title">我的关注</string>
     <string name="follow_people">关注的人</string>
@@ -283,16 +285,34 @@
     <!-- Text Detail -->
     <string name="text">短文</string>
     <string name="text_detail_title">短文详情</string>
-
     <!-- Club -->
     <string name="picture">图片</string>
     <string name="video">视频</string>
     <string name="empty_post">目前尚无贴文</string>
 
     <!-- Follow -->
-    <string name="follow">+关注</string>
+    <string name="follow">关注</string>
     <string name="followed">已关注</string>
     <string name="cancel_follow">取消关注</string>
+
+    <!-- like -->
+    <string name="like">喜欢</string>
+    <!-- fans -->
+    <string name="fans">粉丝</string>
+    <string name="total_count_fans">全部粉丝%s人</string>
+    <string name="title_fans">我的粉丝</string>
+    <!-- fans -->
+    <string name="exchange">兑换激活码</string>
+
+    <!-- every day -->
+    <string name="every_day_count">每日观看次数</string>
+    <string name="every_day_length">長視頻</string>
+    <string name="every_day_short">@string/short_video</string>
+    <string name="every_day_video_count_unlimit">无限</string>
+    <!-- vip -->
+    <string name="vip_hint">VIP享无限观影</string>
+    <string name="deadline_vip">%s 过期</string>
+    <string name="buy_vip">购买VIP</string>
 
     <!-- Post -->
     <string name="upload_video">上传视频</string>
@@ -456,6 +476,7 @@
     <string name="topup_default_time">-</string>
 
     <!-- Invite Vip -->
+    <string name="invite_now">立即推广</string>
     <string name="invite_vip_reward_text">每成功推广 1 人, 增加 2 天 VIP, 无限叠加</string>
     <string name="invite_vip_plus_text">+</string>
     <string name="invite_vip_invite_code_text">邀请码</string>
@@ -483,6 +504,7 @@
     <string name="actor_all_actresses">全部女优</string>
     <string name="actor_hot_unit">人气</string>
     <string name="actor_videos_unit">部影片</string>
+    <string name="actor_videos_title">女优作品</string>
 
     <!-- Clip -->
     <string name="clip_newest">最新</string>

@@ -177,10 +177,10 @@ class CommentDialogViewModel: BaseViewModel() {
         }
     }
 
-    fun postComment(postId: Long, body: PostCommentRequest) {
+    fun postComment(videoId: Long, body: PostCommentRequest) {
         viewModelScope.launch {
             flow {
-                val resp = domainManager.getApiRepository().postMembersPostComment(postId, body)
+                val resp = domainManager.getApiRepository().postMembersPostComment(videoId, body)
                 if (!resp.isSuccessful) throw HttpException(resp)
 
                 emit(ApiResult.success(null))

@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.post
+package com.dabenxiang.mimi.view.club.pic
 
 import android.content.Context
 import android.text.TextUtils

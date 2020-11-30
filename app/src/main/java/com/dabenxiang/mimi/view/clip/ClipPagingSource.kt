@@ -1,37 +1,44 @@
 package com.dabenxiang.mimi.view.clip
 
 import androidx.paging.PagingSource
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.api.vo.VideoItem
+import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.manager.DomainManager
-import com.dabenxiang.mimi.view.home.memberpost.MemberPostDataSource
 import retrofit2.HttpException
 
 class ClipPagingSource(
-    private val domainManager: DomainManager
-) : PagingSource<Long, MemberPostItem>() {
-    override suspend fun load(params: LoadParams<Long>): LoadResult<Long, MemberPostItem> {
+    private val domainManager: DomainManager,
+    private val orderByType: StatisticsOrderType
+) : PagingSource<Long, VideoItem>() {
+    companion object {
+        const val PER_LIMIT = 20
+    }
+
+    override suspend fun load(params: LoadParams<Long>): LoadResult<Long, VideoItem> {
         return try {
             val offset = params.key ?: 0L
-            val result = domainManager.getApiRepository().getMembersPost(
-                PostType.VIDEO, 0, MemberPostDataSource.PER_LIMIT
+            val result = domainManager.getApiRepository().searchShortVideo(
+                orderByType = orderByType,
+                offset = offset.toString(),
+                limit = params.loadSize.toString()
             )
             if (!result.isSuccessful) throw HttpException(result)
             val item = result.body()
-            val memberPostItems = item?.content
+
+            val videos = item?.content?.videos
             val nextOffset = when {
                 hasNextPage(
                     item?.paging?.count ?: 0,
                     item?.paging?.offset ?: 0,
-                    memberPostItems?.size ?: 0,
+                    videos?.size ?: 0,
                     params.loadSize
-                ) -> offset + params.loadSize
+                ) -> offset + PER_LIMIT
                 else -> null
             }
 
             LoadResult.Page(
-                data = memberPostItems ?: arrayListOf(),
-                prevKey = if (offset == 0L) null else offset - params.loadSize.toLong(),
+                data = videos ?: arrayListOf(),
+                prevKey = if (offset == 0L) null else offset - PER_LIMIT,
                 nextKey = nextOffset
             )
         } catch (exception: Exception) {

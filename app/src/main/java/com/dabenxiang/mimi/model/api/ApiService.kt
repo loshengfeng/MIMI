@@ -337,6 +337,7 @@ interface ApiService {
     @GET("/v1/Members/Home/Videos/SearchShortVideo")
     suspend fun searchShortVideo(
         @Query("q") q: String?,
+        @Query("orderByType") orderByType: Int?,
         @Query("offset") offset: String?,
         @Query("limit") limit: String?,
     ): Response<ApiBasePagingItem<VideoSearchItem>>
@@ -388,6 +389,12 @@ interface ApiService {
         @Query("offset") offset: String,
         @Query("limit") limit: String
     ): Response<ApiBaseItem<ActorsItem>>
+
+
+    @GET("/v1/Members/Home/Actors/ActorsList/{id}")
+    suspend fun getActorsList(
+        @Path("id") id: Long
+    ): Response<ApiBaseItem<ActorVideosItem>>
 
 
     /**********************************************************
@@ -527,6 +534,11 @@ interface ApiService {
     suspend fun like(
         @Path("postId") postId: Long,
         @Body body: LikeRequest
+    ): Response<Void>
+
+    @DELETE("/v1/Members/Post/{postId}/Like")
+    suspend fun deleteLike(
+        @Path("postId") postId: Long
     ): Response<Void>
 
     @POST("/v1/Members/Post/{postId}/PostReport")

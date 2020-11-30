@@ -6,4 +6,5 @@ import com.dabenxiang.mimi.model.api.vo.ActorVideoItem
 class ActorVideosFuncItem(
     val getActorAvatarAttachment: ((Long?, ImageView) -> Unit) = { _, _ -> },
     val onVideoClickListener: ((ActorVideoItem, Int) -> Unit) = { _, _ -> },
+    val onActorClickListener: ((Long, Int) -> Unit) = { _, _ -> },
 )

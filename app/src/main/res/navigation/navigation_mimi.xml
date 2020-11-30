@@ -29,6 +29,9 @@
             android:id="@+id/action_mimiFragment_to_rankingFragment"
             app:destination="@id/rankingFragment" />
         <action
+            android:id="@+id/action_mimiFragment_to_actorVideosFragment"
+            app:destination="@id/actorVideosFragment" />
+        <action
             android:id="@+id/action_to_categoriesFragment"
             app:destination="@id/categoriesFragment" />
 
@@ -58,6 +61,14 @@
             android:id="@+id/action_rankingFragment_to_navigation_picture"
             app:destination="@id/navigation_picture" />
 
+    </fragment>
+    <fragment
+        android:id="@+id/actorVideosFragment"
+        android:name="com.dabenxiang.mimi.view.actorvideos.ActorVideosFragment"
+        android:label="ActorVideosFragment" >
+        <action
+            android:id="@+id/action_to_navigation_player"
+            app:destination="@id/navigation_player" />
     </fragment>
 
     <fragment

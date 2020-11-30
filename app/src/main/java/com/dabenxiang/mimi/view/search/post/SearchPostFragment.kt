@@ -20,33 +20,22 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.*
-import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.clip.ClipFragment
-import com.dabenxiang.mimi.view.club.post.ClubPicDetailFragment
-import com.dabenxiang.mimi.view.club.post.ClubPicFragment
-import com.dabenxiang.mimi.view.club.post.ClubPostPicFragment
-import com.dabenxiang.mimi.view.club.post.ClubTextFragment
-import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
-import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
+import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
+import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
-import kotlinx.android.synthetic.main.fragment_general_video.*
 import kotlinx.android.synthetic.main.fragment_search_post.*
-import kotlinx.android.synthetic.main.fragment_search_post.tv_search
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 class SearchPostFragment : BaseFragment() {
@@ -97,6 +86,10 @@ class SearchPostFragment : BaseFragment() {
         }
 
         override fun onFollowClick(items: List<MemberPostItem>, position: Int, isFollow: Boolean) {
+        }
+
+        override fun onAvatarClick(userId: Long, name: String) {
+            //todo
         }
 
         override fun onMoreClick(item: MemberPostItem, position: Int) {

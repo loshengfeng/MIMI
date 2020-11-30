@@ -82,18 +82,13 @@ class ClubTabFragment : BaseFragment() {
         getClubItemList()
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(getLayoutId(), container, false)
-        view.club_view_pager.adapter =
-            ClubTabAdapter(requireContext(), childFragmentManager, lifecycle)
-        tabLayoutMediator =
-            TabLayoutMediator(view.club_tabs, view.club_view_pager) { tab, position ->
-                tab.text = getTabTitle(position)
-            }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val view =  inflater.inflate(getLayoutId(), container, false)
+        view.club_view_pager.adapter = ClubTabAdapter(childFragmentManager, lifecycle)
+        view.club_view_pager.offscreenPageLimit =7
+        tabLayoutMediator = TabLayoutMediator(view.club_tabs,  view.club_view_pager) { tab, position ->
+            tab.text = getTabTitle(position)
+        }
         tabLayoutMediator.attach()
         view.topic_tabs.adapter = topicListAdapter
         view.search_bar.setOnClickListener {
