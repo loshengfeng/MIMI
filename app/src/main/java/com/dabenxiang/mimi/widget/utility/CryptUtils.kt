@@ -77,16 +77,20 @@ object CryptUtils {
         if (file.exists()) file.delete()
     }
 
-    fun decryptWithCEBNoPadding(byteArray: ByteArray, key: String): ByteArray {
+    fun decryptWithCEBNoPadding(byteArray: ByteArray, key: ByteArray): ByteArray {
         val cipher: Cipher = Cipher.getInstance("AES/ECB/NoPadding")
         return try {
-            val secretKey = SecretKeySpec(key.toByteArray(), "AES")
+            val secretKey = SecretKeySpec(key, "AES")
             cipher.init(Cipher.DECRYPT_MODE, secretKey)
 
             cipher.doFinal(byteArray)
         } catch (e: InvalidKeyException) {
             byteArray
         }
+    }
+
+    fun decryptWithCEBNoPadding(byteArray: ByteArray, key: String): ByteArray {
+        return decryptWithCEBNoPadding(byteArray, key.toByteArray())
     }
 
 }
