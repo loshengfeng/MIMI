@@ -32,7 +32,7 @@ class FavoritePlayListDataSource constructor(
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository()
-                    .getPlaylist(playlistType, isAdult, "0", PER_LIMIT)
+                    .getPlaylist(playlistType, isAdult, isShortVideo = false, offset = "0", limit = PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
                 val item = result.body()
                 val items = item?.content
@@ -76,8 +76,9 @@ class FavoritePlayListDataSource constructor(
                     domainManager.getApiRepository().getPlaylist(
                         playlistType,
                         isAdult,
-                        next.toString(),
-                        PER_LIMIT
+                        isShortVideo = false,
+                        offset = next.toString(),
+                        limit = PER_LIMIT
                     )
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(result)

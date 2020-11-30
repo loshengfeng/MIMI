@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.player.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -80,7 +81,10 @@ class ClipPlayerFragment: BasePlayerFragment() {
 
     private fun getPostContent() {
         (arguments?.getLong(KEY_PLAYER_SRC))?.also {
+
             contentId = it
+
+            Log.d("neo","contentId = ${contentId}")
             viewModel.videoContentId = it
             viewModel.getPostDetail()
         }
