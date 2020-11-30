@@ -64,6 +64,7 @@ abstract class BasePlayerFragment: BaseFragment(), AnalyticsListener, Player.Eve
             }
 
         }
+        player_pager.isSaveEnabled = false
 
         TabLayoutMediator(tabs, player_pager) { tab, position ->
             getTabTitle(tab, position)

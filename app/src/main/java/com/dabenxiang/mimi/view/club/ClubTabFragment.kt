@@ -6,18 +6,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.paging.PagingData
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
+import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.enums.StatisticsOrderType
+import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.adapter.ClubTabAdapter
 import com.dabenxiang.mimi.view.club.adapter.TopicItemListener
 import com.dabenxiang.mimi.view.club.adapter.TopicListAdapter
 import com.dabenxiang.mimi.view.club.topic.TopicDetailFragment
+import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_tab_club.*
 import kotlinx.android.synthetic.main.fragment_tab_club.view.*
@@ -30,7 +33,7 @@ import timber.log.Timber
 
 class ClubTabFragment : BaseFragment() {
 
-    companion object{
+    companion object {
         const val TAB_FOLLOW = 0
         const val TAB_RECOMMEND = 1
         const val TAB_LATEST = 2
@@ -47,10 +50,10 @@ class ClubTabFragment : BaseFragment() {
             override fun itemClicked(clubItem: MemberClubItem, position: Int) {
                 val bundle = TopicDetailFragment.createBundle(clubItem)
                 navigateTo(
-                        NavigateItem.Destination(
-                                R.id.action_clubTabFragment_to_topicDetailFragment,
-                                bundle
-                        )
+                    NavigateItem.Destination(
+                        R.id.action_clubTabFragment_to_topicDetailFragment,
+                        bundle
+                    )
                 )
             }
 
@@ -88,15 +91,10 @@ class ClubTabFragment : BaseFragment() {
         }
         tabLayoutMediator.attach()
         view.topic_tabs.adapter = topicListAdapter
-        return view
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        search_bar.addTextChangedListener {
-            //TODO search
+        view.search_bar.setOnClickListener {
+            navToSearch(view.club_tabs.selectedTabPosition)
         }
-
+        return view
     }
 
     override fun onResume() {
@@ -104,7 +102,7 @@ class ClubTabFragment : BaseFragment() {
         Timber.i("ClubTabFragment onResume")
 
     }
-    
+
     override fun onDestroy() {
         super.onDestroy()
         Timber.i("ClubTabFragment onDestroy")
@@ -133,6 +131,25 @@ class ClubTabFragment : BaseFragment() {
                     topicListAdapter.submitData(it)
                 }
         }
+    }
+
+    private fun navToSearch(position: Int) {
+        val searchPostItem = when (position) {
+            TAB_FOLLOW -> SearchPostItem(type = PostType.FOLLOWED)
+            TAB_RECOMMEND -> SearchPostItem(type = PostType.TEXT_IMAGE_VIDEO, orderBy = StatisticsOrderType.HOTTEST)
+            TAB_LATEST -> SearchPostItem(type = PostType.TEXT_IMAGE_VIDEO, orderBy = StatisticsOrderType.LATEST)
+            TAB_CLIP -> SearchPostItem(type = PostType.VIDEO)
+            TAB_PICTURE -> SearchPostItem(type = PostType.IMAGE)
+            TAB_NOVEL -> SearchPostItem(type = PostType.TEXT)
+            else -> SearchPostItem(type = PostType.TEXT_IMAGE_VIDEO)
+        }
+        val bundle = SearchPostFragment.createBundle(searchPostItem)
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_clubTabFragment_to_searchPostFragment,
+                bundle
+            )
+        )
     }
 
 }
