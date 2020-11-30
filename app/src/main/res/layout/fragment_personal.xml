@@ -8,8 +8,8 @@
     android:fitsSystemWindows="true">
 
 <!--    FIXME android:layout_height="match_parent !!!-->
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/nestedScroll"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/layout_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/color_gray_2"
@@ -159,7 +159,7 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar_layout"

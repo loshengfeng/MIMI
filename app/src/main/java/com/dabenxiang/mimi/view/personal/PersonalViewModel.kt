@@ -25,7 +25,9 @@ class PersonalViewModel : BaseViewModel() {
     val unreadResult: LiveData<ApiResult<Int>> = _unreadResult
 
     fun getPostDetail() {
+        setShowProgress(true)
         viewModelScope.launch {
+            setShowProgress(false)
             if (isLogin()) {
                 flow {
                     val result = domainManager.getApiRepository().getMe()

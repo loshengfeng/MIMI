@@ -27,7 +27,10 @@ import com.dabenxiang.mimi.view.topup.TopUpFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.Behavior.DragCallback
+import kotlinx.android.synthetic.main.fragment_club_follow.*
+import kotlinx.android.synthetic.main.fragment_club_latest.*
 import kotlinx.android.synthetic.main.fragment_personal.*
+import kotlinx.android.synthetic.main.fragment_personal.layout_refresh
 import kotlinx.android.synthetic.main.item_personal_is_login.*
 import retrofit2.HttpException
 import timber.log.Timber
@@ -88,9 +91,15 @@ class PersonalFragment : BaseFragment() {
             })
             Glide.with(this).load(R.drawable.default_profile_picture).into(avatar)
         }
+        layout_refresh.setOnRefreshListener {
+            viewModel.getPostDetail()
+        }
     }
 
     override fun setupObservers() {
+        viewModel.showProgress.observe(this, {
+            layout_refresh.isRefreshing = it
+        })
         viewModel.meItem.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
@@ -206,7 +215,7 @@ class PersonalFragment : BaseFragment() {
                 R.id.tv_topup -> mainViewModel?.changeNavigationPosition?.value =
                     R.id.navigation_topup
 
-                R.id.tv_favorite-> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_favoriteFragment))
+                R.id.tv_favorite -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_favoriteFragment))
 
                 R.id.follow_count -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
                 R.id.follow -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
@@ -233,7 +242,7 @@ class PersonalFragment : BaseFragment() {
                         navigateTo(
                             NavigateItem.Destination(
                                 R.id.action_to_inviteVipFragment,
-                               null
+                                null
                             )
                         )
                     } else {
