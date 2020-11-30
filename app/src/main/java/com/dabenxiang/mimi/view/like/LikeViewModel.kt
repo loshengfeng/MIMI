@@ -7,12 +7,8 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.dabenxiang.mimi.callback.MyFollowPagingCallback
 import com.dabenxiang.mimi.callback.MyLikePagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
-import com.dabenxiang.mimi.model.api.vo.MemberClubItem
-import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
@@ -51,9 +47,9 @@ class LikeViewModel : BaseViewModel() {
 
     fun getMemberList(): Flow<PagingData<MemberPostItem>> {
         return Pager(
-            config = PagingConfig(pageSize = MemberLikeListDataSource.PER_LIMIT.toInt()),
+            config = PagingConfig(pageSize = MiMiLikeListDataSource.PER_LIMIT.toInt()),
             pagingSourceFactory = {
-                MemberLikeListDataSource(
+                MiMiLikeListDataSource(
                     domainManager,
                     memberPagingCallback
                 )

@@ -10,7 +10,7 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.DomainManager
 import retrofit2.HttpException
 
-class MemberLikeListDataSource constructor(
+class MiMiLikeListDataSource constructor(
     private val domainManager: DomainManager,
     private val pagingCallback: MyLikePagingCallback
 ) : PagingSource<Long, MemberPostItem>() {
@@ -27,6 +27,9 @@ class MemberLikeListDataSource constructor(
                 PostType.VIDEO, OrderBy.NEWEST,
                 0, PER_LIMIT
             )
+
+//            val result = domainManager.getApiRepository().getPostFavorite("0", PER_LIMIT)
+
             if (!result.isSuccessful) throw HttpException(result)
             val items = result.body()?.content
             val hasNext = hasNextPage(
