@@ -18,22 +18,16 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
-import com.dabenxiang.mimi.view.invitevip.InviteVipFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_LOGIN
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
-import com.dabenxiang.mimi.view.orderresult.OrderResultFragment
 import com.dabenxiang.mimi.view.topup.TopUpFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.Behavior.DragCallback
-import kotlinx.android.synthetic.main.fragment_club_follow.*
-import kotlinx.android.synthetic.main.fragment_club_latest.*
 import kotlinx.android.synthetic.main.fragment_personal.*
-import kotlinx.android.synthetic.main.fragment_personal.layout_refresh
 import kotlinx.android.synthetic.main.item_personal_is_login.*
 import retrofit2.HttpException
-import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -291,6 +285,7 @@ class PersonalFragment : BaseFragment() {
 
                 R.id.like_count -> navigateTo(NavigateItem.Destination(R.id.action_to_likelistFragment))
                 R.id.like -> navigateTo(NavigateItem.Destination(R.id.action_to_likelistFragment))
+                R.id.setting -> navigateTo(NavigateItem.Destination(R.id.action_to_settingFragment))
             }
         }.also {
             layout_vip_unlimit_unlogin.setOnClickListener(it)
