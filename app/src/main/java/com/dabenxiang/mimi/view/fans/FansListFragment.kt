@@ -9,6 +9,7 @@ import com.dabenxiang.mimi.model.api.vo.error.FansItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.adapter.FansListAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.base.NavigateItem
 import kotlinx.android.synthetic.main.fragment_fans.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 
@@ -87,16 +88,16 @@ class FansListFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
-//        View.OnClickListener { buttonView ->
-//            when (buttonView.id) {
-//                R.id.tv_back -> navigateTo(NavigateItem.Up)
-//            }
-//        }.also {
-//            tv_back.setOnClickListener(it)
-//        }
-//
-//        swipeRefreshLayout.setOnRefreshListener {
+        View.OnClickListener { buttonView ->
+            when (buttonView.id) {
+                R.id.tv_back -> navigateTo(NavigateItem.Up)
+            }
+        }.also {
+            tv_back.setOnClickListener(it)
+        }
+
+        layout_refresh.setOnRefreshListener {
 //            viewModel.getChatList()
-//        }
+        }
     }
 }

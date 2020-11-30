@@ -144,7 +144,15 @@ class PersonalFragment : BaseFragment() {
         viewModel.apiSignOut.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Empty -> {
-
+                    Glide.with(this).clear(avatar)
+                    layout_vip_unlimit_unlogin.visibility = View.VISIBLE
+                    item_is_Login.visibility = View.GONE
+                    tv_logout.visibility = View.GONE
+                    id_personal.text = getString(R.string.identity)
+                    like_count.text = "0"
+                    fans_count.text = "0"
+                    follow_count.text = "0"
+                    Glide.with(this).load(R.drawable.default_profile_picture).into(avatar)
                 }
                 is Error -> {
                     when (it.throwable) {

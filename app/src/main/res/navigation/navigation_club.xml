@@ -101,6 +101,9 @@
         <action
             android:id="@+id/action_searchPostFragment_to_postVideoFragment"
             app:destination="@id/postVideoFragment" />
+        <action
+            android:id="@+id/action_searchPostFragment_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
     </fragment>
 
     <fragment
@@ -112,7 +115,14 @@
         android:id="@+id/clipPlayerFragment"
         android:name="com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment"
         tools:layout="@layout/fragment_v2_player"
-        android:label="ClipPlayerFragment" />
+        android:label="ClipPlayerFragment" >
+        <action
+            android:id="@+id/action_clipPlayerFragment_to_navigation_my_post"
+            app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_clipPlayerFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/postArticleFragment"

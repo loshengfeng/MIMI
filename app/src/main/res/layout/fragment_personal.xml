@@ -326,7 +326,7 @@
         android:layout_height="84dp"
         android:layout_marginLeft="16dp"
         android:background="@color/bg_layout_every_day_personal"
-        android:elevation="4dp"
+        android:elevation="8dp"
         app:layout_anchor="@id/appbar_layout"
         app:layout_anchorGravity="bottom|start">
 
@@ -403,7 +403,7 @@
         android:layout_height="84dp"
         android:layout_marginRight="16dp"
         android:background="@color/bg_layout_vip_personal"
-        android:elevation="4dp"
+        android:elevation="8dp"
         android:visibility="invisible"
         app:layout_anchor="@id/appbar_layout"
         app:layout_anchorGravity="bottom|end">
@@ -444,7 +444,7 @@
         android:layout_height="84dp"
         android:layout_marginRight="16dp"
         android:background="@color/bg_layout_vip_unlogin_personal"
-        android:elevation="4dp"
+        android:elevation="8dp"
         app:layout_anchor="@id/appbar_layout"
         app:layout_anchorGravity="bottom|end">
 

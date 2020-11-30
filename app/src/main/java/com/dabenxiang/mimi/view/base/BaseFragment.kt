@@ -149,6 +149,11 @@ abstract class BaseFragment : Fragment() {
         handleBackStackData()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        resetObservers()
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
@@ -555,6 +560,8 @@ abstract class BaseFragment : Fragment() {
     abstract fun getLayoutId(): Int
 
     open fun setupObservers() {}
+
+    open fun resetObservers() {}
 
     open fun setupListeners() {}
 
