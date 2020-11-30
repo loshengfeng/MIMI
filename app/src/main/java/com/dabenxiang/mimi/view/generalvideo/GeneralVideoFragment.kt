@@ -31,7 +31,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
     private val viewModel: GeneralVideoViewModel by viewModels()
 
     private val generalVideoAdapter by lazy {
-        GeneralVideoAdapter(onItemClick)
+        GeneralVideoAdapter(true, onItemClick)
     }
 
     override fun setupFirstTime() {

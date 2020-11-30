@@ -106,9 +106,7 @@ class ClubTabFragment : BaseFragment() {
     override fun onDestroy() {
         super.onDestroy()
         Timber.i("ClubTabFragment onDestroy")
-        if(::tabLayoutMediator.isInitialized){
-            tabLayoutMediator.detach()
-        }
+        if(::tabLayoutMediator.isInitialized) tabLayoutMediator.detach()
     }
 
     private fun getTabTitle(position: Int): String? {

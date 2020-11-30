@@ -8,15 +8,15 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ActorCategoriesItem
 import com.dabenxiang.mimi.model.api.vo.ActorVideoItem
-import com.dabenxiang.mimi.model.api.vo.ActorVideosItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.actorvideos.ActorVideosFragment
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
+import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import kotlinx.android.synthetic.main.fragment_actor.*
-import timber.log.Timber
+import kotlinx.android.synthetic.main.fragment_actor.tv_search
 
 class ActorFragment : BaseFragment() {
 
@@ -60,6 +60,7 @@ class ActorFragment : BaseFragment() {
         super.setupFirstTime()
         rv_hot_actresses.adapter = actorVideosAdapter
         rv_all_actresses.adapter = actorCategoriesAdapter
+
     }
 
     override fun initSettings() {
@@ -70,7 +71,8 @@ class ActorFragment : BaseFragment() {
     override fun setupObservers() {
         viewModel.actorVideosResult.observe(viewLifecycleOwner, Observer {
             when (it.first) {
-                is ApiResult.Loaded -> ""
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Loaded -> progressHUD?.dismiss()
                 is ApiResult.Success -> {
                     val actorVideos = (it.first as ApiResult.Success).result
                     actorVideosAdapter.setupData(actorVideos)
@@ -87,7 +89,9 @@ class ActorFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
-
+        tv_search.setOnClickListener {
+            navToSearch()
+        }
     }
 
     private fun navToActorVideosFragment(id: Long) {
@@ -105,6 +109,16 @@ class ActorFragment : BaseFragment() {
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_to_navigation_player,
+                bundle
+            )
+        )
+    }
+
+    private fun navToSearch() {
+        val bundle = SearchVideoFragment.createBundle(category = "女优")
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_to_searchVideoFragment,
                 bundle
             )
         )
