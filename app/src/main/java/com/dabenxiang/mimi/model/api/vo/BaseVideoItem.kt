@@ -35,7 +35,7 @@ data class VideoItem(
     var favoriteCount: Long? = 0,
 
     @SerializedName("id")
-    val id: Long? = 0,
+    val id: Long = 0,
 
     @SerializedName("like")
     var like: Boolean? = false,

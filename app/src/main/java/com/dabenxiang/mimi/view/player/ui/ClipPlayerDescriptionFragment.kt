@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.player.ui
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.activityViewModels
@@ -10,16 +11,20 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.item_ad.*
 import kotlinx.android.synthetic.main.item_clip_info.*
+import kotlinx.android.synthetic.main.item_comment_interactive.*
 import kotlinx.android.synthetic.main.item_video_tag.*
 import kotlinx.coroutines.InternalCoroutinesApi
 import java.util.*
@@ -33,6 +38,24 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
     private val clipViewModel = ClipPlayerDescriptionViewModel()
 
     override val isStatusBarDark: Boolean = true
+
+    private lateinit var detailItem: MemberPostItem
+    private var reportDialog: ReportDialogFragment? = null
+
+    private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
+        override fun onSend(item: BaseMemberPostItem, content: String, postItem: MemberPostItem?) {
+            if (TextUtils.isEmpty(content)) {
+                GeneralUtils.showToast(App.applicationContext(), getString(R.string.report_error))
+            } else {
+                mainViewModel?.sendPostReport(detailItem,content)
+            }
+            reportDialog?.dismiss()
+        }
+
+        override fun onCancel() {
+            reportDialog?.dismiss()
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -67,6 +90,44 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
         clipViewModel.updateFollow.observe(viewLifecycleOwner) {
             updataFollow(!(tv_follow.text != getText(R.string.follow)))
         }
+
+        clipViewModel.reportResult.observe(viewLifecycleOwner) { event ->
+            event.getContentIfNotHandled()?.also { apiResult ->
+                when (apiResult) {
+                    is ApiResult.Loading -> progressHUD.show()
+                    is ApiResult.Loaded -> progressHUD.dismiss()
+                    is ApiResult.Empty -> {
+                        detailItem.reported = true
+                        GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
+                    }
+                    is ApiResult.Error -> onApiError(apiResult.throwable)
+                }
+            }
+        }
+
+        clipViewModel.likeResult.observe(viewLifecycleOwner) {
+            when (it) {
+                is ApiResult.Loading -> progressHUD.show()
+                is ApiResult.Loaded -> progressHUD.dismiss()
+                is ApiResult.Success -> {
+                    detailItem = it.result
+                    setUILike()
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        }
+
+        clipViewModel.favoriteResult.observe(viewLifecycleOwner) {
+            when (it) {
+                is ApiResult.Loading -> progressHUD.show()
+                is ApiResult.Loaded -> progressHUD.dismiss()
+                is ApiResult.Success -> {
+                    detailItem = it.result
+                    setUIFavorite()
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        }
     }
 
     @InternalCoroutinesApi
@@ -95,7 +156,43 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
         }
     }
 
+    private fun setInteractiveListener() {
+        imgLike.setOnClickListener {
+            clipViewModel.likePost(detailItem, LikeType.LIKE)
+        }
+        imgDislike.setOnClickListener {
+            clipViewModel.likePost(detailItem, LikeType.DISLIKE)
+        }
+        imgFavorite.setOnClickListener {
+            clipViewModel.favoritePost(detailItem)
+        }
+    }
+
+    private fun setReportListener() {
+        imgReport.setOnClickListener {
+            if (detailItem.reported) {
+                GeneralUtils.showToast(
+                    App.applicationContext(),
+                    getString(R.string.already_reported)
+                )
+            } else {
+                reportDialog =
+                    ReportDialogFragment.newInstance(
+                        item = detailItem,
+                        listener = onReportDialogListener,
+                        isComment = false
+                    ).also {
+                        it.show(
+                            requireActivity().supportFragmentManager,
+                            ReportDialogFragment::class.java.simpleName
+                        )
+                    }
+            }
+        }
+    }
+
     private fun parsingPostContent(postItem: MemberPostItem) {
+        detailItem = postItem
         viewModel.loadImage(postItem.avatarAttachmentId, clip_icon, LoadImageType.AVATAR_CS)
         clip_name.text = postItem.postFriendlyName
 
@@ -123,6 +220,43 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
         setupChipGroup(postItem.tags)
 
         clipViewModel.createId = postItem.creatorId
+        setUILike()
+        setUIFavorite()
+        setInteractiveListener()
+        setReportListener()
+    }
+
+    private fun setUILike() {
+        imgLike.setImageResource(if (detailItem.likeType == LikeType.LIKE) R.drawable.ico_nice_s else R.drawable.ico_nice)
+        txtLikeCount.text =
+            String.format(getString(R.string.club_like_count), detailItem.likeCount)
+        txtLikeCount.setTextColor(
+            resources.getColor(
+                if (detailItem.likeType == LikeType.LIKE) R.color.color_red_1 else R.color.color_black_1_60,
+                null
+            )
+        )
+
+        imgDislike.setImageResource(if (detailItem.likeType == LikeType.DISLIKE) R.drawable.ico_bad_s else R.drawable.ico_bad)
+        txtDisLikeCount.text =
+            String.format(getString(R.string.club_dislike_count), detailItem.dislikeCount)
+        txtDisLikeCount.setTextColor(
+            resources.getColor(
+                if (detailItem.likeType == LikeType.DISLIKE) R.color.color_red_1 else R.color.color_black_1_60,
+                null
+            )
+        )
+
+    }
+
+    private fun setUIFavorite() {
+        imgFavorite.setImageResource(if (detailItem.isFavorite) R.drawable.btn_favorite_white_s else R.drawable.btn_favorite_white_n)
+        txtFavorite.setTextColor(
+            resources.getColor(
+                if (detailItem.isFavorite) R.color.color_red_1 else R.color.color_black_1_60,
+                null
+            )
+        )
     }
 
     private fun updataFollow(isFollow: Boolean) {

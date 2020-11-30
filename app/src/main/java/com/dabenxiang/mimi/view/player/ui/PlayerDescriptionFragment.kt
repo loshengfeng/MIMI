@@ -2,20 +2,26 @@ package com.dabenxiang.mimi.view.player.ui
 
 import android.os.Bundle
 import android.text.Html
+import android.text.TextUtils
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setNot
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoEpisodeItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
+import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
+import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.player.GuessLikeVideoAdapter
 import com.dabenxiang.mimi.view.player.GuessLikeVideoAdapter.OnGarbageItemClick
 import com.dabenxiang.mimi.view.player.SelectEpisodeAdapter
@@ -26,6 +32,7 @@ import kotlinx.android.synthetic.main.head_guess_like.*
 import kotlinx.android.synthetic.main.head_source.*
 import kotlinx.android.synthetic.main.head_video_info.*
 import kotlinx.android.synthetic.main.item_ad.*
+import kotlinx.android.synthetic.main.item_comment_interactive.*
 import kotlinx.android.synthetic.main.item_video_tag.*
 import timber.log.Timber
 import java.text.SimpleDateFormat
@@ -36,6 +43,10 @@ class PlayerDescriptionFragment : BaseFragment() {
     private val viewModel: PlayerV2ViewModel by activityViewModels()
 
     private val descriptionViewModel = PlayerDescriptionViewModel()
+
+    override fun getLayoutId(): Int {
+        return R.layout.fragment_player_description
+    }
 
     override val isStatusBarDark: Boolean = true
 
@@ -72,6 +83,25 @@ class PlayerDescriptionFragment : BaseFragment() {
         })
     }
 
+    private lateinit var detailItem: MemberPostItem
+    private var streamId: Long = 0
+    private var reportDialog: ReportDialogFragment? = null
+
+    private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
+        override fun onSend(item: BaseMemberPostItem, content: String, postItem: MemberPostItem?) {
+            if (TextUtils.isEmpty(content)) {
+                GeneralUtils.showToast(App.applicationContext(), getString(R.string.report_error))
+            } else {
+                descriptionViewModel.sendVideoReport(streamId, content)
+            }
+            reportDialog?.dismiss()
+        }
+
+        override fun onCancel() {
+            reportDialog?.dismiss()
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -81,15 +111,30 @@ class PlayerDescriptionFragment : BaseFragment() {
         descriptionViewModel.getAd(adWidth, adHeight)
     }
 
-    override fun getLayoutId(): Int {
-        return R.layout.fragment_player_description
-    }
-
     override fun setupObservers() {
         viewModel.videoContentSource.observe(viewLifecycleOwner) {
             when (it) {
                 is ApiResult.Success -> {
+                    descriptionViewModel.getPostDetail(it.result.id)
                     setUI(it.result)
+                }
+            }
+        }
+        descriptionViewModel.detailResult.observe(viewLifecycleOwner) {
+            when (it) {
+                is ApiResult.Success -> {
+                    detailItem = it.result
+                    setUILike()
+                    setUIFavorite()
+                    setInteractiveListener()
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        }
+
+        viewModel.m3u8ContentSource.observe(viewLifecycleOwner) {
+            when (it) {
+                is ApiResult.Success -> {
                 }
             }
         }
@@ -98,6 +143,7 @@ class PlayerDescriptionFragment : BaseFragment() {
             when (it) {
                 is ApiResult.Success -> {
                     updateStreamInfo(it.result)
+                    streamId = it.result.videoStreams?.get(0)?.id ?: 0L
                 }
             }
         }
@@ -142,19 +188,89 @@ class PlayerDescriptionFragment : BaseFragment() {
 
         viewModel.selectEpisodePosition.observe(viewLifecycleOwner) {
             Timber.w("Select index is $it and old index is ${episodeAdapter.getSelectedPosition()}")
-            if(it != episodeAdapter.getSelectedPosition()) {
+            if (it != episodeAdapter.getSelectedPosition()) {
                 episodeAdapter.setLastSelectedIndex(it)
                 viewModel.getVideoContent()
+            }
+        }
+
+        descriptionViewModel.reportResult.observe(viewLifecycleOwner) { event ->
+            event.getContentIfNotHandled()?.also { apiResult ->
+                when (apiResult) {
+                    is ApiResult.Loading -> progressHUD.show()
+                    is ApiResult.Loaded -> progressHUD.dismiss()
+                    is ApiResult.Empty -> {
+                        detailItem.reported = true
+                        GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
+                    }
+                    is ApiResult.Error -> onApiError(apiResult.throwable)
+                }
+            }
+        }
+
+        descriptionViewModel.likeResult.observe(viewLifecycleOwner) {
+            when (it) {
+                is ApiResult.Loading -> progressHUD.show()
+                is ApiResult.Loaded -> progressHUD.dismiss()
+                is ApiResult.Success -> {
+                    detailItem = it.result
+                    setUILike()
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        }
+
+        descriptionViewModel.favoriteResult.observe(viewLifecycleOwner) {
+            when (it) {
+                is ApiResult.Loading -> progressHUD.show()
+                is ApiResult.Loaded -> progressHUD.dismiss()
+                is ApiResult.Success -> {
+                    detailItem = it.result
+                    setUIFavorite()
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
             }
         }
     }
 
     override fun setupListeners() {
-
         btn_show_introduction.setOnClickListener {
             viewModel.showIntroduction.setNot()
         }
+    }
 
+    private fun setInteractiveListener() {
+        imgLike.setOnClickListener {
+            checkStatus { descriptionViewModel.likePost(detailItem, LikeType.LIKE) }
+        }
+        imgDislike.setOnClickListener {
+            checkStatus { descriptionViewModel.likePost(detailItem, LikeType.DISLIKE) }
+        }
+        imgFavorite.setOnClickListener {
+            checkStatus { descriptionViewModel.favoritePost(detailItem) }
+        }
+        imgReport.setOnClickListener {
+            checkStatus {
+                if (detailItem.reported) {
+                    GeneralUtils.showToast(
+                        App.applicationContext(),
+                        getString(R.string.already_reported)
+                    )
+                } else {
+                    reportDialog =
+                        ReportDialogFragment.newInstance(
+                            item = detailItem,
+                            listener = onReportDialogListener,
+                            isComment = false
+                        ).also {
+                            it.show(
+                                requireActivity().supportFragmentManager,
+                                ReportDialogFragment::class.java.simpleName
+                            )
+                        }
+                }
+            }
+        }
     }
 
     private fun setUI(videoItem: VideoItem) {
@@ -184,7 +300,7 @@ class PlayerDescriptionFragment : BaseFragment() {
             dateString ?: "",
             videoItem.country
         )
-        if(!videoItem.description.isNullOrEmpty()) {
+        if (!videoItem.description.isNullOrEmpty()) {
             tv_introduction.text =
                 Html.fromHtml(videoItem.description, Html.FROM_HTML_MODE_COMPACT)
         }
@@ -192,10 +308,10 @@ class PlayerDescriptionFragment : BaseFragment() {
         if (videoItem.tags != null)
             setupChipGroup(videoItem.tags as List<String>)
 
-        if(videoItem.sources == null || videoItem.sources.isEmpty()) {
+        if (videoItem.sources == null || videoItem.sources.isEmpty()) {
             recyclerview_source_list.visibility = View.GONE
         } else {
-            if(videoItem.sources.size == 1) recyclerview_source_list.visibility = View.GONE
+            if (videoItem.sources.size == 1) recyclerview_source_list.visibility = View.GONE
 
             val result = mutableListOf<String>()
             for (item in videoItem.sources) {
@@ -208,10 +324,44 @@ class PlayerDescriptionFragment : BaseFragment() {
         }
     }
 
+    private fun setUILike() {
+        imgLike.setImageResource(if (detailItem.likeType == LikeType.LIKE) R.drawable.ico_nice_s else R.drawable.ico_nice)
+        txtLikeCount.text =
+            String.format(getString(R.string.club_like_count), detailItem.likeCount)
+        txtLikeCount.setTextColor(
+            resources.getColor(
+                if (detailItem.likeType == LikeType.LIKE) R.color.color_red_1 else R.color.color_black_1_60,
+                null
+            )
+        )
+
+        imgDislike.setImageResource(if (detailItem.likeType == LikeType.DISLIKE) R.drawable.ico_bad_s else R.drawable.ico_bad)
+        txtDisLikeCount.text =
+            String.format(getString(R.string.club_dislike_count), detailItem.dislikeCount)
+        txtDisLikeCount.setTextColor(
+            resources.getColor(
+                if (detailItem.likeType == LikeType.DISLIKE) R.color.color_red_1 else R.color.color_black_1_60,
+                null
+            )
+        )
+
+    }
+
+    private fun setUIFavorite() {
+        imgFavorite.setImageResource(if (detailItem.isFavorite) R.drawable.btn_favorite_white_s else R.drawable.btn_favorite_white_n)
+        txtFavorite.setTextColor(
+            resources.getColor(
+                if (detailItem.isFavorite) R.color.color_red_1 else R.color.color_black_1_60,
+                null
+            )
+        )
+    }
+
     private fun updateStreamInfo(videoEpisodeItem: VideoEpisodeItem) {
         val result = mutableListOf<String>()
-        if(videoEpisodeItem.videoStreams != null
-            && videoEpisodeItem.videoStreams.isNotEmpty()) {
+        if (videoEpisodeItem.videoStreams != null
+            && videoEpisodeItem.videoStreams.isNotEmpty()
+        ) {
             for (item in videoEpisodeItem.videoStreams) {
                 Timber.i("videoStreams =${item.id}")
                 if (item.id != null) {
