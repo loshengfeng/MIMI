@@ -207,6 +207,7 @@
     <string name="btn_register">注册</string>
     <string name="btn_send">送出</string>
     <string name="btn_login">登录</string>
+    <string name="btn_retry">重试</string>
     <string name="login_name">请填写名称</string>
     <string name="login_email">请填写Email</string>
     <string name="login_mobile">请填写手机号</string>
@@ -531,4 +532,7 @@
     <string name="empty_video">目前尚无影片</string>
     <string name="load_video">影片载入中...</string>
     <string name="error_video">影片载入失敗</string>
+
+    <string name="error_server">服务器遇到了点意外!</string>
+
 </resources>
