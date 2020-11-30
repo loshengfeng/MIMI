@@ -834,7 +834,7 @@ abstract class BaseFragment : Fragment() {
     open fun navigationToText(bundle: Bundle) {
         navigateTo(
             NavigateItem.Destination(
-                R.id.action_clubTabFragment_to_clubTextFragment,
+                R.id.action_to_clubTextFragment,
                 bundle
             )
         )
@@ -843,7 +843,7 @@ abstract class BaseFragment : Fragment() {
     open fun navigationToPicture(bundle: Bundle) {
         navigateTo(
             NavigateItem.Destination(
-                R.id.action_clubTabFragment_to_clubPicFragment,
+                R.id.action_to_clubPicFragment,
                 bundle
             )
         )

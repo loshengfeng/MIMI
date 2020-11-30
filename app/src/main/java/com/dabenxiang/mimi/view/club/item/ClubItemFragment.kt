@@ -204,7 +204,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                         val bundle = ClubPicFragment.createBundle(item, 1)
                         navigateTo(
                                 NavigateItem.Destination(
-                                        R.id.action_clubTabFragment_to_clubPicFragment,
+                                        R.id.action_to_clubPicFragment,
                                         bundle
                                 )
                         )
@@ -213,7 +213,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                         val bundle = ClubTextFragment.createBundle(item, 1)
                         navigateTo(
                                 NavigateItem.Destination(
-                                        R.id.action_clubTabFragment_to_clubTextFragment,
+                                        R.id.action_to_clubTextFragment,
                                         bundle
                                 )
                         )
@@ -222,7 +222,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                         val bundle = ClipPlayerFragment.createBundle(item.id, 1)
                         navigateTo(
                                 NavigateItem.Destination(
-                                        R.id.action_clubTabFragment_to_clipPlayerFragment,
+                                        R.id.action_to_clipPlayerFragment,
                                         bundle
                                 )
                         )
@@ -249,7 +249,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             )
             navigateTo(
                     NavigateItem.Destination(
-                            R.id.action_clubTabFragment_to_myPostFragment,
+                            R.id.action_to_myPostFragment,
                             bundle
                     )
             )
@@ -258,6 +258,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         override fun onMoreClick(item: MemberPostItem, position: Int) {
             onMoreClick(item, position) {
                 it as MemberPostItem
+
 
                 val bundle = Bundle()
                 item.id
@@ -268,19 +269,19 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                 when (it.type) {
                     PostType.TEXT -> {
                         findNavController().navigate(
-                            R.id.action_clubTabFragment_to_postArticleFragment,
+                                R.id.action_to_postArticleFragment,
                             bundle
                         )
                     }
                     PostType.IMAGE -> {
                         findNavController().navigate(
-                            R.id.action_clubTabFragment_to_postPicFragment,
+                                R.id.action_to_postPicFragment,
                             bundle
                         )
                     }
                     PostType.VIDEO -> {
                         findNavController().navigate(
-                            R.id.action_clubTabFragment_to_postVideoFragment,
+                                R.id.action_to_postVideoFragment,
                             bundle
                         )
                     }
@@ -300,7 +301,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                     val bundle = ClubTextFragment.createBundle(item)
                     navigateTo(
                             NavigateItem.Destination(
-                                    R.id.action_clubTabFragment_to_clubTextFragment,
+                                    R.id.action_to_clubTextFragment,
                                     bundle
                             )
                     )
@@ -309,7 +310,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                     val bundle = ClubPicFragment.createBundle(item)
                     navigateTo(
                             NavigateItem.Destination(
-                                    R.id.action_clubTabFragment_to_clubPicFragment,
+                                    R.id.action_to_clubPicFragment,
                                     bundle
                             )
                     )
@@ -318,7 +319,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                     val bundle = ClipPlayerFragment.createBundle(item.id)
                     navigateTo(
                             NavigateItem.Destination(
-                                    R.id.action_clubTabFragment_to_clipPlayerFragment,
+                                    R.id.action_to_clipPlayerFragment,
                                     bundle
                             )
                     )
@@ -340,7 +341,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
                     NavigateItem.Destination(
-                            R.id.action_clubTabFragment_to_searchPostFragment,
+                            R.id.action_to_searchPostFragment,
                             bundle
                     )
             )
