@@ -113,16 +113,20 @@ class ClubLatestFragment : BaseFragment() {
 //            navigationToVideo(bundle)
         }
 
-        override fun (type: PostType, tag: String) {
-            val item = SearchPostItem(type = type, tag = tag)
-            val bundle = SearchPostFragment.createBundle(item)
-            navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_clubTabFragment_to_searchPostFragment,
-                            bundle
-                    )
-            )
+        override fun onChipClick(type: PostType, tag: String) {
+            
         }
+
+//        override fun (type: PostType, tag: String) {
+//            val item = SearchPostItem(type = type, tag = tag)
+//            val bundle = SearchPostFragment.createBundle(item)
+//            navigateTo(
+//                    NavigateItem.Destination(
+//                            R.id.action_clubTabFragment_to_searchPostFragment,
+//                            bundle
+//                    )
+//            )
+//        }
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
             when (adultTabType) {
