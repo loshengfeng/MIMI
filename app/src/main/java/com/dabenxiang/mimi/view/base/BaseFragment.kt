@@ -824,7 +824,7 @@ abstract class BaseFragment : Fragment() {
         }
     }
 
-    private fun navigationToText(bundle: Bundle) {
+    open fun navigationToText(bundle: Bundle) {
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_clubTabFragment_to_clubTextFragment,
@@ -833,7 +833,7 @@ abstract class BaseFragment : Fragment() {
         )
     }
 
-    private fun navigationToPicture(bundle: Bundle) {
+    open fun navigationToPicture(bundle: Bundle) {
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_clubTabFragment_to_clubPicFragment,
@@ -842,7 +842,7 @@ abstract class BaseFragment : Fragment() {
         )
     }
 
-    private fun navigationToClip(bundle: Bundle) {
+    open fun navigationToClip(bundle: Bundle) {
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_adultHomeFragment_to_clipFragment,

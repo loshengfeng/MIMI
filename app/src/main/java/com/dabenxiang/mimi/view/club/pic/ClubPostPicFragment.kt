@@ -29,6 +29,7 @@ import com.dabenxiang.mimi.view.club.post.ClubPostViewModel
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
+import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_post_pic.*
@@ -197,6 +198,7 @@ class ClubPostPicFragment : BaseFragment() {
                 val bundle = Bundle()
                 item.id
                 bundle.putBoolean(MyPostFragment.EDIT, true)
+                bundle.putString(BasePostFragment.PAGE, BasePostFragment.TAB)
                 bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
 
                 when(it.type) {
@@ -214,11 +216,9 @@ class ClubPostPicFragment : BaseFragment() {
                     }
                     PostType.VIDEO -> {
                         findNavController().navigate(
-                            R.id.action_myPostFragment_to_postArticleFragment,
+                            R.id.action_clubTabFragment_to_postVideoFragment,
                             bundle
                         )
-
-                        //TODO fix this navigation to video
                     }
                 }
             }

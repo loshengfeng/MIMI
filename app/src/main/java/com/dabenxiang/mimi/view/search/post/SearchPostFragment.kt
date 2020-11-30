@@ -98,8 +98,7 @@ class SearchPostFragment : BaseFragment() {
             onMoreClick(item, position) {
                 it as MemberPostItem
 
-                val searchPostItem = arguments?.getSerializable(KEY_DATA)
-
+                val searchPostItem = SearchPostItem(searchType, searchOrderBy, searchTag, searchKeyword)
                 val bundle = Bundle()
                 item.id
                 bundle.putBoolean(MyPostFragment.EDIT, true)
@@ -122,11 +121,9 @@ class SearchPostFragment : BaseFragment() {
                     }
                     PostType.VIDEO -> {
                         findNavController().navigate(
-                            R.id.action_myPostFragment_to_postArticleFragment,
+                            R.id.action_searchPostFragment_to_postVideoFragment,
                             bundle
                         )
-
-                        //TODO fix this navigation to video
                     }
                 }
             }
@@ -437,6 +434,33 @@ class SearchPostFragment : BaseFragment() {
             viewModel.getSearchPostAllResult(searchType, keyword, tag, searchOrderBy)
                 .collectLatest { adapter.submitData(it) }
         }
+    }
+
+    override fun navigationToText(bundle: Bundle) {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_searchPostFragment_to_clubTextFragment,
+                bundle
+            )
+        )
+    }
+
+    override fun navigationToPicture(bundle: Bundle) {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_searchPostFragment_to_clubPicFragment,
+                bundle
+            )
+        )
+    }
+
+    override fun navigationToClip(bundle: Bundle) {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_searchPostFragment_to_clipPlayerFragment,
+                bundle
+            )
+        )
     }
 
 }

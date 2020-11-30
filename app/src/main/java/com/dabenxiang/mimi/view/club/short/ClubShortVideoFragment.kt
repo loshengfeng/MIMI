@@ -20,15 +20,11 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
+import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_short.*
-import kotlinx.android.synthetic.main.fragment_club_short.id_empty_group
-import kotlinx.android.synthetic.main.fragment_club_short.id_not_login_group
-import kotlinx.android.synthetic.main.fragment_club_short.layout_ad
-import kotlinx.android.synthetic.main.fragment_club_short.layout_refresh
 import kotlinx.android.synthetic.main.item_ad.view.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
@@ -208,6 +204,7 @@ class ClubShortVideoFragment : BaseFragment() {
                 val bundle = Bundle()
                 item.id
                 bundle.putBoolean(MyPostFragment.EDIT, true)
+                bundle.putString(BasePostFragment.PAGE, BasePostFragment.TAB)
                 bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
 
                 when(it.type) {
@@ -225,11 +222,9 @@ class ClubShortVideoFragment : BaseFragment() {
                     }
                     PostType.VIDEO -> {
                         findNavController().navigate(
-                            R.id.action_myPostFragment_to_postArticleFragment,
+                            R.id.action_clubTabFragment_to_postVideoFragment,
                             bundle
                         )
-
-                        //TODO fix this navigation to video
                     }
                 }
             }

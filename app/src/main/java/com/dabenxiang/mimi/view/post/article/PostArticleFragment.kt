@@ -114,6 +114,10 @@ class PostArticleFragment : BasePostFragment() {
             bundle.putSerializable(MEMBER_DATA, item)
             bundle.putSerializable(KEY_DATA, memberClubItem)
             findNavController().navigate(R.id.action_postArticleFragment_to_topicDetailFragment, bundle)
+        } else if (isEdit && page == TAB) {
+            val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
+            bundle.putSerializable(MEMBER_DATA, item)
+            findNavController().navigate(R.id.action_postArticleFragment_to_clubTabFragment, bundle)
         } else {
             findNavController().navigate(R.id.action_postArticleFragment_to_clubTabFragment, bundle)
         }

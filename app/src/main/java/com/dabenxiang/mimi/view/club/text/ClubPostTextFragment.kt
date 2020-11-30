@@ -196,6 +196,7 @@ class ClubPostTextFragment : BaseFragment() {
                 val bundle = Bundle()
                 item.id
                 bundle.putBoolean(MyPostFragment.EDIT, true)
+                bundle.putString(BasePostFragment.PAGE, BasePostFragment.TAB)
                 bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
 
                 when(it.type) {
@@ -213,11 +214,9 @@ class ClubPostTextFragment : BaseFragment() {
                     }
                     PostType.VIDEO -> {
                         findNavController().navigate(
-                            R.id.action_myPostFragment_to_postArticleFragment,
+                            R.id.action_clubTabFragment_to_postVideoFragment,
                             bundle
                         )
-
-                        //TODO fix this navigation to video
                     }
                 }
             }

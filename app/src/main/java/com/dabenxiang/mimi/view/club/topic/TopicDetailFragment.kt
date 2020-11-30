@@ -182,6 +182,33 @@ class TopicDetailFragment : BaseFragment() {
         }
     }
 
+    override fun navigationToText(bundle: Bundle) {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_topicDetailFragment_to_clubTextFragment,
+                bundle
+            )
+        )
+    }
+
+    override fun navigationToPicture(bundle: Bundle) {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_topicDetailFragment_to_clubPicFragment,
+                bundle
+            )
+        )
+    }
+
+    override fun navigationToClip(bundle: Bundle) {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_topicDetailFragment_to_clipPlayerFragment,
+                bundle
+            )
+        )
+    }
+
     private val adultListener = object : AdultListener {
         override fun onFollowPostClick(item: MemberPostItem, position: Int, isFollow: Boolean) {}
 
