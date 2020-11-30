@@ -8,9 +8,6 @@ import android.view.animation.LinearInterpolator
 import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 
-/**
- * @author arturdumchev on 13/10/2018.
- */
 class InitialViewDetails(
         val x: Float,
         val y: Float,

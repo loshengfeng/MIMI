@@ -71,7 +71,6 @@ class ActorVideosFragment : BaseFragment() {
 
     override fun initSettings() {
         super.initSettings()
-//        tv_title.text = getString(R.string.actor_videos_title)
         actor_toolbar_title.text = getString(R.string.actor_videos_title)
             arguments?.getSerializable(KEY_DATA)?.let { id ->
                 id as Long
