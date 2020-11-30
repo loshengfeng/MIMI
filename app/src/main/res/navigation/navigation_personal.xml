@@ -142,7 +142,7 @@
             android:id="@+id/action_myFollowFragmentV2_to_clubPicFragment"
             app:destination="@id/clubPicFragment" />
         <action
-            android:id="@+id/action_myFollowFragmentV2_to_clipPlayerFragment2"
+            android:id="@+id/action_myFollowFragmentV2_to_clipPlayerFragment"
             app:destination="@id/clipPlayerFragment" />
     </fragment>
     <fragment
