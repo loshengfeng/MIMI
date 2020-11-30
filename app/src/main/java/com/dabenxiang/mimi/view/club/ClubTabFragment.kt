@@ -86,8 +86,9 @@ class ClubTabFragment : BaseFragment() {
         val view =  inflater.inflate(getLayoutId(), container, false)
         view.club_view_pager.adapter = ClubTabAdapter(childFragmentManager, lifecycle)
         view.club_view_pager.offscreenPageLimit =7
+        val tabs = resources.getStringArray(R.array.club_tabs)
         tabLayoutMediator = TabLayoutMediator(view.club_tabs,  view.club_view_pager) { tab, position ->
-            tab.text = getTabTitle(position)
+            tab.text =tabs[position]
         }
         tabLayoutMediator.attach()
         view.topic_tabs.adapter = topicListAdapter
@@ -107,18 +108,6 @@ class ClubTabFragment : BaseFragment() {
         super.onDestroy()
         Timber.i("ClubTabFragment onDestroy")
         if(::tabLayoutMediator.isInitialized) tabLayoutMediator.detach()
-    }
-
-    private fun getTabTitle(position: Int): String? {
-        return when (position) {
-            TAB_FOLLOW -> getString(R.string.club_tab_follow)
-            TAB_RECOMMEND -> getString(R.string.club_tab_recommend)
-            TAB_LATEST -> getString(R.string.club_tab_latest)
-            TAB_CLIP -> getString(R.string.club_tab_clip)
-            TAB_PICTURE -> getString(R.string.club_tab_picture)
-            TAB_NOVEL -> getString(R.string.club_tab_novel)
-            else -> null
-        }
     }
 
     private fun getClubItemList() {
