@@ -12,38 +12,20 @@ import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.TextContentItem
 import com.dabenxiang.mimi.model.enums.*
-import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.getSpanString
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.item_clip_post.view.*
 import kotlinx.android.synthetic.main.item_text_post.view.*
-import kotlinx.android.synthetic.main.item_text_post.view.chip_group_tag
-import kotlinx.android.synthetic.main.item_text_post.view.img_avatar
-import kotlinx.android.synthetic.main.item_text_post.view.iv_comment
-import kotlinx.android.synthetic.main.item_text_post.view.iv_favorite
-import kotlinx.android.synthetic.main.item_text_post.view.iv_like
-import kotlinx.android.synthetic.main.item_text_post.view.iv_more
-import kotlinx.android.synthetic.main.item_text_post.view.tv_comment_count
-import kotlinx.android.synthetic.main.item_text_post.view.tv_favorite_count
-import kotlinx.android.synthetic.main.item_text_post.view.tv_follow
-import kotlinx.android.synthetic.main.item_text_post.view.tv_like_count
-import kotlinx.android.synthetic.main.item_text_post.view.tv_name
-import kotlinx.android.synthetic.main.item_text_post.view.tv_time
-import kotlinx.android.synthetic.main.item_text_post.view.tv_title
-import kotlinx.android.synthetic.main.item_text_post.view.v_separator
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import timber.log.Timber
 import java.util.*
 
 class MyPostTextPostHolder(
     itemView: View
-) : BaseViewHolder(itemView),KoinComponent {
-
-    private val accountManager: AccountManager by inject()
+) : BaseViewHolder(itemView), KoinComponent {
 
     private val textPostItemLayout: ConstraintLayout = itemView.layout_text_post_item
     private val imgAvatar: ImageView = itemView.img_avatar
@@ -68,26 +50,14 @@ class MyPostTextPostHolder(
         itemList: List<MemberPostItem>?,
         position: Int,
         myPostListener: MyPostListener,
-        attachmentListener: AttachmentListener
+        attachmentListener: AttachmentListener,
+        searchStr: String = "",
+        searchTag: String = ""
     ) {
-
-        val isMe = accountManager.getProfile().userId == item.creatorId
-
-//        textPostItemLayout.setBackgroundColor(App.self.getColor(if (isAdultTheme) R.color.color_black_4 else R.color.color_white_1))
-//        tvName.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1 else R.color.color_black_1))
-//        tvTime.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1_50 else R.color.color_black_1_50))
-//        tvTitle.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1 else R.color.color_black_1))
-//        tvTextDesc.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1 else R.color.color_black_1))
-//        tvLikeCount.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1 else R.color.color_black_1))
-//        tvCommentCount.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1 else R.color.color_black_1))
-//        ivComment.setImageResource(if (isAdultTheme) R.drawable.ico_messege_adult else R.drawable.ico_messege_adult_gray)
-//        ivMore.setImageResource(if (isAdultTheme) R.drawable.btn_more_white_n else R.drawable.btn_more_gray_n)
-//        vSeparator.setBackgroundColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1_30 else R.color.color_black_1_05))
-//        textLayout.setBackgroundResource(if (isAdultTheme) R.drawable.bg_white_1_10_radius_6 else R.drawable.bg_white_stroke_2_radius_6)
 
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
-        tvTitle.text = item.title
+        tvTitle.text = if (searchStr.isNotBlank()) getSpanString(tvTitle.context, item.title, searchStr) else item.title
 
         // FIXME: item.content json 資料格式有問題
         try {
@@ -99,7 +69,7 @@ class MyPostTextPostHolder(
 
         attachmentListener.onGetAttachment(item.avatarAttachmentId, imgAvatar, LoadImageType.AVATAR)
         imgAvatar.setOnClickListener {
-            myPostListener.onAvatarClick(item.creatorId,item.postFriendlyName)
+            myPostListener.onAvatarClick(item.creatorId, item.postFriendlyName)
         }
 
         tagChipGroup.removeAllViews()
@@ -107,41 +77,25 @@ class MyPostTextPostHolder(
             val chip = LayoutInflater.from(tagChipGroup.context)
                 .inflate(R.layout.chip_item, tagChipGroup, false) as Chip
             chip.text = it
-            chip.setTextColor(tagChipGroup.context.getColor(R.color.color_black_1_50))
-//            chip.chipBackgroundColor = ColorStateList.valueOf(
-//                ContextCompat.getColor(
-//                    tagChipGroup.context,
-//                    if (isAdultTheme) R.color.color_black_6 else R.color.color_black_1_05
-//                )
-//            )
+            if (it == searchTag) chip.setTextColor(tagChipGroup.context.getColor(R.color.color_red_1))
+            else chip.setTextColor(tagChipGroup.context.getColor(R.color.color_black_1_50))
             chip.setOnClickListener { view ->
                 myPostListener.onChipClick(PostType.TEXT, (view as Chip).text.toString())
             }
             tagChipGroup.addView(chip)
         }
-
-//        if (isMe) {
-//            tvFollow.visibility = View.GONE
-//        } else {
-//            tvFollow.visibility = View.VISIBLE
-//            tvFollow.setOnClickListener {
-//                itemList?.also { myPostListener.onFollowClick(itemList, position, !item.isFollow) }
-//                item.isFollow = !item.isFollow
-//            }
-//            updateFollow(item)
-//        }
-        tvFollow.visibility =  View.GONE
+        tvFollow.visibility = View.GONE
 
         updateFavorite(item)
         val onFavoriteClickListener = View.OnClickListener {
             item.isFavorite = !item.isFavorite
             item.favoriteCount =
-                    if (item.isFavorite) item.favoriteCount + 1 else item.favoriteCount - 1
+                if (item.isFavorite) item.favoriteCount + 1 else item.favoriteCount - 1
             myPostListener.onFavoriteClick(
-                    item,
-                    position,
-                    item.isFavorite,
-                    AttachmentType.ADULT_HOME_CLIP
+                item,
+                position,
+                item.isFavorite,
+                AttachmentType.ADULT_HOME_CLIP
             )
         }
         ivFavorite.setOnClickListener(onFavoriteClickListener)
@@ -198,5 +152,4 @@ class MyPostTextPostHolder(
             ivFavorite.setImageResource(R.drawable.btn_favorite_n)
         }
     }
-
 }

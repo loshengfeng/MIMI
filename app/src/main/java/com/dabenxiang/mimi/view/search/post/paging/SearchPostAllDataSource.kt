@@ -39,7 +39,13 @@ class SearchPostAllDataSource constructor(
 
             val body = result.body()
             val memberPostItems = body?.content
-            memberPostItems?.add(0, MemberPostItem(type = PostType.AD, adItem = adItem))
+            val list = arrayListOf<MemberPostItem>()
+            val memberPostAdItem = MemberPostItem(type = PostType.AD, adItem = adItem)
+            memberPostItems?.forEachIndexed { index, item ->
+                if (index == 5) list.add(memberPostAdItem)
+                list.add(item)
+            }
+            list.add(memberPostAdItem)
 
             val hasNext = hasNextPage(
                 result.body()?.paging?.count ?: 0,
@@ -47,9 +53,8 @@ class SearchPostAllDataSource constructor(
                 memberPostItems?.size ?: 0
             )
             val nextKey = if (hasNext) offset + PER_LIMIT_LONG else null
-            if (offset == 0L) pagingCallback.onTotalCount(result.body()?.paging?.count ?: 0)
             pagingCallback.onTotalCount(body?.paging?.count ?: 0)
-            LoadResult.Page(memberPostItems ?: listOf(), null, nextKey)
+            LoadResult.Page(list, null, nextKey)
         } catch (e: Exception) {
             LoadResult.Error(e)
         }
