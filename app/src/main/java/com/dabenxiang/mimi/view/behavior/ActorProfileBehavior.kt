@@ -69,11 +69,11 @@ class ActorProfileBehavior: CoordinatorLayout.Behavior<View> {
                         child.visibility = View.INVISIBLE
                     }
                 }
-                R.id.actor_title -> {
-                    if(child.visibility == View.INVISIBLE){
-                        child.visibility = View.VISIBLE
-                    }
-                }
+//                R.id.actor_title -> {
+//                    if(child.visibility == View.INVISIBLE){
+//                        child.visibility = View.VISIBLE
+//                    }
+//                }
             }
         }
         if (dyConsumed == 0 && dyUnconsumed > 0) {
@@ -99,11 +99,11 @@ class ActorProfileBehavior: CoordinatorLayout.Behavior<View> {
                         child.visibility = View.VISIBLE
                     }
                 }
-                R.id.actor_title -> {
-                    if(child.visibility == View.VISIBLE){
-                        child.visibility = View.INVISIBLE
-                    }
-                }
+//                R.id.actor_title -> {
+//                    if(child.visibility == View.VISIBLE){
+//                        child.visibility = View.INVISIBLE
+//                    }
+//                }
             }
         }
     }

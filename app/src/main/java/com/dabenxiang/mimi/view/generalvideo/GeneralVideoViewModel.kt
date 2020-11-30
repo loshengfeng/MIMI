@@ -22,7 +22,8 @@ class GeneralVideoViewModel : BaseViewModel() {
                     category,
                     orderByType,
                     adWidth,
-                    adHeight
+                    adHeight,
+                    true
                 )
             }
         ).flow.cachedIn(viewModelScope)
