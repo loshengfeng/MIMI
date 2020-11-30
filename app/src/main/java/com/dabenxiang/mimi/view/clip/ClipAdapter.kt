@@ -61,7 +61,6 @@ class ClipAdapter(
     private var isOverdue: Boolean = false
 
     fun setM3U8Result(url: String, errorCode: Int) {
-        Timber.d("@@@errorCode: $errorCode")
         m3u8Url = url
         isOverdue = errorCode == ERROR_CODE_ACCOUNT_OVERDUE
     }

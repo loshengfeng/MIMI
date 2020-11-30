@@ -31,6 +31,9 @@
         <action
             android:id="@+id/action_to_loginFragment"
             app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_clubTabFragment_to_clipPlayerFragment"
+            app:destination="@id/clipPlayerFragment" />
     </fragment>
 
     <fragment
@@ -76,4 +79,10 @@
         android:id="@+id/pictureFragment"
         android:name="com.dabenxiang.mimi.view.fullpicture.FullPictureFragment"
         tools:layout="@layout/fragment_full_picture" />
+
+    <fragment
+        android:id="@+id/clipPlayerFragment"
+        android:name="com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment"
+        tools:layout="@layout/fragment_v2_player"
+        android:label="ClipPlayerFragment" />
 </navigation>

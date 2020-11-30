@@ -13,6 +13,7 @@ class VideoPagingSource(
     private val orderByType: Int = StatisticsOrderType.LATEST.value,
     private val adWidth: Int,
     private val adHeight: Int,
+    private val needAd:Boolean
 ) : PagingSource<Long, StatisticsItem>() {
 
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, StatisticsItem> {
@@ -30,12 +31,14 @@ class VideoPagingSource(
                 )
             if (!result.isSuccessful) throw HttpException(result)
 
-            val adItem = domainManager.getAdRepository()
-                .getAD(adWidth, adHeight).body()?.content ?: AdItem()
-
             val body = result.body()
             val items = body?.content
-            items?.add(0, StatisticsItem(adItem = adItem))
+
+            if(needAd){
+                val adItem = domainManager.getAdRepository()
+                        .getAD(adWidth, adHeight).body()?.content ?: AdItem()
+                items?.add(0, StatisticsItem(adItem = adItem))
+            }
 
             val nextOffset = when {
                 hasNextPage(

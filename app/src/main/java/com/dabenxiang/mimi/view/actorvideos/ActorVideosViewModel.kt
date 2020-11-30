@@ -42,7 +42,7 @@ class ActorVideosViewModel : BaseViewModel() {
     fun getVideoByCategory(category: String): Flow<PagingData<StatisticsItem>> {
         return Pager(
             config = PagingConfig(pageSize = ApiRepository.NETWORK_PAGE_SIZE, enablePlaceholders = false),
-            pagingSourceFactory = { VideoPagingSource(domainManager, category,orderByType, 0, 0) }
+            pagingSourceFactory = { VideoPagingSource(domainManager, category,orderByType, 0, 0, false) }
         ).flow.cachedIn(viewModelScope)
     }
 }

@@ -166,7 +166,6 @@ class MyPostClipPostHolder(
 
         layoutClip.setOnClickListener {
             myPostListener.onItemClick(item, AdultTabType.CLIP)
-//            itemList?.also { myPostListener.onClipItemClick(it, position) }
         }
 
     }
