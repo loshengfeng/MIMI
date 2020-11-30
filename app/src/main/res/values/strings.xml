@@ -108,6 +108,15 @@
     <string name="club_like_count">赞%1$d</string>
     <string name="club_dislike_count">踩%1$d</string>
 
+    <string-array name="club_tabs">
+        <item>@string/club_tab_follow</item>
+        <item>@string/club_tab_recommend</item>
+        <item>@string/club_tab_latest</item>
+        <item>@string/club_tab_clip</item>
+        <item>@string/club_tab_picture</item>
+        <item>@string/club_tab_novel</item>
+    </string-array>
+
     <!-- Favorite -->
     <string name="favorite_title">我的收藏</string>
     <string name="favorite_clean">清除所有收藏</string>
@@ -120,6 +129,14 @@
     <string name="favorite_delete_favorite">取消收藏</string>
     <string name="favorite_no_data">尚未收藏影片，快去看片吧！</string>
     <string name="favorite_delete_this_favorite">是否要清除此收藏</string>
+    <string name="favorite_tab1">蜜蜜影視</string>
+    <string name="favorite_tab2">小視頻</string>
+    <string name="favorite_tab3">帖子</string>
+    <string-array name="favorite_tabs">
+        <item>@string/favorite_tab1</item>
+        <item>@string/favorite_tab2</item>
+        <item>@string/favorite_tab3</item>
+    </string-array>
 
     <!-- Personal -->
     <string name="phone_num">手机号</string>
@@ -364,32 +381,41 @@
     <string name="post_video_length_error">影片长度最短为3秒最长为15秒</string>
 
     <!-- Problem report -->
+    <string name="report_item_can_not_play">视频无法播放</string>
+    <string name="report_item_the_same_other">与其他视频相同</string>
+    <string name="report_item_video_title_content_no_match">视频标题与内容不符</string>
+    <string name="report_item_trash_error_content">垃圾内容或误导性内容</string>
+    <string name="report_item_hate_content">仇恨与恶意内容</string>
+    <string name="report_item_harmful_danger">有害的危险行为</string>
+    <string name="report_item_pic_content_no_match">图片与内容不符</string>
+    <string name="report_item_title_content_no_match">标题与内容不符</string>
+
     <string-array name="video_problem_report_item">
-        <item>视频无法播放</item>
-        <item>与其他视频相同</item>
-        <item>视频标题与内容不符</item>
-        <item>垃圾内容或误导性内容</item>
-        <item>仇恨与恶意内容</item>
-        <item>有害的危险行为</item>
+        <item>@string/report_item_can_not_play</item>
+        <item>@string/report_item_the_same_other</item>
+        <item>@string/report_item_video_title_content_no_match</item>
+        <item>@string/report_item_trash_error_content</item>
+        <item>@string/report_item_hate_content</item>
+        <item>@string/report_item_harmful_danger</item>
     </string-array>
 
     <string-array name="video_comment_problem_report_item">
-        <item>垃圾内容或误导性内容</item>
-        <item>仇恨与恶意内容</item>
+        <item>@string/report_item_trash_error_content</item>
+        <item>@string/report_item_hate_content</item>
     </string-array>
 
     <string-array name="picture_problem_report_item">
-        <item>图片与内容不符</item>
-        <item>垃圾内容或误导性内容</item>
-        <item>仇恨与恶意内容</item>
-        <item>有害的危险行为</item>
+        <item>@string/report_item_pic_content_no_match</item>
+        <item>@string/report_item_trash_error_content</item>
+        <item>@string/report_item_hate_content</item>
+        <item>@string/report_item_harmful_danger</item>
     </string-array>
 
     <string-array name="text_problem_report_item">
-        <item>标题与内容不符</item>
-        <item>垃圾内容或误导性内容</item>
-        <item>仇恨与恶意内容</item>
-        <item>有害的危险行为</item>
+        <item>@string/report_item_title_content_no_match</item>
+        <item>@string/report_item_trash_error_content</item>
+        <item>@string/report_item_hate_content</item>
+        <item>@string/report_item_harmful_danger</item>
     </string-array>
 
     <!-- My post -->
