@@ -12,6 +12,7 @@ import com.dabenxiang.mimi.view.base.BasePlayerFragment
 import com.dabenxiang.mimi.view.club.post.ClubCommentFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.fragment_order.*
 import kotlinx.android.synthetic.main.fragment_v2_player.*
 
 class ClipPlayerFragment: BasePlayerFragment() {
@@ -34,8 +35,10 @@ class ClipPlayerFragment: BasePlayerFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val position = arguments?.getInt(KEY_POSITION, 0)
-        player_pager.currentItem = position ?: 0
+        player_pager.post {
+            val position = arguments?.getInt(KEY_POSITION, 0)
+            player_pager.currentItem = position ?: 0
+        }
     }
 
     override fun createViewPagerFragment(position: Int): Fragment = when(position) {
