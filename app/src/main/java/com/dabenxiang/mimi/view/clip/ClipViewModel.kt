@@ -33,6 +33,9 @@ class ClipViewModel : BaseViewModel() {
     private var _likePostResult = MutableLiveData<ApiResult<Int>>()
     val likePostResult: LiveData<ApiResult<Int>> = _likePostResult
 
+    private val _videoReport = MutableLiveData<ApiResult<Nothing>>()
+    val videoReport: LiveData<ApiResult<Nothing>> = _videoReport
+
     fun getM3U8(item: VideoItem, position: Int, update: (Int, String, Int) -> Unit) {
         viewModelScope.launch {
             flow {
@@ -86,7 +89,7 @@ class ClipViewModel : BaseViewModel() {
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect()
+                .collect { _videoReport.value = it }
         }
     }
 
@@ -120,6 +123,13 @@ class ClipViewModel : BaseViewModel() {
             ),
             pagingSourceFactory = { ClipPagingSource(domainManager, orderByType) }
         ).flow.cachedIn(viewModelScope)
+    }
+
+    fun resetLiveData() {
+        _followResult.value = null
+        _favoriteResult.value = null
+        _likePostResult.value = null
+        _videoReport.value = null
     }
 
 }

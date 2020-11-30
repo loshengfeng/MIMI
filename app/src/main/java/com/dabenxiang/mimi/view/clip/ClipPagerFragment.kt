@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.clip
 
+import android.text.TextUtils
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.CombinedLoadStates
@@ -9,14 +10,21 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
+import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
+import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.dialog.comment.CommentDialogFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.item_clip_pager.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
@@ -33,6 +41,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
             { item, pos, isFavorite -> onFavoriteClick(item, pos, isFavorite) },
             { item, pos, isLike -> onLikeClick(item, pos, isLike) },
             { item -> onCommentClick(item) },
+            { item -> onMoreClick(item) },
             { id, error -> viewModel.sendVideoReport(id, error) },
             { onVipClick() },
             { onPromoteClick() },
@@ -172,6 +181,20 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
                 else -> {}
             }
         })
+
+        viewModel.videoReport.observe(viewLifecycleOwner, {
+            when (it) {
+                is Loading -> progressHUD.show()
+                is Loaded -> progressHUD.dismiss()
+                is Empty -> GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
+                is Error -> onApiError(it.throwable)
+                else -> {}
+            }
+        })
+    }
+
+    override fun resetObservers() {
+        viewModel.resetLiveData()
     }
 
     private fun onPromoteClick() {
@@ -203,6 +226,18 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
         }
     }
 
+    private fun onMoreClick(item: VideoItem) {
+        checkStatus {
+            Timber.d("onMoreClick, item:$item")
+            item.videoEpisodes?.get(0)?.run {
+                Pair(this.videoStreams?.get(0), this.reported ?: false)
+            }?.run {
+                val (videoStream, isReported) = this
+                showMoreDialog(videoStream?.id ?: 0, PostType.VIDEO, isReported)
+            }
+        }
+    }
+
     private fun getClips(update: ((PagingData<VideoItem>, CoroutineScope) -> Unit)) {
         lifecycleScope.launch {
             viewModel.getClips(orderByType).collectLatest {
@@ -216,7 +251,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
     }
 
     private fun scrollToNext(nextPosition: Int) {
-        rv_clip.smoothScrollToPosition(nextPosition)
+        rv_clip?.smoothScrollToPosition(nextPosition)
     }
 
     private fun showCommentDialog(item: VideoItem) {
@@ -249,6 +284,79 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
                 requireActivity().supportFragmentManager,
                 CommentDialogFragment::class.java.simpleName
             )
+        }
+    }
+
+    private var moreDialog: MoreDialogFragment? = null
+    private var reportDialog: ReportDialogFragment? = null
+
+    private fun showMoreDialog(
+        id: Long,
+        type: PostType,
+        isReported: Boolean,
+        isComment: Boolean = false
+    ) {
+        Timber.i("id=$id")
+        Timber.i("isReported=$isReported")
+        moreDialog = MoreDialogFragment.newInstance(
+            MemberPostItem(id = id, type = type, reported = isReported),
+            onMoreDialogListener,
+            isComment
+        ).also {
+            it.show(
+                requireActivity().supportFragmentManager,
+                MoreDialogFragment::class.java.simpleName
+            )
+        }
+    }
+
+    private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
+        override fun onProblemReport(item: BaseMemberPostItem, isComment: Boolean) {
+            checkStatus {
+                if ((item as MemberPostItem).reported) {
+                    GeneralUtils.showToast(
+                        App.applicationContext(),
+                        getString(R.string.already_reported)
+                    )
+                } else {
+                    reportDialog =
+                        ReportDialogFragment.newInstance(
+                            item = item,
+                            listener = onReportDialogListener,
+                            isComment = isComment
+                        ).also {
+                            it.show(
+                                requireActivity().supportFragmentManager,
+                                ReportDialogFragment::class.java.simpleName
+                            )
+                        }
+                }
+                moreDialog?.dismiss()
+            }
+        }
+
+        override fun onCancel() {
+            moreDialog?.dismiss()
+        }
+    }
+
+    private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
+        override fun onSend(item: BaseMemberPostItem, content: String, postItem: MemberPostItem?) {
+            if (TextUtils.isEmpty(content)) {
+                GeneralUtils.showToast(App.applicationContext(), getString(R.string.report_error))
+            } else {
+                when (item) {
+                    is MemberPostItem -> {
+                            viewModel.sendVideoReport(item.id.toString(), content)
+                    }
+                }
+            }
+            reportDialog?.dismiss()
+        }
+
+        override fun onCancel() {
+            Timber.i("reportDialog onCancel reportDialog=$reportDialog ")
+            reportDialog?.dismiss()
         }
     }
 }

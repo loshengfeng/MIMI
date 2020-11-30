@@ -5,7 +5,6 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
@@ -13,6 +12,7 @@ import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.dabenxiang.mimi.model.enums.LoadImageType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.main.MainActivity
@@ -26,7 +26,7 @@ import kotlinx.android.synthetic.main.fragment_dialog_comment.*
 
 class CommentDialogFragment : BaseDialogFragment() {
 
-    private val viewModel: CommentDialogViewModel by viewModels()
+    private val viewModel: CommentDialogViewModel by viewModels(
     private var data: VideoItem? = null
 
     companion object {
@@ -59,11 +59,28 @@ class CommentDialogFragment : BaseDialogFragment() {
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem, isComment: Boolean) {
             moreDialog?.dismiss()
-//            (requireActivity() as MainActivity).showReportDialog(item, data, isComment)
+            showReportDialog(item, isComment)
         }
 
         override fun onCancel() {
             moreDialog?.dismiss()
+        }
+    }
+
+    fun showReportDialog(item: BaseMemberPostItem, isComment: Boolean) {
+        data?.videoEpisodes?.get(0)?.run {
+            Pair(this.videoStreams?.get(0), this.reported ?: false)
+        }?.run {
+            val (videoStream, isReported) = this
+            (requireActivity() as MainActivity).showReportDialog(
+                item,
+                MemberPostItem(
+                    id = videoStream?.id ?: 0,
+                    type = PostType.VIDEO,
+                    reported = isReported
+                ),
+                isComment
+            )
         }
     }
 
@@ -211,23 +228,18 @@ class CommentDialogFragment : BaseDialogFragment() {
 
     override fun setupObservers() {
         super.setupObservers()
-        viewModel.apiLoadReplyCommentResult.observe(this, Observer { event ->
+        viewModel.apiLoadReplyCommentResult.observe(this, { event ->
             event.getContentIfNotHandled()?.also { apiResult ->
                 when (apiResult) {
-                    is Loading -> {
-//                        progressHUD.show()
-                    }
-                    is Empty -> {
-                        loadReplyCommentBlock?.also { it() }
-                    }
-                    is Loaded -> {
-                        loadReplyCommentBlock = null
-                    }
+                    is Loading -> {}
+                    is Empty -> loadReplyCommentBlock?.also { it() }
+                    is Loaded -> loadReplyCommentBlock = null
+                    else -> {}
                 }
             }
         })
 
-        viewModel.apiPostCommentResult.observe(this, Observer { event ->
+        viewModel.apiPostCommentResult.observe(this, { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> {
@@ -251,11 +263,12 @@ class CommentDialogFragment : BaseDialogFragment() {
                         commentListener?.onUpdateCommentCount(data?.commentCount?.toInt() ?: 0)
                     }
                     is Error -> onApiError(it.throwable)
+                    else -> {}
                 }
             }
         })
 
-        viewModel.apiCommentLikeResult.observe(this, Observer { event ->
+        viewModel.apiCommentLikeResult.observe(this, { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> {
@@ -265,11 +278,12 @@ class CommentDialogFragment : BaseDialogFragment() {
                         }
                     }
                     is Error -> onApiError(it.throwable)
+                    else -> {}
                 }
             }
         })
 
-        viewModel.apiDeleteCommentLikeResult.observe(this, Observer { event ->
+        viewModel.apiDeleteCommentLikeResult.observe(this, { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> {
@@ -279,6 +293,7 @@ class CommentDialogFragment : BaseDialogFragment() {
                         }
                     }
                     is Error -> onApiError(it.throwable)
+                    else -> {}
                 }
             }
         })
