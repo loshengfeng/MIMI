@@ -94,5 +94,8 @@
         <action
             android:id="@+id/action_clipPlayerFragment_to_navigation_my_post"
             app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_clipPlayerFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
     </fragment>
 </navigation>
