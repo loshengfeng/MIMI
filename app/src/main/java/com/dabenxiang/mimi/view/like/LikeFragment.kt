@@ -27,18 +27,20 @@ import kotlinx.android.synthetic.main.item_setting_bar.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
+
 
 class LikeFragment : BaseFragment() {
 
     private val viewModel: LikeViewModel by viewModels()
 
     companion object {
-        const val NO_DATA = 0
-        const val TYPE_MEMBER = 0
-        const val TYPE_CLUB = 1
+        const val NO_DATA = -1
+        const val TYPE_POST = 0
+        const val TYPE_MIMI = 1
     }
 
-    private val clubFollowAdapter by lazy { ClubLikeAdapter(clubLikeListener) }
+    private val clublikeAdapter by lazy { ClubLikeAdapter(clubLikeListener) }
     private val clubLikeListener = object : ClubLikeAdapter.EventListener {
         override fun onDetail(item: ClubFollowItem) {
             viewModel.getClub(item.clubId)
@@ -84,11 +86,11 @@ class LikeFragment : BaseFragment() {
         super.onCreate(savedInstanceState)
 
         viewModel.clubCount.observe(this, Observer {
-            if (layout_tab.selectedTabPosition == TYPE_CLUB) refreshUi(TYPE_CLUB, it)
+            if (layout_tab.selectedTabPosition == TYPE_MIMI) refreshUi(TYPE_MIMI, it)
         })
 
         viewModel.memberCount.observe(this, Observer {
-            if (layout_tab.selectedTabPosition == TYPE_MEMBER) refreshUi(TYPE_MEMBER, it)
+            if (layout_tab.selectedTabPosition == TYPE_POST) refreshUi(TYPE_POST, it)
         })
 
         viewModel.clubDetail.observe(this, Observer {
@@ -120,15 +122,15 @@ class LikeFragment : BaseFragment() {
                 is Loading -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, true)
                 is Loaded -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, false)
                 is Success -> {
-                    clubFollowAdapter.removedPosList.add(it.result)
-                    clubFollowAdapter.notifyItemChanged(it.result)
+                    clublikeAdapter.removedPosList.add(it.result)
+                    clublikeAdapter.notifyItemChanged(it.result)
                 }
                 is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.cleanClubRemovedPosList.observe(this, Observer {
-            clubFollowAdapter.removedPosList.clear()
+            clublikeAdapter.removedPosList.clear()
         })
 
         viewModel.cancelOneMember.observe(this, Observer {
@@ -158,14 +160,14 @@ class LikeFragment : BaseFragment() {
     }
 
     override fun getLayoutId(): Int {
-        return R.layout.fragment_my_follow
+        return R.layout.fragment_my_like
     }
 
     override fun setupObservers() {}
 
     private val onCleanDialogListener = object : OnCleanDialogListener {
         override fun onClean() {
-            if (layout_tab.selectedTabPosition == TYPE_MEMBER) {
+            if (layout_tab.selectedTabPosition == TYPE_POST) {
                 viewModel.cleanAllFollowMember()
             } else {
                 viewModel.cleanAllFollowClub()
@@ -174,13 +176,12 @@ class LikeFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
-
         View.OnClickListener { btnView ->
             when (btnView.id) {
                 R.id.tv_back -> navigateTo(NavigateItem.Up)
                 R.id.tv_clean -> CleanDialogFragment.newInstance(
                     onCleanDialogListener,
-                    if (layout_tab.selectedTabPosition == TYPE_MEMBER)
+                    if (layout_tab.selectedTabPosition == TYPE_POST)
                         R.string.follow_clean_member_dlg_msg
                     else
                         R.string.follow_clean_club_dlg_msg
@@ -198,8 +199,10 @@ class LikeFragment : BaseFragment() {
     }
 
     override fun initSettings() {
-        layout_tab.newTab().setText(R.string.follow_people)
-        layout_tab.newTab().setText(R.string.follow_circle)
+        val tabs = resources.getStringArray(R.array.like_tabs)
+        for(i in tabs){
+            layout_tab.addTab(layout_tab.newTab().setText(i))
+        }
         layout_tab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabReselected(tab: TabLayout.Tab) {
             }
@@ -210,20 +213,19 @@ class LikeFragment : BaseFragment() {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 getData()
             }
-
         })
         memberLikeAdapter.addLoadStateListener { loadState ->
             handleLoadState(loadState.refresh)
             handleLoadState(loadState.append)
         }
-        clubFollowAdapter.addLoadStateListener { loadState ->
+        clublikeAdapter.addLoadStateListener { loadState ->
             handleLoadState(loadState.refresh)
             handleLoadState(loadState.append)
         }
         vpAdapter = LikeViewPagerAdapter(
             requireContext(),
             memberLikeAdapter,
-            clubFollowAdapter
+            clublikeAdapter
         ) {
             getData()
         }
@@ -231,7 +233,7 @@ class LikeFragment : BaseFragment() {
         layout_tab.setupWithViewPager(vp)
 
         tv_clean.visibility = View.VISIBLE
-        tv_title.setText(R.string.follow_title)
+        tv_title.setText(R.string.like_title)
     }
 
     private fun handleLoadState(loadState: LoadState) {
@@ -258,18 +260,18 @@ class LikeFragment : BaseFragment() {
         job?.cancel()
         job = lifecycleScope.launch {
             when (layout_tab.selectedTabPosition) {
-                TYPE_MEMBER -> {
+                TYPE_POST -> {
                     memberLikeAdapter.submitData(PagingData.empty())
                     viewModel.getMemberList()
                         .collectLatest {
                             memberLikeAdapter.submitData(it)
                         }
                 }
-                TYPE_CLUB -> {
-                    clubFollowAdapter.submitData(PagingData.empty())
+                TYPE_MIMI -> {
+                    clublikeAdapter.submitData(PagingData.empty())
                     viewModel.getClubList()
                         .collectLatest {
-                            clubFollowAdapter.submitData(it)
+                            clublikeAdapter.submitData(it)
                         }
                 }
             }

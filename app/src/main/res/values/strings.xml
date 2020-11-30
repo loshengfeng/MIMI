@@ -297,6 +297,13 @@
 
     <!-- like -->
     <string name="like">喜欢</string>
+    <string name="like_title">我喜欢</string>
+    <string name="like_tab1">帖子</string>
+    <string name="like_tab2">蜜蜜影視</string>
+    <string-array name="like_tabs">
+        <item>@string/like_tab1</item>
+        <item>@string/like_tab2</item>
+    </string-array>
     <!-- fans -->
     <string name="fans">粉丝</string>
     <string name="total_count_fans">全部粉丝%s人</string>
