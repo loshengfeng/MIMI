@@ -31,6 +31,8 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_post.*
@@ -94,8 +96,39 @@ class SearchPostFragment : BaseFragment() {
 
         override fun onMoreClick(item: MemberPostItem, position: Int) {
             onMoreClick(item, position) {
-                //todo
                 it as MemberPostItem
+
+                val searchPostItem = arguments?.getSerializable(KEY_DATA)
+
+                val bundle = Bundle()
+                item.id
+                bundle.putBoolean(MyPostFragment.EDIT, true)
+                bundle.putString(BasePostFragment.PAGE, BasePostFragment.SEARCH)
+                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+                bundle.putSerializable(KEY_DATA, searchPostItem)
+
+                when(it.type) {
+                    PostType.TEXT -> {
+                        findNavController().navigate(
+                            R.id.action_searchPostFragment_to_postArticleFragment,
+                            bundle
+                        )
+                    }
+                    PostType.IMAGE -> {
+                        findNavController().navigate(
+                            R.id.action_searchPostFragment_to_postPicFragment,
+                            bundle
+                        )
+                    }
+                    PostType.VIDEO -> {
+                        findNavController().navigate(
+                            R.id.action_myPostFragment_to_postArticleFragment,
+                            bundle
+                        )
+
+                        //TODO fix this navigation to video
+                    }
+                }
             }
         }
 

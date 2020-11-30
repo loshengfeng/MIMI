@@ -225,28 +225,31 @@ class TopicDetailFragment : BaseFragment() {
 
         override fun onMoreClick(item: MemberPostItem, position: Int) {
             onMoreClick(item, position) {
+
+                val searchPostItem = arguments?.getSerializable(KEY_DATA)
+
                 val bundle = Bundle()
                 bundle.putBoolean(MyPostFragment.EDIT, true)
-                bundle.putString(BasePostFragment.PAGE, BasePostFragment.ADULT)
+                bundle.putString(BasePostFragment.PAGE, BasePostFragment.CLUB)
                 bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+                bundle.putSerializable(SearchPostFragment.KEY_DATA, searchPostItem)
 
                 it as MemberPostItem
                 when (item.type) {
                     PostType.TEXT -> {
                         findNavController().navigate(
-                                R.id.action_topicDetailFragment_to_clubTextFragment,
+                                R.id.action_topicDetailFragment_to_postArticleFragment,
                                 bundle
                         )
                     }
                     PostType.IMAGE -> {
                         findNavController().navigate(
-                                R.id.action_topicDetailFragment_to_clubPicFragment,
+                                R.id.action_topicDetailFragment_to_postPicFragment,
                                 bundle
                         )
                     }
                     PostType.VIDEO -> {
                         findNavController().navigate(
-                                //TODO
                                 R.id.action_topicDetailFragment_to_postVideoFragment,
                                 bundle
                         )

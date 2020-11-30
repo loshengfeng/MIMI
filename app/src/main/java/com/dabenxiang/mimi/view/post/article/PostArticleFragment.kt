@@ -8,6 +8,7 @@ import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ArticleItem
 import com.dabenxiang.mimi.model.api.vo.MediaItem
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.EDIT
@@ -75,13 +76,18 @@ class PostArticleFragment : BasePostFragment() {
         var isEdit = false
         var page = ""
         var searchPostItem: SearchPostItem? = null
+        var memberClubItem: MemberClubItem? =null
 
         arguments?.let {
             isEdit = it.getBoolean(EDIT, false)
             page = it.getString(PAGE, "")
             val data = it.getSerializable(KEY_DATA)
             if (data != null) {
-                searchPostItem = data as SearchPostItem
+                if (data is SearchPostItem) {
+                    searchPostItem = data
+                } else if (data is MemberClubItem){
+                    memberClubItem = data
+                }
             }
         }
 
@@ -106,7 +112,7 @@ class PostArticleFragment : BasePostFragment() {
         } else if (isEdit && page == CLUB) {
             val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MEMBER_DATA, item)
-            bundle.putSerializable(KEY_DATA, searchPostItem)
+            bundle.putSerializable(KEY_DATA, memberClubItem)
             findNavController().navigate(R.id.action_postArticleFragment_to_topicDetailFragment, bundle)
         } else {
             findNavController().navigate(R.id.action_postArticleFragment_to_clubTabFragment, bundle)

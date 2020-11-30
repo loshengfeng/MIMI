@@ -85,6 +85,13 @@
         <action
             android:id="@+id/action_searchPostFragment_to_clubTextFragment"
             app:destination="@id/clubTextFragment" />
+        <action
+            android:id="@+id/action_searchPostFragment_to_postArticleFragment"
+            app:destination="@id/postArticleFragment" />
+
+        <action
+            android:id="@+id/action_searchPostFragment_to_postPicFragment"
+            app:destination="@id/postPicFragment" />
     </fragment>
 
     <fragment

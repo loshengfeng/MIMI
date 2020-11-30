@@ -1,10 +1,12 @@
 package com.dabenxiang.mimi.view.club.pic
 
 import android.content.Context
+import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
@@ -189,7 +191,37 @@ class ClubPostPicFragment : BaseFragment() {
 
     private val postListener = object : MyPostListener {
         override fun onMoreClick(item: MemberPostItem, position: Int) {
-            onMoreClick(item, position) {}
+            onMoreClick(item, position) {
+                it as MemberPostItem
+
+                val bundle = Bundle()
+                item.id
+                bundle.putBoolean(MyPostFragment.EDIT, true)
+                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+
+                when(it.type) {
+                    PostType.TEXT -> {
+                        findNavController().navigate(
+                            R.id.action_clubTabFragment_to_postArticleFragment,
+                            bundle
+                        )
+                    }
+                    PostType.IMAGE -> {
+                        findNavController().navigate(
+                            R.id.action_clubTabFragment_to_postPicFragment,
+                            bundle
+                        )
+                    }
+                    PostType.VIDEO -> {
+                        findNavController().navigate(
+                            R.id.action_myPostFragment_to_postArticleFragment,
+                            bundle
+                        )
+
+                        //TODO fix this navigation to video
+                    }
+                }
+            }
         }
 
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {

@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
@@ -20,6 +21,7 @@ import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_short.*
@@ -202,6 +204,34 @@ class ClubShortVideoFragment : BaseFragment() {
         override fun onMoreClick(item: MemberPostItem, position: Int) {
             onMoreClick(item, position) {
                 it as MemberPostItem
+
+                val bundle = Bundle()
+                item.id
+                bundle.putBoolean(MyPostFragment.EDIT, true)
+                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+
+                when(it.type) {
+                    PostType.TEXT -> {
+                        findNavController().navigate(
+                            R.id.action_clubTabFragment_to_postArticleFragment,
+                            bundle
+                        )
+                    }
+                    PostType.IMAGE -> {
+                        findNavController().navigate(
+                            R.id.action_clubTabFragment_to_postPicFragment,
+                            bundle
+                        )
+                    }
+                    PostType.VIDEO -> {
+                        findNavController().navigate(
+                            R.id.action_myPostFragment_to_postArticleFragment,
+                            bundle
+                        )
+
+                        //TODO fix this navigation to video
+                    }
+                }
             }
         }
 
