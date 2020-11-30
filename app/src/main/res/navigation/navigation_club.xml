@@ -14,26 +14,45 @@
         android:name="com.dabenxiang.mimi.view.club.ClubTabFragment"
         tools:layout="@layout/fragment_tab_club">
         <action
-            android:id="@+id/action_clubTabFragment_to_clubTextFragment"
+            android:id="@+id/action_to_clubTextFragment"
             app:destination="@id/clubTextFragment" />
         <action
-            android:id="@+id/action_clubTabFragment_to_clubPicFragment"
+            android:id="@+id/action_to_clubPicFragment"
             app:destination="@id/clubPicFragment" />
         <action
-            android:id="@+id/action_clubTabFragment_to_topicDetailFragment"
+            android:id="@+id/action_to_topicDetailFragment"
             app:destination="@id/navigation_club_topic" />
         <action
-            android:id="@+id/action_clubTabFragment_to_myPostFragment"
+            android:id="@+id/action_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
         <action
-            android:id="@+id/action_clubTabFragment_to_searchPostFragment"
+            android:id="@+id/action_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
         <action
             android:id="@+id/action_to_loginFragment"
             app:destination="@id/navigation_login" />
         <action
-            android:id="@+id/action_clubTabFragment_to_clipPlayerFragment"
+            android:id="@+id/action_to_clipPlayerFragment"
             app:destination="@id/clipPlayerFragment" />
+<<<<<<< Updated upstream
+=======
+
+        <action
+            android:id="@+id/action_to_postArticleFragment"
+            app:destination="@id/postArticleFragment" />
+
+        <action
+            android:id="@+id/action_to_postPicFragment"
+            app:destination="@id/postPicFragment" />
+
+        <action
+            android:id="@+id/action_to_editVideoFragment"
+            app:destination="@id/editVideoFragment" />
+
+        <action
+            android:id="@+id/action_to_postVideoFragment"
+            app:destination="@id/postVideoFragment" />
+>>>>>>> Stashed changes
     </fragment>
 
     <fragment

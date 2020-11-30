@@ -119,5 +119,78 @@
         android:name="com.dabenxiang.mimi.view.topup.TopUpFragment"
         android:label="TopUpFragment" />
 
+<<<<<<< Updated upstream
+=======
+    <fragment
+        android:id="@+id/myfavoriteFragment"
+        android:name="com.dabenxiang.mimi.view.favroite.FavoriteFragment"
+        android:label="FavoriteFragment" />
+    <fragment
+        android:id="@+id/myFollowFragmentV2"
+        android:name="com.dabenxiang.mimi.view.myfollow.MyFollowFragmentV2"
+        android:label="MyFollowFragmentV2" >
+
+        <action
+            android:id="@+id/action_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+
+        <action
+            android:id="@+id/action_myFollowFragmentV2_to_clipPlayerFragment2"
+            app:destination="@id/clipPlayerFragment" />
+
+        <action
+            android:id="@+id/action_to_clubTextFragment"
+            app:destination="@id/clubTextFragment" />
+
+        <action
+            android:id="@+id/action_to_clubPicFragment"
+            app:destination="@id/clubPicFragment" />
+
+        <action
+            android:id="@+id/action_to_topicDetailFragment"
+            app:destination="@id/navigation_club_topic" />
+
+        <action
+            android:id="@+id/action_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+
+        <action
+            android:id="@+id/action_to_clipPlayerFragment"
+            app:destination="@id/clipPlayerFragment" />
+
+        <action
+            android:id="@+id/action_to_postArticleFragment"
+            app:destination="@id/postArticleFragment" />
+
+        <action
+            android:id="@+id/action_to_postPicFragment"
+            app:destination="@id/postPicFragment" />
+
+        <action
+            android:id="@+id/action_to_editVideoFragment"
+            app:destination="@id/editVideoFragment" />
+
+        <action
+            android:id="@+id/action_to_postVideoFragment"
+            app:destination="@id/postVideoFragment" />
+
+    </fragment>
+    <fragment
+        android:id="@+id/searchPostFragment"
+        android:name="com.dabenxiang.mimi.view.search.post.SearchPostFragment"
+        android:label="SearchPostFragment" />
+    <fragment
+        android:id="@+id/clubPicFragment"
+        android:name="com.dabenxiang.mimi.view.club.pic.ClubPicFragment"
+        android:label="ClubPicFragment" />
+    <fragment
+        android:id="@+id/clipPlayerFragment"
+        android:name="com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment"
+        android:label="ClipPlayerFragment" />
+>>>>>>> Stashed changes
 
 </navigation>

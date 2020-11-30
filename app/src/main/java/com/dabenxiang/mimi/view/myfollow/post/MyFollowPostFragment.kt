@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.item
+package com.dabenxiang.mimi.view.myfollow.post
 
 import android.content.Context
 import android.os.Bundle
@@ -34,15 +34,15 @@ import kotlinx.android.synthetic.main.item_ad.view.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
-class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
-    private val viewModel: ClubItemViewModel by viewModels()
+class MyFollowPostFragment() : BaseFragment() {
+    private val viewModel: MyFollowPostViewModel by viewModels()
     private val accountManager: AccountManager by inject()
 
-    private val adapter: ClubItemAdapter by lazy {
-        ClubItemAdapter(requireContext(), postListener, attachmentListener, memberPostFuncItem)
+    private val adapter: MyFollowPostAdapter by lazy {
+        MyFollowPostAdapter(requireContext(), postListener, attachmentListener, memberPostFuncItem)
     }
 
-    override fun getLayoutId() = R.layout.fragment_club_short
+    override fun getLayoutId() = R.layout.fragment_my_follow_tab
 
     companion object {
         const val KEY_DATA = "data"
@@ -112,7 +112,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                     adapter?.notifyItemRangeChanged(
                             0,
                             viewModel.totalCount,
-                            ClubItemAdapter.PAYLOAD_UPDATE_FOLLOW
+                            MyFollowPostAdapter.PAYLOAD_UPDATE_FOLLOW
                     )
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
@@ -124,7 +124,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                 is ApiResult.Success -> {
                     adapter?.notifyItemChanged(
                             it.result,
-                            ClubItemAdapter.PAYLOAD_UPDATE_LIKE
+                            MyFollowPostAdapter.PAYLOAD_UPDATE_LIKE
                     )
                 }
                 is ApiResult.Error -> Timber.e(it.throwable)
@@ -136,7 +136,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                 is ApiResult.Success -> {
                     adapter?.notifyItemChanged(
                             it.result,
-                            ClubItemAdapter.PAYLOAD_UPDATE_FAVORITE
+                            MyFollowPostAdapter.PAYLOAD_UPDATE_FAVORITE
                     )
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
@@ -150,7 +150,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
-            viewModel.getData(adapter, type)
+            viewModel.getData(adapter)
         }
     }
 
@@ -174,9 +174,9 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         loginPageToggle(true)
 
         if (viewModel.postCount.value ?: -1 <= 0) {
-            viewModel.getData(adapter, type)
+            viewModel.getData(adapter)
         }
-        viewModel.getAd()
+//        viewModel.getAd()
     }
 
 
@@ -192,7 +192,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
     private val postListener = object : MyPostListener {
 
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
-            checkStatus { viewModel.likePost(item, position, isLike) }
+//            checkStatus { viewModel.likePost(item, position, isLike) }
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
@@ -232,7 +232,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
         override fun onFavoriteClick(item: MemberPostItem, position: Int, isFavorite: Boolean, type: AttachmentType) {
             checkStatus {
-                viewModel.favoritePost(item, position, isFavorite)
+//                viewModel.favoritePost(item, position, isFavorite)
             }
         }
 
@@ -257,36 +257,6 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         override fun onMoreClick(item: MemberPostItem, position: Int) {
             onMoreClick(item, position) {
                 it as MemberPostItem
-<<<<<<< Updated upstream
-=======
-
-                val bundle = Bundle()
-                item.id
-                bundle.putBoolean(MyPostFragment.EDIT, true)
-                bundle.putString(BasePostFragment.PAGE, BasePostFragment.TAB)
-                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
-
-                when (it.type) {
-                    PostType.TEXT -> {
-                        findNavController().navigate(
-                            R.id.action_to_postArticleFragment,
-                            bundle
-                        )
-                    }
-                    PostType.IMAGE -> {
-                        findNavController().navigate(
-                            R.id.action_to_postPicFragment,
-                            bundle
-                        )
-                    }
-                    PostType.VIDEO -> {
-                        findNavController().navigate(
-                            R.id.action_to_postVideoFragment,
-                            bundle
-                        )
-                    }
-                }
->>>>>>> Stashed changes
             }
         }
 

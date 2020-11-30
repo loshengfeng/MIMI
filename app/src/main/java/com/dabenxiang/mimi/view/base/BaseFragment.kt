@@ -825,7 +825,11 @@ abstract class BaseFragment : Fragment() {
     private fun navigationToText(bundle: Bundle) {
         navigateTo(
             NavigateItem.Destination(
+<<<<<<< Updated upstream
                 R.id.action_adultHomeFragment_to_textDetailFragment,
+=======
+                R.id.action_to_clubTextFragment,
+>>>>>>> Stashed changes
                 bundle
             )
         )
@@ -834,7 +838,11 @@ abstract class BaseFragment : Fragment() {
     private fun navigationToPicture(bundle: Bundle) {
         navigateTo(
             NavigateItem.Destination(
+<<<<<<< Updated upstream
                 R.id.action_adultHomeFragment_to_pictureDetailFragment,
+=======
+                R.id.action_to_clubPicFragment,
+>>>>>>> Stashed changes
                 bundle
             )
         )

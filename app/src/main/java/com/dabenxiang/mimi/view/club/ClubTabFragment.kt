@@ -51,7 +51,7 @@ class ClubTabFragment : BaseFragment() {
                 val bundle = TopicDetailFragment.createBundle(clubItem)
                 navigateTo(
                     NavigateItem.Destination(
-                        R.id.action_clubTabFragment_to_topicDetailFragment,
+                        R.id.action_to_topicDetailFragment,
                         bundle
                     )
                 )
@@ -133,6 +133,141 @@ class ClubTabFragment : BaseFragment() {
         }
     }
 
+<<<<<<< Updated upstream
+=======
+    private val onChooseUploadMethodDialogListener = object : OnChooseUploadMethodDialogListener {
+        override fun onUploadVideo() {
+            val requestList = getNotGrantedPermissions(externalPermissions + cameraPermissions)
+            if (requestList.size > 0) {
+                requestPermissions(
+                    requestList.toTypedArray(),
+                    PERMISSION_VIDEO_REQUEST_CODE
+                )
+            } else {
+                PostManager().selectVideo(this@ClubTabFragment)
+            }
+        }
+
+        override fun onUploadPic() {
+            val requestList = getNotGrantedPermissions(externalPermissions + cameraPermissions)
+            if (requestList.size > 0) {
+                requestPermissions(
+                    requestList.toTypedArray(),
+                    PERMISSION_PIC_REQUEST_CODE
+                )
+            } else {
+                file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
+                PostManager().selectPics(this@ClubTabFragment, file)
+            }
+        }
+
+        override fun onUploadArticle() {
+            findNavController().navigate(R.id.action_to_postArticleFragment)
+        }
+    }
+
+    private fun requestVideoPermissions() {
+        val requestList = getNotGrantedPermissions(externalPermissions + cameraPermissions)
+
+        if (requestList.size == 0) {
+            PostManager().selectVideo(this@ClubTabFragment)
+        }
+    }
+
+    private fun requestPicPermissions() {
+        val requestList = getNotGrantedPermissions(externalPermissions + cameraPermissions)
+
+        if (requestList.size == 0) {
+            file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
+            PostManager().selectPics(this@ClubTabFragment, file)
+        }
+    }
+
+    private fun handleTakePhoto(data: Intent?) {
+        val pciUri = arrayListOf<String>()
+
+        val clipData = data?.clipData
+        if (clipData != null) {
+            pciUri.addAll(PostManager().getPicsUri(clipData, requireContext()))
+        } else {
+            val uri = PostManager().getPicUri(data, requireContext(), file)
+
+            if (uri.path!!.isNotBlank()) {
+                pciUri.add(UriUtils.getPath(requireContext(), uri)!!)
+            } else {
+                pciUri.add(file.absolutePath)
+            }
+        }
+
+        val bundle = Bundle()
+        bundle.putStringArrayList(BasePostFragment.BUNDLE_PIC_URI, pciUri)
+
+        findNavController().navigate(
+            R.id.action_to_postPicFragment,
+            bundle
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        Timber.i("onRequestPermissionsResult")
+        if (requestCode == PERMISSION_VIDEO_REQUEST_CODE) {
+            if (getNotGrantedPermissions(externalPermissions + cameraPermissions).isEmpty()) {
+                PostManager().selectVideo(this@ClubTabFragment)
+            } else {
+                requestVideoPermissions()
+            }
+        } else if (requestCode == PERMISSION_PIC_REQUEST_CODE) {
+            if (getNotGrantedPermissions(externalPermissions + cameraPermissions).isEmpty()) {
+                file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
+                PostManager().selectPics(this@ClubTabFragment, file)
+            } else {
+                requestPicPermissions()
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                REQUEST_PHOTO -> {
+                    handleTakePhoto(data)
+                }
+
+                REQUEST_VIDEO_CAPTURE -> {
+                    val videoUri: Uri? = data?.data
+                    val myUri =
+                        Uri.fromFile(File(UriUtils.getPath(requireContext(), videoUri!!) ?: ""))
+
+                    if (PostManager().isVideoTimeValid(myUri, requireContext())) {
+                        val bundle = Bundle()
+                        bundle.putString(EditVideoFragment.BUNDLE_VIDEO_URI, myUri.toString())
+                        findNavController().navigate(
+                            R.id.action_to_editVideoFragment,
+                            bundle
+                        )
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            R.string.post_video_length_error,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+
+                REQUEST_LOGIN -> {
+                    findNavController().navigate(R.id.action_to_loginFragment, data?.extras)
+                }
+            }
+        }
+    }
+
+>>>>>>> Stashed changes
     private fun navToSearch(position: Int) {
         val searchPostItem = when (position) {
             TAB_FOLLOW -> SearchPostItem(type = PostType.FOLLOWED)
@@ -146,7 +281,7 @@ class ClubTabFragment : BaseFragment() {
         val bundle = SearchPostFragment.createBundle(searchPostItem)
         navigateTo(
             NavigateItem.Destination(
-                R.id.action_clubTabFragment_to_searchPostFragment,
+                R.id.action_to_searchPostFragment,
                 bundle
             )
         )
