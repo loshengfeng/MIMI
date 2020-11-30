@@ -64,7 +64,7 @@ class SearchVideoListDataSource(
 
                 val list = mutableListOf<VideoItem>()
                 videos?.forEachIndexed { index, videoItem ->
-                    if (index % 2 == 0 && index != 0) {
+                    if (index % 5 == 0 && index != 0) {
                         val item = VideoItem(type = PostType.AD, adItem = adItem)
                         list.add(item)
                     }
@@ -121,7 +121,7 @@ class SearchVideoListDataSource(
 
                 val list = mutableListOf<VideoItem>()
                 videos?.forEachIndexed { index, videoItem ->
-                    if (index % 2 == 0) {
+                    if (index % 5 == 0) {
                         val item = VideoItem(type = PostType.AD, adItem = adItem)
                         list.add(item)
                     }

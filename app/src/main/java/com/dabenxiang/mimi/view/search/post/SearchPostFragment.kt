@@ -31,6 +31,8 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_post.*
@@ -63,7 +65,13 @@ class SearchPostFragment : BaseFragment() {
     private var searchKeyword: String = ""
 
     private val adapter: SearchPostAdapter by lazy {
-        SearchPostAdapter(requireActivity(), postListener, memberPostFuncItem, attachmentListener)
+        SearchPostAdapter(
+            requireActivity(),
+            postListener,
+            memberPostFuncItem,
+            attachmentListener,
+            { searchText ?: "" },
+            { searchTag ?: "" })
     }
 
     private val postListener = object : MyPostListener {
@@ -73,7 +81,33 @@ class SearchPostFragment : BaseFragment() {
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            //todo
+            checkStatus {
+                when (item.type) {
+                    PostType.IMAGE -> {
+                        val bundle = ClubPicFragment.createBundle(item, 1)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_searchPostFragment_to_clubPicFragment,
+                                bundle
+                            )
+                        )
+                    }
+                    PostType.TEXT -> {
+                        val bundle = ClubTextFragment.createBundle(item, 1)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_searchPostFragment_to_clubTextFragment,
+                                bundle
+                            )
+                        )
+                    }
+                    PostType.VIDEO -> {
+                        //todo
+                    }
+                    else -> {
+                    }
+                }
+            }
         }
 
         override fun onFavoriteClick(
@@ -85,11 +119,25 @@ class SearchPostFragment : BaseFragment() {
             checkStatus { viewModel.favoritePost(item, position, isFavorite) }
         }
 
-        override fun onFollowClick(items: List<MemberPostItem>, position: Int, isFollow: Boolean) {
+        override fun onFollowClick(
+            items: List<MemberPostItem>,
+            position: Int,
+            isFollow: Boolean
+        ) {
         }
 
         override fun onAvatarClick(userId: Long, name: String) {
-            //todo
+            val bundle = MyPostFragment.createBundle(
+                userId, name,
+                isAdult = true,
+                isAdultTheme = true
+            )
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_searchPostFragment_to_myPostFragment,
+                    bundle
+                )
+            )
         }
 
         override fun onMoreClick(item: MemberPostItem, position: Int) {
@@ -115,6 +163,15 @@ class SearchPostFragment : BaseFragment() {
                     navigateTo(
                         NavigateItem.Destination(
                             R.id.action_searchPostFragment_to_clubTextFragment,
+                            bundle
+                        )
+                    )
+                }
+                PostType.VIDEO -> {
+                    val bundle = ClipPlayerFragment.createBundle(item.id)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_searchPostFragment_to_clipPlayerFragment,
                             bundle
                         )
                     )
@@ -150,7 +207,8 @@ class SearchPostFragment : BaseFragment() {
             searchOrderBy = it.orderBy ?: StatisticsOrderType.LATEST
         }
 
-        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
+        viewModel.adWidth =
+            ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
 
         if (TextUtils.isEmpty(searchTag) && TextUtils.isEmpty(searchText)) {
@@ -167,7 +225,7 @@ class SearchPostFragment : BaseFragment() {
         recycler_search_result.adapter = adapter
 
         searchTag?.also { search(tag = searchTag) }
-        searchText?.also { search(keyword = searchText) }
+        searchText?.also { search(text = searchText) }
     }
 
     override fun setupObservers() {
@@ -229,13 +287,13 @@ class SearchPostFragment : BaseFragment() {
         }
 
         tv_search.setOnClickListener {
-            search(keyword = search_bar.text.toString())
+            search(text = search_bar.text.toString())
         }
 
         search_bar.setOnEditorActionListener { _, actionId, _ ->
             when (actionId) {
                 EditorInfo.IME_ACTION_SEARCH -> {
-                    search(keyword = search_bar.text.toString())
+                    search(text = search_bar.text.toString())
                     true
                 }
                 else -> false
@@ -283,28 +341,32 @@ class SearchPostFragment : BaseFragment() {
         }
     }
 
-    private fun search(keyword: String? = null, tag: String? = null) {
+    private fun search(text: String? = null, tag: String? = null) {
         GeneralUtils.hideKeyboard(requireActivity())
-        if (TextUtils.isEmpty(keyword) && TextUtils.isEmpty(tag)) {
+        if (TextUtils.isEmpty(text) && TextUtils.isEmpty(tag)) {
             Timber.d("no search rule!")
             return
         }
         layout_search_history.visibility = View.GONE
         layout_search_text.visibility = View.INVISIBLE
-        keyword?.let {
-            viewModel.updateSearchHistory(keyword)
-            searchKeyword = keyword
+        text?.let {
+            viewModel.updateSearchHistory(text)
+            searchKeyword = text
+            searchText = text
+            searchTag = ""
         }
         tag?.let {
             searchKeyword = tag
+            searchText = ""
+            searchTag = tag
         }
 
         when (searchType) {
-            PostType.FOLLOWED -> searchPostFollow(keyword, tag)
+            PostType.FOLLOWED -> searchPostFollow(text, tag)
             PostType.TEXT_IMAGE_VIDEO,
             PostType.TEXT,
             PostType.IMAGE,
-            PostType.VIDEO -> searchPostAll(keyword, tag)
+            PostType.VIDEO -> searchPostAll(text, tag)
             else -> {
             }
         }
@@ -378,7 +440,7 @@ class SearchPostFragment : BaseFragment() {
             chip.setTextColor(requireContext().getColor(R.color.color_black_1_50))
             chip.setOnClickListener {
                 search_bar.setText(text)
-                search(text)
+                search(text = text)
             }
             chip_group_search_text.addView(chip)
         }

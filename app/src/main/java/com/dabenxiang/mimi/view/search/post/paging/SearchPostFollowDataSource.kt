@@ -35,7 +35,13 @@ class SearchPostFollowDataSource constructor(
 
             val body = result.body()
             val memberPostItems = body?.content
-            memberPostItems?.add(0, MemberPostItem(type = PostType.AD, adItem = adItem))
+            val list = arrayListOf<MemberPostItem>()
+            val memberPostAdItem = MemberPostItem(type = PostType.AD, adItem = adItem)
+            memberPostItems?.forEachIndexed { index, item ->
+                if (index == 5) list.add(memberPostAdItem)
+                list.add(item)
+            }
+            list.add(memberPostAdItem)
 
             val hasNext = hasNextPage(
                 result.body()?.paging?.count ?: 0,

@@ -23,6 +23,7 @@ import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.adapter.PictureAdapter
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.getSpanString
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
@@ -76,10 +77,10 @@ class MyPostPicturePostHolder(
         position: Int,
         myPostListener: MyPostListener,
         attachmentListener: AttachmentListener,
-        memberPostFuncItem: MemberPostFuncItem
+        memberPostFuncItem: MemberPostFuncItem,
+        searchStr: String = "",
+        searchTag: String = ""
     ) {
-        val isMe = accountManager.getProfile().userId == item.creatorId
-
         picturePostItemLayout.setBackgroundColor(App.self.getColor(R.color.color_white_1))
         tvName.setTextColor(App.self.getColor(R.color.color_black_1))
         tvTime.setTextColor(App.self.getColor(R.color.color_black_1_50))
@@ -92,7 +93,11 @@ class MyPostPicturePostHolder(
 
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
-        tvTitle.text = item.title
+        tvTitle.text =  if (searchStr.isNotBlank()) getSpanString(
+            tvTitle.context,
+            item.title,
+            searchStr
+        ) else item.title
         tvFollow.visibility = if(accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
 
         attachmentListener.onGetAttachment(item.avatarAttachmentId, imgAvatar, LoadImageType.AVATAR)
@@ -105,13 +110,8 @@ class MyPostPicturePostHolder(
             val chip = LayoutInflater.from(tagChipGroup.context)
                 .inflate(R.layout.chip_item, tagChipGroup, false) as Chip
             chip.text = it
-            chip.setTextColor(tagChipGroup.context.getColor(R.color.color_black_1_50))
-            chip.chipBackgroundColor = ColorStateList.valueOf(
-                ContextCompat.getColor(
-                    tagChipGroup.context,
-                    R.color.color_black_1_05
-                )
-            )
+            if (it == searchTag) chip.setTextColor(tagChipGroup.context.getColor(R.color.color_red_1))
+            else chip.setTextColor(tagChipGroup.context.getColor(R.color.color_black_1_50))
             chip.setOnClickListener { view ->
                 myPostListener.onChipClick(PostType.IMAGE, (view as Chip).text.toString())
             }
@@ -148,16 +148,6 @@ class MyPostPicturePostHolder(
             tvPictureCount.text = "1/${contentItem.images?.size}"
         }
 
-//        if (isMe) {
-//            tvFollow.visibility = View.GONE
-//        } else {
-//            tvFollow.visibility = View.VISIBLE
-//            tvFollow.setOnClickListener {
-//                itemList?.also { myPostListener.onFollowClick(itemList, position, !item.isFollow) }
-//                item.isFollow = !item.isFollow
-//            }
-//            updateFollow(item)
-//        }
         tvFollow.visibility = View.GONE
 
         updateFavorite(item)
