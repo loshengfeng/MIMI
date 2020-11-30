@@ -39,7 +39,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
     private val accountManager: AccountManager by inject()
 
     private val adapter: ClubItemAdapter by lazy {
-        ClubItemAdapter(requireContext(), postListener, attachmentListener,memberPostFuncItem)
+        ClubItemAdapter(requireContext(), postListener, attachmentListener, memberPostFuncItem)
     }
 
     override fun getLayoutId() = R.layout.fragment_club_short
@@ -57,7 +57,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         MemberPostFuncItem(
                 {},
                 { id, view, type -> },
-                { item, items, isFollow, func ->  },
+                { item, items, isFollow, func -> },
                 { item, isLike, func -> },
                 { item, isFavorite, func -> }
         )
@@ -150,7 +150,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
-            viewModel.getData(adapter,type)
+            viewModel.getData(adapter, type)
         }
     }
 
@@ -268,7 +268,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             }
             Timber.d("onItemClick =${adultTabType}")
             when (adultTabType) {
-                AdultTabType.TEXT->{
+                AdultTabType.TEXT -> {
                     val bundle = ClubTextFragment.createBundle(item)
                     navigateTo(
                             NavigateItem.Destination(
@@ -308,7 +308,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
         override fun onChipClick(type: PostType, tag: String) {
             Timber.d("onChipClick")
-            val item = SearchPostItem(type, tag)
+            val item = SearchPostItem(type, tag = tag)
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
                     NavigateItem.Destination(
