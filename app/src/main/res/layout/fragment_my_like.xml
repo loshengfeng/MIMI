@@ -38,6 +38,7 @@
         app:tabTextAppearance="@style/favorite_tab_item_text"
         app:tabTextColor="@color/color_black_1_50"/>
 
+
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/vp"
         android:layout_width="match_parent"

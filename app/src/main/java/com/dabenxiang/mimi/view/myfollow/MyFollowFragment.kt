@@ -174,7 +174,6 @@ class MyFollowFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
-
         View.OnClickListener { btnView ->
             when (btnView.id) {
                 R.id.tv_back -> navigateTo(NavigateItem.Up)
@@ -198,8 +197,6 @@ class MyFollowFragment : BaseFragment() {
     }
 
     override fun initSettings() {
-        layout_tab.newTab().setText(R.string.follow_people)
-        layout_tab.newTab().setText(R.string.follow_circle)
         layout_tab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabReselected(tab: TabLayout.Tab) {
             }

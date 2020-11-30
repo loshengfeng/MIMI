@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.mimi_home
 
+import android.view.View
 import androidx.fragment.app.viewModels
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.Error
@@ -21,10 +22,15 @@ class MiMiFragment : BaseFragment() {
         viewModel.adWidth = pxToDp(requireContext(), getScreenSize(requireActivity()).first)
         viewModel.adHeight = (viewModel.adWidth / 7)
 
+        btn_retry.setOnClickListener { viewModel.getMenu() }
+
         viewModel.menusItems.observe(this, {
             when (it) {
                 is Success -> setupUi(it.result)
-                is Error -> onApiError(it.throwable)
+                is Error -> {
+                    onApiError(it.throwable)
+                    layout_server_error.visibility = View.VISIBLE
+                }
             }
         })
 
@@ -34,6 +40,7 @@ class MiMiFragment : BaseFragment() {
     override fun getLayoutId() = R.layout.fragment_mimi_home
 
     private fun setupUi(menusItems: List<SecondMenuItem>) {
+        layout_server_error.visibility = View.INVISIBLE
         viewpager.offscreenPageLimit = menusItems.size
         viewpager.isSaveEnabled = false
         viewpager.adapter = MiMiViewPagerAdapter(this, menusItems)
