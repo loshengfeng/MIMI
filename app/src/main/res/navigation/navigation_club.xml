@@ -90,5 +90,9 @@
         android:id="@+id/clipPlayerFragment"
         android:name="com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment"
         tools:layout="@layout/fragment_v2_player"
-        android:label="ClipPlayerFragment" />
+        android:label="ClipPlayerFragment" >
+        <action
+            android:id="@+id/action_clipPlayerFragment_to_navigation_my_post"
+            app:destination="@id/navigation_my_post" />
+    </fragment>
 </navigation>
