@@ -120,6 +120,14 @@
     <string name="favorite_delete_favorite">取消收藏</string>
     <string name="favorite_no_data">尚未收藏影片，快去看片吧！</string>
     <string name="favorite_delete_this_favorite">是否要清除此收藏</string>
+    <string name="favorite_tab1">蜜蜜影視</string>
+    <string name="favorite_tab2">小視頻</string>
+    <string name="favorite_tab3">帖子</string>
+    <string-array name="favorite_tabs">
+        <item>@string/favorite_tab1</item>
+        <item>@string/favorite_tab2</item>
+        <item>@string/favorite_tab3</item>
+    </string-array>
 
     <!-- Personal -->
     <string name="phone_num">手机号</string>
