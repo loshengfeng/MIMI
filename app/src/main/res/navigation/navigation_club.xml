@@ -168,6 +168,7 @@
             android:id="@+id/action_editVideoFragment_to_postVideoFragment"
             app:destination="@id/postVideoFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/postVideoFragment"
         android:name="com.dabenxiang.mimi.view.post.video.PostVideoFragment"
