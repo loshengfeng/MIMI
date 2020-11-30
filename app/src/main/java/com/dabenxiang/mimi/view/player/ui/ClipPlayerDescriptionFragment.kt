@@ -9,7 +9,6 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.extension.throttleFirst
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
@@ -22,9 +21,7 @@ import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.item_ad.*
 import kotlinx.android.synthetic.main.item_clip_info.*
 import kotlinx.android.synthetic.main.item_video_tag.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.InternalCoroutinesApi
 import java.util.*
 
 class ClipPlayerDescriptionFragment : BaseFragment() {
@@ -66,50 +63,35 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         }
+
+        clipViewModel.updateFollow.observe(viewLifecycleOwner) {
+            updataFollow(!(tv_follow.text != getText(R.string.follow)))
+        }
     }
 
+    @InternalCoroutinesApi
     override fun setupListeners() {
         super.setupListeners()
         tv_follow.setOnClickListener {
-            GlobalScope.launch {
-                flow {
-                    clipViewModel.followPost(viewModel.videoContentId)
-                    updataFollow((it as TextView).text != getText(R.string.follow))
-                    emit(null)
-                }
-                    .throttleFirst(500)
-            }
+            clipViewModel.followPost(clipViewModel.createId, tv_follow.text == getText(R.string.followed))
         }
 
         clip_icon.setOnClickListener {
-            GlobalScope.launch {
-                flow {
-                    clipViewModel.followPost(viewModel.videoContentId)
-                    updataFollow(tv_follow.text != getText(R.string.follow))
-                    emit(null)
-                }
-                    .throttleFirst(500)
-            }
+            clipViewModel.followPost(clipViewModel.createId, tv_follow.text == getText(R.string.followed))
         }
 
         clip_name.setOnClickListener {
-            GlobalScope.launch {
-                flow {
-                    val bundle = MyPostFragment.createBundle(
-                        viewModel.accountManager.getProfile().userId, (it as TextView).text.toString(),
-                        isAdult = true,
-                        isAdultTheme = true
-                    )
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_to_myPostFragment,
-                            bundle
-                        )
-                    )
-                    emit(null)
-                }
-                    .throttleFirst(500)
-            }
+            val bundle = MyPostFragment.createBundle(
+                viewModel.accountManager.getProfile().userId, (it as TextView).text.toString(),
+                isAdult = true,
+                isAdultTheme = true
+            )
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_clipPlayerFragment_to_navigation_my_post,
+                    bundle
+                )
+            )
         }
     }
 
@@ -139,6 +121,8 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
         clip_title.text = adjustmentFormat
 
         setupChipGroup(postItem.tags)
+
+        clipViewModel.createId = postItem.creatorId
     }
 
     private fun updataFollow(isFollow: Boolean) {

@@ -418,11 +418,11 @@ class AdultHomeFragment : BaseFragment() {
             val item: SearchPostItem = when (categoryTypeList[lastPosition]) {
                 CategoryType.HOME -> SearchPostItem(type = PostType.HYBRID)
                 CategoryType.VIDEO_ON_DEMAND -> SearchPostItem(type = PostType.VIDEO_ON_DEMAND)
-                CategoryType.FOLLOW -> SearchPostItem(isPostFollow = true)
+                CategoryType.FOLLOW -> SearchPostItem(type = PostType.FOLLOWED)
                 CategoryType.VIDEO -> SearchPostItem(type = PostType.VIDEO)
                 CategoryType.IMAGE -> SearchPostItem(type = PostType.IMAGE)
                 CategoryType.TEXT -> SearchPostItem(type = PostType.TEXT)
-                else -> SearchPostItem(isClub = true)
+                else -> SearchPostItem()
             }
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
@@ -846,18 +846,18 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onChipClick(type: PostType, tag: String) {
-            val item = when (categoryTypeList[lastPosition]) {
-                CategoryType.FOLLOW -> SearchPostItem(type, tag, true)
-                else -> SearchPostItem(type, tag)
-            }
-
-            val bundle = SearchPostFragment.createBundle(item)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_adultHomeFragment_to_searchPostFragment,
-                    bundle
-                )
-            )
+//            val item = when (categoryTypeList[lastPosition]) {
+//                CategoryType.FOLLOW -> SearchPostItem(type, tag, true)
+//                else -> SearchPostItem(type, tag)
+//            }
+//
+//            val bundle = SearchPostFragment.createBundle(item)
+//            navigateTo(
+//                NavigateItem.Destination(
+//                    R.id.action_adultHomeFragment_to_searchPostFragment,
+//                    bundle
+//                )
+//            )
         }
 
         override fun onAvatarClick(userId: Long, name: String) {

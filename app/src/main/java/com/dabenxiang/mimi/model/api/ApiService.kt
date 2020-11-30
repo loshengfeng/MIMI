@@ -177,6 +177,18 @@ interface ApiService {
     @GET("/v1/Members/Post")
     suspend fun getMembersPost(
         @Query("type") type: Int,
+        @Query("tag") tag: String? = null,
+        @Query("key") keyword: String? = null,
+        @Query("orderBy") orderBy: Int,
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int,
+        @Query("isAdult") isAdult: Boolean = true,
+        @Query("status") status: Int = 1
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
+
+    @GET("/v1/Members/Post")
+    suspend fun getMembersPost(
+        @Query("type") type: Int,
         @Query("offset") offset: Int,
         @Query("limit") limit: Int,
         @Query("isAdult") isAdult: Boolean = true,
@@ -470,6 +482,8 @@ interface ApiService {
 
     @GET("/v1/Members/Me/PostFollow")
     suspend fun getPostFollow(
+        @Query("keyword") keyword: String? = null,
+        @Query("tag") tag: String? = null,
         @Query("offset") offset: Int,
         @Query("limit") limit: Int,
         @Query("status") status: Int = 1

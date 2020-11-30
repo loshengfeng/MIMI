@@ -3,6 +3,8 @@ package com.dabenxiang.mimi.model.enums
 import com.google.gson.annotations.SerializedName
 
 enum class PostType(val value: Int) {
+    FOLLOWED(0),
+
     @SerializedName("1")
     TEXT(1),
 
@@ -24,7 +26,7 @@ enum class PostType(val value: Int) {
 
     companion object {
         fun getTypeByValue(target: Int?): PostType {
-            var result: PostType = TEXT
+            var result: PostType = FOLLOWED
             values().forEach {
                 if (it.value == target) {
                     result = it

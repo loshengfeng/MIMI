@@ -445,8 +445,8 @@ class FavoriteFragment : BaseFragment() {
             } else {
                 val bundle = SearchPostFragment.createBundle(
                     SearchPostItem(
-                        PostType.getTypeByValue(type),
-                        text
+                        type = PostType.getTypeByValue(type),
+                        tag = text
                     )
                 )
                 navigateTo(
