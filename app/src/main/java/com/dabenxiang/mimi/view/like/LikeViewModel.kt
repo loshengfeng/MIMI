@@ -10,6 +10,7 @@ import androidx.paging.cachedIn
 import com.dabenxiang.mimi.callback.MyLikePagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -21,8 +22,8 @@ class LikeViewModel : BaseViewModel() {
     private val _clubCount = MutableLiveData<Int>()
     val clubCount: LiveData<Int> = _clubCount
 
-    private val _memberCount = MutableLiveData<Int>()
-    val memberCount: LiveData<Int> = _memberCount
+    private val _mimiCount = MutableLiveData<Int>()
+    val mimiCount: LiveData<Int> = _mimiCount
 
     private val _clubDetail = MutableLiveData<ApiResult<MemberPostItem>>()
     val clubDetail: LiveData<ApiResult<MemberPostItem>> = _clubDetail
@@ -45,7 +46,7 @@ class LikeViewModel : BaseViewModel() {
     private val _clubIdList = ArrayList<Long>()
     private val _userIdList = ArrayList<Long>()
 
-    fun getMemberList(): Flow<PagingData<MemberPostItem>> {
+    fun getMemberList(): Flow<PagingData<PostFavoriteItem>> {
         return Pager(
             config = PagingConfig(pageSize = MiMiLikeListDataSource.PER_LIMIT.toInt()),
             pagingSourceFactory = {
@@ -59,7 +60,7 @@ class LikeViewModel : BaseViewModel() {
             .cachedIn(viewModelScope)
     }
 
-    fun getClubList(): Flow<PagingData<MemberPostItem>> {
+    fun getClubList(): Flow<PagingData<PostFavoriteItem>> {
         return Pager(
             config = PagingConfig(pageSize = ClubLikeListDataSource.PER_LIMIT.toInt()),
             pagingSourceFactory = {
@@ -68,14 +69,13 @@ class LikeViewModel : BaseViewModel() {
                     clubPagingCallback
                 )
             }
-        )
-            .flow
+        ).flow
             .cachedIn(viewModelScope)
     }
 
     private val memberPagingCallback = object : MyLikePagingCallback {
         override fun onTotalCount(count: Long) {
-            _memberCount.postValue(count.toInt())
+            _mimiCount.postValue(count.toInt())
             _cleanMemberRemovedPosList.postValue(null)
         }
 
@@ -103,8 +103,8 @@ class LikeViewModel : BaseViewModel() {
                 val result = domainManager.getApiRepository().cancelMyMemberFollow(userId)
                 if (!result.isSuccessful) throw HttpException(result)
                 _userIdList.remove(userId)
-                val count = _memberCount.value?.minus(1)
-                _memberCount.postValue(count)
+                val count = _mimiCount.value?.minus(1)
+                _mimiCount.postValue(count)
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
