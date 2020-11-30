@@ -131,6 +131,7 @@
         android:id="@+id/myfavoriteFragment"
         android:name="com.dabenxiang.mimi.view.favroite.FavoriteFragment"
         android:label="FavoriteFragment" />
+
     <fragment
         android:id="@+id/myFollowFragmentV2"
         android:name="com.dabenxiang.mimi.view.myfollow.MyFollowFragmentV2"
