@@ -156,7 +156,7 @@ class PostVideoFragment : BasePostFragment() {
                 bundle
             )
         } else {
-            findNavController().navigate(R.id.action_postVideoFragment_to_adultHomeFragment, bundle)
+            findNavController().navigate(R.id.action_postVideoFragment_to_clubTabFragment, bundle)
         }
     }
 

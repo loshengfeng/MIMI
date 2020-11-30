@@ -132,7 +132,7 @@ class PostPicFragment : BasePostFragment() {
             bundle.putSerializable(SearchPostFragment.KEY_DATA, searchPostItem)
             findNavController().navigate(R.id.action_postPicFragment_to_topicDetailFragment, bundle)
         } else {
-            findNavController().navigate(R.id.action_postPicFragment_to_adultHomeFragment, bundle)
+            findNavController().navigate(R.id.action_postPicFragment_to_clubTabFragment, bundle)
         }
     }
 

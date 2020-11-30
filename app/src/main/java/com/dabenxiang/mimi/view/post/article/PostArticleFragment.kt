@@ -109,7 +109,7 @@ class PostArticleFragment : BasePostFragment() {
             bundle.putSerializable(KEY_DATA, searchPostItem)
             findNavController().navigate(R.id.action_postArticleFragment_to_topicDetailFragment, bundle)
         } else {
-            findNavController().navigate(R.id.action_postArticleFragment_to_adultHomeFragment, bundle)
+            findNavController().navigate(R.id.action_postArticleFragment_to_clubTabFragment, bundle)
         }
     }
 }
