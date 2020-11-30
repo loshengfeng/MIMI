@@ -231,6 +231,10 @@
     <string name="follow_title">我的关注</string>
     <string name="follow_people">关注的人</string>
     <string name="follow_circle">关注的圈子</string>
+    <string-array name="follow_tabs">
+        <item>@string/follow_people</item>
+        <item>@string/follow_circle</item>
+    </string-array>
     <string name="follow_members_total_num">全部关注%s人</string>
     <string name="follow_clubs_total_num">全部关注%s圈子</string>
     <string name="follow_clean">清除</string>

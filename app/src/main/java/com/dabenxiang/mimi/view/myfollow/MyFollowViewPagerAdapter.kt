@@ -80,17 +80,14 @@ class MyFollowViewPagerAdapter(
         return view == obj
     }
 
-    override fun getCount() = 2
+    override fun getCount() = context.resources.getStringArray(R.array.follow_tabs).size
 
     override fun destroyItem(container: ViewGroup, position: Int, obj: Any) {
         container.removeView(obj as View)
     }
 
     override fun getPageTitle(position: Int): CharSequence? {
-        return when (position) {
-            TYPE_MEMBER -> context.getString(R.string.follow_people)
-            TYPE_CLUB -> context.getString(R.string.follow_circle)
-            else -> null
-        }
+        val tabs = context.resources.getStringArray(R.array.follow_tabs)
+        return tabs[position]
     }
 }
