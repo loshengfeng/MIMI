@@ -66,7 +66,9 @@ class ClubTextFragment : BaseFragment() {
             tab.text = title[position]
         }.attach()
 
-        val position = arguments?.getInt(ClubPicFragment.KEY_POSITION, 0)
-        viewPager.currentItem = position!!
+        viewPager.post {
+            val position = arguments?.getInt(ClubPicFragment.KEY_POSITION, 0)
+            viewPager.currentItem = position!!
+        }
     }
 }

@@ -12,6 +12,7 @@ import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_club_text.*
 import kotlinx.android.synthetic.main.fragment_order.viewPager
+import kotlinx.android.synthetic.main.fragment_v2_player.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 
 class ClubPicFragment : BaseFragment() {
@@ -65,7 +66,9 @@ class ClubPicFragment : BaseFragment() {
             tab.text = title[position]
         }.attach()
 
-        val position = arguments?.getInt(KEY_POSITION, 0)
-        viewPager.currentItem = position!!
+        viewPager.post {
+            val position = arguments?.getInt(KEY_POSITION, 0)
+            viewPager.currentItem = position!!
+        }
     }
 }
