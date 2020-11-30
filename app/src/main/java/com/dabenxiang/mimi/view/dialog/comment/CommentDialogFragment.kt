@@ -26,7 +26,7 @@ import kotlinx.android.synthetic.main.fragment_dialog_comment.*
 
 class CommentDialogFragment : BaseDialogFragment() {
 
-    private val viewModel: CommentDialogViewModel by viewModels(
+    private val viewModel: CommentDialogViewModel by viewModels()
     private var data: VideoItem? = null
 
     companion object {
