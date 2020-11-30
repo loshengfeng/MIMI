@@ -47,7 +47,7 @@ class LikeFragment : BaseFragment() {
                 isAdultTheme = true
             )
             navigateTo(
-                NavigateItem.Destination(R.id.action_myFollowFragment_to_navigation_my_post, bundle)
+                NavigateItem.Destination(R.id.action_likeFragment_to_clipPlayerFragment, bundle)
             )
         }
 
@@ -69,7 +69,7 @@ class LikeFragment : BaseFragment() {
                 isAdultTheme = true
             )
             navigateTo(
-                NavigateItem.Destination(R.id.action_myFollowFragment_to_navigation_my_post, bundle)
+                NavigateItem.Destination(R.id.action_likeFragment_to_clipPlayerFragment, bundle)
             )
         }
 
@@ -101,10 +101,10 @@ class LikeFragment : BaseFragment() {
         viewModel.clubDetail.observe(this, Observer {
             when (it) {
                 is Success -> {
-//                    val bundle = TopicDetailFragment.createBundle(it.result)
+//                    val bundle = ClipPlayerFragment.createBundle(0)
 //                    navigateTo(
 //                        NavigateItem.Destination(
-//                            R.id.action_myFollowFragment_to_topicDetailFragment,
+//                            R.id.action_likeFragment_to_clipPlayerFragment,
 //                            bundle
 //                        )
 //                    )
@@ -204,10 +204,6 @@ class LikeFragment : BaseFragment() {
     }
 
     override fun initSettings() {
-        val tabs = resources.getStringArray(R.array.like_tabs)
-        for (i in tabs) {
-            layout_tab.addTab(layout_tab.newTab().setText(i))
-        }
         layout_tab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabReselected(tab: TabLayout.Tab) {
             }

@@ -194,5 +194,4 @@ class LikeViewModel : BaseViewModel() {
 //                .collect { _clubDetail.value = it }
 //        }
 //    }
-
 }
