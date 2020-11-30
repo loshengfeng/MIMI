@@ -13,7 +13,6 @@ import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_PICTURE
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_RECOMMEND
 import com.dabenxiang.mimi.view.club.follow.ClubPostFollowFragment
 import com.dabenxiang.mimi.view.club.item.ClubItemFragment
-import com.dabenxiang.mimi.view.club.pic.ClubPostPicFragment
 
 class ClubTabAdapter(
         fragmentManager: FragmentManager,
