@@ -25,7 +25,7 @@ class MyFollowViewPagerAdapter(
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
         val view = LayoutInflater.from(context)
-            .inflate(R.layout.view_my_follow_pager_content, container, false)
+            .inflate(R.layout.layout_my_follow_content, container, false)
 
         view.rv_content.adapter = when (position) {
             TYPE_MEMBER -> memberFollowAdapter

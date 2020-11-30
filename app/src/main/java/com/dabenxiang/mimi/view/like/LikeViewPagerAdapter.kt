@@ -13,7 +13,7 @@ import com.dabenxiang.mimi.view.adapter.MemberLikeAdapter
 import com.dabenxiang.mimi.view.like.LikeFragment.Companion.NO_DATA
 import com.dabenxiang.mimi.view.like.LikeFragment.Companion.TYPE_MIMI
 import com.dabenxiang.mimi.view.like.LikeFragment.Companion.TYPE_POST
-import kotlinx.android.synthetic.main.view_my_follow_pager_content.view.*
+import kotlinx.android.synthetic.main.layout_my_like_content.view.*
 
 class LikeViewPagerAdapter(
     val context: Context,
@@ -27,7 +27,7 @@ class LikeViewPagerAdapter(
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
         val view = LayoutInflater.from(context)
-            .inflate(R.layout.view_my_follow_pager_content, container, false)
+            .inflate(R.layout.layout_my_like_content, container, false)
 
         view.rv_content.adapter = when (position) {
             TYPE_MIMI -> memberFollowAdapter
