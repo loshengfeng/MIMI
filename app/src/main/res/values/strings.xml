@@ -381,32 +381,41 @@
     <string name="post_video_length_error">影片长度最短为3秒最长为15秒</string>
 
     <!-- Problem report -->
+    <string name="report_item_can_not_play">视频无法播放</string>
+    <string name="report_item_the_same_other">与其他视频相同</string>
+    <string name="report_item_video_title_content_no_match">视频标题与内容不符</string>
+    <string name="report_item_trash_error_content">垃圾内容或误导性内容</string>
+    <string name="report_item_hate_content">仇恨与恶意内容</string>
+    <string name="report_item_harmful_danger">有害的危险行为</string>
+    <string name="report_item_pic_content_no_match">图片与内容不符</string>
+    <string name="report_item_title_content_no_match">标题与内容不符</string>
+
     <string-array name="video_problem_report_item">
-        <item>视频无法播放</item>
-        <item>与其他视频相同</item>
-        <item>视频标题与内容不符</item>
-        <item>垃圾内容或误导性内容</item>
-        <item>仇恨与恶意内容</item>
-        <item>有害的危险行为</item>
+        <item>@string/report_item_can_not_play</item>
+        <item>@string/report_item_the_same_other</item>
+        <item>@string/report_item_video_title_content_no_match</item>
+        <item>@string/report_item_trash_error_content</item>
+        <item>@string/report_item_hate_content</item>
+        <item>@string/report_item_harmful_danger</item>
     </string-array>
 
     <string-array name="video_comment_problem_report_item">
-        <item>垃圾内容或误导性内容</item>
-        <item>仇恨与恶意内容</item>
+        <item>@string/report_item_trash_error_content</item>
+        <item>@string/report_item_hate_content</item>
     </string-array>
 
     <string-array name="picture_problem_report_item">
-        <item>图片与内容不符</item>
-        <item>垃圾内容或误导性内容</item>
-        <item>仇恨与恶意内容</item>
-        <item>有害的危险行为</item>
+        <item>@string/report_item_pic_content_no_match</item>
+        <item>@string/report_item_trash_error_content</item>
+        <item>@string/report_item_hate_content</item>
+        <item>@string/report_item_harmful_danger</item>
     </string-array>
 
     <string-array name="text_problem_report_item">
-        <item>标题与内容不符</item>
-        <item>垃圾内容或误导性内容</item>
-        <item>仇恨与恶意内容</item>
-        <item>有害的危险行为</item>
+        <item>@string/report_item_title_content_no_match</item>
+        <item>@string/report_item_trash_error_content</item>
+        <item>@string/report_item_hate_content</item>
+        <item>@string/report_item_harmful_danger</item>
     </string-array>
 
     <!-- My post -->
